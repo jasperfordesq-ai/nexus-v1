@@ -1151,6 +1151,17 @@
         "65_plus": "65+",
         "unknown": "Onbekend"
       }
+    },
+    "empty_value": "-",
+    "loading": "Analyses laden",
+    "location_marker_title": "{{area}}:{{count}}-leden",
+    "member_count_one": "{{count}}-lid",
+    "member_count_other": "{{count}}-leden",
+    "not_available": "Niet beschikbaar",
+    "errors": {
+      "export_failed": "Kan analyses niet exporteren.",
+      "load_community_failed": "Kan communityanalyses niet laden.",
+      "load_geography_failed": "Kan geografische analyses niet laden."
     }
   },
   "billing": {
@@ -1162,7 +1173,7 @@
     "checkout_failed": "Checkout Failed",
     "checkout_failed_desc": "There was a problem processing your checkout. Please try again.",
     "checkout_success": "Checkout successfully",
-    "checkout_success_desc": "Your subscription has been activated successfully.",
+    "checkout_success_desc": "U gebruikt nu het {{plan}}-abonnement",
     "checkout_success_generic": "Checkout completed successfully",
     "checkout_title": "Checkout",
     "choose_plan": "Choose Plan",
@@ -1270,10 +1281,20 @@
     "upgrade_message": "Upgrade",
     "upgrade_message_placeholder": "Enter upgrade message...",
     "upgrade_sent": "Upgrade sent",
-    "user_count_label": "User Count",
+    "user_count_label": "{{count}} / {{max}} gebruikers",
     "your_plan_usage": "Your Plan Usage",
     "over_limit_warning": "You've reached your plan limits. Upgrade to continue.",
-    "upgrade_modal_desc": "Upgrade your plan to unlock additional features and capacity."
+    "upgrade_modal_desc": "Upgrade your plan to unlock additional features and capacity.",
+    "yearly_suffix": "jr",
+    "action_delegate_granted": "Afgevaardigde toegestaan",
+    "action_delegate_revoked": "Afgevaardigde ingetrokken",
+    "action_grace_period_set": "Respijtperiode ingesteld",
+    "action_plan_assigned": "Plan toegewezen",
+    "action_plan_paused": "Plan onderbroken",
+    "action_plan_resumed": "Plan hervat",
+    "action_unknown": "Onbekende actie",
+    "discount_reason_placeholder": "bijv. liefdadigheidsinstelling geverifieerd, early adopter",
+    "percent_mrr": "% MRR"
   },
   "blog": {
     "an_unexpected_error_occurred": "An unexpected error occurred",
@@ -2034,7 +2055,22 @@
     "type_event": "Event",
     "type_listing": "Listing",
     "type_resource": "Resource",
-    "type_vol_opportunity": "Vol Opportunity"
+    "type_vol_opportunity": "Vol Opportunity",
+    "add_category": "Categorie toevoegen",
+    "create_category": "Categorie aanmaken",
+    "delete_category": "Categorie verwijderen",
+    "delete_confirm_message": "{{name}}verwijderen? Dit kan niet ongedaan worden gemaakt.",
+    "edit_category": "Categorie bewerken",
+    "empty_title": "Geen categorieën beschikbaar",
+    "item_added": "Categorie toegevoegd",
+    "item_deleted": "Categorie verwijderd",
+    "item_updated": "Categorie bijgewerkt",
+    "label_created": "Gemaakt",
+    "label_listings": "Advertenties",
+    "label_slug": "Naaktslak",
+    "listings": "Advertenties",
+    "save_changes": "Wijzigingen opslaan",
+    "search_placeholder": "Categorieën zoeken..."
   },
   "common": {
     "an_unexpected_error": "An unexpected error occurred",
@@ -2080,7 +2116,8 @@
     "save": "Save",
     "select_all": "Select All",
     "select_item": "Select Item",
-    "yes": "Yes"
+    "yes": "Yes",
+    "unknown": "Onbekend"
   },
   "community": {
     "active_matching_users": "Active Matching Users",
@@ -2117,7 +2154,8 @@
     "smart_match_monitoring_desc": "Monitor real-time smart matching activity and match score distribution",
     "smart_match_monitoring_title": "Smart Match Monitoring",
     "smart_match_users_desc": "View and manage users participating in the smart matching system",
-    "smart_match_users_title": "Smart Match Users"
+    "smart_match_users_title": "Smart Match Users",
+    "approval_rate_aria": "Goedkeuringspercentage:{{value}}%"
   },
   "completed": "Completed",
   "config": {
@@ -3437,7 +3475,20 @@
     "edit_title": "Edit",
     "label_edit_deliverable": "Edit Deliverable",
     "update_failed": "Update failed",
-    "updated_success": "Updated succeeded"
+    "updated_success": "Updated succeeded",
+    "activity_by_user_date": "{{action}}door{{user}}-{{date}}",
+    "priority_critical": "Kritisch",
+    "priority_high": "Hoog",
+    "priority_low": "Laag",
+    "priority_medium": "Medium",
+    "risk_critical": "Kritisch",
+    "risk_high": "Hoog",
+    "risk_low": "Laag",
+    "risk_medium": "Medium",
+    "status_completed": "Voltooid",
+    "status_in_progress": "In uitvoering",
+    "status_planned": "Gepland",
+    "status_review": "Ter beoordeling"
   },
   "details": "Details",
   "diagnostics": {
@@ -3461,7 +3512,23 @@
     "score_distribution": "Score Distribution",
     "score_distribution_empty": "No score distribution found",
     "score_factors": "Score Factors",
-    "score_factors_desc": "Score Factors."
+    "score_factors_desc": "Score Factors.",
+    "avg_match_score": "Gem. wedstrijdscore",
+    "cache_entries": "Cache-invoer",
+    "diagnose": "Diagnose",
+    "diagnose_listing_matches": "Diagnose van overeenkomsten tussen vermeldingen",
+    "diagnose_listing_matches_desc": "Voer een vermeldings-ID in om te zien welke gebruikers zijn gematcht en waarom.",
+    "diagnose_user_matches": "Diagnose van gebruikersmatches",
+    "diagnose_user_matches_desc": "Voer een gebruikers-ID in om hun wedstrijdresultaten, scores en de factoren die bijdragen aan elke wedstrijd te bekijken.",
+    "engine_status": "Motorstatus",
+    "factor_community_participation": "Deelname van de gemeenschap",
+    "factor_login_frequency": "Inlogfrequentie",
+    "factor_profile_completeness": "Profielvolledigheid",
+    "factor_review_quality": "Kwaliteit beoordelen",
+    "factor_social_engagement": "Maatschappelijke betrokkenheid",
+    "factor_transaction_activity": "Transactieactiviteit",
+    "matches_today": "Wedstrijden vandaag",
+    "user_prompt": "Voer een gebruikers-ID in en klik op Diagnose om de bijbehorende analyse te bekijken."
   },
   "enterprise": {
     "back_to_roles": "Back to Roles",
@@ -5445,7 +5512,12 @@
     "search": "Search",
     "showing_of_total": "Showing {{count}} of {{total}}",
     "try_adjusting_search": "Try adjusting your search",
-    "yes": "Yes"
+    "yes": "Yes",
+    "progress_complete": "{{percent}}% voltooid",
+    "status_abandoned": "Verlaten",
+    "status_active": "Actief",
+    "status_completed": "Voltooid",
+    "status_unknown": "Onbekend"
   },
   "groups": {
     "activate": "Activate",
@@ -5747,7 +5819,10 @@
     "choose_icon": "Choose Icon",
     "choose_icon_placeholder": "Search for an icon...",
     "clear_icon": "Clear Icon",
-    "search_icons": "Search Icons"
+    "search_icons": "Search Icons",
+    "label": "Icon",
+    "no_icons_found": "Geen iconen gevonden die overeenkomen met \"{{search}}\"",
+    "search_for_icon": "Zoek naar een pictogram..."
   },
   "ideation": {
     "an_unexpected_error_occurred": "An unexpected error occurred",
@@ -5798,7 +5873,17 @@
     "view_details": "View Details",
     "no_challenges_found": "No challenges found found",
     "no_matching_challenges": "No matching challenges found",
-    "no_status_challenges": "No status challenges found"
+    "no_status_challenges": "No status challenges found",
+    "col_created": "Gemaakt",
+    "ideation": "Ideevorming",
+    "status_archived": "Gearchiveerd",
+    "status_closed": "Gesloten",
+    "status_draft": "Voorlopige versie",
+    "status_evaluating": "Evalueren",
+    "status_open": "Open",
+    "status_voting": "Stemmen",
+    "top_matches_for_user_one": "Top{{count}}-match voor{{name}}",
+    "top_matches_for_user_other": "Top{{count}}-wedstrijden voor{{name}}"
   },
   "impact": {
     "chart_activity_breakdown_title": "Activity Breakdown",
@@ -6029,7 +6114,7 @@
     "templates_load_error": "Failed to load templates",
     "templates_delete": "Delete",
     "templates_delete_title": "Delete Template",
-    "templates_delete_confirm": "Are you sure you want to delete this template?",
+    "templates_delete_confirm": "Weet u zeker dat u \"{{name}}\" wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.",
     "templates_delete_error": "Failed to delete template",
     "templates_deleted": "Template deleted",
     "stage_applied": "Applied",
@@ -6064,7 +6149,17 @@
     "type_paid": "Paid",
     "type_volunteer": "Volunteer",
     "type_timebank": "Timebank",
-    "bias_all_jobs_placeholder": "All jobs"
+    "bias_all_jobs_placeholder": "All jobs",
+    "pipeline_status_accepted": "Geaccepteerd",
+    "pipeline_status_cancelled": "Geannuleerd",
+    "pipeline_status_declined": "Afgewezen",
+    "pipeline_status_pending": "In behandeling",
+    "pipeline_status_proposed": "Voorgesteld",
+    "pipeline_status_rejected": "Afgewezen",
+    "pipeline_status_withdrawn": "Ingetrokken",
+    "bias_not_available": "N.v.t",
+    "bias_rejection_rates_table": "Afwijzingspercentages per fase",
+    "bias_avg_time_stage_table": "Gemiddelde tijd in etappe"
   },
   "last_checked": "Last checked: {{time}}",
   "listings": {
@@ -6494,11 +6589,11 @@
     "no_pending_description": "All caught up - no items are waiting for review.",
     "notes_label": "Notes",
     "notes_placeholder": "Add moderation notes...",
-    "posted_by": "Posted by",
+    "posted_by": "Geplaatst door {{name}}",
     "reason_label": "Reason",
     "reason_placeholder": "Enter reason...",
     "reason_required": "A reason is required",
-    "spam_score": "Spam score",
+    "spam_score": "Spamscore: {{score}}",
     "stats": {
       "pending_count": "Pending",
       "flagged_count": "Flagged",
@@ -6510,7 +6605,15 @@
     "flags_tooltip": "Number of moderation flags on this item.",
     "load_error": "Failed to load the moderation queue.",
     "pagination_label": "Moderation queue pagination",
-    "user_fallback": "Unknown user"
+    "user_fallback": "Unknown user",
+    "label_content": "Inhoud",
+    "post_type_event": "Evenement",
+    "post_type_listing": "Lijst",
+    "post_type_post": "Tekstbericht",
+    "post_type_review": "Beoordeling",
+    "reports_meta_description": "Door leden ingediende moderatierapporten beoordelen, oplossen en afwijzen.",
+    "unknown_tenant": "Onbekende huurder",
+    "member_id": "ID:{{id}}"
   },
   "new": "NEW",
   "newsletters": {
@@ -6928,7 +7031,8 @@
     "tab_memory_spikes": "Memory Spikes",
     "tab_request_volume": "Request Volume",
     "tab_slow_queries": "Slow Queries",
-    "tab_slow_requests": "Slow Requests"
+    "tab_slow_requests": "Slow Requests",
+    "refresh": "Vernieuwen"
   },
   "placeholder": {
     "migration_description": "Migrating legacy content to the new system",
@@ -6965,7 +7069,9 @@
     "unknown": "Unknown",
     "votes": "Votes",
     "no_matching_polls": "No matching polls found",
-    "no_polls_found": "No polls found found"
+    "no_polls_found": "No polls found found",
+    "status_active": "Actief",
+    "status_ended": "Beëindigd"
   },
   "quick_actions": {
     "advanced_controls": "Advanced Controls",
@@ -9159,7 +9265,7 @@
     "desc_mark_as_under_investigation": "Mark as Under Investigation",
     "desc_positive_to_credit_negative_to_debit": "Positive to credit, negative to debit the account",
     "desc_required_this_will_be_recorded_in_the_g": "Required. This will be recorded in the general ledger",
-    "download_statement_for": "Download Statement for",
+    "download_statement_for": "Afschrift downloaden voor {{name}}",
     "failed_to_adjust_balance": "Failed to adjust balance",
     "failed_to_grant_credits": "Failed to grant credits",
     "failed_to_load_alerts": "Failed to load alerts",
@@ -9211,7 +9317,20 @@
     "top_earners": "Top Earners",
     "top_spenders": "Top Spenders",
     "user_report_desc": "View a detailed time credit report for an individual member",
-    "user_report_title": "User Report"
+    "user_report_title": "User Report",
+    "severity_critical": "Kritisch",
+    "severity_high": "Hoog",
+    "severity_low": "Laag",
+    "severity_medium": "Medium",
+    "status_dismissed": "Afgewezen",
+    "status_new": "Nieuw",
+    "status_resolved": "Opgelost",
+    "status_reviewing": "Beoordelen",
+    "tab_all": "Alle",
+    "tab_dismissed": "Afgewezen",
+    "tab_new": "Nieuw",
+    "tab_resolved": "Opgelost",
+    "tab_reviewing": "Beoordelen"
   },
   "trends": {
     "card_title": "Trends",
@@ -10581,7 +10700,20 @@
       "suspend": "Opschorten",
       "suspended": "Coupon opgeschort",
       "table_aria": "Koopmanscoupons"
-    }
+    },
+    "col_sales": "Verkoop",
+    "col_rating": "Beoordeling",
+    "filter_all": "Alle",
+    "filter_approved": "Goedgekeurd",
+    "seller_filter_all": "Alle",
+    "seller_filter_private": "Privé",
+    "seller_filter_business": "Bedrijf",
+    "seller_filter_verified": "Geverifieerd",
+    "seller_filter_unverified": "Niet geverifieerd",
+    "filter_flagged": "Gemarkeerd",
+    "filter_pending": "In behandeling",
+    "filter_rejected": "Afgewezen",
+    "verify_business": "Verifieer bedrijf"
   },
   "spam": {
     "title": "Spam Detection",
@@ -10782,7 +10914,8 @@
     "maps_kill_switch_aria": "Map display kill switch (locked off)",
     "map_provider_aria": "Map provider",
     "geocoding_provider_aria": "Autocomplete provider",
-    "clear_failed": "Failed to clear"
+    "clear_failed": "Failed to clear",
+    "google_map_id_placeholder": "kaart-id..."
   },
   "cron_setup": {
     "notice_title": "Important: how cron works on Project NEXUS",
@@ -11003,7 +11136,15 @@
     "remove_confirm_message": "Remove Confirm",
     "remove_from_whitelist": "Remove From Whitelist",
     "view": "View",
-    "whitelisted_tenants_count": "Whitelisted Tenants Count"
+    "whitelisted_tenants_count": "Toegestane tenants ({{count}})",
+    "notes_placeholder": "Voeg opmerkingen toe over waarom deze tenant op de witte lijst staat...",
+    "page_description": "Beheer de lijst met huurders die mogen deelnemen aan federatie.",
+    "page_title": "Witte lijst van de Federatie",
+    "select_tenant_placeholder": "Selecteer een huurder...",
+    "select_tenant_required": "Selecteer een huurder.",
+    "tenant_added_to_whitelist": "Huurder toegevoegd aan de witte lijst",
+    "tenant_removed_from_whitelist": "Huurder verwijderd van witte lijst",
+    "whitelisted_tenants_aria": "Witte lijst huurders"
   },
   "impact_report_labels": {
     "transactions": "Transactions",
@@ -11031,7 +11172,17 @@
     "status_archived": "Archived",
     "status_draft": "Draft",
     "status_published": "Published",
-    "update_document": "Update Document"
+    "update_document": "Update Document",
+    "content": "Inhoud",
+    "content_placeholder": "Voer de documentinhoud in...",
+    "document_content": "Documentinhoud",
+    "document_created": "Document gemaakt",
+    "document_details": "Documentdetails",
+    "document_updated": "Document bijgewerkt",
+    "failed_to_load_document": "Kan document niet laden",
+    "failed_to_save_document": "Kan document niet opslaan",
+    "title_placeholder": "Voer de openbare titel in...",
+    "title_required": "Titel is vereist"
   },
   "legal_versions": {
     "compliance_dashboard": "Compliance Dashboard",
@@ -11055,7 +11206,7 @@
     "filter_application": "Application",
     "filter_cron": "Cron",
     "filter_errors": "Errors",
-    "lines_count": "Lines Count",
+    "lines_count": "{{count}} regels",
     "search_placeholder": "Enter search...",
     "total_files": "Total Files",
     "total_size": "Total Size"
@@ -11114,7 +11265,8 @@
     "total": "Total",
     "tracking_enabled": "Tracking Enabled",
     "view_bounces": "View Bounces",
-    "volume_bonus": "Volume Bonus"
+    "volume_bonus": "Volume Bonus",
+    "system_health": "Systeemgezondheid"
   },
   "newsletter_form": {
     "ab_test_label": "Ab Test",
@@ -11235,13 +11387,48 @@
     "opened": "Opened",
     "preview_recipient_count": "Preview Recipient Count",
     "resend_newsletter": "Resend Newsletter",
-    "total_sent": "Total sent"
+    "total_sent": "Total sent",
+    "cancel": "Annuleren",
+    "loading": "Informatie over opnieuw verzenden laden...",
+    "no_recipients_desc": "Er zijn geen ontvangers die voldoen aan uw selectiecriteria.",
+    "non_clickers": "Niet-klikkers",
+    "non_clickers_count": "{{count}}-ontvanger die heeft geopend maar niet heeft geklikt",
+    "non_clickers_count_plural": "{{count}}-ontvangers die het bericht hebben geopend maar niet hebben geklikt",
+    "non_openers": "Niet-openers",
+    "non_openers_count": "{{count}}-ontvanger die niet heeft geopend",
+    "non_openers_count_plural": "{{count}}-ontvangers die niet hebben geopend",
+    "preview_recipient_count_desc": "Deze nieuwe verzending wordt verzonden naar de{{count}}-ontvanger",
+    "preview_recipient_count_desc_plural": "Deze nieuwe verzending wordt verzonden naar{{count}}-ontvangers",
+    "queue_resend": "Wachtrij Opnieuw verzenden",
+    "resend_to": "Opnieuw verzenden naar",
+    "subject_override": "Onderwerp negeren",
+    "subject_override_desc": "Laat dit veld leeg als u het originele onderwerp wilt gebruiken.",
+    "subject_override_placeholder": "Voer een onderwerpoverschrijving in...",
+    "subtitle": "Stuur deze nieuwsbrief naar een gerichte subset van ontvangers."
   },
   "newsletter_send_time": {
     "engagement_heatmap": "Engagement Heatmap",
     "high": "High",
     "low": "Low",
-    "top_recommended": "Top Recommended"
+    "top_recommended": "Top Recommended",
+    "day_friday": "Vr",
+    "day_monday": "ma",
+    "day_saturday": "Zat",
+    "day_sunday": "Zon",
+    "day_thursday": "Do",
+    "day_tuesday": "di",
+    "day_wednesday": "wo",
+    "days": "{{count}}dagen",
+    "description": "Vind het beste tijdstip om elke campagne te verzenden op basis van recente betrokkenheid.",
+    "empty_hint": "Stuur een paar nieuwsbrieven om betrokkenheidspatronen bloot te leggen.",
+    "engagements": "verplichtingen",
+    "heatmap_cell_title": "{{day}}{{hour}}:{{count}}-betrokkenheid",
+    "heatmap_cell_title_one": "{{day}}{{hour}}:{{count}}-betrokkenheid",
+    "heatmap_cell_title_other": "{{day}}{{hour}}:{{count}}-opdrachten",
+    "loading_heatmap": "Warmtekaart laden...",
+    "not_enough_data": "Nog niet voldoende betrokkenheidsgegevens.",
+    "time_period": "Tijdsperiode",
+    "title": "Verzend tijdoptimalisatie"
   },
   "newsletter_template_form": {
     "content": "Content",
@@ -11282,14 +11469,31 @@
     "notice_title_placeholder": "Enter notice title...",
     "preview": "Preview",
     "preview_title_placeholder": "Enter preview title...",
-    "split_view": "Split View"
+    "split_view": "Split View",
+    "start_writing": "Begin met schrijven..."
   },
   "seed_generator": {
-    "count_aria_label": "Count Aria",
+    "count_aria_label": "Aantal {{label}}",
     "data_types_heading": "Data Types",
     "development_only": "Development Only",
     "generate_button": "Generate",
-    "warning_body": "Warning Body"
+    "warning_body": "Warning Body",
+    "option_users_label": "Gebruikers",
+    "option_users_desc": "Genereer voorbeeldlidaccounts",
+    "option_listings_label": "Advertenties",
+    "option_listings_desc": "Genereer voorbeeldaanbiedingen en -aanvragen",
+    "option_transactions_label": "Transacties",
+    "option_transactions_desc": "Genereer voorbeelden van tijdskrediettransacties",
+    "option_feed_posts_label": "Feedposts",
+    "option_feed_posts_desc": "Genereer voorbeelden van communityfeedposts",
+    "option_events_label": "Evenementen",
+    "option_events_desc": "Genereer voorbeeldgemeenschapsevenementen",
+    "option_groups_label": "Groepen",
+    "option_groups_desc": "Voorbeeldgroepen genereren",
+    "option_messages_label": "Berichten",
+    "option_messages_desc": "Genereer voorbeeldberichten van leden",
+    "option_badges_label": "Insignes",
+    "option_badges_desc": "Genereer voorbeeldbadges"
   },
   "segment_form": {
     "analyzing_member_data": "Analyzing Member Data",
@@ -11378,7 +11582,15 @@
     "no_members_found": "No members found found",
     "no_recent_broker_activity": "No recent broker activity found",
     "quick_access": "Quick Access",
-    "recent_activity": "Recent Activity"
+    "recent_activity": "Recent Activity",
+    "no_data": "Geen gegevens",
+    "no_data_available": "Geen gegevens beschikbaar",
+    "open_page_help": "Helppagina openen",
+    "help": "Hulp",
+    "refresh": "Vernieuwen",
+    "search": "Zoekopdracht...",
+    "data_table": "Gegevens",
+    "total_count": "{{count}}totaal"
   },
   "subtitle": "Subtitle",
   "super_controls": {
@@ -12587,7 +12799,8 @@
     },
     "errors": {
       "load_failed": "Failed to load alerts",
-      "send_failed": "Failed to send alert"
+      "send_failed": "Failed to send alert",
+      "deactivate_failed": "Het deactiveren van de waarschuwing is mislukt"
     },
     "severity": {
       "info": "Info",
@@ -12609,7 +12822,8 @@
       "sent": "Sent"
     },
     "status": {
-      "inactive": "Inactive"
+      "inactive": "Inactive",
+      "active": "Actief"
     },
     "modal": {
       "title": "Send emergency alert"
@@ -12625,6 +12839,15 @@
       "confirm_prefix": "This will immediately push to",
       "confirm_audience": "all active members",
       "confirm_suffix": "and display a persistent banner on all pages. I confirm this is a genuine emergency."
+    },
+    "heading": "Noodwaarschuwingen",
+    "intro": {
+      "title": "Over deze pagina - wees voorzichtig",
+      "body": "Noodwaarschuwingen zijn urgente uitzendingen die onmiddellijk naar alle leden (of een gerichte subgroep) worden verzonden. Gebruik dit alleen voor echte noodsituaties - zwaar weer, veiligheidsincidenten in de gemeenschap of lacunes in de dekking van urgente zorg. Waarschuwingen worden verzonden als pushmeldingen en in-app-banners. Zodra ze zijn verzonden, kunnen ze niet meer ongedaan worden gemaakt.",
+      "targeting_label": "Targeting",
+      "targeting_body": "Als u de ernst selecteert, wordt \"Gevaar\" of \"Waarschuwing\" naar alle leden verzonden. Zorgvuldig opstellen: eenmaal uitgezonden is er geen terugroepactie meer.",
+      "delivery_label": "Levering",
+      "delivery_body": "Waarschuwingen worden binnen 60 seconden na verzending afgeleverd."
     }
   },
   "admin": {
@@ -16571,5 +16794,79 @@
     "unsuppress": "Onderdruk opheffen",
     "unsuppress_confirm": "{{email}}verwijderen uit de onderdrukkingslijst zodat het weer nieuwsbrieven kan ontvangen?",
     "unsuppress_title": "Hef het onderdrukken van e-mail op"
+  },
+  "integration_showcase": {
+    "meta": {
+      "page_title": "Integratieshow",
+      "title": "Integratieshow",
+      "subtitle": "Een verwijzing op één pagina van elk openbaar API-, webhook-, federatie-eindpunt en OAuth-oppervlak dat beschikbaar is in deze implementatie - klaar om te overhandigen aan een technische integratiepartner."
+    },
+    "actions": {
+      "refresh": "Vernieuwen",
+      "refresh_aria": "Vernieuw de integratieshowcase"
+    },
+    "about": {
+      "title": "Over deze pagina",
+      "body": "Gebruik deze pagina bij het opzetten van een integratie met een dienst van derden, het datasysteem van een gemeente of een federatief NEXUS-netwerk. Elk hier vermeld eindpunt is live en gericht op deze implementatie. Voorbeeldpayloads zijn ter illustratie: de echte waarden zijn afhankelijk van uw tenant-slug en partnerreferenties. Deel deze URL met integratiepartners in plaats van hen naar de onbewerkte API-documenten te verwijzen.",
+      "last_refreshed": "Laatst vernieuwd{{date}}."
+    },
+    "sections": {
+      "sample_request": "Monsteraanvraag",
+      "read_full_spec": "Lees de volledige specificaties op GitHub"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "toasts": {
+      "load_failed": "Kan integratieshowcase niet laden"
+    }
+  },
+  "admin_help": {
+    "page_title": "Helpcentrum",
+    "title": "Helpcentrum voor beheerders",
+    "description": "Vind begeleiding voor elke pagina in het beheerdersdashboard. Klik op een artikel om naar die pagina te gaan - a ? knop opent contextuele hulp.",
+    "search_placeholder": "Help-artikelen voor{{count}}zoeken...",
+    "search_aria": "Help-artikelen zoeken",
+    "no_matches": "Er zijn geen artikelen die overeenkomen met uw zoekopdracht.",
+    "view_help": "Hulp bekijken",
+    "categories": {
+      "general_admin": "Algemeen beheerder",
+      "caring_community": "Zorgzame gemeenschap",
+      "kiss_agoris": "KUS & AGORIS"
+    }
+  },
+  "newsletter_segments": {
+    "col_created": "Gemaakt",
+    "col_members": "Leden",
+    "col_status": "Status",
+    "create_first_segment": "Maak uw eerste segment",
+    "delete_confirm": "Het segment \"{{name}}\" verwijderen? Campagnes die hiervan gebruikmaken, kunnen deze doelgroep niet langer targeten.",
+    "delete_confirm_label": "Segment verwijderen",
+    "delete_title": "Segment verwijderen",
+    "description": "Creëer herbruikbare doelgroepsegmenten voor gerichte nieuwsbriefcampagnes.",
+    "empty_description": "Bouw een doelgroepsegment om leden te targeten op activiteit, profielvelden of nieuwsbriefgedrag.",
+    "empty_title": "Nog geen segmenten",
+    "match_all": "Alle regels (EN)",
+    "match_any": "Elke regel (OF)",
+    "title": "Segmenten"
+  },
+  "newsletter_templates": {
+    "category_custom": "Aangepast",
+    "category_saved": "Opgeslagen",
+    "category_starter": "Starter",
+    "col_created": "Gemaakt",
+    "col_status": "Status",
+    "col_template_name": "Sjabloonnaam",
+    "delete_confirm": "De sjabloon \"{{name}}\" verwijderen? Dit kan niet ongedaan worden gemaakt.",
+    "delete_confirm_label": "Sjabloon verwijderen",
+    "delete_title": "Sjabloon verwijderen",
+    "description": "Creëer en beheer herbruikbare e-mailsjablonen voor nieuwsbriefcampagnes.",
+    "empty_description": "Maak herbruikbare sjablonen om het maken van toekomstige campagnes te versnellen.",
+    "empty_title": "Nog geen sjablonen",
+    "failed_to_delete_template": "Kan sjabloon niet verwijderen.",
+    "failed_to_duplicate_template": "Kan de sjabloon niet dupliceren.",
+    "template_deleted": "Sjabloon verwijderd.",
+    "template_duplicated": "Sjabloon gedupliceerd.",
+    "title": "Sjablonen"
   }
 }

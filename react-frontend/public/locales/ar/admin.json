@@ -1151,6 +1151,17 @@
         "65_plus": "65+",
         "unknown": "مجهول"
       }
+    },
+    "empty_value": "-",
+    "loading": "جارٍ تحميل التحليلات",
+    "location_marker_title": "{{area}}: أعضاء{{count}}",
+    "member_count_one": "عضو{{count}}",
+    "member_count_other": "أعضاء{{count}}",
+    "not_available": "غير متوفر",
+    "errors": {
+      "export_failed": "فشل تصدير التحليلات.",
+      "load_community_failed": "فشل في تحميل تحليلات المجتمع.",
+      "load_geography_failed": "فشل تحميل التحليلات الجغرافية."
     }
   },
   "billing": {
@@ -1162,7 +1173,7 @@
     "checkout_failed": "Checkout Failed",
     "checkout_failed_desc": "There was a problem processing your checkout. Please try again.",
     "checkout_success": "Checkout successfully",
-    "checkout_success_desc": "Your subscription has been activated successfully.",
+    "checkout_success_desc": "??? ???? ??? ??? {{plan}}",
     "checkout_success_generic": "Checkout completed successfully",
     "checkout_title": "Checkout",
     "choose_plan": "Choose Plan",
@@ -1270,10 +1281,20 @@
     "upgrade_message": "Upgrade",
     "upgrade_message_placeholder": "Enter upgrade message...",
     "upgrade_sent": "Upgrade sent",
-    "user_count_label": "User Count",
+    "user_count_label": "{{count}} / {{max}} ????????",
     "your_plan_usage": "Your Plan Usage",
     "over_limit_warning": "You've reached your plan limits. Upgrade to continue.",
-    "upgrade_modal_desc": "Upgrade your plan to unlock additional features and capacity."
+    "upgrade_modal_desc": "Upgrade your plan to unlock additional features and capacity.",
+    "yearly_suffix": "سنة",
+    "action_delegate_granted": "تم منح التفويض",
+    "action_delegate_revoked": "تم إبطال المندوب",
+    "action_grace_period_set": "تم تحديد فترة السماح",
+    "action_plan_assigned": "تم تعيين الخطة",
+    "action_plan_paused": "توقفت الخطة مؤقتًا",
+    "action_plan_resumed": "تم استئناف الخطة",
+    "action_unknown": "عمل غير معروف",
+    "discount_reason_placeholder": "على سبيل المثال تم التحقق من الأعمال الخيرية، المتبني المبكر",
+    "percent_mrr": "% معدل الوفيات"
   },
   "blog": {
     "an_unexpected_error_occurred": "An unexpected error occurred",
@@ -2034,7 +2055,22 @@
     "type_event": "Event",
     "type_listing": "Listing",
     "type_resource": "Resource",
-    "type_vol_opportunity": "Vol Opportunity"
+    "type_vol_opportunity": "Vol Opportunity",
+    "add_category": "أضف فئة",
+    "create_category": "إنشاء فئة",
+    "delete_category": "حذف الفئة",
+    "delete_confirm_message": "حذف{{name}}؟ لا يمكن التراجع عن هذا.",
+    "edit_category": "تحرير الفئة",
+    "empty_title": "لا توجد فئات متاحة",
+    "item_added": "تمت إضافة الفئة",
+    "item_deleted": "تم حذف الفئة",
+    "item_updated": "تم تحديث الفئة",
+    "label_created": "مخلوق",
+    "label_listings": "القوائم",
+    "label_slug": "سبيكة",
+    "listings": "القوائم",
+    "save_changes": "حفظ التغييرات",
+    "search_placeholder": "فئات البحث..."
   },
   "common": {
     "an_unexpected_error": "An unexpected error occurred",
@@ -2080,7 +2116,8 @@
     "save": "Save",
     "select_all": "Select All",
     "select_item": "Select Item",
-    "yes": "Yes"
+    "yes": "Yes",
+    "unknown": "مجهول"
   },
   "community": {
     "active_matching_users": "Active Matching Users",
@@ -2117,7 +2154,8 @@
     "smart_match_monitoring_desc": "Monitor real-time smart matching activity and match score distribution",
     "smart_match_monitoring_title": "Smart Match Monitoring",
     "smart_match_users_desc": "View and manage users participating in the smart matching system",
-    "smart_match_users_title": "Smart Match Users"
+    "smart_match_users_title": "Smart Match Users",
+    "approval_rate_aria": "معدل الموافقة:{{value}}%"
   },
   "completed": "Completed",
   "config": {
@@ -3437,7 +3475,20 @@
     "edit_title": "Edit",
     "label_edit_deliverable": "Edit Deliverable",
     "update_failed": "Update failed",
-    "updated_success": "Updated succeeded"
+    "updated_success": "Updated succeeded",
+    "activity_by_user_date": "{{action}}بواسطة{{user}}-{{date}}",
+    "priority_critical": "شديد الأهمية",
+    "priority_high": "عالي",
+    "priority_low": "قليل",
+    "priority_medium": "واسطة",
+    "risk_critical": "شديد الأهمية",
+    "risk_high": "عالي",
+    "risk_low": "قليل",
+    "risk_medium": "واسطة",
+    "status_completed": "مكتمل",
+    "status_in_progress": "في تَقَدم",
+    "status_planned": "المخطط لها",
+    "status_review": "قيد المراجعة"
   },
   "details": "Details",
   "diagnostics": {
@@ -3461,7 +3512,23 @@
     "score_distribution": "Score Distribution",
     "score_distribution_empty": "No score distribution found",
     "score_factors": "Score Factors",
-    "score_factors_desc": "Score Factors."
+    "score_factors_desc": "Score Factors.",
+    "avg_match_score": "متوسط ​​نتيجة المباراة",
+    "cache_entries": "إدخالات ذاكرة التخزين المؤقت",
+    "diagnose": "تشخيص",
+    "diagnose_listing_matches": "تشخيص تطابقات القائمة",
+    "diagnose_listing_matches_desc": "أدخل معرف القائمة لمعرفة المستخدمين الذين تمت مطابقتهم ولماذا.",
+    "diagnose_user_matches": "تشخيص تطابقات المستخدم",
+    "diagnose_user_matches_desc": "أدخل معرف المستخدم لرؤية نتائج المباريات والنتائج والعوامل المساهمة في كل مباراة.",
+    "engine_status": "حالة المحرك",
+    "factor_community_participation": "المشاركة المجتمعية",
+    "factor_login_frequency": "تردد تسجيل الدخول",
+    "factor_profile_completeness": "اكتمال الملف الشخصي",
+    "factor_review_quality": "مراجعة الجودة",
+    "factor_social_engagement": "المشاركة الاجتماعية",
+    "factor_transaction_activity": "نشاط المعاملات",
+    "matches_today": "مباريات اليوم",
+    "user_prompt": "أدخل معرف المستخدم وانقر فوق تشخيص لرؤية تحليل المطابقة."
   },
   "enterprise": {
     "back_to_roles": "Back to Roles",
@@ -5445,7 +5512,12 @@
     "search": "Search",
     "showing_of_total": "Showing {{count}} of {{total}}",
     "try_adjusting_search": "Try adjusting your search",
-    "yes": "Yes"
+    "yes": "Yes",
+    "progress_complete": "{{percent}}% مكتمل",
+    "status_abandoned": "متروك",
+    "status_active": "نشيط",
+    "status_completed": "مكتمل",
+    "status_unknown": "مجهول"
   },
   "groups": {
     "activate": "Activate",
@@ -5747,7 +5819,10 @@
     "choose_icon": "Choose Icon",
     "choose_icon_placeholder": "Search for an icon...",
     "clear_icon": "Clear Icon",
-    "search_icons": "Search Icons"
+    "search_icons": "Search Icons",
+    "label": "رمز",
+    "no_icons_found": "لم يتم العثور على أيقونات مطابقة لـ \"{{search}}\"",
+    "search_for_icon": "ابحث عن أيقونة..."
   },
   "ideation": {
     "an_unexpected_error_occurred": "An unexpected error occurred",
@@ -5798,7 +5873,17 @@
     "view_details": "View Details",
     "no_challenges_found": "No challenges found found",
     "no_matching_challenges": "No matching challenges found",
-    "no_status_challenges": "No status challenges found"
+    "no_status_challenges": "No status challenges found",
+    "col_created": "مخلوق",
+    "ideation": "التفكير",
+    "status_archived": "مؤرشف",
+    "status_closed": "مغلق",
+    "status_draft": "مسودة",
+    "status_evaluating": "تقييم",
+    "status_open": "يفتح",
+    "status_voting": "التصويت",
+    "top_matches_for_user_one": "أفضل تطابق لـ{{count}}لـ{{name}}",
+    "top_matches_for_user_other": "أهم مباريات{{count}}لـ{{name}}"
   },
   "impact": {
     "chart_activity_breakdown_title": "Activity Breakdown",
@@ -6029,7 +6114,7 @@
     "templates_load_error": "Failed to load templates",
     "templates_delete": "Delete",
     "templates_delete_title": "Delete Template",
-    "templates_delete_confirm": "Are you sure you want to delete this template?",
+    "templates_delete_confirm": "?? ??? ????? ?? ??? \"{{name}}\"? ?? ???? ??????? ?? ??? ???????.",
     "templates_delete_error": "Failed to delete template",
     "templates_deleted": "Template deleted",
     "stage_applied": "Applied",
@@ -6064,7 +6149,17 @@
     "type_paid": "Paid",
     "type_volunteer": "Volunteer",
     "type_timebank": "Timebank",
-    "bias_all_jobs_placeholder": "All jobs"
+    "bias_all_jobs_placeholder": "All jobs",
+    "pipeline_status_accepted": "مقبول",
+    "pipeline_status_cancelled": "تم الإلغاء",
+    "pipeline_status_declined": "انخفض",
+    "pipeline_status_pending": "قيد الانتظار",
+    "pipeline_status_proposed": "مقترح",
+    "pipeline_status_rejected": "مرفوض",
+    "pipeline_status_withdrawn": "انسحبت",
+    "bias_not_available": "لا يوجد",
+    "bias_rejection_rates_table": "معدلات الرفض حسب المرحلة",
+    "bias_avg_time_stage_table": "متوسط ​​الوقت في المرحلة"
   },
   "last_checked": "Last checked: {{time}}",
   "listings": {
@@ -6494,11 +6589,11 @@
     "no_pending_description": "All caught up - no items are waiting for review.",
     "notes_label": "Notes",
     "notes_placeholder": "Add moderation notes...",
-    "posted_by": "Posted by",
+    "posted_by": "??? ?????? {{name}}",
     "reason_label": "Reason",
     "reason_placeholder": "Enter reason...",
     "reason_required": "A reason is required",
-    "spam_score": "Spam score",
+    "spam_score": "???? ??????? ???????: {{score}}",
     "stats": {
       "pending_count": "Pending",
       "flagged_count": "Flagged",
@@ -6510,7 +6605,15 @@
     "flags_tooltip": "Number of moderation flags on this item.",
     "load_error": "Failed to load the moderation queue.",
     "pagination_label": "Moderation queue pagination",
-    "user_fallback": "Unknown user"
+    "user_fallback": "Unknown user",
+    "label_content": "محتوى",
+    "post_type_event": "حدث",
+    "post_type_listing": "قائمة",
+    "post_type_post": "مشاركة نصية",
+    "post_type_review": "مراجعة",
+    "reports_meta_description": "مراجعة تقارير الإشراف المقدمة من الأعضاء وحلها ورفضها.",
+    "unknown_tenant": "مستأجر غير معروف",
+    "member_id": "المعرف:{{id}}"
   },
   "new": "NEW",
   "newsletters": {
@@ -6928,7 +7031,8 @@
     "tab_memory_spikes": "Memory Spikes",
     "tab_request_volume": "Request Volume",
     "tab_slow_queries": "Slow Queries",
-    "tab_slow_requests": "Slow Requests"
+    "tab_slow_requests": "Slow Requests",
+    "refresh": "ينعش"
   },
   "placeholder": {
     "migration_description": "Migrating legacy content to the new system",
@@ -6965,7 +7069,9 @@
     "unknown": "Unknown",
     "votes": "Votes",
     "no_matching_polls": "No matching polls found",
-    "no_polls_found": "No polls found found"
+    "no_polls_found": "No polls found found",
+    "status_active": "نشيط",
+    "status_ended": "انتهى"
   },
   "quick_actions": {
     "advanced_controls": "Advanced Controls",
@@ -9159,7 +9265,7 @@
     "desc_mark_as_under_investigation": "Mark as Under Investigation",
     "desc_positive_to_credit_negative_to_debit": "Positive to credit, negative to debit the account",
     "desc_required_this_will_be_recorded_in_the_g": "Required. This will be recorded in the general ledger",
-    "download_statement_for": "Download Statement for",
+    "download_statement_for": "????? ??? ?????? ?? {{name}}",
     "failed_to_adjust_balance": "Failed to adjust balance",
     "failed_to_grant_credits": "Failed to grant credits",
     "failed_to_load_alerts": "Failed to load alerts",
@@ -9211,7 +9317,20 @@
     "top_earners": "Top Earners",
     "top_spenders": "Top Spenders",
     "user_report_desc": "View a detailed time credit report for an individual member",
-    "user_report_title": "User Report"
+    "user_report_title": "User Report",
+    "severity_critical": "شديد الأهمية",
+    "severity_high": "عالي",
+    "severity_low": "قليل",
+    "severity_medium": "واسطة",
+    "status_dismissed": "مرفوض",
+    "status_new": "جديد",
+    "status_resolved": "تم الحل",
+    "status_reviewing": "مراجعة",
+    "tab_all": "الجميع",
+    "tab_dismissed": "مرفوض",
+    "tab_new": "جديد",
+    "tab_resolved": "تم الحل",
+    "tab_reviewing": "مراجعة"
   },
   "trends": {
     "card_title": "Trends",
@@ -10581,7 +10700,20 @@
       "suspend": "تعليق",
       "suspended": "القسيمة معلقة",
       "table_aria": "كوبونات التاجر"
-    }
+    },
+    "col_sales": "مبيعات",
+    "col_rating": "تصنيف",
+    "filter_all": "الجميع",
+    "filter_approved": "موافقة",
+    "seller_filter_all": "الجميع",
+    "seller_filter_private": "خاص",
+    "seller_filter_business": "عمل",
+    "seller_filter_verified": "تم التحقق منه",
+    "seller_filter_unverified": "لم يتم التحقق منها",
+    "filter_flagged": "تم وضع علامة عليها",
+    "filter_pending": "قيد الانتظار",
+    "filter_rejected": "مرفوض",
+    "verify_business": "التحقق من الأعمال"
   },
   "spam": {
     "title": "Spam Detection",
@@ -10782,7 +10914,8 @@
     "maps_kill_switch_aria": "Map display kill switch (locked off)",
     "map_provider_aria": "Map provider",
     "geocoding_provider_aria": "Autocomplete provider",
-    "clear_failed": "Failed to clear"
+    "clear_failed": "Failed to clear",
+    "google_map_id_placeholder": "معرف الخريطة..."
   },
   "cron_setup": {
     "notice_title": "Important: how cron works on Project NEXUS",
@@ -11003,7 +11136,15 @@
     "remove_confirm_message": "Remove Confirm",
     "remove_from_whitelist": "Remove From Whitelist",
     "view": "View",
-    "whitelisted_tenants_count": "Whitelisted Tenants Count"
+    "whitelisted_tenants_count": "?????????? ?? ??????? ??????? ({{count}})",
+    "notes_placeholder": "أضف ملاحظات حول سبب إدراج هذا المستأجر في القائمة البيضاء...",
+    "page_description": "إدارة قائمة المستأجرين المسموح لهم بالمشاركة في الاتحاد.",
+    "page_title": "القائمة البيضاء للاتحاد",
+    "select_tenant_placeholder": "اختيار المستأجر...",
+    "select_tenant_required": "الرجاء اختيار المستأجر.",
+    "tenant_added_to_whitelist": "تمت إضافة المستأجر إلى القائمة البيضاء",
+    "tenant_removed_from_whitelist": "تمت إزالة المستأجر من القائمة البيضاء",
+    "whitelisted_tenants_aria": "المستأجرين المدرجين في القائمة البيضاء"
   },
   "impact_report_labels": {
     "transactions": "Transactions",
@@ -11031,7 +11172,17 @@
     "status_archived": "Archived",
     "status_draft": "Draft",
     "status_published": "Published",
-    "update_document": "Update Document"
+    "update_document": "Update Document",
+    "content": "محتوى",
+    "content_placeholder": "أدخل محتوى الوثيقة...",
+    "document_content": "محتوى الوثيقة",
+    "document_created": "تم إنشاء المستند",
+    "document_details": "تفاصيل الوثيقة",
+    "document_updated": "تم تحديث الوثيقة",
+    "failed_to_load_document": "فشل تحميل المستند",
+    "failed_to_save_document": "فشل حفظ المستند",
+    "title_placeholder": "أدخل العنوان العام...",
+    "title_required": "العنوان مطلوب"
   },
   "legal_versions": {
     "compliance_dashboard": "Compliance Dashboard",
@@ -11055,7 +11206,7 @@
     "filter_application": "Application",
     "filter_cron": "Cron",
     "filter_errors": "Errors",
-    "lines_count": "Lines Count",
+    "lines_count": "{{count}} ????",
     "search_placeholder": "Enter search...",
     "total_files": "Total Files",
     "total_size": "Total Size"
@@ -11114,7 +11265,8 @@
     "total": "Total",
     "tracking_enabled": "Tracking Enabled",
     "view_bounces": "View Bounces",
-    "volume_bonus": "Volume Bonus"
+    "volume_bonus": "Volume Bonus",
+    "system_health": "صحة النظام"
   },
   "newsletter_form": {
     "ab_test_label": "Ab Test",
@@ -11235,13 +11387,48 @@
     "opened": "Opened",
     "preview_recipient_count": "Preview Recipient Count",
     "resend_newsletter": "Resend Newsletter",
-    "total_sent": "Total sent"
+    "total_sent": "Total sent",
+    "cancel": "يلغي",
+    "loading": "جارٍ تحميل معلومات إعادة الإرسال...",
+    "no_recipients_desc": "لا يوجد مستلمون مطابقون لمعايير التحديد الخاصة بك.",
+    "non_clickers": "غير النقرات",
+    "non_clickers_count": "{{count}}المستلم الذي فتح ولكن لم ينقر",
+    "non_clickers_count_plural": "{{count}}المستلمون الذين فتحوا ولكن لم ينقروا",
+    "non_openers": "غير الفتاحات",
+    "non_openers_count": "{{count}}المستلم الذي لم يفتح",
+    "non_openers_count_plural": "{{count}}المستلمين الذين لم يفتحوا",
+    "preview_recipient_count_desc": "سيتم إرسال إعادة الإرسال هذه إلى مستلم{{count}}",
+    "preview_recipient_count_desc_plural": "سيتم إرسال إعادة الإرسال هذه إلى مستلمي{{count}}",
+    "queue_resend": "إعادة إرسال قائمة الانتظار",
+    "resend_to": "إعادة الإرسال إلى",
+    "subject_override": "تجاوز الموضوع",
+    "subject_override_desc": "اتركه فارغا لاستخدام الموضوع الأصلي.",
+    "subject_override_placeholder": "أدخل تجاوز الموضوع...",
+    "subtitle": "أرسل هذه الرسالة الإخبارية إلى مجموعة فرعية مستهدفة من المستلمين."
   },
   "newsletter_send_time": {
     "engagement_heatmap": "Engagement Heatmap",
     "high": "High",
     "low": "Low",
-    "top_recommended": "Top Recommended"
+    "top_recommended": "Top Recommended",
+    "day_friday": "الجمعة",
+    "day_monday": "الاثنين",
+    "day_saturday": "قعد",
+    "day_sunday": "شمس",
+    "day_thursday": "الخميس",
+    "day_tuesday": "الثلاثاء",
+    "day_wednesday": "تزوج",
+    "days": "أيام{{count}}",
+    "description": "ابحث عن أفضل وقت لإرسال كل حملة بناءً على المشاركة الأخيرة.",
+    "empty_hint": "أرسل بعض الرسائل الإخبارية للكشف عن أنماط المشاركة.",
+    "engagements": "التعاقدات",
+    "heatmap_cell_title": "{{day}}{{hour}}: مشاركة{{count}}",
+    "heatmap_cell_title_one": "{{day}}{{hour}}: مشاركة{{count}}",
+    "heatmap_cell_title_other": "{{day}}{{hour}}: مشاركات{{count}}",
+    "loading_heatmap": "جارٍ تحميل الخريطة الحرارية...",
+    "not_enough_data": "لا توجد بيانات مشاركة كافية حتى الآن.",
+    "time_period": "الفترة الزمنية",
+    "title": "إرسال محسن الوقت"
   },
   "newsletter_template_form": {
     "content": "Content",
@@ -11282,14 +11469,31 @@
     "notice_title_placeholder": "Enter notice title...",
     "preview": "Preview",
     "preview_title_placeholder": "Enter preview title...",
-    "split_view": "Split View"
+    "split_view": "Split View",
+    "start_writing": "ابدأ بالكتابة..."
   },
   "seed_generator": {
-    "count_aria_label": "Count Aria",
+    "count_aria_label": "??? {{label}}",
     "data_types_heading": "Data Types",
     "development_only": "Development Only",
     "generate_button": "Generate",
-    "warning_body": "Warning Body"
+    "warning_body": "Warning Body",
+    "option_users_label": "المستخدمين",
+    "option_users_desc": "إنشاء نماذج حسابات الأعضاء",
+    "option_listings_label": "القوائم",
+    "option_listings_desc": "إنشاء عروض وطلبات عينة",
+    "option_transactions_label": "المعاملات",
+    "option_transactions_desc": "إنشاء نموذج لمعاملات الائتمان الزمني",
+    "option_feed_posts_label": "منشورات الخلاصة",
+    "option_feed_posts_desc": "قم بإنشاء نماذج منشورات خلاصة المجتمع",
+    "option_events_label": "الأحداث",
+    "option_events_desc": "توليد أحداث المجتمع عينة",
+    "option_groups_label": "المجموعات",
+    "option_groups_desc": "توليد مجموعات العينة",
+    "option_messages_label": "رسائل",
+    "option_messages_desc": "إنشاء نماذج لرسائل الأعضاء",
+    "option_badges_label": "شارات",
+    "option_badges_desc": "إنشاء نماذج لجوائز الشارة"
   },
   "segment_form": {
     "analyzing_member_data": "Analyzing Member Data",
@@ -11378,7 +11582,15 @@
     "no_members_found": "No members found found",
     "no_recent_broker_activity": "No recent broker activity found",
     "quick_access": "Quick Access",
-    "recent_activity": "Recent Activity"
+    "recent_activity": "Recent Activity",
+    "no_data": "لا توجد بيانات",
+    "no_data_available": "لا توجد بيانات متاحة",
+    "open_page_help": "افتح صفحة المساعدة",
+    "help": "يساعد",
+    "refresh": "ينعش",
+    "search": "يبحث...",
+    "data_table": "بيانات",
+    "total_count": "إجمالي{{count}}"
   },
   "subtitle": "Subtitle",
   "super_controls": {
@@ -12587,7 +12799,8 @@
     },
     "errors": {
       "load_failed": "Failed to load alerts",
-      "send_failed": "Failed to send alert"
+      "send_failed": "Failed to send alert",
+      "deactivate_failed": "فشل في إلغاء تنشيط التنبيه"
     },
     "severity": {
       "info": "Info",
@@ -12609,7 +12822,8 @@
       "sent": "Sent"
     },
     "status": {
-      "inactive": "Inactive"
+      "inactive": "Inactive",
+      "active": "نشيط"
     },
     "modal": {
       "title": "Send emergency alert"
@@ -12625,6 +12839,15 @@
       "confirm_prefix": "This will immediately push to",
       "confirm_audience": "all active members",
       "confirm_suffix": "and display a persistent banner on all pages. I confirm this is a genuine emergency."
+    },
+    "heading": "تنبيهات الطوارئ",
+    "intro": {
+      "title": "حول هذه الصفحة - استخدم بحذر",
+      "body": "تنبيهات الطوارئ هي عمليات بث عاجلة يتم إرسالها إلى جميع الأعضاء (أو مجموعة فرعية مستهدفة) على الفور. استخدم هذا فقط في حالات الطوارئ الحقيقية - الطقس القاسي، أو حوادث سلامة المجتمع، أو فجوات تغطية الرعاية العاجلة. يتم إرسال التنبيهات كإشعارات دفع ولافتات داخل التطبيق. ولا يمكن إلغاء إرسالها بمجرد إرسالها.",
+      "targeting_label": "الاستهداف",
+      "targeting_body": "يتم إرسال اختيار الخطورة \"خطر\" أو \"تحذير\" إلى جميع الأعضاء. قم بالصياغة بعناية - لا يوجد أي استدعاء بمجرد البث.",
+      "delivery_label": "توصيل",
+      "delivery_body": "يتم تسليم التنبيهات خلال 60 ثانية من الإرسال."
     }
   },
   "admin": {
@@ -16571,5 +16794,79 @@
     "unsuppress": "إلغاء القمع",
     "unsuppress_confirm": "هل تريد إزالة{{email}}من قائمة المنع حتى يتمكن من تلقي الرسائل الإخبارية مرة أخرى؟",
     "unsuppress_title": "إلغاء حظر البريد الإلكتروني"
+  },
+  "integration_showcase": {
+    "meta": {
+      "page_title": "معرض التكامل",
+      "title": "معرض التكامل",
+      "subtitle": "مرجع من صفحة واحدة لكل واجهة برمجة تطبيقات عامة وخطاف ويب ونقطة نهاية اتحادية وسطح OAuth متوفر في هذا النشر - جاهز للتسليم إلى شريك التكامل الفني."
+    },
+    "actions": {
+      "refresh": "ينعش",
+      "refresh_aria": "تحديث عرض التكامل"
+    },
+    "about": {
+      "title": "حول هذه الصفحة",
+      "body": "استخدم هذه الصفحة عند إعداد التكامل مع خدمة جهة خارجية، أو نظام بيانات البلدية، أو شبكة NEXUS الموحدة. كل نقطة نهاية مدرجة هنا حية ومحددة لهذا النشر. تعتبر الحمولات النموذجية توضيحية - تعتمد القيم الحقيقية على بيانات اعتماد المستأجر وبيانات اعتماد الشريك. قم بمشاركة عنوان URL هذا مع شركاء التكامل بدلاً من توجيههم إلى مستندات واجهة برمجة التطبيقات الأولية.",
+      "last_refreshed": "آخر تحديث لـ{{date}}."
+    },
+    "sections": {
+      "sample_request": "طلب عينة",
+      "read_full_spec": "اقرأ المواصفات الكاملة على GitHub"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "toasts": {
+      "load_failed": "فشل تحميل عرض التكامل"
+    }
+  },
+  "admin_help": {
+    "page_title": "مركز المساعدة",
+    "title": "مركز مساعدة المشرف",
+    "description": "ابحث عن إرشادات لكل صفحة في لوحة الإدارة. انقر فوق أي مقالة للانتقال إلى تلك الصفحة - أ؟ سيفتح الزر تعليمات سياقية.",
+    "search_placeholder": "البحث في مقالات المساعدة الخاصة بـ{{count}}...",
+    "search_aria": "بحث في مقالات المساعدة",
+    "no_matches": "لا توجد مقالات تطابق بحثك.",
+    "view_help": "عرض المساعدة",
+    "categories": {
+      "general_admin": "المشرف العام",
+      "caring_community": "مجتمع الرعاية",
+      "kiss_agoris": "قبلة وأغوريس"
+    }
+  },
+  "newsletter_segments": {
+    "col_created": "مخلوق",
+    "col_members": "أعضاء",
+    "col_status": "حالة",
+    "create_first_segment": "قم بإنشاء الجزء الأول الخاص بك",
+    "delete_confirm": "هل تريد حذف المقطع \"{{name}}\"؟ ولن تتمكن الحملات التي تستخدمه من استهداف هذا الجمهور بعد الآن.",
+    "delete_confirm_label": "حذف المقطع",
+    "delete_title": "حذف المقطع",
+    "description": "إنشاء شرائح جمهور قابلة لإعادة الاستخدام لحملات الرسائل الإخبارية المستهدفة.",
+    "empty_description": "أنشئ شريحة جمهور لاستهداف الأعضاء حسب النشاط أو حقول الملف الشخصي أو سلوك النشرة الإخبارية.",
+    "empty_title": "لا توجد قطاعات بعد",
+    "match_all": "جميع القواعد (و)",
+    "match_any": "أي قاعدة (أو)",
+    "title": "شرائح"
+  },
+  "newsletter_templates": {
+    "category_custom": "مخصص",
+    "category_saved": "أنقذ",
+    "category_starter": "بداية",
+    "col_created": "مخلوق",
+    "col_status": "حالة",
+    "col_template_name": "اسم القالب",
+    "delete_confirm": "هل تريد حذف القالب \"{{name}}\"؟ لا يمكن التراجع عن هذا.",
+    "delete_confirm_label": "حذف القالب",
+    "delete_title": "حذف القالب",
+    "description": "إنشاء وإدارة قوالب البريد الإلكتروني القابلة لإعادة الاستخدام لحملات الرسائل الإخبارية.",
+    "empty_description": "أنشئ قوالب قابلة لإعادة الاستخدام لتسريع عملية إنشاء الحملات المستقبلية.",
+    "empty_title": "لا توجد قوالب حتى الآن",
+    "failed_to_delete_template": "فشل في حذف القالب.",
+    "failed_to_duplicate_template": "فشل تكرار القالب.",
+    "template_deleted": "تم حذف القالب.",
+    "template_duplicated": "القالب مكرر.",
+    "title": "قوالب"
   }
 }

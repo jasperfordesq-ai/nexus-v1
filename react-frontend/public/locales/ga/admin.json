@@ -1151,6 +1151,17 @@
         "65_plus": "65+",
         "unknown": "Anaithnid"
       }
+    },
+    "empty_value": "-",
+    "loading": "Anailísíocht á lódáil",
+    "location_marker_title": "{{area}}: baill{{count}}",
+    "member_count_one": "ball{{count}}",
+    "member_count_other": "baill{{count}}",
+    "not_available": "Níl sé ar fáil",
+    "errors": {
+      "export_failed": "Theip ar an anailísíocht a easpórtáil.",
+      "load_community_failed": "Theip ar an anailís pobail a lódáil.",
+      "load_geography_failed": "Theip ar an anailísíocht gheografach a lódáil."
     }
   },
   "billing": {
@@ -1162,7 +1173,7 @@
     "checkout_failed": "Checkout Failed",
     "checkout_failed_desc": "There was a problem processing your checkout. Please try again.",
     "checkout_success": "Checkout successfully",
-    "checkout_success_desc": "Your subscription has been activated successfully.",
+    "checkout_success_desc": "T? t? anois ar phlean {{plan}}",
     "checkout_success_generic": "Checkout completed successfully",
     "checkout_title": "Checkout",
     "choose_plan": "Choose Plan",
@@ -1270,10 +1281,20 @@
     "upgrade_message": "Upgrade",
     "upgrade_message_placeholder": "Enter upgrade message...",
     "upgrade_sent": "Upgrade sent",
-    "user_count_label": "User Count",
+    "user_count_label": "{{count}} / {{max}} ?s?ideoir",
     "your_plan_usage": "Your Plan Usage",
     "over_limit_warning": "You've reached your plan limits. Upgrade to continue.",
-    "upgrade_modal_desc": "Upgrade your plan to unlock additional features and capacity."
+    "upgrade_modal_desc": "Upgrade your plan to unlock additional features and capacity.",
+    "yearly_suffix": "bl",
+    "action_delegate_granted": "Deonaíodh toscaire",
+    "action_delegate_revoked": "Cúlghair an toscaire",
+    "action_grace_period_set": "Tréimhse Grace socraithe",
+    "action_plan_assigned": "Plean sannta",
+    "action_plan_paused": "Plean ar sos",
+    "action_plan_resumed": "Plean atosaithe",
+    "action_unknown": "Gníomh anaithnid",
+    "discount_reason_placeholder": "e.g. carthanas fíoraithe, uchtú luath",
+    "percent_mrr": "% URR"
   },
   "blog": {
     "an_unexpected_error_occurred": "An unexpected error occurred",
@@ -2034,7 +2055,22 @@
     "type_event": "Event",
     "type_listing": "Listing",
     "type_resource": "Resource",
-    "type_vol_opportunity": "Vol Opportunity"
+    "type_vol_opportunity": "Vol Opportunity",
+    "add_category": "Cuir catagóir leis",
+    "create_category": "Cruthaigh catagóir",
+    "delete_category": "Scrios catagóir",
+    "delete_confirm_message": "Scrios{{name}}? Ní féidir é seo a chealú.",
+    "edit_category": "Cuir catagóir in eagar",
+    "empty_title": "Níl aon chatagóir ar fáil",
+    "item_added": "Cuireadh catagóir leis",
+    "item_deleted": "Scriosadh an chatagóir",
+    "item_updated": "Nuashonraíodh an chatagóir",
+    "label_created": "Cruthaithe",
+    "label_listings": "Liostaí",
+    "label_slug": "Drúchtín",
+    "listings": "Liostaí",
+    "save_changes": "Sábháil athruithe",
+    "search_placeholder": "Cuardaigh catagóirí..."
   },
   "common": {
     "an_unexpected_error": "An unexpected error occurred",
@@ -2080,7 +2116,8 @@
     "save": "Save",
     "select_all": "Select All",
     "select_item": "Select Item",
-    "yes": "Yes"
+    "yes": "Yes",
+    "unknown": "Anaithnid"
   },
   "community": {
     "active_matching_users": "Active Matching Users",
@@ -2117,7 +2154,8 @@
     "smart_match_monitoring_desc": "Monitor real-time smart matching activity and match score distribution",
     "smart_match_monitoring_title": "Smart Match Monitoring",
     "smart_match_users_desc": "View and manage users participating in the smart matching system",
-    "smart_match_users_title": "Smart Match Users"
+    "smart_match_users_title": "Smart Match Users",
+    "approval_rate_aria": "Ráta ceadaithe:{{value}}%"
   },
   "completed": "Completed",
   "config": {
@@ -3437,7 +3475,20 @@
     "edit_title": "Edit",
     "label_edit_deliverable": "Edit Deliverable",
     "update_failed": "Update failed",
-    "updated_success": "Updated succeeded"
+    "updated_success": "Updated succeeded",
+    "activity_by_user_date": "{{action}}le{{user}}-{{date}}",
+    "priority_critical": "Criticiúil",
+    "priority_high": "Ard",
+    "priority_low": "Íseal",
+    "priority_medium": "Meánach",
+    "risk_critical": "Criticiúil",
+    "risk_high": "Ard",
+    "risk_low": "Íseal",
+    "risk_medium": "Meánach",
+    "status_completed": "Críochnaithe",
+    "status_in_progress": "Ar Siúl",
+    "status_planned": "Pleanáilte",
+    "status_review": "In Léirmheas"
   },
   "details": "Details",
   "diagnostics": {
@@ -3461,7 +3512,23 @@
     "score_distribution": "Score Distribution",
     "score_distribution_empty": "No score distribution found",
     "score_factors": "Score Factors",
-    "score_factors_desc": "Score Factors."
+    "score_factors_desc": "Score Factors.",
+    "avg_match_score": "Meán Scór Meaitseála",
+    "cache_entries": "Iontrálacha Taisce",
+    "diagnose": "Diagnóisigh",
+    "diagnose_listing_matches": "Diagnóisigh Meaitseanna Liostála",
+    "diagnose_listing_matches_desc": "Cuir isteach aitheantas liostála chun a fheiceáil cé na húsáideoirí a mheaitseáil agus cén fáth.",
+    "diagnose_user_matches": "Diagnóisigh Meaitseanna Úsáideora",
+    "diagnose_user_matches_desc": "Cuir isteach ID úsáideora chun a dtorthaí meaitseála, a scóir, agus na fachtóirí a chuireann le gach cluiche a fheiceáil.",
+    "engine_status": "Stádas Innill",
+    "factor_community_participation": "Rannpháirtíocht Phobail",
+    "factor_login_frequency": "Minicíocht Logála Isteach",
+    "factor_profile_completeness": "Comhláine Próifíl",
+    "factor_review_quality": "Cáilíocht Athbhreithnithe",
+    "factor_social_engagement": "Rannpháirtíocht Shóisialta",
+    "factor_transaction_activity": "Gníomhaíocht Idirbheart",
+    "matches_today": "Matches Inniu",
+    "user_prompt": "Cuir isteach ID úsáideora agus cliceáil Diagnose chun a n-anailís meaitseála a fheiceáil."
   },
   "enterprise": {
     "back_to_roles": "Back to Roles",
@@ -5445,7 +5512,12 @@
     "search": "Search",
     "showing_of_total": "Showing {{count}} of {{total}}",
     "try_adjusting_search": "Try adjusting your search",
-    "yes": "Yes"
+    "yes": "Yes",
+    "progress_complete": "{{percent}}% críochnaithe",
+    "status_abandoned": "Tréigthe",
+    "status_active": "Gníomhach",
+    "status_completed": "Críochnaithe",
+    "status_unknown": "Anaithnid"
   },
   "groups": {
     "activate": "Activate",
@@ -5747,7 +5819,10 @@
     "choose_icon": "Choose Icon",
     "choose_icon_placeholder": "Search for an icon...",
     "clear_icon": "Clear Icon",
-    "search_icons": "Search Icons"
+    "search_icons": "Search Icons",
+    "label": "Deilbhín",
+    "no_icons_found": "Níor aimsíodh aon deilbhíní a fhreagraíonn do \"{{search}}\"",
+    "search_for_icon": "Cuardaigh deilbhín..."
   },
   "ideation": {
     "an_unexpected_error_occurred": "An unexpected error occurred",
@@ -5798,7 +5873,17 @@
     "view_details": "View Details",
     "no_challenges_found": "No challenges found found",
     "no_matching_challenges": "No matching challenges found",
-    "no_status_challenges": "No status challenges found"
+    "no_status_challenges": "No status challenges found",
+    "col_created": "Cruthaithe",
+    "ideation": "Smaoineamh",
+    "status_archived": "Cartlannaithe",
+    "status_closed": "Dúnta",
+    "status_draft": "Dréacht",
+    "status_evaluating": "Ag luacháil",
+    "status_open": "Oscail",
+    "status_voting": "Vótáil",
+    "top_matches_for_user_one": "Cluiche barr{{count}}do{{name}}",
+    "top_matches_for_user_other": "Na cluichí is fearr do{{count}}do{{name}}"
   },
   "impact": {
     "chart_activity_breakdown_title": "Activity Breakdown",
@@ -6029,7 +6114,7 @@
     "templates_load_error": "Failed to load templates",
     "templates_delete": "Delete",
     "templates_delete_title": "Delete Template",
-    "templates_delete_confirm": "Are you sure you want to delete this template?",
+    "templates_delete_confirm": "An bhfuil t? cinnte gur mhaith leat \"{{name}}\" a scriosadh? N? f?idir an gn?omh seo a cheal?.",
     "templates_delete_error": "Failed to delete template",
     "templates_deleted": "Template deleted",
     "stage_applied": "Applied",
@@ -6064,7 +6149,17 @@
     "type_paid": "Paid",
     "type_volunteer": "Volunteer",
     "type_timebank": "Timebank",
-    "bias_all_jobs_placeholder": "All jobs"
+    "bias_all_jobs_placeholder": "All jobs",
+    "pipeline_status_accepted": "Glactar leis",
+    "pipeline_status_cancelled": "Ar ceal",
+    "pipeline_status_declined": "Diúltaithe",
+    "pipeline_status_pending": "Ar feitheamh",
+    "pipeline_status_proposed": "Beartaithe",
+    "pipeline_status_rejected": "Diúltaithe",
+    "pipeline_status_withdrawn": "Tarraingthe siar",
+    "bias_not_available": "N/B",
+    "bias_rejection_rates_table": "Rátaí diúltaithe de réir céime",
+    "bias_avg_time_stage_table": "Meán-am ar an stáitse"
   },
   "last_checked": "Last checked: {{time}}",
   "listings": {
@@ -6494,11 +6589,11 @@
     "no_pending_description": "All caught up - no items are waiting for review.",
     "notes_label": "Notes",
     "notes_placeholder": "Add moderation notes...",
-    "posted_by": "Posted by",
+    "posted_by": "Post?ilte ag {{name}}",
     "reason_label": "Reason",
     "reason_placeholder": "Enter reason...",
     "reason_required": "A reason is required",
-    "spam_score": "Spam score",
+    "spam_score": "Sc?r turscair: {{score}}",
     "stats": {
       "pending_count": "Pending",
       "flagged_count": "Flagged",
@@ -6510,7 +6605,15 @@
     "flags_tooltip": "Number of moderation flags on this item.",
     "load_error": "Failed to load the moderation queue.",
     "pagination_label": "Moderation queue pagination",
-    "user_fallback": "Unknown user"
+    "user_fallback": "Unknown user",
+    "label_content": "Ábhar",
+    "post_type_event": "Imeacht",
+    "post_type_listing": "Liostú",
+    "post_type_post": "Téacs Post",
+    "post_type_review": "Léirmheas",
+    "reports_meta_description": "Tuarascálacha modhnóireachta arna gcur isteach ag baill a athbhreithniú, a réiteach agus a dhíbhe.",
+    "unknown_tenant": "Tionónta anaithnid",
+    "member_id": "ID:{{id}}"
   },
   "new": "NEW",
   "newsletters": {
@@ -6928,7 +7031,8 @@
     "tab_memory_spikes": "Memory Spikes",
     "tab_request_volume": "Request Volume",
     "tab_slow_queries": "Slow Queries",
-    "tab_slow_requests": "Slow Requests"
+    "tab_slow_requests": "Slow Requests",
+    "refresh": "Athnuaigh"
   },
   "placeholder": {
     "migration_description": "Migrating legacy content to the new system",
@@ -6965,7 +7069,9 @@
     "unknown": "Unknown",
     "votes": "Votes",
     "no_matching_polls": "No matching polls found",
-    "no_polls_found": "No polls found found"
+    "no_polls_found": "No polls found found",
+    "status_active": "Gníomhach",
+    "status_ended": "dar críoch"
   },
   "quick_actions": {
     "advanced_controls": "Advanced Controls",
@@ -9159,7 +9265,7 @@
     "desc_mark_as_under_investigation": "Mark as Under Investigation",
     "desc_positive_to_credit_negative_to_debit": "Positive to credit, negative to debit the account",
     "desc_required_this_will_be_recorded_in_the_g": "Required. This will be recorded in the general ledger",
-    "download_statement_for": "Download Statement for",
+    "download_statement_for": "?osl?d?il r?iteas do {{name}}",
     "failed_to_adjust_balance": "Failed to adjust balance",
     "failed_to_grant_credits": "Failed to grant credits",
     "failed_to_load_alerts": "Failed to load alerts",
@@ -9211,7 +9317,20 @@
     "top_earners": "Top Earners",
     "top_spenders": "Top Spenders",
     "user_report_desc": "View a detailed time credit report for an individual member",
-    "user_report_title": "User Report"
+    "user_report_title": "User Report",
+    "severity_critical": "Criticiúil",
+    "severity_high": "Ard",
+    "severity_low": "Íseal",
+    "severity_medium": "Meánach",
+    "status_dismissed": "Briseadh as a phost",
+    "status_new": "Nua",
+    "status_resolved": "Réitíodh",
+    "status_reviewing": "Athbhreithniú",
+    "tab_all": "Gach",
+    "tab_dismissed": "Briseadh as a phost",
+    "tab_new": "Nua",
+    "tab_resolved": "Réitíodh",
+    "tab_reviewing": "Athbhreithniú"
   },
   "trends": {
     "card_title": "Trends",
@@ -10581,7 +10700,20 @@
       "suspend": "Fionraí",
       "suspended": "Cúpón ar fionraí",
       "table_aria": "Cúpóin ceannaí"
-    }
+    },
+    "col_sales": "Díolacháin",
+    "col_rating": "Rátáil",
+    "filter_all": "Gach",
+    "filter_approved": "Ceadaithe",
+    "seller_filter_all": "Gach",
+    "seller_filter_private": "Príobháideach",
+    "seller_filter_business": "Gnó",
+    "seller_filter_verified": "Fíoraithe",
+    "seller_filter_unverified": "Neamhfhíoraithe",
+    "filter_flagged": "Bratach",
+    "filter_pending": "Ar feitheamh",
+    "filter_rejected": "Diúltaithe",
+    "verify_business": "Fíoraigh Gnó"
   },
   "spam": {
     "title": "Spam Detection",
@@ -10782,7 +10914,8 @@
     "maps_kill_switch_aria": "Map display kill switch (locked off)",
     "map_provider_aria": "Map provider",
     "geocoding_provider_aria": "Autocomplete provider",
-    "clear_failed": "Failed to clear"
+    "clear_failed": "Failed to clear",
+    "google_map_id_placeholder": "léarscáil-aitheantas..."
   },
   "cron_setup": {
     "notice_title": "Important: how cron works on Project NEXUS",
@@ -11003,7 +11136,15 @@
     "remove_confirm_message": "Remove Confirm",
     "remove_from_whitelist": "Remove From Whitelist",
     "view": "View",
-    "whitelisted_tenants_count": "Whitelisted Tenants Count"
+    "whitelisted_tenants_count": "Tion?nta? ar an liosta ceadaithe ({{count}})",
+    "notes_placeholder": "Cuir nótaí leis faoin bhfáth a bhfuil an tionónta seo á chur ar an liosta bán...",
+    "page_description": "Bainistigh liosta na dtionóntaí a bhfuil cead acu páirt a ghlacadh i gcónaidhm.",
+    "page_title": "Liosta Bán Cónaidhm",
+    "select_tenant_placeholder": "Roghnaigh tionónta...",
+    "select_tenant_required": "Roghnaigh tionónta le do thoil.",
+    "tenant_added_to_whitelist": "Tionónta curtha leis an liosta bán",
+    "tenant_removed_from_whitelist": "Tionónta bainte den liosta bán",
+    "whitelisted_tenants_aria": "Tionóntaí ar an liosta bán"
   },
   "impact_report_labels": {
     "transactions": "Transactions",
@@ -11031,7 +11172,17 @@
     "status_archived": "Archived",
     "status_draft": "Draft",
     "status_published": "Published",
-    "update_document": "Update Document"
+    "update_document": "Update Document",
+    "content": "Ábhar",
+    "content_placeholder": "Cuir isteach ábhar an doiciméid...",
+    "document_content": "Ábhar an Doiciméid",
+    "document_created": "Doiciméad cruthaithe",
+    "document_details": "Sonraí an Doiciméid",
+    "document_updated": "Nuashonraíodh an doiciméad",
+    "failed_to_load_document": "Theip ar an doiciméad a lódáil",
+    "failed_to_save_document": "Theip ar an doiciméad a shábháil",
+    "title_placeholder": "Cuir isteach an teideal poiblí...",
+    "title_required": "Tá teideal ag teastáil"
   },
   "legal_versions": {
     "compliance_dashboard": "Compliance Dashboard",
@@ -11055,7 +11206,7 @@
     "filter_application": "Application",
     "filter_cron": "Cron",
     "filter_errors": "Errors",
-    "lines_count": "Lines Count",
+    "lines_count": "{{count}} l?ne",
     "search_placeholder": "Enter search...",
     "total_files": "Total Files",
     "total_size": "Total Size"
@@ -11114,7 +11265,8 @@
     "total": "Total",
     "tracking_enabled": "Tracking Enabled",
     "view_bounces": "View Bounces",
-    "volume_bonus": "Volume Bonus"
+    "volume_bonus": "Volume Bonus",
+    "system_health": "Sláinte an Chórais"
   },
   "newsletter_form": {
     "ab_test_label": "Ab Test",
@@ -11235,13 +11387,48 @@
     "opened": "Opened",
     "preview_recipient_count": "Preview Recipient Count",
     "resend_newsletter": "Resend Newsletter",
-    "total_sent": "Total sent"
+    "total_sent": "Total sent",
+    "cancel": "Cealaigh",
+    "loading": "Faisnéis athsheolta á lódáil…",
+    "no_recipients_desc": "Níl aon fhaighteoirí ann a mheaitseálann do chritéir roghnúcháin.",
+    "non_clickers": "Neamh-clickers",
+    "non_clickers_count": "Faighteoir{{count}}a d’oscail ach nár chliceáil",
+    "non_clickers_count_plural": "Faighteoirí{{count}}a d’oscail ach nár chliceáil",
+    "non_openers": "Neamh-oscailteoirí",
+    "non_openers_count": "{{count}}faighteoir nár oscail",
+    "non_openers_count_plural": "faighteoirí{{count}}nár oscail",
+    "preview_recipient_count_desc": "Seolfar an t-athsheoladh seo chuig faighteoir{{count}}",
+    "preview_recipient_count_desc_plural": "Seolfar an t-athsheoladh seo chuig faighteoirí{{count}}",
+    "queue_resend": "Athsheoladh scuaine",
+    "resend_to": "Seol chuig",
+    "subject_override": "Sárú Ábhar",
+    "subject_override_desc": "Fág bán chun an bunábhar a úsáid.",
+    "subject_override_placeholder": "Cuir isteach sárú ar an ábhar...",
+    "subtitle": "Seol an nuachtlitir seo chuig fo-thacar faighteoirí spriocdhírithe."
   },
   "newsletter_send_time": {
     "engagement_heatmap": "Engagement Heatmap",
     "high": "High",
     "low": "Low",
-    "top_recommended": "Top Recommended"
+    "top_recommended": "Top Recommended",
+    "day_friday": "Aoine",
+    "day_monday": "Mon",
+    "day_saturday": "Sath",
+    "day_sunday": "Ghrian",
+    "day_thursday": "Thu",
+    "day_tuesday": "Dé Máirt",
+    "day_wednesday": "Céad",
+    "days": "Laethanta{{count}}",
+    "description": "Faigh an t-am is fearr chun gach feachtas a sheoladh bunaithe ar rannpháirtíocht le déanaí.",
+    "empty_hint": "Seol cúpla nuachtlitir chun patrúin rannpháirtíochta a nochtadh.",
+    "engagements": "gealltanais",
+    "heatmap_cell_title": "{{day}}{{hour}}:{{count}}rannpháirtíocht",
+    "heatmap_cell_title_one": "{{day}}{{hour}}:{{count}}rannpháirtíocht",
+    "heatmap_cell_title_other": "{{day}}{{hour}}: gealltanais{{count}}",
+    "loading_heatmap": "Léarscáil teasa á lódáil...",
+    "not_enough_data": "Níl go leor sonraí rannpháirtíochta fós.",
+    "time_period": "Tréimhse ama",
+    "title": "Seol optimiser ama"
   },
   "newsletter_template_form": {
     "content": "Content",
@@ -11282,14 +11469,31 @@
     "notice_title_placeholder": "Enter notice title...",
     "preview": "Preview",
     "preview_title_placeholder": "Enter preview title...",
-    "split_view": "Split View"
+    "split_view": "Split View",
+    "start_writing": "Tosaigh ag scríobh..."
   },
   "seed_generator": {
-    "count_aria_label": "Count Aria",
+    "count_aria_label": "L?on {{label}}",
     "data_types_heading": "Data Types",
     "development_only": "Development Only",
     "generate_button": "Generate",
-    "warning_body": "Warning Body"
+    "warning_body": "Warning Body",
+    "option_users_label": "Úsáideoirí",
+    "option_users_desc": "Gin cuntais bhall samplach",
+    "option_listings_label": "Liostaí",
+    "option_listings_desc": "Gin tairiscintí samplacha agus iarratais",
+    "option_transactions_label": "Idirbhearta",
+    "option_transactions_desc": "Gin idirbhearta creidmheasa ama samplacha",
+    "option_feed_posts_label": "Poist bheatha",
+    "option_feed_posts_desc": "Gin postálacha beatha pobail samplacha",
+    "option_events_label": "Imeachtaí",
+    "option_events_desc": "Imeachtaí pobail samplacha a chruthú",
+    "option_groups_label": "Grúpaí",
+    "option_groups_desc": "Gin grúpaí samplacha",
+    "option_messages_label": "Teachtaireachtaí",
+    "option_messages_desc": "Gin teachtaireachtaí ball samplach",
+    "option_badges_label": "Suaitheantais",
+    "option_badges_desc": "Gin dámhachtainí suaitheantais samplacha"
   },
   "segment_form": {
     "analyzing_member_data": "Analyzing Member Data",
@@ -11378,7 +11582,15 @@
     "no_members_found": "No members found found",
     "no_recent_broker_activity": "No recent broker activity found",
     "quick_access": "Quick Access",
-    "recent_activity": "Recent Activity"
+    "recent_activity": "Recent Activity",
+    "no_data": "Gan sonraí",
+    "no_data_available": "Níl aon sonraí ar fáil",
+    "open_page_help": "Cabhair leathanach a oscailt",
+    "help": "Cabhrú",
+    "refresh": "Athnuaigh",
+    "search": "Cuardach...",
+    "data_table": "Sonraí",
+    "total_count": "{{count}}iomlán"
   },
   "subtitle": "Subtitle",
   "super_controls": {
@@ -12587,7 +12799,8 @@
     },
     "errors": {
       "load_failed": "Failed to load alerts",
-      "send_failed": "Failed to send alert"
+      "send_failed": "Failed to send alert",
+      "deactivate_failed": "Theip ar an bhfoláireamh a dhíghníomhachtú"
     },
     "severity": {
       "info": "Info",
@@ -12609,7 +12822,8 @@
       "sent": "Sent"
     },
     "status": {
-      "inactive": "Inactive"
+      "inactive": "Inactive",
+      "active": "Gníomhach"
     },
     "modal": {
       "title": "Send emergency alert"
@@ -12625,6 +12839,15 @@
       "confirm_prefix": "This will immediately push to",
       "confirm_audience": "all active members",
       "confirm_suffix": "and display a persistent banner on all pages. I confirm this is a genuine emergency."
+    },
+    "heading": "Foláirimh Éigeandála",
+    "intro": {
+      "title": "Maidir leis an leathanach seo - bain úsáid as go cúramach",
+      "body": "Is craoltaí práinneacha iad Foláirimh Éigeandála a sheoltar chuig gach ball (nó chuig foghrúpa spriocdhírithe) láithreach. Bain úsáid as seo ach amháin le haghaidh fíoréigeandálaí - aimsir chrua, teagmhais sábháilteachta pobail, nó bearnaí clúdach cúraim phráinneach. Seoltar foláirimh mar bhrúfhógraí agus mar mheirgí in-aip. Ní féidir iad a sheoladh nuair a sheoltar iad.",
+      "targeting_label": "Ag díriú",
+      "targeting_body": "Seoltar \"Contúirt\" nó \"Rabhadh\" déine chuig gach ball. Dréacht go cúramach - níl aon aisghairm nuair a chraoltar é.",
+      "delivery_label": "Seachadadh",
+      "delivery_body": "Seachadtar foláirimh laistigh de 60 soicind tar éis iad a sheoladh."
     }
   },
   "admin": {
@@ -16571,5 +16794,79 @@
     "unsuppress": "Dícheangail",
     "unsuppress_confirm": "An bhfuil fonn ort{{email}}a bhaint den liosta faoi chois ionas gur féidir leis nuachtlitreacha a fháil arís?",
     "unsuppress_title": "Dícheangail an ríomhphost"
+  },
+  "integration_showcase": {
+    "meta": {
+      "page_title": "Taispeántas Comhtháthaithe",
+      "title": "Taispeántas Comhtháthaithe",
+      "subtitle": "Tagairt aon-leathanaigh de gach API poiblí, webbhook, críochphointe cónaidhm, agus dromchla OAuth atá ar fáil san imscaradh seo - réidh le tabhairt ar láimh do chomhpháirtí comhtháthú teicniúil."
+    },
+    "actions": {
+      "refresh": "Athnuaigh",
+      "refresh_aria": "Íoslódáil an taispeántas comhtháthú"
+    },
+    "about": {
+      "title": "Maidir leis an leathanach seo",
+      "body": "Bain úsáid as an leathanach seo agus tú ag bunú comhtháthú le seirbhís tríú páirtí, le córas sonraí bardais, nó le líonra NEXUS cónasctha. Tá gach críochphointe atá liostaithe anseo beo agus scóipe don imscaradh seo. Léiriúcháin atá sna hualaí pá samplacha - braitheann luachanna réadúla ar do dhúthracht tionónta agus ar dhintiúir do pháirtí. Roinn an URL seo le comhpháirtithe comhtháthú seachas iad a dhíriú ar na doiciméid amh API.",
+      "last_refreshed": "{{date}}athnuaite go deireanach."
+    },
+    "sections": {
+      "sample_request": "Iarratas samplach",
+      "read_full_spec": "Léigh an spec iomlán ar GitHub"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "toasts": {
+      "load_failed": "Theip ar an taispeántas comhtháthaithe a lódáil"
+    }
+  },
+  "admin_help": {
+    "page_title": "Ionad Cabhrach",
+    "title": "Lárionad Cabhrach Riaracháin",
+    "description": "Faigh treoir do gach leathanach sa phainéal riaracháin. Cliceáil ar aon alt chun dul go dtí an leathanach sin - a ? Osclóidh an cnaipe cúnamh comhthéacsúil.",
+    "search_placeholder": "Cuardaigh altanna cabhrach{{count}}...",
+    "search_aria": "Cuardaigh altanna cabhrach",
+    "no_matches": "Níl aon alt ag teacht le do chuardach.",
+    "view_help": "Féach ar chabhair",
+    "categories": {
+      "general_admin": "Riarachán Ginearálta",
+      "caring_community": "Pobal Cúramach",
+      "kiss_agoris": "KISS & AGORIS"
+    }
+  },
+  "newsletter_segments": {
+    "col_created": "Cruthaithe",
+    "col_members": "Baill",
+    "col_status": "Stádas",
+    "create_first_segment": "Cruthaigh do chéad mhír",
+    "delete_confirm": "Scrios an mhír \"{{name}}\"? Ní bheidh feachtais a bhaineann úsáid as in ann díriú ar an lucht éisteachta seo a thuilleadh.",
+    "delete_confirm_label": "Scrios deighleog",
+    "delete_title": "Scrios deighleog",
+    "description": "Cruthaigh míreanna lucht féachana ath-inúsáidte le haghaidh feachtais nuachtlitir spriocdhírithe.",
+    "empty_description": "Tóg teascán lucht féachana chun díriú ar bhaill de réir gníomhaíochta, réimsí próifíle, nó iompar nuachtlitreach.",
+    "empty_title": "Níl deighleoga ar bith fós",
+    "match_all": "Na rialacha go léir (AGUS)",
+    "match_any": "Riail ar bith (NÓ)",
+    "title": "Deighleoga"
+  },
+  "newsletter_templates": {
+    "category_custom": "Saincheaptha",
+    "category_saved": "Shábháil",
+    "category_starter": "Tosaitheoir",
+    "col_created": "Cruthaithe",
+    "col_status": "Stádas",
+    "col_template_name": "Ainm teimpléad",
+    "delete_confirm": "Scrios an teimpléad \"{{name}}\"? Ní féidir é seo a chealú.",
+    "delete_confirm_label": "Scrios teimpléad",
+    "delete_title": "Scrios teimpléad",
+    "description": "Cruthaigh agus bainistigh teimpléid ríomhphoist ath-inúsáidte le haghaidh feachtais nuachtlitreach.",
+    "empty_description": "Cruthaigh teimpléid ath-inúsáidte chun cruthú feachtais amach anseo a bhrostú.",
+    "empty_title": "Níl aon teimpléid fós",
+    "failed_to_delete_template": "Theip ar an teimpléad a scriosadh.",
+    "failed_to_duplicate_template": "Theip ar an teimpléad a dhúbailt.",
+    "template_deleted": "Scriosadh an teimpléad.",
+    "template_duplicated": "Teimpléad dúbailt.",
+    "title": "Teimpléid"
   }
 }

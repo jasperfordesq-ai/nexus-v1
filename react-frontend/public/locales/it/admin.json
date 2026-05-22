@@ -1151,6 +1151,17 @@
         "65_plus": "65+",
         "unknown": "Sconosciuto"
       }
+    },
+    "empty_value": "-",
+    "loading": "Caricamento analisi",
+    "location_marker_title": "{{area}}: membri{{count}}",
+    "member_count_one": "Membro{{count}}",
+    "member_count_other": "Membri{{count}}",
+    "not_available": "Non disponibile",
+    "errors": {
+      "export_failed": "Impossibile esportare l'analisi.",
+      "load_community_failed": "Impossibile caricare l'analisi della comunità.",
+      "load_geography_failed": "Impossibile caricare l'analisi geografica."
     }
   },
   "billing": {
@@ -1162,7 +1173,7 @@
     "checkout_failed": "Checkout Failed",
     "checkout_failed_desc": "There was a problem processing your checkout. Please try again.",
     "checkout_success": "Checkout successfully",
-    "checkout_success_desc": "Your subscription has been activated successfully.",
+    "checkout_success_desc": "Ora sei nel piano {{plan}}",
     "checkout_success_generic": "Checkout completed successfully",
     "checkout_title": "Checkout",
     "choose_plan": "Choose Plan",
@@ -1270,10 +1281,20 @@
     "upgrade_message": "Upgrade",
     "upgrade_message_placeholder": "Enter upgrade message...",
     "upgrade_sent": "Upgrade sent",
-    "user_count_label": "User Count",
+    "user_count_label": "{{count}} / {{max}} utenti",
     "your_plan_usage": "Your Plan Usage",
     "over_limit_warning": "You've reached your plan limits. Upgrade to continue.",
-    "upgrade_modal_desc": "Upgrade your plan to unlock additional features and capacity."
+    "upgrade_modal_desc": "Upgrade your plan to unlock additional features and capacity.",
+    "yearly_suffix": "anno",
+    "action_delegate_granted": "Delega concessa",
+    "action_delegate_revoked": "Delegato revocato",
+    "action_grace_period_set": "Periodo di grazia impostato",
+    "action_plan_assigned": "Piano assegnato",
+    "action_plan_paused": "Piano sospeso",
+    "action_plan_resumed": "Piano ripreso",
+    "action_unknown": "Azione sconosciuta",
+    "discount_reason_placeholder": "per esempio. ente di beneficenza verificato, early adopter",
+    "percent_mrr": "% MRR"
   },
   "blog": {
     "an_unexpected_error_occurred": "An unexpected error occurred",
@@ -2034,7 +2055,22 @@
     "type_event": "Event",
     "type_listing": "Listing",
     "type_resource": "Resource",
-    "type_vol_opportunity": "Vol Opportunity"
+    "type_vol_opportunity": "Vol Opportunity",
+    "add_category": "Aggiungi categoria",
+    "create_category": "Crea categoria",
+    "delete_category": "Elimina categoria",
+    "delete_confirm_message": "Eliminare{{name}}? Questa operazione non può essere annullata.",
+    "edit_category": "Modifica categoria",
+    "empty_title": "Nessuna categoria disponibile",
+    "item_added": "Categoria aggiunta",
+    "item_deleted": "Categoria eliminata",
+    "item_updated": "Categoria aggiornata",
+    "label_created": "Creato",
+    "label_listings": "Annunci",
+    "label_slug": "Lumaca",
+    "listings": "Annunci",
+    "save_changes": "Salva modifiche",
+    "search_placeholder": "Cerca categorie..."
   },
   "common": {
     "an_unexpected_error": "An unexpected error occurred",
@@ -2080,7 +2116,8 @@
     "save": "Save",
     "select_all": "Select All",
     "select_item": "Select Item",
-    "yes": "Yes"
+    "yes": "Yes",
+    "unknown": "Sconosciuto"
   },
   "community": {
     "active_matching_users": "Active Matching Users",
@@ -2117,7 +2154,8 @@
     "smart_match_monitoring_desc": "Monitor real-time smart matching activity and match score distribution",
     "smart_match_monitoring_title": "Smart Match Monitoring",
     "smart_match_users_desc": "View and manage users participating in the smart matching system",
-    "smart_match_users_title": "Smart Match Users"
+    "smart_match_users_title": "Smart Match Users",
+    "approval_rate_aria": "Tasso di approvazione:{{value}}%"
   },
   "completed": "Completed",
   "config": {
@@ -3437,7 +3475,20 @@
     "edit_title": "Edit",
     "label_edit_deliverable": "Edit Deliverable",
     "update_failed": "Update failed",
-    "updated_success": "Updated succeeded"
+    "updated_success": "Updated succeeded",
+    "activity_by_user_date": "{{action}}di{{user}}-{{date}}",
+    "priority_critical": "Critico",
+    "priority_high": "Alto",
+    "priority_low": "Basso",
+    "priority_medium": "Medio",
+    "risk_critical": "Critico",
+    "risk_high": "Alto",
+    "risk_low": "Basso",
+    "risk_medium": "Medio",
+    "status_completed": "Completato",
+    "status_in_progress": "In corso",
+    "status_planned": "Pianificato",
+    "status_review": "In revisione"
   },
   "details": "Details",
   "diagnostics": {
@@ -3461,7 +3512,23 @@
     "score_distribution": "Score Distribution",
     "score_distribution_empty": "No score distribution found",
     "score_factors": "Score Factors",
-    "score_factors_desc": "Score Factors."
+    "score_factors_desc": "Score Factors.",
+    "avg_match_score": "Punteggio medio della partita",
+    "cache_entries": "Voci della cache",
+    "diagnose": "Diagnosticare",
+    "diagnose_listing_matches": "Diagnosticare le corrispondenze dell'elenco",
+    "diagnose_listing_matches_desc": "Inserisci un ID elenco per vedere quali utenti sono stati abbinati e perché.",
+    "diagnose_user_matches": "Diagnosticare le corrispondenze degli utenti",
+    "diagnose_user_matches_desc": "Inserisci un ID utente per visualizzare i risultati della partita, i punteggi e i fattori che contribuiscono a ciascuna partita.",
+    "engine_status": "Stato del motore",
+    "factor_community_participation": "Partecipazione comunitaria",
+    "factor_login_frequency": "Frequenza di accesso",
+    "factor_profile_completeness": "Completezza del profilo",
+    "factor_review_quality": "Revisione della qualità",
+    "factor_social_engagement": "Impegno sociale",
+    "factor_transaction_activity": "Attività di transazione",
+    "matches_today": "Partite di oggi",
+    "user_prompt": "Inserisci un ID utente e fai clic su Diagnostica per visualizzare l'analisi della corrispondenza."
   },
   "enterprise": {
     "back_to_roles": "Back to Roles",
@@ -5445,7 +5512,12 @@
     "search": "Search",
     "showing_of_total": "Showing {{count}} of {{total}}",
     "try_adjusting_search": "Try adjusting your search",
-    "yes": "Yes"
+    "yes": "Yes",
+    "progress_complete": "{{percent}}% completato",
+    "status_abandoned": "Abbandonato",
+    "status_active": "Attivo",
+    "status_completed": "Completato",
+    "status_unknown": "Sconosciuto"
   },
   "groups": {
     "activate": "Activate",
@@ -5747,7 +5819,10 @@
     "choose_icon": "Choose Icon",
     "choose_icon_placeholder": "Search for an icon...",
     "clear_icon": "Clear Icon",
-    "search_icons": "Search Icons"
+    "search_icons": "Search Icons",
+    "label": "Icona",
+    "no_icons_found": "Nessuna icona trovata corrispondente a \"{{search}}\"",
+    "search_for_icon": "Cerca un'icona..."
   },
   "ideation": {
     "an_unexpected_error_occurred": "An unexpected error occurred",
@@ -5798,7 +5873,17 @@
     "view_details": "View Details",
     "no_challenges_found": "No challenges found found",
     "no_matching_challenges": "No matching challenges found",
-    "no_status_challenges": "No status challenges found"
+    "no_status_challenges": "No status challenges found",
+    "col_created": "Creato",
+    "ideation": "Ideazione",
+    "status_archived": "Archiviato",
+    "status_closed": "Chiuso",
+    "status_draft": "Bozza",
+    "status_evaluating": "Valutare",
+    "status_open": "Aprire",
+    "status_voting": "Voto",
+    "top_matches_for_user_one": "Migliore corrispondenza{{count}}per{{name}}",
+    "top_matches_for_user_other": "Le migliori partite{{count}}per{{name}}"
   },
   "impact": {
     "chart_activity_breakdown_title": "Activity Breakdown",
@@ -6029,7 +6114,7 @@
     "templates_load_error": "Failed to load templates",
     "templates_delete": "Delete",
     "templates_delete_title": "Delete Template",
-    "templates_delete_confirm": "Are you sure you want to delete this template?",
+    "templates_delete_confirm": "Vuoi davvero eliminare \"{{name}}\"? Questa azione non pu? essere annullata.",
     "templates_delete_error": "Failed to delete template",
     "templates_deleted": "Template deleted",
     "stage_applied": "Applied",
@@ -6064,7 +6149,17 @@
     "type_paid": "Paid",
     "type_volunteer": "Volunteer",
     "type_timebank": "Timebank",
-    "bias_all_jobs_placeholder": "All jobs"
+    "bias_all_jobs_placeholder": "All jobs",
+    "pipeline_status_accepted": "Accettato",
+    "pipeline_status_cancelled": "Annullato",
+    "pipeline_status_declined": "Rifiutato",
+    "pipeline_status_pending": "In attesa di",
+    "pipeline_status_proposed": "Proposto",
+    "pipeline_status_rejected": "Respinto",
+    "pipeline_status_withdrawn": "Ritirato",
+    "bias_not_available": "N / A",
+    "bias_rejection_rates_table": "Tassi di rifiuto per fase",
+    "bias_avg_time_stage_table": "Tempo medio in scena"
   },
   "last_checked": "Last checked: {{time}}",
   "listings": {
@@ -6494,11 +6589,11 @@
     "no_pending_description": "All caught up - no items are waiting for review.",
     "notes_label": "Notes",
     "notes_placeholder": "Add moderation notes...",
-    "posted_by": "Posted by",
+    "posted_by": "Pubblicato da {{name}}",
     "reason_label": "Reason",
     "reason_placeholder": "Enter reason...",
     "reason_required": "A reason is required",
-    "spam_score": "Spam score",
+    "spam_score": "Punteggio spam: {{score}}",
     "stats": {
       "pending_count": "Pending",
       "flagged_count": "Flagged",
@@ -6510,7 +6605,15 @@
     "flags_tooltip": "Number of moderation flags on this item.",
     "load_error": "Failed to load the moderation queue.",
     "pagination_label": "Moderation queue pagination",
-    "user_fallback": "Unknown user"
+    "user_fallback": "Unknown user",
+    "label_content": "Contenuto",
+    "post_type_event": "Evento",
+    "post_type_listing": "Elenco",
+    "post_type_post": "Messaggio di testo",
+    "post_type_review": "Revisione",
+    "reports_meta_description": "Esaminare, risolvere e ignorare i rapporti di moderazione inviati dai membri.",
+    "unknown_tenant": "Inquilino sconosciuto",
+    "member_id": "ID:{{id}}"
   },
   "new": "NEW",
   "newsletters": {
@@ -6928,7 +7031,8 @@
     "tab_memory_spikes": "Memory Spikes",
     "tab_request_volume": "Request Volume",
     "tab_slow_queries": "Slow Queries",
-    "tab_slow_requests": "Slow Requests"
+    "tab_slow_requests": "Slow Requests",
+    "refresh": "Aggiorna"
   },
   "placeholder": {
     "migration_description": "Migrating legacy content to the new system",
@@ -6965,7 +7069,9 @@
     "unknown": "Unknown",
     "votes": "Votes",
     "no_matching_polls": "No matching polls found",
-    "no_polls_found": "No polls found found"
+    "no_polls_found": "No polls found found",
+    "status_active": "Attivo",
+    "status_ended": "Finito"
   },
   "quick_actions": {
     "advanced_controls": "Advanced Controls",
@@ -9159,7 +9265,7 @@
     "desc_mark_as_under_investigation": "Mark as Under Investigation",
     "desc_positive_to_credit_negative_to_debit": "Positive to credit, negative to debit the account",
     "desc_required_this_will_be_recorded_in_the_g": "Required. This will be recorded in the general ledger",
-    "download_statement_for": "Download Statement for",
+    "download_statement_for": "Scarica estratto conto per {{name}}",
     "failed_to_adjust_balance": "Failed to adjust balance",
     "failed_to_grant_credits": "Failed to grant credits",
     "failed_to_load_alerts": "Failed to load alerts",
@@ -9211,7 +9317,20 @@
     "top_earners": "Top Earners",
     "top_spenders": "Top Spenders",
     "user_report_desc": "View a detailed time credit report for an individual member",
-    "user_report_title": "User Report"
+    "user_report_title": "User Report",
+    "severity_critical": "Critico",
+    "severity_high": "Alto",
+    "severity_low": "Basso",
+    "severity_medium": "Medio",
+    "status_dismissed": "Licenziato",
+    "status_new": "Nuovo",
+    "status_resolved": "Risolto",
+    "status_reviewing": "Revisione",
+    "tab_all": "Tutto",
+    "tab_dismissed": "Licenziato",
+    "tab_new": "Nuovo",
+    "tab_resolved": "Risolto",
+    "tab_reviewing": "Revisione"
   },
   "trends": {
     "card_title": "Trends",
@@ -10581,7 +10700,20 @@
       "suspend": "Sospendere",
       "suspended": "Coupon sospeso",
       "table_aria": "Buoni commerciante"
-    }
+    },
+    "col_sales": "Saldi",
+    "col_rating": "Valutazione",
+    "filter_all": "Tutto",
+    "filter_approved": "Approvato",
+    "seller_filter_all": "Tutto",
+    "seller_filter_private": "Privato",
+    "seller_filter_business": "Attività commerciale",
+    "seller_filter_verified": "Verificato",
+    "seller_filter_unverified": "Non verificato",
+    "filter_flagged": "Contrassegnato",
+    "filter_pending": "In attesa di",
+    "filter_rejected": "Respinto",
+    "verify_business": "Verifica attività"
   },
   "spam": {
     "title": "Spam Detection",
@@ -10782,7 +10914,8 @@
     "maps_kill_switch_aria": "Map display kill switch (locked off)",
     "map_provider_aria": "Map provider",
     "geocoding_provider_aria": "Autocomplete provider",
-    "clear_failed": "Failed to clear"
+    "clear_failed": "Failed to clear",
+    "google_map_id_placeholder": "ID mappa..."
   },
   "cron_setup": {
     "notice_title": "Important: how cron works on Project NEXUS",
@@ -11003,7 +11136,15 @@
     "remove_confirm_message": "Remove Confirm",
     "remove_from_whitelist": "Remove From Whitelist",
     "view": "View",
-    "whitelisted_tenants_count": "Whitelisted Tenants Count"
+    "whitelisted_tenants_count": "Tenant autorizzati ({{count}})",
+    "notes_placeholder": "Aggiungi note sul motivo per cui questo tenant è stato inserito nella lista bianca...",
+    "page_description": "Gestire l'elenco degli inquilini autorizzati a partecipare alla federazione.",
+    "page_title": "Lista bianca della Federazione",
+    "select_tenant_placeholder": "Seleziona un inquilino...",
+    "select_tenant_required": "Seleziona un inquilino.",
+    "tenant_added_to_whitelist": "Tenant aggiunto alla whitelist",
+    "tenant_removed_from_whitelist": "Tenant rimosso dalla whitelist",
+    "whitelisted_tenants_aria": "Inquilini autorizzati"
   },
   "impact_report_labels": {
     "transactions": "Transactions",
@@ -11031,7 +11172,17 @@
     "status_archived": "Archived",
     "status_draft": "Draft",
     "status_published": "Published",
-    "update_document": "Update Document"
+    "update_document": "Update Document",
+    "content": "Contenuto",
+    "content_placeholder": "Inserisci il contenuto del documento...",
+    "document_content": "Contenuto del documento",
+    "document_created": "Documento creato",
+    "document_details": "Dettagli del documento",
+    "document_updated": "Documento aggiornato",
+    "failed_to_load_document": "Impossibile caricare il documento",
+    "failed_to_save_document": "Impossibile salvare il documento",
+    "title_placeholder": "Inserisci il titolo pubblico...",
+    "title_required": "Il titolo è obbligatorio"
   },
   "legal_versions": {
     "compliance_dashboard": "Compliance Dashboard",
@@ -11055,7 +11206,7 @@
     "filter_application": "Application",
     "filter_cron": "Cron",
     "filter_errors": "Errors",
-    "lines_count": "Lines Count",
+    "lines_count": "{{count}} righe",
     "search_placeholder": "Enter search...",
     "total_files": "Total Files",
     "total_size": "Total Size"
@@ -11114,7 +11265,8 @@
     "total": "Total",
     "tracking_enabled": "Tracking Enabled",
     "view_bounces": "View Bounces",
-    "volume_bonus": "Volume Bonus"
+    "volume_bonus": "Volume Bonus",
+    "system_health": "Integrità del sistema"
   },
   "newsletter_form": {
     "ab_test_label": "Ab Test",
@@ -11235,13 +11387,48 @@
     "opened": "Opened",
     "preview_recipient_count": "Preview Recipient Count",
     "resend_newsletter": "Resend Newsletter",
-    "total_sent": "Total sent"
+    "total_sent": "Total sent",
+    "cancel": "Cancellare",
+    "loading": "Caricamento informazioni di nuovo invio...",
+    "no_recipients_desc": "Non ci sono destinatari che corrispondono ai tuoi criteri di selezione.",
+    "non_clickers": "Non cliccatori",
+    "non_clickers_count": "Destinatario{{count}}che ha aperto ma non ha fatto clic",
+    "non_clickers_count_plural": "Destinatari{{count}}che hanno aperto ma non hanno fatto clic",
+    "non_openers": "Non aperti",
+    "non_openers_count": "Destinatario{{count}}che non ha aperto",
+    "non_openers_count_plural": "Destinatari{{count}}che non hanno aperto",
+    "preview_recipient_count_desc": "Questo nuovo invio verrà inviato al destinatario{{count}}",
+    "preview_recipient_count_desc_plural": "Questo nuovo invio verrà inviato ai destinatari{{count}}",
+    "queue_resend": "Rinvia coda",
+    "resend_to": "Invia nuovamente a",
+    "subject_override": "Ignora oggetto",
+    "subject_override_desc": "Lascia vuoto per utilizzare l'oggetto originale.",
+    "subject_override_placeholder": "Inserisci un oggetto da sostituire...",
+    "subtitle": "Invia questa newsletter a un sottoinsieme mirato di destinatari."
   },
   "newsletter_send_time": {
     "engagement_heatmap": "Engagement Heatmap",
     "high": "High",
     "low": "Low",
-    "top_recommended": "Top Recommended"
+    "top_recommended": "Top Recommended",
+    "day_friday": "Ven",
+    "day_monday": "Lun",
+    "day_saturday": "Sab",
+    "day_sunday": "Sole",
+    "day_thursday": "Gio",
+    "day_tuesday": "Mar",
+    "day_wednesday": "Mercoledì",
+    "days": "{{count}}giorni",
+    "description": "Trova il momento migliore per inviare ciascuna campagna in base al coinvolgimento recente.",
+    "empty_hint": "Invia alcune newsletter per rivelare modelli di coinvolgimento.",
+    "engagements": "impegni",
+    "heatmap_cell_title": "{{day}}{{hour}}: impegno{{count}}",
+    "heatmap_cell_title_one": "{{day}}{{hour}}: impegno{{count}}",
+    "heatmap_cell_title_other": "{{day}}{{hour}}: impegni{{count}}",
+    "loading_heatmap": "Caricamento mappa termica...",
+    "not_enough_data": "Dati sul coinvolgimento ancora insufficienti.",
+    "time_period": "Periodo di tempo",
+    "title": "Invia ottimizzatore di tempo"
   },
   "newsletter_template_form": {
     "content": "Content",
@@ -11282,14 +11469,31 @@
     "notice_title_placeholder": "Enter notice title...",
     "preview": "Preview",
     "preview_title_placeholder": "Enter preview title...",
-    "split_view": "Split View"
+    "split_view": "Split View",
+    "start_writing": "Inizia a scrivere..."
   },
   "seed_generator": {
-    "count_aria_label": "Count Aria",
+    "count_aria_label": "Conteggio {{label}}",
     "data_types_heading": "Data Types",
     "development_only": "Development Only",
     "generate_button": "Generate",
-    "warning_body": "Warning Body"
+    "warning_body": "Warning Body",
+    "option_users_label": "Utenti",
+    "option_users_desc": "Genera account membro di esempio",
+    "option_listings_label": "Annunci",
+    "option_listings_desc": "Genera offerte e richieste di esempio",
+    "option_transactions_label": "Transazioni",
+    "option_transactions_desc": "Generare transazioni di time-credit campione",
+    "option_feed_posts_label": "Alimenta i post",
+    "option_feed_posts_desc": "Genera post di feed della community di esempio",
+    "option_events_label": "Eventi",
+    "option_events_desc": "Genera eventi di community di esempio",
+    "option_groups_label": "Gruppi",
+    "option_groups_desc": "Genera gruppi campione",
+    "option_messages_label": "Messaggi",
+    "option_messages_desc": "Genera messaggi di esempio per i membri",
+    "option_badges_label": "Distintivi",
+    "option_badges_desc": "Genera premi badge campione"
   },
   "segment_form": {
     "analyzing_member_data": "Analyzing Member Data",
@@ -11378,7 +11582,15 @@
     "no_members_found": "No members found found",
     "no_recent_broker_activity": "No recent broker activity found",
     "quick_access": "Quick Access",
-    "recent_activity": "Recent Activity"
+    "recent_activity": "Recent Activity",
+    "no_data": "Nessun dato",
+    "no_data_available": "Nessun dato disponibile",
+    "open_page_help": "Apri la pagina di aiuto",
+    "help": "Aiuto",
+    "refresh": "Aggiorna",
+    "search": "Ricerca...",
+    "data_table": "Dati",
+    "total_count": "{{count}}totale"
   },
   "subtitle": "Subtitle",
   "super_controls": {
@@ -12587,7 +12799,8 @@
     },
     "errors": {
       "load_failed": "Failed to load alerts",
-      "send_failed": "Failed to send alert"
+      "send_failed": "Failed to send alert",
+      "deactivate_failed": "Impossibile disattivare l'avviso"
     },
     "severity": {
       "info": "Info",
@@ -12609,7 +12822,8 @@
       "sent": "Sent"
     },
     "status": {
-      "inactive": "Inactive"
+      "inactive": "Inactive",
+      "active": "Attivo"
     },
     "modal": {
       "title": "Send emergency alert"
@@ -12625,6 +12839,15 @@
       "confirm_prefix": "This will immediately push to",
       "confirm_audience": "all active members",
       "confirm_suffix": "and display a persistent banner on all pages. I confirm this is a genuine emergency."
+    },
+    "heading": "Avvisi di emergenza",
+    "intro": {
+      "title": "Informazioni su questa pagina: da usare con cautela",
+      "body": "Gli avvisi di emergenza sono trasmissioni urgenti inviate immediatamente a tutti i membri (o a un sottogruppo mirato). Utilizzalo solo in caso di emergenze reali: condizioni meteorologiche avverse, incidenti legati alla sicurezza della comunità o lacune nella copertura delle cure urgenti. Gli avvisi vengono inviati come notifiche push e banner in-app. Non possono essere annullati una volta spediti.",
+      "targeting_label": "Targeting",
+      "targeting_body": "Selezionando la gravità \"Pericolo\" o \"Avvertenza\" si invia a tutti i membri. Redigere attentamente: non è previsto alcun richiamo una volta trasmesso.",
+      "delivery_label": "Consegna",
+      "delivery_body": "Gli avvisi vengono consegnati entro 60 secondi dall'invio."
     }
   },
   "admin": {
@@ -16571,5 +16794,79 @@
     "unsuppress": "Non sopprimere",
     "unsuppress_confirm": "Rimuovere{{email}}dall'elenco di soppressione in modo che possa ricevere nuovamente le newsletter?",
     "unsuppress_title": "Riattiva la posta elettronica"
+  },
+  "integration_showcase": {
+    "meta": {
+      "page_title": "Vetrina dell'integrazione",
+      "title": "Vetrina dell'integrazione",
+      "subtitle": "Un riferimento a pagina singola di ogni API pubblica, webhook, endpoint federativo e superficie OAuth disponibile in questa distribuzione, pronto per essere consegnato a un partner di integrazione tecnica."
+    },
+    "actions": {
+      "refresh": "Aggiorna",
+      "refresh_aria": "Aggiorna la vetrina dell'integrazione"
+    },
+    "about": {
+      "title": "A proposito di questa pagina",
+      "body": "Utilizza questa pagina quando imposti un'integrazione con un servizio di terze parti, il sistema dati di un comune o una rete NEXUS federata. Ogni endpoint elencato qui è attivo e ha come ambito questa distribuzione. I payload di esempio sono illustrativi: i valori reali dipendono dallo slug del tenant e dalle credenziali del partner. Condividi questo URL con i partner di integrazione anziché indirizzarli ai documenti API non elaborati.",
+      "last_refreshed": "Ultimo aggiornamento{{date}}."
+    },
+    "sections": {
+      "sample_request": "Richiesta di campione",
+      "read_full_spec": "Leggi le specifiche complete su GitHub"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "toasts": {
+      "load_failed": "Impossibile caricare la vetrina dell'integrazione"
+    }
+  },
+  "admin_help": {
+    "page_title": "Centro assistenza",
+    "title": "Centro assistenza per amministratori",
+    "description": "Trova indicazioni per ogni pagina nel pannello di amministrazione. Fare clic su qualsiasi articolo per accedere alla pagina corrispondente: a ? il pulsante aprirà la guida contestuale.",
+    "search_placeholder": "Cerca negli articoli della guida{{count}}...",
+    "search_aria": "Cerca articoli della guida",
+    "no_matches": "Nessun articolo corrisponde alla tua ricerca.",
+    "view_help": "Visualizza la guida",
+    "categories": {
+      "general_admin": "Amministratore generale",
+      "caring_community": "Comunità premurosa",
+      "kiss_agoris": "BACIO E AGORI"
+    }
+  },
+  "newsletter_segments": {
+    "col_created": "Creato",
+    "col_members": "Membri",
+    "col_status": "Stato",
+    "create_first_segment": "Crea il tuo primo segmento",
+    "delete_confirm": "Eliminare il segmento \"{{name}}\"? Le campagne che lo utilizzano non potranno più rivolgersi a questo pubblico.",
+    "delete_confirm_label": "Elimina segmento",
+    "delete_title": "Elimina segmento",
+    "description": "Crea segmenti di pubblico riutilizzabili per campagne di newsletter mirate.",
+    "empty_description": "Crea un segmento di pubblico per indirizzare i membri in base all'attività, ai campi del profilo o al comportamento della newsletter.",
+    "empty_title": "Nessun segmento ancora",
+    "match_all": "Tutte le regole (AND)",
+    "match_any": "Qualsiasi regola (OR)",
+    "title": "Segmenti"
+  },
+  "newsletter_templates": {
+    "category_custom": "Costume",
+    "category_saved": "Salvato",
+    "category_starter": "Antipasto",
+    "col_created": "Creato",
+    "col_status": "Stato",
+    "col_template_name": "Nome del modello",
+    "delete_confirm": "Eliminare il modello \"{{name}}\"? Questa operazione non può essere annullata.",
+    "delete_confirm_label": "Elimina modello",
+    "delete_title": "Elimina modello",
+    "description": "Crea e gestisci modelli di email riutilizzabili per campagne di newsletter.",
+    "empty_description": "Crea modelli riutilizzabili per accelerare la creazione di campagne future.",
+    "empty_title": "Nessun modello ancora",
+    "failed_to_delete_template": "Impossibile eliminare il modello.",
+    "failed_to_duplicate_template": "Impossibile duplicare il modello.",
+    "template_deleted": "Modello eliminato.",
+    "template_duplicated": "Modello duplicato.",
+    "title": "Modelli"
   }
 }

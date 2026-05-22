@@ -1151,6 +1151,17 @@
         "65_plus": "65+",
         "unknown": "Unbekannt"
       }
+    },
+    "empty_value": "-",
+    "loading": "Analysen werden geladen",
+    "location_marker_title": "{{area}}:{{count}}-Mitglieder",
+    "member_count_one": "{{count}}-Mitglied",
+    "member_count_other": "{{count}}-Mitglieder",
+    "not_available": "Nicht verfügbar",
+    "errors": {
+      "export_failed": "Analyse konnte nicht exportiert werden.",
+      "load_community_failed": "Community-Analyse konnte nicht geladen werden.",
+      "load_geography_failed": "Geografische Analysen konnten nicht geladen werden."
     }
   },
   "billing": {
@@ -1162,7 +1173,7 @@
     "checkout_failed": "Checkout Failed",
     "checkout_failed_desc": "There was a problem processing your checkout. Please try again.",
     "checkout_success": "Checkout successfully",
-    "checkout_success_desc": "Your subscription has been activated successfully.",
+    "checkout_success_desc": "Sie nutzen jetzt den Tarif {{plan}}",
     "checkout_success_generic": "Checkout completed successfully",
     "checkout_title": "Checkout",
     "choose_plan": "Choose Plan",
@@ -1270,10 +1281,20 @@
     "upgrade_message": "Upgrade",
     "upgrade_message_placeholder": "Enter upgrade message...",
     "upgrade_sent": "Upgrade sent",
-    "user_count_label": "User Count",
+    "user_count_label": "{{count}} / {{max}} Benutzer",
     "your_plan_usage": "Your Plan Usage",
     "over_limit_warning": "You've reached your plan limits. Upgrade to continue.",
-    "upgrade_modal_desc": "Upgrade your plan to unlock additional features and capacity."
+    "upgrade_modal_desc": "Upgrade your plan to unlock additional features and capacity.",
+    "yearly_suffix": "Jahr",
+    "action_delegate_granted": "Delegierter gewährt",
+    "action_delegate_revoked": "Delegierter widerrufen",
+    "action_grace_period_set": "Schonfrist festgelegt",
+    "action_plan_assigned": "Plan zugewiesen",
+    "action_plan_paused": "Plan pausiert",
+    "action_plan_resumed": "Der Plan wurde wieder aufgenommen",
+    "action_unknown": "Unbekannte Aktion",
+    "discount_reason_placeholder": "z.B. Von Wohltätigkeitsorganisationen bestätigt, Early Adopter",
+    "percent_mrr": "% MRR"
   },
   "blog": {
     "an_unexpected_error_occurred": "An unexpected error occurred",
@@ -2034,7 +2055,22 @@
     "type_event": "Event",
     "type_listing": "Listing",
     "type_resource": "Resource",
-    "type_vol_opportunity": "Vol Opportunity"
+    "type_vol_opportunity": "Vol Opportunity",
+    "add_category": "Kategorie hinzufügen",
+    "create_category": "Kategorie erstellen",
+    "delete_category": "Kategorie löschen",
+    "delete_confirm_message": "{{name}}löschen? Dies kann nicht rückgängig gemacht werden.",
+    "edit_category": "Kategorie bearbeiten",
+    "empty_title": "Keine Kategorien verfügbar",
+    "item_added": "Kategorie hinzugefügt",
+    "item_deleted": "Kategorie gelöscht",
+    "item_updated": "Kategorie aktualisiert",
+    "label_created": "Erstellt",
+    "label_listings": "Einträge",
+    "label_slug": "Schnecke",
+    "listings": "Einträge",
+    "save_changes": "Änderungen speichern",
+    "search_placeholder": "Kategorien durchsuchen..."
   },
   "common": {
     "an_unexpected_error": "An unexpected error occurred",
@@ -2080,7 +2116,8 @@
     "save": "Save",
     "select_all": "Select All",
     "select_item": "Select Item",
-    "yes": "Yes"
+    "yes": "Yes",
+    "unknown": "Unbekannt"
   },
   "community": {
     "active_matching_users": "Active Matching Users",
@@ -2117,7 +2154,8 @@
     "smart_match_monitoring_desc": "Monitor real-time smart matching activity and match score distribution",
     "smart_match_monitoring_title": "Smart Match Monitoring",
     "smart_match_users_desc": "View and manage users participating in the smart matching system",
-    "smart_match_users_title": "Smart Match Users"
+    "smart_match_users_title": "Smart Match Users",
+    "approval_rate_aria": "Genehmigungsrate:{{value}}%"
   },
   "completed": "Completed",
   "config": {
@@ -3437,7 +3475,20 @@
     "edit_title": "Edit",
     "label_edit_deliverable": "Edit Deliverable",
     "update_failed": "Update failed",
-    "updated_success": "Updated succeeded"
+    "updated_success": "Updated succeeded",
+    "activity_by_user_date": "{{action}}von{{user}}-{{date}}",
+    "priority_critical": "Kritisch",
+    "priority_high": "Hoch",
+    "priority_low": "Niedrig",
+    "priority_medium": "Medium",
+    "risk_critical": "Kritisch",
+    "risk_high": "Hoch",
+    "risk_low": "Niedrig",
+    "risk_medium": "Medium",
+    "status_completed": "Vollendet",
+    "status_in_progress": "Im Gange",
+    "status_planned": "Geplant",
+    "status_review": "Im Rückblick"
   },
   "details": "Details",
   "diagnostics": {
@@ -3461,7 +3512,23 @@
     "score_distribution": "Score Distribution",
     "score_distribution_empty": "No score distribution found",
     "score_factors": "Score Factors",
-    "score_factors_desc": "Score Factors."
+    "score_factors_desc": "Score Factors.",
+    "avg_match_score": "Durchschnittlicher Match-Score",
+    "cache_entries": "Cache-Einträge",
+    "diagnose": "Diagnostizieren",
+    "diagnose_listing_matches": "Diagnose von Eintragsübereinstimmungen",
+    "diagnose_listing_matches_desc": "Geben Sie eine Eintrags-ID ein, um zu sehen, welche Benutzer zugeordnet wurden und warum.",
+    "diagnose_user_matches": "Benutzerübereinstimmungen diagnostizieren",
+    "diagnose_user_matches_desc": "Geben Sie eine Benutzer-ID ein, um die Spielergebnisse, Punktestände und die Faktoren anzuzeigen, die zu jedem Spiel beitragen.",
+    "engine_status": "Motorstatus",
+    "factor_community_participation": "Beteiligung der Gemeinschaft",
+    "factor_login_frequency": "Anmeldehäufigkeit",
+    "factor_profile_completeness": "Vollständigkeit des Profils",
+    "factor_review_quality": "Überprüfen Sie die Qualität",
+    "factor_social_engagement": "Soziales Engagement",
+    "factor_transaction_activity": "Transaktionsaktivität",
+    "matches_today": "Spiele heute",
+    "user_prompt": "Geben Sie eine Benutzer-ID ein und klicken Sie auf „Diagnose“, um die Übereinstimmungsanalyse anzuzeigen."
   },
   "enterprise": {
     "back_to_roles": "Back to Roles",
@@ -5445,7 +5512,12 @@
     "search": "Search",
     "showing_of_total": "Showing {{count}} of {{total}}",
     "try_adjusting_search": "Try adjusting your search",
-    "yes": "Yes"
+    "yes": "Yes",
+    "progress_complete": "{{percent}}% abgeschlossen",
+    "status_abandoned": "Verlassen",
+    "status_active": "Aktiv",
+    "status_completed": "Vollendet",
+    "status_unknown": "Unbekannt"
   },
   "groups": {
     "activate": "Activate",
@@ -5747,7 +5819,10 @@
     "choose_icon": "Choose Icon",
     "choose_icon_placeholder": "Search for an icon...",
     "clear_icon": "Clear Icon",
-    "search_icons": "Search Icons"
+    "search_icons": "Search Icons",
+    "label": "Symbol",
+    "no_icons_found": "Es wurden keine Symbole gefunden, die zu „{{search}}“ passen.",
+    "search_for_icon": "Nach einem Symbol suchen..."
   },
   "ideation": {
     "an_unexpected_error_occurred": "An unexpected error occurred",
@@ -5798,7 +5873,17 @@
     "view_details": "View Details",
     "no_challenges_found": "No challenges found found",
     "no_matching_challenges": "No matching challenges found",
-    "no_status_challenges": "No status challenges found"
+    "no_status_challenges": "No status challenges found",
+    "col_created": "Erstellt",
+    "ideation": "Idee",
+    "status_archived": "Archiviert",
+    "status_closed": "Geschlossen",
+    "status_draft": "Entwurf",
+    "status_evaluating": "Bewerten",
+    "status_open": "Offen",
+    "status_voting": "Wählen",
+    "top_matches_for_user_one": "Beste{{count}}-Übereinstimmung für{{name}}",
+    "top_matches_for_user_other": "Die besten{{count}}-Übereinstimmungen für{{name}}"
   },
   "impact": {
     "chart_activity_breakdown_title": "Activity Breakdown",
@@ -6029,7 +6114,7 @@
     "templates_load_error": "Failed to load templates",
     "templates_delete": "Delete",
     "templates_delete_title": "Delete Template",
-    "templates_delete_confirm": "Are you sure you want to delete this template?",
+    "templates_delete_confirm": "M?chten Sie \"{{name}}\" wirklich l?schen? Diese Aktion kann nicht r?ckg?ngig gemacht werden.",
     "templates_delete_error": "Failed to delete template",
     "templates_deleted": "Template deleted",
     "stage_applied": "Applied",
@@ -6064,7 +6149,17 @@
     "type_paid": "Paid",
     "type_volunteer": "Volunteer",
     "type_timebank": "Timebank",
-    "bias_all_jobs_placeholder": "All jobs"
+    "bias_all_jobs_placeholder": "All jobs",
+    "pipeline_status_accepted": "Akzeptiert",
+    "pipeline_status_cancelled": "Abgesagt",
+    "pipeline_status_declined": "Abgelehnt",
+    "pipeline_status_pending": "Ausstehend",
+    "pipeline_status_proposed": "Vorgeschlagen",
+    "pipeline_status_rejected": "Abgelehnt",
+    "pipeline_status_withdrawn": "Zurückgezogen",
+    "bias_not_available": "N / A",
+    "bias_rejection_rates_table": "Ablehnungsraten nach Stufe",
+    "bias_avg_time_stage_table": "Durchschnittliche Zeit auf der Bühne"
   },
   "last_checked": "Last checked: {{time}}",
   "listings": {
@@ -6494,11 +6589,11 @@
     "no_pending_description": "All caught up - no items are waiting for review.",
     "notes_label": "Notes",
     "notes_placeholder": "Add moderation notes...",
-    "posted_by": "Posted by",
+    "posted_by": "Gepostet von {{name}}",
     "reason_label": "Reason",
     "reason_placeholder": "Enter reason...",
     "reason_required": "A reason is required",
-    "spam_score": "Spam score",
+    "spam_score": "Spam-Bewertung: {{score}}",
     "stats": {
       "pending_count": "Pending",
       "flagged_count": "Flagged",
@@ -6510,7 +6605,15 @@
     "flags_tooltip": "Number of moderation flags on this item.",
     "load_error": "Failed to load the moderation queue.",
     "pagination_label": "Moderation queue pagination",
-    "user_fallback": "Unknown user"
+    "user_fallback": "Unknown user",
+    "label_content": "Inhalt",
+    "post_type_event": "Ereignis",
+    "post_type_listing": "Auflistung",
+    "post_type_post": "Textbeitrag",
+    "post_type_review": "Rezension",
+    "reports_meta_description": "Überprüfen, lösen und verwerfen Sie von Mitgliedern eingereichte Moderationsberichte.",
+    "unknown_tenant": "Unbekannter Mieter",
+    "member_id": "ID:{{id}}"
   },
   "new": "NEW",
   "newsletters": {
@@ -6928,7 +7031,8 @@
     "tab_memory_spikes": "Memory Spikes",
     "tab_request_volume": "Request Volume",
     "tab_slow_queries": "Slow Queries",
-    "tab_slow_requests": "Slow Requests"
+    "tab_slow_requests": "Slow Requests",
+    "refresh": "Aktualisieren"
   },
   "placeholder": {
     "migration_description": "Migrating legacy content to the new system",
@@ -6965,7 +7069,9 @@
     "unknown": "Unknown",
     "votes": "Votes",
     "no_matching_polls": "No matching polls found",
-    "no_polls_found": "No polls found found"
+    "no_polls_found": "No polls found found",
+    "status_active": "Aktiv",
+    "status_ended": "Beendet"
   },
   "quick_actions": {
     "advanced_controls": "Advanced Controls",
@@ -9159,7 +9265,7 @@
     "desc_mark_as_under_investigation": "Mark as Under Investigation",
     "desc_positive_to_credit_negative_to_debit": "Positive to credit, negative to debit the account",
     "desc_required_this_will_be_recorded_in_the_g": "Required. This will be recorded in the general ledger",
-    "download_statement_for": "Download Statement for",
+    "download_statement_for": "Auszug f?r {{name}} herunterladen",
     "failed_to_adjust_balance": "Failed to adjust balance",
     "failed_to_grant_credits": "Failed to grant credits",
     "failed_to_load_alerts": "Failed to load alerts",
@@ -9211,7 +9317,20 @@
     "top_earners": "Top Earners",
     "top_spenders": "Top Spenders",
     "user_report_desc": "View a detailed time credit report for an individual member",
-    "user_report_title": "User Report"
+    "user_report_title": "User Report",
+    "severity_critical": "Kritisch",
+    "severity_high": "Hoch",
+    "severity_low": "Niedrig",
+    "severity_medium": "Medium",
+    "status_dismissed": "Entlassen",
+    "status_new": "Neu",
+    "status_resolved": "Gelöst",
+    "status_reviewing": "Überprüfung",
+    "tab_all": "Alle",
+    "tab_dismissed": "Entlassen",
+    "tab_new": "Neu",
+    "tab_resolved": "Gelöst",
+    "tab_reviewing": "Überprüfung"
   },
   "trends": {
     "card_title": "Trends",
@@ -10581,7 +10700,20 @@
       "suspend": "Aussetzen",
       "suspended": "Coupon ausgesetzt",
       "table_aria": "Händlergutscheine"
-    }
+    },
+    "col_sales": "Verkäufe",
+    "col_rating": "Bewertung",
+    "filter_all": "Alle",
+    "filter_approved": "Genehmigt",
+    "seller_filter_all": "Alle",
+    "seller_filter_private": "Privat",
+    "seller_filter_business": "Geschäft",
+    "seller_filter_verified": "Verifiziert",
+    "seller_filter_unverified": "Nicht bestätigt",
+    "filter_flagged": "Gekennzeichnet",
+    "filter_pending": "Ausstehend",
+    "filter_rejected": "Abgelehnt",
+    "verify_business": "Unternehmen bestätigen"
   },
   "spam": {
     "title": "Spam Detection",
@@ -10782,7 +10914,8 @@
     "maps_kill_switch_aria": "Map display kill switch (locked off)",
     "map_provider_aria": "Map provider",
     "geocoding_provider_aria": "Autocomplete provider",
-    "clear_failed": "Failed to clear"
+    "clear_failed": "Failed to clear",
+    "google_map_id_placeholder": "Karten-ID..."
   },
   "cron_setup": {
     "notice_title": "Important: how cron works on Project NEXUS",
@@ -11003,7 +11136,15 @@
     "remove_confirm_message": "Remove Confirm",
     "remove_from_whitelist": "Remove From Whitelist",
     "view": "View",
-    "whitelisted_tenants_count": "Whitelisted Tenants Count"
+    "whitelisted_tenants_count": "Zugelassene Mandanten ({{count}})",
+    "notes_placeholder": "Fügen Sie Notizen hinzu, warum dieser Mieter auf die Whitelist gesetzt wird...",
+    "page_description": "Verwalten Sie die Liste der Mieter, die an der Föderation teilnehmen dürfen.",
+    "page_title": "Weiße Liste der Föderation",
+    "select_tenant_placeholder": "Wählen Sie einen Mieter aus...",
+    "select_tenant_required": "Bitte wählen Sie einen Mieter aus.",
+    "tenant_added_to_whitelist": "Mieter zur Whitelist hinzugefügt",
+    "tenant_removed_from_whitelist": "Mieter von der Whitelist entfernt",
+    "whitelisted_tenants_aria": "Mieter auf der Whitelist"
   },
   "impact_report_labels": {
     "transactions": "Transactions",
@@ -11031,7 +11172,17 @@
     "status_archived": "Archived",
     "status_draft": "Draft",
     "status_published": "Published",
-    "update_document": "Update Document"
+    "update_document": "Update Document",
+    "content": "Inhalt",
+    "content_placeholder": "Geben Sie den Dokumentinhalt ein...",
+    "document_content": "Dokumentinhalt",
+    "document_created": "Dokument erstellt",
+    "document_details": "Dokumentdetails",
+    "document_updated": "Dokument aktualisiert",
+    "failed_to_load_document": "Dokument konnte nicht geladen werden",
+    "failed_to_save_document": "Dokument konnte nicht gespeichert werden",
+    "title_placeholder": "Geben Sie den öffentlichen Titel ein...",
+    "title_required": "Titel ist erforderlich"
   },
   "legal_versions": {
     "compliance_dashboard": "Compliance Dashboard",
@@ -11055,7 +11206,7 @@
     "filter_application": "Application",
     "filter_cron": "Cron",
     "filter_errors": "Errors",
-    "lines_count": "Lines Count",
+    "lines_count": "{{count}} Zeilen",
     "search_placeholder": "Enter search...",
     "total_files": "Total Files",
     "total_size": "Total Size"
@@ -11114,7 +11265,8 @@
     "total": "Total",
     "tracking_enabled": "Tracking Enabled",
     "view_bounces": "View Bounces",
-    "volume_bonus": "Volume Bonus"
+    "volume_bonus": "Volume Bonus",
+    "system_health": "Systemgesundheit"
   },
   "newsletter_form": {
     "ab_test_label": "Ab Test",
@@ -11235,13 +11387,48 @@
     "opened": "Opened",
     "preview_recipient_count": "Preview Recipient Count",
     "resend_newsletter": "Resend Newsletter",
-    "total_sent": "Total sent"
+    "total_sent": "Total sent",
+    "cancel": "Stornieren",
+    "loading": "Informationen zum erneuten Senden werden geladen...",
+    "no_recipients_desc": "Es gibt keine Empfänger, die Ihren Auswahlkriterien entsprechen.",
+    "non_clickers": "Nicht-Klicker",
+    "non_clickers_count": "{{count}}-Empfänger, der geöffnet, aber nicht geklickt hat",
+    "non_clickers_count_plural": "{{count}}-Empfänger, die geöffnet, aber nicht geklickt haben",
+    "non_openers": "Nicht-Öffner",
+    "non_openers_count": "{{count}}-Empfänger, der nicht geöffnet hat",
+    "non_openers_count_plural": "{{count}}-Empfänger, die nicht geöffnet haben",
+    "preview_recipient_count_desc": "Dieser erneute Versand wird an den{{count}}-Empfänger gesendet",
+    "preview_recipient_count_desc_plural": "Dieser erneute Versand wird an{{count}}-Empfänger gesendet",
+    "queue_resend": "Warteschlange erneut senden",
+    "resend_to": "Erneut senden an",
+    "subject_override": "Betreffüberschreibung",
+    "subject_override_desc": "Lassen Sie das Feld leer, um den ursprünglichen Betreff zu verwenden.",
+    "subject_override_placeholder": "Geben Sie eine Betreffüberschreibung ein...",
+    "subtitle": "Versenden Sie diesen Newsletter an eine gezielte Untergruppe von Empfängern."
   },
   "newsletter_send_time": {
     "engagement_heatmap": "Engagement Heatmap",
     "high": "High",
     "low": "Low",
-    "top_recommended": "Top Recommended"
+    "top_recommended": "Top Recommended",
+    "day_friday": "Fr",
+    "day_monday": "Mo",
+    "day_saturday": "Sa",
+    "day_sunday": "Sonne",
+    "day_thursday": "Do",
+    "day_tuesday": "Di",
+    "day_wednesday": "Heiraten",
+    "days": "{{count}}Tage",
+    "description": "Finden Sie den besten Zeitpunkt zum Versenden jeder Kampagne basierend auf dem jüngsten Engagement.",
+    "empty_hint": "Versenden Sie ein paar Newsletter, um Engagement-Muster aufzudecken.",
+    "engagements": "Engagements",
+    "heatmap_cell_title": "{{day}}{{hour}}:{{count}}-Engagement",
+    "heatmap_cell_title_one": "{{day}}{{hour}}:{{count}}-Engagement",
+    "heatmap_cell_title_other": "{{day}}{{hour}}:{{count}}-Engagements",
+    "loading_heatmap": "Heatmap wird geladen...",
+    "not_enough_data": "Noch nicht genügend Engagement-Daten.",
+    "time_period": "Zeitraum",
+    "title": "Zeitoptimierer senden"
   },
   "newsletter_template_form": {
     "content": "Content",
@@ -11282,14 +11469,31 @@
     "notice_title_placeholder": "Enter notice title...",
     "preview": "Preview",
     "preview_title_placeholder": "Enter preview title...",
-    "split_view": "Split View"
+    "split_view": "Split View",
+    "start_writing": "Fangen Sie an zu schreiben..."
   },
   "seed_generator": {
-    "count_aria_label": "Count Aria",
+    "count_aria_label": "Anzahl {{label}}",
     "data_types_heading": "Data Types",
     "development_only": "Development Only",
     "generate_button": "Generate",
-    "warning_body": "Warning Body"
+    "warning_body": "Warning Body",
+    "option_users_label": "Benutzer",
+    "option_users_desc": "Generieren Sie Beispiel-Mitgliedskonten",
+    "option_listings_label": "Einträge",
+    "option_listings_desc": "Generieren Sie Musterangebote und -anfragen",
+    "option_transactions_label": "Transaktionen",
+    "option_transactions_desc": "Generieren Sie Beispiel-Zeitguthabentransaktionen",
+    "option_feed_posts_label": "Feed-Beiträge",
+    "option_feed_posts_desc": "Generieren Sie Beispiel-Community-Feed-Beiträge",
+    "option_events_label": "Veranstaltungen",
+    "option_events_desc": "Generieren Sie Beispiel-Community-Events",
+    "option_groups_label": "Gruppen",
+    "option_groups_desc": "Generieren Sie Probengruppen",
+    "option_messages_label": "Nachrichten",
+    "option_messages_desc": "Generieren Sie Beispielnachrichten für Mitglieder",
+    "option_badges_label": "Abzeichen",
+    "option_badges_desc": "Generieren Sie Muster-Abzeichen-Auszeichnungen"
   },
   "segment_form": {
     "analyzing_member_data": "Analyzing Member Data",
@@ -11378,7 +11582,15 @@
     "no_members_found": "No members found found",
     "no_recent_broker_activity": "No recent broker activity found",
     "quick_access": "Quick Access",
-    "recent_activity": "Recent Activity"
+    "recent_activity": "Recent Activity",
+    "no_data": "Keine Daten",
+    "no_data_available": "Keine Daten verfügbar",
+    "open_page_help": "Hilfeseite öffnen",
+    "help": "Helfen",
+    "refresh": "Aktualisieren",
+    "search": "Suchen...",
+    "data_table": "Daten",
+    "total_count": "{{count}}insgesamt"
   },
   "subtitle": "Subtitle",
   "super_controls": {
@@ -12587,7 +12799,8 @@
     },
     "errors": {
       "load_failed": "Failed to load alerts",
-      "send_failed": "Failed to send alert"
+      "send_failed": "Failed to send alert",
+      "deactivate_failed": "Warnung konnte nicht deaktiviert werden"
     },
     "severity": {
       "info": "Info",
@@ -12609,7 +12822,8 @@
       "sent": "Sent"
     },
     "status": {
-      "inactive": "Inactive"
+      "inactive": "Inactive",
+      "active": "Aktiv"
     },
     "modal": {
       "title": "Send emergency alert"
@@ -12625,6 +12839,15 @@
       "confirm_prefix": "This will immediately push to",
       "confirm_audience": "all active members",
       "confirm_suffix": "and display a persistent banner on all pages. I confirm this is a genuine emergency."
+    },
+    "heading": "Notfallwarnungen",
+    "intro": {
+      "title": "Über diese Seite – mit Vorsicht verwenden",
+      "body": "Notfallwarnungen sind dringende Mitteilungen, die sofort an alle Mitglieder (oder eine gezielte Untergruppe) gesendet werden. Verwenden Sie dies nur für echte Notfälle – Unwetter, Sicherheitsvorfälle in der Gemeinde oder Lücken bei der dringenden Pflegeversorgung. Benachrichtigungen werden als Push-Benachrichtigungen und In-App-Banner gesendet. Sie können nach dem Versand nicht mehr rückgängig gemacht werden.",
+      "targeting_label": "Targeting",
+      "targeting_body": "Wenn Sie den Schweregrad „Gefahr“ oder „Warnung“ auswählen, werden die Nachrichten an alle Mitglieder gesendet. Sorgfältig entwerfen – nach der Ausstrahlung erfolgt kein Rückruf.",
+      "delivery_label": "Lieferung",
+      "delivery_body": "Benachrichtigungen werden innerhalb von 60 Sekunden nach Versand übermittelt."
     }
   },
   "admin": {
@@ -16571,5 +16794,79 @@
     "unsuppress": "Unterdrückung aufheben",
     "unsuppress_confirm": "{{email}}aus der Unterdrückungsliste entfernen, damit es wieder Newsletter empfangen kann?",
     "unsuppress_title": "E-Mail-Unterdrückung aufheben"
+  },
+  "integration_showcase": {
+    "meta": {
+      "page_title": "Integrationsschaufenster",
+      "title": "Integrationsschaufenster",
+      "subtitle": "Eine einseitige Referenz aller öffentlichen APIs, Webhooks, Verbundendpunkte und OAuth-Oberflächen, die in dieser Bereitstellung verfügbar sind – bereit zur Übergabe an einen technischen Integrationspartner."
+    },
+    "actions": {
+      "refresh": "Aktualisieren",
+      "refresh_aria": "Integrationsschaufenster aktualisieren"
+    },
+    "about": {
+      "title": "Über diese Seite",
+      "body": "Verwenden Sie diese Seite, wenn Sie eine Integration mit einem Drittanbieterdienst, dem Datensystem einer Gemeinde oder einem föderierten NEXUS-Netzwerk einrichten. Jeder hier aufgeführte Endpunkt ist aktiv und auf diese Bereitstellung beschränkt. Beispielnutzlasten dienen der Veranschaulichung – die tatsächlichen Werte hängen von den Anmeldeinformationen Ihres Mandanten und Partners ab. Teilen Sie diese URL mit Integrationspartnern, anstatt sie auf die Roh-API-Dokumente zu verweisen.",
+      "last_refreshed": "Zuletzt aktualisiertes{{date}}."
+    },
+    "sections": {
+      "sample_request": "Musteranfrage",
+      "read_full_spec": "Lesen Sie die vollständige Spezifikation auf GitHub"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "toasts": {
+      "load_failed": "Der Integrations-Showcase konnte nicht geladen werden"
+    }
+  },
+  "admin_help": {
+    "page_title": "Hilfecenter",
+    "title": "Admin-Hilfecenter",
+    "description": "Hier finden Sie Anleitungen für jede Seite im Admin-Bereich. Klicken Sie auf einen Artikel, um zu dieser Seite zu gelangen – ein ? Die Schaltfläche öffnet die kontextbezogene Hilfe.",
+    "search_placeholder": "Durchsuchen Sie{{count}}-Hilfeartikel...",
+    "search_aria": "Hilfeartikel durchsuchen",
+    "no_matches": "Keine Artikel entsprechen Ihrer Suche.",
+    "view_help": "Hilfe anzeigen",
+    "categories": {
+      "general_admin": "Allgemeiner Administrator",
+      "caring_community": "Fürsorgliche Gemeinschaft",
+      "kiss_agoris": "KUSS & AGORIS"
+    }
+  },
+  "newsletter_segments": {
+    "col_created": "Erstellt",
+    "col_members": "Mitglieder",
+    "col_status": "Status",
+    "create_first_segment": "Erstellen Sie Ihr erstes Segment",
+    "delete_confirm": "Segment „{{name}}“ löschen? Kampagnen, die es verwenden, können diese Zielgruppe nicht mehr ansprechen.",
+    "delete_confirm_label": "Segment löschen",
+    "delete_title": "Segment löschen",
+    "description": "Erstellen Sie wiederverwendbare Zielgruppensegmente für gezielte Newsletter-Kampagnen.",
+    "empty_description": "Erstellen Sie ein Zielgruppensegment, um Mitglieder nach Aktivität, Profilfeldern oder Newsletter-Verhalten anzusprechen.",
+    "empty_title": "Noch keine Segmente",
+    "match_all": "Alle Regeln (UND)",
+    "match_any": "Beliebige Regel (ODER)",
+    "title": "Segmente"
+  },
+  "newsletter_templates": {
+    "category_custom": "Brauch",
+    "category_saved": "Gespeichert",
+    "category_starter": "Anlasser",
+    "col_created": "Erstellt",
+    "col_status": "Status",
+    "col_template_name": "Vorlagenname",
+    "delete_confirm": "Vorlage „{{name}}“ löschen? Dies kann nicht rückgängig gemacht werden.",
+    "delete_confirm_label": "Vorlage löschen",
+    "delete_title": "Vorlage löschen",
+    "description": "Erstellen und verwalten Sie wiederverwendbare E-Mail-Vorlagen für Newsletter-Kampagnen.",
+    "empty_description": "Erstellen Sie wiederverwendbare Vorlagen, um die Erstellung zukünftiger Kampagnen zu beschleunigen.",
+    "empty_title": "Noch keine Vorlagen",
+    "failed_to_delete_template": "Vorlage konnte nicht gelöscht werden.",
+    "failed_to_duplicate_template": "Die Vorlage konnte nicht dupliziert werden.",
+    "template_deleted": "Vorlage gelöscht.",
+    "template_duplicated": "Vorlage dupliziert.",
+    "title": "Vorlagen"
   }
 }

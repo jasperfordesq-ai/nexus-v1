@@ -1151,6 +1151,17 @@
         "65_plus": "65歳以上",
         "unknown": "未知"
       }
+    },
+    "empty_value": "-",
+    "loading": "分析を読み込み中",
+    "location_marker_title": "{{area}}:{{count}}メンバー",
+    "member_count_one": "{{count}}メンバー",
+    "member_count_other": "{{count}}メンバー",
+    "not_available": "利用不可",
+    "errors": {
+      "export_failed": "分析をエクスポートできませんでした。",
+      "load_community_failed": "コミュニティ分析を読み込めませんでした。",
+      "load_geography_failed": "地理分析をロードできませんでした。"
     }
   },
   "billing": {
@@ -1162,7 +1173,7 @@
     "checkout_failed": "Checkout Failed",
     "checkout_failed_desc": "There was a problem processing your checkout. Please try again.",
     "checkout_success": "Checkout successfully",
-    "checkout_success_desc": "Your subscription has been activated successfully.",
+    "checkout_success_desc": "{{plan}} ?????????",
     "checkout_success_generic": "Checkout completed successfully",
     "checkout_title": "Checkout",
     "choose_plan": "Choose Plan",
@@ -1270,10 +1281,20 @@
     "upgrade_message": "Upgrade",
     "upgrade_message_placeholder": "Enter upgrade message...",
     "upgrade_sent": "Upgrade sent",
-    "user_count_label": "User Count",
+    "user_count_label": "{{count}} / {{max}} ????",
     "your_plan_usage": "Your Plan Usage",
     "over_limit_warning": "You've reached your plan limits. Upgrade to continue.",
-    "upgrade_modal_desc": "Upgrade your plan to unlock additional features and capacity."
+    "upgrade_modal_desc": "Upgrade your plan to unlock additional features and capacity.",
+    "yearly_suffix": "年",
+    "action_delegate_granted": "代理人が承認されました",
+    "action_delegate_revoked": "代理人が取り消されました",
+    "action_grace_period_set": "猶予期間の設定",
+    "action_plan_assigned": "割り当てられたプラン",
+    "action_plan_paused": "計画は一時停止されました",
+    "action_plan_resumed": "計画再開",
+    "action_unknown": "不明なアクション",
+    "discount_reason_placeholder": "例えば慈善事業の検証済み、早期導入者",
+    "percent_mrr": "%MRR"
   },
   "blog": {
     "an_unexpected_error_occurred": "An unexpected error occurred",
@@ -2034,7 +2055,22 @@
     "type_event": "Event",
     "type_listing": "Listing",
     "type_resource": "Resource",
-    "type_vol_opportunity": "Vol Opportunity"
+    "type_vol_opportunity": "Vol Opportunity",
+    "add_category": "カテゴリを追加",
+    "create_category": "カテゴリの作成",
+    "delete_category": "カテゴリの削除",
+    "delete_confirm_message": "{{name}}を削除しますか?これを元に戻すことはできません。",
+    "edit_category": "カテゴリを編集する",
+    "empty_title": "利用可能なカテゴリがありません",
+    "item_added": "カテゴリを追加しました",
+    "item_deleted": "カテゴリが削除されました",
+    "item_updated": "カテゴリを更新しました",
+    "label_created": "作成されました",
+    "label_listings": "リスト",
+    "label_slug": "ナメクジ",
+    "listings": "リスト",
+    "save_changes": "変更を保存する",
+    "search_placeholder": "カテゴリを検索..."
   },
   "common": {
     "an_unexpected_error": "An unexpected error occurred",
@@ -2080,7 +2116,8 @@
     "save": "Save",
     "select_all": "Select All",
     "select_item": "Select Item",
-    "yes": "Yes"
+    "yes": "Yes",
+    "unknown": "未知"
   },
   "community": {
     "active_matching_users": "Active Matching Users",
@@ -2117,7 +2154,8 @@
     "smart_match_monitoring_desc": "Monitor real-time smart matching activity and match score distribution",
     "smart_match_monitoring_title": "Smart Match Monitoring",
     "smart_match_users_desc": "View and manage users participating in the smart matching system",
-    "smart_match_users_title": "Smart Match Users"
+    "smart_match_users_title": "Smart Match Users",
+    "approval_rate_aria": "承認率:{{value}}%"
   },
   "completed": "Completed",
   "config": {
@@ -3437,7 +3475,20 @@
     "edit_title": "Edit",
     "label_edit_deliverable": "Edit Deliverable",
     "update_failed": "Update failed",
-    "updated_success": "Updated succeeded"
+    "updated_success": "Updated succeeded",
+    "activity_by_user_date": "{{action}}by{{user}}-{{date}}",
+    "priority_critical": "致命的",
+    "priority_high": "高い",
+    "priority_low": "低い",
+    "priority_medium": "中くらい",
+    "risk_critical": "致命的",
+    "risk_high": "高い",
+    "risk_low": "低い",
+    "risk_medium": "中くらい",
+    "status_completed": "完了しました",
+    "status_in_progress": "進行中",
+    "status_planned": "計画済み",
+    "status_review": "レビュー中"
   },
   "details": "Details",
   "diagnostics": {
@@ -3461,7 +3512,23 @@
     "score_distribution": "Score Distribution",
     "score_distribution_empty": "No score distribution found",
     "score_factors": "Score Factors",
-    "score_factors_desc": "Score Factors."
+    "score_factors_desc": "Score Factors.",
+    "avg_match_score": "平均マッチスコア",
+    "cache_entries": "キャッシュエントリ",
+    "diagnose": "診断する",
+    "diagnose_listing_matches": "リストの一致を診断する",
+    "diagnose_listing_matches_desc": "リスティング ID を入力すると、どのユーザーが一致したか、およびその理由が表示されます。",
+    "diagnose_user_matches": "ユーザーの一致を診断する",
+    "diagnose_user_matches_desc": "ユーザー ID を入力すると、試合結果、スコア、各試合に寄与した要因が表示されます。",
+    "engine_status": "エンジンのステータス",
+    "factor_community_participation": "コミュニティへの参加",
+    "factor_login_frequency": "ログイン頻度",
+    "factor_profile_completeness": "プロファイルの完全性",
+    "factor_review_quality": "レビューの品質",
+    "factor_social_engagement": "社会的関与",
+    "factor_transaction_activity": "トランザクションアクティビティ",
+    "matches_today": "今日の試合",
+    "user_prompt": "ユーザー ID を入力し、「診断」をクリックすると、一致する分析が表示されます。"
   },
   "enterprise": {
     "back_to_roles": "Back to Roles",
@@ -5445,7 +5512,12 @@
     "search": "Search",
     "showing_of_total": "Showing {{count}} of {{total}}",
     "try_adjusting_search": "Try adjusting your search",
-    "yes": "Yes"
+    "yes": "Yes",
+    "progress_complete": "{{percent}}% 完了",
+    "status_abandoned": "放棄された",
+    "status_active": "アクティブ",
+    "status_completed": "完了しました",
+    "status_unknown": "未知"
   },
   "groups": {
     "activate": "Activate",
@@ -5747,7 +5819,10 @@
     "choose_icon": "Choose Icon",
     "choose_icon_placeholder": "Search for an icon...",
     "clear_icon": "Clear Icon",
-    "search_icons": "Search Icons"
+    "search_icons": "Search Icons",
+    "label": "アイコン",
+    "no_icons_found": "「{{search}}」に一致するアイコンは見つかりませんでした",
+    "search_for_icon": "アイコンを検索..."
   },
   "ideation": {
     "an_unexpected_error_occurred": "An unexpected error occurred",
@@ -5798,7 +5873,17 @@
     "view_details": "View Details",
     "no_challenges_found": "No challenges found found",
     "no_matching_challenges": "No matching challenges found",
-    "no_status_challenges": "No status challenges found"
+    "no_status_challenges": "No status challenges found",
+    "col_created": "作成されました",
+    "ideation": "アイデア出し",
+    "status_archived": "アーカイブ済み",
+    "status_closed": "閉店",
+    "status_draft": "下書き",
+    "status_evaluating": "評価中",
+    "status_open": "開ける",
+    "status_voting": "投票",
+    "top_matches_for_user_one": "{{name}}の上位{{count}}一致",
+    "top_matches_for_user_other": "{{name}}の上位{{count}}一致"
   },
   "impact": {
     "chart_activity_breakdown_title": "Activity Breakdown",
@@ -6029,7 +6114,7 @@
     "templates_load_error": "Failed to load templates",
     "templates_delete": "Delete",
     "templates_delete_title": "Delete Template",
-    "templates_delete_confirm": "Are you sure you want to delete this template?",
+    "templates_delete_confirm": "?{{name}}????????????????????????????",
     "templates_delete_error": "Failed to delete template",
     "templates_deleted": "Template deleted",
     "stage_applied": "Applied",
@@ -6064,7 +6149,17 @@
     "type_paid": "Paid",
     "type_volunteer": "Volunteer",
     "type_timebank": "Timebank",
-    "bias_all_jobs_placeholder": "All jobs"
+    "bias_all_jobs_placeholder": "All jobs",
+    "pipeline_status_accepted": "承認されました",
+    "pipeline_status_cancelled": "キャンセル",
+    "pipeline_status_declined": "拒否されました",
+    "pipeline_status_pending": "保留中",
+    "pipeline_status_proposed": "提案された",
+    "pipeline_status_rejected": "拒否されました",
+    "pipeline_status_withdrawn": "撤回されました",
+    "bias_not_available": "該当なし",
+    "bias_rejection_rates_table": "段階ごとの拒否率",
+    "bias_avg_time_stage_table": "ステージの平均時間"
   },
   "last_checked": "Last checked: {{time}}",
   "listings": {
@@ -6494,11 +6589,11 @@
     "no_pending_description": "All caught up - no items are waiting for review.",
     "notes_label": "Notes",
     "notes_placeholder": "Add moderation notes...",
-    "posted_by": "Posted by",
+    "posted_by": "{{name}} ???",
     "reason_label": "Reason",
     "reason_placeholder": "Enter reason...",
     "reason_required": "A reason is required",
-    "spam_score": "Spam score",
+    "spam_score": "??????: {{score}}",
     "stats": {
       "pending_count": "Pending",
       "flagged_count": "Flagged",
@@ -6510,7 +6605,15 @@
     "flags_tooltip": "Number of moderation flags on this item.",
     "load_error": "Failed to load the moderation queue.",
     "pagination_label": "Moderation queue pagination",
-    "user_fallback": "Unknown user"
+    "user_fallback": "Unknown user",
+    "label_content": "コンテンツ",
+    "post_type_event": "イベント",
+    "post_type_listing": "リスト",
+    "post_type_post": "テキスト投稿",
+    "post_type_review": "レビュー",
+    "reports_meta_description": "メンバーが提出したモデレーションレポートを確認、解決、および却下します。",
+    "unknown_tenant": "不明なテナント",
+    "member_id": "ID: {{id}}"
   },
   "new": "NEW",
   "newsletters": {
@@ -6928,7 +7031,8 @@
     "tab_memory_spikes": "Memory Spikes",
     "tab_request_volume": "Request Volume",
     "tab_slow_queries": "Slow Queries",
-    "tab_slow_requests": "Slow Requests"
+    "tab_slow_requests": "Slow Requests",
+    "refresh": "リフレッシュ"
   },
   "placeholder": {
     "migration_description": "Migrating legacy content to the new system",
@@ -6965,7 +7069,9 @@
     "unknown": "Unknown",
     "votes": "Votes",
     "no_matching_polls": "No matching polls found",
-    "no_polls_found": "No polls found found"
+    "no_polls_found": "No polls found found",
+    "status_active": "アクティブ",
+    "status_ended": "終了しました"
   },
   "quick_actions": {
     "advanced_controls": "Advanced Controls",
@@ -9159,7 +9265,7 @@
     "desc_mark_as_under_investigation": "Mark as Under Investigation",
     "desc_positive_to_credit_negative_to_debit": "Positive to credit, negative to debit the account",
     "desc_required_this_will_be_recorded_in_the_g": "Required. This will be recorded in the general ledger",
-    "download_statement_for": "Download Statement for",
+    "download_statement_for": "{{name}} ??????????",
     "failed_to_adjust_balance": "Failed to adjust balance",
     "failed_to_grant_credits": "Failed to grant credits",
     "failed_to_load_alerts": "Failed to load alerts",
@@ -9211,7 +9317,20 @@
     "top_earners": "Top Earners",
     "top_spenders": "Top Spenders",
     "user_report_desc": "View a detailed time credit report for an individual member",
-    "user_report_title": "User Report"
+    "user_report_title": "User Report",
+    "severity_critical": "致命的",
+    "severity_high": "高い",
+    "severity_low": "低い",
+    "severity_medium": "中くらい",
+    "status_dismissed": "解雇されました",
+    "status_new": "新しい",
+    "status_resolved": "解決済み",
+    "status_reviewing": "レビュー中",
+    "tab_all": "全て",
+    "tab_dismissed": "解雇されました",
+    "tab_new": "新しい",
+    "tab_resolved": "解決済み",
+    "tab_reviewing": "レビュー中"
   },
   "trends": {
     "card_title": "Trends",
@@ -10581,7 +10700,20 @@
       "suspend": "つるす",
       "suspended": "クーポン停止中",
       "table_aria": "加盟店クーポン"
-    }
+    },
+    "col_sales": "販売",
+    "col_rating": "評価",
+    "filter_all": "全て",
+    "filter_approved": "承認された",
+    "seller_filter_all": "全て",
+    "seller_filter_private": "プライベート",
+    "seller_filter_business": "仕事",
+    "seller_filter_verified": "確認済み",
+    "seller_filter_unverified": "未検証",
+    "filter_flagged": "フラグ付き",
+    "filter_pending": "保留中",
+    "filter_rejected": "拒否されました",
+    "verify_business": "ビジネスの検証"
   },
   "spam": {
     "title": "Spam Detection",
@@ -10782,7 +10914,8 @@
     "maps_kill_switch_aria": "Map display kill switch (locked off)",
     "map_provider_aria": "Map provider",
     "geocoding_provider_aria": "Autocomplete provider",
-    "clear_failed": "Failed to clear"
+    "clear_failed": "Failed to clear",
+    "google_map_id_placeholder": "マップID..."
   },
   "cron_setup": {
     "notice_title": "Important: how cron works on Project NEXUS",
@@ -11003,7 +11136,15 @@
     "remove_confirm_message": "Remove Confirm",
     "remove_from_whitelist": "Remove From Whitelist",
     "view": "View",
-    "whitelisted_tenants_count": "Whitelisted Tenants Count"
+    "whitelisted_tenants_count": "???????? ({{count}})",
+    "notes_placeholder": "このテナントがホワイトリストに登録されている理由に関するメモを追加します...",
+    "page_description": "フェデレーションへの参加を許可されたテナントのリストを管理します。",
+    "page_title": "フェデレーション ホワイトリスト",
+    "select_tenant_placeholder": "テナントを選択してください...",
+    "select_tenant_required": "テナントを選択してください。",
+    "tenant_added_to_whitelist": "テナントがホワイトリストに追加されました",
+    "tenant_removed_from_whitelist": "テナントがホワイトリストから削除されました",
+    "whitelisted_tenants_aria": "ホワイトリストに登録されたテナント"
   },
   "impact_report_labels": {
     "transactions": "Transactions",
@@ -11031,7 +11172,17 @@
     "status_archived": "Archived",
     "status_draft": "Draft",
     "status_published": "Published",
-    "update_document": "Update Document"
+    "update_document": "Update Document",
+    "content": "コンテンツ",
+    "content_placeholder": "文書の内容を入力してください...",
+    "document_content": "文書の内容",
+    "document_created": "ドキュメントが作成されました",
+    "document_details": "文書の詳細",
+    "document_updated": "ドキュメントが更新されました",
+    "failed_to_load_document": "ドキュメントのロードに失敗しました",
+    "failed_to_save_document": "ドキュメントの保存に失敗しました",
+    "title_placeholder": "公開タイトルを入力してください...",
+    "title_required": "タイトルは必須です"
   },
   "legal_versions": {
     "compliance_dashboard": "Compliance Dashboard",
@@ -11055,7 +11206,7 @@
     "filter_application": "Application",
     "filter_cron": "Cron",
     "filter_errors": "Errors",
-    "lines_count": "Lines Count",
+    "lines_count": "{{count}} ?",
     "search_placeholder": "Enter search...",
     "total_files": "Total Files",
     "total_size": "Total Size"
@@ -11114,7 +11265,8 @@
     "total": "Total",
     "tracking_enabled": "Tracking Enabled",
     "view_bounces": "View Bounces",
-    "volume_bonus": "Volume Bonus"
+    "volume_bonus": "Volume Bonus",
+    "system_health": "システムの健全性"
   },
   "newsletter_form": {
     "ab_test_label": "Ab Test",
@@ -11235,13 +11387,48 @@
     "opened": "Opened",
     "preview_recipient_count": "Preview Recipient Count",
     "resend_newsletter": "Resend Newsletter",
-    "total_sent": "Total sent"
+    "total_sent": "Total sent",
+    "cancel": "キャンセル",
+    "loading": "再送情報を読み込んでいます...",
+    "no_recipients_desc": "選択基準に一致する受信者はありません。",
+    "non_clickers": "ノンクリッカー",
+    "non_clickers_count": "開封したがクリックしなかった{{count}}受信者",
+    "non_clickers_count_plural": "開封したがクリックしなかった{{count}}受信者",
+    "non_openers": "非オープナー",
+    "non_openers_count": "開かなかった{{count}}受信者",
+    "non_openers_count_plural": "開封しなかった{{count}}受信者",
+    "preview_recipient_count_desc": "この再送信は{{count}}受信者に送信されます",
+    "preview_recipient_count_desc_plural": "この再送信は{{count}}受信者に送信されます",
+    "queue_resend": "再送信をキューに入れる",
+    "resend_to": "に再送信します",
+    "subject_override": "件名のオーバーライド",
+    "subject_override_desc": "元の件名を使用する場合は空白のままにします。",
+    "subject_override_placeholder": "件名のオーバーライドを入力してください...",
+    "subtitle": "このニュースレターを対象の受信者の一部に送信します。"
   },
   "newsletter_send_time": {
     "engagement_heatmap": "Engagement Heatmap",
     "high": "High",
     "low": "Low",
-    "top_recommended": "Top Recommended"
+    "top_recommended": "Top Recommended",
+    "day_friday": "金",
+    "day_monday": "月",
+    "day_saturday": "土",
+    "day_sunday": "太陽",
+    "day_thursday": "木",
+    "day_tuesday": "火",
+    "day_wednesday": "水",
+    "days": "{{count}}日",
+    "description": "最近のエンゲージメントに基づいて、各キャンペーンを送信する最適な時期を見つけます。",
+    "empty_hint": "エンゲージメント パターンを明らかにするために、ニュースレターをいくつか送信します。",
+    "engagements": "婚約",
+    "heatmap_cell_title": "{{day}}{{hour}}:{{count}}エンゲージメント",
+    "heatmap_cell_title_one": "{{day}}{{hour}}:{{count}}エンゲージメント",
+    "heatmap_cell_title_other": "{{day}}{{hour}}:{{count}}エンゲージメント",
+    "loading_heatmap": "ヒートマップを読み込んでいます...",
+    "not_enough_data": "まだ十分なエンゲージメント データがありません。",
+    "time_period": "期間",
+    "title": "送信時間オプティマイザー"
   },
   "newsletter_template_form": {
     "content": "Content",
@@ -11282,14 +11469,31 @@
     "notice_title_placeholder": "Enter notice title...",
     "preview": "Preview",
     "preview_title_placeholder": "Enter preview title...",
-    "split_view": "Split View"
+    "split_view": "Split View",
+    "start_writing": "書き始めてください..."
   },
   "seed_generator": {
-    "count_aria_label": "Count Aria",
+    "count_aria_label": "{{label}} ?",
     "data_types_heading": "Data Types",
     "development_only": "Development Only",
     "generate_button": "Generate",
-    "warning_body": "Warning Body"
+    "warning_body": "Warning Body",
+    "option_users_label": "ユーザー",
+    "option_users_desc": "サンプルメンバーアカウントを生成する",
+    "option_listings_label": "リスト",
+    "option_listings_desc": "サンプルのオファーとリクエストを生成する",
+    "option_transactions_label": "取引",
+    "option_transactions_desc": "サンプル時間クレジット トランザクションを生成する",
+    "option_feed_posts_label": "フィード投稿",
+    "option_feed_posts_desc": "コミュニティ フィード投稿のサンプルを生成する",
+    "option_events_label": "イベント",
+    "option_events_desc": "サンプルコミュニティイベントを生成する",
+    "option_groups_label": "グループ",
+    "option_groups_desc": "サンプルグループの生成",
+    "option_messages_label": "メッセージ",
+    "option_messages_desc": "サンプルメンバーメッセージを生成する",
+    "option_badges_label": "バッジ",
+    "option_badges_desc": "サンプルバッジ賞を生成する"
   },
   "segment_form": {
     "analyzing_member_data": "Analyzing Member Data",
@@ -11378,7 +11582,15 @@
     "no_members_found": "No members found found",
     "no_recent_broker_activity": "No recent broker activity found",
     "quick_access": "Quick Access",
-    "recent_activity": "Recent Activity"
+    "recent_activity": "Recent Activity",
+    "no_data": "データなし",
+    "no_data_available": "利用可能なデータがありません",
+    "open_page_help": "ページのヘルプを開く",
+    "help": "ヘルプ",
+    "refresh": "リフレッシュ",
+    "search": "検索...",
+    "data_table": "データ",
+    "total_count": "{{count}}合計"
   },
   "subtitle": "Subtitle",
   "super_controls": {
@@ -12587,7 +12799,8 @@
     },
     "errors": {
       "load_failed": "Failed to load alerts",
-      "send_failed": "Failed to send alert"
+      "send_failed": "Failed to send alert",
+      "deactivate_failed": "アラートを非アクティブ化できませんでした"
     },
     "severity": {
       "info": "Info",
@@ -12609,7 +12822,8 @@
       "sent": "Sent"
     },
     "status": {
-      "inactive": "Inactive"
+      "inactive": "Inactive",
+      "active": "アクティブ"
     },
     "modal": {
       "title": "Send emergency alert"
@@ -12625,6 +12839,15 @@
       "confirm_prefix": "This will immediately push to",
       "confirm_audience": "all active members",
       "confirm_suffix": "and display a persistent banner on all pages. I confirm this is a genuine emergency."
+    },
+    "heading": "緊急警報",
+    "intro": {
+      "title": "このページについて - 使用には注意してください",
+      "body": "緊急警報は、すべてのメンバー (または対象のサブグループ) に即座に送信される緊急ブロードキャストです。これは、悪天候、地域の安全に関する事故、緊急治療の対象範囲が狭い場合など、真の緊急事態の場合にのみ使用してください。アラートはプッシュ通知およびアプリ内バナーとして送信されます。一度発送すると、送信を取り消すことはできません。",
+      "targeting_label": "ターゲティング",
+      "targeting_body": "重大度「危険」または「警告」を選択すると、すべてのメンバーに送信されます。慎重にドラフトを作成します。一度放送されると取り消しはありません。",
+      "delivery_label": "配達",
+      "delivery_body": "アラートは発信後 60 秒以内に配信されます。"
     }
   },
   "admin": {
@@ -16571,5 +16794,79 @@
     "unsuppress": "抑制を解除する",
     "unsuppress_confirm": "{{email}}を抑制リストから削除して、ニュースレターを再び受信できるようにしますか?",
     "unsuppress_title": "電子メールの抑制を解除する"
+  },
+  "integration_showcase": {
+    "meta": {
+      "page_title": "統合ショーケース",
+      "title": "統合ショーケース",
+      "subtitle": "この展開で利用可能なすべてのパブリック API、Webhook、フェデレーション エンドポイント、および OAuth サーフェスの単一ページのリファレンス。技術統合パートナーにすぐに渡すことができます。"
+    },
+    "actions": {
+      "refresh": "リフレッシュ",
+      "refresh_aria": "統合ショーケースを更新する"
+    },
+    "about": {
+      "title": "このページについて",
+      "body": "サードパーティのサービス、自治体のデータ システム、またはフェデレーテッド NEXUS ネットワークとの統合を設定する場合は、このページを使用します。ここにリストされているすべてのエンドポイントはライブであり、この展開にスコープされています。サンプル ペイロードは例示的なものであり、実際の値はテナントのスラッグとパートナーの資格情報によって異なります。統合パートナーに未加工の API ドキュメントを示すのではなく、この URL を統合パートナーと共有してください。",
+      "last_refreshed": "最後に更新された{{date}}。"
+    },
+    "sections": {
+      "sample_request": "サンプルリクエスト",
+      "read_full_spec": "GitHub で完全な仕様を読む"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "toasts": {
+      "load_failed": "統合ショーケースの読み込みに失敗しました"
+    }
+  },
+  "admin_help": {
+    "page_title": "ヘルプセンター",
+    "title": "管理者ヘルプセンター",
+    "description": "管理パネルの各ページのガイダンスを見つけてください。記事をクリックするとそのページに移動します - 「?」ボタンをクリックすると、コンテキスト ヘルプが開きます。",
+    "search_placeholder": "{{count}}ヘルプ記事を検索...",
+    "search_aria": "ヘルプ記事を検索する",
+    "no_matches": "検索に一致する記事はありません。",
+    "view_help": "ヘルプを見る",
+    "categories": {
+      "general_admin": "一般管理者",
+      "caring_community": "思いやりのあるコミュニティ",
+      "kiss_agoris": "キス＆アゴリス"
+    }
+  },
+  "newsletter_segments": {
+    "col_created": "作成されました",
+    "col_members": "メンバー",
+    "col_status": "状態",
+    "create_first_segment": "最初のセグメントを作成する",
+    "delete_confirm": "セグメント「{{name}}」を削除しますか?これを使用するキャンペーンでは、このユーザーをターゲットにすることができなくなります。",
+    "delete_confirm_label": "セグメントの削除",
+    "delete_title": "セグメントの削除",
+    "description": "ターゲットを絞ったニュースレター キャンペーン用に再利用可能なオーディエンス セグメントを作成します。",
+    "empty_description": "オーディエンス セグメントを構築して、アクティビティ、プロフィール フィールド、またはニュースレターの行動に基づいてメンバーをターゲットにします。",
+    "empty_title": "まだセグメントがありません",
+    "match_all": "すべてのルール (AND)",
+    "match_any": "任意のルール (OR)",
+    "title": "セグメント"
+  },
+  "newsletter_templates": {
+    "category_custom": "カスタム",
+    "category_saved": "保存されました",
+    "category_starter": "スターター",
+    "col_created": "作成されました",
+    "col_status": "状態",
+    "col_template_name": "テンプレート名",
+    "delete_confirm": "テンプレート「{{name}}」を削除しますか?これを元に戻すことはできません。",
+    "delete_confirm_label": "テンプレートの削除",
+    "delete_title": "テンプレートの削除",
+    "description": "ニュースレター キャンペーン用の再利用可能な電子メール テンプレートを作成および管理します。",
+    "empty_description": "再利用可能なテンプレートを作成して、将来のキャンペーン作成を迅速化します。",
+    "empty_title": "まだテンプレートがありません",
+    "failed_to_delete_template": "テンプレートの削除に失敗しました。",
+    "failed_to_duplicate_template": "テンプレートの複製に失敗しました。",
+    "template_deleted": "テンプレートが削除されました。",
+    "template_duplicated": "テンプレートが複製されました。",
+    "title": "テンプレート"
   }
 }
