@@ -42,7 +42,8 @@
     "offer": "Offer",
     "accepted": "Accepted",
     "rejected": "Rejected",
-    "withdrawn": "Withdrawn"
+    "withdrawn": "Withdrawn",
+    "unknown": "غير معروف"
   },
   "views": "{{count}} مشاهدات",
   "applications": "{{count}} طلبات",
@@ -130,7 +131,32 @@
     "no_roles": "لا توجد وظائف مفتوحة في الوقت الحالي",
     "error": "غير قادر على تحميل ملف صاحب العمل",
     "employer_jobs": "وظائف صاحب العمل",
-    "employees": "{{size}} موظف"
+    "employees": "{{size}} موظف",
+    "open_roles_count": "{{count}} وظيفة شاغرة",
+    "meta_description": "اعرض ملف صاحب العمل والوظائف المفتوحة ومراجعات المجتمع عبر {{count}} فرصة حالية.",
+    "review_submit_failed": "فشل إرسال المراجعة",
+    "reviews_heading": "مراجعات صاحب العمل",
+    "leave_review": "اترك مراجعة",
+    "reviews_count": "{{count}} مراجعة",
+    "reviews_count_one": "{{count}} مراجعة",
+    "reviews_count_other": "{{count}} مراجعة",
+    "star_distribution": "{{star}} نجوم: {{count}} مراجعة",
+    "star_distribution_one": "{{star}} نجمة: {{count}} مراجعة",
+    "star_distribution_other": "{{star}} نجوم: {{count}} مراجعة",
+    "star_option": "{{count}} نجوم",
+    "star_option_one": "{{count}} نجمة",
+    "star_option_other": "{{count}} نجوم",
+    "write_review": "اكتب مراجعة",
+    "overall_rating": "التقييم العام",
+    "dim_respect": "الاحترام",
+    "dim_communication": "التواصل",
+    "dim_flexibility": "المرونة",
+    "dim_impact": "التأثير المجتمعي",
+    "review_comment": "تعليق",
+    "review_comment_placeholder": "شارك تجربتك في العمل مع صاحب العمل هذا...",
+    "submit_review": "إرسال المراجعة",
+    "no_reviews": "لا توجد مراجعات بعد",
+    "anonymous": "مجهول"
   },
   "bulk": {
     "select_action": "الانتقال إلى المرحلة...",
@@ -211,7 +237,26 @@
     "referral_apps": "طلبات الإحالة",
     "referral_conversion": "تحويل الإحالة",
     "scorecard_avg": "متوسط بطاقة التقييم",
-    "export_csv": "تصدير CSV"
+    "export_csv": "تصدير CSV",
+    "load_error": "فشل تحميل التحليلات",
+    "views_tooltip": "{{date}}: {{count}} مشاهدة",
+    "applications_tooltip": "{{week}}: {{count}} طلب",
+    "stage_progress_aria": "تقدم مرحلة طلب {{stage}}",
+    "predictions": "توقعات الذكاء الاصطناعي",
+    "based_on": "استنادًا إلى {{count}} وظيفة مشابهة",
+    "no_predictions": "بيانات غير كافية للتوقعات.",
+    "expected_apps": "الطلبات المتوقعة",
+    "current": "حالي",
+    "posted_days_ago": "نُشر منذ {{days}} يومًا",
+    "conversion_comparison": "معدل التحويل",
+    "avg": "متوسط",
+    "salary_comparison": "الراتب مقابل السوق",
+    "yours": "راتبك",
+    "versus": "مقابل",
+    "market_avg": "متوسط السوق",
+    "ai_insights": "رؤى الذكاء الاصطناعي",
+    "days_short_value": "{{count}} ي",
+    "not_available": "غ/م"
   },
   "salary": {
     "label": "Compensation",
@@ -318,7 +363,18 @@
     "personal_message": "رسالة شخصية",
     "personal_message_placeholder": "ملاحظة للمرشح...",
     "select_applicant": "اختر {{name}}",
-    "ai_score": "AI: {{score}}/100"
+    "ai_score": "AI: {{score}}/100",
+    "ai_rank": "ترتيب الذكاء الاصطناعي",
+    "ai_ranked": "تم ترتيب المرشحين بواسطة الذكاء الاصطناعي",
+    "ai_rank_failed": "فشل ترتيب الذكاء الاصطناعي",
+    "tab_pipeline": "خط الأنابيب",
+    "tab_activity": "سجل النشاط",
+    "no_activity": "لا يوجد نشاط بعد",
+    "no_activity_hint": "ستظهر الأحداث هنا مع تقدم عملية التوظيف.",
+    "previous": "السابق",
+    "next": "التالي",
+    "interview_location_placeholder": "https://meet.google.com/...",
+    "offer_salary_placeholder": "مثال: 45000"
   },
   "apply": {
     "button": "قدّم الآن",
@@ -344,7 +400,9 @@
     "message_employer": "رسالة إلى صاحب العمل",
     "cv_parse_error": "فشل في تحليل السيرة الذاتية. يمكنك تقديم طلبك يدويًا.",
     "cv_size_kb": "({{count}} KB)",
-    "quick_apply": "Quick Apply with Saved Profile"
+    "quick_apply": "Quick Apply with Saved Profile",
+    "this_job": "هذه الوظيفة",
+    "view": "عرض"
   },
   "detail": {
     "loading": "جارٍ تحميل الوظيفة...",
@@ -762,7 +820,8 @@
     "note_privacy": "هذا التقرير يحلل مقاييس العملية فقط. لا يتم جمع أو استخدام أي بيانات ديموغرافية.",
     "stages": "stages",
     "not_available": "N/A",
-    "access_denied": "Access denied"
+    "access_denied": "Access denied",
+    "rejection_rates_table_aria": "معدلات الرفض حسب مرحلة التوظيف"
   },
   "self_scheduling": {
     "title": "مواعيد المقابلات",
@@ -937,13 +996,15 @@
       "title": "تدقيق التحيز"
     },
     "create": {
-      "title": "نشر وظيفة"
+      "title": "نشر وظيفة",
+      "description": "أنشئ وظيفة أو فرصة تطوع أو فرصة بنك الوقت لمجتمعك."
     },
     "talent_search": {
       "title": "بحث عن المواهب"
     },
     "my_applications": {
-      "title": "طلباتي"
+      "title": "طلباتي",
+      "description": "تتبع طلبات الوظائف والتطوع وبنك الوقت من لوحة تحكم خاصة واحدة."
     },
     "analytics": {
       "title": "تحليلات الوظائف"
@@ -959,11 +1020,16 @@
     },
     "employer_brand": {
       "title": "علامة أصحاب العمل"
+    },
+    "edit": {
+      "title": "تعديل الوظيفة",
+      "description": "حدّث تفاصيل الوظيفة الشاغرة والتعويض وإعدادات الفريق وخيارات النشر."
     }
   },
   "page_title": "Job Vacancies",
   "page_description": "Browse job opportunities, volunteering roles, and timebank positions offered by community members and partner organisations near you.",
   "jobs": {
     "view_details": "View job details"
-  }
+  },
+  "cancel": "إلغاء"
 }

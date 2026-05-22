@@ -23,7 +23,11 @@
     "categories": "Categories",
     "my_listings": "My Listings",
     "my_offers": "My Offers",
-    "my_orders": "My Orders"
+    "my_orders": "My Orders",
+    "eyebrow": "سوق المجتمع",
+    "categories_stat": "الفئات",
+    "listings_stat": "الإعلانات المرئية",
+    "featured_stat": "مميز"
   },
   "hub_feature_gate": {
     "title": "السوق غير متاح",
@@ -73,7 +77,17 @@
     "get_directions": "Directions",
     "promoted": "Promoted",
     "unsave": "Remove from saved",
-    "save": "Save listing"
+    "save": "Save listing",
+    "video": "فيديو الإعلان",
+    "video_unsupported": "متصفحك لا يدعم وسم الفيديو.",
+    "report_submitted": "تم إرسال البلاغ. شكرًا لك.",
+    "report_error": "فشل إرسال البلاغ",
+    "order_created": "تم إنشاء الطلب!",
+    "message_template": "مرحبًا، أنا مهتم بإعلانك: {{title}}",
+    "member_since": "عضو منذ {{date}}",
+    "sign_in_to_report": "سجّل الدخول للإبلاغ",
+    "meta_description_fallback": "إعلان في السوق",
+    "detail_field_label": "{{field}}"
   },
   "offer": {
     "modal_title": "قدم عرضاً",
@@ -103,7 +117,8 @@
     "decline": "Decline",
     "counter": "Counter",
     "withdraw": "Withdraw",
-    "amount_invalid": "Please enter a valid offer amount"
+    "amount_invalid": "Please enter a valid offer amount",
+    "amount_placeholder": "0.00"
   },
   "create": {
     "page_title": "بيع شيء ما - السوق",
@@ -152,7 +167,17 @@
     "currency_label": "Currency",
     "location_label": "Location",
     "cancel": "Cancel",
-    "draft_saved": "Draft saved"
+    "draft_saved": "Draft saved",
+    "image_alt": "تحميل {{number}}",
+    "video": "فيديو",
+    "video_optional": "(اختياري، 1 فيديو كحد أقصى، 50 ميجابايت)",
+    "remove_video": "إزالة الفيديو",
+    "video_drop_zone": "انقر لإضافة فيديو",
+    "video_limits": "MP4 أو WebM أو MOV. الحد الأقصى 50 ميجابايت.",
+    "video_type_error": "يُسمح فقط بملفات الفيديو من نوع MP4 وWebM وMOV.",
+    "video_size_error": "{{name}} يتجاوز حد حجم الفيديو 50 ميجابايت.",
+    "select_field_placeholder": "اختر {{field}}",
+    "enter_field_placeholder": "أدخل {{field}}"
   },
   "search": {
     "page_title": "ابحث في السوق",
@@ -249,7 +274,9 @@
     "filters_title": "Filters",
     "price_min": "Min",
     "price_max": "Max",
-    "condition_label": "Condition"
+    "condition_label": "Condition",
+    "any_field": "أي {{field}}",
+    "filter_by_field": "تصفية حسب {{field}}"
   },
   "common": {
     "save_listing": "حفظ القائمة",
@@ -265,7 +292,9 @@
     "negotiable": "Negotiable",
     "save": "Save",
     "unsave": "Unsave",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "go_back": "العودة",
+    "dismiss": "تجاهل"
   },
   "condition": {
     "like_new": "مثل الجديد",
@@ -283,7 +312,8 @@
     "pickup": "استلام فقط",
     "shipping": "شحن فقط",
     "both": "استلام أو شحن",
-    "community_delivery": "توصيل مجتمعي"
+    "community_delivery": "توصيل مجتمعي",
+    "other": "طريقة توصيل أخرى"
   },
   "sort": {
     "newest": "الأحدث أولاً",
@@ -320,7 +350,10 @@
     "delivery_all": "All",
     "delivery_shipping": "Shipping",
     "delivery_both": "Both",
-    "title": "Filters"
+    "title": "Filters",
+    "posted_any_time": "في أي وقت",
+    "posted_today": "اليوم",
+    "posted_last_days": "آخر {{count}} يوم"
   },
   "gallery": {
     "no_images": "لا توجد صور متاحة",
@@ -381,7 +414,8 @@
     "stat_revenue": "Revenue",
     "action_edit": "Edit",
     "action_renew": "Renew",
-    "action_remove": "Remove"
+    "action_remove": "Remove",
+    "views_count_aria": "{{count}} مشاهدة"
   },
   "my_offers": {
     "page_title": "عروضى - السوق",
@@ -526,7 +560,20 @@
     "delivery_confirmed": "تم تأكيد التوصيل! تم منح اعتمادات زمنية.",
     "confirm_failed": "فشل في تأكيد التوصيل",
     "unknown": "Unknown",
-    "accept": "Accept"
+    "accept": "Accept",
+    "offers_title_count": "عروض التوصيل ({{count}})",
+    "time_credits_value": "{{count}} رصيد زمني",
+    "estimated_minutes": "~{{count}} دقيقة",
+    "time_credits_placeholder": "1.0",
+    "estimated_time_placeholder": "30",
+    "cancel": "إلغاء",
+    "status": {
+      "pending": "قيد الانتظار",
+      "accepted": "مقبول",
+      "declined": "مرفوض",
+      "completed": "مكتمل",
+      "cancelled": "ملغى"
+    }
   },
   "ai_reply": {
     "suggest": "اقترح ردًا",
@@ -557,7 +604,9 @@
     "search_this_area": "ابحث في هذه المنطقة",
     "distance_km": "{{km}} كم بعيد",
     "distance_meters": "{{m}}م بعيد",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "radius_option": "{{km}} كم",
+    "location_required": "حدد موقعك في ملفك الشخصي لاستخدام هذه الميزة"
   },
   "shipping": {
     "title": "خيارات الشحن",
@@ -588,7 +637,9 @@
     "price": "Price",
     "currency": "Currency",
     "default_badge": "Default",
-    "recommended": "Recommended"
+    "recommended": "Recommended",
+    "price_placeholder": "0.00",
+    "cancel": "إلغاء"
   },
   "listing_location": {
     "approximate_location": "الموقع التقريبي",
@@ -599,7 +650,18 @@
     "choose_slot": "Choose pickup slot",
     "no_slot_selected": "No pickup slot",
     "left": "left",
-    "slot_fallback": "Slot #{{id}}"
+    "slot_fallback": "Slot #{{id}}",
+    "my_pickups_title": "عمليات الاستلام الخاصة بي",
+    "my_pickups_subtitle": "اعرض هذا الرمز في موقع البائع لاستلام طلبك.",
+    "no_pickups": "لا توجد عمليات استلام قادمة.",
+    "order_n": "الطلب رقم #{{id}}",
+    "window": "نافذة الاستلام",
+    "show_this_code": "اعرض هذا الرمز للبائع",
+    "status_reserved": "محجوز",
+    "status_picked_up": "تم الاستلام",
+    "status_cancelled": "ملغى",
+    "status_no_show": "لم يحضر",
+    "status_unknown": "غير معروف"
   },
   "orders": {
     "load_error": "فشل في تحميل الطلبات",
@@ -685,7 +747,8 @@
     "track": "Track",
     "tab_all": "All",
     "tab_active": "Active",
-    "tab_completed": "Completed"
+    "tab_completed": "Completed",
+    "quantity_multiplier": "×{{count}}"
   },
   "onboarding": {
     "page_title": "توجيه البائع - السوق",
@@ -710,7 +773,10 @@
     "incomplete_description": "إعداد حسابك على Stripe لم يكتمل بعد. يرجى إنهاء عملية الانضمام لبدء استلام المدفوعات.",
     "continue_onboarding": "تابع عملية الانضمام",
     "check_status": "تحقق من الحالة",
-    "start_error": "فشل في بدء عملية الانضمام"
+    "start_error": "فشل في بدء عملية الانضمام",
+    "nudge_title": "أكمل إعداد التاجر الخاص بك",
+    "nudge_description": "أضف تفاصيل العمل والعلامة التجارية والمدفوعات لفتح شارة شريك السوق.",
+    "start_cta": "ابدأ الإعداد"
   },
   "page_title": "Marketplace",
   "checkout": {
@@ -727,5 +793,16 @@
     "payment_error": "An unexpected error occurred. Please try again.",
     "not_available_title": "Payment Processing Being Set Up",
     "not_available_description": "Payment processing is being set up. Please contact the seller to arrange payment."
+  },
+  "inventory": {
+    "section_title": "المخزون",
+    "section_subtitle": "تتبع المخزون ومنع البيع الزائد.",
+    "unlimited": "مخزون غير محدود",
+    "count": "عدد المخزون",
+    "low_stock_threshold": "تنبيه انخفاض المخزون عند",
+    "oversold_protected": "رفض الطلبات التي تتجاوز المخزون",
+    "sold_out": "نفذت الكمية",
+    "low_chip": "المخزون: {{count}} (منخفض)",
+    "count_chip": "المخزون: {{count}}"
   }
 }

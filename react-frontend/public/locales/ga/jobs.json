@@ -42,7 +42,8 @@
     "offer": "Tairiscint",
     "accepted": "Glactha",
     "rejected": "Diúltaithe",
-    "withdrawn": "Tarraingthe siar"
+    "withdrawn": "Tarraingthe siar",
+    "unknown": "Anaithnid"
   },
   "views": "{{count}} amharc",
   "applications": "{{count}} iarratas",
@@ -130,7 +131,32 @@
     "no_roles": "Níl róil oscailte ann faoi láthair",
     "error": "Ní féidir próifíl fostóra a lódáil",
     "employer_jobs": "Poist Fostóra",
-    "employees": "{{size}} fostaithe"
+    "employees": "{{size}} fostaithe",
+    "open_roles_count": "{{count}} ról oscailte",
+    "meta_description": "Féach próifíl an fhostóra, róil oscailte agus athbhreithnithe pobail thar {{count}} deis reatha.",
+    "review_submit_failed": "Theip ar an athbhreithniú a chur isteach",
+    "reviews_heading": "Athbhreithnithe Fostóra",
+    "leave_review": "Fág Athbhreithniú",
+    "reviews_count": "{{count}} athbhreithniú",
+    "reviews_count_one": "{{count}} athbhreithniú",
+    "reviews_count_other": "{{count}} athbhreithniú",
+    "star_distribution": "{{star}} réalta: {{count}} athbhreithniú",
+    "star_distribution_one": "{{star}} réalta: {{count}} athbhreithniú",
+    "star_distribution_other": "{{star}} réalta: {{count}} athbhreithniú",
+    "star_option": "{{count}} réalta",
+    "star_option_one": "{{count}} réalta",
+    "star_option_other": "{{count}} réalta",
+    "write_review": "Scríobh Athbhreithniú",
+    "overall_rating": "Rátáil Iomlán",
+    "dim_respect": "Meas",
+    "dim_communication": "Cumarsáid",
+    "dim_flexibility": "Solúbthacht",
+    "dim_impact": "Tionchar Pobail",
+    "review_comment": "Trácht",
+    "review_comment_placeholder": "Roinn do thaithí ag obair leis an bhfostóir seo...",
+    "submit_review": "Cuir Athbhreithniú Isteach",
+    "no_reviews": "Gan athbhreithnithe go fóill",
+    "anonymous": "Gan ainm"
   },
   "bulk": {
     "select_action": "Bog chuig céim...",
@@ -211,7 +237,26 @@
     "referral_apps": "Iarratais Atreoraithe",
     "referral_conversion": "Tiontú Atreoraithe",
     "scorecard_avg": "Meáncárta Scóir",
-    "export_csv": "Easpórtáil CSV"
+    "export_csv": "Easpórtáil CSV",
+    "load_error": "Theip ar lódáil na hanailísíochta",
+    "views_tooltip": "{{date}}: {{count}} amharc",
+    "applications_tooltip": "{{week}}: {{count}} iarratas",
+    "stage_progress_aria": "Dul chun cinn na céime iarratais {{stage}}",
+    "predictions": "Tuartha IS",
+    "based_on": "Bunaithe ar {{count}} post den chineál céanna",
+    "no_predictions": "Sonraí easnamhacha le haghaidh tuartha.",
+    "expected_apps": "Iarratais Mheasta",
+    "current": "Reatha",
+    "posted_days_ago": "Postáilte {{days}} lá ó shin",
+    "conversion_comparison": "Ráta Tiontaithe",
+    "avg": "Meán",
+    "salary_comparison": "Tuarastal vs Margadh",
+    "yours": "Do cheannsa",
+    "versus": "vs",
+    "market_avg": "Meán an Mhargaidh",
+    "ai_insights": "Léargais IS",
+    "days_short_value": "{{count}} lá",
+    "not_available": "N/A"
   },
   "salary": {
     "label": "Cúiteamh",
@@ -318,7 +363,18 @@
     "personal_message": "Teachtaireacht Phearsanta",
     "personal_message_placeholder": "Nóta don iarrthóir...",
     "select_applicant": "Roghnaigh {{name}}",
-    "ai_score": "AI: {{score}}/100"
+    "ai_score": "AI: {{score}}/100",
+    "ai_rank": "Rangú IS",
+    "ai_ranked": "Iarrthóirí rangaithe ag IS",
+    "ai_rank_failed": "Theip ar rangú IS",
+    "tab_pipeline": "Píblíne",
+    "tab_activity": "Loga Gníomhaíochta",
+    "no_activity": "Gan ghníomhaíocht go fóill",
+    "no_activity_hint": "Beidh imeachtaí le feiceáil anseo de réir mar a théann an próiseas earcaíochta ar aghaidh.",
+    "previous": "Roimhe",
+    "next": "Ar Aghaidh",
+    "interview_location_placeholder": "https://meet.google.com/...",
+    "offer_salary_placeholder": "m.sh. 45000"
   },
   "apply": {
     "button": "Cuir Isteach Anois",
@@ -344,7 +400,9 @@
     "message_employer": "Cuir Teachtaireacht chuig Fostóir",
     "cv_parse_error": "Theip ar CV a pharsáil. Is féidir leat d'iarratas a chur isteach de láimh fós.",
     "cv_size_kb": "({{count}} KB)",
-    "quick_apply": "Quick Apply with Saved Profile"
+    "quick_apply": "Quick Apply with Saved Profile",
+    "this_job": "an post seo",
+    "view": "Féach"
   },
   "detail": {
     "loading": "Folúntas á luchtú...",
@@ -762,7 +820,8 @@
     "note_privacy": "Déanann an tuairisc seo anailís ar mhéadrachtaí próisis amháin. Ní bhailítear ná ní úsáidtear sonraí déimeagrafacha.",
     "stages": "stages",
     "not_available": "N/A",
-    "access_denied": "Access denied"
+    "access_denied": "Access denied",
+    "rejection_rates_table_aria": "Rátaí diúltaithe de réir céime earcaíochta"
   },
   "self_scheduling": {
     "title": "Sliotáin Agallaimh",
@@ -937,13 +996,15 @@
       "title": "Bias Audit"
     },
     "create": {
-      "title": "Post a Job"
+      "title": "Post a Job",
+      "description": "Cruthaigh folúntas poist, oibre deonaí nó bainc ama do do phobal."
     },
     "talent_search": {
       "title": "Talent Search"
     },
     "my_applications": {
-      "title": "My Applications"
+      "title": "My Applications",
+      "description": "Lean iarratais ar phost, ar obair dheonach agus ar bhanc ama ó dheais príobháideach amháin."
     },
     "analytics": {
       "title": "Job Analytics"
@@ -959,11 +1020,16 @@
     },
     "employer_brand": {
       "title": "Employer Brand"
+    },
+    "edit": {
+      "title": "Cuir Post in Eagar",
+      "description": "Nuashonraigh sonraí an fholúntais, luach saothair, socruithe foirne agus roghanna foilsithe."
     }
   },
   "page_title": "Job Vacancies",
   "page_description": "Browse job opportunities, volunteering roles, and timebank positions offered by community members and partner organisations near you.",
   "jobs": {
     "view_details": "View job details"
-  }
+  },
+  "cancel": "Cealaigh"
 }

@@ -23,7 +23,11 @@
     "categories": "Categories",
     "my_listings": "My Listings",
     "my_offers": "My Offers",
-    "my_orders": "My Orders"
+    "my_orders": "My Orders",
+    "eyebrow": "Community-marktplaats",
+    "categories_stat": "Categorieën",
+    "listings_stat": "Zichtbare vermeldingen",
+    "featured_stat": "Uitgelicht"
   },
   "hub_feature_gate": {
     "title": "Marktplaats Niet Beschikbaar",
@@ -73,7 +77,17 @@
     "get_directions": "Directions",
     "promoted": "Promoted",
     "unsave": "Remove from saved",
-    "save": "Save listing"
+    "save": "Save listing",
+    "video": "Vermeldingsvideo",
+    "video_unsupported": "Je browser ondersteunt de video-tag niet.",
+    "report_submitted": "Melding verstuurd. Bedankt.",
+    "report_error": "Melding versturen mislukt",
+    "order_created": "Bestelling aangemaakt!",
+    "message_template": "Hallo, ik ben geïnteresseerd in je vermelding: {{title}}",
+    "member_since": "Lid sinds {{date}}",
+    "sign_in_to_report": "Meld je aan om te rapporteren",
+    "meta_description_fallback": "Marktplaatsvermelding",
+    "detail_field_label": "{{field}}"
   },
   "offer": {
     "modal_title": "Doe een bod",
@@ -103,7 +117,8 @@
     "decline": "Decline",
     "counter": "Counter",
     "withdraw": "Withdraw",
-    "amount_invalid": "Please enter a valid offer amount"
+    "amount_invalid": "Please enter a valid offer amount",
+    "amount_placeholder": "0,00"
   },
   "create": {
     "page_title": "Verkoop iets - Marktplaats",
@@ -152,7 +167,17 @@
     "currency_label": "Currency",
     "location_label": "Location",
     "cancel": "Cancel",
-    "draft_saved": "Draft saved"
+    "draft_saved": "Draft saved",
+    "image_alt": "Uploaden {{number}}",
+    "video": "Video",
+    "video_optional": "(optioneel, max. 1 video, 50 MB)",
+    "remove_video": "Video verwijderen",
+    "video_drop_zone": "Klik om een video toe te voegen",
+    "video_limits": "MP4, WebM of MOV. Max. 50 MB.",
+    "video_type_error": "Alleen MP4-, WebM- en MOV-videobestanden zijn toegestaan.",
+    "video_size_error": "{{name}} overschrijdt de videolimiet van 50 MB.",
+    "select_field_placeholder": "Selecteer {{field}}",
+    "enter_field_placeholder": "Voer {{field}} in"
   },
   "search": {
     "page_title": "Zoek Marktplaats",
@@ -249,7 +274,9 @@
     "filters_title": "Filters",
     "price_min": "Min",
     "price_max": "Max",
-    "condition_label": "Condition"
+    "condition_label": "Condition",
+    "any_field": "Elke {{field}}",
+    "filter_by_field": "Filter op {{field}}"
   },
   "common": {
     "save_listing": "Lijst Opslaan",
@@ -265,7 +292,9 @@
     "negotiable": "Negotiable",
     "save": "Save",
     "unsave": "Unsave",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "go_back": "Terug",
+    "dismiss": "Sluiten"
   },
   "condition": {
     "like_new": "Bijna Nieuw",
@@ -283,7 +312,8 @@
     "pickup": "Alleen Afhalen",
     "shipping": "Alleen Verzending",
     "both": "Afhalen of Verzending",
-    "community_delivery": "Gemeenschapslevering"
+    "community_delivery": "Gemeenschapslevering",
+    "other": "Andere leveringsmethode"
   },
   "sort": {
     "newest": "Nieuwste Eerst",
@@ -320,7 +350,10 @@
     "delivery_all": "All",
     "delivery_shipping": "Shipping",
     "delivery_both": "Both",
-    "title": "Filters"
+    "title": "Filters",
+    "posted_any_time": "Elk tijdstip",
+    "posted_today": "Vandaag",
+    "posted_last_days": "Laatste {{count}} dagen"
   },
   "gallery": {
     "no_images": "Geen afbeeldingen beschikbaar",
@@ -381,7 +414,8 @@
     "stat_revenue": "Revenue",
     "action_edit": "Edit",
     "action_renew": "Renew",
-    "action_remove": "Remove"
+    "action_remove": "Remove",
+    "views_count_aria": "{{count}} weergaven"
   },
   "my_offers": {
     "page_title": "Mijn Aanbiedingen - Marketplace",
@@ -526,7 +560,20 @@
     "delivery_confirmed": "Levering bevestigd! Tijdcredits toegekend.",
     "confirm_failed": "Bevestigen van levering mislukt",
     "unknown": "Unknown",
-    "accept": "Accept"
+    "accept": "Accept",
+    "offers_title_count": "Bezorgaanbiedingen ({{count}})",
+    "time_credits_value": "{{count}} TC",
+    "estimated_minutes": "~{{count}} min",
+    "time_credits_placeholder": "1,0",
+    "estimated_time_placeholder": "30",
+    "cancel": "Annuleren",
+    "status": {
+      "pending": "In behandeling",
+      "accepted": "Geaccepteerd",
+      "declined": "Geweigerd",
+      "completed": "Voltooid",
+      "cancelled": "Geannuleerd"
+    }
   },
   "ai_reply": {
     "suggest": "Stel Antwoord Voor",
@@ -557,7 +604,9 @@
     "search_this_area": "Zoek Dit Gebied",
     "distance_km": "{{km}} km afstand",
     "distance_meters": "{{m}}m afstand",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "radius_option": "{{km}} km",
+    "location_required": "Stel je locatie in je profiel in om deze functie te gebruiken"
   },
   "shipping": {
     "title": "Verzendopties",
@@ -588,7 +637,9 @@
     "price": "Price",
     "currency": "Currency",
     "default_badge": "Default",
-    "recommended": "Recommended"
+    "recommended": "Recommended",
+    "price_placeholder": "0,00",
+    "cancel": "Annuleren"
   },
   "listing_location": {
     "approximate_location": "Geschatte locatie",
@@ -599,7 +650,18 @@
     "choose_slot": "Choose pickup slot",
     "no_slot_selected": "No pickup slot",
     "left": "left",
-    "slot_fallback": "Slot #{{id}}"
+    "slot_fallback": "Slot #{{id}}",
+    "my_pickups_title": "Mijn afhalingen",
+    "my_pickups_subtitle": "Toon deze code op de locatie van de verkoper om je bestelling op te halen.",
+    "no_pickups": "Geen aankomende afhalingen.",
+    "order_n": "Bestelling #{{id}}",
+    "window": "Afhaalvenster",
+    "show_this_code": "Toon deze code aan de verkoper",
+    "status_reserved": "Gereserveerd",
+    "status_picked_up": "Opgehaald",
+    "status_cancelled": "Geannuleerd",
+    "status_no_show": "Niet verschenen",
+    "status_unknown": "Onbekend"
   },
   "orders": {
     "load_error": "Kon bestellingen niet laden",
@@ -685,7 +747,8 @@
     "track": "Track",
     "tab_all": "All",
     "tab_active": "Active",
-    "tab_completed": "Completed"
+    "tab_completed": "Completed",
+    "quantity_multiplier": "×{{count}}"
   },
   "onboarding": {
     "page_title": "Verkoper Onboarding - Marketplace",
@@ -710,7 +773,10 @@
     "incomplete_description": "Je Stripe-accountinstelling is nog niet compleet. Voltooi het onboardingproces om betalingen te kunnen ontvangen.",
     "continue_onboarding": "Ga Door met Onboarding",
     "check_status": "Controleer Status",
-    "start_error": "Starten van onboarding is mislukt"
+    "start_error": "Starten van onboarding is mislukt",
+    "nudge_title": "Voltooi je verkoper-onboarding",
+    "nudge_description": "Voeg bedrijfsgegevens, branding en uitbetalingen toe om de Marktplaats-partnerbadge te ontgrendelen.",
+    "start_cta": "Onboarding starten"
   },
   "page_title": "Marketplace",
   "checkout": {
@@ -727,5 +793,16 @@
     "payment_error": "An unexpected error occurred. Please try again.",
     "not_available_title": "Payment Processing Being Set Up",
     "not_available_description": "Payment processing is being set up. Please contact the seller to arrange payment."
+  },
+  "inventory": {
+    "section_title": "Voorraad",
+    "section_subtitle": "Houd voorraad bij en voorkom oververkoop.",
+    "unlimited": "Onbeperkte voorraad",
+    "count": "Voorraadaantal",
+    "low_stock_threshold": "Waarschuwing lage voorraad bij",
+    "oversold_protected": "Bestellingen weigeren die de voorraad overschrijden",
+    "sold_out": "Uitverkocht",
+    "low_chip": "Voorraad: {{count}} (Laag)",
+    "count_chip": "Voorraad: {{count}}"
   }
 }

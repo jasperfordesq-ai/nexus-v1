@@ -42,7 +42,8 @@
     "offer": "Angebot",
     "accepted": "Angenommen",
     "rejected": "Abgelehnt",
-    "withdrawn": "Zurückgezogen"
+    "withdrawn": "Zurückgezogen",
+    "unknown": "Unbekannt"
   },
   "views": "{{count}} Aufrufe",
   "applications": "{{count}} Bewerbungen",
@@ -130,7 +131,32 @@
     "no_roles": "Derzeit keine offenen Stellen",
     "error": "Arbeitgeberprofil konnte nicht geladen werden",
     "employer_jobs": "Arbeitgeber-Stellen",
-    "employees": "{{size}} Mitarbeiter"
+    "employees": "{{size}} Mitarbeiter",
+    "open_roles_count": "{{count}} offene Stellen",
+    "meta_description": "Sehen Sie das Arbeitgeberprofil, offene Stellen und Community-Bewertungen über {{count}} aktuelle Möglichkeiten an.",
+    "review_submit_failed": "Bewertung konnte nicht übermittelt werden",
+    "reviews_heading": "Arbeitgeberbewertungen",
+    "leave_review": "Bewertung abgeben",
+    "reviews_count": "{{count}} Bewertungen",
+    "reviews_count_one": "{{count}} Bewertung",
+    "reviews_count_other": "{{count}} Bewertungen",
+    "star_distribution": "{{star}} Sterne: {{count}} Bewertungen",
+    "star_distribution_one": "{{star}} Stern: {{count}} Bewertung",
+    "star_distribution_other": "{{star}} Sterne: {{count}} Bewertungen",
+    "star_option": "{{count}} Sterne",
+    "star_option_one": "{{count}} Stern",
+    "star_option_other": "{{count}} Sterne",
+    "write_review": "Bewertung schreiben",
+    "overall_rating": "Gesamtbewertung",
+    "dim_respect": "Respekt",
+    "dim_communication": "Kommunikation",
+    "dim_flexibility": "Flexibilität",
+    "dim_impact": "Community-Wirkung",
+    "review_comment": "Kommentar",
+    "review_comment_placeholder": "Teilen Sie Ihre Erfahrung mit diesem Arbeitgeber...",
+    "submit_review": "Bewertung einreichen",
+    "no_reviews": "Noch keine Bewertungen",
+    "anonymous": "Anonym"
   },
   "bulk": {
     "select_action": "In Phase verschieben...",
@@ -211,7 +237,26 @@
     "referral_apps": "Empfehlungsbewerbungen",
     "referral_conversion": "Empfehlungskonversion",
     "scorecard_avg": "Durchschn. Scorecard",
-    "export_csv": "CSV exportieren"
+    "export_csv": "CSV exportieren",
+    "load_error": "Analysen konnten nicht geladen werden",
+    "views_tooltip": "{{date}}: {{count}} Aufrufe",
+    "applications_tooltip": "{{week}}: {{count}} Bewerbungen",
+    "stage_progress_aria": "Fortschritt der Bewerbungsphase {{stage}}",
+    "predictions": "KI-Prognosen",
+    "based_on": "Basierend auf {{count}} ähnlichen Stellen",
+    "no_predictions": "Nicht genügend Daten für Prognosen.",
+    "expected_apps": "Erwartete Bewerbungen",
+    "current": "Aktuell",
+    "posted_days_ago": "Vor {{days}} Tagen veröffentlicht",
+    "conversion_comparison": "Konversionsrate",
+    "avg": "Durchschn.",
+    "salary_comparison": "Gehalt vs. Markt",
+    "yours": "Ihres",
+    "versus": "vs.",
+    "market_avg": "Marktdurchschnitt",
+    "ai_insights": "KI-Erkenntnisse",
+    "days_short_value": "{{count}} T",
+    "not_available": "k. A."
   },
   "salary": {
     "label": "Vergütung",
@@ -318,7 +363,18 @@
     "personal_message": "Persönliche Nachricht",
     "personal_message_placeholder": "Eine Notiz an den Kandidaten...",
     "select_applicant": "{{name}} auswählen",
-    "ai_score": "AI: {{score}}/100"
+    "ai_score": "AI: {{score}}/100",
+    "ai_rank": "KI-Rang",
+    "ai_ranked": "Kandidaten von KI eingestuft",
+    "ai_rank_failed": "KI-Ranking fehlgeschlagen",
+    "tab_pipeline": "Pipeline",
+    "tab_activity": "Aktivitätsprotokoll",
+    "no_activity": "Noch keine Aktivität",
+    "no_activity_hint": "Ereignisse erscheinen hier im Verlauf des Einstellungsprozesses.",
+    "previous": "Zurück",
+    "next": "Weiter",
+    "interview_location_placeholder": "https://meet.google.com/...",
+    "offer_salary_placeholder": "z. B. 45000"
   },
   "apply": {
     "button": "Jetzt bewerben",
@@ -344,7 +400,9 @@
     "message_employer": "Arbeitgeber kontaktieren",
     "cv_parse_error": "Lebenslauf konnte nicht analysiert werden. Sie können Ihre Bewerbung trotzdem manuell einreichen.",
     "cv_size_kb": "({{count}} KB)",
-    "quick_apply": "Quick Apply with Saved Profile"
+    "quick_apply": "Quick Apply with Saved Profile",
+    "this_job": "diese Stelle",
+    "view": "Ansehen"
   },
   "detail": {
     "loading": "Stelle wird geladen...",
@@ -762,7 +820,8 @@
     "note_privacy": "Dieser Bericht analysiert nur Prozesskennzahlen. Es werden keine demographischen Daten erhoben oder verwendet.",
     "stages": "stages",
     "not_available": "N/A",
-    "access_denied": "Access denied"
+    "access_denied": "Access denied",
+    "rejection_rates_table_aria": "Ablehnungsraten nach Einstellungsphase"
   },
   "self_scheduling": {
     "title": "Gesprächszeitfenster",
@@ -937,13 +996,15 @@
       "title": "Bias-Audit"
     },
     "create": {
-      "title": "Job posten"
+      "title": "Job posten",
+      "description": "Erstellen Sie eine Stellen-, Freiwilligen- oder Timebanking-Ausschreibung für Ihre Community."
     },
     "talent_search": {
       "title": "Talentsuche"
     },
     "my_applications": {
-      "title": "Meine Bewerbungen"
+      "title": "Meine Bewerbungen",
+      "description": "Verfolgen Sie Bewerbungen für Stellen, Freiwilligenarbeit und Timebanking über ein privates Dashboard."
     },
     "analytics": {
       "title": "Jobanalysen"
@@ -959,11 +1020,16 @@
     },
     "employer_brand": {
       "title": "Arbeitgebermarke"
+    },
+    "edit": {
+      "title": "Stelle bearbeiten",
+      "description": "Aktualisieren Sie Stellendetails, Vergütung, Teameinstellungen und Veröffentlichungsoptionen."
     }
   },
   "page_title": "Job Vacancies",
   "page_description": "Browse job opportunities, volunteering roles, and timebank positions offered by community members and partner organisations near you.",
   "jobs": {
     "view_details": "View job details"
-  }
+  },
+  "cancel": "Abbrechen"
 }
