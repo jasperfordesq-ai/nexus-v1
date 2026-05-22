@@ -358,7 +358,12 @@
     "receipt_message": "Nachricht",
     "receipt_error": "Beleg konnte nicht geladen werden.",
     "receipt_not_found": "Beleg nicht gefunden.",
-    "progress_aria": "Donation progress: {{percent}}%"
+    "progress_aria": "Donation progress: {{percent}}%",
+    "currencies": {
+      "EUR": "EUR",
+      "GBP": "GBP",
+      "USD": "USD"
+    }
   },
   "safeguarding": {
     "heading": "Kinderschutz",
@@ -543,7 +548,11 @@
     "accept": "Annehmen",
     "reject": "Ablehnen",
     "cancel": "Abbrechen",
-    "reject_confirm": "Möchten Sie diese Tauschanfrage wirklich ablehnen?"
+    "reject_confirm": "Möchten Sie diese Tauschanfrage wirklich ablehnen?",
+    "status_admin_pending": "Wartet auf Admin-Prüfung",
+    "status_admin_approved": "Vom Admin genehmigt",
+    "status_admin_rejected": "Vom Admin abgelehnt",
+    "status_expired": "Abgelaufen"
   },
   "opportunity": {
     "search_placeholder": "Nach Name suchen...",
@@ -570,7 +579,8 @@
     "select_shift": "Schicht auswählen (optional)",
     "cancel": "Abbrechen",
     "submit_application": "Bewerbung absenden",
-    "applied_on": "Applied {{date}}"
+    "applied_on": "Applied {{date}}",
+    "meta_description_fallback": "{{title}} ist eine Freiwilligenmöglichkeit mit {{organization}} in {{location}}."
   },
   "org_settings": {
     "heading": "Organisationseinstellungen",
@@ -649,7 +659,12 @@
     "no_member_found": "Kein Mitglied mit dieser E-Mail-Adresse gefunden.",
     "member_added": "Mitglied zur Gruppe hinzugefügt.",
     "add_member_error": "Mitglied konnte nicht hinzugefügt werden. Möglicherweise sind sie bereits in der Gruppe oder die E-Mail ist ungültig.",
-    "add_member_error_generic": "Mitglied konnte nicht hinzugefügt werden. Bitte überprüfen Sie die E-Mail und versuchen Sie es erneut."
+    "add_member_error_generic": "Mitglied konnte nicht hinzugefügt werden. Bitte überprüfen Sie die E-Mail und versuchen Sie es erneut.",
+    "status": {
+      "confirmed": "Bestätigt",
+      "pending": "Ausstehend",
+      "cancelled": "Abgesagt"
+    }
   },
   "recommendations": {
     "title": "Für Sie empfohlen",

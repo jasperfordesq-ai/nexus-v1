@@ -358,7 +358,12 @@
     "receipt_message": "Message",
     "receipt_error": "領収書の読み込みに失敗しました。",
     "receipt_not_found": "領収書が見つかりません。",
-    "progress_aria": "Donation progress: {{percent}}%"
+    "progress_aria": "Donation progress: {{percent}}%",
+    "currencies": {
+      "EUR": "ユーロ",
+      "GBP": "英ポンド",
+      "USD": "米ドル"
+    }
   },
   "safeguarding": {
     "heading": "Safeguarding",
@@ -543,7 +548,11 @@
     "accept": "受け入れる",
     "reject": "拒否する",
     "cancel": "キャンセル",
-    "reject_confirm": "この交換リクエストを拒否してもよろしいですか?"
+    "reject_confirm": "この交換リクエストを拒否してもよろしいですか?",
+    "status_admin_pending": "管理者の確認待ち",
+    "status_admin_approved": "管理者が承認",
+    "status_admin_rejected": "管理者が却下",
+    "status_expired": "期限切れ"
   },
   "opportunity": {
     "search_placeholder": "名前で検索...",
@@ -570,7 +579,8 @@
     "select_shift": "シフトを選択してください（オプション）",
     "cancel": "キャンセル",
     "submit_application": "申請書の提出",
-    "applied_on": "Applied {{date}}"
+    "applied_on": "Applied {{date}}",
+    "meta_description_fallback": "{{title}} は {{location}} の {{organization}} とのボランティア機会です。"
   },
   "org_settings": {
     "heading": "組織の設定",
@@ -649,7 +659,12 @@
     "no_member_found": "そのメール アドレスを持つメンバーは見つかりませんでした。",
     "member_added": "メンバーがグループに追加されました。",
     "add_member_error": "メンバーの追加に失敗しました。すでにグループに参加しているか、電子メールが無効である可能性があります。",
-    "add_member_error_generic": "メンバーを追加できません。メールを確認して、もう一度お試しください。"
+    "add_member_error_generic": "メンバーを追加できません。メールを確認して、もう一度お試しください。",
+    "status": {
+      "confirmed": "確定",
+      "pending": "保留中",
+      "cancelled": "キャンセル済み"
+    }
   },
   "recommendations": {
     "title": "あなたへのおすすめ",

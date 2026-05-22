@@ -358,7 +358,12 @@
     "receipt_message": "Message",
     "receipt_error": "Failed to load receipt.",
     "receipt_not_found": "Receipt not found.",
-    "progress_aria": "Donation progress: {{percent}}%"
+    "progress_aria": "Donation progress: {{percent}}%",
+    "currencies": {
+      "EUR": "EUR",
+      "GBP": "GBP",
+      "USD": "USD"
+    }
   },
   "safeguarding": {
     "heading": "Safeguarding",
@@ -543,7 +548,11 @@
     "accept": "Przyjąć",
     "reject": "Odrzucić",
     "cancel": "Anulować",
-    "reject_confirm": "Czy na pewno chcesz odrzucić tę prośbę o wymianę?"
+    "reject_confirm": "Czy na pewno chcesz odrzucić tę prośbę o wymianę?",
+    "status_admin_pending": "Oczekuje na sprawdzenie przez administratora",
+    "status_admin_approved": "Zatwierdzone przez administratora",
+    "status_admin_rejected": "Odrzucone przez administratora",
+    "status_expired": "Wygasłe"
   },
   "opportunity": {
     "search_placeholder": "Szukaj według nazwy...",
@@ -570,7 +579,8 @@
     "select_shift": "Wybierz zmianę (opcjonalnie)",
     "cancel": "Anulować",
     "submit_application": "Prześlij wniosek",
-    "applied_on": "Applied {{date}}"
+    "applied_on": "Applied {{date}}",
+    "meta_description_fallback": "{{title}} to możliwość wolontariatu z {{organization}} w lokalizacji {{location}}."
   },
   "org_settings": {
     "heading": "Ustawienia organizacji",
@@ -649,7 +659,12 @@
     "no_member_found": "Nie znaleziono żadnego członka o tym adresie e-mail.",
     "member_added": "Członek dodany do grupy.",
     "add_member_error": "Nie udało się dodać członka. Być może są już w grupie lub adres e-mail jest nieprawidłowy.",
-    "add_member_error_generic": "Nie można dodać członka. Sprawdź e-mail i spróbuj ponownie."
+    "add_member_error_generic": "Nie można dodać członka. Sprawdź e-mail i spróbuj ponownie.",
+    "status": {
+      "confirmed": "Potwierdzone",
+      "pending": "Oczekujące",
+      "cancelled": "Anulowane"
+    }
   },
   "recommendations": {
     "title": "Recommended for You",

@@ -123,7 +123,13 @@
   "aria": {
     "export_csv": "Esporta transazioni in CSV",
     "loading_transactions": "Caricamento transazioni",
-    "transaction_detail": "{{direction}} {{amount}} ore {{name}}"
+    "transaction_detail": "{{direction}} {{amount}} ore {{name}}",
+    "refresh_wallet": "Aggiorna i dati del portafoglio",
+    "send_credits": "Invia crediti tempo",
+    "donate_credits": "Dona crediti tempo",
+    "loading_balance": "Caricamento del saldo del portafoglio",
+    "load_more_transactions": "Carica altre transazioni",
+    "transaction_filters": "Filtri transazioni"
   },
   "available_balance": "Saldo disponibile",
   "recipient": "Destinatario",
@@ -145,5 +151,9 @@
     "max_transfer": "Maximum transfer is {{max}} hours"
   },
   "hours_value": "{{count}}h",
-  "signed_hours_value": "{{sign}}{{count}}h"
+  "signed_hours_value": "{{sign}}{{count}}h",
+  "refresh": "Aggiorna",
+  "no_filtered_transactions": "Nessuna transazione corrispondente",
+  "no_filtered_transactions_desc": "Prova un altro filtro per vedere più attività del portafoglio.",
+  "transaction_fallback": "Transazione del portafoglio"
 }

@@ -358,7 +358,12 @@
     "receipt_message": "Mensaje",
     "receipt_error": "No se pudo cargar el recibo.",
     "receipt_not_found": "Recibo no encontrado.",
-    "progress_aria": "Donation progress: {{percent}}%"
+    "progress_aria": "Donation progress: {{percent}}%",
+    "currencies": {
+      "EUR": "EUR",
+      "GBP": "GBP",
+      "USD": "USD"
+    }
   },
   "safeguarding": {
     "heading": "Protección",
@@ -543,7 +548,11 @@
     "accept": "Aceptar",
     "reject": "Rechazar",
     "cancel": "Cancelar",
-    "reject_confirm": "¿Está seguro de que desea rechazar esta solicitud de intercambio?"
+    "reject_confirm": "¿Está seguro de que desea rechazar esta solicitud de intercambio?",
+    "status_admin_pending": "Pendiente de revisión del administrador",
+    "status_admin_approved": "Aprobado por el administrador",
+    "status_admin_rejected": "Rechazado por el administrador",
+    "status_expired": "Caducado"
   },
   "opportunity": {
     "search_placeholder": "Buscar por nombre...",
@@ -570,7 +579,8 @@
     "select_shift": "Seleccione un turno (opcional)",
     "cancel": "Cancelar",
     "submit_application": "Enviar solicitud",
-    "applied_on": "Applied {{date}}"
+    "applied_on": "Applied {{date}}",
+    "meta_description_fallback": "{{title}} es una oportunidad de voluntariado con {{organization}} en {{location}}."
   },
   "org_settings": {
     "heading": "Configuración de la organización",
@@ -649,7 +659,12 @@
     "no_member_found": "No se encontró ningún miembro con esa dirección de correo electrónico.",
     "member_added": "Miembro agregado al grupo.",
     "add_member_error": "No se pudo agregar miembro. Es posible que ya estén en el grupo o que el correo electrónico no sea válido.",
-    "add_member_error_generic": "No se puede agregar miembro. Por favor revisa el correo electrónico y vuelve a intentarlo."
+    "add_member_error_generic": "No se puede agregar miembro. Por favor revisa el correo electrónico y vuelve a intentarlo.",
+    "status": {
+      "confirmed": "Confirmado",
+      "pending": "Pendiente",
+      "cancelled": "Cancelado"
+    }
   },
   "recommendations": {
     "title": "Recomendado para ti",

@@ -358,7 +358,12 @@
     "receipt_message": "Message",
     "receipt_error": "Failed to load receipt.",
     "receipt_not_found": "Receipt not found.",
-    "progress_aria": "Donation progress: {{percent}}%"
+    "progress_aria": "Donation progress: {{percent}}%",
+    "currencies": {
+      "EUR": "EUR",
+      "GBP": "GBP",
+      "USD": "USD"
+    }
   },
   "safeguarding": {
     "heading": "Safeguarding",
@@ -543,7 +548,11 @@
     "accept": "Accepteren",
     "reject": "Afwijzen",
     "cancel": "Annuleren",
-    "reject_confirm": "Weet u zeker dat u dit ruilverzoek wilt afwijzen?"
+    "reject_confirm": "Weet u zeker dat u dit ruilverzoek wilt afwijzen?",
+    "status_admin_pending": "Wacht op beoordeling door beheerder",
+    "status_admin_approved": "Door beheerder goedgekeurd",
+    "status_admin_rejected": "Door beheerder afgewezen",
+    "status_expired": "Verlopen"
   },
   "opportunity": {
     "search_placeholder": "Zoek op naam...",
@@ -570,7 +579,8 @@
     "select_shift": "Selecteer een dienst (optioneel)",
     "cancel": "Annuleren",
     "submit_application": "Aanvraag indienen",
-    "applied_on": "Applied {{date}}"
+    "applied_on": "Applied {{date}}",
+    "meta_description_fallback": "{{title}} is een vrijwilligersmogelijkheid bij {{organization}} in {{location}}."
   },
   "org_settings": {
     "heading": "Organisatie-instellingen",
@@ -649,7 +659,12 @@
     "no_member_found": "Er is geen lid gevonden met dat e-mailadres.",
     "member_added": "Lid toegevoegd aan de groep.",
     "add_member_error": "Kan lid niet toevoegen. Mogelijk zitten ze al in de groep of is de e-mail ongeldig.",
-    "add_member_error_generic": "Kan lid niet toevoegen. Controleer de e-mail en probeer het opnieuw."
+    "add_member_error_generic": "Kan lid niet toevoegen. Controleer de e-mail en probeer het opnieuw.",
+    "status": {
+      "confirmed": "Bevestigd",
+      "pending": "In afwachting",
+      "cancelled": "Geannuleerd"
+    }
   },
   "recommendations": {
     "title": "Recommended for You",

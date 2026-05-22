@@ -69,6 +69,19 @@
     "loading_search_results": "Torthaí cuardaigh á luchtú"
   },
   "page_meta": {
-    "title": "Search"
-  }
+    "title": "Search",
+    "description": "Cuardaigh do phobal le haghaidh liostaí, baill, grúpaí, imeachtaí, agus gníomhaíocht áitiúil úsáideach ar ardán bainc ama Project NEXUS."
+  },
+  "hero_eyebrow": "Cuardach trasna an phobail",
+  "results_label": "Torthaí aimsithe",
+  "empty_tip_spelling": "Seiceáil an litriú",
+  "empty_tip_filters": "Athshocraigh na scagairí",
+  "empty_tip_broaden": "Bain úsáid as focail níos leithne",
+  "hours_estimate": "{{hours}} u.",
+  "hours_unknown": "Am gan socrú",
+  "initial_tip_services": "Seirbhísí",
+  "initial_tip_people": "Daoine",
+  "initial_tip_events": "Imeachtaí",
+  "saved_result_count_one": "({{count}} toradh)",
+  "saved_result_count_other": "({{count}} toradh)"
 }

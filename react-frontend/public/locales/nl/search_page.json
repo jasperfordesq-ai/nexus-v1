@@ -69,6 +69,19 @@
     "loading_search_results": "Zoekresultaten laden"
   },
   "page_meta": {
-    "title": "Search"
-  }
+    "title": "Search",
+    "description": "Doorzoek je community voor advertenties, leden, groepen, evenementen en nuttige lokale activiteit op het Project NEXUS tijdbankplatform."
+  },
+  "hero_eyebrow": "Zoeken in de hele community",
+  "results_label": "Gevonden resultaten",
+  "empty_tip_spelling": "Controleer de spelling",
+  "empty_tip_filters": "Filters herstellen",
+  "empty_tip_broaden": "Gebruik bredere woorden",
+  "hours_estimate": "{{hours}} u",
+  "hours_unknown": "Tijd niet ingesteld",
+  "initial_tip_services": "Diensten",
+  "initial_tip_people": "Mensen",
+  "initial_tip_events": "Evenementen",
+  "saved_result_count_one": "({{count}} resultaat)",
+  "saved_result_count_other": "({{count}} resultaten)"
 }
