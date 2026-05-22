@@ -17,7 +17,7 @@
   "error_load_retry": "Theip ar lódáil an fhotha. Bain triail eile as.",
   "empty_title": "Níl aon phostálacha fós",
   "empty_desc": "Bí ar an gcéad duine rud éigin a roinnt le do phobal!",
-  "empty_filtered": "Níl aon {{filter}} san fhotha faoi láthair. Bain triail as scagaire eile!",
+  "empty_filtered": "N? mheaitse?lann aon rud an radharc seo faoi l?thair. Bain triail as scagaire eile.",
   "filter": {
     "all": "Uile",
     "posts": "Postálacha",

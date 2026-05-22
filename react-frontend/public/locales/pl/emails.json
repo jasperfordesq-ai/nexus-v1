@@ -62,11 +62,11 @@
     "expiry": "Ten link wygaśnie za {{hours}} godzin."
   },
   "password_reset": {
-    "subject": "Reset your password",
+    "subject": "Zresetuj has?o ? {{community}}",
     "greeting": "Cześć {{name}},",
     "body": "Poprosiłeś o resetowanie hasła. Kliknij poniższy przycisk, aby ustawić nowe hasło.",
     "cta": "Zresetuj hasło",
-    "expiry": "This link expires in {{hours}} hours.",
+    "expiry": "Ten link wyga?nie za 1 godzin?.",
     "ignore": "Jeśli nie prosiłeś o to, możesz bezpiecznie zignorować tę wiadomość.",
     "title": "Zresetuj swoje hasło",
     "preview": "Poprosiłeś o link do resetowania hasła"
@@ -79,8 +79,8 @@
     "description": "Opis: {{description}}"
   },
   "review_request": {
-    "subject": "Leave a review for {{name}}",
-    "greeting": "Hi {{name}},",
+    "subject": "Zostaw opini? dla :name",
+    "greeting": "Cze?? :name,",
     "body": "Jak poszła twoja wymiana z :name? Zostaw recenzję, aby pomóc społeczności.",
     "cta": "Zostaw recenzję"
   },

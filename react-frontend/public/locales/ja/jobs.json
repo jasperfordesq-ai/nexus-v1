@@ -783,7 +783,7 @@
     "rejection_rate": "拒否率",
     "days": "days",
     "funnel_title": "応募ファネル",
-    "funnel_description": "{{variable}}がパイプラインの各段階を進む方法",
+    "funnel_description": "???????????????????????",
     "rejection_rates_title": "段階別拒否率",
     "rejection_rates_description": "各段階で拒否された候補者の割合",
     "time_in_stage_title": "段階の平均時間",

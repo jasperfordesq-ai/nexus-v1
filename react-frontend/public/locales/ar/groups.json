@@ -290,7 +290,7 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "load_failed": "فشل في تحميل الملفات",
-    "upload_success": "{{count}} file(s) uploaded",
+    "upload_success": "?? ????? ????? ?????",
     "upload_failed": "فشل في رفع الملف(ات)",
     "download_failed": "فشل في تنزيل الملف",
     "file_deleted": "تم حذف الملف",

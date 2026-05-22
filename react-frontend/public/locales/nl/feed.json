@@ -17,7 +17,7 @@
   "error_load_retry": "Kon feed niet laden. Probeer het opnieuw.",
   "empty_title": "Nog geen berichten",
   "empty_desc": "Wees de eerste om iets te delen met jouw gemeenschap!",
-  "empty_filtered": "Geen {{filter}} in de feed op dit moment. Probeer een andere filter!",
+  "empty_filtered": "Niets komt momenteel overeen met deze weergave. Probeer een ander filter.",
   "filter": {
     "all": "All",
     "posts": "Posts",

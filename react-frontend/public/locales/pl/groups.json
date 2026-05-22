@@ -290,7 +290,7 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "load_failed": "Nie udało się załadować plików",
-    "upload_success": "{{count}} file(s) uploaded",
+    "upload_success": "Plik zosta? przes?any pomy?lnie",
     "upload_failed": "Nie udało się przesłać pliku(ów)",
     "download_failed": "Nie udało się pobrać pliku",
     "file_deleted": "Plik usunięty",

@@ -34,11 +34,11 @@
     "expiry": "Rachaidh an nasc seo in éag i gceann {{hours}} uair an chloig."
   },
   "password_reset": {
-    "subject": "Athshocraigh do phasfhocal",
+    "subject": "Athshocraigh do phasfhocal ? {{community}}",
     "greeting": "Dia duit {{name}},",
     "body": "D'iarr tú athshocrú pasfhocail. Cliceáil ar an gcnaipe thíos chun pasfhocal nua a shocrú.",
     "cta": "Athshocraigh Pasfhocal",
-    "expiry": "Rachaidh an nasc seo in éag i gceann {{hours}} uair an chloig.",
+    "expiry": "Rachaidh an nasc seo in ?ag i gceann 1 uair an chloig.",
     "ignore": "Murar iarr tú é seo, is féidir leat neamhaird a dhéanamh den ríomhphost seo.",
     "title": "Athshocraigh do Phasfhocal",
     "preview": "D'iarr tú nasc athshocraithe pasfhocail"
@@ -51,8 +51,8 @@
     "description": "Cur síos: {{description}}"
   },
   "review_request": {
-    "subject": "Fág léirmheas do {{name}}",
-    "greeting": "Dia duit {{name}},",
+    "subject": "F?g l?irmheas do :name",
+    "greeting": "Dia duit :name,",
     "body": "Conas a chuaigh do mhalartú le :name? Fág léirmheas chun cabhrú leis an bpobal.",
     "cta": "Fág Léirmheas"
   },

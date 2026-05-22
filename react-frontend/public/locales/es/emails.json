@@ -34,11 +34,11 @@
     "expiry": "Este enlace expira en {{hours}} horas."
   },
   "password_reset": {
-    "subject": "Restablece tu contraseña",
+    "subject": "Restablece tu contrase?a ? {{community}}",
     "greeting": "Hola {{name}},",
     "body": "Solicitaste un restablecimiento de contraseña. Haz clic en el botón de abajo para establecer una nueva contraseña.",
     "cta": "Restablecer Contraseña",
-    "expiry": "Este enlace expira en {{hours}} horas.",
+    "expiry": "Este enlace caduca en 1 hora.",
     "ignore": "Si no solicitaste esto, puedes ignorar este correo con tranquilidad.",
     "title": "Restablece tu contraseña",
     "preview": "Solicitaste un enlace para restablecer la contraseña"
@@ -51,8 +51,8 @@
     "description": "Descripción: {{description}}"
   },
   "review_request": {
-    "subject": "Deja una reseña para {{name}}",
-    "greeting": "Hola {{name}},",
+    "subject": "Deja una rese?a para :name",
+    "greeting": "Hola :name,",
     "body": "¿Cómo fue tu intercambio con :name? Deja una reseña para ayudar a la comunidad.",
     "cta": "Dejar Reseña"
   },

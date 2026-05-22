@@ -17,7 +17,7 @@
   "error_load_retry": "Feed konnte nicht geladen werden. Bitte versuchen Sie es erneut.",
   "empty_title": "Noch keine Beiträge",
   "empty_desc": "Seien Sie die erste Person, die etwas mit Ihrer Gemeinschaft teilt!",
-  "empty_filtered": "Keine {{filter}} im Feed vorhanden. Versuchen Sie einen anderen Filter!",
+  "empty_filtered": "Nichts passt derzeit zu dieser Ansicht. Versuche einen anderen Filter.",
   "filter": {
     "all": "Alle",
     "posts": "Beiträge",

@@ -290,7 +290,7 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "load_failed": "Bestanden konden niet worden geladen",
-    "upload_success": "{{count}} file(s) uploaded",
+    "upload_success": "Bestand succesvol ge?pload",
     "upload_failed": "Bestand(en) konden niet worden geüpload",
     "download_failed": "Bestand kon niet worden gedownload",
     "file_deleted": "Bestand verwijderd",

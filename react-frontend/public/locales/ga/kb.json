@@ -43,8 +43,8 @@
   },
   "feedback": {
     "question": "An raibh an t-alt seo cabhrach?",
-    "yes": "Tá ({{count}})",
-    "no": "Níl ({{count}})"
+    "yes": "T?",
+    "no": "N?l"
   },
   "page_title": "Knowledge Base",
   "page_description": "Articles, guides, and tutorials for the community.",

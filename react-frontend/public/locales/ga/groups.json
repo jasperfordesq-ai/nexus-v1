@@ -290,7 +290,7 @@
     "cancel": "Cealaigh",
     "delete": "Scrios",
     "load_failed": "Theip ar luchtú comhad",
-    "upload_success": "{{count}} comhad uaslódáilte",
+    "upload_success": "Uasl?d?ladh an comhad go rath?il",
     "upload_failed": "Theip ar uaslódáil comhad",
     "download_failed": "Theip ar íoslódáil comhaid",
     "file_deleted": "Comhad scriosta",

@@ -17,7 +17,7 @@
   "error_load_retry": "Échec du chargement du fil. Veuillez réessayer.",
   "empty_title": "Aucune publication pour le moment",
   "empty_desc": "Soyez la première personne à partager quelque chose avec votre communauté !",
-  "empty_filtered": "Aucun(e) {{filter}} dans le fil pour le moment. Essayez un autre filtre !",
+  "empty_filtered": "Rien ne correspond ? cette vue pour le moment. Essayez un autre filtre.",
   "filter": {
     "all": "Tout",
     "posts": "Publications",

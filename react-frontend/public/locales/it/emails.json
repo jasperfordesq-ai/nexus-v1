@@ -34,11 +34,11 @@
     "expiry": "Questo link scade tra {{hours}} ore."
   },
   "password_reset": {
-    "subject": "Reimposti la Sua password",
+    "subject": "Reimposta la password ? {{community}}",
     "greeting": "Gentile {{name}},",
     "body": "Ha richiesto la reimpostazione della password. Clicchi sul pulsante in basso per impostare una nuova password.",
     "cta": "Reimposta Password",
-    "expiry": "Questo link scade tra {{hours}} ore.",
+    "expiry": "Questo link scade tra 1 ora.",
     "ignore": "Se non ha richiesto questa operazione, ignori pure questa email.",
     "title": "Reimposta la tua password",
     "preview": "Hai richiesto un link di reset della password"
@@ -51,8 +51,8 @@
     "description": "Descrizione: {{description}}"
   },
   "review_request": {
-    "subject": "Lasci una recensione per {{name}}",
-    "greeting": "Gentile {{name}},",
+    "subject": "Lascia una recensione per :name",
+    "greeting": "Ciao :name,",
     "body": "Com'è andato il tuo scambio con :name? Lascia una recensione per aiutare la comunità.",
     "cta": "Lascia Recensione"
   },

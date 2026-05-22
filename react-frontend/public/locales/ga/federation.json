@@ -1,6 +1,6 @@
 {
-  "relay_no_remote_node": "Cannot determine remote node for account: :account",
-  "relay_no_route_to_node": "No route to node: :node",
+  "relay_no_remote_node": "N? f?idir an n?d cianda don chuntas a aimsi?: {{account}}",
+  "relay_no_route_to_node": "N?l aon bhealach chuig an n?d: {{node}}",
   "relay_url_blocked": "Relay target URL blocked by security filter",
   "external": "External",
   "hub": {

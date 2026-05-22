@@ -34,11 +34,11 @@
     "expiry": "Ce lien expire dans {{hours}} heures."
   },
   "password_reset": {
-    "subject": "Réinitialisez votre mot de passe",
+    "subject": "R?initialisez votre mot de passe ? {{community}}",
     "greeting": "Bonjour {{name}},",
     "body": "Vous avez demandé une réinitialisation de mot de passe. Cliquez sur le bouton ci-dessous pour définir un nouveau mot de passe.",
     "cta": "Réinitialiser le mot de passe",
-    "expiry": "Ce lien expire dans {{hours}} heures.",
+    "expiry": "Ce lien expire dans 1 heure.",
     "ignore": "Si vous n'avez pas effectué cette demande, vous pouvez ignorer cet e-mail.",
     "title": "Réinitialisez votre mot de passe",
     "preview": "Vous avez demandé un lien de réinitialisation de mot de passe"
@@ -51,8 +51,8 @@
     "description": "Description : {{description}}"
   },
   "review_request": {
-    "subject": "Laissez une évaluation pour {{name}}",
-    "greeting": "Bonjour {{name}},",
+    "subject": "Laissez une ?valuation pour :name",
+    "greeting": "Bonjour :name,",
     "body": "Comment s'est passé votre échange avec :name ? Laissez un avis pour aider la communauté.",
     "cta": "Laisser une évaluation"
   },

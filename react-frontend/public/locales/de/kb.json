@@ -43,8 +43,8 @@
   },
   "feedback": {
     "question": "War dieser Artikel hilfreich?",
-    "yes": "Ja ({{count}})",
-    "no": "Nein ({{count}})"
+    "yes": "Ja",
+    "no": "Nein"
   },
   "page_title": "Knowledge Base",
   "page_description": "Articles, guides, and tutorials for the community.",

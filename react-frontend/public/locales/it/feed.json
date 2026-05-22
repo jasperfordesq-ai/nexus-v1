@@ -17,7 +17,7 @@
   "error_load_retry": "Impossibile caricare il feed. La preghiamo di riprovare.",
   "empty_title": "Nessun post ancora",
   "empty_desc": "Sia la prima persona a condividere qualcosa con la Sua comunità!",
-  "empty_filtered": "Nessun {{filter}} nel feed al momento. Provi un filtro diverso!",
+  "empty_filtered": "Al momento nulla corrisponde a questa vista. Prova un filtro diverso.",
   "filter": {
     "all": "Tutto",
     "posts": "Post",

@@ -62,11 +62,11 @@
     "expiry": "تنتهي صلاحية هذا الرابط خلال {{hours}} ساعة."
   },
   "password_reset": {
-    "subject": "Reset your password",
+    "subject": "????? ????? ???? ?????? ? {{community}}",
     "greeting": "مرحباً {{name}}،",
     "body": "لقد طلبت إعادة تعيين كلمة المرور. انقر على الزر أدناه لتعيين كلمة مرور جديدة.",
     "cta": "إعادة تعيين كلمة المرور",
-    "expiry": "This link expires in {{hours}} hours.",
+    "expiry": "????? ?????? ??? ?????? ???? ???? ?????.",
     "ignore": "إذا لم تطلب هذا، يمكنك تجاهل هذا البريد الإلكتروني بأمان.",
     "title": "أعد تعيين كلمة المرور الخاصة بك",
     "preview": "لقد طلبت رابط إعادة تعيين كلمة المرور"
@@ -79,8 +79,8 @@
     "description": "الوصف: {{description}}"
   },
   "review_request": {
-    "subject": "Leave a review for {{name}}",
-    "greeting": "Hi {{name}},",
+    "subject": "???? ?????? ?? :name",
+    "greeting": "?????? :name,",
     "body": "كيف كان تبادلك مع :name؟ اترك مراجعة لمساعدة المجتمع.",
     "cta": "اكتب مراجعة"
   },

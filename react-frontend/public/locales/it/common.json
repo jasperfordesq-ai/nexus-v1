@@ -1,6 +1,6 @@
 {
   "back": "Indietro",
-  "hours_short": "NEXUSPLACEholder0TOKENh",
+  "hours_short": "{{count}}h",
   "error_title": "Qualcosa è andato storto",
   "nav": {
     "dashboard": "Dashboard",

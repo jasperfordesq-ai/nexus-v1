@@ -290,7 +290,7 @@
     "cancel": "Cancelar",
     "delete": "Eliminar",
     "load_failed": "Error al cargar archivos",
-    "upload_success": "{{count}} archivo(s) subidos",
+    "upload_success": "Archivo subido correctamente",
     "upload_failed": "Error al subir archivo(s)",
     "download_failed": "Error al descargar archivo",
     "file_deleted": "Archivo eliminado",

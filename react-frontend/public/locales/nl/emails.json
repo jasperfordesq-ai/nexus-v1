@@ -62,11 +62,11 @@
     "expiry": "Deze link verloopt over {{hours}} uur."
   },
   "password_reset": {
-    "subject": "Reset your password",
+    "subject": "Reset je wachtwoord ? {{community}}",
     "greeting": "Hi {{name}},",
     "body": "Je hebt een wachtwoordreset aangevraagd. Klik op de onderstaande knop om een nieuw wachtwoord in te stellen.",
     "cta": "Wachtwoord opnieuw instellen",
-    "expiry": "This link expires in {{hours}} hours.",
+    "expiry": "Deze link verloopt over 1 uur.",
     "ignore": "Als je dit niet hebt aangevraagd, kun je deze e-mail veilig negeren.",
     "title": "Stel je wachtwoord opnieuw in",
     "preview": "Je hebt een link voor het opnieuw instellen van het wachtwoord aangevraagd"
@@ -79,8 +79,8 @@
     "description": "Beschrijving: {{description}}"
   },
   "review_request": {
-    "subject": "Leave a review for {{name}}",
-    "greeting": "Hi {{name}},",
+    "subject": "Laat een beoordeling achter voor :name",
+    "greeting": "Hallo :name,",
     "body": "Hoe verliep je uitwisseling met :name? Laat een beoordeling achter om de community te helpen.",
     "cta": "Beoordeling achterlaten"
   },

@@ -828,7 +828,7 @@
     "unable_to_load": "تعذر التحميل",
     "try_again": "حاول مرة أخرى"
   },
-  "hours_display_one": "ساعة واحدة",
+  "hours_display_one": "{{count}} ????",
   "hours_display_other": "{{count}} ساعات",
   "compose": {
     "placeholder_url": "https://example.com",

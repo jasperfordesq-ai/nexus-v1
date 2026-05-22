@@ -34,11 +34,11 @@
     "expiry": "Este link expira em {{hours}} horas."
   },
   "password_reset": {
-    "subject": "Repor a sua palavra-passe",
+    "subject": "Repor a sua palavra-passe ? {{community}}",
     "greeting": "Olá {{name}},",
     "body": "Solicitou uma reposição de palavra-passe. Clique no botão abaixo para definir uma nova palavra-passe.",
     "cta": "Repor Palavra-passe",
-    "expiry": "Este link expira em {{hours}} horas.",
+    "expiry": "Este link expira dentro de 1 hora.",
     "ignore": "Se não solicitou isto, pode ignorar este email com segurança.",
     "title": "Redefina a sua palavra-passe",
     "preview": "Solicitou um link de redefinição de palavra-passe"
@@ -51,8 +51,8 @@
     "description": "Descrição: {{description}}"
   },
   "review_request": {
-    "subject": "Deixe uma avaliação para {{name}}",
-    "greeting": "Olá {{name}},",
+    "subject": "Deixe uma avalia??o para :name",
+    "greeting": "Ol? :name,",
     "body": "Como foi a sua troca com :name? Deixe uma avaliação para ajudar a comunidade.",
     "cta": "Deixar Avaliação"
   },

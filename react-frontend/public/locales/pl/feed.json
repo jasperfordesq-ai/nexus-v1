@@ -17,7 +17,7 @@
   "error_load_retry": "Nie udało się załadować kanału. Proszę spróbować ponownie.",
   "empty_title": "Brak postów",
   "empty_desc": "Bądź pierwszym, który podzieli się czymś ze swoją społecznością!",
-  "empty_filtered": "Brak {{filter}} w kanale w tej chwili. Spróbuj innego filtra!",
+  "empty_filtered": "Nic nie pasuje teraz do tego widoku. Spr?buj innego filtra.",
   "filter": {
     "all": "All",
     "posts": "Posts",

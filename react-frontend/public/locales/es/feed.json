@@ -17,7 +17,7 @@
   "error_load_retry": "Error al cargar el feed. Por favor intenta de nuevo.",
   "empty_title": "Aún no hay publicaciones",
   "empty_desc": "¡Sé el primero en compartir algo con tu comunidad!",
-  "empty_filtered": "No hay {{filter}} en el feed ahora mismo. ¡Prueba un filtro diferente!",
+  "empty_filtered": "Nada coincide con esta vista ahora mismo. Prueba otro filtro.",
   "filter": {
     "all": "Todo",
     "posts": "Publicaciones",
