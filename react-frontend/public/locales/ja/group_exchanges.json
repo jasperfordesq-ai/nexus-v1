@@ -89,8 +89,7 @@
     "no_members_found": "検索に一致するメンバーは見つかりませんでした。",
     "done": "完了",
     "aria_exchange_participants": "交換参加者",
-    "aria_hour_split": "時間分割",
-    "hours_amount": "{{count}}時間"
+    "aria_hour_split": "時間分割"
   },
   "create": {
     "page_title": "グループ交換を作成",

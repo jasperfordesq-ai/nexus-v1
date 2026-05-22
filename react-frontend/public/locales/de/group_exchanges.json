@@ -89,8 +89,7 @@
     "no_members_found": "Keine Mitglieder gefunden, die Ihrer Suche entsprechen.",
     "done": "Fertig",
     "aria_exchange_participants": "Austauschteilnehmer",
-    "aria_hour_split": "Stundenaufteilung",
-    "hours_amount": "{{count}} Std."
+    "aria_hour_split": "Stundenaufteilung"
   },
   "create": {
     "page_title": "Gruppentausch erstellen",

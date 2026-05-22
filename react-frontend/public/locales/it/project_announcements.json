@@ -1,7 +1,11 @@
 {
   "meta": {
     "description": "Segui i progetti municipali, cooperativi e di quartiere dall'annuncio al traguardo.",
-    "title": "Progetti comunitari"
+    "title": "Progetti comunitari",
+    "detail_title": "{{title}}",
+    "detail_description_fallback": "{{title}} is {{status}} at {{progress}}% progress. Stage: {{stage}}. Location: {{location}}.",
+    "stage_unknown": "Stage pending",
+    "location_unknown": "Location pending"
   },
   "status": {
     "active": "Attivo",
@@ -27,6 +31,11 @@
     "subscribe": "Impossibile aggiornare le notifiche del progetto."
   },
   "share": {
-    "share_text": "{{title}} - {{description}}"
+    "share_text": "{{title}} - {{description}}",
+    "title": "Share project",
+    "copy_link": "Copy link",
+    "native": "Share",
+    "link_copied": "Link copied",
+    "copy_failed": "Could not copy link"
   }
 }

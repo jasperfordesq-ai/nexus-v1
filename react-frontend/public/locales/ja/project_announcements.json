@@ -4,7 +4,8 @@
     "detail_description_fallback": "{{title}}は進捗{{progress}}%で{{status}}です。ステージ：{{stage}}。場所：{{location}}。",
     "location_unknown": "場所未定",
     "stage_unknown": "ステージ未定",
-    "title": "コミュニティプロジェクト"
+    "title": "コミュニティプロジェクト",
+    "detail_title": "{{title}}"
   },
   "status": {
     "active": "進行中",

@@ -117,7 +117,17 @@
       "who_can_see_heading": "Wie dit kan zien",
       "your_selections": "Uw selecties"
     },
-    "select_option": "Kies een optie"
+    "select_option": "Kies een optie",
+    "load_error": "Failed to load options",
+    "try_again": "Please try again.",
+    "required": "Required options",
+    "required_respond": "Please respond to: {{items}}",
+    "empty": "No safeguarding options have been configured for this community.",
+    "save_failed": "Save failed",
+    "save_continue": "Save & Continue",
+    "required_fields": "Required fields",
+    "or_separator": "or",
+    "learn_more": "Learn more"
   },
   "page_meta": {
     "title": "Onboarding"

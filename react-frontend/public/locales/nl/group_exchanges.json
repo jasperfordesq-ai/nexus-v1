@@ -89,8 +89,7 @@
     "no_members_found": "Geen leden gevonden die overeenkomen met je zoekopdracht.",
     "done": "Klaar",
     "aria_exchange_participants": "Ruil deelnemers",
-    "aria_hour_split": "Uren verdeling",
-    "hours_amount": "{{count}} u"
+    "aria_hour_split": "Uren verdeling"
   },
   "create": {
     "page_title": "Creëer Groepsruil",

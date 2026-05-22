@@ -117,7 +117,17 @@
       "who_can_see_heading": "من يمكنه رؤية هذا",
       "your_selections": "اختياراتك"
     },
-    "select_option": "اختر خيارًا"
+    "select_option": "اختر خيارًا",
+    "load_error": "Failed to load options",
+    "try_again": "Please try again.",
+    "required": "Required options",
+    "required_respond": "Please respond to: {{items}}",
+    "empty": "No safeguarding options have been configured for this community.",
+    "save_failed": "Save failed",
+    "save_continue": "Save & Continue",
+    "required_fields": "Required fields",
+    "or_separator": "or",
+    "learn_more": "Learn more"
   },
   "page_meta": {
     "title": "الإعداد"

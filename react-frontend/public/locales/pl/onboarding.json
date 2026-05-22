@@ -117,7 +117,17 @@
       "who_can_see_heading": "Kto może to zobaczyć",
       "your_selections": "Twoje wybory"
     },
-    "select_option": "Wybierz opcję"
+    "select_option": "Wybierz opcję",
+    "load_error": "Failed to load options",
+    "try_again": "Please try again.",
+    "required": "Required options",
+    "required_respond": "Please respond to: {{items}}",
+    "empty": "No safeguarding options have been configured for this community.",
+    "save_failed": "Save failed",
+    "save_continue": "Save & Continue",
+    "required_fields": "Required fields",
+    "or_separator": "or",
+    "learn_more": "Learn more"
   },
   "page_meta": {
     "title": "Wdrożenie"

@@ -89,8 +89,7 @@
     "no_members_found": "Nessun membro trovato corrispondente alla Sua ricerca.",
     "done": "Fatto",
     "aria_exchange_participants": "Partecipanti allo scambio",
-    "aria_hour_split": "Suddivisione ore",
-    "hours_amount": "{{count}} h"
+    "aria_hour_split": "Suddivisione ore"
   },
   "create": {
     "page_title": "Crea scambio di gruppo",

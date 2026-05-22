@@ -4,7 +4,8 @@
     "detail_description_fallback": "{{title}} {{status}} بنسبة تقدم {{progress}}%. المرحلة: {{stage}}. الموقع: {{location}}.",
     "location_unknown": "الموقع قيد الانتظار",
     "stage_unknown": "المرحلة قيد الانتظار",
-    "title": "مشاريع المجتمع"
+    "title": "مشاريع المجتمع",
+    "detail_title": "{{title}}"
   },
   "status": {
     "active": "نشط",
