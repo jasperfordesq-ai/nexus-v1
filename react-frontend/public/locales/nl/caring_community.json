@@ -96,7 +96,7 @@
       "urgent": "Dringend"
     },
     "status": {
-      "open": "Openen",
+      "open": "Open",
       "matched": "Komt overeen",
       "accepted": "Geaccepteerd",
       "cancelled": "Geannuleerd",
@@ -121,7 +121,7 @@
     "filter_verein": "Verenigingen",
     "filter_volunteer": "Vrijwilligers",
     "verified_badge": "Geverifieerd",
-    "contact": "Contacteer",
+    "contact": "Contact",
     "website": "Website",
     "call_aria": "Bel provider op{{phone}}",
     "email_aria": "E-mailprovider bij{{email}}",
