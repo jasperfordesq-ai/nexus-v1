@@ -157,7 +157,10 @@
     "send_request": "Invia richiesta",
     "prep_time_label": "Preparation Time",
     "prep_time_placeholder": "0",
-    "prep_time_description": "Additional time needed for preparation (optional)"
+    "prep_time_description": "Additional time needed for preparation (optional)",
+    "summary_estimate": "Tempo stimato",
+    "form_heading": "Dettagli della richiesta",
+    "form_description": "Conferma le ore proposte e aggiungi contesto in modo che l'altro membro possa rispondere con sicurezza."
   },
   "page_meta": {
     "request": {

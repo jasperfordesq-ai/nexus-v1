@@ -88,7 +88,8 @@
     "private_title": "This goal is private",
     "private_description": "Only the goal owner can view this goal.",
     "overdue_chip": "Overdue",
-    "checkin_frequency": "Check-in frequency"
+    "checkin_frequency": "Check-in frequency",
+    "meta_description": "{{owner}} śledzi „{{title}}” z postępem {{progress}}% w tym celu społeczności."
   },
   "goals": {
     "load_error": "Failed to load goals. Please try again."

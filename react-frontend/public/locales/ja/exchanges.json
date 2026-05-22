@@ -157,7 +157,10 @@
     "send_request": "リクエストを送信",
     "prep_time_label": "Preparation Time",
     "prep_time_placeholder": "0",
-    "prep_time_description": "Additional time needed for preparation (optional)"
+    "prep_time_description": "Additional time needed for preparation (optional)",
+    "summary_estimate": "推定時間",
+    "form_heading": "リクエストの詳細",
+    "form_description": "提案された時間を確認し、相手のメンバーが自信を持って返信できるよう背景情報を追加してください。"
   },
   "page_meta": {
     "request": {

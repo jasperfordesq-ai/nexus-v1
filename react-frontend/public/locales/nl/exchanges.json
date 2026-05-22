@@ -157,7 +157,10 @@
     "send_request": "Verzoek Verzenden",
     "prep_time_label": "Preparation Time",
     "prep_time_placeholder": "0",
-    "prep_time_description": "Additional time needed for preparation (optional)"
+    "prep_time_description": "Additional time needed for preparation (optional)",
+    "summary_estimate": "Geschatte tijd",
+    "form_heading": "Aanvraagdetails",
+    "form_description": "Bevestig de voorgestelde uren en voeg context toe zodat het andere lid met vertrouwen kan reageren."
   },
   "page_meta": {
     "request": {

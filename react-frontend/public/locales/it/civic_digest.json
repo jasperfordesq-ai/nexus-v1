@@ -39,7 +39,9 @@
     "cta_manage_prefs": "Gestisci le preferenze del digest",
     "footer": "Stai ricevendo questa e-mail perché hai attivato il digest comunale di {{community}}. Puoi modificare la frequenza o disiscriverti in qualsiasi momento.",
     "match_score": "Affinità {{score}}",
-    "view_all": "Vedi il digest completo"
+    "view_all": "Vedi il digest completo",
+    "subject_monthly": "Il tuo riepilogo civico mensile — {{community}}",
+    "intro_monthly": "Ecco il tuo riepilogo mensile — {{count}} aggiornamento/i selezionato/i per te in base alla tua sotto-regione e ai tuoi interessi."
   },
   "push": {
     "title": "Il tuo digest comunale è pronto",
@@ -58,5 +60,6 @@
     "reason_safety": "Safety alert",
     "reason_announcement": "Official announcement",
     "no_reasons": "Default ranking"
-  }
+  },
+  "prefs_cadence_monthly": "Riepilogo mensile"
 }
