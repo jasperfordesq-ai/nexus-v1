@@ -61,15 +61,15 @@
     "submit_failed": "Échec de la soumission",
     "try_again": "Veuillez réessayer",
     "submit_error_desc": "Une erreur s'est produite. Veuillez réessayer.",
-    "recipient_load_failed": "Could not load recipient. Please search manually."
+    "recipient_load_failed": "Impossible de charger le destinataire. Veuillez rechercher manuellement."
   },
   "error": {
     "load_balance": "Impossible de charger le solde du portefeuille",
     "load_wallet": "Impossible de charger les données du portefeuille. Veuillez réessayer.",
     "session_expired": "Votre session a expiré. Veuillez vous reconnecter.",
     "load_community_fund": "Impossible de charger le fonds communautaire",
-    "transfer_failed": "Transfer failed. Please try again.",
-    "unexpected": "An unexpected error occurred. Please try again."
+    "transfer_failed": "Le transfert a échoué. Veuillez réessayer.",
+    "unexpected": "Une erreur inattendue s'est produite. Veuillez réessayer."
   },
   "no_members_found": "Aucun membre trouvé",
   "donate": "Faire un don",
@@ -89,7 +89,7 @@
   "donate_member_desc": "Offrir des crédits directement à un autre membre",
   "donate_recipient_id": "ID du destinataire",
   "donate_recipient_placeholder": "Saisir l'ID du membre",
-  "donate_search_member": "Search by member",
+  "donate_search_member": "Rechercher par membre",
   "donate_amount_placeholder": "1",
   "donate_message_placeholder": "Ajouter une note à votre don...",
   "donate_balance_info": "Votre solde : {{balance}} heures",
@@ -143,12 +143,12 @@
   "optional": "optionnel",
   "description_placeholder": "À quoi sert ce transfert ?",
   "new_balance_after": "Votre nouveau solde sera de {{balance}} heures",
-  "transfer_summary": "You are about to send {{amount}} {{unit}} to {{name}}",
+  "transfer_summary": "Vous êtes sur le point d'envoyer {{amount}} {{unit}} à {{name}}",
   "validation": {
-    "select_recipient": "Please select a recipient",
-    "valid_amount": "Please enter a valid amount",
-    "insufficient_balance": "Insufficient balance",
-    "max_transfer": "Maximum transfer is {{max}} hours"
+    "select_recipient": "Veuillez sélectionner un destinataire",
+    "valid_amount": "Veuillez saisir un montant valide",
+    "insufficient_balance": "Solde insuffisant",
+    "max_transfer": "Le transfert maximum est {{max}} heures"
   },
   "hours_value": "{{count}}h",
   "signed_hours_value": "{{sign}}{{count}}h",

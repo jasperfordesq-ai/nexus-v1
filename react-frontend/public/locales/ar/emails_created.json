@@ -1,50 +1,50 @@
 {
   "listing": {
-    "subject": "قائمتك مباشرة: {{title}} — {{community}}",
-    "title": "تم نشر القائمة!",
-    "preview": "أصبحت قائمتك \"{{title}}\" متاحة الآن على {{community}}",
-    "body": "أصبحت قائمتك متاحة الآن على {{community}} ويمكن للأعضاء الآخرين اكتشافها.",
-    "cta": "عرض القائمة الخاصة بك"
+    "subject": "إعلانك نشط: {{title}} — {{community}}",
+    "title": "تم نشر الإعلان!",
+    "preview": "إعلانك \"{{title}}\" أصبح نشطاً على {{community}}",
+    "body": "إعلانك أصبح نشطاً على {{community}} ويمكن للأعضاء الآخرين اكتشافه.",
+    "cta": "عرض إعلانك"
   },
   "event": {
-    "subject": "تمت جدولة الحدث الخاص بك: {{title}} — {{community}}",
-    "title": "تم إنشاء الحدث!",
-    "preview": "تمت جدولة الحدث الخاص بك \"{{title}}\" على {{community}}",
-    "body": "لقد تم إنشاء الحدث الخاص بك وهو الآن مرئي للمجتمع. يمكن للأعضاء بدء الرد على الدعوة.",
-    "cta": "عرض الحدث الخاص بك"
+    "subject": "فعاليتك مجدولة: {{title}} — {{community}}",
+    "title": "تم إنشاء الفعالية!",
+    "preview": "تمت جدولة فعاليتك \"{{title}}\" على {{community}}",
+    "body": "تم إنشاء فعاليتك وهي الآن مرئية للمجتمع. يمكن للأعضاء البدء في التسجيل.",
+    "cta": "عرض فعاليتك"
   },
   "group": {
-    "subject": "مجموعتك مباشرة: {{name}} — {{community}}",
+    "subject": "مجموعتك نشطة: {{name}} — {{community}}",
     "title": "تم إنشاء المجموعة!",
-    "preview": "أصبحت مجموعتك \"{{name}}\" متاحة الآن على {{community}}",
-    "body": "تم إنشاء مجموعتك على {{community}}. قم بدعوة الأعضاء لبدء الأمور.",
+    "preview": "مجموعتك \"{{name}}\" أصبحت نشطة على {{community}}",
+    "body": "تم إنشاء مجموعتك على {{community}}. ادعُ الأعضاء للبدء.",
     "cta": "عرض مجموعتك"
   },
   "credits_sent": {
-    "subject": "لقد أرسلت {{amount}} ساعة (ساعات) إلى {{recipient}} — {{community}}",
-    "title": "الاعتمادات الوقت المرسلة",
-    "preview": "لقد أرسلت {{amount}} ساعة (ساعات) إلى {{recipient}} على {{community}}",
-    "body": "تمت معالجة تحويل رصيد الوقت الخاص بك إلى <strong>{{recipient}}</strong> بنجاح.",
-    "label_amount": "Amount",
-    "label_recipient": "تم الإرسال إلى",
-    "label_description": "Description",
+    "subject": "لقد أرسلت {{amount}} ساعة/ساعات إلى {{recipient}} — {{community}}",
+    "title": "تم إرسال رصيد الوقت",
+    "preview": "لقد أرسلت {{amount}} ساعة/ساعات إلى {{recipient}} على {{community}}",
+    "body": "تمت معالجة تحويل رصيد الوقت إلى <strong>{{recipient}}</strong> بنجاح.",
+    "label_amount": "المبلغ",
+    "label_recipient": "أُرسل إلى",
+    "label_description": "الوصف",
     "cta": "عرض محفظتك"
   },
   "donation": {
-    "subject": "شكرًا لك على تبرعك لـ {{community}}",
+    "subject": "شكراً على تبرعك لـ {{community}}",
     "title": "تم استلام التبرع",
-    "preview": "شكرًا لك على تبرعك السخي لـ {{community}}",
-    "body": "نشكرك على تبرعك السخي إلى <strong>{{community}}</strong>. دعمكم يحدث فرقا حقيقيا.",
-    "label_amount": "Amount",
-    "label_date": "Date",
-    "recurring_note": "هذا هو التبرع المتكرر. يمكنك إدارة تبرعاتك من إعدادات حسابك.",
+    "preview": "شكراً على تبرعك الكريم لـ {{community}}",
+    "body": "شكراً على تبرعك الكريم لـ <strong>{{community}}</strong>. دعمك يُحدث فرقاً حقيقياً.",
+    "label_amount": "المبلغ",
+    "label_date": "التاريخ",
+    "recurring_note": "هذا تبرع متكرر. يمكنك إدارة تبرعاتك من إعدادات حسابك.",
     "cta": "عرض حسابك"
   },
   "listing_updated": {
-    "subject": "تم تحديث القائمة التي قمت بحفظها — {{community}}",
-    "title": "تم تحديث القائمة المحفوظة",
+    "subject": "إعلان حفظته تم تحديثه — {{community}}",
+    "title": "تم تحديث إعلان محفوظ",
     "preview": "تم تحديث \"{{title}}\" على {{community}}",
-    "body": "تم تحديث القائمة التي قمت بحفظها، <strong>\"{{title}}\"</strong>، على {{community}}.",
-    "cta": "عرض القائمة"
+    "body": "الإعلان الذي حفظته، <strong>\"{{title}}\"</strong>، تم تحديثه على {{community}}.",
+    "cta": "عرض الإعلان"
   }
 }

@@ -1,39 +1,39 @@
 {
   "created": {
-    "subject": "目標セット: {{title}} — {{community}}",
-    "title": "目標が作成されました!",
-    "preview": "新しい目標を設定しました: {{title}}",
-    "body": "{{community}} に新しい目標を設定しました。続行してください。順調に進むようリマインダーを送信します。",
-    "cta": "目標を確認する"
+    "subject": "目標設定：{{title}} — {{community}}",
+    "title": "目標作成完了！",
+    "preview": "新しい目標を設定しました：{{title}}",
+    "body": "{{community}} で新しい目標を設定しました。頑張って — 軌道に乗るためのリマインダーをお送りします。",
+    "cta": "目標を表示"
   },
   "completed": {
-    "subject": "目標達成: {{title}} — {{community}}",
+    "subject": "目標達成：{{title}} — {{community}}",
     "title": "目標達成！",
-    "preview": "おめでとう！目標を達成しました: {{title}}",
-    "body": "素晴らしい作品です！ {{community}} での目標は達成されました。コミュニティへのあなたの貢献は本当に高く評価されています。",
-    "highlight": "目標は完了しました",
-    "cta": "あなたの実績を見る"
+    "preview": "おめでとうございます！目標を達成しました：{{title}}",
+    "body": "素晴らしい！{{community}} で目標を達成しました。コミュニティへのあなたの貢献に心から感謝します。",
+    "highlight": "目標達成",
+    "cta": "実績を表示"
   },
   "abandoned": {
-    "subject": "削除されたゴール: {{title}} — {{community}}",
-    "title": "ゴールが削除されました",
-    "preview": "あなたの目標は削除されました",
-    "body": "目標<strong>「{{title}}」</strong> は {{community}} から削除されました。",
+    "subject": "目標削除：{{title}} — {{community}}",
+    "title": "目標が削除されました",
+    "preview": "あなたの目標が削除されました",
+    "body": "{{community}} からあなたの目標 <strong>「{{title}}」</strong> が削除されました。",
     "note": "プロフィールからいつでも新しい目標を設定できます。",
-    "cta": "新しい目標を設定する"
+    "cta": "新しい目標を設定"
   },
   "goal_milestone": {
-    "progress_subject": "目標まであと {{percent}}% です!",
+    "progress_subject": "目標の{{percent}}%達成！",
     "progress_title": "{{percent}}% 完了",
-    "progress_preview": "「{{goal}}」の大きな進歩",
-    "progress_greeting": "頑張れ、{{name}}!",
-    "progress_body": "目標「{{goal}}」の {{percent}}% に到達しました。あなたは素晴らしい進歩を遂げています - 続けてください!",
-    "progress_cta": "目標を確認する",
+    "progress_preview": "「{{goal}}」で素晴らしい進歩",
+    "progress_greeting": "その調子、{{name}}！",
+    "progress_body": "目標「{{goal}}」の{{percent}}%に達しました。素晴らしい進歩です — 続けてください！",
+    "progress_cta": "目標を表示",
     "complete_subject": "目標を達成しました！",
     "complete_title": "目標達成！",
-    "complete_preview": "おめでとうございます — 「{{goal}}」を完了しました",
-    "complete_greeting": "おめでとうございます、{{name}}!",
-    "complete_body": "目標「{{goal}}」を無事に達成しました。これは素晴らしい成果です。よくやった！",
-    "complete_cta": "あなたの実績を見る"
+    "complete_preview": "おめでとう — 「{{goal}}」を達成しました",
+    "complete_greeting": "おめでとう、{{name}}！",
+    "complete_body": "目標「{{goal}}」を見事に達成しました。素晴らしい成果です — よくやりました！",
+    "complete_cta": "実績を表示"
   }
 }

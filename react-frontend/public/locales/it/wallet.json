@@ -61,15 +61,15 @@
     "submit_failed": "Invio non riuscito",
     "try_again": "Per favore riprova",
     "submit_error_desc": "Si è verificato un errore. Per favore riprova.",
-    "recipient_load_failed": "Could not load recipient. Please search manually."
+    "recipient_load_failed": "Impossibile caricare il destinatario. Cerca manualmente."
   },
   "error": {
     "load_balance": "Impossibile caricare il saldo del portafoglio",
     "load_wallet": "Impossibile caricare i dati del portafoglio. La preghiamo di riprovare.",
     "session_expired": "La Sua sessione è scaduta. Effettui nuovamente l'accesso.",
     "load_community_fund": "Impossibile caricare il fondo comunitario",
-    "transfer_failed": "Transfer failed. Please try again.",
-    "unexpected": "An unexpected error occurred. Please try again."
+    "transfer_failed": "Trasferimento non riuscito. Riprova.",
+    "unexpected": "Si è verificato un errore imprevisto. Riprova."
   },
   "no_members_found": "Nessun membro trovato",
   "donate": "Dona",
@@ -89,7 +89,7 @@
   "donate_member_desc": "Regala crediti direttamente a un altro membro",
   "donate_recipient_id": "ID Destinatario",
   "donate_recipient_placeholder": "Inserisci l'ID del membro",
-  "donate_search_member": "Search by member",
+  "donate_search_member": "Cerca per membro",
   "donate_amount_placeholder": "1",
   "donate_message_placeholder": "Aggiungi una nota con la tua donazione...",
   "donate_balance_info": "Il tuo saldo: {{balance}} ore",
@@ -143,12 +143,12 @@
   "optional": "opzionale",
   "description_placeholder": "A cosa serve questo trasferimento?",
   "new_balance_after": "Il tuo nuovo saldo sarà {{balance}} ore",
-  "transfer_summary": "You are about to send {{amount}} {{unit}} to {{name}}",
+  "transfer_summary": "Stai per inviare {{amount}} {{unit}} a {{name}}",
   "validation": {
-    "select_recipient": "Please select a recipient",
-    "valid_amount": "Please enter a valid amount",
-    "insufficient_balance": "Insufficient balance",
-    "max_transfer": "Maximum transfer is {{max}} hours"
+    "select_recipient": "Seleziona un destinatario",
+    "valid_amount": "Inserisci un importo valido",
+    "insufficient_balance": "Saldo insufficiente",
+    "max_transfer": "Il trasferimento massimo è {{max}} ore"
   },
   "hours_value": "{{count}}h",
   "signed_hours_value": "{{sign}}{{count}}h",

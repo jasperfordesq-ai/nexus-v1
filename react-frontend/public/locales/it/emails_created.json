@@ -1,50 +1,50 @@
 {
   "listing": {
-    "subject": "La tua inserzione è attiva: {{title}} — {{community}}",
+    "subject": "Il tuo annuncio è attivo: {{title}} — {{community}}",
     "title": "Annuncio pubblicato!",
-    "preview": "La tua inserzione \"{{title}}\" è ora pubblicata su {{community}}",
-    "body": "La tua inserzione è ora pubblicata su {{community}} e può essere scoperta da altri membri.",
-    "cta": "Visualizza la tua inserzione"
+    "preview": "Il tuo annuncio \"{{title}}\" è ora attivo su {{community}}",
+    "body": "Il tuo annuncio è ora attivo su {{community}} e può essere trovato dagli altri membri.",
+    "cta": "Visualizza il tuo annuncio"
   },
   "event": {
     "subject": "Il tuo evento è programmato: {{title}} — {{community}}",
     "title": "Evento creato!",
     "preview": "Il tuo evento \"{{title}}\" è stato programmato su {{community}}",
-    "body": "Il tuo evento è stato creato ed è ora visibile alla community. I membri possono iniziare a rispondere.",
+    "body": "Il tuo evento è stato creato ed è ora visibile alla community. I membri possono iniziare a iscriversi.",
     "cta": "Visualizza il tuo evento"
   },
   "group": {
     "subject": "Il tuo gruppo è attivo: {{name}} — {{community}}",
     "title": "Gruppo creato!",
     "preview": "Il tuo gruppo \"{{name}}\" è ora attivo su {{community}}",
-    "body": "Il tuo gruppo è stato creato su {{community}}. Invita i membri a iniziare.",
+    "body": "Il tuo gruppo è stato creato su {{community}}. Invita i membri per iniziare.",
     "cta": "Visualizza il tuo gruppo"
   },
   "credits_sent": {
-    "subject": "Hai inviato ore {{amount}} a {{recipient}} — {{community}}",
+    "subject": "Hai inviato {{amount}} ora/e a {{recipient}} — {{community}}",
     "title": "Crediti temporali inviati",
-    "preview": "Hai inviato ore {{amount}} a {{recipient}} su {{community}}",
-    "body": "Il trasferimento del tuo credito temporale a <strong>{{recipient}}</strong> è stato elaborato correttamente.",
-    "label_amount": "Amount",
+    "preview": "Hai inviato {{amount}} ora/e a {{recipient}} su {{community}}",
+    "body": "Il tuo trasferimento di crediti temporali a <strong>{{recipient}}</strong> è stato elaborato con successo.",
+    "label_amount": "Importo",
     "label_recipient": "Inviato a",
-    "label_description": "Description",
+    "label_description": "Descrizione",
     "cta": "Visualizza il tuo portafoglio"
   },
   "donation": {
     "subject": "Grazie per la tua donazione a {{community}}",
     "title": "Donazione ricevuta",
     "preview": "Grazie per la tua generosa donazione a {{community}}",
-    "body": "Grazie per la tua generosa donazione a <strong>{{community}}</strong>. Il tuo supporto fa davvero la differenza.",
-    "label_amount": "Amount",
-    "label_date": "Date",
+    "body": "Grazie per la tua generosa donazione a <strong>{{community}}</strong>. Il tuo supporto fa una differenza reale.",
+    "label_amount": "Importo",
+    "label_date": "Data",
     "recurring_note": "Questa è una donazione ricorrente. Puoi gestire le tue donazioni dalle impostazioni del tuo account.",
     "cta": "Visualizza il tuo account"
   },
   "listing_updated": {
-    "subject": "Un elenco che hai salvato è stato aggiornato: {{community}}",
-    "title": "Elenco salvato aggiornato",
+    "subject": "Un annuncio salvato è stato aggiornato — {{community}}",
+    "title": "Annuncio salvato aggiornato",
     "preview": "\"{{title}}\" è stato aggiornato su {{community}}",
-    "body": "Un elenco che hai salvato, <strong>\"{{title}}\"</strong>, è stato aggiornato su {{community}}.",
-    "cta": "Visualizza elenco"
+    "body": "Un annuncio che hai salvato, <strong>\"{{title}}\"</strong>, è stato aggiornato su {{community}}.",
+    "cta": "Visualizza annuncio"
   }
 }

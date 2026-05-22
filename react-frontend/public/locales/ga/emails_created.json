@@ -1,50 +1,50 @@
 {
   "listing": {
-    "subject": "Tá do liostú beo: {{title}} — {{community}}",
-    "title": "Liostáil Postáilte!",
-    "preview": "Tá do liostú \"{{title}}\" beo anois ar {{community}}",
-    "body": "Tá do liostú beo anois ar {{community}} agus is féidir le baill eile teacht air.",
-    "cta": "Féach ar Do Liostú"
+    "subject": "Tá d'fhógra beo: {{title}} — {{community}}",
+    "title": "Fógra Postáilte!",
+    "preview": "Tá d'fhógra \"{{title}}\" beo anois ar {{community}}",
+    "body": "Tá d'fhógra beo anois ar {{community}} agus is féidir le baill eile é a fháil.",
+    "cta": "Féach ar d'Fhógra"
   },
   "event": {
-    "subject": "Tá d'imeacht sceidealta: {{title}} — {{community}}",
+    "subject": "Tá d'imeacht sceidealaithe: {{title}} — {{community}}",
     "title": "Imeacht Cruthaithe!",
     "preview": "Tá d'imeacht \"{{title}}\" sceidealaithe ar {{community}}",
-    "body": "Cruthaíodh d'imeacht agus tá sé le feiceáil ag an bpobal anois. Is féidir le baill tosú ar RSVPing.",
+    "body": "Cruthaíodh d'imeacht agus tá sé infheicthe ag an bpobal anois. Is féidir le baill tosú ag RSVP.",
     "cta": "Féach ar d'Imeacht"
   },
   "group": {
-    "subject": "Tá do ghrúpa ag craoladh beo: {{name}} — {{community}}",
+    "subject": "Tá do ghrúpa beo: {{name}} — {{community}}",
     "title": "Grúpa Cruthaithe!",
     "preview": "Tá do ghrúpa \"{{name}}\" beo anois ar {{community}}",
-    "body": "Cruthaíodh do ghrúpa ar {{community}}. Tabhair cuireadh do bhaill tús a chur le rudaí.",
-    "cta": "Féach ar Do Ghrúpa"
+    "body": "Cruthaíodh do ghrúpa ar {{community}}. Tabhair cuireadh do bhaill tosú.",
+    "cta": "Féach ar do Ghrúpa"
   },
   "credits_sent": {
-    "subject": "Sheol tú uair an chloig {{amount}} chuig {{recipient}} - {{community}}",
-    "title": "Creidmheasanna Ama Seolta",
-    "preview": "Sheol tú uair an chloig {{amount}} chuig {{recipient}} ar {{community}}",
-    "body": "Próiseáladh d'aistriú creidmheasa ama go <strong>{{recipient}}</strong> go rathúil.",
-    "label_amount": "Amount",
-    "label_recipient": "Seolta Chuig",
-    "label_description": "Description",
-    "cta": "Féach ar Do Sparán"
+    "subject": "Sheol tú {{amount}} uair(eanta) go {{recipient}} — {{community}}",
+    "title": "Creidmheas Ama Seolta",
+    "preview": "Sheol tú {{amount}} uair(eanta) go {{recipient}} ar {{community}}",
+    "body": "Próisáladh d'aistriú creidmheas ama go <strong>{{recipient}}</strong> go rathúil.",
+    "label_amount": "Méid",
+    "label_recipient": "Seolta go",
+    "label_description": "Cur síos",
+    "cta": "Féach ar do Sparán"
   },
   "donation": {
-    "subject": "Go raibh maith agat as do thabhartas do {{community}}",
-    "title": "Síntiús a Fuarthas",
-    "preview": "Go raibh maith agat as do thabhartas flaithiúil do {{community}}",
-    "body": "Go raibh maith agat as do thabhartas flaithiúil do <strong>{{community}}</strong>. Déanann do thacaíocht difríocht mhór.",
-    "label_amount": "Amount",
-    "label_date": "Date",
-    "recurring_note": "Is síntiús athfhillteach é seo. Is féidir leat do thabhartais a bhainistiú ó do shocruithe cuntais.",
-    "cta": "Féach ar Do Chuntas"
+    "subject": "Go raibh maith agat as do thabharthas do {{community}}",
+    "title": "Tabharthas Faighte",
+    "preview": "Go raibh maith agat as do thabharthas flaithiúil do {{community}}",
+    "body": "Go raibh maith agat as do thabharthas flaithiúil do <strong>{{community}}</strong>. Déanann do thacaíocht difear fíorcheart.",
+    "label_amount": "Méid",
+    "label_date": "Dáta",
+    "recurring_note": "Is tabharthas athfhillteach é seo. Is féidir leat do thabhartais a bhainistiú ó shocruithe do chuntais.",
+    "cta": "Féach ar do Chuntas"
   },
   "listing_updated": {
-    "subject": "Nuashonraíodh liostú a shábháil tú — {{community}}",
-    "title": "Nuashonraíodh an Liosta Sábháilte",
-    "preview": "Tá \"{{title}}\" nuashonraithe ar {{community}}",
-    "body": "Nuashonraíodh liostú a shábháil tú, <strong>\"{{title}}\"</strong> ar {{community}}.",
-    "cta": "Amharc ar Liostú"
+    "subject": "Fógra a shábháil tú nuashonraíodh é — {{community}}",
+    "title": "Fógra Sábháilte Nuashonraithe",
+    "preview": "Nuashonraíodh \"{{title}}\" ar {{community}}",
+    "body": "Fógra a shábháil tú, <strong>\"{{title}}\"</strong>, nuashonraíodh é ar {{community}}.",
+    "cta": "Féach ar an bhFógra"
   }
 }

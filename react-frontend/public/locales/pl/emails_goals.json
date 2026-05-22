@@ -1,39 +1,39 @@
 {
   "created": {
-    "subject": "Wyznaczony cel: {{title}} — {{community}}",
-    "title": "Cel stworzony!",
-    "preview": "Wyznaczyłeś nowy cel: {{title}}",
-    "body": "Wyznaczyłeś nowy cel w {{community}}. Kontynuuj — wyślemy Ci przypomnienia, które pomogą Ci utrzymać się na właściwej drodze.",
-    "cta": "Zobacz swój cel"
+    "subject": "Cel ustawiony: {{title}} — {{community}}",
+    "title": "Cel utworzony!",
+    "preview": "Ustawiłeś(-aś) nowy cel: {{title}}",
+    "body": "Ustawiłeś(-aś) nowy cel na {{community}}. Kontynuuj — będziemy wysyłać Ci przypomnienia, aby pomóc Ci pozostać na właściwej ścieżce.",
+    "cta": "Wyświetl swój cel"
   },
   "completed": {
     "subject": "Cel osiągnięty: {{title}} — {{community}}",
     "title": "Cel osiągnięty!",
-    "preview": "Gratulacje! Osiągnąłeś swój cel: {{title}}",
-    "body": "Niesamowita praca! Osiągnąłeś swój cel na {{community}}. Twój wkład w społeczność jest naprawdę ceniony.",
-    "highlight": "Cel zrealizowany",
-    "cta": "Zobacz swoje osiągnięcia"
+    "preview": "Gratulacje! Osiągnąłeś(-aś) swój cel: {{title}}",
+    "body": "Niesamowita praca! Osiągnąłeś(-aś) swój cel na {{community}}. Twój wkład w społeczność jest naprawdę doceniany.",
+    "highlight": "Cel ukończony",
+    "cta": "Wyświetl swoje osiągnięcia"
   },
   "abandoned": {
     "subject": "Cel usunięty: {{title}} — {{community}}",
     "title": "Cel usunięty",
     "preview": "Twój cel został usunięty",
-    "body": "Twój cel <strong>„{{title}}”</strong> został usunięty z {{community}}.",
-    "note": "W dowolnym momencie możesz wyznaczyć nowy cel w swoim profilu.",
-    "cta": "Wyznacz nowy cel"
+    "body": "Twój cel <strong>\"{{title}}\"</strong> został usunięty z {{community}}.",
+    "note": "Możesz ustawić nowy cel w dowolnym momencie ze swojego profilu.",
+    "cta": "Ustaw nowy cel"
   },
   "goal_milestone": {
-    "progress_subject": "Jesteś {{percent}}% drogi do celu!",
-    "progress_title": "{{percent}}% Ukończono",
-    "progress_preview": "Wielki postęp w „{{goal}}”",
+    "progress_subject": "Jesteś w {{percent}}% drogi do swojego celu!",
+    "progress_title": "{{percent}}% ukończone",
+    "progress_preview": "Świetne postępy w '{{goal}}'",
     "progress_greeting": "Tak trzymaj, {{name}}!",
-    "progress_body": "Osiągnąłeś {{percent}}% swojego celu „{{goal}}”. Robisz fantastyczne postępy – kontynuuj!",
-    "progress_cta": "Zobacz swój cel",
-    "complete_subject": "Osiągnąłeś swój cel!",
+    "progress_body": "Osiągnąłeś(-aś) {{percent}}% swojego celu '{{goal}}'. Robisz fantastyczne postępy — kontynuuj!",
+    "progress_cta": "Wyświetl swój cel",
+    "complete_subject": "Osiągnąłeś(-aś) swój cel!",
     "complete_title": "Cel osiągnięty!",
-    "complete_preview": "Gratulacje — ukończyłeś „{{goal}}”",
+    "complete_preview": "Gratulacje — ukończyłeś(-aś) '{{goal}}'",
     "complete_greeting": "Gratulacje, {{name}}!",
-    "complete_body": "Pomyślnie zrealizowałeś swój cel „{{goal}}”. To fantastyczne osiągnięcie – brawo!",
-    "complete_cta": "Zobacz swoje osiągnięcie"
+    "complete_body": "Pomyślnie ukończyłeś(-aś) swój cel '{{goal}}'. To fantastyczne osiągnięcie — świetna robota!",
+    "complete_cta": "Wyświetl swoje osiągnięcie"
   }
 }

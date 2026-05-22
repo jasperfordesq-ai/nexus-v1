@@ -1,50 +1,50 @@
 {
   "listing": {
-    "subject": "あなたのリスティングは公開中です: {{title}} — {{community}}",
-    "title": "出品リストを掲載しました！",
-    "preview": "あなたのリスティング「{{title}}」は現在 {{community}} で公開されています",
-    "body": "あなたのリスティングは現在 {{community}} に公開されており、他のメンバーが見つけることができます。",
-    "cta": "あなたのリストを見る"
+    "subject": "リスティングが公開されました：{{title}} — {{community}}",
+    "title": "リスティング投稿完了！",
+    "preview": "{{community}} でリスティング「{{title}}」が公開されました",
+    "body": "リスティングが {{community}} で公開され、他のメンバーが見つけられます。",
+    "cta": "リスティングを表示"
   },
   "event": {
-    "subject": "イベントがスケジュールされています: {{title}} — {{community}}",
-    "title": "イベントが作成されました!",
-    "preview": "あなたのイベント「{{title}}」が{{community}}でスケジュールされました",
-    "body": "イベントが作成され、コミュニティに表示されるようになりました。メンバーは出欠確認を開始できます。",
-    "cta": "イベントを見る"
+    "subject": "イベントが予定されました：{{title}} — {{community}}",
+    "title": "イベント作成完了！",
+    "preview": "{{community}} でイベント「{{title}}」が予定されました",
+    "body": "イベントが作成され、コミュニティに公開されました。メンバーが参加登録を開始できます。",
+    "cta": "イベントを表示"
   },
   "group": {
-    "subject": "あなたのグループはライブ中です: {{name}} — {{community}}",
-    "title": "グループが作成されました!",
-    "preview": "あなたのグループ「{{name}}」は現在 {{community}} でライブ中です",
-    "body": "グループは {{community}} に作成されました。メンバーを招待して作業を始めましょう。",
-    "cta": "自分のグループを表示する"
+    "subject": "グループが公開されました：{{name}} — {{community}}",
+    "title": "グループ作成完了！",
+    "preview": "{{community}} でグループ「{{name}}」が公開されました",
+    "body": "{{community}} にグループが作成されました。メンバーを招待して始めましょう。",
+    "cta": "グループを表示"
   },
   "credits_sent": {
-    "subject": "{{amount}} 時間を {{recipient}} — {{community}} に送信しました",
-    "title": "送信された時間クレジット",
-    "preview": "{{community}} 上の {{recipient}} に {{amount}} 時間を送信しました",
-    "body": "<strong>{{recipient}}</strong> へのタイム クレジットの転送は正常に処理されました。",
-    "label_amount": "Amount",
+    "subject": "{{recipient}} に {{amount}} 時間送信しました — {{community}}",
+    "title": "タイムクレジット送信完了",
+    "preview": "{{community}} で {{recipient}} に {{amount}} 時間送信しました",
+    "body": "<strong>{{recipient}}</strong> へのタイムクレジット送金が正常に処理されました。",
+    "label_amount": "金額",
     "label_recipient": "送信先",
-    "label_description": "Description",
-    "cta": "ウォレットを表示する"
+    "label_description": "説明",
+    "cta": "ウォレットを表示"
   },
   "donation": {
     "subject": "{{community}} へのご寄付ありがとうございます",
-    "title": "寄付金の受領",
-    "preview": "{{community}} への多大なご寄付に感謝いたします",
-    "body": "<strong>{{community}}</strong> への多大なご寄付に感謝いたします。あなたのサポートが大きな変化をもたらします。",
-    "label_amount": "Amount",
-    "label_date": "Date",
-    "recurring_note": "これは定期的な寄付です。アカウント設定から寄付を管理できます。",
-    "cta": "アカウントを表示する"
+    "title": "寄付受領",
+    "preview": "{{community}} への寛大なご寄付ありがとうございます",
+    "body": "<strong>{{community}}</strong> へのご寄付ありがとうございます。あなたのサポートは大きな違いをもたらします。",
+    "label_amount": "金額",
+    "label_date": "日付",
+    "recurring_note": "これは定期寄付です。アカウント設定から寄付を管理できます。",
+    "cta": "アカウントを表示"
   },
   "listing_updated": {
-    "subject": "保存したリストが更新されました — {{community}}",
-    "title": "保存されたリストが更新されました",
-    "preview": "{{community}}に「{{title}}」がアップデートされました",
-    "body": "保存したリスト <strong>「{{title}}」</strong> が {{community}} で更新されました。",
-    "cta": "リストを見る"
+    "subject": "保存したリスティングが更新されました — {{community}}",
+    "title": "保存済みリスティングが更新されました",
+    "preview": "{{community}} で「{{title}}」が更新されました",
+    "body": "保存したリスティング <strong>「{{title}}」</strong> が {{community}} で更新されました。",
+    "cta": "リスティングを表示"
   }
 }

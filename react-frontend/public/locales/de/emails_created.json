@@ -1,50 +1,50 @@
 {
   "listing": {
-    "subject": "Ihr Eintrag ist online: {{title}} – {{community}}",
-    "title": "Eintrag veröffentlicht!",
-    "preview": "Ihr Eintrag „{{title}}“ ist jetzt auf {{community}} verfügbar",
-    "body": "Ihr Eintrag ist jetzt auf {{community}} verfügbar und kann von anderen Mitgliedern entdeckt werden.",
-    "cta": "Sehen Sie sich Ihren Eintrag an"
+    "subject": "Ihr Inserat ist live: {{title}} — {{community}}",
+    "title": "Inserat veröffentlicht!",
+    "preview": "Ihr Inserat \"{{title}}\" ist jetzt auf {{community}} live",
+    "body": "Ihr Inserat ist jetzt auf {{community}} live und kann von anderen Mitgliedern gefunden werden.",
+    "cta": "Ihr Inserat anzeigen"
   },
   "event": {
-    "subject": "Ihre Veranstaltung ist geplant: {{title}} – {{community}}",
-    "title": "Ereignis erstellt!",
-    "preview": "Ihr Event „{{title}}“ wurde auf {{community}} geplant",
-    "body": "Ihre Veranstaltung wurde erstellt und ist nun für die Community sichtbar. Mitglieder können mit dem RSVPing beginnen.",
-    "cta": "Sehen Sie sich Ihre Veranstaltung an"
+    "subject": "Ihre Veranstaltung ist geplant: {{title}} — {{community}}",
+    "title": "Veranstaltung erstellt!",
+    "preview": "Ihre Veranstaltung \"{{title}}\" wurde auf {{community}} geplant",
+    "body": "Ihre Veranstaltung wurde erstellt und ist jetzt für die Community sichtbar. Mitglieder können mit der Anmeldung beginnen.",
+    "cta": "Ihre Veranstaltung anzeigen"
   },
   "group": {
-    "subject": "Ihre Gruppe ist live: {{name}} – {{community}}",
+    "subject": "Ihre Gruppe ist aktiv: {{name}} — {{community}}",
     "title": "Gruppe erstellt!",
-    "preview": "Ihre Gruppe „{{name}}“ ist jetzt auf {{community}} live",
-    "body": "Ihre Gruppe wurde auf {{community}} erstellt. Laden Sie Mitglieder ein, die Dinge in Gang zu bringen.",
-    "cta": "Sehen Sie sich Ihre Gruppe an"
+    "preview": "Ihre Gruppe \"{{name}}\" ist jetzt auf {{community}} aktiv",
+    "body": "Ihre Gruppe wurde auf {{community}} erstellt. Laden Sie Mitglieder ein, um loszulegen.",
+    "cta": "Ihre Gruppe anzeigen"
   },
   "credits_sent": {
-    "subject": "Sie haben {{amount}} Stunde(n) an {{recipient}} – {{community}} gesendet",
+    "subject": "Sie haben {{amount}} Stunde(n) an {{recipient}} gesendet — {{community}}",
     "title": "Zeitguthaben gesendet",
     "preview": "Sie haben {{amount}} Stunde(n) an {{recipient}} auf {{community}} gesendet",
-    "body": "Ihre Zeitgutschriftsübertragung an <strong>{{recipient}}</strong> wurde erfolgreich verarbeitet.",
-    "label_amount": "Amount",
+    "body": "Ihre Zeitguthaben-Überweisung an <strong>{{recipient}}</strong> wurde erfolgreich verarbeitet.",
+    "label_amount": "Betrag",
     "label_recipient": "Gesendet an",
-    "label_description": "Description",
-    "cta": "Sehen Sie sich Ihr Portemonnaie an"
+    "label_description": "Beschreibung",
+    "cta": "Ihr Portemonnaie anzeigen"
   },
   "donation": {
     "subject": "Vielen Dank für Ihre Spende an {{community}}",
     "title": "Spende erhalten",
     "preview": "Vielen Dank für Ihre großzügige Spende an {{community}}",
     "body": "Vielen Dank für Ihre großzügige Spende an <strong>{{community}}</strong>. Ihre Unterstützung macht einen echten Unterschied.",
-    "label_amount": "Amount",
-    "label_date": "Date",
-    "recurring_note": "Dies ist eine wiederkehrende Spende. Sie können Ihre Spenden über Ihre Kontoeinstellungen verwalten.",
-    "cta": "Sehen Sie sich Ihr Konto an"
+    "label_amount": "Betrag",
+    "label_date": "Datum",
+    "recurring_note": "Dies ist eine wiederkehrende Spende. Sie können Ihre Spenden in Ihren Kontoeinstellungen verwalten.",
+    "cta": "Ihr Konto anzeigen"
   },
   "listing_updated": {
-    "subject": "Ein von Ihnen gespeicherter Eintrag wurde aktualisiert – {{community}}",
-    "title": "Gespeicherter Eintrag aktualisiert",
-    "preview": "„{{title}}“ wurde auf {{community}} aktualisiert",
-    "body": "Ein von Ihnen gespeicherter Eintrag, <strong>\"{{title}}\"</strong>, wurde auf {{community}} aktualisiert.",
-    "cta": "Eintrag anzeigen"
+    "subject": "Ein gespeichertes Inserat wurde aktualisiert — {{community}}",
+    "title": "Gespeichertes Inserat aktualisiert",
+    "preview": "\"{{title}}\" wurde auf {{community}} aktualisiert",
+    "body": "Ein gespeichertes Inserat, <strong>\"{{title}}\"</strong>, wurde auf {{community}} aktualisiert.",
+    "cta": "Inserat anzeigen"
   }
 }

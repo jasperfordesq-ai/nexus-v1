@@ -68,8 +68,8 @@
     "load_wallet": "Zeitkonto-Daten konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
     "session_expired": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
     "load_community_fund": "Community-Fonds konnte nicht geladen werden",
-    "transfer_failed": "Transfer failed. Please try again.",
-    "unexpected": "An unexpected error occurred. Please try again."
+    "transfer_failed": "Überweisung fehlgeschlagen. Bitte erneut versuchen.",
+    "unexpected": "Ein unerwarteter Fehler ist aufgetreten. Bitte erneut versuchen."
   },
   "no_members_found": "Keine Mitglieder gefunden",
   "donate": "Spenden",
@@ -89,7 +89,7 @@
   "donate_member_desc": "Kredite direkt an ein anderes Mitglied verschenken",
   "donate_recipient_id": "Empfänger-ID",
   "donate_recipient_placeholder": "Mitglieds-ID eingeben",
-  "donate_search_member": "Search by member",
+  "donate_search_member": "Nach Mitglied suchen",
   "donate_amount_placeholder": "1",
   "donate_message_placeholder": "Fügen Sie Ihrer Spende eine Notiz hinzu...",
   "donate_balance_info": "Ihr Guthaben: {{balance}} Stunden",
@@ -143,7 +143,7 @@
   "optional": "optional",
   "description_placeholder": "Wofür ist diese Überweisung?",
   "new_balance_after": "Ihr neues Guthaben beträgt {{balance}} Stunden",
-  "transfer_summary": "You are about to send {{amount}} {{unit}} to {{name}}",
+  "transfer_summary": "Sie sind dabei, {{amount}} {{unit}} an {{name}} zu senden",
   "validation": {
     "select_recipient": "Bitte wählen Sie einen Empfänger aus",
     "valid_amount": "Bitte geben Sie einen gültigen Betrag ein",

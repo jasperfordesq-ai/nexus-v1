@@ -1,39 +1,39 @@
 {
   "created": {
-    "subject": "Tacar spriocanna: {{title}} — {{community}}",
+    "subject": "Sprioc socraithe: {{title}} — {{community}}",
     "title": "Sprioc Cruthaithe!",
-    "preview": "Tá sprioc nua socraithe agat: {{title}}",
-    "body": "Tá sprioc nua socraithe agat ar {{community}}. Lean ort - seolfaimid meabhrúcháin chugat chun cabhrú leat fanacht ar an mbóthar ceart.",
-    "cta": "Féach ar Do Sprioc"
+    "preview": "Shocraigh tú sprioc nua: {{title}}",
+    "body": "Shocraigh tú sprioc nua ar {{community}}. Coinnigh ort — seolfaimid cuimhneacháin chugat le cabhrú leat fanacht ar an gconair.",
+    "cta": "Féach ar do Sprioc"
   },
   "completed": {
     "subject": "Sprioc bainte amach: {{title}} — {{community}}",
-    "title": "Sprioc bainte amach!",
-    "preview": "Comhghairdeachas! Tá do sprioc críochnaithe agat: {{title}}",
-    "body": "Obair iontach! Tá do sprioc críochnaithe agat ar {{community}}. Tá fíor-luach ar do chuid oibre leis an bpobal.",
+    "title": "Sprioc Bainte Amach!",
+    "preview": "Comhghairdeas! Bhain tú do sprioc amach: {{title}}",
+    "body": "Obair iontach! D'éirigh leat do sprioc ar {{community}} a bhaint amach. Tá do rannchuidiú leis an bpobal fíor-mheasúnaithe.",
     "highlight": "Sprioc Críochnaithe",
-    "cta": "Féach ar Do Ghnóthachtálacha"
+    "cta": "Féach ar do Ghnóthachtálacha"
   },
   "abandoned": {
-    "subject": "Baineadh an sprioc: {{title}} — {{community}}",
-    "title": "Baineadh an Sprioc",
+    "subject": "Sprioc bainte: {{title}} — {{community}}",
+    "title": "Sprioc Bainte",
     "preview": "Baineadh do sprioc",
     "body": "Baineadh do sprioc <strong>\"{{title}}\"</strong> de {{community}}.",
     "note": "Is féidir leat sprioc nua a shocrú am ar bith ó do phróifíl.",
     "cta": "Socraigh Sprioc Nua"
   },
   "goal_milestone": {
-    "progress_subject": "Tá tú {{percent}}% den bhealach chuig do sprioc!",
+    "progress_subject": "Tá tú {{percent}}% ar an mbealach go dtí do sprioc!",
     "progress_title": "{{percent}}% Críochnaithe",
     "progress_preview": "Dul chun cinn iontach ar '{{goal}}'",
-    "progress_greeting": "Coinnigh suas é, {{name}}!",
-    "progress_body": "Tá {{percent}}% de do sprioc '{{goal}}' sroichte agat. Tá dul chun cinn iontach á dhéanamh agat - lean ort!",
-    "progress_cta": "Féach ar Do Sprioc",
-    "complete_subject": "Bhain tú amach do sprioc!",
-    "complete_title": "Sprioc bainte amach!",
-    "complete_preview": "Comhghairdeas - chríochnaigh tú '{{goal}}'",
+    "progress_greeting": "Coinnigh ort, {{name}}!",
+    "progress_body": "Shroich tú {{percent}}% de do sprioc '{{goal}}'. Tá dul chun cinn iontach á dhéanamh agat — coinnigh ort!",
+    "progress_cta": "Féach ar do Sprioc",
+    "complete_subject": "Bhain tú do sprioc amach!",
+    "complete_title": "Sprioc Bainte Amach!",
+    "complete_preview": "Comhghairdeas — chríochnaigh tú '{{goal}}'",
     "complete_greeting": "Comhghairdeas, {{name}}!",
-    "complete_body": "D'éirigh leat do sprioc '{{goal}}' a chríochnú. Is éacht iontach é seo - maith sibh!",
-    "complete_cta": "Féach ar Do Ghnóthachtáil"
+    "complete_body": "D'éirigh leat do sprioc '{{goal}}' a chríochnú. Is éacht iontach é seo — maith thú!",
+    "complete_cta": "Féach ar do Ghnóthachtáil"
   }
 }

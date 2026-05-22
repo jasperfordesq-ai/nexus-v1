@@ -1,39 +1,39 @@
 {
   "created": {
-    "subject": "Objectif fixé : {{title}} — {{community}}",
-    "title": "Objectif créé !",
-    "preview": "Vous vous êtes fixé un nouvel objectif : {{title}}",
-    "body": "Vous avez fixé un nouvel objectif sur {{community}}. Continuez – nous vous enverrons des rappels pour vous aider à rester sur la bonne voie.",
-    "cta": "Afficher votre objectif"
+    "subject": "Objectif défini : {{title}} — {{community}}",
+    "title": "Objectif créé !",
+    "preview": "Vous avez défini un nouvel objectif : {{title}}",
+    "body": "Vous avez défini un nouvel objectif sur {{community}}. Continuez — nous vous enverrons des rappels pour vous aider à rester sur la bonne voie.",
+    "cta": "Voir votre objectif"
   },
   "completed": {
-    "subject": "Objectif atteint : {{title}} — {{community}}",
+    "subject": "Objectif atteint : {{title}} — {{community}}",
     "title": "Objectif atteint !",
-    "preview": "Félicitations! Vous avez atteint votre objectif : {{title}}",
-    "body": "Un travail incroyable ! Vous avez atteint votre objectif sur {{community}}. Votre contribution à la communauté est vraiment appréciée.",
+    "preview": "Félicitations ! Vous avez atteint votre objectif : {{title}}",
+    "body": "Excellent travail ! Vous avez atteint votre objectif sur {{community}}. Votre contribution à la communauté est vraiment appréciée.",
     "highlight": "Objectif atteint",
-    "cta": "Visualisez vos réalisations"
+    "cta": "Voir vos réalisations"
   },
   "abandoned": {
-    "subject": "Objectif supprimé : {{title}} — {{community}}",
+    "subject": "Objectif supprimé : {{title}} — {{community}}",
     "title": "Objectif supprimé",
     "preview": "Votre objectif a été supprimé",
     "body": "Votre objectif <strong>\"{{title}}\"</strong> a été supprimé de {{community}}.",
     "note": "Vous pouvez définir un nouvel objectif à tout moment depuis votre profil.",
-    "cta": "Fixez-vous un nouvel objectif"
+    "cta": "Définir un nouvel objectif"
   },
   "goal_milestone": {
-    "progress_subject": "Vous êtes {{percent}} % du chemin vers votre objectif !",
+    "progress_subject": "Vous êtes à {{percent}}% de votre objectif !",
     "progress_title": "{{percent}}% terminé",
-    "progress_preview": "De grands progrès sur '{{goal}}'",
-    "progress_greeting": "Continuez comme ça, {{name}} !",
-    "progress_body": "Vous avez atteint {{percent}} % de votre objectif \"{{goal}}\". Vous faites des progrès fantastiques, continuez !",
-    "progress_cta": "Afficher votre objectif",
-    "complete_subject": "Vous avez atteint votre objectif !",
+    "progress_preview": "Excellents progrès sur '{{goal}}'",
+    "progress_greeting": "Continuez comme ça, {{name}} !",
+    "progress_body": "Vous avez atteint {{percent}}% de votre objectif '{{goal}}'. Vous faites des progrès fantastiques — continuez !",
+    "progress_cta": "Voir votre objectif",
+    "complete_subject": "Vous avez atteint votre objectif !",
     "complete_title": "Objectif atteint !",
-    "complete_preview": "Félicitations : vous avez terminé « {{goal}} »",
-    "complete_greeting": "Félicitations, {{name}} !",
-    "complete_body": "Vous avez atteint avec succès votre objectif « {{goal}} ». C'est une réalisation fantastique — bravo !",
-    "complete_cta": "Visualisez votre réussite"
+    "complete_preview": "Félicitations — vous avez terminé '{{goal}}'",
+    "complete_greeting": "Félicitations, {{name}} !",
+    "complete_body": "Vous avez terminé avec succès votre objectif '{{goal}}'. C'est une réalisation fantastique — bravo !",
+    "complete_cta": "Voir votre réalisation"
   }
 }

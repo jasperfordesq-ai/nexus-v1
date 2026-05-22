@@ -1,50 +1,50 @@
 {
   "listing": {
-    "subject": "Sua listagem está ativa: {{title}} — {{community}}",
-    "title": "Listagem publicada!",
-    "preview": "Sua listagem \"{{title}}\" agora está ativa no {{community}}",
-    "body": "Sua listagem agora está ativa no {{community}} e pode ser descoberta por outros membros.",
-    "cta": "Veja sua listagem"
+    "subject": "O seu anúncio está ativo: {{title}} — {{community}}",
+    "title": "Anúncio publicado!",
+    "preview": "O seu anúncio \"{{title}}\" está agora ativo em {{community}}",
+    "body": "O seu anúncio está agora ativo em {{community}} e pode ser descoberto por outros membros.",
+    "cta": "Ver o seu anúncio"
   },
   "event": {
-    "subject": "Seu evento está agendado: {{title}} — {{community}}",
+    "subject": "O seu evento está agendado: {{title}} — {{community}}",
     "title": "Evento criado!",
-    "preview": "Seu evento \"{{title}}\" foi agendado no {{community}}",
-    "body": "Seu evento foi criado e agora está visível para a comunidade. Os membros podem começar a confirmar presença.",
-    "cta": "Veja seu evento"
+    "preview": "O seu evento \"{{title}}\" foi agendado em {{community}}",
+    "body": "O seu evento foi criado e está agora visível para a comunidade. Os membros podem começar a confirmar presença.",
+    "cta": "Ver o seu evento"
   },
   "group": {
-    "subject": "Seu grupo está ativo: {{name}} — {{community}}",
+    "subject": "O seu grupo está ativo: {{name}} — {{community}}",
     "title": "Grupo criado!",
-    "preview": "Seu grupo \"{{name}}\" agora está ativo no {{community}}",
-    "body": "Seu grupo foi criado em {{community}}. Convide os membros para começar.",
-    "cta": "Veja seu grupo"
+    "preview": "O seu grupo \"{{name}}\" está agora ativo em {{community}}",
+    "body": "O seu grupo foi criado em {{community}}. Convide membros para começar.",
+    "cta": "Ver o seu grupo"
   },
   "credits_sent": {
-    "subject": "Você enviou hora(s) {{amount}} para {{recipient}} — {{community}}",
+    "subject": "Enviou {{amount}} hora(s) para {{recipient}} — {{community}}",
     "title": "Créditos de tempo enviados",
-    "preview": "Você enviou hora(s) {{amount}} para {{recipient}} em {{community}}",
-    "body": "Sua transferência de crédito de tempo para <strong>{{recipient}}</strong> foi processada com sucesso.",
-    "label_amount": "Amount",
+    "preview": "Enviou {{amount}} hora(s) para {{recipient}} em {{community}}",
+    "body": "A sua transferência de créditos de tempo para <strong>{{recipient}}</strong> foi processada com sucesso.",
+    "label_amount": "Valor",
     "label_recipient": "Enviado para",
-    "label_description": "Description",
-    "cta": "Veja sua carteira"
+    "label_description": "Descrição",
+    "cta": "Ver a sua carteira"
   },
   "donation": {
-    "subject": "Obrigado por sua doação para {{community}}",
+    "subject": "Obrigado pela sua doação a {{community}}",
     "title": "Doação recebida",
-    "preview": "Obrigado por sua generosa doação para {{community}}",
-    "body": "Obrigado por sua generosa doação para <strong>{{community}}</strong>. Seu apoio faz uma diferença real.",
-    "label_amount": "Amount",
-    "label_date": "Date",
-    "recurring_note": "Esta é uma doação recorrente. Você pode gerenciar suas doações nas configurações da sua conta.",
-    "cta": "Veja sua conta"
+    "preview": "Obrigado pela sua generosa doação a {{community}}",
+    "body": "Obrigado pela sua generosa doação a <strong>{{community}}</strong>. O seu apoio faz uma diferença real.",
+    "label_amount": "Valor",
+    "label_date": "Data",
+    "recurring_note": "Esta é uma doação recorrente. Pode gerir as suas doações nas definições da conta.",
+    "cta": "Ver a sua conta"
   },
   "listing_updated": {
-    "subject": "Uma listagem que você salvou foi atualizada — {{community}}",
-    "title": "Listagem salva atualizada",
+    "subject": "Um anúncio guardado foi atualizado — {{community}}",
+    "title": "Anúncio guardado atualizado",
     "preview": "\"{{title}}\" foi atualizado em {{community}}",
-    "body": "Uma listagem que você salvou, <strong>\"{{title}}\"</strong>, foi atualizada em {{community}}.",
-    "cta": "Ver listagem"
+    "body": "Um anúncio que guardou, <strong>\"{{title}}\"</strong>, foi atualizado em {{community}}.",
+    "cta": "Ver anúncio"
   }
 }

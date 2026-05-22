@@ -1,50 +1,50 @@
 {
   "listing": {
-    "subject": "Uw vermelding is live: {{title}} — {{community}}",
+    "subject": "Uw advertentie is actief: {{title}} — {{community}}",
     "title": "Advertentie geplaatst!",
-    "preview": "Uw vermelding '{{title}}' is nu live op {{community}}",
-    "body": "Uw vermelding is nu live op {{community}} en kan door andere leden worden ontdekt.",
-    "cta": "Bekijk uw vermelding"
+    "preview": "Uw advertentie \"{{title}}\" is nu actief op {{community}}",
+    "body": "Uw advertentie is nu actief op {{community}} en kan worden gevonden door andere leden.",
+    "cta": "Bekijk uw advertentie"
   },
   "event": {
-    "subject": "Uw evenement staat gepland: {{title}} — {{community}}",
+    "subject": "Uw evenement is gepland: {{title}} — {{community}}",
     "title": "Evenement aangemaakt!",
     "preview": "Uw evenement \"{{title}}\" is gepland op {{community}}",
-    "body": "Je evenement is gemaakt en is nu zichtbaar voor de community. Leden kunnen beginnen met reageren.",
+    "body": "Uw evenement is aangemaakt en nu zichtbaar voor de community. Leden kunnen beginnen met aanmelden.",
     "cta": "Bekijk uw evenement"
   },
   "group": {
-    "subject": "Je groep is live: {{name}} — {{community}}",
+    "subject": "Uw groep is actief: {{name}} — {{community}}",
     "title": "Groep aangemaakt!",
-    "preview": "Je groep \"{{name}}\" is nu live op {{community}}",
-    "body": "Uw groep is gemaakt op {{community}}. Nodig leden uit om aan de slag te gaan.",
+    "preview": "Uw groep \"{{name}}\" is nu actief op {{community}}",
+    "body": "Uw groep is aangemaakt op {{community}}. Nodig leden uit om te beginnen.",
     "cta": "Bekijk uw groep"
   },
   "credits_sent": {
-    "subject": "Je hebt {{amount}} uur(en) naar {{recipient}} gestuurd — {{community}}",
+    "subject": "U heeft {{amount}} uur aan {{recipient}} gestuurd — {{community}}",
     "title": "Tijdkredieten verzonden",
-    "preview": "Je hebt {{amount}} uur(en) naar {{recipient}} gestuurd op {{community}}",
-    "body": "Uw tijdskredietoverdracht naar <strong>{{recipient}}</strong> is succesvol verwerkt.",
-    "label_amount": "Amount",
+    "preview": "U heeft {{amount}} uur aan {{recipient}} gestuurd op {{community}}",
+    "body": "Uw tijdkrediet-overdracht naar <strong>{{recipient}}</strong> is succesvol verwerkt.",
+    "label_amount": "Bedrag",
     "label_recipient": "Verzonden naar",
-    "label_description": "Description",
+    "label_description": "Beschrijving",
     "cta": "Bekijk uw portemonnee"
   },
   "donation": {
     "subject": "Bedankt voor uw donatie aan {{community}}",
     "title": "Donatie ontvangen",
     "preview": "Bedankt voor uw genereuze donatie aan {{community}}",
-    "body": "Bedankt voor uw genereuze donatie aan <strong>{{community}}</strong>. Uw steun maakt echt een verschil.",
-    "label_amount": "Amount",
-    "label_date": "Date",
-    "recurring_note": "Het betreft een terugkerende donatie. U kunt uw donaties beheren via uw accountinstellingen.",
+    "body": "Bedankt voor uw genereuze donatie aan <strong>{{community}}</strong>. Uw steun maakt een echt verschil.",
+    "label_amount": "Bedrag",
+    "label_date": "Datum",
+    "recurring_note": "Dit is een terugkerende donatie. U kunt uw donaties beheren vanuit uw accountinstellingen.",
     "cta": "Bekijk uw account"
   },
   "listing_updated": {
-    "subject": "Een vermelding die u heeft opgeslagen, is bijgewerkt: {{community}}",
-    "title": "Opgeslagen vermelding bijgewerkt",
+    "subject": "Een opgeslagen advertentie is bijgewerkt — {{community}}",
+    "title": "Opgeslagen advertentie bijgewerkt",
     "preview": "\"{{title}}\" is bijgewerkt op {{community}}",
-    "body": "Een vermelding die u heeft opgeslagen, <strong>'{{title}}'</strong>, is bijgewerkt op {{community}}.",
-    "cta": "Bekijk vermelding"
+    "body": "Een advertentie die u heeft opgeslagen, <strong>\"{{title}}\"</strong>, is bijgewerkt op {{community}}.",
+    "cta": "Bekijk advertentie"
   }
 }

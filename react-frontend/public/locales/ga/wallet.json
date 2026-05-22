@@ -61,15 +61,15 @@
     "submit_failed": "Theip ar chur isteach",
     "try_again": "Bain triail eile as le do thoil",
     "submit_error_desc": "Tharla earráid. Bain triail eile as le do thoil.",
-    "recipient_load_failed": "Could not load recipient. Please search manually."
+    "recipient_load_failed": "Níorbh fhéidir an faighteoir a luchtú. Déan cuardach de láimh."
   },
   "error": {
     "load_balance": "Theip ar luchtú iarmhéid an sparáin",
     "load_wallet": "Theip ar luchtú sonraí an sparáin. Bain triail eile as le do thoil.",
     "session_expired": "Tá do sheisiún imithe in éag. Logáil isteach arís le do thoil.",
     "load_community_fund": "Níorbh fhéidir an ciste pobail a luchtú",
-    "transfer_failed": "Transfer failed. Please try again.",
-    "unexpected": "An unexpected error occurred. Please try again."
+    "transfer_failed": "Theip ar an aistriú. Déan iarracht arís.",
+    "unexpected": "Tharla earráid gan choinne. Déan iarracht arís."
   },
   "no_members_found": "Níor aimsíodh comhaltaí",
   "donate": "Tabhair",
@@ -89,7 +89,7 @@
   "donate_member_desc": "Tabhair creidmheasanna go díreach do bhall eile",
   "donate_recipient_id": "Aitheantas Faighteora",
   "donate_recipient_placeholder": "Cuir aitheantas baill isteach",
-  "donate_search_member": "Search by member",
+  "donate_search_member": "Cuardaigh de réir ball",
   "donate_amount_placeholder": "1",
   "donate_message_placeholder": "Cuir nóta le do thabhartas...",
   "donate_balance_info": "D'iarmhéid: {{balance}} uair",
@@ -143,15 +143,15 @@
   "optional": "roghnach",
   "description_placeholder": "Cad is aidhm leis an aistriú seo?",
   "new_balance_after": "Beidh d'iarmhéid nua {{balance}} uair",
-  "transfer_summary": "You are about to send {{amount}} {{unit}} to {{name}}",
+  "transfer_summary": "Tá tú ar tí {{amount}} {{unit}} a sheoladh chuig {{name}}",
   "validation": {
-    "select_recipient": "Please select a recipient",
-    "valid_amount": "Please enter a valid amount",
-    "insufficient_balance": "Insufficient balance",
-    "max_transfer": "Maximum transfer is {{max}} hours"
+    "select_recipient": "Roghnaigh faighteoir le do thoil",
+    "valid_amount": "Iontráil méid bailí le do thoil",
+    "insufficient_balance": "Iarmhéid neamhleor",
+    "max_transfer": "Is é {{max}} uair an aimsir an t-aistriú uasta"
   },
-  "hours_value": "{{count}}h",
-  "signed_hours_value": "{{sign}}{{count}}h",
+  "hours_value": "{{count}}u",
+  "signed_hours_value": "{{sign}}{{count}}u",
   "refresh": "Athnuaigh",
   "no_filtered_transactions": "Níl aon idirbheart comhoiriúnach",
   "no_filtered_transactions_desc": "Bain triail as scagaire eile chun níos mó gníomhaíochta sparáin a fheiceáil.",

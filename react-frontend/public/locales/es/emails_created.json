@@ -1,50 +1,50 @@
 {
   "listing": {
-    "subject": "Su listado está activo: {{title}} — {{community}}",
-    "title": "Listado publicado!",
-    "preview": "Su anuncio \"{{title}}\" ya está disponible en {{community}}",
-    "body": "Su listado ahora está activo en {{community}} y otros miembros pueden descubrirlo.",
-    "cta": "Ver su listado"
+    "subject": "Tu anuncio está activo: {{title}} — {{community}}",
+    "title": "¡Anuncio publicado!",
+    "preview": "Tu anuncio \"{{title}}\" ya está activo en {{community}}",
+    "body": "Tu anuncio ya está activo en {{community}} y puede ser descubierto por otros miembros.",
+    "cta": "Ver tu anuncio"
   },
   "event": {
     "subject": "Tu evento está programado: {{title}} — {{community}}",
     "title": "¡Evento creado!",
-    "preview": "Su evento \"{{title}}\" ha sido programado en {{community}}",
-    "body": "Su evento ha sido creado y ahora es visible para la comunidad. Los miembros pueden comenzar a confirmar su asistencia.",
-    "cta": "Vea su evento"
+    "preview": "Tu evento \"{{title}}\" ha sido programado en {{community}}",
+    "body": "Tu evento ha sido creado y ahora es visible para la comunidad. Los miembros pueden empezar a confirmar asistencia.",
+    "cta": "Ver tu evento"
   },
   "group": {
     "subject": "Tu grupo está activo: {{name}} — {{community}}",
     "title": "¡Grupo creado!",
-    "preview": "Su grupo \"{{name}}\" ya está disponible en {{community}}",
-    "body": "Su grupo ha sido creado en {{community}}. Invite a los miembros a comenzar.",
+    "preview": "Tu grupo \"{{name}}\" ya está activo en {{community}}",
+    "body": "Tu grupo ha sido creado en {{community}}. Invita a miembros para empezar.",
     "cta": "Ver tu grupo"
   },
   "credits_sent": {
     "subject": "Enviaste {{amount}} hora(s) a {{recipient}} — {{community}}",
     "title": "Créditos de tiempo enviados",
-    "preview": "Enviaste horas {{amount}} a {{recipient}} en {{community}}",
-    "body": "Su transferencia de crédito de tiempo a <strong>{{recipient}}</strong> se ha procesado correctamente.",
-    "label_amount": "Amount",
+    "preview": "Enviaste {{amount}} hora(s) a {{recipient}} en {{community}}",
+    "body": "Tu transferencia de créditos de tiempo a <strong>{{recipient}}</strong> se ha procesado correctamente.",
+    "label_amount": "Cantidad",
     "label_recipient": "Enviado a",
-    "label_description": "Description",
-    "cta": "Ver tu billetera"
+    "label_description": "Descripción",
+    "cta": "Ver tu cartera"
   },
   "donation": {
     "subject": "Gracias por tu donación a {{community}}",
     "title": "Donación recibida",
-    "preview": "Gracias por su generosa donación a {{community}}",
-    "body": "Gracias por su generosa donación a <strong>{{community}}</strong>. Su apoyo hace una verdadera diferencia.",
-    "label_amount": "Amount",
-    "label_date": "Date",
-    "recurring_note": "Esta es una donación recurrente. Puede administrar sus donaciones desde la configuración de su cuenta.",
-    "cta": "Ver su cuenta"
+    "preview": "Gracias por tu generosa donación a {{community}}",
+    "body": "Gracias por tu generosa donación a <strong>{{community}}</strong>. Tu apoyo marca una diferencia real.",
+    "label_amount": "Cantidad",
+    "label_date": "Fecha",
+    "recurring_note": "Esta es una donación recurrente. Puedes gestionar tus donaciones desde la configuración de tu cuenta.",
+    "cta": "Ver tu cuenta"
   },
   "listing_updated": {
-    "subject": "Se actualizó un listado que guardó: {{community}}",
-    "title": "Listado guardado actualizado",
-    "preview": "\"{{title}}\" se ha actualizado en {{community}}",
-    "body": "Una lista que guardó, <strong>\"{{title}}\"</strong>, se actualizó en {{community}}.",
-    "cta": "Ver listado"
+    "subject": "Un anuncio que guardaste ha sido actualizado — {{community}}",
+    "title": "Anuncio guardado actualizado",
+    "preview": "\"{{title}}\" ha sido actualizado en {{community}}",
+    "body": "Un anuncio que guardaste, <strong>\"{{title}}\"</strong>, ha sido actualizado en {{community}}.",
+    "cta": "Ver anuncio"
   }
 }

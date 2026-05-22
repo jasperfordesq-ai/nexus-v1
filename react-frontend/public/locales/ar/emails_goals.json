@@ -1,17 +1,17 @@
 {
   "created": {
-    "subject": "مجموعة الأهداف: {{title}} — {{community}}",
+    "subject": "تم تحديد الهدف: {{title}} — {{community}}",
     "title": "تم إنشاء الهدف!",
-    "preview": "لقد حددت هدفًا جديدًا: {{title}}",
-    "body": "لقد حددت هدفًا جديدًا على {{community}}. استمر - سنرسل إليك تذكيرات لمساعدتك على البقاء على المسار الصحيح.",
+    "preview": "لقد حددت هدفاً جديداً: {{title}}",
+    "body": "لقد حددت هدفاً جديداً على {{community}}. استمر — سنرسل لك تذكيرات لمساعدتك على البقاء في المسار.",
     "cta": "عرض هدفك"
   },
   "completed": {
-    "subject": "تم تحقيق الهدف: {{title}} — {{community}}",
-    "title": "تم تحقيق الهدف!",
+    "subject": "تحقق الهدف: {{title}} — {{community}}",
+    "title": "تحقق الهدف!",
     "preview": "تهانينا! لقد أكملت هدفك: {{title}}",
-    "body": "عمل مذهل! لقد أكملت هدفك على {{community}}. مساهمتك في المجتمع موضع تقدير حقًا.",
-    "highlight": "الهدف مكتمل",
+    "body": "عمل رائع! لقد أكملت هدفك على {{community}}. مساهمتك في المجتمع موضع تقدير حقيقي.",
+    "highlight": "تم إكمال الهدف",
     "cta": "عرض إنجازاتك"
   },
   "abandoned": {
@@ -20,20 +20,20 @@
     "preview": "تمت إزالة هدفك",
     "body": "تمت إزالة هدفك <strong>\"{{title}}\"</strong> من {{community}}.",
     "note": "يمكنك تحديد هدف جديد في أي وقت من ملفك الشخصي.",
-    "cta": "حدد هدفًا جديدًا"
+    "cta": "تحديد هدف جديد"
   },
   "goal_milestone": {
-    "progress_subject": "لقد قطعت {{percent}}% من الطريق نحو هدفك!",
-    "progress_title": "اكتمل {{percent}}%",
-    "progress_preview": "تقدم كبير في \"{{goal}}\"",
+    "progress_subject": "أنت في {{percent}}% من طريقك نحو هدفك!",
+    "progress_title": "{{percent}}% مكتمل",
+    "progress_preview": "تقدم رائع في '{{goal}}'",
     "progress_greeting": "استمر في ذلك، {{name}}!",
-    "progress_body": "لقد وصلت إلى {{percent}}% من هدفك \"{{goal}}\". أنت تحرز تقدمًا رائعًا – استمر!",
+    "progress_body": "لقد وصلت إلى {{percent}}% من هدفك '{{goal}}'. تحرز تقدماً رائعاً — استمر!",
     "progress_cta": "عرض هدفك",
     "complete_subject": "لقد حققت هدفك!",
-    "complete_title": "تم تحقيق الهدف!",
-    "complete_preview": "تهانينا - لقد أكملت \"{{goal}}\"",
-    "complete_greeting": "???????? {{name}}!",
-    "complete_body": "لقد أكملت هدفك \"{{goal}}\" بنجاح. هذا إنجاز رائع – أحسنت!",
+    "complete_title": "تحقق الهدف!",
+    "complete_preview": "تهانينا — لقد أكملت '{{goal}}'",
+    "complete_greeting": "تهانينا، {{name}}!",
+    "complete_body": "لقد أكملت هدفك '{{goal}}' بنجاح. هذا إنجاز رائع — أحسنت!",
     "complete_cta": "عرض إنجازك"
   }
 }
