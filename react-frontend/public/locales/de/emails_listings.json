@@ -1,56 +1,56 @@
 {
   "listings": {
     "expired": {
-      "notification": "Your listing \"{{title}}\" has expired. You can renew it to make it active again.",
-      "subject": "Your listing has expired",
-      "heading": "Your listing has expired",
-      "subheading": "Renew your listing to keep it active.",
-      "body_expired": "Your listing <strong>\"{{title}}\"</strong> has expired.",
-      "body_renew": "You can renew it to make it visible to the community again.",
-      "cta": "Renew Listing"
+      "notification": "Ihr Eintrag „{{title}}“ ist abgelaufen. Sie können es erneuern, um es wieder aktiv zu machen.",
+      "subject": "Ihr Eintrag ist abgelaufen",
+      "heading": "Ihr Eintrag ist abgelaufen",
+      "subheading": "Erneuern Sie Ihren Eintrag, um ihn aktiv zu halten.",
+      "body_expired": "Ihr Eintrag <strong>\"{{title}}\"</strong> ist abgelaufen.",
+      "body_renew": "Sie können es erneuern, um es wieder für die Community sichtbar zu machen.",
+      "cta": "Eintrag erneuern"
     },
     "expiry_reminder": {
-      "notification": "Your listing \"{{title}}\" expires in {{days_text}} (on {{expiry_date}}) — renew it to keep it active.",
-      "subject": "Your listing expires in {{days_text}}",
-      "heading": "Your listing expires in {{days_text}}",
-      "subheading": "Don't miss out — renew your listing to keep it active.",
-      "body_expires": "Your listing <strong>\"{{title}}\"</strong> expires in {{days_text}} (on {{expiry_date}}).",
-      "body_renew": "Renew it now to keep it visible to the community.",
-      "cta": "View Listing",
-      "days_one": "1 day",
-      "days_other": "{{count}} days",
-      "urgent_note": "Act soon to keep your listing visible!",
+      "notification": "Ihr Eintrag „{{title}}“ läuft in {{days_text}} (auf {{expiry_date}}) ab – erneuern Sie ihn, um ihn aktiv zu halten.",
+      "subject": "Ihr Eintrag läuft in {{days_text}} ab",
+      "heading": "Ihr Eintrag läuft in {{days_text}} ab",
+      "subheading": "Verpassen Sie es nicht – erneuern Sie Ihren Eintrag, um ihn aktiv zu halten.",
+      "body_expires": "Ihr Eintrag <strong>\"{{title}}\"</strong> läuft in {{days_text}} (auf {{expiry_date}}) ab.",
+      "body_renew": "Erneuern Sie es jetzt, damit es für die Community sichtbar bleibt.",
+      "cta": "Eintrag anzeigen",
+      "days_one": "1 Tag",
+      "days_other": "{{count}} Tage",
+      "urgent_note": "Handeln Sie schnell, damit Ihr Eintrag sichtbar bleibt!",
       "expired_subject": "Dein Eintrag \"{{title}}\" ist abgelaufen",
-      "expired_title": "Listing Expired",
-      "expired_preview": "Your listing has expired — renew it to stay visible",
+      "expired_title": "Eintrag abgelaufen",
+      "expired_preview": "Ihr Eintrag ist abgelaufen. Erneuern Sie ihn, um sichtbar zu bleiben",
       "expired_body": "Dein Eintrag <strong>\"{{title}}\"</strong> ist abgelaufen. Erneuere ihn jetzt, um weiterhin Antworten von Community-Mitgliedern zu erhalten.",
-      "expired_cta": "Renew Listing"
+      "expired_cta": "Eintrag erneuern"
     },
     "approved": {
-      "notification": "Your listing \"{{title}}\" has been approved and is now active.",
-      "notification_short": "Your listing \"{{title}}\" has been approved!",
-      "email_subject": "Your listing has been approved — {{title}}",
-      "email_title": "Listing Approved",
-      "email_body": "Great news! Your listing <strong>\"{{title}}\"</strong> has been approved and is now active in the community.",
-      "email_cta": "View Listing"
+      "notification": "Ihr Eintrag „{{title}}“ wurde genehmigt und ist jetzt aktiv.",
+      "notification_short": "Ihr Eintrag „{{title}}“ wurde genehmigt!",
+      "email_subject": "Ihr Eintrag wurde genehmigt – {{title}}",
+      "email_title": "Eintrag genehmigt",
+      "email_body": "Tolle Neuigkeiten! Ihr Eintrag <strong>\"{{title}}\"</strong> wurde genehmigt und ist jetzt in der Community aktiv.",
+      "email_cta": "Eintrag anzeigen"
     },
     "rejected": {
-      "notification": "Your listing \"{{title}}\" was not approved. Reason: {{reason}}",
-      "notification_no_reason": "Your listing \"{{title}}\" was not approved.",
-      "subject": "Your listing needs changes",
-      "heading": "Your listing needs changes",
-      "subheading": "Your listing was not approved — here's what to do next.",
-      "body_not_approved": "Your listing <strong>\"{{title}}\"</strong> was not approved.",
-      "body_reason": "<strong>Reason:</strong> {{reason}}",
-      "body_resubmit": "Please review and update your listing, then resubmit for approval.",
-      "cta": "Edit Listing"
+      "notification": "Ihr Eintrag „{{title}}“ wurde nicht genehmigt. Grund: {{reason}}",
+      "notification_no_reason": "Ihr Eintrag „{{title}}“ wurde nicht genehmigt.",
+      "subject": "Ihr Eintrag muss geändert werden",
+      "heading": "Ihr Eintrag muss geändert werden",
+      "subheading": "Ihr Eintrag wurde nicht genehmigt – hier erfahren Sie, was als Nächstes zu tun ist.",
+      "body_not_approved": "Ihr Eintrag <strong>\"{{title}}\"</strong> wurde nicht genehmigt.",
+      "body_reason": "<strong>Grund:</strong> {{reason}}",
+      "body_resubmit": "Bitte überprüfen und aktualisieren Sie Ihren Eintrag und reichen Sie ihn dann erneut zur Genehmigung ein.",
+      "cta": "Eintrag bearbeiten"
     },
     "removed": {
-      "notification": "Your listing \"{{title}}\" has been removed by a moderator.",
-      "email_subject": "Your listing has been removed — {{title}}",
-      "email_title": "Listing Removed",
-      "email_body": "Your listing <strong>\"{{title}}\"</strong> has been removed by a moderator.",
-      "email_cta": "Browse Listings"
+      "notification": "Ihr Eintrag „{{title}}“ wurde von einem Moderator entfernt.",
+      "email_subject": "Ihr Eintrag wurde entfernt – {{title}}",
+      "email_title": "Eintrag entfernt",
+      "email_body": "Ihr Eintrag <strong>\"{{title}}\"</strong> wurde von einem Moderator entfernt.",
+      "email_cta": "Einträge durchsuchen"
     }
   }
 }

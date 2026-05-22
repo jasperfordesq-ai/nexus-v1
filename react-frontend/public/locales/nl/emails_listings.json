@@ -1,56 +1,56 @@
 {
   "listings": {
     "expired": {
-      "notification": "Your listing \"{{title}}\" has expired. You can renew it to make it active again.",
-      "subject": "Your listing has expired",
-      "heading": "Your listing has expired",
-      "subheading": "Renew your listing to keep it active.",
-      "body_expired": "Your listing <strong>\"{{title}}\"</strong> has expired.",
-      "body_renew": "You can renew it to make it visible to the community again.",
-      "cta": "Renew Listing"
+      "notification": "Uw vermelding '{{title}}' is verlopen. U kunt het verlengen om het weer actief te maken.",
+      "subject": "Uw vermelding is verlopen",
+      "heading": "Uw vermelding is verlopen",
+      "subheading": "Verleng uw vermelding om deze actief te houden.",
+      "body_expired": "Uw vermelding <strong>\"{{title}}\"</strong> is verlopen.",
+      "body_renew": "Je kunt het verlengen om het weer zichtbaar te maken voor de community.",
+      "cta": "Verleng vermelding"
     },
     "expiry_reminder": {
-      "notification": "Your listing \"{{title}}\" expires in {{days_text}} (on {{expiry_date}}) — renew it to keep it active.",
-      "subject": "Your listing expires in {{days_text}}",
-      "heading": "Your listing expires in {{days_text}}",
-      "subheading": "Don't miss out — renew your listing to keep it active.",
-      "body_expires": "Your listing <strong>\"{{title}}\"</strong> expires in {{days_text}} (on {{expiry_date}}).",
-      "body_renew": "Renew it now to keep it visible to the community.",
-      "cta": "View Listing",
-      "days_one": "1 day",
-      "days_other": "{{count}} days",
-      "urgent_note": "Act soon to keep your listing visible!",
+      "notification": "Uw vermelding \"{{title}}\" verloopt over {{days_text}} (op {{expiry_date}}). Verleng deze om actief te blijven.",
+      "subject": "Uw vermelding vervalt over {{days_text}}",
+      "heading": "Uw vermelding vervalt over {{days_text}}",
+      "subheading": "Mis dit niet: vernieuw uw vermelding om deze actief te houden.",
+      "body_expires": "Uw vermelding <strong>'{{title}}'</strong> verloopt in {{days_text}} (op {{expiry_date}}).",
+      "body_renew": "Verleng het nu om het zichtbaar te houden voor de community.",
+      "cta": "Bekijk vermelding",
+      "days_one": "1 dag",
+      "days_other": "{{count}} dagen",
+      "urgent_note": "Kom snel in actie om uw vermelding zichtbaar te houden!",
       "expired_subject": "Je vermelding \"{{title}}\" is verlopen",
-      "expired_title": "Listing Expired",
-      "expired_preview": "Your listing has expired — renew it to stay visible",
+      "expired_title": "Advertentie verlopen",
+      "expired_preview": "Uw vermelding is verlopen. Verleng deze om zichtbaar te blijven",
       "expired_body": "Je vermelding <strong>\"{{title}}\"</strong> is verlopen. Vernieuw deze nu om reacties van communityleden te blijven ontvangen.",
-      "expired_cta": "Renew Listing"
+      "expired_cta": "Verleng vermelding"
     },
     "approved": {
-      "notification": "Your listing \"{{title}}\" has been approved and is now active.",
-      "notification_short": "Your listing \"{{title}}\" has been approved!",
-      "email_subject": "Your listing has been approved — {{title}}",
-      "email_title": "Listing Approved",
-      "email_body": "Great news! Your listing <strong>\"{{title}}\"</strong> has been approved and is now active in the community.",
-      "email_cta": "View Listing"
+      "notification": "Uw vermelding \"{{title}}\" is goedgekeurd en is nu actief.",
+      "notification_short": "Uw vermelding \"{{title}}\" is goedgekeurd!",
+      "email_subject": "Uw vermelding is goedgekeurd: {{title}}",
+      "email_title": "Vermelding goedgekeurd",
+      "email_body": "Geweldig nieuws! Uw vermelding <strong>\"{{title}}\"</strong> is goedgekeurd en is nu actief in de community.",
+      "email_cta": "Bekijk vermelding"
     },
     "rejected": {
-      "notification": "Your listing \"{{title}}\" was not approved. Reason: {{reason}}",
-      "notification_no_reason": "Your listing \"{{title}}\" was not approved.",
-      "subject": "Your listing needs changes",
-      "heading": "Your listing needs changes",
-      "subheading": "Your listing was not approved — here's what to do next.",
-      "body_not_approved": "Your listing <strong>\"{{title}}\"</strong> was not approved.",
-      "body_reason": "<strong>Reason:</strong> {{reason}}",
-      "body_resubmit": "Please review and update your listing, then resubmit for approval.",
-      "cta": "Edit Listing"
+      "notification": "Uw vermelding '{{title}}' is niet goedgekeurd. Reden: {{reason}}",
+      "notification_no_reason": "Uw vermelding '{{title}}' is niet goedgekeurd.",
+      "subject": "Uw vermelding heeft wijzigingen nodig",
+      "heading": "Uw vermelding heeft wijzigingen nodig",
+      "subheading": "Uw vermelding is niet goedgekeurd. Dit is wat u vervolgens moet doen.",
+      "body_not_approved": "Uw vermelding <strong>'{{title}}'</strong> is niet goedgekeurd.",
+      "body_reason": "<strong>Reden:</strong> {{reason}}",
+      "body_resubmit": "Controleer uw vermelding, werk deze bij en dien deze vervolgens opnieuw ter goedkeuring in.",
+      "cta": "Bewerk vermelding"
     },
     "removed": {
-      "notification": "Your listing \"{{title}}\" has been removed by a moderator.",
-      "email_subject": "Your listing has been removed — {{title}}",
-      "email_title": "Listing Removed",
-      "email_body": "Your listing <strong>\"{{title}}\"</strong> has been removed by a moderator.",
-      "email_cta": "Browse Listings"
+      "notification": "Uw vermelding \"{{title}}\" is verwijderd door een moderator.",
+      "email_subject": "Uw vermelding is verwijderd: {{title}}",
+      "email_title": "Vermelding verwijderd",
+      "email_body": "Uw vermelding <strong>\"{{title}}\"</strong> is verwijderd door een moderator.",
+      "email_cta": "Blader door vermeldingen"
     }
   }
 }

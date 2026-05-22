@@ -1,56 +1,56 @@
 {
   "listings": {
     "expired": {
-      "notification": "Your listing \"{{title}}\" has expired. You can renew it to make it active again.",
-      "subject": "Your listing has expired",
-      "heading": "Your listing has expired",
-      "subheading": "Renew your listing to keep it active.",
-      "body_expired": "Your listing <strong>\"{{title}}\"</strong> has expired.",
-      "body_renew": "You can renew it to make it visible to the community again.",
-      "cta": "Renew Listing"
+      "notification": "Sua listagem \"{{title}}\" expirou. Você pode renová-lo para torná-lo ativo novamente.",
+      "subject": "Sua listagem expirou",
+      "heading": "Sua listagem expirou",
+      "subheading": "Renove sua listagem para mantê-la ativa.",
+      "body_expired": "Sua listagem <strong>\"{{title}}\"</strong> expirou.",
+      "body_renew": "Você pode renová-lo para torná-lo visível novamente para a comunidade.",
+      "cta": "Renovar listagem"
     },
     "expiry_reminder": {
-      "notification": "Your listing \"{{title}}\" expires in {{days_text}} (on {{expiry_date}}) — renew it to keep it active.",
-      "subject": "Your listing expires in {{days_text}}",
-      "heading": "Your listing expires in {{days_text}}",
-      "subheading": "Don't miss out — renew your listing to keep it active.",
-      "body_expires": "Your listing <strong>\"{{title}}\"</strong> expires in {{days_text}} (on {{expiry_date}}).",
-      "body_renew": "Renew it now to keep it visible to the community.",
-      "cta": "View Listing",
-      "days_one": "1 day",
-      "days_other": "{{count}} days",
-      "urgent_note": "Act soon to keep your listing visible!",
+      "notification": "Sua listagem \"{{title}}\" expira em {{days_text}} (em {{expiry_date}}) — renove-a para mantê-la ativa.",
+      "subject": "Sua listagem expira em {{days_text}}",
+      "heading": "Sua listagem expira em {{days_text}}",
+      "subheading": "Não perca: renove seu anúncio para mantê-lo ativo.",
+      "body_expires": "Sua listagem <strong>\"{{title}}\"</strong> expira em {{days_text}} (em {{expiry_date}}).",
+      "body_renew": "Renove-o agora para mantê-lo visível para a comunidade.",
+      "cta": "Ver listagem",
+      "days_one": "1 dia",
+      "days_other": "{{count}} dias",
+      "urgent_note": "Aja logo para manter sua listagem visível!",
       "expired_subject": "O seu an?ncio \"{{title}}\" expirou",
-      "expired_title": "Listing Expired",
-      "expired_preview": "Your listing has expired — renew it to stay visible",
+      "expired_title": "Listagem expirada",
+      "expired_preview": "Sua listagem expirou – renove-a para permanecer visível",
       "expired_body": "O seu an?ncio <strong>\"{{title}}\"</strong> expirou. Renove-o agora para continuar a receber respostas de membros da comunidade.",
-      "expired_cta": "Renew Listing"
+      "expired_cta": "Renovar listagem"
     },
     "approved": {
-      "notification": "Your listing \"{{title}}\" has been approved and is now active.",
-      "notification_short": "Your listing \"{{title}}\" has been approved!",
-      "email_subject": "Your listing has been approved — {{title}}",
-      "email_title": "Listing Approved",
-      "email_body": "Great news! Your listing <strong>\"{{title}}\"</strong> has been approved and is now active in the community.",
-      "email_cta": "View Listing"
+      "notification": "Sua listagem \"{{title}}\" foi aprovada e agora está ativa.",
+      "notification_short": "Sua listagem \"{{title}}\" foi aprovada!",
+      "email_subject": "Sua listagem foi aprovada — {{title}}",
+      "email_title": "Listagem aprovada",
+      "email_body": "Ótimas notícias! Sua listagem <strong>\"{{title}}\"</strong> foi aprovada e agora está ativa na comunidade.",
+      "email_cta": "Ver listagem"
     },
     "rejected": {
-      "notification": "Your listing \"{{title}}\" was not approved. Reason: {{reason}}",
-      "notification_no_reason": "Your listing \"{{title}}\" was not approved.",
-      "subject": "Your listing needs changes",
-      "heading": "Your listing needs changes",
-      "subheading": "Your listing was not approved — here's what to do next.",
-      "body_not_approved": "Your listing <strong>\"{{title}}\"</strong> was not approved.",
-      "body_reason": "<strong>Reason:</strong> {{reason}}",
-      "body_resubmit": "Please review and update your listing, then resubmit for approval.",
-      "cta": "Edit Listing"
+      "notification": "Sua listagem \"{{title}}\" não foi aprovada. Razão: {{reason}}",
+      "notification_no_reason": "Sua listagem \"{{title}}\" não foi aprovada.",
+      "subject": "Sua listagem precisa de mudanças",
+      "heading": "Sua listagem precisa de mudanças",
+      "subheading": "Sua listagem não foi aprovada. Veja o que fazer a seguir.",
+      "body_not_approved": "Sua listagem <strong>\"{{title}}\"</strong> não foi aprovada.",
+      "body_reason": "<strong>Motivo:</strong> {{reason}}",
+      "body_resubmit": "Revise e atualize sua listagem e reenvie-a para aprovação.",
+      "cta": "Editar listagem"
     },
     "removed": {
-      "notification": "Your listing \"{{title}}\" has been removed by a moderator.",
-      "email_subject": "Your listing has been removed — {{title}}",
-      "email_title": "Listing Removed",
-      "email_body": "Your listing <strong>\"{{title}}\"</strong> has been removed by a moderator.",
-      "email_cta": "Browse Listings"
+      "notification": "Sua listagem \"{{title}}\" foi removida por um moderador.",
+      "email_subject": "Sua listagem foi removida — {{title}}",
+      "email_title": "Listagem removida",
+      "email_body": "Sua listagem <strong>\"{{title}}\"</strong> foi removida por um moderador.",
+      "email_cta": "Navegar nas listagens"
     }
   }
 }

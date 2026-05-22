@@ -1,56 +1,56 @@
 {
   "listings": {
     "expired": {
-      "notification": "Your listing \"{{title}}\" has expired. You can renew it to make it active again.",
-      "subject": "Your listing has expired",
-      "heading": "Your listing has expired",
-      "subheading": "Renew your listing to keep it active.",
-      "body_expired": "Your listing <strong>\"{{title}}\"</strong> has expired.",
-      "body_renew": "You can renew it to make it visible to the community again.",
-      "cta": "Renew Listing"
+      "notification": "Twój wpis „{{title}}” wygasł. Możesz go odnowić, aby ponownie był aktywny.",
+      "subject": "Twój wpis wygasł",
+      "heading": "Twój wpis wygasł",
+      "subheading": "Odnów swoją ofertę, aby była aktywna.",
+      "body_expired": "Twój wpis <strong>„{{title}}”</strong> wygasł.",
+      "body_renew": "Możesz go odnowić, aby ponownie był widoczny dla społeczności.",
+      "cta": "Odnów ogłoszenie"
     },
     "expiry_reminder": {
-      "notification": "Your listing \"{{title}}\" expires in {{days_text}} (on {{expiry_date}}) — renew it to keep it active.",
-      "subject": "Your listing expires in {{days_text}}",
-      "heading": "Your listing expires in {{days_text}}",
-      "subheading": "Don't miss out — renew your listing to keep it active.",
-      "body_expires": "Your listing <strong>\"{{title}}\"</strong> expires in {{days_text}} (on {{expiry_date}}).",
-      "body_renew": "Renew it now to keep it visible to the community.",
-      "cta": "View Listing",
-      "days_one": "1 day",
-      "days_other": "{{count}} days",
-      "urgent_note": "Act soon to keep your listing visible!",
+      "notification": "Twój wpis „{{title}}” wygasa w {{days_text}} (na {{expiry_date}}) — odnów go, aby pozostał aktywny.",
+      "subject": "Twoja aukcja wygaśnie w {{days_text}}",
+      "heading": "Twoja aukcja wygaśnie w {{days_text}}",
+      "subheading": "Nie przegap tej okazji — odnów swoją ofertę, aby była aktywna.",
+      "body_expires": "Twój wpis <strong>„{{title}}”</strong> wygasa za {{days_text}} (na {{expiry_date}}).",
+      "body_renew": "Odnów go teraz, aby był widoczny dla społeczności.",
+      "cta": "Zobacz listę",
+      "days_one": "1 dzień",
+      "days_other": "{{count}} dni",
+      "urgent_note": "Działaj szybko, aby Twój wpis był widoczny!",
       "expired_subject": "Twoje og?oszenie ?{{title}}? wygas?o",
-      "expired_title": "Listing Expired",
-      "expired_preview": "Your listing has expired — renew it to stay visible",
+      "expired_title": "Lista wygasła",
+      "expired_preview": "Twój wpis wygasł — odnów go, aby pozostać widocznym",
       "expired_body": "Twoje og?oszenie <strong>?{{title}}?</strong> wygas?o. Odn?w je teraz, aby nadal otrzymywa? odpowiedzi od cz?onk?w spo?eczno?ci.",
-      "expired_cta": "Renew Listing"
+      "expired_cta": "Odnów ogłoszenie"
     },
     "approved": {
-      "notification": "Your listing \"{{title}}\" has been approved and is now active.",
-      "notification_short": "Your listing \"{{title}}\" has been approved!",
-      "email_subject": "Your listing has been approved — {{title}}",
-      "email_title": "Listing Approved",
-      "email_body": "Great news! Your listing <strong>\"{{title}}\"</strong> has been approved and is now active in the community.",
-      "email_cta": "View Listing"
+      "notification": "Twój wpis „{{title}}” został zatwierdzony i jest teraz aktywny.",
+      "notification_short": "Twój wpis „{{title}}” został zatwierdzony!",
+      "email_subject": "Twój wpis został zatwierdzony — {{title}}",
+      "email_title": "Lista zatwierdzona",
+      "email_body": "Świetna wiadomość! Twój wpis <strong>„{{title}}”</strong> został zatwierdzony i jest teraz aktywny w społeczności.",
+      "email_cta": "Zobacz listę"
     },
     "rejected": {
-      "notification": "Your listing \"{{title}}\" was not approved. Reason: {{reason}}",
-      "notification_no_reason": "Your listing \"{{title}}\" was not approved.",
-      "subject": "Your listing needs changes",
-      "heading": "Your listing needs changes",
-      "subheading": "Your listing was not approved — here's what to do next.",
-      "body_not_approved": "Your listing <strong>\"{{title}}\"</strong> was not approved.",
-      "body_reason": "<strong>Reason:</strong> {{reason}}",
-      "body_resubmit": "Please review and update your listing, then resubmit for approval.",
-      "cta": "Edit Listing"
+      "notification": "Twój wpis „{{title}}” nie został zatwierdzony. Powód: {{reason}}",
+      "notification_no_reason": "Twój wpis „{{title}}” nie został zatwierdzony.",
+      "subject": "Twój wpis wymaga zmian",
+      "heading": "Twój wpis wymaga zmian",
+      "subheading": "Twój wpis nie został zatwierdzony — oto, co robić dalej.",
+      "body_not_approved": "Twój wpis <strong>„{{title}}”</strong> nie został zatwierdzony.",
+      "body_reason": "<strong>Powód:</strong> {{reason}}",
+      "body_resubmit": "Sprawdź i zaktualizuj swój wpis, a następnie prześlij go ponownie do zatwierdzenia.",
+      "cta": "Edytuj listę"
     },
     "removed": {
-      "notification": "Your listing \"{{title}}\" has been removed by a moderator.",
-      "email_subject": "Your listing has been removed — {{title}}",
-      "email_title": "Listing Removed",
-      "email_body": "Your listing <strong>\"{{title}}\"</strong> has been removed by a moderator.",
-      "email_cta": "Browse Listings"
+      "notification": "Twój wpis „{{title}}” został usunięty przez moderatora.",
+      "email_subject": "Twój wpis został usunięty — {{title}}",
+      "email_title": "Lista została usunięta",
+      "email_body": "Twój wpis <strong>„{{title}}”</strong> został usunięty przez moderatora.",
+      "email_cta": "Przeglądaj oferty"
     }
   }
 }
