@@ -413,21 +413,57 @@
     "title": "Disclaimer della Piattaforma",
     "subtitle": "Importanti limitazioni di responsabilità per la piattaforma Project NEXUS",
     "link_terms": "Termini di Servizio della Piattaforma",
-    "link_privacy": "Informativa sulla Privacy della Piattaforma"
+    "link_privacy": "Informativa sulla Privacy della Piattaforma",
+    "sections": {
+      "no-warranty": "Nessuna garanzia",
+      "no-advice": "Nessuna consulenza legale, finanziaria o regolamentare",
+      "operator-independence": "Indipendenza degli operatori della community",
+      "member-interactions": "Interazioni tra membri",
+      "content-uploads": "Contenuti e caricamenti",
+      "identity-verification": "Verifica dell'identità",
+      "third-party": "Servizi di terzi",
+      "limitation-of-liability": "Limitazione di responsabilità"
+    }
   },
   "platform_privacy": {
     "page_title": "Informativa sulla Privacy della Piattaforma",
     "title": "Informativa sulla Privacy della Piattaforma",
     "subtitle": "Come Project NEXUS gestisce i dati a livello di infrastruttura della piattaforma",
     "link_terms": "Termini di Servizio della Piattaforma",
-    "link_disclaimer": "Disclaimer della Piattaforma"
+    "link_disclaimer": "Disclaimer della Piattaforma",
+    "sections": {
+      "introduction": "Introduzione",
+      "controller-processor": "Titolare del trattamento e responsabile del trattamento",
+      "data-collected": "Dati raccolti a livello di piattaforma",
+      "legal-basis": "Base giuridica del trattamento",
+      "data-sharing": "Comunicazione dei dati",
+      "international-transfers": "Trasferimenti internazionali di dati",
+      "retention": "Conservazione dei dati",
+      "your-rights": "I tuoi diritti ai sensi del GDPR",
+      "security": "Misure di sicurezza",
+      "contact": "Contatto"
+    }
   },
   "platform_terms": {
     "page_title": "Termini di Servizio della Piattaforma",
     "title": "Termini di Servizio della Piattaforma",
     "subtitle": "I termini che regolano l'infrastruttura della piattaforma Project NEXUS",
     "link_privacy": "Informativa sulla Privacy della Piattaforma",
-    "link_disclaimer": "Disclaimer della Piattaforma"
+    "link_disclaimer": "Disclaimer della Piattaforma",
+    "sections": {
+      "introduction": "Introduzione e accettazione",
+      "provider": "Identità del fornitore della piattaforma",
+      "definitions": "Definizioni",
+      "operator-responsibilities": "Responsabilità dell'operatore",
+      "acceptable-use": "Uso accettabile",
+      "intellectual-property": "Proprietà intellettuale",
+      "limitation-of-liability": "Limitazione di responsabilità",
+      "indemnification": "Indennizzo",
+      "data-processing": "Trattamento dei dati",
+      "termination": "Risoluzione",
+      "changes": "Modifiche alle condizioni",
+      "governing-law": "Legge applicabile"
+    }
   },
   "gate": {
     "title": "Documenti legali aggiornati",
@@ -576,5 +612,184 @@
     "contact_cta_body": "Get in touch and a coordinator will get back to you. Most messages are answered within one working day.",
     "contact_cta_button": "Contact us",
     "community_guidelines_link": "Read the Community Guidelines"
+  },
+  "community_guidelines": {
+    "default_community_name": "questa community",
+    "heading": "Regole della community",
+    "page_title": "Regole della community",
+    "subtitle": "Come ci aspettiamo che ogni persona in {{communityName}} si rapporti agli altri. Brevi, in linguaggio semplice, e valide per ogni scambio, messaggio, post ed evento.",
+    "version": "Versione 1.0 - Ultimo aggiornamento 13/05/2026",
+    "sections": {
+      "kind": {
+        "title": "1. Sii gentile e rispettoso",
+        "body": "Tratta gli altri membri come tratteresti un vicino di casa. Il disaccordo va bene; il disprezzo, gli insulti, lo scherno e gli attacchi personali no.",
+        "items": {
+          "0": "Nessuna molestia, prepotenza, persecuzione o intimidazione.",
+          "1": "Nessun discorso d'odio, insulto o contenuto che umili le persone per ciò che sono, incluse origine, etnia, nazionalità, religione, genere, sessualità, disabilità, età o estrazione sociale.",
+          "2": "Nessuna minaccia di violenza, esplicita o implicita."
+        }
+      },
+      "honest": {
+        "title": "2. Sii onesto",
+        "body": "La fiducia è ciò che fa funzionare una banca del tempo. Travisare se stessi o ciò che si offre danneggia l'intera community.",
+        "items": {
+          "0": "Usa il tuo vero nome e una foto autentica nel profilo.",
+          "1": "Descrivi competenze, annunci e richieste in modo accurato. Non esagerare ciò che sai fare né i tempi necessari.",
+          "2": "Registra le ore in modo onesto. Non rivendicare tempo che non hai dato.",
+          "3": "Una persona, un account."
+        }
+      },
+      "relevant": {
+        "title": "3. Resta in tema",
+        "body": "Questo è uno spazio per lo scambio comunitario, non un marketplace, un cartellone pubblicitario o una tribuna politica.",
+        "items": {
+          "0": "Niente spam, promozioni ripetute o messaggi fuori tema in massa.",
+          "1": "Niente vendita commerciale, reclutamento o raccolta fondi al di fuori delle funzionalità pensate per questo, come lavori, organizzazioni o il marketplace, quando abilitato.",
+          "2": "Niente materiale di campagna, organizzazione di parte o contenuti volti ad alimentare il conflitto politico. La partecipazione civica è benvenuta; lo scontro politico partigiano no."
+        }
+      },
+      "privacy": {
+        "title": "4. Tutela la riservatezza",
+        "body": "Ciò che i membri condividono dentro la community resta dentro la community.",
+        "items": {
+          "0": "Non diffondere informazioni personali di un altro membro, come indirizzo, telefono, foto, dati sanitari o situazione familiare, senza il suo chiaro permesso.",
+          "1": "Non pubblicare screenshot di messaggi privati.",
+          "2": "Non fare foto agli eventi della community senza chiedere alle persone ritratte.",
+          "3": "Usa la messaggistica della piattaforma per le comunicazioni relative agli scambi; non spingere le persone verso canali esterni prima che siano a loro agio."
+        }
+      },
+      "in_person": {
+        "title": "5. Prendetevi cura gli uni degli altri di persona",
+        "body": "Gli scambi spesso comportano incontri di persona, talvolta a casa di qualcuno. Usa il buon senso di tutti i giorni.",
+        "items": {
+          "0": "Leggi il profilo e le recensioni del membro prima del primo scambio.",
+          "1": "Quando possibile, incontratevi in un luogo pubblico per il primo scambio.",
+          "2": "Avvisa una persona di fiducia di dove stai andando e a che ora prevedi di tornare.",
+          "3": "Interrompi lo scambio e vai via se qualcosa non ti convince. Non devi alcuna spiegazione sul momento.",
+          "4": "Se una persona è in pericolo, da sola o con altri, consulta la sezione Fiducia e Sicurezza per sapere come segnalare. In caso di emergenza, contatta prima i servizi di emergenza locali."
+        }
+      },
+      "report": {
+        "title": "6. Segnalare le criticità",
+        "body_before": "Se vedi qualcosa che viola queste regole o che ti preoccupa, dillo. Puoi:",
+        "items": {
+          "0": "usare il pulsante di segnalazione su qualsiasi profilo, annuncio, messaggio, post o evento.",
+          "1": "scrivere via email al team della community attraverso la pagina Contatti.",
+          "2": "Per questioni di tutela, ad esempio un minore o un adulto vulnerabile a rischio, consulta la pagina Fiducia e Sicurezza per il canale di segnalazione dedicato."
+        },
+        "body_after": "Le segnalazioni vengono esaminate dai moderatori e trattate con riservatezza. Non condividiamo la tua identità con la persona segnalata, a meno che tu non lo richieda o la legge lo imponga."
+      },
+      "enforcement": {
+        "title": "7. Cosa succede quando le regole vengono violate",
+        "body_before": "La maggior parte dei problemi è frutto di piccoli malintesi che una chiacchierata pacata risolve. Per violazioni più nette adottiamo passi proporzionati:",
+        "items": {
+          "0": "Un richiamo per la prima infrazione minore.",
+          "1": "Rimozione del contenuto, ad esempio post, annuncio o messaggio.",
+          "2": "Un avvertimento, registrato sul tuo account.",
+          "3": "Sospensione temporanea per violazioni ripetute o gravi.",
+          "4": "Esclusione definitiva per molestie, violazioni di tutela, frode, minacce, discorsi d'odio o sospensioni ripetute."
+        },
+        "body_serious": "Le questioni gravi, inclusi abusi, minacce, frodi o sfruttamento, possono essere segnalate alle autorità di polizia o a quelle competenti, indipendentemente dalle misure adottate sulla piattaforma.",
+        "body_appeal": "Se ritieni che una decisione sia errata, puoi presentare ricorso tramite la pagina Contatti. Verrà esaminato da un moderatore non coinvolto nella decisione originale."
+      },
+      "changes": {
+        "title": "Modifiche a queste regole",
+        "body": "Potremo aggiornare queste regole man mano che la community cresce. Le modifiche sostanziali saranno annunciate sulla piattaforma e registrate nello storico legale delle versioni."
+      }
+    }
+  },
+  "acceptable_use": {
+    "default_platform_name": "la piattaforma",
+    "heading": "Politica di uso accettabile",
+    "page_title": "Politica di uso accettabile",
+    "subtitle": "I comportamenti specifici non consentiti su {{platformName}}. Questa politica si affianca alle Condizioni del servizio e alle Regole della community e si applica a ogni account.",
+    "version": "Versione 1.0 - Ultimo aggiornamento 13/05/2026",
+    "sections": {
+      "scope": {
+        "title": "1. Ambito di applicazione",
+        "body": "Questa politica si applica a chiunque utilizzi {{platformName}}: membri, organizzazioni, visitatori, utenti API e integratori. Si applica a ogni attività sulla piattaforma, inclusi profili, annunci, messaggi, eventi, post, sondaggi, lavori, file e comunicazioni in uscita inviate tramite la piattaforma."
+      },
+      "illegal": {
+        "title": "2. Nessuna attività illecita",
+        "body": "Non devi utilizzare la piattaforma per:",
+        "items": {
+          "0": "Svolgere, pianificare o agevolare qualcosa di illecito nel luogo in cui ti trovi tu, l'altra persona o l'attività.",
+          "1": "Offrire o richiedere servizi che richiedono un'abilitazione o regolamentazione professionale che non possiedi, come prestazioni mediche, legali, finanziarie, elettriche, di gas o di assistenza all'infanzia non autorizzate.",
+          "2": "Commerciare beni regolamentati o vietati, inclusi alcol, tabacco, farmaci da prescrizione, armi da fuoco, sostanze stupefacenti o altri articoli soggetti a restrizioni.",
+          "3": "Riciclare denaro o evadere obblighi fiscali."
+        }
+      },
+      "fraud": {
+        "title": "3. Nessuna frode o usurpazione di identità",
+        "items": {
+          "0": "Non spacciarti per un'altra persona, organizzazione o ente ufficiale.",
+          "1": "Non creare account falsi, fittizi o duplicati per manipolare valutazioni, recensioni, sondaggi o abbinamenti.",
+          "2": "Non falsificare la tua identità, le tue credenziali, le tue qualifiche o lo stato della verifica.",
+          "3": "Non manipolare i saldi dei crediti-tempo tramite scambi fittizi, collusione o transazioni simulate."
+        }
+      },
+      "harm": {
+        "title": "4. Nessun danno alle persone",
+        "items": {
+          "0": "Niente molestie, prepotenze, persecuzioni, doxxing o azioni coordinate contro singoli.",
+          "1": "Niente discorsi d'odio, insulti o contenuti che umilino le persone in base a caratteristiche protette.",
+          "2": "Niente minacce, istigazioni o glorificazione della violenza.",
+          "3": "Niente contenuti che sessualizzino minori, in qualsiasi forma.",
+          "4": "Niente contenuti sessuali non consensuali, abuso di immagini intime o contenuti pubblicati per umiliare o estorcere.",
+          "5": "Niente promozione di autolesionismo o suicidio. Se tu o una persona che conosci siete in crisi, contattate i servizi di emergenza locali o una linea di ascolto riconosciuta."
+        }
+      },
+      "content": {
+        "title": "5. Nessun contenuto vietato",
+        "items": {
+          "0": "Contenuti sessualmente espliciti, violenza gratuita o contenuti scioccanti.",
+          "1": "Contenuti che violino diritti d'autore, marchi o altri diritti di proprietà intellettuale di terzi.",
+          "2": "Informazioni riservate che non sei autorizzato a condividere, come segreti aziendali o informazioni sanitarie protette.",
+          "3": "Dati personali di altri pubblicati senza il loro consenso."
+        }
+      },
+      "misuse": {
+        "title": "6. Nessuno spam, abuso o uso improprio della piattaforma",
+        "items": {
+          "0": "Niente messaggi di massa non sollecitati, post identici ripetuti o invii promozionali a tappeto.",
+          "1": "Niente scraping, download massivo o raccolta automatizzata di profili, annunci o altri dati, salvo tramite API documentate e nei rispettivi limiti d'uso.",
+          "2": "Niente gonfiamento artificioso dell'interazione, inclusi like, recensioni, raccomandazioni, abbinamenti, badge o posizioni in classifica falsi.",
+          "3": "Niente schemi di referral, MLM, piramidali o pay-to-click.",
+          "4": "Niente utilizzo della piattaforma principalmente per dirottare traffico verso un sito o servizio esterno non collegato allo scambio comunitario."
+        }
+      },
+      "interference": {
+        "title": "7. Nessuna interferenza con la piattaforma",
+        "items": {
+          "0": "Nessun sondaggio, scansione o test di vulnerabilità senza previo consenso scritto. La divulgazione coordinata è benvenuta tramite la pagina Contatti.",
+          "1": "Nessun malware, virus, worm o altro codice dannoso.",
+          "2": "Nessun tentativo di aggirare l'autenticazione, i limiti d'uso, i paywall, i blocchi di funzionalità o gli strumenti di moderazione.",
+          "3": "Nessun tentativo di Denial-of-Service né attività che degradi sensibilmente il servizio per gli altri.",
+          "4": "Nessuna attività di reverse engineering, decompilazione o estrazione del codice sorgente, salvo quanto espressamente consentito dalla licenza AGPL-3.0."
+        }
+      },
+      "account": {
+        "title": "8. Igiene dell'account",
+        "items": {
+          "0": "Non condividere le tue credenziali. Sei responsabile dell'attività svolta dal tuo account.",
+          "1": "Avvisaci tempestivamente se sospetti che il tuo account sia stato compromesso.",
+          "2": "Non trasferire né vendere il tuo account ad altri.",
+          "3": "Utilizza gli strumenti della piattaforma per eliminare o esportare i tuoi dati; non tentare di estrarli tramite automazioni."
+        }
+      },
+      "enforcement": {
+        "title": "9. Applicazione",
+        "body": "Le violazioni possono comportare la rimozione di contenuti, avvertimenti, sospensione temporanea o esclusione permanente dall'accesso, in misura proporzionata alla gravità e ai precedenti. Le violazioni gravi possono essere segnalate alle competenti autorità di polizia, all'autorità di protezione dei dati pertinente o ad altre autorità competenti, e potremmo essere giuridicamente obbligati a farlo.",
+        "appeal": "Puoi impugnare una decisione tramite la pagina Contatti. I ricorsi sono esaminati da una persona non coinvolta nella decisione originale."
+      },
+      "reporting": {
+        "title": "10. Segnalazione delle violazioni",
+        "body": "Se noti qualcosa che viola questa politica, utilizza lo strumento di segnalazione integrato sul relativo profilo, annuncio, messaggio, post o evento, oppure scrivi al team tramite la pagina Contatti. Per questioni di tutela di un minore o di un adulto vulnerabile, segui il canale dedicato nella pagina Fiducia e Sicurezza."
+      },
+      "changes": {
+        "title": "11. Modifiche",
+        "body": "Potremo aggiornare questa politica man mano che la piattaforma e il quadro normativo si evolvono. Le modifiche sostanziali saranno annunciate e registrate nello storico legale delle versioni."
+      }
+    }
   }
 }

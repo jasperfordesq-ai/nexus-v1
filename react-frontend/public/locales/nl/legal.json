@@ -413,21 +413,57 @@
     "title": "Platform Disclaimer",
     "subtitle": "Belangrijke disclaimers en aansprakelijkheidsbeperkingen voor het Project NEXUS-platform",
     "link_terms": "Platform Gebruiksvoorwaarden",
-    "link_privacy": "Platform Privacybeleid"
+    "link_privacy": "Platform Privacybeleid",
+    "sections": {
+      "no-warranty": "Geen garantie",
+      "no-advice": "Geen juridisch, financieel of regelgevend advies",
+      "operator-independence": "Onafhankelijkheid van communityoperators",
+      "member-interactions": "Interacties tussen leden",
+      "content-uploads": "Content en uploads",
+      "identity-verification": "Identiteitsverificatie",
+      "third-party": "Diensten van derden",
+      "limitation-of-liability": "Beperking van aansprakelijkheid"
+    }
   },
   "platform_privacy": {
     "page_title": "Platform Privacybeleid",
     "title": "Platform Privacybeleid",
     "subtitle": "Hoe Project NEXUS gegevens beheert op het niveau van de platforminfrastructuur",
     "link_terms": "Platform Gebruiksvoorwaarden",
-    "link_disclaimer": "Platform Disclaimer"
+    "link_disclaimer": "Platform Disclaimer",
+    "sections": {
+      "introduction": "Inleiding",
+      "controller-processor": "Verwerkingsverantwoordelijke versus verwerker",
+      "data-collected": "Gegevens die wij op platformniveau verzamelen",
+      "legal-basis": "Rechtsgrondslag voor verwerking",
+      "data-sharing": "Delen van gegevens",
+      "international-transfers": "Internationale doorgifte van gegevens",
+      "retention": "Bewaartermijn van gegevens",
+      "your-rights": "Uw rechten onder de AVG",
+      "security": "Beveiligingsmaatregelen",
+      "contact": "Contact"
+    }
   },
   "platform_terms": {
     "page_title": "Platform Gebruiksvoorwaarden",
     "title": "Platform Gebruiksvoorwaarden",
     "subtitle": "De voorwaarden die de infrastructuur van het Project NEXUS-platform regelen",
     "link_privacy": "Platform Privacybeleid",
-    "link_disclaimer": "Platform Disclaimer"
+    "link_disclaimer": "Platform Disclaimer",
+    "sections": {
+      "introduction": "Inleiding en aanvaarding",
+      "provider": "Identiteit van de platformaanbieder",
+      "definitions": "Definities",
+      "operator-responsibilities": "Verantwoordelijkheden van de operator",
+      "acceptable-use": "Aanvaardbaar gebruik",
+      "intellectual-property": "Intellectuele eigendom",
+      "limitation-of-liability": "Beperking van aansprakelijkheid",
+      "indemnification": "Vrijwaring",
+      "data-processing": "Gegevensverwerking",
+      "termination": "Beëindiging",
+      "changes": "Wijzigingen in de voorwaarden",
+      "governing-law": "Toepasselijk recht"
+    }
   },
   "gate": {
     "title": "Bijgewerkte juridische documenten",
@@ -576,5 +612,184 @@
     "contact_cta_body": "Get in touch and a coordinator will get back to you. Most messages are answered within one working day.",
     "contact_cta_button": "Contact us",
     "community_guidelines_link": "Read the Community Guidelines"
+  },
+  "community_guidelines": {
+    "default_community_name": "deze community",
+    "heading": "Communityrichtlijnen",
+    "page_title": "Communityrichtlijnen",
+    "subtitle": "Hoe wij verwachten dat iedereen in {{communityName}} met elkaar omgaat. Kort, in eenvoudige taal en van toepassing op elke uitwisseling, elk bericht, elke post en elk evenement.",
+    "version": "Versie 1.0 - Laatst bijgewerkt op 13-05-2026",
+    "sections": {
+      "kind": {
+        "title": "1. Wees vriendelijk en respectvol",
+        "body": "Behandel andere leden zoals je een buur zou behandelen. Het is prima om het oneens te zijn; minachting, schelden, spot en persoonlijke aanvallen niet.",
+        "items": {
+          "0": "Geen intimidatie, pesten, stalken of bedreigingen.",
+          "1": "Geen haatzaaiende uitlatingen, scheldwoorden of content die mensen kleineert om wie ze zijn, waaronder afkomst, etniciteit, nationaliteit, religie, gender, seksualiteit, beperking, leeftijd of achtergrond.",
+          "2": "Geen geweldsdreigingen, expliciet of impliciet."
+        }
+      },
+      "honest": {
+        "title": "2. Wees eerlijk",
+        "body": "Vertrouwen is wat een tijdbank doet werken. Jezelf of wat je aanbiedt verkeerd voorstellen schaadt de hele community.",
+        "items": {
+          "0": "Gebruik je echte naam en een echte foto op je profiel.",
+          "1": "Beschrijf vaardigheden, aanbiedingen en verzoeken nauwkeurig. Overdrijf niet wat je kunt of hoelang iets duurt.",
+          "2": "Registreer uren eerlijk. Claim geen tijd die je niet hebt gegeven.",
+          "3": "Eén persoon, één account."
+        }
+      },
+      "relevant": {
+        "title": "3. Houd het relevant",
+        "body": "Dit is een ruimte voor communityuitwisseling, geen marktplaats, geen aanplakbord en geen politiek platform.",
+        "items": {
+          "0": "Geen spam, herhaalde promotie of off-topic massaberichten.",
+          "1": "Geen commerciële verkoop, werving of fondsenwerving buiten de daarvoor bedoelde functies, zoals vacatures, organisaties of de marktplaats waar deze is ingeschakeld.",
+          "2": "Geen campagnemateriaal, partijpolitieke organisatie of content die bedoeld is om politieke conflicten aan te wakkeren. Maatschappelijke betrokkenheid is welkom; partijpolitieke strijd niet."
+        }
+      },
+      "privacy": {
+        "title": "4. Bescherm de privacy",
+        "body": "Wat leden binnen de community delen, blijft binnen de community.",
+        "items": {
+          "0": "Deel geen persoonsgegevens van een ander lid, zoals adres, telefoon, foto's, gezondheidsgegevens of gezinssituatie, zonder uitdrukkelijke toestemming.",
+          "1": "Plaats geen screenshots van privéberichten.",
+          "2": "Maak op community-evenementen geen foto's zonder vooraf toestemming te vragen aan de afgebeelde personen.",
+          "3": "Gebruik de berichtenfunctie van het platform voor communicatie over uitwisselingen; dwing mensen niet om over te stappen naar externe kanalen voordat zij daar klaar voor zijn."
+        }
+      },
+      "in_person": {
+        "title": "5. Let in persoonlijke contacten op elkaar",
+        "body": "Uitwisselingen vinden vaak persoonlijk plaats, soms bij iemand thuis. Gebruik gezond verstand.",
+        "items": {
+          "0": "Lees het profiel en de beoordelingen van een lid vóór een eerste uitwisseling.",
+          "1": "Spreek voor de eerste uitwisseling waar mogelijk op een openbare plek af.",
+          "2": "Vertel iemand die je vertrouwt waar je naartoe gaat en wanneer je terug verwacht te zijn.",
+          "3": "Stop de uitwisseling en vertrek als iets niet klopt. Je hoeft op dat moment niemand uitleg te geven.",
+          "4": "Als iemand onveilig is, voor zichzelf of voor anderen, raadpleeg dan Vertrouwen en Veiligheid voor de meldroute. Bel in noodgevallen eerst de lokale hulpdiensten."
+        }
+      },
+      "report": {
+        "title": "6. Meld zorgen",
+        "body_before": "Als je iets ziet dat tegen deze richtlijnen ingaat of je verontrust, laat het ons dan weten. Je kunt:",
+        "items": {
+          "0": "de meldknop gebruiken bij elk profiel, elke aanbieding, elk bericht, elke post of elk evenement.",
+          "1": "het communityteam mailen via de Contactpagina.",
+          "2": "Voor zorgen over de bescherming van een kind of een kwetsbare volwassene: raadpleeg de pagina Vertrouwen en Veiligheid voor de speciale meldroute."
+        },
+        "body_after": "Meldingen worden door moderatoren beoordeeld en vertrouwelijk behandeld. Wij delen je identiteit niet met de gemelde persoon, tenzij je daar zelf om vraagt of de wet dat vereist."
+      },
+      "enforcement": {
+        "title": "7. Wat gebeurt er als richtlijnen worden overtreden",
+        "body_before": "De meeste zaken zijn kleine misverstanden die met een rustig gesprek opgelost worden. Bij duidelijker overtredingen hanteren wij evenredige stappen:",
+        "items": {
+          "0": "Een herinnering bij een eerste, klein voorval.",
+          "1": "Verwijdering van content, bijvoorbeeld een post, aanbieding of bericht.",
+          "2": "Een waarschuwing die op je account wordt vastgelegd.",
+          "3": "Tijdelijke schorsing bij herhaalde of ernstige voorvallen.",
+          "4": "Definitieve verwijdering bij intimidatie, schending van beschermingsregels, fraude, bedreigingen, haatzaaien of herhaalde schorsingen."
+        },
+        "body_serious": "Ernstige zaken, waaronder misbruik, bedreigingen, fraude of uitbuiting, kunnen worden gemeld aan de relevante politie of een bevoegde autoriteit, ongeacht de maatregel op het platform.",
+        "body_appeal": "Als je vindt dat een beslissing onjuist is, kun je bezwaar indienen via de Contactpagina. De beoordeling gebeurt door een moderator die niet betrokken was bij de oorspronkelijke beslissing."
+      },
+      "changes": {
+        "title": "Wijzigingen in deze richtlijnen",
+        "body": "Wij kunnen deze richtlijnen aanpassen naarmate de community groeit. Wezenlijke wijzigingen worden aangekondigd op het platform en vastgelegd in de juridische versiegeschiedenis."
+      }
+    }
+  },
+  "acceptable_use": {
+    "default_platform_name": "het platform",
+    "heading": "Beleid voor aanvaardbaar gebruik",
+    "page_title": "Beleid voor aanvaardbaar gebruik",
+    "subtitle": "De concrete gedragingen die op {{platformName}} niet zijn toegestaan. Dit beleid geldt naast de Servicevoorwaarden en de Communityrichtlijnen en is van toepassing op elk account.",
+    "version": "Versie 1.0 - Laatst bijgewerkt op 13-05-2026",
+    "sections": {
+      "scope": {
+        "title": "1. Toepassingsgebied",
+        "body": "Dit beleid is van toepassing op iedereen die {{platformName}} gebruikt: leden, organisaties, bezoekers, API-gebruikers en integratiepartners. Het geldt voor alle activiteit op het platform, waaronder profielen, aanbiedingen, berichten, evenementen, posts, polls, vacatures, bestanden en uitgaande communicatie verstuurd via het platform."
+      },
+      "illegal": {
+        "title": "2. Geen illegale activiteiten",
+        "body": "Je mag het platform niet gebruiken om:",
+        "items": {
+          "0": "iets uit te voeren, te plannen of te faciliteren dat illegaal is op de locatie van jezelf, de ander of de activiteit.",
+          "1": "diensten aan te bieden of te vragen waarvoor een vergunning of regulering geldt die je niet hebt, zoals medische, juridische, financiële, elektrische, gas- of kinderopvangwerkzaamheden zonder de vereiste bevoegdheid.",
+          "2": "te handelen in gereguleerde of verboden goederen, waaronder alcohol, tabak, geneesmiddelen op recept, vuurwapens, verdovende middelen of vergelijkbare beperkte artikelen.",
+          "3": "geld wit te wassen of belastingverplichtingen te ontduiken."
+        }
+      },
+      "fraud": {
+        "title": "3. Geen fraude of identiteitsmisbruik",
+        "items": {
+          "0": "Doe je niet voor als een andere persoon, organisatie of officiële instantie.",
+          "1": "Maak geen valse accounts, stromannen of dubbele accounts om beoordelingen, recensies, polls of matching te manipuleren.",
+          "2": "Vervals je identiteit, referenties, kwalificaties of verificatiestatus niet.",
+          "3": "Manipuleer geen tijdkredietsaldi via valse uitwisselingen, samenspanning of in scène gezette transacties."
+        }
+      },
+      "harm": {
+        "title": "4. Geen schade aan mensen",
+        "items": {
+          "0": "Geen intimidatie, pesten, stalken, doxxing of gecoördineerde aanvallen.",
+          "1": "Geen haatzaaiende uitlatingen, scheldwoorden of content die mensen kleineert op basis van beschermde kenmerken.",
+          "2": "Geen bedreigingen, aanzetten tot of verheerlijking van geweld.",
+          "3": "Geen content die kinderen in welke vorm dan ook seksualiseert.",
+          "4": "Geen niet-consensuele seksuele content, misbruik van intieme beelden of content die wordt gedeeld om te vernederen of af te persen.",
+          "5": "Geen verheerlijking van zelfbeschadiging of zelfdoding. Als jij of iemand die je kent in crisis is, neem dan contact op met de lokale hulpdiensten of een erkende hulplijn."
+        }
+      },
+      "content": {
+        "title": "5. Geen verboden content",
+        "items": {
+          "0": "Seksueel expliciete content, nodeloos geweld of schokkende content.",
+          "1": "Content die inbreuk maakt op auteursrechten, handelsmerken of andere intellectuele eigendom van derden.",
+          "2": "Vertrouwelijke informatie die je niet mag delen, zoals bedrijfsgeheimen of beschermde medische gegevens.",
+          "3": "Persoonsgegevens van anderen die zonder hun toestemming worden geplaatst."
+        }
+      },
+      "misuse": {
+        "title": "6. Geen spam, misbruik of oneigenlijk gebruik van het platform",
+        "items": {
+          "0": "Geen ongevraagde bulkberichten, herhaalde identieke posts of grootschalige promotie.",
+          "1": "Geen scraping, massadownloads of geautomatiseerd verzamelen van profielen, aanbiedingen of andere data, behalve via gedocumenteerde API's en binnen de geldende limieten.",
+          "2": "Geen kunstmatige opvoering van interactie, waaronder valse likes, recensies, aanbevelingen, matches, badges of leaderboard-posities.",
+          "3": "Geen verwijzings-, MLM-, piramide- of betaald-per-kliksystemen.",
+          "4": "Geen gebruik van het platform dat primair bedoeld is om verkeer naar een externe site of dienst te leiden die niets met community-uitwisseling te maken heeft."
+        }
+      },
+      "interference": {
+        "title": "7. Geen verstoring van het platform",
+        "items": {
+          "0": "Geen onderzoeken, scannen of testen op kwetsbaarheden zonder voorafgaande schriftelijke toestemming. Verantwoorde melding wordt verwelkomd via de Contactpagina.",
+          "1": "Geen malware, virussen, wormen of andere kwaadaardige code.",
+          "2": "Geen pogingen om authenticatie, gebruikslimieten, paywalls, functievergrendelingen of moderatietools te omzeilen.",
+          "3": "Geen denial-of-service-pogingen of activiteiten die de dienstverlening voor anderen wezenlijk verslechteren.",
+          "4": "Geen reverse engineering, decompilatie of het uitlezen van broncode, behoudens voor zover de AGPL-3.0-licentie dit uitdrukkelijk toestaat."
+        }
+      },
+      "account": {
+        "title": "8. Accounthygiëne",
+        "items": {
+          "0": "Deel je inloggegevens niet. Je bent verantwoordelijk voor activiteit onder je account.",
+          "1": "Meld het ons direct als je vermoedt dat je account is gecompromitteerd.",
+          "2": "Draag je account niet over en verkoop het niet aan anderen.",
+          "3": "Gebruik de hulpmiddelen van het platform om je gegevens te verwijderen of te exporteren; probeer ze niet via automatisering te onttrekken."
+        }
+      },
+      "enforcement": {
+        "title": "9. Handhaving",
+        "body": "Overtredingen kunnen leiden tot verwijdering van content, waarschuwingen, tijdelijke schorsing of permanente intrekking van toegang, in verhouding tot de ernst en het verleden. Ernstige overtredingen kunnen worden gemeld bij de bevoegde politie, de relevante toezichthouder gegevensbescherming of andere bevoegde autoriteiten, en wij kunnen daartoe wettelijk verplicht zijn.",
+        "appeal": "Je kunt bezwaar maken tegen een handhavingsbeslissing via de Contactpagina. Bezwaren worden beoordeeld door iemand die niet betrokken was bij de oorspronkelijke beslissing."
+      },
+      "reporting": {
+        "title": "10. Overtredingen melden",
+        "body": "Als je iets ziet dat in strijd is met dit beleid, gebruik dan de meldfunctie binnen het product op het betreffende profiel, de aanbieding, het bericht, de post of het evenement, of mail het team via de Contactpagina. Voor zorgen over de bescherming van een kind of kwetsbare volwassene volg je de speciale route op de pagina Vertrouwen en Veiligheid."
+      },
+      "changes": {
+        "title": "11. Wijzigingen",
+        "body": "Wij kunnen dit beleid bijwerken naarmate het platform en het wettelijk kader zich ontwikkelen. Wezenlijke wijzigingen worden aangekondigd en vastgelegd in de juridische versiegeschiedenis."
+      }
+    }
   }
 }
