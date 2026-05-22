@@ -324,7 +324,12 @@
     "load_failed": "Theip ar luchtú ball",
     "load_more_failed": "Theip ar luchtú tuilleadh ball",
     "my_profile": "Mo Phróifíl",
-    "load_more_count": "Lódáil tuilleadh ({{remaining}} fágtha)"
+    "load_more_count": "Lódáil tuilleadh ({{remaining}} fágtha)",
+    "hero_eyebrow": "Eolaire an phobail",
+    "count_label": "Baill ar taispeáint",
+    "empty_tip_profiles": "Brabhsáil próifílí iomlána",
+    "empty_tip_skills": "Cuardaigh de réir scile",
+    "empty_tip_location": "Bain triail as baill in aice láimhe"
   },
   "error_boundary": {
     "title": "Chuaigh rud éigin mícheart",
@@ -598,7 +603,8 @@
       "hours": "Hours",
       "status": "Status",
       "reason": "Reason",
-      "empty": "No transfers yet."
+      "empty": "No transfers yet.",
+      "aria": "Stair aistrithe uaireanta"
     },
     "status": {
       "pending": "Awaiting approval",
@@ -770,7 +776,8 @@
     "clear_location": "Glan suíomh",
     "select_category": "Roghnaigh catagóir",
     "verification_badges": "Suaitheantais fhírúcháin",
-    "search_skills": "Cuardaigh scileanna"
+    "search_skills": "Cuardaigh scileanna",
+    "current_language": "Teanga: {{language}}"
   },
   "skills": {
     "browse_title": "Eolaire Scileanna Pobail",
@@ -816,7 +823,10 @@
     "aria_clear_search": "Glan cuardach",
     "aria_close_members_list": "Dún liosta ball",
     "category_optional": "Catagóir (roghnach)",
-    "proficiency_level": "Leibhéal Inniúlachta"
+    "proficiency_level": "Leibhéal Inniúlachta",
+    "explainer": "Brabhsáil scileanna a roinneann baill i do phobal, aimsigh daoine atá ag tairiscint cabhrach, agus faigh amach baill ar mhaith leo foghlaim.",
+    "unable_to_load": "Ní féidir lódáil",
+    "try_again": "Bain triail eile as"
   },
   "hours_display_one": "{{count}} uair",
   "hours_display_other": "{{count}} uair",
@@ -843,7 +853,8 @@
   "radius_100": "100 km",
   "page_meta": {
     "skills_browse": {
-      "title": "Browse Skills"
+      "title": "Browse Skills",
+      "description": "Brabhsáil scileanna an phobail, aimsigh baill atá ag tairiscint cabhrach, agus faigh amach iarratais foghlama ar fud do bhainc ama."
     },
     "members": {
       "title": "Members",
@@ -1027,7 +1038,8 @@
         "merchant": "Merchant",
         "item": "Item",
         "credits": "Hours Used",
-        "discount": "Discount"
+        "discount": "Discount",
+        "aria": "Stair fuascailte dílseachta"
       },
       "empty": {
         "title": "No Redemptions Yet",
@@ -1065,7 +1077,8 @@
       "date": "Requested",
       "format": "Format",
       "size": "Size",
-      "empty": "You haven't exported your data yet."
+      "empty": "You haven't exported your data yet.",
+      "count": "{{count}} easpórtáil"
     },
     "errors": {
       "rate_limit": "You can request 5 exports per day. Please try again tomorrow.",
@@ -1221,7 +1234,9 @@
     "created_success": "Campaign created successfully.",
     "create_error": "Could not create campaign. Please try again.",
     "submit_create": "Create campaign",
-    "feature_disabled": "Local advertising is not available for your account."
+    "feature_disabled": "Local advertising is not available for your account.",
+    "date_range": "{{start}} go {{end}}",
+    "table_aria": "Feachtais fógraíochta"
   },
   "push_campaign": {
     "meta": {
@@ -1306,7 +1321,9 @@
     "created_success": "Push campaign created successfully.",
     "create_error": "Could not create push campaign. Please try again.",
     "submit_create": "Create campaign",
-    "feature_disabled": "Push campaigns are not available for your account."
+    "feature_disabled": "Push campaigns are not available for your account.",
+    "table_aria": "Feachtais brúfhógraí",
+    "radius_km": "{{radius}} km"
   },
   "push_campaign_opt_in": "Receive promoted push notifications",
   "push_campaign_opt_in_description": "Allow local businesses and organisations to send you targeted push notifications. You can opt out at any time.",
@@ -1366,8 +1383,17 @@
       "view_redemptions": "View redemptions",
       "usage_count": "Used {{count}} times",
       "saved": "Coupon saved",
-      "deleted": "Coupon deleted"
-    }
+      "deleted": "Coupon deleted",
+      "status_draft": "Dréacht",
+      "status_active": "Gníomhach",
+      "status_paused": "Ar sos",
+      "status_expired": "As feidhm",
+      "amount_cents_help": "Méid i gcent",
+      "table_aria": "Cúpóin an díoltóra"
+    },
+    "meta_description": "Brabhsáil cúpóin ghníomhacha an phobail, lascainí ceannaithe agus tairiscintí áitiúla atá ar fáil i do cheantar.",
+    "detail_meta_description": "Féach an cúpón pobail seo, cóipeáil cód na tairisceana, nó cruthaigh cód QR fuascailte in-stór.",
+    "detail_meta_description_named": "Féach {{title}}, cóipeáil cód an chúpóin {{code}}, nó cruthaigh cód QR fuascailte in-stór."
   },
   "regional_points": {
     "title": "Regional Points",
@@ -1389,7 +1415,10 @@
       "errors": {
         "invalid_recipient": "Enter a valid recipient member ID",
         "invalid_amount": "Enter a positive amount"
-      }
+      },
+      "recipient_placeholder": "m.sh. 123",
+      "amount_placeholder": "0.00",
+      "message_placeholder": "Cuir nóta leis don fhaighteoir"
     },
     "history": {
       "title": "Recent activity",
@@ -1398,12 +1427,14 @@
       "type": "Type",
       "description": "Description",
       "amount": "Amount",
-      "balance_after": "Balance"
+      "balance_after": "Balance",
+      "table_aria": "Gníomhaíocht phointí réigiúnacha"
     },
     "errors": {
       "load_failed": "Failed to load regional points",
       "transfer_failed": "Transfer failed"
-    }
+    },
+    "default_symbol": "pts"
   },
   "verein_import": {
     "title": "Import club members",
@@ -1429,7 +1460,8 @@
       "email": "Email",
       "name": "Name",
       "role": "Role",
-      "errors": "Errors"
+      "errors": "Errors",
+      "table_aria": "Réamhamharc iompórtála ball"
     },
     "result": {
       "title": "Import complete",
@@ -1444,6 +1476,13 @@
       "import_failed": "Import failed",
       "has_invalid": "Fix invalid rows before importing",
       "has_invalid_summary": "Some rows are invalid. Fix them in your CSV and re-run the preview before importing."
+    },
+    "csv_placeholder": "email,first_name,last_name,phone,role\nalice@example.org,Alice,Smith,+1 555 123 4567,member",
+    "actions": {
+      "already": "ann cheana",
+      "create": "cruthaigh",
+      "invalid": "neamhbhailí",
+      "link": "nasc"
     }
   },
   "premium": {
@@ -1502,7 +1541,8 @@
       "past_due": "Past Due",
       "grace": "Grace Period",
       "canceled": "Cancelled",
-      "incomplete": "Incomplete"
+      "incomplete": "Incomplete",
+      "unknown": "Anaithnid"
     },
     "feature": {
       "verified_badge": "Verified badge",
@@ -1552,7 +1592,24 @@
     "webhook_signing_title": "Verifying signatures",
     "webhook_signing_body": "Compute HMAC-SHA256 of the raw request body using your subscription secret. Compare with the X-Partner-Signature header in constant time.",
     "webhook_create_title": "Create a subscription",
-    "webhook_create_body": "POST /api/partner/v1/webhooks/subscriptions with event_types (array) and target_url (https only). The response includes a one-time secret — store it."
+    "webhook_create_body": "POST /api/partner/v1/webhooks/subscriptions with event_types (array) and target_url (https only). The response includes a one-time secret — store it.",
+    "meta_description": "Déan iniúchadh ar API Comhpháirtí Project NEXUS le haghaidh fíordheimhniú OAuth2, críochphointí scóipithe, hooks gréasáin sínithe agus rochtain comhtháthaithe.",
+    "auth_meta_title": "Fíordheimhniú API",
+    "endpoints_meta_title": "Críochphointí API",
+    "webhooks_meta_title": "Webhooks API",
+    "endpoints_table_aria": "Críochphointí API Comhpháirtí",
+    "endpoint_descriptions": {
+      "oauth_token": "Malartaigh dintiúir cliaint ar chomhartha iompróra (deonú client_credentials).",
+      "oauth_revoke": "Cúlghair comhartha iompróra eisithe (RFC 7009).",
+      "users_list": "Liostáil baill ghníomhacha. Cuir an scóip users.pii leis chun ríomhphost a fháil.",
+      "users_detail": "Faigh ball amháin de réir ID.",
+      "listings_list": "Liostáil liostálacha gníomhacha (seirbhísí agus iarratais).",
+      "wallet_balance": "Léigh iarmhéid creidmheasa ama ball in uaireanta.",
+      "wallet_credit": "Creidmheasaigh uaireanta ama ó aistriú bainc socraithe. Comhlacht: user_id, hours, reference, note?",
+      "aggregates_community": "Iomláin phobail bhuicéadaithe (gan PII). Úsáideach do dheaisbhoird chomhpháirtithe.",
+      "webhooks_list": "Liostáil do shíntiúis hooks gréasáin.",
+      "webhooks_create": "Liostáil le himeachtaí. Comhlacht: event_types[], target_url (https://)."
+    }
   },
   "regional_analytics": {
     "page_title": "Anailísí Réigiúnacha",
@@ -1601,7 +1658,10 @@
         "feature_3": "Ceardlanna athbhreithnithe ráithiúla",
         "feature_4": "Bainisteoir rath tiomnaithe"
       }
-    }
+    },
+    "meta_description": "Faigh amach anailíseolaíocht réigiúnach a thugann tús áite don phríobháideachas do bhardais agus do chomhpháirtithe FBM, le treochtaí pobail gan ainm agus tuairisciú comhiomlán.",
+    "partner_dashboard_title": "Anailíseolaíocht Réigiúnach",
+    "partner_dashboard_meta_description": "Deais anailíseolaíochta réigiúnach príobháideach do chomhpháirtithe údaraithe."
   },
   "provisioning": {
     "meta": {
@@ -1923,6 +1983,12 @@
       "generate_failed": "Generation failed.",
       "reminder_failed": "Could not send reminder.",
       "waive_failed": "Could not waive dues."
+    },
+    "col_email_delivery": "Seachadadh ríomhphoist",
+    "email_status": {
+      "failed": "Theip",
+      "pending": "Gan fianaise",
+      "sent": "Seolta"
     }
   },
   "collections": {
@@ -1995,7 +2061,42 @@
     "ios_add_to_home": "Add to Home Screen",
     "ios_step_2_after": ".",
     "ios_step_3": "Tap Add. NEXUS will appear on your home screen as a standalone app.",
-    "got_it": "Got it"
+    "got_it": "Got it",
+    "generic_title": "Suiteáil NEXUS",
+    "generic_intro": "Cuardaigh rogha suiteála i roghchlár do bhrabhsálaí:",
+    "generic_step_1": "Oscail roghchlár an bhrabhsálaí, deilbhín trí phointe nó trí líne de ghnáth.",
+    "generic_step_2": "Lorg Suiteáil aip, Suiteáil an suíomh seo, nó Cuir leis an scáileán baile.",
+    "generic_step_3": "Deimhnigh chun NEXUS a chur le do ghléas.",
+    "manual_note": "Mura bhfeiceann tú an rogha, b'fhéidir gur shuiteáil do bhrabhsálaí an aip cheana féin nó nach dtacaíonn do ghléas leis.",
+    "android_chrome_title": "Suiteáil ar Android",
+    "android_chrome_intro": "Cuir NEXUS le do scáileán baile ó roghchlár Chrome:",
+    "android_chrome_step_1": "Tapáil an roghchlár trí phointe i mbarr ar dheis Chrome.",
+    "android_chrome_step_2": "Tapáil Suiteáil aip nó Cuir leis an scáileán baile.",
+    "android_chrome_step_3": "Deimhnigh. Beidh NEXUS le feiceáil ar do scáileán baile mar aip neamhspleách.",
+    "samsung_title": "Suiteáil le Samsung Internet",
+    "samsung_intro": "Cuir NEXUS le do scáileán baile ó roghchlár Samsung Internet:",
+    "samsung_step_1": "Tapáil deilbhín an roghchláir ag bun Samsung Internet.",
+    "samsung_step_2": "Tapáil Cuir leathanach le, ansin Scáileán baile.",
+    "samsung_step_3": "Deimhnigh. Beidh NEXUS le feiceáil ar do scáileán baile.",
+    "firefox_android_title": "Suiteáil ar Firefox d'Android",
+    "firefox_android_intro": "Cuir NEXUS le do scáileán baile ó roghchlár Firefox:",
+    "firefox_android_step_1": "Tapáil an roghchlár trí phointe i Firefox.",
+    "firefox_android_step_2": "Tapáil Suiteáil nó Cuir leis an scáileán baile.",
+    "firefox_android_step_3": "Deimhnigh chun NEXUS a chur le do scáileán baile.",
+    "chrome_desktop_title": "Suiteáil ar do ríomhaire",
+    "chrome_desktop_intro": "B'fhéidir nár thairg Chrome an leid go fóill. Is féidir leat NEXUS a shuiteáil ó roghchlár Chrome fós:",
+    "chrome_desktop_step_1": "Cliceáil an roghchlár trí phointe i mbarr ar dheis Chrome.",
+    "chrome_desktop_step_2": "Cliceáil Teilg, sábháil agus comhroinn, ansin Suiteáil leathanach mar aip, nó lorg deilbhín suiteála sa bharra seolta.",
+    "chrome_desktop_step_3": "Cliceáil Suiteáil. Osclóidh NEXUS ina fhuinneog féin cosúil le haip dhúchasach.",
+    "edge_desktop_title": "Suiteáil ar do ríomhaire",
+    "edge_desktop_intro": "Suiteáil NEXUS mar aip deisce ó roghchlár Edge:",
+    "edge_desktop_step_1": "Cliceáil an roghchlár trí phointe i mbarr ar dheis Edge.",
+    "edge_desktop_step_2": "Cliceáil Aipeanna, ansin Suiteáil an suíomh seo mar aip.",
+    "edge_desktop_step_3": "Cliceáil Suiteáil. Osclóidh NEXUS ina fhuinneog féin.",
+    "firefox_desktop_title": "Suiteáil ar do ríomhaire",
+    "firefox_desktop_intro": "Ní thacaíonn Firefox ar an deasc le haipeanna gréasáin a shuiteáil faoi láthair. Is féidir leat NEXUS a phionnáil le haghaidh rochtana gasta fós:",
+    "firefox_desktop_step_1": "Marcáil an leathanach seo le Ctrl+D nó pionnáil an cluaisín ó roghchlár comhthéacs an chluaisín.",
+    "firefox_desktop_step_2": "Le haghaidh fíor-aip in-suiteáilte, bain triail as Chrome, Edge nó ár n-aip soghluaiste."
   },
   "release_status": {
     "summary": "Project NEXUS is actively evolving, with feature maturity shown transparently across the platform.",
@@ -2032,5 +2133,54 @@
   "level_plain": "Level {{level}}",
   "level_named": "Level {{level}} - {{name}}",
   "xp_progress": "{{current}} / {{required}} XP",
-  "level_progress_aria": "Level {{level}} progress: {{percentage}}%"
+  "level_progress_aria": "Level {{level}} progress: {{percentage}}%",
+  "empty_dash": "-",
+  "refresh": "Athnuaigh",
+  "not_available": "Níl ar fáil",
+  "keyboard": {
+    "command_symbol": "⌘",
+    "k_key": "K"
+  },
+  "partner_analytics": {
+    "no_token_title": "Comhartha síntiúis ag teastáil",
+    "no_token_body": "Bain úsáid as an nasc slán a sholáthair do bhainisteoir cuntais. Áirítear leis an nasc comhartha síntiúis uathúil.",
+    "error_title": "Ní féidir anailíseolaíocht a lódáil",
+    "error_unauthorized": "Tá do chomhartha síntiúis neamhbhailí nó imithe in éag.",
+    "error_generic": "Chuaigh rud éigin mícheart agus do anailíseolaíocht á fáil. Bain triail eile as.",
+    "retry": "Bain triail eile as",
+    "title": "Anailíseolaíocht réigiúnach",
+    "subtitle": "Léargais phríobháideachta-bhuicéadaithe do do réigiún. Athnuaite go laethúil.",
+    "period_label": "Tréimhse",
+    "period_30d": "30 lá deireanacha",
+    "period_90d": "90 lá deireanacha",
+    "period_year": "Bliain seo caite",
+    "tabs_aria": "Cluaisíní anailíseolaíochta",
+    "tab_trends": "Treochtaí",
+    "tab_demand_supply": "Éileamh agus soláthar",
+    "tab_demographics": "Déimeagrafaic",
+    "tab_footfall": "Líon cuairteoirí",
+    "reports_title": "Tuarascálacha míosúla",
+    "no_reports": "Níor gineadh tuarascálacha go fóill.",
+    "download_pdf": "Íoslódáil PDF",
+    "privacy_footer": "Tá gach méadracht buicéadaithe agus gan ainm. Cuirtear deighleoga le N<10 faoi chois.",
+    "metric_active_members": "Baill ghníomhacha",
+    "metric_categories": "Catagóirí",
+    "metric_partner_orgs": "Eagraíochtaí comhpháirtithe",
+    "metric_event_participation": "Rannpháirtíocht in imeachtaí",
+    "metric_volunteer_hours": "Uaireanta deonacha",
+    "engagement_overview": "Forbhreathnú ar rannpháirtíocht (meánphointí buicéad)",
+    "ds_by_postcode": "Tairiscintí vs iarratais de réir cóid phoist (3 dhigit)",
+    "no_data": "Níl aon sonraí ar fáil.",
+    "offers": "Tairiscintí",
+    "requests": "Iarratais",
+    "match_heatmap": "Cealla ráta meaitseála",
+    "category_short": "cat",
+    "age_distribution": "Dáileadh aoise",
+    "gender_distribution": "Dáileadh inscne",
+    "footfall_by_area": "Amhairc leathanaigh de réir limistéir",
+    "page_views": "Amhairc leathanaigh",
+    "distinct_visitors": "Cuairteoirí ar leith",
+    "suppressed_value": "Faoi chois",
+    "suppressed_short": "--"
+  }
 }
