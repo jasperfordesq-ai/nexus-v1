@@ -1,33 +1,33 @@
 {
-  "title": "Polls",
+  "title": "Ankiety",
   "subtitle": "Głosuj i zobacz, co myśli społeczność",
-  "page_title": "Polls",
+  "page_title": "Ankiety",
   "create_poll": "Utwórz ankietę",
-  "question": "Question",
+  "question": "Pytanie",
   "question_placeholder": "Co chciałbyś zapytać?",
   "description": "Opis (opcjonalnie)",
   "description_placeholder": "Dodaj kontekst do swojej ankiety...",
-  "options": "Options",
+  "options": "Opcje",
   "option_placeholder": "Opcja {{number}}",
   "add_option": "Dodaj opcję",
   "remove_option": "Usuń opcję",
   "expires_at": "Data zakończenia (opcjonalnie)",
   "no_deadline": "Pozostaw puste, aby nie ustalać terminu",
   "submit": "Utwórz ankietę",
-  "vote": "Vote",
-  "votes": "votes",
-  "votes_one": "vote",
+  "vote": "Głosuj",
+  "votes": "głosy",
+  "votes_one": "głos",
   "voted": "Oddałeś głos",
-  "results": "Results",
+  "results": "Wyniki",
   "total_votes": "{{count}} głosów",
   "total_votes_one": "{{count}} głos",
   "status": {
-    "open": "Open",
-    "closed": "Closed"
+    "open": "Otwarte",
+    "closed": "Zamknięte"
   },
   "tabs": {
-    "open": "Open",
-    "closed": "Closed",
+    "open": "Otwarte",
+    "closed": "Zamknięte",
     "mine": "Moje ankiety",
     "aria_label": "Karty filtrów ankiet"
   },
@@ -38,14 +38,14 @@
     "description_mine": "Nie stworzyłeś jeszcze żadnych ankiet."
   },
   "time_remaining": "{{time}} pozostało",
-  "expired": "Expired",
+  "expired": "Wygasłe",
   "created_by": "by",
   "delete_poll": "Usuń ankietę",
   "confirm_delete": {
     "title": "Usuń ankietę",
     "message": "Czy na pewno chcesz usunąć tę ankietę? Ta akcja nie może być cofnięta.",
-    "confirm": "Delete",
-    "cancel": "Cancel"
+    "confirm": "Usuń",
+    "cancel": "Anuluj"
   },
   "toast": {
     "created": "Ankieta została pomyślnie utworzona!",
@@ -65,7 +65,7 @@
   },
   "load_more": "Załaduj więcej",
   "try_again": "Spróbuj ponownie",
-  "collapse": "Collapse",
+  "collapse": "Zwiń",
   "expand": "Utwórz ankietę",
   "poll_type": "Typ ankiety",
   "poll_type_standard": "Standardowy (wybierz jeden)",
@@ -80,12 +80,12 @@
     "move_rank_up": "Przenieś {{option}} w górę"
   },
   "page_meta": {
-    "title": "Polls"
+    "title": "Ankiety"
   },
-  "ranked_results_title": "Round-by-Round Results",
-  "round_number": "Round {{number}}",
-  "eliminated_candidate": "Eliminated: {{name}}",
-  "total_ballots": "Total ballots: {{count}}",
+  "ranked_results_title": "Wyniki runda po rundzie",
+  "round_number": "Runda {{number}}",
+  "eliminated_candidate": "Wyeliminowany: {{name}}",
+  "total_ballots": "Łączna liczba głosów: {{count}}",
   "rank_preferences": "Ułóż swoje preferencje",
   "all_categories": "Wszystkie kategorie",
   "ranked_instructions": "Przeciągnij opcje lub użyj strzałek, aby ułożyć je od najbardziej preferowanej (u góry) do najmniej preferowanej (na dole).",
@@ -93,7 +93,7 @@
   "winner_label": "Zwycięzca: {{name}}",
   "submit_rankings": "Prześlij ranking",
   "badges": {
-    "ranked": "Ranked",
-    "anonymous": "Anonymous"
+    "ranked": "Z rankingiem",
+    "anonymous": "Anonimowy"
   }
 }

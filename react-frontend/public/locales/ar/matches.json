@@ -1,19 +1,19 @@
 {
-  "page_title": "Matches",
-  "breadcrumb_dashboard": "Dashboard",
-  "breadcrumb_matches": "Matches",
+  "page_title": "المطابقات",
+  "breadcrumb_dashboard": "لوحة التحكم",
+  "breadcrumb_matches": "المطابقات",
   "heading": "مطابقاتك",
   "subtitle": "اكتشف الروابط عبر القوائم، الوظائف، التطوع، والمجموعات",
-  "refresh": "Refresh",
+  "refresh": "تحديث",
   "stats_total_matches": "إجمالي المطابقات",
   "stats_avg_score": "متوسط الدرجة",
   "stats_hot_matches": "مطابقات ساخنة",
   "stats_source_types": "أنواع المصادر",
-  "filter_all": "All",
-  "source_listing": "Listing",
-  "source_job": "Job",
-  "source_volunteering": "Volunteering",
-  "source_group": "Group",
+  "filter_all": "الكل",
+  "source_listing": "إعلان",
+  "source_job": "وظيفة",
+  "source_volunteering": "تطوع",
+  "source_group": "مجموعة",
   "empty_title_all": "لا توجد مطابقة حتى الآن",
   "empty_title_filtered": "لا توجد مطابقة {{source}}",
   "empty_description": "ستظهر المطابقات هنا عندما يجد النظام روابط لك عبر المنصة.",
@@ -26,6 +26,6 @@
   "load_failed": "فشل في تحميل المطابقات",
   "match_hidden": "المطابقة مخفية — سنعرض لك عددًا أقل مثل هذه",
   "page_meta": {
-    "title": "Matches"
+    "title": "المطابقات"
   }
 }

@@ -1,14 +1,14 @@
 {
   "page_title": "AI Assistent",
-  "aria_chat": "AI Chat",
+  "aria_chat": "AI Gesprek",
   "header_title": "AI Assistent",
   "header_subtitle": "Aangedreven door AI",
   "limits_left_today": "{{count}} is vandaag vertrokken",
   "new_conversation_aria": "Start een nieuw gesprek",
   "typing_aria": "AI is aan het typen",
   "sources_label": "Bronnen",
-  "error_label": "Error",
-  "input_aria": "Message",
+  "error_label": "Fout",
+  "input_aria": "Bericht",
   "input_placeholder": "Vraag me alles... (Druk op Enter om te verzenden, Shift+Enter voor een nieuwe regel)",
   "send_aria": "Stuur bericht",
   "disclaimer": "AI-antwoorden zijn mogelijk niet altijd nauwkeurig. Verifieer belangrijke informatie.",
@@ -28,14 +28,14 @@
   "starter_q4": "Welke aankomende evenementen zijn er?",
   "starter_q5": "Hoe maak ik een aanbieding om mijn vaardigheden aan te bieden?",
   "page_meta": {
-    "title": "AI Chat"
+    "title": "AI Gesprek"
   },
-  "thumbs_up_aria": "Helpful answer",
-  "thumbs_down_aria": "Unhelpful answer",
+  "thumbs_up_aria": "Nuttig antwoord",
+  "thumbs_down_aria": "Niet nuttig antwoord",
   "card_online": "Online",
-  "card_remote": "Remote",
-  "card_wallet_title": "Your wallet",
-  "card_wallet_transactions": "{{count}} transactions in last 30 days",
+  "card_remote": "Op afstand",
+  "card_wallet_title": "Uw portemonnee",
+  "card_wallet_transactions": "{{count}} transacties in de afgelopen 30 dagen",
   "tool_results": {
     "view": "Bekijken"
   }

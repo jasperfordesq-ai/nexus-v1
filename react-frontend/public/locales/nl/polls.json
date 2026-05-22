@@ -1,33 +1,33 @@
 {
-  "title": "Polls",
+  "title": "Peilingen",
   "subtitle": "Stem en zie wat de gemeenschap denkt",
-  "page_title": "Polls",
+  "page_title": "Peilingen",
   "create_poll": "Maak Peiling",
-  "question": "Question",
+  "question": "Vraag",
   "question_placeholder": "Wat zou je willen vragen?",
   "description": "Beschrijving (optioneel)",
   "description_placeholder": "Voeg wat context toe aan je peiling...",
-  "options": "Options",
+  "options": "Opties",
   "option_placeholder": "Optie {{number}}",
   "add_option": "Voeg Optie toe",
   "remove_option": "Verwijder optie",
   "expires_at": "Einddatum (optioneel)",
   "no_deadline": "Laat leeg voor geen deadline",
   "submit": "Maak Peiling",
-  "vote": "Vote",
-  "votes": "votes",
-  "votes_one": "vote",
+  "vote": "Stemmen",
+  "votes": "stemmen",
+  "votes_one": "stem",
   "voted": "Je hebt gestemd",
-  "results": "Results",
+  "results": "Resultaten",
   "total_votes": "{{count}} stemmen",
   "total_votes_one": "{{count}} stem",
   "status": {
     "open": "Open",
-    "closed": "Closed"
+    "closed": "Gesloten"
   },
   "tabs": {
     "open": "Open",
-    "closed": "Closed",
+    "closed": "Gesloten",
     "mine": "Mijn Peilingen",
     "aria_label": "Peiling filtertabs"
   },
@@ -38,14 +38,14 @@
     "description_mine": "Je hebt nog geen peilingen gemaakt."
   },
   "time_remaining": "{{time}} over",
-  "expired": "Expired",
+  "expired": "Verlopen",
   "created_by": "by",
   "delete_poll": "Verwijder Peiling",
   "confirm_delete": {
     "title": "Verwijder Peiling",
     "message": "Weet je zeker dat je deze peiling wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.",
-    "confirm": "Delete",
-    "cancel": "Cancel"
+    "confirm": "Verwijderen",
+    "cancel": "Annuleren"
   },
   "toast": {
     "created": "Peiling succesvol aangemaakt!",
@@ -65,7 +65,7 @@
   },
   "load_more": "Meer laden",
   "try_again": "Probeer het opnieuw",
-  "collapse": "Collapse",
+  "collapse": "Inklappen",
   "expand": "Maak een peiling aan",
   "poll_type": "Peilingstype",
   "poll_type_standard": "Standaard (kies er één)",
@@ -80,12 +80,12 @@
     "move_rank_up": "{{option}} omhoog verplaatsen"
   },
   "page_meta": {
-    "title": "Polls"
+    "title": "Peilingen"
   },
-  "ranked_results_title": "Round-by-Round Results",
-  "round_number": "Round {{number}}",
-  "eliminated_candidate": "Eliminated: {{name}}",
-  "total_ballots": "Total ballots: {{count}}",
+  "ranked_results_title": "Ronde-voor-ronde resultaten",
+  "round_number": "Ronde {{number}}",
+  "eliminated_candidate": "Geëlimineerd: {{name}}",
+  "total_ballots": "Totaal stembiljetten: {{count}}",
   "rank_preferences": "Rangschik je voorkeuren",
   "all_categories": "Alle categorieën",
   "ranked_instructions": "Sleep opties of gebruik de pijlen om ze te rangschikken van hoogste voorkeur (bovenaan) naar laagste voorkeur (onderaan).",
@@ -93,7 +93,7 @@
   "winner_label": "Winnaar: {{name}}",
   "submit_rankings": "Rangschikking indienen",
   "badges": {
-    "ranked": "Ranked",
-    "anonymous": "Anonymous"
+    "ranked": "Gerangschikt",
+    "anonymous": "Anoniem"
   }
 }

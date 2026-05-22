@@ -80,12 +80,12 @@
     "move_rank_up": "Bog {{option}} suas"
   },
   "page_meta": {
-    "title": "Polls"
+    "title": "Pobalbhreith"
   },
-  "ranked_results_title": "Round-by-Round Results",
-  "round_number": "Round {{number}}",
-  "eliminated_candidate": "Eliminated: {{name}}",
-  "total_ballots": "Total ballots: {{count}}",
+  "ranked_results_title": "Torthaí Babhta ar Bhabhta",
+  "round_number": "Babhta {{number}}",
+  "eliminated_candidate": "Díbeartha: {{name}}",
+  "total_ballots": "Iomlán ballot: {{count}}",
   "rank_preferences": "Cuir do roghanna in ord",
   "all_categories": "Gach catagóir",
   "ranked_instructions": "Tarraing na roghanna nó úsáid na saigheada chun iad a chur ón rogha is fearr (barr) go dtí an rogha is ísle (bun).",
@@ -93,7 +93,7 @@
   "winner_label": "Buaiteoir: {{name}}",
   "submit_rankings": "Cuir an rangú isteach",
   "badges": {
-    "ranked": "Ranked",
-    "anonymous": "Anonymous"
+    "ranked": "Rangaithe",
+    "anonymous": "Anaithnid"
   }
 }

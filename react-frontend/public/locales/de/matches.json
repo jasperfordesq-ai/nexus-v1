@@ -2,7 +2,7 @@
   "load_failed": "Matches konnten nicht geladen werden",
   "match_hidden": "Match ausgeblendet — wir zeigen dir weniger davon",
   "page_title": "Treffer",
-  "breadcrumb_dashboard": "Dashboard",
+  "breadcrumb_dashboard": "Übersicht",
   "breadcrumb_matches": "Treffer",
   "heading": "Ihre Treffer",
   "subtitle": "Entdecken Sie Verbindungen über Anzeigen, Stellen, Freiwilligenarbeit und Gruppen",
@@ -26,6 +26,6 @@
   "view_details": "Treffer-Details ansehen",
   "not_interested": "Kein Interesse",
   "page_meta": {
-    "title": "Matches"
+    "title": "Treffer"
   }
 }

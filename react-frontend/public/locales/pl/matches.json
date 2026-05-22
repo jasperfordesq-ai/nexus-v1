@@ -1,19 +1,19 @@
 {
-  "page_title": "Matches",
-  "breadcrumb_dashboard": "Dashboard",
-  "breadcrumb_matches": "Matches",
+  "page_title": "Dopasowania",
+  "breadcrumb_dashboard": "Panel główny",
+  "breadcrumb_matches": "Dopasowania",
   "heading": "Twoje dopasowania",
   "subtitle": "Odkryj połączenia w ogłoszeniach, ofertach pracy, wolontariacie i grupach",
-  "refresh": "Refresh",
+  "refresh": "Odśwież",
   "stats_total_matches": "Łączna liczba dopasowań",
   "stats_avg_score": "Średni wynik",
   "stats_hot_matches": "Gorące dopasowania",
   "stats_source_types": "Typy źródeł",
-  "filter_all": "All",
-  "source_listing": "Listing",
-  "source_job": "Job",
-  "source_volunteering": "Volunteering",
-  "source_group": "Group",
+  "filter_all": "Wszystkie",
+  "source_listing": "Ogłoszenie",
+  "source_job": "Praca",
+  "source_volunteering": "Wolontariat",
+  "source_group": "Grupa",
   "empty_title_all": "Brak dopasowań",
   "empty_title_filtered": "Brak {{source}} dopasowań",
   "empty_description": "Dopasowania pojawią się tutaj, gdy system znajdzie połączenia dla Ciebie w całej platformie.",
@@ -26,6 +26,6 @@
   "load_failed": "Nie udało się załadować dopasowań",
   "match_hidden": "Dopasowanie ukryte — pokażemy Ci mniej takich",
   "page_meta": {
-    "title": "Matches"
+    "title": "Dopasowania"
   }
 }

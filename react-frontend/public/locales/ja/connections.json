@@ -1,17 +1,17 @@
 {
-  "title": "Connections",
+  "title": "つながり",
   "subtitle": "コミュニティのつながりを管理する",
   "pending_count": "{{count}} 保留中",
   "search_placeholder": "名前または場所で検索...",
   "tab_my_connections": "私のつながり",
-  "tab_pending": "Pending",
-  "tab_sent": "Sent",
+  "tab_pending": "保留中",
+  "tab_sent": "送信済み",
   "connected_since": "{{date}} から接続されています",
-  "message": "Message",
-  "disconnect": "Disconnect",
+  "message": "メッセージ",
+  "disconnect": "切断",
   "wants_to_connect": "あなたとつながりたい",
-  "accept": "Accept",
-  "decline": "Decline",
+  "accept": "承認",
+  "decline": "拒否",
   "request_pending": "リクエスト保留中",
   "cancel_request": "リクエストをキャンセル",
   "load_more": "もっと読み込む",
@@ -30,11 +30,11 @@
   "toast_accept_failed": "接続を承認できませんでした",
   "toast_declined": "リクエストが拒否されました",
   "toast_decline_failed": "リクエストを拒否できませんでした",
-  "toast_disconnected": "Disconnected",
+  "toast_disconnected": "切断されました",
   "toast_disconnect_failed": "切断に失敗しました",
   "toast_cancelled": "リクエストがキャンセルされました",
   "toast_cancel_failed": "リクエストをキャンセルできませんでした",
   "page_meta": {
-    "title": "Connections"
+    "title": "つながり"
   }
 }

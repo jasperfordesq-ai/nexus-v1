@@ -1,19 +1,19 @@
 {
-  "page_title": "Matches",
-  "breadcrumb_dashboard": "Dashboard",
-  "breadcrumb_matches": "Matches",
+  "page_title": "マッチ",
+  "breadcrumb_dashboard": "ダッシュボード",
+  "breadcrumb_matches": "マッチ",
   "heading": "あなたのマッチ",
   "subtitle": "リスティング、仕事、ボランティア、グループを通じてつながりを発見しましょう",
-  "refresh": "Refresh",
+  "refresh": "更新",
   "stats_total_matches": "合計マッチ",
   "stats_avg_score": "平均スコア",
   "stats_hot_matches": "ホットマッチ",
   "stats_source_types": "ソースタイプ",
-  "filter_all": "All",
-  "source_listing": "Listing",
-  "source_job": "Job",
-  "source_volunteering": "Volunteering",
-  "source_group": "Group",
+  "filter_all": "すべて",
+  "source_listing": "リスト",
+  "source_job": "求人",
+  "source_volunteering": "ボランティア",
+  "source_group": "グループ",
   "empty_title_all": "まだマッチはありません",
   "empty_title_filtered": "マッチは{{source}}ありません",
   "empty_description": "システムがプラットフォーム全体であなたのために接続を見つけると、マッチがここに表示されます。",
@@ -26,6 +26,6 @@
   "load_failed": "マッチの読み込みに失敗しました",
   "match_hidden": "マッチが非表示 — このようなものは少なく表示します",
   "page_meta": {
-    "title": "Matches"
+    "title": "マッチ"
   }
 }

@@ -1,17 +1,17 @@
 {
-  "title": "Connections",
+  "title": "الاتصالات",
   "subtitle": "إدارة اتصالات مجتمعك",
   "pending_count": "{{count}} قيد الانتظار",
   "search_placeholder": "ابحث بالاسم أو الموقع...",
   "tab_my_connections": "اتصالاتي",
-  "tab_pending": "Pending",
-  "tab_sent": "Sent",
+  "tab_pending": "معلّق",
+  "tab_sent": "مُرسَل",
   "connected_since": "متصل منذ {{date}}",
-  "message": "Message",
-  "disconnect": "Disconnect",
+  "message": "رسالة",
+  "disconnect": "قطع الاتصال",
   "wants_to_connect": "يريد الاتصال بك",
-  "accept": "Accept",
-  "decline": "Decline",
+  "accept": "قبول",
+  "decline": "رفض",
   "request_pending": "طلب قيد الانتظار",
   "cancel_request": "إلغاء الطلب",
   "load_more": "تحميل المزيد",
@@ -30,11 +30,11 @@
   "toast_accept_failed": "فشل في قبول الاتصال",
   "toast_declined": "تم رفض الطلب",
   "toast_decline_failed": "فشل في رفض الطلب",
-  "toast_disconnected": "Disconnected",
+  "toast_disconnected": "تم قطع الاتصال",
   "toast_disconnect_failed": "فشل في قطع الاتصال",
   "toast_cancelled": "تم إلغاء الطلب",
   "toast_cancel_failed": "فشل في إلغاء الطلب",
   "page_meta": {
-    "title": "Connections"
+    "title": "الاتصالات"
   }
 }

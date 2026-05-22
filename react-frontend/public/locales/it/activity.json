@@ -47,7 +47,7 @@
     "event": "Evento",
     "message": "Messaggio",
     "review": "Recensione",
-    "post": "Post",
+    "post": "Pubblicazione",
     "default": "Attività"
   },
   "endorsements_count_one": "{{count}} referenza",

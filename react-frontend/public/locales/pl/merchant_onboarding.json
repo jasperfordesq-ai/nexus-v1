@@ -51,6 +51,6 @@
     "save_failed": "Zapisanie nie powiodło się. Spróbuj ponownie.",
     "complete_failed": "Nie udało się zakończyć konfiguracji."
   },
-  "open_time": "Opening time",
-  "close_time": "Closing time"
+  "open_time": "Godzina otwarcia",
+  "close_time": "Godzina zamknięcia"
 }

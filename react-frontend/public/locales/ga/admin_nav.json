@@ -1,5 +1,4 @@
 {
-  "community_fund": "Community Fund",
   "dashboard": "Deais",
   "users": "Úsáideoirí",
   "crm": "CRM",
@@ -255,5 +254,6 @@
   "zone_people": "Daoine",
   "zone_communications": "Cumars?id",
   "zone_commerce": "Tr?cht?il",
-  "zone_diagnostics": "Diagn?isic"
+  "zone_diagnostics": "Diagn?isic",
+  "community_fund": "Community Fund"
 }

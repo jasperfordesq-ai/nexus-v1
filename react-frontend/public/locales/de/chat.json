@@ -30,12 +30,12 @@
   "page_meta": {
     "title": "KI-Chat"
   },
-  "thumbs_up_aria": "Helpful answer",
-  "thumbs_down_aria": "Unhelpful answer",
+  "thumbs_up_aria": "Hilfreiche Antwort",
+  "thumbs_down_aria": "Nicht hilfreiche Antwort",
   "card_online": "Online",
-  "card_remote": "Remote",
-  "card_wallet_title": "Your wallet",
-  "card_wallet_transactions": "{{count}} transactions in last 30 days",
+  "card_remote": "Fernarbeit",
+  "card_wallet_title": "Deine Geldbörse",
+  "card_wallet_transactions": "{{count}} Transaktionen in den letzten 30 Tagen",
   "tool_results": {
     "view": "Ansehen"
   }

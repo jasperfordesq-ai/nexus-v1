@@ -30,12 +30,12 @@
   "page_meta": {
     "title": "Chat AI"
   },
-  "thumbs_up_aria": "Helpful answer",
-  "thumbs_down_aria": "Unhelpful answer",
+  "thumbs_up_aria": "Risposta utile",
+  "thumbs_down_aria": "Risposta non utile",
   "card_online": "Online",
-  "card_remote": "Remote",
-  "card_wallet_title": "Your wallet",
-  "card_wallet_transactions": "{{count}} transactions in last 30 days",
+  "card_remote": "Da remoto",
+  "card_wallet_title": "Il tuo portafoglio",
+  "card_wallet_transactions": "{{count}} transazioni negli ultimi 30 giorni",
   "tool_results": {
     "view": "Visualizza"
   }

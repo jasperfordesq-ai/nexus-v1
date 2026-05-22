@@ -7,8 +7,8 @@
   "new_conversation_aria": "Rozpocznij nową rozmowę",
   "typing_aria": "AI pisze",
   "sources_label": "Źródła",
-  "error_label": "Error",
-  "input_aria": "Message",
+  "error_label": "Błąd",
+  "input_aria": "Wiadomość",
   "input_placeholder": "Zapytaj mnie o cokolwiek... (Naciśnij Enter, aby wysłać, Shift+Enter, aby dodać nową linię)",
   "send_aria": "Wyślij wiadomość",
   "disclaimer": "Odpowiedzi AI mogą nie zawsze być dokładne. Zweryfikuj ważne informacje.",
@@ -30,12 +30,12 @@
   "page_meta": {
     "title": "Czat AI"
   },
-  "thumbs_up_aria": "Helpful answer",
-  "thumbs_down_aria": "Unhelpful answer",
+  "thumbs_up_aria": "Użyteczna odpowiedź",
+  "thumbs_down_aria": "Nieużyteczna odpowiedź",
   "card_online": "Online",
-  "card_remote": "Remote",
-  "card_wallet_title": "Your wallet",
-  "card_wallet_transactions": "{{count}} transactions in last 30 days",
+  "card_remote": "Zdalny",
+  "card_wallet_title": "Twój portfel",
+  "card_wallet_transactions": "{{count}} transakcji w ciągu ostatnich 30 dni",
   "tool_results": {
     "view": "Zobacz"
   }

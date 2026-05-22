@@ -1,33 +1,33 @@
 {
-  "title": "Polls",
+  "title": "استطلاعات",
   "subtitle": "صوّت وانظر ماذا تفكر المجتمع",
-  "page_title": "Polls",
+  "page_title": "استطلاعات",
   "create_poll": "إنشاء استطلاع",
-  "question": "Question",
+  "question": "السؤال",
   "question_placeholder": "ماذا تود أن تسأل؟",
   "description": "الوصف (اختياري)",
   "description_placeholder": "أضف بعض السياق لاستطلاعك...",
-  "options": "Options",
+  "options": "الخيارات",
   "option_placeholder": "الخيار {{number}}",
   "add_option": "إضافة خيار",
   "remove_option": "إزالة الخيار",
   "expires_at": "تاريخ الانتهاء (اختياري)",
   "no_deadline": "اتركه فارغًا لعدم وجود موعد نهائي",
   "submit": "إنشاء استطلاع",
-  "vote": "Vote",
-  "votes": "votes",
-  "votes_one": "vote",
+  "vote": "تصويت",
+  "votes": "أصوات",
+  "votes_one": "صوت",
   "voted": "لقد صوتت",
-  "results": "Results",
+  "results": "النتائج",
   "total_votes": "{{count}} أصوات",
   "total_votes_one": "{{count}} صوت",
   "status": {
-    "open": "Open",
-    "closed": "Closed"
+    "open": "مفتوح",
+    "closed": "مغلق"
   },
   "tabs": {
-    "open": "Open",
-    "closed": "Closed",
+    "open": "المفتوحة",
+    "closed": "المغلقة",
     "mine": "استطلاعاتي",
     "aria_label": "علامات تصفية الاستطلاع"
   },
@@ -38,14 +38,14 @@
     "description_mine": "لم تقم بإنشاء أي استطلاعات حتى الآن."
   },
   "time_remaining": "{{time}} متبقية",
-  "expired": "Expired",
+  "expired": "منتهي",
   "created_by": "by",
   "delete_poll": "حذف الاستطلاع",
   "confirm_delete": {
     "title": "حذف الاستطلاع",
     "message": "هل أنت متأكد أنك تريد حذف هذا الاستطلاع؟ لا يمكن التراجع عن هذا الإجراء.",
-    "confirm": "Delete",
-    "cancel": "Cancel"
+    "confirm": "حذف",
+    "cancel": "إلغاء"
   },
   "toast": {
     "created": "تم إنشاء الاستطلاع بنجاح!",
@@ -65,7 +65,7 @@
   },
   "load_more": "تحميل المزيد",
   "try_again": "حاول مرة أخرى",
-  "collapse": "Collapse",
+  "collapse": "طيّ",
   "expand": "إنشاء استطلاع",
   "poll_type": "نوع الاستطلاع",
   "poll_type_standard": "قياسي (اختر واحدًا)",
@@ -80,12 +80,12 @@
     "move_rank_up": "نقل {{option}} إلى الأعلى"
   },
   "page_meta": {
-    "title": "Polls"
+    "title": "استطلاعات"
   },
-  "ranked_results_title": "Round-by-Round Results",
-  "round_number": "Round {{number}}",
-  "eliminated_candidate": "Eliminated: {{name}}",
-  "total_ballots": "Total ballots: {{count}}",
+  "ranked_results_title": "نتائج الجولة بالجولة",
+  "round_number": "الجولة {{number}}",
+  "eliminated_candidate": "مُقصى: {{name}}",
+  "total_ballots": "إجمالي الأصوات: {{count}}",
   "rank_preferences": "رتّب تفضيلاتك",
   "all_categories": "كل الفئات",
   "ranked_instructions": "اسحب الخيارات أو استخدم الأسهم لترتيبها من الأكثر تفضيلاً (في الأعلى) إلى الأقل تفضيلاً (في الأسفل).",
@@ -93,7 +93,7 @@
   "winner_label": "الفائز: {{name}}",
   "submit_rankings": "إرسال الترتيب",
   "badges": {
-    "ranked": "Ranked",
-    "anonymous": "Anonymous"
+    "ranked": "مرتّب",
+    "anonymous": "مجهول"
   }
 }

@@ -1,17 +1,17 @@
 {
-  "title": "Connections",
+  "title": "Verbindingen",
   "subtitle": "Beheer je gemeenschapsverbindingen",
   "pending_count": "{{count}} in behandeling",
   "search_placeholder": "Zoek op naam of locatie...",
   "tab_my_connections": "Mijn Verbindingen",
-  "tab_pending": "Pending",
-  "tab_sent": "Sent",
+  "tab_pending": "In behandeling",
+  "tab_sent": "Verzonden",
   "connected_since": "Verbonden sinds {{date}}",
-  "message": "Message",
-  "disconnect": "Disconnect",
+  "message": "Bericht",
+  "disconnect": "Verbinding verbreken",
   "wants_to_connect": "Wil verbinding maken met jou",
-  "accept": "Accept",
-  "decline": "Decline",
+  "accept": "Accepteren",
+  "decline": "Weigeren",
   "request_pending": "Verzoek in behandeling",
   "cancel_request": "Verzoek annuleren",
   "load_more": "Laad meer",
@@ -30,11 +30,11 @@
   "toast_accept_failed": "Kon verbinding niet accepteren",
   "toast_declined": "Verzoek afgewezen",
   "toast_decline_failed": "Kon verzoek niet afwijzen",
-  "toast_disconnected": "Disconnected",
+  "toast_disconnected": "Verbinding verbroken",
   "toast_disconnect_failed": "Kon niet ontkoppelen",
   "toast_cancelled": "Verzoek geannuleerd",
   "toast_cancel_failed": "Kon verzoek niet annuleren",
   "page_meta": {
-    "title": "Connections"
+    "title": "Verbindingen"
   }
 }

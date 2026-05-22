@@ -1,12 +1,12 @@
 {
-  "page_title": "Success Stories",
-  "intro": "Proof cards tied to live metrics from our pilot. Each story shows a before-and-after change, the affected audience, the method behind the figure, and where the evidence comes from.",
-  "empty_state": "No success stories have been published yet. Check back soon — community coordinators are putting cards together.",
-  "demo_label": "Demo / illustrative",
-  "audience_label": "Audience",
-  "before_label": "Before",
-  "after_label": "After",
-  "caveat_label": "Method",
-  "evidence_label": "Evidence",
-  "error_loading": "We couldn't load the success stories right now. Please try again in a moment."
+  "page_title": "قصص النجاح",
+  "intro": "بطاقات إثبات مرتبطة بمقاييس مباشرة من تجربتنا التجريبية. تُظهر كل قصة تغيراً قبل وبعد، والجمهور المتأثر، والمنهجية وراء الأرقام، ومصدر الأدلة.",
+  "empty_state": "لم يتم نشر أي قصص نجاح بعد. تحقق قريباً — يقوم منسقو المجتمع بإعداد البطاقات.",
+  "demo_label": "عرض توضيحي / توضيحي",
+  "audience_label": "الجمهور",
+  "before_label": "قبل",
+  "after_label": "بعد",
+  "caveat_label": "الطريقة",
+  "evidence_label": "الدليل",
+  "error_loading": "لم نتمكن من تحميل قصص النجاح الآن. الرجاء المحاولة مرة أخرى بعد قليل."
 }

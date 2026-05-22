@@ -1,19 +1,19 @@
 {
-  "page_title": "Matches",
+  "page_title": "Overeenkomsten",
   "breadcrumb_dashboard": "Dashboard",
-  "breadcrumb_matches": "Matches",
+  "breadcrumb_matches": "Overeenkomsten",
   "heading": "Jouw Matches",
   "subtitle": "Ontdek verbindingen tussen aanbiedingen, banen, vrijwilligerswerk en groepen",
-  "refresh": "Refresh",
+  "refresh": "Vernieuwen",
   "stats_total_matches": "Totaal aantal Matches",
   "stats_avg_score": "Gemiddelde Score",
   "stats_hot_matches": "Populaire Matches",
   "stats_source_types": "Bron Types",
-  "filter_all": "All",
-  "source_listing": "Listing",
-  "source_job": "Job",
-  "source_volunteering": "Volunteering",
-  "source_group": "Group",
+  "filter_all": "Alles",
+  "source_listing": "Aanbieding",
+  "source_job": "Vacature",
+  "source_volunteering": "Vrijwilligerswerk",
+  "source_group": "Groep",
   "empty_title_all": "Nog geen matches",
   "empty_title_filtered": "Geen {{source}} matches",
   "empty_description": "Matches verschijnen hier zodra het systeem verbindingen voor jou vindt op het platform.",
@@ -26,6 +26,6 @@
   "load_failed": "Kon matches niet laden",
   "match_hidden": "Match verborgen — we tonen je er minder zoals deze",
   "page_meta": {
-    "title": "Matches"
+    "title": "Overeenkomsten"
   }
 }

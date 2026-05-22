@@ -1,5 +1,4 @@
 {
-  "community_fund": "Community Fund",
   "dashboard": "Tableau de bord",
   "users": "Utilisateurs",
   "crm": "CRM",
@@ -255,5 +254,6 @@
   "zone_people": "Personnes",
   "zone_communications": "Communications",
   "zone_commerce": "Commerce",
-  "zone_diagnostics": "Diagnostic"
+  "zone_diagnostics": "Diagnostic",
+  "community_fund": "Community Fund"
 }

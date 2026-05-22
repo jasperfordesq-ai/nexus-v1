@@ -7,8 +7,8 @@
   "new_conversation_aria": "ابدأ محادثة جديدة",
   "typing_aria": "الذكاء الاصطناعي يكتب",
   "sources_label": "مصادر",
-  "error_label": "Error",
-  "input_aria": "Message",
+  "error_label": "خطأ",
+  "input_aria": "رسالة",
   "input_placeholder": "اسألني أي شيء... (اضغط Enter للإرسال، Shift+Enter لسطر جديد)",
   "send_aria": "أرسل رسالة",
   "disclaimer": "قد لا تكون ردود الذكاء الاصطناعي دقيقة دائمًا. تحقق من المعلومات المهمة.",
@@ -30,12 +30,12 @@
   "page_meta": {
     "title": "دردشة الذكاء الاصطناعي"
   },
-  "thumbs_up_aria": "Helpful answer",
-  "thumbs_down_aria": "Unhelpful answer",
-  "card_online": "Online",
-  "card_remote": "Remote",
-  "card_wallet_title": "Your wallet",
-  "card_wallet_transactions": "{{count}} transactions in last 30 days",
+  "thumbs_up_aria": "إجابة مفيدة",
+  "thumbs_down_aria": "إجابة غير مفيدة",
+  "card_online": "متصل",
+  "card_remote": "عن بُعد",
+  "card_wallet_title": "محفظتك",
+  "card_wallet_transactions": "{{count}} معاملة خلال آخر 30 يوماً",
   "tool_results": {
     "view": "عرض"
   }

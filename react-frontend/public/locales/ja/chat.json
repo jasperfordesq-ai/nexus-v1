@@ -7,8 +7,8 @@
   "new_conversation_aria": "新しい会話を始める",
   "typing_aria": "AIが入力中です",
   "sources_label": "情報源",
-  "error_label": "Error",
-  "input_aria": "Message",
+  "error_label": "エラー",
+  "input_aria": "メッセージ",
   "input_placeholder": "何でも聞いてください...（送信するにはEnter、改行するにはShift+Enter）",
   "send_aria": "メッセージを送信",
   "disclaimer": "AIの応答は必ずしも正確ではありません。重要な情報は確認してください。",
@@ -30,12 +30,12 @@
   "page_meta": {
     "title": "AIチャット"
   },
-  "thumbs_up_aria": "Helpful answer",
-  "thumbs_down_aria": "Unhelpful answer",
-  "card_online": "Online",
-  "card_remote": "Remote",
-  "card_wallet_title": "Your wallet",
-  "card_wallet_transactions": "{{count}} transactions in last 30 days",
+  "thumbs_up_aria": "役に立つ回答",
+  "thumbs_down_aria": "役に立たない回答",
+  "card_online": "オンライン",
+  "card_remote": "リモート",
+  "card_wallet_title": "あなたのウォレット",
+  "card_wallet_transactions": "過去30日間の{{count}}件の取引",
   "tool_results": {
     "view": "表示"
   }

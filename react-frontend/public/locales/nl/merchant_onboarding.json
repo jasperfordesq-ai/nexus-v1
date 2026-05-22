@@ -33,7 +33,7 @@
     "sat": "Zaterdag",
     "sun": "Zondag"
   },
-  "open": "Open",
+  "open": "Geopend",
   "closed": "Gesloten",
   "upload_photo": "Profielfoto uploaden",
   "upload_cover": "Omslagafbeelding uploaden (optioneel)",
@@ -51,6 +51,6 @@
     "save_failed": "Opslaan mislukt. Probeer het opnieuw.",
     "complete_failed": "Installatie kon niet worden voltooid."
   },
-  "open_time": "Opening time",
-  "close_time": "Closing time"
+  "open_time": "Openingstijd",
+  "close_time": "Sluitingstijd"
 }

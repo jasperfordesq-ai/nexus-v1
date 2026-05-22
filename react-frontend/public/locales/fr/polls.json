@@ -80,12 +80,12 @@
     "move_rank_up": "Déplacer {{option}} vers le haut"
   },
   "page_meta": {
-    "title": "Polls"
+    "title": "Sondages"
   },
-  "ranked_results_title": "Round-by-Round Results",
-  "round_number": "Round {{number}}",
-  "eliminated_candidate": "Eliminated: {{name}}",
-  "total_ballots": "Total ballots: {{count}}",
+  "ranked_results_title": "Résultats tour par tour",
+  "round_number": "Tour {{number}}",
+  "eliminated_candidate": "Éliminé : {{name}}",
+  "total_ballots": "Total des bulletins : {{count}}",
   "rank_preferences": "Classez vos préférences",
   "all_categories": "Toutes les catégories",
   "ranked_instructions": "Faites glisser les options ou utilisez les flèches pour les classer de la préférence la plus forte (en haut) à la plus faible (en bas).",
@@ -93,7 +93,7 @@
   "winner_label": "Gagnant : {{name}}",
   "submit_rankings": "Envoyer le classement",
   "badges": {
-    "ranked": "Ranked",
-    "anonymous": "Anonymous"
+    "ranked": "Classé",
+    "anonymous": "Anonyme"
   }
 }

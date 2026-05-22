@@ -1,12 +1,12 @@
 {
-  "page_title": "Success Stories",
-  "intro": "Proof cards tied to live metrics from our pilot. Each story shows a before-and-after change, the affected audience, the method behind the figure, and where the evidence comes from.",
-  "empty_state": "No success stories have been published yet. Check back soon — community coordinators are putting cards together.",
-  "demo_label": "Demo / illustrative",
-  "audience_label": "Audience",
-  "before_label": "Before",
-  "after_label": "After",
-  "caveat_label": "Method",
-  "evidence_label": "Evidence",
-  "error_loading": "We couldn't load the success stories right now. Please try again in a moment."
+  "page_title": "成功事例",
+  "intro": "パイロットのライブ指標に紐付けた証拠カード。各ストーリーは変化の前後、影響を受けた対象者、数値の根拠、証拠の出所を示します。",
+  "empty_state": "まだ成功事例は公開されていません。近日中に再度ご確認ください — コミュニティのコーディネーターがカードを準備中です。",
+  "demo_label": "デモ / 説明用",
+  "audience_label": "対象者",
+  "before_label": "前",
+  "after_label": "後",
+  "caveat_label": "手法",
+  "evidence_label": "根拠",
+  "error_loading": "成功事例を現在読み込めません。しばらくしてからもう一度お試しください。"
 }

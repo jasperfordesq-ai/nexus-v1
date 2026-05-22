@@ -51,6 +51,6 @@
     "save_failed": "Falha ao guardar. Por favor, tente novamente.",
     "complete_failed": "Falha ao concluir a configuração."
   },
-  "open_time": "Opening time",
-  "close_time": "Closing time"
+  "open_time": "Hora de abertura",
+  "close_time": "Hora de fechamento"
 }

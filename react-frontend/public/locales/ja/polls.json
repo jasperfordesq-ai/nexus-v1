@@ -1,33 +1,33 @@
 {
-  "title": "Polls",
+  "title": "投票",
   "subtitle": "投票してコミュニティの意見を見てみましょう",
-  "page_title": "Polls",
+  "page_title": "投票",
   "create_poll": "投票を作成",
-  "question": "Question",
+  "question": "質問",
   "question_placeholder": "何を質問したいですか？",
   "description": "説明（任意）",
   "description_placeholder": "投票にコンテキストを追加...",
-  "options": "Options",
+  "options": "オプション",
   "option_placeholder": "オプション {{number}}",
   "add_option": "オプションを追加",
   "remove_option": "オプションを削除",
   "expires_at": "終了日（任意）",
   "no_deadline": "締切なしの場合は空白のままにしてください",
   "submit": "投票を作成",
-  "vote": "Vote",
-  "votes": "votes",
-  "votes_one": "vote",
+  "vote": "投票する",
+  "votes": "票",
+  "votes_one": "票",
   "voted": "あなたは投票しました",
-  "results": "Results",
+  "results": "結果",
   "total_votes": "{{count}}票",
   "total_votes_one": "{{count}}票",
   "status": {
-    "open": "Open",
-    "closed": "Closed"
+    "open": "受付中",
+    "closed": "締め切り"
   },
   "tabs": {
-    "open": "Open",
-    "closed": "Closed",
+    "open": "受付中",
+    "closed": "締め切り済み",
     "mine": "私の投票",
     "aria_label": "投票フィルタタブ"
   },
@@ -38,14 +38,14 @@
     "description_mine": "まだ投票を作成していません。"
   },
   "time_remaining": "{{time}}が残っています",
-  "expired": "Expired",
+  "expired": "期限切れ",
   "created_by": "by",
   "delete_poll": "投票を削除",
   "confirm_delete": {
     "title": "投票を削除",
     "message": "本当にこの投票を削除してもよろしいですか？この操作は元に戻せません。",
-    "confirm": "Delete",
-    "cancel": "Cancel"
+    "confirm": "削除",
+    "cancel": "キャンセル"
   },
   "toast": {
     "created": "投票が正常に作成されました！",
@@ -65,7 +65,7 @@
   },
   "load_more": "もっと読み込む",
   "try_again": "再試行",
-  "collapse": "Collapse",
+  "collapse": "折りたたむ",
   "expand": "投票を作成する",
   "poll_type": "投票タイプ",
   "poll_type_standard": "標準（1つ選択）",
@@ -80,12 +80,12 @@
     "move_rank_up": "{{option}} を上に移動"
   },
   "page_meta": {
-    "title": "Polls"
+    "title": "投票"
   },
-  "ranked_results_title": "Round-by-Round Results",
-  "round_number": "Round {{number}}",
-  "eliminated_candidate": "Eliminated: {{name}}",
-  "total_ballots": "Total ballots: {{count}}",
+  "ranked_results_title": "ラウンドごとの結果",
+  "round_number": "ラウンド {{number}}",
+  "eliminated_candidate": "脱落: {{name}}",
+  "total_ballots": "総投票数: {{count}}",
   "rank_preferences": "希望順位を並べる",
   "all_categories": "すべてのカテゴリ",
   "ranked_instructions": "選択肢をドラッグするか矢印を使って、最も希望するもの（上）から最も低いもの（下）へ並べ替えてください。",
@@ -93,7 +93,7 @@
   "winner_label": "勝者: {{name}}",
   "submit_rankings": "順位を送信",
   "badges": {
-    "ranked": "Ranked",
-    "anonymous": "Anonymous"
+    "ranked": "順位付き",
+    "anonymous": "匿名"
   }
 }

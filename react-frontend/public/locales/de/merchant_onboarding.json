@@ -51,6 +51,6 @@
     "save_failed": "Speichern fehlgeschlagen. Bitte versuchen Sie es erneut.",
     "complete_failed": "Einrichtung konnte nicht abgeschlossen werden."
   },
-  "open_time": "Opening time",
-  "close_time": "Closing time"
+  "open_time": "Öffnungszeit",
+  "close_time": "Schließzeit"
 }

@@ -140,7 +140,7 @@
   "job_alert": {
     "subject_single": "Neue Stelle, die Ihrem Alert entspricht: {{title}}",
     "subject_digest": "Stellenalert — {{count}} neue {{plural}} Ihren Kriterien",
-    "remote": "Remote",
+    "remote": "Fernarbeit",
     "location_not_specified": "Standort nicht angegeben",
     "deadline_open": "Offen",
     "closes": "Schliesst: {{date}}",

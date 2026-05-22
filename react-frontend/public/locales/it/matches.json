@@ -2,7 +2,7 @@
   "load_failed": "Impossibile caricare le corrispondenze",
   "match_hidden": "Corrispondenza nascosta — te ne mostreremo meno di questo tipo",
   "page_title": "Abbinamenti",
-  "breadcrumb_dashboard": "Dashboard",
+  "breadcrumb_dashboard": "Cruscotto",
   "breadcrumb_matches": "Abbinamenti",
   "heading": "I Tuoi Abbinamenti",
   "subtitle": "Scopri connessioni tra annunci, lavori, volontariato e gruppi",
@@ -26,6 +26,6 @@
   "view_details": "Vedi dettagli abbinamento",
   "not_interested": "Non interessato",
   "page_meta": {
-    "title": "Matches"
+    "title": "Corrispondenze"
   }
 }

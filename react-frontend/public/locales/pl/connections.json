@@ -1,17 +1,17 @@
 {
-  "title": "Connections",
+  "title": "Połączenia",
   "subtitle": "Zarządzaj swoimi połączeniami w społeczności",
   "pending_count": "{{count}} oczekujące",
   "search_placeholder": "Szukaj według imienia lub lokalizacji...",
   "tab_my_connections": "Moje połączenia",
-  "tab_pending": "Pending",
-  "tab_sent": "Sent",
+  "tab_pending": "Oczekujące",
+  "tab_sent": "Wysłane",
   "connected_since": "Połączony od {{date}}",
-  "message": "Message",
-  "disconnect": "Disconnect",
+  "message": "Wiadomość",
+  "disconnect": "Rozłącz",
   "wants_to_connect": "Chce się z Tobą połączyć",
-  "accept": "Accept",
-  "decline": "Decline",
+  "accept": "Akceptuj",
+  "decline": "Odrzuć",
   "request_pending": "Prośba w toku",
   "cancel_request": "Anuluj prośbę",
   "load_more": "Załaduj więcej",
@@ -30,11 +30,11 @@
   "toast_accept_failed": "Nie udało się zaakceptować połączenia",
   "toast_declined": "Prośba odrzucona",
   "toast_decline_failed": "Nie udało się odrzucić prośby",
-  "toast_disconnected": "Disconnected",
+  "toast_disconnected": "Rozłączono",
   "toast_disconnect_failed": "Nie udało się rozłączyć",
   "toast_cancelled": "Prośba anulowana",
   "toast_cancel_failed": "Nie udało się anulować prośby",
   "page_meta": {
-    "title": "Connections"
+    "title": "Połączenia"
   }
 }

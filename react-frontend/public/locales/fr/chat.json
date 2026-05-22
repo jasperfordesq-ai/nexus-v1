@@ -30,12 +30,12 @@
   "page_meta": {
     "title": "Chat IA"
   },
-  "thumbs_up_aria": "Helpful answer",
-  "thumbs_down_aria": "Unhelpful answer",
-  "card_online": "Online",
-  "card_remote": "Remote",
-  "card_wallet_title": "Your wallet",
-  "card_wallet_transactions": "{{count}} transactions in last 30 days",
+  "thumbs_up_aria": "Réponse utile",
+  "thumbs_down_aria": "Réponse inutile",
+  "card_online": "En ligne",
+  "card_remote": "À distance",
+  "card_wallet_title": "Votre portefeuille",
+  "card_wallet_transactions": "{{count}} transactions au cours des 30 derniers jours",
   "tool_results": {
     "view": "Voir"
   }

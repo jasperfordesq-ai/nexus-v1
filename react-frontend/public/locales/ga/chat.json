@@ -28,14 +28,14 @@
   "starter_q4": "Cad iad na himeachtaí atá le teacht?",
   "starter_q5": "Conas a chruthaím liostú chun mo scileanna a thairiscint?",
   "page_meta": {
-    "title": "AI Chat"
+    "title": "Comhrá AI"
   },
-  "thumbs_up_aria": "Helpful answer",
-  "thumbs_down_aria": "Unhelpful answer",
-  "card_online": "Online",
-  "card_remote": "Remote",
-  "card_wallet_title": "Your wallet",
-  "card_wallet_transactions": "{{count}} transactions in last 30 days",
+  "thumbs_up_aria": "Freagra úsáideach",
+  "thumbs_down_aria": "Freagra gan úsáid",
+  "card_online": "Ar líne",
+  "card_remote": "Cianda",
+  "card_wallet_title": "Do sparán",
+  "card_wallet_transactions": "{{count}} idirbheart le 30 lá anuas",
   "tool_results": {
     "view": "Amharc"
   }
