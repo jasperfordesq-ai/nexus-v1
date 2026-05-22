@@ -17,7 +17,7 @@
     "breakdown": {
       "title": "La ripartizione del livello di fiducia",
       "subtitle": "Ecco come hai guadagnato il tuo livello attuale e cosa ti serve per quello successivo.",
-      "signal_progress": "{{current}} of {{required}}",
+      "signal_progress": "{{current}} di {{required}}",
       "achieved": "Raggiunto",
       "in_progress": "In corso",
       "next_tier_hint": "Completa i segnali rimanenti per raggiungere il livello successivo.",
@@ -151,7 +151,7 @@
     "cancel_button": "Cancellare",
     "empty": "Nessuna comunità federata è attualmente rilevabile. Puoi comunque inserire manualmente uno slug della community.",
     "fallback_label": "Oppure inserisci manualmente uno slug della community",
-    "member_count_label": "members"
+    "member_count_label": "membri"
   },
   "onboarding": {
     "title": "Benvenuto nella tua comunità di cura",
@@ -873,7 +873,7 @@
       "title": "Cadenza del digest civico",
       "subtitle": "Configura la cadenza di consegna predefinita per il compendio civico personalizzato che i membri ricevono. Il riepilogo aggrega i contenuti rilevanti della comunità (avvisi di sicurezza, aggiornamenti di progetti, avvisi di eventi e annunci) in un unico riepilogo.",
       "preview_member_view": "Anteprima della visualizzazione dei membri",
-      "reset": "Reset",
+      "reset": "Reimposta",
       "save": "Risparmia cadenza",
       "member_override": "I membri possono ignorare la cadenza e disattivare singole fonti dalla propria pagina delle preferenze del digest.",
       "about": {
@@ -1044,7 +1044,7 @@
         "aria": "Salvaguardia dei rapporti",
         "severity": "Gravità",
         "category": "Categoria",
-        "reporter": "Reporter",
+        "reporter": "Segnalante",
         "subject": "Soggetto",
         "status": "Stato",
         "assigned": "Assegnato",
@@ -1055,7 +1055,7 @@
       },
       "fields": {
         "category": "Categoria",
-        "reporter": "Reporter",
+        "reporter": "Segnalante",
         "subject": "Soggetto",
         "description": "Descrizione",
         "evidence": "Prova",

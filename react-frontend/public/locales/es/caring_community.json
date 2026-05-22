@@ -17,7 +17,7 @@
     "breakdown": {
       "title": "Desglose de su nivel de confianza",
       "subtitle": "A continuación te explicamos cómo obtuviste tu nivel actual y lo que necesitas para el siguiente.",
-      "signal_progress": "{{current}} of {{required}}",
+      "signal_progress": "{{current}} de {{required}}",
       "achieved": "Logrado",
       "in_progress": "En curso",
       "next_tier_hint": "Completa las señales restantes para llegar al siguiente nivel.",
@@ -151,7 +151,7 @@
     "cancel_button": "Cancelar",
     "empty": "Actualmente no se pueden descubrir comunidades federadas. Aún puedes ingresar un slug comunitario manualmente.",
     "fallback_label": "O ingrese un slug comunitario manualmente",
-    "member_count_label": "members"
+    "member_count_label": "miembros"
   },
   "onboarding": {
     "title": "Bienvenido a su comunidad solidaria",
@@ -794,13 +794,13 @@
       },
       "categories": {
         "question": "Pregunta",
-        "idea": "Idea",
+        "idea": "ideas",
         "issue_report": "Informe de problemas",
         "sentiment": "Sentimiento"
       },
       "sentiments": {
         "positive": "Positivo",
-        "neutral": "Neutral",
+        "neutral": "Neutro",
         "negative": "Negativo",
         "concerned": "Preocupado"
       },
@@ -1149,7 +1149,7 @@
         "type": "Tipo",
         "description": "Descripción",
         "points": "Agujas",
-        "balance": "Balance",
+        "balance": "Saldo",
         "user_fallback": "#{{id}}"
       },
       "messages": {

@@ -17,7 +17,7 @@
     "breakdown": {
       "title": "Aufschlüsselung Ihrer Vertrauensstufe",
       "subtitle": "Hier erfahren Sie, wie Sie Ihre aktuelle Stufe erreicht haben und was Sie für die nächste Stufe benötigen.",
-      "signal_progress": "{{current}} of {{required}}",
+      "signal_progress": "{{current}} von {{required}}",
       "achieved": "Erreicht",
       "in_progress": "Im Gange",
       "next_tier_hint": "Vervollständigen Sie die verbleibenden Signale, um die nächste Stufe zu erreichen.",
@@ -151,7 +151,7 @@
     "cancel_button": "Stornieren",
     "empty": "Derzeit sind keine Verbundgemeinschaften erkennbar. Sie können einen Community-Slug weiterhin manuell eingeben.",
     "fallback_label": "Oder geben Sie manuell einen Community-Slug ein",
-    "member_count_label": "members"
+    "member_count_label": "Mitglieder"
   },
   "onboarding": {
     "title": "Willkommen in Ihrer Caring Community",
@@ -169,7 +169,7 @@
   },
   "relationships": {
     "actions": {
-      "pause": "Pause",
+      "pause": "Pausieren",
       "end": "Beziehung beenden",
       "resume": "Wieder aufnehmen"
     },
@@ -178,7 +178,7 @@
       "description": "Sie können später fortfahren. Möchten Sie einen Grund hinzufügen oder ein Lebenslaufdatum festlegen?",
       "reason_label": "Grund (optional)",
       "resume_at_label": "Fortsetzen am (optional)",
-      "confirm": "Pause"
+      "confirm": "Pausieren"
     },
     "end_modal": {
       "title": "Beenden Sie diese Supportbeziehung",
@@ -310,7 +310,7 @@
         "emergency_alerts": "Notfallwarnungen",
         "surveys": "Kommunale Umfragen",
         "copilot": "Kommunikations-Copilot",
-        "civic_digest": "Civic Digest",
+        "civic_digest": "Bürger-Digest",
         "lead_nurture": "Lead-Pflege",
         "success_stories": "Erfolgsgeschichten",
         "feedback": "Feedback-Posteingang",
@@ -546,7 +546,7 @@
         "merchant": "Händler",
         "item": "Artikel",
         "hours": "Std",
-        "rate": "Rate",
+        "rate": "Kurs",
         "discount": "Rabatt",
         "status": "Status",
         "actions": "Aktionen",
@@ -825,7 +825,7 @@
         "next": "Nächste"
       },
       "modal": {
-        "title": "Feedback #{{id}}",
+        "title": "Rückmeldung #{{id}}",
         "category": "Kategorie",
         "submitter": "Einsender",
         "sentiment": "Gefühl",
@@ -966,7 +966,7 @@
         "family": "Familie",
         "friend": "Freund",
         "neighbour": "Nachbar",
-        "professional": "Professional",
+        "professional": "Fachperson",
         "unknown": "Unbekannte Beziehung: {{type}}"
       },
       "status": {
@@ -1011,7 +1011,7 @@
       "severity": {
         "critical": "Kritisch",
         "high": "Hoch",
-        "medium": "Medium",
+        "medium": "Mittel",
         "low": "Niedrig"
       },
       "status": {
@@ -1044,7 +1044,7 @@
         "aria": "Sicherstellung von Berichten",
         "severity": "Schwere",
         "category": "Kategorie",
-        "reporter": "Reporter",
+        "reporter": "Meldende Person",
         "subject": "Thema",
         "status": "Status",
         "assigned": "Zugewiesen",
@@ -1055,7 +1055,7 @@
       },
       "fields": {
         "category": "Kategorie",
-        "reporter": "Reporter",
+        "reporter": "Meldende Person",
         "subject": "Thema",
         "description": "Beschreibung",
         "evidence": "Beweis",

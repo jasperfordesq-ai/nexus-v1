@@ -17,7 +17,7 @@
     "breakdown": {
       "title": "انهيار مستوى ثقتك",
       "subtitle": "إليك كيفية حصولك على مستواك الحالي وما تحتاجه للمرحلة التالية.",
-      "signal_progress": "{{current}} of {{required}}",
+      "signal_progress": "{{current}} من {{required}}",
       "achieved": "تم تحقيقه",
       "in_progress": "في تَقَدم",
       "next_tier_hint": "أكمل الإشارات المتبقية للوصول إلى المستوى التالي.",
@@ -151,7 +151,7 @@
     "cancel_button": "يلغي",
     "empty": "لا توجد مجتمعات موحدة قابلة للاكتشاف حاليًا. لا يزال بإمكانك إدخال سبيكة المجتمع يدويًا.",
     "fallback_label": "أو أدخل سبيكة المجتمع يدويًا",
-    "member_count_label": "members"
+    "member_count_label": "الأعضاء"
   },
   "onboarding": {
     "title": "مرحبًا بك في مجتمع الرعاية الخاص بك",

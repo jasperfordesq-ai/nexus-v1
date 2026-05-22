@@ -17,7 +17,7 @@
     "breakdown": {
       "title": "Répartition de votre niveau de confiance",
       "subtitle": "Voici comment vous avez obtenu votre niveau actuel et ce dont vous avez besoin pour le prochain.",
-      "signal_progress": "{{current}} of {{required}}",
+      "signal_progress": "{{current}} sur {{required}}",
       "achieved": "Réalisé",
       "in_progress": "En cours",
       "next_tier_hint": "Complétez les signaux restants pour atteindre le niveau suivant.",
@@ -151,7 +151,7 @@
     "cancel_button": "Annuler",
     "empty": "Aucune communauté fédérée n'est actuellement détectable. Vous pouvez toujours saisir manuellement un slug de communauté.",
     "fallback_label": "Ou saisissez manuellement un slug communautaire",
-    "member_count_label": "members"
+    "member_count_label": "membres"
   },
   "onboarding": {
     "title": "Bienvenue dans votre communauté bienveillante",
@@ -169,7 +169,7 @@
   },
   "relationships": {
     "actions": {
-      "pause": "Pause",
+      "pause": "Mettre en pause",
       "end": "Mettre fin à la relation",
       "resume": "CV"
     },
@@ -178,7 +178,7 @@
       "description": "Vous pourrez reprendre plus tard. Souhaitez-vous ajouter un motif ou fixer une date de reprise ?",
       "reason_label": "Raison (facultatif)",
       "resume_at_label": "Reprendre le (facultatif)",
-      "confirm": "Pause"
+      "confirm": "Mettre en pause"
     },
     "end_modal": {
       "title": "Mettre fin à cette relation d'assistance",
@@ -390,7 +390,7 @@
       },
       "fields": {
         "address": "Adresse",
-        "description": "Description",
+        "description": "Descriptif",
         "email": "E-mail",
         "name": "Nom",
         "phone": "Téléphone",
@@ -626,12 +626,12 @@
       "table": {
         "actions": "Actes",
         "date": "Date",
-        "destination": "Destination",
+        "destination": "Destinataire",
         "hours": "Heures",
         "member": "Membre",
         "member_credited": "Membre crédité",
         "reason": "Raison",
-        "source": "Source",
+        "source": "Origine",
         "status": "Statut"
       },
       "status": {
@@ -775,7 +775,7 @@
         "last_7_days": "7 derniers jours",
         "by_status": "Par statut:",
         "by_category": "Par catégorie:",
-        "sentiment": "Sentiment:"
+        "sentiment": "Sentiment :"
       },
       "filters": {
         "status": "Statut",
@@ -979,7 +979,7 @@
         "title": "Relations de soutien",
         "empty": "Aucune relation de support active",
         "aria": "Relations de soutien",
-        "supporter": "Supporter",
+        "supporter": "Soutien",
         "trust_tier": "Niveau de confiance",
         "type": "Taper",
         "hours_logged": "Heures enregistrées",
@@ -1057,7 +1057,7 @@
         "category": "Catégorie",
         "reporter": "Journaliste",
         "subject": "Sujet",
-        "description": "Description",
+        "description": "Descriptif",
         "evidence": "Preuve",
         "resolution_notes": "Notes de résolution"
       },
@@ -1134,7 +1134,7 @@
         "tabs_aria": "Actions de solde de points régionaux",
         "issue_tab": "Points problématiques",
         "points_to_issue": "Points à émettre",
-        "description": "Description",
+        "description": "Descriptif",
         "issue": "Points problématiques",
         "adjust_tab": "Ajuster (+/-)",
         "points_delta": "Delta de points (positif ou négatif)",
@@ -1147,7 +1147,7 @@
         "date": "Date",
         "member": "Membre",
         "type": "Taper",
-        "description": "Description",
+        "description": "Descriptif",
         "points": "Points",
         "balance": "Équilibre",
         "user_fallback": "#{{id}}"

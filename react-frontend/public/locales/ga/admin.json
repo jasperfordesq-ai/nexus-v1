@@ -5808,12 +5808,12 @@
     "delete": "Scrios"
   },
   "header": {
-    "admin_menu": "Admin menu",
-    "back_to_site": "Back to site",
-    "my_profile": "My Profile",
-    "notifications": "Notifications",
-    "sign_out": "Sign Out",
-    "toggle_sidebar": "Toggle sidebar"
+    "admin_menu": "Roghchlár admin",
+    "back_to_site": "Ar ais go dtí an suíomh",
+    "my_profile": "Mo Phróifíl",
+    "notifications": "Fógraí",
+    "sign_out": "Sínigh Amach",
+    "toggle_sidebar": "Scoránaigh barra taoibh"
   },
   "icon_picker": {
     "choose_icon": "Choose Icon",
@@ -7665,22 +7665,22 @@
     }
   },
   "stats": {
-    "active_listings": "Active Listings",
-    "active_users": "Active Users",
-    "hours_exchanged": "Hours Exchanged",
-    "new_listings_this_month": "New Listings This Month",
-    "new_users_this_month": "New Users This Month",
-    "total_listings": "Total Listings",
-    "total_members": "Total Members",
-    "transactions": "Transactions"
+    "active_listings": "Liostaí Gníomhacha",
+    "active_users": "Úsáideoirí Gníomhacha",
+    "hours_exchanged": "Uaireanta Malartaithe",
+    "new_listings_this_month": "Liostaí Nua an Mhí seo",
+    "new_users_this_month": "Úsáideoirí Nua an Mhí seo",
+    "total_listings": "Liostaí Iomlána",
+    "total_members": "Iomlán na mBall",
+    "transactions": "Idirbhearta"
   },
   "status": {
-    "all_operational": "All systems operational",
-    "issues_detected": "Issues detected",
-    "offline": "Offline",
-    "online": "Online",
-    "some_attention": "Some services need attention",
-    "warning": "Warning"
+    "all_operational": "Gach córas ag feidhmiú",
+    "issues_detected": "Saincheisteanna braite",
+    "offline": "As líne",
+    "online": "Ar líne",
+    "some_attention": "Teastaíonn aird ar sheirbhísí áirithe",
+    "warning": "Rabhadh"
   },
   "super": {
     "action_failed": "Theip",
@@ -11106,12 +11106,12 @@
     "select_job": "Select Job"
   },
   "diagnostics_matching": {
-    "avg_match_score": "Avg Match Score",
-    "cache_entries": "Cache Entries",
-    "diagnose_listing_matches": "Diagnose Listing Matches",
-    "diagnose_user_matches": "Diagnose User Matches",
-    "engine_status": "Engine Status",
-    "matches_today": "Matches Today"
+    "avg_match_score": "Meán Scór Meaitseála",
+    "cache_entries": "Iontrálacha Taisce",
+    "diagnose_listing_matches": "Diagnóisigh Meaitseanna Liostála",
+    "diagnose_user_matches": "Diagnóisigh Meaitseanna Úsáideora",
+    "engine_status": "Stádas Innill",
+    "matches_today": "Matches Inniu"
   },
   "error_occurred": "Occurred error",
   "federation_audit": {
@@ -11153,10 +11153,10 @@
   },
   "import": "Import",
   "legal_doc_form": {
-    "back_to_documents": "Back to Documents",
-    "cancel": "Cancel",
+    "back_to_documents": "Ar ais go Doiciméid",
+    "cancel": "Cealaigh",
     "create_description": "Create.",
-    "create_document": "Create Document",
+    "create_document": "Cruthaigh Doiciméad",
     "create_title": "Create",
     "doc_type_acceptable_use": "Doc Type Acceptable Use",
     "doc_type_accessibility": "Doc Type Accessibility",
@@ -11169,10 +11169,10 @@
     "page_title_create": "Title Create",
     "page_title_edit": "Title Edit",
     "save_failed_generic": "Save Failed Generic",
-    "status_archived": "Archived",
-    "status_draft": "Draft",
-    "status_published": "Published",
-    "update_document": "Update Document",
+    "status_archived": "Cartlannaithe",
+    "status_draft": "Dréacht",
+    "status_published": "Foilsithe",
+    "update_document": "Doiciméad Nuashonraithe",
     "content": "Ábhar",
     "content_placeholder": "Cuir isteach ábhar an doiciméid...",
     "document_content": "Ábhar an Doiciméid",
@@ -11185,44 +11185,44 @@
     "title_required": "Tá teideal ag teastáil"
   },
   "legal_versions": {
-    "compliance_dashboard": "Compliance Dashboard",
-    "create_new_version": "Create New Version",
-    "delete_draft": "Delete Draft",
-    "delete_draft_version": "Delete Draft Version",
+    "compliance_dashboard": "Painéal na Comhlíonta",
+    "create_new_version": "Cruthaigh Leagan Nua",
+    "delete_draft": "Scrios Dréacht",
+    "delete_draft_version": "Scrios Dréacht-Leagan",
     "publish_step_1": "Publish Step 1",
     "publish_step_2": "Publish Step 2",
     "publish_step_3": "Publish Step 3",
     "publish_step_4": "Publish Step 4",
-    "publish_version": "Publish Version",
-    "send_notification": "Send Notification",
+    "publish_version": "Foilsigh Leagan",
+    "send_notification": "Seol Fógra",
     "subtitle": "Subtitle",
     "this_will": "This Will",
     "title": "Title"
   },
   "load_error": "Load error",
   "log_files_labels": {
-    "download": "Download",
-    "filter_all": "All",
-    "filter_application": "Application",
+    "download": "Íosluchtaigh",
+    "filter_all": "Gach",
+    "filter_application": "Iarratas",
     "filter_cron": "Cron",
-    "filter_errors": "Errors",
+    "filter_errors": "Earráidí",
     "lines_count": "{{count}} l?ne",
-    "search_placeholder": "Enter search...",
-    "total_files": "Total Files",
-    "total_size": "Total Size"
+    "search_placeholder": "Iontráil cuardach...",
+    "total_files": "Comhaid Iomlán",
+    "total_size": "Méid Iomlán"
   },
   "manage": "Manage",
   "match_detail": {
-    "associated_listing": "Associated Listing",
-    "category": "Category",
-    "distance": "Distance",
-    "listing_owner": "Listing Owner",
-    "match_information": "Match Information",
-    "match_reasons": "Match Reasons",
-    "match_score": "Match Score",
-    "match_type": "Match",
-    "matched_user": "Matched User",
-    "review_details": "Review Details"
+    "associated_listing": "Liostú Gaolmhar",
+    "category": "Catagóir",
+    "distance": "Fad",
+    "listing_owner": "Úinéir Liostú",
+    "match_information": "Eolas Meaitseála",
+    "match_reasons": "Cúiseanna Meaitseála",
+    "match_score": "Scór Meaitseála",
+    "match_type": "Meaitseáil",
+    "matched_user": "Úsáideoir Meaitseála",
+    "review_details": "Sonraí Athbhreithnithe"
   },
   "newsletter_diagnostics": {
     "bounce_chip_critical": "Sliseanna Preab ríthábhachtach",
@@ -11381,13 +11381,13 @@
     "tag_unsubscribe_link": "Nasc díliostáil"
   },
   "newsletter_resend": {
-    "clicked": "Clicked",
-    "failed_to_load": "Failed to load",
-    "no_recipients": "No recipients found",
-    "opened": "Opened",
-    "preview_recipient_count": "Preview Recipient Count",
-    "resend_newsletter": "Resend Newsletter",
-    "total_sent": "Total sent",
+    "clicked": "Chliceáil",
+    "failed_to_load": "Theip ar luchtú",
+    "no_recipients": "Níor aimsíodh aon fhaighteoir",
+    "opened": "Osclaíodh",
+    "preview_recipient_count": "Réamhamhairc Líon Faighteoirí",
+    "resend_newsletter": "Seol an Nuachtlitir arís",
+    "total_sent": "Iomlán seolta",
     "cancel": "Cealaigh",
     "loading": "Faisnéis athsheolta á lódáil…",
     "no_recipients_desc": "Níl aon fhaighteoirí ann a mheaitseálann do chritéir roghnúcháin.",
@@ -11431,12 +11431,12 @@
     "title": "Seol optimiser ama"
   },
   "newsletter_template_form": {
-    "content": "Content",
-    "email_settings": "Email Settings",
-    "template_details": "Template Details",
-    "test_tip_clients": "Test Tip Clients",
-    "test_tip_unsubscribe": "Test Tip Unsubscribe",
-    "usage_stats": "Usage Stats"
+    "content": "Ábhar",
+    "email_settings": "Socruithe Ríomhphoist",
+    "template_details": "Sonraí Teimpléad",
+    "test_tip_clients": "Cliaint Leid Tástála",
+    "test_tip_unsubscribe": "Leid Tástála Díliostáil",
+    "usage_stats": "Staitisticí Úsáide"
   },
   "provider_health": {
     "aria_success_rate": "Success Rate"
@@ -11444,30 +11444,30 @@
   "refresh": "Refresh",
   "rte": {
     "block_quote": "Block Quote",
-    "bold": "Bold",
+    "bold": "Trom",
     "bullet_list": "Bullet List",
-    "enter_url": "Enter URL",
+    "enter_url": "Cuir isteach URL",
     "heading_2": "2",
     "heading_3": "3",
-    "import_markdown": "Import Markdown",
+    "import_markdown": "Iompórtáil Markdown",
     "import_md": "Import Md",
     "inline_code": "Inline Code",
     "insert_link": "Insert Link",
-    "italic": "Italic",
+    "italic": "iodálach",
     "numbered_list": "Numbered List",
-    "redo": "Redo",
+    "redo": "Athdhéan",
     "remove_link": "Remove Link",
-    "strikethrough": "Strikethrough",
-    "underline": "Underline",
-    "undo": "Undo",
-    "content_html": "Content HTML",
+    "strikethrough": "Stailc tríd",
+    "underline": "Cuir líne faoi",
+    "undo": "Cealaigh",
+    "content_html": "Ábhar HTML",
     "content_helper": "Content",
     "content_placeholder": "Content...",
     "editor_only": "Editor Only",
     "notice_body_placeholder": "Enter notice body...",
     "notice_box": "Notice Box",
     "notice_title_placeholder": "Enter notice title...",
-    "preview": "Preview",
+    "preview": "Réamhamharc",
     "preview_title_placeholder": "Enter preview title...",
     "split_view": "Split View",
     "start_writing": "Tosaigh ag scríobh..."
@@ -11667,13 +11667,13 @@
     "view_full_details": "Féach ar na Sonraí Iomlána"
   },
   "system_monitoring": {
-    "feature_flags": "Feature Flags",
-    "log_files": "Log Files",
-    "log_files_desc": "Log Files.",
-    "system_requirements": "System Requirements",
-    "system_requirements_desc": "System Requirements.",
-    "memory_available": "{{available}} available",
-    "vm_memory": "VM Memory"
+    "feature_flags": "Bratacha Gné",
+    "log_files": "Comhaid Logála",
+    "log_files_desc": "Comhaid Logála.",
+    "system_requirements": "Riachtanais Chórais",
+    "system_requirements_desc": "Riachtanais Chórais.",
+    "memory_available": "{{available}} ar fáil",
+    "vm_memory": "Cuimhne VM"
   },
   "template_form": {
     "active": "Gníomhach",
@@ -12660,7 +12660,7 @@
       "cancel": "Cealaigh",
       "save": "Sábháil teimpléad",
       "modal_title": "Cruthaigh teimpléad tuairisce",
-      "hour_value_chip": "CHF {{value}}/h",
+      "hour_value_chip": "CHF {{value}}/u",
       "fields": {
         "name": "Ainm teimpléad",
         "description": "Cur síos",
@@ -13715,12 +13715,12 @@
     }
   },
   "help_drawer": {
-    "aria_label": "Help: {{title}}",
-    "close_panel": "Close help panel",
-    "how_to_use": "How to use this page",
-    "label": "Help",
-    "related_pages": "Related pages",
-    "tips": "Tips & gotchas"
+    "aria_label": "Cabhair: {{title}}",
+    "close_panel": "Dún an painéal cabhrach",
+    "how_to_use": "Conas an leathanach seo a úsáid",
+    "label": "Cabhrú",
+    "related_pages": "Leathanaigh ghaolmhara",
+    "tips": "Leideanna & gotchas"
   },
   "clear_accent_color": "Dath accent soiléir",
   "clear_primary_color": "Dath bunscoile soiléir",
@@ -13784,7 +13784,7 @@
       "contact_email_placeholder": "integrations@partner.example",
       "description": "Cur síos",
       "name": "Ainm",
-      "name_placeholder": "e.g. PostFinance Switzerland",
+      "name_placeholder": "e.g. Iar-Airgeadas Eilvéis",
       "rate_limit": "Teorainn an ráta (iarratais / nóiméad)",
       "sandbox_mode": "Mód bosca gainimh (inléite amháin - diúltófar do scríobhann)",
       "submit": "Cruthaigh & eisigh dintiúir",
@@ -14060,9 +14060,9 @@
     },
     "residency": {
       "article_16": "Ceadaítear nochtadh trasteorann sonraí pearsanta má áirithíonn an tír chinn scríbe cosaint leordhóthanach sonraí arna aithint ag an gComhairle Chónaidhme. Cáilíonn ballstáit Switzerland, EU/EEA, agus liosta beag de thíortha eile.",
-      "article_16_label": "FADP Art. 16",
+      "article_16_label": "Ealaín FADP. 16",
       "article_17": "Mura gcáilíonn an ceann scríbe, ní mór cosaintí iomchuí a bheith i bhfeidhm, amhail clásail chaighdeánacha um chosaint sonraí arna bhformheas ag FDPIC, rialacha ceangailteacha corparáideacha, nó toiliú na mball.",
-      "article_17_label": "FADP Art. 17",
+      "article_17_label": "Ealaín FADP. 17",
       "description": "Sa chás go ndéantar sonraí ball tionónta a stóráil agus a phróiseáil.",
       "dpa_contact": "teagmhálaí DPA",
       "title": "Cónaitheacht sonraí dearbhaithe",
@@ -14114,9 +14114,9 @@
       "unknown": "Bunús dlí anaithnid: {{basis}}"
     },
     "data_residency": {
-      "EU": "EU (EEA)",
+      "EU": "AE (LEE)",
       "International": "Idirnáisiúnta (lasmuigh de EU/Switzerland)",
-      "Switzerland": "Switzerland"
+      "Switzerland": "Eilvéis"
     },
     "consent_actions": {
       "granted": "Deonaithe",
@@ -14350,8 +14350,8 @@
         },
         "placeholders": {
           "body": "Cur síos simplí ar an modúl seo. Cad a dhéanann sé, conas é a úsáid, agus cad nach féidir.",
-          "keywords": "e.g. timebank, hours, credits, exchange",
-          "module_slug": "e.g. listings, wallet, events",
+          "keywords": "e.g. banc ama, uaireanta, creidmheasanna, malartú",
+          "module_slug": "e.g. liostaí, sparán, imeachtaí",
           "title": "e.g. Conas a oibríonn credits"
         }
       },
@@ -14373,7 +14373,7 @@
     },
     "trace_metrics": {
       "meta": {
-        "title": "AI Trace Metrics",
+        "title": "AI Trace Méadracht",
         "description": "Costas, latency, úsáid uirlisí, agus ceisteanna gan freagra don chúntóir comhrá AI."
       },
       "empty": {

@@ -17,7 +17,7 @@
     "breakdown": {
       "title": "Podział poziomu zaufania",
       "subtitle": "Oto, w jaki sposób zdobyłeś swój obecny poziom i czego potrzebujesz do następnego.",
-      "signal_progress": "{{current}} of {{required}}",
+      "signal_progress": "{{current}} z {{required}}",
       "achieved": "Osiągnięte",
       "in_progress": "W toku",
       "next_tier_hint": "Uzupełnij pozostałe sygnały, aby przejść do następnego poziomu.",
@@ -151,7 +151,7 @@
     "cancel_button": "Anulować",
     "empty": "Obecnie nie można odkryć żadnych społeczności stowarzyszonych. Nadal możesz ręcznie wprowadzić ślimak społecznościowy.",
     "fallback_label": "Możesz też ręcznie wprowadzić ślimak społecznościowy",
-    "member_count_label": "members"
+    "member_count_label": "członkowie"
   },
   "onboarding": {
     "title": "Witamy w Twojej troskliwej społeczności",
@@ -394,7 +394,7 @@
         "email": "E-mail",
         "name": "Nazwa",
         "phone": "Telefon",
-        "status": "Status",
+        "status": "Stan",
         "type": "Typ",
         "website": "Strona internetowa"
       },
@@ -436,7 +436,7 @@
         "actions": "Działania",
         "aria": "Tabela dostawców opieki",
         "name": "Nazwa",
-        "status": "Status",
+        "status": "Stan",
         "type": "Typ",
         "verified": "Zweryfikowano"
       },
@@ -548,7 +548,7 @@
         "hours": "Godziny",
         "rate": "Wskaźnik",
         "discount": "Rabat",
-        "status": "Status",
+        "status": "Stan",
         "actions": "Działania",
         "reverse": "Odwracać",
         "empty_value": "-",
@@ -632,7 +632,7 @@
         "member_credited": "Członek zaliczony",
         "reason": "Powód",
         "source": "Źródło",
-        "status": "Status"
+        "status": "Stan"
       },
       "status": {
         "approved_by_source": "Zatwierdzone przez źródło",
@@ -684,7 +684,7 @@
       "table": {
         "aria": "Sondaże gminne",
         "title": "Tytuł",
-        "status": "Status",
+        "status": "Stan",
         "questions": "Pytania",
         "responses": "Odpowiedzi",
         "anonymous": "Anonimowy",
@@ -778,7 +778,7 @@
         "sentiment": "Sentyment:"
       },
       "filters": {
-        "status": "Status",
+        "status": "Stan",
         "all_statuses": "Wszystkie statusy",
         "category": "Kategoria",
         "all_categories": "Wszystkie kategorie",
@@ -815,7 +815,7 @@
         "category": "Kategoria",
         "subject": "Temat",
         "submitter": "Przesyłający",
-        "status": "Status",
+        "status": "Stan",
         "created": "Stworzony",
         "actions": "Działania"
       },
@@ -984,7 +984,7 @@
         "type": "Typ",
         "hours_logged": "Zarejestrowane godziny",
         "last_activity": "Ostatnia aktywność",
-        "status": "Status"
+        "status": "Stan"
       },
       "errors": {
         "load": "Nie udało się załadować kręgu odbiorców. Sprawdź identyfikator członka i spróbuj ponownie."
@@ -1037,16 +1037,16 @@
         "dismissed": "Zamknięte bez dalszych działań. Należy zapisać powód."
       },
       "filters": {
-        "status": "Status",
+        "status": "Stan",
         "severity": "Powaga"
       },
       "table": {
         "aria": "Raporty zabezpieczające",
         "severity": "Powaga",
         "category": "Kategoria",
-        "reporter": "Reporter",
+        "reporter": "Zgłaszający",
         "subject": "Temat",
-        "status": "Status",
+        "status": "Stan",
         "assigned": "Przydzielony",
         "sla": "Umowa dotycząca poziomu usług",
         "sla_abbr": "SLA",
@@ -1055,7 +1055,7 @@
       },
       "fields": {
         "category": "Kategoria",
-        "reporter": "Reporter",
+        "reporter": "Zgłaszający",
         "subject": "Temat",
         "description": "Opis",
         "evidence": "Dowód",

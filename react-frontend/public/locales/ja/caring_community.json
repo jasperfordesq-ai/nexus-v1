@@ -17,7 +17,7 @@
     "breakdown": {
       "title": "信頼階層の内訳",
       "subtitle": "現在のティアを獲得した方法と、次のティアに必要なものは次のとおりです。",
-      "signal_progress": "{{current}} of {{required}}",
+      "signal_progress": "{{required}}件中{{current}}件",
       "achieved": "達成",
       "in_progress": "進行中",
       "next_tier_hint": "次の層に到達するには、残りのシグナルを完了してください。",
@@ -151,7 +151,7 @@
     "cancel_button": "キャンセル",
     "empty": "現在、フェデレーション コミュニティは見つかりません。コミュニティ スラッグを手動で入力することもできます。",
     "fallback_label": "またはコミュニティスラッグを手動で入力します",
-    "member_count_label": "members"
+    "member_count_label": "メンバー"
   },
   "onboarding": {
     "title": "思いやりのあるコミュニティへようこそ",
@@ -556,7 +556,7 @@
       },
       "reverse_modal": {
         "title": "逆償還",
-        "body": "This will restore {{hours}} hours to {{member}}'s wallet and mark the redemption as reversed. This cannot be undone.",
+        "body": "これにより{{hours}}時間が{{member}}さんのウォレットに戻され、引き換えは取り消し済みとしてマークされます。この操作は元に戻せません。",
         "member_fallback": "メンバー",
         "merchant": "販売者:{{merchant}}",
         "discount": "割引: CHF{{total}}の注文で CHF{{discount}}",

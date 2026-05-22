@@ -5808,12 +5808,12 @@
     "delete": "Borrar"
   },
   "header": {
-    "admin_menu": "Admin menu",
-    "back_to_site": "Back to site",
-    "my_profile": "My Profile",
-    "notifications": "Notifications",
-    "sign_out": "Sign Out",
-    "toggle_sidebar": "Toggle sidebar"
+    "admin_menu": "Menú de administración",
+    "back_to_site": "Volver al sitio",
+    "my_profile": "Mi perfil",
+    "notifications": "Notificaciones",
+    "sign_out": "Cerrar sesión",
+    "toggle_sidebar": "Alternar barra lateral"
   },
   "icon_picker": {
     "choose_icon": "Choose Icon",
@@ -7665,22 +7665,22 @@
     }
   },
   "stats": {
-    "active_listings": "Active Listings",
-    "active_users": "Active Users",
-    "hours_exchanged": "Hours Exchanged",
-    "new_listings_this_month": "New Listings This Month",
-    "new_users_this_month": "New Users This Month",
-    "total_listings": "Total Listings",
-    "total_members": "Total Members",
-    "transactions": "Transactions"
+    "active_listings": "Listados activos",
+    "active_users": "Usuarios activos",
+    "hours_exchanged": "Horas Intercambiadas",
+    "new_listings_this_month": "Nuevos listados este mes",
+    "new_users_this_month": "Nuevos usuarios este mes",
+    "total_listings": "Listados totales",
+    "total_members": "Total de miembros",
+    "transactions": "Transacciones"
   },
   "status": {
-    "all_operational": "All systems operational",
-    "issues_detected": "Issues detected",
-    "offline": "Offline",
-    "online": "Online",
-    "some_attention": "Some services need attention",
-    "warning": "Warning"
+    "all_operational": "Todos los sistemas operativos.",
+    "issues_detected": "Problemas detectados",
+    "offline": "Sin conexión",
+    "online": "En línea",
+    "some_attention": "Algunos servicios necesitan atención.",
+    "warning": "Advertencia"
   },
   "super": {
     "action_failed": "Fallido",
@@ -11106,12 +11106,12 @@
     "select_job": "Select Job"
   },
   "diagnostics_matching": {
-    "avg_match_score": "Avg Match Score",
-    "cache_entries": "Cache Entries",
-    "diagnose_listing_matches": "Diagnose Listing Matches",
-    "diagnose_user_matches": "Diagnose User Matches",
-    "engine_status": "Engine Status",
-    "matches_today": "Matches Today"
+    "avg_match_score": "Puntuación promedio del partido",
+    "cache_entries": "Entradas de caché",
+    "diagnose_listing_matches": "Diagnosticar coincidencias de listados",
+    "diagnose_user_matches": "Diagnosticar coincidencias de usuarios",
+    "engine_status": "Estado del motor",
+    "matches_today": "Partidos hoy"
   },
   "error_occurred": "Occurred error",
   "federation_audit": {
@@ -11153,10 +11153,10 @@
   },
   "import": "Import",
   "legal_doc_form": {
-    "back_to_documents": "Back to Documents",
-    "cancel": "Cancel",
+    "back_to_documents": "Volver a Documentos",
+    "cancel": "Cancelar",
     "create_description": "Create.",
-    "create_document": "Create Document",
+    "create_document": "Crear documento",
     "create_title": "Create",
     "doc_type_acceptable_use": "Doc Type Acceptable Use",
     "doc_type_accessibility": "Doc Type Accessibility",
@@ -11169,10 +11169,10 @@
     "page_title_create": "Title Create",
     "page_title_edit": "Title Edit",
     "save_failed_generic": "Save Failed Generic",
-    "status_archived": "Archived",
-    "status_draft": "Draft",
-    "status_published": "Published",
-    "update_document": "Update Document",
+    "status_archived": "Archivado",
+    "status_draft": "Borrador",
+    "status_published": "Publicado",
+    "update_document": "Actualizar documento",
     "content": "Contenido",
     "content_placeholder": "Introduzca el contenido del documento...",
     "document_content": "Contenido del documento",
@@ -11185,44 +11185,44 @@
     "title_required": "Se requiere título"
   },
   "legal_versions": {
-    "compliance_dashboard": "Compliance Dashboard",
-    "create_new_version": "Create New Version",
-    "delete_draft": "Delete Draft",
-    "delete_draft_version": "Delete Draft Version",
+    "compliance_dashboard": "Panel de cumplimiento",
+    "create_new_version": "Crear nueva versión",
+    "delete_draft": "Eliminar borrador",
+    "delete_draft_version": "Eliminar versión borrador",
     "publish_step_1": "Publish Step 1",
     "publish_step_2": "Publish Step 2",
     "publish_step_3": "Publish Step 3",
     "publish_step_4": "Publish Step 4",
-    "publish_version": "Publish Version",
-    "send_notification": "Send Notification",
+    "publish_version": "Publicar versión",
+    "send_notification": "Enviar notificación",
     "subtitle": "Subtitle",
     "this_will": "This Will",
     "title": "Title"
   },
   "load_error": "Load error",
   "log_files_labels": {
-    "download": "Download",
-    "filter_all": "All",
-    "filter_application": "Application",
-    "filter_cron": "Cron",
-    "filter_errors": "Errors",
+    "download": "Descargar",
+    "filter_all": "Todos",
+    "filter_application": "Solicitud",
+    "filter_cron": "cron",
+    "filter_errors": "Errores",
     "lines_count": "{{count}} l?neas",
-    "search_placeholder": "Enter search...",
-    "total_files": "Total Files",
-    "total_size": "Total Size"
+    "search_placeholder": "Introduce la búsqueda...",
+    "total_files": "Archivos totales",
+    "total_size": "Tamaño total"
   },
   "manage": "Manage",
   "match_detail": {
-    "associated_listing": "Associated Listing",
-    "category": "Category",
-    "distance": "Distance",
-    "listing_owner": "Listing Owner",
-    "match_information": "Match Information",
-    "match_reasons": "Match Reasons",
-    "match_score": "Match Score",
-    "match_type": "Match",
-    "matched_user": "Matched User",
-    "review_details": "Review Details"
+    "associated_listing": "Listado asociado",
+    "category": "categoría",
+    "distance": "Distancia",
+    "listing_owner": "Propietario del listado",
+    "match_information": "Información del partido",
+    "match_reasons": "Razones del partido",
+    "match_score": "Puntuación del partido",
+    "match_type": "partido",
+    "matched_user": "Usuario coincidente",
+    "review_details": "Detalles de la revisión"
   },
   "newsletter_diagnostics": {
     "bounce_chip_critical": "Chip de rebote crítico",
@@ -11381,13 +11381,13 @@
     "tag_unsubscribe_link": "Enlace para darse de baja"
   },
   "newsletter_resend": {
-    "clicked": "Clicked",
-    "failed_to_load": "Failed to load",
-    "no_recipients": "No recipients found",
-    "opened": "Opened",
-    "preview_recipient_count": "Preview Recipient Count",
-    "resend_newsletter": "Resend Newsletter",
-    "total_sent": "Total sent",
+    "clicked": "Se hizo clic",
+    "failed_to_load": "No se pudo cargar",
+    "no_recipients": "No se encontraron destinatarios",
+    "opened": "Abierto",
+    "preview_recipient_count": "Vista previa del recuento de destinatarios",
+    "resend_newsletter": "Reenviar boletín",
+    "total_sent": "Total enviado",
     "cancel": "Cancelar",
     "loading": "Cargando información de reenvío...",
     "no_recipients_desc": "No hay destinatarios que coincidan con sus criterios de selección.",
@@ -11431,12 +11431,12 @@
     "title": "Enviar optimizador de tiempo"
   },
   "newsletter_template_form": {
-    "content": "Content",
-    "email_settings": "Email Settings",
-    "template_details": "Template Details",
-    "test_tip_clients": "Test Tip Clients",
-    "test_tip_unsubscribe": "Test Tip Unsubscribe",
-    "usage_stats": "Usage Stats"
+    "content": "Contenido",
+    "email_settings": "Configuración de correo electrónico",
+    "template_details": "Detalles de la plantilla",
+    "test_tip_clients": "Clientes de consejos de prueba",
+    "test_tip_unsubscribe": "Consejo de prueba Cancelar suscripción",
+    "usage_stats": "Estadísticas de uso"
   },
   "provider_health": {
     "aria_success_rate": "Success Rate"
@@ -11444,30 +11444,30 @@
   "refresh": "Refresh",
   "rte": {
     "block_quote": "Block Quote",
-    "bold": "Bold",
+    "bold": "Negrita",
     "bullet_list": "Bullet List",
-    "enter_url": "Enter URL",
+    "enter_url": "Ingrese la URL",
     "heading_2": "2",
     "heading_3": "3",
-    "import_markdown": "Import Markdown",
+    "import_markdown": "Importación de rebajas",
     "import_md": "Import Md",
     "inline_code": "Inline Code",
     "insert_link": "Insert Link",
-    "italic": "Italic",
+    "italic": "cursiva",
     "numbered_list": "Numbered List",
-    "redo": "Redo",
+    "redo": "Rehacer",
     "remove_link": "Remove Link",
-    "strikethrough": "Strikethrough",
-    "underline": "Underline",
-    "undo": "Undo",
-    "content_html": "Content HTML",
+    "strikethrough": "Tachado",
+    "underline": "subrayado",
+    "undo": "Deshacer",
+    "content_html": "Contenido HTML",
     "content_helper": "Content",
     "content_placeholder": "Content...",
     "editor_only": "Editor Only",
     "notice_body_placeholder": "Enter notice body...",
     "notice_box": "Notice Box",
     "notice_title_placeholder": "Enter notice title...",
-    "preview": "Preview",
+    "preview": "Vista previa",
     "preview_title_placeholder": "Enter preview title...",
     "split_view": "Split View",
     "start_writing": "Empieza a escribir..."
@@ -11667,13 +11667,13 @@
     "view_full_details": "Ver todos los detalles"
   },
   "system_monitoring": {
-    "feature_flags": "Feature Flags",
-    "log_files": "Log Files",
-    "log_files_desc": "Log Files.",
-    "system_requirements": "System Requirements",
-    "system_requirements_desc": "System Requirements.",
-    "memory_available": "{{available}} available",
-    "vm_memory": "VM Memory"
+    "feature_flags": "Banderas de características",
+    "log_files": "Archivos de registro",
+    "log_files_desc": "Archivos de registro.",
+    "system_requirements": "Requisitos del sistema",
+    "system_requirements_desc": "Requisitos del sistema.",
+    "memory_available": "{{available}} disponible",
+    "vm_memory": "Memoria de máquina virtual"
   },
   "template_form": {
     "active": "Activo",
@@ -13715,12 +13715,12 @@
     }
   },
   "help_drawer": {
-    "aria_label": "Help: {{title}}",
-    "close_panel": "Close help panel",
-    "how_to_use": "How to use this page",
-    "label": "Help",
-    "related_pages": "Related pages",
-    "tips": "Tips & gotchas"
+    "aria_label": "Ayuda: {{title}}",
+    "close_panel": "Cerrar panel de ayuda",
+    "how_to_use": "Cómo utilizar esta página",
+    "label": "Ayuda",
+    "related_pages": "Páginas relacionadas",
+    "tips": "Consejos y trampas"
   },
   "clear_accent_color": "Color de acento claro",
   "clear_primary_color": "Color primario claro",
@@ -13781,7 +13781,7 @@
     "create_modal": {
       "allowed_scopes": "Alcances permitidos",
       "contact_email": "Correo electrónico de contacto",
-      "contact_email_placeholder": "integrations@partner.example",
+      "contact_email_placeholder": "integraciones@socio.ejemplo",
       "description": "Descripción",
       "name": "Nombre",
       "name_placeholder": "p.ej. PostFinance Switzerland",
@@ -14060,9 +14060,9 @@
     },
     "residency": {
       "article_16": "Se permite la divulgación transfronteriza de datos personales si el país de destino garantiza una protección de datos adecuada reconocida por el Consejo Federal. Switzerland, EU/EEA member states, and a small list of other countries qualify.",
-      "article_16_label": "FADP Art. 16",
+      "article_16_label": "Art. FADP. 16",
       "article_17": "Si el destino no califica, se deben implementar salvaguardias adecuadas, como cláusulas estándar de protección de datos aprobadas por FDPIC, reglas corporativas vinculantes o el consentimiento de los miembros.",
-      "article_17_label": "FADP Art. 17",
+      "article_17_label": "Art. FADP. 17",
       "description": "Donde se almacenan y procesan los datos de los miembros inquilinos.",
       "dpa_contact": "Contacto DPA",
       "title": "Residencia de datos declarada",
@@ -14114,9 +14114,9 @@
       "unknown": "Base jurídica desconocida: {{basis}}"
     },
     "data_residency": {
-      "EU": "EU (EEA)",
+      "EU": "UE (EEE)",
       "International": "Internacional (fuera de EU/Switzerland)",
-      "Switzerland": "Switzerland"
+      "Switzerland": "Suiza"
     },
     "consent_actions": {
       "granted": "Otorgada",
@@ -14148,7 +14148,7 @@
     },
     "ki_agents": {
       "meta": {
-        "title": "KI-Agenten",
+        "title": "Agentes KI",
         "description": "AG61 - Marco de agentes autónomos. Los agentes proponen acciones; los humanos aprueban antes de que se aplique algo."
       },
       "about": {
@@ -14194,7 +14194,7 @@
         "running": "Correr"
       },
       "triggered_by": {
-        "manual": "Manual",
+        "manual": "manuales",
         "scheduled": "Programado"
       },
       "config": {
@@ -14213,7 +14213,7 @@
         "max_proposals": "Propuestas máximas por ejecución",
         "schedule_hour": "Hora programada (0-23, hora local del servidor)",
         "notification_email": "Correo electrónico de notificación",
-        "notification_email_placeholder": "admin@example.org"
+        "notification_email_placeholder": "administrador@ejemplo.org"
       },
       "actions": {
         "approve": "Aprobar",

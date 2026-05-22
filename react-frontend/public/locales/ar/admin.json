@@ -5808,12 +5808,12 @@
     "delete": "يمسح"
   },
   "header": {
-    "admin_menu": "Admin menu",
-    "back_to_site": "Back to site",
-    "my_profile": "My Profile",
-    "notifications": "Notifications",
-    "sign_out": "Sign Out",
-    "toggle_sidebar": "Toggle sidebar"
+    "admin_menu": "قائمة المشرف",
+    "back_to_site": "العودة إلى الموقع",
+    "my_profile": "ملفي الشخصي",
+    "notifications": "إشعارات",
+    "sign_out": "تسجيل الخروج",
+    "toggle_sidebar": "تبديل الشريط الجانبي"
   },
   "icon_picker": {
     "choose_icon": "Choose Icon",
@@ -7665,22 +7665,22 @@
     }
   },
   "stats": {
-    "active_listings": "Active Listings",
-    "active_users": "Active Users",
-    "hours_exchanged": "Hours Exchanged",
-    "new_listings_this_month": "New Listings This Month",
-    "new_users_this_month": "New Users This Month",
-    "total_listings": "Total Listings",
-    "total_members": "Total Members",
-    "transactions": "Transactions"
+    "active_listings": "القوائم النشطة",
+    "active_users": "المستخدمون النشطون",
+    "hours_exchanged": "ساعات متبادلة",
+    "new_listings_this_month": "قوائم جديدة هذا الشهر",
+    "new_users_this_month": "المستخدمون الجدد هذا الشهر",
+    "total_listings": "إجمالي القوائم",
+    "total_members": "إجمالي الأعضاء",
+    "transactions": "المعاملات"
   },
   "status": {
-    "all_operational": "All systems operational",
-    "issues_detected": "Issues detected",
-    "offline": "Offline",
-    "online": "Online",
-    "some_attention": "Some services need attention",
-    "warning": "Warning"
+    "all_operational": "جميع الأنظمة قيد التشغيل",
+    "issues_detected": "تم اكتشاف مشكلات",
+    "offline": "غير متصل",
+    "online": "متصل",
+    "some_attention": "بعض الخدمات تحتاج إلى الاهتمام",
+    "warning": "تحذير"
   },
   "super": {
     "action_failed": "فشل",
@@ -11106,12 +11106,12 @@
     "select_job": "Select Job"
   },
   "diagnostics_matching": {
-    "avg_match_score": "Avg Match Score",
-    "cache_entries": "Cache Entries",
-    "diagnose_listing_matches": "Diagnose Listing Matches",
-    "diagnose_user_matches": "Diagnose User Matches",
-    "engine_status": "Engine Status",
-    "matches_today": "Matches Today"
+    "avg_match_score": "متوسط ​​نتيجة المباراة",
+    "cache_entries": "إدخالات ذاكرة التخزين المؤقت",
+    "diagnose_listing_matches": "تشخيص تطابقات القائمة",
+    "diagnose_user_matches": "تشخيص تطابقات المستخدم",
+    "engine_status": "حالة المحرك",
+    "matches_today": "مباريات اليوم"
   },
   "error_occurred": "Occurred error",
   "federation_audit": {
@@ -11153,10 +11153,10 @@
   },
   "import": "Import",
   "legal_doc_form": {
-    "back_to_documents": "Back to Documents",
-    "cancel": "Cancel",
+    "back_to_documents": "العودة إلى المستندات",
+    "cancel": "يلغي",
     "create_description": "Create.",
-    "create_document": "Create Document",
+    "create_document": "إنشاء مستند",
     "create_title": "Create",
     "doc_type_acceptable_use": "Doc Type Acceptable Use",
     "doc_type_accessibility": "Doc Type Accessibility",
@@ -11169,10 +11169,10 @@
     "page_title_create": "Title Create",
     "page_title_edit": "Title Edit",
     "save_failed_generic": "Save Failed Generic",
-    "status_archived": "Archived",
-    "status_draft": "Draft",
-    "status_published": "Published",
-    "update_document": "Update Document",
+    "status_archived": "مؤرشف",
+    "status_draft": "مسودة",
+    "status_published": "تم النشر",
+    "update_document": "تحديث الوثيقة",
     "content": "محتوى",
     "content_placeholder": "أدخل محتوى الوثيقة...",
     "document_content": "محتوى الوثيقة",
@@ -11185,44 +11185,44 @@
     "title_required": "العنوان مطلوب"
   },
   "legal_versions": {
-    "compliance_dashboard": "Compliance Dashboard",
-    "create_new_version": "Create New Version",
-    "delete_draft": "Delete Draft",
-    "delete_draft_version": "Delete Draft Version",
+    "compliance_dashboard": "لوحة معلومات الامتثال",
+    "create_new_version": "إنشاء نسخة جديدة",
+    "delete_draft": "حذف المسودة",
+    "delete_draft_version": "حذف نسخة المسودة",
     "publish_step_1": "Publish Step 1",
     "publish_step_2": "Publish Step 2",
     "publish_step_3": "Publish Step 3",
     "publish_step_4": "Publish Step 4",
-    "publish_version": "Publish Version",
-    "send_notification": "Send Notification",
+    "publish_version": "نشر النسخة",
+    "send_notification": "إرسال الإخطار",
     "subtitle": "Subtitle",
     "this_will": "This Will",
     "title": "Title"
   },
   "load_error": "Load error",
   "log_files_labels": {
-    "download": "Download",
-    "filter_all": "All",
-    "filter_application": "Application",
-    "filter_cron": "Cron",
-    "filter_errors": "Errors",
+    "download": "تحميل",
+    "filter_all": "الجميع",
+    "filter_application": "طلب",
+    "filter_cron": "كرون",
+    "filter_errors": "أخطاء",
     "lines_count": "{{count}} ????",
-    "search_placeholder": "Enter search...",
-    "total_files": "Total Files",
-    "total_size": "Total Size"
+    "search_placeholder": "أدخل البحث...",
+    "total_files": "إجمالي الملفات",
+    "total_size": "الحجم الإجمالي"
   },
   "manage": "Manage",
   "match_detail": {
-    "associated_listing": "Associated Listing",
-    "category": "Category",
-    "distance": "Distance",
-    "listing_owner": "Listing Owner",
-    "match_information": "Match Information",
-    "match_reasons": "Match Reasons",
-    "match_score": "Match Score",
-    "match_type": "Match",
-    "matched_user": "Matched User",
-    "review_details": "Review Details"
+    "associated_listing": "القائمة المرتبطة",
+    "category": "فئة",
+    "distance": "مسافة",
+    "listing_owner": "مالك القائمة",
+    "match_information": "معلومات المباراة",
+    "match_reasons": "أسباب المباراة",
+    "match_score": "نتيجة المباراة",
+    "match_type": "مباراة",
+    "matched_user": "المستخدم المطابق",
+    "review_details": "تفاصيل المراجعة"
   },
   "newsletter_diagnostics": {
     "bounce_chip_critical": "ترتد رقاقة الحرجة",
@@ -11381,13 +11381,13 @@
     "tag_unsubscribe_link": "رابط إلغاء الاشتراك"
   },
   "newsletter_resend": {
-    "clicked": "Clicked",
-    "failed_to_load": "Failed to load",
-    "no_recipients": "No recipients found",
-    "opened": "Opened",
-    "preview_recipient_count": "Preview Recipient Count",
-    "resend_newsletter": "Resend Newsletter",
-    "total_sent": "Total sent",
+    "clicked": "تم النقر عليه",
+    "failed_to_load": "فشل التحميل",
+    "no_recipients": "لم يتم العثور على مستلمين",
+    "opened": "مفتوح",
+    "preview_recipient_count": "معاينة عدد المستلمين",
+    "resend_newsletter": "إعادة إرسال النشرة الإخبارية",
+    "total_sent": "إجمالي المرسلة",
     "cancel": "يلغي",
     "loading": "جارٍ تحميل معلومات إعادة الإرسال...",
     "no_recipients_desc": "لا يوجد مستلمون مطابقون لمعايير التحديد الخاصة بك.",
@@ -11431,12 +11431,12 @@
     "title": "إرسال محسن الوقت"
   },
   "newsletter_template_form": {
-    "content": "Content",
-    "email_settings": "Email Settings",
-    "template_details": "Template Details",
-    "test_tip_clients": "Test Tip Clients",
-    "test_tip_unsubscribe": "Test Tip Unsubscribe",
-    "usage_stats": "Usage Stats"
+    "content": "محتوى",
+    "email_settings": "إعدادات البريد الإلكتروني",
+    "template_details": "تفاصيل القالب",
+    "test_tip_clients": "عملاء نصيحة الاختبار",
+    "test_tip_unsubscribe": "نصيحة تجريبية إلغاء الاشتراك",
+    "usage_stats": "إحصائيات الاستخدام"
   },
   "provider_health": {
     "aria_success_rate": "Success Rate"
@@ -11444,30 +11444,30 @@
   "refresh": "Refresh",
   "rte": {
     "block_quote": "Block Quote",
-    "bold": "Bold",
+    "bold": "عريض",
     "bullet_list": "Bullet List",
-    "enter_url": "Enter URL",
+    "enter_url": "أدخل عنوان URL",
     "heading_2": "2",
     "heading_3": "3",
-    "import_markdown": "Import Markdown",
+    "import_markdown": "استيراد تخفيض السعر",
     "import_md": "Import Md",
     "inline_code": "Inline Code",
     "insert_link": "Insert Link",
-    "italic": "Italic",
+    "italic": "مائل",
     "numbered_list": "Numbered List",
-    "redo": "Redo",
+    "redo": "إعادة",
     "remove_link": "Remove Link",
-    "strikethrough": "Strikethrough",
-    "underline": "Underline",
-    "undo": "Undo",
-    "content_html": "Content HTML",
+    "strikethrough": "يتوسطه خط",
+    "underline": "تسطير",
+    "undo": "تراجع",
+    "content_html": "محتوى HTML",
     "content_helper": "Content",
     "content_placeholder": "Content...",
     "editor_only": "Editor Only",
     "notice_body_placeholder": "Enter notice body...",
     "notice_box": "Notice Box",
     "notice_title_placeholder": "Enter notice title...",
-    "preview": "Preview",
+    "preview": "معاينة",
     "preview_title_placeholder": "Enter preview title...",
     "split_view": "Split View",
     "start_writing": "ابدأ بالكتابة..."
@@ -11667,13 +11667,13 @@
     "view_full_details": "عرض التفاصيل الكاملة"
   },
   "system_monitoring": {
-    "feature_flags": "Feature Flags",
-    "log_files": "Log Files",
-    "log_files_desc": "Log Files.",
-    "system_requirements": "System Requirements",
-    "system_requirements_desc": "System Requirements.",
-    "memory_available": "{{available}} available",
-    "vm_memory": "VM Memory"
+    "feature_flags": "أعلام مميزة",
+    "log_files": "ملفات السجل",
+    "log_files_desc": "ملفات السجل.",
+    "system_requirements": "متطلبات النظام",
+    "system_requirements_desc": "متطلبات النظام.",
+    "memory_available": "{{available}} متاح",
+    "vm_memory": "ذاكرة VM"
   },
   "template_form": {
     "active": "نشيط",
@@ -13715,12 +13715,12 @@
     }
   },
   "help_drawer": {
-    "aria_label": "Help: {{title}}",
-    "close_panel": "Close help panel",
-    "how_to_use": "How to use this page",
-    "label": "Help",
-    "related_pages": "Related pages",
-    "tips": "Tips & gotchas"
+    "aria_label": "مساعدة: {{title}}",
+    "close_panel": "إغلاق لوحة المساعدة",
+    "how_to_use": "كيفية استخدام هذه الصفحة",
+    "label": "يساعد",
+    "related_pages": "الصفحات ذات الصلة",
+    "tips": "نصائح ومسكتك"
   },
   "clear_accent_color": "لون مميز واضح",
   "clear_primary_color": "مسح اللون الأساسي",
@@ -13781,7 +13781,7 @@
     "create_modal": {
       "allowed_scopes": "النطاقات المسموح بها",
       "contact_email": "البريد الإلكتروني للاتصال",
-      "contact_email_placeholder": "integrations@partner.example",
+      "contact_email_placeholder": "التكامل @partner.example",
       "description": "وصف",
       "name": "اسم",
       "name_placeholder": "على سبيل المثال PostFinance Switzerland",
@@ -14060,9 +14060,9 @@
     },
     "residency": {
       "article_16": "يُسمح بالكشف عن البيانات الشخصية عبر الحدود إذا كانت دولة المقصد تضمن حماية كافية للبيانات معترف بها من قبل المجلس الفيدرالي. Switzerland والدول الأعضاء EU/EEA وقائمة صغيرة من البلدان الأخرى مؤهلة.",
-      "article_16_label": "FADP Art. 16",
+      "article_16_label": "فن FADP. 16",
       "article_17": "إذا كانت الوجهة غير مؤهلة، فيجب وضع الضمانات المناسبة، مثل بنود حماية البيانات القياسية المعتمدة من قبل FDPIC، أو قواعد الشركة الملزمة، أو موافقة الأعضاء.",
-      "article_17_label": "FADP Art. 17",
+      "article_17_label": "فن FADP. 17",
       "description": "حيث يتم تخزين بيانات العضو المستأجر ومعالجتها.",
       "dpa_contact": "جهة اتصال DPA",
       "title": "مكان إقامة البيانات المعلنة",
@@ -14114,9 +14114,9 @@
       "unknown": "أساس قانوني غير معروف: {{basis}}"
     },
     "data_residency": {
-      "EU": "EU (EEA)",
+      "EU": "الاتحاد الأوروبي (المنطقة الاقتصادية الأوروبية)",
       "International": "دولي (خارج EU/Switzerland)",
-      "Switzerland": "Switzerland"
+      "Switzerland": "سويسرا"
     },
     "consent_actions": {
       "granted": "ممنوح",

@@ -5808,12 +5808,12 @@
     "delete": "Supprimer"
   },
   "header": {
-    "admin_menu": "Admin menu",
-    "back_to_site": "Back to site",
-    "my_profile": "My Profile",
+    "admin_menu": "Menu administrateur",
+    "back_to_site": "Retour au site",
+    "my_profile": "Mon profil",
     "notifications": "Notifications",
-    "sign_out": "Sign Out",
-    "toggle_sidebar": "Toggle sidebar"
+    "sign_out": "Se déconnecter",
+    "toggle_sidebar": "Basculer la barre latérale"
   },
   "icon_picker": {
     "choose_icon": "Choose Icon",
@@ -7665,22 +7665,22 @@
     }
   },
   "stats": {
-    "active_listings": "Active Listings",
-    "active_users": "Active Users",
-    "hours_exchanged": "Hours Exchanged",
-    "new_listings_this_month": "New Listings This Month",
-    "new_users_this_month": "New Users This Month",
-    "total_listings": "Total Listings",
-    "total_members": "Total Members",
-    "transactions": "Transactions"
+    "active_listings": "Annonces actives",
+    "active_users": "Utilisateurs actifs",
+    "hours_exchanged": "Heures échangées",
+    "new_listings_this_month": "Nouvelles inscriptions ce mois-ci",
+    "new_users_this_month": "Nouveaux utilisateurs ce mois-ci",
+    "total_listings": "Total des annonces",
+    "total_members": "Nombre total de membres",
+    "transactions": "Opérations"
   },
   "status": {
-    "all_operational": "All systems operational",
-    "issues_detected": "Issues detected",
-    "offline": "Offline",
-    "online": "Online",
-    "some_attention": "Some services need attention",
-    "warning": "Warning"
+    "all_operational": "Tous les systèmes opérationnels",
+    "issues_detected": "Problèmes détectés",
+    "offline": "Hors ligne",
+    "online": "En ligne",
+    "some_attention": "Certains services nécessitent une attention particulière",
+    "warning": "Avertissement"
   },
   "super": {
     "action_failed": "Échec",
@@ -8282,9 +8282,9 @@
     "jwt_setup_docker_env": "Docker Compose/serveur Linux simple avec fichier.env:",
     "jwt_setup_docker_no_env": "Docker Compose sans fichier.env:",
     "jwt_setup_docker_no_env_body": "ajoutez-le sous le service de l'application",
-    "jwt_setup_hosting_panel": "Plesk / cPanel / IIS:",
+    "jwt_setup_hosting_panel": "Plesk / cPanel / IIS :",
     "jwt_setup_hosting_panel_body": "utilisez l'éditeur de variables d'environnement du panneau d'hébergement, tel que Plesk PHP Settings > Env Vars ou IIS web.config",
-    "jwt_setup_kubernetes": "Kubernetes:",
+    "jwt_setup_kubernetes": "Kubernetes :",
     "jwt_setup_kubernetes_body": "créer un",
     "jwt_setup_paas": "Heroku / Rendu / Fly.io:",
     "jwt_setup_paas_suffix": "ou le champ équivalent du tableau de bord.",
@@ -8656,7 +8656,7 @@
       "done": "Terminé",
       "email_verification": "Vérification par e-mail",
       "exhausted": "Épuisé",
-      "expired": "Expired",
+      "expired": "Expiré",
       "expiry_date": "Date d'expiration",
       "fallback_admin": "Administrateur de secours",
       "fallback_admin_desc": "Exiger l'approbation de l'administrateur après avoir réussi la vérification d'identité",
@@ -11106,12 +11106,12 @@
     "select_job": "Select Job"
   },
   "diagnostics_matching": {
-    "avg_match_score": "Avg Match Score",
-    "cache_entries": "Cache Entries",
-    "diagnose_listing_matches": "Diagnose Listing Matches",
-    "diagnose_user_matches": "Diagnose User Matches",
-    "engine_status": "Engine Status",
-    "matches_today": "Matches Today"
+    "avg_match_score": "Score de correspondance moyen",
+    "cache_entries": "Entrées du cache",
+    "diagnose_listing_matches": "Diagnostiquer les correspondances d'annonces",
+    "diagnose_user_matches": "Diagnostiquer les correspondances d'utilisateurs",
+    "engine_status": "État du moteur",
+    "matches_today": "Matchs aujourd'hui"
   },
   "error_occurred": "Occurred error",
   "federation_audit": {
@@ -11153,10 +11153,10 @@
   },
   "import": "Import",
   "legal_doc_form": {
-    "back_to_documents": "Back to Documents",
-    "cancel": "Cancel",
+    "back_to_documents": "Retour aux documents",
+    "cancel": "Annuler",
     "create_description": "Create.",
-    "create_document": "Create Document",
+    "create_document": "Créer un document",
     "create_title": "Create",
     "doc_type_acceptable_use": "Doc Type Acceptable Use",
     "doc_type_accessibility": "Doc Type Accessibility",
@@ -11169,10 +11169,10 @@
     "page_title_create": "Title Create",
     "page_title_edit": "Title Edit",
     "save_failed_generic": "Save Failed Generic",
-    "status_archived": "Archived",
-    "status_draft": "Draft",
-    "status_published": "Published",
-    "update_document": "Update Document",
+    "status_archived": "Archivé",
+    "status_draft": "Brouillon",
+    "status_published": "Publié",
+    "update_document": "Mettre à jour le document",
     "content": "Contenu",
     "content_placeholder": "Saisissez le contenu du document...",
     "document_content": "Contenu du document",
@@ -11185,44 +11185,44 @@
     "title_required": "Le titre est requis"
   },
   "legal_versions": {
-    "compliance_dashboard": "Compliance Dashboard",
-    "create_new_version": "Create New Version",
-    "delete_draft": "Delete Draft",
-    "delete_draft_version": "Delete Draft Version",
+    "compliance_dashboard": "Tableau de bord de conformité",
+    "create_new_version": "Créer une nouvelle version",
+    "delete_draft": "Supprimer le brouillon",
+    "delete_draft_version": "Supprimer la version brouillon",
     "publish_step_1": "Publish Step 1",
     "publish_step_2": "Publish Step 2",
     "publish_step_3": "Publish Step 3",
     "publish_step_4": "Publish Step 4",
-    "publish_version": "Publish Version",
-    "send_notification": "Send Notification",
+    "publish_version": "Publier la version",
+    "send_notification": "Envoyer une notification",
     "subtitle": "Subtitle",
     "this_will": "This Will",
     "title": "Title"
   },
   "load_error": "Load error",
   "log_files_labels": {
-    "download": "Download",
-    "filter_all": "All",
-    "filter_application": "Application",
+    "download": "Télécharger",
+    "filter_all": "Tout",
+    "filter_application": "Demande",
     "filter_cron": "Cron",
-    "filter_errors": "Errors",
+    "filter_errors": "Erreurs",
     "lines_count": "{{count}} lignes",
-    "search_placeholder": "Enter search...",
-    "total_files": "Total Files",
-    "total_size": "Total Size"
+    "search_placeholder": "Entrez la recherche...",
+    "total_files": "Total des fichiers",
+    "total_size": "Taille totale"
   },
   "manage": "Manage",
   "match_detail": {
-    "associated_listing": "Associated Listing",
-    "category": "Category",
+    "associated_listing": "Annonce associée",
+    "category": "Catégorie",
     "distance": "Distance",
-    "listing_owner": "Listing Owner",
-    "match_information": "Match Information",
-    "match_reasons": "Match Reasons",
-    "match_score": "Match Score",
-    "match_type": "Match",
-    "matched_user": "Matched User",
-    "review_details": "Review Details"
+    "listing_owner": "Propriétaire de l'annonce",
+    "match_information": "Informations sur le match",
+    "match_reasons": "Raisons de correspondance",
+    "match_score": "Score du match",
+    "match_type": "Correspondance",
+    "matched_user": "Utilisateur correspondant",
+    "review_details": "Détails de l'examen"
   },
   "newsletter_diagnostics": {
     "bounce_chip_critical": "Puce de rebond critique",
@@ -11381,13 +11381,13 @@
     "tag_unsubscribe_link": "Lien de désabonnement"
   },
   "newsletter_resend": {
-    "clicked": "Clicked",
-    "failed_to_load": "Failed to load",
-    "no_recipients": "No recipients found",
-    "opened": "Opened",
-    "preview_recipient_count": "Preview Recipient Count",
-    "resend_newsletter": "Resend Newsletter",
-    "total_sent": "Total sent",
+    "clicked": "cliqué",
+    "failed_to_load": "Échec du chargement",
+    "no_recipients": "Aucun destinataire trouvé",
+    "opened": "Ouvert",
+    "preview_recipient_count": "Aperçu du nombre de destinataires",
+    "resend_newsletter": "Renvoyer la newsletter",
+    "total_sent": "Total envoyé",
     "cancel": "Annuler",
     "loading": "Chargement des informations de renvoi...",
     "no_recipients_desc": "Aucun destinataire ne correspond à vos critères de sélection.",
@@ -11431,12 +11431,12 @@
     "title": "Optimiseur de temps d'envoi"
   },
   "newsletter_template_form": {
-    "content": "Content",
-    "email_settings": "Email Settings",
-    "template_details": "Template Details",
-    "test_tip_clients": "Test Tip Clients",
-    "test_tip_unsubscribe": "Test Tip Unsubscribe",
-    "usage_stats": "Usage Stats"
+    "content": "Contenu",
+    "email_settings": "Paramètres de messagerie",
+    "template_details": "Détails du modèle",
+    "test_tip_clients": "Clients de conseils de test",
+    "test_tip_unsubscribe": "Astuce de test Se désabonner",
+    "usage_stats": "Statistiques d'utilisation"
   },
   "provider_health": {
     "aria_success_rate": "Success Rate"
@@ -11444,30 +11444,30 @@
   "refresh": "Refresh",
   "rte": {
     "block_quote": "Block Quote",
-    "bold": "Bold",
+    "bold": "Audacieux",
     "bullet_list": "Bullet List",
-    "enter_url": "Enter URL",
+    "enter_url": "Entrez l'URL",
     "heading_2": "2",
     "heading_3": "3",
-    "import_markdown": "Import Markdown",
+    "import_markdown": "Importer une démarque",
     "import_md": "Import Md",
     "inline_code": "Inline Code",
     "insert_link": "Insert Link",
-    "italic": "Italic",
+    "italic": "Italique",
     "numbered_list": "Numbered List",
-    "redo": "Redo",
+    "redo": "Refaire",
     "remove_link": "Remove Link",
-    "strikethrough": "Strikethrough",
-    "underline": "Underline",
-    "undo": "Undo",
-    "content_html": "Content HTML",
+    "strikethrough": "Barré",
+    "underline": "Souligner",
+    "undo": "Annuler",
+    "content_html": "Contenu HTML",
     "content_helper": "Content",
     "content_placeholder": "Content...",
     "editor_only": "Editor Only",
     "notice_body_placeholder": "Enter notice body...",
     "notice_box": "Notice Box",
     "notice_title_placeholder": "Enter notice title...",
-    "preview": "Preview",
+    "preview": "Aperçu",
     "preview_title_placeholder": "Enter preview title...",
     "split_view": "Split View",
     "start_writing": "Commencez à écrire..."
@@ -11667,13 +11667,13 @@
     "view_full_details": "Afficher tous les détails"
   },
   "system_monitoring": {
-    "feature_flags": "Feature Flags",
-    "log_files": "Log Files",
-    "log_files_desc": "Log Files.",
-    "system_requirements": "System Requirements",
-    "system_requirements_desc": "System Requirements.",
-    "memory_available": "{{available}} available",
-    "vm_memory": "VM Memory"
+    "feature_flags": "Indicateurs de fonctionnalités",
+    "log_files": "Fichiers journaux",
+    "log_files_desc": "Fichiers journaux.",
+    "system_requirements": "Configuration système requise",
+    "system_requirements_desc": "Configuration système requise.",
+    "memory_available": "{{available}} disponible",
+    "vm_memory": "Mémoire de machine virtuelle"
   },
   "template_form": {
     "active": "Actif",
@@ -12663,7 +12663,7 @@
       "hour_value_chip": "CHF {{value}}/h",
       "fields": {
         "name": "Nom du modèle",
-        "description": "Description",
+        "description": "Descriptif",
         "audience": "Public",
         "period": "Période de déclaration",
         "hour_value": "Remplacement de la valeur horaire (CHF)",
@@ -13715,12 +13715,12 @@
     }
   },
   "help_drawer": {
-    "aria_label": "Help: {{title}}",
-    "close_panel": "Close help panel",
-    "how_to_use": "How to use this page",
-    "label": "Help",
-    "related_pages": "Related pages",
-    "tips": "Tips & gotchas"
+    "aria_label": "Aide : {{title}}",
+    "close_panel": "Fermer le panneau d'aide",
+    "how_to_use": "Comment utiliser cette page",
+    "label": "Aide",
+    "related_pages": "Pages connexes",
+    "tips": "Conseils et pièges"
   },
   "clear_accent_color": "Couleur d'accent claire",
   "clear_primary_color": "Couleur primaire claire",
@@ -13781,8 +13781,8 @@
     "create_modal": {
       "allowed_scopes": "Portées autorisées",
       "contact_email": "E-mail de contact",
-      "contact_email_placeholder": "integrations@partner.example",
-      "description": "Description",
+      "contact_email_placeholder": "Integrations@partner.example",
+      "description": "Descriptif",
       "name": "Nom",
       "name_placeholder": "par ex. PostFinance Switzerland",
       "rate_limit": "Limite de débit (requêtes / minute)",
@@ -13802,7 +13802,7 @@
     },
     "detail": {
       "call_log_tab": "Journal des appels",
-      "contact": "Contact:",
+      "contact": "Contacter :",
       "info_tab": "Informations",
       "ip_allowlist": "Liste verte IP :",
       "rate_limit": "Limite de taux :",
@@ -14060,11 +14060,11 @@
     },
     "residency": {
       "article_16": "La divulgation transfrontalière de données personnelles est autorisée si le pays de destination garantit une protection des données adéquate, reconnue par le Conseil fédéral. Les États membres de Switzerland, EU/EEA et une petite liste d'autres pays sont éligibles.",
-      "article_16_label": "FADP Art. 16",
+      "article_16_label": "LPD Art. 16",
       "article_17": "Si la destination n'est pas éligible, des garanties appropriées doivent être en place, telles que des clauses standard de protection des données approuvées par FDPIC, des règles d'entreprise contraignantes ou le consentement des membres.",
-      "article_17_label": "FADP Art. 17",
+      "article_17_label": "LPD Art. 17",
       "description": "Où les données des membres locataires sont stockées et traitées.",
-      "dpa_contact": "DPA contact",
+      "dpa_contact": "Contact DPA",
       "title": "Résidence déclarée des données",
       "update_hint_prefix": "Pour mettre à jour la résidence déclarée, utilisez le",
       "update_hint_suffix": "languette.",
@@ -14114,9 +14114,9 @@
       "unknown": "Base légale inconnue : {{basis}}"
     },
     "data_residency": {
-      "EU": "EU (EEA)",
+      "EU": "UE (EEE)",
       "International": "International (en dehors de EU/Switzerland)",
-      "Switzerland": "Switzerland"
+      "Switzerland": "Suisse"
     },
     "consent_actions": {
       "granted": "Accordé",
@@ -14148,7 +14148,7 @@
     },
     "ki_agents": {
       "meta": {
-        "title": "KI-Agenten",
+        "title": "Agents KI",
         "description": "AG61 - Cadre d'agent autonome. Les agents proposent des actions ; les humains approuvent avant que quoi que ce soit ne soit appliqué."
       },
       "about": {
@@ -14213,7 +14213,7 @@
         "max_proposals": "Nombre maximum de propositions par exécution",
         "schedule_hour": "Heure de planification (0-23, heure locale du serveur)",
         "notification_email": "E-mail de notification",
-        "notification_email_placeholder": "admin@example.org"
+        "notification_email_placeholder": "admin@exemple.org"
       },
       "actions": {
         "approve": "Approuver",
@@ -14404,7 +14404,7 @@
         "table_aria": "Questions sans réponse",
         "columns": {
           "assistant_reply": "Réponse de l'assistant (extrait)",
-          "note": "Note",
+          "note": "Remarque",
           "user_question": "Question de l'utilisateur",
           "when": "Quand"
         }

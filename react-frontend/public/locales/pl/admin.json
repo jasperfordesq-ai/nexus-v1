@@ -1017,7 +1017,7 @@
     "listings_count": "Oferty",
     "member_growth_title": "Wzrost członka",
     "no_category_data": "Brak danych kategorii",
-    "no_earner_data": "No earner data",
+    "no_earner_data": "Brak danych o zarabiających",
     "no_exchange_trend_data": "Brak danych o tendencjach giełdowych",
     "no_location_data": "Brak danych o lokalizacji",
     "no_member_growth_data": "Brak danych dotyczących wzrostu liczby członków",
@@ -2704,13 +2704,13 @@
     "option_jobs_max_postings_per_user_label": "Maksymalna liczba postów na użytkownika",
     "option_jobs_max_postings_per_user_desc": "Maksymalna liczba aktywnych ofert pracy na użytkownika",
     "option_jobs_default_deadline_days_label": "Domyślny termin (dni)",
-    "option_jobs_default_deadline_days_desc": "Default application deadline in days from posting",
+    "option_jobs_default_deadline_days_desc": "Domyślny termin składania wniosków w dniach od wysłania",
     "option_jobs_moderation_enabled_label": "Wymagaj umiaru",
-    "option_jobs_moderation_enabled_desc": "Job postings require admin approval before going live",
+    "option_jobs_moderation_enabled_desc": "Oferty pracy wymagają zgody administratora przed publikacją",
     "option_jobs_spam_detection_label": "Wykrywanie spamu",
     "option_jobs_spam_detection_desc": "Automatycznie wykrywaj i oznaczaj spamowe oferty pracy",
     "option_jobs_auto_approve_trusted_label": "Automatyczne zatwierdzanie zaufane",
-    "option_jobs_auto_approve_trusted_desc": "Automatically approve postings from trusted employers",
+    "option_jobs_auto_approve_trusted_desc": "Automatycznie zatwierdzaj oferty pracy od zaufanych pracodawców",
     "option_jobs_enable_cv_upload_label": "Przesyłanie CV",
     "option_jobs_enable_cv_upload_desc": "Zezwalaj kandydatom na przesyłanie CV wraz z aplikacjami",
     "option_category_applications_pipeline": "Aplikacje i potok",
@@ -3473,7 +3473,7 @@
     "title_required": "Tytuł jest wymagany",
     "edit_description": "Edytuj.",
     "edit_title": "Edytuj",
-    "label_edit_deliverable": "Edit Deliverable",
+    "label_edit_deliverable": "Edytuj element dostarczany",
     "update_failed": "Aktualizacja nie powiodła się",
     "updated_success": "Aktualizacja powiodła się",
     "activity_by_user_date": "{{action}}autorstwa{{user}}-{{date}}",
@@ -5808,12 +5808,12 @@
     "delete": "Usuwać"
   },
   "header": {
-    "admin_menu": "Admin menu",
-    "back_to_site": "Back to site",
-    "my_profile": "My Profile",
-    "notifications": "Notifications",
-    "sign_out": "Sign Out",
-    "toggle_sidebar": "Toggle sidebar"
+    "admin_menu": "Menu administratora",
+    "back_to_site": "Powrót do serwisu",
+    "my_profile": "Mój profil",
+    "notifications": "Powiadomienia",
+    "sign_out": "Wyloguj się",
+    "toggle_sidebar": "Przełącz pasek boczny"
   },
   "icon_picker": {
     "choose_icon": "Choose Icon",
@@ -5927,7 +5927,7 @@
     "section_community_health": "Zdrowie społeczności",
     "section_community_health_desc": "Bieżące wskaźniki zaangażowania społeczności i sieci",
     "section_impact_summary": "Podsumowanie wpływu",
-    "section_skills_overview": "Skills Overview",
+    "section_skills_overview": "Przegląd umiejętności",
     "unit_connections": "connections",
     "btn_configure": "Skonfiguruj",
     "btn_export_csv": "Eksportuj plik CSV",
@@ -6198,7 +6198,7 @@
     "listings_admin_title": "Administrator ofert",
     "no_active_listings_found": "Nie znaleziono aktywnych ogłoszeń",
     "no_featured_listings": "Brak polecanych ofert",
-    "now_featured": "Now Featured",
+    "now_featured": "Teraz wyróżnione",
     "page_title": "Oferty",
     "placeholder_search_active_listings_to_feature": "Przeszukaj aktywne oferty, aby je wyróżnić...",
     "reject": "Odrzuć",
@@ -7665,22 +7665,22 @@
     }
   },
   "stats": {
-    "active_listings": "Active Listings",
-    "active_users": "Active Users",
-    "hours_exchanged": "Hours Exchanged",
-    "new_listings_this_month": "New Listings This Month",
-    "new_users_this_month": "New Users This Month",
-    "total_listings": "Total Listings",
-    "total_members": "Total Members",
-    "transactions": "Transactions"
+    "active_listings": "Aktywne oferty",
+    "active_users": "Aktywni użytkownicy",
+    "hours_exchanged": "Wymienione godziny",
+    "new_listings_this_month": "Nowe oferty w tym miesiącu",
+    "new_users_this_month": "Nowi użytkownicy w tym miesiącu",
+    "total_listings": "Łączna liczba ofert",
+    "total_members": "Całkowita liczba członków",
+    "transactions": "Transakcje"
   },
   "status": {
-    "all_operational": "All systems operational",
-    "issues_detected": "Issues detected",
-    "offline": "Offline",
-    "online": "Online",
-    "some_attention": "Some services need attention",
-    "warning": "Warning"
+    "all_operational": "Wszystkie systemy sprawne",
+    "issues_detected": "Wykryto problemy",
+    "offline": "Nieaktywny",
+    "online": "W Internecie",
+    "some_attention": "Niektóre usługi wymagają uwagi",
+    "warning": "Ostrzeżenie"
   },
   "super": {
     "action_failed": "Nie udało się",
@@ -10786,7 +10786,7 @@
     "job_last_run": "Last run:{{time}}",
     "job_never_run": "Nigdy nie biegaj",
     "run_job_aria": "Uruchom{{name}}",
-    "no_jobs_configured": "No background jobs configured",
+    "no_jobs_configured": "Nie skonfigurowano żadnych zadań w tle",
     "label_ai_chat": "Czat AI",
     "label_blog": "Bloga",
     "label_caring_community": "Troskliwa społeczność",
@@ -11106,12 +11106,12 @@
     "select_job": "Select Job"
   },
   "diagnostics_matching": {
-    "avg_match_score": "Avg Match Score",
-    "cache_entries": "Cache Entries",
-    "diagnose_listing_matches": "Diagnose Listing Matches",
-    "diagnose_user_matches": "Diagnose User Matches",
-    "engine_status": "Engine Status",
-    "matches_today": "Matches Today"
+    "avg_match_score": "Średni wynik meczu",
+    "cache_entries": "Wpisy w pamięci podręcznej",
+    "diagnose_listing_matches": "Zdiagnozuj dopasowanie listy",
+    "diagnose_user_matches": "Diagnozuj dopasowania użytkowników",
+    "engine_status": "Stan silnika",
+    "matches_today": "Mecze dzisiaj"
   },
   "error_occurred": "Occurred error",
   "federation_audit": {
@@ -11153,10 +11153,10 @@
   },
   "import": "Import",
   "legal_doc_form": {
-    "back_to_documents": "Back to Documents",
-    "cancel": "Cancel",
+    "back_to_documents": "Powrót do Dokumentów",
+    "cancel": "Anuluj",
     "create_description": "Create.",
-    "create_document": "Create Document",
+    "create_document": "Utwórz dokument",
     "create_title": "Create",
     "doc_type_acceptable_use": "Doc Type Acceptable Use",
     "doc_type_accessibility": "Doc Type Accessibility",
@@ -11169,10 +11169,10 @@
     "page_title_create": "Title Create",
     "page_title_edit": "Title Edit",
     "save_failed_generic": "Save Failed Generic",
-    "status_archived": "Archived",
-    "status_draft": "Draft",
-    "status_published": "Published",
-    "update_document": "Update Document",
+    "status_archived": "Zarchiwizowane",
+    "status_draft": "Wersja robocza",
+    "status_published": "Opublikowano",
+    "update_document": "Aktualizuj dokument",
     "content": "Treść",
     "content_placeholder": "Wprowadź treść dokumentu...",
     "document_content": "Treść dokumentu",
@@ -11185,44 +11185,44 @@
     "title_required": "Tytuł jest wymagany"
   },
   "legal_versions": {
-    "compliance_dashboard": "Compliance Dashboard",
-    "create_new_version": "Create New Version",
-    "delete_draft": "Delete Draft",
-    "delete_draft_version": "Delete Draft Version",
+    "compliance_dashboard": "Panel zgodności",
+    "create_new_version": "Utwórz nową wersję",
+    "delete_draft": "Usuń wersję roboczą",
+    "delete_draft_version": "Usuń wersję roboczą",
     "publish_step_1": "Publish Step 1",
     "publish_step_2": "Publish Step 2",
     "publish_step_3": "Publish Step 3",
     "publish_step_4": "Publish Step 4",
-    "publish_version": "Publish Version",
-    "send_notification": "Send Notification",
+    "publish_version": "Opublikuj wersję",
+    "send_notification": "Wyślij powiadomienie",
     "subtitle": "Subtitle",
     "this_will": "This Will",
     "title": "Title"
   },
   "load_error": "Load error",
   "log_files_labels": {
-    "download": "Download",
-    "filter_all": "All",
-    "filter_application": "Application",
+    "download": "Pobierz",
+    "filter_all": "Wszystko",
+    "filter_application": "Zastosowanie",
     "filter_cron": "Cron",
-    "filter_errors": "Errors",
+    "filter_errors": "Błędy",
     "lines_count": "{{count}} wierszy",
-    "search_placeholder": "Enter search...",
-    "total_files": "Total Files",
-    "total_size": "Total Size"
+    "search_placeholder": "Wpisz szukaj...",
+    "total_files": "Całkowita liczba plików",
+    "total_size": "Całkowity rozmiar"
   },
   "manage": "Manage",
   "match_detail": {
-    "associated_listing": "Associated Listing",
-    "category": "Category",
-    "distance": "Distance",
-    "listing_owner": "Listing Owner",
-    "match_information": "Match Information",
-    "match_reasons": "Match Reasons",
-    "match_score": "Match Score",
-    "match_type": "Match",
-    "matched_user": "Matched User",
-    "review_details": "Review Details"
+    "associated_listing": "Powiązane zestawienie",
+    "category": "Kategoria",
+    "distance": "Odległość",
+    "listing_owner": "Właściciel aukcji",
+    "match_information": "Informacje o meczu",
+    "match_reasons": "Powody dopasowania",
+    "match_score": "Wynik meczu",
+    "match_type": "Mecz",
+    "matched_user": "Dopasowany użytkownik",
+    "review_details": "Szczegóły recenzji"
   },
   "newsletter_diagnostics": {
     "bounce_chip_critical": "Odbicie chipa jest krytyczne",
@@ -11381,13 +11381,13 @@
     "tag_unsubscribe_link": "Link do anulowania subskrypcji"
   },
   "newsletter_resend": {
-    "clicked": "Clicked",
-    "failed_to_load": "Failed to load",
-    "no_recipients": "No recipients found",
-    "opened": "Opened",
-    "preview_recipient_count": "Preview Recipient Count",
-    "resend_newsletter": "Resend Newsletter",
-    "total_sent": "Total sent",
+    "clicked": "Kliknięty",
+    "failed_to_load": "Nie udało się załadować",
+    "no_recipients": "Nie znaleziono odbiorców",
+    "opened": "Otwarty",
+    "preview_recipient_count": "Podgląd liczby odbiorców",
+    "resend_newsletter": "Wyślij ponownie biuletyn",
+    "total_sent": "Razem wysłano",
     "cancel": "Anulować",
     "loading": "Ładowanie informacji o ponownym wysłaniu...",
     "no_recipients_desc": "Brak odbiorców spełniających podane kryteria wyboru.",
@@ -11431,12 +11431,12 @@
     "title": "Wyślij optymalizator czasu"
   },
   "newsletter_template_form": {
-    "content": "Content",
-    "email_settings": "Email Settings",
-    "template_details": "Template Details",
-    "test_tip_clients": "Test Tip Clients",
-    "test_tip_unsubscribe": "Test Tip Unsubscribe",
-    "usage_stats": "Usage Stats"
+    "content": "Treść",
+    "email_settings": "Ustawienia poczty e-mail",
+    "template_details": "Szczegóły szablonu",
+    "test_tip_clients": "Klienci z końcówkami testowymi",
+    "test_tip_unsubscribe": "Wskazówka testowa Zrezygnuj z subskrypcji",
+    "usage_stats": "Statystyki użytkowania"
   },
   "provider_health": {
     "aria_success_rate": "Success Rate"
@@ -11444,30 +11444,30 @@
   "refresh": "Refresh",
   "rte": {
     "block_quote": "Block Quote",
-    "bold": "Bold",
+    "bold": "Odważne",
     "bullet_list": "Bullet List",
-    "enter_url": "Enter URL",
+    "enter_url": "Wpisz adres URL",
     "heading_2": "2",
     "heading_3": "3",
-    "import_markdown": "Import Markdown",
+    "import_markdown": "Importuj Markdown",
     "import_md": "Import Md",
     "inline_code": "Inline Code",
     "insert_link": "Insert Link",
-    "italic": "Italic",
+    "italic": "Kursywa",
     "numbered_list": "Numbered List",
-    "redo": "Redo",
+    "redo": "Powtórz",
     "remove_link": "Remove Link",
-    "strikethrough": "Strikethrough",
-    "underline": "Underline",
-    "undo": "Undo",
-    "content_html": "Content HTML",
+    "strikethrough": "Przekreślenie",
+    "underline": "Podkreśl",
+    "undo": "Cofnij",
+    "content_html": "Treść HTML",
     "content_helper": "Content",
     "content_placeholder": "Content...",
     "editor_only": "Editor Only",
     "notice_body_placeholder": "Enter notice body...",
     "notice_box": "Notice Box",
     "notice_title_placeholder": "Enter notice title...",
-    "preview": "Preview",
+    "preview": "Podgląd",
     "preview_title_placeholder": "Enter preview title...",
     "split_view": "Split View",
     "start_writing": "Zacznij pisać..."
@@ -11529,7 +11529,7 @@
     "section_preview": "Podgląd",
     "section_segment_details": "Szczegóły segmentu",
     "section_smart_suggestions": "Inteligentne sugestie",
-    "section_targeting_rules": "Targeting Rules",
+    "section_targeting_rules": "Zasady targetowania",
     "status_active": "Aktywny",
     "status_active_hint": "Aktywna wskazówka",
     "status_inactive": "Nieaktywny",
@@ -11651,7 +11651,7 @@
     "role_member": "Członek roli",
     "role_tenant_admin": "Rola Administrator dzierżawy",
     "select_hub_tenant_placeholder": "Wprowadź wybierz dzierżawcę centrum...",
-    "select_tenant_placeholder": "Enter select tenant...",
+    "select_tenant_placeholder": "Wprowadź wybierz najemcę...",
     "status": "Stan",
     "super_admin_privileges": "Uprawnienia superadministratora",
     "tenant_super_admin": "Superadministrator najemcy",
@@ -11667,13 +11667,13 @@
     "view_full_details": "Zobacz pełne szczegóły"
   },
   "system_monitoring": {
-    "feature_flags": "Feature Flags",
-    "log_files": "Log Files",
-    "log_files_desc": "Log Files.",
-    "system_requirements": "System Requirements",
-    "system_requirements_desc": "System Requirements.",
-    "memory_available": "{{available}} available",
-    "vm_memory": "VM Memory"
+    "feature_flags": "Flagi funkcyjne",
+    "log_files": "Pliki dziennika",
+    "log_files_desc": "Pliki dziennika.",
+    "system_requirements": "Wymagania systemowe",
+    "system_requirements_desc": "Wymagania systemowe.",
+    "memory_available": "Dostępny {{available}}",
+    "vm_memory": "Pamięć maszyny wirtualnej"
   },
   "template_form": {
     "active": "Aktywny",
@@ -11992,7 +11992,7 @@
       "step_1": "Skonfiguruj politykę operacyjną: ustaw przepływ pracy zatwierdzania i stawkę godzinową w CHF.",
       "step_2": "Zapisz punkt odniesienia przed pilotażem na tablicy wyników pilotażu.",
       "step_3": "Skonfiguruj progi warstwy zaufania.",
-      "step_4": "Run the Pilot Launch Readiness check.",
+      "step_4": "Uruchom test gotowości do startu pilotażowego.",
       "step_5": "Po uruchomieniu użyj przepływu pracy koordynatora jako pulpitu codziennych operacji."
     }
   },
@@ -13715,12 +13715,12 @@
     }
   },
   "help_drawer": {
-    "aria_label": "Help: {{title}}",
-    "close_panel": "Close help panel",
-    "how_to_use": "How to use this page",
-    "label": "Help",
-    "related_pages": "Related pages",
-    "tips": "Tips & gotchas"
+    "aria_label": "Pomoc: {{title}}",
+    "close_panel": "Zamknij panel pomocy",
+    "how_to_use": "Jak korzystać z tej strony",
+    "label": "Pomoc",
+    "related_pages": "Powiązane strony",
+    "tips": "Wskazówki i porady"
   },
   "clear_accent_color": "Wyraźny akcent kolorystyczny",
   "clear_primary_color": "Wyraźny kolor podstawowy",
@@ -13754,7 +13754,7 @@
         "duration": "Czas trwania",
         "method": "Metoda",
         "path": "Ścieżka",
-        "status": "Status",
+        "status": "Stan",
         "when": "Gdy"
       }
     },
@@ -13765,7 +13765,7 @@
       "sandbox": "Piaskownica",
       "scopes": "Zakresy",
       "slug": "Ślimak",
-      "status": "Status"
+      "status": "Stan"
     },
     "common": {
       "any": "każdy",
@@ -13781,7 +13781,7 @@
     "create_modal": {
       "allowed_scopes": "Dozwolone zakresy",
       "contact_email": "Adres e-mail do kontaktu",
-      "contact_email_placeholder": "integrations@partner.example",
+      "contact_email_placeholder": "integracje@partner.przykład",
       "description": "Opis",
       "name": "Nazwa",
       "name_placeholder": "np. PostFinance Switzerland",
@@ -13808,7 +13808,7 @@
       "rate_limit": "Limit stawki:",
       "sandbox": "Piaskownica:",
       "scopes": "Zakresy:",
-      "status": "Status:",
+      "status": "Stan:",
       "tabs_aria": "Zakładki szczegółów partnera"
     },
     "empty": {
@@ -14060,9 +14060,9 @@
     },
     "residency": {
       "article_16": "Transgraniczne ujawnianie danych osobowych jest dozwolone, jeżeli kraj docelowy zapewnia odpowiednią ochronę danych uznaną przez Radę Federalną. Kwalifikują się państwa członkowskie Switzerland, EU/EEA i niewielka lista innych krajów.",
-      "article_16_label": "FADP Art. 16",
+      "article_16_label": "Sztuka FADP. 16",
       "article_17": "Jeżeli miejsce docelowe nie kwalifikuje się, należy zastosować odpowiednie zabezpieczenia, takie jak standardowe klauzule ochrony danych zatwierdzone przez FDPIC, wiążące zasady korporacyjne lub zgoda członka.",
-      "article_17_label": "FADP Art. 17",
+      "article_17_label": "Sztuka FADP. 17",
       "description": "Miejsce przechowywania i przetwarzania danych członków najemcy.",
       "dpa_contact": "Kontakt DPA",
       "title": "Deklarowana rezydencja danych",
@@ -14114,9 +14114,9 @@
       "unknown": "Nieznana podstawa prawna: {{basis}}"
     },
     "data_residency": {
-      "EU": "EU (EEA)",
+      "EU": "UE (EOG)",
       "International": "Międzynarodowe (poza EU/Switzerland)",
-      "Switzerland": "Switzerland"
+      "Switzerland": "Szwajcaria"
     },
     "consent_actions": {
       "granted": "Nadany",
@@ -14148,7 +14148,7 @@
     },
     "ki_agents": {
       "meta": {
-        "title": "KI-Agenten",
+        "title": "KI-Agent",
         "description": "AG61 — Struktura agenta autonomicznego. Agenci proponują działania; ludzie zatwierdzają, zanim cokolwiek zostanie zastosowane."
       },
       "about": {
@@ -14213,7 +14213,7 @@
         "max_proposals": "Maksymalna liczba propozycji na przebieg",
         "schedule_hour": "Godzina harmonogramu (0–23, czas lokalny serwera)",
         "notification_email": "E-mail z powiadomieniem",
-        "notification_email_placeholder": "admin@example.org"
+        "notification_email_placeholder": "administrator@example.org"
       },
       "actions": {
         "approve": "Zatwierdzić",
@@ -14239,14 +14239,14 @@
           "confidence": "Zaufanie",
           "created": "Stworzony",
           "proposal_data": "Dane propozycji",
-          "status": "Status",
+          "status": "Stan",
           "subject_user": "Użytkownik tematu",
           "target_user": "Użytkownik docelowy",
           "type": "Typ"
         }
       },
       "legend": {
-        "status": "Status:",
+        "status": "Stan:",
         "awaiting_decision": "czekam na Twoją decyzję",
         "human_approved": "zatwierdzone i stosowane przez człowieka",
         "auto_applied": "naliczane automatycznie po przekroczeniu progu",
@@ -14269,13 +14269,13 @@
           "duration": "Czas trwania",
           "proposals": "Propozycje",
           "started": "Rozpoczęło się",
-          "status": "Status",
+          "status": "Stan",
           "triggered_by": "Wywołane przez"
         }
       },
       "run_detail": {
         "title": "Uruchom #{{id}} - {{type}}",
-        "status": "Status:",
+        "status": "Stan:",
         "triggered_by": "Wywołane przez:",
         "started": "Rozpoczęto:",
         "duration": "Czas trwania:",
@@ -14325,7 +14325,7 @@
         "actions": "Działania",
         "keywords": "Słowa kluczowe",
         "slug": "Ślimak",
-        "status": "Status",
+        "status": "Stan",
         "title": "Tytuł",
         "updated": "Zaktualizowano"
       },

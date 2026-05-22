@@ -17,7 +17,7 @@
     "breakdown": {
       "title": "Briseadh do shraith iontaobhais",
       "subtitle": "Seo mar a thuill tú do chiseal reatha agus an méid a bheidh uait don chéad cheann eile.",
-      "signal_progress": "{{current}} of {{required}}",
+      "signal_progress": "{{current}} as {{required}}",
       "achieved": "Bainte amach",
       "in_progress": "Ar siúl",
       "next_tier_hint": "Comhlánaigh na comharthaí atá fágtha chun an chéad sraith eile a bhaint amach.",
@@ -151,7 +151,7 @@
     "cancel_button": "Cealaigh",
     "empty": "Níl aon phobail chónasctha le fáil faoi láthair. Is féidir leat fós dul isteach i seilide pobail de láimh.",
     "fallback_label": "Nó cuir isteach seilide pobail de láimh",
-    "member_count_label": "members"
+    "member_count_label": "baill"
   },
   "onboarding": {
     "title": "Fáilte romhat chuig do Phobal Cúraim",
@@ -783,7 +783,7 @@
         "category": "Catagóir",
         "all_categories": "Gach catagóir",
         "sub_region": "Aitheantas an fho-réigiúin",
-        "sub_region_placeholder": "e.g. 12"
+        "sub_region_placeholder": "m.sh. 12"
       },
       "status": {
         "new": "Nua",

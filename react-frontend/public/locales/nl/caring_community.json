@@ -17,7 +17,7 @@
     "breakdown": {
       "title": "Uw uitsplitsing van het vertrouwensniveau",
       "subtitle": "Hier leest u hoe u uw huidige niveau heeft verdiend en wat u nodig heeft voor het volgende niveau.",
-      "signal_progress": "{{current}} of {{required}}",
+      "signal_progress": "{{current}} van {{required}}",
       "achieved": "Bereikt",
       "in_progress": "In uitvoering",
       "next_tier_hint": "Voltooi de resterende signalen om het volgende niveau te bereiken.",
@@ -151,7 +151,7 @@
     "cancel_button": "Annuleren",
     "empty": "Er zijn momenteel geen federatieve gemeenschappen detecteerbaar. U kunt nog steeds handmatig een community-slug invoeren.",
     "fallback_label": "Of voer handmatig een community-slug in",
-    "member_count_label": "members"
+    "member_count_label": "leden"
   },
   "onboarding": {
     "title": "Welkom bij uw zorgzame gemeenschap",
@@ -395,7 +395,7 @@
         "name": "Naam",
         "phone": "Telefoon",
         "status": "Status",
-        "type": "Type",
+        "type": "Typ",
         "website": "Website"
       },
       "messages": {
@@ -437,7 +437,7 @@
         "aria": "Tabel met zorgverleners",
         "name": "Naam",
         "status": "Status",
-        "type": "Type",
+        "type": "Typ",
         "verified": "Geverifieerd"
       },
       "types": {
@@ -544,7 +544,7 @@
         "date": "Datum",
         "member": "Lid",
         "merchant": "Handelaar",
-        "item": "Item",
+        "item": "Artikel",
         "hours": "Uur",
         "rate": "Tarief",
         "discount": "Korting",
@@ -979,9 +979,9 @@
         "title": "Ondersteun relaties",
         "empty": "Geen actieve ondersteuningsrelaties",
         "aria": "Ondersteun relaties",
-        "supporter": "Supporter",
+        "supporter": "Ondersteuner",
         "trust_tier": "Vertrouwensniveau",
-        "type": "Type",
+        "type": "Typ",
         "hours_logged": "Uren geregistreerd",
         "last_activity": "Laatste activiteit",
         "status": "Status"
@@ -999,7 +999,7 @@
       "subject_org": "Organisatie #{{id}}",
       "overdue": "Verlopen",
       "escalated": "Geëscaleerd",
-      "open": "Open",
+      "open": "Openen",
       "report_title": "Rapporteer #{{id}}",
       "empty": "Er zijn geen beveiligingsrapporten die overeenkomen met deze filters.",
       "loading": "Beveiligingsrapporten laden",
@@ -1011,12 +1011,12 @@
       "severity": {
         "critical": "Kritisch",
         "high": "Hoog",
-        "medium": "Medium",
+        "medium": "Gemiddeld",
         "low": "Laag"
       },
       "status": {
         "submitted": "Ingediend",
-        "triaged": "Triaged",
+        "triaged": "Beoordeeld",
         "investigating": "Onderzoeken",
         "resolved": "Opgelost",
         "dismissed": "Afgewezen"
@@ -1069,7 +1069,7 @@
         "escalate": "Escaleren",
         "set_status": "Status instellen",
         "notes": "Opmerkingen (optioneel)",
-        "update": "Update",
+        "update": "Bijwerken",
         "resolved_hint": "'Opgelost' sluit dit rapport af met gedocumenteerde resolutienotities. Gebruik wanneer actie is ondernomen.",
         "dismissed_hint": "Met 'Afgewezen' wordt dit rapport afgesloten zonder verdere actie. In de opmerkingen hierboven moet een reden worden vermeld.",
         "add_note": "Notitie toevoegen"
@@ -1146,7 +1146,7 @@
         "empty": "Er zijn nog geen grootboekposten.",
         "date": "Datum",
         "member": "Lid",
-        "type": "Type",
+        "type": "Typ",
         "description": "Beschrijving",
         "points": "Punten",
         "balance": "Evenwicht",

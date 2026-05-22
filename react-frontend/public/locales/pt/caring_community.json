@@ -17,7 +17,7 @@
     "breakdown": {
       "title": "Seu detalhamento do nível de confiança",
       "subtitle": "Veja como você conquistou seu nível atual e o que você precisa para o próximo.",
-      "signal_progress": "{{current}} of {{required}}",
+      "signal_progress": "{{current}} de {{required}}",
       "achieved": "Alcançou",
       "in_progress": "Em andamento",
       "next_tier_hint": "Complete os sinais restantes para alcançar o próximo nível.",
@@ -151,7 +151,7 @@
     "cancel_button": "Cancelar",
     "empty": "Nenhuma comunidade federada pode ser descoberta atualmente. Você ainda pode inserir um slug da comunidade manualmente.",
     "fallback_label": "Ou insira um slug da comunidade manualmente",
-    "member_count_label": "members"
+    "member_count_label": "membros"
   },
   "onboarding": {
     "title": "Bem-vindo à sua comunidade de cuidado",
@@ -394,7 +394,7 @@
         "email": "E-mail",
         "name": "Nome",
         "phone": "Telefone",
-        "status": "Status",
+        "status": "Estado",
         "type": "Tipo",
         "website": "Site"
       },
@@ -436,7 +436,7 @@
         "actions": "Ações",
         "aria": "Tabela de prestadores de cuidados",
         "name": "Nome",
-        "status": "Status",
+        "status": "Estado",
         "type": "Tipo",
         "verified": "Verificado"
       },
@@ -544,11 +544,11 @@
         "date": "Data",
         "member": "Membro",
         "merchant": "Comerciante",
-        "item": "Item",
+        "item": "Artigo",
         "hours": "Horas",
         "rate": "Avaliar",
         "discount": "Desconto",
-        "status": "Status",
+        "status": "Estado",
         "actions": "Ações",
         "reverse": "Reverter",
         "empty_value": "-",
@@ -632,7 +632,7 @@
         "member_credited": "Membro creditado",
         "reason": "Razão",
         "source": "Fonte",
-        "status": "Status"
+        "status": "Estado"
       },
       "status": {
         "approved_by_source": "Aprovado pela fonte",
@@ -684,7 +684,7 @@
       "table": {
         "aria": "Pesquisas municipais",
         "title": "Título",
-        "status": "Status",
+        "status": "Estado",
         "questions": "Questões",
         "responses": "Respostas",
         "anonymous": "Anônimo",
@@ -778,7 +778,7 @@
         "sentiment": "Sentimento:"
       },
       "filters": {
-        "status": "Status",
+        "status": "Estado",
         "all_statuses": "Todos os status",
         "category": "Categoria",
         "all_categories": "Todas as categorias",
@@ -815,7 +815,7 @@
         "category": "Categoria",
         "subject": "Assunto",
         "submitter": "Remetente",
-        "status": "Status",
+        "status": "Estado",
         "created": "Criado",
         "actions": "Ações"
       },
@@ -984,7 +984,7 @@
         "type": "Tipo",
         "hours_logged": "Horas registradas",
         "last_activity": "Última atividade",
-        "status": "Status"
+        "status": "Estado"
       },
       "errors": {
         "load": "Falha ao carregar o círculo de destinatários. Verifique o ID do membro e tente novamente."
@@ -1037,7 +1037,7 @@
         "dismissed": "Fechado sem nenhuma ação adicional. Um motivo deve ser registrado."
       },
       "filters": {
-        "status": "Status",
+        "status": "Estado",
         "severity": "Gravidade"
       },
       "table": {
@@ -1046,7 +1046,7 @@
         "category": "Categoria",
         "reporter": "Repórter",
         "subject": "Assunto",
-        "status": "Status",
+        "status": "Estado",
         "assigned": "Atribuído",
         "sla": "Acordo de nível de serviço",
         "sla_abbr": "SLA",
