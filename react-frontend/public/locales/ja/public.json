@@ -416,5 +416,419 @@
     "view_on_github": "View on GitHub",
     "loading": "Loading changelog...",
     "error": "Could not load the changelog. You can read it directly on GitHub."
+  },
+  "features_page": {
+    "chips": {
+      "beta": "ベータ",
+      "preview": "プレビュー"
+    },
+    "title": "機能",
+    "meta_title": "機能 - Project NEXUS v1.5",
+    "meta_description": "Project NEXUS v1.5 で提供されるすべてのモジュールを、フェデレーション、タイムバンキング、マーケットプレイス、コミュニティツール、セキュリティ、分析、オープンソース基盤の各分野で、正直な成熟度ラベルとともに紹介します。",
+    "heading": "Project NEXUS でできること",
+    "subheading": "Project NEXUS はエンタープライズ級のマルチテナント・コミュニティプラットフォームです。以下のすべてのモジュールは現在 v1.5 で提供されています。成熟度は正直にラベル付けしています。マークのない項目は一般提供 (GA) であり、より新しいか継続的に強化中の領域にはベータまたはプレビューのラベルが付きます。",
+    "maturity_key_title": "成熟度の表記について",
+    "maturity_ga": "一般提供 (GA) - 安定して稼働し、サポートされ、パイロットテナントで本番運用中。",
+    "maturity_beta": "本番で稼働中ですが、公開インターフェイスやワイヤープロトコルはまだ強化作業中です。",
+    "maturity_preview": "最近リリースされ、オプトインで利用可能。急速な反復を予定しています - API と UX が変わる可能性があります。",
+    "tech_stack_title": "モダンな技術スタック",
+    "open_source_title": "オープンソース - AGPL-3.0",
+    "open_source_body": "Project NEXUS は AGPL-3.0 のもとで完全にオープンソースです。すべてのコード行は監査可能で、フォーク可能で、セルフホスト可能です。フェデレーションプロトコルはオープン標準として文書化されており、単一のプラットフォームがグローバルなタイムバンキングネットワークを支配することはありません。",
+    "link_repo": "ソースリポジトリ",
+    "link_changelog": "変更履歴",
+    "link_report_bug": "バグを報告",
+    "link_about": "このテナントについて",
+    "security_title": "セキュリティ開示",
+    "security_body_before": "セキュリティ上の問題を見つけましたか？公開イシューを立てずに、",
+    "security_body_after": " に個別にご報告ください。脆弱性開示ポリシーの全文はソースリポジトリの SECURITY.md にあります。",
+    "security_email": "jasper@hour-timebank.ie",
+    "tech_stack": {
+      "ai_label": "AI",
+      "ai_value": "OpenAI text-embedding-3-small",
+      "backend_label": "バックエンド",
+      "backend_value": "Laravel 12 + PHP 8.2+",
+      "database_label": "データベース",
+      "database_value": "MariaDB 10.11",
+      "frontend_label": "フロントエンド",
+      "frontend_value": "React 18 + TypeScript + HeroUI + Tailwind CSS 4",
+      "infrastructure_label": "インフラ",
+      "infrastructure_value": "Docker、Redis、フル PWA",
+      "mobile_label": "モバイル",
+      "mobile_value": "Capacitor (iOS + Android)",
+      "realtime_label": "リアルタイム",
+      "realtime_value": "Pusher WebSockets、Firebase Cloud Messaging",
+      "search_label": "検索",
+      "search_value": "Meilisearch v1.7"
+    },
+    "groups": {
+      "core_platform": {
+        "title": "コアプラットフォーム",
+        "items": {
+          "timebanking_engine": {
+            "title": "タイムバンキングエンジン",
+            "description": "ウォレット、トランザクション、ブローカー制御を備えた完全なクレジット交換システム。"
+          },
+          "multi_tenancy": {
+            "title": "マルチテナンシー",
+            "description": "ひとつのプラットフォーム上で無制限のコミュニティをホスト。それぞれが独自のブランディング、設定、機能セットを持てます。"
+          },
+          "tenant_hierarchy": {
+            "title": "テナント階層",
+            "description": "親子関係を持つテナント間で、機能のオン・オフとフェデレーションのスコープを設定可能。"
+          },
+          "smart_matching": {
+            "title": "スマートマッチング",
+            "description": "セマンティック埋め込み、協調フィルタリング、空き時間スケジューリング、学習済みの好みを組み合わせた AI 駆動のマッチング。"
+          },
+          "real_time_messaging": {
+            "title": "リアルタイムメッセージング",
+            "description": "Pusher WebSocket 連携によるプライベートな会話と、リアルタイムのプレゼンス表示。"
+          },
+          "progressive_web_app": {
+            "title": "プログレッシブウェブアプリ",
+            "description": "どんなデバイスにも PWA としてインストール可能 — オフラインシェル、プッシュ通知、NetworkFirst の更新フロー。"
+          },
+          "native_mobile_app": {
+            "title": "ネイティブモバイルアプリ",
+            "description": "Capacitor を介して同じ React コードベースから iOS と Android のビルドを生成。",
+            "note": "Web が主要な配布チャネルで、ネイティブビルドはテスト済みですが、まだ継続的なリリース体制にはありません。"
+          }
+        }
+      },
+      "federation": {
+        "title": "フェデレーション",
+        "intro": "コミュニティ間の交換のための 4 プロトコル対応フェデレーション層 — Nexus (ネイティブ)、Komunitin (15 エンドポイント)、Credit Commons Protocol (11 エンドポイント、CEN 互換)、TimeOverflow。",
+        "items": {
+          "federation_network": {
+            "title": "フェデレーションネットワーク",
+            "description": "複数の NEXUS コミュニティをネットワークにつなぎ、コミュニティ横断の発見、リスティング、イベント、メッセージングを実現。"
+          },
+          "external_partner_federation": {
+            "title": "外部パートナーとのフェデレーション",
+            "description": "外部のタイムバンキングプラットフォームと本番稼働中 — パートナーシップが確立し、メッセージが流通し、クレジット交換は活発にテスト中です。",
+            "note": "実際のパートナーシップが存在し、毎日データを交換しています。ワイヤープロトコルはまだエッジケースに対して強化中です — 外部のクレジット送金は自動化されたものではなく、監督下のものとして扱ってください。"
+          },
+          "multi_protocol_adapters": {
+            "title": "マルチプロトコルアダプター",
+            "description": "9 種類のエンティティ（メンバー、リスティング、イベント、グループ、コネクション、ボランティア、レビュー、送金、メッセージ）の双方向同期。"
+          },
+          "federation_neighborhoods": {
+            "title": "フェデレーション近隣",
+            "description": "地域単位でまとめられた連携コミュニティのクラスタにより、地域内の調整を容易に。"
+          },
+          "credit_agreements": {
+            "title": "クレジット契約",
+            "description": "連携コミュニティ間で交渉された為替条件。"
+          },
+          "federation_analytics": {
+            "title": "フェデレーション分析",
+            "description": "パートナーの活動、同期の健全性、連携取引量のリアルタイム管理者ダッシュボード。"
+          }
+        }
+      },
+      "member_experience": {
+        "title": "メンバー体験",
+        "items": {
+          "service_listings": {
+            "title": "サービスリスティング",
+            "description": "提供と依頼を投稿し、リスティングを閲覧・スマートマッチング。"
+          },
+          "marketplace": {
+            "title": "マーケットプレイス",
+            "description": "Stripe Connect による支払い、注文、出品者プロフィール、AI による返信案を備えた独立したクラシファイドモジュール。"
+          },
+          "donations": {
+            "title": "寄付",
+            "description": "Stripe による単発および定期寄付。組織向けの充実したダッシュボードと領収書付き。"
+          },
+          "identity_verification": {
+            "title": "本人確認",
+            "description": "任意の Stripe Identity フロー（書類 + 自撮り + 氏名・生年月日の照合）と、認証済みメンバーバッジ。"
+          },
+          "exchange_workflow": {
+            "title": "交換ワークフロー",
+            "description": "ブローカーの承認と紛争対応を備えた、構造化されたサービス交換のライフサイクル。"
+          },
+          "group_exchanges": {
+            "title": "グループ交換",
+            "description": "複数メンバーをまたいだコミュニティでの一括サービス交換。"
+          },
+          "social_feed": {
+            "title": "ソーシャルフィード",
+            "description": "投稿、コメント、いいね、投票、ハッシュタグ、ボイスメッセージ、メディア添付、リンクプレビュー、@メンション。"
+          },
+          "stories": {
+            "title": "ストーリー",
+            "description": "24 時間限定の写真と動画のストーリー。リアクション、投票、ハイライト機能付き。"
+          },
+          "presence_system": {
+            "title": "プレゼンスシステム",
+            "description": "プライバシー設定とカスタムステータスメッセージ付きの、リアルタイムなオンライン／オフライン表示。"
+          },
+          "events_and_groups": {
+            "title": "イベントとグループ",
+            "description": "コミュニティの集まり、関心ベースのグループ、イベントのリマインダー。"
+          },
+          "connections": {
+            "title": "コネクション",
+            "description": "コミュニティの他のメンバーをフォローしてつながりましょう。"
+          },
+          "members_directory": {
+            "title": "メンバーディレクトリ",
+            "description": "コミュニティ内の人々を閲覧・絞り込み・発見。"
+          },
+          "gamification": {
+            "title": "ゲーミフィケーション",
+            "description": "認証バッジ、ジャーニー、XP、ランキング、実績、チャレンジ、連続記録、XP ショップの報酬、コミュニティダッシュボード、シーズン制大会。"
+          },
+          "goals_and_impact": {
+            "title": "目標とインパクト",
+            "description": "個人の目標とコミュニティへの貢献を、メンタリングと成果物の追跡とともに記録。"
+          },
+          "ideation_challenges": {
+            "title": "アイデアチャレンジ",
+            "description": "キャンペーン、アイデア、投票、成果の追跡を備えたイノベーションハブ。"
+          },
+          "volunteering": {
+            "title": "ボランティア",
+            "description": "ボランティアの機会、時間の記録、チェックイン、経費、証明書、ウェルビーイング監視、緊急アラート、承認済み時間に対して時間クレジットを支払うボランティア組織用ウォレット。"
+          },
+          "job_vacancies": {
+            "title": "求人情報",
+            "description": "アラート、分析、アグリゲーター向けの公開 RSS/JSON 求人フィードを備えたフル機能の採用モジュール。"
+          },
+          "organisations": {
+            "title": "組織",
+            "description": "サブアカウントと専用の組織ウォレットを持つ、企業および雇用者プロフィール。"
+          },
+          "sub_accounts_family_accounts": {
+            "title": "サブアカウント／家族アカウント",
+            "description": "世帯および家族管理のための親子アカウント関係。"
+          },
+          "reviews_and_ratings": {
+            "title": "レビューと評価",
+            "description": "構造化されたメンバーフィードバックで信頼を構築。"
+          },
+          "endorsements": {
+            "title": "推薦",
+            "description": "ピア同士によるスキルと経験の推薦。"
+          },
+          "polls": {
+            "title": "投票",
+            "description": "複数の質問形式に対応したコミュニティ投票とアンケート。"
+          },
+          "skills_browse": {
+            "title": "スキルブラウズ",
+            "description": "スキルの分類体系を探索し、専門知識を発見。"
+          },
+          "availability_scheduling": {
+            "title": "空き時間スケジューリング",
+            "description": "スマートマッチングや予約のための、タイムゾーンを考慮した時間枠のスケジューリング。"
+          }
+        }
+      },
+      "content_and_communication": {
+        "title": "コンテンツとコミュニケーション",
+        "items": {
+          "blog": {
+            "title": "ブログ",
+            "description": "テナント管理のコンテンツ管理とコミュニティニュース。"
+          },
+          "resources_and_knowledge_base": {
+            "title": "リソースとナレッジベース",
+            "description": "構造化された記事と、共有リソースライブラリ。"
+          },
+          "help_center": {
+            "title": "ヘルプセンター",
+            "description": "ドキュメントハブと FAQ。"
+          },
+          "custom_pages": {
+            "title": "カスタムページ",
+            "description": "コミュニティコンテンツ向けのテナント管理 CMS ページ。"
+          },
+          "newsletter_system": {
+            "title": "ニュースレターシステム",
+            "description": "A/B テスト、スマートセグメント、地域ターゲティング、定期配信、テンプレート、送信時間の最適化、開封・クリックの完全分析を備えたメールキャンペーンマネージャー。"
+          },
+          "ai_chat": {
+            "title": "AI チャット",
+            "description": "プラットフォーム案内のための OpenAI 駆動のアシスタント。"
+          },
+          "legal_hub": {
+            "title": "リーガルハブ",
+            "description": "バージョン管理された法的文書を、同意ゲートと監査ログとともに提供。"
+          },
+          "impact_reports": {
+            "title": "インパクトレポート",
+            "description": "SROI 分析、メンバーの成果報告、社会的インパクトのケーススタディ。"
+          },
+          "social_prescribing": {
+            "title": "ソーシャルプリスクライビング",
+            "description": "コミュニティヘルスとの統合ワークフローに役立つ情報とツール。"
+          }
+        }
+      },
+      "trust_reputation_and_safety": {
+        "title": "信頼・評判・安全",
+        "items": {
+          "member_verification_badges": {
+            "title": "メンバー認証バッジ",
+            "description": "メンバーのプロフィールに表示される認証ステータス。"
+          },
+          "nexusscore": {
+            "title": "NexusScore",
+            "description": "独自の評判・信頼性スコア。"
+          },
+          "streaks": {
+            "title": "連続記録",
+            "description": "継続的な活動を追跡し、安定した関与を表彰。"
+          },
+          "personal_insights_dashboard": {
+            "title": "個人インサイトダッシュボード",
+            "description": "個人ごとの参加状況、提供・受領時間、スキルの内訳、月次グラフ、パーソナライズされた提案。"
+          },
+          "safeguarding_module": {
+            "title": "セーフガーディングモジュール",
+            "description": "通報コンテンツのレビューワークフロー、インシデント報告、セーフガーディング担当者の追跡、コミュニティ安全ダッシュボード。"
+          },
+          "crm": {
+            "title": "CRM",
+            "description": "メモ、タスク、タグ、活動タイムライン、エクスポート機能を備えた管理者向け連絡先管理。"
+          }
+        }
+      },
+      "ai_and_recommendation_engine": {
+        "title": "AI とレコメンデーションエンジン",
+        "items": {
+          "semantic_search": {
+            "title": "セマンティック検索",
+            "description": "Meilisearch を活用し、リスティング・メンバー・イベント・グループを横断する全文検索。タイポ補正、同義語、テナント単位の分離に対応。"
+          },
+          "collaborative_filtering": {
+            "title": "協調フィルタリング",
+            "description": "実際のコミュニティのインタラクションデータをもとにしたアイテムベースの推薦。"
+          },
+          "semantic_embeddings": {
+            "title": "セマンティック埋め込み",
+            "description": "OpenAI を活用したリスティング、メンバー、リクエストのコンテンツマッチング。"
+          },
+          "edgerank_feed": {
+            "title": "EdgeRank フィード",
+            "description": "時間減衰、親和性、関与度で重み付けされたフィードランキング。"
+          },
+          "matchrank_and_communityrank": {
+            "title": "MatchRank と CommunityRank",
+            "description": "Wilson 信頼区間を用いたベイズ的な品質スコアリング。"
+          },
+          "group_recommendations": {
+            "title": "グループ推薦",
+            "description": "トレンドと親和性に基づくグループの発見。"
+          },
+          "match_learning": {
+            "title": "マッチ学習",
+            "description": "ユーザーのインタラクションから推薦を改善するフィードバックループ。"
+          },
+          "algorithm_health_dashboard": {
+            "title": "アルゴリズムヘルスダッシュボード",
+            "description": "すべてのランキングシステムを管理者がリアルタイムに監視・調整。"
+          }
+        }
+      },
+      "caring_community_layer": {
+        "title": "ケアリングコミュニティレイヤー",
+        "intro": "市民活動およびケアリングコミュニティ向け展開の、パイロット準備のためのガバナンスレイヤー — 多くのモジュールは 2026 年 4 月から 5 月にリリースされました。",
+        "items": {
+          "civic_digest": {
+            "title": "シビックダイジェスト",
+            "description": "ステークホルダー向けに、コミュニティの活動と成果を定期的にまとめた要約。"
+          },
+          "success_stories": {
+            "title": "成功事例",
+            "description": "メンバー主導の成果を厳選したケーススタディ。"
+          },
+          "feedback_inbox": {
+            "title": "フィードバック受信箱",
+            "description": "管理者によるトリアージ機能を備えた、パイロットフィードバックの集中受付。"
+          },
+          "integration_showcase": {
+            "title": "統合ショーケース",
+            "description": "連携パートナーと統合を公開する場。"
+          },
+          "lead_nurture": {
+            "title": "リードナーチャー",
+            "description": "パイロットのステークホルダーをフォローアップするためのワークフローツール。"
+          },
+          "copilot": {
+            "title": "コパイロット",
+            "description": "コミュニティ管理者向けの、文脈に応じた AI アシスタント。"
+          }
+        }
+      },
+      "built_for_production": {
+        "title": "本番運用のために構築",
+        "items": {
+          "enterprise_security": {
+            "title": "エンタープライズセキュリティ",
+            "description": "CSRF、レート制限、TOTP 2FA、WebAuthn パスキー、CSP ノンス、CORS 許可リスト、Form Request バリデーション、メール認証ゲート、招待コードによる登録。"
+          },
+          "stripe_payments_layer": {
+            "title": "Stripe 決済レイヤー",
+            "description": "サブスクリプション、寄付、マーケットプレイス (Connect)、本人確認に対応。Webhook の冪等な処理と、入出金フローを徹底的にカバーするテストを備えています。"
+          },
+          "gdpr_compliance_suite": {
+            "title": "GDPR コンプライアンススイート",
+            "description": "データ請求、同意管理、Cookie 同意、漏洩追跡、完全な監査ログ。"
+          },
+          "fraud_and_abuse_detection": {
+            "title": "不正・悪用検知",
+            "description": "不審な活動の自動アラートとコンテンツモデレーション。"
+          },
+          "insurance_certificate_tracking": {
+            "title": "保険証書の追跡",
+            "description": "ボランティア向け保険の管理と確認。"
+          },
+          "enterprise_rbac": {
+            "title": "エンタープライズ RBAC",
+            "description": "13 を超えるモジュールにまたがる、完全な権限マトリックス付きロールベースのアクセス制御。"
+          },
+          "wcag_2_1_aa_accessibility": {
+            "title": "WCAG 2.1 AA アクセシビリティ",
+            "description": "ユーザー向けの全領域で監査済みのアクセシビリティ準拠。"
+          },
+          "multi_language_support": {
+            "title": "多言語サポート",
+            "description": "11 言語：英語、アイルランド語、ドイツ語、フランス語、イタリア語、ポルトガル語、スペイン語、オランダ語、ポーランド語、日本語、アラビア語（完全 RTL 対応）。"
+          },
+          "self_hosted_prerendering": {
+            "title": "セルフホスト型プリレンダリング",
+            "description": "ボット専用の Playwright スナップショットを SEO クローラーに配信。ユーザーは常にライブの SPA を取得します。"
+          },
+          "guided_onboarding": {
+            "title": "ガイド付きオンボーディング",
+            "description": "スマートなデフォルト設定を備えた、新メンバー向けのウィザード。"
+          },
+          "admin_panel": {
+            "title": "管理パネル",
+            "description": "アルゴリズム制御、診断、cron ジョブ監視、メール配信性の監視。"
+          },
+          "email_webhook_processing": {
+            "title": "メール Webhook 処理",
+            "description": "SendGrid のバウンス、苦情、配信イベントの処理。"
+          },
+          "500plus_phpunit_tests": {
+            "title": "500 以上の PHPUnit テスト",
+            "description": "入出金フロー、Webhook、フェデレーション、グループ、マーケットプレイスに加え、Vitest によるフロントエンドスイート。"
+          },
+          "openapi_3_0_specification": {
+            "title": "OpenAPI 3.0 仕様",
+            "description": "Swagger UI のドキュメント付きの完全な API 仕様。"
+          },
+          "fully_dockerized": {
+            "title": "完全 Docker 化",
+            "description": "本番環境と開発環境を同じ Docker Compose 基盤で稼働。"
+          }
+        }
+      }
+    }
   }
 }

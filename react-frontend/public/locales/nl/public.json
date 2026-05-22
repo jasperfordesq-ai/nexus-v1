@@ -416,5 +416,419 @@
     "view_on_github": "View on GitHub",
     "loading": "Loading changelog...",
     "error": "Could not load the changelog. You can read it directly on GitHub."
+  },
+  "features_page": {
+    "chips": {
+      "beta": "Bèta",
+      "preview": "Preview"
+    },
+    "title": "Functies",
+    "meta_title": "Functies - Project NEXUS v1.5",
+    "meta_description": "Alle modules in Project NEXUS v1.5, met eerlijke volwassenheidslabels voor federatie, timebanking, marktplaats, community-tools, beveiliging, analytics en open-source infrastructuur.",
+    "heading": "Wat Project NEXUS doet",
+    "subheading": "Project NEXUS is een multi-tenant communityplatform van enterprise-niveau. Alle onderstaande modules zijn beschikbaar in v1.5. We labelen volwassenheid eerlijk: items zonder label zijn algemeen beschikbaar; nieuwere of nog te verharden oppervlakken dragen een Bèta- of Preview-label.",
+    "maturity_key_title": "Hoe we volwassenheid labelen",
+    "maturity_ga": "Algemeen beschikbaar - stabiel, ondersteund, in productie bij pilot-tenants.",
+    "maturity_beta": "Vandaag in productie, maar het publieke oppervlak of het wire-protocol wordt nog verhard.",
+    "maturity_preview": "Recent uitgebracht en op aanvraag beschikbaar. Verwacht snelle iteratie - API en UX kunnen wijzigen.",
+    "tech_stack_title": "Moderne tech stack",
+    "open_source_title": "Open source - AGPL-3.0",
+    "open_source_body": "Project NEXUS is volledig open source onder AGPL-3.0. Elke regel code is auditbaar, forkbaar en zelf te hosten. Federatieprotocollen zijn gedocumenteerd als open standaarden, zodat geen enkel platform het wereldwijde timebanking-netwerk in handen heeft.",
+    "link_repo": "Bronrepository",
+    "link_changelog": "Wijzigingslog",
+    "link_report_bug": "Een bug melden",
+    "link_about": "Over deze tenant",
+    "security_title": "Beveiligingsmelding",
+    "security_body_before": "Een beveiligingsprobleem gevonden? Meld het a.u.b. privé bij ",
+    "security_body_after": " in plaats van een openbaar issue te openen. Volledig beleid voor het melden van kwetsbaarheden in SECURITY.md in de bronrepository.",
+    "security_email": "jasper@hour-timebank.ie",
+    "tech_stack": {
+      "ai_label": "AI",
+      "ai_value": "OpenAI text-embedding-3-small",
+      "backend_label": "Backend",
+      "backend_value": "Laravel 12 + PHP 8.2+",
+      "database_label": "Database",
+      "database_value": "MariaDB 10.11",
+      "frontend_label": "Frontend",
+      "frontend_value": "React 18 + TypeScript + HeroUI + Tailwind CSS 4",
+      "infrastructure_label": "Infrastructuur",
+      "infrastructure_value": "Docker, Redis, volledige PWA",
+      "mobile_label": "Mobiel",
+      "mobile_value": "Capacitor (iOS + Android)",
+      "realtime_label": "Realtime",
+      "realtime_value": "Pusher WebSockets, Firebase Cloud Messaging",
+      "search_label": "Zoeken",
+      "search_value": "Meilisearch v1.7"
+    },
+    "groups": {
+      "core_platform": {
+        "title": "Kernplatform",
+        "items": {
+          "timebanking_engine": {
+            "title": "Timebanking-engine",
+            "description": "Volledig kredietuitwisselingssysteem met wallet, transacties en brokerbedieningen."
+          },
+          "multi_tenancy": {
+            "title": "Multi-tenancy",
+            "description": "Host onbeperkt communities op één platform, elk met eigen huisstijl, configuratie en functies."
+          },
+          "tenant_hierarchy": {
+            "title": "Tenant-hiërarchie",
+            "description": "Ouder–kindrelaties tussen tenants met functieschakeling en federatie-reikwijdte."
+          },
+          "smart_matching": {
+            "title": "Slim matchen",
+            "description": "AI-gestuurd matchen met semantische embeddings, collaboratief filteren, beschikbaarheidsplanning en geleerde voorkeuren."
+          },
+          "real_time_messaging": {
+            "title": "Realtime berichten",
+            "description": "Privégesprekken met Pusher WebSocket-integratie en realtime aanwezigheid."
+          },
+          "progressive_web_app": {
+            "title": "Progressive Web App",
+            "description": "Installeer als PWA op elk apparaat — offline-shell, pushmeldingen, NetworkFirst-updateflow."
+          },
+          "native_mobile_app": {
+            "title": "Native mobiele app",
+            "description": "iOS- en Android-builds vanuit dezelfde React-codebase via Capacitor.",
+            "note": "Web is het primaire distributiekanaal; native builds zijn getest maar nog niet in doorlopende release."
+          }
+        }
+      },
+      "federation": {
+        "title": "Federatie",
+        "intro": "Een federatielaag met vier protocollen voor uitwisseling tussen communities — Nexus (native), Komunitin (15 endpoints), Credit Commons Protocol (11 endpoints, CEN-compatibel) en TimeOverflow.",
+        "items": {
+          "federation_network": {
+            "title": "Federatienetwerk",
+            "description": "Verbind meerdere NEXUS-communities in een netwerk voor ontdekking, advertenties, evenementen en berichten tussen communities."
+          },
+          "external_partner_federation": {
+            "title": "Federatie met externe partners",
+            "description": "Live met externe timebanking-platforms — partnerschappen opgezet, berichten stromen, kredietuitwisseling wordt actief getest.",
+            "note": "Er zijn echte partnerschappen die dagelijks data uitwisselen. De wire-protocollen worden nog verhard tegen randgevallen — behandel externe kredietoverschrijvingen als gesuperviseerd, niet geautomatiseerd."
+          },
+          "multi_protocol_adapters": {
+            "title": "Multi-protocol adapters",
+            "description": "Tweezijdige synchronisatie voor 9 entiteitstypen: leden, advertenties, evenementen, groepen, verbindingen, vrijwilligerswerk, beoordelingen, overschrijvingen, berichten."
+          },
+          "federation_neighborhoods": {
+            "title": "Federatie-buurten",
+            "description": "Geografisch gegroepeerde clusters van gefedereerde communities voor regionale coördinatie."
+          },
+          "credit_agreements": {
+            "title": "Kredietovereenkomsten",
+            "description": "Onderhandelde wisselkoersvoorwaarden tussen gefedereerde communities."
+          },
+          "federation_analytics": {
+            "title": "Federatie-analytics",
+            "description": "Live admin-dashboards voor partneractiviteit, sync-status en gefedereerd transactievolume."
+          }
+        }
+      },
+      "member_experience": {
+        "title": "Ledenervaring",
+        "items": {
+          "service_listings": {
+            "title": "Service-advertenties",
+            "description": "Plaats aanbiedingen en verzoeken, blader door en match advertenties slim."
+          },
+          "marketplace": {
+            "title": "Marktplaats",
+            "description": "Zelfstandige rubrieken-module met uitbetalingen via Stripe Connect, bestellingen, verkopersprofielen en AI-suggesties voor antwoorden."
+          },
+          "donations": {
+            "title": "Donaties",
+            "description": "Eenmalige en terugkerende donaties via Stripe met volledige dashboards en kwitanties voor organisaties."
+          },
+          "identity_verification": {
+            "title": "Identiteitsverificatie",
+            "description": "Optionele Stripe Identity-flow (document + selfie + matching van naam/geboortedatum) met badge voor geverifieerd lid."
+          },
+          "exchange_workflow": {
+            "title": "Uitwisselingsworkflow",
+            "description": "Gestructureerde levenscyclus voor service-uitwisseling met brokergoedkeuring en geschillenbehandeling."
+          },
+          "group_exchanges": {
+            "title": "Groepsuitwisselingen",
+            "description": "Bulk-uitwisselingen van community-services tussen meerdere leden."
+          },
+          "social_feed": {
+            "title": "Sociale feed",
+            "description": "Berichten, reacties, vind-ik-leuks, polls, hashtags, spraakberichten, mediabijlagen, linkvoorbeelden en @vermeldingen."
+          },
+          "stories": {
+            "title": "Stories",
+            "description": "Vluchtige foto- en videostories van 24 uur met reacties, polls en highlights."
+          },
+          "presence_system": {
+            "title": "Aanwezigheidssysteem",
+            "description": "Realtime online/offline-status met privacy-instellingen en aangepaste statusberichten."
+          },
+          "events_and_groups": {
+            "title": "Evenementen en groepen",
+            "description": "Community-bijeenkomsten, interessegroepen en evenementherinneringen."
+          },
+          "connections": {
+            "title": "Verbindingen",
+            "description": "Volg en verbind met andere leden van de community."
+          },
+          "members_directory": {
+            "title": "Ledenoverzicht",
+            "description": "Blader, filter en ontdek mensen in je community."
+          },
+          "gamification": {
+            "title": "Gamification",
+            "description": "Verificatiebadges, journeys, XP, ranglijsten, prestaties, uitdagingen, streaks, beloningen in de XP-shop, community-dashboard en seizoenscompetities."
+          },
+          "goals_and_impact": {
+            "title": "Doelen en impact",
+            "description": "Volg persoonlijke doelen en community-impact met mentoring en deliverable-tracking."
+          },
+          "ideation_challenges": {
+            "title": "Ideatie-uitdagingen",
+            "description": "Innovatiehub met campagnes, ideeën, stemmen en het volgen van uitkomsten."
+          },
+          "volunteering": {
+            "title": "Vrijwilligerswerk",
+            "description": "Vrijwilligersmogelijkheden, urenregistratie, check-ins, kosten, certificaten, welzijnsmonitoring, noodmeldingen en een wallet van de vrijwilligersorganisatie die tijdkredieten uitkeert voor goedgekeurde uren."
+          },
+          "job_vacancies": {
+            "title": "Vacatures",
+            "description": "Volledige recruitment-module met meldingen, analytics en een openbare RSS/JSON-vacaturefeed voor aggregatoren."
+          },
+          "organisations": {
+            "title": "Organisaties",
+            "description": "Bedrijfs- en werkgeversprofielen met subaccounts en een eigen organisatie-wallet."
+          },
+          "sub_accounts_family_accounts": {
+            "title": "Subaccounts / Gezinsaccounts",
+            "description": "Ouder–kind accountrelaties voor huishouden- en gezinsbeheer."
+          },
+          "reviews_and_ratings": {
+            "title": "Reviews en beoordelingen",
+            "description": "Bouw vertrouwen op via gestructureerde ledenfeedback."
+          },
+          "endorsements": {
+            "title": "Aanbevelingen",
+            "description": "Aanbevelingen tussen peers voor vaardigheden en ervaring."
+          },
+          "polls": {
+            "title": "Polls",
+            "description": "Community-stemmingen en enquêtes met meerdere vraagtypen."
+          },
+          "skills_browse": {
+            "title": "Vaardigheden verkennen",
+            "description": "Verken de vaardighedentaxonomie en ontdek expertise."
+          },
+          "availability_scheduling": {
+            "title": "Beschikbaarheidsplanning",
+            "description": "Tijdzonebewuste tijdslot-planning voor slim matchen en boekingen."
+          }
+        }
+      },
+      "content_and_communication": {
+        "title": "Content en communicatie",
+        "items": {
+          "blog": {
+            "title": "Blog",
+            "description": "Door de tenant beheerd contentmanagement en community-nieuws."
+          },
+          "resources_and_knowledge_base": {
+            "title": "Bronnen en kennisbank",
+            "description": "Gestructureerde artikelen en een gedeelde bronnenbibliotheek."
+          },
+          "help_center": {
+            "title": "Helpcentrum",
+            "description": "Documentatie-hub en FAQ."
+          },
+          "custom_pages": {
+            "title": "Eigen pagina's",
+            "description": "Door de tenant beheerde CMS-pagina's voor community-content."
+          },
+          "newsletter_system": {
+            "title": "Nieuwsbriefsysteem",
+            "description": "E-mailcampagnemanager met A/B-tests, slimme segmenten, geo-targeting, terugkerende verzendingen, sjablonen, optimalisatie van verzendtijd en volledige open-/klik-analytics."
+          },
+          "ai_chat": {
+            "title": "AI-chat",
+            "description": "OpenAI-gestuurde assistent voor begeleiding op het platform."
+          },
+          "legal_hub": {
+            "title": "Juridische hub",
+            "description": "Geversioneerde juridische documenten met acceptatiegates en audit trail."
+          },
+          "impact_reports": {
+            "title": "Impactrapporten",
+            "description": "SROI-analyse, rapporten over uitkomsten van leden en casestudy's over sociale impact."
+          },
+          "social_prescribing": {
+            "title": "Sociale prescriptie",
+            "description": "Informatie en tooling voor integratieworkflows met community-gezondheidszorg."
+          }
+        }
+      },
+      "trust_reputation_and_safety": {
+        "title": "Vertrouwen, reputatie en veiligheid",
+        "items": {
+          "member_verification_badges": {
+            "title": "Verificatiebadges voor leden",
+            "description": "Geverifieerde-statusindicatoren op ledenprofielen."
+          },
+          "nexusscore": {
+            "title": "NexusScore",
+            "description": "Eigen score voor reputatie en betrouwbaarheid."
+          },
+          "streaks": {
+            "title": "Streaks",
+            "description": "Tracking van opeenvolgende activiteit om consistente betrokkenheid te belonen."
+          },
+          "personal_insights_dashboard": {
+            "title": "Persoonlijk inzichtsdashboard",
+            "description": "Individuele betrokkenheidsmetrics, gegeven/ontvangen uren, vaardigheden-overzicht, maandgrafieken en gepersonaliseerde aanbevelingen."
+          },
+          "safeguarding_module": {
+            "title": "Beschermingsmodule",
+            "description": "Workflow voor het beoordelen van gemelde content, incidentmelding, het volgen van beschermings­toewijzingen en een dashboard voor community-veiligheid."
+          },
+          "crm": {
+            "title": "CRM",
+            "description": "Contactbeheer aan de admin-kant met notities, taken, tags, activiteitstijdlijnen en export."
+          }
+        }
+      },
+      "ai_and_recommendation_engine": {
+        "title": "AI- en aanbevelingenmotor",
+        "items": {
+          "semantic_search": {
+            "title": "Semantisch zoeken",
+            "description": "Meilisearch-gestuurde full-text zoekfunctie over advertenties, leden, evenementen en groepen met typotolerantie, synoniemen en per-tenant isolatie."
+          },
+          "collaborative_filtering": {
+            "title": "Collaboratief filteren",
+            "description": "Item-gebaseerde aanbevelingen op basis van echte interactiedata uit de community."
+          },
+          "semantic_embeddings": {
+            "title": "Semantische embeddings",
+            "description": "OpenAI-gestuurde contentmatch voor advertenties, leden en verzoeken."
+          },
+          "edgerank_feed": {
+            "title": "EdgeRank-feed",
+            "description": "Feed-ranking gewogen op basis van tijdverval, affiniteit en betrokkenheid."
+          },
+          "matchrank_and_communityrank": {
+            "title": "MatchRank en CommunityRank",
+            "description": "Bayesiaanse kwaliteitsscoring met Wilson-betrouwbaarheidsintervallen."
+          },
+          "group_recommendations": {
+            "title": "Groepsaanbevelingen",
+            "description": "Ontdek groepen op basis van trends en affiniteit."
+          },
+          "match_learning": {
+            "title": "Match-leren",
+            "description": "Feedbackloop die aanbevelingen verbetert op basis van gebruikersinteracties."
+          },
+          "algorithm_health_dashboard": {
+            "title": "Dashboard algoritmegezondheid",
+            "description": "Live admin-monitoring en bijsturing van alle ranking-systemen."
+          }
+        }
+      },
+      "caring_community_layer": {
+        "title": "Zorgende-communitylaag",
+        "intro": "Een governance-laag voor pilot-gereedheid bij civic- en zorgende-community-deployments — de meeste modules zijn uitgebracht tussen april en mei 2026.",
+        "items": {
+          "civic_digest": {
+            "title": "Civic Digest",
+            "description": "Periodieke samenvatting van community-activiteit en uitkomsten voor stakeholders."
+          },
+          "success_stories": {
+            "title": "Succesverhalen",
+            "description": "Geselecteerde casestudy's van uitkomsten geleid door leden."
+          },
+          "feedback_inbox": {
+            "title": "Feedback-inbox",
+            "description": "Centrale opvang van pilot-feedback met triage in admin."
+          },
+          "integration_showcase": {
+            "title": "Integratie-etalage",
+            "description": "Openbaar oppervlak voor verbonden partners en integraties."
+          },
+          "lead_nurture": {
+            "title": "Leadbegeleiding",
+            "description": "Workflow-tooling voor opvolging van pilot-stakeholders."
+          },
+          "copilot": {
+            "title": "Copilot",
+            "description": "Contextuele AI-helper voor community-beheerders."
+          }
+        }
+      },
+      "built_for_production": {
+        "title": "Gebouwd voor productie",
+        "items": {
+          "enterprise_security": {
+            "title": "Enterprise-beveiliging",
+            "description": "CSRF, rate limiting, TOTP-2FA, WebAuthn-passkeys, CSP-nonces, CORS-allowlist, Form Request-validatie, e-mailverificatiegates en registratie via uitnodigingscode."
+          },
+          "stripe_payments_layer": {
+            "title": "Stripe-betaallaag",
+            "description": "Abonnementen, donaties, marktplaats (Connect) en identiteitsverificatie, met idempotente webhook-afhandeling en diepe testdekking van geldstromen."
+          },
+          "gdpr_compliance_suite": {
+            "title": "AVG-compliance suite",
+            "description": "Dataverzoeken, toestemmingsbeheer, cookietoestemming, registratie van datalekken en een volledig audit log."
+          },
+          "fraud_and_abuse_detection": {
+            "title": "Fraude- en misbruikdetectie",
+            "description": "Automatische meldingen van verdachte activiteit en contentmoderatie."
+          },
+          "insurance_certificate_tracking": {
+            "title": "Beheer verzekeringscertificaten",
+            "description": "Beheer en verificatie van verzekeringen voor vrijwilligers."
+          },
+          "enterprise_rbac": {
+            "title": "Enterprise-RBAC",
+            "description": "Op rollen gebaseerde toegangscontrole over 13+ modules met volledige rechtenmatrix."
+          },
+          "wcag_2_1_aa_accessibility": {
+            "title": "WCAG 2.1 AA toegankelijkheid",
+            "description": "Geauditeerde toegankelijkheidsconformiteit over het hele gebruikersoppervlak."
+          },
+          "multi_language_support": {
+            "title": "Meertalige ondersteuning",
+            "description": "11 talen: Engels, Iers, Duits, Frans, Italiaans, Portugees, Spaans, Nederlands, Pools, Japans en Arabisch (volledig RTL)."
+          },
+          "self_hosted_prerendering": {
+            "title": "Zelf-gehoste pre-rendering",
+            "description": "Playwright-snapshots alleen voor bots, geserveerd aan SEO-crawlers; gebruikers krijgen altijd de live SPA."
+          },
+          "guided_onboarding": {
+            "title": "Begeleide onboarding",
+            "description": "Wizard voor nieuwe leden met slimme standaarden."
+          },
+          "admin_panel": {
+            "title": "Adminpaneel",
+            "description": "Algoritmebediening, diagnostiek, monitoring van cron-jobs en e-mailaflevering."
+          },
+          "email_webhook_processing": {
+            "title": "Verwerking van e-mailwebhooks",
+            "description": "Afhandeling van SendGrid-events voor bounces, klachten en aflevering."
+          },
+          "500plus_phpunit_tests": {
+            "title": "500+ PHPUnit-tests",
+            "description": "Geldstromen, webhooks, federatie, groepen, marktplaats — plus Vitest-frontendsuites."
+          },
+          "openapi_3_0_specification": {
+            "title": "OpenAPI 3.0-specificatie",
+            "description": "Volledige API-specificatie met Swagger UI-documentatie."
+          },
+          "fully_dockerized": {
+            "title": "Volledig gedockeriseerd",
+            "description": "Productie en development draaien op dezelfde Docker Compose-fundering."
+          }
+        }
+      }
+    }
   }
 }
