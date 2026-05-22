@@ -17,8 +17,13 @@
   "type": {
     "all": "すべてのタイプ",
     "paid": "Paid",
-    "volunteer": "Volunteer",
-    "timebank": "Timebank"
+    "volunteer": "ボランティア",
+    "timebank": "タイムバンク",
+    "full_time": "フルタイム",
+    "part_time": "パートタイム",
+    "contract": "契約社員",
+    "internship": "インターンシップ",
+    "freelance": "フリーランス"
   },
   "commitment": {
     "all": "All",
@@ -29,21 +34,27 @@
   },
   "status": {
     "open": "Open",
-    "closed": "Closed",
-    "filled": "Filled",
-    "draft": "Draft"
+    "closed": "締め切り",
+    "filled": "採用済み",
+    "draft": "下書き",
+    "active": "公開中",
+    "expired": "期限切れ",
+    "paused": "一時停止"
   },
   "application_status": {
     "applied": "Applied",
-    "pending": "Pending",
+    "pending": "審査待ち",
     "screening": "Screening",
     "reviewed": "Reviewed",
-    "interview": "Interview",
+    "interview": "面接",
     "offer": "Offer",
-    "accepted": "Accepted",
-    "rejected": "Rejected",
-    "withdrawn": "Withdrawn",
-    "unknown": "不明"
+    "accepted": "承諾済み",
+    "rejected": "不採用",
+    "withdrawn": "取り下げ済み",
+    "unknown": "不明",
+    "reviewing": "審査中",
+    "shortlisted": "候補者リスト入り",
+    "offered": "オファー済み"
   },
   "views": "{{count}} 回の閲覧",
   "applications": "{{count}} 件の応募",
@@ -118,11 +129,11 @@
     "action_move_stage": "ステージを移動",
     "action_auto_reject": "自動拒否",
     "action_notify_me": "通知を受け取る",
-    "generated_name": "{{stage}} to {{target}} after {{count}}d",
-    "rule_summary": "If in \"{{stage}}\" for {{count}}d -> {{action}}",
-    "rule_summary_with_target": "If in \"{{stage}}\" for {{count}}d -> {{action}} -> {{target}}",
-    "rules_title": "Automation Rules",
-    "reviewed": "Reviewed"
+    "generated_name": "{{stage}} から {{target}} へ {{count}}日後",
+    "rule_summary": "「{{stage}}」に {{count}}日 いる場合 -> {{action}}",
+    "rule_summary_with_target": "「{{stage}}」に {{count}}日 いる場合 -> {{action}} -> {{target}}",
+    "rules_title": "自動化ルール",
+    "reviewed": "確認済み"
   },
   "employer": {
     "page_title": "雇用者プロフィール",
@@ -400,7 +411,7 @@
     "message_employer": "雇用主にメッセージを送る",
     "cv_parse_error": "CVの解析に失敗しました。手動で申請を提出することはできます。",
     "cv_size_kb": "({{count}} KB)",
-    "quick_apply": "Quick Apply with Saved Profile",
+    "quick_apply": "保存済みプロフィールで簡単応募",
     "this_job": "この求人",
     "view": "表示"
   },
@@ -463,7 +474,7 @@
     "type_in_person": "対面",
     "duration": "Duration",
     "datetime": "日付と時間",
-    "location": "ミーティングリンク / 場所",
+    "location": "場所",
     "send_request": "面接リクエストを送信する",
     "accepted": "面接が確認されました",
     "proposed": "面接がリクエストされました",
@@ -471,23 +482,34 @@
     "accept": "Accept",
     "decline": "Decline",
     "minutes": "min",
-    "join_call": "Join Video Call",
-    "add_to_calendar": "Add to Calendar",
+    "join_call": "ビデオ通話に参加",
+    "add_to_calendar": "カレンダーに追加",
     "calendar_google": "Google",
     "calendar_outlook": "Outlook",
     "calendar_ics": ".ics",
-    "download_ics": "Download .ics"
+    "download_ics": ".ics をダウンロード",
+    "scheduled": "面接がスケジュールされました",
+    "date": "日付",
+    "time": "時間",
+    "notes": "メモ",
+    "virtual": "オンライン",
+    "in_person": "対面"
   },
   "offer": {
-    "title": "オファーを受け取りました！",
-    "salary": "Salary",
-    "start_date": "開始日",
-    "accept": "オファーを受け入れる",
+    "title": "内定通知",
+    "salary": "提示給与",
+    "start_date": "入社予定日",
+    "accept": "オファーを承諾",
     "reject": "Decline",
-    "accepted": "オファーが受け入れられました",
+    "accepted": "オファー承諾済み",
     "rejected": "オファーが辞退されました",
     "send": "オファーを送信する",
-    "modal_title": "求人オファーを送信する"
+    "modal_title": "求人オファーを送信する",
+    "deadline": "返答期限",
+    "decline": "オファーを辞退",
+    "declined": "オファー辞退済み",
+    "expired": "オファーの期限が切れました",
+    "notes": "オファーのメモ"
   },
   "org": {
     "job_openings": "求人情報"
@@ -496,7 +518,14 @@
     "parse": "スキルは提出後に抽出されます",
     "parsing": "履歴書を分析中...",
     "detected": "履歴書から検出されたスキル",
-    "parsed_toast": "応募が提出されました！{{count}} あなたの履歴書から検出されたスキル。"
+    "parsed_toast": "応募が提出されました！{{count}} あなたの履歴書から検出されたスキル。",
+    "title": "履歴書",
+    "upload": "履歴書をアップロード",
+    "download": "履歴書をダウンロード",
+    "remove": "履歴書を削除",
+    "no_cv": "履歴書がアップロードされていません",
+    "uploaded": "履歴書がアップロードされました",
+    "required": "履歴書は必須です"
   },
   "branding": {
     "section": "雇用主ブランディング",
@@ -506,17 +535,21 @@
     "size_label": "会社の規模",
     "benefits_label": "福利厚生",
     "benefits_placeholder": "福利厚生を入力してEnterを押してください",
-    "about_company": "会社について"
+    "about_company": "会社について",
+    "logo": "会社ロゴ",
+    "cover": "カバー画像",
+    "upload_logo": "ロゴをアップロード",
+    "upload_cover": "カバー画像をアップロード"
   },
   "referral": {
     "share": "共有して稼ぐ",
     "copied": "紹介リンクがクリップボードにコピーされました！"
   },
   "scorecard": {
-    "title": "応募者を評価する",
+    "title": "評価スコアカード",
     "criteria": "評価基準",
-    "notes": "レビューノート",
-    "save": "スコアカードを保存",
+    "notes": "メモ",
+    "save": "評価を保存",
     "saved": "スコアカードが保存されました",
     "notes_placeholder": "この応募者に関する任意のノート...",
     "communication": "Communication",
@@ -524,14 +557,18 @@
     "cultural_fit": "文化的適合",
     "experience": "Experience",
     "motivation": "Motivation",
-    "max_score_suffix": "/ 10"
+    "max_score_suffix": "/ 10",
+    "add_criterion": "評価基準を追加",
+    "criterion": "評価基準",
+    "weight": "重み",
+    "score": "スコア"
   },
   "saved_profile": {
     "found": "保存された応募プロフィールが見つかりました",
     "use": "保存されたプロフィールを使用",
     "start_fresh": "新たに始める",
     "inline_cv": "- CV: {{filename}}",
-    "cv_label": "Saved CV: {{filename}}"
+    "cv_label": "保存済み履歴書: {{filename}}"
   },
   "team": {
     "section": "採用チーム",
@@ -540,16 +577,19 @@
     "add": "Add",
     "add_member": "メンバーを追加",
     "remove": "Remove",
-    "remove_member": "Remove",
+    "remove_member": "メンバーを削除",
     "search_placeholder": "メンバーを検索...",
-    "role": "Role",
+    "role": "役割",
     "role_reviewer": "Reviewer",
     "role_interviewer": "Interviewer",
     "role_hiring_manager": "採用マネージャー",
     "role_manager": "Manager",
     "added": "チームメンバーが追加されました",
     "removed": "チームメンバーが削除されました",
-    "edit_only": "仕事を保存した後に利用可能"
+    "edit_only": "仕事を保存した後に利用可能",
+    "reviewer": "レビュアー",
+    "interviewer": "面接官",
+    "hiring_manager": "採用マネージャー"
   },
   "search": {
     "label": "求人を検索",
@@ -643,8 +683,15 @@
       "salary_required": "給与範囲が必要です。「給与交渉可」をチェックして省略できます。",
       "salary_range_invalid": "最低給与は最高給与を超えることはできません"
     },
-    "save_draft": "Save as Draft",
-    "draft_saved": "Draft saved"
+    "save_draft": "下書きとして保存",
+    "draft_saved": "下書きを保存しました",
+    "title": "求人タイトル",
+    "description": "説明",
+    "requirements": "応募要件",
+    "location": "勤務地",
+    "salary_min": "最低給与",
+    "salary_max": "最高給与",
+    "closing_date": "締め切り日"
   },
   "ai_generate": {
     "button": "AI生成",
@@ -664,9 +711,9 @@
     "approved": "Approved",
     "rejected": "Rejected",
     "flagged": "Flagged",
-    "approve": "Approve",
-    "reject": "Reject",
-    "flag": "レビューのためにフラグを立てる",
+    "approve": "承認",
+    "reject": "却下",
+    "flag": "フラグを立てる",
     "approve_success": "求人が承認され、公開されました",
     "reject_success": "求人が拒否されました",
     "flag_success": "求人がレビューのためにフラグが立てられました",
@@ -689,9 +736,10 @@
     },
     "status": {
       "pending_review": "レビュー待ち",
-      "approved": "Approved",
-      "rejected": "Rejected",
-      "flagged": "Flagged"
+      "approved": "承認済み",
+      "rejected": "却下済み",
+      "flagged": "フラグ済み",
+      "pending": "審査待ち"
     },
     "confirm_approve": "この求人を承認しますか？すぐに公開されます。",
     "confirm_reject": "この求人を拒否してもよろしいですか？",
@@ -700,15 +748,15 @@
     "submitted": "提出者 {{date}}",
     "spam_score": "スパムスコア: {{score}}",
     "spam_flags_label": "検出フラグ",
-    "refresh": "Refresh",
-    "loading": "Loading...",
-    "cancel": "Cancel",
-    "no_description": "No description",
-    "no_flags": "No flags",
-    "load_error": "Failed to load moderation queue",
-    "flags_tooltip": "Flags: {{flags}}",
-    "user_fallback": "User #{{id}}",
-    "pagination_label": "Moderation queue pages"
+    "refresh": "更新",
+    "loading": "読み込み中...",
+    "cancel": "キャンセル",
+    "no_description": "説明なし",
+    "no_flags": "フラグなし",
+    "load_error": "モデレーションキューの読み込みに失敗しました",
+    "flags_tooltip": "フラグ: {{flags}}",
+    "user_fallback": "ユーザー #{{id}}",
+    "pagination_label": "モデレーションキューのページ"
   },
   "spam": {
     "title": "スパム検出",
@@ -783,7 +831,7 @@
     "rejection_rate": "拒否率",
     "days": "days",
     "funnel_title": "応募ファネル",
-    "funnel_description": "???????????????????????",
+    "funnel_description": "候補者がパイプラインの各ステージをどのように進むか",
     "rejection_rates_title": "段階別拒否率",
     "rejection_rates_description": "各段階で拒否された候補者の割合",
     "time_in_stage_title": "段階の平均時間",
@@ -818,9 +866,9 @@
     "no_data": "選択した期間の応募データは利用できません",
     "load_error": "バイアス監査レポートの読み込みに失敗しました",
     "note_privacy": "このレポートはプロセスメトリのみを分析します。人口統計データは収集または使用されません。",
-    "stages": "stages",
+    "stages": "ステージ",
     "not_available": "N/A",
-    "access_denied": "Access denied",
+    "access_denied": "アクセス拒否",
     "rejection_rates_table_aria": "採用ステージ別の不採用率"
   },
   "self_scheduling": {
@@ -869,7 +917,7 @@
     "candidate_pick": "インタビューのための時間スロットを選択してください"
   },
   "onboarding": {
-    "title": "雇用主のオンボーディング",
+    "title": "採用ダッシュボードへようこそ",
     "step_welcome": "Welcome",
     "step_organization": "Organization",
     "step_first_job": "求人を投稿",
@@ -894,7 +942,7 @@
     "org_linked": "あなたの組織にリンクされています",
     "next": "Next",
     "back": "Back",
-    "skip": "今はスキップ",
+    "skip": "セットアップをスキップ",
     "job_title": "最初の求人を投稿する",
     "job_desc": "最初の求人リストを作成するために基本情報を入力してください。",
     "salary_hint": "EUの給与透明性：給与範囲を含めることで候補者の質が向上します",
@@ -914,7 +962,11 @@
     "first_time_banner": "初めての投稿ですか？",
     "first_time_desc": "私たちのオンボーディングウィザードが、初めての求人投稿をサポートします。",
     "start_wizard": "ウィザードを開始",
-    "aria_progress": "オンボーディングの進捗"
+    "aria_progress": "オンボーディングの進捗",
+    "step1": "最初の求人を作成する",
+    "step2": "応募を確認する",
+    "step3": "候補者と連絡を取る",
+    "complete": "セットアップ完了"
   },
   "preview": {
     "title": "求人プレビュー",
@@ -932,7 +984,7 @@
     "copy_link": "リンクをコピー",
     "email": "メールで共有",
     "copied": "リンクがコピーされました！",
-    "native": "Share..."
+    "native": "共有..."
   },
   "already_applied": "すでに応募しています",
   "application_status_label": "応募状況",
@@ -984,12 +1036,15 @@
   "ai_chat": {
     "open": "この仕事についてAIに聞いてみる",
     "close": "AIチャットを閉じる",
-    "send": "メッセージを送信",
-    "title": "この仕事についてAIに聞いてみる",
+    "send": "送信",
+    "title": "AI求人アシスタント",
     "hint": "この仕事について何でも聞いてください — 資格、給与、応募方法、面接のヒント...",
-    "placeholder": "質問を入力してください...",
-    "error_response": "Sorry, I could not process your request.",
-    "error_generic": "Sorry, something went wrong."
+    "placeholder": "この求人について質問する...",
+    "error_response": "申し訳ありませんが、リクエストを処理できませんでした。",
+    "error_generic": "申し訳ありませんが、エラーが発生しました。",
+    "thinking": "考え中...",
+    "clear": "会話をクリア",
+    "suggestions": "おすすめの質問"
   },
   "page_meta": {
     "bias_audit": {
@@ -1024,12 +1079,20 @@
     "edit": {
       "title": "求人を編集",
       "description": "求人の詳細、報酬、チーム設定、公開オプションを更新します。"
+    },
+    "index": {
+      "title": "求人情報",
+      "description": "コミュニティで利用可能な仕事の機会や役割を探す"
+    },
+    "detail": {
+      "title": "{{title}} — 求人",
+      "description": "求人詳細を見て応募する"
     }
   },
-  "page_title": "Job Vacancies",
-  "page_description": "Browse job opportunities, volunteering roles, and timebank positions offered by community members and partner organisations near you.",
+  "page_title": "求人情報",
+  "page_description": "お近くのコミュニティメンバーやパートナー団体が提供する求人、ボランティア活動、タイムバンクのポジションをご覧ください。",
   "jobs": {
-    "view_details": "View job details"
+    "view_details": "求人詳細を見る"
   },
   "cancel": "キャンセル"
 }

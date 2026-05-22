@@ -118,11 +118,11 @@
     "action_move_stage": "Phase verschieben",
     "action_auto_reject": "Automatisch ablehnen",
     "action_notify_me": "Benachrichtigen",
-    "generated_name": "{{stage}} to {{target}} after {{count}}d",
-    "rule_summary": "If in \"{{stage}}\" for {{count}}d -> {{action}}",
-    "rule_summary_with_target": "If in \"{{stage}}\" for {{count}}d -> {{action}} -> {{target}}",
-    "rules_title": "Automation Rules",
-    "reviewed": "Reviewed"
+    "generated_name": "{{stage}} zu {{target}} nach {{count}}T",
+    "rule_summary": "Wenn in \"{{stage}}\" für {{count}}T -> {{action}}",
+    "rule_summary_with_target": "Wenn in \"{{stage}}\" für {{count}}T -> {{action}} -> {{target}}",
+    "rules_title": "Automatisierungsregeln",
+    "reviewed": "Überprüft"
   },
   "employer": {
     "page_title": "Arbeitgeberprofil",
@@ -400,7 +400,7 @@
     "message_employer": "Arbeitgeber kontaktieren",
     "cv_parse_error": "Lebenslauf konnte nicht analysiert werden. Sie können Ihre Bewerbung trotzdem manuell einreichen.",
     "cv_size_kb": "({{count}} KB)",
-    "quick_apply": "Quick Apply with Saved Profile",
+    "quick_apply": "Schnell bewerben mit gespeichertem Profil",
     "this_job": "diese Stelle",
     "view": "Ansehen"
   },
@@ -471,8 +471,8 @@
     "accept": "Akzeptieren",
     "decline": "Ablehnen",
     "minutes": "Min",
-    "join_call": "Join Video Call",
-    "add_to_calendar": "Add to Calendar",
+    "join_call": "Videoanruf beitreten",
+    "add_to_calendar": "Zum Kalender hinzufügen",
     "calendar_google": "Google",
     "calendar_outlook": "Outlook",
     "calendar_ics": ".ics",
@@ -531,7 +531,7 @@
     "use": "Gespeichertes Profil verwenden",
     "start_fresh": "Neu beginnen",
     "inline_cv": "- CV: {{filename}}",
-    "cv_label": "Saved CV: {{filename}}"
+    "cv_label": "Gespeicherter Lebenslauf: {{filename}}"
   },
   "team": {
     "section": "Einstellungsteam",
@@ -643,8 +643,8 @@
       "salary_required": "Gehaltsbereich erforderlich. Sie können 'Gehalt verhandelbar' ankreuzen, um ihn wegzulassen.",
       "salary_range_invalid": "Das Mindestgehalt darf das Maximalgehalt nicht überschreiten"
     },
-    "save_draft": "Save as Draft",
-    "draft_saved": "Draft saved"
+    "save_draft": "Als Entwurf speichern",
+    "draft_saved": "Entwurf gespeichert"
   },
   "ai_generate": {
     "button": "KI-Generierung",
@@ -700,15 +700,15 @@
     "submitted": "Eingereicht am {{date}}",
     "spam_score": "Spam-Score: {{score}}",
     "spam_flags_label": "Erkennungsmarkierungen",
-    "refresh": "Refresh",
-    "loading": "Loading...",
-    "cancel": "Cancel",
-    "no_description": "No description",
-    "no_flags": "No flags",
-    "load_error": "Failed to load moderation queue",
-    "flags_tooltip": "Flags: {{flags}}",
-    "user_fallback": "User #{{id}}",
-    "pagination_label": "Moderation queue pages"
+    "refresh": "Aktualisieren",
+    "loading": "Wird geladen...",
+    "cancel": "Abbrechen",
+    "no_description": "Keine Beschreibung",
+    "no_flags": "Keine Markierungen",
+    "load_error": "Moderationswarteschlange konnte nicht geladen werden",
+    "flags_tooltip": "Markierungen: {{flags}}",
+    "user_fallback": "Benutzer #{{id}}",
+    "pagination_label": "Seiten der Moderationswarteschlange"
   },
   "spam": {
     "title": "Spam-Erkennung",
@@ -818,9 +818,9 @@
     "no_data": "Keine Bewerbungsdaten für den ausgewählten Zeitraum verfügbar",
     "load_error": "Vorurteils-Audit-Bericht konnte nicht geladen werden",
     "note_privacy": "Dieser Bericht analysiert nur Prozesskennzahlen. Es werden keine demographischen Daten erhoben oder verwendet.",
-    "stages": "stages",
-    "not_available": "N/A",
-    "access_denied": "Access denied",
+    "stages": "Stufen",
+    "not_available": "N/V",
+    "access_denied": "Zugriff verweigert",
     "rejection_rates_table_aria": "Ablehnungsraten nach Einstellungsphase"
   },
   "self_scheduling": {
@@ -932,7 +932,7 @@
     "copy_link": "Link kopieren",
     "email": "Per E-Mail teilen",
     "copied": "Link kopiert!",
-    "native": "Share..."
+    "native": "Teilen..."
   },
   "already_applied": "Sie haben sich bereits beworben",
   "application_status_label": "Bewerbungsstatus",
@@ -988,8 +988,8 @@
     "title": "Frag die KI zu diesem Job",
     "hint": "Frag mich alles zu diesem Job – Qualifikationen, Gehalt, wie man sich bewirbt, Interviewtipps...",
     "placeholder": "Tippe deine Frage ein...",
-    "error_response": "Sorry, I could not process your request.",
-    "error_generic": "Sorry, something went wrong."
+    "error_response": "Leider konnte ich Ihre Anfrage nicht verarbeiten.",
+    "error_generic": "Leider ist etwas schiefgelaufen."
   },
   "page_meta": {
     "bias_audit": {
@@ -1026,10 +1026,10 @@
       "description": "Aktualisieren Sie Stellendetails, Vergütung, Teameinstellungen und Veröffentlichungsoptionen."
     }
   },
-  "page_title": "Job Vacancies",
-  "page_description": "Browse job opportunities, volunteering roles, and timebank positions offered by community members and partner organisations near you.",
+  "page_title": "Stellenangebote",
+  "page_description": "Durchsuchen Sie Stellenangebote, Freiwilligenstellen und Zeitbank-Positionen von Gemeinschaftsmitgliedern und Partnerorganisationen in Ihrer Nähe.",
   "jobs": {
-    "view_details": "View job details"
+    "view_details": "Stellendetails anzeigen"
   },
   "cancel": "Abbrechen"
 }

@@ -118,11 +118,11 @@
     "action_move_stage": "Mover etapa",
     "action_auto_reject": "Rechazo automático",
     "action_notify_me": "Notificarme",
-    "generated_name": "{{stage}} to {{target}} after {{count}}d",
-    "rule_summary": "If in \"{{stage}}\" for {{count}}d -> {{action}}",
-    "rule_summary_with_target": "If in \"{{stage}}\" for {{count}}d -> {{action}} -> {{target}}",
-    "rules_title": "Automation Rules",
-    "reviewed": "Reviewed"
+    "generated_name": "{{stage}} a {{target}} después de {{count}}d",
+    "rule_summary": "Si está en \"{{stage}}\" durante {{count}}d -> {{action}}",
+    "rule_summary_with_target": "Si está en \"{{stage}}\" durante {{count}}d -> {{action}} -> {{target}}",
+    "rules_title": "Reglas de automatización",
+    "reviewed": "Revisado"
   },
   "employer": {
     "page_title": "Perfil del Empleador",
@@ -400,7 +400,7 @@
     "message_employer": "Mensaje al Empleador",
     "cv_parse_error": "No se pudo analizar el CV. Aún puede enviar su solicitud manualmente.",
     "cv_size_kb": "({{count}} KB)",
-    "quick_apply": "Quick Apply with Saved Profile",
+    "quick_apply": "Solicitud rápida con perfil guardado",
     "this_job": "este empleo",
     "view": "Ver"
   },
@@ -471,8 +471,8 @@
     "accept": "Aceptar",
     "decline": "Rechazar",
     "minutes": "min",
-    "join_call": "Join Video Call",
-    "add_to_calendar": "Add to Calendar",
+    "join_call": "Unirse a la videollamada",
+    "add_to_calendar": "Añadir al calendario",
     "calendar_google": "Google",
     "calendar_outlook": "Outlook",
     "calendar_ics": ".ics",
@@ -531,7 +531,7 @@
     "use": "Usar Perfil Guardado",
     "start_fresh": "Empezar de Nuevo",
     "inline_cv": "- CV: {{filename}}",
-    "cv_label": "Saved CV: {{filename}}"
+    "cv_label": "CV guardado: {{filename}}"
   },
   "team": {
     "section": "Equipo de Contratación",
@@ -643,8 +643,8 @@
       "salary_required": "Se requiere rango salarial. Puede marcar 'Salario negociable' para omitirlo.",
       "salary_range_invalid": "El salario mínimo no puede superar el salario máximo"
     },
-    "save_draft": "Save as Draft",
-    "draft_saved": "Draft saved"
+    "save_draft": "Guardar como borrador",
+    "draft_saved": "Borrador guardado"
   },
   "ai_generate": {
     "button": "Generar con IA",
@@ -700,15 +700,15 @@
     "submitted": "Enviado {{date}}",
     "spam_score": "Puntuación de Spam: {{score}}",
     "spam_flags_label": "Indicadores de Detección",
-    "refresh": "Refresh",
-    "loading": "Loading...",
-    "cancel": "Cancel",
-    "no_description": "No description",
-    "no_flags": "No flags",
-    "load_error": "Failed to load moderation queue",
-    "flags_tooltip": "Flags: {{flags}}",
-    "user_fallback": "User #{{id}}",
-    "pagination_label": "Moderation queue pages"
+    "refresh": "Actualizar",
+    "loading": "Cargando...",
+    "cancel": "Cancelar",
+    "no_description": "Sin descripción",
+    "no_flags": "Sin marcas",
+    "load_error": "Error al cargar la cola de moderación",
+    "flags_tooltip": "Marcas: {{flags}}",
+    "user_fallback": "Usuario #{{id}}",
+    "pagination_label": "Páginas de la cola de moderación"
   },
   "spam": {
     "title": "Detección de Spam",
@@ -818,9 +818,9 @@
     "no_data": "No hay datos de solicitudes disponibles para el período seleccionado",
     "load_error": "No se pudo cargar el informe de auditoría de sesgo",
     "note_privacy": "Este informe solo analiza métricas de proceso. No se recopilan ni utilizan datos demográficos.",
-    "stages": "stages",
-    "not_available": "N/A",
-    "access_denied": "Access denied",
+    "stages": "etapas",
+    "not_available": "N/D",
+    "access_denied": "Acceso denegado",
     "rejection_rates_table_aria": "Tasas de rechazo por etapa de contratación"
   },
   "self_scheduling": {
@@ -932,7 +932,7 @@
     "copy_link": "Copiar Enlace",
     "email": "Compartir por Correo",
     "copied": "¡Enlace copiado!",
-    "native": "Share..."
+    "native": "Compartir..."
   },
   "already_applied": "Ya te has inscrito",
   "application_status_label": "Estado de la Solicitud",
@@ -988,8 +988,8 @@
     "title": "Pregunta a la IA sobre este trabajo",
     "hint": "Pregúntame cualquier cosa sobre este trabajo: requisitos, salario, cómo postular, consejos para la entrevista...",
     "placeholder": "Escribe tu pregunta...",
-    "error_response": "Sorry, I could not process your request.",
-    "error_generic": "Sorry, something went wrong."
+    "error_response": "Lo siento, no pude procesar tu solicitud.",
+    "error_generic": "Lo siento, algo salió mal."
   },
   "page_meta": {
     "bias_audit": {
@@ -1026,10 +1026,10 @@
       "description": "Actualiza los detalles de la vacante, la remuneración, la configuración del equipo y las opciones de publicación."
     }
   },
-  "page_title": "Job Vacancies",
-  "page_description": "Browse job opportunities, volunteering roles, and timebank positions offered by community members and partner organisations near you.",
+  "page_title": "Ofertas de empleo",
+  "page_description": "Explora oportunidades de trabajo, roles de voluntariado y puestos de banco de tiempo ofrecidos por miembros de la comunidad y organizaciones asociadas cerca de ti.",
   "jobs": {
-    "view_details": "View job details"
+    "view_details": "Ver detalles del empleo"
   },
   "cancel": "Cancelar"
 }

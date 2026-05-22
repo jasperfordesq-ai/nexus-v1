@@ -16,9 +16,14 @@
   "filter_by_commitment": "تصفية حسب الالتزام",
   "type": {
     "all": "جميع الأنواع",
-    "paid": "Paid",
-    "volunteer": "Volunteer",
-    "timebank": "Timebank"
+    "paid": "مدفوع",
+    "volunteer": "تطوع",
+    "timebank": "بنك الوقت",
+    "full_time": "دوام كامل",
+    "part_time": "دوام جزئي",
+    "contract": "عقد",
+    "internship": "تدريب",
+    "freelance": "عمل حر"
   },
   "commitment": {
     "all": "All",
@@ -28,22 +33,28 @@
     "one_off": "عمل واحد"
   },
   "status": {
-    "open": "Open",
-    "closed": "Closed",
-    "filled": "Filled",
-    "draft": "Draft"
+    "open": "مفتوح",
+    "closed": "مغلق",
+    "filled": "مشغول",
+    "draft": "مسودة",
+    "active": "نشط",
+    "expired": "منتهي الصلاحية",
+    "paused": "متوقف"
   },
   "application_status": {
-    "applied": "Applied",
-    "pending": "Pending",
-    "screening": "Screening",
-    "reviewed": "Reviewed",
-    "interview": "Interview",
-    "offer": "Offer",
-    "accepted": "Accepted",
-    "rejected": "Rejected",
-    "withdrawn": "Withdrawn",
-    "unknown": "غير معروف"
+    "applied": "تم التقديم",
+    "pending": "قيد الانتظار",
+    "screening": "فرز",
+    "reviewed": "تمت المراجعة",
+    "interview": "مقابلة",
+    "offer": "عرض",
+    "accepted": "مقبول",
+    "rejected": "مرفوض",
+    "withdrawn": "تم السحب",
+    "unknown": "غير معروف",
+    "reviewing": "قيد المراجعة",
+    "shortlisted": "في القائمة المختصرة",
+    "offered": "تم تقديم عرض"
   },
   "views": "{{count}} مشاهدات",
   "applications": "{{count}} طلبات",
@@ -118,11 +129,11 @@
     "action_move_stage": "نقل المرحلة",
     "action_auto_reject": "رفض تلقائي",
     "action_notify_me": "أعلمني",
-    "generated_name": "{{stage}} to {{target}} after {{count}}d",
-    "rule_summary": "If in \"{{stage}}\" for {{count}}d -> {{action}}",
-    "rule_summary_with_target": "If in \"{{stage}}\" for {{count}}d -> {{action}} -> {{target}}",
-    "rules_title": "Automation Rules",
-    "reviewed": "Reviewed"
+    "generated_name": "{{stage}} إلى {{target}} بعد {{count}}د",
+    "rule_summary": "إذا كان في \"{{stage}}\" لمدة {{count}}د -> {{action}}",
+    "rule_summary_with_target": "إذا كان في \"{{stage}}\" لمدة {{count}}د -> {{action}} -> {{target}}",
+    "rules_title": "قواعد الأتمتة",
+    "reviewed": "تمت المراجعة"
   },
   "employer": {
     "page_title": "ملف صاحب العمل",
@@ -400,7 +411,7 @@
     "message_employer": "رسالة إلى صاحب العمل",
     "cv_parse_error": "فشل في تحليل السيرة الذاتية. يمكنك تقديم طلبك يدويًا.",
     "cv_size_kb": "({{count}} KB)",
-    "quick_apply": "Quick Apply with Saved Profile",
+    "quick_apply": "تقدم سريعاً بالملف المحفوظ",
     "this_job": "هذه الوظيفة",
     "view": "عرض"
   },
@@ -463,7 +474,7 @@
     "type_in_person": "In Person",
     "duration": "Duration",
     "datetime": "Date & Time",
-    "location": "Meeting Link / Location",
+    "location": "الموقع",
     "send_request": "Send Interview Request",
     "accepted": "Interview Confirmed",
     "proposed": "Interview Requested",
@@ -471,85 +482,114 @@
     "accept": "Accept",
     "decline": "Decline",
     "minutes": "min",
-    "join_call": "Join Video Call",
-    "add_to_calendar": "Add to Calendar",
+    "join_call": "انضم إلى مكالمة الفيديو",
+    "add_to_calendar": "أضف إلى التقويم",
     "calendar_google": "Google",
     "calendar_outlook": "Outlook",
     "calendar_ics": ".ics",
-    "download_ics": "Download .ics"
+    "download_ics": "تنزيل .ics",
+    "scheduled": "تمت جدولة المقابلة",
+    "date": "التاريخ",
+    "time": "الوقت",
+    "notes": "ملاحظات",
+    "virtual": "افتراضي",
+    "in_person": "حضوري"
   },
   "offer": {
-    "title": "You received an offer!",
-    "salary": "Salary",
-    "start_date": "Start Date",
-    "accept": "Accept Offer",
-    "reject": "Decline",
-    "accepted": "Offer Accepted",
-    "rejected": "Offer Declined",
-    "send": "Send Offer",
-    "modal_title": "Send Job Offer"
+    "title": "عرض العمل",
+    "salary": "الراتب المعروض",
+    "start_date": "تاريخ البدء",
+    "accept": "قبول العرض",
+    "reject": "رفض",
+    "accepted": "تم قبول العرض",
+    "rejected": "تم رفض العرض",
+    "send": "إرسال العرض",
+    "modal_title": "إرسال عرض عمل",
+    "deadline": "الموعد النهائي للرد",
+    "decline": "رفض العرض",
+    "declined": "تم رفض العرض",
+    "expired": "العرض منتهي الصلاحية",
+    "notes": "ملاحظات العرض"
   },
   "org": {
     "job_openings": "Job Openings"
   },
   "cv": {
-    "parse": "Skills will be extracted after submission",
-    "parsing": "Analysing CV...",
-    "detected": "Skills detected from CV",
-    "parsed_toast": "Application submitted! {{count}} skills detected from your CV."
+    "parse": "سيتم استخراج المهارات بعد التقديم",
+    "parsing": "جارٍ تحليل السيرة الذاتية...",
+    "detected": "تم اكتشاف مهارات من السيرة الذاتية",
+    "parsed_toast": "تم تقديم الطلب! تم اكتشاف {{count}} مهارة من سيرتك الذاتية.",
+    "title": "السيرة الذاتية",
+    "upload": "رفع السيرة الذاتية",
+    "download": "تنزيل السيرة الذاتية",
+    "remove": "إزالة السيرة الذاتية",
+    "no_cv": "لم يتم رفع سيرة ذاتية",
+    "uploaded": "تم رفع السيرة الذاتية",
+    "required": "السيرة الذاتية مطلوبة"
   },
   "branding": {
-    "section": "Employer Branding",
-    "tagline_label": "Company Tagline",
-    "tagline_placeholder": "What makes your company great?",
-    "video_label": "Culture Video URL",
+    "section": "علامة صاحب العمل التجارية",
+    "tagline_label": "شعار الشركة",
+    "tagline_placeholder": "ما الذي يجعل شركتك رائعة؟",
+    "video_label": "رابط فيديو الثقافة",
     "size_label": "حجم الشركة",
     "benefits_label": "المزايا والفوائد",
     "benefits_placeholder": "اكتب ميزة واضغط Enter",
-    "about_company": "عن الشركة"
+    "about_company": "عن الشركة",
+    "logo": "شعار الشركة",
+    "cover": "صورة الغلاف",
+    "upload_logo": "رفع الشعار",
+    "upload_cover": "رفع صورة الغلاف"
   },
   "referral": {
     "share": "شارك واكسب",
     "copied": "تم نسخ رابط الإحالة إلى الحافظة!"
   },
   "scorecard": {
-    "title": "تقييم المتقدم",
+    "title": "بطاقة التقييم",
     "criteria": "معايير التقييم",
-    "notes": "ملاحظات المراجع",
-    "save": "احفظ بطاقة التقييم",
+    "notes": "ملاحظات",
+    "save": "حفظ التقييم",
     "saved": "تم حفظ بطاقة التقييم",
     "notes_placeholder": "ملاحظات اختيارية حول هذا المتقدم...",
-    "communication": "Communication",
+    "communication": "التواصل",
     "technical": "المهارات التقنية",
     "cultural_fit": "التوافق الثقافي",
-    "experience": "Experience",
-    "motivation": "Motivation",
-    "max_score_suffix": "/ 10"
+    "experience": "الخبرة",
+    "motivation": "الدافعية",
+    "max_score_suffix": "/ 10",
+    "add_criterion": "إضافة معيار",
+    "criterion": "المعيار",
+    "weight": "الوزن",
+    "score": "الدرجة"
   },
   "saved_profile": {
     "found": "تم العثور على ملف الطلب المحفوظ",
     "use": "استخدم الملف المحفوظ",
     "start_fresh": "ابدأ من جديد",
     "inline_cv": "- CV: {{filename}}",
-    "cv_label": "Saved CV: {{filename}}"
+    "cv_label": "السيرة الذاتية المحفوظة: {{filename}}"
   },
   "team": {
     "section": "فريق التوظيف",
     "title": "فريق التوظيف",
     "add_reviewer": "أضف مراجعًا",
     "add": "Add",
-    "add_member": "أضف عضوًا",
+    "add_member": "إضافة عضو",
     "remove": "Remove",
-    "remove_member": "Remove",
+    "remove_member": "إزالة عضو",
     "search_placeholder": "ابحث عن الأعضاء...",
-    "role": "Role",
-    "role_reviewer": "Reviewer",
-    "role_interviewer": "Interviewer",
+    "role": "الدور",
+    "role_reviewer": "مراجع",
+    "role_interviewer": "مُقابِل",
     "role_hiring_manager": "مدير التوظيف",
     "role_manager": "Manager",
     "added": "تم إضافة عضو الفريق",
     "removed": "تم إزالة عضو الفريق",
-    "edit_only": "متاح بعد حفظ الوظيفة"
+    "edit_only": "متاح بعد حفظ الوظيفة",
+    "reviewer": "مراجع",
+    "interviewer": "مُقابِل",
+    "hiring_manager": "مدير التوظيف"
   },
   "search": {
     "label": "ابحث عن الوظائف الشاغرة",
@@ -643,8 +683,15 @@
       "salary_required": "نطاق الراتب مطلوب. يمكنك اختيار 'الراتب قابل للتفاوض' لتجاوزه.",
       "salary_range_invalid": "لا يمكن أن يتجاوز الراتب الأدنى الراتب الأقصى"
     },
-    "save_draft": "Save as Draft",
-    "draft_saved": "Draft saved"
+    "save_draft": "حفظ كمسودة",
+    "draft_saved": "تم حفظ المسودة",
+    "title": "عنوان الوظيفة",
+    "description": "الوصف",
+    "requirements": "المتطلبات",
+    "location": "الموقع",
+    "salary_min": "الحد الأدنى للراتب",
+    "salary_max": "الحد الأقصى للراتب",
+    "closing_date": "تاريخ الإغلاق"
   },
   "ai_generate": {
     "button": "توليد الذكاء الاصطناعي",
@@ -664,9 +711,9 @@
     "approved": "Approved",
     "rejected": "Rejected",
     "flagged": "Flagged",
-    "approve": "Approve",
-    "reject": "Reject",
-    "flag": "علامة للمراجعة",
+    "approve": "موافقة",
+    "reject": "رفض",
+    "flag": "تعليم",
     "approve_success": "تمت الموافقة على الوظيفة ونشرها",
     "reject_success": "تم رفض الوظيفة",
     "flag_success": "تم وضع علامة على الوظيفة للمراجعة",
@@ -689,9 +736,10 @@
     },
     "status": {
       "pending_review": "في انتظار المراجعة",
-      "approved": "Approved",
-      "rejected": "Rejected",
-      "flagged": "Flagged"
+      "approved": "موافق عليه",
+      "rejected": "مرفوض",
+      "flagged": "مُعلَّم",
+      "pending": "قيد الانتظار"
     },
     "confirm_approve": "هل تريد الموافقة على هذا الإعلان الوظيفي؟ سيتم نشره على الفور.",
     "confirm_reject": "هل أنت متأكد أنك تريد رفض هذا الإعلان الوظيفي؟",
@@ -700,15 +748,15 @@
     "submitted": "تم تقديمه {{date}}",
     "spam_score": "درجة البريد المزعج: {{score}}",
     "spam_flags_label": "علامات الكشف",
-    "refresh": "Refresh",
-    "loading": "Loading...",
-    "cancel": "Cancel",
-    "no_description": "No description",
-    "no_flags": "No flags",
-    "load_error": "Failed to load moderation queue",
-    "flags_tooltip": "Flags: {{flags}}",
-    "user_fallback": "User #{{id}}",
-    "pagination_label": "Moderation queue pages"
+    "refresh": "تحديث",
+    "loading": "جارٍ التحميل...",
+    "cancel": "إلغاء",
+    "no_description": "لا يوجد وصف",
+    "no_flags": "لا توجد علامات",
+    "load_error": "فشل تحميل قائمة الإشراف",
+    "flags_tooltip": "العلامات: {{flags}}",
+    "user_fallback": "المستخدم #{{id}}",
+    "pagination_label": "صفحات قائمة الإشراف"
   },
   "spam": {
     "title": "كشف البريد المزعج",
@@ -783,7 +831,7 @@
     "rejection_rate": "معدل الرفض",
     "days": "days",
     "funnel_title": "قناة التقديم",
-    "funnel_description": "كيف يتقدم المرشحون عبر مراحل القناة",
+    "funnel_description": "كيف يتقدم المرشحون عبر كل مرحلة في خط الأنابيب",
     "rejection_rates_title": "معدلات الرفض حسب المرحلة",
     "rejection_rates_description": "نسبة المرشحين المرفوضين في كل مرحلة",
     "time_in_stage_title": "متوسط الوقت في المرحلة",
@@ -818,9 +866,9 @@
     "no_data": "لا توجد بيانات تقديم متاحة للفترة المحددة",
     "load_error": "فشل في تحميل تقرير تدقيق التحيز",
     "note_privacy": "هذا التقرير يحلل مقاييس العملية فقط. لا يتم جمع أو استخدام أي بيانات ديموغرافية.",
-    "stages": "stages",
-    "not_available": "N/A",
-    "access_denied": "Access denied",
+    "stages": "المراحل",
+    "not_available": "غير متاح",
+    "access_denied": "الوصول مرفوض",
     "rejection_rates_table_aria": "معدلات الرفض حسب مرحلة التوظيف"
   },
   "self_scheduling": {
@@ -869,7 +917,7 @@
     "candidate_pick": "اختر موعدًا لمقابلتك"
   },
   "onboarding": {
-    "title": "توظيف أصحاب العمل",
+    "title": "مرحباً بك في لوحة التوظيف",
     "step_welcome": "Welcome",
     "step_organization": "Organization",
     "step_first_job": "نشر وظيفة",
@@ -894,7 +942,7 @@
     "org_linked": "مرتبط بمنظمتك",
     "next": "Next",
     "back": "Back",
-    "skip": "تجاوز الآن",
+    "skip": "تخطي الإعداد",
     "job_title": "انشر وظيفتك الأولى",
     "job_desc": "املأ التفاصيل الأساسية لإنشاء قائمة الوظائف الأولى الخاصة بك.",
     "salary_hint": "شفافية الأجور في الاتحاد الأوروبي: تضمين نطاقات الرواتب يحسن جودة المرشحين",
@@ -914,7 +962,11 @@
     "first_time_banner": "هل هذه أول مرة تنشر فيها؟",
     "first_time_desc": "سيرشدك معالج الانضمام لدينا خلال نشر أول وظيفة لك.",
     "start_wizard": "ابدأ المعالج",
-    "aria_progress": "تقدم الانضمام"
+    "aria_progress": "تقدم الانضمام",
+    "step1": "أنشئ أول وظيفة لك",
+    "step2": "راجع الطلبات",
+    "step3": "تواصل مع المرشحين",
+    "complete": "اكتمل الإعداد"
   },
   "preview": {
     "title": "معاينة الوظيفة",
@@ -932,7 +984,7 @@
     "copy_link": "نسخ الرابط",
     "email": "شارك عبر البريد الإلكتروني",
     "copied": "تم نسخ الرابط!",
-    "native": "Share..."
+    "native": "مشاركة..."
   },
   "already_applied": "لقد تقدمت بالفعل",
   "application_status_label": "حالة الطلب",
@@ -984,12 +1036,15 @@
   "ai_chat": {
     "open": "اسأل الذكاء الاصطناعي عن هذه الوظيفة",
     "close": "أغلق دردشة الذكاء الاصطناعي",
-    "send": "أرسل رسالة",
-    "title": "اسأل الذكاء الاصطناعي عن هذه الوظيفة",
+    "send": "إرسال",
+    "title": "مساعد الوظائف الذكي",
     "hint": "اسألني أي شيء عن هذه الوظيفة - المؤهلات، الراتب، كيفية التقديم، نصائح المقابلة...",
-    "placeholder": "اكتب سؤالك...",
-    "error_response": "Sorry, I could not process your request.",
-    "error_generic": "Sorry, something went wrong."
+    "placeholder": "اسأل عن هذه الوظيفة...",
+    "error_response": "عذراً، لم أتمكن من معالجة طلبك.",
+    "error_generic": "عذراً، حدث خطأ ما.",
+    "thinking": "جارٍ التفكير...",
+    "clear": "مسح المحادثة",
+    "suggestions": "أسئلة مقترحة"
   },
   "page_meta": {
     "bias_audit": {
@@ -1024,12 +1079,20 @@
     "edit": {
       "title": "تعديل الوظيفة",
       "description": "حدّث تفاصيل الوظيفة الشاغرة والتعويض وإعدادات الفريق وخيارات النشر."
+    },
+    "index": {
+      "title": "الوظائف الشاغرة",
+      "description": "تصفح فرص العمل والأدوار المتاحة في مجتمعك"
+    },
+    "detail": {
+      "title": "{{title}} — الوظائف",
+      "description": "عرض تفاصيل الوظيفة والتقدم إليها"
     }
   },
-  "page_title": "Job Vacancies",
-  "page_description": "Browse job opportunities, volunteering roles, and timebank positions offered by community members and partner organisations near you.",
+  "page_title": "الوظائف الشاغرة",
+  "page_description": "تصفح فرص العمل وأدوار التطوع ومواقع بنك الوقت التي يقدمها أعضاء المجتمع والمنظمات الشريكة بالقرب منك.",
   "jobs": {
-    "view_details": "View job details"
+    "view_details": "عرض تفاصيل الوظيفة"
   },
   "cancel": "إلغاء"
 }

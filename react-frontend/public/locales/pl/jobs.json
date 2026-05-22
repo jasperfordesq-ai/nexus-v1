@@ -17,8 +17,13 @@
   "type": {
     "all": "Wszystkie typy",
     "paid": "Paid",
-    "volunteer": "Volunteer",
-    "timebank": "Timebank"
+    "volunteer": "Wolontariusz",
+    "timebank": "Bank czasu",
+    "full_time": "Pełny etat",
+    "part_time": "Niepełny etat",
+    "contract": "Umowa",
+    "internship": "Staż",
+    "freelance": "Freelance"
   },
   "commitment": {
     "all": "All",
@@ -29,21 +34,27 @@
   },
   "status": {
     "open": "Open",
-    "closed": "Closed",
-    "filled": "Filled",
-    "draft": "Draft"
+    "closed": "Zamknięty",
+    "filled": "Obsadzony",
+    "draft": "Szkic",
+    "active": "Aktywny",
+    "expired": "Wygasły",
+    "paused": "Wstrzymany"
   },
   "application_status": {
     "applied": "Applied",
-    "pending": "Pending",
+    "pending": "Oczekujący",
     "screening": "Screening",
     "reviewed": "Reviewed",
-    "interview": "Interview",
+    "interview": "Rozmowa kwalifikacyjna",
     "offer": "Offer",
-    "accepted": "Accepted",
-    "rejected": "Rejected",
-    "withdrawn": "Withdrawn",
-    "unknown": "Nieznany"
+    "accepted": "Zaakceptowany",
+    "rejected": "Odrzucony",
+    "withdrawn": "Wycofany",
+    "unknown": "Nieznany",
+    "reviewing": "W trakcie przeglądu",
+    "shortlisted": "Na krótkiej liście",
+    "offered": "Złożono ofertę"
   },
   "views": "{{count}} wyświetleń",
   "applications": "{{count}} aplikacji",
@@ -118,11 +129,11 @@
     "action_move_stage": "Przenieś etap",
     "action_auto_reject": "Automatyczne odrzucenie",
     "action_notify_me": "Powiadom mnie",
-    "generated_name": "{{stage}} to {{target}} after {{count}}d",
-    "rule_summary": "If in \"{{stage}}\" for {{count}}d -> {{action}}",
-    "rule_summary_with_target": "If in \"{{stage}}\" for {{count}}d -> {{action}} -> {{target}}",
-    "rules_title": "Automation Rules",
-    "reviewed": "Reviewed"
+    "generated_name": "{{stage}} do {{target}} po {{count}}d",
+    "rule_summary": "Jeśli w \"{{stage}}\" przez {{count}}d -> {{action}}",
+    "rule_summary_with_target": "Jeśli w \"{{stage}}\" przez {{count}}d -> {{action}} -> {{target}}",
+    "rules_title": "Reguły automatyzacji",
+    "reviewed": "Przejrzany"
   },
   "employer": {
     "page_title": "Profil pracodawcy",
@@ -400,7 +411,7 @@
     "message_employer": "Wyślij wiadomość do pracodawcy",
     "cv_parse_error": "Nie udało się przetworzyć CV. Możesz nadal złożyć swoją aplikację ręcznie.",
     "cv_size_kb": "({{count}} KB)",
-    "quick_apply": "Quick Apply with Saved Profile",
+    "quick_apply": "Szybka aplikacja z zapisanym profilem",
     "this_job": "tę ofertę pracy",
     "view": "Zobacz"
   },
@@ -463,7 +474,7 @@
     "type_in_person": "Osobiście",
     "duration": "Duration",
     "datetime": "Data i Czas",
-    "location": "Link do Spotkania / Lokalizacja",
+    "location": "Lokalizacja",
     "send_request": "Wyślij Prośbę o Rozmowę Kwalifikacyjną",
     "accepted": "Rozmowa Kwalifikacyjna Potwierdzona",
     "proposed": "Rozmowa Kwalifikacyjna Żądana",
@@ -471,23 +482,34 @@
     "accept": "Accept",
     "decline": "Decline",
     "minutes": "min",
-    "join_call": "Join Video Call",
-    "add_to_calendar": "Add to Calendar",
+    "join_call": "Dołącz do rozmowy wideo",
+    "add_to_calendar": "Dodaj do kalendarza",
     "calendar_google": "Google",
     "calendar_outlook": "Outlook",
     "calendar_ics": ".ics",
-    "download_ics": "Pobierz .ics"
+    "download_ics": "Pobierz .ics",
+    "scheduled": "Rozmowa kwalifikacyjna zaplanowana",
+    "date": "Data",
+    "time": "Godzina",
+    "notes": "Notatki",
+    "virtual": "Wirtualna",
+    "in_person": "Osobiście"
   },
   "offer": {
-    "title": "Otrzymałeś ofertę!",
-    "salary": "Salary",
-    "start_date": "Data Rozpoczęcia",
-    "accept": "Akceptuj Ofertę",
+    "title": "Oferta pracy",
+    "salary": "Proponowane wynagrodzenie",
+    "start_date": "Data rozpoczęcia",
+    "accept": "Zaakceptuj ofertę",
     "reject": "Decline",
-    "accepted": "Oferta Przyjęta",
+    "accepted": "Oferta zaakceptowana",
     "rejected": "Oferta Odrzucona",
     "send": "Wyślij Ofertę",
-    "modal_title": "Wyślij Ofertę Pracy"
+    "modal_title": "Wyślij Ofertę Pracy",
+    "deadline": "Termin odpowiedzi",
+    "decline": "Odrzuć ofertę",
+    "declined": "Oferta odrzucona",
+    "expired": "Oferta wygasła",
+    "notes": "Notatki do oferty"
   },
   "org": {
     "job_openings": "Oferty Pracy"
@@ -496,7 +518,14 @@
     "parse": "Umiejętności zostaną wyodrębnione po przesłaniu",
     "parsing": "Analizowanie CV...",
     "detected": "Umiejętności wykryte w CV",
-    "parsed_toast": "Aplikacja została złożona! {{count}} umiejętności wykryte w Twoim CV."
+    "parsed_toast": "Aplikacja została złożona! {{count}} umiejętności wykryte w Twoim CV.",
+    "title": "Życiorys",
+    "upload": "Prześlij CV",
+    "download": "Pobierz CV",
+    "remove": "Usuń CV",
+    "no_cv": "Nie przesłano CV",
+    "uploaded": "CV przesłane",
+    "required": "CV jest wymagane"
   },
   "branding": {
     "section": "Marka Pracodawcy",
@@ -506,17 +535,21 @@
     "size_label": "Wielkość firmy",
     "benefits_label": "Korzyści i dodatki",
     "benefits_placeholder": "Wpisz korzyść i naciśnij Enter",
-    "about_company": "O firmie"
+    "about_company": "O firmie",
+    "logo": "Logo firmy",
+    "cover": "Zdjęcie w tle",
+    "upload_logo": "Prześlij logo",
+    "upload_cover": "Prześlij zdjęcie w tle"
   },
   "referral": {
     "share": "Udostępnij i zarabiaj",
     "copied": "Link polecający skopiowany do schowka!"
   },
   "scorecard": {
-    "title": "Oceń kandydata",
+    "title": "Karta oceny",
     "criteria": "Kryteria oceny",
-    "notes": "Notatki recenzenta",
-    "save": "Zapisz kartę oceny",
+    "notes": "Notatki",
+    "save": "Zapisz ocenę",
     "saved": "Karta oceny zapisana",
     "notes_placeholder": "Opcjonalne notatki o tym kandydacie...",
     "communication": "Communication",
@@ -524,14 +557,18 @@
     "cultural_fit": "Dopasowanie kulturowe",
     "experience": "Experience",
     "motivation": "Motivation",
-    "max_score_suffix": "/ 10"
+    "max_score_suffix": "/ 10",
+    "add_criterion": "Dodaj kryterium",
+    "criterion": "Kryterium",
+    "weight": "Waga",
+    "score": "Wynik"
   },
   "saved_profile": {
     "found": "Znaleziono zapisany profil aplikacji",
     "use": "Użyj zapisanego profilu",
     "start_fresh": "Zacznij od nowa",
     "inline_cv": "- CV: {{filename}}",
-    "cv_label": "Saved CV: {{filename}}"
+    "cv_label": "Zapisane CV: {{filename}}"
   },
   "team": {
     "section": "Zespół rekrutacyjny",
@@ -540,16 +577,19 @@
     "add": "Add",
     "add_member": "Dodaj członka",
     "remove": "Remove",
-    "remove_member": "Remove",
+    "remove_member": "Usuń członka",
     "search_placeholder": "Szukaj członków...",
-    "role": "Role",
+    "role": "Rola",
     "role_reviewer": "Reviewer",
     "role_interviewer": "Interviewer",
     "role_hiring_manager": "Kierownik rekrutacji",
     "role_manager": "Manager",
     "added": "Członek zespołu dodany",
     "removed": "Członek zespołu usunięty",
-    "edit_only": "Dostępne po zapisaniu oferty pracy"
+    "edit_only": "Dostępne po zapisaniu oferty pracy",
+    "reviewer": "Recenzent",
+    "interviewer": "Prowadzący rozmowę",
+    "hiring_manager": "Menedżer ds. rekrutacji"
   },
   "search": {
     "label": "Szukaj ofert pracy",
@@ -643,8 +683,15 @@
       "salary_required": "Zakres wynagrodzenia jest wymagany. Możesz zaznaczyć 'Wynagrodzenie do negocjacji', aby pominąć.",
       "salary_range_invalid": "Minimalne wynagrodzenie nie może przekraczać maksymalnego wynagrodzenia"
     },
-    "save_draft": "Save as Draft",
-    "draft_saved": "Draft saved"
+    "save_draft": "Zapisz jako szkic",
+    "draft_saved": "Szkic zapisany",
+    "title": "Tytuł stanowiska",
+    "description": "Opis",
+    "requirements": "Wymagania",
+    "location": "Lokalizacja",
+    "salary_min": "Minimalne wynagrodzenie",
+    "salary_max": "Maksymalne wynagrodzenie",
+    "closing_date": "Data zamknięcia"
   },
   "ai_generate": {
     "button": "Generowanie AI",
@@ -664,9 +711,9 @@
     "approved": "Approved",
     "rejected": "Rejected",
     "flagged": "Flagged",
-    "approve": "Approve",
-    "reject": "Reject",
-    "flag": "Zgłoś do przeglądu",
+    "approve": "Zatwierdź",
+    "reject": "Odrzuć",
+    "flag": "Oznacz flagą",
     "approve_success": "Praca zatwierdzona i opublikowana",
     "reject_success": "Praca odrzucona",
     "flag_success": "Praca zgłoszona do przeglądu",
@@ -689,9 +736,10 @@
     },
     "status": {
       "pending_review": "Oczekujące na Przegląd",
-      "approved": "Approved",
-      "rejected": "Rejected",
-      "flagged": "Flagged"
+      "approved": "Zatwierdzony",
+      "rejected": "Odrzucony",
+      "flagged": "Oznaczony flagą",
+      "pending": "Oczekujący"
     },
     "confirm_approve": "Czy zatwierdzić to ogłoszenie o pracy? Zostanie opublikowane natychmiast.",
     "confirm_reject": "Czy na pewno chcesz odrzucić to ogłoszenie o pracy?",
@@ -700,15 +748,15 @@
     "submitted": "Złożone {{date}}",
     "spam_score": "Wynik spamu: {{score}}",
     "spam_flags_label": "Flagi wykrycia",
-    "refresh": "Refresh",
-    "loading": "Loading...",
-    "cancel": "Cancel",
-    "no_description": "No description",
-    "no_flags": "No flags",
-    "load_error": "Failed to load moderation queue",
-    "flags_tooltip": "Flags: {{flags}}",
-    "user_fallback": "User #{{id}}",
-    "pagination_label": "Moderation queue pages"
+    "refresh": "Odśwież",
+    "loading": "Ładowanie...",
+    "cancel": "Anuluj",
+    "no_description": "Brak opisu",
+    "no_flags": "Brak flag",
+    "load_error": "Nie udało się załadować kolejki moderacji",
+    "flags_tooltip": "Flagi: {{flags}}",
+    "user_fallback": "Użytkownik #{{id}}",
+    "pagination_label": "Strony kolejki moderacji"
   },
   "spam": {
     "title": "Wykrywanie spamu",
@@ -783,7 +831,7 @@
     "rejection_rate": "Wskaźnik Odrzuceń",
     "days": "days",
     "funnel_title": "Lejek Aplikacyjny",
-    "funnel_description": "Jak kandydaci przechodzą przez etapy procesu",
+    "funnel_description": "Jak kandydaci przechodzą przez kolejne etapy pipeline'u",
     "rejection_rates_title": "Wskaźniki Odrzuceń według Etapu",
     "rejection_rates_description": "Procent kandydatów odrzuconych na każdym etapie",
     "time_in_stage_title": "Średni Czas w Etapie",
@@ -818,9 +866,9 @@
     "no_data": "Brak danych aplikacyjnych dostępnych za wybrany okres",
     "load_error": "Nie udało się załadować raportu audytu stronniczości",
     "note_privacy": "Ten raport analizuje tylko metryki procesu. Żadne dane demograficzne nie są zbierane ani używane.",
-    "stages": "stages",
-    "not_available": "N/A",
-    "access_denied": "Access denied",
+    "stages": "etapy",
+    "not_available": "N/D",
+    "access_denied": "Odmowa dostępu",
     "rejection_rates_table_aria": "Wskaźniki odrzuceń według etapu rekrutacji"
   },
   "self_scheduling": {
@@ -869,7 +917,7 @@
     "candidate_pick": "Wybierz termin rozmowy"
   },
   "onboarding": {
-    "title": "Wprowadzenie pracodawcy",
+    "title": "Witaj w panelu rekrutacyjnym",
     "step_welcome": "Welcome",
     "step_organization": "Organization",
     "step_first_job": "Opublikuj ofertę pracy",
@@ -894,7 +942,7 @@
     "org_linked": "Powiązane z Twoją organizacją",
     "next": "Next",
     "back": "Back",
-    "skip": "Pomiń na razie",
+    "skip": "Pomiń konfigurację",
     "job_title": "Opublikuj swoją pierwszą ofertę pracy",
     "job_desc": "Wypełnij podstawowe dane, aby stworzyć swoją pierwszą ofertę pracy.",
     "salary_hint": "Przejrzystość wynagrodzeń w UE: Uwzględnienie zakresów wynagrodzeń poprawia jakość kandydatów",
@@ -914,7 +962,11 @@
     "first_time_banner": "Pierwszy raz publikujesz?",
     "first_time_desc": "Nasz kreator wprowadzenia poprowadzi Cię przez publikację Twojej pierwszej oferty pracy.",
     "start_wizard": "Rozpocznij kreatora",
-    "aria_progress": "Postęp w onboardingu"
+    "aria_progress": "Postęp w onboardingu",
+    "step1": "Utwórz swoją pierwszą ofertę pracy",
+    "step2": "Przeglądaj aplikacje",
+    "step3": "Skontaktuj się z kandydatami",
+    "complete": "Konfiguracja zakończona"
   },
   "preview": {
     "title": "Podgląd oferty pracy",
@@ -932,7 +984,7 @@
     "copy_link": "Skopiuj link",
     "email": "Podziel się przez e-mail",
     "copied": "Link skopiowany!",
-    "native": "Share..."
+    "native": "Udostępnij..."
   },
   "already_applied": "Już aplikowałeś",
   "application_status_label": "Status aplikacji",
@@ -984,12 +1036,15 @@
   "ai_chat": {
     "open": "Zapytaj AI o tę pracę",
     "close": "Zamknij czat z AI",
-    "send": "Wyślij wiadomość",
-    "title": "Zapytaj AI o tę pracę",
+    "send": "Wyślij",
+    "title": "Asystent AI ds. pracy",
     "hint": "Zapytaj mnie o wszystko dotyczące tej pracy — kwalifikacje, wynagrodzenie, jak aplikować, porady dotyczące rozmowy kwalifikacyjnej...",
-    "placeholder": "Wpisz swoje pytanie...",
-    "error_response": "Sorry, I could not process your request.",
-    "error_generic": "Sorry, something went wrong."
+    "placeholder": "Zadaj pytanie dotyczące tej oferty...",
+    "error_response": "Przepraszam, nie mogłem przetworzyć Twojego żądania.",
+    "error_generic": "Przepraszam, coś poszło nie tak.",
+    "thinking": "Myślę...",
+    "clear": "Wyczyść rozmowę",
+    "suggestions": "Sugerowane pytania"
   },
   "page_meta": {
     "bias_audit": {
@@ -1024,12 +1079,20 @@
     "edit": {
       "title": "Edytuj ofertę pracy",
       "description": "Zaktualizuj szczegóły wakatu, wynagrodzenie, ustawienia zespołu i opcje publikacji."
+    },
+    "index": {
+      "title": "Oferty pracy",
+      "description": "Przeglądaj dostępne możliwości zatrudnienia i role w swojej społeczności"
+    },
+    "detail": {
+      "title": "{{title}} — Oferty pracy",
+      "description": "Zobacz szczegóły oferty i aplikuj"
     }
   },
-  "page_title": "Job Vacancies",
-  "page_description": "Browse job opportunities, volunteering roles, and timebank positions offered by community members and partner organisations near you.",
+  "page_title": "Oferty pracy",
+  "page_description": "Przeglądaj oferty pracy, role wolontariackie i stanowiska banku czasu oferowane przez członków społeczności i organizacje partnerskie w pobliżu.",
   "jobs": {
-    "view_details": "View job details"
+    "view_details": "Zobacz szczegóły oferty"
   },
   "cancel": "Anuluj"
 }
