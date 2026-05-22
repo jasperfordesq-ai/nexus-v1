@@ -1,6 +1,6 @@
 {
-  "page_title": "Marketplace",
-  "meta_description": "Buy, sell, or share items locally with neighbours — community marketplace listings, free items, group buys, and deliveries within your timebank.",
+  "page_title": "Rynek",
+  "meta_description": "Kupuj, sprzedawaj lub dziel się przedmiotami lokalnie z sąsiadami — ogłoszenia rynku społecznościowego, darmowe przedmioty, zakupy grupowe i dostawy w ramach twojego banku czasu.",
   "hub": {
     "subtitle": "Kupuj, sprzedawaj i wymieniaj rzeczy w swojej społeczności",
     "sell_something": "Sprzedaj coś",
@@ -22,9 +22,9 @@
     "saved_items": "Zapisane przedmioty",
     "unable_to_load": "Nie udało się załadować ogłoszeń",
     "load_more_failed": "Nie udało się załadować kolejnych ogłoszeń",
-    "my_listings": "My Listings",
-    "my_offers": "My Offers",
-    "my_orders": "My Orders",
+    "my_listings": "Moje ogłoszenia",
+    "my_offers": "Moje oferty",
+    "my_orders": "Moje zamówienia",
     "eyebrow": "Społecznościowy marketplace",
     "categories_stat": "Kategorie",
     "listings_stat": "Widoczne ogłoszenia",
@@ -68,17 +68,17 @@
     "image_alt": "Obraz {{number}}",
     "thumbnail_alt": "Miniatura {{number}}",
     "link_copied": "Link skopiowany do schowka",
-    "thumbnail_label": "View image {{n}}",
-    "report_modal_title": "Report Listing",
-    "report_reason_label": "Reason",
-    "report_reason_placeholder": "Please describe why you are reporting this listing...",
-    "report_submit": "Submit Report",
-    "location_title": "Location",
-    "approximate_location": "Approximate location",
-    "get_directions": "Directions",
-    "promoted": "Promoted",
-    "unsave": "Remove from saved",
-    "save": "Save listing",
+    "thumbnail_label": "Wyświetl obraz {{n}}",
+    "report_modal_title": "Zgłoś ogłoszenie",
+    "report_reason_label": "Powód",
+    "report_reason_placeholder": "Opisz, dlaczego zgłaszasz to ogłoszenie...",
+    "report_submit": "Wyślij zgłoszenie",
+    "location_title": "Lokalizacja",
+    "approximate_location": "Przybliżona lokalizacja",
+    "get_directions": "Wskazówki dojazdu",
+    "promoted": "Promowane",
+    "unsave": "Usuń z zapisanych",
+    "save": "Zapisz ogłoszenie",
     "video": "Wideo ogłoszenia",
     "video_unsupported": "Twoja przeglądarka nie obsługuje tagu wideo.",
     "report_submitted": "Zgłoszenie wysłane. Dziękujemy.",
@@ -118,7 +118,7 @@
     "counter": "Kontroferta",
     "withdraw": "Wycofaj",
     "accept_counter": "Zaakceptuj kontrofertę",
-    "amount_invalid": "Please enter a valid offer amount",
+    "amount_invalid": "Wprowadź prawidłową kwotę oferty",
     "amount_placeholder": "0,00"
   },
   "create": {
@@ -246,10 +246,10 @@
     "reviews_coming_soon_title": "Opinie już wkrótce",
     "reviews_coming_soon_description": "Opinie kupujących będą dostępne w fazie 2. Zajrzyj później, aby zobaczyć, co społeczność sądzi o tym sprzedawcy.",
     "view_listings": "Zobacz ogłoszenia {{name}} na marketplace.",
-    "business": "Business",
-    "private": "Private",
-    "view_profile": "View Profile",
-    "verified_business": "Verified Business"
+    "business": "Firma",
+    "private": "Prywatny",
+    "view_profile": "Zobacz profil",
+    "verified_business": "Zweryfikowana firma"
   },
   "category": {
     "not_found_title": "Nie znaleziono kategorii",
@@ -528,7 +528,7 @@
     "sell_to_group": "Sprzedaj grupie",
     "empty_title": "Brak ogłoszeń grupy",
     "empty_description": "Bądź pierwszym członkiem grupy, który wystawi coś na sprzedaż!",
-    "tab_label": "Marketplace"
+    "tab_label": "Rynek"
   },
   "hybrid_pricing": {
     "tooltip": "Kredyty czasu zdobyte poprzez bank czasu społeczności",
@@ -648,10 +648,10 @@
     "get_directions": "Wskazówki dojazdu"
   },
   "pickup": {
-    "choose_slot": "Choose pickup slot",
-    "no_slot_selected": "No pickup slot",
-    "left": "left",
-    "slot_fallback": "Slot #{{id}}",
+    "choose_slot": "Wybierz termin odbioru",
+    "no_slot_selected": "Brak wybranego terminu odbioru",
+    "left": "pozostało",
+    "slot_fallback": "Termin #{{id}}",
     "my_pickups_title": "Moje odbiory",
     "my_pickups_subtitle": "Pokaż ten kod w lokalizacji sprzedawcy, aby odebrać zamówienie.",
     "no_pickups": "Brak nadchodzących odbiorów.",
@@ -697,8 +697,8 @@
       "leave_rating": "Wystaw ocenę",
       "rated": "Oceniono",
       "dispute_open": "Otwarty spór",
-      "confirm_delivery_modal_title": "Confirm Delivery",
-      "confirm_delivery_modal_body": "Mark this order as delivered? This cannot be undone."
+      "confirm_delivery_modal_title": "Potwierdź dostawę",
+      "confirm_delivery_modal_body": "Oznaczyć to zamówienie jako dostarczone? Tej czynności nie można cofnąć."
     },
     "seller": {
       "page_title": "Moja sprzedaż - Marketplace",
@@ -720,7 +720,7 @@
       "shipping_method_express": "Ekspres / kurier",
       "shipping_method_tracked": "Poczta śledzona",
       "shipping_method_hand_delivery": "Dostawa osobista",
-      "shipping_method_other": "Inna",
+      "shipping_method_other": "Inne",
       "tracking_number": "Numer śledzenia (opcjonalnie)",
       "tracking_number_placeholder": "np. 1Z999AA10123456784",
       "tracking_url_label": "Adres URL śledzenia (opcjonalnie)",
@@ -780,19 +780,19 @@
     "start_cta": "Rozpocznij wdrożenie"
   },
   "checkout": {
-    "title": "Secure Checkout",
-    "order_summary": "Order Summary",
-    "shipping": "Shipping",
-    "total": "Total",
-    "secure_notice": "Payments are processed securely by Stripe. Your card details are never stored on our servers.",
-    "cancel": "Cancel",
-    "close": "Close",
-    "pay_now": "Pay {{amount}}",
-    "payment_failed": "Payment failed. Please try again.",
-    "payment_processing": "Payment is being processed. You will be notified when complete.",
-    "payment_error": "An unexpected error occurred. Please try again.",
-    "not_available_title": "Payment Processing Being Set Up",
-    "not_available_description": "Payment processing is being set up. Please contact the seller to arrange payment."
+    "title": "Bezpieczna płatność",
+    "order_summary": "Podsumowanie zamówienia",
+    "shipping": "Dostawa",
+    "total": "Łącznie",
+    "secure_notice": "Płatności są bezpiecznie przetwarzane przez Stripe. Dane Twojej karty nigdy nie są przechowywane na naszych serwerach.",
+    "cancel": "Anuluj",
+    "close": "Zamknij",
+    "pay_now": "Zapłać {{amount}}",
+    "payment_failed": "Płatność nie powiodła się. Spróbuj ponownie.",
+    "payment_processing": "Płatność jest przetwarzana. Otrzymasz powiadomienie po zakończeniu.",
+    "payment_error": "Wystąpił nieoczekiwany błąd. Spróbuj ponownie.",
+    "not_available_title": "Konfigurowanie przetwarzania płatności",
+    "not_available_description": "Przetwarzanie płatności jest w trakcie konfiguracji. Skontaktuj się ze sprzedawcą, aby uzgodnić płatność."
   },
   "inventory": {
     "section_title": "Stan magazynowy",
