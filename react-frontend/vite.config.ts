@@ -85,6 +85,7 @@ export default defineConfig(({ command, mode }) => {
         // code" workflow that PWAs are notorious for. Removing it makes
         // deploys propagate to users on their next navigation, with no UI.
         globPatterns: ['**/*.{js,css,ico,png,svg,woff2}'],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         skipWaiting: true,
         clientsClaim: true,
         cleanupOutdatedCaches: true,
