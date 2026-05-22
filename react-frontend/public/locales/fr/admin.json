@@ -14537,5 +14537,515 @@
       "under_review": "En cours de révision"
     },
     "submitted": "Soumis"
+  },
+  "category_coefficients": {
+    "about": {
+      "body_middle": "). Un coefficient de 0,5 signifie qu'il remplace une demi-heure. Un coefficient de 2,0 signifie qu'il remplace deux heures de soins formels - par exemple, des soins personnels intensifs ou un soutien spécialisé. Le Age-Stiftung/",
+      "body_prefix": "Les coefficients de substitution contrôlent la valeur sociale de chaque catégorie de soins dans le calcul de la compensation des coûts. Un coefficient de 1,0 signifie qu’une heure équivaut à une heure de soins formels Spitex/Pflege (",
+      "body_suffix": "La méthodologie recommande de commencer toutes les catégories à 1,0 et d’ajuster en fonction de l’intensité des soins observée.",
+      "chf_amount": "CHF 35",
+      "range_prefix": "Les valeurs vont de 0,00 (aucune valeur de substitution de soins) à 9,99. Les modifications prennent effet le prochain",
+      "range_suffix": "Actualisation du rapport.",
+      "title": "À propos de cette page"
+    },
+    "actions": {
+      "refresh_aria": "Actualiser les coefficients de catégorie",
+      "save": "Sauvegarder"
+    },
+    "empty": {
+      "categories": "Aucune catégorie trouvée."
+    },
+    "fields": {
+      "coefficient_aria": "Coefficient pour {{name}}",
+      "coefficient_error": "Doit être compris entre 0,00 et 9,99"
+    },
+    "meta": {
+      "page_title": "Coefficients de substitution de catégorie",
+      "subtitle": "Dans quelle mesure chaque heure de soins communautaires remplace les Spitex/Pflege heures formelles. Utilisé dans les calculs du rapport d’impact municipal.",
+      "title": "Coefficients de substitution de catégorie"
+    },
+    "migration": {
+      "body_middle": "la colonne n’a pas encore été migrée. Courir",
+      "body_prefix": "Le",
+      "body_suffix": "pour activer les coefficients par catégorie.",
+      "title": "Migration en attente",
+      "warning": "Une migration de base de données est en attente: enregistrez vos modifications une fois la migration terminée pour éviter qu'elles ne soient écrasées."
+    },
+    "table": {
+      "action": "Action",
+      "aria": "Coefficients de substitution de catégorie",
+      "category": "Catégorie",
+      "coefficient": "Coefficient",
+      "source": "Source"
+    },
+    "toasts": {
+      "invalid_number": "Le coefficient doit être un nombre",
+      "load_failed": "Échec du chargement des coefficients de catégorie",
+      "save_failed": "Échec de l'enregistrement du coefficient pour {{name}}",
+      "saved": "Coefficient enregistré pour {{name}}"
+    }
+  },
+  "data_quality": {
+    "about": {
+      "body": "Les contrôles de qualité des données analysent les données de votre plateforme à la recherche de problèmes susceptibles de fausser les mesures pilotes ou de provoquer des erreurs de reporting - par exemple, des membres avec des profils en double, des heures enregistrées sur des listes supprimées ou des enregistrements d'échange manquant de champs obligatoires. Exécutez-le mensuellement avant de générer des rapports. Résolvez tous les éléments critiques et d’avertissement avant de soumettre les rapports aux bailleurs de fonds ou aux partenaires municipaux.",
+      "title": "À propos de cette page"
+    },
+    "actions": {
+      "close": "Fermer",
+      "refresh_aria": "Actualiser les contrôles de qualité des données",
+      "refresh_checks": "Actualiser les contrôles",
+      "view_affected_rows": "Afficher les lignes concernées"
+    },
+    "drilldown": {
+      "empty": "Aucune ligne affectée à afficher.",
+      "subtitle": "Jusqu'à 50 lignes concernées: résolvez ou documentez avant le lancement.",
+      "table_aria": "Lignes concernées"
+    },
+    "empty": {
+      "rows": "Aucune ligne",
+      "value": "-"
+    },
+    "meta": {
+      "page_title": "Qualité des données pilotes",
+      "subtitle": "AG84 - vérifications de préparation avant d'intégrer de vrais résidents",
+      "title": "Qualité des données pilotes"
+    },
+    "severity": {
+      "danger": "Danger",
+      "info": "Informations",
+      "ok": "D'ACCORD",
+      "warning": "Avertissement"
+    },
+    "severity_guide": {
+      "danger": "Les erreurs qui entraîneront des numéros incorrects dans les rapports doivent être corrigées avant l'exportation.",
+      "info": "Avis d'information - aucune action requise.",
+      "note_prefix": "Cliquez",
+      "note_suffix": "sur n'importe quelle carte pour voir les enregistrements spécifiques. Certains problèmes peuvent être corrigés dans la plateforme; d'autres nécessitent un examen manuel des données sous-jacentes.",
+      "ok": "Aucun problème détecté dans cette catégorie.",
+      "title": "Guide de gravité",
+      "warning": "Problèmes potentiels pouvant affecter la précision des mesures: examinez et confirmez ou corrigez."
+    },
+    "summary": {
+      "affected": "affecté",
+      "count": "{{count}} {{label}}",
+      "generated": "Généré {{date}}",
+      "label": "Résumé:"
+    },
+    "table": {
+      "created": "Créé",
+      "id": "ID",
+      "identifier": "Identifiant",
+      "name": "Nom",
+      "status": "Statut"
+    },
+    "toasts": {
+      "load_failed": "Échec du chargement du rapport sur la qualité des données",
+      "rows_failed": "Échec du chargement des lignes concernées"
+    }
+  },
+  "isolated_node": {
+    "about": {
+      "body_middle": "sur les infrastructures entièrement contrôlées par le canton ou la commune - aucune donnée ne quitte les limites du canton. Cette configuration est requise pour",
+      "body_prefix": "Un déploiement de nœud isolé s'exécute",
+      "body_suffix": "déploiements dans le cadre de règles cantonales suisses strictes en matière de protection des données. La plupart des communautés s'exécutent sous forme de déploiements hébergés standard et n'ont pas besoin de configurer cette section.",
+      "title": "À propos de cette page",
+      "workflow": "Parcourez chaque élément de décision ci-dessous: définissez la valeur, attribuez un propriétaire et marquez-le comme Décidé une fois convenu. La porte se ferme (et le contrôle de préparation au lancement pilote réussit) une fois que chaque élément est à l'état Décidé."
+    },
+    "actions": {
+      "cancel": "Annuler",
+      "edit": "Modifier",
+      "refresh": "Rafraîchir",
+      "refresh_aria": "Actualiser la porte de décision du nœud isolé",
+      "save_changes": "Enregistrer les modifications"
+    },
+    "empty": {
+      "none": "aucun",
+      "unassigned": "non attribué"
+    },
+    "fields": {
+      "notes": "Remarques",
+      "notes_description": "Contexte, liens, références contractuelles ou bloqueurs",
+      "owner": "Propriétaire",
+      "owner_description": "Personne ou organisation responsable de cette décision",
+      "status": "Statut",
+      "url_placeholder": "https://...",
+      "value": "Valeur"
+    },
+    "gate": {
+      "blocked_count": "- {{count}} bloqué",
+      "closed": "Portail fermé - prêt à lancer",
+      "decided_count": "{{decided}} éléments sur {{total}} décidés",
+      "open": "Porte ouverte – des décisions restent à prendre",
+      "progress_aria": "Progrès de la porte de décision"
+    },
+    "meta": {
+      "page_title": "Porte de décision à nœud isolé",
+      "subtitle": "AG85 - liste de contrôle de préparation pour un déploiement contrôlé par les cantons",
+      "title": "Porte de décision à nœud isolé"
+    },
+    "modal": {
+      "edit_decision_item": "Modifier l'élément de décision",
+      "subtitle": "Mettre à jour la valeur, le propriétaire, le statut et les notes pour cet élément de porte"
+    },
+    "status": {
+      "blocked": "Bloqué",
+      "decided": "Décidé",
+      "in_progress": "En cours",
+      "pending": "En attente"
+    },
+    "status_counts": {
+      "blocked": "Bloqué: {{count}}",
+      "decided": "Décidé: {{count}}",
+      "in_progress": "En cours: {{count}}",
+      "pending": "En attente: {{count}}"
+    },
+    "timestamps": {
+      "last_updated": "Dernière mise à jour {{date}}"
+    },
+    "toasts": {
+      "item_updated": "Élément de décision mis à jour",
+      "load_failed": "Échec du chargement des données de porte de décision",
+      "save_failed": "Échec de l'enregistrement de l'élément de décision"
+    },
+    "warning": {
+      "body_prefix": "Modifiez ces paramètres uniquement si votre municipalité a explicitement spécifié une exigence de nœud isolé. La modification du mode de déploiement après le lancement du projet pilote nécessite une coordination avec le",
+      "body_suffix": "équipe technique. Ne modifiez pas ce paramètre sans l’accord de votre délégué cantonal à la protection des données.",
+      "title": "Important - configurez uniquement si nécessaire"
+    }
+  },
+  "kpi_baselines": {
+    "about": {
+      "body_prefix": "Les lignes de base enregistrent l’état de votre communauté avant le début du programme Caring Community. Ils sont comparés aux mesures actuelles lors de chaque examen trimestriel pour démontrer leur impact. Capturez des lignes de base pour chaque",
+      "body_suffix": "avant l'intégration des résidents: une fois le projet pilote démarré, la référence est gelée et ne peut pas être antidatée.",
+      "compare_prefix": "Cliquez",
+      "compare_suffix": "sur n’importe quelle ligne de référence pour voir une comparaison côte à côte avec les données actuelles de la plateforme. Les mesures montrant plus de 25 % de changement sur les indicateurs d'impact clés sont mises en évidence comme Impact atteint.",
+      "title": "À propos de cette page"
+    },
+    "actions": {
+      "cancel": "Annuler",
+      "capture_first": "Capturez votre première ligne de base",
+      "capture_now": "Capturez la ligne de base maintenant",
+      "capture_now_short": "Capturez maintenant",
+      "close": "Fermer",
+      "compare": "Comparer",
+      "refresh": "Rafraîchir",
+      "refresh_aria": "Actualiser les lignes de base KPI"
+    },
+    "comparison": {
+      "baseline": "Référence",
+      "captured": "(capturé {{date}})",
+      "comparing": "En comparant:",
+      "impact_achieved": "Impact obtenu",
+      "now": "Maintenant"
+    },
+    "empty": {
+      "no_baselines": "Aucune ligne de base capturée pour l'instant.",
+      "no_data": "Aucune donnée disponible"
+    },
+    "fields": {
+      "baseline_description": "Un nom court pour identifier cet instantané (par exemple, \"Pré-lancement du premier trimestre 2025\")",
+      "baseline_label": "Étiquette de référence",
+      "baseline_placeholder": "par ex. Avant le lancement de NEXUS",
+      "notes_description": "Documentez l'origine de ces chiffres (par exemple, « données de référence des médecins généralistes pour le premier trimestre 2026 », « enquête auprès des membres de mars 2026 »). Les sources citées rendent la référence défendable dans les rapports sur les subventions.",
+      "notes_label_prefix": "Remarques:",
+      "notes_placeholder": "par ex. « Données de référence GP T1 2026, enquête auprès des membres de mars 2026, capturées avant le déploiement de la plateforme dans tous les Gemeinden »",
+      "notes_source": "Notes / source (facultatif)",
+      "period_end": "Fin de période",
+      "period_end_description": "Fin de la période de référence",
+      "period_start": "Début de la période",
+      "period_start_description": "Début de la période de référence"
+    },
+    "meta": {
+      "page_title": "Communauté KPI Références",
+      "subtitle_prefix": "Capturez des instantanés des métriques de votre communauté pour les suivre avant/après",
+      "subtitle_suffix": "impact",
+      "title": "Communauté KPI Références"
+    },
+    "metrics": {
+      "active_relationships": "Relations actives",
+      "avg_response_hours": "Temps de réponse moyen (heures)",
+      "engagement_rate_pct": "Taux d'engagement (%)",
+      "member_count": "Membres actifs",
+      "recipient_count": "Destinataires atteints",
+      "total_exchanges": "Total des échanges",
+      "volunteer_hours": "Heures de bénévolat (90j)"
+    },
+    "modal": {
+      "body": "Cela prendra un instantané en direct des métriques de votre communauté dès maintenant et l'enregistrera comme référence nommée pour des comparaisons futures.",
+      "metrics_captured": "Mesures capturées: nombre de membres actifs, heures de bénévolat approuvées (90 derniers jours), relations de soutien actives, destinataires distincts et nombre total d'échanges.",
+      "title_prefix": "Capturer",
+      "title_suffix": "Référence"
+    },
+    "table": {
+      "actions": "Actes",
+      "active_relationships": "Relations actives",
+      "aria": "KPI Lignes de base",
+      "captured": "Capturé",
+      "label": "Étiquette",
+      "members": "Membres",
+      "total_exchanges": "Total des échanges",
+      "volunteer_hours": "Heures de bénévolat"
+    },
+    "toasts": {
+      "capture_failed": "Échec de la capture de la ligne de base",
+      "comparison_failed": "Échec du chargement de la comparaison",
+      "load_failed": "Échec du chargement des lignes de base KPI",
+      "saved": "Ligne de base enregistrée. Utilisez-le pour comparer les futures métriques avec cet instantané."
+    }
+  },
+  "lead_nurture": {
+    "about": {
+      "body": "Le tracker Lead Nurture est un CRM léger pour les NEXUS opportunités de déploiement. Lorsqu'une municipalité, un bailleur de fonds potentiel ou un partenaire commercial exprime son intérêt, ajoutez-le ici et suivez ses progrès via l'entonnoir. Utilisez le champ d'étape pour enregistrer où se trouve chaque contact dans la conversation et la date de suivi pour vous assurer que personne ne se refroidit. Exportez vers CSV pour créer des rapports ou importez dans un CRM externe.",
+      "title": "À propos de cette page"
+    },
+    "actions": {
+      "cancel": "Annuler",
+      "edit": "Modifier",
+      "export_csv": "Exporter CSV",
+      "mark_unsubscribed": "Marquer comme désabonné",
+      "refresh": "Rafraîchir",
+      "refresh_aria": "Actualiser les contacts de lead nurture",
+      "save": "Sauvegarder",
+      "unsubscribe_aria": "Se désabonner"
+    },
+    "confirm_unsubscribe": "Marquer {{email}} comme désabonné?",
+    "contacts": {
+      "empty": "Aucun contact ne correspond aux filtres actuels.",
+      "table_aria": "Diriger les contacts de développement",
+      "title": "Contacts ({{count}})"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "fields": {
+      "follow_up_date": "Date de suivi (ISO 8601)",
+      "follow_up_placeholder": "2026-05-15",
+      "notes": "Remarques"
+    },
+    "filters": {
+      "all_segments": "Tous les segments",
+      "all_stages": "Toutes les étapes",
+      "segment": "Segment",
+      "segment_description": "municipalité: gouvernement local; investisseur: bailleur de fonds; entreprise: mécénat; résident: particulier; partenaire: ONG/association caritative.",
+      "stage": "Scène",
+      "title": "Filtres"
+    },
+    "meta": {
+      "page_title": "Gestion des leads",
+      "subtitle": "Suivez et entretenez les partenaires potentiels - municipalités, investisseurs, entreprises, résidents et organismes communautaires - du premier contact jusqu'à l'intégration.",
+      "title": "Gestion des leads"
+    },
+    "modal": {
+      "stage_description": "capturé: premier contact; contacté: contacté; engagé: conversation active; qualifié: intérêt et budget confirmés; converti: inscrit; dormant: devenu silencieux; désabonné: désabonné.",
+      "title": "Modifier le contact"
+    },
+    "segments": {
+      "business": "Entreprise",
+      "investor": "Investisseur",
+      "municipality": "Municipalité",
+      "partner": "Partenaire",
+      "resident": "Résident"
+    },
+    "stages": {
+      "captured": "Capturé",
+      "contacted": "Contacté",
+      "converted": "Converti",
+      "dormant": "Dormant",
+      "engaged": "Engagé",
+      "qualified": "Qualifié",
+      "unsubscribed": "Désabonné"
+    },
+    "summary": {
+      "by_segment": "Par segment:",
+      "by_stage": "Par étape:",
+      "title": "Résumé",
+      "total_contacts": "nombre total de contacts"
+    },
+    "table": {
+      "actions": "Actes",
+      "captured": "Capturé",
+      "follow_up": "Suivi",
+      "name_email": "Nom/E-mail",
+      "organisation": "Organisation",
+      "segment": "Segment",
+      "source": "Source",
+      "stage": "Scène"
+    },
+    "toasts": {
+      "export_failed": "Échec de l'exportation CSV",
+      "exported": "Liste de prospects exportée",
+      "load_failed": "Échec du chargement des contacts de lead nurture",
+      "unsubscribe_failed": "Échec de la désinscription",
+      "unsubscribed": "Marqué comme désabonné",
+      "update_failed": "Échec de la mise à jour du contact",
+      "updated": "Contact mis à jour"
+    }
+  },
+  "regional_analytics_admin": {
+    "access_log": {
+      "endpoint": "Point de terminaison",
+      "ip_hashed": "IP (hachée)",
+      "table_aria": "Journal d'accès",
+      "title": "Journal d'accès - {{name}}",
+      "user_agent": "Agent utilisateur",
+      "when": "Quand"
+    },
+    "actions": {
+      "cancel": "Annuler",
+      "close": "Fermer",
+      "create": "Créer",
+      "generate_report_now": "Générer un rapport maintenant",
+      "new_subscription": "Nouvel abonnement",
+      "resume": "CV",
+      "suspend": "Suspendre",
+      "view_access_log": "Afficher le journal d'accès"
+    },
+    "create_modal": {
+      "billing_email": "E-mail de facturation",
+      "contact_email": "E-mail de contact",
+      "currency": "Devise",
+      "enabled_modules": "Modules activés",
+      "monthly_price_cents": "Prix ​​mensuel (centimes)",
+      "partner_name": "Nom du partenaire",
+      "partner_type": "Type de partenaire",
+      "plan_tier": "Niveau du forfait",
+      "tenant_id": "Locataire ID",
+      "title": "Nouvel abonnement aux analyses régionales"
+    },
+    "empty": {
+      "access_log": "Aucun événement d'accès enregistré pour le moment.",
+      "subscriptions": "Aucun abonnement pour l'instant. Fournissez-en un pour commencer à vendre des analyses régionales.",
+      "value": "-"
+    },
+    "meta": {
+      "description": "Gérez les abonnements analytiques payants pour la municipalité et les partenaires SME - agrégats regroupés et respectueux de la confidentialité uniquement.",
+      "title": "Analyse régionale"
+    },
+    "modules": {
+      "demand_supply": "Demande et offre",
+      "demographics": "Données démographiques",
+      "footfall": "Bruit de pas",
+      "trends": "Tendances"
+    },
+    "partner_types": {
+      "municipality": "Municipalité",
+      "sme_partner": "SME partenaire"
+    },
+    "plan_tiers": {
+      "basic": "Basique",
+      "enterprise": "Entreprise",
+      "pro": "Pro"
+    },
+    "statuses": {
+      "active": "Actif",
+      "cancelled": "Annulé",
+      "past_due": "En souffrance",
+      "trialing": "Essai"
+    },
+    "tables": {
+      "actions": "Actes",
+      "modules": "Modules",
+      "partner": "Partenaire",
+      "period_end": "Fin de période",
+      "plan": "Plan",
+      "price_per_month": "Prix ​​/ mois",
+      "status": "Statut",
+      "subscriptions_aria": "Abonnements aux analyses régionales",
+      "type": "Taper"
+    },
+    "toasts": {
+      "create_failed": "Échec de la création",
+      "created": "Abonnement créé",
+      "load_failed": "Échec du chargement des abonnements",
+      "report_failed": "Échec de la mise en file d'attente du rapport",
+      "report_queued": "Génération de rapport en file d'attente",
+      "required_fields": "Le nom du locataire, le nom du partenaire et l'e-mail de contact sont requis",
+      "status_updated": "Abonnement {{status}}",
+      "update_failed": "La mise à jour a échoué"
+    }
+  },
+  "smart_nudges": {
+    "about": {
+      "body": "Les Smart Nudges sont des invites automatisées envoyées aux membres lorsqu'un partenaire de match en tandem de haute qualité est détecté. Les membres qui bénéficieraient d'une connexion homologue sont identifiés par le moteur de correspondance et reçoivent une notification dans l'application (et éventuellement un e-mail) leur suggérant de se connecter. Les nudges respectent une fenêtre de temps de recharge afin qu'aucun membre ne soit contacté trop fréquemment. Utilisez le test à blanc pour prévisualiser les personnes qui seront poussées avant de procéder à une expédition réelle.",
+      "follow_up_body": "envoyé au coordinateur après qu'un échange approuvé n'a pas été marqué comme terminé",
+      "follow_up_label": "Suivi",
+      "inactivity_body": "déclenché lorsqu'un membre ne s'est pas connecté pendant le nombre de jours configuré",
+      "inactivity_label": "Inactivité",
+      "title": "À propos de cette page",
+      "unmatched_request_body": "déclenché lorsqu'une demande d'aide n'a pas d'offre après le passage de la fenêtre de recharge",
+      "unmatched_request_label": "Demande sans correspondance"
+    },
+    "actions": {
+      "cancel": "Annuler",
+      "dispatch": "Expédition",
+      "dispatch_now": "Expédier maintenant",
+      "dry_run": "Exécution à sec",
+      "refresh": "Rafraîchir",
+      "save_configuration": "Enregistrer la configuration"
+    },
+    "chart": {
+      "converted": "Converti",
+      "sent": "Envoyé",
+      "title": "Coups de pouce quotidiens (30 derniers jours)"
+    },
+    "config": {
+      "cooldown_days": "Temps de recharge (jours)",
+      "cooldown_description": "Attendez aussi longtemps avant de pousser à nouveau la même paire",
+      "daily_limit": "Limite quotidienne",
+      "daily_limit_description": "Nombre maximal de coups de pouce par jour sur l'ensemble du locataire",
+      "engine_description": "Lorsqu'elle est désactivée, aucun coup de pouce n'est envoyé.",
+      "engine_enabled": "Moteur activé",
+      "min_score": "Note minimale (0,40 - 0,95)",
+      "min_score_description": "Seuil de score de match en tandem pour l'envoi d'un coup de coude",
+      "save_note": "Les modifications prennent effet immédiatement: la prochaine exécution de nudge programmée appliquera les nouveaux paramètres.",
+      "title": "Configuration"
+    },
+    "dispatch_modal": {
+      "body_prefix": "Cela enverra jusqu'à",
+      "body_suffix": "envoyez des notifications aux membres éligibles dès maintenant. Assurez-vous d'avoir d'abord examiné un essai à sec.",
+      "title": "Envoyer des coups de pouce maintenant?"
+    },
+    "dry_run": {
+      "candidates": "{{count}} candidats",
+      "empty": "Aucun candidat éligible pour le moment.",
+      "table_aria": "Candidats au coup de pouce à sec",
+      "title": "Aperçu du test à sec"
+    },
+    "meta": {
+      "description": "Des suggestions automatisées qui incitent les membres à se tourner vers des partenaires tandem hautement qualifiés. Défauts conservateurs - fonctionne avec un plafond quotidien.",
+      "page_title": "Coups de pouce intelligents aux membres",
+      "title": "Coups de pouce intelligents aux membres"
+    },
+    "recent": {
+      "empty": "Aucun coup de pouce envoyé pour l'instant.",
+      "table_aria": "Coups de pouce intelligents récents",
+      "title": "Coups de pouce récents"
+    },
+    "stats": {
+      "conversion_30d": "Conversion (30j)",
+      "eligible_candidates": "Candidats éligibles",
+      "opted_out": "Désinscription",
+      "sent_30d": "Envoyé (30j)"
+    },
+    "status": {
+      "converted": "Converti",
+      "sent": "Envoyé"
+    },
+    "table": {
+      "score": "Score",
+      "sent": "Envoyé",
+      "status": "Statut",
+      "suggested_partner": "Partenaire suggéré",
+      "target": "Cible",
+      "target_user": "Utilisateur cible"
+    },
+    "toasts": {
+      "config_saved": "Configuration du Nudge enregistrée. Les règles mises à jour s'appliqueront lors de la prochaine exécution planifiée.",
+      "dispatch_failed": "Échec de l'envoi",
+      "dispatched": "{{count}} nudges envoyés",
+      "dry_run": "Essais à blanc: {{count}} candidats éligibles",
+      "load_failed": "Échec du chargement des analyses de nudge",
+      "save_failed": "Échec de l'enregistrement de la configuration"
+    }
   }
 }

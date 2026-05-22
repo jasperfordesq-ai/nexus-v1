@@ -14537,5 +14537,515 @@
       "under_review": "In fase di revisione"
     },
     "submitted": "Inviato"
+  },
+  "category_coefficients": {
+    "about": {
+      "body_middle": "). Un coefficiente di 0,5 significa che sostituisce mezz'ora. Un coefficiente pari a 2,0 significa che sostituisce due ore di assistenza formale, ad esempio assistenza personale intensiva o supporto specialistico. Il Age-Stiftung/",
+      "body_prefix": "I coefficienti di sostituzione controllano il valore sociale di ciascuna categoria di assistenza nel calcolo della compensazione dei costi. Un coefficiente pari a 1,0 significa che un'ora equivale a un'ora di assistenza formale Spitex/Pflege (",
+      "body_suffix": "La metodologia consiglia di iniziare tutte le categorie da 1.0 e di adattarle in base all'intensità di cura osservata.",
+      "chf_amount": "CHF 35",
+      "range_prefix": "I valori vanno da 0,00 (nessun valore di sostituzione delle cure) a 9,99. Le modifiche entreranno in vigore il giorno successivo",
+      "range_suffix": "aggiornamento del rapporto.",
+      "title": "A proposito di questa pagina"
+    },
+    "actions": {
+      "refresh_aria": "Aggiorna i coefficienti della categoria",
+      "save": "Salva"
+    },
+    "empty": {
+      "categories": "Nessuna categoria trovata."
+    },
+    "fields": {
+      "coefficient_aria": "Coefficiente per {{name}}",
+      "coefficient_error": "Deve essere compreso tra 0,00 e 9,99"
+    },
+    "meta": {
+      "page_title": "Coefficienti di sostituzione di categoria",
+      "subtitle": "Quanto ogni ora di assistenza comunitaria sostituisce Spitex/Pflege ore formali. Utilizzato nei calcoli del Rapporto sull'Impatto Comunale.",
+      "title": "Coefficienti di sostituzione di categoria"
+    },
+    "migration": {
+      "body_middle": "la colonna non è stata ancora migrata. Correre",
+      "body_prefix": "IL",
+      "body_suffix": "per abilitare i coefficienti per categoria.",
+      "title": "Migrazione in sospeso",
+      "warning": "Una migrazione del database è in sospeso: salva le modifiche al termine della migrazione per evitare che vengano sovrascritte."
+    },
+    "table": {
+      "action": "Azione",
+      "aria": "Coefficienti di sostituzione di categoria",
+      "category": "Categoria",
+      "coefficient": "Coefficiente",
+      "source": "Fonte"
+    },
+    "toasts": {
+      "invalid_number": "Il coefficiente deve essere un numero",
+      "load_failed": "Impossibile caricare i coefficienti della categoria",
+      "save_failed": "Impossibile salvare il coefficiente per {{name}}",
+      "saved": "Coefficiente salvato per {{name}}"
+    }
+  },
+  "data_quality": {
+    "about": {
+      "body": "I controlli sulla qualità dei dati scansionano i dati della tua piattaforma per rilevare problemi che potrebbero distorcere le metriche pilota o causare errori di reporting, ad esempio membri con profili duplicati, ore registrate rispetto a elenchi eliminati o record di scambio con campi obbligatori mancanti. Eseguilo mensilmente prima di generare report. Risolvere tutti gli elementi critici e di avvertenza prima di inviare rapporti ai finanziatori o ai partner municipali.",
+      "title": "A proposito di questa pagina"
+    },
+    "actions": {
+      "close": "Vicino",
+      "refresh_aria": "Aggiorna i controlli sulla qualità dei dati",
+      "refresh_checks": "Aggiorna i controlli",
+      "view_affected_rows": "Visualizza le righe interessate"
+    },
+    "drilldown": {
+      "empty": "Nessuna riga interessata da mostrare.",
+      "subtitle": "Fino a 50 righe interessate: risolvi o documenta prima del lancio.",
+      "table_aria": "Righe interessate"
+    },
+    "empty": {
+      "rows": "Nessuna riga",
+      "value": "-"
+    },
+    "meta": {
+      "page_title": "Qualità dei dati pilota",
+      "subtitle": "AG84 - controlli di preparazione prima dell'onboarding dei residenti reali",
+      "title": "Qualità dei dati pilota"
+    },
+    "severity": {
+      "danger": "Pericolo",
+      "info": "Informazioni",
+      "ok": "OK",
+      "warning": "Avvertimento"
+    },
+    "severity_guide": {
+      "danger": "Errori che causeranno numeri errati nei report: devono essere risolti prima dell'esportazione.",
+      "info": "Avvisi informativi: nessuna azione richiesta.",
+      "note_prefix": "Clic",
+      "note_suffix": "su qualsiasi scheda per visualizzare i record specifici. Alcuni problemi possono essere corretti nella piattaforma; altri richiedono la revisione manuale dei dati sottostanti.",
+      "ok": "Nessun problema rilevato in questa categoria.",
+      "title": "Guida alla gravità",
+      "warning": "Potenziali problemi che potrebbero influire sull'accuratezza della metrica: rivedi e conferma o risolvi."
+    },
+    "summary": {
+      "affected": "ricercato",
+      "count": "{{count}} {{label}}",
+      "generated": "Generato {{date}}",
+      "label": "Riepilogo:"
+    },
+    "table": {
+      "created": "Creato",
+      "id": "ID",
+      "identifier": "Identificatore",
+      "name": "Nome",
+      "status": "Stato"
+    },
+    "toasts": {
+      "load_failed": "Impossibile caricare il rapporto sulla qualità dei dati",
+      "rows_failed": "Impossibile caricare le righe interessate"
+    }
+  },
+  "isolated_node": {
+    "about": {
+      "body_middle": "sulle infrastrutture controllate interamente dal Cantone o dal Comune: nessun dato esce dai confini cantonali. Questa configurazione è necessaria per",
+      "body_prefix": "Viene eseguita una distribuzione del nodo isolato",
+      "body_suffix": "implementazioni secondo le rigide norme cantonali svizzere sulla protezione dei dati. La maggior parte delle comunità viene eseguita come distribuzioni ospitate standard e non è necessario configurare questa sezione.",
+      "title": "A proposito di questa pagina",
+      "workflow": "Esamina ciascun elemento decisionale di seguito: imposta il valore, assegna un proprietario e contrassegnalo come Deciso una volta concordato. Il cancello si chiude (e il controllo di preparazione al lancio pilota viene superato) una volta che ogni articolo è nello stato Deciso."
+    },
+    "actions": {
+      "cancel": "Cancellare",
+      "edit": "Modificare",
+      "refresh": "Aggiorna",
+      "refresh_aria": "Aggiorna il gate decisionale del nodo isolato",
+      "save_changes": "Salva modifiche"
+    },
+    "empty": {
+      "none": "nessuno",
+      "unassigned": "non assegnato"
+    },
+    "fields": {
+      "notes": "Note",
+      "notes_description": "Contesto, collegamenti, riferimenti contrattuali o blocchi",
+      "owner": "Proprietario",
+      "owner_description": "Persona o organizzazione responsabile di questa decisione",
+      "status": "Stato",
+      "url_placeholder": "https://...",
+      "value": "Valore"
+    },
+    "gate": {
+      "blocked_count": "- {{count}} bloccato",
+      "closed": "Cancello chiuso: pronto al lancio",
+      "decided_count": "{{decided}} su {{total}} elementi decisi",
+      "open": "Cancello aperto: decisioni ancora necessarie",
+      "progress_aria": "Progresso decisionale"
+    },
+    "meta": {
+      "page_title": "Porta decisionale a nodo isolato",
+      "subtitle": "AG85 - Lista di controllo per la preparazione all'implementazione controllata dai cantoni",
+      "title": "Porta decisionale a nodo isolato"
+    },
+    "modal": {
+      "edit_decision_item": "Modifica elemento decisionale",
+      "subtitle": "Aggiorna valore, proprietario, stato e note per questo elemento cancello"
+    },
+    "status": {
+      "blocked": "Bloccato",
+      "decided": "Deciso",
+      "in_progress": "In corso",
+      "pending": "In attesa di"
+    },
+    "status_counts": {
+      "blocked": "Bloccato: {{count}}",
+      "decided": "Deciso: {{count}}",
+      "in_progress": "In corso: {{count}}",
+      "pending": "In attesa: {{count}}"
+    },
+    "timestamps": {
+      "last_updated": "Ultimo aggiornamento {{date}}"
+    },
+    "toasts": {
+      "item_updated": "Elemento decisionale aggiornato",
+      "load_failed": "Impossibile caricare i dati del gate decisionale",
+      "save_failed": "Impossibile salvare l'elemento decisionale"
+    },
+    "warning": {
+      "body_prefix": "Modifica queste impostazioni solo se il tuo comune ha esplicitamente specificato un requisito di nodo isolato. La modifica della modalità di distribuzione dopo il lancio del progetto pilota richiede il coordinamento con",
+      "body_suffix": "squadra tecnica. Non modificare questa impostazione senza il consenso del responsabile cantonale della protezione dei dati.",
+      "title": "Importante: configuralo solo se necessario"
+    }
+  },
+  "kpi_baselines": {
+    "about": {
+      "body_prefix": "I valori di riferimento registrano lo stato della vostra comunità prima dell'inizio del programma Caring Community. Vengono confrontati con i parametri attuali ad ogni revisione trimestrale per dimostrarne l'impatto. Cattura linee di base per ogni",
+      "body_suffix": "prima dell'onboarding dei residenti: una volta avviato il progetto pilota, la linea di base viene congelata e non può essere retrodatata.",
+      "compare_prefix": "Clic",
+      "compare_suffix": "su qualsiasi riga della linea di base per visualizzare un confronto affiancato con i dati attuali della piattaforma. I parametri che mostrano una variazione superiore al 25% sugli indicatori chiave di impatto sono evidenziati come Impatto raggiunto.",
+      "title": "A proposito di questa pagina"
+    },
+    "actions": {
+      "cancel": "Cancellare",
+      "capture_first": "Cattura la tua prima linea di base",
+      "capture_now": "Cattura la linea di base adesso",
+      "capture_now_short": "Cattura ora",
+      "close": "Vicino",
+      "compare": "Confrontare",
+      "refresh": "Aggiorna",
+      "refresh_aria": "Aggiorna KPI linee di base"
+    },
+    "comparison": {
+      "baseline": "Linea di base",
+      "captured": "(catturato {{date}})",
+      "comparing": "Confronto:",
+      "impact_achieved": "Impatto raggiunto",
+      "now": "Ora"
+    },
+    "empty": {
+      "no_baselines": "Nessuna linea di base ancora catturata.",
+      "no_data": "Nessun dato disponibile"
+    },
+    "fields": {
+      "baseline_description": "Un nome breve per identificare questa istantanea (ad esempio \"Pre-lancio Q1 2025\")",
+      "baseline_label": "Etichetta di base",
+      "baseline_placeholder": "per esempio. Prima del lancio di NEXUS",
+      "notes_description": "Documento da cui provengono questi numeri (ad esempio \"dati di riferimento del medico di base Q1 2026\", \"sondaggio sui membri marzo 2026\"). Le fonti citate rendono la linea di base difendibile nella rendicontazione delle sovvenzioni.",
+      "notes_label_prefix": "Note:",
+      "notes_placeholder": "per esempio. \"Dati di riferimento GP 1° trimestre 2026, sondaggio tra i membri marzo 2026, acquisiti prima del lancio della piattaforma a tutti i Gemeinden\"",
+      "notes_source": "Note/fonte (facoltativo)",
+      "period_end": "Fine periodo",
+      "period_end_description": "Fine del periodo di riferimento",
+      "period_start": "Inizio periodo",
+      "period_start_description": "Inizio periodo di riferimento"
+    },
+    "meta": {
+      "page_title": "Linee di base della comunità KPI",
+      "subtitle_prefix": "Cattura istantanee delle metriche della tua community per monitorarle prima/dopo",
+      "subtitle_suffix": "impatto",
+      "title": "Linee di base della comunità KPI"
+    },
+    "metrics": {
+      "active_relationships": "Relazioni attive",
+      "avg_response_hours": "Tempo medio di risposta (ore)",
+      "engagement_rate_pct": "Tasso di coinvolgimento (%)",
+      "member_count": "Membri attivi",
+      "recipient_count": "Destinatari raggiunti",
+      "total_exchanges": "Scambi totali",
+      "volunteer_hours": "Ore di volontariato (90gg)"
+    },
+    "modal": {
+      "body": "Verrà acquisita un'istantanea in tempo reale delle metriche della tua community in questo momento e la salverai come riferimento denominato per confronti futuri.",
+      "metrics_captured": "Metriche acquisite: conteggio dei membri attivi, ore di volontariato approvate (ultimi 90 giorni), relazioni di supporto attive, destinatari distinti e scambi totali.",
+      "title_prefix": "Catturare",
+      "title_suffix": "Linea di base"
+    },
+    "table": {
+      "actions": "Azioni",
+      "active_relationships": "Relazioni attive",
+      "aria": "KPI Linee di base",
+      "captured": "Catturato",
+      "label": "Etichetta",
+      "members": "Membri",
+      "total_exchanges": "Scambi totali",
+      "volunteer_hours": "Orari di volontariato"
+    },
+    "toasts": {
+      "capture_failed": "Impossibile acquisire la linea di base",
+      "comparison_failed": "Impossibile caricare il confronto",
+      "load_failed": "Impossibile caricare KPI linee di base",
+      "saved": "Baseline saved. Usalo per confrontare le metriche future con questa istantanea."
+    }
+  },
+  "lead_nurture": {
+    "about": {
+      "body": "Il tracker Lead Nurture è un CRM leggero per NEXUS opportunità di distribuzione. Quando un comune, un potenziale finanziatore o un partner commerciale esprime interesse, aggiungilo qui e monitora i suoi progressi attraverso la canalizzazione. Utilizza il campo della fase per registrare la posizione di ciascun contatto nella conversazione e la data di follow-up per garantire che nessuno si irrigidisca. Export to CSV for reporting or import into an external CRM.",
+      "title": "A proposito di questa pagina"
+    },
+    "actions": {
+      "cancel": "Cancellare",
+      "edit": "Modificare",
+      "export_csv": "Esporta CSV",
+      "mark_unsubscribed": "Segna la cancellazione dell'iscrizione",
+      "refresh": "Aggiorna",
+      "refresh_aria": "Aggiorna i contatti di lead nuture",
+      "save": "Salva",
+      "unsubscribe_aria": "Cancella il contatto"
+    },
+    "confirm_unsubscribe": "Contrassegnare {{email}} come iscritto annullato?",
+    "contacts": {
+      "empty": "Nessun contatto corrisponde ai filtri attuali.",
+      "table_aria": "Guidare i contatti",
+      "title": "Contatti ({{count}})"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "fields": {
+      "follow_up_date": "Data di follow-up (ISO 8601)",
+      "follow_up_placeholder": "2026-05-15",
+      "notes": "Note"
+    },
+    "filters": {
+      "all_segments": "Tutti i segmenti",
+      "all_stages": "Tutte le fasi",
+      "segment": "Segmento",
+      "segment_description": "comune: governo locale; investitore: finanziatore; affari: sponsorizzazione; residente: individuo; partner: ONG/organizzazione benefica.",
+      "stage": "Palcoscenico",
+      "title": "Filtri"
+    },
+    "meta": {
+      "page_title": "Coltivare il piombo",
+      "subtitle": "Traccia e coltiva i potenziali partner (comuni, investitori, imprese, residenti e organizzazioni comunitarie) dal primo contatto fino all'onboarding.",
+      "title": "Coltivare il piombo"
+    },
+    "modal": {
+      "stage_description": "catturato: primo contatto; contattato: raggiunto; impegnato: conversazione attiva; qualificato: interesse e budget confermati; convertito: iscritto; dormiente: diventato silenzioso; non iscritto: rinunciato.",
+      "title": "Modifica contatto"
+    },
+    "segments": {
+      "business": "Attività commerciale",
+      "investor": "Investitore",
+      "municipality": "Comune",
+      "partner": "Partner",
+      "resident": "Residente"
+    },
+    "stages": {
+      "captured": "Catturato",
+      "contacted": "Contattato",
+      "converted": "Convertito",
+      "dormant": "Dormiente",
+      "engaged": "Impegnato",
+      "qualified": "Qualificato",
+      "unsubscribed": "Iscrizione annullata"
+    },
+    "summary": {
+      "by_segment": "Per segmento:",
+      "by_stage": "Per fase:",
+      "title": "Riepilogo",
+      "total_contacts": "contatti totali"
+    },
+    "table": {
+      "actions": "Azioni",
+      "captured": "Catturato",
+      "follow_up": "Seguito",
+      "name_email": "Nome/e-mail",
+      "organisation": "Organizzazione",
+      "segment": "Segmento",
+      "source": "Fonte",
+      "stage": "Palcoscenico"
+    },
+    "toasts": {
+      "export_failed": "Impossibile esportare CSV",
+      "exported": "Elenco lead esportato",
+      "load_failed": "Impossibile caricare i contatti di lead nuture",
+      "unsubscribe_failed": "Impossibile annullare l'iscrizione",
+      "unsubscribed": "Contrassegnato come cancellato",
+      "update_failed": "Impossibile aggiornare il contatto",
+      "updated": "Contatto aggiornato"
+    }
+  },
+  "regional_analytics_admin": {
+    "access_log": {
+      "endpoint": "Punto finale",
+      "ip_hashed": "IP (con hash)",
+      "table_aria": "Registro degli accessi",
+      "title": "Registro di accesso - {{name}}",
+      "user_agent": "Agente utente",
+      "when": "Quando"
+    },
+    "actions": {
+      "cancel": "Cancellare",
+      "close": "Vicino",
+      "create": "Creare",
+      "generate_report_now": "Genera rapporto ora",
+      "new_subscription": "Nuovo abbonamento",
+      "resume": "Riprendere",
+      "suspend": "Sospendere",
+      "view_access_log": "Visualizza il registro degli accessi"
+    },
+    "create_modal": {
+      "billing_email": "E-mail di fatturazione",
+      "contact_email": "Contatto e-mail",
+      "currency": "Valuta",
+      "enabled_modules": "Moduli abilitati",
+      "monthly_price_cents": "Prezzo mensile (centesimi)",
+      "partner_name": "Nome del partner",
+      "partner_type": "Tipo di partner",
+      "plan_tier": "Livello del piano",
+      "tenant_id": "Locatario ID",
+      "title": "Nuovo abbonamento all'analisi regionale"
+    },
+    "empty": {
+      "access_log": "Nessun evento di accesso ancora registrato.",
+      "subscriptions": "Nessun abbonamento ancora. Fornirne uno per iniziare a vendere analisi regionali.",
+      "value": "-"
+    },
+    "meta": {
+      "description": "Gestisci gli abbonamenti alle analisi a pagamento per il comune e i partner SME: solo aggregati raggruppati e rispettosi della privacy.",
+      "title": "Analisi regionale"
+    },
+    "modules": {
+      "demand_supply": "Domanda e offerta",
+      "demographics": "Dati demografici",
+      "footfall": "Calpestio",
+      "trends": "Tendenze"
+    },
+    "partner_types": {
+      "municipality": "Comune",
+      "sme_partner": "SME socio"
+    },
+    "plan_tiers": {
+      "basic": "Di base",
+      "enterprise": "Impresa",
+      "pro": "Pro"
+    },
+    "statuses": {
+      "active": "Attivo",
+      "cancelled": "Annullato",
+      "past_due": "Scaduto",
+      "trialing": "Prova"
+    },
+    "tables": {
+      "actions": "Azioni",
+      "modules": "Moduli",
+      "partner": "Partner",
+      "period_end": "Fine periodo",
+      "plan": "Piano",
+      "price_per_month": "Prezzo/mese",
+      "status": "Stato",
+      "subscriptions_aria": "Abbonamenti all'analisi regionale",
+      "type": "Tipo"
+    },
+    "toasts": {
+      "create_failed": "Creazione fallita",
+      "created": "Abbonamento creato",
+      "load_failed": "Impossibile caricare gli abbonamenti",
+      "report_failed": "Impossibile mettere in coda il rapporto",
+      "report_queued": "Generazione del report in coda",
+      "required_fields": "Sono obbligatori il locatario, il nome del partner e l'e-mail di contatto",
+      "status_updated": "Abbonamento {{status}}",
+      "update_failed": "Aggiornamento non riuscito"
+    }
+  },
+  "smart_nudges": {
+    "about": {
+      "body": "Gli Smart Nudge sono messaggi automatizzati inviati ai membri quando viene rilevato un partner con corrispondenza tandem di alto livello. I membri che trarrebbero vantaggio da una connessione peer vengono identificati dal motore di corrispondenza e ricevono una notifica in-app (e facoltativamente un'e-mail) suggerendo di connettersi. I nudge rispettano una finestra di recupero, quindi nessun membro viene contattato troppo frequentemente. Usa la prova di prova per vedere in anteprima chi verrebbe spinto prima di inviarlo davvero.",
+      "follow_up_body": "inviato al coordinatore dopo che uno scambio approvato non è stato contrassegnato come completato",
+      "follow_up_label": "Seguito",
+      "inactivity_body": "attivato quando un membro non ha effettuato l'accesso per il numero di giorni configurato",
+      "inactivity_label": "Inattività",
+      "title": "A proposito di questa pagina",
+      "unmatched_request_body": "attivato quando una richiesta di aiuto non ha offerte dopo che è trascorsa la finestra di recupero",
+      "unmatched_request_label": "Richiesta senza corrispondenza"
+    },
+    "actions": {
+      "cancel": "Cancellare",
+      "dispatch": "Spedizione",
+      "dispatch_now": "Spedisci ora",
+      "dry_run": "Prova a secco",
+      "refresh": "Aggiorna",
+      "save_configuration": "Salva configurazione"
+    },
+    "chart": {
+      "converted": "Convertito",
+      "sent": "Inviato",
+      "title": "Solleciti giornalieri (ultimi 30 giorni)"
+    },
+    "config": {
+      "cooldown_days": "Raffreddamento (giorni)",
+      "cooldown_description": "Aspetta così a lungo prima di spingere di nuovo la stessa coppia",
+      "daily_limit": "Limite giornaliero",
+      "daily_limit_description": "Numero massimo di solleciti giornalieri per l'intero tenant",
+      "engine_description": "Quando è disattivato, non viene inviato alcun sollecito.",
+      "engine_enabled": "Motore abilitato",
+      "min_score": "Punteggio minimo (0,40 - 0,95)",
+      "min_score_description": "Soglia del punteggio della corrispondenza tandem per l'invio di un nudge",
+      "save_note": "Le modifiche hanno effetto immediato: la successiva esecuzione programmata del sollecito applicherà le nuove impostazioni.",
+      "title": "Configurazione"
+    },
+    "dispatch_modal": {
+      "body_prefix": "Questo invierà fino a",
+      "body_suffix": "invia subito notifiche ai membri idonei. Make sure you've reviewed a dry-run first.",
+      "title": "Inviare solleciti adesso?"
+    },
+    "dry_run": {
+      "candidates": "{{count}} candidati",
+      "empty": "Nessun candidato idoneo in questo momento.",
+      "table_aria": "Candidati nudge di prova",
+      "title": "Anteprima di prova"
+    },
+    "meta": {
+      "description": "Suggerimenti automatizzati che spingono i membri verso partner tandem di alto livello. Conservative defaults - runs on a daily cap.",
+      "page_title": "Solleciti intelligenti dei membri",
+      "title": "Solleciti intelligenti dei membri"
+    },
+    "recent": {
+      "empty": "Nessun sollecito ancora inviato.",
+      "table_aria": "Smart nudge recenti",
+      "title": "Solleciti recenti"
+    },
+    "stats": {
+      "conversion_30d": "Conversione (30 gg)",
+      "eligible_candidates": "Candidati idonei",
+      "opted_out": "Disattivato",
+      "sent_30d": "Inviato (30 gg)"
+    },
+    "status": {
+      "converted": "Convertito",
+      "sent": "Inviato"
+    },
+    "table": {
+      "score": "Punto",
+      "sent": "Inviato",
+      "status": "Stato",
+      "suggested_partner": "Partner suggerito",
+      "target": "Bersaglio",
+      "target_user": "Utente di destinazione"
+    },
+    "toasts": {
+      "config_saved": "Configurazione del Nudge salvata. Le regole aggiornate verranno applicate alla prossima corsa programmata.",
+      "dispatch_failed": "Invio non riuscito",
+      "dispatched": "{{count}} solleciti inviati",
+      "dry_run": "Prova di prova: {{count}} candidati idonei",
+      "load_failed": "Impossibile caricare l'analisi dei solleciti",
+      "save_failed": "Impossibile salvare la configurazione"
+    }
   }
 }

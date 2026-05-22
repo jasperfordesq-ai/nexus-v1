@@ -14537,5 +14537,515 @@
       "under_review": "Onder beoordeling"
     },
     "submitted": "Ingediend"
+  },
+  "category_coefficients": {
+    "about": {
+      "body_middle": "). Een coëfficiënt van 0,5 betekent dat het een half uur vervangt. Een coëfficiënt van 2,0 betekent dat het twee uur formele zorg vervangt, bijvoorbeeld intensieve persoonlijke zorg of specialistische ondersteuning. De Age-Stiftung/",
+      "body_prefix": "Substitutiecoëfficiënten bepalen hoeveel maatschappelijke waarde elke zorgcategorie waard is in de kostencompensatieberekening. Een coëfficiënt van 1,0 betekent dat één uur gelijk is aan één uur formele Spitex/Pflege zorg (",
+      "body_suffix": "De methodologie beveelt aan om alle categorieën op 1,0 te starten en deze aan te passen op basis van de waargenomen zorgintensiteit.",
+      "chf_amount": "CHF 35",
+      "range_prefix": "Waarden variëren van 0,00 (geen zorgvervangende waarde) tot 9,99. Wijzigingen worden van kracht op de volgende",
+      "range_suffix": "rapport vernieuwen.",
+      "title": "Over deze pagina"
+    },
+    "actions": {
+      "refresh_aria": "Categoriecoëfficiënten vernieuwen",
+      "save": "Redden"
+    },
+    "empty": {
+      "categories": "Geen categorieën gevonden."
+    },
+    "fields": {
+      "coefficient_aria": "Coëfficiënt voor {{name}}",
+      "coefficient_error": "Moet tussen 0,00 en 9,99 liggen"
+    },
+    "meta": {
+      "page_title": "Categorievervangingscoëfficiënten",
+      "subtitle": "Hoeveel elk uur gemeenschapszorg vervangt voor formele Spitex/Pflege uur. Gebruikt bij berekeningen van het Gemeentelijk Effectrapport.",
+      "title": "Categorievervangingscoëfficiënten"
+    },
+    "migration": {
+      "body_middle": "kolom is nog niet gemigreerd. Loop",
+      "body_prefix": "De",
+      "body_suffix": "om coëfficiënten per categorie mogelijk te maken.",
+      "title": "Migratie in behandeling",
+      "warning": "Er is een databasemigratie in behandeling. Sla uw wijzigingen op nadat de migratie is voltooid om te voorkomen dat ze worden overschreven."
+    },
+    "table": {
+      "action": "Actie",
+      "aria": "Categorievervangingscoëfficiënten",
+      "category": "Categorie",
+      "coefficient": "Coëfficiënt",
+      "source": "Bron"
+    },
+    "toasts": {
+      "invalid_number": "Coëfficiënt moet een getal zijn",
+      "load_failed": "Kan categoriecoëfficiënten niet laden",
+      "save_failed": "Kan de coëfficiënt voor {{name}} niet opslaan",
+      "saved": "Coëfficiënt opgeslagen voor {{name}}"
+    }
+  },
+  "data_quality": {
+    "about": {
+      "body": "Gegevenskwaliteitscontroles scannen uw platformgegevens op problemen die de pilotstatistieken kunnen verstoren of rapportagefouten kunnen veroorzaken, bijvoorbeeld leden met dubbele profielen, urenregistratie voor verwijderde vermeldingen of uitwisselingsrecords waarin verplichte velden ontbreken. Voer dit maandelijks uit voordat u rapporten genereert. Los alle kritieke en waarschuwingspunten op voordat u rapporten indient bij financiers of gemeentelijke partners.",
+      "title": "Over deze pagina"
+    },
+    "actions": {
+      "close": "Dichtbij",
+      "refresh_aria": "Vernieuw de controles op de gegevenskwaliteit",
+      "refresh_checks": "Controles vernieuwen",
+      "view_affected_rows": "Bekijk de getroffen rijen"
+    },
+    "drilldown": {
+      "empty": "Er zijn geen getroffen rijen om te tonen.",
+      "subtitle": "Maximaal 50 betrokken rijen - oplossen of documenteren vóór lancering.",
+      "table_aria": "Betrokken rijen"
+    },
+    "empty": {
+      "rows": "Geen rijen",
+      "value": "-"
+    },
+    "meta": {
+      "page_title": "Pilotgegevenskwaliteit",
+      "subtitle": "AG84 - gereedheidscontroles voordat echte bewoners aan boord gaan",
+      "title": "Pilotgegevenskwaliteit"
+    },
+    "severity": {
+      "danger": "Gevaar",
+      "info": "Info",
+      "ok": "OK",
+      "warning": "Waarschuwing"
+    },
+    "severity_guide": {
+      "danger": "Fouten die onjuiste cijfers in rapporten veroorzaken, moeten worden opgelost voordat ze worden geëxporteerd.",
+      "info": "Informatieve mededelingen - geen actie vereist.",
+      "note_prefix": "Klik",
+      "note_suffix": "op elke kaart om de specifieke gegevens te bekijken. Sommige problemen kunnen op het platform worden gecorrigeerd; andere vereisen een handmatige beoordeling van de onderliggende gegevens.",
+      "ok": "Er zijn geen problemen gedetecteerd in deze categorie.",
+      "title": "Gids voor ernst",
+      "warning": "Potentiële problemen die de metrische nauwkeurigheid kunnen beïnvloeden: controleer en bevestig of repareer."
+    },
+    "summary": {
+      "affected": "aangetast",
+      "count": "{{count}} {{label}}",
+      "generated": "Gegenereerd {{date}}",
+      "label": "Samenvatting:"
+    },
+    "table": {
+      "created": "Gemaakt",
+      "id": "ID",
+      "identifier": "Identificatie",
+      "name": "Naam",
+      "status": "Status"
+    },
+    "toasts": {
+      "load_failed": "Kan het rapport over de gegevenskwaliteit niet laden",
+      "rows_failed": "Kan de getroffen rijen niet laden"
+    }
+  },
+  "isolated_node": {
+    "about": {
+      "body_middle": "op infrastructuur die volledig door het kanton of de gemeente wordt beheerd - geen gegevens verlaten de grens van het kanton. Deze configuratie is vereist voor",
+      "body_prefix": "Er wordt een geïsoleerde knooppuntimplementatie uitgevoerd",
+      "body_suffix": "implementaties onder strikte Zwitserse kantonnale regels voor gegevensbescherming. De meeste community's draaien als standaard gehoste implementaties en hoeven deze sectie niet te configureren.",
+      "title": "Over deze pagina",
+      "workflow": "Doorloop elk beslissingsitem hieronder: stel de waarde in, wijs een eigenaar toe en markeer het als Besloten wanneer er overeenstemming is bereikt. De poort sluit (en de Pilot Launch Readiness-controle is geslaagd) zodra elk item de status Beslist heeft."
+    },
+    "actions": {
+      "cancel": "Annuleren",
+      "edit": "Bewerking",
+      "refresh": "Vernieuwen",
+      "refresh_aria": "Vernieuw de beslissingspoort met geïsoleerde knooppunten",
+      "save_changes": "Wijzigingen opslaan"
+    },
+    "empty": {
+      "none": "geen",
+      "unassigned": "niet toegewezen"
+    },
+    "fields": {
+      "notes": "Opmerkingen",
+      "notes_description": "Context, links, contractreferenties of blockers",
+      "owner": "Eigenaar",
+      "owner_description": "Persoon of organisatie die verantwoordelijk is voor deze beslissing",
+      "status": "Status",
+      "url_placeholder": "https://...",
+      "value": "Waarde"
+    },
+    "gate": {
+      "blocked_count": "- {{count}} geblokkeerd",
+      "closed": "Poort gesloten - klaar om te lanceren",
+      "decided_count": "{{decided}} van {{total}} punten besloten",
+      "open": "Poort open - beslissingen zijn nog steeds vereist",
+      "progress_aria": "Vooruitgang op het gebied van besluitvorming"
+    },
+    "meta": {
+      "page_title": "Besluitpoort met geïsoleerde knooppunten",
+      "subtitle": "AG85 - checklist voor gereedheid voor kantongestuurde implementatie",
+      "title": "Besluitpoort met geïsoleerde knooppunten"
+    },
+    "modal": {
+      "edit_decision_item": "Beslissingsitem bewerken",
+      "subtitle": "Update de waarde, eigenaar, status en opmerkingen voor dit poortitem"
+    },
+    "status": {
+      "blocked": "Geblokkeerd",
+      "decided": "Besloten",
+      "in_progress": "In uitvoering",
+      "pending": "In behandeling"
+    },
+    "status_counts": {
+      "blocked": "Geblokkeerd: {{count}}",
+      "decided": "Besloten: {{count}}",
+      "in_progress": "In uitvoering: {{count}}",
+      "pending": "In behandeling: {{count}}"
+    },
+    "timestamps": {
+      "last_updated": "Laatst bijgewerkt {{date}}"
+    },
+    "toasts": {
+      "item_updated": "Beslissingsitem bijgewerkt",
+      "load_failed": "Kan beslissingspoortgegevens niet laden",
+      "save_failed": "Kan beslissingsitem niet opslaan"
+    },
+    "warning": {
+      "body_prefix": "Wijzig deze instellingen alleen als uw gemeente expliciet een eis voor geïsoleerde knooppunten heeft opgegeven. Het wijzigen van de inzetmodus na de lancering van de pilot vereist coördinatie met de",
+      "body_suffix": "technisch team. Wijzig deze instelling niet zonder toestemming van uw kantonale functionaris voor gegevensbescherming.",
+      "title": "Belangrijk - configureer alleen indien nodig"
+    }
+  },
+  "kpi_baselines": {
+    "about": {
+      "body_prefix": "Basislijnen leggen de toestand van uw gemeenschap vast voordat het Caring Community-programma begint. Bij elke kwartaalbeoordeling worden ze vergeleken met de huidige statistieken om de impact aan te tonen. Leg basislijnen vast voor iedereen",
+      "body_suffix": "voordat bewoners aan boord gaan: zodra de pilot start, is de basislijn bevroren en kan deze niet meer met terugwerkende kracht worden gedateerd.",
+      "compare_prefix": "Klik",
+      "compare_suffix": "op elke basislijnrij om een ​​vergelijking naast elkaar te zien met de huidige platformgegevens. Statistieken die een verandering van meer dan 25% op de belangrijkste impactindicatoren laten zien, worden gemarkeerd als Impact bereikt.",
+      "title": "Over deze pagina"
+    },
+    "actions": {
+      "cancel": "Annuleren",
+      "capture_first": "Leg uw eerste basislijn vast",
+      "capture_now": "Leg nu de basislijn vast",
+      "capture_now_short": "Leg nu vast",
+      "close": "Dichtbij",
+      "compare": "Vergelijken",
+      "refresh": "Vernieuwen",
+      "refresh_aria": "Vernieuw KPI basislijnen"
+    },
+    "comparison": {
+      "baseline": "Basislijn",
+      "captured": "(vastgelegd {{date}})",
+      "comparing": "Vergelijken:",
+      "impact_achieved": "Impact bereikt",
+      "now": "Nu"
+    },
+    "empty": {
+      "no_baselines": "Er zijn nog geen basislijnen vastgelegd.",
+      "no_data": "Geen gegevens beschikbaar"
+    },
+    "fields": {
+      "baseline_description": "Een korte naam om deze momentopname te identificeren (bijvoorbeeld 'Pre-lancering Q1 2025')",
+      "baseline_label": "Basislijnlabel",
+      "baseline_placeholder": "bijv. Vóór de lancering van NEXUS",
+      "notes_description": "Documenteer waar deze cijfers vandaan komen (bijvoorbeeld 'Verwijsgegevens huisarts Q1 2026', 'ledenonderzoek maart 2026'). Geciteerde bronnen maken de uitgangssituatie verdedigbaar in de subsidierapportage.",
+      "notes_label_prefix": "Opmerkingen:",
+      "notes_placeholder": "bijv. 'Verwijzingsgegevens huisartsen Q1 2026, ledenenquête maart 2026, vastgelegd vóór platformuitrol naar alle Gemeinden'",
+      "notes_source": "Opmerkingen / bron (optioneel)",
+      "period_end": "Einde periode",
+      "period_end_description": "Einde referentieperiode",
+      "period_start": "Periode begin",
+      "period_start_description": "Begin referentieperiode"
+    },
+    "meta": {
+      "page_title": "Gemeenschap KPI Basislijnen",
+      "subtitle_prefix": "Maak momentopnamen van uw communitystatistieken om deze voor/na bij te houden",
+      "subtitle_suffix": "invloed",
+      "title": "Gemeenschap KPI Basislijnen"
+    },
+    "metrics": {
+      "active_relationships": "Actieve relaties",
+      "avg_response_hours": "Gem. responstijd (uur)",
+      "engagement_rate_pct": "Betrokkenheidspercentage (%)",
+      "member_count": "Actieve leden",
+      "recipient_count": "Ontvangers bereikt",
+      "total_exchanges": "Totaal aantal uitwisselingen",
+      "volunteer_hours": "Vrijwilligersuren (90d)"
+    },
+    "modal": {
+      "body": "Er wordt nu een live momentopname gemaakt van uw communitystatistieken en deze wordt opgeslagen als een benoemde basislijn voor toekomstige vergelijkingen.",
+      "metrics_captured": "Vastgelegde statistieken: aantal actieve leden, goedgekeurde vrijwilligersuren (laatste 90 dagen), actieve ondersteuningsrelaties, verschillende ontvangers en totale uitwisselingen.",
+      "title_prefix": "Vastlegging",
+      "title_suffix": "Basislijn"
+    },
+    "table": {
+      "actions": "Acties",
+      "active_relationships": "Actieve relaties",
+      "aria": "KPI Basislijnen",
+      "captured": "Gevangen",
+      "label": "Label",
+      "members": "Leden",
+      "total_exchanges": "Totaal aantal uitwisselingen",
+      "volunteer_hours": "Vrijwilligersuren"
+    },
+    "toasts": {
+      "capture_failed": "Kan basislijn niet vastleggen",
+      "comparison_failed": "Kan de vergelijking niet laden",
+      "load_failed": "Kan KPI basislijnen niet laden",
+      "saved": "Basislijn opgeslagen. Gebruik het om toekomstige statistieken te vergelijken met deze momentopname."
+    }
+  },
+  "lead_nurture": {
+    "about": {
+      "body": "De Lead Nurture-tracker is een lichtgewicht CRM voor NEXUS implementatiemogelijkheden. Wanneer een gemeente, potentiële financier of zakenpartner interesse toont, kunt u deze hier toevoegen en de voortgang via de trechter volgen. Gebruik het faseveld om vast te leggen waar elk contact zich in het gesprek bevindt, en de vervolgdatum om ervoor te zorgen dat niemand het koud krijgt. Exporteer naar CSV voor rapportage of importeer in een externe CRM.",
+      "title": "Over deze pagina"
+    },
+    "actions": {
+      "cancel": "Annuleren",
+      "edit": "Bewerking",
+      "export_csv": "Exporteer CSV",
+      "mark_unsubscribed": "Markeer als afgemeld",
+      "refresh": "Vernieuwen",
+      "refresh_aria": "Ververs leadnurture-contacten",
+      "save": "Redden",
+      "unsubscribe_aria": "Afmelden contactpersoon"
+    },
+    "confirm_unsubscribe": "{{email}} markeren als afgemeld?",
+    "contacts": {
+      "empty": "Er zijn geen contacten die overeenkomen met de huidige filters.",
+      "table_aria": "Leid nurture-contacten",
+      "title": "Contacten ({{count}})"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "fields": {
+      "follow_up_date": "Vervolgdatum (ISO 8601)",
+      "follow_up_placeholder": "2026-05-15",
+      "notes": "Opmerkingen"
+    },
+    "filters": {
+      "all_segments": "Alle segmenten",
+      "all_stages": "Alle fasen",
+      "segment": "Segment",
+      "segment_description": "gemeente: lokaal bestuur; investeerder: financier; zakelijk: sponsoring; ingezetene: individu; partner: NGO/goed doel.",
+      "stage": "Fase",
+      "title": "Filters"
+    },
+    "meta": {
+      "page_title": "Leid nurture",
+      "subtitle": "Volg en begeleid potentiële partners - gemeenten, investeerders, bedrijven, bewoners en maatschappelijke organisaties - vanaf het eerste contact tot en met de onboarding.",
+      "title": "Leid nurture"
+    },
+    "modal": {
+      "stage_description": "vastgelegd: eerste contact; gecontacteerd: contact opgenomen; betrokken: actief gesprek; gekwalificeerd: rente en budget bevestigd; omgezet: aangemeld; slapend: stil geworden; uitgeschreven: opt-out.",
+      "title": "Contact bewerken"
+    },
+    "segments": {
+      "business": "Bedrijf",
+      "investor": "Investeerder",
+      "municipality": "Gemeente",
+      "partner": "Partner",
+      "resident": "Inwoner"
+    },
+    "stages": {
+      "captured": "Gevangen",
+      "contacted": "Gecontacteerd",
+      "converted": "Geconverteerd",
+      "dormant": "Slaperig",
+      "engaged": "Betrokken",
+      "qualified": "Gekwalificeerd",
+      "unsubscribed": "Uitgeschreven"
+    },
+    "summary": {
+      "by_segment": "Per segment:",
+      "by_stage": "Per fase:",
+      "title": "Samenvatting",
+      "total_contacts": "totale contacten"
+    },
+    "table": {
+      "actions": "Acties",
+      "captured": "Gevangen",
+      "follow_up": "Vervolg",
+      "name_email": "Naam / E-mail",
+      "organisation": "Organisatie",
+      "segment": "Segment",
+      "source": "Bron",
+      "stage": "Fase"
+    },
+    "toasts": {
+      "export_failed": "Kan CSV niet exporteren",
+      "exported": "Leadlijst geëxporteerd",
+      "load_failed": "Kan leadnurture-contacten niet laden",
+      "unsubscribe_failed": "Afmelden is mislukt",
+      "unsubscribed": "Gemarkeerd als afgemeld",
+      "update_failed": "Kan contactpersoon niet updaten",
+      "updated": "Contact bijgewerkt"
+    }
+  },
+  "regional_analytics_admin": {
+    "access_log": {
+      "endpoint": "Eindpunt",
+      "ip_hashed": "IP (gehasht)",
+      "table_aria": "Toegangslogboek",
+      "title": "Toegangslogboek - {{name}}",
+      "user_agent": "Gebruikersagent",
+      "when": "Wanneer"
+    },
+    "actions": {
+      "cancel": "Annuleren",
+      "close": "Dichtbij",
+      "create": "Creëren",
+      "generate_report_now": "Genereer nu een rapport",
+      "new_subscription": "Nieuw abonnement",
+      "resume": "Cv",
+      "suspend": "Opschorten",
+      "view_access_log": "Toegangslogboek bekijken"
+    },
+    "create_modal": {
+      "billing_email": "E-mail voor facturering",
+      "contact_email": "E-mailadres voor contact",
+      "currency": "Munteenheid",
+      "enabled_modules": "Ingeschakelde modules",
+      "monthly_price_cents": "Maandelijkse prijs (cent)",
+      "partner_name": "Partnernaam",
+      "partner_type": "Partnertype",
+      "plan_tier": "Planniveau",
+      "tenant_id": "Huurder ID",
+      "title": "Nieuw abonnement op regionale analyses"
+    },
+    "empty": {
+      "access_log": "Er zijn nog geen toegangsgebeurtenissen geregistreerd.",
+      "subscriptions": "Nog geen abonnementen. Zorg voor één om regionale analyses te gaan verkopen.",
+      "value": "-"
+    },
+    "meta": {
+      "description": "Beheer betaalde analyseabonnementen voor gemeenten en SME-partners - alleen in buckets verdeelde, privacyveilige aggregaten.",
+      "title": "Regionale analyses"
+    },
+    "modules": {
+      "demand_supply": "Vraag en aanbod",
+      "demographics": "Demografie",
+      "footfall": "Voetstappen",
+      "trends": "Trends"
+    },
+    "partner_types": {
+      "municipality": "Gemeente",
+      "sme_partner": "SME partner"
+    },
+    "plan_tiers": {
+      "basic": "Basis",
+      "enterprise": "Onderneming",
+      "pro": "Pro"
+    },
+    "statuses": {
+      "active": "Actief",
+      "cancelled": "Geannuleerd",
+      "past_due": "Achterstallig",
+      "trialing": "Proeven"
+    },
+    "tables": {
+      "actions": "Acties",
+      "modules": "Modules",
+      "partner": "Partner",
+      "period_end": "Einde periode",
+      "plan": "Plan",
+      "price_per_month": "Prijs / ma",
+      "status": "Status",
+      "subscriptions_aria": "Abonnementen op regionale analyses",
+      "type": "Type"
+    },
+    "toasts": {
+      "create_failed": "Maken mislukt",
+      "created": "Abonnement aangemaakt",
+      "load_failed": "Kan abonnementen niet laden",
+      "report_failed": "Kan het rapport niet in de wachtrij plaatsen",
+      "report_queued": "Het genereren van rapporten staat in de wachtrij",
+      "required_fields": "Huurder, partnernaam en e-mailadres voor contact zijn vereist",
+      "status_updated": "Abonnement {{status}}",
+      "update_failed": "Update mislukt"
+    }
+  },
+  "smart_nudges": {
+    "about": {
+      "body": "Smart Nudges zijn geautomatiseerde aanwijzingen die naar leden worden verzonden wanneer een goed passende tandemmatchpartner wordt gedetecteerd. Leden die baat zouden hebben bij een peer-verbinding worden geïdentificeerd door de matching-engine en sturen een in-app-melding (en optioneel een e-mail) waarin wordt voorgesteld dat ze verbinding maken. Nudges respecteren een cooldown-periode, zodat er niet te vaak contact wordt opgenomen met een lid. Gebruik de proefsessie om te zien wie er een duwtje in de rug krijgt voordat het echt wordt verzonden.",
+      "follow_up_body": "verzonden naar de coördinator nadat een goedgekeurde uitwisseling niet als voltooid is gemarkeerd",
+      "follow_up_label": "Vervolg",
+      "inactivity_body": "geactiveerd wanneer een lid het geconfigureerde aantal dagen niet heeft ingelogd",
+      "inactivity_label": "Inactiviteit",
+      "title": "Over deze pagina",
+      "unmatched_request_body": "wordt geactiveerd wanneer een hulpverzoek geen aanbiedingen bevat nadat de afkoelperiode is verstreken",
+      "unmatched_request_label": "Ongeëvenaard verzoek"
+    },
+    "actions": {
+      "cancel": "Annuleren",
+      "dispatch": "Verzenden",
+      "dispatch_now": "Nu verzenden",
+      "dry_run": "Drooglopen",
+      "refresh": "Vernieuwen",
+      "save_configuration": "Configuratie opslaan"
+    },
+    "chart": {
+      "converted": "Geconverteerd",
+      "sent": "Verstuurd",
+      "title": "Dagelijkse nudges (laatste 30 dagen)"
+    },
+    "config": {
+      "cooldown_days": "Afkoeling (dagen)",
+      "cooldown_description": "Wacht zo lang voordat je hetzelfde paar opnieuw een duwtje geeft",
+      "daily_limit": "Dagelijkse limiet",
+      "daily_limit_description": "Maximale nudges per dag voor de hele huurder",
+      "engine_description": "Wanneer uitgeschakeld, worden er geen nudges verzonden.",
+      "engine_enabled": "Motor ingeschakeld",
+      "min_score": "Minimale score (0,40 - 0,95)",
+      "min_score_description": "Scoredrempel voor tandemmatches voor het verzenden van een duwtje",
+      "save_note": "Wijzigingen worden onmiddellijk van kracht: bij de volgende geplande nudge-run worden de nieuwe instellingen toegepast.",
+      "title": "Configuratie"
+    },
+    "dispatch_modal": {
+      "body_prefix": "Dit wordt verzonden naar",
+      "body_suffix": "geef nu meldingen door aan in aanmerking komende leden. Zorg ervoor dat u eerst een proefrun heeft beoordeeld.",
+      "title": "Nudges versturen?"
+    },
+    "dry_run": {
+      "candidates": "{{count}} kandidaten",
+      "empty": "Er zijn momenteel geen geschikte kandidaten.",
+      "table_aria": "Kandidaten voor een dry-run-nudge",
+      "title": "Voorbeeld van droogdraaien"
+    },
+    "meta": {
+      "description": "Geautomatiseerde suggesties die leden naar goed passende tandempartners sturen. Conservatieve wanbetalingen - geldt voor een dagelijkse limiet.",
+      "page_title": "Slimme duwtjes voor leden",
+      "title": "Slimme duwtjes voor leden"
+    },
+    "recent": {
+      "empty": "Er zijn nog geen nudges verzonden.",
+      "table_aria": "Recente slimme duwtjes",
+      "title": "Recente duwtjes"
+    },
+    "stats": {
+      "conversion_30d": "Conversie (30d)",
+      "eligible_candidates": "Geschikte kandidaten",
+      "opted_out": "Afgemeld",
+      "sent_30d": "Verzonden (30d)"
+    },
+    "status": {
+      "converted": "Geconverteerd",
+      "sent": "Verstuurd"
+    },
+    "table": {
+      "score": "Scoren",
+      "sent": "Verstuurd",
+      "status": "Status",
+      "suggested_partner": "Voorgestelde partner",
+      "target": "Doel",
+      "target_user": "Doelgebruiker"
+    },
+    "toasts": {
+      "config_saved": "Nudge-configuratie opgeslagen. De bijgewerkte regels zijn van toepassing op de volgende geplande run.",
+      "dispatch_failed": "Verzending mislukt",
+      "dispatched": "{{count}} duwtjes verzonden",
+      "dry_run": "Testrun: {{count}} geschikte kandidaten",
+      "load_failed": "Kan nudge-analyses niet laden",
+      "save_failed": "Kan configuratie niet opslaan"
+    }
   }
 }

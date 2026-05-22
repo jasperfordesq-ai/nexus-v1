@@ -14537,5 +14537,515 @@
       "under_review": "Faoi Léirmheas"
     },
     "submitted": "Arna chur isteach"
+  },
+  "category_coefficients": {
+    "about": {
+      "body_middle": "). Ciallaíonn comhéifeacht 0.5 go ndéanann sé ionadú ar feadh leathuaire. Ciallaíonn comhéifeacht 2.0 go gcuirtear dhá uair an chloig de chúram foirmiúil ina ionad - mar shampla, dianchúram pearsanta nó saintacaíocht. an Age-Stiftung/",
+      "body_prefix": "Rialaíonn Comhéifeachtaí Ionaid cé mhéad luach sóisialta is fiú gach catagóir cúraim i ríomh an fhritháirimh costais. Ciallaíonn comhéifeacht 1.0 uair is ionann uair an chloig agus uair an chloig de chúram foirmiúil Spitex/Pflege (",
+      "body_suffix": "molann an mhodheolaíocht tús a chur le gach catagóir ag 1.0 agus coigeartú a dhéanamh bunaithe ar dhéine an chúraim a breathnaíodh.",
+      "chf_amount": "CHF 35",
+      "range_prefix": "Réimsíonn na luachanna ó 0.00 (gan aon luach ionadaíochta cúraim) go 9.99. Tagann athruithe i bhfeidhm ar an gcéad cheann eile",
+      "range_suffix": "athnuachan tuairisce.",
+      "title": "Maidir leis an leathanach seo"
+    },
+    "actions": {
+      "refresh_aria": "Athnuaigh comhéifeachtaí na gcatagóirí",
+      "save": "Sábháil"
+    },
+    "empty": {
+      "categories": "Níor aimsíodh aon chatagóir."
+    },
+    "fields": {
+      "coefficient_aria": "Comhéifeacht do {{name}}",
+      "coefficient_error": "Caithfidh sé a bheith idir 0.00 agus 9.99"
+    },
+    "meta": {
+      "page_title": "Comhéifeachtaí Ionadaíochta na gCatagóirí",
+      "subtitle": "Cé mhéad a chuirtear in ionad gach uair an chloig de chúram pobail ar Spitex/Pflege uaireanta foirmiúla. Úsáidte i ríomhanna Tuairisc Tionchair Chathrach.",
+      "title": "Comhéifeachtaí Ionadaíochta na gCatagóirí"
+    },
+    "migration": {
+      "body_middle": "níl an colún aistrithe fós. Rith",
+      "body_prefix": "Tá an",
+      "body_suffix": "chun comhéifeachtaí in aghaidh na catagóire a chumasú.",
+      "title": "Imirce ar feitheamh",
+      "warning": "Tá aistriú bunachar sonraí ar feitheamh - sábháil do chuid athruithe tar éis don aistriú a bheith críochnaithe ionas nach ndéanfar iad a fhorscríobh."
+    },
+    "table": {
+      "action": "Gníomh",
+      "aria": "Comhéifeachtaí ionadaíochta catagóir",
+      "category": "Catagóir",
+      "coefficient": "Comhéifeacht",
+      "source": "Foinse"
+    },
+    "toasts": {
+      "invalid_number": "Ní mór go mbeadh an chomhéifeacht ina uimhir",
+      "load_failed": "Theip ar lódáil comhéifeachtaí na gcatagóirí",
+      "save_failed": "Theip ar shábháil an chomhéifeacht le haghaidh {{name}}",
+      "saved": "Comhéifeacht shábháilte do {{name}}"
+    }
+  },
+  "data_quality": {
+    "about": {
+      "body": "Déanann seiceálacha Cáilíochta Sonraí do shonraí ardán a scanadh le haghaidh saincheisteanna a d’fhéadfadh méadracht phíolóta a shaobhadh nó earráidí tuairiscithe a chruthú - mar shampla, baill a bhfuil próifílí dúblacha acu, uaireanta logáilte i gcoinne liostaí scriosta, nó taifid a mhalartú ar na réimsí riachtanacha atá in easnamh. Déan é seo go míosúil sula ngintear tuairiscí. Réitigh gach mír Chriticiúil agus Rabhaidh roimh thuarascálacha a chur faoi bhráid maoinitheoirí nó comhpháirtithe bardais.",
+      "title": "Maidir leis an leathanach seo"
+    },
+    "actions": {
+      "close": "Dún",
+      "refresh_aria": "Seiceálacha cáilíochta sonraí a athnuachan",
+      "refresh_checks": "Seiceálacha a athnuachan",
+      "view_affected_rows": "Féach ar na sraitheanna lena mbaineann"
+    },
+    "drilldown": {
+      "empty": "Níl aon sraitheanna difear le taispeáint.",
+      "subtitle": "Suas le 50 sraith lena mbaineann - réiteach nó doiciméad roimh é a sheoladh.",
+      "table_aria": "Sraitheanna a bhfuil tionchar orthu"
+    },
+    "empty": {
+      "rows": "Uimh sraitheanna",
+      "value": "-"
+    },
+    "meta": {
+      "page_title": "Cáilíocht Sonraí Píolótach",
+      "subtitle": "AG84 - seiceálacha ullmhachta sula gcuirtear fíorchónaitheoirí ar bord",
+      "title": "Cáilíocht Sonraí Píolótach"
+    },
+    "severity": {
+      "danger": "Contúirt",
+      "info": "Eolas",
+      "ok": "ceart go leor",
+      "warning": "Rabhadh"
+    },
+    "severity_guide": {
+      "danger": "Earráidí a bheidh ina gcúis le huimhreacha míchearta i dtuairiscí - ní mór iad a shocrú sula n-onnmhairítear iad.",
+      "info": "Fógraí faisnéise - ní gá aon ghníomh a dhéanamh.",
+      "note_prefix": "Cliceáil",
+      "note_suffix": "ar aon chárta chun na taifid ar leith a fheiceáil. Is féidir roinnt saincheisteanna a cheartú san ardán; teastaíonn athbhreithniú láimhe ar na sonraí bunúsacha ó chinn eile.",
+      "ok": "Níor aimsíodh aon fhadhb sa chatagóir seo.",
+      "title": "Treoir déine",
+      "warning": "Saincheisteanna féideartha a d'fhéadfadh cur isteach ar chruinneas méadrach - athbhreithniú agus a dhearbhú nó a shocrú."
+    },
+    "summary": {
+      "affected": "difear",
+      "count": "{{count}} {{label}}",
+      "generated": "Gineadh {{date}}",
+      "label": "Achoimre:"
+    },
+    "table": {
+      "created": "Cruthaithe",
+      "id": "ID",
+      "identifier": "Aitheantóir",
+      "name": "Ainm",
+      "status": "Stádas"
+    },
+    "toasts": {
+      "load_failed": "Theip ar an tuairisc ar cháilíocht sonraí a lódáil",
+      "rows_failed": "Theip ar lódáil na sraitheanna lena mbaineann"
+    }
+  },
+  "isolated_node": {
+    "about": {
+      "body_middle": "ar bhonneagar arna rialú go hiomlán ag an canton nó an bhardas - ní fhágann aon sonraí teorainn an chantóin. Tá an chumraíocht seo ag teastáil le haghaidh",
+      "body_prefix": "Ritheann imscaradh Nód Scoite",
+      "body_suffix": "imscaradh faoi rialacha dochta cantonal cosanta sonraí na hEilvéise. Ritheann formhór na bpobal mar imlonnaithe óstaithe caighdeánacha agus ní gá dóibh an chuid seo a chumrú.",
+      "title": "Maidir leis an leathanach seo",
+      "workflow": "Oibrigh trí gach mír chinnidh thíos: socraigh an luach, sann úinéir, agus marcáil mar a Cinneadh nuair a chomhaontaítear é. Dúnann an geata (agus éiríonn leis an tseiceáil ar Ullmhacht don Seoladh Píolótach) a luaithe a bhíonn gach mír i stádas Cinnte."
+    },
+    "actions": {
+      "cancel": "Cealaigh",
+      "edit": "Cuir in eagar",
+      "refresh": "Athnuaigh",
+      "refresh_aria": "Athnuaigh geata cinneadh scoite nód",
+      "save_changes": "Sábháil athruithe"
+    },
+    "empty": {
+      "none": "aon cheann",
+      "unassigned": "neamhshannta"
+    },
+    "fields": {
+      "notes": "Nótaí",
+      "notes_description": "Comhthéacs, naisc, tagairtí conradh, nó blockers",
+      "owner": "Úinéir",
+      "owner_description": "Duine nó eagraíocht atá freagrach as an gcinneadh seo",
+      "status": "Stádas",
+      "url_placeholder": "https://...",
+      "value": "Luach"
+    },
+    "gate": {
+      "blocked_count": "- {{count}} bactha",
+      "closed": "Geata dúnta - réidh le seoladh",
+      "decided_count": "{{decided}} de {{total}} míreanna cinneadh",
+      "open": "Geata oscailte - cinntí fós ag teastáil",
+      "progress_aria": "Dul chun cinn geata cinntí"
+    },
+    "meta": {
+      "page_title": "Geata Cinnidh Aonair-Nóid",
+      "subtitle": "AG85 - seicliosta ullmhachta le haghaidh imscaradh faoi rialú canton",
+      "title": "Geata Cinnidh Aonair-Nóid"
+    },
+    "modal": {
+      "edit_decision_item": "Cuir mír chinnidh in eagar",
+      "subtitle": "Nuashonraigh luach, úinéir, stádas, agus nótaí don mhír geata seo"
+    },
+    "status": {
+      "blocked": "bactha",
+      "decided": "Cinneadh",
+      "in_progress": "Ar siúl",
+      "pending": "Ar feitheamh"
+    },
+    "status_counts": {
+      "blocked": "Coiscthe: {{count}}",
+      "decided": "Cinneadh: {{count}}",
+      "in_progress": "Ar siúl: {{count}}",
+      "pending": "Ar feitheamh: {{count}}"
+    },
+    "timestamps": {
+      "last_updated": "Nuashonraithe {{date}} is déanaí"
+    },
+    "toasts": {
+      "item_updated": "Mír chinnidh nuashonraithe",
+      "load_failed": "Theip ar lódáil sonraí geata cinntí",
+      "save_failed": "Theip ar shábháil an mhír chinnidh"
+    },
+    "warning": {
+      "body_prefix": "Ná athraigh na socruithe seo ach amháin má tá ceanglas nód leithlis sonraithe go sainráite ag do bhardas. Teastaíonn comhordú leis an modh imlonnaithe a athrú tar éis seoladh píolótach",
+      "body_suffix": "foireann theicniúil. Ná athraigh an socrú seo gan comhaontú ó d’oifigeach cantonal um chosaint sonraí.",
+      "title": "Tábhachtach - cumraigh ach amháin más gá"
+    }
+  },
+  "kpi_baselines": {
+    "about": {
+      "body_prefix": "Taifeadann bunlínte staid do phobail sula gcuirtear tús leis an gclár Pobal Cúraim. Déantar iad a chur i gcomparáid le méadracht reatha ag gach athbhreithniú ráithiúil chun tionchar a léiriú. Gabháil bunlínte do gach",
+      "body_suffix": "sula dtéann siad ar bord cónaitheoirí - a luaithe a thosaíonn an clár píolótach, reoitear an bhunlíne agus ní féidir é a shiardhátú.",
+      "compare_prefix": "Cliceáil",
+      "compare_suffix": "ar aon bhunlíne chun comparáid a dhéanamh taobh le taobh le sonraí reatha an ardáin. Aibhsítear méadrachtaí a léiríonn athrú 25%+ ar phríomhtháscairí tionchair mar Tionchar a baineadh amach.",
+      "title": "Maidir leis an leathanach seo"
+    },
+    "actions": {
+      "cancel": "Cealaigh",
+      "capture_first": "Gabh do chéad bhunlíne",
+      "capture_now": "Gabháil Bunlíne Anois",
+      "capture_now_short": "Gabháil Anois",
+      "close": "Dún",
+      "compare": "Déan comparáid idir",
+      "refresh": "Athnuaigh",
+      "refresh_aria": "Athnuaigh KPI bunlínte"
+    },
+    "comparison": {
+      "baseline": "Bunlíne",
+      "captured": "(gafa {{date}})",
+      "comparing": "Comparáid a dhéanamh:",
+      "impact_achieved": "Tionchar bainte amach",
+      "now": "Anois"
+    },
+    "empty": {
+      "no_baselines": "Níl aon bonnlínte gafa go fóill.",
+      "no_data": "Níl aon sonraí ar fáil"
+    },
+    "fields": {
+      "baseline_description": "Ainm gairid chun an pictiúr seo a aithint (m.sh. \"Réamhsheoladh Q1 2025\")",
+      "baseline_label": "Lipéad Bunlíne",
+      "baseline_placeholder": "e.g. Roimh NEXUS Seoladh",
+      "notes_description": "Déan doiciméadú ar cad as a dtagann na huimhreacha seo (m.sh. ‘sonraí atreoraithe DG R1 2026’, ‘suirbhé na mball Márta 2026’). Fágann foinsí a luadh go bhfuil an bhunlíne inchosanta i dtuairisciú deontais.",
+      "notes_label_prefix": "Nótaí:",
+      "notes_placeholder": "e.g. ‘Sonraí atreoraithe DG R1 2026, suirbhé ball Márta 2026, gafa roimh rolladh amach an ardáin chuig gach Gemeinden’",
+      "notes_source": "Nótaí / foinse (roghnach)",
+      "period_end": "Deireadh na Tréimhse",
+      "period_end_description": "Críoch na tréimhse tagartha",
+      "period_start": "Tréimhse Tosaigh",
+      "period_start_description": "Tús na tréimhse tagartha"
+    },
+    "meta": {
+      "page_title": "Pobal KPI Bunlínte",
+      "subtitle_prefix": "Gabh pictiúir de do mhéadracht phobail le rianú roimh/i ndiaidh",
+      "subtitle_suffix": "tionchar",
+      "title": "Pobal KPI Bunlínte"
+    },
+    "metrics": {
+      "active_relationships": "Caidreamh Gníomhach",
+      "avg_response_hours": "Meán Am Freagartha (uair an chloig)",
+      "engagement_rate_pct": "Ráta Rannpháirtíochta (%)",
+      "member_count": "Baill Gníomhacha",
+      "recipient_count": "Faighteoirí Sroichte",
+      "total_exchanges": "Malartuithe Iomlán",
+      "volunteer_hours": "Uaireanta Oibrithe Deonacha (90d)"
+    },
+    "modal": {
+      "body": "Tógfaidh sé seo léargas beo ar do mhéadracht phobail faoi láthair agus sábhálfaidh sé é mar bhunlíne ainmnithe le haghaidh comparáidí amach anseo.",
+      "metrics_captured": "Méadracht a gabhadh: comhaireamh ball gníomhach, uaireanta ceadaithe deonacha (90 lá deiridh), caidreamh gníomhach tacaíochta, faighteoirí ar leith, agus malartuithe iomlána.",
+      "title_prefix": "Gabháil",
+      "title_suffix": "Bunlíne"
+    },
+    "table": {
+      "actions": "Gníomhartha",
+      "active_relationships": "Caidreamh Gníomhach",
+      "aria": "KPI Bunlínte",
+      "captured": "Gabhadh",
+      "label": "Lipéad",
+      "members": "Baill",
+      "total_exchanges": "Malartuithe Iomlán",
+      "volunteer_hours": "Uaireanta Oibrithe Deonacha"
+    },
+    "toasts": {
+      "capture_failed": "Theip ar an mbunlíne a ghabháil",
+      "comparison_failed": "Theip ar an gcomparáid a lódáil",
+      "load_failed": "Theip ar KPI bunlínte a lódáil",
+      "saved": "Sábháladh an bhunlíne. Bain úsáid as é chun méadracht na todhchaí a chur i gcomparáid leis an ngrianghraf seo."
+    }
+  },
+  "lead_nurture": {
+    "about": {
+      "body": "Is éadrom CRM é an rianaitheoir Lead Nurture le haghaidh deiseanna imlonnaithe NEXUS. Nuair a chuireann bardas, maoinitheoir ionchasach, nó comhpháirtí gnó suim in iúl, cuir anseo iad agus rianaigh a ndul chun cinn tríd an tonnadóir. Bain úsáid as réimse an stáitse chun cá bhfuil gach teagmhálaí sa chomhrá a thaifeadadh, agus an dáta leantach lena chinntiú nach n-imíonn aon duine fuar. Easpórtáil go CSV chun tuairisciú nó iompórtáil isteach i CRM sheachtrach.",
+      "title": "Maidir leis an leathanach seo"
+    },
+    "actions": {
+      "cancel": "Cealaigh",
+      "edit": "Cuir in eagar",
+      "export_csv": "Easpórtáil CSV",
+      "mark_unsubscribed": "Marcáil gan síntiús",
+      "refresh": "Athnuaigh",
+      "refresh_aria": "Déan teagmhálacha cothaithe luaidhe a athnuachan",
+      "save": "Sábháil",
+      "unsubscribe_aria": "Déan teagmháil le díliostáil"
+    },
+    "confirm_unsubscribe": "Marcáil {{email}} mar neamhliostáil?",
+    "contacts": {
+      "empty": "Níl aon teagmhálaí ag teacht leis na scagairí reatha.",
+      "table_aria": "Déan teagmháil chothaithe a threorú",
+      "title": "Teagmhálaithe ({{count}})"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "fields": {
+      "follow_up_date": "Dáta leantach (ISO 8601)",
+      "follow_up_placeholder": "2026-05-15",
+      "notes": "Nótaí"
+    },
+    "filters": {
+      "all_segments": "Gach deighleog",
+      "all_stages": "Gach céim",
+      "segment": "Deighleog",
+      "segment_description": "bhardas: local gov; infheisteoir: funder; gnó: sponsorship; cónaitheoir: duine aonair; páirtí: NGO/carthanas.",
+      "stage": "Céim",
+      "title": "Scagairí"
+    },
+    "meta": {
+      "page_title": "Cothú Luaidhe",
+      "subtitle": "Comhpháirtithe ionchasacha a rianú agus a chothú - bardais, infheisteoirí, gnólachtaí, cónaitheoirí, agus eagraíochtaí pobail - ón gcéad teagmháil go dtí an dul ar bord.",
+      "title": "Cothú Luaidhe"
+    },
+    "modal": {
+      "stage_description": "gabhadh: an chéad teagmháil; i dteagmháil le: bainte amach; ag gabháil: active conversation; cáilithe: ús agus buiséad deimhnithe; tiontaithe: sínithe suas; díomhaoin: gone quiet; gan síntiús: opted out.",
+      "title": "Cuir teagmhálaí in eagar"
+    },
+    "segments": {
+      "business": "Gnó",
+      "investor": "Infheisteoir",
+      "municipality": "Bardas",
+      "partner": "Comhpháirtí",
+      "resident": "Cónaitheach"
+    },
+    "stages": {
+      "captured": "Gabhadh",
+      "contacted": "Teagmháil",
+      "converted": "tiontaithe",
+      "dormant": "Díomhaoin",
+      "engaged": "Gafa",
+      "qualified": "Cáilithe",
+      "unsubscribed": "Gan liostáil"
+    },
+    "summary": {
+      "by_segment": "De réir míre:",
+      "by_stage": "De réir an stáitse:",
+      "title": "Achoimre",
+      "total_contacts": "teagmhálacha iomlána"
+    },
+    "table": {
+      "actions": "Gníomhartha",
+      "captured": "Gabhadh",
+      "follow_up": "Leantach",
+      "name_email": "Ainm / Ríomhphost",
+      "organisation": "Eagraíocht",
+      "segment": "Deighleog",
+      "source": "Foinse",
+      "stage": "Céim"
+    },
+    "toasts": {
+      "export_failed": "Theip ar easpórtáil CSV",
+      "exported": "Easpórtáil an liosta luaidhe",
+      "load_failed": "Theip ar na teagmhálaithe cothaithe luaidhe a lódáil",
+      "unsubscribe_failed": "Theip ar dhíliostáil",
+      "unsubscribed": "Marcáilte gan síntiús",
+      "update_failed": "Theip ar an teagmhálaí a nuashonrú",
+      "updated": "Nuashonraíodh an teagmhálaí"
+    }
+  },
+  "regional_analytics_admin": {
+    "access_log": {
+      "endpoint": "Críochphointe",
+      "ip_hashed": "IP (staiste)",
+      "table_aria": "Logchomhad rochtana",
+      "title": "Loga rochtana - {{name}}",
+      "user_agent": "Gníomhaire úsáideora",
+      "when": "Cathain"
+    },
+    "actions": {
+      "cancel": "Cealaigh",
+      "close": "Dún",
+      "create": "Cruthaigh",
+      "generate_report_now": "Gin tuairisc anois",
+      "new_subscription": "Síntiús nua",
+      "resume": "Atosaigh",
+      "suspend": "Fionraí",
+      "view_access_log": "Féach ar loga rochtana"
+    },
+    "create_modal": {
+      "billing_email": "Ríomhphost billeála",
+      "contact_email": "Ríomhphost teagmhála",
+      "currency": "Airgeadra",
+      "enabled_modules": "Modúil chumasaithe",
+      "monthly_price_cents": "Praghas míosúil (cents)",
+      "partner_name": "Ainm an chomhpháirtí",
+      "partner_type": "Cineál comhpháirtí",
+      "plan_tier": "Sraith plean",
+      "tenant_id": "Tionónta ID",
+      "title": "Síntiús nua anailísíochta réigiúnach"
+    },
+    "empty": {
+      "access_log": "Níl aon imeachtaí rochtana taifeadta go fóill.",
+      "subscriptions": "Níl aon síntiús fós. Foráil a haon chun tús a chur le hanailísíocht réigiúnach a dhíol.",
+      "value": "-"
+    },
+    "meta": {
+      "description": "Bainistigh síntiúis anailísíochta íoctha do pháirtithe bardais agus SME - comhiomláin buicéad, atá sábháilte ó thaobh príobháideachta amháin.",
+      "title": "Anailísí Réigiúnacha"
+    },
+    "modules": {
+      "demand_supply": "Éileamh agus soláthar",
+      "demographics": "Déimeagrafaic",
+      "footfall": "Líon coise",
+      "trends": "Treochtaí"
+    },
+    "partner_types": {
+      "municipality": "Bardas",
+      "sme_partner": "SME comhpháirtí"
+    },
+    "plan_tiers": {
+      "basic": "Bunúsach",
+      "enterprise": "Fiontar",
+      "pro": "Pro"
+    },
+    "statuses": {
+      "active": "Gníomhach",
+      "cancelled": "Ar ceal",
+      "past_due": "Past dlite",
+      "trialing": "Triail"
+    },
+    "tables": {
+      "actions": "Gníomhartha",
+      "modules": "modúil",
+      "partner": "Comhpháirtí",
+      "period_end": "Deireadh tréimhse",
+      "plan": "Plean",
+      "price_per_month": "Praghas / mo",
+      "status": "Stádas",
+      "subscriptions_aria": "Síntiúis anailíse réigiúnacha",
+      "type": "Cineál"
+    },
+    "toasts": {
+      "create_failed": "Theip ar chruthú",
+      "created": "Síntiús cruthaithe",
+      "load_failed": "Theip ar shíntiúis a lódáil",
+      "report_failed": "Theip ar an tuairisc scuaine",
+      "report_queued": "Giniúint tuairisce ciúáilte",
+      "required_fields": "Teastaíonn ainm an tionónta, an chomhpháirtí agus an ríomhphost teagmhála",
+      "status_updated": "Síntiús {{status}}",
+      "update_failed": "Theip ar an nuashonrú"
+    }
+  },
+  "smart_nudges": {
+    "about": {
+      "body": "Is leideanna uathoibrithe iad Smart Nudges a sheoltar chuig baill nuair a bhraitear comhpháirtí ardfheistithe tandem. Aithníonn an t-inneall meaitseála na baill a bhainfeadh leas as nasc piaraí agus sheol siad fógra in-app (agus ríomhphost de rogha air) ag moladh dóibh ceangal a dhéanamh. Bíonn meas ar fhuinneog an fhuaraithe agus mar sin ní dhéantar teagmháil rómhinic le haon bhall. Bain úsáid as an tirim-rith chun réamhamharc a fháil ar cé a bheadh ​​nudged roimh sheoladh le haghaidh fíor.",
+      "follow_up_body": "seolta chuig an gcomhordaitheoir tar éis do mhalartú ceadaithe a bheith marcáilte críochnaithe",
+      "follow_up_label": "Leantach",
+      "inactivity_body": "spreagtha nuair nach bhfuil ball logáilte isteach ar feadh líon na laethanta cumraithe",
+      "inactivity_label": "Neamhghníomhaíocht",
+      "title": "Maidir leis an leathanach seo",
+      "unmatched_request_body": "a spreagtar nuair nach mbíonn aon thairiscintí ag iarratas cabhrach tar éis don fhuinneog fuarú dul thart",
+      "unmatched_request_label": "Iarratas gan mheaitseáil"
+    },
+    "actions": {
+      "cancel": "Cealaigh",
+      "dispatch": "Seolta",
+      "dispatch_now": "Seol anois",
+      "dry_run": "Tirim-reáchtáil",
+      "refresh": "Athnuaigh",
+      "save_configuration": "Sábháil cumraíocht"
+    },
+    "chart": {
+      "converted": "tiontaithe",
+      "sent": "Seolta",
+      "title": "Pointí laethúla (na 30 lá deiridh)"
+    },
+    "config": {
+      "cooldown_days": "Cooldown (laethanta)",
+      "cooldown_description": "Fan leis seo i bhfad sula n-ógfaidh tú an péire céanna arís",
+      "daily_limit": "Teorainn laethúil",
+      "daily_limit_description": "Nudges uasta in aghaidh an lae ar fud an tionónta ar fad",
+      "engine_description": "Nuair atá sé múchta, ní sheoltar aon nodanna.",
+      "engine_enabled": "Inneall cumasaithe",
+      "min_score": "Íosscór (0.40 - 0.95)",
+      "min_score_description": "Táirseach scór-mheaitseála tandem chun nudge a sheoladh",
+      "save_note": "Tagann athruithe i bhfeidhm láithreach - cuirfear na socruithe nua i bhfeidhm sa chéad rith sceidealaithe eile.",
+      "title": "Cumraíocht"
+    },
+    "dispatch_modal": {
+      "body_prefix": "Seolfaidh sé seo suas go dtí",
+      "body_suffix": "fógraí a thabhairt do chomhaltaí incháilithe faoi láthair. Déan cinnte go ndearna tú athbhreithniú ar rith tirim ar dtús.",
+      "title": "Nudges seolta anois?"
+    },
+    "dry_run": {
+      "candidates": "{{count}} iarrthóirí",
+      "empty": "Níl aon iarrthóirí incháilithe faoi láthair.",
+      "table_aria": "Iarrthóirí nudge tirim-rith",
+      "title": "Réamhamharc tirim-rith"
+    },
+    "meta": {
+      "description": "Moltaí uathoibrithe a spreagann baill i dtreo comhpháirtithe comhraic ardfheistithe. Mainneachtainí coimeádach - ritheann ar chaipín laethúil.",
+      "page_title": "Spreagann ball cliste",
+      "title": "Spreagann ball cliste"
+    },
+    "recent": {
+      "empty": "Níor seoladh aon nodanna fós.",
+      "table_aria": "Nótaí cliste le déanaí",
+      "title": "Nudges le déanaí"
+    },
+    "stats": {
+      "conversion_30d": "Tiontú (30d)",
+      "eligible_candidates": "Iarrthóirí incháilithe",
+      "opted_out": "Diúltaithe",
+      "sent_30d": "Seolta (30d)"
+    },
+    "status": {
+      "converted": "tiontaithe",
+      "sent": "Seolta"
+    },
+    "table": {
+      "score": "Scór",
+      "sent": "Seolta",
+      "status": "Stádas",
+      "suggested_partner": "Comhpháirtí molta",
+      "target": "Sprioc",
+      "target_user": "Úsáideoir sprice"
+    },
+    "toasts": {
+      "config_saved": "Shábháil cumraíocht nudge. Beidh feidhm ag na rialacha nuashonraithe ar an gcéad rith sceidealaithe eile.",
+      "dispatch_failed": "Theip ar an seoladh",
+      "dispatched": "Seoladh {{count}} nudges",
+      "dry_run": "Rith tirim: {{count}} iarrthóirí incháilithe",
+      "load_failed": "Theip ar lódáil anailísí nudge",
+      "save_failed": "Theip ar an chumraíocht a shábháil"
+    }
   }
 }

@@ -14537,5 +14537,515 @@
       "under_review": "検討中"
     },
     "submitted": "提出済み"
+  },
+  "category_coefficients": {
+    "about": {
+      "body_middle": "）。係数 0.5 は、30 分を置き換えることを意味します。係数 2.0 は、集中的なパーソナルケアや専門家のサポートなど、2 時間の正式なケアに代わることを意味します。 The Age-Stiftung/",
+      "body_prefix": "代替係数は、コスト オフセットの計算において各ケア カテゴリにどれだけの社会的価値があるかを制御します。係数 1.0 は、1 時間が 1 時間の正式な Spitex/Pflege ケアに等しいことを意味します (",
+      "body_suffix": "方法論では、すべてのカテゴリーを 1.0 から開始し、観察されたケア強度に基づいて調整することを推奨しています。",
+      "chf_amount": "CHF 35",
+      "range_prefix": "値の範囲は 0.00 (ケア置換値なし) ～ 9.99 です。変更は次回から有効になります",
+      "range_suffix": "レポートを更新します。",
+      "title": "このページについて"
+    },
+    "actions": {
+      "refresh_aria": "カテゴリ係数を更新する",
+      "save": "保存"
+    },
+    "empty": {
+      "categories": "カテゴリが見つかりませんでした。"
+    },
+    "fields": {
+      "coefficient_aria": "{{name}} の係数",
+      "coefficient_error": "0.00 ～ 9.99 の範囲にする必要があります"
+    },
+    "meta": {
+      "page_title": "カテゴリ置換係数",
+      "subtitle": "地域ケアの 1 時間あたりが、正式な Spitex/Pflege 時間にどれだけ代替できるか。自治体影響レポートの計算に使用されます。",
+      "title": "カテゴリ置換係数"
+    },
+    "migration": {
+      "body_middle": "列はまだ移行されていません。走る",
+      "body_prefix": "の",
+      "body_suffix": "カテゴリごとの係数を有効にします。",
+      "title": "移行保留中",
+      "warning": "データベースの移行は保留中です。上書きされないように、移行の完了後に変更を保存してください。"
+    },
+    "table": {
+      "action": "アクション",
+      "aria": "カテゴリ置換係数",
+      "category": "カテゴリ",
+      "coefficient": "係数",
+      "source": "ソース"
+    },
+    "toasts": {
+      "invalid_number": "係数は数値でなければなりません",
+      "load_failed": "カテゴリ係数のロードに失敗しました",
+      "save_failed": "{{name}} の係数を保存できませんでした",
+      "saved": "{{name}} の保存された係数"
+    }
+  },
+  "data_quality": {
+    "about": {
+      "body": "データ品質チェックでは、プラットフォーム データをスキャンして、パイロット メトリクスを歪めたり、レポート エラーを引き起こす可能性のある問題 (たとえば、重複したプロファイルを持つメンバー、削除されたリストに対して記録された時間数、必須フィールドが欠落している交換レコードなど) を検出します。レポートを生成する前にこれを毎月実行します。資金提供者や地方自治体のパートナーにレポートを提出する前に、すべての重要項目と警告項目を解決してください。",
+      "title": "このページについて"
+    },
+    "actions": {
+      "close": "近い",
+      "refresh_aria": "データ品質チェックを更新する",
+      "refresh_checks": "リフレッシュチェック",
+      "view_affected_rows": "影響を受ける行を表示する"
+    },
+    "drilldown": {
+      "empty": "影響を受ける行は表示されません。",
+      "subtitle": "影響を受ける行は最大 50 行 - 起動前に解決または文書化します。",
+      "table_aria": "影響を受ける行"
+    },
+    "empty": {
+      "rows": "行がありません",
+      "value": "-"
+    },
+    "meta": {
+      "page_title": "パイロットデータの品質",
+      "subtitle": "AG84 - 実際の居住者をオンボーディングする前の準備状況チェック",
+      "title": "パイロットデータの品質"
+    },
+    "severity": {
+      "danger": "危険",
+      "info": "情報",
+      "ok": "わかりました",
+      "warning": "警告"
+    },
+    "severity_guide": {
+      "danger": "レポート内の数値が正しくなくなる原因となるエラー - エクスポートする前に修正する必要があります。",
+      "info": "情報通知 - アクションは必要ありません。",
+      "note_prefix": "クリック",
+      "note_suffix": "どのカードでも、特定の記録を確認できます。一部の問題はプラットフォームで修正できます。基になるデータを手動でレビューする必要があるものもあります。",
+      "ok": "このカテゴリでは問題は検出されませんでした。",
+      "title": "重大度ガイド",
+      "warning": "メトリクスの精度に影響を与える可能性のある潜在的な問題 - 確認して修正します。"
+    },
+    "summary": {
+      "affected": "影響を受ける",
+      "count": "{{count}} {{label}}",
+      "generated": "生成 {{date}}",
+      "label": "まとめ："
+    },
+    "table": {
+      "created": "作成されました",
+      "id": "ID",
+      "identifier": "識別子",
+      "name": "名前",
+      "status": "状態"
+    },
+    "toasts": {
+      "load_failed": "データ品質レポートのロードに失敗しました",
+      "rows_failed": "影響を受ける行のロードに失敗しました"
+    }
+  },
+  "isolated_node": {
+    "about": {
+      "body_middle": "州または自治体によって完全に管理されているインフラストラクチャでは、データが州の境界を出ることはありません。この構成は次の場合に必要です",
+      "body_prefix": "分離されたノードのデプロイメントが実行される",
+      "body_suffix": "スイス州の厳格なデータ保護規則に基づいて展開されます。ほとんどのコミュニティは標準のホスト型展開として実行されるため、このセクションを構成する必要はありません。",
+      "title": "このページについて",
+      "workflow": "以下の各決定項目を実行します。値を設定し、所有者を割り当て、合意されたら決定済みとしてマークします。すべての項目が「決定済み」ステータスになると、ゲートが閉じます (パイロット打ち上げ準備状況チェックに合格します)。"
+    },
+    "actions": {
+      "cancel": "キャンセル",
+      "edit": "編集",
+      "refresh": "リフレッシュ",
+      "refresh_aria": "分離ノード決定ゲートをリフレッシュする",
+      "save_changes": "変更を保存する"
+    },
+    "empty": {
+      "none": "なし",
+      "unassigned": "未割り当て"
+    },
+    "fields": {
+      "notes": "注意事項",
+      "notes_description": "コンテキスト、リンク、契約参照、またはブロッカー",
+      "owner": "所有者",
+      "owner_description": "この決定に責任を負う個人または組織",
+      "status": "状態",
+      "url_placeholder": "https://...",
+      "value": "価値"
+    },
+    "gate": {
+      "blocked_count": "- {{count}} がブロックされました",
+      "closed": "ゲートは閉じています - 発射準備完了",
+      "decided_count": "{{total}} 件中 {{decided}} 件が決定しました",
+      "open": "ゲートは開いています - 依然として決定が必要です",
+      "progress_aria": "意思決定ゲートの進捗状況"
+    },
+    "meta": {
+      "page_title": "孤立ノード決定ゲート",
+      "subtitle": "AG85 - 州が管理する展開の準備チェックリスト",
+      "title": "孤立ノード決定ゲート"
+    },
+    "modal": {
+      "edit_decision_item": "決定項目を編集する",
+      "subtitle": "このゲート アイテムの値、所有者、ステータス、メモを更新します"
+    },
+    "status": {
+      "blocked": "ブロックされました",
+      "decided": "決めた",
+      "in_progress": "進行中",
+      "pending": "保留中"
+    },
+    "status_counts": {
+      "blocked": "ブロックされました: {{count}}",
+      "decided": "決定: {{count}}",
+      "in_progress": "進行中: {{count}}",
+      "pending": "保留中: {{count}}"
+    },
+    "timestamps": {
+      "last_updated": "最終更新日 {{date}}"
+    },
+    "toasts": {
+      "item_updated": "決定事項を更新しました",
+      "load_failed": "ディシジョンゲートデータのロードに失敗しました",
+      "save_failed": "決定項目の保存に失敗しました"
+    },
+    "warning": {
+      "body_prefix": "これらの設定は、自治体が分離ノード要件を明示的に指定している場合にのみ変更してください。パイロットの開始後に展開モードを変更するには、担当者との調整が必要です。",
+      "body_suffix": "技術チーム。州のデータ保護担当者の同意なしにこの設定を変更しないでください。",
+      "title": "重要 - 必要な場合にのみ構成してください"
+    }
+  },
+  "kpi_baselines": {
+    "about": {
+      "body_prefix": "ベースラインは、Caring Community プログラムが開始される前のコミュニティの状態を記録します。これらは四半期レビューごとに現在の指標と比較され、影響が実証されます。すべてのベースラインを取得",
+      "body_suffix": "住民をオンボーディングする前 - パイロットが開始されると、ベースラインは凍結され、過去に遡ることはできません。",
+      "compare_prefix": "クリック",
+      "compare_suffix": "任意のベースライン行を使用して、現在のプラットフォーム データと並べて比較できます。主要な影響指標で 25% 以上の変化を示す指標は、達成された影響として強調表示されます。",
+      "title": "このページについて"
+    },
+    "actions": {
+      "cancel": "キャンセル",
+      "capture_first": "最初のベースラインをキャプチャする",
+      "capture_now": "今すぐベースラインをキャプチャ",
+      "capture_now_short": "今すぐキャプチャ",
+      "close": "近い",
+      "compare": "比較する",
+      "refresh": "リフレッシュ",
+      "refresh_aria": "KPI ベースラインを更新します"
+    },
+    "comparison": {
+      "baseline": "ベースライン",
+      "captured": "(捕獲 {{date}})",
+      "comparing": "比較:",
+      "impact_achieved": "達成された効果",
+      "now": "今"
+    },
+    "empty": {
+      "no_baselines": "まだベースラインがキャプチャされていません。",
+      "no_data": "利用可能なデータがありません"
+    },
+    "fields": {
+      "baseline_description": "このスナップショットを識別するための短い名前 (例: \"Q1 2025 Pre-launch\")",
+      "baseline_label": "ベースラインラベル",
+      "baseline_placeholder": "例えばNEXUS の起動前",
+      "notes_description": "これらの数値の出所を文書化します (例: 「GP 紹介データ 2026 年第 1 四半期」、「会員調査 2026 年 3 月」)。引用された情報源により、補助金報告においてベースラインが擁護可能になります。",
+      "notes_label_prefix": "注:",
+      "notes_placeholder": "例えば「GP 紹介データ 2026 年第 1 四半期、会員調査 2026 年 3 月、プラットフォームをすべてのゲマインデンに展開する前に収集」",
+      "notes_source": "注記/ソース (オプション)",
+      "period_end": "期間終了",
+      "period_end_description": "基準期間終了日",
+      "period_start": "期間の開始",
+      "period_start_description": "基準期間の開始"
+    },
+    "meta": {
+      "page_title": "コミュニティ KPI のベースライン",
+      "subtitle_prefix": "コミュニティ指標のスナップショットを取得して前後を追跡します",
+      "subtitle_suffix": "インパクト",
+      "title": "コミュニティ KPI のベースライン"
+    },
+    "metrics": {
+      "active_relationships": "活発な人間関係",
+      "avg_response_hours": "平均応答時間 (時間)",
+      "engagement_rate_pct": "エンゲージメント率 (%)",
+      "member_count": "アクティブなメンバー",
+      "recipient_count": "受信者に到達しました",
+      "total_exchanges": "合計交換数",
+      "volunteer_hours": "ボランティア時間 (90 日)"
+    },
+    "modal": {
+      "body": "これにより、現在のコミュニティ メトリクスのライブ スナップショットが取得され、将来の比較のために名前付きベースラインとして保存されます。",
+      "metrics_captured": "取得された指標: アクティブなメンバー数、承認されたボランティア時間 (過去 90 日間)、アクティブなサポート関係、個別の受信者、総交換数。",
+      "title_prefix": "捕獲",
+      "title_suffix": "ベースライン"
+    },
+    "table": {
+      "actions": "アクション",
+      "active_relationships": "活発な人間関係",
+      "aria": "KPI ベースライン",
+      "captured": "捕らえられた",
+      "label": "ラベル",
+      "members": "メンバー",
+      "total_exchanges": "合計交換数",
+      "volunteer_hours": "ボランティアの時間"
+    },
+    "toasts": {
+      "capture_failed": "ベースラインのキャプチャに失敗しました",
+      "comparison_failed": "比較のロードに失敗しました",
+      "load_failed": "KPI ベースラインのロードに失敗しました",
+      "saved": "ベースラインが保存されました。これを使用して、将来のメトリクスをこのスナップショットと比較します。"
+    }
+  },
+  "lead_nurture": {
+    "about": {
+      "body": "Lead Nurture トラッカーは、NEXUS の導入機会を対象とした軽量の CRM です。自治体、潜在的な資金提供者、またはビジネス パートナーが関心を示したら、ここに追加し、ファネルを通じて進捗状況を追跡します。ステージ フィールドを使用して、各連絡先が会話のどの位置にいたかを記録し、誰も冷めてしまわないようにフォローアップの日付を記録します。レポート用に CSV にエクスポートするか、外部の CRM にインポートします。",
+      "title": "このページについて"
+    },
+    "actions": {
+      "cancel": "キャンセル",
+      "edit": "編集",
+      "export_csv": "エクスポート CSV",
+      "mark_unsubscribed": "購読解除のマークを付ける",
+      "refresh": "リフレッシュ",
+      "refresh_aria": "リード育成の連絡先を更新する",
+      "save": "保存",
+      "unsubscribe_aria": "購読解除連絡先"
+    },
+    "confirm_unsubscribe": "{{email}} を登録解除としてマークしますか?",
+    "contacts": {
+      "empty": "現在のフィルターに一致する連絡先がありません。",
+      "table_aria": "リードナーチャリングの連絡先",
+      "title": "連絡先 ({{count}})"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "fields": {
+      "follow_up_date": "フォローアップ日 (ISO 8601)",
+      "follow_up_placeholder": "2026-05-15",
+      "notes": "注意事項"
+    },
+    "filters": {
+      "all_segments": "全セグメント",
+      "all_stages": "全ステージ",
+      "segment": "セグメント",
+      "segment_description": "自治体: 地方自治体;投資家: 資金提供者。ビジネス: スポンサーシップ;居住者：個人。パートナー: NGO/慈善団体。",
+      "stage": "ステージ",
+      "title": "フィルター"
+    },
+    "meta": {
+      "page_title": "リードの育成",
+      "subtitle": "最初のコンタクトからオンボーディングまで、地方自治体、投資家、企業、住民、コミュニティ組織などの潜在的なパートナーを追跡し、育成します。",
+      "title": "リードの育成"
+    },
+    "modal": {
+      "stage_description": "捕らえられた：ファーストコンタクト。連絡した:連絡した;参加中: 活発な会話。適格: 関心と予算が確認済み。変換しました: サインアップしました。休眠中：静かになった。未購読: オプトアウトしました。",
+      "title": "連絡先の編集"
+    },
+    "segments": {
+      "business": "仕事",
+      "investor": "投資家",
+      "municipality": "自治体",
+      "partner": "パートナー",
+      "resident": "居住者"
+    },
+    "stages": {
+      "captured": "捕らえられた",
+      "contacted": "連絡済み",
+      "converted": "変換された",
+      "dormant": "睡眠状態",
+      "engaged": "婚約中",
+      "qualified": "資格のある",
+      "unsubscribed": "購読解除済み"
+    },
+    "summary": {
+      "by_segment": "セグメント別:",
+      "by_stage": "段階別:",
+      "title": "まとめ",
+      "total_contacts": "総連絡先数"
+    },
+    "table": {
+      "actions": "アクション",
+      "captured": "捕らえられた",
+      "follow_up": "フォローアップ",
+      "name_email": "名前/メールアドレス",
+      "organisation": "組織",
+      "segment": "セグメント",
+      "source": "ソース",
+      "stage": "ステージ"
+    },
+    "toasts": {
+      "export_failed": "CSV をエクスポートできませんでした",
+      "exported": "リードリストがエクスポートされました",
+      "load_failed": "見込み客育成連絡先の読み込みに失敗しました",
+      "unsubscribe_failed": "購読解除に失敗しました",
+      "unsubscribed": "未購読としてマークされました",
+      "update_failed": "連絡先を更新できませんでした",
+      "updated": "連絡先が更新されました"
+    }
+  },
+  "regional_analytics_admin": {
+    "access_log": {
+      "endpoint": "終点",
+      "ip_hashed": "IP (ハッシュ化)",
+      "table_aria": "アクセスログ",
+      "title": "アクセスログ - {{name}}",
+      "user_agent": "ユーザーエージェント",
+      "when": "いつ"
+    },
+    "actions": {
+      "cancel": "キャンセル",
+      "close": "近い",
+      "create": "作成する",
+      "generate_report_now": "今すぐレポートを生成",
+      "new_subscription": "新規購読",
+      "resume": "再開する",
+      "suspend": "つるす",
+      "view_access_log": "アクセスログを見る"
+    },
+    "create_modal": {
+      "billing_email": "請求メール",
+      "contact_email": "連絡先メールアドレス",
+      "currency": "通貨",
+      "enabled_modules": "有効なモジュール",
+      "monthly_price_cents": "月額料金 (セント)",
+      "partner_name": "パートナー名",
+      "partner_type": "パートナータイプ",
+      "plan_tier": "プラン階層",
+      "tenant_id": "テナント ID",
+      "title": "新しい地域分析サブスクリプション"
+    },
+    "empty": {
+      "access_log": "アクセス イベントはまだ記録されていません。",
+      "subscriptions": "まだ購読はありません。地域分析の販売を開始するには、1 つをプロビジョニングします。",
+      "value": "-"
+    },
+    "meta": {
+      "description": "自治体および SME パートナー向けの有料分析サブスクリプションを管理します - バケット化されたプライバシーに安全な集計のみ。",
+      "title": "地域分析"
+    },
+    "modules": {
+      "demand_supply": "需要と供給",
+      "demographics": "人口統計",
+      "footfall": "足音",
+      "trends": "トレンド"
+    },
+    "partner_types": {
+      "municipality": "自治体",
+      "sme_partner": "SME パートナー"
+    },
+    "plan_tiers": {
+      "basic": "基本",
+      "enterprise": "企業",
+      "pro": "プロ"
+    },
+    "statuses": {
+      "active": "アクティブ",
+      "cancelled": "キャンセル",
+      "past_due": "期限を過ぎた",
+      "trialing": "トライアル中"
+    },
+    "tables": {
+      "actions": "アクション",
+      "modules": "モジュール",
+      "partner": "パートナー",
+      "period_end": "期間終了",
+      "plan": "プラン",
+      "price_per_month": "価格/月",
+      "status": "状態",
+      "subscriptions_aria": "地域分析サブスクリプション",
+      "type": "タイプ"
+    },
+    "toasts": {
+      "create_failed": "作成に失敗しました",
+      "created": "サブスクリプションが作成されました",
+      "load_failed": "サブスクリプションの読み込みに失敗しました",
+      "report_failed": "レポートをキューに入れることができませんでした",
+      "report_queued": "レポート生成がキューに入れられました",
+      "required_fields": "テナント、パートナー名、連絡先メールアドレスは必須です",
+      "status_updated": "定期購読 {{status}}",
+      "update_failed": "アップデートに失敗しました"
+    }
+  },
+  "smart_nudges": {
+    "about": {
+      "body": "スマート ナッジは、適合性の高いタンデム マッチ パートナーが検出されたときにメンバーに送信される自動プロンプトです。ピア接続の恩恵を受けるメンバーはマッチング エンジンによって識別され、接続を提案するアプリ内通知 (およびオプションで電子メール) が送信されます。ナッジではクールダウン期間が考慮されるため、メンバーに頻繁に連絡することはありません。実際に派遣する前に、予行演習を使用して、誰がナッジされるかをプレビューします。",
+      "follow_up_body": "承認された交換が完了としてマークされなかった後にコーディネーターに送信される",
+      "follow_up_label": "フォローアップ",
+      "inactivity_body": "メンバーが設定された日数ログインしなかった場合にトリガーされます",
+      "inactivity_label": "非アクティブ",
+      "title": "このページについて",
+      "unmatched_request_body": "クールダウンウィンドウが経過した後にヘルプリクエストにオファーがない場合にトリガーされます",
+      "unmatched_request_label": "一致しないリクエスト"
+    },
+    "actions": {
+      "cancel": "キャンセル",
+      "dispatch": "急送",
+      "dispatch_now": "今すぐ発送",
+      "dry_run": "予行演習",
+      "refresh": "リフレッシュ",
+      "save_configuration": "設定の保存"
+    },
+    "chart": {
+      "converted": "変換された",
+      "sent": "送信済み",
+      "title": "毎日のナッジ (過去 30 日間)"
+    },
+    "config": {
+      "cooldown_days": "クールダウン (日数)",
+      "cooldown_description": "同じペアを再度ナッジする前に、このくらい待ってください",
+      "daily_limit": "1日あたりの制限",
+      "daily_limit_description": "テナント全体の 1 日あたりの最大ナッジ",
+      "engine_description": "オフの場合、ナッジは送出されません。",
+      "engine_enabled": "エンジンが有効",
+      "min_score": "最小スコア (0.40 - 0.95)",
+      "min_score_description": "ナッジを送信するためのタンデムマッチ スコアのしきい値",
+      "save_note": "変更はすぐに有効になります。次にスケジュールされたナッジ実行で新しい設定が適用されます。",
+      "title": "構成"
+    },
+    "dispatch_modal": {
+      "body_prefix": "これにより、最大で送信されます",
+      "body_suffix": "資格のあるメンバーに今すぐ通知を促します。最初に予行演習を必ず行ってください。",
+      "title": "今すぐナッジを派遣しますか？"
+    },
+    "dry_run": {
+      "candidates": "{{count}} 人の候補者",
+      "empty": "現在適格な候補者はいません。",
+      "table_aria": "ナッジ候補のドライラン",
+      "title": "ドライランプレビュー"
+    },
+    "meta": {
+      "description": "適合性の高いタンデム パートナーに向けてメンバーを誘導する自動提案。保守的なデフォルト - 1 日の上限に基づいて実行されます。",
+      "page_title": "賢いメンバーのナッジ",
+      "title": "賢いメンバーのナッジ"
+    },
+    "recent": {
+      "empty": "まだナッジは送信されていません。",
+      "table_aria": "最近のスマートナッジ",
+      "title": "最近のナッジ"
+    },
+    "stats": {
+      "conversion_30d": "変換 (30 日)",
+      "eligible_candidates": "対象者",
+      "opted_out": "オプトアウトしました",
+      "sent_30d": "送信済み (30日)"
+    },
+    "status": {
+      "converted": "変換された",
+      "sent": "送信済み"
+    },
+    "table": {
+      "score": "スコア",
+      "sent": "送信済み",
+      "status": "状態",
+      "suggested_partner": "推奨パートナー",
+      "target": "ターゲット",
+      "target_user": "対象ユーザー"
+    },
+    "toasts": {
+      "config_saved": "ナッジ構成が保存されました。更新されたルールは、次回のスケジュールされた実行に適用されます。",
+      "dispatch_failed": "派遣失敗",
+      "dispatched": "{{count}} ナッジをディスパッチしました",
+      "dry_run": "予行演習: {{count}} 人の適格な候補者",
+      "load_failed": "ナッジ分析の読み込みに失敗しました",
+      "save_failed": "設定の保存に失敗しました"
+    }
   }
 }

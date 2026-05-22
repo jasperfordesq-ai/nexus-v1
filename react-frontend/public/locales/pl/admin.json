@@ -14537,5 +14537,515 @@
       "under_review": "W trakcie przeglądu"
     },
     "submitted": "Złożony"
+  },
+  "category_coefficients": {
+    "about": {
+      "body_middle": "). Współczynnik 0,5 oznacza, że ​​zastępuje pół godziny. Współczynnik 2,0 oznacza, że ​​zastępuje dwie godziny formalnej opieki – na przykład intensywnej opieki osobistej lub wsparcia specjalistycznego. Age-Stiftung/",
+      "body_prefix": "Współczynniki substytucji kontrolują wartość społeczną każdej kategorii opieki w kalkulacji kompensacji kosztów. Współczynnik 1,0 oznacza, że ​​jedna godzina równa się jednej godzinie opieki formalnej Spitex/Pflege (",
+      "body_suffix": "Metodologia zaleca rozpoczęcie wszystkich kategorii od 1,0 i dostosowanie ich w oparciu o zaobserwowaną intensywność opieki.",
+      "chf_amount": "CHF 35",
+      "range_prefix": "Wartości wahają się od 0,00 (wartość zastępcza bez opieki) do 9,99. Zmiany zaczną obowiązywać od następnego",
+      "range_suffix": "odświeżenie raportu.",
+      "title": "O tej stronie"
+    },
+    "actions": {
+      "refresh_aria": "Odśwież współczynniki kategorii",
+      "save": "Ratować"
+    },
+    "empty": {
+      "categories": "Nie znaleziono żadnych kategorii."
+    },
+    "fields": {
+      "coefficient_aria": "Współczynnik dla {{name}}",
+      "coefficient_error": "Musi mieścić się w przedziale od 0,00 do 9,99"
+    },
+    "meta": {
+      "page_title": "Współczynniki substytucji kategorii",
+      "subtitle": "Ile każda godzina opieki środowiskowej zastępuje formalne Spitex/Pflege godziny. Używany w obliczeniach Miejskiego Raportu Oddziaływania.",
+      "title": "Współczynniki substytucji kategorii"
+    },
+    "migration": {
+      "body_middle": "kolumna nie została jeszcze przeniesiona. Uruchomić",
+      "body_prefix": "The",
+      "body_suffix": "aby włączyć współczynniki według kategorii.",
+      "title": "Migracja w toku",
+      "warning": "Oczekuje migracja bazy danych — zapisz zmiany po zakończeniu migracji, aby uniknąć ich nadpisania."
+    },
+    "table": {
+      "action": "Działanie",
+      "aria": "Współczynniki substytucji kategorii",
+      "category": "Kategoria",
+      "coefficient": "Współczynnik",
+      "source": "Źródło"
+    },
+    "toasts": {
+      "invalid_number": "Współczynnik musi być liczbą",
+      "load_failed": "Nie udało się załadować współczynników kategorii",
+      "save_failed": "Nie udało się zapisać współczynnika dla {{name}}",
+      "saved": "Zapisany współczynnik dla {{name}}"
+    }
+  },
+  "data_quality": {
+    "about": {
+      "body": "Kontrole jakości danych skanują dane platformy pod kątem problemów, które mogą zniekształcić wskaźniki pilotażowe lub spowodować błędy w raportach – na przykład członkowie ze zduplikowanymi profilami, godziny zarejestrowane w odniesieniu do usuniętych wpisów lub rekordy wymiany, w których brakuje wymaganych pól. Uruchamiaj to co miesiąc przed wygenerowaniem raportów. Rozwiąż wszystkie kwestie krytyczne i ostrzegawcze przed przesłaniem raportów do fundatorów lub partnerów miejskich.",
+      "title": "O tej stronie"
+    },
+    "actions": {
+      "close": "Zamknąć",
+      "refresh_aria": "Odśwież kontrole jakości danych",
+      "refresh_checks": "Odśwież kontrole",
+      "view_affected_rows": "Wyświetl wiersze, których to dotyczy"
+    },
+    "drilldown": {
+      "empty": "Brak wierszy, których dotyczy problem, do pokazania.",
+      "subtitle": "Do 50 wierszy, których dotyczy problem — rozwiąż lub udokumentuj przed uruchomieniem.",
+      "table_aria": "Dotknięte wiersze"
+    },
+    "empty": {
+      "rows": "Żadnych rzędów",
+      "value": "-"
+    },
+    "meta": {
+      "page_title": "Jakość danych pilotażowych",
+      "subtitle": "AG84 - kontrola gotowości przed przyjęciem prawdziwych mieszkańców",
+      "title": "Jakość danych pilotażowych"
+    },
+    "severity": {
+      "danger": "Niebezpieczeństwo",
+      "info": "Informacje",
+      "ok": "OK",
+      "warning": "Ostrzeżenie"
+    },
+    "severity_guide": {
+      "danger": "Błędy powodujące nieprawidłowe liczby w raportach - należy naprawić przed eksportem.",
+      "info": "Powiadomienia informacyjne – nie są wymagane żadne działania.",
+      "note_prefix": "Trzask",
+      "note_suffix": "na dowolnej karcie, aby zobaczyć konkretne zapisy. Niektóre problemy można rozwiązać na platformie; inne wymagają ręcznego przeglądu danych źródłowych.",
+      "ok": "Nie wykryto żadnych problemów w tej kategorii.",
+      "title": "Przewodnik po ważności",
+      "warning": "Potencjalne problemy, które mogą mieć wpływ na dokładność metryki — przejrzyj i potwierdź lub napraw."
+    },
+    "summary": {
+      "affected": "dotknięty",
+      "count": "{{count}} {{label}}",
+      "generated": "Wygenerowano {{date}}",
+      "label": "Streszczenie:"
+    },
+    "table": {
+      "created": "Stworzony",
+      "id": "ID",
+      "identifier": "Identyfikator",
+      "name": "Nazwa",
+      "status": "Status"
+    },
+    "toasts": {
+      "load_failed": "Nie udało się załadować raportu o jakości danych",
+      "rows_failed": "Nie udało się wczytać wierszy, których to dotyczy"
+    }
+  },
+  "isolated_node": {
+    "about": {
+      "body_middle": "dotyczące infrastruktury kontrolowanej całkowicie przez kanton lub gminę – żadne dane nie opuszczają granic kantonu. Ta konfiguracja jest wymagana dla",
+      "body_prefix": "Trwa wdrażanie izolowanego węzła",
+      "body_suffix": "wdrożenia zgodnie ze ścisłymi szwajcarskimi przepisami dotyczącymi ochrony danych kantonalnych. Większość społeczności działa w ramach standardowych wdrożeń hostowanych i nie ma potrzeby konfigurowania tej sekcji.",
+      "title": "O tej stronie",
+      "workflow": "Przeanalizuj każdy element decyzji poniżej: ustaw wartość, przypisz właściciela i oznacz go jako Zdecydowany, gdy zostanie uzgodniony. Brama zamyka się (i test gotowości pilota do startu przechodzi pomyślnie), gdy każdy element ma status Zdecydowano."
+    },
+    "actions": {
+      "cancel": "Anulować",
+      "edit": "Redagować",
+      "refresh": "Odświeżać",
+      "refresh_aria": "Odśwież bramkę decyzyjną izolowanego węzła",
+      "save_changes": "Zapisz zmiany"
+    },
+    "empty": {
+      "none": "nic",
+      "unassigned": "nieprzypisany"
+    },
+    "fields": {
+      "notes": "Notatki",
+      "notes_description": "Kontekst, linki, odniesienia do umów lub elementy blokujące",
+      "owner": "Właściciel",
+      "owner_description": "Osoba lub organizacja odpowiedzialna za tę decyzję",
+      "status": "Status",
+      "url_placeholder": "https://...",
+      "value": "Wartość"
+    },
+    "gate": {
+      "blocked_count": "- {{count}} zablokowane",
+      "closed": "Brama zamknięta - gotowa do uruchomienia",
+      "decided_count": "Zdecydowano {{decided}} z {{total}} elementów",
+      "open": "Brama otwarta – potrzebne są jeszcze decyzje",
+      "progress_aria": "Postęp dzięki bramce decyzyjnej"
+    },
+    "meta": {
+      "page_title": "Brama decyzyjna z izolowanym węzłem",
+      "subtitle": "AG85 — lista kontrolna gotowości do wdrożenia kontrolowanego przez kanton",
+      "title": "Brama decyzyjna z izolowanym węzłem"
+    },
+    "modal": {
+      "edit_decision_item": "Edytuj element decyzji",
+      "subtitle": "Zaktualizuj wartość, właściciela, status i notatki dla tego elementu bramy"
+    },
+    "status": {
+      "blocked": "Zablokowany",
+      "decided": "Zdecydowany",
+      "in_progress": "W toku",
+      "pending": "Aż do"
+    },
+    "status_counts": {
+      "blocked": "Zablokowano: {{count}}",
+      "decided": "Zdecydowano: {{count}}",
+      "in_progress": "W toku: {{count}}",
+      "pending": "Oczekujące: {{count}}"
+    },
+    "timestamps": {
+      "last_updated": "Ostatnia aktualizacja {{date}}"
+    },
+    "toasts": {
+      "item_updated": "Zaktualizowano element decyzji",
+      "load_failed": "Nie udało się załadować danych bramki decyzyjnej",
+      "save_failed": "Nie udało się zapisać elementu decyzji"
+    },
+    "warning": {
+      "body_prefix": "Zmień te ustawienia tylko wtedy, gdy Twoja gmina wyraźnie określiła wymagania dotyczące izolowanego węzła. Zmiana trybu wdrażania po uruchomieniu pilotażu wymaga koordynacji z",
+      "body_suffix": "zespół techniczny. Nie zmieniaj tego ustawienia bez zgody swojego kantonalnego inspektora ochrony danych.",
+      "title": "Ważne — konfiguruj tylko w razie potrzeby"
+    }
+  },
+  "kpi_baselines": {
+    "about": {
+      "body_prefix": "Linie bazowe rejestrują stan Twojej społeczności przed rozpoczęciem programu Caring Community. Są one porównywane z bieżącymi wskaźnikami podczas każdego kwartalnego przeglądu, aby wykazać wpływ. Przechwytuj linie bazowe dla każdego",
+      "body_suffix": "przed przyjęciem mieszkańców na pokład – po rozpoczęciu pilotażu wartości bazowe zostają zamrożone i nie można zastosować ich wstecznej daty.",
+      "compare_prefix": "Trzask",
+      "compare_suffix": "w dowolnym wierszu linii bazowej, aby zobaczyć bezpośrednie porównanie z bieżącymi danymi platformy. Metryki wykazujące zmianę kluczowych wskaźników wpływu o ponad 25% są wyróżnione jako Wpływ osiągnięty.",
+      "title": "O tej stronie"
+    },
+    "actions": {
+      "cancel": "Anulować",
+      "capture_first": "Uchwyć swoją pierwszą linię bazową",
+      "capture_now": "Przechwyć teraz linię bazową",
+      "capture_now_short": "Przechwytuj teraz",
+      "close": "Zamknąć",
+      "compare": "Porównywać",
+      "refresh": "Odświeżać",
+      "refresh_aria": "Odśwież KPI linie bazowe"
+    },
+    "comparison": {
+      "baseline": "Linia bazowa",
+      "captured": "(przechwycone {{date}})",
+      "comparing": "Porównywanie:",
+      "impact_achieved": "Osiągnięty wpływ",
+      "now": "Teraz"
+    },
+    "empty": {
+      "no_baselines": "Nie przechwycono jeszcze żadnych wartości bazowych.",
+      "no_data": "Brak dostępnych danych"
+    },
+    "fields": {
+      "baseline_description": "Krótka nazwa identyfikująca tę migawkę (np. „Pierwszy kwartał 2025 r. przed premierą”)",
+      "baseline_label": "Etykieta bazowa",
+      "baseline_placeholder": "np. Przed NEXUS uruchomieniem",
+      "notes_description": "Dokument, z którego pochodzą te liczby (np. „dane dotyczące skierowań do lekarzy pierwszego kontaktu za I kwartał 2026 r.”, „ankieta wśród członków z marca 2026 r.”). Cytowane źródła sprawiają, że poziom bazowy można obronić w raportach o dotacjach.",
+      "notes_label_prefix": "Uwagi:",
+      "notes_placeholder": "np. „Dane dotyczące skierowań do lekarzy pierwszego kontaktu za pierwszy kwartał 2026 r., ankieta wśród członków z marca 2026 r., zebrane przed wprowadzeniem platformy we wszystkich Gemeinden”",
+      "notes_source": "Uwagi / źródło (opcjonalnie)",
+      "period_end": "Koniec okresu",
+      "period_end_description": "Koniec okresu referencyjnego",
+      "period_start": "Początek okresu",
+      "period_start_description": "Początek okresu referencyjnego"
+    },
+    "meta": {
+      "page_title": "Wartości bazowe społeczności KPI",
+      "subtitle_prefix": "Przechwytuj migawki wskaźników swojej społeczności, aby śledzić je przed i po",
+      "subtitle_suffix": "uderzenie",
+      "title": "Wartości bazowe społeczności KPI"
+    },
+    "metrics": {
+      "active_relationships": "Aktywne relacje",
+      "avg_response_hours": "Średni czas reakcji (godz.)",
+      "engagement_rate_pct": "Wskaźnik zaangażowania (%)",
+      "member_count": "Aktyw",
+      "recipient_count": "Odbiorcy dotarli",
+      "total_exchanges": "Całkowita wymiana",
+      "volunteer_hours": "Godziny wolontariatu (90d)"
+    },
+    "modal": {
+      "body": "Spowoduje to wykonanie aktualnej migawki wskaźników Twojej społeczności i zapisanie jej jako nazwanej linii bazowej na potrzeby przyszłych porównań.",
+      "metrics_captured": "Przechwycone wskaźniki: liczba aktywnych członków, godziny zatwierdzonych wolontariatów (ostatnie 90 dni), relacje aktywnego wsparcia, różni odbiorcy i łączna liczba wymian.",
+      "title_prefix": "Schwytać",
+      "title_suffix": "Linia bazowa"
+    },
+    "table": {
+      "actions": "Działania",
+      "active_relationships": "Aktywne relacje",
+      "aria": "KPI Linie bazowe",
+      "captured": "Złapany",
+      "label": "Etykieta",
+      "members": "Członkowie",
+      "total_exchanges": "Całkowita wymiana",
+      "volunteer_hours": "Godziny wolontariatu"
+    },
+    "toasts": {
+      "capture_failed": "Nie udało się przechwycić linii bazowej",
+      "comparison_failed": "Nie udało się załadować porównania",
+      "load_failed": "Nie udało się załadować KPI linii bazowych",
+      "saved": "Wartość bazowa została zapisana. Użyj go, aby porównać przyszłe metryki z tą migawką."
+    }
+  },
+  "lead_nurture": {
+    "about": {
+      "body": "Narzędzie do śledzenia Lead Nurture to lekkie narzędzie CRM dla NEXUS możliwości wdrożenia. Gdy gmina, potencjalny fundator lub partner biznesowy wyrazi zainteresowanie, dodaj ich tutaj i śledź ich postępy na ścieżce. Użyj pola etapu, aby zapisać miejsce, w którym znajduje się każdy kontakt w rozmowie, oraz datę kolejnej wizyty, aby mieć pewność, że nikt nie zmarznie. Eksportuj do CSV w celu raportowania lub importuj do zewnętrznego CRM.",
+      "title": "O tej stronie"
+    },
+    "actions": {
+      "cancel": "Anulować",
+      "edit": "Redagować",
+      "export_csv": "Eksportuj CSV",
+      "mark_unsubscribed": "Oznacz jako anulowane",
+      "refresh": "Odświeżać",
+      "refresh_aria": "Odśwież kontakty w zakresie pielęgnacji leadów",
+      "save": "Ratować",
+      "unsubscribe_aria": "Wypisz kontakt"
+    },
+    "confirm_unsubscribe": "Oznaczyć {{email}} jako osobę niesubskrybowaną?",
+    "contacts": {
+      "empty": "Żadne kontakty nie pasują do bieżących filtrów.",
+      "table_aria": "Kontakty pielęgnujące leady",
+      "title": "Kontakty ({{count}})"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "fields": {
+      "follow_up_date": "Data kontroli (ISO 8601)",
+      "follow_up_placeholder": "2026-05-15",
+      "notes": "Notatki"
+    },
+    "filters": {
+      "all_segments": "Wszystkie segmenty",
+      "all_stages": "Wszystkie etapy",
+      "segment": "Segment",
+      "segment_description": "gmina: samorząd lokalny; inwestor: fundator; biznes: sponsoring; mieszkaniec: indywidualny; partner: organizacja pozarządowa/organizacja charytatywna.",
+      "stage": "Scena",
+      "title": "Filtry"
+    },
+    "meta": {
+      "page_title": "Pielęgnowanie leadów",
+      "subtitle": "Śledź i wspieraj potencjalnych partnerów — gminy, inwestorów, firmy, mieszkańców i organizacje społeczne — od pierwszego kontaktu po wdrożenie.",
+      "title": "Pielęgnowanie leadów"
+    },
+    "modal": {
+      "stage_description": "schwytany: pierwszy kontakt; skontaktowano się: wyciągnięto rękę; zaangażowany: aktywna rozmowa; zakwalifikowany: potwierdzone odsetki i budżet; przekonwertowany: zarejestrowany; uśpiony: uspokoił się; bez subskrypcji: rezygnacja.",
+      "title": "Edytuj kontakt"
+    },
+    "segments": {
+      "business": "Biznes",
+      "investor": "Inwestor",
+      "municipality": "Miasto",
+      "partner": "Partner",
+      "resident": "Rezydent"
+    },
+    "stages": {
+      "captured": "Złapany",
+      "contacted": "Skontaktowano się",
+      "converted": "Przekształcony",
+      "dormant": "Uśpiony",
+      "engaged": "Zaangażowany",
+      "qualified": "Wykwalifikowany",
+      "unsubscribed": "Niesubskrybowany"
+    },
+    "summary": {
+      "by_segment": "Według segmentu:",
+      "by_stage": "Według etapu:",
+      "title": "Streszczenie",
+      "total_contacts": "ogół kontaktów"
+    },
+    "table": {
+      "actions": "Działania",
+      "captured": "Złapany",
+      "follow_up": "Podejmować właściwe kroki",
+      "name_email": "Imię/e-mail",
+      "organisation": "Organizacja",
+      "segment": "Segment",
+      "source": "Źródło",
+      "stage": "Scena"
+    },
+    "toasts": {
+      "export_failed": "Nie udało się wyeksportować CSV",
+      "exported": "Wyeksportowano listę potencjalnych klientów",
+      "load_failed": "Nie udało się wczytać kontaktów zajmujących się opieką nad potencjalnymi klientami",
+      "unsubscribe_failed": "Nie udało się anulować subskrypcji",
+      "unsubscribed": "Oznaczono jako niesubskrybowane",
+      "update_failed": "Nie udało się zaktualizować kontaktu",
+      "updated": "Kontakt zaktualizowany"
+    }
+  },
+  "regional_analytics_admin": {
+    "access_log": {
+      "endpoint": "Punkt końcowy",
+      "ip_hashed": "Adres IP (haszowany)",
+      "table_aria": "Dziennik dostępu",
+      "title": "Dziennik dostępu - {{name}}",
+      "user_agent": "Agent użytkownika",
+      "when": "Gdy"
+    },
+    "actions": {
+      "cancel": "Anulować",
+      "close": "Zamknąć",
+      "create": "Tworzyć",
+      "generate_report_now": "Wygeneruj raport teraz",
+      "new_subscription": "Nowa subskrypcja",
+      "resume": "Wznawiać",
+      "suspend": "Wstrzymać",
+      "view_access_log": "Wyświetl dziennik dostępu"
+    },
+    "create_modal": {
+      "billing_email": "E-mail rozliczeniowy",
+      "contact_email": "Adres e-mail do kontaktu",
+      "currency": "Waluta",
+      "enabled_modules": "Włączone moduły",
+      "monthly_price_cents": "Cena miesięczna (centy)",
+      "partner_name": "Nazwa partnera",
+      "partner_type": "Typ partnera",
+      "plan_tier": "Poziom planu",
+      "tenant_id": "Najemca ID",
+      "title": "Nowa subskrypcja analiz regionalnych"
+    },
+    "empty": {
+      "access_log": "Nie zarejestrowano jeszcze żadnych zdarzeń związanych z dostępem.",
+      "subscriptions": "Nie ma jeszcze subskrypcji. Zapewnij jeden, aby rozpocząć sprzedaż analiz regionalnych.",
+      "value": "-"
+    },
+    "meta": {
+      "description": "Zarządzaj subskrypcjami płatnych usług analitycznych dla gmin i partnerów SME — wyłącznie zbiorcze dane zbiorcze zapewniające ochronę prywatności.",
+      "title": "Analityka regionalna"
+    },
+    "modules": {
+      "demand_supply": "Popyt i podaż",
+      "demographics": "Demografia",
+      "footfall": "Odgłos kroków",
+      "trends": "Trendy"
+    },
+    "partner_types": {
+      "municipality": "Miasto",
+      "sme_partner": "SME partnera"
+    },
+    "plan_tiers": {
+      "basic": "Podstawowy",
+      "enterprise": "Przedsiębiorstwo",
+      "pro": "Zawodowiec"
+    },
+    "statuses": {
+      "active": "Aktywny",
+      "cancelled": "Odwołany",
+      "past_due": "Przeterminowany",
+      "trialing": "Próba"
+    },
+    "tables": {
+      "actions": "Działania",
+      "modules": "Moduły",
+      "partner": "Partner",
+      "period_end": "Koniec okresu",
+      "plan": "Plan",
+      "price_per_month": "Cena / mc",
+      "status": "Status",
+      "subscriptions_aria": "Subskrypcje analiz regionalnych",
+      "type": "Typ"
+    },
+    "toasts": {
+      "create_failed": "Tworzenie nie powiodło się",
+      "created": "Subskrypcja utworzona",
+      "load_failed": "Nie udało się załadować subskrypcji",
+      "report_failed": "Nie udało się ustawić w kolejce raportu",
+      "report_queued": "Generowanie raportu w kolejce",
+      "required_fields": "Wymagane są najemca, nazwa partnera i kontaktowy adres e-mail",
+      "status_updated": "Subskrypcja {{status}}",
+      "update_failed": "Aktualizacja nie powiodła się"
+    }
+  },
+  "smart_nudges": {
+    "about": {
+      "body": "Inteligentne podpowiedzi to automatyczne monity wysyłane do członków w przypadku wykrycia dobrze dopasowanego partnera do meczu tandemowego. Członkowie, którzy skorzystaliby na połączeniu równorzędnym, są identyfikowani przez silnik dopasowujący i wysyłani do aplikacji powiadomienie (i opcjonalnie e-mail) sugerujące połączenie. Szturchnięcia uwzględniają czas odnowienia, więc żaden członek nie kontaktuje się zbyt często. Skorzystaj z próby próbnej, aby zobaczyć, kto zostanie szturchnięty przed realną wysyłką.",
+      "follow_up_body": "wysyłane do koordynatora, gdy zatwierdzona wymiana nie została oznaczona jako ukończona",
+      "follow_up_label": "Podejmować właściwe kroki",
+      "inactivity_body": "wyzwalane, gdy członek nie zalogował się przez skonfigurowaną liczbę dni",
+      "inactivity_label": "Bezczynność",
+      "title": "O tej stronie",
+      "unmatched_request_body": "wyzwalane, gdy prośba o pomoc nie zawiera żadnych ofert po upływie okna odnowienia",
+      "unmatched_request_label": "Niedopasowane żądanie"
+    },
+    "actions": {
+      "cancel": "Anulować",
+      "dispatch": "Załatwić",
+      "dispatch_now": "Wyślij teraz",
+      "dry_run": "Praca na sucho",
+      "refresh": "Odświeżać",
+      "save_configuration": "Zapisz konfigurację"
+    },
+    "chart": {
+      "converted": "Przekształcony",
+      "sent": "Wysłano",
+      "title": "Codzienne podpowiedzi (ostatnie 30 dni)"
+    },
+    "config": {
+      "cooldown_days": "Czas odnowienia (dni)",
+      "cooldown_description": "Poczekaj tak długo, zanim ponownie szturchniesz tę samą parę",
+      "daily_limit": "Limit dzienny",
+      "daily_limit_description": "Maksymalna liczba szturchnięć dziennie w całym najemcy",
+      "engine_description": "Gdy opcja jest wyłączona, żadne podpowiedzi nie są wysyłane.",
+      "engine_enabled": "Silnik włączony",
+      "min_score": "Minimalny wynik (0,40 - 0,95)",
+      "min_score_description": "Próg wyniku w przypadku dopasowania tandemowego przy wysyłaniu szturchnięcia",
+      "save_note": "Zmiany zaczynają obowiązywać natychmiast — przy następnym zaplanowanym uruchomieniu podpowiedzi zostaną zastosowane nowe ustawienia.",
+      "title": "Konfiguracja"
+    },
+    "dispatch_modal": {
+      "body_prefix": "To wyśle ​​do",
+      "body_suffix": "wysyłaj powiadomienia do kwalifikujących się członków już teraz. Upewnij się, że najpierw sprawdziłeś próbę próbną.",
+      "title": "Wysłać podpowiedzi teraz?"
+    },
+    "dry_run": {
+      "candidates": "{{count}} kandydatów",
+      "empty": "W tej chwili brak odpowiednich kandydatów.",
+      "table_aria": "Wyselekcjonowani kandydaci szturchają",
+      "title": "Podgląd próbny"
+    },
+    "meta": {
+      "description": "Zautomatyzowane sugestie, które skłaniają członków do wybierania partnerów w tandemie o dobrej kondycji. Konserwatywne ustawienia domyślne – działają z dziennym limitem.",
+      "page_title": "Inteligentne szturchnięcia członków",
+      "title": "Inteligentne szturchnięcia członków"
+    },
+    "recent": {
+      "empty": "Nie wysłano jeszcze żadnych podpowiedzi.",
+      "table_aria": "Ostatnie inteligentne szturchnięcia",
+      "title": "Ostatnie szturchnięcia"
+    },
+    "stats": {
+      "conversion_30d": "Konwersja (30 dni)",
+      "eligible_candidates": "Kwalifikujący się kandydaci",
+      "opted_out": "Zrezygnowano",
+      "sent_30d": "Wysłano (30 dni)"
+    },
+    "status": {
+      "converted": "Przekształcony",
+      "sent": "Wysłano"
+    },
+    "table": {
+      "score": "Wynik",
+      "sent": "Wysłano",
+      "status": "Status",
+      "suggested_partner": "Sugerowany partner",
+      "target": "Cel",
+      "target_user": "Użytkownik docelowy"
+    },
+    "toasts": {
+      "config_saved": "Konfiguracja przesuwania została zapisana. Zaktualizowane zasady będą obowiązywać w następnym zaplanowanym biegu.",
+      "dispatch_failed": "Wysyłka nie powiodła się",
+      "dispatched": "Wysłano {{count}} podpowiedzi",
+      "dry_run": "Próba próbna: {{count}} kwalifikujący się kandydaci",
+      "load_failed": "Nie udało się wczytać statystyk podpowiedzi",
+      "save_failed": "Nie udało się zapisać konfiguracji"
+    }
   }
 }

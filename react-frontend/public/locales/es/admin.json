@@ -14537,5 +14537,515 @@
       "under_review": "En revisión"
     },
     "submitted": "Enviado"
+  },
+  "category_coefficients": {
+    "about": {
+      "body_middle": "). Un coeficiente de 0,5 significa que sustituye a media hora. Un coeficiente de 2,0 significa que sustituye dos horas de atención formal, por ejemplo, atención personal intensiva o apoyo de un especialista. El Age-Stiftung/",
+      "body_prefix": "Los coeficientes de sustitución controlan cuánto valor social vale cada categoría de atención en el cálculo de compensación de costos. Un coeficiente de 1,0 significa que una hora equivale a una hora de cuidado formal Spitex/Pflege (",
+      "body_suffix": "La metodología recomienda comenzar todas las categorías en 1,0 y ajustarlas según la intensidad de la atención observada.",
+      "chf_amount": "CHF 35",
+      "range_prefix": "Los valores oscilan entre 0,00 (sin valor de sustitución de atención) y 9,99. Los cambios entran en vigor el día siguiente.",
+      "range_suffix": "actualización del informe.",
+      "title": "Acerca de esta página"
+    },
+    "actions": {
+      "refresh_aria": "Actualizar coeficientes de categoría",
+      "save": "Ahorrar"
+    },
+    "empty": {
+      "categories": "No se encontraron categorías."
+    },
+    "fields": {
+      "coefficient_aria": "Coeficiente para {{name}}",
+      "coefficient_error": "Debe estar entre 0,00 y 9,99"
+    },
+    "meta": {
+      "page_title": "Coeficientes de sustitución de categorías",
+      "subtitle": "Cuánto sustituye cada hora de atención comunitaria a las Spitex/Pflege horas formales. Utilizado en los cálculos del Informe de Impacto Municipal.",
+      "title": "Coeficientes de sustitución de categorías"
+    },
+    "migration": {
+      "body_middle": "La columna aún no se ha migrado. Correr",
+      "body_prefix": "El",
+      "body_suffix": "para habilitar coeficientes por categoría.",
+      "title": "Migración pendiente",
+      "warning": "Hay una migración de base de datos pendiente: guarde los cambios una vez completada la migración para evitar que se sobrescriban."
+    },
+    "table": {
+      "action": "Acción",
+      "aria": "Coeficientes de sustitución de categorías",
+      "category": "Categoría",
+      "coefficient": "Coeficiente",
+      "source": "Fuente"
+    },
+    "toasts": {
+      "invalid_number": "El coeficiente debe ser un número.",
+      "load_failed": "No se pudieron cargar los coeficientes de categoría",
+      "save_failed": "No se pudo guardar el coeficiente para {{name}}",
+      "saved": "Coeficiente guardado para {{name}}"
+    }
+  },
+  "data_quality": {
+    "about": {
+      "body": "Las comprobaciones de calidad de los datos analizan los datos de su plataforma en busca de problemas que podrían distorsionar las métricas piloto o causar errores en los informes; por ejemplo, miembros con perfiles duplicados, horas registradas en listados eliminados o registros de intercambio a los que les faltan los campos obligatorios. Ejecute esto mensualmente antes de generar informes. Resuelva todos los elementos críticos y de advertencia antes de enviar informes a los financiadores o socios municipales.",
+      "title": "Acerca de esta página"
+    },
+    "actions": {
+      "close": "Cerca",
+      "refresh_aria": "Actualizar comprobaciones de calidad de datos",
+      "refresh_checks": "Actualizar cheques",
+      "view_affected_rows": "Ver filas afectadas"
+    },
+    "drilldown": {
+      "empty": "No hay filas afectadas para mostrar.",
+      "subtitle": "Hasta 50 filas afectadas: resuelva o documente antes del lanzamiento.",
+      "table_aria": "Filas afectadas"
+    },
+    "empty": {
+      "rows": "Sin filas",
+      "value": "-"
+    },
+    "meta": {
+      "page_title": "Calidad de los datos piloto",
+      "subtitle": "AG84: comprobaciones de preparación antes de incorporar a residentes reales",
+      "title": "Calidad de los datos piloto"
+    },
+    "severity": {
+      "danger": "Peligro",
+      "info": "Información",
+      "ok": "DE ACUERDO",
+      "warning": "Advertencia"
+    },
+    "severity_guide": {
+      "danger": "Los errores que provocarán números incorrectos en los informes deben corregirse antes de exportar.",
+      "info": "Avisos informativos: no se requiere ninguna acción.",
+      "note_prefix": "Hacer clic",
+      "note_suffix": "en cualquier tarjeta para ver los registros específicos. Algunos problemas se pueden corregir en la plataforma; otros requieren una revisión manual de los datos subyacentes.",
+      "ok": "No se detectaron problemas en esta categoría.",
+      "title": "guía de gravedad",
+      "warning": "Posibles problemas que pueden afectar la precisión de las métricas: revíselos y confirme o solucione."
+    },
+    "summary": {
+      "affected": "afectado",
+      "count": "{{count}} {{label}}",
+      "generated": "Generado {{date}}",
+      "label": "Resumen:"
+    },
+    "table": {
+      "created": "Creado",
+      "id": "ID",
+      "identifier": "Identificador",
+      "name": "Nombre",
+      "status": "Estado"
+    },
+    "toasts": {
+      "load_failed": "No se pudo cargar el informe de calidad de los datos",
+      "rows_failed": "No se pudieron cargar las filas afectadas"
+    }
+  },
+  "isolated_node": {
+    "about": {
+      "body_middle": "sobre infraestructura controlada enteramente por el cantón o municipio; ningún dato sale de los límites del cantón. Esta configuración es necesaria para",
+      "body_prefix": "Se ejecuta una implementación de nodo aislado",
+      "body_suffix": "implementaciones bajo estrictas normas de protección de datos cantonales suizas. La mayoría de las comunidades se ejecutan como implementaciones alojadas estándar y no es necesario configurar esta sección.",
+      "title": "Acerca de esta página",
+      "workflow": "Analice cada elemento de decisión a continuación: establezca el valor, asigne un propietario y márquelo como Decidido cuando se acuerde. La puerta se cierra (y se pasa la prueba de preparación para el lanzamiento del piloto) una vez que todos los elementos están en estado Decidido."
+    },
+    "actions": {
+      "cancel": "Cancelar",
+      "edit": "Editar",
+      "refresh": "Refrescar",
+      "refresh_aria": "Actualizar puerta de decisión de nodo aislado",
+      "save_changes": "Guardar cambios"
+    },
+    "empty": {
+      "none": "ninguno",
+      "unassigned": "no asignado"
+    },
+    "fields": {
+      "notes": "Notas",
+      "notes_description": "Contexto, enlaces, referencias de contratos o bloqueadores",
+      "owner": "Dueño",
+      "owner_description": "Persona u organización responsable de esta decisión.",
+      "status": "Estado",
+      "url_placeholder": "https://...",
+      "value": "Valor"
+    },
+    "gate": {
+      "blocked_count": "- {{count}} bloqueado",
+      "closed": "Puerta cerrada - listo para lanzar",
+      "decided_count": "{{decided}} de {{total}} elementos decididos",
+      "open": "Puerta abierta: aún se requieren decisiones",
+      "progress_aria": "Progreso de la puerta de decisión"
+    },
+    "meta": {
+      "page_title": "Puerta de decisión de nodo aislado",
+      "subtitle": "AG85 - lista de verificación de preparación para el despliegue controlado por el cantón",
+      "title": "Puerta de decisión de nodo aislado"
+    },
+    "modal": {
+      "edit_decision_item": "Editar elemento de decisión",
+      "subtitle": "Actualizar valor, propietario, estado y notas para este elemento de puerta"
+    },
+    "status": {
+      "blocked": "Obstruido",
+      "decided": "Decidido",
+      "in_progress": "En curso",
+      "pending": "Pendiente"
+    },
+    "status_counts": {
+      "blocked": "Bloqueado: {{count}}",
+      "decided": "Decidido: {{count}}",
+      "in_progress": "En curso: {{count}}",
+      "pending": "Pendiente: {{count}}"
+    },
+    "timestamps": {
+      "last_updated": "Última actualización {{date}}"
+    },
+    "toasts": {
+      "item_updated": "Elemento de decisión actualizado",
+      "load_failed": "No se pudieron cargar los datos de la puerta de decisión",
+      "save_failed": "No se pudo guardar el elemento de decisión"
+    },
+    "warning": {
+      "body_prefix": "Cambie esta configuración solo si su municipio ha especificado explícitamente un requisito de nodo aislado. Cambiar el modo de despliegue después del lanzamiento piloto requiere coordinación con el",
+      "body_suffix": "equipo técnico. No cambie esta configuración sin el acuerdo de su responsable cantonal de protección de datos.",
+      "title": "Importante: configure solo si es necesario"
+    }
+  },
+  "kpi_baselines": {
+    "about": {
+      "body_prefix": "Las líneas de base registran el estado de su comunidad antes de que comience el programa Caring Community. Se comparan con las métricas actuales en cada revisión trimestral para demostrar el impacto. Capture líneas de base para cada",
+      "body_suffix": "antes de incorporar a los residentes: una vez que comienza el piloto, la línea de base se congela y no se puede retroceder.",
+      "compare_prefix": "Hacer clic",
+      "compare_suffix": "en cualquier fila de referencia para ver una comparación lado a lado con los datos actuales de la plataforma. Las métricas que muestran un cambio de más del 25 % en los indicadores clave de impacto se destacan como Impacto logrado.",
+      "title": "Acerca de esta página"
+    },
+    "actions": {
+      "cancel": "Cancelar",
+      "capture_first": "Capture su primera línea de base",
+      "capture_now": "Capture la línea de base ahora",
+      "capture_now_short": "Capturar ahora",
+      "close": "Cerca",
+      "compare": "Comparar",
+      "refresh": "Refrescar",
+      "refresh_aria": "Actualizar KPI líneas base"
+    },
+    "comparison": {
+      "baseline": "Base",
+      "captured": "(capturado {{date}})",
+      "comparing": "Comparando:",
+      "impact_achieved": "Impacto logrado",
+      "now": "Ahora"
+    },
+    "empty": {
+      "no_baselines": "Aún no se han capturado líneas de base.",
+      "no_data": "No hay datos disponibles"
+    },
+    "fields": {
+      "baseline_description": "Un nombre corto para identificar esta instantánea (por ejemplo, \"Prelanzamiento del primer trimestre de 2025\")",
+      "baseline_label": "Etiqueta de línea base",
+      "baseline_placeholder": "p.ej. Antes del lanzamiento de NEXUS",
+      "notes_description": "Documente de dónde provienen estos números (por ejemplo, 'datos de referencias de médicos de cabecera del primer trimestre de 2026', 'encuesta de miembros de marzo de 2026'). Las fuentes citadas hacen que la línea de base sea defendible en los informes de subvenciones.",
+      "notes_label_prefix": "Notas:",
+      "notes_placeholder": "p.ej. 'Datos de referencia de médicos de cabecera del primer trimestre de 2026, encuesta de miembros de marzo de 2026, capturados antes del lanzamiento de la plataforma en todos los Gemeinden'",
+      "notes_source": "Notas/fuente (opcional)",
+      "period_end": "Fin del período",
+      "period_end_description": "Fin del período de referencia",
+      "period_start": "Inicio del período",
+      "period_start_description": "Inicio del período de referencia"
+    },
+    "meta": {
+      "page_title": "Comunidad KPI Puntos de referencia",
+      "subtitle_prefix": "Capture instantáneas de las métricas de su comunidad para realizar un seguimiento antes y después",
+      "subtitle_suffix": "impacto",
+      "title": "Comunidad KPI Puntos de referencia"
+    },
+    "metrics": {
+      "active_relationships": "Relaciones activas",
+      "avg_response_hours": "Tiempo promedio de respuesta (horas)",
+      "engagement_rate_pct": "Tasa de participación (%)",
+      "member_count": "Miembros activos",
+      "recipient_count": "Destinatarios alcanzados",
+      "total_exchanges": "Intercambios totales",
+      "volunteer_hours": "Horas de voluntariado (90d)"
+    },
+    "modal": {
+      "body": "Esto tomará una instantánea en vivo de las métricas de su comunidad en este momento y la guardará como una base con nombre para futuras comparaciones.",
+      "metrics_captured": "Métricas capturadas: recuento de miembros activos, horas de voluntariado aprobadas (últimos 90 días), relaciones de apoyo activas, distintos destinatarios e intercambios totales.",
+      "title_prefix": "Captura",
+      "title_suffix": "Base"
+    },
+    "table": {
+      "actions": "Comportamiento",
+      "active_relationships": "Relaciones activas",
+      "aria": "KPI Líneas de base",
+      "captured": "capturado",
+      "label": "Etiqueta",
+      "members": "Miembros",
+      "total_exchanges": "Intercambios totales",
+      "volunteer_hours": "Horas de voluntariado"
+    },
+    "toasts": {
+      "capture_failed": "No se pudo capturar la línea de base",
+      "comparison_failed": "No se pudo cargar la comparación",
+      "load_failed": "No se pudieron cargar KPI líneas base",
+      "saved": "Línea base guardada. Úselo para comparar métricas futuras con esta instantánea."
+    }
+  },
+  "lead_nurture": {
+    "about": {
+      "body": "El rastreador Lead Nurture es un CRM ligero para NEXUS oportunidades de implementación. Cuando un municipio, un posible financiador o un socio comercial exprese interés, agréguelo aquí y realice un seguimiento de su progreso a través del embudo. Utilice el campo de etapa para registrar dónde se encuentra cada contacto en la conversación y la fecha de seguimiento para asegurarse de que nadie se quede frío. Exporte a CSV para generar informes o importe a un CRM externo.",
+      "title": "Acerca de esta página"
+    },
+    "actions": {
+      "cancel": "Cancelar",
+      "edit": "Editar",
+      "export_csv": "Exportar CSV",
+      "mark_unsubscribed": "Marcar como baja",
+      "refresh": "Refrescar",
+      "refresh_aria": "Actualizar contactos de fomento de clientes potenciales",
+      "save": "Ahorrar",
+      "unsubscribe_aria": "Darse de baja contacto"
+    },
+    "confirm_unsubscribe": "¿Marcar {{email}} como cancelado de suscripción?",
+    "contacts": {
+      "empty": "Ningún contacto coincide con los filtros actuales.",
+      "table_aria": "Contactos de fomento líderes",
+      "title": "Contactos ({{count}})"
+    },
+    "empty": {
+      "value": "-"
+    },
+    "fields": {
+      "follow_up_date": "Fecha de seguimiento (ISO 8601)",
+      "follow_up_placeholder": "2026-05-15",
+      "notes": "Notas"
+    },
+    "filters": {
+      "all_segments": "Todos los segmentos",
+      "all_stages": "Todas las etapas",
+      "segment": "Segmento",
+      "segment_description": "municipio: gobierno local; inversor: financiador; negocios: patrocinio; residente: individuo; Socio: ONG/organización benéfica.",
+      "stage": "Escenario",
+      "title": "Filtros"
+    },
+    "meta": {
+      "page_title": "Nutrición de clientes potenciales",
+      "subtitle": "Realice un seguimiento y forme a socios potenciales (municipios, inversores, empresas, residentes y organizaciones comunitarias) desde el primer contacto hasta la incorporación.",
+      "title": "Nutrición de clientes potenciales"
+    },
+    "modal": {
+      "stage_description": "capturado: primer contacto; contactado: contactado; comprometido: conversación activa; calificado: interés y presupuesto confirmados; convertido: registrado; inactivo: en silencio; darse de baja: darse de baja.",
+      "title": "Editar contacto"
+    },
+    "segments": {
+      "business": "Negocio",
+      "investor": "Inversor",
+      "municipality": "Municipio",
+      "partner": "Pareja",
+      "resident": "Residente"
+    },
+    "stages": {
+      "captured": "capturado",
+      "contacted": "Contactado",
+      "converted": "Convertido",
+      "dormant": "Latente",
+      "engaged": "Comprometido",
+      "qualified": "Calificado",
+      "unsubscribed": "Cancelar suscripción"
+    },
+    "summary": {
+      "by_segment": "Por segmento:",
+      "by_stage": "Por etapa:",
+      "title": "Resumen",
+      "total_contacts": "contactos totales"
+    },
+    "table": {
+      "actions": "Comportamiento",
+      "captured": "capturado",
+      "follow_up": "Hacer un seguimiento",
+      "name_email": "Nombre / Correo electrónico",
+      "organisation": "Organización",
+      "segment": "Segmento",
+      "source": "Fuente",
+      "stage": "Escenario"
+    },
+    "toasts": {
+      "export_failed": "No se pudo exportar CSV",
+      "exported": "Lista de clientes potenciales exportada",
+      "load_failed": "No se pudieron cargar los contactos de desarrollo de clientes potenciales",
+      "unsubscribe_failed": "No se pudo cancelar la suscripción",
+      "unsubscribed": "Marcado como dado de baja",
+      "update_failed": "No se pudo actualizar el contacto",
+      "updated": "Contacto actualizado"
+    }
+  },
+  "regional_analytics_admin": {
+    "access_log": {
+      "endpoint": "Punto final",
+      "ip_hashed": "IP (en hash)",
+      "table_aria": "Registro de acceso",
+      "title": "Registro de acceso: {{name}}",
+      "user_agent": "agente de usuario",
+      "when": "Cuando"
+    },
+    "actions": {
+      "cancel": "Cancelar",
+      "close": "Cerca",
+      "create": "Crear",
+      "generate_report_now": "Generar informe ahora",
+      "new_subscription": "Nueva suscripción",
+      "resume": "Reanudar",
+      "suspend": "Suspender",
+      "view_access_log": "Ver registro de acceso"
+    },
+    "create_modal": {
+      "billing_email": "Correo electrónico de facturación",
+      "contact_email": "Correo electrónico de contacto",
+      "currency": "Divisa",
+      "enabled_modules": "Módulos habilitados",
+      "monthly_price_cents": "Precio mensual (centavos)",
+      "partner_name": "Nombre del socio",
+      "partner_type": "Tipo de socio",
+      "plan_tier": "Nivel del plan",
+      "tenant_id": "Inquilino ID",
+      "title": "Nueva suscripción de análisis regional"
+    },
+    "empty": {
+      "access_log": "Aún no se han registrado eventos de acceso.",
+      "subscriptions": "Aún no hay suscripciones. Proporcione uno para comenzar a vender análisis regionales.",
+      "value": "-"
+    },
+    "meta": {
+      "description": "Administre suscripciones de análisis pagas para municipios y SME socios: solo agregados agrupados y seguros para la privacidad.",
+      "title": "Análisis regionales"
+    },
+    "modules": {
+      "demand_supply": "Demanda y oferta",
+      "demographics": "Demografía",
+      "footfall": "Pisada",
+      "trends": "Tendencias"
+    },
+    "partner_types": {
+      "municipality": "Municipio",
+      "sme_partner": "SME socio"
+    },
+    "plan_tiers": {
+      "basic": "Básico",
+      "enterprise": "Empresa",
+      "pro": "Pro"
+    },
+    "statuses": {
+      "active": "Activo",
+      "cancelled": "Cancelado",
+      "past_due": "Vencido",
+      "trialing": "Ensayo"
+    },
+    "tables": {
+      "actions": "Comportamiento",
+      "modules": "Módulos",
+      "partner": "Pareja",
+      "period_end": "Fin del período",
+      "plan": "Plan",
+      "price_per_month": "Precio / mes",
+      "status": "Estado",
+      "subscriptions_aria": "Suscripciones a análisis regionales",
+      "type": "Tipo"
+    },
+    "toasts": {
+      "create_failed": "Error al crear",
+      "created": "Suscripción creada",
+      "load_failed": "No se pudieron cargar las suscripciones",
+      "report_failed": "No se pudo poner en cola el informe",
+      "report_queued": "Generación de informes en cola",
+      "required_fields": "Se requieren inquilino, nombre del socio y correo electrónico de contacto.",
+      "status_updated": "Suscripción {{status}}",
+      "update_failed": "La actualización falló"
+    }
+  },
+  "smart_nudges": {
+    "about": {
+      "body": "Los Smart Nudges son avisos automáticos que se envían a los miembros cuando se detecta un compañero de tándem de alta aptitud. El motor de búsqueda identifica a los miembros que se beneficiarían de una conexión entre pares y les envía una notificación en la aplicación (y opcionalmente un correo electrónico) sugiriendo que se conecten. Los empujones respetan una ventana de recuperación para que no se contacte a ningún miembro con demasiada frecuencia. Utilice el simulacro para obtener una vista previa de quién sería empujado antes de enviarlo de verdad.",
+      "follow_up_body": "enviado al coordinador después de que un intercambio aprobado no se haya marcado como completo",
+      "follow_up_label": "Hacer un seguimiento",
+      "inactivity_body": "Se activa cuando un miembro no ha iniciado sesión durante el número de días configurado.",
+      "inactivity_label": "Inactividad",
+      "title": "Acerca de esta página",
+      "unmatched_request_body": "Se activa cuando una solicitud de ayuda no tiene ofertas después de que pasa la ventana de recuperación.",
+      "unmatched_request_label": "Solicitud inigualable"
+    },
+    "actions": {
+      "cancel": "Cancelar",
+      "dispatch": "Despacho",
+      "dispatch_now": "Enviar ahora",
+      "dry_run": "Ejecución en seco",
+      "refresh": "Refrescar",
+      "save_configuration": "Guardar configuración"
+    },
+    "chart": {
+      "converted": "Convertido",
+      "sent": "Enviado",
+      "title": "Empujones diarios (últimos 30 días)"
+    },
+    "config": {
+      "cooldown_days": "Enfriamiento (días)",
+      "cooldown_description": "Espera tanto tiempo antes de volver a empujar al mismo par.",
+      "daily_limit": "Límite diario",
+      "daily_limit_description": "Empujones máximos por día en todo el inquilino",
+      "engine_description": "Cuando está apagado, no se envían empujones.",
+      "engine_enabled": "Motor habilitado",
+      "min_score": "Puntuación mínima (0,40 - 0,95)",
+      "min_score_description": "Umbral de puntuación de coincidencia en tándem para enviar un empujón",
+      "save_note": "Los cambios entran en vigor inmediatamente: la próxima ejecución de empuje programada aplicará la nueva configuración.",
+      "title": "Configuración"
+    },
+    "dispatch_modal": {
+      "body_prefix": "Esto enviará hasta",
+      "body_suffix": "envíe notificaciones a los miembros elegibles ahora mismo. Primero asegúrese de haber revisado un ensayo.",
+      "title": "¿Enviar empujones ahora?"
+    },
+    "dry_run": {
+      "candidates": "{{count}} candidatos",
+      "empty": "No hay candidatos elegibles en este momento.",
+      "table_aria": "Candidatos de empujón de prueba",
+      "title": "Vista previa del ensayo"
+    },
+    "meta": {
+      "description": "Sugerencias automatizadas que empujan a los miembros hacia socios tándem de alta aptitud. Valores predeterminados conservadores: se ejecuta con un límite diario.",
+      "page_title": "Empujes inteligentes para los miembros",
+      "title": "Empujes inteligentes para los miembros"
+    },
+    "recent": {
+      "empty": "Aún no se han enviado empujones.",
+      "table_aria": "Empujones inteligentes recientes",
+      "title": "Empujones recientes"
+    },
+    "stats": {
+      "conversion_30d": "Conversión (30d)",
+      "eligible_candidates": "Candidatos elegibles",
+      "opted_out": "Optado por no participar",
+      "sent_30d": "Enviado (30d)"
+    },
+    "status": {
+      "converted": "Convertido",
+      "sent": "Enviado"
+    },
+    "table": {
+      "score": "Puntaje",
+      "sent": "Enviado",
+      "status": "Estado",
+      "suggested_partner": "Socio sugerido",
+      "target": "Objetivo",
+      "target_user": "Usuario objetivo"
+    },
+    "toasts": {
+      "config_saved": "Configuración de empuje guardada. Las reglas actualizadas se aplicarán en la próxima ejecución programada.",
+      "dispatch_failed": "El envío falló",
+      "dispatched": "{{count}} empujones enviados",
+      "dry_run": "Prueba: {{count}} candidatos aptos",
+      "load_failed": "No se pudo cargar el análisis de empuje",
+      "save_failed": "No se pudo guardar la configuración"
+    }
   }
 }
