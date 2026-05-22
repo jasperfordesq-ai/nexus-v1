@@ -69,6 +69,19 @@
     "loading_search_results": "検索結果を読み込んでいます"
   },
   "page_meta": {
-    "title": "Search"
-  }
+    "title": "Search",
+    "description": "Project NEXUS タイムバンクプラットフォームで、コミュニティのリスティング、メンバー、グループ、イベント、有益な地域活動を検索しましょう。"
+  },
+  "hero_eyebrow": "コミュニティ全体を検索",
+  "results_label": "見つかった結果",
+  "empty_tip_spelling": "スペルを確認",
+  "empty_tip_filters": "フィルターをリセット",
+  "empty_tip_broaden": "より広い言葉を使う",
+  "hours_estimate": "{{hours}}時間",
+  "hours_unknown": "時間未設定",
+  "initial_tip_services": "サービス",
+  "initial_tip_people": "メンバー",
+  "initial_tip_events": "イベント",
+  "saved_result_count_one": "({{count}} 件の結果)",
+  "saved_result_count_other": "({{count}} 件の結果)"
 }

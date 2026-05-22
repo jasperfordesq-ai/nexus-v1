@@ -358,7 +358,12 @@
     "receipt_message": "Message",
     "receipt_error": "Failed to load receipt.",
     "receipt_not_found": "Receipt not found.",
-    "progress_aria": "Donation progress: {{percent}}%"
+    "progress_aria": "Donation progress: {{percent}}%",
+    "currencies": {
+      "EUR": "يورو",
+      "GBP": "جنيه إسترليني",
+      "USD": "دولار أمريكي"
+    }
   },
   "safeguarding": {
     "heading": "Safeguarding",
@@ -543,7 +548,11 @@
     "accept": "يقبل",
     "reject": "يرفض",
     "cancel": "يلغي",
-    "reject_confirm": "هل أنت متأكد أنك تريد رفض طلب المبادلة هذا؟"
+    "reject_confirm": "هل أنت متأكد أنك تريد رفض طلب المبادلة هذا؟",
+    "status_admin_pending": "بانتظار مراجعة المشرف",
+    "status_admin_approved": "تمت الموافقة من المشرف",
+    "status_admin_rejected": "رفضه المشرف",
+    "status_expired": "منتهي الصلاحية"
   },
   "opportunity": {
     "search_placeholder": "البحث بالاسم...",
@@ -570,7 +579,8 @@
     "select_shift": "حدد التحول (اختياري)",
     "cancel": "يلغي",
     "submit_application": "تقديم الطلب",
-    "applied_on": "Applied {{date}}"
+    "applied_on": "Applied {{date}}",
+    "meta_description_fallback": "{{title}} هي فرصة تطوع مع {{organization}} في {{location}}."
   },
   "org_settings": {
     "heading": "إعدادات المنظمة",
@@ -649,7 +659,12 @@
     "no_member_found": "لم يتم العثور على عضو لديه عنوان البريد الإلكتروني هذا.",
     "member_added": "تمت إضافة العضو إلى المجموعة.",
     "add_member_error": "فشلت إضافة العضو. ربما يكونون موجودين بالفعل في المجموعة أو أن البريد الإلكتروني غير صالح.",
-    "add_member_error_generic": "غير قادر على إضافة عضو. يرجى التحقق من البريد الإلكتروني والمحاولة مرة أخرى."
+    "add_member_error_generic": "غير قادر على إضافة عضو. يرجى التحقق من البريد الإلكتروني والمحاولة مرة أخرى.",
+    "status": {
+      "confirmed": "مؤكد",
+      "pending": "قيد الانتظار",
+      "cancelled": "ملغى"
+    }
   },
   "recommendations": {
     "title": "Recommended for You",

@@ -69,6 +69,19 @@
     "loading_search_results": "Suchergebnisse werden geladen"
   },
   "page_meta": {
-    "title": "Search"
-  }
+    "title": "Search",
+    "description": "Durchsuchen Sie Ihre Community nach Anzeigen, Mitgliedern, Gruppen, Veranstaltungen und nützlichen lokalen Aktivitäten auf der Project NEXUS Zeitbank-Plattform."
+  },
+  "hero_eyebrow": "Community-weite Suche",
+  "results_label": "Gefundene Ergebnisse",
+  "empty_tip_spelling": "Rechtschreibung prüfen",
+  "empty_tip_filters": "Filter zurücksetzen",
+  "empty_tip_broaden": "Allgemeinere Begriffe verwenden",
+  "hours_estimate": "{{hours}} Std.",
+  "hours_unknown": "Zeit nicht angegeben",
+  "initial_tip_services": "Dienste",
+  "initial_tip_people": "Personen",
+  "initial_tip_events": "Veranstaltungen",
+  "saved_result_count_one": "({{count}} Ergebnis)",
+  "saved_result_count_other": "({{count}} Ergebnisse)"
 }

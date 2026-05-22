@@ -358,7 +358,12 @@
     "receipt_message": "Mensagem",
     "receipt_error": "Falha ao carregar recibo.",
     "receipt_not_found": "Recibo não encontrado.",
-    "progress_aria": "Donation progress: {{percent}}%"
+    "progress_aria": "Donation progress: {{percent}}%",
+    "currencies": {
+      "EUR": "EUR",
+      "GBP": "GBP",
+      "USD": "USD"
+    }
   },
   "safeguarding": {
     "heading": "Salvaguarda",
@@ -543,7 +548,11 @@
     "accept": "Aceitar",
     "reject": "Rejeitar",
     "cancel": "Cancelar",
-    "reject_confirm": "Tem certeza de que deseja rejeitar esta solicitação de troca?"
+    "reject_confirm": "Tem certeza de que deseja rejeitar esta solicitação de troca?",
+    "status_admin_pending": "Aguarda revisão do administrador",
+    "status_admin_approved": "Aprovado pelo administrador",
+    "status_admin_rejected": "Rejeitado pelo administrador",
+    "status_expired": "Expirado"
   },
   "opportunity": {
     "search_placeholder": "Pesquise por nome...",
@@ -570,7 +579,8 @@
     "select_shift": "Selecione um turno (opcional)",
     "cancel": "Cancelar",
     "submit_application": "Enviar inscrição",
-    "applied_on": "Applied {{date}}"
+    "applied_on": "Applied {{date}}",
+    "meta_description_fallback": "{{title}} é uma oportunidade de voluntariado com {{organization}} em {{location}}."
   },
   "org_settings": {
     "heading": "Configurações da organização",
@@ -649,7 +659,12 @@
     "no_member_found": "Nenhum membro encontrado com esse endereço de e-mail.",
     "member_added": "Membro adicionado ao grupo.",
     "add_member_error": "Falha ao adicionar membro. Eles podem já estar no grupo ou o e-mail é inválido.",
-    "add_member_error_generic": "Não foi possível adicionar membro. Verifique o e-mail e tente novamente."
+    "add_member_error_generic": "Não foi possível adicionar membro. Verifique o e-mail e tente novamente.",
+    "status": {
+      "confirmed": "Confirmado",
+      "pending": "Pendente",
+      "cancelled": "Cancelado"
+    }
   },
   "recommendations": {
     "title": "Recomendado para si",

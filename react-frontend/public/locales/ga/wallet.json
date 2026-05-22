@@ -123,7 +123,13 @@
   "aria": {
     "export_csv": "Easpórtáil idirbhearta go CSV",
     "loading_transactions": "Idirbhearta á luchtú",
-    "transaction_detail": "{{direction}} {{amount}} uair {{name}}"
+    "transaction_detail": "{{direction}} {{amount}} uair {{name}}",
+    "refresh_wallet": "Athnuaigh sonraí an sparáin",
+    "send_credits": "Seol creidmheasanna ama",
+    "donate_credits": "Bronn creidmheasanna ama",
+    "loading_balance": "Iarmhéid an sparáin á luchtú",
+    "load_more_transactions": "Luchtaigh tuilleadh idirbheart",
+    "transaction_filters": "Scagairí idirbheart"
   },
   "available_balance": "Iarmhéid ar Fáil",
   "recipient": "Faighteoir",
@@ -145,5 +151,9 @@
     "max_transfer": "Maximum transfer is {{max}} hours"
   },
   "hours_value": "{{count}}h",
-  "signed_hours_value": "{{sign}}{{count}}h"
+  "signed_hours_value": "{{sign}}{{count}}h",
+  "refresh": "Athnuaigh",
+  "no_filtered_transactions": "Níl aon idirbheart comhoiriúnach",
+  "no_filtered_transactions_desc": "Bain triail as scagaire eile chun níos mó gníomhaíochta sparáin a fheiceáil.",
+  "transaction_fallback": "Idirbheart sparáin"
 }

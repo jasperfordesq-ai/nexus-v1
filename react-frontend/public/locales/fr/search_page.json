@@ -69,6 +69,19 @@
     "loading_search_results": "Chargement des résultats de recherche"
   },
   "page_meta": {
-    "title": "Search"
-  }
+    "title": "Search",
+    "description": "Recherchez dans votre communauté des annonces, des membres, des groupes, des événements et des activités locales utiles sur la plateforme de banque de temps Project NEXUS."
+  },
+  "hero_eyebrow": "Recherche dans toute la communauté",
+  "results_label": "Résultats trouvés",
+  "empty_tip_spelling": "Vérifier l'orthographe",
+  "empty_tip_filters": "Réinitialiser les filtres",
+  "empty_tip_broaden": "Utiliser des mots plus généraux",
+  "hours_estimate": "{{hours}} h",
+  "hours_unknown": "Temps non défini",
+  "initial_tip_services": "Services",
+  "initial_tip_people": "Personnes",
+  "initial_tip_events": "Événements",
+  "saved_result_count_one": "({{count}} résultat)",
+  "saved_result_count_other": "({{count}} résultats)"
 }

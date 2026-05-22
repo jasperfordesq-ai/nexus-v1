@@ -69,6 +69,19 @@
     "loading_search_results": "جارٍ تحميل نتائج البحث"
   },
   "page_meta": {
-    "title": "Search"
-  }
+    "title": "Search",
+    "description": "ابحث في مجتمعك عن القوائم والأعضاء والمجموعات والفعاليات والنشاط المحلي المفيد عبر منصة بنك الوقت Project NEXUS."
+  },
+  "hero_eyebrow": "البحث في المجتمع",
+  "results_label": "النتائج التي تم العثور عليها",
+  "empty_tip_spelling": "تحقق من الإملاء",
+  "empty_tip_filters": "إعادة ضبط عوامل التصفية",
+  "empty_tip_broaden": "استخدم كلمات أعم",
+  "hours_estimate": "{{hours}}س",
+  "hours_unknown": "الوقت غير محدد",
+  "initial_tip_services": "الخدمات",
+  "initial_tip_people": "الأشخاص",
+  "initial_tip_events": "الفعاليات",
+  "saved_result_count_one": "({{count}} نتيجة)",
+  "saved_result_count_other": "({{count}} نتائج)"
 }

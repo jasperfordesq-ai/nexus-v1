@@ -358,7 +358,12 @@
     "receipt_message": "Messaggio",
     "receipt_error": "Impossibile caricare la ricevuta.",
     "receipt_not_found": "Ricevuta non trovata.",
-    "progress_aria": "Donation progress: {{percent}}%"
+    "progress_aria": "Donation progress: {{percent}}%",
+    "currencies": {
+      "EUR": "EUR",
+      "GBP": "GBP",
+      "USD": "USD"
+    }
   },
   "safeguarding": {
     "heading": "Tutela",
@@ -543,7 +548,11 @@
     "accept": "Accettare",
     "reject": "Rifiutare",
     "cancel": "Cancellare",
-    "reject_confirm": "Sei sicuro di voler rifiutare questa richiesta di scambio?"
+    "reject_confirm": "Sei sicuro di voler rifiutare questa richiesta di scambio?",
+    "status_admin_pending": "In attesa di revisione dell'amministratore",
+    "status_admin_approved": "Approvato dall'amministratore",
+    "status_admin_rejected": "Rifiutato dall'amministratore",
+    "status_expired": "Scaduto"
   },
   "opportunity": {
     "search_placeholder": "Cerca per nome...",
@@ -570,7 +579,8 @@
     "select_shift": "Seleziona un turno (facoltativo)",
     "cancel": "Cancellare",
     "submit_application": "Invia domanda",
-    "applied_on": "Applied {{date}}"
+    "applied_on": "Applied {{date}}",
+    "meta_description_fallback": "{{title}} è un'opportunità di volontariato con {{organization}} a {{location}}."
   },
   "org_settings": {
     "heading": "Impostazioni dell'organizzazione",
@@ -649,7 +659,12 @@
     "no_member_found": "Nessun membro trovato con quell'indirizzo email.",
     "member_added": "Membro aggiunto al gruppo.",
     "add_member_error": "Impossibile aggiungere membro. Potrebbero essere già nel gruppo o l'e-mail non è valida.",
-    "add_member_error_generic": "Impossibile aggiungere membro. Controlla l'e-mail e riprova."
+    "add_member_error_generic": "Impossibile aggiungere membro. Controlla l'e-mail e riprova.",
+    "status": {
+      "confirmed": "Confermato",
+      "pending": "In attesa",
+      "cancelled": "Annullato"
+    }
   },
   "recommendations": {
     "title": "Consigliato per te",

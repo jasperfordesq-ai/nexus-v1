@@ -123,7 +123,13 @@
   "aria": {
     "export_csv": "تصدير المعاملات إلى CSV",
     "loading_transactions": "جارٍ تحميل المعاملات",
-    "transaction_detail": "{{direction}} {{amount}} hours {{name}}"
+    "transaction_detail": "{{direction}} {{amount}} hours {{name}}",
+    "refresh_wallet": "تحديث بيانات المحفظة",
+    "send_credits": "إرسال أرصدة وقت",
+    "donate_credits": "التبرع بأرصدة وقت",
+    "loading_balance": "جارٍ تحميل رصيد المحفظة",
+    "load_more_transactions": "تحميل المزيد من المعاملات",
+    "transaction_filters": "عوامل تصفية المعاملات"
   },
   "available_balance": "الرصيد المتاح",
   "recipient": "Recipient",
@@ -145,5 +151,9 @@
     "max_transfer": "Maximum transfer is {{max}} hours"
   },
   "hours_value": "{{count}}h",
-  "signed_hours_value": "{{sign}}{{count}}h"
+  "signed_hours_value": "{{sign}}{{count}}h",
+  "refresh": "تحديث",
+  "no_filtered_transactions": "لا توجد معاملات مطابقة",
+  "no_filtered_transactions_desc": "جرّب عامل تصفية مختلفًا لرؤية المزيد من نشاط المحفظة.",
+  "transaction_fallback": "معاملة المحفظة"
 }

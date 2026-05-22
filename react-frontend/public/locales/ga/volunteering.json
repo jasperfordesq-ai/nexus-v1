@@ -358,7 +358,12 @@
     "receipt_message": "Teachtaireacht",
     "receipt_error": "Theip ar admháil a lódáil.",
     "receipt_not_found": "Admháil gan aimsiú.",
-    "progress_aria": "Donation progress: {{percent}}%"
+    "progress_aria": "Donation progress: {{percent}}%",
+    "currencies": {
+      "EUR": "EUR",
+      "GBP": "GBP",
+      "USD": "USD"
+    }
   },
   "safeguarding": {
     "heading": "Cosaint",
@@ -543,7 +548,11 @@
     "accept": "Glac",
     "reject": "Diúltaigh",
     "cancel": "Cealaigh",
-    "reject_confirm": "An bhfuil tú cinnte gur mhaith leat diúltú don iarratas babhtála seo?"
+    "reject_confirm": "An bhfuil tú cinnte gur mhaith leat diúltú don iarratas babhtála seo?",
+    "status_admin_pending": "Ag fanacht ar athbhreithniú riarthóra",
+    "status_admin_approved": "Ceadaithe ag riarthóir",
+    "status_admin_rejected": "Diúltaithe ag riarthóir",
+    "status_expired": "Imithe in éag"
   },
   "opportunity": {
     "search_placeholder": "Cuardaigh de réir ainm...",
@@ -570,7 +579,8 @@
     "select_shift": "Roghnaigh aistriú (roghnach)",
     "cancel": "Cealaigh",
     "submit_application": "Cuir Iarratas isteach",
-    "applied_on": "Applied {{date}}"
+    "applied_on": "Applied {{date}}",
+    "meta_description_fallback": "Is deis dheonach é {{title}} le {{organization}} in {{location}}."
   },
   "org_settings": {
     "heading": "Socruithe Eagraíochta",
@@ -649,7 +659,12 @@
     "no_member_found": "Níor aimsíodh aon bhall leis an seoladh ríomhphoist sin.",
     "member_added": "Ball curtha leis an ngrúpa.",
     "add_member_error": "Theip ar bhall a chur leis. Seans go bhfuil siad sa ghrúpa cheana féin nó go bhfuil an ríomhphost neamhbhailí.",
-    "add_member_error_generic": "Ní féidir ball a chur leis. Seiceáil an ríomhphost agus bain triail eile as."
+    "add_member_error_generic": "Ní féidir ball a chur leis. Seiceáil an ríomhphost agus bain triail eile as.",
+    "status": {
+      "confirmed": "Deimhnithe",
+      "pending": "Ar feitheamh",
+      "cancelled": "Cealaithe"
+    }
   },
   "recommendations": {
     "title": "Molta Duit",

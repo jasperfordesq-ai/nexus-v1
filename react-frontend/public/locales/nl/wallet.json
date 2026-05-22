@@ -123,7 +123,13 @@
   "aria": {
     "export_csv": "Exporteer transacties naar CSV",
     "loading_transactions": "Transacties laden",
-    "transaction_detail": "{{direction}} {{amount}} hours {{name}}"
+    "transaction_detail": "{{direction}} {{amount}} hours {{name}}",
+    "refresh_wallet": "Portemonneegegevens vernieuwen",
+    "send_credits": "Tijdtegoed verzenden",
+    "donate_credits": "Tijdtegoed doneren",
+    "loading_balance": "Portemonneesaldo wordt geladen",
+    "load_more_transactions": "Meer transacties laden",
+    "transaction_filters": "Transactiefilters"
   },
   "available_balance": "Beschikbaar saldo",
   "recipient": "Recipient",
@@ -145,5 +151,9 @@
     "max_transfer": "Maximum transfer is {{max}} hours"
   },
   "hours_value": "{{count}}h",
-  "signed_hours_value": "{{sign}}{{count}}h"
+  "signed_hours_value": "{{sign}}{{count}}h",
+  "refresh": "Vernieuwen",
+  "no_filtered_transactions": "Geen overeenkomende transacties",
+  "no_filtered_transactions_desc": "Probeer een ander filter om meer portemonnee-activiteit te zien.",
+  "transaction_fallback": "Portemonneetransactie"
 }

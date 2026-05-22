@@ -358,7 +358,12 @@
     "receipt_message": "Message",
     "receipt_error": "Impossible de charger le reçu.",
     "receipt_not_found": "Reçu introuvable.",
-    "progress_aria": "Donation progress: {{percent}}%"
+    "progress_aria": "Donation progress: {{percent}}%",
+    "currencies": {
+      "EUR": "EUR",
+      "GBP": "GBP",
+      "USD": "USD"
+    }
   },
   "safeguarding": {
     "heading": "Protection",
@@ -543,7 +548,11 @@
     "accept": "Accepter",
     "reject": "Rejeter",
     "cancel": "Annuler",
-    "reject_confirm": "Etes-vous sûr de vouloir rejeter cette demande d'échange ?"
+    "reject_confirm": "Etes-vous sûr de vouloir rejeter cette demande d'échange ?",
+    "status_admin_pending": "En attente d'examen administrateur",
+    "status_admin_approved": "Approuvé par l'administrateur",
+    "status_admin_rejected": "Rejeté par l'administrateur",
+    "status_expired": "Expiré"
   },
   "opportunity": {
     "search_placeholder": "Rechercher par nom...",
@@ -570,7 +579,8 @@
     "select_shift": "Sélectionnez un quart de travail (facultatif)",
     "cancel": "Annuler",
     "submit_application": "Soumettre la candidature",
-    "applied_on": "Applied {{date}}"
+    "applied_on": "Applied {{date}}",
+    "meta_description_fallback": "{{title}} est une opportunité de bénévolat avec {{organization}} à {{location}}."
   },
   "org_settings": {
     "heading": "Paramètres de l'organisation",
@@ -649,7 +659,12 @@
     "no_member_found": "Aucun membre trouvé avec cette adresse email.",
     "member_added": "Membre ajouté au groupe.",
     "add_member_error": "Échec de l'ajout du membre. Il se peut qu'ils soient déjà dans le groupe ou que l'e-mail soit invalide.",
-    "add_member_error_generic": "Impossible d'ajouter un membre. Veuillez vérifier l'e-mail et réessayer."
+    "add_member_error_generic": "Impossible d'ajouter un membre. Veuillez vérifier l'e-mail et réessayer.",
+    "status": {
+      "confirmed": "Confirmé",
+      "pending": "En attente",
+      "cancelled": "Annulé"
+    }
   },
   "recommendations": {
     "title": "Recommandé pour vous",
