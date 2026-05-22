@@ -2,8 +2,8 @@
   "active": "Active",
   "activity": {
     "card_title": "Activity",
-    "empty": "No activity found",
-    "view_all": "View All"
+    "empty": "لم يتم العثور على أي نشاط",
+    "view_all": "عرض الكل"
   },
   "advanced": {
     "404_entry_dismissed": "تم رفض 404 دخول",
@@ -986,8 +986,8 @@
     "sync_search_hint_suffix": "بعد بدء Meilisearch."
   },
   "alerts": {
-    "pending_approvals": "Pending Approvals",
-    "pending_listings": "Pending Listings"
+    "pending_approvals": "الموافقات المعلقة",
+    "pending_listings": "القوائم المعلقة"
   },
   "analytics": {
     "category_demand_title": "الطلب على الفئة",
@@ -3408,7 +3408,7 @@
   },
   "data_table": {
     "admin_data_table": "Data",
-    "no_data": "No data",
+    "no_data": "لا توجد بيانات",
     "refresh": "Refresh",
     "search": "Search"
   },
@@ -5816,10 +5816,10 @@
     "toggle_sidebar": "تبديل الشريط الجانبي"
   },
   "icon_picker": {
-    "choose_icon": "Choose Icon",
-    "choose_icon_placeholder": "Search for an icon...",
-    "clear_icon": "Clear Icon",
-    "search_icons": "Search Icons",
+    "choose_icon": "اختر أيقونة",
+    "choose_icon_placeholder": "ابحث عن أيقونة...",
+    "clear_icon": "أيقونة واضحة",
+    "search_icons": "أيقونات البحث",
     "label": "رمز",
     "no_icons_found": "لم يتم العثور على أيقونات مطابقة لـ \"{{search}}\"",
     "search_for_icon": "ابحث عن أيقونة..."
@@ -6161,7 +6161,7 @@
     "bias_rejection_rates_table": "معدلات الرفض حسب المرحلة",
     "bias_avg_time_stage_table": "متوسط ​​الوقت في المرحلة"
   },
-  "last_checked": "Last checked: {{time}}",
+  "last_checked": "آخر فحص: {{time}}",
   "listings": {
     "actions": "الإجراءات",
     "an_unexpected_error_occurred": "حدث خطأ غير متوقع",
@@ -7000,13 +7000,13 @@
     "section_top_performers_desc": "النشرات الإخبارية مع أقوى المشاركة الأخيرة.",
     "winner": "الفائز"
   },
-  "no_data": "No data available",
+  "no_data": "لا توجد بيانات متاحة",
   "not_found": {
-    "back_to_dashboard": "Back to Dashboard",
-    "description": "The page you are looking for does not exist",
-    "heading": "Page Not Found",
-    "page_title": "Not Found",
-    "title": "Not Found"
+    "back_to_dashboard": "العودة إلى لوحة القيادة",
+    "description": "الصفحة التي تبحث عنها غير موجودة",
+    "heading": "لم يتم العثور على الصفحة",
+    "page_title": "لم يتم العثور عليه",
+    "title": "لم يتم العثور عليه"
   },
   "performance": {
     "label_performance_metrics": "مقاييس الأداء",
@@ -7035,9 +7035,9 @@
     "refresh": "ينعش"
   },
   "placeholder": {
-    "migration_description": "Migrating legacy content to the new system",
+    "migration_description": "ترحيل المحتوى القديم إلى النظام الجديد",
     "migration_title": "Migration",
-    "open_legacy": "Open Legacy"
+    "open_legacy": "فتح تراث"
   },
   "polls": {
     "an_unexpected_error_occurred": "حدث خطأ غير متوقع",
@@ -7074,15 +7074,15 @@
     "status_ended": "انتهى"
   },
   "quick_actions": {
-    "advanced_controls": "Advanced Controls",
-    "card_title": "Quick Actions",
+    "advanced_controls": "الضوابط المتقدمة",
+    "card_title": "إجراءات سريعة",
     "enterprise": "Enterprise",
     "gamification": "Gamification",
-    "manage_users": "Manage Users",
-    "new_blog_post": "New Blog Post",
-    "send_newsletter": "Send Newsletter",
+    "manage_users": "إدارة المستخدمين",
+    "new_blog_post": "مشاركة مدونة جديدة",
+    "send_newsletter": "إرسال النشرة الإخبارية",
     "settings": "Settings",
-    "view_listings": "View Listings"
+    "view_listings": "عرض القوائم"
   },
   "reports": {
     "active_30d_total": "Active (30 days)",
@@ -9335,7 +9335,7 @@
   "trends": {
     "card_title": "Trends",
     "hours_suffix": "hrs",
-    "no_data": "No data available"
+    "no_data": "لا توجد بيانات متاحة"
   },
   "user_create": {
     "back_to_users": "العودة إلى المستخدمين",
@@ -9804,7 +9804,7 @@
     "validation_password_min": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",
     "validation_role_required": "الدور مطلوب"
   },
-  "view_all": "View All",
+  "view_all": "عرض الكل",
   "visibility_rules": {
     "min_role": "الدور الأدنى",
     "requires_auth": "يتطلب المصادقة",
@@ -10426,10 +10426,10 @@
     "webhook_url_placeholder": "https://example.com/webhook"
   },
   "mailer": {
-    "gmail_not_enabled": "Gmail API is not enabled",
-    "gmail_token_failed": "Failed to obtain access token. Check credentials.",
-    "gmail_connected": "Connected to Gmail API successfully. Email: :email",
-    "gmail_verify_failed": "Failed to verify Gmail API connection"
+    "gmail_not_enabled": "لم يتم تمكين واجهة برمجة تطبيقات Gmail",
+    "gmail_token_failed": "فشل في الحصول على رمز الوصول. التحقق من بيانات الاعتماد.",
+    "gmail_connected": "تم الاتصال بـ Gmail API بنجاح. البريد الإلكتروني: :email",
+    "gmail_verify_failed": "فشل في التحقق من اتصال Gmail API"
   },
   "menu_builder": {
     "location_header_main": "الرأس الرئيسي",
@@ -10716,11 +10716,11 @@
     "verify_business": "التحقق من الأعمال"
   },
   "spam": {
-    "title": "Spam Detection",
-    "avg_score": "Avg Score",
+    "title": "كشف البريد العشوائي",
+    "avg_score": "متوسط ​​النتيجة",
     "blocked_count": "Blocked",
     "flagged_count": "Flagged",
-    "total_analyzed": "Total Analyzed"
+    "total_analyzed": "إجمالي التحليل"
   },
   "bulk": {
     "selected_count": "تم تحديد {{count}}",
@@ -10966,10 +10966,10 @@
     "checklist_no_http_triggers": "لم يتم تكوين مشغلات HTTP منفصلة لنقاط النهاية /cron/*"
   },
   "api_docs": {
-    "aria_api_documentation_sections": "API Documentation Sections",
-    "aria_hmac_headers": "Hmac Headers",
+    "aria_api_documentation_sections": "أقسام توثيق API",
+    "aria_hmac_headers": "رؤوس هماك",
     "aria_parameters": "Parameters",
-    "aria_rate_limit_headers": "Rate Limit Headers"
+    "aria_rate_limit_headers": "رؤوس حدود المعدل"
   },
   "aria": {
     "breadcrumbs": "Breadcrumbs"
@@ -11073,7 +11073,7 @@
     "select_tenants": "حدد المستأجرين"
   },
   "cancel": "Cancel",
-  "checking_permissions": "Checking Permissions",
+  "checking_permissions": "التحقق من الأذونات",
   "clear": "Clear",
   "close": "Close",
   "common:nav": {
@@ -11101,9 +11101,9 @@
     "wallet": "محفظة"
   },
   "cron_settings": {
-    "enable_job": "Enable Job",
-    "global_settings": "Global Settings",
-    "select_job": "Select Job"
+    "enable_job": "تمكين الوظيفة",
+    "global_settings": "الإعدادات العالمية",
+    "select_job": "حدد الوظيفة"
   },
   "diagnostics_matching": {
     "avg_match_score": "متوسط ​​نتيجة المباراة",
@@ -11113,11 +11113,11 @@
     "engine_status": "حالة المحرك",
     "matches_today": "مباريات اليوم"
   },
-  "error_occurred": "Occurred error",
+  "error_occurred": "حدث خطأ",
   "federation_audit": {
     "clear": "Clear",
-    "export_csv": "Export CSV",
-    "total_actions_30d": "Total Actions 30d"
+    "export_csv": "تصدير CSV",
+    "total_actions_30d": "إجمالي الإجراءات 30 د"
   },
   "federation_whitelist": {
     "add_tenant_to_whitelist": "أضف المستأجر إلى القائمة البيضاء",
@@ -11148,8 +11148,8 @@
   },
   "impact_report_labels": {
     "transactions": "Transactions",
-    "unique_givers": "Unique Givers",
-    "unique_receivers": "Unique Receivers"
+    "unique_givers": "المانحون الفريدون",
+    "unique_receivers": "أجهزة الاستقبال الفريدة"
   },
   "import": "Import",
   "legal_doc_form": {
@@ -11199,7 +11199,7 @@
     "this_will": "This Will",
     "title": "Title"
   },
-  "load_error": "Load error",
+  "load_error": "خطأ في التحميل",
   "log_files_labels": {
     "download": "تحميل",
     "filter_all": "الجميع",
@@ -11407,7 +11407,7 @@
     "subtitle": "أرسل هذه الرسالة الإخبارية إلى مجموعة فرعية مستهدفة من المستلمين."
   },
   "newsletter_send_time": {
-    "engagement_heatmap": "Engagement Heatmap",
+    "engagement_heatmap": "خريطة الحرارة للمشاركة",
     "high": "High",
     "low": "Low",
     "top_recommended": "Top Recommended",
@@ -11439,7 +11439,7 @@
     "usage_stats": "إحصائيات الاستخدام"
   },
   "provider_health": {
-    "aria_success_rate": "Success Rate"
+    "aria_success_rate": "معدل النجاح"
   },
   "refresh": "Refresh",
   "rte": {
@@ -11474,8 +11474,8 @@
   },
   "seed_generator": {
     "count_aria_label": "??? {{label}}",
-    "data_types_heading": "Data Types",
-    "development_only": "Development Only",
+    "data_types_heading": "أنواع البيانات",
+    "development_only": "التطوير فقط",
     "generate_button": "Generate",
     "warning_body": "Warning Body",
     "option_users_label": "المستخدمين",
@@ -11594,7 +11594,7 @@
   },
   "subtitle": "Subtitle",
   "super_controls": {
-    "bulk_operations": "Bulk Operations",
+    "bulk_operations": "العمليات السائبة",
     "hierarchy": "Hierarchy"
   },
   "super_user_form": {
@@ -11916,15 +11916,15 @@
   },
   "title": "Title",
   "webp_converter": {
-    "already_webp": "Already WebP",
-    "pending_conversion": "Pending Conversion",
-    "total_images": "Total Images"
+    "already_webp": "بالفعل WebP",
+    "pending_conversion": "في انتظار التحويل",
+    "total_images": "إجمالي الصور"
   },
-  "label_active_members": "Active Members",
-  "label_new_this_month": "New This Month",
-  "label_pending_approvals": "Pending Approvals",
-  "label_retention_rate": "Retention Rate",
-  "label_total_members": "Total Members",
+  "label_active_members": "الأعضاء النشطين",
+  "label_new_this_month": "جديد هذا الشهر",
+  "label_pending_approvals": "الموافقات المعلقة",
+  "label_retention_rate": "معدل الاحتفاظ",
+  "label_total_members": "إجمالي الأعضاء",
   "enabled": "Enabled",
   "disabled": "Disabled",
   "caring_community": {
@@ -13326,7 +13326,7 @@
       "items": {
         "surveys": "Surveys",
         "projects": "Projects",
-        "trust_tier": "Trust Tier"
+        "trust_tier": "طبقة الثقة"
       }
     }
   },
@@ -14561,7 +14561,7 @@
         "sent": "مرسل"
       },
       "fields": {
-        "cta_url": "CTA URL",
+        "cta_url": "عنوان URL للحث على اتخاذ إجراء",
         "cta_url_optional": "CTA URL (اختياري)",
         "notification_body": "دفع هيئة الإخطار",
         "notification_title": "دفع عنوان الإخطار",
@@ -14762,7 +14762,7 @@
       "prevention_value": "قيمة الوقاية",
       "social_isolation_supported": "دعم الناس للخروج من العزلة الاجتماعية",
       "title": "تعويض تكلفة الرعاية المقدرة",
-      "yoy": "{{value}} YoY"
+      "yoy": "{{value}} سنويًا"
     },
     "stats": {
       "active_members": "الأعضاء النشطين",
@@ -15036,7 +15036,7 @@
       "title": "Fondation KISS - لوحة المعلومات الوطنية"
     },
     "metrics": {
-      "yoy": "{{value}} YoY"
+      "yoy": "{{value}} سنويًا"
     },
     "periods": {
       "custom": "نطاق مخصص",
@@ -15407,7 +15407,7 @@
       "name_placeholder": "على سبيل المثال لورزينهوف",
       "postal_codes": "الرموز البريدية",
       "postal_codes_description": "قائمة PLZ مفصولة بفواصل أو مسافات.",
-      "postal_codes_placeholder": "6330, 6331, 6332",
+      "postal_codes_placeholder": "6330، 6331، 6332",
       "slug": "سبيكة (يتم إنشاؤها تلقائيًا إذا كانت فارغة)",
       "slug_description": "المعرف الموصول بالأحرف الصغيرة والمستخدم في URL والمرشحات.",
       "slug_placeholder": "على سبيل المثال لورزينهوف",
@@ -16220,7 +16220,7 @@
       "body_middle": "). معامل 0.5 يعني أنه يستبدل نصف ساعة. معامل 2.0 يعني أنه يحل محل ساعتين من الرعاية الرسمية - على سبيل المثال، العناية الشخصية المكثفة أو الدعم المتخصص. Age-Stiftung/",
       "body_prefix": "تتحكم معاملات الاستبدال في مقدار القيمة الاجتماعية التي تستحقها كل فئة رعاية في حساب تعويض التكلفة. معامل 1.0 يعني أن ساعة واحدة تساوي ساعة واحدة من الرعاية الرسمية Spitex/Pflege (",
       "body_suffix": "توصي المنهجية ببدء جميع الفئات عند 1.0 والتعديل بناءً على كثافة الرعاية الملحوظة.",
-      "chf_amount": "CHF 35",
+      "chf_amount": "35 فرنك سويسري",
       "range_prefix": "تتراوح القيم من 0.00 (بدون قيمة استبدال الرعاية) إلى 9.99. التغييرات نافذة المفعول في اليوم التالي",
       "range_suffix": "تحديث التقرير.",
       "title": "حول هذه الصفحة"

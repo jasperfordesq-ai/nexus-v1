@@ -2,8 +2,8 @@
   "active": "Active",
   "activity": {
     "card_title": "Activity",
-    "empty": "No activity found",
-    "view_all": "View All"
+    "empty": "Aucune activité trouvée",
+    "view_all": "Tout afficher"
   },
   "advanced": {
     "404_entry_dismissed": "Entrée 404 rejetée",
@@ -986,8 +986,8 @@
     "sync_search_hint_suffix": "après le démarrage de Meilisearch."
   },
   "alerts": {
-    "pending_approvals": "Pending Approvals",
-    "pending_listings": "Pending Listings"
+    "pending_approvals": "Approbations en attente",
+    "pending_listings": "Annonces en attente"
   },
   "analytics": {
     "category_demand_title": "Demande de catégorie",
@@ -3408,7 +3408,7 @@
   },
   "data_table": {
     "admin_data_table": "Data",
-    "no_data": "No data",
+    "no_data": "Aucune donnée",
     "refresh": "Refresh",
     "search": "Search"
   },
@@ -5816,10 +5816,10 @@
     "toggle_sidebar": "Basculer la barre latérale"
   },
   "icon_picker": {
-    "choose_icon": "Choose Icon",
-    "choose_icon_placeholder": "Search for an icon...",
-    "clear_icon": "Clear Icon",
-    "search_icons": "Search Icons",
+    "choose_icon": "Choisir l'icône",
+    "choose_icon_placeholder": "Rechercher une icône...",
+    "clear_icon": "Icône Effacer",
+    "search_icons": "Icônes de recherche",
     "label": "Icône",
     "no_icons_found": "Aucune icône trouvée correspondant à \"{{search}}\"",
     "search_for_icon": "Rechercher une icône..."
@@ -6161,7 +6161,7 @@
     "bias_rejection_rates_table": "Taux de rejet par étape",
     "bias_avg_time_stage_table": "Temps moyen par étape"
   },
-  "last_checked": "Last checked: {{time}}",
+  "last_checked": "Dernière vérification : {{time}}",
   "listings": {
     "actions": "Actions",
     "an_unexpected_error_occurred": "Une erreur inattendue s'est produite",
@@ -7000,13 +7000,13 @@
     "section_top_performers_desc": "Newsletters avec le plus fort engagement récent.",
     "winner": "Gagnant"
   },
-  "no_data": "No data available",
+  "no_data": "Aucune donnée disponible",
   "not_found": {
-    "back_to_dashboard": "Back to Dashboard",
-    "description": "The page you are looking for does not exist",
-    "heading": "Page Not Found",
-    "page_title": "Not Found",
-    "title": "Not Found"
+    "back_to_dashboard": "Retour au tableau de bord",
+    "description": "La page que vous recherchez n'existe pas",
+    "heading": "Page introuvable",
+    "page_title": "Introuvable",
+    "title": "Introuvable"
   },
   "performance": {
     "label_performance_metrics": "Mesures de performances",
@@ -7035,9 +7035,9 @@
     "refresh": "Rafraîchir"
   },
   "placeholder": {
-    "migration_description": "Migrating legacy content to the new system",
+    "migration_description": "Migration du contenu existant vers le nouveau système",
     "migration_title": "Migration",
-    "open_legacy": "Open Legacy"
+    "open_legacy": "Ouvrir l'héritage"
   },
   "polls": {
     "an_unexpected_error_occurred": "Une erreur inattendue s'est produite",
@@ -7074,15 +7074,15 @@
     "status_ended": "Terminé"
   },
   "quick_actions": {
-    "advanced_controls": "Advanced Controls",
-    "card_title": "Quick Actions",
+    "advanced_controls": "Contrôles avancés",
+    "card_title": "Actions rapides",
     "enterprise": "Enterprise",
     "gamification": "Gamification",
-    "manage_users": "Manage Users",
-    "new_blog_post": "New Blog Post",
-    "send_newsletter": "Send Newsletter",
+    "manage_users": "Gérer les utilisateurs",
+    "new_blog_post": "Nouvel article de blog",
+    "send_newsletter": "Envoyer la newsletter",
     "settings": "Settings",
-    "view_listings": "View Listings"
+    "view_listings": "Voir les annonces"
   },
   "reports": {
     "active_30d_total": "Active (30 days)",
@@ -9335,7 +9335,7 @@
   "trends": {
     "card_title": "Trends",
     "hours_suffix": "hrs",
-    "no_data": "No data available"
+    "no_data": "Aucune donnée disponible"
   },
   "user_create": {
     "back_to_users": "Retour aux utilisateurs",
@@ -9804,7 +9804,7 @@
     "validation_password_min": "Le mot de passe doit contenir au moins 8 caractères",
     "validation_role_required": "Le rôle est requis"
   },
-  "view_all": "View All",
+  "view_all": "Tout afficher",
   "visibility_rules": {
     "min_role": "Rôle minimum",
     "requires_auth": "Nécessite une authentification",
@@ -10426,10 +10426,10 @@
     "webhook_url_placeholder": "https://exemple.com/webhook"
   },
   "mailer": {
-    "gmail_not_enabled": "Gmail API is not enabled",
-    "gmail_token_failed": "Failed to obtain access token. Check credentials.",
-    "gmail_connected": "Connected to Gmail API successfully. Email: :email",
-    "gmail_verify_failed": "Failed to verify Gmail API connection"
+    "gmail_not_enabled": "L'API Gmail n'est pas activée",
+    "gmail_token_failed": "Échec de l'obtention du jeton d'accès. Vérifiez les informations d'identification.",
+    "gmail_connected": "Connecté avec succès à l'API Gmail. Courriel : courriel",
+    "gmail_verify_failed": "Échec de la vérification de la connexion à l'API Gmail"
   },
   "menu_builder": {
     "location_header_main": "En-tête principal",
@@ -10716,11 +10716,11 @@
     "verify_business": "Vérifier l'entreprise"
   },
   "spam": {
-    "title": "Spam Detection",
-    "avg_score": "Avg Score",
+    "title": "Détection du spam",
+    "avg_score": "Score moyen",
     "blocked_count": "Blocked",
     "flagged_count": "Flagged",
-    "total_analyzed": "Total Analyzed"
+    "total_analyzed": "Total analysé"
   },
   "bulk": {
     "selected_count": "{{count}} sélectionné",
@@ -10966,10 +10966,10 @@
     "checklist_no_http_triggers": "Aucun déclencheur HTTP distinct pour les points de terminaison /cron/* n'est configuré"
   },
   "api_docs": {
-    "aria_api_documentation_sections": "API Documentation Sections",
-    "aria_hmac_headers": "Hmac Headers",
+    "aria_api_documentation_sections": "Sections de documentation de l'API",
+    "aria_hmac_headers": "En-têtes Hmac",
     "aria_parameters": "Parameters",
-    "aria_rate_limit_headers": "Rate Limit Headers"
+    "aria_rate_limit_headers": "En-têtes de limite de débit"
   },
   "aria": {
     "breadcrumbs": "Breadcrumbs"
@@ -11073,7 +11073,7 @@
     "select_tenants": "Sélectionnez les locataires"
   },
   "cancel": "Cancel",
-  "checking_permissions": "Checking Permissions",
+  "checking_permissions": "Vérification des autorisations",
   "clear": "Clear",
   "close": "Close",
   "common:nav": {
@@ -11101,9 +11101,9 @@
     "wallet": "Portefeuille"
   },
   "cron_settings": {
-    "enable_job": "Enable Job",
-    "global_settings": "Global Settings",
-    "select_job": "Select Job"
+    "enable_job": "Activer le travail",
+    "global_settings": "Paramètres globaux",
+    "select_job": "Sélectionnez un emploi"
   },
   "diagnostics_matching": {
     "avg_match_score": "Score de correspondance moyen",
@@ -11113,11 +11113,11 @@
     "engine_status": "État du moteur",
     "matches_today": "Matchs aujourd'hui"
   },
-  "error_occurred": "Occurred error",
+  "error_occurred": "Erreur survenue",
   "federation_audit": {
     "clear": "Clear",
-    "export_csv": "Export CSV",
-    "total_actions_30d": "Total Actions 30d"
+    "export_csv": "Exporter au format CSV",
+    "total_actions_30d": "Total des actions 30j"
   },
   "federation_whitelist": {
     "add_tenant_to_whitelist": "Ajouter un locataire à la liste blanche",
@@ -11148,8 +11148,8 @@
   },
   "impact_report_labels": {
     "transactions": "Transactions",
-    "unique_givers": "Unique Givers",
-    "unique_receivers": "Unique Receivers"
+    "unique_givers": "Donateurs uniques",
+    "unique_receivers": "Récepteurs uniques"
   },
   "import": "Import",
   "legal_doc_form": {
@@ -11199,7 +11199,7 @@
     "this_will": "This Will",
     "title": "Title"
   },
-  "load_error": "Load error",
+  "load_error": "Erreur de chargement",
   "log_files_labels": {
     "download": "Télécharger",
     "filter_all": "Tout",
@@ -11407,7 +11407,7 @@
     "subtitle": "Envoyez cette newsletter à un sous-ensemble ciblé de destinataires."
   },
   "newsletter_send_time": {
-    "engagement_heatmap": "Engagement Heatmap",
+    "engagement_heatmap": "Carte thermique d'engagement",
     "high": "High",
     "low": "Low",
     "top_recommended": "Top Recommended",
@@ -11439,7 +11439,7 @@
     "usage_stats": "Statistiques d'utilisation"
   },
   "provider_health": {
-    "aria_success_rate": "Success Rate"
+    "aria_success_rate": "Taux de réussite"
   },
   "refresh": "Refresh",
   "rte": {
@@ -11474,8 +11474,8 @@
   },
   "seed_generator": {
     "count_aria_label": "Nombre de {{label}}",
-    "data_types_heading": "Data Types",
-    "development_only": "Development Only",
+    "data_types_heading": "Types de données",
+    "development_only": "Développement uniquement",
     "generate_button": "Generate",
     "warning_body": "Warning Body",
     "option_users_label": "Utilisateurs",
@@ -11594,7 +11594,7 @@
   },
   "subtitle": "Subtitle",
   "super_controls": {
-    "bulk_operations": "Bulk Operations",
+    "bulk_operations": "Opérations groupées",
     "hierarchy": "Hierarchy"
   },
   "super_user_form": {
@@ -11916,15 +11916,15 @@
   },
   "title": "Title",
   "webp_converter": {
-    "already_webp": "Already WebP",
-    "pending_conversion": "Pending Conversion",
-    "total_images": "Total Images"
+    "already_webp": "Déjà WebP",
+    "pending_conversion": "En attente de conversion",
+    "total_images": "Images totales"
   },
-  "label_active_members": "Active Members",
-  "label_new_this_month": "New This Month",
-  "label_pending_approvals": "Pending Approvals",
-  "label_retention_rate": "Retention Rate",
-  "label_total_members": "Total Members",
+  "label_active_members": "Membres actifs",
+  "label_new_this_month": "Nouveau ce mois-ci",
+  "label_pending_approvals": "Approbations en attente",
+  "label_retention_rate": "Taux de rétention",
+  "label_total_members": "Nombre total de membres",
   "enabled": "Enabled",
   "disabled": "Disabled",
   "caring_community": {
@@ -13326,7 +13326,7 @@
       "items": {
         "surveys": "Surveys",
         "projects": "Projects",
-        "trust_tier": "Trust Tier"
+        "trust_tier": "Niveau de confiance"
       }
     }
   },
@@ -14762,7 +14762,7 @@
       "prevention_value": "Valeur de prévention",
       "social_isolation_supported": "Personnes accompagnées hors de l’isolement social",
       "title": "Compensation estimée du coût des soins",
-      "yoy": "{{value}} YoY"
+      "yoy": "{{value}} Annuel"
     },
     "stats": {
       "active_members": "Membres actifs",
@@ -15036,7 +15036,7 @@
       "title": "Fondation KISS – Tableau de bord national"
     },
     "metrics": {
-      "yoy": "{{value}} YoY"
+      "yoy": "{{value}} Annuel"
     },
     "periods": {
       "custom": "Gamme personnalisée",
@@ -15482,7 +15482,7 @@
     "confirm_delete": "Supprimer le homologue de fédération « {{name}} »? C’est permanent.",
     "confirm_rotate": "Faire pivoter le secret partagé pour « {{name}} »? L'ancien secret cesse de fonctionner immédiatement et vous devez mettre à jour le côté distant.",
     "create_modal": {
-      "base_url": "Base URL",
+      "base_url": "URL de base",
       "base_url_description": "HTTPS URL de la télécommande NEXUS API. Le chemin /v2/federation/hour-transfer/inbound est automatiquement ajouté.",
       "base_url_placeholder": "https://api.kiss-bern.ch",
       "display_name": "Nom d'affichage",
@@ -15510,7 +15510,7 @@
       "title": "Pairs enregistrés"
     },
     "secret_modal": {
-      "base_url_label": "Base URL:",
+      "base_url_label": "URL de base :",
       "body_prefix": "Ce secret est montré",
       "body_suffix": "Copiez-le maintenant et collez-le dans l'entrée homologue de la fédération de l'installation NEXUS distante pour cette coopérative. Si vous le perdez, vous devez faire pivoter le secret ici et mettre à jour à nouveau le côté distant.",
       "only_once": "une seule fois",
@@ -15524,7 +15524,7 @@
     },
     "table": {
       "actions": "Actes",
-      "base_url": "Base URL",
+      "base_url": "URL de base",
       "last_handshake": "Dernière poignée de main",
       "name": "Nom",
       "slug": "Limace",
@@ -15761,7 +15761,7 @@
       "reset_default_aria": "Réinitialiser aux valeurs par défaut"
     },
     "classification": {
-      "agpl_public": "AGPL public",
+      "agpl_public": "AGPL publique",
       "commercial": "Commercial",
       "private_deployment": "Déploiement privé",
       "tenant_config": "Configuration du locataire"

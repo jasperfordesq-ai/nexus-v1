@@ -2,8 +2,8 @@
   "active": "Active",
   "activity": {
     "card_title": "Activity",
-    "empty": "No activity found",
-    "view_all": "View All"
+    "empty": "Níor aimsíodh aon ghníomhaíocht",
+    "view_all": "Féach ar Uile"
   },
   "advanced": {
     "404_entry_dismissed": "Briseadh 404 iontráil",
@@ -986,8 +986,8 @@
     "sync_search_hint_suffix": "tar éis tosú Meilisearch."
   },
   "alerts": {
-    "pending_approvals": "Pending Approvals",
-    "pending_listings": "Pending Listings"
+    "pending_approvals": "Ceaduithe ar Feitheamh",
+    "pending_listings": "Liostaí ar Feitheamh"
   },
   "analytics": {
     "category_demand_title": "Éileamh Catagóire",
@@ -3408,7 +3408,7 @@
   },
   "data_table": {
     "admin_data_table": "Data",
-    "no_data": "No data",
+    "no_data": "Gan sonraí",
     "refresh": "Refresh",
     "search": "Search"
   },
@@ -5816,10 +5816,10 @@
     "toggle_sidebar": "Scoránaigh barra taoibh"
   },
   "icon_picker": {
-    "choose_icon": "Choose Icon",
-    "choose_icon_placeholder": "Search for an icon...",
-    "clear_icon": "Clear Icon",
-    "search_icons": "Search Icons",
+    "choose_icon": "Roghnaigh Deilbhín",
+    "choose_icon_placeholder": "Cuardaigh deilbhín...",
+    "clear_icon": "Glan Deilbhín",
+    "search_icons": "Deilbhíní Cuardaigh",
     "label": "Deilbhín",
     "no_icons_found": "Níor aimsíodh aon deilbhíní a fhreagraíonn do \"{{search}}\"",
     "search_for_icon": "Cuardaigh deilbhín..."
@@ -6161,7 +6161,7 @@
     "bias_rejection_rates_table": "Rátaí diúltaithe de réir céime",
     "bias_avg_time_stage_table": "Meán-am ar an stáitse"
   },
-  "last_checked": "Last checked: {{time}}",
+  "last_checked": "Seiceáilte go deireanach: {{time}}",
   "listings": {
     "actions": "Gníomhartha",
     "an_unexpected_error_occurred": "Tharla earráid gan choinne",
@@ -7000,13 +7000,13 @@
     "section_top_performers_desc": "Nuachtlitreacha leis an rannpháirtíocht is láidre le déanaí.",
     "winner": "Buaiteoir"
   },
-  "no_data": "No data available",
+  "no_data": "Níl aon sonraí ar fáil",
   "not_found": {
-    "back_to_dashboard": "Back to Dashboard",
-    "description": "The page you are looking for does not exist",
-    "heading": "Page Not Found",
-    "page_title": "Not Found",
-    "title": "Not Found"
+    "back_to_dashboard": "Ar ais go dtí an Deais",
+    "description": "Níl an leathanach atá á lorg agat ann",
+    "heading": "Leathanach Gan Aimsiú",
+    "page_title": "Gan Aimsiú",
+    "title": "Gan Aimsiú"
   },
   "performance": {
     "label_performance_metrics": "Méadrachtaí Feidhmíochta",
@@ -7035,9 +7035,9 @@
     "refresh": "Athnuaigh"
   },
   "placeholder": {
-    "migration_description": "Migrating legacy content to the new system",
+    "migration_description": "Ábhar oidhreachta a aistriú chuig an gcóras nua",
     "migration_title": "Migration",
-    "open_legacy": "Open Legacy"
+    "open_legacy": "Oidhreacht Oscailte"
   },
   "polls": {
     "an_unexpected_error_occurred": "Tharla earráid gan choinne",
@@ -7074,15 +7074,15 @@
     "status_ended": "dar críoch"
   },
   "quick_actions": {
-    "advanced_controls": "Advanced Controls",
-    "card_title": "Quick Actions",
+    "advanced_controls": "Ard-rialuithe",
+    "card_title": "Gníomhartha Tapa",
     "enterprise": "Enterprise",
     "gamification": "Gamification",
-    "manage_users": "Manage Users",
-    "new_blog_post": "New Blog Post",
-    "send_newsletter": "Send Newsletter",
+    "manage_users": "Bainistigh Úsáideoirí",
+    "new_blog_post": "Blagphost Nua",
+    "send_newsletter": "Seol Nuachtlitir",
     "settings": "Settings",
-    "view_listings": "View Listings"
+    "view_listings": "Féach ar Liostaí"
   },
   "reports": {
     "active_30d_total": "Active (30 days)",
@@ -9335,7 +9335,7 @@
   "trends": {
     "card_title": "Trends",
     "hours_suffix": "hrs",
-    "no_data": "No data available"
+    "no_data": "Níl aon sonraí ar fáil"
   },
   "user_create": {
     "back_to_users": "Ar ais chuig Úsáideoirí",
@@ -9804,7 +9804,7 @@
     "validation_password_min": "Caithfidh pasfhocal a bheith 8 gcarachtar ar a laghad",
     "validation_role_required": "Tá ról ag teastáil"
   },
-  "view_all": "View All",
+  "view_all": "Féach ar Uile",
   "visibility_rules": {
     "min_role": "Ról Íosta",
     "requires_auth": "Teastaíonn Auth",
@@ -10426,10 +10426,10 @@
     "webhook_url_placeholder": "https://example.com/webhook"
   },
   "mailer": {
-    "gmail_not_enabled": "Gmail API is not enabled",
-    "gmail_token_failed": "Failed to obtain access token. Check credentials.",
-    "gmail_connected": "Connected to Gmail API successfully. Email: :email",
-    "gmail_verify_failed": "Failed to verify Gmail API connection"
+    "gmail_not_enabled": "Níl Gmail API cumasaithe",
+    "gmail_token_failed": "Theip ar chomhartha rochtana a fháil. Seiceáil dintiúir.",
+    "gmail_connected": "D'éirigh le ceangal le Gmail API. Ríomhphost: : email",
+    "gmail_verify_failed": "Theip ar an gceangal Gmail API a fhíorú"
   },
   "menu_builder": {
     "location_header_main": "Príomhcheannteideal",
@@ -10716,11 +10716,11 @@
     "verify_business": "Fíoraigh Gnó"
   },
   "spam": {
-    "title": "Spam Detection",
-    "avg_score": "Avg Score",
+    "title": "Brath Turscar",
+    "avg_score": "Meán Scór",
     "blocked_count": "Blocked",
     "flagged_count": "Flagged",
-    "total_analyzed": "Total Analyzed"
+    "total_analyzed": "Iomlán Anailísithe"
   },
   "bulk": {
     "selected_count": "{{count}} roghnaithe",
@@ -10966,10 +10966,10 @@
     "checklist_no_http_triggers": "Níl aon truicear HTTP ar leith do chríochphointí /cron/* cumraithe"
   },
   "api_docs": {
-    "aria_api_documentation_sections": "API Documentation Sections",
-    "aria_hmac_headers": "Hmac Headers",
+    "aria_api_documentation_sections": "Rannóga Doiciméadúcháin API",
+    "aria_hmac_headers": "Ceanntásca Hmac",
     "aria_parameters": "Parameters",
-    "aria_rate_limit_headers": "Rate Limit Headers"
+    "aria_rate_limit_headers": "Ceanntásca Teorainn Rátaí"
   },
   "aria": {
     "breadcrumbs": "Breadcrumbs"
@@ -11073,7 +11073,7 @@
     "select_tenants": "Roghnaigh Tionóntaí"
   },
   "cancel": "Cancel",
-  "checking_permissions": "Checking Permissions",
+  "checking_permissions": "Ceadanna á Seiceáil",
   "clear": "Clear",
   "close": "Close",
   "common:nav": {
@@ -11101,9 +11101,9 @@
     "wallet": "Sparán"
   },
   "cron_settings": {
-    "enable_job": "Enable Job",
-    "global_settings": "Global Settings",
-    "select_job": "Select Job"
+    "enable_job": "Cumasaigh Job",
+    "global_settings": "Socruithe Domhanda",
+    "select_job": "Roghnaigh Jab"
   },
   "diagnostics_matching": {
     "avg_match_score": "Meán Scór Meaitseála",
@@ -11113,11 +11113,11 @@
     "engine_status": "Stádas Innill",
     "matches_today": "Matches Inniu"
   },
-  "error_occurred": "Occurred error",
+  "error_occurred": "Tharla earráid",
   "federation_audit": {
     "clear": "Clear",
-    "export_csv": "Export CSV",
-    "total_actions_30d": "Total Actions 30d"
+    "export_csv": "Easpórtáil CSV",
+    "total_actions_30d": "Gníomhartha Iomlána 30d"
   },
   "federation_whitelist": {
     "add_tenant_to_whitelist": "Cuir Tionónta leis an Liosta Bán",
@@ -11148,8 +11148,8 @@
   },
   "impact_report_labels": {
     "transactions": "Transactions",
-    "unique_givers": "Unique Givers",
-    "unique_receivers": "Unique Receivers"
+    "unique_givers": "Tabhartóirí Uathúla",
+    "unique_receivers": "Glacadóirí Uathúla"
   },
   "import": "Import",
   "legal_doc_form": {
@@ -11199,7 +11199,7 @@
     "this_will": "This Will",
     "title": "Title"
   },
-  "load_error": "Load error",
+  "load_error": "Earráid luchtaithe",
   "log_files_labels": {
     "download": "Íosluchtaigh",
     "filter_all": "Gach",
@@ -11407,7 +11407,7 @@
     "subtitle": "Seol an nuachtlitir seo chuig fo-thacar faighteoirí spriocdhírithe."
   },
   "newsletter_send_time": {
-    "engagement_heatmap": "Engagement Heatmap",
+    "engagement_heatmap": "Léarscáil Teasa Rannpháirtíochta",
     "high": "High",
     "low": "Low",
     "top_recommended": "Top Recommended",
@@ -11439,7 +11439,7 @@
     "usage_stats": "Staitisticí Úsáide"
   },
   "provider_health": {
-    "aria_success_rate": "Success Rate"
+    "aria_success_rate": "Ráta Ratha"
   },
   "refresh": "Refresh",
   "rte": {
@@ -11474,8 +11474,8 @@
   },
   "seed_generator": {
     "count_aria_label": "L?on {{label}}",
-    "data_types_heading": "Data Types",
-    "development_only": "Development Only",
+    "data_types_heading": "Cineálacha Sonraí",
+    "development_only": "Forbairt Amháin",
     "generate_button": "Generate",
     "warning_body": "Warning Body",
     "option_users_label": "Úsáideoirí",
@@ -11594,7 +11594,7 @@
   },
   "subtitle": "Subtitle",
   "super_controls": {
-    "bulk_operations": "Bulk Operations",
+    "bulk_operations": "Oibríochtaí Bulc",
     "hierarchy": "Hierarchy"
   },
   "super_user_form": {
@@ -11916,15 +11916,15 @@
   },
   "title": "Title",
   "webp_converter": {
-    "already_webp": "Already WebP",
-    "pending_conversion": "Pending Conversion",
-    "total_images": "Total Images"
+    "already_webp": "WebP cheana féin",
+    "pending_conversion": "Tiontú ar Feitheamh",
+    "total_images": "Íomhánna Iomlána"
   },
-  "label_active_members": "Active Members",
-  "label_new_this_month": "New This Month",
-  "label_pending_approvals": "Pending Approvals",
-  "label_retention_rate": "Retention Rate",
-  "label_total_members": "Total Members",
+  "label_active_members": "Baill Gníomhacha",
+  "label_new_this_month": "Nua an Mhí seo",
+  "label_pending_approvals": "Ceaduithe ar Feitheamh",
+  "label_retention_rate": "Ráta Coinneála",
+  "label_total_members": "Iomlán na mBall",
   "enabled": "Enabled",
   "disabled": "Disabled",
   "caring_community": {
@@ -13326,7 +13326,7 @@
       "items": {
         "surveys": "Surveys",
         "projects": "Projects",
-        "trust_tier": "Trust Tier"
+        "trust_tier": "Sraith Iontaobhais"
       }
     }
   },
@@ -14561,7 +14561,7 @@
         "sent": "Seolta"
       },
       "fields": {
-        "cta_url": "CTA URL",
+        "cta_url": "URL CTA",
         "cta_url_optional": "CTA URL (roghnach)",
         "notification_body": "Comhlacht fógra a bhrú",
         "notification_title": "Brúigh teideal an fhógra",
@@ -15969,7 +15969,7 @@
       "avg_to_agreed": "Meán go dtí aontaithe:",
       "avg_to_live": "Meán le maireachtáil:",
       "avg_to_proposal": "Meán an togra:",
-      "days": "{{count}}d",
+      "days": "{{count}}D",
       "title": "Treoluas píblíne - meánlaethanta ó chur isteach fiosrúcháin go dtí gach cloch mhíle:"
     }
   },

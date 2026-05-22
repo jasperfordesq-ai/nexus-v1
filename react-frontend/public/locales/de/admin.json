@@ -2,8 +2,8 @@
   "active": "Active",
   "activity": {
     "card_title": "Activity",
-    "empty": "No activity found",
-    "view_all": "View All"
+    "empty": "Keine Aktivität gefunden",
+    "view_all": "Alle anzeigen"
   },
   "advanced": {
     "404_entry_dismissed": "404-Eintrag abgewiesen",
@@ -986,8 +986,8 @@
     "sync_search_hint_suffix": "nach dem Start von Meilisearch."
   },
   "alerts": {
-    "pending_approvals": "Pending Approvals",
-    "pending_listings": "Pending Listings"
+    "pending_approvals": "Ausstehende Genehmigungen",
+    "pending_listings": "Ausstehende Einträge"
   },
   "analytics": {
     "category_demand_title": "Kategorienachfrage",
@@ -3408,7 +3408,7 @@
   },
   "data_table": {
     "admin_data_table": "Data",
-    "no_data": "No data",
+    "no_data": "Keine Daten",
     "refresh": "Refresh",
     "search": "Search"
   },
@@ -5816,10 +5816,10 @@
     "toggle_sidebar": "Seitenleiste umschalten"
   },
   "icon_picker": {
-    "choose_icon": "Choose Icon",
-    "choose_icon_placeholder": "Search for an icon...",
-    "clear_icon": "Clear Icon",
-    "search_icons": "Search Icons",
+    "choose_icon": "Wählen Sie Symbol",
+    "choose_icon_placeholder": "Nach einem Symbol suchen...",
+    "clear_icon": "Klares Symbol",
+    "search_icons": "Suchsymbole",
     "label": "Symbol",
     "no_icons_found": "Es wurden keine Symbole gefunden, die zu „{{search}}“ passen.",
     "search_for_icon": "Nach einem Symbol suchen..."
@@ -6161,7 +6161,7 @@
     "bias_rejection_rates_table": "Ablehnungsraten nach Stufe",
     "bias_avg_time_stage_table": "Durchschnittliche Zeit auf der Bühne"
   },
-  "last_checked": "Last checked: {{time}}",
+  "last_checked": "Zuletzt überprüft: {{time}}",
   "listings": {
     "actions": "Aktionen",
     "an_unexpected_error_occurred": "Es ist ein unerwarteter Fehler aufgetreten",
@@ -7000,13 +7000,13 @@
     "section_top_performers_desc": "Newsletter mit dem stärksten aktuellen Engagement.",
     "winner": "Gewinner"
   },
-  "no_data": "No data available",
+  "no_data": "Keine Daten verfügbar",
   "not_found": {
-    "back_to_dashboard": "Back to Dashboard",
-    "description": "The page you are looking for does not exist",
-    "heading": "Page Not Found",
-    "page_title": "Not Found",
-    "title": "Not Found"
+    "back_to_dashboard": "Zurück zum Dashboard",
+    "description": "Die gesuchte Seite existiert nicht",
+    "heading": "Seite nicht gefunden",
+    "page_title": "Nicht gefunden",
+    "title": "Nicht gefunden"
   },
   "performance": {
     "label_performance_metrics": "Leistungskennzahlen",
@@ -7035,9 +7035,9 @@
     "refresh": "Aktualisieren"
   },
   "placeholder": {
-    "migration_description": "Migrating legacy content to the new system",
+    "migration_description": "Migration von Legacy-Inhalten in das neue System",
     "migration_title": "Migration",
-    "open_legacy": "Open Legacy"
+    "open_legacy": "Öffnen Sie Legacy"
   },
   "polls": {
     "an_unexpected_error_occurred": "Es ist ein unerwarteter Fehler aufgetreten",
@@ -7074,15 +7074,15 @@
     "status_ended": "Beendet"
   },
   "quick_actions": {
-    "advanced_controls": "Advanced Controls",
-    "card_title": "Quick Actions",
+    "advanced_controls": "Erweiterte Steuerelemente",
+    "card_title": "Schnelle Aktionen",
     "enterprise": "Enterprise",
     "gamification": "Gamification",
-    "manage_users": "Manage Users",
-    "new_blog_post": "New Blog Post",
-    "send_newsletter": "Send Newsletter",
+    "manage_users": "Benutzer verwalten",
+    "new_blog_post": "Neuer Blogbeitrag",
+    "send_newsletter": "Newsletter versenden",
     "settings": "Settings",
-    "view_listings": "View Listings"
+    "view_listings": "Einträge anzeigen"
   },
   "reports": {
     "active_30d_total": "Active (30 days)",
@@ -9335,7 +9335,7 @@
   "trends": {
     "card_title": "Trends",
     "hours_suffix": "hrs",
-    "no_data": "No data available"
+    "no_data": "Keine Daten verfügbar"
   },
   "user_create": {
     "back_to_users": "Zurück zu Benutzer",
@@ -9804,7 +9804,7 @@
     "validation_password_min": "Das Passwort muss mindestens 8 Zeichen lang sein",
     "validation_role_required": "Rolle ist erforderlich"
   },
-  "view_all": "View All",
+  "view_all": "Alle anzeigen",
   "visibility_rules": {
     "min_role": "Min. Rolle",
     "requires_auth": "Erfordert Authentifizierung",
@@ -10426,10 +10426,10 @@
     "webhook_url_placeholder": "https://example.com/webhook"
   },
   "mailer": {
-    "gmail_not_enabled": "Gmail API is not enabled",
-    "gmail_token_failed": "Failed to obtain access token. Check credentials.",
-    "gmail_connected": "Connected to Gmail API successfully. Email: :email",
-    "gmail_verify_failed": "Failed to verify Gmail API connection"
+    "gmail_not_enabled": "Die Gmail-API ist nicht aktiviert",
+    "gmail_token_failed": "Zugriffstoken konnte nicht abgerufen werden. Überprüfen Sie die Anmeldeinformationen.",
+    "gmail_connected": "Erfolgreich mit der Gmail-API verbunden. E-Mail: :email",
+    "gmail_verify_failed": "Die Gmail-API-Verbindung konnte nicht überprüft werden"
   },
   "menu_builder": {
     "location_header_main": "Hauptkopfzeile",
@@ -10716,11 +10716,11 @@
     "verify_business": "Unternehmen bestätigen"
   },
   "spam": {
-    "title": "Spam Detection",
-    "avg_score": "Avg Score",
+    "title": "Spam-Erkennung",
+    "avg_score": "Durchschnittlicher Wert",
     "blocked_count": "Blocked",
     "flagged_count": "Flagged",
-    "total_analyzed": "Total Analyzed"
+    "total_analyzed": "Insgesamt analysiert"
   },
   "bulk": {
     "selected_count": "{{count}} ausgewählt",
@@ -10966,10 +10966,10 @@
     "checklist_no_http_triggers": "Es sind keine separaten HTTP-Trigger für /cron/*-Endpunkte konfiguriert"
   },
   "api_docs": {
-    "aria_api_documentation_sections": "API Documentation Sections",
-    "aria_hmac_headers": "Hmac Headers",
+    "aria_api_documentation_sections": "API-Dokumentationsabschnitte",
+    "aria_hmac_headers": "Hmac-Header",
     "aria_parameters": "Parameters",
-    "aria_rate_limit_headers": "Rate Limit Headers"
+    "aria_rate_limit_headers": "Rate-Limit-Header"
   },
   "aria": {
     "breadcrumbs": "Breadcrumbs"
@@ -11073,7 +11073,7 @@
     "select_tenants": "Wählen Sie Mieter aus"
   },
   "cancel": "Cancel",
-  "checking_permissions": "Checking Permissions",
+  "checking_permissions": "Berechtigungen prüfen",
   "clear": "Clear",
   "close": "Close",
   "common:nav": {
@@ -11101,9 +11101,9 @@
     "wallet": "Geldbörse"
   },
   "cron_settings": {
-    "enable_job": "Enable Job",
-    "global_settings": "Global Settings",
-    "select_job": "Select Job"
+    "enable_job": "Job aktivieren",
+    "global_settings": "Globale Einstellungen",
+    "select_job": "Wählen Sie Job aus"
   },
   "diagnostics_matching": {
     "avg_match_score": "Durchschnittlicher Match-Score",
@@ -11113,11 +11113,11 @@
     "engine_status": "Motorstatus",
     "matches_today": "Spiele heute"
   },
-  "error_occurred": "Occurred error",
+  "error_occurred": "Es ist ein Fehler aufgetreten",
   "federation_audit": {
     "clear": "Clear",
-    "export_csv": "Export CSV",
-    "total_actions_30d": "Total Actions 30d"
+    "export_csv": "CSV exportieren",
+    "total_actions_30d": "Gesamtaktionen 30 Tage"
   },
   "federation_whitelist": {
     "add_tenant_to_whitelist": "Mieter zur Whitelist hinzufügen",
@@ -11148,8 +11148,8 @@
   },
   "impact_report_labels": {
     "transactions": "Transactions",
-    "unique_givers": "Unique Givers",
-    "unique_receivers": "Unique Receivers"
+    "unique_givers": "Einzigartige Geber",
+    "unique_receivers": "Einzigartige Empfänger"
   },
   "import": "Import",
   "legal_doc_form": {
@@ -11199,7 +11199,7 @@
     "this_will": "This Will",
     "title": "Title"
   },
-  "load_error": "Load error",
+  "load_error": "Ladefehler",
   "log_files_labels": {
     "download": "Herunterladen",
     "filter_all": "Alle",
@@ -11407,7 +11407,7 @@
     "subtitle": "Versenden Sie diesen Newsletter an eine gezielte Untergruppe von Empfängern."
   },
   "newsletter_send_time": {
-    "engagement_heatmap": "Engagement Heatmap",
+    "engagement_heatmap": "Engagement-Heatmap",
     "high": "High",
     "low": "Low",
     "top_recommended": "Top Recommended",
@@ -11439,7 +11439,7 @@
     "usage_stats": "Nutzungsstatistiken"
   },
   "provider_health": {
-    "aria_success_rate": "Success Rate"
+    "aria_success_rate": "Erfolgsquote"
   },
   "refresh": "Refresh",
   "rte": {
@@ -11474,8 +11474,8 @@
   },
   "seed_generator": {
     "count_aria_label": "Anzahl {{label}}",
-    "data_types_heading": "Data Types",
-    "development_only": "Development Only",
+    "data_types_heading": "Datentypen",
+    "development_only": "Nur Entwicklung",
     "generate_button": "Generate",
     "warning_body": "Warning Body",
     "option_users_label": "Benutzer",
@@ -11594,7 +11594,7 @@
   },
   "subtitle": "Subtitle",
   "super_controls": {
-    "bulk_operations": "Bulk Operations",
+    "bulk_operations": "Massenoperationen",
     "hierarchy": "Hierarchy"
   },
   "super_user_form": {
@@ -11916,15 +11916,15 @@
   },
   "title": "Title",
   "webp_converter": {
-    "already_webp": "Already WebP",
-    "pending_conversion": "Pending Conversion",
-    "total_images": "Total Images"
+    "already_webp": "Bereits WebP",
+    "pending_conversion": "Ausstehende Konvertierung",
+    "total_images": "Gesamtbilder"
   },
-  "label_active_members": "Active Members",
-  "label_new_this_month": "New This Month",
-  "label_pending_approvals": "Pending Approvals",
-  "label_retention_rate": "Retention Rate",
-  "label_total_members": "Total Members",
+  "label_active_members": "Aktive Mitglieder",
+  "label_new_this_month": "Neu in diesem Monat",
+  "label_pending_approvals": "Ausstehende Genehmigungen",
+  "label_retention_rate": "Retentionsrate",
+  "label_total_members": "Gesamtzahl der Mitglieder",
   "enabled": "Enabled",
   "disabled": "Disabled",
   "caring_community": {
@@ -13326,7 +13326,7 @@
       "items": {
         "surveys": "Surveys",
         "projects": "Projects",
-        "trust_tier": "Trust Tier"
+        "trust_tier": "Vertrauensstufe"
       }
     }
   },
@@ -14561,8 +14561,8 @@
         "sent": "Gesendet"
       },
       "fields": {
-        "cta_url": "CTA URL",
-        "cta_url_optional": "CTA URL (optional)",
+        "cta_url": "CTA-URL",
+        "cta_url_optional": "CTA-URL (optional)",
         "notification_body": "Push-Benachrichtigungstext",
         "notification_title": "Titel der Push-Benachrichtigung",
         "push_body": "Körper schieben",
@@ -14762,7 +14762,7 @@
       "prevention_value": "Präventionswert",
       "social_isolation_supported": "Menschen, die aus der sozialen Isolation heraus unterstützt werden",
       "title": "Geschätzter Pflegekostenausgleich",
-      "yoy": "{{value}} YoY"
+      "yoy": "{{value}} im Jahresvergleich"
     },
     "stats": {
       "active_members": "Aktive Mitglieder",
@@ -15036,7 +15036,7 @@
       "title": "Fondation KISS – Nationales Dashboard"
     },
     "metrics": {
-      "yoy": "{{value}} YoY"
+      "yoy": "{{value}} im Jahresvergleich"
     },
     "periods": {
       "custom": "Benutzerdefiniertes Sortiment",
@@ -15271,7 +15271,7 @@
       "dsa_body": "Muss vor jedem Live-Datenaustausch unterzeichnet werden. Entwerfen Sie Vereinbarungen mithilfe der Vorlagen für Forschungspartnerschaften.",
       "dsa_label": "DSA (Datenfreigabevereinbarung):",
       "sandbox_body": "Link zur Testumgebung des Partners. Überprüfen Sie die Integration in der Sandbox, bevor Sie sie zum Leben erwecken.",
-      "sandbox_label": "Sandbox URL:",
+      "sandbox_label": "Sandbox-URL:",
       "statuses_body": "Vorgeschlagen -> Scoping -> Sandbox -> Live. Blockiert bedeutet, dass eine externe Abhängigkeit nicht aufgelöst ist.",
       "statuses_label": "Status:",
       "title": "Über diese Seite"
@@ -15327,7 +15327,7 @@
       "owner_name": "Name des Besitzers",
       "owner_name_placeholder": "Vollständiger Name des externen Kontakts",
       "sandbox_placeholder": "https://sandbox.partner.example",
-      "sandbox_url": "Sandbox URL",
+      "sandbox_url": "Sandbox-URL",
       "status": "Status"
     },
     "empty": {

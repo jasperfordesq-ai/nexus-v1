@@ -2,8 +2,8 @@
   "active": "Active",
   "activity": {
     "card_title": "Activity",
-    "empty": "No activity found",
-    "view_all": "View All"
+    "empty": "Geen activiteit gevonden",
+    "view_all": "Bekijk alles"
   },
   "advanced": {
     "404_entry_dismissed": "404-inzending afgewezen",
@@ -986,8 +986,8 @@
     "sync_search_hint_suffix": "nadat Meilisearch is gestart."
   },
   "alerts": {
-    "pending_approvals": "Pending Approvals",
-    "pending_listings": "Pending Listings"
+    "pending_approvals": "In afwachting van goedkeuringen",
+    "pending_listings": "In behandeling zijnde aanbiedingen"
   },
   "analytics": {
     "category_demand_title": "Categorievraag",
@@ -3408,7 +3408,7 @@
   },
   "data_table": {
     "admin_data_table": "Data",
-    "no_data": "No data",
+    "no_data": "Geen gegevens",
     "refresh": "Refresh",
     "search": "Search"
   },
@@ -5816,10 +5816,10 @@
     "toggle_sidebar": "Zijbalk schakelen"
   },
   "icon_picker": {
-    "choose_icon": "Choose Icon",
-    "choose_icon_placeholder": "Search for an icon...",
-    "clear_icon": "Clear Icon",
-    "search_icons": "Search Icons",
+    "choose_icon": "Kies Pictogram",
+    "choose_icon_placeholder": "Zoek naar een pictogram...",
+    "clear_icon": "Duidelijk pictogram",
+    "search_icons": "Zoek iconen",
     "label": "Icon",
     "no_icons_found": "Geen iconen gevonden die overeenkomen met \"{{search}}\"",
     "search_for_icon": "Zoek naar een pictogram..."
@@ -6161,7 +6161,7 @@
     "bias_rejection_rates_table": "Afwijzingspercentages per fase",
     "bias_avg_time_stage_table": "Gemiddelde tijd in etappe"
   },
-  "last_checked": "Last checked: {{time}}",
+  "last_checked": "Laatst gecontroleerd: {{time}}",
   "listings": {
     "actions": "Acties",
     "an_unexpected_error_occurred": "Er is een onverwachte fout opgetreden",
@@ -7000,13 +7000,13 @@
     "section_top_performers_desc": "Nieuwsbrieven met de sterkste recente betrokkenheid.",
     "winner": "Winnaar"
   },
-  "no_data": "No data available",
+  "no_data": "Geen gegevens beschikbaar",
   "not_found": {
-    "back_to_dashboard": "Back to Dashboard",
-    "description": "The page you are looking for does not exist",
-    "heading": "Page Not Found",
-    "page_title": "Not Found",
-    "title": "Not Found"
+    "back_to_dashboard": "Terug naar Dashboard",
+    "description": "De pagina die u zoekt bestaat niet",
+    "heading": "Pagina niet gevonden",
+    "page_title": "Niet gevonden",
+    "title": "Niet gevonden"
   },
   "performance": {
     "label_performance_metrics": "Prestatiestatistieken",
@@ -7035,9 +7035,9 @@
     "refresh": "Vernieuwen"
   },
   "placeholder": {
-    "migration_description": "Migrating legacy content to the new system",
+    "migration_description": "Verouderde inhoud migreren naar het nieuwe systeem",
     "migration_title": "Migration",
-    "open_legacy": "Open Legacy"
+    "open_legacy": "Open erfenis"
   },
   "polls": {
     "an_unexpected_error_occurred": "Er is een onverwachte fout opgetreden",
@@ -7074,15 +7074,15 @@
     "status_ended": "Beëindigd"
   },
   "quick_actions": {
-    "advanced_controls": "Advanced Controls",
-    "card_title": "Quick Actions",
+    "advanced_controls": "Geavanceerde bedieningselementen",
+    "card_title": "Snelle acties",
     "enterprise": "Enterprise",
     "gamification": "Gamification",
-    "manage_users": "Manage Users",
-    "new_blog_post": "New Blog Post",
-    "send_newsletter": "Send Newsletter",
+    "manage_users": "Beheer gebruikers",
+    "new_blog_post": "Nieuwe blogpost",
+    "send_newsletter": "Nieuwsbrief versturen",
     "settings": "Settings",
-    "view_listings": "View Listings"
+    "view_listings": "Bekijk aanbiedingen"
   },
   "reports": {
     "active_30d_total": "Active (30 days)",
@@ -9335,7 +9335,7 @@
   "trends": {
     "card_title": "Trends",
     "hours_suffix": "hrs",
-    "no_data": "No data available"
+    "no_data": "Geen gegevens beschikbaar"
   },
   "user_create": {
     "back_to_users": "Terug naar Gebruikers",
@@ -9804,7 +9804,7 @@
     "validation_password_min": "Wachtwoord moet minimaal 8 tekens lang zijn",
     "validation_role_required": "Rol is vereist"
   },
-  "view_all": "View All",
+  "view_all": "Bekijk alles",
   "visibility_rules": {
     "min_role": "Minimale rol",
     "requires_auth": "Vereist authenticatie",
@@ -10426,10 +10426,10 @@
     "webhook_url_placeholder": "https://example.com/webhook"
   },
   "mailer": {
-    "gmail_not_enabled": "Gmail API is not enabled",
-    "gmail_token_failed": "Failed to obtain access token. Check credentials.",
-    "gmail_connected": "Connected to Gmail API successfully. Email: :email",
-    "gmail_verify_failed": "Failed to verify Gmail API connection"
+    "gmail_not_enabled": "Gmail-API is niet ingeschakeld",
+    "gmail_token_failed": "Kan geen toegangstoken verkrijgen. Controleer de inloggegevens.",
+    "gmail_connected": "Succesvol verbonden met de Gmail API. E-mail: :e-mail",
+    "gmail_verify_failed": "Kan de Gmail API-verbinding niet verifiëren"
   },
   "menu_builder": {
     "location_header_main": "Hoofdkop",
@@ -10716,11 +10716,11 @@
     "verify_business": "Verifieer bedrijf"
   },
   "spam": {
-    "title": "Spam Detection",
-    "avg_score": "Avg Score",
+    "title": "Spamdetectie",
+    "avg_score": "Gem. score",
     "blocked_count": "Blocked",
     "flagged_count": "Flagged",
-    "total_analyzed": "Total Analyzed"
+    "total_analyzed": "Totaal geanalyseerd"
   },
   "bulk": {
     "selected_count": "{{count}} geselecteerd",
@@ -10932,7 +10932,7 @@
     "verify": "Verifieer",
     "thats_it": "Dat is het!",
     "thats_it_prefix": "Laravel's planner (via",
-    "thats_it_suffix": ") will handle all job dispatching internally.",
+    "thats_it_suffix": ") zal alle taakverzending intern afhandelen.",
     "linux_vps": "Linux/VPS",
     "linux_step_1": "Stap 1: Open uw crontab",
     "linux_step_2": "Stap 2: Voeg een enkele plannerregel toe",
@@ -10966,10 +10966,10 @@
     "checklist_no_http_triggers": "Er zijn geen afzonderlijke HTTP-triggers voor /cron/*-eindpunten geconfigureerd"
   },
   "api_docs": {
-    "aria_api_documentation_sections": "API Documentation Sections",
-    "aria_hmac_headers": "Hmac Headers",
+    "aria_api_documentation_sections": "API-documentatiesecties",
+    "aria_hmac_headers": "Hmac-headers",
     "aria_parameters": "Parameters",
-    "aria_rate_limit_headers": "Rate Limit Headers"
+    "aria_rate_limit_headers": "Kopteksten voor tarieflimieten"
   },
   "aria": {
     "breadcrumbs": "Breadcrumbs"
@@ -11073,7 +11073,7 @@
     "select_tenants": "Selecteer Huurders"
   },
   "cancel": "Cancel",
-  "checking_permissions": "Checking Permissions",
+  "checking_permissions": "Machtigingen controleren",
   "clear": "Clear",
   "close": "Close",
   "common:nav": {
@@ -11101,9 +11101,9 @@
     "wallet": "Portemonnee"
   },
   "cron_settings": {
-    "enable_job": "Enable Job",
-    "global_settings": "Global Settings",
-    "select_job": "Select Job"
+    "enable_job": "Schakel Taak in",
+    "global_settings": "Algemene instellingen",
+    "select_job": "Selecteer Taak"
   },
   "diagnostics_matching": {
     "avg_match_score": "Gem. wedstrijdscore",
@@ -11113,11 +11113,11 @@
     "engine_status": "Motorstatus",
     "matches_today": "Wedstrijden vandaag"
   },
-  "error_occurred": "Occurred error",
+  "error_occurred": "Er is een fout opgetreden",
   "federation_audit": {
     "clear": "Clear",
-    "export_csv": "Export CSV",
-    "total_actions_30d": "Total Actions 30d"
+    "export_csv": "CSV exporteren",
+    "total_actions_30d": "Totaal aantal acties 30d"
   },
   "federation_whitelist": {
     "add_tenant_to_whitelist": "Huurder toevoegen aan witte lijst",
@@ -11148,8 +11148,8 @@
   },
   "impact_report_labels": {
     "transactions": "Transactions",
-    "unique_givers": "Unique Givers",
-    "unique_receivers": "Unique Receivers"
+    "unique_givers": "Unieke gevers",
+    "unique_receivers": "Unieke ontvangers"
   },
   "import": "Import",
   "legal_doc_form": {
@@ -11199,7 +11199,7 @@
     "this_will": "This Will",
     "title": "Title"
   },
-  "load_error": "Load error",
+  "load_error": "Fout bij laden",
   "log_files_labels": {
     "download": "Downloaden",
     "filter_all": "Allemaal",
@@ -11407,7 +11407,7 @@
     "subtitle": "Stuur deze nieuwsbrief naar een gerichte subset van ontvangers."
   },
   "newsletter_send_time": {
-    "engagement_heatmap": "Engagement Heatmap",
+    "engagement_heatmap": "Betrokkenheidshittekaart",
     "high": "High",
     "low": "Low",
     "top_recommended": "Top Recommended",
@@ -11439,7 +11439,7 @@
     "usage_stats": "Gebruiksstatistieken"
   },
   "provider_health": {
-    "aria_success_rate": "Success Rate"
+    "aria_success_rate": "Succespercentage"
   },
   "refresh": "Refresh",
   "rte": {
@@ -11474,8 +11474,8 @@
   },
   "seed_generator": {
     "count_aria_label": "Aantal {{label}}",
-    "data_types_heading": "Data Types",
-    "development_only": "Development Only",
+    "data_types_heading": "Gegevenstypen",
+    "development_only": "Alleen ontwikkeling",
     "generate_button": "Generate",
     "warning_body": "Warning Body",
     "option_users_label": "Gebruikers",
@@ -11594,7 +11594,7 @@
   },
   "subtitle": "Subtitle",
   "super_controls": {
-    "bulk_operations": "Bulk Operations",
+    "bulk_operations": "Bulkoperaties",
     "hierarchy": "Hierarchy"
   },
   "super_user_form": {
@@ -11916,15 +11916,15 @@
   },
   "title": "Title",
   "webp_converter": {
-    "already_webp": "Already WebP",
-    "pending_conversion": "Pending Conversion",
-    "total_images": "Total Images"
+    "already_webp": "Al WebP",
+    "pending_conversion": "Conversie in behandeling",
+    "total_images": "Totaal aantal afbeeldingen"
   },
-  "label_active_members": "Active Members",
-  "label_new_this_month": "New This Month",
-  "label_pending_approvals": "Pending Approvals",
-  "label_retention_rate": "Retention Rate",
-  "label_total_members": "Total Members",
+  "label_active_members": "Actieve leden",
+  "label_new_this_month": "Nieuw deze maand",
+  "label_pending_approvals": "In afwachting van goedkeuringen",
+  "label_retention_rate": "Retentiepercentage",
+  "label_total_members": "Totaal aantal leden",
   "enabled": "Enabled",
   "disabled": "Disabled",
   "caring_community": {
@@ -13326,7 +13326,7 @@
       "items": {
         "surveys": "Surveys",
         "projects": "Projects",
-        "trust_tier": "Trust Tier"
+        "trust_tier": "Vertrouwensniveau"
       }
     }
   },
@@ -14561,7 +14561,7 @@
         "sent": "Verstuurd"
       },
       "fields": {
-        "cta_url": "CTA URL",
+        "cta_url": "CTA-URL",
         "cta_url_optional": "CTA URL (optioneel)",
         "notification_body": "Pushmeldingstekst",
         "notification_title": "Titel van pushmelding",
@@ -14762,7 +14762,7 @@
       "prevention_value": "Preventiewaarde",
       "social_isolation_supported": "Mensen ondersteund uit sociaal isolement",
       "title": "Geschatte zorgkostencompensatie",
-      "yoy": "{{value}} YoY"
+      "yoy": "{{value}} JoJ"
     },
     "stats": {
       "active_members": "Actieve leden",
@@ -15036,7 +15036,7 @@
       "title": "Fondation KISS - Nationaal dashboard"
     },
     "metrics": {
-      "yoy": "{{value}} YoY"
+      "yoy": "{{value}} JoJ"
     },
     "periods": {
       "custom": "Aangepast bereik",
@@ -15271,7 +15271,7 @@
       "dsa_body": "Moet worden ondertekend vóór elke live gegevensuitwisseling. Maak overeenkomsten op met behulp van de Research Partnerships-sjablonen.",
       "dsa_label": "DSA (overeenkomst voor het delen van gegevens):",
       "sandbox_body": "Link naar de testomgeving van de partner. Valideer de integratie in de sandbox voordat u deze promoveert naar live.",
-      "sandbox_label": "Sandbox URL:",
+      "sandbox_label": "Sandbox-URL:",
       "statuses_body": "Voorgesteld -> Scoping -> Sandbox -> Live. Geblokkeerd betekent dat een externe afhankelijkheid onopgelost is.",
       "statuses_label": "Statussen:",
       "title": "Over deze pagina"
@@ -15327,7 +15327,7 @@
       "owner_name": "Naam eigenaar",
       "owner_name_placeholder": "Volledige naam van externe contactpersoon",
       "sandbox_placeholder": "https://sandbox.partner.voorbeeld",
-      "sandbox_url": "Sandbox URL",
+      "sandbox_url": "Sandbox-URL",
       "status": "Status"
     },
     "empty": {
@@ -15655,7 +15655,7 @@
       "cancel": "Annuleren",
       "close": "Dichtbij",
       "create": "Creëren",
-      "download_markdown": "Download Markdown",
+      "download_markdown": "Markdown downloaden",
       "generate": "Genereer",
       "generate_export": "Exporteren genereren",
       "open": "Open",
@@ -16606,7 +16606,7 @@
     },
     "partner_types": {
       "municipality": "Gemeente",
-      "sme_partner": "SME partner"
+      "sme_partner": "MKB-partner"
     },
     "plan_tiers": {
       "basic": "Basis",

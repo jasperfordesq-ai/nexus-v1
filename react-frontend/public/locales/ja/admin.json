@@ -2,8 +2,8 @@
   "active": "Active",
   "activity": {
     "card_title": "Activity",
-    "empty": "No activity found",
-    "view_all": "View All"
+    "empty": "アクティビティが見つかりませんでした",
+    "view_all": "すべて見る"
   },
   "advanced": {
     "404_entry_dismissed": "404 エントリが却下されました",
@@ -986,8 +986,8 @@
     "sync_search_hint_suffix": "メイリサーチ開始後。"
   },
   "alerts": {
-    "pending_approvals": "Pending Approvals",
-    "pending_listings": "Pending Listings"
+    "pending_approvals": "承認待ち",
+    "pending_listings": "保留中のリスト"
   },
   "analytics": {
     "category_demand_title": "カテゴリーの需要",
@@ -3408,7 +3408,7 @@
   },
   "data_table": {
     "admin_data_table": "Data",
-    "no_data": "No data",
+    "no_data": "データなし",
     "refresh": "Refresh",
     "search": "Search"
   },
@@ -5816,10 +5816,10 @@
     "toggle_sidebar": "サイドバーの切り替え"
   },
   "icon_picker": {
-    "choose_icon": "Choose Icon",
-    "choose_icon_placeholder": "Search for an icon...",
-    "clear_icon": "Clear Icon",
-    "search_icons": "Search Icons",
+    "choose_icon": "アイコンを選択",
+    "choose_icon_placeholder": "アイコンを検索...",
+    "clear_icon": "クリアアイコン",
+    "search_icons": "検索アイコン",
     "label": "アイコン",
     "no_icons_found": "「{{search}}」に一致するアイコンは見つかりませんでした",
     "search_for_icon": "アイコンを検索..."
@@ -6161,7 +6161,7 @@
     "bias_rejection_rates_table": "段階ごとの拒否率",
     "bias_avg_time_stage_table": "ステージの平均時間"
   },
-  "last_checked": "Last checked: {{time}}",
+  "last_checked": "最終チェック日: {{time}}",
   "listings": {
     "actions": "アクション",
     "an_unexpected_error_occurred": "予期しないエラーが発生しました",
@@ -7000,13 +7000,13 @@
     "section_top_performers_desc": "最近最もエンゲージメントが高かったニュースレター。",
     "winner": "勝者"
   },
-  "no_data": "No data available",
+  "no_data": "利用可能なデータがありません",
   "not_found": {
-    "back_to_dashboard": "Back to Dashboard",
-    "description": "The page you are looking for does not exist",
-    "heading": "Page Not Found",
-    "page_title": "Not Found",
-    "title": "Not Found"
+    "back_to_dashboard": "ダッシュボードに戻る",
+    "description": "お探しのページは存在しません",
+    "heading": "ページが見つかりません",
+    "page_title": "見つかりません",
+    "title": "見つかりません"
   },
   "performance": {
     "label_performance_metrics": "パフォーマンス指標",
@@ -7035,9 +7035,9 @@
     "refresh": "リフレッシュ"
   },
   "placeholder": {
-    "migration_description": "Migrating legacy content to the new system",
+    "migration_description": "レガシーコンテンツを新しいシステムに移行する",
     "migration_title": "Migration",
-    "open_legacy": "Open Legacy"
+    "open_legacy": "オープンレガシー"
   },
   "polls": {
     "an_unexpected_error_occurred": "予期しないエラーが発生しました",
@@ -7074,15 +7074,15 @@
     "status_ended": "終了しました"
   },
   "quick_actions": {
-    "advanced_controls": "Advanced Controls",
-    "card_title": "Quick Actions",
+    "advanced_controls": "高度なコントロール",
+    "card_title": "クイックアクション",
     "enterprise": "Enterprise",
     "gamification": "Gamification",
-    "manage_users": "Manage Users",
-    "new_blog_post": "New Blog Post",
-    "send_newsletter": "Send Newsletter",
+    "manage_users": "ユーザーの管理",
+    "new_blog_post": "新しいブログ投稿",
+    "send_newsletter": "ニュースレターを送信する",
     "settings": "Settings",
-    "view_listings": "View Listings"
+    "view_listings": "リストを見る"
   },
   "reports": {
     "active_30d_total": "Active (30 days)",
@@ -9335,7 +9335,7 @@
   "trends": {
     "card_title": "Trends",
     "hours_suffix": "hrs",
-    "no_data": "No data available"
+    "no_data": "利用可能なデータがありません"
   },
   "user_create": {
     "back_to_users": "ユーザーに戻る",
@@ -9804,7 +9804,7 @@
     "validation_password_min": "パスワードは8文字以上である必要があります",
     "validation_role_required": "役割は必須です"
   },
-  "view_all": "View All",
+  "view_all": "すべて見る",
   "visibility_rules": {
     "min_role": "最小の役割",
     "requires_auth": "認証が必要です",
@@ -10426,10 +10426,10 @@
     "webhook_url_placeholder": "https://example.com/webhook"
   },
   "mailer": {
-    "gmail_not_enabled": "Gmail API is not enabled",
-    "gmail_token_failed": "Failed to obtain access token. Check credentials.",
-    "gmail_connected": "Connected to Gmail API successfully. Email: :email",
-    "gmail_verify_failed": "Failed to verify Gmail API connection"
+    "gmail_not_enabled": "Gmail APIが有効になっていません",
+    "gmail_token_failed": "アクセストークンの取得に失敗しました。資格情報を確認します。",
+    "gmail_connected": "Gmail APIに正常に接続されました。電子メール: :電子メール",
+    "gmail_verify_failed": "Gmail API 接続を確認できませんでした"
   },
   "menu_builder": {
     "location_header_main": "メインヘッダー",
@@ -10716,11 +10716,11 @@
     "verify_business": "ビジネスの検証"
   },
   "spam": {
-    "title": "Spam Detection",
-    "avg_score": "Avg Score",
+    "title": "スパムの検出",
+    "avg_score": "平均スコア",
     "blocked_count": "Blocked",
     "flagged_count": "Flagged",
-    "total_analyzed": "Total Analyzed"
+    "total_analyzed": "分析合計"
   },
   "bulk": {
     "selected_count": "{{count}} が選択されました",
@@ -10966,10 +10966,10 @@
     "checklist_no_http_triggers": "/cron/* エンドポイント用の個別の HTTP トリガーは構成されていません"
   },
   "api_docs": {
-    "aria_api_documentation_sections": "API Documentation Sections",
-    "aria_hmac_headers": "Hmac Headers",
+    "aria_api_documentation_sections": "API ドキュメントのセクション",
+    "aria_hmac_headers": "Hmac ヘッダー",
     "aria_parameters": "Parameters",
-    "aria_rate_limit_headers": "Rate Limit Headers"
+    "aria_rate_limit_headers": "レート制限ヘッダー"
   },
   "aria": {
     "breadcrumbs": "Breadcrumbs"
@@ -11073,7 +11073,7 @@
     "select_tenants": "テナントの選択"
   },
   "cancel": "Cancel",
-  "checking_permissions": "Checking Permissions",
+  "checking_permissions": "権限の確認",
   "clear": "Clear",
   "close": "Close",
   "common:nav": {
@@ -11101,9 +11101,9 @@
     "wallet": "ウォレット"
   },
   "cron_settings": {
-    "enable_job": "Enable Job",
-    "global_settings": "Global Settings",
-    "select_job": "Select Job"
+    "enable_job": "ジョブを有効にする",
+    "global_settings": "グローバル設定",
+    "select_job": "ジョブの選択"
   },
   "diagnostics_matching": {
     "avg_match_score": "平均マッチスコア",
@@ -11113,11 +11113,11 @@
     "engine_status": "エンジンのステータス",
     "matches_today": "今日の試合"
   },
-  "error_occurred": "Occurred error",
+  "error_occurred": "発生したエラー",
   "federation_audit": {
     "clear": "Clear",
-    "export_csv": "Export CSV",
-    "total_actions_30d": "Total Actions 30d"
+    "export_csv": "CSVのエクスポート",
+    "total_actions_30d": "合計アクション 30 日"
   },
   "federation_whitelist": {
     "add_tenant_to_whitelist": "テナントをホワイトリストに追加",
@@ -11148,8 +11148,8 @@
   },
   "impact_report_labels": {
     "transactions": "Transactions",
-    "unique_givers": "Unique Givers",
-    "unique_receivers": "Unique Receivers"
+    "unique_givers": "ユニークなギバー",
+    "unique_receivers": "ユニークな受信機"
   },
   "import": "Import",
   "legal_doc_form": {
@@ -11199,7 +11199,7 @@
     "this_will": "This Will",
     "title": "Title"
   },
-  "load_error": "Load error",
+  "load_error": "ロードエラー",
   "log_files_labels": {
     "download": "ダウンロード",
     "filter_all": "すべて",
@@ -11407,7 +11407,7 @@
     "subtitle": "このニュースレターを対象の受信者の一部に送信します。"
   },
   "newsletter_send_time": {
-    "engagement_heatmap": "Engagement Heatmap",
+    "engagement_heatmap": "エンゲージメントヒートマップ",
     "high": "High",
     "low": "Low",
     "top_recommended": "Top Recommended",
@@ -11439,7 +11439,7 @@
     "usage_stats": "使用状況統計"
   },
   "provider_health": {
-    "aria_success_rate": "Success Rate"
+    "aria_success_rate": "成功率"
   },
   "refresh": "Refresh",
   "rte": {
@@ -11474,8 +11474,8 @@
   },
   "seed_generator": {
     "count_aria_label": "{{label}} ?",
-    "data_types_heading": "Data Types",
-    "development_only": "Development Only",
+    "data_types_heading": "データ型",
+    "development_only": "開発のみ",
     "generate_button": "Generate",
     "warning_body": "Warning Body",
     "option_users_label": "ユーザー",
@@ -11594,7 +11594,7 @@
   },
   "subtitle": "Subtitle",
   "super_controls": {
-    "bulk_operations": "Bulk Operations",
+    "bulk_operations": "一括操作",
     "hierarchy": "Hierarchy"
   },
   "super_user_form": {
@@ -11702,22 +11702,22 @@
     "load_failed": "ロードに失敗しました",
     "loading_preview": "プレビューを読み込んでいます...",
     "loading_template": "テンプレートを読み込んでいます...",
-    "merge_variables_hint": "Merge Variables.",
+    "merge_variables_hint": "変数を結合します。",
     "name_required": "名前は必須です",
     "no_content": "コンテンツが見つかりませんでした",
     "preview_text_placeholder": "プレビューテキストを入力してください...",
     "return_to_templates": "テンプレートに戻る",
     "save_template": "テンプレートの保存",
     "subject_label": "件名",
-    "template_not_found": "Template Not Found",
+    "template_not_found": "テンプレートが見つかりません",
     "template_preview": "テンプレートのプレビュー",
-    "tip_content_width": "Tip Content Width",
-    "tip_inline_css": "Tip Inline CSS",
-    "tip_web_safe_fonts": "Tip Web Safe Fonts",
-    "unexpected_error_loading": "Unexpected Error Loading",
+    "tip_content_width": "ヒントコンテンツの幅",
+    "tip_inline_css": "ヒント インラインCSS",
+    "tip_web_safe_fonts": "ヒント Web セーフ フォント",
+    "unexpected_error_loading": "読み込み中の予期しないエラー",
     "update_template": "テンプレートを更新する",
-    "usage_stats_sent": "Usage Stats sent",
-    "usage_stats_sent_plural": "Usage Stats Sent Plural"
+    "usage_stats_sent": "送信された使用状況統計",
+    "usage_stats_sent_plural": "複数の使用統計が送信されました"
   },
   "tenant_form": {
     "active": "アクティブ",
@@ -11916,15 +11916,15 @@
   },
   "title": "Title",
   "webp_converter": {
-    "already_webp": "Already WebP",
-    "pending_conversion": "Pending Conversion",
-    "total_images": "Total Images"
+    "already_webp": "すでにWebP",
+    "pending_conversion": "変換保留中",
+    "total_images": "総画像数"
   },
-  "label_active_members": "Active Members",
-  "label_new_this_month": "New This Month",
-  "label_pending_approvals": "Pending Approvals",
-  "label_retention_rate": "Retention Rate",
-  "label_total_members": "Total Members",
+  "label_active_members": "アクティブなメンバー",
+  "label_new_this_month": "今月の新商品",
+  "label_pending_approvals": "承認待ち",
+  "label_retention_rate": "定着率",
+  "label_total_members": "総会員数",
   "enabled": "Enabled",
   "disabled": "Disabled",
   "caring_community": {
@@ -13326,7 +13326,7 @@
       "items": {
         "surveys": "Surveys",
         "projects": "Projects",
-        "trust_tier": "Trust Tier"
+        "trust_tier": "トラスト層"
       }
     }
   },
@@ -15407,7 +15407,7 @@
       "name_placeholder": "例えばロルツェンホフ",
       "postal_codes": "郵便番号",
       "postal_codes_description": "カンマまたはスペースで区切られた PLZ リスト。",
-      "postal_codes_placeholder": "6330, 6331, 6332",
+      "postal_codes_placeholder": "6330、6331、6332",
       "slug": "スラグ (空白の場合は自動生成)",
       "slug_description": "URL およびフィルタで使用される小文字のハイフンでつながれた識別子。",
       "slug_placeholder": "例えばロルツェンホフ",
@@ -16220,7 +16220,7 @@
       "body_middle": "）。係数 0.5 は、30 分を置き換えることを意味します。係数 2.0 は、集中的なパーソナルケアや専門家のサポートなど、2 時間の正式なケアに代わることを意味します。 The Age-Stiftung/",
       "body_prefix": "代替係数は、コスト オフセットの計算において各ケア カテゴリにどれだけの社会的価値があるかを制御します。係数 1.0 は、1 時間が 1 時間の正式な Spitex/Pflege ケアに等しいことを意味します (",
       "body_suffix": "方法論では、すべてのカテゴリーを 1.0 から開始し、観察されたケア強度に基づいて調整することを推奨しています。",
-      "chf_amount": "CHF 35",
+      "chf_amount": "35スイスフラン",
       "range_prefix": "値の範囲は 0.00 (ケア置換値なし) ～ 9.99 です。変更は次回から有効になります",
       "range_suffix": "レポートを更新します。",
       "title": "このページについて"

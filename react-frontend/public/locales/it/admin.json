@@ -2,8 +2,8 @@
   "active": "Active",
   "activity": {
     "card_title": "Activity",
-    "empty": "No activity found",
-    "view_all": "View All"
+    "empty": "Nessuna attività trovata",
+    "view_all": "Visualizza tutto"
   },
   "advanced": {
     "404_entry_dismissed": "404 voce respinta",
@@ -986,8 +986,8 @@
     "sync_search_hint_suffix": "dopo l'avvio di Meilisearch."
   },
   "alerts": {
-    "pending_approvals": "Pending Approvals",
-    "pending_listings": "Pending Listings"
+    "pending_approvals": "Approvazioni in sospeso",
+    "pending_listings": "Annunci in sospeso"
   },
   "analytics": {
     "category_demand_title": "Domanda di categoria",
@@ -3408,7 +3408,7 @@
   },
   "data_table": {
     "admin_data_table": "Data",
-    "no_data": "No data",
+    "no_data": "Nessun dato",
     "refresh": "Refresh",
     "search": "Search"
   },
@@ -5816,10 +5816,10 @@
     "toggle_sidebar": "Attiva/disattiva la barra laterale"
   },
   "icon_picker": {
-    "choose_icon": "Choose Icon",
-    "choose_icon_placeholder": "Search for an icon...",
-    "clear_icon": "Clear Icon",
-    "search_icons": "Search Icons",
+    "choose_icon": "Scegli Icona",
+    "choose_icon_placeholder": "Cerca un'icona...",
+    "clear_icon": "Icona Cancella",
+    "search_icons": "Cerca icone",
     "label": "Icona",
     "no_icons_found": "Nessuna icona trovata corrispondente a \"{{search}}\"",
     "search_for_icon": "Cerca un'icona..."
@@ -6161,7 +6161,7 @@
     "bias_rejection_rates_table": "Tassi di rifiuto per fase",
     "bias_avg_time_stage_table": "Tempo medio in scena"
   },
-  "last_checked": "Last checked: {{time}}",
+  "last_checked": "Ultimo controllo: {{time}}",
   "listings": {
     "actions": "Azioni",
     "an_unexpected_error_occurred": "Si è verificato un errore imprevisto",
@@ -7000,13 +7000,13 @@
     "section_top_performers_desc": "Newsletter con il più forte coinvolgimento recente.",
     "winner": "Vincitore"
   },
-  "no_data": "No data available",
+  "no_data": "Nessun dato disponibile",
   "not_found": {
-    "back_to_dashboard": "Back to Dashboard",
-    "description": "The page you are looking for does not exist",
-    "heading": "Page Not Found",
-    "page_title": "Not Found",
-    "title": "Not Found"
+    "back_to_dashboard": "Torna alla dashboard",
+    "description": "La pagina che stai cercando non esiste",
+    "heading": "Pagina non trovata",
+    "page_title": "Non trovato",
+    "title": "Non trovato"
   },
   "performance": {
     "label_performance_metrics": "Metriche delle prestazioni",
@@ -7035,9 +7035,9 @@
     "refresh": "Aggiorna"
   },
   "placeholder": {
-    "migration_description": "Migrating legacy content to the new system",
+    "migration_description": "Migrazione dei contenuti legacy al nuovo sistema",
     "migration_title": "Migration",
-    "open_legacy": "Open Legacy"
+    "open_legacy": "Apri l'eredità"
   },
   "polls": {
     "an_unexpected_error_occurred": "Si è verificato un errore imprevisto",
@@ -7074,15 +7074,15 @@
     "status_ended": "Finito"
   },
   "quick_actions": {
-    "advanced_controls": "Advanced Controls",
-    "card_title": "Quick Actions",
+    "advanced_controls": "Controlli avanzati",
+    "card_title": "Azioni rapide",
     "enterprise": "Enterprise",
     "gamification": "Gamification",
-    "manage_users": "Manage Users",
-    "new_blog_post": "New Blog Post",
-    "send_newsletter": "Send Newsletter",
+    "manage_users": "Gestisci utenti",
+    "new_blog_post": "Nuovo post sul blog",
+    "send_newsletter": "Invia newsletter",
     "settings": "Settings",
-    "view_listings": "View Listings"
+    "view_listings": "Visualizza elenchi"
   },
   "reports": {
     "active_30d_total": "Active (30 days)",
@@ -9335,7 +9335,7 @@
   "trends": {
     "card_title": "Trends",
     "hours_suffix": "hrs",
-    "no_data": "No data available"
+    "no_data": "Nessun dato disponibile"
   },
   "user_create": {
     "back_to_users": "Torniamo agli Utenti",
@@ -9804,7 +9804,7 @@
     "validation_password_min": "La password deve contenere almeno 8 caratteri",
     "validation_role_required": "Il ruolo è obbligatorio"
   },
-  "view_all": "View All",
+  "view_all": "Visualizza tutto",
   "visibility_rules": {
     "min_role": "Ruolo minimo",
     "requires_auth": "Richiede l'autenticazione",
@@ -10426,10 +10426,10 @@
     "webhook_url_placeholder": "https://example.com/webhook"
   },
   "mailer": {
-    "gmail_not_enabled": "Gmail API is not enabled",
-    "gmail_token_failed": "Failed to obtain access token. Check credentials.",
-    "gmail_connected": "Connected to Gmail API successfully. Email: :email",
-    "gmail_verify_failed": "Failed to verify Gmail API connection"
+    "gmail_not_enabled": "L'API Gmail non è abilitata",
+    "gmail_token_failed": "Impossibile ottenere il token di accesso. Controlla le credenziali.",
+    "gmail_connected": "Connessione all'API Gmail riuscita. E-mail: :e-mail",
+    "gmail_verify_failed": "Impossibile verificare la connessione all'API Gmail"
   },
   "menu_builder": {
     "location_header_main": "Intestazione principale",
@@ -10716,11 +10716,11 @@
     "verify_business": "Verifica attività"
   },
   "spam": {
-    "title": "Spam Detection",
-    "avg_score": "Avg Score",
+    "title": "Rilevamento dello spam",
+    "avg_score": "Punteggio medio",
     "blocked_count": "Blocked",
     "flagged_count": "Flagged",
-    "total_analyzed": "Total Analyzed"
+    "total_analyzed": "Totale analizzato"
   },
   "bulk": {
     "selected_count": "{{count}} selezionato",
@@ -10931,8 +10931,8 @@
     "docker_step_1_desc": "Modifica il crontab dell'host con `sudo crontab -e` e aggiungi questa singola riga:",
     "verify": "Verifica",
     "thats_it": "Questo è tutto!",
-    "thats_it_prefix": "Laravel's scheduler (via",
-    "thats_it_suffix": ") will handle all job dispatching internally.",
+    "thats_it_prefix": "Lo scheduler di Laravel (via",
+    "thats_it_suffix": ") gestirà internamente l'invio di tutti i lavori.",
     "linux_vps": "Linux/VPS",
     "linux_step_1": "Passaggio 1: apri il crontab",
     "linux_step_2": "Passaggio 2: aggiungi una singola riga di pianificazione",
@@ -10966,10 +10966,10 @@
     "checklist_no_http_triggers": "Non sono configurati trigger HTTP separati per gli endpoint /cron/*"
   },
   "api_docs": {
-    "aria_api_documentation_sections": "API Documentation Sections",
-    "aria_hmac_headers": "Hmac Headers",
+    "aria_api_documentation_sections": "Sezioni della documentazione API",
+    "aria_hmac_headers": "Intestazioni Hmac",
     "aria_parameters": "Parameters",
-    "aria_rate_limit_headers": "Rate Limit Headers"
+    "aria_rate_limit_headers": "Intestazioni dei limiti di velocità"
   },
   "aria": {
     "breadcrumbs": "Breadcrumbs"
@@ -11073,7 +11073,7 @@
     "select_tenants": "Seleziona inquilini"
   },
   "cancel": "Cancel",
-  "checking_permissions": "Checking Permissions",
+  "checking_permissions": "Controllo dei permessi",
   "clear": "Clear",
   "close": "Close",
   "common:nav": {
@@ -11101,9 +11101,9 @@
     "wallet": "Portafoglio"
   },
   "cron_settings": {
-    "enable_job": "Enable Job",
-    "global_settings": "Global Settings",
-    "select_job": "Select Job"
+    "enable_job": "Abilita lavoro",
+    "global_settings": "Impostazioni globali",
+    "select_job": "Seleziona Lavoro"
   },
   "diagnostics_matching": {
     "avg_match_score": "Punteggio medio della partita",
@@ -11113,11 +11113,11 @@
     "engine_status": "Stato del motore",
     "matches_today": "Partite di oggi"
   },
-  "error_occurred": "Occurred error",
+  "error_occurred": "Si è verificato un errore",
   "federation_audit": {
     "clear": "Clear",
-    "export_csv": "Export CSV",
-    "total_actions_30d": "Total Actions 30d"
+    "export_csv": "Esporta CSV",
+    "total_actions_30d": "Azioni totali 30d"
   },
   "federation_whitelist": {
     "add_tenant_to_whitelist": "Aggiungi tenant alla lista bianca",
@@ -11148,8 +11148,8 @@
   },
   "impact_report_labels": {
     "transactions": "Transactions",
-    "unique_givers": "Unique Givers",
-    "unique_receivers": "Unique Receivers"
+    "unique_givers": "Donatori unici",
+    "unique_receivers": "Ricevitori unici"
   },
   "import": "Import",
   "legal_doc_form": {
@@ -11199,7 +11199,7 @@
     "this_will": "This Will",
     "title": "Title"
   },
-  "load_error": "Load error",
+  "load_error": "Errore di caricamento",
   "log_files_labels": {
     "download": "Scarica",
     "filter_all": "Tutto",
@@ -11407,7 +11407,7 @@
     "subtitle": "Invia questa newsletter a un sottoinsieme mirato di destinatari."
   },
   "newsletter_send_time": {
-    "engagement_heatmap": "Engagement Heatmap",
+    "engagement_heatmap": "Mappa termica del coinvolgimento",
     "high": "High",
     "low": "Low",
     "top_recommended": "Top Recommended",
@@ -11439,7 +11439,7 @@
     "usage_stats": "Statistiche di utilizzo"
   },
   "provider_health": {
-    "aria_success_rate": "Success Rate"
+    "aria_success_rate": "Tasso di successo"
   },
   "refresh": "Refresh",
   "rte": {
@@ -11474,8 +11474,8 @@
   },
   "seed_generator": {
     "count_aria_label": "Conteggio {{label}}",
-    "data_types_heading": "Data Types",
-    "development_only": "Development Only",
+    "data_types_heading": "Tipi di dati",
+    "development_only": "Solo sviluppo",
     "generate_button": "Generate",
     "warning_body": "Warning Body",
     "option_users_label": "Utenti",
@@ -11594,7 +11594,7 @@
   },
   "subtitle": "Subtitle",
   "super_controls": {
-    "bulk_operations": "Bulk Operations",
+    "bulk_operations": "Operazioni in blocco",
     "hierarchy": "Hierarchy"
   },
   "super_user_form": {
@@ -11916,15 +11916,15 @@
   },
   "title": "Title",
   "webp_converter": {
-    "already_webp": "Already WebP",
-    "pending_conversion": "Pending Conversion",
-    "total_images": "Total Images"
+    "already_webp": "Già WebP",
+    "pending_conversion": "Conversione in attesa",
+    "total_images": "Immagini totali"
   },
-  "label_active_members": "Active Members",
-  "label_new_this_month": "New This Month",
-  "label_pending_approvals": "Pending Approvals",
-  "label_retention_rate": "Retention Rate",
-  "label_total_members": "Total Members",
+  "label_active_members": "Membri attivi",
+  "label_new_this_month": "Novità questo mese",
+  "label_pending_approvals": "Approvazioni in sospeso",
+  "label_retention_rate": "Tasso di ritenzione",
+  "label_total_members": "Membri totali",
   "enabled": "Enabled",
   "disabled": "Disabled",
   "caring_community": {
@@ -13326,7 +13326,7 @@
       "items": {
         "surveys": "Surveys",
         "projects": "Projects",
-        "trust_tier": "Trust Tier"
+        "trust_tier": "Livello di fiducia"
       }
     }
   },
@@ -15271,7 +15271,7 @@
       "dsa_body": "Deve essere firmato prima di qualsiasi scambio di dati in tempo reale. Bozze di accordi utilizzando i modelli di partenariati di ricerca.",
       "dsa_label": "DSA (Accordo di condivisione dei dati):",
       "sandbox_body": "Collegamento all'ambiente di test del partner. Convalida l'integrazione nella sandbox prima di promuovere la pubblicazione.",
-      "sandbox_label": "Sandbox URL:",
+      "sandbox_label": "URL della sandbox:",
       "statuses_body": "Proposto -> Scoping -> Sandbox -> Live. Bloccato significa che una dipendenza esterna non è risolta.",
       "statuses_label": "Stati:",
       "title": "A proposito di questa pagina"
@@ -15482,7 +15482,7 @@
     "confirm_delete": "Eliminare il peer federato \"{{name}}\"? Questo è permanente.",
     "confirm_rotate": "Ruotare il segreto condiviso per \"{{name}}\"? Il vecchio segreto smette di funzionare immediatamente ed è necessario aggiornare il lato remoto.",
     "create_modal": {
-      "base_url": "Base URL",
+      "base_url": "URL di base",
       "base_url_description": "HTTPS URL del telecomando NEXUS API. Il percorso /v2/federation/hour-transfer/inbound viene aggiunto automaticamente.",
       "base_url_placeholder": "https://api.kiss-bern.ch",
       "display_name": "Nome da visualizzare",
@@ -15510,7 +15510,7 @@
       "title": "Colleghi registrati"
     },
     "secret_modal": {
-      "base_url_label": "Base URL:",
+      "base_url_label": "URL di base:",
       "body_prefix": "Questo segreto viene mostrato",
       "body_suffix": "Copialo ora e incollalo nella voce peer della federazione dell'installazione NEXUS remota per questa cooperativa. Se lo perdi, devi ruotare il segreto qui e aggiornare nuovamente il lato remoto.",
       "only_once": "solo una volta",
@@ -15524,7 +15524,7 @@
     },
     "table": {
       "actions": "Azioni",
-      "base_url": "Base URL",
+      "base_url": "URL di base",
       "last_handshake": "L'ultima stretta di mano",
       "name": "Nome",
       "slug": "Lumaca",
@@ -16220,7 +16220,7 @@
       "body_middle": "). Un coefficiente di 0,5 significa che sostituisce mezz'ora. Un coefficiente pari a 2,0 significa che sostituisce due ore di assistenza formale, ad esempio assistenza personale intensiva o supporto specialistico. Il Age-Stiftung/",
       "body_prefix": "I coefficienti di sostituzione controllano il valore sociale di ciascuna categoria di assistenza nel calcolo della compensazione dei costi. Un coefficiente pari a 1,0 significa che un'ora equivale a un'ora di assistenza formale Spitex/Pflege (",
       "body_suffix": "La metodologia consiglia di iniziare tutte le categorie da 1.0 e di adattarle in base all'intensità di cura osservata.",
-      "chf_amount": "CHF 35",
+      "chf_amount": "35 franchi",
       "range_prefix": "I valori vanno da 0,00 (nessun valore di sostituzione delle cure) a 9,99. Le modifiche entreranno in vigore il giorno successivo",
       "range_suffix": "aggiornamento del rapporto.",
       "title": "A proposito di questa pagina"
