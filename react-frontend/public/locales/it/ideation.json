@@ -83,7 +83,7 @@
     "draft_updated": "Aggiornata {{date}}",
     "draft_created": "Creata {{date}}",
     "new_idea": "Nuova Idea",
-    "sort_label": "Sort ideas"
+    "sort_label": "Ordina idee"
   },
   "idea_detail": {
     "page_title": "Dettagli dell'Idea",
@@ -215,7 +215,7 @@
     "placeholder": "Cerca sfide per titolo o descrizione...",
     "clear_tags": "Cancella tag",
     "no_results": "Nessuna sfida corrisponde alla tua ricerca",
-    "clear": "Clear search"
+    "clear": "Cancella ricerca"
   },
   "tags": {
     "label": "Tag",
@@ -313,9 +313,9 @@
     "confirm_unlink": "Conferma",
     "confirm_unlink_label": "Conferma scollegamento",
     "fallback_title": "Campagna",
-    "feature_not_available": "Ideation Not Available",
-    "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more.",
-    "retry": "Retry"
+    "feature_not_available": "Funzionalità di ideazione non disponibile",
+    "feature_not_available_desc": "La funzionalità di ideazione non è abilitata per questa community. Contatta il tuo amministratore della banca del tempo per saperne di più.",
+    "retry": "Riprova"
   },
   "templates": {
     "title": "Modelli di Sfida",
@@ -345,7 +345,7 @@
     "total_challenges": "Totale Monitorato",
     "implemented_count": "Implementati",
     "in_progress_count": "In Corso",
-    "edit": "Edit outcomes"
+    "edit": "Modifica risultati"
   },
   "tasks": {
     "title": "Attivita",
@@ -414,10 +414,10 @@
       "title": "Crea Sfida"
     },
     "campaigns": {
-      "title": "Campaigns"
+      "title": "Campagne"
     }
   },
   "challenge_detail": {
-    "actions": "Challenge actions"
+    "actions": "Azioni della sfida"
   }
 }

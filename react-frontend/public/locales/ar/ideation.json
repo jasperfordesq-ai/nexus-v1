@@ -4,48 +4,48 @@
   "subtitle": "شارك الأفكار، صوت، وساعد في تشكيل مجتمعك",
   "page_description": "تصفح تحديات المجتمع، قدم أفكارك، وصوت على الحلول. ساعد في تشكيل مستقبل مجتمعك.",
   "actions": {
-    "retry": "Retry"
+    "retry": "إعادة المحاولة"
   },
   "tabs": {
-    "all": "All",
-    "open": "Open",
-    "voting": "Voting",
-    "evaluating": "Evaluating",
-    "closed": "Closed",
-    "archived": "Archived",
+    "all": "الكل",
+    "open": "مفتوح",
+    "voting": "التصويت",
+    "evaluating": "قيد التقييم",
+    "closed": "مغلق",
+    "archived": "مؤرشف",
     "favorites": "المفضلات الخاصة بي"
   },
   "status": {
-    "draft": "Draft",
-    "open": "Open",
-    "voting": "Voting",
-    "evaluating": "Evaluating",
-    "closed": "Closed",
-    "archived": "Archived"
+    "draft": "مسودة",
+    "open": "مفتوح",
+    "voting": "التصويت",
+    "evaluating": "قيد التقييم",
+    "closed": "مغلق",
+    "archived": "مؤرشف"
   },
   "idea_status": {
-    "draft": "Draft",
-    "submitted": "Submitted",
-    "shortlisted": "Shortlisted",
-    "winner": "Winner",
-    "withdrawn": "Withdrawn"
+    "draft": "مسودة",
+    "submitted": "مُقدَّمة",
+    "shortlisted": "في القائمة المختصرة",
+    "winner": "فائز",
+    "withdrawn": "مسحوبة"
   },
   "challenge": {
     "ideas_count": "{{count}} أفكار",
     "ideas_count_one": "{{count}} فكرة",
     "submission_deadline": "تاريخ التسليم {{date}}",
     "voting_deadline": "تنتهي فترة التصويت {{date}}",
-    "prize": "Prize",
-    "category": "Category",
+    "prize": "الجائزة",
+    "category": "الفئة",
     "max_ideas": "حد أقصى {{count}} أفكار لكل شخص",
     "created_by": "أنشأها {{name}}",
     "no_deadline": "لا يوجد موعد نهائي",
     "evaluation_criteria": "معايير التقييم",
-    "outcome": "Outcome",
+    "outcome": "النتيجة",
     "team_links": "فرق المشروع"
   },
   "challenges": {
-    "title": "Challenges",
+    "title": "التحديات",
     "empty_title": "لا توجد تحديات بعد",
     "empty_description": "لا توجد تحديات إبداعية في الوقت الحالي. تحقق مرة أخرى قريبًا!",
     "empty_filtered": "لا توجد تحديات تتطابق مع الفلتر المحدد.",
@@ -54,15 +54,15 @@
     "load_more": "تحميل المزيد"
   },
   "ideas": {
-    "title": "Ideas",
+    "title": "الأفكار",
     "empty_title": "لا توجد أفكار بعد",
     "empty_description": "كن أول من يشارك بفكرته لهذا التحدي!",
     "submit": "قدم فكرة",
     "submit_title": "قدم فكرتك",
     "sort_votes": "الأعلى تصويتًا",
-    "sort_newest": "Newest",
-    "vote": "Vote",
-    "unvote": "Unvote",
+    "sort_newest": "الأحدث",
+    "vote": "تصويت",
+    "unvote": "إلغاء التصويت",
     "votes": "{{count}} أصوات",
     "votes_one": "{{count}} صوت",
     "comments": "{{count}} تعليقات",
@@ -77,39 +77,39 @@
     "save_draft": "حفظ المسودة",
     "publish_draft": "نشر الفكرة",
     "draft_saved": "تم حفظ المسودة",
-    "draft": "Draft",
+    "draft": "مسودة",
     "your_drafts": "مسوداتك",
     "untitled_draft": "مسودة بلا عنوان",
     "draft_updated": "تم تحديث {{date}}",
     "draft_created": "تم إنشاء {{date}}",
     "new_idea": "فكرة جديدة",
-    "sort_label": "Sort ideas"
+    "sort_label": "ترتيب الأفكار"
   },
   "idea_detail": {
     "page_title": "تفاصيل الفكرة",
     "back_to_challenge": "العودة إلى التحدي",
     "submitted_by": "تم تقديمه بواسطة {{name}}",
     "submitted_on": "تم تقديمه في {{date}}",
-    "actions": "Idea actions"
+    "actions": "إجراءات الفكرة"
   },
   "comments": {
-    "title": "Comments",
+    "title": "التعليقات",
     "empty_title": "لا تعليقات حتى الآن",
     "empty_description": "كن أول من يشارك أفكاره حول هذه الفكرة.",
     "add_placeholder": "شارك أفكارك...",
     "add_button": "نشر تعليق",
-    "delete": "Delete",
+    "delete": "حذف",
     "delete_confirm": "هل أنت متأكد أنك تريد حذف هذا التعليق؟",
     "load_more": "تحميل المزيد من التعليقات",
     "load_error": "غير قادر على تحميل التعليقات"
   },
   "form": {
-    "title_label": "Title",
+    "title_label": "العنوان",
     "title_placeholder": "أدخل عنوانًا واضحًا ووصفًا",
-    "description_label": "Description",
+    "description_label": "الوصف",
     "description_placeholder": "صف التحدي أو فكرتك بالتفصيل",
     "description_helper": "صف المشكلة بوضوح، بما في ذلك من يتأثر، ولماذا هي مهمة، وما يبدو عليه الحل الناجح",
-    "category_label": "Category",
+    "category_label": "الفئة",
     "category_placeholder": "اختر فئة",
     "category_free_label": "الفئة (نص حر)",
     "category_free_placeholder": "مثل: البيئة، التكنولوجيا، المجتمع",
@@ -127,13 +127,13 @@
     "evaluation_criteria_helper": "حدد كيف سيتم تقييم الأفكار",
     "template_label": "ابدأ من قالب",
     "template_placeholder": "اختر قالبًا (اختياري)",
-    "save": "Save",
+    "save": "حفظ",
     "saving": "جارٍ الحفظ...",
     "create": "إنشاء تحدي",
     "creating": "جارٍ الإنشاء...",
     "update": "تحديث التحدي",
     "updating": "جارٍ التحديث...",
-    "cancel": "Cancel"
+    "cancel": "إلغاء"
   },
   "create_page": {
     "page_title": "إنشاء تحدي",
@@ -208,17 +208,17 @@
     "empty_title": "لا توجد مفضلات بعد",
     "empty_description": "قم بتمييز تحدٍ لإضافته إلى مفضلتك."
   },
-  "views": "views",
-  "featured": "Featured",
+  "views": "مشاهدات",
+  "featured": "مميّز",
   "search": {
     "label": "ابحث عن التحديات",
     "placeholder": "ابحث عن التحديات حسب العنوان أو الوصف...",
     "clear_tags": "مسح العلامات",
     "no_results": "لا توجد تحديات تتطابق مع بحثك",
-    "clear": "Clear search"
+    "clear": "مسح البحث"
   },
   "tags": {
-    "label": "Tags",
+    "label": "الوسوم",
     "placeholder": "أضف علامات (اضغط Enter)",
     "helper": "أضف المهارات أو المواضيع المتعلقة بهذا التحدي",
     "interests": "مجالات الاهتمام",
@@ -269,19 +269,19 @@
   },
   "idea_image": "صورة الفكرة",
   "media": {
-    "title": "Attachments",
+    "title": "المرفقات",
     "add": "إضافة مرفق",
     "add_image": "إضافة صورة",
     "add_link": "إضافة رابط",
     "url_label": "URL",
     "url_placeholder": "https://...",
-    "caption_label": "Caption",
+    "caption_label": "التعليق التوضيحي",
     "caption_placeholder": "وصف موجز (اختياري)",
-    "type_label": "Type",
-    "type_image": "Image",
-    "type_video": "Video",
-    "type_document": "Document",
-    "type_link": "Link",
+    "type_label": "النوع",
+    "type_image": "صورة",
+    "type_video": "فيديو",
+    "type_document": "مستند",
+    "type_link": "رابط",
     "delete_confirm": "هل تريد إزالة هذا المرفق؟",
     "empty": "لا توجد مرفقات"
   },
@@ -291,9 +291,9 @@
     "description": "قم بتحويل هذه الفكرة الفائزة إلى فريق مشروع حيث يمكن للأعضاء التعاون، إدارة المهام، مشاركة الوثائق، والدردشة.",
     "name_label": "اسم الفريق",
     "description_label": "وصف الفريق",
-    "visibility_label": "Visibility",
-    "visibility_public": "Public",
-    "visibility_private": "Private",
+    "visibility_label": "الرؤية",
+    "visibility_public": "عام",
+    "visibility_private": "خاص",
     "confirm": "إنشاء فريق",
     "creating": "جارٍ الإنشاء...",
     "success": "تم إنشاء فريق المشروع بنجاح! جارٍ التوجيه...",
@@ -301,8 +301,8 @@
     "already_converted": "تم تحويل هذه الفكرة بالفعل إلى فريق"
   },
   "campaigns": {
-    "title": "Campaigns",
-    "page_title": "Campaigns",
+    "title": "الحملات",
+    "page_title": "الحملات",
     "empty_title": "لا توجد حملات بعد",
     "empty_description": "أنشئ حملة لتجميع التحديات ذات الصلة معًا.",
     "create": "إنشاء حملة",
@@ -313,9 +313,9 @@
     "confirm_unlink": "تأكيد",
     "confirm_unlink_label": "تأكيد فك الارتباط",
     "fallback_title": "حملة",
-    "feature_not_available": "Ideation Not Available",
-    "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more.",
-    "retry": "Retry"
+    "feature_not_available": "ميزة الأفكار غير متاحة",
+    "feature_not_available_desc": "ميزة الأفكار غير مفعّلة لهذا المجتمع. تواصل مع مسؤول بنك الوقت لمعرفة المزيد.",
+    "retry": "إعادة المحاولة"
   },
   "templates": {
     "title": "قوالب التحديات",
@@ -330,12 +330,12 @@
     "title": "تتبع الأثر",
     "page_title": "لوحة معلومات الأثر",
     "empty_title": "لا توجد نتائج بعد",
-    "status_label": "Status",
+    "status_label": "الحالة",
     "implementation_status_label": "حالة التنفيذ",
     "status_not_started": "لم يبدأ بعد",
     "status_in_progress": "قيد التنفيذ",
-    "status_implemented": "Implemented",
-    "status_abandoned": "Abandoned",
+    "status_implemented": "منجز",
+    "status_abandoned": "متروك",
     "winning_idea": "فكرة فائزة",
     "impact_description": "وصف الأثر",
     "impact_placeholder": "صف الأثر والنتائج...",
@@ -343,32 +343,32 @@
     "saving": "جارٍ الحفظ...",
     "dashboard": "لوحة تأثير",
     "total_challenges": "الإجمالي المتعقب",
-    "implemented_count": "Implemented",
+    "implemented_count": "منجز",
     "in_progress_count": "قيد التنفيذ",
-    "edit": "Edit outcomes"
+    "edit": "تعديل النتائج"
   },
   "tasks": {
-    "title": "Tasks",
-    "status_label": "Status",
-    "priority_label": "Priority",
+    "title": "المهام",
+    "status_label": "الحالة",
+    "priority_label": "الأولوية",
     "create": "أضف مهمة",
     "empty_title": "لا توجد مهام بعد",
     "empty_description": "أنشئ مهام لتنظيم عمل فريقك.",
     "status_todo": "للقراءة",
     "status_in_progress": "قيد التنفيذ",
-    "status_done": "Done",
-    "priority_low": "Low",
-    "priority_medium": "Medium",
-    "priority_high": "High",
-    "priority_urgent": "Urgent",
+    "status_done": "منجز",
+    "priority_low": "منخفض",
+    "priority_medium": "متوسط",
+    "priority_high": "عالي",
+    "priority_urgent": "عاجل",
     "assigned_to": "مخصص لـ",
-    "unassigned": "Unassigned",
+    "unassigned": "غير مُعيَّن",
     "due_date": "تاريخ الاستحقاق",
-    "overdue": "Overdue",
+    "overdue": "متأخر",
     "stats": "إحصائيات المهام"
   },
   "documents": {
-    "title": "Documents",
+    "title": "المستندات",
     "upload": "تحميل مستند",
     "empty_title": "لا توجد مستندات بعد",
     "empty_description": "قم بتحميل الملفات لمشاركتها مع فريقك.",
@@ -376,26 +376,26 @@
     "max_size": "أقصى حجم للملف: 10 ميغابايت"
   },
   "chatrooms": {
-    "title": "Channels",
+    "title": "القنوات",
     "create": "إنشاء قناة",
-    "general": "General",
+    "general": "عام",
     "empty_title": "لا توجد رسائل بعد",
     "empty_description": "ابدأ المحادثة!",
     "message_placeholder": "اكتب رسالة...",
-    "send": "Send",
+    "send": "إرسال",
     "delete_channel": "حذف القناة",
     "delete_channel_confirm": "هل تريد حذف هذه القناة وجميع رسائلها؟"
   },
   "categories": {
-    "title": "Categories",
+    "title": "الفئات",
     "manage": "إدارة الفئات",
     "all": "جميع الفئات",
     "create": "أضف فئة",
     "name_label": "اسم الفئة",
     "name_placeholder": "مثلًا: البيئة",
-    "icon_label": "Icon",
+    "icon_label": "الرمز",
     "icon_placeholder": "اسم أيقونة لوسيد (مثل: ورقة)",
-    "color_label": "Color",
+    "color_label": "اللون",
     "delete_confirm": "هل تريد حذف هذه الفئة؟"
   },
   "validation": {
@@ -414,10 +414,10 @@
       "title": "إنشاء تحدي"
     },
     "campaigns": {
-      "title": "Campaigns"
+      "title": "الحملات"
     }
   },
   "challenge_detail": {
-    "actions": "Challenge actions"
+    "actions": "إجراءات التحدي"
   }
 }

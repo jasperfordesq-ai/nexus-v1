@@ -137,7 +137,7 @@
     "view_original": "Ver original",
     "show_translation": "Mostrar traducción",
     "translating": "Traduciendo...",
-    "translation_failed": "Error en la traducción. Inténtelo de nuevo.",
+    "translation_failed": "Traducción fallida. Por favor, inténtalo de nuevo.",
     "translated_label": "Traducido"
   },
   "auto_translate": {
@@ -146,14 +146,14 @@
     "disabled_toast": "Traducción automática desactivada",
     "translating_all": "Traduciendo mensajes...",
     "tooltip_off": "Traducir todos los mensajes automáticamente",
-    "tooltip_on": "La traducción automática está activada — haz clic para desactivarla",
+    "tooltip_on": "La traducción automática está activada — haz clic para desactivar",
     "active_banner": "Los mensajes en esta conversación se están traduciendo automáticamente a tu idioma.",
     "turn_off": "Desactivar"
   },
   "translate_hint": {
-    "title": "La traducción está disponible",
-    "body": "Tú y esta persona pueden escribir en su propio idioma. Toca \"Traducir\" en cualquier mensaje para leerlo en el tuyo, o usa el botón de traducción en el encabezado para traducir todo automáticamente.",
-    "dismiss": "Descartar sugerencia de traducción"
+    "title": "Traducción disponible",
+    "body": "Tú y esta persona pueden escribir cada uno en su propio idioma. Toca «Traducir» en cualquier mensaje para leerlo en el tuyo, o usa el botón de traducir en el encabezado para traducirlo todo automáticamente.",
+    "dismiss": "Cerrar sugerencia de traducción"
   },
   "new_group": "Nuevo Grupo",
   "create_group": "Crear Grupo",
@@ -189,17 +189,17 @@
   "auto_translate.tooltip_on": "Auto-translate is on — click to turn off",
   "auto_translate.active_banner": "Messages in this conversation are being automatically translated into your language.",
   "auto_translate.turn_off": "Turn off",
-  "group_participants": "Participants",
+  "group_participants": "Participantes",
   "group_admin": "Admin",
-  "group_member": "Member",
-  "group_remove_member": "Remove",
-  "group_tab": "Groups",
+  "group_member": "Miembro",
+  "group_remove_member": "Eliminar",
+  "group_tab": "Grupos",
   "page_meta": {
     "list": {
-      "title": "Messages"
+      "title": "Mensajes"
     },
     "conversation": {
-      "title": "Conversation"
+      "title": "Conversación"
     }
   },
   "character_count": "{{current}}/{{max}}",

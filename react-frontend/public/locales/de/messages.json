@@ -133,11 +133,11 @@
   },
   "translate": {
     "translate": "Übersetzen",
-    "translate_to": "Übersetzen in",
+    "translate_to": "Übersetzen nach",
     "view_original": "Original anzeigen",
     "show_translation": "Übersetzung anzeigen",
     "translating": "Wird übersetzt...",
-    "translation_failed": "Übersetzung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "translation_failed": "Übersetzung fehlgeschlagen. Bitte erneut versuchen.",
     "translated_label": "Übersetzt"
   },
   "auto_translate": {
@@ -146,14 +146,14 @@
     "disabled_toast": "Automatische Übersetzung deaktiviert",
     "translating_all": "Nachrichten werden übersetzt...",
     "tooltip_off": "Alle Nachrichten automatisch übersetzen",
-    "tooltip_on": "Automatische Übersetzung ist aktiv — klicken Sie, um sie auszuschalten",
-    "active_banner": "Nachrichten in diesem Gespräch werden automatisch in Ihre Sprache übersetzt.",
+    "tooltip_on": "Automatische Übersetzung ist aktiv — klicken zum Deaktivieren",
+    "active_banner": "Nachrichten in diesem Gespräch werden automatisch in deine Sprache übersetzt.",
     "turn_off": "Ausschalten"
   },
   "translate_hint": {
-    "title": "Übersetzung ist verfügbar",
-    "body": "Sie und diese Person können jeweils in Ihrer eigenen Sprache schreiben. Tippen Sie auf \"Übersetzen\" bei einer Nachricht, um sie in Ihrer Sprache zu lesen, oder verwenden Sie die Übersetzen-Schaltfläche im Header, um alles automatisch zu übersetzen.",
-    "dismiss": "Übersetzungshinweis schliessen"
+    "title": "Übersetzung verfügbar",
+    "body": "Du und diese Person können jeweils in eurer eigenen Sprache schreiben. Tippe auf \"Übersetzen\" bei einer Nachricht, um sie in deiner Sprache zu lesen, oder verwende den Übersetzen-Button im Header, um alles automatisch zu übersetzen.",
+    "dismiss": "Übersetzungshinweis schließen"
   },
   "new_group": "Neue Gruppe",
   "create_group": "Gruppe erstellen",
@@ -189,17 +189,17 @@
   "auto_translate.tooltip_on": "Auto-translate is on — click to turn off",
   "auto_translate.active_banner": "Messages in this conversation are being automatically translated into your language.",
   "auto_translate.turn_off": "Turn off",
-  "group_participants": "Participants",
+  "group_participants": "Teilnehmer",
   "group_admin": "Admin",
-  "group_member": "Member",
-  "group_remove_member": "Remove",
-  "group_tab": "Groups",
+  "group_member": "Mitglied",
+  "group_remove_member": "Entfernen",
+  "group_tab": "Gruppen",
   "page_meta": {
     "list": {
-      "title": "Messages"
+      "title": "Nachrichten"
     },
     "conversation": {
-      "title": "Conversation"
+      "title": "Gespräch"
     }
   },
   "character_count": "{{current}}/{{max}}",

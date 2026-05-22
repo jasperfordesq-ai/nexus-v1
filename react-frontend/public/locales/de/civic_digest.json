@@ -48,18 +48,18 @@
     "body_one": "{{count}} neue Aktualisierung in Ihrer Gemeinschaft",
     "body_other": "{{count}} neue Aktualisierungen in Ihrer Gemeinschaft"
   },
-  "back_link": "Back to Community Hub",
+  "back_link": "Zurück zum Community-Hub",
   "transparency": {
-    "why_button": "Why am I seeing this?",
-    "match_score_label": "Match",
-    "global_note": "Items are ranked by relevance to your sub-region, interests, and recent activity. Tap 'Why?' on any item for details.",
-    "reason_sub_region": "Matches your sub-region",
-    "reason_priority": "Marked as priority/urgent",
-    "reason_recency": "Recently published",
-    "reason_category_match": "Matches your interests",
-    "reason_safety": "Safety alert",
-    "reason_announcement": "Official announcement",
-    "no_reasons": "Default ranking"
+    "why_button": "Warum sehe ich das?",
+    "match_score_label": "Übereinstimmung",
+    "global_note": "Elemente werden nach Relevanz für deine Unterregion, Interessen und jüngste Aktivität sortiert. Tippe auf «Warum?» bei einem Element für Details.",
+    "reason_sub_region": "Entspricht deiner Unterregion",
+    "reason_priority": "Als prioritär/dringend markiert",
+    "reason_recency": "Kürzlich veröffentlicht",
+    "reason_category_match": "Entspricht deinen Interessen",
+    "reason_safety": "Sicherheitswarnung",
+    "reason_announcement": "Offizielle Ankündigung",
+    "no_reasons": "Standardsortierung"
   },
   "prefs_cadence_monthly": "Monatliche Zusammenfassung"
 }

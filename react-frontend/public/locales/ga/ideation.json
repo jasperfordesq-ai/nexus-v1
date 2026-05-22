@@ -82,14 +82,14 @@
     "draft_updated": "Nuashonraithe {{date}}",
     "draft_created": "Cruthaithe {{date}}",
     "new_idea": "Smaoineamh Nua",
-    "sort_label": "Sort ideas"
+    "sort_label": "Sórtáil smaointe"
   },
   "idea_detail": {
     "page_title": "Sonrai an Smaoineamh",
     "back_to_challenge": "Ar Ais go dti an Dushshlan",
     "submitted_by": "Curtha isteach ag {{name}}",
     "submitted_on": "Curtha isteach ar {{date}}",
-    "actions": "Idea actions"
+    "actions": "Gníomhartha smaoineamh"
   },
   "comments": {
     "title": "Trachtanna",
@@ -214,7 +214,7 @@
     "placeholder": "Cuardaigh dúshláin de réir teidil nó cur síos...",
     "clear_tags": "Glan clibeanna",
     "no_results": "Níl aon dúshlán ag freagairt do do chuardach",
-    "clear": "Clear search"
+    "clear": "Glan cuardach"
   },
   "tags": {
     "label": "Clibeanna",
@@ -312,9 +312,9 @@
     "confirm_unlink": "Deimhnigh",
     "confirm_unlink_label": "Deimhnigh dínascadh",
     "fallback_title": "Feachtas",
-    "feature_not_available": "Ideation Not Available",
-    "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more.",
-    "retry": "Retry"
+    "feature_not_available": "Cumadóireacht Smaointe Gan Fáil",
+    "feature_not_available_desc": "Níl an ghné chumadóireachta smaointe cumasaithe don phobal seo. Déan teagmháil le do riarthóir bainc ama le haghaidh tuilleadh eolais.",
+    "retry": "Déan arís"
   },
   "templates": {
     "title": "Teimpléid Dúshláin",
@@ -344,7 +344,7 @@
     "total_challenges": "Iomlán Rianta",
     "implemented_count": "Curtha i bhFeidhm",
     "in_progress_count": "Ar Siúl",
-    "edit": "Edit outcomes"
+    "edit": "Cuir torthaí in eagar"
   },
   "tasks": {
     "title": "Tascanna",
@@ -405,19 +405,19 @@
     "name_required": "Tá ainm ag teastáil",
     "file_required": "Tá comhad ag teastáil"
   },
-  "page_description": "Browse community challenges, submit ideas, and vote on solutions. Help shape the future of your community.",
+  "page_description": "Brabhsáil dúshláin phobail, cuir isteach smaointe, agus vótáil ar réitigh. Cuidigh le todhchaí do phobail a mhúnlú.",
   "page_meta": {
     "outcomes": {
-      "title": "Outcomes Dashboard"
+      "title": "Deais Torthaí"
     },
     "create_challenge": {
-      "title": "Create Challenge"
+      "title": "Cruthaigh Dúshlán"
     },
     "campaigns": {
-      "title": "Campaigns"
+      "title": "Feachtais"
     }
   },
   "challenge_detail": {
-    "actions": "Challenge actions"
+    "actions": "Gníomhartha dúshláin"
   }
 }

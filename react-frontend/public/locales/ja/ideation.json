@@ -4,48 +4,48 @@
   "subtitle": "アイデアを共有し、投票して、コミュニティを形作る手助けをしましょう",
   "page_description": "コミュニティのチャレンジを閲覧し、アイデアを提出し、解決策に投票しましょう。あなたのコミュニティの未来を形作る手助けをしましょう。",
   "actions": {
-    "retry": "Retry"
+    "retry": "再試行"
   },
   "tabs": {
-    "all": "All",
-    "open": "Open",
-    "voting": "Voting",
-    "evaluating": "Evaluating",
-    "closed": "Closed",
-    "archived": "Archived",
+    "all": "すべて",
+    "open": "公開",
+    "voting": "投票中",
+    "evaluating": "審査中",
+    "closed": "終了",
+    "archived": "アーカイブ",
     "favorites": "お気に入り"
   },
   "status": {
-    "draft": "Draft",
-    "open": "Open",
-    "voting": "Voting",
-    "evaluating": "Evaluating",
-    "closed": "Closed",
-    "archived": "Archived"
+    "draft": "下書き",
+    "open": "公開",
+    "voting": "投票中",
+    "evaluating": "審査中",
+    "closed": "終了",
+    "archived": "アーカイブ"
   },
   "idea_status": {
-    "draft": "Draft",
-    "submitted": "Submitted",
-    "shortlisted": "Shortlisted",
-    "winner": "Winner",
-    "withdrawn": "Withdrawn"
+    "draft": "下書き",
+    "submitted": "提出済み",
+    "shortlisted": "候補",
+    "winner": "優勝",
+    "withdrawn": "取り下げ"
   },
   "challenge": {
     "ideas_count": "{{count}} アイデア",
     "ideas_count_one": "{{count}} アイデア",
     "submission_deadline": "提出期限 {{date}}",
     "voting_deadline": "投票終了 {{date}}",
-    "prize": "Prize",
-    "category": "Category",
+    "prize": "賞",
+    "category": "カテゴリー",
     "max_ideas": "1人あたり最大 {{count}} アイデア",
     "created_by": "{{name}} によって作成されました",
     "no_deadline": "締切なし",
     "evaluation_criteria": "評価基準",
-    "outcome": "Outcome",
+    "outcome": "成果",
     "team_links": "プロジェクトチーム"
   },
   "challenges": {
-    "title": "Challenges",
+    "title": "チャレンジ",
     "empty_title": "まだチャレンジはありません",
     "empty_description": "現在、アイデアチャレンジはありません。もう一度チェックしてください！",
     "empty_filtered": "選択したフィルターに一致するチャレンジはありません。",
@@ -54,15 +54,15 @@
     "load_more": "もっと読み込む"
   },
   "ideas": {
-    "title": "Ideas",
+    "title": "アイデア",
     "empty_title": "まだアイデアはありません",
     "empty_description": "このチャレンジのために最初にアイデアを共有しましょう！",
     "submit": "アイデアを提出",
     "submit_title": "あなたのアイデアを提出",
     "sort_votes": "最も投票された",
-    "sort_newest": "Newest",
-    "vote": "Vote",
-    "unvote": "Unvote",
+    "sort_newest": "最新",
+    "vote": "投票",
+    "unvote": "投票取消",
     "votes": "{{count}} 投票",
     "votes_one": "{{count}} 投票",
     "comments": "{{count}} コメント",
@@ -77,39 +77,39 @@
     "save_draft": "ドラフトを保存",
     "publish_draft": "アイデアを公開",
     "draft_saved": "ドラフトが保存されました",
-    "draft": "Draft",
+    "draft": "下書き",
     "your_drafts": "あなたのドラフト",
     "untitled_draft": "無題のドラフト",
     "draft_updated": "更新された {{date}}",
     "draft_created": "作成された {{date}}",
     "new_idea": "新しいアイデア",
-    "sort_label": "Sort ideas"
+    "sort_label": "アイデアを並べ替え"
   },
   "idea_detail": {
     "page_title": "アイデアの詳細",
     "back_to_challenge": "チャレンジに戻る",
     "submitted_by": "{{name}} によって提出されました",
     "submitted_on": "{{date}} に提出されました",
-    "actions": "Idea actions"
+    "actions": "アイデアアクション"
   },
   "comments": {
-    "title": "Comments",
+    "title": "コメント",
     "empty_title": "まだコメントはありません",
     "empty_description": "このアイデアについてあなたの考えを最初に共有しましょう。",
     "add_placeholder": "あなたの考えを共有...",
     "add_button": "コメントを投稿",
-    "delete": "Delete",
+    "delete": "削除",
     "delete_confirm": "このコメントを削除してもよろしいですか？",
     "load_more": "さらにコメントを読み込む",
     "load_error": "コメントを読み込めません"
   },
   "form": {
-    "title_label": "Title",
+    "title_label": "タイトル",
     "title_placeholder": "明確で説明的なタイトルを入力してください",
-    "description_label": "Description",
+    "description_label": "説明",
     "description_placeholder": "チャレンジやあなたのアイデアを詳細に説明してください",
     "description_helper": "問題を明確に説明し、誰が影響を受けているのか、なぜそれが重要なのか、成功する解決策がどのようなものかを含めてください",
-    "category_label": "Category",
+    "category_label": "カテゴリー",
     "category_placeholder": "カテゴリを選択",
     "category_free_label": "カテゴリ（自由記述）",
     "category_free_placeholder": "例：環境、技術、コミュニティ",
@@ -127,13 +127,13 @@
     "evaluation_criteria_helper": "アイデアがどのように評価されるかを定義します",
     "template_label": "テンプレートから始める",
     "template_placeholder": "テンプレートを選択してください（任意）",
-    "save": "Save",
+    "save": "保存",
     "saving": "保存中...",
     "create": "チャレンジを作成",
     "creating": "作成中...",
     "update": "チャレンジを更新",
     "updating": "更新中...",
-    "cancel": "Cancel"
+    "cancel": "キャンセル"
   },
   "create_page": {
     "page_title": "チャレンジを作成",
@@ -208,17 +208,17 @@
     "empty_title": "まだお気に入りはありません",
     "empty_description": "チャレンジにハートを付けてお気に入りに追加しましょう。"
   },
-  "views": "views",
-  "featured": "Featured",
+  "views": "閲覧数",
+  "featured": "注目",
   "search": {
     "label": "チャレンジを検索",
     "placeholder": "タイトルまたは説明でチャレンジを検索...",
     "clear_tags": "タグをクリア",
     "no_results": "検索に一致するチャレンジはありません",
-    "clear": "Clear search"
+    "clear": "検索をクリア"
   },
   "tags": {
-    "label": "Tags",
+    "label": "タグ",
     "placeholder": "タグを追加 (Enterキーを押してください)",
     "helper": "このチャレンジに関連するスキルやトピックを追加",
     "interests": "興味のある分野",
@@ -269,19 +269,19 @@
   },
   "idea_image": "アイデア画像",
   "media": {
-    "title": "Attachments",
+    "title": "添付ファイル",
     "add": "添付ファイルを追加",
     "add_image": "画像を追加",
     "add_link": "リンクを追加",
     "url_label": "URL",
     "url_placeholder": "https://...",
-    "caption_label": "Caption",
+    "caption_label": "キャプション",
     "caption_placeholder": "簡単な説明（任意）",
-    "type_label": "Type",
-    "type_image": "Image",
-    "type_video": "Video",
-    "type_document": "Document",
-    "type_link": "Link",
+    "type_label": "種類",
+    "type_image": "画像",
+    "type_video": "動画",
+    "type_document": "ドキュメント",
+    "type_link": "リンク",
     "delete_confirm": "この添付ファイルを削除しますか？",
     "empty": "添付ファイルはありません"
   },
@@ -291,9 +291,9 @@
     "description": "この受賞アイデアをプロジェクトチームに変換し、メンバーが協力し、タスクを管理し、文書を共有し、チャットできるようにします。",
     "name_label": "チーム名",
     "description_label": "チームの説明",
-    "visibility_label": "Visibility",
-    "visibility_public": "Public",
-    "visibility_private": "Private",
+    "visibility_label": "公開設定",
+    "visibility_public": "公開",
+    "visibility_private": "非公開",
     "confirm": "チームを作成",
     "creating": "作成中...",
     "success": "プロジェクトチームが正常に作成されました！リダイレクト中...",
@@ -301,8 +301,8 @@
     "already_converted": "このアイデアはすでにチームに変換されています"
   },
   "campaigns": {
-    "title": "Campaigns",
-    "page_title": "Campaigns",
+    "title": "キャンペーン",
+    "page_title": "キャンペーン",
     "empty_title": "まだキャンペーンはありません",
     "empty_description": "関連する課題をまとめるためにキャンペーンを作成してください。",
     "create": "キャンペーンを作成",
@@ -313,9 +313,9 @@
     "confirm_unlink": "確認",
     "confirm_unlink_label": "リンク解除を確認",
     "fallback_title": "キャンペーン",
-    "feature_not_available": "Ideation Not Available",
-    "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more.",
-    "retry": "Retry"
+    "feature_not_available": "アイデア機能は利用できません",
+    "feature_not_available_desc": "アイデア機能はこのコミュニティでは有効になっていません。詳細はタイムバンク管理者にお問い合わせください。",
+    "retry": "再試行"
   },
   "templates": {
     "title": "課題テンプレート",
@@ -330,12 +330,12 @@
     "title": "影響の追跡",
     "page_title": "影響ダッシュボード",
     "empty_title": "まだ結果はありません",
-    "status_label": "Status",
+    "status_label": "ステータス",
     "implementation_status_label": "実施状況",
     "status_not_started": "未開始",
     "status_in_progress": "進行中",
-    "status_implemented": "Implemented",
-    "status_abandoned": "Abandoned",
+    "status_implemented": "実施済み",
+    "status_abandoned": "中止",
     "winning_idea": "勝利したアイデア",
     "impact_description": "影響の説明",
     "impact_placeholder": "影響と結果を説明してください...",
@@ -343,32 +343,32 @@
     "saving": "保存中...",
     "dashboard": "インパクトダッシュボード",
     "total_challenges": "合計トラッキング数",
-    "implemented_count": "Implemented",
+    "implemented_count": "実施済み",
     "in_progress_count": "進行中",
-    "edit": "Edit outcomes"
+    "edit": "成果を編集"
   },
   "tasks": {
-    "title": "Tasks",
-    "status_label": "Status",
-    "priority_label": "Priority",
+    "title": "タスク",
+    "status_label": "ステータス",
+    "priority_label": "優先度",
     "create": "タスクを追加",
     "empty_title": "まだタスクはありません",
     "empty_description": "チームの作業を整理するためにタスクを作成しましょう。",
     "status_todo": "やること",
     "status_in_progress": "進行中",
-    "status_done": "Done",
-    "priority_low": "Low",
-    "priority_medium": "Medium",
-    "priority_high": "High",
-    "priority_urgent": "Urgent",
+    "status_done": "完了",
+    "priority_low": "低",
+    "priority_medium": "中",
+    "priority_high": "高",
+    "priority_urgent": "緊急",
     "assigned_to": "割り当て先",
-    "unassigned": "Unassigned",
+    "unassigned": "未割り当て",
     "due_date": "期限",
-    "overdue": "Overdue",
+    "overdue": "期限超過",
     "stats": "タスク統計"
   },
   "documents": {
-    "title": "Documents",
+    "title": "ドキュメント",
     "upload": "ドキュメントをアップロード",
     "empty_title": "まだドキュメントはありません",
     "empty_description": "チームと共有するファイルをアップロードしましょう。",
@@ -376,26 +376,26 @@
     "max_size": "最大ファイルサイズ：10 MB"
   },
   "chatrooms": {
-    "title": "Channels",
+    "title": "チャンネル",
     "create": "チャンネルを作成",
-    "general": "General",
+    "general": "一般",
     "empty_title": "まだメッセージはありません",
     "empty_description": "会話を始めましょう！",
     "message_placeholder": "メッセージを入力...",
-    "send": "Send",
+    "send": "送信",
     "delete_channel": "チャンネルを削除",
     "delete_channel_confirm": "このチャンネルとそのすべてのメッセージを削除しますか？"
   },
   "categories": {
-    "title": "Categories",
+    "title": "カテゴリー",
     "manage": "カテゴリを管理",
     "all": "すべてのカテゴリ",
     "create": "カテゴリを追加",
     "name_label": "カテゴリ名",
     "name_placeholder": "例：環境",
-    "icon_label": "Icon",
+    "icon_label": "アイコン",
     "icon_placeholder": "Lucideアイコン名（例：葉）",
-    "color_label": "Color",
+    "color_label": "色",
     "delete_confirm": "このカテゴリを削除しますか？"
   },
   "validation": {
@@ -414,10 +414,10 @@
       "title": "チャレンジを作成"
     },
     "campaigns": {
-      "title": "Campaigns"
+      "title": "キャンペーン"
     }
   },
   "challenge_detail": {
-    "actions": "Challenge actions"
+    "actions": "チャレンジアクション"
   }
 }

@@ -147,13 +147,13 @@
     "translating_all": "Traduction des messages...",
     "tooltip_off": "Traduire tous les messages automatiquement",
     "tooltip_on": "La traduction automatique est activée — cliquez pour désactiver",
-    "active_banner": "Les messages de cette conversation sont traduits automatiquement dans votre langue.",
+    "active_banner": "Les messages de cette conversation sont automatiquement traduits dans votre langue.",
     "turn_off": "Désactiver"
   },
   "translate_hint": {
-    "title": "La traduction est disponible",
-    "body": "Vous et cette personne pouvez chacun écrire dans votre propre langue. Appuyez sur \"Traduire\" sur n'importe quel message pour le lire dans la vôtre, ou utilisez le bouton de traduction dans l'en-tête pour tout traduire automatiquement.",
-    "dismiss": "Ignorer l'astuce de traduction"
+    "title": "Traduction disponible",
+    "body": "Vous et cette personne pouvez chacun écrire dans votre propre langue. Appuyez sur « Traduire » sur n'importe quel message pour le lire dans la vôtre, ou utilisez le bouton de traduction dans l'en-tête pour tout traduire automatiquement.",
+    "dismiss": "Fermer le conseil de traduction"
   },
   "new_group": "Nouveau groupe",
   "create_group": "Créer un groupe",
@@ -191,9 +191,9 @@
   "auto_translate.turn_off": "Turn off",
   "group_participants": "Participants",
   "group_admin": "Admin",
-  "group_member": "Member",
-  "group_remove_member": "Remove",
-  "group_tab": "Groups",
+  "group_member": "Membre",
+  "group_remove_member": "Retirer",
+  "group_tab": "Groupes",
   "page_meta": {
     "list": {
       "title": "Messages"

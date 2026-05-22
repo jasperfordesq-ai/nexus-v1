@@ -83,7 +83,7 @@
     "draft_updated": "Aktualisiert {{date}}",
     "draft_created": "Erstellt {{date}}",
     "new_idea": "Neue Idee",
-    "sort_label": "Sort ideas"
+    "sort_label": "Ideen sortieren"
   },
   "idea_detail": {
     "page_title": "Ideendetails",
@@ -215,7 +215,7 @@
     "placeholder": "Wettbewerbe nach Titel oder Beschreibung durchsuchen...",
     "clear_tags": "Schlagwörter löschen",
     "no_results": "Keine Wettbewerbe entsprechen Ihrer Suche",
-    "clear": "Clear search"
+    "clear": "Suche löschen"
   },
   "tags": {
     "label": "Schlagwörter",
@@ -313,9 +313,9 @@
     "confirm_unlink": "Bestätigen",
     "confirm_unlink_label": "Trennung bestätigen",
     "fallback_title": "Kampagne",
-    "feature_not_available": "Ideation Not Available",
-    "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more.",
-    "retry": "Retry"
+    "feature_not_available": "Ideensammlung nicht verfügbar",
+    "feature_not_available_desc": "Die Ideensammlungsfunktion ist für diese Community nicht aktiviert. Wende dich an deinen Zeitbank-Administrator, um mehr zu erfahren.",
+    "retry": "Erneut versuchen"
   },
   "templates": {
     "title": "Wettbewerbsvorlagen",
@@ -345,7 +345,7 @@
     "total_challenges": "Gesamt verfolgt",
     "implemented_count": "Umgesetzt",
     "in_progress_count": "In Bearbeitung",
-    "edit": "Edit outcomes"
+    "edit": "Ergebnisse bearbeiten"
   },
   "tasks": {
     "title": "Aufgaben",
@@ -414,10 +414,10 @@
       "title": "Herausforderung erstellen"
     },
     "campaigns": {
-      "title": "Campaigns"
+      "title": "Kampagnen"
     }
   },
   "challenge_detail": {
-    "actions": "Challenge actions"
+    "actions": "Challenge-Aktionen"
   }
 }

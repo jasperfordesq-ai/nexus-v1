@@ -83,7 +83,7 @@
     "draft_updated": "Actualizado {{date}}",
     "draft_created": "Creado {{date}}",
     "new_idea": "Nueva Idea",
-    "sort_label": "Sort ideas"
+    "sort_label": "Ordenar ideas"
   },
   "idea_detail": {
     "page_title": "Detalles de la Idea",
@@ -215,7 +215,7 @@
     "placeholder": "Buscar retos por título o descripción...",
     "clear_tags": "Limpiar etiquetas",
     "no_results": "Ningún reto coincide con tu búsqueda",
-    "clear": "Clear search"
+    "clear": "Borrar búsqueda"
   },
   "tags": {
     "label": "Etiquetas",
@@ -313,9 +313,9 @@
     "confirm_unlink": "Confirmar",
     "confirm_unlink_label": "Confirmar desvinculación",
     "fallback_title": "Campaña",
-    "feature_not_available": "Ideation Not Available",
-    "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more.",
-    "retry": "Retry"
+    "feature_not_available": "Ideación no disponible",
+    "feature_not_available_desc": "La función de ideación no está habilitada para esta comunidad. Contacta con tu administrador del banco de tiempo para obtener más información.",
+    "retry": "Reintentar"
   },
   "templates": {
     "title": "Plantillas de Reto",
@@ -345,7 +345,7 @@
     "total_challenges": "Total Rastreados",
     "implemented_count": "Implementados",
     "in_progress_count": "En Progreso",
-    "edit": "Edit outcomes"
+    "edit": "Editar resultados"
   },
   "tasks": {
     "title": "Tareas",
@@ -414,10 +414,10 @@
       "title": "Crear Desafío"
     },
     "campaigns": {
-      "title": "Campaigns"
+      "title": "Campañas"
     }
   },
   "challenge_detail": {
-    "actions": "Challenge actions"
+    "actions": "Acciones del desafío"
   }
 }

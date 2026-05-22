@@ -4,48 +4,48 @@
   "subtitle": "Deel ideeën, stem en help je gemeenschap vorm te geven",
   "page_description": "Blader door de gemeenschapsuitdagingen, dien ideeën in en stem op oplossingen. Help de toekomst van je gemeenschap vorm te geven.",
   "actions": {
-    "retry": "Retry"
+    "retry": "Opnieuw proberen"
   },
   "tabs": {
-    "all": "All",
+    "all": "Alles",
     "open": "Open",
-    "voting": "Voting",
-    "evaluating": "Evaluating",
-    "closed": "Closed",
-    "archived": "Archived",
+    "voting": "Stemmen",
+    "evaluating": "In evaluatie",
+    "closed": "Gesloten",
+    "archived": "Gearchiveerd",
     "favorites": "Mijn Favorieten"
   },
   "status": {
-    "draft": "Draft",
+    "draft": "Concept",
     "open": "Open",
-    "voting": "Voting",
-    "evaluating": "Evaluating",
-    "closed": "Closed",
-    "archived": "Archived"
+    "voting": "Stemmen",
+    "evaluating": "In evaluatie",
+    "closed": "Gesloten",
+    "archived": "Gearchiveerd"
   },
   "idea_status": {
-    "draft": "Draft",
-    "submitted": "Submitted",
-    "shortlisted": "Shortlisted",
-    "winner": "Winner",
-    "withdrawn": "Withdrawn"
+    "draft": "Concept",
+    "submitted": "Ingediend",
+    "shortlisted": "Op de shortlist",
+    "winner": "Winnaar",
+    "withdrawn": "Ingetrokken"
   },
   "challenge": {
     "ideas_count": "{{count}} ideeën",
     "ideas_count_one": "{{count}} idee",
     "submission_deadline": "Inzendingen moeten voor {{date}} binnen zijn",
     "voting_deadline": "Stemmen eindigt op {{date}}",
-    "prize": "Prize",
-    "category": "Category",
+    "prize": "Prijs",
+    "category": "Categorie",
     "max_ideas": "Maximaal {{count}} ideeën per persoon",
     "created_by": "Gemaakt door {{name}}",
     "no_deadline": "Geen deadline",
     "evaluation_criteria": "Evaluatiecriteria",
-    "outcome": "Outcome",
+    "outcome": "Resultaat",
     "team_links": "Projectteams"
   },
   "challenges": {
-    "title": "Challenges",
+    "title": "Uitdagingen",
     "empty_title": "Nog geen uitdagingen",
     "empty_description": "Er zijn op dit moment geen idee-uitdagingen. Kom snel terug!",
     "empty_filtered": "Geen uitdagingen passen bij de geselecteerde filter.",
@@ -54,15 +54,15 @@
     "load_more": "Meer laden"
   },
   "ideas": {
-    "title": "Ideas",
+    "title": "Ideeën",
     "empty_title": "Nog geen ideeën",
     "empty_description": "Wees de eerste om je idee voor deze uitdaging te delen!",
     "submit": "Dien Idee In",
     "submit_title": "Dien Je Idee In",
     "sort_votes": "Meest Gestemd",
-    "sort_newest": "Newest",
-    "vote": "Vote",
-    "unvote": "Unvote",
+    "sort_newest": "Nieuwste",
+    "vote": "Stem",
+    "unvote": "Stem intrekken",
     "votes": "{{count}} stemmen",
     "votes_one": "{{count}} stem",
     "comments": "{{count}} opmerkingen",
@@ -77,13 +77,13 @@
     "save_draft": "Concept Opslaan",
     "publish_draft": "Idee Publiceren",
     "draft_saved": "Concept opgeslagen",
-    "draft": "Draft",
+    "draft": "Concept",
     "your_drafts": "Jouw Concepten",
     "untitled_draft": "Ongetiteld Concept",
     "draft_updated": "Bijgewerkt {{date}}",
     "draft_created": "Aangemaakt {{date}}",
     "new_idea": "Nieuw Idee",
-    "sort_label": "Sort ideas"
+    "sort_label": "Ideeën sorteren"
   },
   "idea_detail": {
     "page_title": "Idee Details",
@@ -93,23 +93,23 @@
     "actions": "Idee-acties"
   },
   "comments": {
-    "title": "Comments",
+    "title": "Reacties",
     "empty_title": "Nog Geen Reacties",
     "empty_description": "Wees de eerste om je gedachten over dit idee te delen.",
     "add_placeholder": "Deel je gedachten...",
     "add_button": "Plaats Reactie",
-    "delete": "Delete",
+    "delete": "Verwijderen",
     "delete_confirm": "Weet je zeker dat je deze reactie wilt verwijderen?",
     "load_more": "Laad Meer Reacties",
     "load_error": "Kan reacties niet laden"
   },
   "form": {
-    "title_label": "Title",
+    "title_label": "Titel",
     "title_placeholder": "Voer een duidelijke, beschrijvende titel in",
-    "description_label": "Description",
+    "description_label": "Beschrijving",
     "description_placeholder": "Beschrijf de uitdaging of je idee in detail",
     "description_helper": "Beschrijf het probleem duidelijk, inclusief wie erdoor wordt getroffen, waarom het belangrijk is, en hoe een succesvolle oplossing eruitziet",
-    "category_label": "Category",
+    "category_label": "Categorie",
     "category_placeholder": "Selecteer een categorie",
     "category_free_label": "Categorie (vrije tekst)",
     "category_free_placeholder": "bijv. Milieu, Technologie, Gemeenschap",
@@ -127,13 +127,13 @@
     "evaluation_criteria_helper": "Definieer hoe ideeën beoordeeld zullen worden",
     "template_label": "Begin vanaf sjabloon",
     "template_placeholder": "Selecteer een sjabloon (optioneel)",
-    "save": "Save",
+    "save": "Opslaan",
     "saving": "Opslaan...",
     "create": "Creëer uitdaging",
     "creating": "Aan het creëren...",
     "update": "Update uitdaging",
     "updating": "Aan het bijwerken...",
-    "cancel": "Cancel"
+    "cancel": "Annuleren"
   },
   "create_page": {
     "page_title": "Creëer uitdaging",
@@ -208,17 +208,17 @@
     "empty_title": "Nog geen Favorieten",
     "empty_description": "Geef een uitdaging een hart om deze aan je favorieten toe te voegen."
   },
-  "views": "views",
-  "featured": "Featured",
+  "views": "weergaven",
+  "featured": "Uitgelicht",
   "search": {
     "label": "Zoek uitdagingen",
     "placeholder": "Zoek uitdagingen op titel of beschrijving...",
     "clear_tags": "Tags wissen",
     "no_results": "Geen uitdagingen die overeenkomen met je zoekopdracht",
-    "clear": "Clear search"
+    "clear": "Zoekopdracht wissen"
   },
   "tags": {
-    "label": "Tags",
+    "label": "Labels",
     "placeholder": "Voeg tags toe (druk op Enter)",
     "helper": "Voeg vaardigheden of onderwerpen toe die relevant zijn voor deze uitdaging",
     "interests": "Interessegebieden",
@@ -269,16 +269,16 @@
   },
   "idea_image": "Idee afbeelding",
   "media": {
-    "title": "Attachments",
+    "title": "Bijlagen",
     "add": "Voeg Bijlage Toe",
     "add_image": "Voeg Afbeelding Toe",
     "add_link": "Voeg Link Toe",
     "url_label": "URL",
     "url_placeholder": "https://...",
-    "caption_label": "Caption",
+    "caption_label": "Bijschrift",
     "caption_placeholder": "Korte beschrijving (optioneel)",
     "type_label": "Type",
-    "type_image": "Image",
+    "type_image": "Afbeelding",
     "type_video": "Video",
     "type_document": "Document",
     "type_link": "Link",
@@ -291,9 +291,9 @@
     "description": "Zet dit winnende idee om in een projectteam waar leden kunnen samenwerken, taken beheren, documenten delen en chatten.",
     "name_label": "Teamnaam",
     "description_label": "Teambeschrijving",
-    "visibility_label": "Visibility",
-    "visibility_public": "Public",
-    "visibility_private": "Private",
+    "visibility_label": "Zichtbaarheid",
+    "visibility_public": "Openbaar",
+    "visibility_private": "Privé",
     "confirm": "Team aanmaken",
     "creating": "Aanmaken...",
     "success": "Projectteam succesvol aangemaakt! Wordt omgeleid...",
@@ -301,8 +301,8 @@
     "already_converted": "Dit idee is al omgezet naar een team"
   },
   "campaigns": {
-    "title": "Campaigns",
-    "page_title": "Campaigns",
+    "title": "Campagnes",
+    "page_title": "Campagnes",
     "empty_title": "Nog geen campagnes",
     "empty_description": "Maak een campagne om gerelateerde uitdagingen te groeperen.",
     "create": "Campagne aanmaken",
@@ -313,9 +313,9 @@
     "confirm_unlink": "Bevestigen",
     "confirm_unlink_label": "Ontkoppelen bevestigen",
     "fallback_title": "Campagne",
-    "feature_not_available": "Ideation Not Available",
-    "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more.",
-    "retry": "Retry"
+    "feature_not_available": "Ideevorming niet beschikbaar",
+    "feature_not_available_desc": "De ideevormingsfunctie is niet ingeschakeld voor deze community. Neem contact op met je tijdbank-beheerder voor meer informatie.",
+    "retry": "Opnieuw proberen"
   },
   "templates": {
     "title": "Uitdaging Sjablonen",
@@ -327,15 +327,15 @@
     "start_from_template": "Begin vanaf sjabloon"
   },
   "outcomes": {
-    "title": "Impact Tracking",
+    "title": "Impacttracking",
     "page_title": "Impact Dashboard",
     "empty_title": "Nog geen resultaten",
     "status_label": "Status",
     "implementation_status_label": "Implementatiestatus",
     "status_not_started": "Niet gestart",
     "status_in_progress": "Bezig",
-    "status_implemented": "Implemented",
-    "status_abandoned": "Abandoned",
+    "status_implemented": "Geïmplementeerd",
+    "status_abandoned": "Verlaten",
     "winning_idea": "Winnend idee",
     "impact_description": "Impactbeschrijving",
     "impact_placeholder": "Beschrijf de impact en resultaten...",
@@ -343,32 +343,32 @@
     "saving": "Opslaan...",
     "dashboard": "Impact Dashboard",
     "total_challenges": "Totaal Gevolgd",
-    "implemented_count": "Implemented",
+    "implemented_count": "Geïmplementeerd",
     "in_progress_count": "In Behandeling",
-    "edit": "Edit outcomes"
+    "edit": "Resultaten bewerken"
   },
   "tasks": {
-    "title": "Tasks",
+    "title": "Taken",
     "status_label": "Status",
-    "priority_label": "Priority",
+    "priority_label": "Prioriteit",
     "create": "Taak Toevoegen",
     "empty_title": "Nog Geen Taken",
     "empty_description": "Maak taken aan om het werk van je team te organiseren.",
     "status_todo": "Te Doen",
     "status_in_progress": "In Behandeling",
-    "status_done": "Done",
-    "priority_low": "Low",
-    "priority_medium": "Medium",
-    "priority_high": "High",
+    "status_done": "Klaar",
+    "priority_low": "Laag",
+    "priority_medium": "Gemiddeld",
+    "priority_high": "Hoog",
     "priority_urgent": "Urgent",
     "assigned_to": "Toegewezen aan",
-    "unassigned": "Unassigned",
+    "unassigned": "Niet toegewezen",
     "due_date": "Vervaldatum",
-    "overdue": "Overdue",
+    "overdue": "Achterstallig",
     "stats": "Taak Statistieken"
   },
   "documents": {
-    "title": "Documents",
+    "title": "Documenten",
     "upload": "Document Uploaden",
     "empty_title": "Nog Geen Documenten",
     "empty_description": "Upload bestanden om te delen met je team.",
@@ -376,26 +376,26 @@
     "max_size": "Maximale bestandsgrootte: 10 MB"
   },
   "chatrooms": {
-    "title": "Channels",
+    "title": "Kanalen",
     "create": "Kanaal Aanmaken",
-    "general": "General",
+    "general": "Algemeen",
     "empty_title": "Nog Geen Berichten",
     "empty_description": "Begin het gesprek!",
     "message_placeholder": "Typ een bericht...",
-    "send": "Send",
+    "send": "Verzenden",
     "delete_channel": "Kanaal Verwijderen",
     "delete_channel_confirm": "Dit kanaal en al zijn berichten verwijderen?"
   },
   "categories": {
-    "title": "Categories",
+    "title": "Categorieën",
     "manage": "Categorieën Beheren",
     "all": "Alle Categorieën",
     "create": "Categorie Toevoegen",
     "name_label": "Categorie Naam",
     "name_placeholder": "bijv. Milieu",
-    "icon_label": "Icon",
+    "icon_label": "Pictogram",
     "icon_placeholder": "Lucide icoon naam (bijv. Blad)",
-    "color_label": "Color",
+    "color_label": "Kleur",
     "delete_confirm": "Deze categorie verwijderen?"
   },
   "validation": {
@@ -414,10 +414,10 @@
       "title": "Uitdaging Creëren"
     },
     "campaigns": {
-      "title": "Campaigns"
+      "title": "Campagnes"
     }
   },
   "challenge_detail": {
-    "actions": "Challenge actions"
+    "actions": "Uitdagingsacties"
   }
 }

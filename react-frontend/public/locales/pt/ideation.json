@@ -83,7 +83,7 @@
     "draft_updated": "Atualizado {{date}}",
     "draft_created": "Criado {{date}}",
     "new_idea": "Nova Ideia",
-    "sort_label": "Sort ideas"
+    "sort_label": "Ordenar ideias"
   },
   "idea_detail": {
     "page_title": "Detalhes da Ideia",
@@ -215,7 +215,7 @@
     "placeholder": "Pesquisar desafios por título ou descrição...",
     "clear_tags": "Limpar etiquetas",
     "no_results": "Nenhum desafio corresponde à sua pesquisa",
-    "clear": "Clear search"
+    "clear": "Limpar pesquisa"
   },
   "tags": {
     "label": "Etiquetas",
@@ -313,9 +313,9 @@
     "confirm_unlink": "Confirmar",
     "confirm_unlink_label": "Confirmar desassociação",
     "fallback_title": "Campanha",
-    "feature_not_available": "Ideation Not Available",
-    "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more.",
-    "retry": "Retry"
+    "feature_not_available": "Funcionalidade de ideação não disponível",
+    "feature_not_available_desc": "A funcionalidade de ideação não está ativada para esta comunidade. Contacte o seu administrador do banco de tempo para saber mais.",
+    "retry": "Tentar novamente"
   },
   "templates": {
     "title": "Modelos de Desafio",
@@ -345,7 +345,7 @@
     "total_challenges": "Total Rastreado",
     "implemented_count": "Implementados",
     "in_progress_count": "Em Progresso",
-    "edit": "Edit outcomes"
+    "edit": "Editar resultados"
   },
   "tasks": {
     "title": "Tarefas",
@@ -414,10 +414,10 @@
       "title": "Criar Desafio"
     },
     "campaigns": {
-      "title": "Campaigns"
+      "title": "Campanhas"
     }
   },
   "challenge_detail": {
-    "actions": "Challenge actions"
+    "actions": "Ações do desafio"
   }
 }

@@ -4,48 +4,48 @@
   "subtitle": "Dziel się pomysłami, głosuj i pomóż kształtować swoją społeczność",
   "page_description": "Przeglądaj wyzwania społeczności, zgłaszaj pomysły i głosuj na rozwiązania. Pomóż kształtować przyszłość swojej społeczności.",
   "actions": {
-    "retry": "Retry"
+    "retry": "Ponów próbę"
   },
   "tabs": {
-    "all": "All",
-    "open": "Open",
-    "voting": "Voting",
-    "evaluating": "Evaluating",
-    "closed": "Closed",
-    "archived": "Archived",
+    "all": "Wszystkie",
+    "open": "Otwarte",
+    "voting": "Głosowanie",
+    "evaluating": "Oceniane",
+    "closed": "Zamknięte",
+    "archived": "Zarchiwizowane",
     "favorites": "Moje Ulubione"
   },
   "status": {
-    "draft": "Draft",
-    "open": "Open",
-    "voting": "Voting",
-    "evaluating": "Evaluating",
-    "closed": "Closed",
-    "archived": "Archived"
+    "draft": "Wersja robocza",
+    "open": "Otwarte",
+    "voting": "Głosowanie",
+    "evaluating": "Oceniane",
+    "closed": "Zamknięte",
+    "archived": "Zarchiwizowane"
   },
   "idea_status": {
-    "draft": "Draft",
-    "submitted": "Submitted",
-    "shortlisted": "Shortlisted",
-    "winner": "Winner",
-    "withdrawn": "Withdrawn"
+    "draft": "Wersja robocza",
+    "submitted": "Zgłoszone",
+    "shortlisted": "Na liście kandydatów",
+    "winner": "Zwycięzca",
+    "withdrawn": "Wycofane"
   },
   "challenge": {
     "ideas_count": "{{count}} pomysłów",
     "ideas_count_one": "{{count}} pomysł",
     "submission_deadline": "Zgłoszenia do {{date}}",
     "voting_deadline": "Głosowanie kończy się {{date}}",
-    "prize": "Prize",
-    "category": "Category",
+    "prize": "Nagroda",
+    "category": "Kategoria",
     "max_ideas": "Maksymalnie {{count}} pomysłów na osobę",
     "created_by": "Utworzone przez {{name}}",
     "no_deadline": "Brak terminu",
     "evaluation_criteria": "Kryteria Oceny",
-    "outcome": "Outcome",
+    "outcome": "Wynik",
     "team_links": "Zespoły Projektowe"
   },
   "challenges": {
-    "title": "Challenges",
+    "title": "Wyzwania",
     "empty_title": "Brak Wyzwań",
     "empty_description": "Obecnie nie ma wyzwań ideacyjnych. Sprawdź ponownie wkrótce!",
     "empty_filtered": "Brak wyzwań pasujących do wybranego filtra.",
@@ -54,15 +54,15 @@
     "load_more": "Załaduj Więcej"
   },
   "ideas": {
-    "title": "Ideas",
+    "title": "Pomysły",
     "empty_title": "Brak Pomysłów",
     "empty_description": "Bądź pierwszym, który podzieli się swoim pomysłem na to wyzwanie!",
     "submit": "Zgłoś Pomysł",
     "submit_title": "Zgłoś Swój Pomysł",
     "sort_votes": "Najlepiej Głosowane",
-    "sort_newest": "Newest",
-    "vote": "Vote",
-    "unvote": "Unvote",
+    "sort_newest": "Najnowsze",
+    "vote": "Głosuj",
+    "unvote": "Cofnij głos",
     "votes": "{{count}} głosów",
     "votes_one": "{{count}} głos",
     "comments": "{{count}} komentarzy",
@@ -77,13 +77,13 @@
     "save_draft": "Zapisz Szkic",
     "publish_draft": "Opublikuj Pomysł",
     "draft_saved": "Szkic zapisany",
-    "draft": "Draft",
+    "draft": "Wersja robocza",
     "your_drafts": "Twoje Szkice",
     "untitled_draft": "Szkic bez tytułu",
     "draft_updated": "Zaktualizowano {{date}}",
     "draft_created": "Utworzono {{date}}",
     "new_idea": "Nowy Pomysł",
-    "sort_label": "Sort ideas"
+    "sort_label": "Sortuj pomysły"
   },
   "idea_detail": {
     "page_title": "Szczegóły Pomysłu",
@@ -93,23 +93,23 @@
     "actions": "Akcje pomyslu"
   },
   "comments": {
-    "title": "Comments",
+    "title": "Komentarze",
     "empty_title": "Brak Komentarzy",
     "empty_description": "Bądź pierwszym, który podzieli się swoimi myślami na ten temat.",
     "add_placeholder": "Podziel się swoimi myślami...",
     "add_button": "Opublikuj Komentarz",
-    "delete": "Delete",
+    "delete": "Usuń",
     "delete_confirm": "Czy na pewno chcesz usunąć ten komentarz?",
     "load_more": "Załaduj Więcej Komentarzy",
     "load_error": "Nie można załadować komentarzy"
   },
   "form": {
-    "title_label": "Title",
+    "title_label": "Tytuł",
     "title_placeholder": "Wprowadź jasny, opisowy tytuł",
-    "description_label": "Description",
+    "description_label": "Opis",
     "description_placeholder": "Szczegółowo opisz wyzwanie lub swój pomysł",
     "description_helper": "Wyraźnie opisz problem, w tym kto jest dotknięty, dlaczego to ważne i jak wyglądałby udany rozwiązanie",
-    "category_label": "Category",
+    "category_label": "Kategoria",
     "category_placeholder": "Wybierz kategorię",
     "category_free_label": "Kategoria (tekst dowolny)",
     "category_free_placeholder": "np. Środowisko, Technologia, Społeczność",
@@ -127,13 +127,13 @@
     "evaluation_criteria_helper": "Zdefiniuj, jak będą oceniane pomysły",
     "template_label": "Rozpocznij od szablonu",
     "template_placeholder": "Wybierz szablon (opcjonalnie)",
-    "save": "Save",
+    "save": "Zapisz",
     "saving": "Zapisywanie...",
     "create": "Utwórz wyzwanie",
     "creating": "Tworzenie...",
     "update": "Zaktualizuj wyzwanie",
     "updating": "Aktualizowanie...",
-    "cancel": "Cancel"
+    "cancel": "Anuluj"
   },
   "create_page": {
     "page_title": "Utwórz wyzwanie",
@@ -208,17 +208,17 @@
     "empty_title": "Brak ulubionych jeszcze",
     "empty_description": "Polub wyzwanie, aby dodać je do swoich ulubionych."
   },
-  "views": "views",
-  "featured": "Featured",
+  "views": "wyświetlenia",
+  "featured": "Wyróżnione",
   "search": {
     "label": "Szukaj wyzwań",
     "placeholder": "Szukaj wyzwań według tytułu lub opisu...",
     "clear_tags": "Wyczyść tagi",
     "no_results": "Brak wyzwań pasujących do twojego wyszukiwania",
-    "clear": "Clear search"
+    "clear": "Wyczyść wyszukiwanie"
   },
   "tags": {
-    "label": "Tags",
+    "label": "Tagi",
     "placeholder": "Dodaj tagi (naciśnij Enter)",
     "helper": "Dodaj umiejętności lub tematy związane z tym wyzwaniem",
     "interests": "Obszary zainteresowań",
@@ -269,18 +269,18 @@
   },
   "idea_image": "Obrazek pomysłu",
   "media": {
-    "title": "Attachments",
+    "title": "Załączniki",
     "add": "Dodaj załącznik",
     "add_image": "Dodaj obrazek",
     "add_link": "Dodaj link",
     "url_label": "URL",
     "url_placeholder": "https://...",
-    "caption_label": "Caption",
+    "caption_label": "Podpis",
     "caption_placeholder": "Krótki opis (opcjonalnie)",
-    "type_label": "Type",
-    "type_image": "Image",
-    "type_video": "Video",
-    "type_document": "Document",
+    "type_label": "Typ",
+    "type_image": "Obraz",
+    "type_video": "Wideo",
+    "type_document": "Dokument",
     "type_link": "Link",
     "delete_confirm": "Usunąć ten załącznik?",
     "empty": "Brak załączników"
@@ -291,9 +291,9 @@
     "description": "Przekształć ten zwycięski pomysł w zespół projektowy, w którym członkowie mogą współpracować, zarządzać zadaniami, dzielić się dokumentami i czatować.",
     "name_label": "Nazwa zespołu",
     "description_label": "Opis zespołu",
-    "visibility_label": "Visibility",
-    "visibility_public": "Public",
-    "visibility_private": "Private",
+    "visibility_label": "Widoczność",
+    "visibility_public": "Publiczna",
+    "visibility_private": "Prywatna",
     "confirm": "Utwórz zespół",
     "creating": "Tworzenie...",
     "success": "Zespół projektu został pomyślnie utworzony! Przekierowuję...",
@@ -301,8 +301,8 @@
     "already_converted": "Ten pomysł został już przekształcony w zespół"
   },
   "campaigns": {
-    "title": "Campaigns",
-    "page_title": "Campaigns",
+    "title": "Kampanie",
+    "page_title": "Kampanie",
     "empty_title": "Brak kampanii",
     "empty_description": "Utwórz kampanię, aby połączyć powiązane wyzwania.",
     "create": "Utwórz kampanię",
@@ -313,9 +313,9 @@
     "confirm_unlink": "Potwierdź",
     "confirm_unlink_label": "Potwierdź odłączenie",
     "fallback_title": "Kampania",
-    "feature_not_available": "Ideation Not Available",
-    "feature_not_available_desc": "The ideation feature is not enabled for this community. Contact your timebank administrator to learn more.",
-    "retry": "Retry"
+    "feature_not_available": "Funkcja tworzenia pomysłów niedostępna",
+    "feature_not_available_desc": "Funkcja tworzenia pomysłów nie jest włączona dla tej społeczności. Skontaktuj się z administratorem banku czasu, aby dowiedzieć się więcej.",
+    "retry": "Ponów próbę"
   },
   "templates": {
     "title": "Szablony wyzwań",
@@ -334,8 +334,8 @@
     "implementation_status_label": "Status wdrożenia",
     "status_not_started": "Nie rozpoczęto",
     "status_in_progress": "W trakcie",
-    "status_implemented": "Implemented",
-    "status_abandoned": "Abandoned",
+    "status_implemented": "Wdrożone",
+    "status_abandoned": "Zaniechane",
     "winning_idea": "Zwycięski pomysł",
     "impact_description": "Opis wpływu",
     "impact_placeholder": "Opisz wpływ i wyniki...",
@@ -343,32 +343,32 @@
     "saving": "Zapisywanie...",
     "dashboard": "Panel wpływu",
     "total_challenges": "Łącznie śledzone",
-    "implemented_count": "Implemented",
+    "implemented_count": "Wdrożone",
     "in_progress_count": "W trakcie",
-    "edit": "Edit outcomes"
+    "edit": "Edytuj wyniki"
   },
   "tasks": {
-    "title": "Tasks",
+    "title": "Zadania",
     "status_label": "Status",
-    "priority_label": "Priority",
+    "priority_label": "Priorytet",
     "create": "Dodaj zadanie",
     "empty_title": "Brak zadań jeszcze",
     "empty_description": "Twórz zadania, aby zorganizować pracę swojego zespołu.",
     "status_todo": "Do zrobienia",
     "status_in_progress": "W trakcie",
-    "status_done": "Done",
-    "priority_low": "Low",
-    "priority_medium": "Medium",
-    "priority_high": "High",
-    "priority_urgent": "Urgent",
+    "status_done": "Gotowe",
+    "priority_low": "Niski",
+    "priority_medium": "Średni",
+    "priority_high": "Wysoki",
+    "priority_urgent": "Pilny",
     "assigned_to": "Przydzielone do",
-    "unassigned": "Unassigned",
+    "unassigned": "Nieprzypisane",
     "due_date": "Termin",
-    "overdue": "Overdue",
+    "overdue": "Przeterminowane",
     "stats": "Statystyki zadań"
   },
   "documents": {
-    "title": "Documents",
+    "title": "Dokumenty",
     "upload": "Prześlij dokument",
     "empty_title": "Brak dokumentów jeszcze",
     "empty_description": "Prześlij pliki, aby podzielić się z zespołem.",
@@ -376,26 +376,26 @@
     "max_size": "Maksymalny rozmiar pliku: 10 MB"
   },
   "chatrooms": {
-    "title": "Channels",
+    "title": "Kanały",
     "create": "Utwórz kanał",
-    "general": "General",
+    "general": "Ogólny",
     "empty_title": "Brak wiadomości jeszcze",
     "empty_description": "Rozpocznij rozmowę!",
     "message_placeholder": "Napisz wiadomość...",
-    "send": "Send",
+    "send": "Wyślij",
     "delete_channel": "Usuń kanał",
     "delete_channel_confirm": "Usunąć ten kanał i wszystkie jego wiadomości?"
   },
   "categories": {
-    "title": "Categories",
+    "title": "Kategorie",
     "manage": "Zarządzaj kategoriami",
     "all": "Wszystkie kategorie",
     "create": "Dodaj kategorię",
     "name_label": "Nazwa kategorii",
     "name_placeholder": "np. Środowisko",
-    "icon_label": "Icon",
+    "icon_label": "Ikona",
     "icon_placeholder": "Nazwa ikony Lucide (np. Liść)",
-    "color_label": "Color",
+    "color_label": "Kolor",
     "delete_confirm": "Czy chcesz usunąć tę kategorię?"
   },
   "validation": {
@@ -414,10 +414,10 @@
       "title": "Utwórz wyzwanie"
     },
     "campaigns": {
-      "title": "Campaigns"
+      "title": "Kampanie"
     }
   },
   "challenge_detail": {
-    "actions": "Challenge actions"
+    "actions": "Akcje wyzwania"
   }
 }
