@@ -324,7 +324,12 @@
     "load_failed": "فشل تحميل الأعضاء",
     "load_more_failed": "فشل تحميل المزيد من الأعضاء",
     "my_profile": "ملفي الشخصي",
-    "load_more_count": "تحميل المزيد (يتبقى {{remaining}})"
+    "load_more_count": "تحميل المزيد (يتبقى {{remaining}})",
+    "hero_eyebrow": "دليل المجتمع",
+    "count_label": "الأعضاء المعروضون",
+    "empty_tip_profiles": "تصفح الملفات الكاملة",
+    "empty_tip_skills": "ابحث حسب المهارة",
+    "empty_tip_location": "جرّب الأعضاء القريبين"
   },
   "error_boundary": {
     "title": "حدث خطأ ما",
@@ -598,7 +603,8 @@
       "hours": "Hours",
       "status": "Status",
       "reason": "Reason",
-      "empty": "No transfers yet."
+      "empty": "No transfers yet.",
+      "aria": "سجل تحويل الساعات"
     },
     "status": {
       "pending": "Awaiting approval",
@@ -770,7 +776,8 @@
     "clear_location": "مسح الموقع",
     "select_category": "اختر فئة",
     "verification_badges": "شارات التحقق",
-    "search_skills": "البحث عن مهارات"
+    "search_skills": "البحث عن مهارات",
+    "current_language": "اللغة: {{language}}"
   },
   "skills": {
     "browse_title": "دليل مهارات المجتمع",
@@ -816,7 +823,10 @@
     "aria_clear_search": "مسح البحث",
     "aria_close_members_list": "إغلاق قائمة الأعضاء",
     "category_optional": "الفئة (اختياري)",
-    "proficiency_level": "مستوى الإتقان"
+    "proficiency_level": "مستوى الإتقان",
+    "explainer": "تصفح المهارات التي يشاركها الأعضاء في مجتمعك، وابحث عن الأشخاص الذين يقدمون المساعدة، واكتشف الأعضاء الذين يرغبون في التعلم.",
+    "unable_to_load": "تعذر التحميل",
+    "try_again": "حاول مرة أخرى"
   },
   "hours_display_one": "ساعة واحدة",
   "hours_display_other": "{{count}} ساعات",
@@ -843,7 +853,8 @@
   "radius_100": "100 km",
   "page_meta": {
     "skills_browse": {
-      "title": "تصفح المهارات"
+      "title": "تصفح المهارات",
+      "description": "تصفح مهارات المجتمع، وابحث عن الأعضاء الذين يقدمون المساعدة، واكتشف طلبات التعلم في بنك الوقت الخاص بك."
     },
     "members": {
       "title": "Members",
@@ -1027,7 +1038,8 @@
         "merchant": "Merchant",
         "item": "Item",
         "credits": "Hours Used",
-        "discount": "Discount"
+        "discount": "Discount",
+        "aria": "سجل استبدال نقاط الولاء"
       },
       "empty": {
         "title": "No Redemptions Yet",
@@ -1065,7 +1077,8 @@
       "date": "Requested",
       "format": "Format",
       "size": "Size",
-      "empty": "You haven't exported your data yet."
+      "empty": "You haven't exported your data yet.",
+      "count": "{{count}} عمليات تصدير"
     },
     "errors": {
       "rate_limit": "You can request 5 exports per day. Please try again tomorrow.",
@@ -1221,7 +1234,9 @@
     "created_success": "Campaign created successfully.",
     "create_error": "Could not create campaign. Please try again.",
     "submit_create": "Create campaign",
-    "feature_disabled": "Local advertising is not available for your account."
+    "feature_disabled": "Local advertising is not available for your account.",
+    "date_range": "{{start}} إلى {{end}}",
+    "table_aria": "حملات الإعلانات"
   },
   "push_campaign": {
     "meta": {
@@ -1306,7 +1321,9 @@
     "created_success": "Push campaign created successfully.",
     "create_error": "Could not create push campaign. Please try again.",
     "submit_create": "Create campaign",
-    "feature_disabled": "Push campaigns are not available for your account."
+    "feature_disabled": "Push campaigns are not available for your account.",
+    "table_aria": "حملات الإشعارات",
+    "radius_km": "{{radius}} كم"
   },
   "push_campaign_opt_in": "Receive promoted push notifications",
   "push_campaign_opt_in_description": "Allow local businesses and organisations to send you targeted push notifications. You can opt out at any time.",
@@ -1366,8 +1383,17 @@
       "view_redemptions": "View redemptions",
       "usage_count": "Used {{count}} times",
       "saved": "Coupon saved",
-      "deleted": "Coupon deleted"
-    }
+      "deleted": "Coupon deleted",
+      "status_draft": "مسودة",
+      "status_active": "نشط",
+      "status_paused": "متوقف مؤقتاً",
+      "status_expired": "منتهي الصلاحية",
+      "amount_cents_help": "المبلغ بالسنتات",
+      "table_aria": "كوبونات البائع"
+    },
+    "meta_description": "تصفح كوبونات المجتمع النشطة وخصومات التجار والعروض المحلية المتاحة في منطقتك.",
+    "detail_meta_description": "اعرض كوبون المجتمع هذا، أو انسخ رمز العرض، أو أنشئ رمز QR للاستبدال في المتجر.",
+    "detail_meta_description_named": "اعرض {{title}}، أو انسخ رمز الكوبون {{code}}، أو أنشئ رمز QR للاستبدال في المتجر."
   },
   "regional_points": {
     "title": "Regional Points",
@@ -1389,7 +1415,10 @@
       "errors": {
         "invalid_recipient": "Enter a valid recipient member ID",
         "invalid_amount": "Enter a positive amount"
-      }
+      },
+      "recipient_placeholder": "مثال: 123",
+      "amount_placeholder": "0.00",
+      "message_placeholder": "أضف ملاحظة للمستلم"
     },
     "history": {
       "title": "Recent activity",
@@ -1398,12 +1427,14 @@
       "type": "Type",
       "description": "Description",
       "amount": "Amount",
-      "balance_after": "Balance"
+      "balance_after": "Balance",
+      "table_aria": "نشاط النقاط الإقليمية"
     },
     "errors": {
       "load_failed": "Failed to load regional points",
       "transfer_failed": "Transfer failed"
-    }
+    },
+    "default_symbol": "نقطة"
   },
   "verein_import": {
     "title": "Import club members",
@@ -1429,7 +1460,8 @@
       "email": "Email",
       "name": "Name",
       "role": "Role",
-      "errors": "Errors"
+      "errors": "Errors",
+      "table_aria": "معاينة استيراد الأعضاء"
     },
     "result": {
       "title": "Import complete",
@@ -1444,6 +1476,13 @@
       "import_failed": "Import failed",
       "has_invalid": "Fix invalid rows before importing",
       "has_invalid_summary": "Some rows are invalid. Fix them in your CSV and re-run the preview before importing."
+    },
+    "csv_placeholder": "email,first_name,last_name,phone,role\nalice@example.org,Alice,Smith,+1 555 123 4567,member",
+    "actions": {
+      "already": "موجود مسبقاً",
+      "create": "إنشاء",
+      "invalid": "غير صالح",
+      "link": "ربط"
     }
   },
   "premium": {
@@ -1502,7 +1541,8 @@
       "past_due": "Past Due",
       "grace": "Grace Period",
       "canceled": "Cancelled",
-      "incomplete": "Incomplete"
+      "incomplete": "Incomplete",
+      "unknown": "غير معروف"
     },
     "feature": {
       "verified_badge": "Verified badge",
@@ -1552,7 +1592,24 @@
     "webhook_signing_title": "Verifying signatures",
     "webhook_signing_body": "Compute HMAC-SHA256 of the raw request body using your subscription secret. Compare with the X-Partner-Signature header in constant time.",
     "webhook_create_title": "Create a subscription",
-    "webhook_create_body": "POST /api/partner/v1/webhooks/subscriptions with event_types (array) and target_url (https only). The response includes a one-time secret — store it."
+    "webhook_create_body": "POST /api/partner/v1/webhooks/subscriptions with event_types (array) and target_url (https only). The response includes a one-time secret — store it.",
+    "meta_description": "استكشف واجهة برمجة تطبيقات شركاء NEXUS لمصادقة OAuth2، ونقاط النهاية المحددة النطاق، وخطافات الويب الموقعة، والوصول إلى التكامل.",
+    "auth_meta_title": "مصادقة API",
+    "endpoints_meta_title": "نقاط نهاية API",
+    "webhooks_meta_title": "خطافات ويب API",
+    "endpoints_table_aria": "نقاط نهاية API الشريكة",
+    "endpoint_descriptions": {
+      "oauth_token": "تبادل بيانات اعتماد العميل برمز حامل (منح client_credentials).",
+      "oauth_revoke": "إبطال رمز حامل صادر (RFC 7009).",
+      "users_list": "عرض الأعضاء النشطين. أضف نطاق users.pii لتلقي البريد الإلكتروني.",
+      "users_detail": "جلب عضو واحد بواسطة المعرّف.",
+      "listings_list": "عرض القوائم النشطة (الخدمات والطلبات).",
+      "wallet_balance": "قراءة رصيد ساعات الوقت للعضو.",
+      "wallet_credit": "إضافة ساعات وقت من تحويل بنكي مسوّى. الجسم: user_id، hours، reference، note?",
+      "aggregates_community": "إجماليات المجتمع المُجمَّعة (بدون معلومات شخصية). مفيدة للوحات الشركاء.",
+      "webhooks_list": "عرض اشتراكات خطافات الويب الخاصة بك.",
+      "webhooks_create": "الاشتراك في الأحداث. الجسم: event_types[]، target_url (https://)."
+    }
   },
   "regional_analytics": {
     "page_title": "التحليلات الإقليمية",
@@ -1601,7 +1658,10 @@
         "feature_3": "ورش عمل للمراجعة الفصلية",
         "feature_4": "مدير نجاح مخصص"
       }
-    }
+    },
+    "meta_description": "اكتشف تحليلات إقليمية تركز على الخصوصية للبلديات وشركاء الشركات الصغيرة والمتوسطة باستخدام اتجاهات المجتمع المجهولة والتقارير المُجمَّعة.",
+    "partner_dashboard_title": "التحليلات الإقليمية",
+    "partner_dashboard_meta_description": "لوحة تحليلات إقليمية خاصة للشركاء المعتمدين."
   },
   "provisioning": {
     "meta": {
@@ -1923,6 +1983,12 @@
       "generate_failed": "Generation failed.",
       "reminder_failed": "Could not send reminder.",
       "waive_failed": "Could not waive dues."
+    },
+    "col_email_delivery": "تسليم البريد الإلكتروني",
+    "email_status": {
+      "failed": "فشل",
+      "pending": "لا يوجد دليل",
+      "sent": "تم الإرسال"
     }
   },
   "collections": {
@@ -1995,7 +2061,42 @@
     "ios_add_to_home": "Add to Home Screen",
     "ios_step_2_after": ".",
     "ios_step_3": "Tap Add. NEXUS will appear on your home screen as a standalone app.",
-    "got_it": "Got it"
+    "got_it": "Got it",
+    "generic_title": "تثبيت NEXUS",
+    "generic_intro": "ابحث عن خيار التثبيت في قائمة متصفحك:",
+    "generic_step_1": "افتح قائمة المتصفح، عادة أيقونة النقاط الثلاث أو الخطوط الثلاثة.",
+    "generic_step_2": "ابحث عن تثبيت التطبيق، أو تثبيت هذا الموقع، أو إضافة إلى الشاشة الرئيسية.",
+    "generic_step_3": "أكّد لإضافة NEXUS إلى جهازك.",
+    "manual_note": "إذا لم تجد الخيار، فقد يكون متصفحك قد ثبّت التطبيق بالفعل أو قد لا يدعمه جهازك.",
+    "android_chrome_title": "التثبيت على Android",
+    "android_chrome_intro": "أضف NEXUS إلى شاشتك الرئيسية من قائمة Chrome:",
+    "android_chrome_step_1": "اضغط على قائمة النقاط الثلاث في أعلى يمين Chrome.",
+    "android_chrome_step_2": "اضغط على تثبيت التطبيق أو إضافة إلى الشاشة الرئيسية.",
+    "android_chrome_step_3": "أكّد. سيظهر NEXUS على شاشتك الرئيسية كتطبيق مستقل.",
+    "samsung_title": "التثبيت باستخدام Samsung Internet",
+    "samsung_intro": "أضف NEXUS إلى شاشتك الرئيسية من قائمة Samsung Internet:",
+    "samsung_step_1": "اضغط على أيقونة القائمة في أسفل Samsung Internet.",
+    "samsung_step_2": "اضغط على إضافة الصفحة إلى، ثم الشاشة الرئيسية.",
+    "samsung_step_3": "أكّد. سيظهر NEXUS على شاشتك الرئيسية.",
+    "firefox_android_title": "التثبيت على Firefox لنظام Android",
+    "firefox_android_intro": "أضف NEXUS إلى شاشتك الرئيسية من قائمة Firefox:",
+    "firefox_android_step_1": "اضغط على قائمة النقاط الثلاث في Firefox.",
+    "firefox_android_step_2": "اضغط على تثبيت أو إضافة إلى الشاشة الرئيسية.",
+    "firefox_android_step_3": "أكّد لإضافة NEXUS إلى شاشتك الرئيسية.",
+    "chrome_desktop_title": "التثبيت على جهاز الكمبيوتر الخاص بك",
+    "chrome_desktop_intro": "ربما لم يقدم Chrome الإشعار بعد. لا يزال بإمكانك تثبيت NEXUS من قائمة Chrome:",
+    "chrome_desktop_step_1": "انقر على قائمة النقاط الثلاث في أعلى يمين Chrome.",
+    "chrome_desktop_step_2": "انقر على إرسال وحفظ ومشاركة، ثم تثبيت الصفحة كتطبيق، أو ابحث عن أيقونة التثبيت في شريط العناوين.",
+    "chrome_desktop_step_3": "انقر على تثبيت. سيُفتح NEXUS في نافذته الخاصة كتطبيق أصلي.",
+    "edge_desktop_title": "التثبيت على جهاز الكمبيوتر الخاص بك",
+    "edge_desktop_intro": "ثبّت NEXUS كتطبيق سطح مكتب من قائمة Edge:",
+    "edge_desktop_step_1": "انقر على قائمة النقاط الثلاث في أعلى يمين Edge.",
+    "edge_desktop_step_2": "انقر على التطبيقات، ثم تثبيت هذا الموقع كتطبيق.",
+    "edge_desktop_step_3": "انقر على تثبيت. سيُفتح NEXUS في نافذته الخاصة.",
+    "firefox_desktop_title": "التثبيت على جهاز الكمبيوتر الخاص بك",
+    "firefox_desktop_intro": "لا يدعم Firefox على سطح المكتب حالياً تثبيت تطبيقات الويب. لا يزال بإمكانك تثبيت NEXUS للوصول السريع:",
+    "firefox_desktop_step_1": "أضف هذه الصفحة إلى الإشارات المرجعية باستخدام Ctrl+D أو ثبّت علامة التبويب من قائمة سياق علامة التبويب.",
+    "firefox_desktop_step_2": "للحصول على تطبيق قابل للتثبيت بالكامل، جرّب Chrome أو Edge أو تطبيقنا للجوال."
   },
   "release_status": {
     "summary": "Project NEXUS is actively evolving, with feature maturity shown transparently across the platform.",
@@ -2032,5 +2133,54 @@
   "level_plain": "Level {{level}}",
   "level_named": "Level {{level}} - {{name}}",
   "xp_progress": "{{current}} / {{required}} XP",
-  "level_progress_aria": "Level {{level}} progress: {{percentage}}%"
+  "level_progress_aria": "Level {{level}} progress: {{percentage}}%",
+  "empty_dash": "-",
+  "refresh": "تحديث",
+  "not_available": "غير متاح",
+  "keyboard": {
+    "command_symbol": "⌘",
+    "k_key": "K"
+  },
+  "partner_analytics": {
+    "no_token_title": "رمز الاشتراك مطلوب",
+    "no_token_body": "يرجى استخدام الرابط الآمن المقدم من مدير حسابك. يتضمن الرابط رمز اشتراك فريد.",
+    "error_title": "تعذر تحميل التحليلات",
+    "error_unauthorized": "رمز اشتراكك غير صالح أو منتهي الصلاحية.",
+    "error_generic": "حدث خطأ ما أثناء جلب تحليلاتك. يرجى إعادة المحاولة.",
+    "retry": "إعادة المحاولة",
+    "title": "التحليلات الإقليمية",
+    "subtitle": "رؤى مجهولة الهوية لمنطقتك. يتم تحديثها يومياً.",
+    "period_label": "الفترة",
+    "period_30d": "آخر 30 يوماً",
+    "period_90d": "آخر 90 يوماً",
+    "period_year": "آخر سنة",
+    "tabs_aria": "علامات تبويب التحليلات",
+    "tab_trends": "الاتجاهات",
+    "tab_demand_supply": "الطلب والعرض",
+    "tab_demographics": "البيانات الديموغرافية",
+    "tab_footfall": "حركة الزوار",
+    "reports_title": "التقارير الشهرية",
+    "no_reports": "لم يتم إنشاء تقارير بعد.",
+    "download_pdf": "تنزيل PDF",
+    "privacy_footer": "جميع المقاييس مُجمَّعة ومجهولة الهوية. يتم إخفاء الشرائح التي يكون فيها N<10.",
+    "metric_active_members": "الأعضاء النشطون",
+    "metric_categories": "الفئات",
+    "metric_partner_orgs": "منظمات الشركاء",
+    "metric_event_participation": "المشاركة في الفعاليات",
+    "metric_volunteer_hours": "ساعات التطوع",
+    "engagement_overview": "نظرة عامة على المشاركة (نقاط الوسط)",
+    "ds_by_postcode": "العروض مقابل الطلبات حسب الرمز البريدي (3 أرقام)",
+    "no_data": "لا توجد بيانات متاحة.",
+    "offers": "العروض",
+    "requests": "الطلبات",
+    "match_heatmap": "خلايا معدل التطابق",
+    "category_short": "فئة",
+    "age_distribution": "توزيع الأعمار",
+    "gender_distribution": "توزيع الجنس",
+    "footfall_by_area": "مشاهدات الصفحة حسب المنطقة",
+    "page_views": "مشاهدات الصفحة",
+    "distinct_visitors": "زوار مميزون",
+    "suppressed_value": "مخفي",
+    "suppressed_short": "--"
+  }
 }

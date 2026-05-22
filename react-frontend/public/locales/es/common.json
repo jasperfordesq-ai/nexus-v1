@@ -324,7 +324,12 @@
     "load_failed": "Error al cargar miembros",
     "load_more_failed": "Error al cargar más miembros",
     "my_profile": "Mi perfil",
-    "load_more_count": "Cargar más ({{remaining}} restantes)"
+    "load_more_count": "Cargar más ({{remaining}} restantes)",
+    "hero_eyebrow": "Directorio de la comunidad",
+    "count_label": "Miembros mostrados",
+    "empty_tip_profiles": "Explorar perfiles completos",
+    "empty_tip_skills": "Buscar por habilidad",
+    "empty_tip_location": "Prueba con miembros cercanos"
   },
   "error_boundary": {
     "title": "Algo salió mal",
@@ -598,7 +603,8 @@
       "hours": "Hours",
       "status": "Status",
       "reason": "Reason",
-      "empty": "No transfers yet."
+      "empty": "No transfers yet.",
+      "aria": "Historial de transferencias de horas"
     },
     "status": {
       "pending": "Awaiting approval",
@@ -770,7 +776,8 @@
     "clear_location": "Limpiar ubicación",
     "select_category": "Seleccionar una categoría",
     "verification_badges": "Insignias de verificación",
-    "search_skills": "Buscar habilidades"
+    "search_skills": "Buscar habilidades",
+    "current_language": "Idioma: {{language}}"
   },
   "skills": {
     "browse_title": "Directorio de Habilidades de la Comunidad",
@@ -816,7 +823,10 @@
     "aria_clear_search": "Limpiar búsqueda",
     "aria_close_members_list": "Cerrar lista de miembros",
     "category_optional": "Categoría (opcional)",
-    "proficiency_level": "Nivel de competencia"
+    "proficiency_level": "Nivel de competencia",
+    "explainer": "Explora las habilidades que comparten los miembros de tu comunidad, encuentra personas que ofrecen ayuda y descubre miembros que quieren aprender.",
+    "unable_to_load": "No se puede cargar",
+    "try_again": "Reintentar"
   },
   "hours_display_one": "{{count}} hora",
   "hours_display_other": "{{count}} horas",
@@ -843,7 +853,8 @@
   "radius_100": "100 km",
   "page_meta": {
     "skills_browse": {
-      "title": "Explorar habilidades"
+      "title": "Explorar habilidades",
+      "description": "Explora habilidades de la comunidad, encuentra miembros que ofrecen ayuda y descubre solicitudes de aprendizaje en tu banco de tiempo."
     },
     "members": {
       "title": "Members",
@@ -1027,7 +1038,8 @@
         "merchant": "Merchant",
         "item": "Item",
         "credits": "Hours Used",
-        "discount": "Discount"
+        "discount": "Discount",
+        "aria": "Historial de canjes de fidelidad"
       },
       "empty": {
         "title": "No Redemptions Yet",
@@ -1065,7 +1077,8 @@
       "date": "Requested",
       "format": "Format",
       "size": "Size",
-      "empty": "You haven't exported your data yet."
+      "empty": "You haven't exported your data yet.",
+      "count": "{{count}} exportaciones"
     },
     "errors": {
       "rate_limit": "You can request 5 exports per day. Please try again tomorrow.",
@@ -1221,7 +1234,9 @@
     "created_success": "Campaign created successfully.",
     "create_error": "Could not create campaign. Please try again.",
     "submit_create": "Create campaign",
-    "feature_disabled": "Local advertising is not available for your account."
+    "feature_disabled": "Local advertising is not available for your account.",
+    "date_range": "{{start}} al {{end}}",
+    "table_aria": "Campañas publicitarias"
   },
   "push_campaign": {
     "meta": {
@@ -1306,7 +1321,9 @@
     "created_success": "Push campaign created successfully.",
     "create_error": "Could not create push campaign. Please try again.",
     "submit_create": "Create campaign",
-    "feature_disabled": "Push campaigns are not available for your account."
+    "feature_disabled": "Push campaigns are not available for your account.",
+    "table_aria": "Campañas push",
+    "radius_km": "{{radius}} km"
   },
   "push_campaign_opt_in": "Receive promoted push notifications",
   "push_campaign_opt_in_description": "Allow local businesses and organisations to send you targeted push notifications. You can opt out at any time.",
@@ -1366,8 +1383,17 @@
       "view_redemptions": "View redemptions",
       "usage_count": "Used {{count}} times",
       "saved": "Coupon saved",
-      "deleted": "Coupon deleted"
-    }
+      "deleted": "Coupon deleted",
+      "status_draft": "Borrador",
+      "status_active": "Activo",
+      "status_paused": "Pausado",
+      "status_expired": "Caducado",
+      "amount_cents_help": "Importe en céntimos",
+      "table_aria": "Cupones del vendedor"
+    },
+    "meta_description": "Explora cupones activos de la comunidad, descuentos de comerciantes y ofertas locales disponibles en tu área.",
+    "detail_meta_description": "Ver este cupón de la comunidad, copiar el código de la oferta o generar un código QR para canjear en tienda.",
+    "detail_meta_description_named": "Ver {{title}}, copiar el código de cupón {{code}} o generar un código QR para canjear en tienda."
   },
   "regional_points": {
     "title": "Regional Points",
@@ -1389,7 +1415,10 @@
       "errors": {
         "invalid_recipient": "Enter a valid recipient member ID",
         "invalid_amount": "Enter a positive amount"
-      }
+      },
+      "recipient_placeholder": "p. ej. 123",
+      "amount_placeholder": "0,00",
+      "message_placeholder": "Añade una nota para el destinatario"
     },
     "history": {
       "title": "Recent activity",
@@ -1398,12 +1427,14 @@
       "type": "Type",
       "description": "Description",
       "amount": "Amount",
-      "balance_after": "Balance"
+      "balance_after": "Balance",
+      "table_aria": "Actividad de puntos regionales"
     },
     "errors": {
       "load_failed": "Failed to load regional points",
       "transfer_failed": "Transfer failed"
-    }
+    },
+    "default_symbol": "pts"
   },
   "verein_import": {
     "title": "Import club members",
@@ -1429,7 +1460,8 @@
       "email": "Email",
       "name": "Name",
       "role": "Role",
-      "errors": "Errors"
+      "errors": "Errors",
+      "table_aria": "Vista previa de importación de miembros"
     },
     "result": {
       "title": "Import complete",
@@ -1444,6 +1476,13 @@
       "import_failed": "Import failed",
       "has_invalid": "Fix invalid rows before importing",
       "has_invalid_summary": "Some rows are invalid. Fix them in your CSV and re-run the preview before importing."
+    },
+    "csv_placeholder": "email,first_name,last_name,phone,role\nalice@example.org,Alice,Smith,+1 555 123 4567,member",
+    "actions": {
+      "already": "ya existe",
+      "create": "crear",
+      "invalid": "no válido",
+      "link": "vincular"
     }
   },
   "premium": {
@@ -1502,7 +1541,8 @@
       "past_due": "Past Due",
       "grace": "Grace Period",
       "canceled": "Cancelled",
-      "incomplete": "Incomplete"
+      "incomplete": "Incomplete",
+      "unknown": "Desconocido"
     },
     "feature": {
       "verified_badge": "Verified badge",
@@ -1552,7 +1592,24 @@
     "webhook_signing_title": "Verifying signatures",
     "webhook_signing_body": "Compute HMAC-SHA256 of the raw request body using your subscription secret. Compare with the X-Partner-Signature header in constant time.",
     "webhook_create_title": "Create a subscription",
-    "webhook_create_body": "POST /api/partner/v1/webhooks/subscriptions with event_types (array) and target_url (https only). The response includes a one-time secret — store it."
+    "webhook_create_body": "POST /api/partner/v1/webhooks/subscriptions with event_types (array) and target_url (https only). The response includes a one-time secret — store it.",
+    "meta_description": "Explora la API de socios de Project NEXUS para autenticación OAuth2, endpoints con ámbito, webhooks firmados y acceso de integración.",
+    "auth_meta_title": "Autenticación de la API",
+    "endpoints_meta_title": "Endpoints de la API",
+    "webhooks_meta_title": "Webhooks de la API",
+    "endpoints_table_aria": "Endpoints de la API de socios",
+    "endpoint_descriptions": {
+      "oauth_token": "Intercambia credenciales de cliente por un token bearer (concesión client_credentials).",
+      "oauth_revoke": "Revoca un token bearer emitido (RFC 7009).",
+      "users_list": "Lista los miembros activos. Añade el ámbito users.pii para recibir el correo.",
+      "users_detail": "Obtén un miembro por ID.",
+      "listings_list": "Lista los anuncios activos (servicios y solicitudes).",
+      "wallet_balance": "Lee el saldo de tiempo de un miembro en horas.",
+      "wallet_credit": "Acredita horas de tiempo desde una transferencia bancaria liquidada. Body: user_id, hours, reference, note?",
+      "aggregates_community": "Totales agrupados de la comunidad (sin PII). Útil para paneles de socios.",
+      "webhooks_list": "Lista tus suscripciones a webhooks.",
+      "webhooks_create": "Suscríbete a eventos. Body: event_types[], target_url (https://)."
+    }
   },
   "regional_analytics": {
     "page_title": "Análisis regionales",
@@ -1601,7 +1658,10 @@
         "feature_3": "Talleres de revisión trimestrales",
         "feature_4": "Gerente de éxito dedicado"
       }
-    }
+    },
+    "meta_description": "Descubre analíticas regionales que priorizan la privacidad para municipios y socios pyme, con tendencias comunitarias anonimizadas e informes agregados.",
+    "partner_dashboard_title": "Analíticas regionales",
+    "partner_dashboard_meta_description": "Panel privado de analíticas regionales para socios autorizados."
   },
   "provisioning": {
     "meta": {
@@ -1923,6 +1983,12 @@
       "generate_failed": "Generation failed.",
       "reminder_failed": "Could not send reminder.",
       "waive_failed": "Could not waive dues."
+    },
+    "col_email_delivery": "Entrega del correo",
+    "email_status": {
+      "failed": "Fallido",
+      "pending": "Sin evidencia",
+      "sent": "Enviado"
     }
   },
   "collections": {
@@ -1995,7 +2061,42 @@
     "ios_add_to_home": "Add to Home Screen",
     "ios_step_2_after": ".",
     "ios_step_3": "Tap Add. NEXUS will appear on your home screen as a standalone app.",
-    "got_it": "Got it"
+    "got_it": "Got it",
+    "generic_title": "Instalar NEXUS",
+    "generic_intro": "Busca una opción de instalación en el menú de tu navegador:",
+    "generic_step_1": "Abre el menú del navegador, normalmente un icono de tres puntos o tres líneas.",
+    "generic_step_2": "Busca Instalar aplicación, Instalar este sitio o Añadir a la pantalla de inicio.",
+    "generic_step_3": "Confirma para añadir NEXUS a tu dispositivo.",
+    "manual_note": "Si no ves la opción, tu navegador puede haber instalado ya la aplicación o tu dispositivo puede no admitirlo.",
+    "android_chrome_title": "Instalar en Android",
+    "android_chrome_intro": "Añade NEXUS a tu pantalla de inicio desde el menú de Chrome:",
+    "android_chrome_step_1": "Toca el menú de tres puntos en la esquina superior derecha de Chrome.",
+    "android_chrome_step_2": "Toca Instalar aplicación o Añadir a la pantalla de inicio.",
+    "android_chrome_step_3": "Confirma. NEXUS aparecerá en tu pantalla de inicio como una aplicación independiente.",
+    "samsung_title": "Instalar con Samsung Internet",
+    "samsung_intro": "Añade NEXUS a tu pantalla de inicio desde el menú de Samsung Internet:",
+    "samsung_step_1": "Toca el icono del menú en la parte inferior de Samsung Internet.",
+    "samsung_step_2": "Toca Añadir página a y luego Pantalla de inicio.",
+    "samsung_step_3": "Confirma. NEXUS aparecerá en tu pantalla de inicio.",
+    "firefox_android_title": "Instalar en Firefox para Android",
+    "firefox_android_intro": "Añade NEXUS a tu pantalla de inicio desde el menú de Firefox:",
+    "firefox_android_step_1": "Toca el menú de tres puntos en Firefox.",
+    "firefox_android_step_2": "Toca Instalar o Añadir a la pantalla de inicio.",
+    "firefox_android_step_3": "Confirma para añadir NEXUS a tu pantalla de inicio.",
+    "chrome_desktop_title": "Instalar en tu ordenador",
+    "chrome_desktop_intro": "Es posible que Chrome aún no haya ofrecido la solicitud. Aun así, puedes instalar NEXUS desde el menú de Chrome:",
+    "chrome_desktop_step_1": "Haz clic en el menú de tres puntos en la esquina superior derecha de Chrome.",
+    "chrome_desktop_step_2": "Haz clic en Enviar, guardar y compartir y luego en Instalar página como aplicación, o busca un icono de instalación en la barra de direcciones.",
+    "chrome_desktop_step_3": "Haz clic en Instalar. NEXUS se abrirá en su propia ventana como una aplicación nativa.",
+    "edge_desktop_title": "Instalar en tu ordenador",
+    "edge_desktop_intro": "Instala NEXUS como aplicación de escritorio desde el menú de Edge:",
+    "edge_desktop_step_1": "Haz clic en el menú de tres puntos en la esquina superior derecha de Edge.",
+    "edge_desktop_step_2": "Haz clic en Aplicaciones y luego en Instalar este sitio como aplicación.",
+    "edge_desktop_step_3": "Haz clic en Instalar. NEXUS se abrirá en su propia ventana.",
+    "firefox_desktop_title": "Instalar en tu ordenador",
+    "firefox_desktop_intro": "Firefox en escritorio no admite actualmente la instalación de aplicaciones web. Aun así, puedes anclar NEXUS para acceder rápidamente:",
+    "firefox_desktop_step_1": "Marca esta página como favorita con Ctrl+D o ancla la pestaña desde el menú contextual.",
+    "firefox_desktop_step_2": "Para una aplicación realmente instalable, prueba Chrome, Edge o nuestra aplicación móvil."
   },
   "release_status": {
     "summary": "Project NEXUS is actively evolving, with feature maturity shown transparently across the platform.",
@@ -2032,5 +2133,54 @@
   "level_plain": "Level {{level}}",
   "level_named": "Level {{level}} - {{name}}",
   "xp_progress": "{{current}} / {{required}} XP",
-  "level_progress_aria": "Level {{level}} progress: {{percentage}}%"
+  "level_progress_aria": "Level {{level}} progress: {{percentage}}%",
+  "empty_dash": "-",
+  "refresh": "Actualizar",
+  "not_available": "No disponible",
+  "keyboard": {
+    "command_symbol": "⌘",
+    "k_key": "K"
+  },
+  "partner_analytics": {
+    "no_token_title": "Token de suscripción requerido",
+    "no_token_body": "Utiliza el enlace seguro proporcionado por tu gestor de cuenta. El enlace incluye un token de suscripción único.",
+    "error_title": "No se pueden cargar las analíticas",
+    "error_unauthorized": "Tu token de suscripción no es válido o ha caducado.",
+    "error_generic": "Algo salió mal al obtener tus analíticas. Vuelve a intentarlo.",
+    "retry": "Reintentar",
+    "title": "Analíticas regionales",
+    "subtitle": "Información agrupada con privacidad para tu región. Se actualiza a diario.",
+    "period_label": "Periodo",
+    "period_30d": "Últimos 30 días",
+    "period_90d": "Últimos 90 días",
+    "period_year": "Último año",
+    "tabs_aria": "Pestañas de analíticas",
+    "tab_trends": "Tendencias",
+    "tab_demand_supply": "Demanda y oferta",
+    "tab_demographics": "Demografía",
+    "tab_footfall": "Afluencia",
+    "reports_title": "Informes mensuales",
+    "no_reports": "Aún no se han generado informes.",
+    "download_pdf": "Descargar PDF",
+    "privacy_footer": "Todas las métricas están agrupadas y anonimizadas. Los segmentos con N<10 se suprimen.",
+    "metric_active_members": "Miembros activos",
+    "metric_categories": "Categorías",
+    "metric_partner_orgs": "Organizaciones socias",
+    "metric_event_participation": "Participación en eventos",
+    "metric_volunteer_hours": "Horas de voluntariado",
+    "engagement_overview": "Resumen de participación (puntos medios)",
+    "ds_by_postcode": "Ofertas vs. solicitudes por código postal (3 dígitos)",
+    "no_data": "No hay datos disponibles.",
+    "offers": "Ofertas",
+    "requests": "Solicitudes",
+    "match_heatmap": "Celdas de tasa de coincidencia",
+    "category_short": "cat",
+    "age_distribution": "Distribución por edad",
+    "gender_distribution": "Distribución por género",
+    "footfall_by_area": "Vistas de página por zona",
+    "page_views": "Vistas de página",
+    "distinct_visitors": "Visitantes únicos",
+    "suppressed_value": "Suprimido",
+    "suppressed_short": "--"
+  }
 }

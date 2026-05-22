@@ -324,7 +324,12 @@
     "load_failed": "Kan leden niet laden",
     "load_more_failed": "Kan meer leden niet laden",
     "my_profile": "Mijn profiel",
-    "load_more_count": "Meer laden ({{remaining}} resterend)"
+    "load_more_count": "Meer laden ({{remaining}} resterend)",
+    "hero_eyebrow": "Community-overzicht",
+    "count_label": "Weergegeven leden",
+    "empty_tip_profiles": "Bekijk volledige profielen",
+    "empty_tip_skills": "Zoeken op vaardigheid",
+    "empty_tip_location": "Probeer leden in de buurt"
   },
   "error_boundary": {
     "title": "Er ging iets mis",
@@ -598,7 +603,8 @@
       "hours": "Hours",
       "status": "Status",
       "reason": "Reason",
-      "empty": "No transfers yet."
+      "empty": "No transfers yet.",
+      "aria": "Geschiedenis uurovermakingen"
     },
     "status": {
       "pending": "Awaiting approval",
@@ -770,7 +776,8 @@
     "clear_location": "Locatie wissen",
     "select_category": "Selecteer een categorie",
     "verification_badges": "Verificatiebadges",
-    "search_skills": "Vaardigheden zoeken"
+    "search_skills": "Vaardigheden zoeken",
+    "current_language": "Taal: {{language}}"
   },
   "skills": {
     "browse_title": "Gemeenschaps vaardigheidsgids",
@@ -816,7 +823,10 @@
     "aria_clear_search": "Zoekopdracht wissen",
     "aria_close_members_list": "Ledenlijst sluiten",
     "category_optional": "Categorie (optioneel)",
-    "proficiency_level": "Vaardigheidsniveau"
+    "proficiency_level": "Vaardigheidsniveau",
+    "explainer": "Bekijk vaardigheden die door leden in jouw community worden gedeeld, vind mensen die hulp aanbieden en ontdek leden die willen leren.",
+    "unable_to_load": "Kan niet laden",
+    "try_again": "Opnieuw proberen"
   },
   "hours_display_one": "{{count}} uur",
   "hours_display_other": "{{count}} uren",
@@ -843,7 +853,8 @@
   "radius_100": "100 km",
   "page_meta": {
     "skills_browse": {
-      "title": "Bekijk Vaardigheden"
+      "title": "Bekijk Vaardigheden",
+      "description": "Bekijk vaardigheden in de community, vind leden die hulp aanbieden en ontdek leerverzoeken in jouw tijdbank."
     },
     "members": {
       "title": "Members",
@@ -1027,7 +1038,8 @@
         "merchant": "Merchant",
         "item": "Item",
         "credits": "Hours Used",
-        "discount": "Discount"
+        "discount": "Discount",
+        "aria": "Geschiedenis loyaliteit-inwisselingen"
       },
       "empty": {
         "title": "No Redemptions Yet",
@@ -1065,7 +1077,8 @@
       "date": "Requested",
       "format": "Format",
       "size": "Size",
-      "empty": "You haven't exported your data yet."
+      "empty": "You haven't exported your data yet.",
+      "count": "{{count}} exports"
     },
     "errors": {
       "rate_limit": "You can request 5 exports per day. Please try again tomorrow.",
@@ -1221,7 +1234,9 @@
     "created_success": "Campaign created successfully.",
     "create_error": "Could not create campaign. Please try again.",
     "submit_create": "Create campaign",
-    "feature_disabled": "Local advertising is not available for your account."
+    "feature_disabled": "Local advertising is not available for your account.",
+    "date_range": "{{start}} tot {{end}}",
+    "table_aria": "Advertentiecampagnes"
   },
   "push_campaign": {
     "meta": {
@@ -1306,7 +1321,9 @@
     "created_success": "Push campaign created successfully.",
     "create_error": "Could not create push campaign. Please try again.",
     "submit_create": "Create campaign",
-    "feature_disabled": "Push campaigns are not available for your account."
+    "feature_disabled": "Push campaigns are not available for your account.",
+    "table_aria": "Pushcampagnes",
+    "radius_km": "{{radius}} km"
   },
   "push_campaign_opt_in": "Receive promoted push notifications",
   "push_campaign_opt_in_description": "Allow local businesses and organisations to send you targeted push notifications. You can opt out at any time.",
@@ -1366,8 +1383,17 @@
       "view_redemptions": "View redemptions",
       "usage_count": "Used {{count}} times",
       "saved": "Coupon saved",
-      "deleted": "Coupon deleted"
-    }
+      "deleted": "Coupon deleted",
+      "status_draft": "Concept",
+      "status_active": "Actief",
+      "status_paused": "Gepauzeerd",
+      "status_expired": "Verlopen",
+      "amount_cents_help": "Bedrag in centen",
+      "table_aria": "Verkoperscoupons"
+    },
+    "meta_description": "Bekijk actieve community-coupons, kortingen van handelaren en lokale aanbiedingen in jouw omgeving.",
+    "detail_meta_description": "Bekijk deze community-coupon, kopieer de aanbiedingscode of genereer een QR-code voor inwisseling in de winkel.",
+    "detail_meta_description_named": "Bekijk {{title}}, kopieer couponcode {{code}} of genereer een QR-code voor inwisseling in de winkel."
   },
   "regional_points": {
     "title": "Regional Points",
@@ -1389,7 +1415,10 @@
       "errors": {
         "invalid_recipient": "Enter a valid recipient member ID",
         "invalid_amount": "Enter a positive amount"
-      }
+      },
+      "recipient_placeholder": "bijv. 123",
+      "amount_placeholder": "0,00",
+      "message_placeholder": "Voeg een notitie voor de ontvanger toe"
     },
     "history": {
       "title": "Recent activity",
@@ -1398,12 +1427,14 @@
       "type": "Type",
       "description": "Description",
       "amount": "Amount",
-      "balance_after": "Balance"
+      "balance_after": "Balance",
+      "table_aria": "Activiteit regionale punten"
     },
     "errors": {
       "load_failed": "Failed to load regional points",
       "transfer_failed": "Transfer failed"
-    }
+    },
+    "default_symbol": "pt"
   },
   "verein_import": {
     "title": "Import club members",
@@ -1429,7 +1460,8 @@
       "email": "Email",
       "name": "Name",
       "role": "Role",
-      "errors": "Errors"
+      "errors": "Errors",
+      "table_aria": "Voorbeeld ledenimport"
     },
     "result": {
       "title": "Import complete",
@@ -1444,6 +1476,13 @@
       "import_failed": "Import failed",
       "has_invalid": "Fix invalid rows before importing",
       "has_invalid_summary": "Some rows are invalid. Fix them in your CSV and re-run the preview before importing."
+    },
+    "csv_placeholder": "email,first_name,last_name,phone,role\nalice@example.org,Alice,Smith,+1 555 123 4567,member",
+    "actions": {
+      "already": "al aanwezig",
+      "create": "aanmaken",
+      "invalid": "ongeldig",
+      "link": "koppelen"
     }
   },
   "premium": {
@@ -1502,7 +1541,8 @@
       "past_due": "Past Due",
       "grace": "Grace Period",
       "canceled": "Cancelled",
-      "incomplete": "Incomplete"
+      "incomplete": "Incomplete",
+      "unknown": "Onbekend"
     },
     "feature": {
       "verified_badge": "Verified badge",
@@ -1552,7 +1592,24 @@
     "webhook_signing_title": "Verifying signatures",
     "webhook_signing_body": "Compute HMAC-SHA256 of the raw request body using your subscription secret. Compare with the X-Partner-Signature header in constant time.",
     "webhook_create_title": "Create a subscription",
-    "webhook_create_body": "POST /api/partner/v1/webhooks/subscriptions with event_types (array) and target_url (https only). The response includes a one-time secret — store it."
+    "webhook_create_body": "POST /api/partner/v1/webhooks/subscriptions with event_types (array) and target_url (https only). The response includes a one-time secret — store it.",
+    "meta_description": "Ontdek de Project NEXUS partner-API voor OAuth2-authenticatie, scoped endpoints, ondertekende webhooks en integratietoegang.",
+    "auth_meta_title": "API-authenticatie",
+    "endpoints_meta_title": "API-endpoints",
+    "webhooks_meta_title": "API-webhooks",
+    "endpoints_table_aria": "Partner-API-endpoints",
+    "endpoint_descriptions": {
+      "oauth_token": "Wissel clientgegevens in voor een bearer-token (client_credentials grant).",
+      "oauth_revoke": "Trek een uitgegeven bearer-token in (RFC 7009).",
+      "users_list": "Lijst actieve leden. Voeg scope users.pii toe om e-mail te ontvangen.",
+      "users_detail": "Haal een enkel lid op via ID.",
+      "listings_list": "Lijst actieve advertenties (diensten en aanvragen).",
+      "wallet_balance": "Lees het tijdcredit-saldo van een lid in uren.",
+      "wallet_credit": "Credit tijduren vanuit een verwerkte bankoverschrijving. Body: user_id, hours, reference, note?",
+      "aggregates_community": "Gebucketeerde community-totalen (geen PII). Handig voor partnerdashboards.",
+      "webhooks_list": "Lijst je webhook-abonnementen.",
+      "webhooks_create": "Abonneer je op events. Body: event_types[], target_url (https://)."
+    }
   },
   "regional_analytics": {
     "page_title": "Regionale analyses",
@@ -1601,7 +1658,10 @@
         "feature_3": "Kwartaaloverzichtworkshops",
         "feature_4": "Toegewijde succesmanager"
       }
-    }
+    },
+    "meta_description": "Ontdek privacyvriendelijke regionale analytics voor gemeenten en mkb-partners met geanonimiseerde community-trends en aggregatierapportages.",
+    "partner_dashboard_title": "Regionale analytics",
+    "partner_dashboard_meta_description": "Privé regionale analytics-dashboard voor geautoriseerde partners."
   },
   "provisioning": {
     "meta": {
@@ -1923,6 +1983,12 @@
       "generate_failed": "Generation failed.",
       "reminder_failed": "Could not send reminder.",
       "waive_failed": "Could not waive dues."
+    },
+    "col_email_delivery": "E-mailbezorging",
+    "email_status": {
+      "failed": "Mislukt",
+      "pending": "Geen bewijs",
+      "sent": "Verzonden"
     }
   },
   "collections": {
@@ -1995,7 +2061,42 @@
     "ios_add_to_home": "Add to Home Screen",
     "ios_step_2_after": ".",
     "ios_step_3": "Tap Add. NEXUS will appear on your home screen as a standalone app.",
-    "got_it": "Got it"
+    "got_it": "Got it",
+    "generic_title": "NEXUS installeren",
+    "generic_intro": "Zoek naar een installatieoptie in het menu van je browser:",
+    "generic_step_1": "Open het browsermenu, meestal een pictogram met drie puntjes of drie lijntjes.",
+    "generic_step_2": "Zoek naar App installeren, Deze site installeren of Toevoegen aan startscherm.",
+    "generic_step_3": "Bevestig om NEXUS aan je apparaat toe te voegen.",
+    "manual_note": "Als je de optie niet ziet, heeft je browser de app mogelijk al geïnstalleerd of ondersteunt je apparaat dit niet.",
+    "android_chrome_title": "Installeren op Android",
+    "android_chrome_intro": "Voeg NEXUS toe aan je startscherm vanuit het Chrome-menu:",
+    "android_chrome_step_1": "Tik op het menu met drie puntjes rechtsboven in Chrome.",
+    "android_chrome_step_2": "Tik op App installeren of Toevoegen aan startscherm.",
+    "android_chrome_step_3": "Bevestig. NEXUS verschijnt op je startscherm als een zelfstandige app.",
+    "samsung_title": "Installeren met Samsung Internet",
+    "samsung_intro": "Voeg NEXUS toe aan je startscherm vanuit het Samsung Internet-menu:",
+    "samsung_step_1": "Tik op het menupictogram onderaan Samsung Internet.",
+    "samsung_step_2": "Tik op Pagina toevoegen aan en daarna op Startscherm.",
+    "samsung_step_3": "Bevestig. NEXUS verschijnt op je startscherm.",
+    "firefox_android_title": "Installeren op Firefox voor Android",
+    "firefox_android_intro": "Voeg NEXUS toe aan je startscherm vanuit het Firefox-menu:",
+    "firefox_android_step_1": "Tik op het menu met drie puntjes in Firefox.",
+    "firefox_android_step_2": "Tik op Installeren of Toevoegen aan startscherm.",
+    "firefox_android_step_3": "Bevestig om NEXUS aan je startscherm toe te voegen.",
+    "chrome_desktop_title": "Installeren op je computer",
+    "chrome_desktop_intro": "Chrome heeft mogelijk nog geen melding gegeven. Je kunt NEXUS nog steeds installeren via het Chrome-menu:",
+    "chrome_desktop_step_1": "Klik op het menu met drie puntjes rechtsboven in Chrome.",
+    "chrome_desktop_step_2": "Klik op Casten, opslaan en delen en daarna op Pagina als app installeren, of zoek naar een installatiepictogram in de adresbalk.",
+    "chrome_desktop_step_3": "Klik op Installeren. NEXUS opent in een eigen venster als een native app.",
+    "edge_desktop_title": "Installeren op je computer",
+    "edge_desktop_intro": "Installeer NEXUS als bureaubladapp vanuit het Edge-menu:",
+    "edge_desktop_step_1": "Klik op het menu met drie puntjes rechtsboven in Edge.",
+    "edge_desktop_step_2": "Klik op Apps en daarna op Deze site installeren als app.",
+    "edge_desktop_step_3": "Klik op Installeren. NEXUS opent in een eigen venster.",
+    "firefox_desktop_title": "Installeren op je computer",
+    "firefox_desktop_intro": "Firefox op de desktop ondersteunt momenteel geen installatie van webapps. Je kunt NEXUS wel vastmaken voor snelle toegang:",
+    "firefox_desktop_step_1": "Maak een bladwijzer van deze pagina met Ctrl+D of maak het tabblad vast via het contextmenu van het tabblad.",
+    "firefox_desktop_step_2": "Probeer voor een echt installeerbare app Chrome, Edge of onze mobiele app."
   },
   "release_status": {
     "summary": "Project NEXUS is actively evolving, with feature maturity shown transparently across the platform.",
@@ -2032,5 +2133,54 @@
   "level_plain": "Level {{level}}",
   "level_named": "Level {{level}} - {{name}}",
   "xp_progress": "{{current}} / {{required}} XP",
-  "level_progress_aria": "Level {{level}} progress: {{percentage}}%"
+  "level_progress_aria": "Level {{level}} progress: {{percentage}}%",
+  "empty_dash": "-",
+  "refresh": "Vernieuwen",
+  "not_available": "Niet beschikbaar",
+  "keyboard": {
+    "command_symbol": "⌘",
+    "k_key": "K"
+  },
+  "partner_analytics": {
+    "no_token_title": "Abonnementstoken vereist",
+    "no_token_body": "Gebruik de beveiligde link die je accountmanager heeft verstrekt. De link bevat een uniek abonnementstoken.",
+    "error_title": "Kan analytics niet laden",
+    "error_unauthorized": "Je abonnementstoken is ongeldig of verlopen.",
+    "error_generic": "Er is iets misgegaan bij het ophalen van je analytics. Probeer het opnieuw.",
+    "retry": "Opnieuw proberen",
+    "title": "Regionale analytics",
+    "subtitle": "Privacy-gebucketeerde inzichten voor jouw regio. Dagelijks ververst.",
+    "period_label": "Periode",
+    "period_30d": "Laatste 30 dagen",
+    "period_90d": "Laatste 90 dagen",
+    "period_year": "Afgelopen jaar",
+    "tabs_aria": "Analytics-tabs",
+    "tab_trends": "Trends",
+    "tab_demand_supply": "Vraag en aanbod",
+    "tab_demographics": "Demografie",
+    "tab_footfall": "Bezoekersaantal",
+    "reports_title": "Maandelijkse rapporten",
+    "no_reports": "Nog geen rapporten gegenereerd.",
+    "download_pdf": "PDF downloaden",
+    "privacy_footer": "Alle metrieken zijn gebucketeerd en geanonimiseerd. Segmenten met N<10 worden onderdrukt.",
+    "metric_active_members": "Actieve leden",
+    "metric_categories": "Categorieën",
+    "metric_partner_orgs": "Partnerorganisaties",
+    "metric_event_participation": "Evenementdeelname",
+    "metric_volunteer_hours": "Vrijwilligersuren",
+    "engagement_overview": "Engagement-overzicht (bucketmiddens)",
+    "ds_by_postcode": "Aanbod versus vraag per postcode (3-cijferig)",
+    "no_data": "Geen gegevens beschikbaar.",
+    "offers": "Aanbod",
+    "requests": "Vraag",
+    "match_heatmap": "Cellen matchpercentage",
+    "category_short": "cat",
+    "age_distribution": "Leeftijdsverdeling",
+    "gender_distribution": "Geslachtsverdeling",
+    "footfall_by_area": "Paginaweergaven per gebied",
+    "page_views": "Paginaweergaven",
+    "distinct_visitors": "Unieke bezoekers",
+    "suppressed_value": "Onderdrukt",
+    "suppressed_short": "--"
+  }
 }
