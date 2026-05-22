@@ -1,33 +1,33 @@
 {
   "job_application_applicant": {
-    "subject": "アプリケーションを受信しました: {{job_title}} — {{community}}",
-    "title": "申請書が提出されました！",
-    "preview": "{{job_title}} のお申し込みを受け付けました",
-    "body": "<strong>{{job_title}}</strong> の申請が受理され、審査中です。",
-    "next_steps": "採用チームがあなたの応募を審査し、最終候補者に選ばれた場合には連絡します。",
-    "cta": "アプリケーションを見る"
+    "subject": "応募受付: {{job_title}} — {{community}}",
+    "title": "応募完了！",
+    "preview": "{{job_title}}へのご応募を受け付けました",
+    "body": "<strong>{{job_title}}</strong>へのご応募を受け付けました。現在審査中です。",
+    "next_steps": "採用チームが応募内容を審査し、選考通過の場合はご連絡いたします。",
+    "cta": "応募内容を確認"
   },
   "job_application_employer": {
-    "subject": "新しいアプリケーション: {{job_title}} — {{community}}",
-    "title": "新しい求人への応募",
-    "preview": "{{applicant_name}} applied for {{job_title}}",
-    "body": "<strong>{{applicant_name}}</strong> があなたの求人への申請書を提出しました: <strong>{{job_title}}</strong>。",
-    "cta": "申請のレビュー"
+    "subject": "新規応募: {{job_title}} — {{community}}",
+    "title": "新しい求人応募",
+    "preview": "{{applicant_name}}さんが{{job_title}}に応募しました",
+    "body": "<strong>{{applicant_name}}</strong>さんが求人<strong>{{job_title}}</strong>に応募しました。",
+    "cta": "応募内容を確認"
   },
   "group_removed": {
-    "subject": "{{group_name}} — {{community}} から削除されました",
+    "subject": "{{group_name}}から削除されました — {{community}}",
     "title": "グループメンバーシップの更新",
-    "preview": "{{group_name}} のメンバーシップは終了しました",
-    "body": "{{community}} のグループ<strong>「{{group_name}}」</strong> のメンバーシップが終了しました。",
+    "preview": "{{group_name}}へのメンバーシップが終了しました",
+    "body": "{{community}}のグループ<strong>「{{group_name}}」</strong>のメンバーシップが終了しました。",
     "suggestion": "コミュニティ内の他のグループを見つけて参加することができます。",
-    "cta": "グループを参照する"
+    "cta": "グループを探す"
   },
   "group_promoted": {
-    "subject": "あなたは現在、{{group_name}} の {{role}} — {{community}} です",
+    "subject": "{{group_name}}の{{role}}になりました — {{community}}",
     "title": "役割の更新",
-    "preview": "おめでとうございます — あなたは {{group_name}} の {{role}} になりました",
-    "body": "{{community}} のグループ <strong>「{{group_name}}」</strong> の <strong>{{role}}</strong> に昇格しました。",
-    "responsibilities": "{{role}} として、グループの管理とメンバーのサポートを支援できます。",
-    "cta": "グループに移動"
+    "preview": "おめでとうございます — {{group_name}}の{{role}}になりました",
+    "body": "{{community}}のグループ<strong>「{{group_name}}」</strong>で<strong>{{role}}</strong>に昇格しました。",
+    "responsibilities": "{{role}}として、グループの管理やメンバーのサポートを担っていただけます。",
+    "cta": "グループへ移動"
   }
 }

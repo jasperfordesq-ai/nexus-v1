@@ -1,33 +1,33 @@
 {
   "job_application_applicant": {
-    "subject": "Ontvangen aanvraag: {{job_title}} — {{community}}",
-    "title": "Aanvraag ingediend!",
-    "preview": "Uw aanvraag voor {{job_title}} is ontvangen",
-    "body": "Uw aanvraag voor <strong>{{job_title}}</strong> is ontvangen en wordt beoordeeld.",
-    "next_steps": "Het wervingsteam beoordeelt uw sollicitatie en neemt contact met u op als u op de shortlist staat.",
-    "cta": "Bekijk applicatie"
+    "subject": "Sollicitatie ontvangen: {{job_title}} — {{community}}",
+    "title": "Sollicitatie ingediend!",
+    "preview": "Je sollicitatie voor {{job_title}} is ontvangen",
+    "body": "Je sollicitatie voor <strong>{{job_title}}</strong> is ontvangen en wordt beoordeeld.",
+    "next_steps": "Het wervingsteam beoordeelt je sollicitatie en neemt contact met je op als je wordt geselecteerd.",
+    "cta": "Sollicitatie bekijken"
   },
   "job_application_employer": {
-    "subject": "Nieuwe applicatie voor: {{job_title}} — {{community}}",
+    "subject": "Nieuwe sollicitatie voor: {{job_title}} — {{community}}",
     "title": "Nieuwe sollicitatie",
-    "preview": "{{applicant_name}} applied for {{job_title}}",
-    "body": "<strong>{{applicant_name}}</strong> heeft gesolliciteerd op uw vacature: <strong>{{job_title}}</strong>.",
-    "cta": "Beoordeling aanvraag"
+    "preview": "{{applicant_name}} solliciteerde op {{job_title}}",
+    "body": "<strong>{{applicant_name}}</strong> heeft een sollicitatie ingediend voor uw vacature: <strong>{{job_title}}</strong>.",
+    "cta": "Sollicitatie beoordelen"
   },
   "group_removed": {
-    "subject": "U bent verwijderd uit {{group_name}} — {{community}}",
-    "title": "Update van groepslidmaatschap",
-    "preview": "Uw lidmaatschap van {{group_name}} is beëindigd",
+    "subject": "Je bent verwijderd uit {{group_name}} — {{community}}",
+    "title": "Update groepslidmaatschap",
+    "preview": "Je lidmaatschap van {{group_name}} is beëindigd",
     "body": "Je lidmaatschap van de groep <strong>\"{{group_name}}\"</strong> op {{community}} is beëindigd.",
-    "suggestion": "U kunt andere groepen in uw community ontdekken en er lid van worden.",
-    "cta": "Blader door groepen"
+    "suggestion": "Je kunt andere groepen in je gemeenschap ontdekken en eraan deelnemen.",
+    "cta": "Groepen verkennen"
   },
   "group_promoted": {
-    "subject": "Je bent nu een {{role}} of {{group_name}} — {{community}}",
-    "title": "Rol-update",
-    "preview": "Gefeliciteerd: u bent benoemd tot {{role}} of {{group_name}}",
+    "subject": "Je bent nu {{role}} van {{group_name}} — {{community}}",
+    "title": "Rolupdate",
+    "preview": "Gefeliciteerd — je bent nu {{role}} van {{group_name}}",
     "body": "Je bent gepromoveerd tot <strong>{{role}}</strong> van de groep <strong>\"{{group_name}}\"</strong> op {{community}}.",
-    "responsibilities": "Als {{role}} kunt u helpen bij het beheren van de groep en het ondersteunen van de leden.",
-    "cta": "Ga naar Groep"
+    "responsibilities": "Als {{role}} kun je helpen de groep te beheren en de leden te ondersteunen.",
+    "cta": "Ga naar groep"
   }
 }

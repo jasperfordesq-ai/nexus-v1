@@ -1,41 +1,32 @@
 {
   "meta": {
-    "title": "Community Projects",
-    "description": "Follow municipality, cooperative, and neighbourhood projects from announcement to milestone.",
-    "detail_title": "{{title}}",
-    "detail_description_fallback": "Ta {{title}} {{status}} ag dul chun cinn {{progress}}%. Ceim: {{stage}}. Suiomh: {{location}}.",
-    "stage_unknown": "Ceim le deimhniu",
-    "location_unknown": "Suiomh le deimhniu"
+    "description": "Lean tionscadail bardas, comharchumann agus comharsanachta ó fhógairt go garsprioc.",
+    "title": "Tionscadail Pobail"
   },
   "status": {
-    "draft": "Draft",
-    "active": "Active",
-    "paused": "Paused",
-    "completed": "Completed",
-    "cancelled": "Cancelled"
+    "active": "Gníomhach",
+    "cancelled": "Curtha ar ceal",
+    "completed": "Críochnaithe",
+    "draft": "Dréacht",
+    "paused": "Ar sos"
   },
-  "progress_label": "Project progress",
-  "progress_value": "{{value}}% complete",
-  "subscriber_count_one": "{{count}} follower",
-  "subscriber_count_other": "{{count}} followers",
-  "date_unknown": "Date pending",
-  "back_to_projects": "Back to projects",
-  "subscribe": "Follow updates",
-  "unsubscribe": "Following",
-  "updates_title": "Updates and milestones",
-  "milestone": "Milestone",
-  "no_updates": "No updates have been published yet.",
-  "empty": "There are no active community projects right now.",
+  "progress_label": "Dul chun cinn tionscadail",
+  "progress_value": "{{value}}% críochnaithe",
+  "subscriber_count_one": "{{count}} leantóir",
+  "subscriber_count_other": "{{count}} leantóir",
+  "date_unknown": "Dáta ar feitheamh",
+  "back_to_projects": "Ar ais chuig na tionscadail",
+  "subscribe": "Lean nuashonruithe",
+  "unsubscribe": "Á leanúint",
+  "updates_title": "Nuashonruithe agus garspriocanna",
+  "milestone": "Garsprioc",
+  "no_updates": "Níl aon nuashonruithe foilsithe go fóill.",
+  "empty": "Níl aon tionscadail pobail gníomhacha ann faoi láthair.",
   "errors": {
-    "load": "Could not load community projects.",
-    "subscribe": "Could not update your project notifications."
+    "load": "Níorbh fhéidir tionscadail pobail a lódáil.",
+    "subscribe": "Níorbh fhéidir do chuid fógraí tionscadail a nuashonrú."
   },
   "share": {
-    "title": "Roinn an tionscadal",
-    "copy_link": "Coipeail nasc",
-    "native": "Roinn",
-    "link_copied": "Nasc coipeailte",
-    "copy_failed": "Niorbh fheidir an nasc a choipeail",
     "share_text": "{{title}} - {{description}}"
   }
 }

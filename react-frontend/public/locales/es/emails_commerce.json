@@ -2,32 +2,32 @@
   "job_application_applicant": {
     "subject": "Solicitud recibida: {{job_title}} — {{community}}",
     "title": "¡Solicitud enviada!",
-    "preview": "Su solicitud para {{job_title}} ha sido recibida",
-    "body": "Su solicitud para <strong>{{job_title}}</strong> ha sido recibida y está siendo revisada.",
-    "next_steps": "El equipo de contratación revisará su solicitud y se pondrá en contacto si está preseleccionado.",
+    "preview": "Tu solicitud para {{job_title}} ha sido recibida",
+    "body": "Tu solicitud para <strong>{{job_title}}</strong> ha sido recibida y está siendo revisada.",
+    "next_steps": "El equipo de contratación revisará tu solicitud y se pondrá en contacto contigo si eres preseleccionado/a.",
     "cta": "Ver solicitud"
   },
   "job_application_employer": {
-    "subject": "Nueva aplicación para: {{job_title}} — {{community}}",
+    "subject": "Nueva solicitud para: {{job_title}} — {{community}}",
     "title": "Nueva solicitud de empleo",
-    "preview": "{{applicant_name}} applied for {{job_title}}",
-    "body": "<strong>{{applicant_name}}</strong> ha enviado una solicitud para su vacante: <strong>{{job_title}}</strong>.",
-    "cta": "Revisar la solicitud"
+    "preview": "{{applicant_name}} se postuló para {{job_title}}",
+    "body": "<strong>{{applicant_name}}</strong> ha enviado una solicitud para tu vacante: <strong>{{job_title}}</strong>.",
+    "cta": "Revisar solicitud"
   },
   "group_removed": {
-    "subject": "Has sido eliminado de {{group_name}} — {{community}}",
+    "subject": "Has sido eliminado/a de {{group_name}} — {{community}}",
     "title": "Actualización de membresía de grupo",
     "preview": "Tu membresía en {{group_name}} ha finalizado",
-    "body": "Su membresía en el grupo <strong>\"{{group_name}}\"</strong> en {{community}} ha finalizado.",
-    "suggestion": "Puedes descubrir y unirte a otros grupos en tu comunidad.",
+    "body": "Tu membresía en el grupo <strong>\"{{group_name}}\"</strong> en {{community}} ha finalizado.",
+    "suggestion": "Puedes descubrir y unirte a otros grupos de tu comunidad.",
     "cta": "Explorar grupos"
   },
   "group_promoted": {
-    "subject": "Ahora eres un {{role}} de {{group_name}} — {{community}}",
-    "title": "Actualización de roles",
-    "preview": "Felicitaciones: se le ha convertido en {{role}} de {{group_name}}.",
-    "body": "Has sido ascendido a <strong>{{role}}</strong> del grupo <strong>\"{{group_name}}\"</strong> en {{community}}.",
-    "responsibilities": "Como {{role}}, puedes ayudar a administrar el grupo y apoyar a sus miembros.",
+    "subject": "Ahora eres {{role}} de {{group_name}} — {{community}}",
+    "title": "Actualización de rol",
+    "preview": "Enhorabuena — ahora eres {{role}} de {{group_name}}",
+    "body": "Has sido promovido/a a <strong>{{role}}</strong> del grupo <strong>\"{{group_name}}\"</strong> en {{community}}.",
+    "responsibilities": "Como {{role}}, puedes ayudar a gestionar el grupo y apoyar a sus miembros.",
     "cta": "Ir al grupo"
   }
 }

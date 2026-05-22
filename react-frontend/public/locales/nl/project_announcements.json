@@ -1,41 +1,32 @@
 {
   "meta": {
-    "title": "Community Projects",
-    "description": "Follow municipality, cooperative, and neighbourhood projects from announcement to milestone.",
-    "detail_title": "{{title}}",
-    "detail_description_fallback": "{{title}} is {{status}} met {{progress}}% voortgang. Fase: {{stage}}. Locatie: {{location}}.",
-    "stage_unknown": "Fase volgt nog",
-    "location_unknown": "Locatie volgt nog"
+    "description": "Volg gemeente-, coöperatieve en buurtprojecten van aankondiging tot mijlpaal.",
+    "title": "Gemeenschapsprojecten"
   },
   "status": {
-    "draft": "Draft",
-    "active": "Active",
-    "paused": "Paused",
-    "completed": "Completed",
-    "cancelled": "Cancelled"
+    "active": "Actief",
+    "cancelled": "Geannuleerd",
+    "completed": "Voltooid",
+    "draft": "Concept",
+    "paused": "Gepauzeerd"
   },
-  "progress_label": "Project progress",
-  "progress_value": "{{value}}% complete",
-  "subscriber_count_one": "{{count}} follower",
-  "subscriber_count_other": "{{count}} followers",
-  "date_unknown": "Date pending",
-  "back_to_projects": "Back to projects",
-  "subscribe": "Follow updates",
-  "unsubscribe": "Following",
-  "updates_title": "Updates and milestones",
-  "milestone": "Milestone",
-  "no_updates": "No updates have been published yet.",
-  "empty": "There are no active community projects right now.",
+  "progress_label": "Projectvoortgang",
+  "progress_value": "{{value}}% voltooid",
+  "subscriber_count_one": "{{count}} volger",
+  "subscriber_count_other": "{{count}} volgers",
+  "date_unknown": "Datum nog niet bekend",
+  "back_to_projects": "Terug naar projecten",
+  "subscribe": "Updates volgen",
+  "unsubscribe": "Volgend",
+  "updates_title": "Updates en mijlpalen",
+  "milestone": "Mijlpaal",
+  "no_updates": "Er zijn nog geen updates gepubliceerd.",
+  "empty": "Er zijn momenteel geen actieve gemeenschapsprojecten.",
   "errors": {
-    "load": "Could not load community projects.",
-    "subscribe": "Could not update your project notifications."
+    "load": "Gemeenschapsprojecten konden niet worden geladen.",
+    "subscribe": "Uw projectmeldingen konden niet worden bijgewerkt."
   },
   "share": {
-    "title": "Project delen",
-    "copy_link": "Link kopieren",
-    "native": "Delen",
-    "link_copied": "Link gekopieerd",
-    "copy_failed": "Link kon niet worden gekopieerd",
     "share_text": "{{title}} - {{description}}"
   }
 }

@@ -2,32 +2,32 @@
   "job_application_applicant": {
     "subject": "تم استلام الطلب: {{job_title}} — {{community}}",
     "title": "تم تقديم الطلب!",
-    "preview": "لقد تم استلام طلبك للحصول على {{job_title}}",
-    "body": "تم استلام طلبك للحصول على <strong>{{job_title}}</strong> وهو قيد المراجعة.",
-    "next_steps": "سيقوم فريق التوظيف بمراجعة طلبك وسيكون على اتصال إذا تم إدراجك في القائمة المختصرة.",
-    "cta": "عرض التطبيق"
+    "preview": "تم استلام طلبك للوظيفة {{job_title}}",
+    "body": "تم استلام طلبك للوظيفة <strong>{{job_title}}</strong> وهو قيد المراجعة.",
+    "next_steps": "سيقوم فريق التوظيف بمراجعة طلبك والتواصل معك إذا تم اختيارك.",
+    "cta": "عرض الطلب"
   },
   "job_application_employer": {
-    "subject": "تطبيق جديد لـ: {{job_title}} — {{community}}",
-    "title": "طلب عمل جديد",
-    "preview": "{{applicant_name}} applied for {{job_title}}",
-    "body": "أرسل <strong>{{applicant_name}}</strong> طلبًا لشغل الوظيفة الشاغرة لديك: <strong>{{job_title}}</strong>.",
-    "cta": "مراجعة التطبيق"
+    "subject": "طلب جديد لـ: {{job_title}} — {{community}}",
+    "title": "طلب توظيف جديد",
+    "preview": "{{applicant_name}} تقدّم لوظيفة {{job_title}}",
+    "body": "قدّم <strong>{{applicant_name}}</strong> طلباً للوظيفة الشاغرة لديك: <strong>{{job_title}}</strong>.",
+    "cta": "مراجعة الطلب"
   },
   "group_removed": {
-    "subject": "لقد تمت إزالتك من {{group_name}} — {{community}}",
+    "subject": "تمت إزالتك من {{group_name}} — {{community}}",
     "title": "تحديث عضوية المجموعة",
-    "preview": "لقد انتهت عضويتك في {{group_name}}",
-    "body": "لقد انتهت عضويتك في المجموعة <strong>\"{{group_name}}\"</strong> على {{community}}.",
-    "suggestion": "يمكنك اكتشاف والانضمام إلى مجموعات أخرى في مجتمعك.",
+    "preview": "انتهت عضويتك في {{group_name}}",
+    "body": "انتهت عضويتك في مجموعة <strong>\"{{group_name}}\"</strong> على {{community}}.",
+    "suggestion": "يمكنك اكتشاف مجموعات أخرى والانضمام إليها في مجتمعك.",
     "cta": "تصفح المجموعات"
   },
   "group_promoted": {
-    "subject": "أنت الآن {{role}} من {{group_name}} — {{community}}",
+    "subject": "أنت الآن {{role}} في {{group_name}} — {{community}}",
     "title": "تحديث الدور",
-    "preview": "تهانينا — لقد حصلت على {{role}} من {{group_name}}",
-    "body": "لقد تمت ترقيتك إلى <strong>{{role}}</strong> من المجموعة <strong>\"{{group_name}}\"</strong> على {{community}}.",
-    "responsibilities": "باعتبارك {{role}}، يمكنك المساعدة في إدارة المجموعة ودعم أعضائها.",
-    "cta": "اذهب إلى المجموعة"
+    "preview": "تهانينا — لقد أصبحت {{role}} في {{group_name}}",
+    "body": "لقد تمت ترقيتك إلى <strong>{{role}}</strong> في مجموعة <strong>\"{{group_name}}\"</strong> على {{community}}.",
+    "responsibilities": "بصفتك {{role}}، يمكنك المساعدة في إدارة المجموعة ودعم أعضائها.",
+    "cta": "الذهاب إلى المجموعة"
   }
 }

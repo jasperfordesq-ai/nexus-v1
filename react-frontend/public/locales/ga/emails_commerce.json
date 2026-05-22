@@ -1,33 +1,33 @@
 {
   "job_application_applicant": {
     "subject": "Iarratas faighte: {{job_title}} — {{community}}",
-    "title": "Iarratas curtha isteach!",
-    "preview": "Tá d’iarratas ar {{job_title}} faighte",
+    "title": "Iarratas Curtha Isteach!",
+    "preview": "Tá d'iarratas ar {{job_title}} faighte",
     "body": "Tá d'iarratas ar <strong>{{job_title}}</strong> faighte agus á athbhreithniú.",
-    "next_steps": "Déanfaidh an fhoireann fruilithe athbhreithniú ar d’iarratas agus beidh siad i dteagmháil má tá tú ar an ngearrliosta.",
-    "cta": "Féach ar an bhFeidhmchlár"
+    "next_steps": "Déanfaidh an foireann earcaíochta athbhreithniú ar d'iarratas agus rachaidh siad i dteagmháil leat má chuirtear ar ghearrliosta thú.",
+    "cta": "Féach ar an Iarratas"
   },
   "job_application_employer": {
-    "subject": "Iarratas nua le haghaidh: {{job_title}} — {{community}}",
-    "title": "Iarratas Post Nua",
-    "preview": "{{applicant_name}} applied for {{job_title}}",
-    "body": "Chuir <strong>{{applicant_name}}</strong> iarratas isteach ar d'fholúntas: <strong>{{job_title}}</strong>.",
-    "cta": "Iarratas Athbhreithnithe"
+    "subject": "Iarratas nua do: {{job_title}} — {{community}}",
+    "title": "Iarratas Poist Nua",
+    "preview": "Chuir {{applicant_name}} isteach ar {{job_title}}",
+    "body": "Chuir <strong>{{applicant_name}}</strong> iarratas isteach do d'fholúntas: <strong>{{job_title}}</strong>.",
+    "cta": "Athbhreithnigh an tIarratas"
   },
   "group_removed": {
-    "subject": "Baineadh de {{group_name}} — {{community}} thú",
+    "subject": "Baineadh as {{group_name}} thú — {{community}}",
     "title": "Nuashonrú Ballraíochta Grúpa",
-    "preview": "Tá deireadh tagtha le do bhallraíocht in {{group_name}}",
+    "preview": "Tá deireadh tagtha le do bhallraíocht i {{group_name}}",
     "body": "Tá deireadh tagtha le do bhallraíocht sa ghrúpa <strong>\"{{group_name}}\"</strong> ar {{community}}.",
-    "suggestion": "Is féidir leat teacht ar ghrúpaí eile i do phobal agus páirt a ghlacadh iontu.",
+    "suggestion": "Is féidir leat grúpaí eile a fháil agus dul isteach iontu i do phobal.",
     "cta": "Brabhsáil Grúpaí"
   },
   "group_promoted": {
-    "subject": "Is {{role}} de {{group_name}} thú anois - {{community}}",
+    "subject": "Is {{role}} thú anois de {{group_name}} — {{community}}",
     "title": "Nuashonrú Róil",
-    "preview": "Comhghairdeas - rinneadh {{role}} de {{group_name}} duit",
-    "body": "Tugadh ardú céime duit go <strong>{{role}}</strong> den ghrúpa <strong>\"{{group_name}}\"</strong> ar {{community}}.",
-    "responsibilities": "Mar {{role}}, is féidir leat cabhrú leis an ngrúpa a bhainistiú agus tacú lena chomhaltaí.",
-    "cta": "Téigh go Grúpa"
+    "preview": "Comhghairdeas — tá tú anois i do {{role}} de {{group_name}}",
+    "body": "Tá tú ardaithe go <strong>{{role}}</strong> den ghrúpa <strong>\"{{group_name}}\"</strong> ar {{community}}.",
+    "responsibilities": "Mar {{role}}, is féidir leat cabhrú leis an ngrúpa a bhainistiú agus tacú lena bhaill.",
+    "cta": "Téigh chuig an nGrúpa"
   }
 }

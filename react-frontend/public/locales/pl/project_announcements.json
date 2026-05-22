@@ -1,41 +1,32 @@
 {
   "meta": {
-    "title": "Community Projects",
-    "description": "Follow municipality, cooperative, and neighbourhood projects from announcement to milestone.",
-    "detail_title": "{{title}}",
-    "detail_description_fallback": "{{title}} ma status {{status}} i {{progress}}% postepu. Etap: {{stage}}. Lokalizacja: {{location}}.",
-    "stage_unknown": "Etap oczekuje",
-    "location_unknown": "Lokalizacja oczekuje"
+    "description": "Śledź projekty miejskie, spółdzielcze i sąsiedzkie od ogłoszenia do kamienia milowego.",
+    "title": "Projekty społeczności"
   },
   "status": {
-    "draft": "Draft",
-    "active": "Active",
-    "paused": "Paused",
-    "completed": "Completed",
-    "cancelled": "Cancelled"
+    "active": "Aktywny",
+    "cancelled": "Anulowany",
+    "completed": "Ukończony",
+    "draft": "Szkic",
+    "paused": "Wstrzymany"
   },
-  "progress_label": "Project progress",
-  "progress_value": "{{value}}% complete",
-  "subscriber_count_one": "{{count}} follower",
-  "subscriber_count_other": "{{count}} followers",
-  "date_unknown": "Date pending",
-  "back_to_projects": "Back to projects",
-  "subscribe": "Follow updates",
-  "unsubscribe": "Following",
-  "updates_title": "Updates and milestones",
-  "milestone": "Milestone",
-  "no_updates": "No updates have been published yet.",
-  "empty": "There are no active community projects right now.",
+  "progress_label": "Postęp projektu",
+  "progress_value": "{{value}}% ukończone",
+  "subscriber_count_one": "{{count}} obserwujący",
+  "subscriber_count_other": "{{count}} obserwujących",
+  "date_unknown": "Data do ustalenia",
+  "back_to_projects": "Wróć do projektów",
+  "subscribe": "Śledź aktualizacje",
+  "unsubscribe": "Śledzę",
+  "updates_title": "Aktualizacje i kamienie milowe",
+  "milestone": "Kamień milowy",
+  "no_updates": "Nie opublikowano jeszcze żadnych aktualizacji.",
+  "empty": "Nie ma teraz żadnych aktywnych projektów społecznościowych.",
   "errors": {
-    "load": "Could not load community projects.",
-    "subscribe": "Could not update your project notifications."
+    "load": "Nie można załadować projektów społecznościowych.",
+    "subscribe": "Nie można zaktualizować powiadomień o projekcie."
   },
   "share": {
-    "title": "Udostepnij projekt",
-    "copy_link": "Kopiuj link",
-    "native": "Udostepnij",
-    "link_copied": "Link skopiowany",
-    "copy_failed": "Nie mozna skopiowac linku",
     "share_text": "{{title}} - {{description}}"
   }
 }

@@ -7,10 +7,10 @@
   "step_skills": "Scileanna",
   "step_confirm": "Deimhnigh",
   "step_safeguarding": "Cosaint",
-  "safeguarding_title": "Support & Safeguarding",
-  "safeguarding_subtitle": "Let us know if you'd like additional support",
-  "safeguarding_intro": "Your safety matters to us. If you consider yourself a vulnerable adult, or if you would like additional support when using this community, please let us know below. Our coordinators can arrange safeguarded exchanges, mediate contact on your behalf, and ensure you are matched with appropriately vetted members. Your responses are confidential and only visible to community coordinators — never on your public profile.",
-  "safeguarding_gdpr_notice": "This information is classified as sensitive personal data. We collect it solely to ensure your safety during community exchanges. Your selections are stored with a consent record and can be changed at any time from your settings. Only community coordinators and administrators can view your responses.",
+  "safeguarding_title": "Tacaíocht & Cosaint",
+  "safeguarding_subtitle": "Cuir in iúl dúinn más mian leat tacaíocht bhreise",
+  "safeguarding_intro": "Tá do shábháilteacht tábhachtach dúinn. Má mheasann tú gur duine fásta leochaileach thú, nó má theastaíonn tacaíocht bhreise uait agus tú ag úsáid an phobail seo, cuir in iúl dúinn thíos é. Is féidir lenár gcomhordaitheoirí malartuithe cosanta a eagrú, teagmháil a idirghabháil ar do shon, agus a chinntiú go meaitseálfar thú le baill a bhfuil seiceáil chuí déanta orthu. Tá do fhreagraí rúnda agus ní féidir ach le comhordaitheoirí pobail iad a fheiceáil — ní bheidh siad ar do phróifíl phoiblí riamh.",
+  "safeguarding_gdpr_notice": "Aicmítear an fhaisnéis seo mar shonraí pearsanta íogaire. Bailímid í go heisiach chun do shábháilteacht a chinntiú le linn malartuithe pobail. Stóráiltear do roghanna le taifead toilithe agus is féidir iad a athrú am ar bith ó do shocruithe. Ní féidir ach le comhordaitheoirí agus riarthóirí pobail do fhreagraí a fheiceáil.",
   "welcome_title": "Failte go {{name}}!",
   "welcome_description": "Socraigh do phroifil ionas go mbeidh tu in ann nascadh le do phobal agus creidmheasanna ama a mhalartú.",
   "benefit_earn_title": "Tuill Creidmheasanna Ama",
@@ -97,39 +97,12 @@
   "toast_complete_profile_first": "Críochnaigh do phroifíl ar dtús",
   "toast_photo_bio_required": "Tá grianghraf agus beathaisnéis riachtanach.",
   "safeguarding": {
-    "load_error": "Theip ar roghanna a lódáil",
-    "try_again": "Bain triail eile as.",
-    "required": "Roghanna riachtanacha",
-    "required_respond": "Freagair le do thoil: {{items}}",
-    "empty": "Níl aon roghanna cosanta cumraithe don phobal seo.",
-    "save_failed": "Theip ar shábháil",
-    "save_continue": "Sábháil & Lean ar aghaidh",
-    "required_fields": "Réimsí riachtanacha",
-    "select_option": "Roghnaigh rogha",
-    "or_separator": "or",
-    "learn_more": "Foghlaim níos mó",
     "confirmation": {
-      "title": "Sábháladh do shainroghanna cosanta",
-      "intro": "Go raibh maith agat as an eolas seo a roinnt. Seo achoimre ar do rogha, cé a fheiceann é, agus cad a thosaíonn mar thoradh air.",
-      "your_selections": "Do roghanna",
-      "no_selections": "Níor roghnaigh tú aon rogha cosanta.",
-      "who_can_see_heading": "Cé a fheiceann é",
-      "who_can_see_body": "Ní fheiceann ach comhordaitheoirí agus riarthóirí an phobail na sainroghanna seo. Ní fheiceann baill eile iad. Déantar gach rochtain a logáil.",
-      "what_activates_heading": "Cad a thosaíonn mar thoradh air",
-      "activation_broker_review": "Déanfaidh comhordaitheoir athbhreithniú ar theachtaireachtaí a sheolann tú agus a fhaigheann tú.",
-      "activation_match_approval": "Ceadóidh comhordaitheoir meaitseálacha a bhaineann leat sula moltar don bhall eile iad.",
-      "activation_discovery_hidden": "Beidh tú i bhfolach ó fhionnachtain ag baill nach bhfuil an grinnfhiosrúchán riachtanach acu.",
-      "activation_notification": "Cuireadh comhordaitheoir ar an eolas agus rachaidh sé/sí i dteagmháil leat chun plé a dhéanamh ar conas is féidir linn cabhrú.",
-      "activation_none": "Ní thosaíonn aon chosaint uathoibríoch ó na roghanna seo. Cuirtear do shainroghanna ar taifead d'fheasacht an chomhordaitheora.",
-      "revoke_heading": "Conas iad seo a athrú nó a chúlghairm aon uair",
-      "revoke_body": "Is féidir leat aon cheann de na sainroghanna seo a athbhreithniú nó a chúlghairm aon uair ó do shocruithe próifíle. Ní gá duit iarraidh ar riarthóir é seo a dhéanamh.",
-      "revoke_cta": "Téigh go socruithe cosanta",
-      "continue_cta": "Lean ar aghaidh",
-      "declination_title": "Noted — your response is recorded",
-      "declination_intro": "Thank you for reviewing these options. Your response has been saved so coordinators know you have seen and considered this step."
+      "declination_intro": "Go raibh maith agat as na roghanna seo a athbhreithniú. Tá do fhreagra sábháilte ionas go mbeidh a fhios ag na comhordaitheoirí gur léigh tú agus gur bhreithnígh tú an chéim seo.",
+      "declination_title": "Tógtha ar aird — tá do fhreagra taifeadta"
     }
   },
   "page_meta": {
-    "title": "Onboarding"
+    "title": "Ar Bord"
   }
 }

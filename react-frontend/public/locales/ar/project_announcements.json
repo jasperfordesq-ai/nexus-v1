@@ -1,41 +1,40 @@
 {
   "meta": {
-    "title": "Community Projects",
-    "description": "Follow municipality, cooperative, and neighbourhood projects from announcement to milestone.",
-    "detail_title": "{{title}}",
-    "detail_description_fallback": "{{title}} is {{status}} at {{progress}}% progress. Stage: {{stage}}. Location: {{location}}.",
-    "stage_unknown": "Stage pending",
-    "location_unknown": "Location pending"
+    "description": "تابع مشاريع البلديات والتعاونيات والأحياء من الإعلان إلى المعلم.",
+    "detail_description_fallback": "{{title}} {{status}} بنسبة تقدم {{progress}}%. المرحلة: {{stage}}. الموقع: {{location}}.",
+    "location_unknown": "الموقع قيد الانتظار",
+    "stage_unknown": "المرحلة قيد الانتظار",
+    "title": "مشاريع المجتمع"
   },
   "status": {
-    "draft": "Draft",
-    "active": "Active",
-    "paused": "Paused",
-    "completed": "Completed",
-    "cancelled": "Cancelled"
+    "active": "نشط",
+    "cancelled": "ملغى",
+    "completed": "مكتمل",
+    "draft": "مسودة",
+    "paused": "متوقف مؤقتًا"
   },
-  "progress_label": "Project progress",
-  "progress_value": "{{value}}% complete",
-  "subscriber_count_one": "{{count}} follower",
-  "subscriber_count_other": "{{count}} followers",
-  "date_unknown": "Date pending",
-  "back_to_projects": "Back to projects",
-  "subscribe": "Follow updates",
-  "unsubscribe": "Following",
-  "updates_title": "Updates and milestones",
-  "milestone": "Milestone",
-  "no_updates": "No updates have been published yet.",
-  "empty": "There are no active community projects right now.",
+  "progress_label": "تقدم المشروع",
+  "progress_value": "{{value}}% مكتمل",
+  "subscriber_count_one": "{{count}} متابع",
+  "subscriber_count_other": "{{count}} متابع",
+  "date_unknown": "التاريخ قيد الانتظار",
+  "back_to_projects": "العودة إلى المشاريع",
+  "subscribe": "متابعة التحديثات",
+  "unsubscribe": "متابَع",
+  "updates_title": "التحديثات والمعالم",
+  "milestone": "معلم",
+  "no_updates": "لم يتم نشر أي تحديثات بعد.",
+  "empty": "لا توجد مشاريع مجتمعية نشطة في الوقت الحالي.",
   "errors": {
-    "load": "Could not load community projects.",
-    "subscribe": "Could not update your project notifications."
+    "load": "تعذّر تحميل مشاريع المجتمع.",
+    "subscribe": "تعذّر تحديث إشعارات مشروعك."
   },
   "share": {
-    "title": "Share project",
-    "copy_link": "Copy link",
-    "native": "Share",
-    "link_copied": "Link copied",
-    "copy_failed": "Could not copy link",
-    "share_text": "{{title}} - {{description}}"
+    "copy_failed": "تعذّر نسخ الرابط",
+    "copy_link": "نسخ الرابط",
+    "link_copied": "تم نسخ الرابط",
+    "native": "مشاركة",
+    "share_text": "{{title}} - {{description}}",
+    "title": "مشاركة المشروع"
   }
 }

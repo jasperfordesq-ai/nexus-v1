@@ -7,10 +7,10 @@
   "step_skills": "Compétences",
   "step_confirm": "Confirmer",
   "step_safeguarding": "Sauvegarde",
-  "safeguarding_title": "Support & Safeguarding",
-  "safeguarding_subtitle": "Let us know if you'd like additional support",
-  "safeguarding_intro": "Your safety matters to us. If you consider yourself a vulnerable adult, or if you would like additional support when using this community, please let us know below. Our coordinators can arrange safeguarded exchanges, mediate contact on your behalf, and ensure you are matched with appropriately vetted members. Your responses are confidential and only visible to community coordinators — never on your public profile.",
-  "safeguarding_gdpr_notice": "This information is classified as sensitive personal data. We collect it solely to ensure your safety during community exchanges. Your selections are stored with a consent record and can be changed at any time from your settings. Only community coordinators and administrators can view your responses.",
+  "safeguarding_title": "Soutien et protection",
+  "safeguarding_subtitle": "Indiquez-nous si vous souhaitez un soutien supplémentaire",
+  "safeguarding_intro": "Votre sécurité nous importe. Si vous vous considérez comme un adulte vulnérable, ou si vous souhaitez un soutien supplémentaire lors de l'utilisation de cette communauté, veuillez nous le faire savoir ci-dessous. Nos coordinateurs peuvent organiser des échanges sécurisés, servir d'intermédiaire en votre nom et veiller à ce que vous soyez mis en relation avec des membres dûment vérifiés. Vos réponses sont confidentielles et uniquement visibles par les coordinateurs de la communauté — jamais sur votre profil public.",
+  "safeguarding_gdpr_notice": "Ces informations sont classées comme données personnelles sensibles. Nous les collectons uniquement pour assurer votre sécurité lors des échanges communautaires. Vos sélections sont stockées avec un registre de consentement et peuvent être modifiées à tout moment depuis vos paramètres. Seuls les coordinateurs et administrateurs de la communauté peuvent consulter vos réponses.",
   "welcome_title": "Bienvenue sur {{name}} !",
   "welcome_description": "Configurez votre profil pour commencer à vous connecter avec votre communauté et échanger des crédits de temps.",
   "benefit_earn_title": "Gagnez des crédits de temps",
@@ -97,39 +97,12 @@
   "toast_complete_profile_first": "Complétez d'abord votre profil",
   "toast_photo_bio_required": "La photo et la biographie sont requises.",
   "safeguarding": {
-    "load_error": "Impossible de charger les options",
-    "try_again": "Veuillez réessayer.",
-    "required": "Options requises",
-    "required_respond": "Veuillez répondre à : {{items}}",
-    "empty": "Aucune option de protection n'a été configurée pour cette communauté.",
-    "save_failed": "Échec de la sauvegarde",
-    "save_continue": "Enregistrer et continuer",
-    "required_fields": "Champs obligatoires",
-    "select_option": "Choisir une option",
-    "or_separator": "or",
-    "learn_more": "Apprendre encore plus",
     "confirmation": {
-      "title": "Vos préférences de protection ont été enregistrées",
-      "intro": "Merci de nous l'avoir indiqué. Voici un résumé de ce que vous avez choisi, qui peut le consulter et ce qui s'active en conséquence.",
-      "your_selections": "Vos choix",
-      "no_selections": "Vous n'avez sélectionné aucune option de protection.",
-      "who_can_see_heading": "Qui peut voir cela",
-      "who_can_see_body": "Seuls les coordinateur·trices et administrateur·trices de la communauté peuvent consulter ces préférences. Les autres membres ne le peuvent pas. Chaque accès est journalisé.",
-      "what_activates_heading": "Ce qui s'active en conséquence",
-      "activation_broker_review": "Un·e coordinateur·trice examinera les messages que vous envoyez et recevez.",
-      "activation_match_approval": "Un·e coordinateur·trice approuvera les correspondances vous concernant avant qu'elles ne soient proposées à l'autre membre.",
-      "activation_discovery_hidden": "Vous serez masqué·e dans la recherche pour les membres qui n'ont pas effectué les vérifications requises.",
-      "activation_notification": "Un·e coordinateur·trice a été informé·e et vous contactera pour voir comment nous pouvons vous aider.",
-      "activation_none": "Aucune protection automatique ne s'active à partir de ces choix. Vos préférences sont enregistrées pour information des coordinateur·trices.",
-      "revoke_heading": "Comment les modifier ou les révoquer à tout moment",
-      "revoke_body": "Vous pouvez consulter ou révoquer ces préférences à tout moment depuis les paramètres de votre profil. Aucune demande à un·e administrateur·trice n'est nécessaire.",
-      "revoke_cta": "Accéder aux paramètres de protection",
-      "continue_cta": "Continuer",
-      "declination_title": "Noted — your response is recorded",
-      "declination_intro": "Thank you for reviewing these options. Your response has been saved so coordinators know you have seen and considered this step."
+      "declination_intro": "Merci d'avoir examiné ces options. Votre réponse a été enregistrée afin que les coordinateurs sachent que vous avez pris connaissance de cette étape et l'avez examinée.",
+      "declination_title": "Noté — votre réponse est enregistrée"
     }
   },
   "page_meta": {
-    "title": "Onboarding"
+    "title": "Intégration"
   }
 }

@@ -1,41 +1,40 @@
 {
   "meta": {
-    "title": "Community Projects",
-    "description": "Follow municipality, cooperative, and neighbourhood projects from announcement to milestone.",
-    "detail_title": "{{title}}",
-    "detail_description_fallback": "{{title}} is {{status}} at {{progress}}% progress. Stage: {{stage}}. Location: {{location}}.",
-    "stage_unknown": "Stage pending",
-    "location_unknown": "Location pending"
+    "description": "自治体、協同組合、地域のプロジェクトを発表からマイルストーンまで追跡します。",
+    "detail_description_fallback": "{{title}}は進捗{{progress}}%で{{status}}です。ステージ：{{stage}}。場所：{{location}}。",
+    "location_unknown": "場所未定",
+    "stage_unknown": "ステージ未定",
+    "title": "コミュニティプロジェクト"
   },
   "status": {
-    "draft": "Draft",
-    "active": "Active",
-    "paused": "Paused",
-    "completed": "Completed",
-    "cancelled": "Cancelled"
+    "active": "進行中",
+    "cancelled": "中止",
+    "completed": "完了",
+    "draft": "下書き",
+    "paused": "一時停止"
   },
-  "progress_label": "Project progress",
-  "progress_value": "{{value}}% complete",
-  "subscriber_count_one": "{{count}} follower",
-  "subscriber_count_other": "{{count}} followers",
-  "date_unknown": "Date pending",
-  "back_to_projects": "Back to projects",
-  "subscribe": "Follow updates",
-  "unsubscribe": "Following",
-  "updates_title": "Updates and milestones",
-  "milestone": "Milestone",
-  "no_updates": "No updates have been published yet.",
-  "empty": "There are no active community projects right now.",
+  "progress_label": "プロジェクトの進捗",
+  "progress_value": "{{value}}% 完了",
+  "subscriber_count_one": "{{count}}人のフォロワー",
+  "subscriber_count_other": "{{count}}人のフォロワー",
+  "date_unknown": "日付未定",
+  "back_to_projects": "プロジェクト一覧に戻る",
+  "subscribe": "更新をフォロー",
+  "unsubscribe": "フォロー中",
+  "updates_title": "更新情報とマイルストーン",
+  "milestone": "マイルストーン",
+  "no_updates": "まだ更新情報は公開されていません。",
+  "empty": "現在アクティブなコミュニティプロジェクトはありません。",
   "errors": {
-    "load": "Could not load community projects.",
-    "subscribe": "Could not update your project notifications."
+    "load": "コミュニティプロジェクトを読み込めませんでした。",
+    "subscribe": "プロジェクト通知を更新できませんでした。"
   },
   "share": {
-    "title": "Share project",
-    "copy_link": "Copy link",
-    "native": "Share",
-    "link_copied": "Link copied",
-    "copy_failed": "Could not copy link",
-    "share_text": "{{title}} - {{description}}"
+    "copy_failed": "リンクをコピーできませんでした",
+    "copy_link": "リンクをコピー",
+    "link_copied": "リンクをコピーしました",
+    "native": "共有",
+    "share_text": "{{title}} - {{description}}",
+    "title": "プロジェクトを共有"
   }
 }

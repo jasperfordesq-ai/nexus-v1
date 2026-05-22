@@ -1,33 +1,33 @@
 {
   "job_application_applicant": {
-    "subject": "Domanda ricevuta: {{job_title}} — {{community}}",
-    "title": "Domanda presentata!",
-    "preview": "La tua richiesta per {{job_title}} è stata ricevuta",
-    "body": "La tua richiesta per <strong>{{job_title}}</strong> è stata ricevuta ed è in fase di revisione.",
-    "next_steps": "Il team di assunzione esaminerà la tua domanda e ti contatterà se sarai selezionato.",
-    "cta": "Visualizza l'applicazione"
+    "subject": "Candidatura ricevuta: {{job_title}} — {{community}}",
+    "title": "Candidatura inviata!",
+    "preview": "La tua candidatura per {{job_title}} è stata ricevuta",
+    "body": "La tua candidatura per <strong>{{job_title}}</strong> è stata ricevuta ed è in fase di revisione.",
+    "next_steps": "Il team di selezione esaminerà la tua candidatura e ti contatterà se vieni inserito/a nella lista ristretta.",
+    "cta": "Visualizza candidatura"
   },
   "job_application_employer": {
-    "subject": "Nuova applicazione per: {{job_title}} — {{community}}",
-    "title": "Nuova domanda di lavoro",
-    "preview": "{{applicant_name}} applied for {{job_title}}",
-    "body": "<strong>{{applicant_name}}</strong> ha presentato una candidatura per il tuo posto vacante: <strong>{{job_title}}</strong>.",
-    "cta": "Revisione dell'applicazione"
+    "subject": "Nuova candidatura per: {{job_title}} — {{community}}",
+    "title": "Nuova candidatura di lavoro",
+    "preview": "{{applicant_name}} si è candidato/a per {{job_title}}",
+    "body": "<strong>{{applicant_name}}</strong> ha inviato una candidatura per la tua offerta di lavoro: <strong>{{job_title}}</strong>.",
+    "cta": "Esamina candidatura"
   },
   "group_removed": {
-    "subject": "Sei stato rimosso da {{group_name}} — {{community}}",
-    "title": "Aggiornamento sull'appartenenza al gruppo",
+    "subject": "Sei stato/a rimosso/a da {{group_name}} — {{community}}",
+    "title": "Aggiornamento iscrizione al gruppo",
     "preview": "La tua iscrizione a {{group_name}} è terminata",
     "body": "La tua iscrizione al gruppo <strong>\"{{group_name}}\"</strong> su {{community}} è terminata.",
     "suggestion": "Puoi scoprire e unirti ad altri gruppi nella tua comunità.",
-    "cta": "Sfoglia gruppi"
+    "cta": "Esplora i gruppi"
   },
   "group_promoted": {
-    "subject": "Ora sei un {{role}} di {{group_name}} — {{community}}",
-    "title": "Aggiornamento del ruolo",
-    "preview": "Congratulazioni: sei stato nominato {{role}} di {{group_name}}",
-    "body": "Sei stato promosso a <strong>{{role}}</strong> del gruppo <strong>\"{{group_name}}\"</strong> su {{community}}.",
-    "responsibilities": "Come {{role}}, puoi aiutare a gestire il gruppo e supportare i suoi membri.",
-    "cta": "Vai al Gruppo"
+    "subject": "Ora sei {{role}} di {{group_name}} — {{community}}",
+    "title": "Aggiornamento ruolo",
+    "preview": "Congratulazioni — sei ora {{role}} di {{group_name}}",
+    "body": "Sei stato/a promosso/a al ruolo di <strong>{{role}}</strong> del gruppo <strong>\"{{group_name}}\"</strong> su {{community}}.",
+    "responsibilities": "Come {{role}}, puoi contribuire a gestire il gruppo e supportare i suoi membri.",
+    "cta": "Vai al gruppo"
   }
 }

@@ -1,41 +1,32 @@
 {
   "meta": {
-    "title": "Community Projects",
-    "description": "Follow municipality, cooperative, and neighbourhood projects from announcement to milestone.",
-    "detail_title": "{{title}}",
-    "detail_description_fallback": "{{title}} esta {{status}} con un {{progress}}% de avance. Etapa: {{stage}}. Ubicacion: {{location}}.",
-    "stage_unknown": "Etapa pendiente",
-    "location_unknown": "Ubicacion pendiente"
+    "description": "Sigue proyectos municipales, cooperativos y vecinales desde el anuncio hasta los hitos.",
+    "title": "Proyectos comunitarios"
   },
   "status": {
-    "draft": "Draft",
-    "active": "Active",
-    "paused": "Paused",
-    "completed": "Completed",
-    "cancelled": "Cancelled"
+    "active": "Activo",
+    "cancelled": "Cancelado",
+    "completed": "Completado",
+    "draft": "Borrador",
+    "paused": "En pausa"
   },
-  "progress_label": "Project progress",
-  "progress_value": "{{value}}% complete",
-  "subscriber_count_one": "{{count}} follower",
-  "subscriber_count_other": "{{count}} followers",
-  "date_unknown": "Date pending",
-  "back_to_projects": "Back to projects",
-  "subscribe": "Follow updates",
-  "unsubscribe": "Following",
-  "updates_title": "Updates and milestones",
-  "milestone": "Milestone",
-  "no_updates": "No updates have been published yet.",
-  "empty": "There are no active community projects right now.",
+  "progress_label": "Progreso del proyecto",
+  "progress_value": "{{value}}% completado",
+  "subscriber_count_one": "{{count}} seguidor",
+  "subscriber_count_other": "{{count}} seguidores",
+  "date_unknown": "Fecha pendiente",
+  "back_to_projects": "Volver a los proyectos",
+  "subscribe": "Seguir actualizaciones",
+  "unsubscribe": "Siguiendo",
+  "updates_title": "Actualizaciones e hitos",
+  "milestone": "Hito",
+  "no_updates": "Aún no se han publicado actualizaciones.",
+  "empty": "No hay proyectos comunitarios activos en este momento.",
   "errors": {
-    "load": "Could not load community projects.",
-    "subscribe": "Could not update your project notifications."
+    "load": "No se pudieron cargar los proyectos comunitarios.",
+    "subscribe": "No se pudieron actualizar las notificaciones del proyecto."
   },
   "share": {
-    "title": "Compartir proyecto",
-    "copy_link": "Copiar enlace",
-    "native": "Compartir",
-    "link_copied": "Enlace copiado",
-    "copy_failed": "No se pudo copiar el enlace",
     "share_text": "{{title}} - {{description}}"
   }
 }

@@ -7,10 +7,10 @@
   "step_skills": "Fähigkeiten",
   "step_confirm": "Bestätigen",
   "step_safeguarding": "Schutz",
-  "safeguarding_title": "Support & Safeguarding",
-  "safeguarding_subtitle": "Let us know if you'd like additional support",
-  "safeguarding_intro": "Your safety matters to us. If you consider yourself a vulnerable adult, or if you would like additional support when using this community, please let us know below. Our coordinators can arrange safeguarded exchanges, mediate contact on your behalf, and ensure you are matched with appropriately vetted members. Your responses are confidential and only visible to community coordinators — never on your public profile.",
-  "safeguarding_gdpr_notice": "This information is classified as sensitive personal data. We collect it solely to ensure your safety during community exchanges. Your selections are stored with a consent record and can be changed at any time from your settings. Only community coordinators and administrators can view your responses.",
+  "safeguarding_title": "Unterstützung & Schutz",
+  "safeguarding_subtitle": "Teilen Sie uns mit, ob Sie zusätzliche Unterstützung benötigen",
+  "safeguarding_intro": "Ihre Sicherheit ist uns wichtig. Wenn Sie sich als schutzbedürftigen Erwachsenen betrachten oder wenn Sie bei der Nutzung dieser Gemeinschaft zusätzliche Unterstützung wünschen, teilen Sie uns dies bitte unten mit. Unsere Koordinatoren können geschützte Austausche arrangieren, in Ihrem Namen Kontakt vermitteln und sicherstellen, dass Sie mit angemessen überprüften Mitgliedern zusammengeführt werden. Ihre Antworten sind vertraulich und nur für Gemeinschaftskoordinatoren sichtbar — niemals in Ihrem öffentlichen Profil.",
+  "safeguarding_gdpr_notice": "Diese Informationen werden als sensible personenbezogene Daten eingestuft. Wir erheben sie ausschließlich, um Ihre Sicherheit bei Gemeinschaftsaustauschen zu gewährleisten. Ihre Auswahl wird mit einem Zustimmungsnachweis gespeichert und kann jederzeit in Ihren Einstellungen geändert werden. Nur Gemeinschaftskoordinatoren und Administratoren können Ihre Antworten einsehen.",
   "welcome_title": "Willkommen bei {{name}}!",
   "welcome_description": "Richten Sie Ihr Profil ein, damit Sie sich mit Ihrer Gemeinschaft verbinden und Zeitguthaben austauschen können.",
   "benefit_earn_title": "Zeitguthaben verdienen",
@@ -97,39 +97,12 @@
   "toast_complete_profile_first": "Vervollständigen Sie zuerst Ihr Profil",
   "toast_photo_bio_required": "Foto und Biografie sind erforderlich.",
   "safeguarding": {
-    "load_error": "Optionen konnten nicht geladen werden",
-    "try_again": "Bitte versuchen Sie es erneut.",
-    "required": "Erforderliche Optionen",
-    "required_respond": "Bitte antworten Sie auf: {{items}}",
-    "empty": "Für diese Gemeinschaft wurden keine Schutzoptionen konfiguriert.",
-    "save_failed": "Speichern fehlgeschlagen",
-    "save_continue": "Speichern & Weiter",
-    "required_fields": "Pflichtfelder",
-    "select_option": "Option auswählen",
-    "or_separator": "or",
-    "learn_more": "Erfahren Sie mehr",
     "confirmation": {
-      "title": "Ihre Schutz-Einstellungen wurden gespeichert",
-      "intro": "Vielen Dank, dass Sie uns dies mitgeteilt haben. Hier sehen Sie, was Sie gewählt haben, wer es sieht und was dadurch aktiviert wird.",
-      "your_selections": "Ihre Auswahl",
-      "no_selections": "Sie haben keine Schutzoptionen ausgewählt.",
-      "who_can_see_heading": "Wer dies sieht",
-      "who_can_see_body": "Nur die Koordinator/innen und Administrator/innen der Gemeinschaft können diese Einstellungen einsehen. Andere Mitglieder nicht. Jeder Zugriff wird protokolliert.",
-      "what_activates_heading": "Was dadurch aktiviert wird",
-      "activation_broker_review": "Eine Koordinatorin oder ein Koordinator prüft Nachrichten, die Sie senden und empfangen.",
-      "activation_match_approval": "Eine Koordinatorin oder ein Koordinator gibt Tandem-Vorschläge frei, bevor diese dem anderen Mitglied gezeigt werden.",
-      "activation_discovery_hidden": "Sie sind in der Suche für Mitglieder unsichtbar, welche die erforderlichen Prüfungen nicht abgeschlossen haben.",
-      "activation_notification": "Eine Koordinatorin oder ein Koordinator wurde informiert und wird sich melden, um zu besprechen, wie wir helfen können.",
-      "activation_none": "Aus dieser Auswahl ergeben sich keine automatischen Schutzmassnahmen. Ihre Einstellungen werden zur Information der Koordinator/innen gespeichert.",
-      "revoke_heading": "Wie Sie diese jederzeit ändern oder widerrufen können",
-      "revoke_body": "Sie können diese Einstellungen jederzeit in Ihren Profil-Einstellungen einsehen oder widerrufen. Dafür ist keine Anfrage bei der Administration nötig.",
-      "revoke_cta": "Zu den Schutz-Einstellungen",
-      "continue_cta": "Weiter",
-      "declination_title": "Noted — your response is recorded",
-      "declination_intro": "Thank you for reviewing these options. Your response has been saved so coordinators know you have seen and considered this step."
+      "declination_intro": "Danke, dass Sie diese Optionen geprüft haben. Ihre Antwort wurde gespeichert, damit die Koordinatoren wissen, dass Sie diesen Schritt zur Kenntnis genommen und berücksichtigt haben.",
+      "declination_title": "Vermerkt — Ihre Antwort ist gespeichert"
     }
   },
   "page_meta": {
-    "title": "Onboarding"
+    "title": "Einführung"
   }
 }
