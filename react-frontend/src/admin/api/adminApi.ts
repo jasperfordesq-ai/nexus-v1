@@ -35,6 +35,8 @@ import type {
   TimebankingStats,
   FraudAlert,
   OrgWallet,
+  CommunityFundBalance,
+  CommunityFundTransaction,
   UserFinancialReport,
   WalletGrant,
   CronJob,
@@ -569,6 +571,24 @@ export const adminTimebanking = {
 
   getOrgWallets: () =>
     api.get<OrgWallet[]>('/v2/admin/timebanking/org-wallets'),
+
+  getCommunityFund: () =>
+    api.get<CommunityFundBalance>('/v2/wallet/community-fund'),
+
+  getCommunityFundTransactions: (params: { limit?: number; offset?: number } = {}) =>
+    api.get<CommunityFundTransaction[]>(
+      `/v2/wallet/community-fund/transactions${buildQuery(params)}`
+    ),
+
+  depositCommunityFund: (amount: number, description: string) =>
+    api.post<{ balance: number }>('/v2/wallet/community-fund/deposit', { amount, description }),
+
+  withdrawCommunityFund: (recipientId: number, amount: number, description: string) =>
+    api.post<{ balance: number }>('/v2/wallet/community-fund/withdraw', {
+      recipient_id: recipientId,
+      amount,
+      description,
+    }),
 
   getUserReport: (params: { page?: number; search?: string } = {}) =>
     api.get<PaginatedResponse<UserFinancialReport>>(

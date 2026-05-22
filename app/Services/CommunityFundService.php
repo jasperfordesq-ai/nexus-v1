@@ -110,7 +110,6 @@ class CommunityFundService
                 'description' => $description ?: 'Admin deposit',
                 'admin_id' => $adminId,
                 'created_at' => now(),
-                'updated_at' => now(),
             ]);
 
             DB::commit();
@@ -178,7 +177,6 @@ class CommunityFundService
                 'description' => $description ?: 'Admin grant to member',
                 'admin_id' => $adminId,
                 'created_at' => now(),
-                'updated_at' => now(),
             ]);
 
             // Log wallet transaction for the recipient (sender_id is NULL — credits come from the fund, not a user)
@@ -318,7 +316,6 @@ class CommunityFundService
                 'balance_after' => $newBalance,
                 'description' => $message ?: 'Member donation',
                 'created_at' => now(),
-                'updated_at' => now(),
             ]);
 
             // Log donation record
@@ -329,7 +326,6 @@ class CommunityFundService
                 'amount' => $amount,
                 'message' => $message,
                 'created_at' => now(),
-                'updated_at' => now(),
             ]);
 
             // Log wallet transaction for the donor (receiver_id is NULL — credits go to the fund, not a user)

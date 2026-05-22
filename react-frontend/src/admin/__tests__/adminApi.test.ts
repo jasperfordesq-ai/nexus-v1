@@ -333,6 +333,26 @@ describe('adminApi', () => {
       await adminTimebanking.getOrgWallets();
       expect(mockGet).toHaveBeenCalledWith('/v2/admin/timebanking/org-wallets');
     });
+
+    it('getCommunityFund calls correct endpoint', async () => {
+      await adminTimebanking.getCommunityFund();
+      expect(mockGet).toHaveBeenCalledWith('/v2/wallet/community-fund');
+    });
+
+    it('getCommunityFundTransactions calls correct endpoint with paging', async () => {
+      await adminTimebanking.getCommunityFundTransactions({ limit: 25, offset: 50 });
+      expect(mockGet).toHaveBeenCalledWith('/v2/wallet/community-fund/transactions?limit=25&offset=50');
+    });
+
+    it('depositCommunityFund calls POST', async () => {
+      await adminTimebanking.depositCommunityFund(10, 'Seed pool');
+      expect(mockPost).toHaveBeenCalledWith('/v2/wallet/community-fund/deposit', { amount: 10, description: 'Seed pool' });
+    });
+
+    it('withdrawCommunityFund calls POST', async () => {
+      await adminTimebanking.withdrawCommunityFund(5, 3, 'Emergency support');
+      expect(mockPost).toHaveBeenCalledWith('/v2/wallet/community-fund/withdraw', { recipient_id: 5, amount: 3, description: 'Emergency support' });
+    });
   });
 
   // ─────────────────────────────────────────────────────────────────────────

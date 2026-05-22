@@ -18,6 +18,7 @@ import TrendingUp from 'lucide-react/icons/trending-up';
 import Wallet from 'lucide-react/icons/wallet';
 import Users from 'lucide-react/icons/users';
 import Building2 from 'lucide-react/icons/building-2';
+import HandHeart from 'lucide-react/icons/hand-heart';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import { useAdminPageMeta } from '../../AdminMetaContext';
@@ -199,7 +200,7 @@ export function TimebankingDashboard() {
           <h3 className="font-semibold">{t('timebanking.quick_links')}</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <Button
               as={Link}
               to={tenantPath('/admin/timebanking/alerts')}
@@ -211,6 +212,20 @@ export function TimebankingDashboard() {
               <div className="flex items-center gap-2">
                 <AlertTriangle size={18} />
                 <span>{t('timebanking.fraud_alerts_title')}</span>
+              </div>
+            </Button>
+
+            <Button
+              as={Link}
+              to={tenantPath('/admin/timebanking/community-fund')}
+              variant="flat"
+              color="success"
+              className="justify-between h-auto py-3"
+              endContent={<ChevronRight size={16} />}
+            >
+              <div className="flex items-center gap-2">
+                <HandHeart size={18} />
+                <span>{t('timebanking.community_fund_title')}</span>
               </div>
             </Button>
 

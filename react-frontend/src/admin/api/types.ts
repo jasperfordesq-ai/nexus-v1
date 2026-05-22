@@ -475,6 +475,29 @@ export interface OrgWallet {
   created_at: string;
 }
 
+export interface CommunityFundBalance {
+  id: number;
+  balance: number;
+  total_deposited: number;
+  total_withdrawn: number;
+  total_donated: number;
+  description: string;
+}
+
+export interface CommunityFundTransaction {
+  id: number;
+  type: 'deposit' | 'withdrawal' | 'donation' | 'starting_balance_grant';
+  amount: number;
+  balance_after: number;
+  description: string;
+  user_id: number | null;
+  user_name: string;
+  user_avatar: string;
+  admin_id: number | null;
+  admin_name: string;
+  created_at: string;
+}
+
 export interface UserFinancialReport {
   id: number;
   name: string;

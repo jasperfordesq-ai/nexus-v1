@@ -104,6 +104,7 @@ const SEGMENT_LABEL_KEYS: Record<string, string> = {
   'org-wallets': 'breadcrumbs.org_wallets',
   'create-org': 'breadcrumbs.create_org',
   'starting-balances': 'breadcrumbs.starting_balances',
+  'community-fund': 'breadcrumbs.community_fund',
 
   // Enterprise
   enterprise: 'breadcrumbs.enterprise',

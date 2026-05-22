@@ -8,6 +8,7 @@ namespace Tests\Laravel\Feature\Controllers;
 
 use Tests\Laravel\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
 use App\Models\User;
 
@@ -125,6 +126,39 @@ class WalletFeaturesControllerTest extends TestCase
         ]);
 
         $response->assertStatus(401);
+    }
+
+    public function test_can_donate_to_community_fund(): void
+    {
+        $user = $this->authenticatedUser();
+
+        $response = $this->apiPost('/v2/wallet/donate', [
+            'recipient_type' => 'community_fund',
+            'amount' => 1.0,
+            'message' => 'Test community gift',
+        ]);
+
+        $response->assertStatus(201);
+
+        $this->assertDatabaseHas('community_fund_transactions', [
+            'tenant_id' => $this->testTenantId,
+            'user_id' => $user->id,
+            'type' => 'donation',
+            'amount' => 1.00,
+            'description' => 'Test community gift',
+        ]);
+
+        $this->assertDatabaseHas('credit_donations', [
+            'tenant_id' => $this->testTenantId,
+            'donor_id' => $user->id,
+            'recipient_type' => 'community_fund',
+            'amount' => 1.00,
+        ]);
+
+        $this->assertEquals(
+            9.0,
+            (float) DB::table('users')->where('id', $user->id)->value('balance')
+        );
     }
 
     // ------------------------------------------------------------------

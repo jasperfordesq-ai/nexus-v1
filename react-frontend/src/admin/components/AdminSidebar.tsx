@@ -445,6 +445,7 @@ function useAdminNav(safeguardingFlagCount: number): NavSection[] {
           ...(hasModule('wallet') ? [
             { label: t('timebanking'), href: '/admin/timebanking', icon: Clock },
             { label: t('fraud_alerts'), href: '/admin/timebanking/alerts', icon: AlertTriangle },
+            { label: t('community_fund'), href: '/admin/timebanking/community-fund', icon: Wallet },
             { label: t('org_wallets'), href: '/admin/timebanking/org-wallets', icon: Wallet },
             { label: t('starting_balances'), href: '/admin/timebanking/starting-balances', icon: Wallet },
           ] : []),

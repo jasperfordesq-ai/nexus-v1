@@ -79,6 +79,7 @@ const FraudAlerts = lazy(() => import('./modules/timebanking/FraudAlerts'));
 const OrgWallets = lazy(() => import('./modules/timebanking/OrgWallets'));
 const UserReport = lazy(() => import('./modules/timebanking/UserReport'));
 const StartingBalances = lazy(() => import('./modules/timebanking/StartingBalances'));
+const CommunityFund = lazy(() => import('./modules/timebanking/CommunityFund'));
 // admin/modules/broker/* retired — broker control panel lives at /broker/*
 // (see react-frontend/src/broker/pages/). Legacy /admin/broker-controls/*
 // URLs redirect via the TenantRedirect Route below.
@@ -488,6 +489,7 @@ export function AdminRoutes() {
       <Route path="timebanking/org-wallets" element={<Lazy><OrgWallets /></Lazy>} />
       <Route path="timebanking/create-org" element={<Lazy><OrgWallets /></Lazy>} />
       <Route path="timebanking/starting-balances" element={<Lazy><StartingBalances /></Lazy>} />
+      <Route path="timebanking/community-fund" element={<Lazy><CommunityFund /></Lazy>} />
       <Route path="plans" element={<Lazy><PlansAdmin /></Lazy>} />
       <Route path="plans/subscriptions" element={<Lazy><SubscriptionsAdmin /></Lazy>} />
       <Route element={<SuperAdminRoute />}>
