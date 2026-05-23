@@ -9245,7 +9245,9 @@
     "upload_image": "Upload image",
     "replace_image": "Replace image",
     "upload_failed": "Upload failed",
-    "powered_by_image_uploaded": "Image uploaded"
+    "powered_by_image_uploaded": "Image uploaded",
+    "partner_logo_link_url": "Partner Logo Link URL",
+    "partner_logo_link_url_description": "Optional website link for the partner logo in the footer."
   },
   "timebanking": {
     "a_reason_is_required_for_balance_adjustm": "É necessário um motivo para ajustes de saldo",

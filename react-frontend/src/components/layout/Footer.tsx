@@ -53,6 +53,9 @@ export function Footer({ children, copyright }: FooterProps) {
   const pbUrl   = (tenant?.config?.powered_by_url   as string | undefined) || DEFAULT_PB_URL;
   const pbLabel = tenant?.config?.powered_by_label as string | undefined;
 
+  const partnerLogoUrl  = tenant?.config?.partner_logo_url      as string | undefined;
+  const partnerLinkUrl  = tenant?.config?.partner_logo_link_url as string | undefined;
+
   // Use tenant's footer_text from config if set, otherwise build a default
   const footerText = tenant?.config?.footer_text?.trim()
     || copyright
@@ -72,18 +75,20 @@ export function Footer({ children, copyright }: FooterProps) {
             title={pbLabel || t('footer.powered_by')}
             className="transition-opacity hover:opacity-80"
           >
-            <img src={pbImage} alt={pbLabel || t('footer.powered_by')} className="h-24 w-auto object-contain" />
+            <img src={pbImage} alt={pbLabel || t('footer.powered_by')} className="h-20 w-auto max-w-[14rem] object-contain" />
           </a>
           <SourceRepositoryLink compact className="w-full max-w-[18rem] justify-center" />
           {/* Tenant partner logo — real or placeholder */}
-          {tenant?.config?.partner_logo_url ? (
-            <img
-              src={tenant.config.partner_logo_url as string}
-              alt={branding.name}
-              className="h-14 w-auto max-w-[12rem] object-contain"
-            />
+          {partnerLogoUrl ? (
+            partnerLinkUrl ? (
+              <a href={partnerLinkUrl} target="_blank" rel="noopener noreferrer" className="transition-opacity hover:opacity-80">
+                <img src={partnerLogoUrl} alt={branding.name} className="h-20 w-auto max-w-[14rem] object-contain" />
+              </a>
+            ) : (
+              <img src={partnerLogoUrl} alt={branding.name} className="h-20 w-auto max-w-[14rem] object-contain" />
+            )
           ) : (
-            <div className="w-full max-w-[18rem] border-2 border-dashed border-theme-default/40 rounded-xl h-14 flex items-center justify-center">
+            <div className="w-full max-w-[18rem] border-2 border-dashed border-theme-default/40 rounded-xl h-20 flex items-center justify-center">
               <span className="text-xs text-theme-subtle/40">{t('footer.tenant_logo_placeholder')}</span>
             </div>
           )}
@@ -256,14 +261,16 @@ export function Footer({ children, copyright }: FooterProps) {
                   <span className="text-[10px] font-semibold uppercase tracking-widest text-theme-subtle/50">
                     {t('footer.community_partner')}
                   </span>
-                  {tenant?.config?.partner_logo_url ? (
-                    <img
-                      src={tenant.config.partner_logo_url as string}
-                      alt={branding.name}
-                      className="h-20 w-auto max-w-[12rem] object-contain"
-                    />
+                  {partnerLogoUrl ? (
+                    partnerLinkUrl ? (
+                      <a href={partnerLinkUrl} target="_blank" rel="noopener noreferrer" className="transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg">
+                        <img src={partnerLogoUrl} alt={branding.name} className="h-28 w-auto max-w-[14rem] object-contain" />
+                      </a>
+                    ) : (
+                      <img src={partnerLogoUrl} alt={branding.name} className="h-28 w-auto max-w-[14rem] object-contain" />
+                    )
                   ) : (
-                    <div className="h-20 w-48 border-2 border-dashed border-theme-default/40 rounded-xl flex items-center justify-center">
+                    <div className="h-28 w-48 border-2 border-dashed border-theme-default/40 rounded-xl flex items-center justify-center">
                       <span className="text-xs text-theme-subtle/40 text-center leading-snug px-3">
                         {t('footer.tenant_logo_placeholder')}
                       </span>
@@ -298,7 +305,7 @@ export function Footer({ children, copyright }: FooterProps) {
                     <img
                       src={pbImage}
                       alt={pbLabel || t('footer.powered_by')}
-                      className="h-32 w-auto object-contain"
+                      className="h-28 w-auto max-w-[14rem] object-contain"
                     />
                   </a>
                 </div>

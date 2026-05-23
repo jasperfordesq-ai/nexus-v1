@@ -63,6 +63,7 @@ class AdminConfigController extends BaseApiController
         'email_verification', 'admin_approval', 'welcome_credits',
         'footer_text',
         'partner_logo_url',
+        'partner_logo_link_url',
         'powered_by_label',
         'powered_by_url',
         'powered_by_image_light',

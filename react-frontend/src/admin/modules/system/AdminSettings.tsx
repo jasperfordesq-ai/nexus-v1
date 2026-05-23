@@ -52,6 +52,7 @@ interface SettingsForm {
   maintenance_mode: boolean;  // general.maintenance_mode
   footer_text: string;        // general.footer_text (charity number, legal name, etc.)
   partner_logo_url: string;      // general.partner_logo_url (shown in footer left slot)
+  partner_logo_link_url: string; // general.partner_logo_link_url (hyperlink for partner logo)
   powered_by_label: string;      // general.powered_by_label (God-only — footer right slot)
   powered_by_image_light: string; // general.powered_by_image_light
   powered_by_image_dark: string;  // general.powered_by_image_dark
@@ -79,6 +80,7 @@ const DEFAULT_SETTINGS: SettingsForm = {
   maintenance_mode: false,
   footer_text: '',
   partner_logo_url: '',
+  partner_logo_link_url: '',
   powered_by_label: '',
   powered_by_image_light: '',
   powered_by_image_dark: '',
@@ -132,6 +134,7 @@ export function AdminSettings() {
           maintenance_mode: settings.maintenance_mode === 'true' || settings.maintenance_mode === '1',
           footer_text: (settings.footer_text as string) ?? '',
           partner_logo_url: (settings.partner_logo_url as string) ?? '',
+          partner_logo_link_url: (settings.partner_logo_link_url as string) ?? '',
           powered_by_label: (settings.powered_by_label as string) ?? '',
           powered_by_image_light: (settings.powered_by_image_light as string) ?? '',
           powered_by_image_dark: (settings.powered_by_image_dark as string) ?? '',
@@ -168,6 +171,7 @@ export function AdminSettings() {
       if (form.admin_approval !== originalForm.admin_approval) changes.admin_approval = String(form.admin_approval);
       if (form.footer_text !== originalForm.footer_text) changes.footer_text = form.footer_text;
       if (form.partner_logo_url !== originalForm.partner_logo_url) changes.partner_logo_url = form.partner_logo_url;
+      if (form.partner_logo_link_url !== originalForm.partner_logo_link_url) changes.partner_logo_link_url = form.partner_logo_link_url;
       if (isPlatformGod && form.powered_by_label !== originalForm.powered_by_label) changes.powered_by_label = form.powered_by_label;
       if (isPlatformGod && form.powered_by_url !== originalForm.powered_by_url) changes.powered_by_url = form.powered_by_url;
       if (form.default_currency !== originalForm.default_currency) changes.default_currency = form.default_currency;
@@ -388,6 +392,15 @@ export function AdminSettings() {
                 </Button>
               </div>
             </div>
+            {/* Partner Logo Link URL */}
+            <Input
+              label={t('system.partner_logo_link_url')}
+              placeholder="https://example.com"
+              value={form.partner_logo_link_url}
+              onValueChange={(val) => setForm(prev => ({ ...prev, partner_logo_link_url: val }))}
+              description={t('system.partner_logo_link_url_description')}
+              type="url"
+            />
           </CardBody>
         </Card>
 
