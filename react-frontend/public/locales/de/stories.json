@@ -1,4 +1,7 @@
 {
+  "empty": {
+    "no_stories": "Keine Geschichten verfügbar"
+  },
   "creator": {
     "title": "Story erstellen",
     "close": "Ersteller schliessen",
@@ -30,8 +33,8 @@
     "gradient_dark": "Dunkel",
     "gradient_pink_rose": "Rosa-Rosé",
     "gradient_cyan_blue": "Cyan-Blau",
-    "font_sans": "Sans",
-    "font_serif": "Serif",
+    "font_sans": "Ohne",
+    "font_serif": "Serife",
     "font_mono": "Mono",
     "template_ama": "Frag mich alles",
     "template_morning": "Guten Morgen",
@@ -64,7 +67,10 @@
     "error_image_size": "Das Bild darf maximal 10 MB gross sein",
     "error_video_type": "Bitte wählen Sie eine Videodatei aus",
     "error_video_size": "Das Video darf maximal 50 MB gross sein",
+    "share_story": "Geschichte teilen",
     "error_camera": "Kamerazugriff nicht möglich. Bitte überprüfen Sie die Berechtigungen.",
+    "error_camera_permission": "Kamerazugriff wurde verweigert. Bitte aktiviere ihn in den Browsereinstellungen.",
+    "error_camera_not_found": "Keine Kamera auf diesem Gerät gefunden.",
     "error_process": "Bild konnte nicht verarbeitet werden",
     "error_create": "Story konnte nicht erstellt werden",
     "flip_camera": "Kamera umdrehen",
@@ -92,9 +98,6 @@
     "or_divider": "oder",
     "poll_add_option_button": "Option hinzufügen",
     "videos_trimmed_notice": "Videos länger als 60 Sekunden werden auf 60 Sekunden Anzeigedauer gekürzt",
-    "share_story": "Geschichte teilen",
-    "error_camera_permission": "Kamerazugriff wurde verweigert. Bitte aktiviere ihn in den Browsereinstellungen.",
-    "error_camera_not_found": "Keine Kamera auf diesem Gerät gefunden.",
     "video_duration_seconds": "{{count}}s"
   },
   "viewer": {
@@ -129,9 +132,6 @@
     "reply_placeholder_generic": "Auf Story antworten...",
     "react_with": "Reagiere mit {{type}}",
     "viewers_title_count": "Zuschauer ({{count}})"
-  },
-  "empty": {
-    "no_stories": "Keine Geschichten verfügbar"
   },
   "highlights": {
     "no_stories": "Diese Highlight hat keine Geschichten",

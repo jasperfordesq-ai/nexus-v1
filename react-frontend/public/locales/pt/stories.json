@@ -1,4 +1,7 @@
 {
+  "empty": {
+    "no_stories": "Sem histórias disponíveis"
+  },
   "creator": {
     "title": "Criar história",
     "close": "Fechar criação",
@@ -30,7 +33,7 @@
     "gradient_dark": "Escuro",
     "gradient_pink_rose": "Rosa Rosé",
     "gradient_cyan_blue": "Ciano Azul",
-    "font_sans": "Sans",
+    "font_sans": "Sem",
     "font_serif": "Serif",
     "font_mono": "Mono",
     "template_ama": "Pergunte-me qualquer coisa",
@@ -64,7 +67,10 @@
     "error_image_size": "A imagem deve ter menos de 10MB",
     "error_video_type": "Selecione um ficheiro de vídeo",
     "error_video_size": "O vídeo deve ter menos de 50MB",
+    "share_story": "Partilhar história",
     "error_camera": "Não foi possível aceder à câmara. Verifique as permissões.",
+    "error_camera_permission": "O acesso à câmara foi negado. Por favor ative-o nas definições do browser.",
+    "error_camera_not_found": "Nenhuma câmara encontrada neste dispositivo.",
     "error_process": "Falha ao processar imagem",
     "error_create": "Falha ao criar história",
     "flip_camera": "Inverter câmara",
@@ -92,9 +98,6 @@
     "or_divider": "ou",
     "poll_add_option_button": "Adicionar opção",
     "videos_trimmed_notice": "Vídeos com mais de 60s serão cortados para 60s de duração de exibição",
-    "share_story": "Partilhar história",
-    "error_camera_permission": "O acesso à câmara foi negado. Por favor ative-o nas definições do browser.",
-    "error_camera_not_found": "Nenhuma câmara encontrada neste dispositivo.",
     "video_duration_seconds": "{{count}}s"
   },
   "viewer": {
@@ -129,9 +132,6 @@
     "reply_placeholder_generic": "Responder à história...",
     "react_with": "Reagir com {{type}}",
     "viewers_title_count": "Espectadores ({{count}})"
-  },
-  "empty": {
-    "no_stories": "Sem histórias disponíveis"
   },
   "highlights": {
     "no_stories": "Este destaque não tem histórias",

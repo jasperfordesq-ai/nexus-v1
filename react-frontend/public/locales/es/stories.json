@@ -1,4 +1,7 @@
 {
+  "empty": {
+    "no_stories": "No hay historias disponibles"
+  },
   "creator": {
     "title": "Crear historia",
     "close": "Cerrar creador",
@@ -30,9 +33,9 @@
     "gradient_dark": "Oscuro",
     "gradient_pink_rose": "Rosa rosado",
     "gradient_cyan_blue": "Cian azul",
-    "font_sans": "Sans",
-    "font_serif": "Serif",
-    "font_mono": "Mono",
+    "font_sans": "sin",
+    "font_serif": "Serifa",
+    "font_mono": "Mononucleosis infecciosa",
     "template_ama": "Pregúntame lo que quieras",
     "template_morning": "Buenos días",
     "template_grateful": "Agradecido por",
@@ -64,7 +67,10 @@
     "error_image_size": "La imagen debe ser menor a 10 MB",
     "error_video_type": "Por favor, seleccione un archivo de video",
     "error_video_size": "El video debe ser menor a 50 MB",
+    "share_story": "Compartir historia",
     "error_camera": "No se pudo acceder a la cámara. Por favor, revise los permisos.",
+    "error_camera_permission": "Se denegó el acceso a la cámara. Por favor, actívalo en la configuración del navegador.",
+    "error_camera_not_found": "No se encontró ninguna cámara en este dispositivo.",
     "error_process": "Error al procesar la imagen",
     "error_create": "Error al crear la historia",
     "flip_camera": "Girar cámara",
@@ -92,9 +98,6 @@
     "or_divider": "o",
     "poll_add_option_button": "Añadir opción",
     "videos_trimmed_notice": "Los vídeos de más de 60s se recortarán a 60s de duración de visualización",
-    "share_story": "Compartir historia",
-    "error_camera_permission": "Se denegó el acceso a la cámara. Por favor, actívalo en la configuración del navegador.",
-    "error_camera_not_found": "No se encontró ninguna cámara en este dispositivo.",
     "video_duration_seconds": "{{count}}s"
   },
   "viewer": {
@@ -129,9 +132,6 @@
     "reply_placeholder_generic": "Responder a la historia...",
     "react_with": "Reaccionar con {{type}}",
     "viewers_title_count": "Espectadores ({{count}})"
-  },
-  "empty": {
-    "no_stories": "No hay historias disponibles"
   },
   "highlights": {
     "no_stories": "Este destacado no tiene historias",

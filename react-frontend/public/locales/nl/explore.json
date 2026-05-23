@@ -34,7 +34,7 @@
   "top_contributors": {
     "title": "Top Bijdragers",
     "subtitle": "Gemeenschapsleiders op basis van ervaring",
-    "level": "Lv.{{level}}"
+    "level": "Niveau{{level}}"
   },
   "trending_hashtags": {
     "title": "Populaire hashtags",
