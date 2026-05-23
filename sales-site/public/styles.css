@@ -1521,79 +1521,80 @@ body.menu-open {
   width: 100%;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  margin-bottom: 3rem;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  margin-bottom: 2.5rem;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.55);
+  border: 1px solid var(--border);
 }
 
 .partners-banner img {
   width: 100%;
   height: auto;
   display: block;
-  border-radius: var(--radius-lg);
 }
 
-.partners-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 2rem;
-  margin-top: 1rem;
-}
-
-.partner-card {
+/* Featured partner spotlight — horizontal card */
+.partner-spotlight {
+  display: flex;
+  align-items: center;
+  gap: 3rem;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.25rem;
+  padding: 2.5rem 3rem;
   transition: all var(--transition);
-  text-align: center;
 }
 
-.partner-card:hover {
-  background: var(--bg-card-hover);
+.partner-spotlight:hover {
   border-color: var(--border-light);
-  transform: translateY(-3px);
-  box-shadow: 0 12px 40px rgba(129,140,248,0.1);
+  background: var(--bg-card-hover);
+  box-shadow: 0 12px 48px rgba(129,140,248,0.08);
 }
 
-.partner-logo {
-  height: 80px;
+.spotlight-logo-wrap {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 200px;
+}
+
+.spotlight-logo {
+  max-height: 72px;
+  max-width: 200px;
   width: auto;
-  max-width: 100%;
   object-fit: contain;
 }
 
-.partner-logo-wide {
-  height: 64px;
+.spotlight-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
 }
 
-.partner-name {
-  font-size: 1.125rem;
+.spotlight-name {
+  font-size: 1.375rem;
   font-weight: 700;
   color: var(--text);
   margin: 0;
 }
 
-.partner-desc {
-  font-size: 0.875rem;
+.spotlight-desc {
+  font-size: 0.9375rem;
   color: var(--text-muted);
-  line-height: 1.65;
+  line-height: 1.7;
   margin: 0;
-  flex: 1;
+  max-width: 560px;
 }
 
 .partner-link {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--primary-light);
   transition: color var(--transition);
-  margin-top: auto;
+  margin-top: 0.5rem;
 }
 
 .partner-link:hover {
@@ -1609,6 +1610,7 @@ body.menu-open {
   background: rgba(129,140,248,0.1);
   color: var(--primary-light);
   border: 1px solid rgba(129,140,248,0.2);
+  width: fit-content;
 }
 
 @media (max-width: 480px) {
@@ -1622,7 +1624,18 @@ body.menu-open {
 }
 
 @media (max-width: 768px) {
-  .partners-grid {
-    grid-template-columns: 1fr;
+  .partner-spotlight {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.75rem;
+    padding: 2rem;
+  }
+
+  .spotlight-logo-wrap {
+    width: auto;
+  }
+
+  .spotlight-desc {
+    max-width: 100%;
   }
 }
