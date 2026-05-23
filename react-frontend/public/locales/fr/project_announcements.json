@@ -1,18 +1,18 @@
 {
   "meta": {
-    "description": "Suivez les projets municipaux, coopératifs et de quartier de l'annonce au jalon.",
     "title": "Projets communautaires",
+    "description": "Suivez les projets municipaux, coopératifs et de quartier de l'annonce au jalon.",
     "detail_title": "{{title}}",
-    "detail_description_fallback": "{{title}} is {{status}} at {{progress}}% progress. Stage: {{stage}}. Location: {{location}}.",
-    "stage_unknown": "Stage pending",
-    "location_unknown": "Location pending"
+    "detail_description_fallback": "{{title}} est {{status}} à {{progress}} % de progression. Étape : {{stage}}. Emplacement : {{location}}.",
+    "stage_unknown": "Étape en attente",
+    "location_unknown": "Localisation en attente"
   },
   "status": {
-    "active": "Actif",
-    "cancelled": "Annulé",
-    "completed": "Terminé",
     "draft": "Brouillon",
-    "paused": "En pause"
+    "active": "Actif",
+    "paused": "En pause",
+    "completed": "Terminé",
+    "cancelled": "Annulé"
   },
   "progress_label": "Avancement du projet",
   "progress_value": "{{value}}% complété",
@@ -31,11 +31,11 @@
     "subscribe": "Impossible de mettre à jour vos notifications de projet."
   },
   "share": {
-    "share_text": "{{title}} - {{description}}",
-    "title": "Share project",
-    "copy_link": "Copy link",
-    "native": "Share",
-    "link_copied": "Link copied",
-    "copy_failed": "Could not copy link"
+    "title": "Partager le projet",
+    "copy_link": "Copier le lien",
+    "native": "Partager",
+    "link_copied": "Lien copié",
+    "copy_failed": "Impossible de copier le lien",
+    "share_text": "{{title}} - {{description}}"
   }
 }

@@ -1,18 +1,18 @@
 {
   "meta": {
-    "description": "Lean tionscadail bardas, comharchumann agus comharsanachta ó fhógairt go garsprioc.",
     "title": "Tionscadail Pobail",
+    "description": "Lean tionscadail bardas, comharchumann agus comharsanachta ó fhógairt go garsprioc.",
     "detail_title": "{{title}}",
-    "detail_description_fallback": "{{title}} is {{status}} at {{progress}}% progress. Stage: {{stage}}. Location: {{location}}.",
-    "stage_unknown": "Stage pending",
-    "location_unknown": "Location pending"
+    "detail_description_fallback": "Tá {{title}} {{status}} ag {{progress}} % progress. Céim: {{stage}}. Suíomh: {{location}}.",
+    "stage_unknown": "Céim ar feitheamh",
+    "location_unknown": "Suíomh ar feitheamh"
   },
   "status": {
-    "active": "Gníomhach",
-    "cancelled": "Curtha ar ceal",
-    "completed": "Críochnaithe",
     "draft": "Dréacht",
-    "paused": "Ar sos"
+    "active": "Gníomhach",
+    "paused": "Ar sos",
+    "completed": "Críochnaithe",
+    "cancelled": "Curtha ar ceal"
   },
   "progress_label": "Dul chun cinn tionscadail",
   "progress_value": "{{value}}% críochnaithe",
@@ -31,11 +31,11 @@
     "subscribe": "Níorbh fhéidir do chuid fógraí tionscadail a nuashonrú."
   },
   "share": {
-    "share_text": "{{title}} - {{description}}",
-    "title": "Share project",
-    "copy_link": "Copy link",
-    "native": "Share",
-    "link_copied": "Link copied",
-    "copy_failed": "Could not copy link"
+    "title": "Tionscadal a roinnt",
+    "copy_link": "Cóipeáil nasc",
+    "native": "Comhroinn",
+    "link_copied": "Cóipeáladh an nasc",
+    "copy_failed": "Níorbh fhéidir an nasc a chóipeáil",
+    "share_text": "{{title}} - {{description}}"
   }
 }

@@ -1,18 +1,18 @@
 {
   "meta": {
-    "description": "Verfolgen Sie Gemeinde-, Genossenschafts- und Nachbarschaftsprojekte von der Ankündigung bis zum Meilenstein.",
     "title": "Community-Projekte",
+    "description": "Verfolgen Sie Gemeinde-, Genossenschafts- und Nachbarschaftsprojekte von der Ankündigung bis zum Meilenstein.",
     "detail_title": "{{title}}",
-    "detail_description_fallback": "{{title}} is {{status}} at {{progress}}% progress. Stage: {{stage}}. Location: {{location}}.",
-    "stage_unknown": "Stage pending",
-    "location_unknown": "Location pending"
+    "detail_description_fallback": "{{title}} ist {{status}} bei {{progress}} % Fortschritt. Stufe: {{stage}}. Standort: {{location}}.",
+    "stage_unknown": "Phase steht noch aus",
+    "location_unknown": "Standort steht noch aus"
   },
   "status": {
-    "active": "Aktiv",
-    "cancelled": "Abgebrochen",
-    "completed": "Abgeschlossen",
     "draft": "Entwurf",
-    "paused": "Pausiert"
+    "active": "Aktiv",
+    "paused": "Pausiert",
+    "completed": "Abgeschlossen",
+    "cancelled": "Abgebrochen"
   },
   "progress_label": "Projektfortschritt",
   "progress_value": "{{value}}% abgeschlossen",
@@ -31,11 +31,11 @@
     "subscribe": "Ihre Projektbenachrichtigungen konnten nicht aktualisiert werden."
   },
   "share": {
-    "share_text": "{{title}} - {{description}}",
-    "title": "Share project",
-    "copy_link": "Copy link",
-    "native": "Share",
-    "link_copied": "Link copied",
-    "copy_failed": "Could not copy link"
+    "title": "Projekt teilen",
+    "copy_link": "Link kopieren",
+    "native": "Aktie",
+    "link_copied": "Link kopiert",
+    "copy_failed": "Link konnte nicht kopiert werden",
+    "share_text": "{{title}} - {{description}}"
   }
 }

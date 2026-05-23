@@ -1,18 +1,18 @@
 {
   "meta": {
-    "description": "Volg gemeente-, coöperatieve en buurtprojecten van aankondiging tot mijlpaal.",
     "title": "Gemeenschapsprojecten",
+    "description": "Volg gemeente-, coöperatieve en buurtprojecten van aankondiging tot mijlpaal.",
     "detail_title": "{{title}}",
-    "detail_description_fallback": "{{title}} is {{status}} at {{progress}}% progress. Stage: {{stage}}. Location: {{location}}.",
-    "stage_unknown": "Stage pending",
-    "location_unknown": "Location pending"
+    "detail_description_fallback": "{{title}} is {{status}} met {{progress}}% voortgang. Fase: {{stage}}. Locatie: {{location}}.",
+    "stage_unknown": "Fase in behandeling",
+    "location_unknown": "Locatie in behandeling"
   },
   "status": {
-    "active": "Actief",
-    "cancelled": "Geannuleerd",
-    "completed": "Voltooid",
     "draft": "Concept",
-    "paused": "Gepauzeerd"
+    "active": "Actief",
+    "paused": "Gepauzeerd",
+    "completed": "Voltooid",
+    "cancelled": "Geannuleerd"
   },
   "progress_label": "Projectvoortgang",
   "progress_value": "{{value}}% voltooid",
@@ -31,11 +31,11 @@
     "subscribe": "Uw projectmeldingen konden niet worden bijgewerkt."
   },
   "share": {
-    "share_text": "{{title}} - {{description}}",
-    "title": "Share project",
-    "copy_link": "Copy link",
-    "native": "Share",
-    "link_copied": "Link copied",
-    "copy_failed": "Could not copy link"
+    "title": "Deel project",
+    "copy_link": "Kopieer link",
+    "native": "Deel",
+    "link_copied": "Link gekopieerd",
+    "copy_failed": "Kan link niet kopiëren",
+    "share_text": "{{title}} - {{description}}"
   }
 }

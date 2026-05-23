@@ -1,10 +1,23 @@
 {
+  "meta_title": "Projektankündigungen",
   "title": "Gemeinschaftsprojekte",
   "subtitle": "Verfolgen Sie inszenierte Ankündigungen von Kommunen und Genossenschaften.",
   "create_project": "Projekt erstellen",
   "empty": "Keine Projekte stimmen mit dieser Ansicht überein.",
   "date_unknown": "Nicht festgelegt",
   "progress_value": "{{value}}%",
+  "about": {
+    "title": "Über diese Seite",
+    "body": "Bei Projektankündigungen handelt es sich um nicht dringende Aktualisierungen, die im Community-Feed und im Benachrichtigungscenter für Mitglieder veröffentlicht werden. Verwenden Sie sie für Programmnachrichten, die Rekrutierung von Freiwilligen, Veranstaltungshinweise und Aktualisierungen zu Auswirkungen. Im Gegensatz zu Notfallwarnungen werden Ankündigungen in die Warteschlange gestellt und nach dem normalen Benachrichtigungsplan der Plattform übermittelt.",
+    "draft": "Für Mitglieder nicht sichtbar; vor der Veröffentlichung frei bearbeiten.",
+    "active": "Veröffentlicht und im Community-Feed sichtbar. Verwenden Sie „Update hinzufügen“, um Meilensteinaktualisierungen für Abonnenten zu veröffentlichen.",
+    "paused_completed_label": "Angehalten / abgeschlossen",
+    "paused_completed": "Aus dem aktiven Feed archiviert. Abonnenten werden nach Abschluss benachrichtigt."
+  },
+  "list": {
+    "title": "Projektankündigungen",
+    "subtitle": "Veröffentlichen Sie Initiativen und Meilensteinaktualisierungen, die Mitglieder abonnieren können."
+  },
   "filters": {
     "status": "Status",
     "all": "Alle Status"
@@ -36,14 +49,14 @@
     "title": "Titel",
     "summary": "Zusammenfassung",
     "location": "Standort",
+    "current_stage": "Aktueller Stand",
     "stage": "Bühne",
     "progress": "Fortschritt in Prozent",
     "publish_now": "Jetzt veröffentlichen",
     "update_title": "Titel aktualisieren",
     "update_body": "Körper aktualisieren",
     "milestone": "Meilenstein",
-    "publish_update_now": "Jetzt Update veröffentlichen",
-    "current_stage": "Aktueller Stand"
+    "publish_update_now": "Jetzt Update veröffentlichen"
   },
   "create_modal": {
     "title": "Community-Projekt erstellen",
@@ -59,18 +72,5 @@
     "update": "Das Update konnte nicht gespeichert werden.",
     "publish": "Das Projekt konnte nicht veröffentlicht werden.",
     "status": "Der Projektstatus konnte nicht geändert werden."
-  },
-  "meta_title": "Projektankündigungen",
-  "about": {
-    "title": "Über diese Seite",
-    "body": "Bei Projektankündigungen handelt es sich um nicht dringende Aktualisierungen, die im Community-Feed und im Benachrichtigungscenter für Mitglieder veröffentlicht werden. Verwenden Sie sie für Programmnachrichten, die Rekrutierung von Freiwilligen, Veranstaltungshinweise und Aktualisierungen zu Auswirkungen. Im Gegensatz zu Notfallwarnungen werden Ankündigungen in die Warteschlange gestellt und nach dem normalen Benachrichtigungsplan der Plattform übermittelt.",
-    "draft": "Für Mitglieder nicht sichtbar; vor der Veröffentlichung frei bearbeiten.",
-    "active": "Veröffentlicht und im Community-Feed sichtbar. Verwenden Sie „Update hinzufügen“, um Meilensteinaktualisierungen für Abonnenten zu veröffentlichen.",
-    "paused_completed_label": "Angehalten / abgeschlossen",
-    "paused_completed": "Aus dem aktiven Feed archiviert. Abonnenten werden nach Abschluss benachrichtigt."
-  },
-  "list": {
-    "title": "Projektankündigungen",
-    "subtitle": "Veröffentlichen Sie Initiativen und Meilensteinaktualisierungen, die Mitglieder abonnieren können."
   }
 }

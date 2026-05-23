@@ -1,18 +1,18 @@
 {
   "meta": {
-    "description": "Śledź projekty miejskie, spółdzielcze i sąsiedzkie od ogłoszenia do kamienia milowego.",
     "title": "Projekty społeczności",
+    "description": "Śledź projekty miejskie, spółdzielcze i sąsiedzkie od ogłoszenia do kamienia milowego.",
     "detail_title": "{{title}}",
-    "detail_description_fallback": "{{title}} is {{status}} at {{progress}}% progress. Stage: {{stage}}. Location: {{location}}.",
-    "stage_unknown": "Stage pending",
-    "location_unknown": "Location pending"
+    "detail_description_fallback": "{{title}} to {{status}} z {{progress}}% postępu. Etap: {{stage}}. Lokalizacja: {{location}}.",
+    "stage_unknown": "Etap w toku",
+    "location_unknown": "Lokalizacja w oczekiwaniu"
   },
   "status": {
-    "active": "Aktywny",
-    "cancelled": "Anulowany",
-    "completed": "Ukończony",
     "draft": "Szkic",
-    "paused": "Wstrzymany"
+    "active": "Aktywny",
+    "paused": "Wstrzymany",
+    "completed": "Ukończony",
+    "cancelled": "Anulowany"
   },
   "progress_label": "Postęp projektu",
   "progress_value": "{{value}}% ukończone",
@@ -31,11 +31,11 @@
     "subscribe": "Nie można zaktualizować powiadomień o projekcie."
   },
   "share": {
-    "share_text": "{{title}} - {{description}}",
-    "title": "Share project",
-    "copy_link": "Copy link",
-    "native": "Share",
-    "link_copied": "Link copied",
-    "copy_failed": "Could not copy link"
+    "title": "Udostępnij projekt",
+    "copy_link": "Skopiuj link",
+    "native": "Udział",
+    "link_copied": "Link skopiowany",
+    "copy_failed": "Nie udało się skopiować linku",
+    "share_text": "{{title}} - {{description}}"
   }
 }
