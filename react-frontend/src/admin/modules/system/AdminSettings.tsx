@@ -51,8 +51,12 @@ interface SettingsForm {
   admin_approval: boolean;    // general.admin_approval
   maintenance_mode: boolean;  // general.maintenance_mode
   footer_text: string;        // general.footer_text (charity number, legal name, etc.)
-  partner_logo_url: string;   // general.partner_logo_url (shown in footer left slot)
-  default_currency: string;   // general.default_currency (ISO 4217 lowercase, e.g. 'eur', 'usd')
+  partner_logo_url: string;      // general.partner_logo_url (shown in footer left slot)
+  powered_by_label: string;      // general.powered_by_label (God-only — footer right slot)
+  powered_by_image_light: string; // general.powered_by_image_light
+  powered_by_image_dark: string;  // general.powered_by_image_dark
+  powered_by_url: string;         // general.powered_by_url
+  default_currency: string;       // general.default_currency (ISO 4217 lowercase, e.g. 'eur', 'usd')
 }
 
 const CURRENCY_OPTIONS: Array<{ code: string; labelKey: string }> = [
@@ -75,6 +79,10 @@ const DEFAULT_SETTINGS: SettingsForm = {
   maintenance_mode: false,
   footer_text: '',
   partner_logo_url: '',
+  powered_by_label: '',
+  powered_by_image_light: '',
+  powered_by_image_dark: '',
+  powered_by_url: '',
   default_currency: 'eur',
 };
 
@@ -90,13 +98,18 @@ export function AdminSettings() {
     (user?.role as string) === 'god' ||
     (user?.role as string) === 'super_admin' ||
     userRecord?.is_super_admin === true;
+  const isPlatformGod = userRecord?.is_god === true;
 
   const [form, setForm] = useState<SettingsForm>(DEFAULT_SETTINGS);
   const [originalForm, setOriginalForm] = useState<SettingsForm>(DEFAULT_SETTINGS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingPbLight, setUploadingPbLight] = useState(false);
+  const [uploadingPbDark, setUploadingPbDark] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const pbLightInputRef = useRef<HTMLInputElement>(null);
+  const pbDarkInputRef  = useRef<HTMLInputElement>(null);
 
   const fetchSettings = useCallback(async () => {
     setLoading(true);
@@ -119,6 +132,10 @@ export function AdminSettings() {
           maintenance_mode: settings.maintenance_mode === 'true' || settings.maintenance_mode === '1',
           footer_text: (settings.footer_text as string) ?? '',
           partner_logo_url: (settings.partner_logo_url as string) ?? '',
+          powered_by_label: (settings.powered_by_label as string) ?? '',
+          powered_by_image_light: (settings.powered_by_image_light as string) ?? '',
+          powered_by_image_dark: (settings.powered_by_image_dark as string) ?? '',
+          powered_by_url: (settings.powered_by_url as string) ?? '',
           default_currency: (settings.default_currency as string)?.toLowerCase() || 'eur',
         };
         setForm(loaded);
@@ -151,6 +168,8 @@ export function AdminSettings() {
       if (form.admin_approval !== originalForm.admin_approval) changes.admin_approval = String(form.admin_approval);
       if (form.footer_text !== originalForm.footer_text) changes.footer_text = form.footer_text;
       if (form.partner_logo_url !== originalForm.partner_logo_url) changes.partner_logo_url = form.partner_logo_url;
+      if (isPlatformGod && form.powered_by_label !== originalForm.powered_by_label) changes.powered_by_label = form.powered_by_label;
+      if (isPlatformGod && form.powered_by_url !== originalForm.powered_by_url) changes.powered_by_url = form.powered_by_url;
       if (form.default_currency !== originalForm.default_currency) changes.default_currency = form.default_currency;
 
       if (Object.keys(changes).length === 0) {
@@ -195,6 +214,38 @@ export function AdminSettings() {
     } finally {
       setUploadingLogo(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handlePoweredByUpload = async (
+    variant: 'light' | 'dark',
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const setUploading = variant === 'light' ? setUploadingPbLight : setUploadingPbDark;
+    const inputRef     = variant === 'light' ? pbLightInputRef     : pbDarkInputRef;
+    const field        = variant === 'light' ? 'powered_by_image_light' : 'powered_by_image_dark';
+    const uploadFn     = variant === 'light'
+      ? adminSettings.uploadPoweredByImageLight
+      : adminSettings.uploadPoweredByImageDark;
+
+    setUploading(true);
+    try {
+      const res = await uploadFn(file);
+      if (res.data?.url) {
+        setForm(prev => ({ ...prev, [field]: res.data!.url }));
+        setOriginalForm(prev => ({ ...prev, [field]: res.data!.url }));
+        toast.success(t('system.powered_by_image_uploaded'));
+        refreshTenant();
+      } else {
+        toast.error(t('system.upload_failed'));
+      }
+    } catch {
+      toast.error(t('system.upload_failed'));
+    } finally {
+      setUploading(false);
+      if (inputRef.current) inputRef.current.value = '';
     }
   };
 
@@ -339,6 +390,119 @@ export function AdminSettings() {
             </div>
           </CardBody>
         </Card>
+
+        {/* God-only: Powered By Branding (footer right slot) */}
+        {isPlatformGod && (
+          <Card shadow="sm" className="border-2 border-warning/30">
+            <CardHeader>
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <Lock size={18} className="text-warning" />
+                {t('system.powered_by_branding_section')}
+                <Chip size="sm" color="warning" variant="flat">{t('system.god_only_chip')}</Chip>
+              </h3>
+            </CardHeader>
+            <CardBody className="gap-5">
+              <p className="text-sm text-default-500">{t('system.powered_by_branding_desc')}</p>
+
+              <Input
+                label={t('system.label_powered_by_label')}
+                placeholder={t('system.placeholder_powered_by_label')}
+                description={t('system.desc_powered_by_label')}
+                variant="bordered"
+                value={form.powered_by_label}
+                onValueChange={(val) => setForm(prev => ({ ...prev, powered_by_label: val }))}
+              />
+              <Input
+                label={t('system.label_powered_by_url')}
+                placeholder={t('system.placeholder_powered_by_url')}
+                description={t('system.desc_powered_by_url')}
+                variant="bordered"
+                value={form.powered_by_url}
+                onValueChange={(val) => setForm(prev => ({ ...prev, powered_by_url: val }))}
+              />
+
+              {/* Light mode image */}
+              <div className="space-y-2">
+                <p className="text-sm font-medium">{t('system.label_powered_by_image_light')}</p>
+                {form.powered_by_image_light && (
+                  <div className="flex items-start gap-3 p-3 rounded-lg border border-default-200 bg-default-50">
+                    <img
+                      src={form.powered_by_image_light}
+                      alt="Light mode preview"
+                      className="h-14 w-auto max-w-[180px] object-contain rounded"
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                    />
+                    <Button
+                      isIconOnly size="sm" variant="flat" color="danger"
+                      aria-label="Remove light image"
+                      onPress={() => {
+                        setForm(prev => ({ ...prev, powered_by_image_light: '' }));
+                        setOriginalForm(prev => ({ ...prev, powered_by_image_light: '' }));
+                      }}
+                    >
+                      <X size={14} />
+                    </Button>
+                  </div>
+                )}
+                <input
+                  ref={pbLightInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+                  className="hidden"
+                  onChange={(e) => handlePoweredByUpload('light', e)}
+                />
+                <Button
+                  variant="flat" color="primary" size="sm"
+                  isLoading={uploadingPbLight}
+                  startContent={!uploadingPbLight ? <Upload size={14} /> : undefined}
+                  onPress={() => pbLightInputRef.current?.click()}
+                >
+                  {form.powered_by_image_light ? t('system.replace_image') : t('system.upload_image')}
+                </Button>
+              </div>
+
+              {/* Dark mode image */}
+              <div className="space-y-2">
+                <p className="text-sm font-medium">{t('system.label_powered_by_image_dark')}</p>
+                {form.powered_by_image_dark && (
+                  <div className="flex items-start gap-3 p-3 rounded-lg border border-default-200 bg-default-50">
+                    <img
+                      src={form.powered_by_image_dark}
+                      alt="Dark mode preview"
+                      className="h-14 w-auto max-w-[180px] object-contain rounded"
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                    />
+                    <Button
+                      isIconOnly size="sm" variant="flat" color="danger"
+                      aria-label="Remove dark image"
+                      onPress={() => {
+                        setForm(prev => ({ ...prev, powered_by_image_dark: '' }));
+                        setOriginalForm(prev => ({ ...prev, powered_by_image_dark: '' }));
+                      }}
+                    >
+                      <X size={14} />
+                    </Button>
+                  </div>
+                )}
+                <input
+                  ref={pbDarkInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
+                  className="hidden"
+                  onChange={(e) => handlePoweredByUpload('dark', e)}
+                />
+                <Button
+                  variant="flat" color="primary" size="sm"
+                  isLoading={uploadingPbDark}
+                  startContent={!uploadingPbDark ? <Upload size={14} /> : undefined}
+                  onPress={() => pbDarkInputRef.current?.click()}
+                >
+                  {form.powered_by_image_dark ? t('system.replace_image') : t('system.upload_image')}
+                </Button>
+              </div>
+            </CardBody>
+          </Card>
+        )}
 
         <Card shadow="sm">
           <CardHeader className="flex items-center justify-between">

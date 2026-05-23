@@ -1658,6 +1658,8 @@ export const adminSettings = {
   get: () => api.get<import('./types').AdminSettingsResponse>('/v2/admin/settings'),
   update: (data: Record<string, unknown>) => api.put<{ success: boolean }>('/v2/admin/settings', data),
   uploadPartnerLogo: (file: File) => api.upload<{ url: string }>('/v2/admin/settings/partner-logo', file, 'logo'),
+  uploadPoweredByImageLight: (file: File) => api.upload<{ url: string }>('/v2/admin/settings/powered-by-image-light', file, 'logo'),
+  uploadPoweredByImageDark:  (file: File) => api.upload<{ url: string }>('/v2/admin/settings/powered-by-image-dark',  file, 'logo'),
 
   getAiConfig: () => api.get<Record<string, unknown>>('/v2/admin/config/ai'),
   updateAiConfig: (data: Record<string, unknown>) => api.put<{ success: boolean }>('/v2/admin/config/ai', data),

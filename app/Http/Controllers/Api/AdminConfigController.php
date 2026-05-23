@@ -63,6 +63,8 @@ class AdminConfigController extends BaseApiController
         'email_verification', 'admin_approval', 'welcome_credits',
         'footer_text',
         'partner_logo_url',
+        'powered_by_label',
+        'powered_by_url',
         'map_provider', 'geocoding_provider',
         'google_maps_api_key', 'google_maps_map_id', 'maptiler_api_key',
     ];
@@ -803,6 +805,71 @@ class AdminConfigController extends BaseApiController
             return $this->respondWithData(['url' => $imageUrl]);
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Partner logo upload failed', ['error' => $e->getMessage(), 'tenant_id' => $tenantId]);
+            return $this->respondWithError('UPLOAD_FAILED', 'Failed to upload image. Please try again.', 'logo', 500);
+        }
+    }
+
+    /** POST /api/v2/admin/settings/powered-by-image-light */
+    public function uploadPoweredByImageLight(): JsonResponse
+    {
+        return $this->uploadPoweredByImage('light');
+    }
+
+    /** POST /api/v2/admin/settings/powered-by-image-dark */
+    public function uploadPoweredByImageDark(): JsonResponse
+    {
+        return $this->uploadPoweredByImage('dark');
+    }
+
+    private function uploadPoweredByImage(string $variant): JsonResponse
+    {
+        $adminId  = $this->requireAdmin();
+        $tenantId = TenantContext::getId();
+
+        if (!\App\Models\User::isGod($adminId)) {
+            return $this->respondWithError('AUTH_INSUFFICIENT_PERMISSIONS', 'God access required.', null, 403);
+        }
+
+        $this->rateLimit('admin_logo_upload', 10, 60);
+
+        $file = request()->file('logo');
+        if (!$file || !$file->isValid()) {
+            return $this->respondWithError('VALIDATION_ERROR', 'No image uploaded.', 'logo', 400);
+        }
+
+        $mime = $file->getMimeType();
+        if (!in_array($mime, ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'], true)) {
+            return $this->respondWithError('VALIDATION_ERROR', 'File must be an image (JPEG, PNG, GIF, WebP, or SVG).', 'logo', 422);
+        }
+
+        if ($file->getSize() > 2 * 1024 * 1024) {
+            return $this->respondWithError('VALIDATION_ERROR', 'Image must be 2 MB or smaller.', 'logo', 422);
+        }
+
+        try {
+            $fileArray = [
+                'name'     => $file->getClientOriginalName(),
+                'type'     => $file->getMimeType(),
+                'tmp_name' => $file->getRealPath(),
+                'error'    => UPLOAD_ERR_OK,
+                'size'     => $file->getSize(),
+            ];
+
+            $imageUrl   = \App\Core\ImageUploader::upload($fileArray, 'powered-by-images');
+            $settingKey = "general.powered_by_image_{$variant}";
+
+            DB::table('tenant_settings')->updateOrInsert(
+                ['tenant_id' => $tenantId, 'setting_key' => $settingKey],
+                ['setting_value' => $imageUrl, 'updated_at' => now()]
+            );
+
+            return $this->respondWithData(['url' => $imageUrl]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Powered-by image upload failed', [
+                'variant'   => $variant,
+                'error'     => $e->getMessage(),
+                'tenant_id' => $tenantId,
+            ]);
             return $this->respondWithError('UPLOAD_FAILED', 'Failed to upload image. Please try again.', 'logo', 500);
         }
     }

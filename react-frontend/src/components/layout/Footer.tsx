@@ -7,7 +7,7 @@ import { type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@heroui/react';
-import { useTenant, useFeature, useCookieConsent } from '@/contexts';
+import { useTenant, useFeature, useCookieConsent, useTheme } from '@/contexts';
 import Mail from 'lucide-react/icons/mail';
 import Phone from 'lucide-react/icons/phone';
 import MapPin from 'lucide-react/icons/map-pin';
@@ -36,11 +36,20 @@ export interface FooterProps {
 export function Footer({ children, copyright }: FooterProps) {
   const { t } = useTranslation('common');
   const { tenant, branding, tenantPath } = useTenant();
+  const { resolvedTheme } = useTheme();
   const hasConnections = useFeature('connections');
   const hasEvents = useFeature('events');
   const hasBlog = useFeature('blog');
   const { resetConsent } = useCookieConsent();
   const year = new Date().getFullYear();
+
+  // Custom powered-by branding (God-configured per tenant)
+  const pbImageLight = tenant?.config?.powered_by_image_light as string | undefined;
+  const pbImageDark  = tenant?.config?.powered_by_image_dark  as string | undefined;
+  const pbImage = resolvedTheme === 'dark' ? (pbImageDark || pbImageLight) : (pbImageLight || pbImageDark);
+  const pbUrl   = tenant?.config?.powered_by_url   as string | undefined;
+  const pbLabel = tenant?.config?.powered_by_label as string | undefined;
+  const hasCustomPoweredBy = Boolean(pbImage);
 
   // Use tenant's footer_text from config if set, otherwise build a default
   const footerText = tenant?.config?.footer_text?.trim()
@@ -53,22 +62,37 @@ export function Footer({ children, copyright }: FooterProps) {
     <footer className="relative z-10 border-t border-theme-default mt-auto glass-surface backdrop-blur-sm" data-nosnippet>
       <div className="md:hidden px-4 py-6 pb-[calc(var(--safe-area-bottom)+5rem)]">
         <div className="flex flex-col items-center gap-4">
-          {/* NEXUS banner — clickable, links to project-nexus.ie */}
-          <a
-            href={PROJECT_NEXUS_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            title={t('footer.nexus_link_label')}
-            className="transition-opacity hover:opacity-80"
-          >
-            <img
-              src="/images/project-nexus-open-source-community-platform.png"
-              alt={t('footer.nexus_link_label')}
-              className="h-24 w-auto object-contain"
-              width="1536"
-              height="1024"
-            />
-          </a>
+          {/* Powered-by banner (custom or default NEXUS) */}
+          {hasCustomPoweredBy ? (
+            pbUrl ? (
+              <a
+                href={pbUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-opacity hover:opacity-80"
+              >
+                <img src={pbImage} alt={pbLabel || t('footer.powered_by')} className="h-24 w-auto object-contain" />
+              </a>
+            ) : (
+              <img src={pbImage} alt={pbLabel || t('footer.powered_by')} className="h-24 w-auto object-contain" />
+            )
+          ) : (
+            <a
+              href={PROJECT_NEXUS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={t('footer.nexus_link_label')}
+              className="transition-opacity hover:opacity-80"
+            >
+              <img
+                src="/images/project-nexus-open-source-community-platform.png"
+                alt={t('footer.nexus_link_label')}
+                className="h-24 w-auto object-contain"
+                width="1536"
+                height="1024"
+              />
+            </a>
+          )}
           <SourceRepositoryLink compact className="w-full max-w-[18rem] justify-center" />
           {/* Tenant partner logo — real or placeholder */}
           {tenant?.config?.partner_logo_url ? (
@@ -277,35 +301,60 @@ export function Footer({ children, copyright }: FooterProps) {
                   </p>
                 </div>
 
-                {/* COL 3: Powered by Project NEXUS */}
+                {/* COL 3: Powered by (custom or default NEXUS) */}
                 <div className="flex flex-col items-start sm:items-end gap-2">
                   <span className="text-[10px] font-semibold uppercase tracking-widest text-theme-subtle/50">
-                    {t('footer.powered_by')}
+                    {pbLabel || t('footer.powered_by')}
                   </span>
-                  <a
-                    href={PROJECT_NEXUS_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    title={t('footer.nexus_link_label')}
-                    aria-label={t('footer.nexus_link_label')}
-                    className="transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
-                  >
-                    <img
-                      src="/images/project-nexus-open-source-community-platform.png"
-                      alt={t('footer.nexus_link_label')}
-                      className="h-32 w-auto object-contain"
-                      width="1536"
-                      height="1024"
-                    />
-                  </a>
-                  <a
-                    href={PROJECT_NEXUS_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs text-theme-muted hover:text-theme-primary transition-colors"
-                  >
-                    {PROJECT_NEXUS_HOST} <span aria-hidden="true">↗</span>
-                  </a>
+                  {hasCustomPoweredBy ? (
+                    pbUrl ? (
+                      <a
+                        href={pbUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
+                      >
+                        <img
+                          src={pbImage}
+                          alt={pbLabel || t('footer.powered_by')}
+                          className="h-32 w-auto object-contain"
+                        />
+                      </a>
+                    ) : (
+                      <img
+                        src={pbImage}
+                        alt={pbLabel || t('footer.powered_by')}
+                        className="h-32 w-auto object-contain"
+                      />
+                    )
+                  ) : (
+                    <>
+                      <a
+                        href={PROJECT_NEXUS_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        title={t('footer.nexus_link_label')}
+                        aria-label={t('footer.nexus_link_label')}
+                        className="transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
+                      >
+                        <img
+                          src="/images/project-nexus-open-source-community-platform.png"
+                          alt={t('footer.nexus_link_label')}
+                          className="h-32 w-auto object-contain"
+                          width="1536"
+                          height="1024"
+                        />
+                      </a>
+                      <a
+                        href={PROJECT_NEXUS_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-theme-muted hover:text-theme-primary transition-colors"
+                      >
+                        {PROJECT_NEXUS_HOST} <span aria-hidden="true">↗</span>
+                      </a>
+                    </>
+                  )}
                 </div>
 
               </div>

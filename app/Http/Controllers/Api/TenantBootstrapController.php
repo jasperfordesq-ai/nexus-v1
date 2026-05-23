@@ -692,16 +692,26 @@ class TenantBootstrapController extends BaseApiController
             $publicConfig['footer_text'] = $footerText;
         }
 
-        // Partner logo URL (shown in footer left slot)
+        // Partner logo + powered-by settings (shown in footer)
         if ($tenantId > 0) {
             try {
-                $row = DB::table('tenant_settings')
+                $footerSettingKeys = [
+                    'general.partner_logo_url',
+                    'general.powered_by_label',
+                    'general.powered_by_image_light',
+                    'general.powered_by_image_dark',
+                    'general.powered_by_url',
+                ];
+                $rows = DB::table('tenant_settings')
                     ->where('tenant_id', $tenantId)
-                    ->where('setting_key', 'general.partner_logo_url')
-                    ->select('setting_value')
-                    ->first();
-                if ($row && !empty($row->setting_value)) {
-                    $publicConfig['partner_logo_url'] = $row->setting_value;
+                    ->whereIn('setting_key', $footerSettingKeys)
+                    ->select('setting_key', 'setting_value')
+                    ->get();
+                foreach ($rows as $row) {
+                    if (!empty($row->setting_value)) {
+                        $shortKey = str_replace('general.', '', $row->setting_key);
+                        $publicConfig[$shortKey] = $row->setting_value;
+                    }
                 }
             } catch (\Exception $e) {
                 // table may not exist yet
