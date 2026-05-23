@@ -25,6 +25,10 @@
     "open": "مفتوح",
     "closed": "مغلق"
   },
+  "badges": {
+    "ranked": "مرتّب",
+    "anonymous": "مجهول"
+  },
   "tabs": {
     "open": "المفتوحة",
     "closed": "المغلقة",
@@ -39,7 +43,7 @@
   },
   "time_remaining": "{{time}} متبقية",
   "expired": "منتهي",
-  "created_by": "by",
+  "created_by": "بواسطة",
   "delete_poll": "حذف الاستطلاع",
   "confirm_delete": {
     "title": "حذف الاستطلاع",
@@ -74,14 +78,6 @@
   "category_placeholder": "مثل: المجتمع، الفعاليات، الملاحظات",
   "anonymous_voting": "تصويت مجهول",
   "anonymous_voting_desc": "إخفاء هويات الناخبين في النتائج",
-  "aria": {
-    "export_csv": "تصدير النتائج كـ CSV",
-    "move_rank_down": "نقل {{option}} إلى الأسفل",
-    "move_rank_up": "نقل {{option}} إلى الأعلى"
-  },
-  "page_meta": {
-    "title": "استطلاعات"
-  },
   "ranked_results_title": "نتائج الجولة بالجولة",
   "round_number": "الجولة {{number}}",
   "eliminated_candidate": "مُقصى: {{name}}",
@@ -92,8 +88,12 @@
   "view_ranked_results": "عرض نتائج الترتيب",
   "winner_label": "الفائز: {{name}}",
   "submit_rankings": "إرسال الترتيب",
-  "badges": {
-    "ranked": "مرتّب",
-    "anonymous": "مجهول"
+  "aria": {
+    "export_csv": "تصدير النتائج كـ CSV",
+    "move_rank_down": "نقل {{option}} إلى الأسفل",
+    "move_rank_up": "نقل {{option}} إلى الأعلى"
+  },
+  "page_meta": {
+    "title": "استطلاعات"
   }
 }

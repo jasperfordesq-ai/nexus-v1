@@ -63,13 +63,25 @@
   },
   "password_reset": {
     "subject": "Zresetuj has?o ? {{community}}",
+    "title": "Zresetuj swoje hasło",
+    "preview": "Poprosiłeś o link do resetowania hasła",
     "greeting": "Cześć {{name}},",
     "body": "Poprosiłeś o resetowanie hasła. Kliknij poniższy przycisk, aby ustawić nowe hasło.",
     "cta": "Zresetuj hasło",
     "expiry": "Ten link wyga?nie za 1 godzin?.",
-    "ignore": "Jeśli nie prosiłeś o to, możesz bezpiecznie zignorować tę wiadomość.",
-    "title": "Zresetuj swoje hasło",
-    "preview": "Poprosiłeś o link do resetowania hasła"
+    "ignore": "Jeśli nie prosiłeś o to, możesz bezpiecznie zignorować tę wiadomość."
+  },
+  "security": {
+    "password_changed_subject": "Alert bezpieczeństwa: twoje hasło zostało zmienione — {{community}}",
+    "password_changed_title": "Hasło zmienione",
+    "password_changed_preview": "Hasło do twojego konta zostało niedawno zmienione",
+    "password_changed_body": "Hasło do twojego konta zostało niedawno zmienione. Jeśli to ty dokonałeś tej zmiany, żadne działanie nie jest potrzebne.",
+    "password_changed_warning": "Jeśli to nie ty dokonałeś tej zmiany, natychmiast skontaktuj się z pomocą, aby zabezpieczyć swoje konto.",
+    "email_changed_subject": "Alert bezpieczeństwa: twój adres e-mail został zmieniony — {{community}}",
+    "email_changed_title": "Adres e-mail zmieniony",
+    "email_changed_preview": "Adres e-mail na twoim koncie został zmieniony",
+    "email_changed_body": "Adres e-mail na twoim koncie <strong>{{community}}</strong> został zaktualizowany na nowy adres.",
+    "email_changed_warning": "Jeśli to nie ty dokonałeś tej zmiany, natychmiast skontaktuj się z pomocą, aby zabezpieczyć swoje konto."
   },
   "transaction": {
     "subject": "Transakcja kredytu czasu — {{amount}}h",
@@ -90,6 +102,17 @@
     "body": "{{sender}} wysłał ci wiadomość.",
     "cta": "Zobacz wiadomość"
   },
+  "message": {
+    "in_app_content": "{{sender}} wysłał ci wiadomość",
+    "title": "Nowa wiadomość",
+    "preview": "{{sender}} wysłał ci wiadomość",
+    "body_intro": "Masz nową wiadomość od <strong>{{sender}}</strong>.",
+    "voice_notice": "To wiadomość głosowa — odsłuchaj ją na platformie.",
+    "view_button": "Zobacz rozmowę",
+    "footer_note": "Możesz odpowiedzieć bezpośrednio z platformy. Aby przestać otrzymywać e-maile z wiadomościami, zaktualizuj swoje <a href=\"{{url}}\">preferencje powiadomień</a>.",
+    "fallback_recipient_name": "ty",
+    "fallback_sender_name": "Ktoś"
+  },
   "common": {
     "greeting": "Cześć {{name}},",
     "button_fallback": "Jeśli powyższy przycisk nie działa, skopiuj i wklej ten link do przeglądarki:",
@@ -101,10 +124,10 @@
     "fallback_federation_member": "Członek federacji",
     "fallback_partner_community": "społeczność partnerska",
     "fallback_federation_level": "Poziom {{level}}",
-    "or_separator": "or",
     "fallback_job": "praca",
     "fallback_manager": "Menedżer",
-    "fallback_organization": "Organizacja"
+    "fallback_organization": "Organizacja",
+    "or_separator": "Lub"
   },
   "footer": {
     "unsubscribe": "Wypisz się z tych e-maili",
@@ -178,7 +201,7 @@
     "label_community": "Społeczność",
     "label_amount": "Kwota",
     "label_description": "Opis",
-    "label_to": "To",
+    "label_to": "Do",
     "label_new_balance": "Nowe saldo",
     "label_from_community": "Ze społeczności",
     "label_requested_level": "Żądany poziom",
@@ -389,29 +412,20 @@
     "exchange_disputed": "⚠️ Spór wymiany - potrzebny przegląd brokera",
     "default": "Powiadomienie z Project NEXUS"
   },
-  "security": {
-    "password_changed_subject": "Alert bezpieczeństwa: twoje hasło zostało zmienione — {{community}}",
-    "password_changed_title": "Hasło zmienione",
-    "password_changed_preview": "Hasło do twojego konta zostało niedawno zmienione",
-    "password_changed_body": "Hasło do twojego konta zostało niedawno zmienione. Jeśli to ty dokonałeś tej zmiany, żadne działanie nie jest potrzebne.",
-    "password_changed_warning": "Jeśli to nie ty dokonałeś tej zmiany, natychmiast skontaktuj się z pomocą, aby zabezpieczyć swoje konto.",
-    "email_changed_subject": "Alert bezpieczeństwa: twój adres e-mail został zmieniony — {{community}}",
-    "email_changed_title": "Adres e-mail zmieniony",
-    "email_changed_preview": "Adres e-mail na twoim koncie został zmieniony",
-    "email_changed_body": "Adres e-mail na twoim koncie <strong>{{community}}</strong> został zaktualizowany na nowy adres.",
-    "email_changed_warning": "Jeśli to nie ty dokonałeś tej zmiany, natychmiast skontaktuj się z pomocą, aby zabezpieczyć swoje konto."
+  "exchange_dispute": {
+    "subject": "Twoja wymiana została oznaczona do przeglądu",
+    "title": "Wymiana w trakcie przeglądu",
+    "preview": "Wymiana, w której uczestniczyłeś, wymaga uwagi",
+    "body": "Twoja niedawna wymiana została oznaczona jako sporna z powodu różnicy w zgłoszonych godzinach. Koordynator przejrzy to i wkrótce skontaktuje się z tobą.",
+    "next_steps": "Może skontaktować się z tobą broker lub koordynator, aby pomóc to rozwiązać. W międzyczasie możesz zobaczyć szczegóły wymiany.",
+    "cta": "Zobacz wymianę"
   },
-  "message": {
-    "in_app_content": "{{sender}} wysłał ci wiadomość",
-    "title": "Nowa wiadomość",
-    "preview": "{{sender}} wysłał ci wiadomość",
-    "body_intro": "Masz nową wiadomość od <strong>{{sender}}</strong>.",
-    "voice_notice": "To wiadomość głosowa — odsłuchaj ją na platformie.",
-    "view_button": "Zobacz rozmowę",
-    "footer_note": "Możesz odpowiedzieć bezpośrednio z platformy. Aby przestać otrzymywać e-maile z wiadomościami, zaktualizuj swoje <a href=\"{{url}}\">preferencje powiadomień</a>.",
-    "fallback_recipient_name": "ty",
-    "fallback_sender_name": "Ktoś"
-  },
+  "dispute_resolved_subject": "Twój spór dotyczący wymiany został rozstrzygnięty",
+  "dispute_resolved_title": "Spór rozstrzygnięty",
+  "dispute_resolved_preview": "Twoja wymiana została pomyślnie zakończona",
+  "dispute_resolved_body": "Twoja wymiana została przejrzana i osiągnięto ostateczne porozumienie na :hours godzin.",
+  "dispute_resolved_hours_label": "Ostatecznie uzgodnione godziny",
+  "dispute_resolved_cta": "Zobacz wymianę",
   "donation": {
     "sent_subject": "Przekazałeś :amount kredytów czasu",
     "sent_title": "Wysłano darowiznę",
@@ -473,14 +487,6 @@
     "hours_declined_body": "Twoich godzin wolontariatu dla ':opportunity' nie udało się potwierdzić w tej chwili. Skontaktuj się ze swoim koordynatorem.",
     "hours_declined_cta": "Zobacz wolontariat"
   },
-  "exchange_dispute": {
-    "subject": "Twoja wymiana została oznaczona do przeglądu",
-    "title": "Wymiana w trakcie przeglądu",
-    "preview": "Wymiana, w której uczestniczyłeś, wymaga uwagi",
-    "body": "Twoja niedawna wymiana została oznaczona jako sporna z powodu różnicy w zgłoszonych godzinach. Koordynator przejrzy to i wkrótce skontaktuje się z tobą.",
-    "next_steps": "Może skontaktować się z tobą broker lub koordynator, aby pomóc to rozwiązać. W międzyczasie możesz zobaczyć szczegóły wymiany.",
-    "cta": "Zobacz wymianę"
-  },
   "onboarding_nurture": {
     "day2_subject": "Uzupełnij swój profil, aby uzyskać więcej połączeń",
     "day2_title": "Twój profil jest prawie gotowy",
@@ -500,11 +506,5 @@
     "day7_greeting": "Cześć :name,",
     "day7_body": "Jesteś częścią :community od tygodnia! Oto szybkie przypomnienie wszystkiego, co możesz zrobić: przeglądać oferty, nawiązywać kontakty, dołączać do grup i uczestniczyć w wydarzeniach.",
     "day7_cta": "Odkryj swoją społeczność"
-  },
-  "dispute_resolved_subject": "Twój spór dotyczący wymiany został rozstrzygnięty",
-  "dispute_resolved_title": "Spór rozstrzygnięty",
-  "dispute_resolved_preview": "Twoja wymiana została pomyślnie zakończona",
-  "dispute_resolved_body": "Twoja wymiana została przejrzana i osiągnięto ostateczne porozumienie na :hours godzin.",
-  "dispute_resolved_hours_label": "Ostatecznie uzgodnione godziny",
-  "dispute_resolved_cta": "Zobacz wymianę"
+  }
 }

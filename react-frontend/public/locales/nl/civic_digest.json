@@ -1,5 +1,6 @@
 {
   "page_title": "Jouw civieke digest",
+  "back_link": "Terug naar Community Hub",
   "intro_title": "Wat er bij jou in de buurt gebeurt",
   "intro_body": "Een gepersonaliseerde feed van aankondigingen, projecten, evenementen, diensten en meldingen in jouw community — gefilterd op jouw subregio, taal en interesses.",
   "empty_state": "Niets nieuws in de afgelopen 30 dagen. Kom later terug of pas je voorkeuren aan om de feed te verbreden.",
@@ -7,7 +8,7 @@
   "prefs_cadence_label": "Hoe vaak",
   "prefs_cadence_off": "Uit — stuur mij geen digest",
   "prefs_cadence_daily": "Dagelijkse samenvatting",
-  "prefs_cadence_weekly": "Weekly summary",
+  "prefs_cadence_monthly": "Maandelijkse samenvatting",
   "prefs_sub_region_label": "Gewenste subregio (optioneel)",
   "prefs_sub_region_placeholder": "Subregio-ID",
   "prefs_sub_region_help": "Laat leeg om de subregio van je profiel te gebruiken.",
@@ -30,28 +31,27 @@
   "error_loading": "Kon jouw digest niet laden. Probeer het opnieuw.",
   "email": {
     "subject_daily": "Jouw dagelijkse civieke digest — {{community}}",
-    "subject_weekly": "Your weekly civic digest — {{community}}",
+    "subject_monthly": "Je maandelijkse burgerdigest — {{community}}",
     "greeting": "Hallo {{name}},",
     "intro_daily": "Dit is wat er vandaag nieuw is in jouw community — {{count}} update(s) geselecteerd op basis van jouw subregio en interesses.",
-    "intro_weekly": "Here's your weekly round-up — {{count}} update(s) selected for you based on your sub-region and interests.",
+    "intro_monthly": "Hier is je maandelijkse overzicht — {{count}} update(s) voor jou geselecteerd op basis van je subregio en interesses.",
     "empty": "Voorlopig niets nieuws in jouw community. We houden je op de hoogte.",
     "cta_open": "Openen",
     "cta_manage_prefs": "Digest-voorkeuren beheren",
     "footer": "Je ontvangt dit omdat je je hebt aangemeld voor de civieke digest van {{community}}. Je kunt de frequentie aanpassen of je op elk moment afmelden.",
     "match_score": "Match {{score}}",
     "view_all": "Volledige digest bekijken",
-    "subject_monthly": "Je maandelijkse burgerdigest — {{community}}",
-    "intro_monthly": "Hier is je maandelijkse overzicht — {{count}} update(s) voor jou geselecteerd op basis van je subregio en interesses."
+    "subject_weekly": "Your weekly civic digest — {{community}}",
+    "intro_weekly": "Here's your weekly round-up — {{count}} update(s) selected for you based on your sub-region and interests."
   },
   "push": {
     "title": "Jouw civieke digest is klaar",
     "body_one": "{{count}} nieuwe update in jouw community",
     "body_other": "{{count}} nieuwe updates in jouw community"
   },
-  "back_link": "Terug naar Community Hub",
   "transparency": {
     "why_button": "Waarom zie ik dit?",
-    "match_score_label": "Match",
+    "match_score_label": "Overeenkomst",
     "global_note": "Items worden gerangschikt op relevantie voor jouw subregio, interesses en recente activiteit. Tik op 'Waarom?' bij een item voor details.",
     "reason_sub_region": "Komt overeen met jouw subregio",
     "reason_priority": "Gemarkeerd als prioriteit/urgent",
@@ -61,5 +61,5 @@
     "reason_announcement": "Officiële aankondiging",
     "no_reasons": "Standaardrangschikking"
   },
-  "prefs_cadence_monthly": "Maandelijkse samenvatting"
+  "prefs_cadence_weekly": "Weekly summary"
 }

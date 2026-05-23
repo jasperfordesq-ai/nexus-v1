@@ -1,5 +1,7 @@
 {
   "page_title": "Blog",
+  "hero_eyebrow": "Community-Geschichten",
+  "hero_posts_label": "Angezeigte Beiträge",
   "title": "Blog & Neuigkeiten",
   "subtitle": "Gemeinschaftsgeschichten, Updates und Ankündigungen",
   "search_placeholder": "Beiträge suchen...",
@@ -11,6 +13,9 @@
   "empty_title": "Keine Beiträge gefunden",
   "empty_desc": "Es wurden noch keine Blogbeiträge veröffentlicht",
   "empty_desc_filtered": "Versuchen Sie andere Suchbegriffe oder setzen Sie Ihre Filter zurück",
+  "empty_tip_stories": "Mitgliedergeschichten",
+  "empty_tip_guides": "Anleitungen",
+  "empty_tip_updates": "Aktualisierungen",
   "load_more": "Weitere Beiträge laden",
   "min_read": "{{count}} Min. Lesezeit",
   "min_read_short": "{{count}}Min",
@@ -42,6 +47,7 @@
     "reply_count": "{{count}} Antworten",
     "hide": "Ausblenden",
     "you": "Sie",
+    "unknown_author": "Unbekannter Autor",
     "aria_add_reaction": "Reaktion hinzufügen",
     "aria_send_reply": "Antwort senden",
     "reaction_heart": "Liebe",
@@ -49,17 +55,11 @@
     "reaction_thumbs_down": "Gefällt mir nicht",
     "reaction_laugh": "Haha",
     "reaction_angry": "Wütend",
-    "unknown_author": "Unbekannter Autor",
     "reaction_love": "Liebe",
     "reaction_like": "Gefällt mir",
     "reaction_wow": "Wow",
     "reaction_sad": "Traurig",
     "reaction_celebrate": "Feiern"
   },
-  "page_description": "Geschichten, Leitfäden und Updates aus der Zeitbank-Community — erfolgreiche Tauschgeschäfte, gewonnene Erkenntnisse und Neuigkeiten aus lokalen Gruppen und von Partnern.",
-  "hero_eyebrow": "Community-Geschichten",
-  "hero_posts_label": "Angezeigte Beiträge",
-  "empty_tip_stories": "Mitgliedergeschichten",
-  "empty_tip_guides": "Anleitungen",
-  "empty_tip_updates": "Aktualisierungen"
+  "page_description": "Geschichten, Leitfäden und Updates aus der Zeitbank-Community — erfolgreiche Tauschgeschäfte, gewonnene Erkenntnisse und Neuigkeiten aus lokalen Gruppen und von Partnern."
 }

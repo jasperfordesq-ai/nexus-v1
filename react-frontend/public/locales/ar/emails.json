@@ -63,13 +63,25 @@
   },
   "password_reset": {
     "subject": "????? ????? ???? ?????? ? {{community}}",
+    "title": "أعد تعيين كلمة المرور الخاصة بك",
+    "preview": "لقد طلبت رابط إعادة تعيين كلمة المرور",
     "greeting": "مرحباً {{name}}،",
     "body": "لقد طلبت إعادة تعيين كلمة المرور. انقر على الزر أدناه لتعيين كلمة مرور جديدة.",
     "cta": "إعادة تعيين كلمة المرور",
     "expiry": "????? ?????? ??? ?????? ???? ???? ?????.",
-    "ignore": "إذا لم تطلب هذا، يمكنك تجاهل هذا البريد الإلكتروني بأمان.",
-    "title": "أعد تعيين كلمة المرور الخاصة بك",
-    "preview": "لقد طلبت رابط إعادة تعيين كلمة المرور"
+    "ignore": "إذا لم تطلب هذا، يمكنك تجاهل هذا البريد الإلكتروني بأمان."
+  },
+  "security": {
+    "password_changed_subject": "تنبيه أمني: تم تغيير كلمة المرور الخاصة بك — {{community}}",
+    "password_changed_title": "تم تغيير كلمة المرور",
+    "password_changed_preview": "تم تغيير كلمة مرور حسابك مؤخراً",
+    "password_changed_body": "تم تغيير كلمة مرور حسابك مؤخراً. إذا قمت بهذا التغيير، فلا يلزم اتخاذ أي إجراء.",
+    "password_changed_warning": "إذا لم تقم بهذا التغيير، يرجى الاتصال بالدعم فوراً لتأمين حسابك.",
+    "email_changed_subject": "تنبيه أمني: تم تغيير عنوان بريدك الإلكتروني — {{community}}",
+    "email_changed_title": "تم تغيير عنوان البريد الإلكتروني",
+    "email_changed_preview": "تم تغيير عنوان البريد الإلكتروني لحسابك",
+    "email_changed_body": "تم تحديث عنوان البريد الإلكتروني الخاص بحساب <strong>{{community}}</strong> إلى عنوان جديد.",
+    "email_changed_warning": "إذا لم تقم بهذا التغيير، يرجى الاتصال بالدعم فوراً لتأمين حسابك."
   },
   "transaction": {
     "subject": "معاملة رصيد الوقت — {{amount}} ساعة",
@@ -90,6 +102,17 @@
     "body": "أرسل لك {{sender}} رسالة.",
     "cta": "عرض الرسالة"
   },
+  "message": {
+    "in_app_content": "أرسل لك {{sender}} رسالة",
+    "title": "رسالة جديدة",
+    "preview": "أرسل لك {{sender}} رسالة",
+    "body_intro": "لديك رسالة جديدة من <strong>{{sender}}</strong>.",
+    "voice_notice": "هذه رسالة صوتية — استمع إليها على المنصة.",
+    "view_button": "عرض المحادثة",
+    "footer_note": "يمكنك الرد مباشرة من المنصة. لإيقاف تلقي رسائل البريد الإلكتروني، قم بتحديث <a href=\"{{url}}\">تفضيلات الإشعارات</a>.",
+    "fallback_recipient_name": "مرحباً",
+    "fallback_sender_name": "شخص ما"
+  },
   "common": {
     "greeting": "مرحباً {{name}}،",
     "button_fallback": "إذا لم يعمل الزر أعلاه، انسخ والصق هذا الرابط في متصفحك:",
@@ -101,10 +124,10 @@
     "fallback_federation_member": "عضو في الاتحاد",
     "fallback_partner_community": "مجتمع شريك",
     "fallback_federation_level": "المستوى {{level}}",
-    "or_separator": "or",
     "fallback_job": "وظيفة",
     "fallback_manager": "المدير",
-    "fallback_organization": "المنظمة"
+    "fallback_organization": "المنظمة",
+    "or_separator": "أو"
   },
   "footer": {
     "unsubscribe": "إلغاء الاشتراك من هذه الرسائل",
@@ -178,7 +201,7 @@
     "label_community": "المجتمع",
     "label_amount": "المبلغ",
     "label_description": "الوصف",
-    "label_to": "To",
+    "label_to": "ل",
     "label_new_balance": "الرصيد الجديد",
     "label_from_community": "من المجتمع",
     "label_requested_level": "المستوى المطلوب",
@@ -389,29 +412,20 @@
     "exchange_disputed": "⚠️ نزاع تبادل - مراجعة الوسيط مطلوبة",
     "default": "إشعار من Project NEXUS"
   },
-  "security": {
-    "password_changed_subject": "تنبيه أمني: تم تغيير كلمة المرور الخاصة بك — {{community}}",
-    "password_changed_title": "تم تغيير كلمة المرور",
-    "password_changed_preview": "تم تغيير كلمة مرور حسابك مؤخراً",
-    "password_changed_body": "تم تغيير كلمة مرور حسابك مؤخراً. إذا قمت بهذا التغيير، فلا يلزم اتخاذ أي إجراء.",
-    "password_changed_warning": "إذا لم تقم بهذا التغيير، يرجى الاتصال بالدعم فوراً لتأمين حسابك.",
-    "email_changed_subject": "تنبيه أمني: تم تغيير عنوان بريدك الإلكتروني — {{community}}",
-    "email_changed_title": "تم تغيير عنوان البريد الإلكتروني",
-    "email_changed_preview": "تم تغيير عنوان البريد الإلكتروني لحسابك",
-    "email_changed_body": "تم تحديث عنوان البريد الإلكتروني الخاص بحساب <strong>{{community}}</strong> إلى عنوان جديد.",
-    "email_changed_warning": "إذا لم تقم بهذا التغيير، يرجى الاتصال بالدعم فوراً لتأمين حسابك."
+  "exchange_dispute": {
+    "subject": "تم وضع تبادلك قيد المراجعة",
+    "title": "التبادل قيد المراجعة",
+    "preview": "تبادل شاركت فيه يحتاج إلى انتباه",
+    "body": "تم وضع علامة على تبادلك الأخير كمتنازع عليه بسبب اختلاف في الساعات المبلغ عنها. سيقوم منسق بمراجعة ذلك والتواصل معك قريباً.",
+    "next_steps": "قد يتواصل معك وسيط أو منسق للمساعدة في حل هذا الأمر. في غضون ذلك، يمكنك عرض تفاصيل التبادل.",
+    "cta": "عرض التبادل"
   },
-  "message": {
-    "in_app_content": "أرسل لك {{sender}} رسالة",
-    "title": "رسالة جديدة",
-    "preview": "أرسل لك {{sender}} رسالة",
-    "body_intro": "لديك رسالة جديدة من <strong>{{sender}}</strong>.",
-    "voice_notice": "هذه رسالة صوتية — استمع إليها على المنصة.",
-    "view_button": "عرض المحادثة",
-    "footer_note": "يمكنك الرد مباشرة من المنصة. لإيقاف تلقي رسائل البريد الإلكتروني، قم بتحديث <a href=\"{{url}}\">تفضيلات الإشعارات</a>.",
-    "fallback_recipient_name": "مرحباً",
-    "fallback_sender_name": "شخص ما"
-  },
+  "dispute_resolved_subject": "تم حل نزاع التبادل الخاص بك",
+  "dispute_resolved_title": "تم حل النزاع",
+  "dispute_resolved_preview": "تم إكمال تبادلك بنجاح",
+  "dispute_resolved_body": "تمت مراجعة تبادلك وتم التوصل إلى اتفاق نهائي بـ :hours ساعة.",
+  "dispute_resolved_hours_label": "الساعات النهائية المتفق عليها",
+  "dispute_resolved_cta": "عرض التبادل",
   "donation": {
     "sent_subject": "تبرعت بـ :amount من رصيد الوقت",
     "sent_title": "تم إرسال التبرع",
@@ -473,14 +487,6 @@
     "hours_declined_body": "تعذر تأكيد ساعات تطوعك في ':opportunity' في الوقت الحالي. يرجى الاتصال بالمنسق الخاص بك.",
     "hours_declined_cta": "عرض التطوع"
   },
-  "exchange_dispute": {
-    "subject": "تم وضع تبادلك قيد المراجعة",
-    "title": "التبادل قيد المراجعة",
-    "preview": "تبادل شاركت فيه يحتاج إلى انتباه",
-    "body": "تم وضع علامة على تبادلك الأخير كمتنازع عليه بسبب اختلاف في الساعات المبلغ عنها. سيقوم منسق بمراجعة ذلك والتواصل معك قريباً.",
-    "next_steps": "قد يتواصل معك وسيط أو منسق للمساعدة في حل هذا الأمر. في غضون ذلك، يمكنك عرض تفاصيل التبادل.",
-    "cta": "عرض التبادل"
-  },
   "onboarding_nurture": {
     "day2_subject": "أكمل ملفك الشخصي للحصول على المزيد من الاتصالات",
     "day2_title": "ملفك الشخصي شبه جاهز",
@@ -500,11 +506,5 @@
     "day7_greeting": "مرحباً :name،",
     "day7_body": "أنت جزء من :community منذ أسبوع! إليك تذكير سريع بكل ما يمكنك فعله: تصفح القوائم، إنشاء اتصالات، الانضمام إلى مجموعات، وحضور الأحداث.",
     "day7_cta": "استكشف مجتمعك"
-  },
-  "dispute_resolved_subject": "تم حل نزاع التبادل الخاص بك",
-  "dispute_resolved_title": "تم حل النزاع",
-  "dispute_resolved_preview": "تم إكمال تبادلك بنجاح",
-  "dispute_resolved_body": "تمت مراجعة تبادلك وتم التوصل إلى اتفاق نهائي بـ :hours ساعة.",
-  "dispute_resolved_hours_label": "الساعات النهائية المتفق عليها",
-  "dispute_resolved_cta": "عرض التبادل"
+  }
 }

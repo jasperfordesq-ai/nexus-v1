@@ -25,6 +25,10 @@
     "open": "Open",
     "closed": "Gesloten"
   },
+  "badges": {
+    "ranked": "Gerangschikt",
+    "anonymous": "Anoniem"
+  },
   "tabs": {
     "open": "Open",
     "closed": "Gesloten",
@@ -39,7 +43,7 @@
   },
   "time_remaining": "{{time}} over",
   "expired": "Verlopen",
-  "created_by": "by",
+  "created_by": "door",
   "delete_poll": "Verwijder Peiling",
   "confirm_delete": {
     "title": "Verwijder Peiling",
@@ -74,14 +78,6 @@
   "category_placeholder": "bijv. Gemeenschap, Evenementen, Feedback",
   "anonymous_voting": "Anonieme stemmingen",
   "anonymous_voting_desc": "Verberg stemmeridentiteiten in de resultaten",
-  "aria": {
-    "export_csv": "Exporteer resultaten als CSV",
-    "move_rank_down": "{{option}} omlaag verplaatsen",
-    "move_rank_up": "{{option}} omhoog verplaatsen"
-  },
-  "page_meta": {
-    "title": "Peilingen"
-  },
   "ranked_results_title": "Ronde-voor-ronde resultaten",
   "round_number": "Ronde {{number}}",
   "eliminated_candidate": "Geëlimineerd: {{name}}",
@@ -92,8 +88,12 @@
   "view_ranked_results": "Gerangschikte resultaten bekijken",
   "winner_label": "Winnaar: {{name}}",
   "submit_rankings": "Rangschikking indienen",
-  "badges": {
-    "ranked": "Gerangschikt",
-    "anonymous": "Anoniem"
+  "aria": {
+    "export_csv": "Exporteer resultaten als CSV",
+    "move_rank_down": "{{option}} omlaag verplaatsen",
+    "move_rank_up": "{{option}} omhoog verplaatsen"
+  },
+  "page_meta": {
+    "title": "Peilingen"
   }
 }
