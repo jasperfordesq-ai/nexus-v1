@@ -7,7 +7,6 @@
   "prefs_cadence_label": "Fréquence",
   "prefs_cadence_off": "Désactivé — ne pas m'envoyer de digest",
   "prefs_cadence_daily": "Résumé quotidien",
-  "prefs_cadence_weekly": "Résumé hebdomadaire",
   "prefs_sub_region_label": "Sous-région préférée (facultatif)",
   "prefs_sub_region_placeholder": "ID de sous-région",
   "prefs_sub_region_help": "Laissez vide pour utiliser la sous-région de votre profil.",
@@ -30,10 +29,8 @@
   "error_loading": "Impossible de charger votre digest. Veuillez réessayer.",
   "email": {
     "subject_daily": "Votre digest communal du jour — {{community}}",
-    "subject_weekly": "Votre digest communal de la semaine — {{community}}",
     "greeting": "Bonjour {{name}},",
     "intro_daily": "Voici les nouveautés du jour dans votre communauté — {{count}} actualité(s) sélectionnée(s) selon votre sous-région et vos centres d'intérêt.",
-    "intro_weekly": "Voici votre récap hebdomadaire — {{count}} actualité(s) sélectionnée(s) selon votre sous-région et vos centres d'intérêt.",
     "empty": "Rien de neuf dans votre communauté pour l'instant. Nous vous tiendrons informé.",
     "cta_open": "Ouvrir",
     "cta_manage_prefs": "Gérer les préférences du digest",

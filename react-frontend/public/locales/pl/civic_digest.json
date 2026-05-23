@@ -7,7 +7,6 @@
   "prefs_cadence_label": "Jak często",
   "prefs_cadence_off": "Wył. — nie wysyłaj mi digestu",
   "prefs_cadence_daily": "Codzienne podsumowanie",
-  "prefs_cadence_weekly": "Weekly summary",
   "prefs_sub_region_label": "Preferowany podregion (opcjonalnie)",
   "prefs_sub_region_placeholder": "ID podregionu",
   "prefs_sub_region_help": "Pozostaw puste, aby użyć podregionu z Twojego profilu.",
@@ -30,10 +29,8 @@
   "error_loading": "Nie udało się załadować Twojego digestu. Spróbuj ponownie.",
   "email": {
     "subject_daily": "Twój codzienny obywatelski digest — {{community}}",
-    "subject_weekly": "Your weekly civic digest — {{community}}",
     "greeting": "Cześć {{name}},",
     "intro_daily": "Oto co nowego w Twojej społeczności dzisiaj — {{count}} aktualizacja(-e) wybrana(-e) dla Ciebie na podstawie Twojego podregionu i zainteresowań.",
-    "intro_weekly": "Here's your weekly round-up — {{count}} update(s) selected for you based on your sub-region and interests.",
     "empty": "Na razie nic nowego w Twojej społeczności. Będziemy Cię informować.",
     "cta_open": "Otwórz",
     "cta_manage_prefs": "Zarządzaj preferencjami podsumowania",

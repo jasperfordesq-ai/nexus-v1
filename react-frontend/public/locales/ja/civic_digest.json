@@ -7,7 +7,6 @@
   "prefs_cadence_label": "配信頻度",
   "prefs_cadence_off": "オフ — ダイジェストを送らない",
   "prefs_cadence_daily": "毎日のまとめ",
-  "prefs_cadence_weekly": "Weekly summary",
   "prefs_sub_region_label": "希望するサブ地域（任意）",
   "prefs_sub_region_placeholder": "サブ地域ID",
   "prefs_sub_region_help": "空白のままにするとプロフィールのサブ地域が使用されます。",
@@ -30,10 +29,8 @@
   "error_loading": "ダイジェストを読み込めませんでした。再試行してください。",
   "email": {
     "subject_daily": "本日の市民ダイジェスト — {{community}}",
-    "subject_weekly": "Your weekly civic digest — {{community}}",
     "greeting": "こんにちは {{name}}、",
     "intro_daily": "本日のコミュニティの新着情報 — あなたのサブ地域と興味に基づいて選ばれた{{count}}件の更新。",
-    "intro_weekly": "Here's your weekly round-up — {{count}} update(s) selected for you based on your sub-region and interests.",
     "empty": "現在、あなたのコミュニティに新しい情報はありません。最新情報をお届けします。",
     "cta_open": "開く",
     "cta_manage_prefs": "ダイジェスト設定を管理",

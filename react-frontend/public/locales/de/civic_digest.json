@@ -7,7 +7,6 @@
   "prefs_cadence_label": "Häufigkeit",
   "prefs_cadence_off": "Aus — keinen Digest senden",
   "prefs_cadence_daily": "Tägliche Zusammenfassung",
-  "prefs_cadence_weekly": "Wöchentliche Zusammenfassung",
   "prefs_sub_region_label": "Bevorzugte Region (optional)",
   "prefs_sub_region_placeholder": "Regions-ID",
   "prefs_sub_region_help": "Leer lassen, um die Region aus Ihrem Profil zu verwenden.",
@@ -30,10 +29,8 @@
   "error_loading": "Ihr Digest konnte nicht geladen werden. Bitte versuchen Sie es erneut.",
   "email": {
     "subject_daily": "Ihr täglicher Gemeinde-Digest — {{community}}",
-    "subject_weekly": "Ihr wöchentlicher Gemeinde-Digest — {{community}}",
     "greeting": "Hallo {{name}},",
     "intro_daily": "Das ist heute neu in Ihrer Gemeinschaft — {{count}} Aktualisierung(en), ausgewählt nach Ihrer Region und Ihren Interessen.",
-    "intro_weekly": "Hier ist Ihre Wochenübersicht — {{count}} Aktualisierung(en), ausgewählt nach Ihrer Region und Ihren Interessen.",
     "empty": "Aktuell gibt es nichts Neues in Ihrer Gemeinschaft. Wir halten Sie auf dem Laufenden.",
     "cta_open": "Öffnen",
     "cta_manage_prefs": "Digest-Einstellungen verwalten",

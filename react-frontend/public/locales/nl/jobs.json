@@ -1,5 +1,7 @@
 {
   "title": "Vacatures",
+  "page_title": "Vacatures",
+  "page_description": "Blader door vacatures, vrijwilligersrollen en tijdbank-posities aangeboden door gemeenschapsleden en partnerorganisaties bij u in de buurt.",
   "subtitle": "Vind kansen in jouw gemeenschap",
   "create_vacancy": "Plaats Vacature",
   "edit_vacancy": "Bewerk Vacature",
@@ -18,12 +20,7 @@
     "all": "Alle Types",
     "paid": "Paid",
     "volunteer": "Vrijwilliger",
-    "timebank": "Tijdbank",
-    "full_time": "Voltijd",
-    "part_time": "Deeltijd",
-    "contract": "Contract",
-    "internship": "Stage",
-    "freelance": "Freelance"
+    "timebank": "Tijdbank"
   },
   "commitment": {
     "all": "All",
@@ -36,10 +33,7 @@
     "open": "Open",
     "closed": "Gesloten",
     "filled": "Ingevuld",
-    "draft": "Concept",
-    "active": "Actief",
-    "expired": "Verlopen",
-    "paused": "Gepauzeerd"
+    "draft": "Concept"
   },
   "application_status": {
     "applied": "Applied",
@@ -51,10 +45,7 @@
     "accepted": "Geaccepteerd",
     "rejected": "Afgewezen",
     "withdrawn": "Ingetrokken",
-    "unknown": "Onbekend",
-    "reviewing": "In beoordeling",
-    "shortlisted": "Op shortlist",
-    "offered": "Aanbod gedaan"
+    "unknown": "Onbekend"
   },
   "views": "{{count}} weergaven",
   "applications": "{{count}} aanvragen",
@@ -66,6 +57,7 @@
   "posted_by": "Geplaatst door",
   "load_more": "Laad Meer",
   "try_again": "Probeer Opnieuw",
+  "cancel": "Annuleren",
   "featured": "Featured",
   "empty_title": "Geen vacatures gevonden",
   "empty_description": "Er zijn geen vacatures die aan jouw criteria voldoen",
@@ -138,12 +130,12 @@
   "employer": {
     "page_title": "Werkgeversprofiel",
     "open_roles": "openstaande rollen",
+    "open_roles_count": "{{count}} openstaande vacatures",
     "open_roles_heading": "Openstaande Rollen",
     "no_roles": "Geen openstaande rollen op dit moment",
     "error": "Kan werkgeversprofiel niet laden",
     "employer_jobs": "Werkgeversbanen",
     "employees": "{{size}} medewerkers",
-    "open_roles_count": "{{count}} openstaande vacatures",
     "meta_description": "Bekijk dit werkgeversprofiel, openstaande vacatures en community-recensies over {{count}} actuele kansen.",
     "review_submit_failed": "Recensie versturen mislukt",
     "reviews_heading": "Werkgeversrecensies",
@@ -243,13 +235,13 @@
     "views_over_time": "Weergaven in de Tijd",
     "applications_by_stage": "Aanvragen per Fase",
     "no_data": "Nog geen analytische gegevens",
+    "load_error": "Analyses laden mislukt",
     "weekly_trend": "Wekelijkse Aanvragen",
     "referral_shares": "Totaal Aandelen",
     "referral_apps": "Verwijsaanvragen",
     "referral_conversion": "Verwijsconversie",
     "scorecard_avg": "Gem. Scorekaart",
     "export_csv": "Exporteer CSV",
-    "load_error": "Analyses laden mislukt",
     "views_tooltip": "{{date}}: {{count}} weergaven",
     "applications_tooltip": "{{week}}: {{count}} sollicitaties",
     "stage_progress_aria": "Voortgang van sollicitatiefase {{stage}}",
@@ -367,14 +359,10 @@
   "kanban": {
     "pipeline_title": "Kanban-pijplijn",
     "not_authorized": "U bent niet gemachtigd om deze pijplijn te bekijken.",
-    "download_cv": "Download CV",
-    "drop_here": "Sleep hierheen",
-    "duration_90": "1,5 uur",
-    "salary_monthly": "Monthly",
-    "personal_message": "Persoonlijk bericht",
-    "personal_message_placeholder": "Een notitie voor de kandidaat...",
     "select_applicant": "Selecteer {{name}}",
     "ai_score": "AI: {{score}}/100",
+    "download_cv": "Download CV",
+    "drop_here": "Sleep hierheen",
     "ai_rank": "AI-rang",
     "ai_ranked": "Kandidaten gerangschikt door AI",
     "ai_rank_failed": "AI-rangschikking mislukt",
@@ -384,12 +372,18 @@
     "no_activity_hint": "Gebeurtenissen verschijnen hier naarmate het wervingsproces vordert.",
     "previous": "Vorige",
     "next": "Volgende",
+    "duration_90": "1,5 uur",
+    "salary_monthly": "Monthly",
+    "personal_message": "Persoonlijk bericht",
+    "personal_message_placeholder": "Een notitie voor de kandidaat...",
     "interview_location_placeholder": "https://meet.google.com/...",
     "offer_salary_placeholder": "bijv. 45000"
   },
   "apply": {
     "button": "Nu solliciteren",
     "button_label": "Solliciteer voor {{title}}",
+    "this_job": "deze vacature",
+    "view": "Bekijken",
     "applied": "Applied",
     "title": "Solliciteer voor deze functie",
     "message_label": "Uw bericht (optioneel)",
@@ -408,12 +402,10 @@
     "cv_dropzone_aria": "Klik of sleep het bestand om CV te uploaden",
     "cv_too_large": "CV-bestand moet kleiner zijn dan 5MB",
     "cv_invalid_type": "Alleen PDF-, DOC- of DOCX-bestanden worden ondersteund",
+    "cv_size_kb": "({{count}} KB)",
     "message_employer": "Bericht Werkgever",
     "cv_parse_error": "Kon CV niet parseren. Je kunt je aanvraag nog steeds handmatig indienen.",
-    "cv_size_kb": "({{count}} KB)",
-    "quick_apply": "Snel solliciteren met opgeslagen profiel",
-    "this_job": "deze vacature",
-    "view": "Bekijken"
+    "quick_apply": "Snel solliciteren met opgeslagen profiel"
   },
   "detail": {
     "loading": "Vacature laden...",
@@ -475,6 +467,11 @@
     "duration": "Duration",
     "datetime": "Datum & Tijd",
     "location": "Locatie",
+    "join_call": "Deelnemen aan videogesprek",
+    "add_to_calendar": "Toevoegen aan agenda",
+    "calendar_google": "Google",
+    "calendar_outlook": "Outlook",
+    "calendar_ics": ".ics",
     "send_request": "Stuur Interviewverzoek",
     "accepted": "Interview Bevestigd",
     "proposed": "Interview Aangevraagd",
@@ -482,18 +479,7 @@
     "accept": "Accept",
     "decline": "Decline",
     "minutes": "min",
-    "join_call": "Deelnemen aan videogesprek",
-    "add_to_calendar": "Toevoegen aan agenda",
-    "calendar_google": "Google",
-    "calendar_outlook": "Outlook",
-    "calendar_ics": ".ics",
-    "download_ics": "Download .ics",
-    "scheduled": "Sollicitatiegesprek gepland",
-    "date": "Datum",
-    "time": "Tijd",
-    "notes": "Notities",
-    "virtual": "Virtueel",
-    "in_person": "Persoonlijk"
+    "download_ics": "Download .ics"
   },
   "offer": {
     "title": "Jobaanbieding",
@@ -504,12 +490,7 @@
     "accepted": "Aanbod geaccepteerd",
     "rejected": "Aanbod Geweigerd",
     "send": "Stuur Aanbod",
-    "modal_title": "Stuur Vacature Aanbieding",
-    "deadline": "Reactiedeadline",
-    "decline": "Aanbod afwijzen",
-    "declined": "Aanbod afgewezen",
-    "expired": "Aanbod verlopen",
-    "notes": "Notities bij aanbod"
+    "modal_title": "Stuur Vacature Aanbieding"
   },
   "org": {
     "job_openings": "Vacatures"
@@ -518,14 +499,7 @@
     "parse": "Vaardigheden worden na indiening geëxtraheerd",
     "parsing": "CV aan het analyseren...",
     "detected": "Vaardigheden gedetecteerd uit CV",
-    "parsed_toast": "Aanvraag ingediend! {{count}} vaardigheden gedetecteerd uit uw CV.",
-    "title": "Curriculum Vitae",
-    "upload": "CV uploaden",
-    "download": "CV downloaden",
-    "remove": "CV verwijderen",
-    "no_cv": "Geen CV geüpload",
-    "uploaded": "CV geüpload",
-    "required": "CV is verplicht"
+    "parsed_toast": "Aanvraag ingediend! {{count}} vaardigheden gedetecteerd uit uw CV."
   },
   "branding": {
     "section": "Werkgeversmerk",
@@ -535,11 +509,7 @@
     "size_label": "Bedrijfsgrootte",
     "benefits_label": "Voordelen & Extra's",
     "benefits_placeholder": "Typ een voordeel en druk op Enter",
-    "about_company": "Over het Bedrijf",
-    "logo": "Bedrijfslogo",
-    "cover": "Omslagafbeelding",
-    "upload_logo": "Logo uploaden",
-    "upload_cover": "Omslagafbeelding uploaden"
+    "about_company": "Over het Bedrijf"
   },
   "referral": {
     "share": "Deel & Verdien",
@@ -552,16 +522,12 @@
     "save": "Beoordeling opslaan",
     "saved": "Scorekaart opgeslagen",
     "notes_placeholder": "Optionele opmerkingen over deze aanvrager...",
+    "max_score_suffix": "/ 10",
     "communication": "Communication",
     "technical": "Technische Vaardigheden",
     "cultural_fit": "Culturele Geschiktheid",
     "experience": "Experience",
-    "motivation": "Motivation",
-    "max_score_suffix": "/ 10",
-    "add_criterion": "Criterium toevoegen",
-    "criterion": "Criterium",
-    "weight": "Gewicht",
-    "score": "Score"
+    "motivation": "Motivation"
   },
   "saved_profile": {
     "found": "Opgeslagen aanvraagprofiel gevonden",
@@ -586,10 +552,7 @@
     "role_manager": "Manager",
     "added": "Teamlid toegevoegd",
     "removed": "Teamlid verwijderd",
-    "edit_only": "Beschikbaar na het opslaan van de vacature",
-    "reviewer": "Beoordelaar",
-    "interviewer": "Interviewer",
-    "hiring_manager": "Wervingsmanager"
+    "edit_only": "Beschikbaar na het opslaan van de vacature"
   },
   "search": {
     "label": "Zoek naar vacatures",
@@ -669,6 +632,8 @@
     "salary_transparency_hint": "Vereist onder EU Richtlijn voor Loontransparantie (juni 2026)",
     "submit_create": "Vacature Plaatsen",
     "submit_update": "Wijzigingen Opslaan",
+    "save_draft": "Opslaan als concept",
+    "draft_saved": "Concept opgeslagen",
     "cancel": "Cancel",
     "creating": "Plaatsen...",
     "updating": "Opslaan...",
@@ -682,16 +647,7 @@
       "deadline_past": "Deadline moet een toekomstige datum zijn",
       "salary_required": "Salarisrange vereist. Je kunt 'Salaris bespreekbaar' aanvinken om dit over te slaan.",
       "salary_range_invalid": "Minimum salaris mag niet hoger zijn dan maximum salaris"
-    },
-    "save_draft": "Opslaan als concept",
-    "draft_saved": "Concept opgeslagen",
-    "title": "Functietitel",
-    "description": "Beschrijving",
-    "requirements": "Vereisten",
-    "location": "Locatie",
-    "salary_min": "Minimumsalaris",
-    "salary_max": "Maximumsalaris",
-    "closing_date": "Sluitingsdatum"
+    }
   },
   "ai_generate": {
     "button": "AI Genereren",
@@ -738,8 +694,7 @@
       "pending_review": "In Afwachting van Beoordeling",
       "approved": "Goedgekeurd",
       "rejected": "Afgewezen",
-      "flagged": "Gemarkeerd",
-      "pending": "In afwachting"
+      "flagged": "Gemarkeerd"
     },
     "confirm_approve": "Deze vacature goedkeuren? Het zal onmiddellijk worden gepubliceerd.",
     "confirm_reject": "Weet je zeker dat je deze vacature wilt afwijzen?",
@@ -750,10 +705,10 @@
     "spam_flags_label": "Detectie Vlaggen",
     "refresh": "Vernieuwen",
     "loading": "Laden...",
+    "load_error": "Laden van moderatiewachtrij mislukt",
     "cancel": "Annuleren",
     "no_description": "Geen beschrijving",
     "no_flags": "Geen markeringen",
-    "load_error": "Laden van moderatiewachtrij mislukt",
     "flags_tooltip": "Markeringen: {{flags}}",
     "user_fallback": "Gebruiker #{{id}}",
     "pagination_label": "Pagina's van de moderatiewachtrij"
@@ -830,10 +785,13 @@
     "acceptance_rate": "Acceptatiepercentage",
     "rejection_rate": "Afwijspercentage",
     "days": "days",
+    "stages": "fasen",
+    "not_available": "N/B",
     "funnel_title": "Aanvraagfunnel",
     "funnel_description": "Hoe kandidaten door elke fase van de pijplijn vorderen",
     "rejection_rates_title": "Afwijspercentages per Fase",
     "rejection_rates_description": "Percentage kandidaten dat in elke fase wordt afgewezen",
+    "rejection_rates_table_aria": "Afwijzingspercentages per wervingsfase",
     "time_in_stage_title": "Gemiddelde Tijd in Fase",
     "time_in_stage_description": "Gemiddeld aantal dagen dat kandidaten in elke pijplijnfase doorbrengen",
     "skills_match_title": "Vaardigheden Match Correlatie",
@@ -864,12 +822,9 @@
     "generate": "Genereer Rapport",
     "loading": "Rapport aan het genereren...",
     "no_data": "Geen aanvraaggegevens beschikbaar voor de geselecteerde periode",
-    "load_error": "Kon het bias audit rapport niet laden",
-    "note_privacy": "Dit rapport analyseert alleen processtatistieken. Er worden geen demografische gegevens verzameld of gebruikt.",
-    "stages": "fasen",
-    "not_available": "N/B",
     "access_denied": "Toegang geweigerd",
-    "rejection_rates_table_aria": "Afwijzingspercentages per wervingsfase"
+    "load_error": "Kon het bias audit rapport niet laden",
+    "note_privacy": "Dit rapport analyseert alleen processtatistieken. Er worden geen demografische gegevens verzameld of gebruikt."
   },
   "self_scheduling": {
     "title": "Interviewslots",
@@ -962,11 +917,7 @@
     "first_time_banner": "Eerste keer plaatsen?",
     "first_time_desc": "Onze onboarding wizard begeleidt je bij het plaatsen van je eerste baan.",
     "start_wizard": "Start Wizard",
-    "aria_progress": "Onboarding voortgang",
-    "step1": "Maak uw eerste vacature aan",
-    "step2": "Bekijk sollicitaties",
-    "step3": "Neem contact op met kandidaten",
-    "complete": "Instelling voltooid"
+    "aria_progress": "Onboarding voortgang"
   },
   "preview": {
     "title": "Vacaturevoorbeeld",
@@ -1041,10 +992,7 @@
     "hint": "Vraag me alles over deze baan — kwalificaties, salaris, hoe te solliciteren, sollicitatietips...",
     "placeholder": "Stel een vraag over deze vacature...",
     "error_response": "Sorry, ik kon uw verzoek niet verwerken.",
-    "error_generic": "Sorry, er is iets misgegaan.",
-    "thinking": "Nadenken...",
-    "clear": "Gesprek wissen",
-    "suggestions": "Voorgestelde vragen"
+    "error_generic": "Sorry, er is iets misgegaan."
   },
   "page_meta": {
     "bias_audit": {
@@ -1053,6 +1001,10 @@
     "create": {
       "title": "Plaats een baan",
       "description": "Maak een vacature voor werk, vrijwilligerswerk of tijdbanken voor je gemeenschap."
+    },
+    "edit": {
+      "title": "Vacature bewerken",
+      "description": "Werk vacaturegegevens, vergoeding, teaminstellingen en publicatieopties bij."
     },
     "talent_search": {
       "title": "Talentzoektocht"
@@ -1075,24 +1027,9 @@
     },
     "employer_brand": {
       "title": "Werkgever Merk"
-    },
-    "edit": {
-      "title": "Vacature bewerken",
-      "description": "Werk vacaturegegevens, vergoeding, teaminstellingen en publicatieopties bij."
-    },
-    "index": {
-      "title": "Vacatures",
-      "description": "Blader door beschikbare werkmogelijkheden en rollen in uw gemeenschap"
-    },
-    "detail": {
-      "title": "{{title}} — Vacatures",
-      "description": "Bekijk vacaturedetails en solliciteer"
     }
   },
-  "page_title": "Vacatures",
-  "page_description": "Blader door vacatures, vrijwilligersrollen en tijdbank-posities aangeboden door gemeenschapsleden en partnerorganisaties bij u in de buurt.",
   "jobs": {
     "view_details": "Vacaturedetails bekijken"
-  },
-  "cancel": "Annuleren"
+  }
 }

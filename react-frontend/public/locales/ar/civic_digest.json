@@ -7,7 +7,6 @@
   "prefs_cadence_label": "مدى التكرار",
   "prefs_cadence_off": "إيقاف — لا ترسل لي ملخصاً",
   "prefs_cadence_daily": "ملخص يومي",
-  "prefs_cadence_weekly": "Weekly summary",
   "prefs_sub_region_label": "المنطقة الفرعية المفضلة (اختياري)",
   "prefs_sub_region_placeholder": "معرّف المنطقة الفرعية",
   "prefs_sub_region_help": "اتركه فارغاً لاستخدام المنطقة الفرعية في ملفك الشخصي.",
@@ -30,10 +29,8 @@
   "error_loading": "تعذّر تحميل ملخصك. يرجى المحاولة مرة أخرى.",
   "email": {
     "subject_daily": "ملخصك المدني اليومي — {{community}}",
-    "subject_weekly": "Your weekly civic digest — {{community}}",
     "greeting": "مرحباً {{name}}،",
     "intro_daily": "إليك ما هو جديد في مجتمعك اليوم — {{count}} تحديث تم اختياره لك بناءً على منطقتك الفرعية واهتماماتك.",
-    "intro_weekly": "Here's your weekly round-up — {{count}} update(s) selected for you based on your sub-region and interests.",
     "empty": "لا جديد في مجتمعك في الوقت الحالي. سنبقيك على اطلاع.",
     "cta_open": "فتح",
     "cta_manage_prefs": "إدارة تفضيلات الملخص",

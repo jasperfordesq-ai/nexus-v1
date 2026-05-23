@@ -7,7 +7,6 @@
   "prefs_cadence_label": "Con qué frecuencia",
   "prefs_cadence_off": "Desactivado — no me envíes un resumen",
   "prefs_cadence_daily": "Resumen diario",
-  "prefs_cadence_weekly": "Weekly summary",
   "prefs_sub_region_label": "Subregión preferida (opcional)",
   "prefs_sub_region_placeholder": "ID de subregión",
   "prefs_sub_region_help": "Déjalo en blanco para usar la subregión de tu perfil.",
@@ -30,10 +29,8 @@
   "error_loading": "No se pudo cargar tu resumen. Inténtalo de nuevo.",
   "email": {
     "subject_daily": "Tu resumen cívico diario — {{community}}",
-    "subject_weekly": "Your weekly civic digest — {{community}}",
     "greeting": "Hola {{name}},",
     "intro_daily": "Esto es lo nuevo en tu comunidad hoy — {{count}} actualización(es) seleccionada(s) para ti según tu subregión e intereses.",
-    "intro_weekly": "Here's your weekly round-up — {{count}} update(s) selected for you based on your sub-region and interests.",
     "empty": "Nada nuevo en tu comunidad por ahora. Te mantendremos informado.",
     "cta_open": "Abrir",
     "cta_manage_prefs": "Gestionar preferencias del resumen",

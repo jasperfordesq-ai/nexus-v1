@@ -7,7 +7,6 @@
   "prefs_cadence_label": "Cé chomh minic",
   "prefs_cadence_off": "As — ná seol achoimre chugam",
   "prefs_cadence_daily": "Achoimre laethúil",
-  "prefs_cadence_weekly": "Weekly summary",
   "prefs_sub_region_label": "Fo-réigiún roghnach (roghnach)",
   "prefs_sub_region_placeholder": "Aitheantóir fo-réigiúin",
   "prefs_sub_region_help": "Fág folamh chun an fo-réigiún ar do phróifíl a úsáid.",
@@ -30,10 +29,8 @@
   "error_loading": "Níorbh fhéidir d'achoimre a luchtú. Déan iarracht arís.",
   "email": {
     "subject_daily": "D'achoimre sibhialta laethúil — {{community}}",
-    "subject_weekly": "Your weekly civic digest — {{community}}",
     "greeting": "Dia duit {{name}},",
     "intro_daily": "Seo a bhfuil nua i do phobal inniu — {{count}} nuashonrú roghnaithe duit bunaithe ar do fho-réigiún agus do chuid spéiseanna.",
-    "intro_weekly": "Here's your weekly round-up — {{count}} update(s) selected for you based on your sub-region and interests.",
     "empty": "Níl aon rud nua i do phobal faoi láthair. Coinneoimid ar an eolas thú.",
     "cta_open": "Oscail",
     "cta_manage_prefs": "Bainistigh roghanna achoimre",

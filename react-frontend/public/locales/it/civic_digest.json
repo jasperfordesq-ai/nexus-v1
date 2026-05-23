@@ -7,7 +7,6 @@
   "prefs_cadence_label": "Frequenza",
   "prefs_cadence_off": "Disattivato — non inviarmi il digest",
   "prefs_cadence_daily": "Riepilogo giornaliero",
-  "prefs_cadence_weekly": "Riepilogo settimanale",
   "prefs_sub_region_label": "Sottoregione preferita (facoltativa)",
   "prefs_sub_region_placeholder": "ID sottoregione",
   "prefs_sub_region_help": "Lascia vuoto per usare la sottoregione del tuo profilo.",
@@ -30,10 +29,8 @@
   "error_loading": "Impossibile caricare il tuo digest. Riprova.",
   "email": {
     "subject_daily": "Il tuo digest comunale di oggi — {{community}}",
-    "subject_weekly": "Il tuo digest comunale della settimana — {{community}}",
     "greeting": "Ciao {{name}},",
     "intro_daily": "Ecco le novità di oggi nella tua comunità — {{count}} aggiornamento/i selezionati in base alla tua sottoregione e ai tuoi interessi.",
-    "intro_weekly": "Ecco il tuo riepilogo settimanale — {{count}} aggiornamento/i selezionati in base alla tua sottoregione e ai tuoi interessi.",
     "empty": "Nessuna novità nella tua comunità per ora. Ti terremo aggiornato.",
     "cta_open": "Apri",
     "cta_manage_prefs": "Gestisci le preferenze del digest",

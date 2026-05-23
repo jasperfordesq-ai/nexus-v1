@@ -7,7 +7,6 @@
   "prefs_cadence_label": "Hoe vaak",
   "prefs_cadence_off": "Uit — stuur mij geen digest",
   "prefs_cadence_daily": "Dagelijkse samenvatting",
-  "prefs_cadence_weekly": "Weekly summary",
   "prefs_sub_region_label": "Gewenste subregio (optioneel)",
   "prefs_sub_region_placeholder": "Subregio-ID",
   "prefs_sub_region_help": "Laat leeg om de subregio van je profiel te gebruiken.",
@@ -30,10 +29,8 @@
   "error_loading": "Kon jouw digest niet laden. Probeer het opnieuw.",
   "email": {
     "subject_daily": "Jouw dagelijkse civieke digest — {{community}}",
-    "subject_weekly": "Your weekly civic digest — {{community}}",
     "greeting": "Hallo {{name}},",
     "intro_daily": "Dit is wat er vandaag nieuw is in jouw community — {{count}} update(s) geselecteerd op basis van jouw subregio en interesses.",
-    "intro_weekly": "Here's your weekly round-up — {{count}} update(s) selected for you based on your sub-region and interests.",
     "empty": "Voorlopig niets nieuws in jouw community. We houden je op de hoogte.",
     "cta_open": "Openen",
     "cta_manage_prefs": "Digest-voorkeuren beheren",

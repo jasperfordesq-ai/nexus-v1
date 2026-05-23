@@ -2,8 +2,12 @@
   "page_title": "Marktplatz",
   "meta_description": "Kaufe, verkaufe oder teile Gegenstände lokal mit Nachbarn — Community-Marktplatz, kostenlose Artikel, Gruppenbestellungen und Lieferungen in deiner Zeitbank.",
   "hub": {
+    "eyebrow": "Community-Marktplatz",
     "subtitle": "Kaufen, verkaufen und tauschen Sie Artikel in Ihrer Gemeinschaft",
     "sell_something": "Etwas verkaufen",
+    "categories_stat": "Kategorien",
+    "listings_stat": "Sichtbare Einträge",
+    "featured_stat": "Hervorgehoben",
     "search_placeholder": "Marktplatz durchsuchen...",
     "all": "Alle",
     "featured_listings": "Empfohlene Inserate",
@@ -24,11 +28,7 @@
     "load_more_failed": "Weitere Inserate konnten nicht geladen werden",
     "my_listings": "Meine Inserate",
     "my_offers": "Meine Angebote",
-    "my_orders": "Meine Bestellungen",
-    "eyebrow": "Community-Marktplatz",
-    "categories_stat": "Kategorien",
-    "listings_stat": "Sichtbare Einträge",
-    "featured_stat": "Hervorgehoben"
+    "my_orders": "Meine Bestellungen"
   },
   "hub_feature_gate": {
     "title": "Marktplatz nicht verfügbar",
@@ -62,6 +62,8 @@
     "share_aria": "Teilen",
     "unsave_aria": "Nicht mehr speichern",
     "save_aria": "Speichern",
+    "video": "Eintragsvideo",
+    "video_unsupported": "Ihr Browser unterstützt das Video-Tag nicht.",
     "previous_image": "Vorheriges Bild",
     "next_image": "Nächstes Bild",
     "view_image": "Bild {{number}} anzeigen",
@@ -69,6 +71,14 @@
     "thumbnail_alt": "Vorschaubild {{number}}",
     "link_copied": "Link in die Zwischenablage kopiert",
     "thumbnail_label": "Bild {{n}} anzeigen",
+    "report_submitted": "Meldung übermittelt. Vielen Dank.",
+    "report_error": "Meldung konnte nicht übermittelt werden",
+    "order_created": "Bestellung erstellt!",
+    "message_template": "Hallo, ich interessiere mich für Ihren Eintrag: {{title}}",
+    "member_since": "Mitglied seit {{date}}",
+    "sign_in_to_report": "Zum Melden anmelden",
+    "meta_description_fallback": "Marktplatz-Eintrag",
+    "detail_field_label": "{{field}}",
     "report_modal_title": "Inserat melden",
     "report_reason_label": "Grund",
     "report_reason_placeholder": "Bitte beschreiben Sie, warum Sie dieses Inserat melden...",
@@ -78,22 +88,13 @@
     "get_directions": "Wegbeschreibung",
     "promoted": "Beworben",
     "unsave": "Aus gespeicherten Artikeln entfernen",
-    "save": "Inserat speichern",
-    "video": "Eintragsvideo",
-    "video_unsupported": "Ihr Browser unterstützt das Video-Tag nicht.",
-    "report_submitted": "Meldung übermittelt. Vielen Dank.",
-    "report_error": "Meldung konnte nicht übermittelt werden",
-    "order_created": "Bestellung erstellt!",
-    "message_template": "Hallo, ich interessiere mich für Ihren Eintrag: {{title}}",
-    "member_since": "Mitglied seit {{date}}",
-    "sign_in_to_report": "Zum Melden anmelden",
-    "meta_description_fallback": "Marktplatz-Eintrag",
-    "detail_field_label": "{{field}}"
+    "save": "Inserat speichern"
   },
   "offer": {
     "modal_title": "Angebot machen",
     "asking_price": "Verkaufspreis:",
     "your_offer": "Ihr Angebot",
+    "amount_placeholder": "0,00",
     "message_label": "Nachricht (optional)",
     "message_placeholder": "Fügen Sie eine Nachricht für den Verkäufer hinzu...",
     "cancel": "Abbrechen",
@@ -118,8 +119,7 @@
     "decline": "Ablehnen",
     "counter": "Gegenangebot",
     "withdraw": "Zurückziehen",
-    "accept_counter": "Gegenangebot annehmen",
-    "amount_placeholder": "0,00"
+    "accept_counter": "Gegenangebot annehmen"
   },
   "create": {
     "page_title": "Etwas verkaufen – Marktplatz",
@@ -132,6 +132,14 @@
     "cover": "Titelbild",
     "add": "Hinzufügen",
     "remove_image": "Bild entfernen",
+    "image_alt": "Hochladen {{number}}",
+    "video": "Video",
+    "video_optional": "(optional, max. 1 Video, 50 MB)",
+    "remove_video": "Video entfernen",
+    "video_drop_zone": "Klicken, um ein Video hinzuzufügen",
+    "video_limits": "MP4, WebM oder MOV. Max. 50 MB.",
+    "video_type_error": "Nur MP4-, WebM- und MOV-Videodateien sind erlaubt.",
+    "video_size_error": "{{name}} überschreitet die Video-Größenbeschränkung von 50 MB.",
     "max_images_error": "Maximal {{max}} Bilder erlaubt",
     "not_image_error": "{{name}} ist kein Bild",
     "size_limit_error": "{{name}} überschreitet das Limit von 10 MB",
@@ -152,6 +160,8 @@
     "quantity_label": "Menge",
     "loading_category_fields": "Kategoriefelder werden geladen...",
     "category_specific_details": "Kategoriespezifische Details",
+    "select_field_placeholder": "{{field}} auswählen",
+    "enter_field_placeholder": "{{field}} eingeben",
     "pricing": "Preisgestaltung",
     "price_type_label": "Preistyp",
     "price_label": "Preis",
@@ -168,17 +178,7 @@
     "created_success": "Inserat erfolgreich erstellt!",
     "created_error": "Inserat konnte nicht erstellt werden",
     "created_error_retry": "Inserat konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
-    "draft_saved": "Entwurf gespeichert",
-    "image_alt": "Hochladen {{number}}",
-    "video": "Video",
-    "video_optional": "(optional, max. 1 Video, 50 MB)",
-    "remove_video": "Video entfernen",
-    "video_drop_zone": "Klicken, um ein Video hinzuzufügen",
-    "video_limits": "MP4, WebM oder MOV. Max. 50 MB.",
-    "video_type_error": "Nur MP4-, WebM- und MOV-Videodateien sind erlaubt.",
-    "video_size_error": "{{name}} überschreitet die Video-Größenbeschränkung von 50 MB.",
-    "select_field_placeholder": "{{field}} auswählen",
-    "enter_field_placeholder": "{{field}} eingeben"
+    "draft_saved": "Entwurf gespeichert"
   },
   "search": {
     "page_title": "Marktplatz durchsuchen",
@@ -266,6 +266,8 @@
     "price_max": "Max.",
     "condition_label": "Zustand",
     "category_details": "Details zu {{name}}",
+    "any_field": "Beliebig: {{field}}",
+    "filter_by_field": "Filtern nach {{field}}",
     "reset_filters": "Filter zurücksetzen ({{count}})",
     "no_listings_title": "Keine Inserate gefunden",
     "no_listings_filtered": "Versuchen Sie, Ihre Suche oder Filter anzupassen.",
@@ -275,9 +277,7 @@
     "results_count_one": "{{count}} Ergebnis",
     "results_count_other": "{{count}} Ergebnisse",
     "load_more": "Mehr laden",
-    "browse_description": "Inserate in {{name}} auf dem Marktplatz durchsuchen.",
-    "any_field": "Beliebig: {{field}}",
-    "filter_by_field": "Filtern nach {{field}}"
+    "browse_description": "Inserate in {{name}} auf dem Marktplatz durchsuchen."
   },
   "common": {
     "free": "Kostenlos",
@@ -292,10 +292,10 @@
     "sign_in_to_save": "Bitte melden Sie sich an, um Inserate zu speichern",
     "load_more": "Mehr laden",
     "try_again": "Erneut versuchen",
-    "cancel": "Abbrechen",
-    "sort_by": "Sortieren nach",
     "go_back": "Zurück",
-    "dismiss": "Verwerfen"
+    "dismiss": "Verwerfen",
+    "cancel": "Abbrechen",
+    "sort_by": "Sortieren nach"
   },
   "condition": {
     "new": "Neu",
@@ -349,12 +349,12 @@
     "delivery_both": "Beides",
     "sort": "Sortieren nach",
     "posted_within": "Veröffentlicht innerhalb",
-    "apply": "Filter anwenden",
-    "clear": "Alle löschen",
-    "title": "Filter",
     "posted_any_time": "Jederzeit",
     "posted_today": "Heute",
-    "posted_last_days": "Letzte {{count}} Tage"
+    "posted_last_days": "Letzte {{count}} Tage",
+    "apply": "Filter anwenden",
+    "clear": "Alle löschen",
+    "title": "Filter"
   },
   "gallery": {
     "no_images": "Keine Bilder verfügbar",
@@ -401,6 +401,7 @@
     "action_edit": "Bearbeiten",
     "action_renew": "Erneuern",
     "action_remove": "Entfernen",
+    "views_count_aria": "{{count}} Aufrufe",
     "renewed_success": "Inserat erfolgreich erneuert",
     "renewed_error": "Inserat konnte nicht erneuert werden",
     "removed_success": "Inserat entfernt",
@@ -415,8 +416,7 @@
     "empty_sold_title": "Noch keine Verkäufe",
     "empty_sold_description": "Sie haben noch keine Artikel verkauft.",
     "empty_expired_title": "Keine abgelaufenen Inserate",
-    "empty_expired_description": "Sie haben keine abgelaufenen Inserate.",
-    "views_count_aria": "{{count}} Aufrufe"
+    "empty_expired_description": "Sie haben keine abgelaufenen Inserate."
   },
   "my_offers": {
     "page_title": "Meine Angebote – Marktplatz",
@@ -537,37 +537,36 @@
     "learn_more": "Was sind Zeitgutschriften?"
   },
   "community_delivery": {
-    "title": "Gemeinschaftslieferung",
-    "description": "Ein Mitglied der Gemeinschaft kann diesen Artikel liefern und Zeitgutschriften verdienen.",
-    "tooltip": "Die Gemeinschaftslieferung ist eine NEXUS-Funktion, bei der Gemeinschaftsmitglieder anbieten, Artikel gegen Zeitgutschriften statt gegen Bargeld zu liefern. Dies unterstützt die lokale Gemeinschaft und das Zeittausch-Ökosystem.",
-    "step1": "Gemeinschaftsmitglieder bieten Lieferung an",
-    "step2": "Lieferant verdient nach Abschluss Zeitgutschriften",
-    "step3": "Käufer bestätigt Lieferung, Gutschriften werden übertragen",
-    "offers_title": "Lieferangebote",
-    "unknown": "Unbekannt",
-    "accept": "Annehmen",
-    "confirm": "Lieferung bestätigen",
-    "offer_to_deliver": "Lieferung anbieten",
-    "offer_modal_title": "Lieferung anbieten",
-    "offer_modal_description": "Bieten Sie an, diesen Artikel zu liefern und Zeitgutschriften zu verdienen. Käufer und Verkäufer prüfen Ihr Angebot.",
-    "time_credits_label": "Zeitgutschriften (Stunden)",
-    "time_credits_hint": "Wie viele Zeitgutschriften möchten Sie für diese Lieferung verdienen?",
-    "estimated_time_label": "Geschätzte Lieferzeit (Minuten)",
-    "notes_label": "Notizen (optional)",
-    "notes_placeholder": "Details zu Ihrer Verfügbarkeit für die Lieferung...",
-    "send_offer": "Angebot senden",
     "offer_sent": "Lieferangebot gesendet!",
     "offer_failed": "Lieferangebot konnte nicht gesendet werden",
     "offer_accepted": "Lieferangebot akzeptiert!",
     "accept_failed": "Angebot konnte nicht angenommen werden",
     "delivery_confirmed": "Lieferung bestätigt! Zeitgutschriften wurden vergeben.",
     "confirm_failed": "Lieferung konnte nicht bestätigt werden",
+    "title": "Gemeinschaftslieferung",
+    "description": "Ein Mitglied der Gemeinschaft kann diesen Artikel liefern und Zeitgutschriften verdienen.",
+    "tooltip": "Die Gemeinschaftslieferung ist eine NEXUS-Funktion, bei der Gemeinschaftsmitglieder anbieten, Artikel gegen Zeitgutschriften statt gegen Bargeld zu liefern. Dies unterstützt die lokale Gemeinschaft und das Zeittausch-Ökosystem.",
+    "step1": "Gemeinschaftsmitglieder bieten Lieferung an",
+    "step2": "Lieferant verdient nach Abschluss Zeitgutschriften",
+    "step3": "Käufer bestätigt Lieferung, Gutschriften werden übertragen",
     "offers_title_count": "Lieferangebote ({{count}})",
+    "unknown": "Unbekannt",
     "time_credits_value": "{{count}} ZK",
     "estimated_minutes": "~{{count}} Min.",
+    "accept": "Annehmen",
+    "confirm": "Lieferung bestätigen",
+    "offer_to_deliver": "Lieferung anbieten",
+    "offer_modal_title": "Lieferung anbieten",
+    "offer_modal_description": "Bieten Sie an, diesen Artikel zu liefern und Zeitgutschriften zu verdienen. Käufer und Verkäufer prüfen Ihr Angebot.",
+    "time_credits_label": "Zeitgutschriften (Stunden)",
     "time_credits_placeholder": "1,0",
+    "time_credits_hint": "Wie viele Zeitgutschriften möchten Sie für diese Lieferung verdienen?",
+    "estimated_time_label": "Geschätzte Lieferzeit (Minuten)",
     "estimated_time_placeholder": "30",
+    "notes_label": "Notizen (optional)",
+    "notes_placeholder": "Details zu Ihrer Verfügbarkeit für die Lieferung...",
     "cancel": "Abbrechen",
+    "send_offer": "Angebot senden",
     "status": {
       "pending": "Ausstehend",
       "accepted": "Angenommen",
@@ -575,6 +574,34 @@
       "completed": "Abgeschlossen",
       "cancelled": "Storniert"
     }
+  },
+  "pickup": {
+    "my_pickups_title": "Meine Abholungen",
+    "my_pickups_subtitle": "Zeigen Sie diesen Code am Verkäuferstandort, um Ihre Bestellung abzuholen.",
+    "no_pickups": "Keine anstehenden Abholungen.",
+    "order_n": "Bestellung Nr. {{id}}",
+    "window": "Abholzeitfenster",
+    "show_this_code": "Zeigen Sie diesen Code dem Verkäufer",
+    "status_reserved": "Reserviert",
+    "status_picked_up": "Abgeholt",
+    "status_cancelled": "Storniert",
+    "status_no_show": "Nicht erschienen",
+    "choose_slot": "Abholtermin wählen",
+    "no_slot_selected": "Kein Abholtermin",
+    "left": "übrig",
+    "slot_fallback": "Slot #{{id}}",
+    "status_unknown": "Unbekannt"
+  },
+  "inventory": {
+    "section_title": "Bestand",
+    "section_subtitle": "Bestand verfolgen und Überverkäufe verhindern.",
+    "unlimited": "Unbegrenzter Bestand",
+    "count": "Bestandsmenge",
+    "low_stock_threshold": "Warnung bei niedrigem Bestand ab",
+    "oversold_protected": "Bestellungen ablehnen, die den Bestand überschreiten",
+    "sold_out": "Ausverkauft",
+    "low_chip": "Bestand: {{count}} (niedrig)",
+    "count_chip": "Bestand: {{count}}"
   },
   "ai_reply": {
     "suggest": "Antwort vorschlagen",
@@ -591,11 +618,13 @@
     "breadcrumb": "Kartensuche",
     "search_placeholder": "Inserate in der Nähe suchen...",
     "radius_label": "Suchradius",
+    "radius_option": "{{km}} km",
     "radius_chip": "{{km}} km Radius",
     "results_count": "{{count}} Inserate in der Nähe gefunden",
     "refresh": "Aktualisieren",
     "map_view": "Kartenansicht",
     "list_view": "Listenansicht",
+    "location_required": "Legen Sie Ihren Standort im Profil fest, um diese Funktion zu nutzen",
     "search_failed": "Kartensuche fehlgeschlagen. Bitte versuchen Sie es erneut.",
     "not_available_title": "Kartenansicht nicht verfügbar",
     "not_available_description": "Die Kartenbibliothek ist nicht konfiguriert. Inserate werden in der Listenansicht angezeigt.",
@@ -605,9 +634,7 @@
     "use_my_location": "Meinen Standort verwenden",
     "search_this_area": "Diesen Bereich durchsuchen",
     "distance_km": "{{km}} km entfernt",
-    "distance_meters": "{{m}} m entfernt",
-    "radius_option": "{{km}} km",
-    "location_required": "Legen Sie Ihren Standort im Profil fest, um diese Funktion zu nutzen"
+    "distance_meters": "{{m}} m entfernt"
   },
   "shipping": {
     "title": "Versandoptionen",
@@ -615,10 +642,12 @@
     "courier_name": "Kuriername",
     "courier_name_placeholder": "z. B. Schweizerische Post, DHL",
     "price": "Preis",
+    "price_placeholder": "0,00",
     "currency": "Währung",
     "estimated_days": "Geschätzte Tage",
     "estimated_days_placeholder": "z. B. 3",
     "set_as_default": "Als Standard festlegen",
+    "cancel": "Abbrechen",
     "save_changes": "Änderungen speichern",
     "default_badge": "Standard",
     "estimated_delivery": "~{{days}} Tage",
@@ -638,37 +667,19 @@
     "local_pickup_subtitle": "Persönlich abholen",
     "recommended": "Empfohlen",
     "loading": "Versandoptionen werden geladen...",
-    "no_options": "Keine Versandoptionen für diesen Verkäufer verfügbar.",
-    "price_placeholder": "0,00",
-    "cancel": "Abbrechen"
+    "no_options": "Keine Versandoptionen für diesen Verkäufer verfügbar."
   },
   "listing_location": {
     "location_title": "Standort",
     "approximate_location": "Ungefährer Standort",
     "get_directions": "Wegbeschreibung"
   },
-  "pickup": {
-    "choose_slot": "Abholtermin wählen",
-    "no_slot_selected": "Kein Abholtermin",
-    "left": "übrig",
-    "slot_fallback": "Slot #{{id}}",
-    "my_pickups_title": "Meine Abholungen",
-    "my_pickups_subtitle": "Zeigen Sie diesen Code am Verkäuferstandort, um Ihre Bestellung abzuholen.",
-    "no_pickups": "Keine anstehenden Abholungen.",
-    "order_n": "Bestellung Nr. {{id}}",
-    "window": "Abholzeitfenster",
-    "show_this_code": "Zeigen Sie diesen Code dem Verkäufer",
-    "status_reserved": "Reserviert",
-    "status_picked_up": "Abgeholt",
-    "status_cancelled": "Storniert",
-    "status_no_show": "Nicht erschienen",
-    "status_unknown": "Unbekannt"
-  },
   "orders": {
     "load_error": "Bestellungen konnten nicht geladen werden",
     "action_error": "Aktion fehlgeschlagen",
     "tracking_number": "Sendungsverfolgung:",
     "track": "Verfolgen",
+    "quantity_multiplier": "×{{count}}",
     "tab_all": "Alle",
     "tab_active": "Aktiv",
     "tab_completed": "Abgeschlossen",
@@ -748,8 +759,7 @@
       "select_rating": "Bitte wählen Sie eine Bewertung aus",
       "success": "Bewertung erfolgreich eingereicht!",
       "error": "Bewertung konnte nicht eingereicht werden"
-    },
-    "quantity_multiplier": "×{{count}}"
+    }
   },
   "onboarding": {
     "page_title": "Verkäufer-Onboarding – Marktplatz",
@@ -774,10 +784,10 @@
     "incomplete_description": "Die Einrichtung Ihres Stripe-Kontos ist noch nicht abgeschlossen. Bitte beenden Sie den Onboarding-Prozess, um Zahlungen zu erhalten.",
     "continue_onboarding": "Onboarding fortsetzen",
     "check_status": "Status überprüfen",
-    "start_error": "Onboarding konnte nicht gestartet werden",
     "nudge_title": "Schließen Sie Ihr Händler-Onboarding ab",
     "nudge_description": "Fügen Sie Geschäftsdetails, Branding und Auszahlungen hinzu, um das Marketplace-Partner-Abzeichen freizuschalten.",
-    "start_cta": "Onboarding starten"
+    "start_cta": "Onboarding starten",
+    "start_error": "Onboarding konnte nicht gestartet werden"
   },
   "checkout": {
     "title": "Sicherer Checkout",
@@ -793,16 +803,5 @@
     "payment_error": "Ein unerwarteter Fehler ist aufgetreten. Bitte erneut versuchen.",
     "not_available_title": "Zahlungsabwicklung wird eingerichtet",
     "not_available_description": "Die Zahlungsabwicklung wird gerade eingerichtet. Bitte kontaktieren Sie den Verkäufer, um eine Zahlung zu vereinbaren."
-  },
-  "inventory": {
-    "section_title": "Bestand",
-    "section_subtitle": "Bestand verfolgen und Überverkäufe verhindern.",
-    "unlimited": "Unbegrenzter Bestand",
-    "count": "Bestandsmenge",
-    "low_stock_threshold": "Warnung bei niedrigem Bestand ab",
-    "oversold_protected": "Bestellungen ablehnen, die den Bestand überschreiten",
-    "sold_out": "Ausverkauft",
-    "low_chip": "Bestand: {{count}} (niedrig)",
-    "count_chip": "Bestand: {{count}}"
   }
 }
