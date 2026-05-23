@@ -3,6 +3,8 @@
   "balance": "Solde",
   "time_credits": "Crédits temps",
   "hours": "Heures",
+  "hours_value": "{{count}}h",
+  "signed_hours_value": "{{sign}}{{count}}h",
   "transactions": "Transactions",
   "pending": "En attente",
   "completed": "Effectuées",
@@ -15,6 +17,7 @@
   "subtitle": "Suivez vos crédits temps et transactions",
   "unable_to_load": "Impossible de charger le portefeuille",
   "try_again": "Réessayer",
+  "refresh": "Actualiser",
   "your_balance": "Votre solde",
   "pending_in": "+{{count}}h en attente",
   "no_pending": "Aucune transaction en attente",
@@ -24,6 +27,9 @@
   "load_more": "Charger plus",
   "no_transactions": "Aucune transaction",
   "no_transactions_desc": "Votre historique de transactions apparaîtra ici",
+  "no_filtered_transactions": "Aucune transaction correspondante",
+  "no_filtered_transactions_desc": "Essayez un autre filtre pour voir plus d'activité du portefeuille.",
+  "transaction_fallback": "Transaction du portefeuille",
   "stats": {
     "earned": "Gagnés",
     "spent": "Dépensés",
@@ -37,7 +43,7 @@
   },
   "csv": {
     "date": "Date",
-    "type": "Type",
+    "type": "Taper",
     "amount": "Montant",
     "description": "Description",
     "other_party": "Autre partie",
@@ -122,14 +128,20 @@
   },
   "aria": {
     "export_csv": "Exporter les transactions en CSV",
-    "loading_transactions": "Chargement des transactions",
-    "transaction_detail": "{{direction}} {{amount}} heures {{name}}",
     "refresh_wallet": "Actualiser les données du portefeuille",
     "send_credits": "Envoyer des crédits temps",
     "donate_credits": "Faire don de crédits temps",
     "loading_balance": "Chargement du solde du portefeuille",
+    "loading_transactions": "Chargement des transactions",
     "load_more_transactions": "Charger plus de transactions",
-    "transaction_filters": "Filtres de transactions"
+    "transaction_filters": "Filtres de transactions",
+    "transaction_detail": "{{direction}} {{amount}} heures {{name}}"
+  },
+  "validation": {
+    "select_recipient": "Veuillez sélectionner un destinataire",
+    "valid_amount": "Veuillez saisir un montant valide",
+    "insufficient_balance": "Solde insuffisant",
+    "max_transfer": "Le transfert maximum est {{max}} heures"
   },
   "available_balance": "Solde disponible",
   "recipient": "Destinataire",
@@ -143,17 +155,5 @@
   "optional": "optionnel",
   "description_placeholder": "À quoi sert ce transfert ?",
   "new_balance_after": "Votre nouveau solde sera de {{balance}} heures",
-  "transfer_summary": "Vous êtes sur le point d'envoyer {{amount}} {{unit}} à {{name}}",
-  "validation": {
-    "select_recipient": "Veuillez sélectionner un destinataire",
-    "valid_amount": "Veuillez saisir un montant valide",
-    "insufficient_balance": "Solde insuffisant",
-    "max_transfer": "Le transfert maximum est {{max}} heures"
-  },
-  "hours_value": "{{count}}h",
-  "signed_hours_value": "{{sign}}{{count}}h",
-  "refresh": "Actualiser",
-  "no_filtered_transactions": "Aucune transaction correspondante",
-  "no_filtered_transactions_desc": "Essayez un autre filtre pour voir plus d'activité du portefeuille.",
-  "transaction_fallback": "Transaction du portefeuille"
+  "transfer_summary": "Vous êtes sur le point d'envoyer {{amount}} {{unit}} à {{name}}"
 }

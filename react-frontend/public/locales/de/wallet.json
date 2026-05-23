@@ -3,6 +3,8 @@
   "balance": "Guthaben",
   "time_credits": "Zeitguthaben",
   "hours": "Stunden",
+  "hours_value": "{{count}}h",
+  "signed_hours_value": "{{sign}}{{count}}h",
   "transactions": "Transaktionen",
   "pending": "Ausstehend",
   "completed": "Abgeschlossen",
@@ -15,6 +17,7 @@
   "subtitle": "Verfolgen Sie Ihre Zeitguthaben und Transaktionen",
   "unable_to_load": "Zeitkonto kann nicht geladen werden",
   "try_again": "Erneut versuchen",
+  "refresh": "Aktualisieren",
   "your_balance": "Ihr Guthaben",
   "pending_in": "+{{count}}h ausstehend",
   "no_pending": "Keine ausstehenden Transaktionen",
@@ -24,6 +27,9 @@
   "load_more": "Mehr laden",
   "no_transactions": "Keine Transaktionen",
   "no_transactions_desc": "Ihre Transaktionshistorie erscheint hier",
+  "no_filtered_transactions": "Keine passenden Transaktionen",
+  "no_filtered_transactions_desc": "Versuchen Sie einen anderen Filter, um mehr Wallet-Aktivität zu sehen.",
+  "transaction_fallback": "Wallet-Transaktion",
   "stats": {
     "earned": "Erhalten",
     "spent": "Ausgegeben",
@@ -122,14 +128,20 @@
   },
   "aria": {
     "export_csv": "Transaktionen als CSV exportieren",
-    "loading_transactions": "Transaktionen werden geladen",
-    "transaction_detail": "{{direction}} {{amount}} Stunden {{name}}",
     "refresh_wallet": "Wallet-Daten aktualisieren",
     "send_credits": "Zeitguthaben senden",
     "donate_credits": "Zeitguthaben spenden",
     "loading_balance": "Wallet-Guthaben wird geladen",
+    "loading_transactions": "Transaktionen werden geladen",
     "load_more_transactions": "Weitere Transaktionen laden",
-    "transaction_filters": "Transaktionsfilter"
+    "transaction_filters": "Transaktionsfilter",
+    "transaction_detail": "{{direction}} {{amount}} Stunden {{name}}"
+  },
+  "validation": {
+    "select_recipient": "Bitte wählen Sie einen Empfänger aus",
+    "valid_amount": "Bitte geben Sie einen gültigen Betrag ein",
+    "insufficient_balance": "Unzureichendes Guthaben",
+    "max_transfer": "Maximale Überweisung beträgt {{max}} Stunden"
   },
   "available_balance": "Verfügbares Guthaben",
   "recipient": "Empfänger",
@@ -143,17 +155,5 @@
   "optional": "optional",
   "description_placeholder": "Wofür ist diese Überweisung?",
   "new_balance_after": "Ihr neues Guthaben beträgt {{balance}} Stunden",
-  "transfer_summary": "Sie sind dabei, {{amount}} {{unit}} an {{name}} zu senden",
-  "validation": {
-    "select_recipient": "Bitte wählen Sie einen Empfänger aus",
-    "valid_amount": "Bitte geben Sie einen gültigen Betrag ein",
-    "insufficient_balance": "Unzureichendes Guthaben",
-    "max_transfer": "Maximale Überweisung beträgt {{max}} Stunden"
-  },
-  "hours_value": "{{count}}h",
-  "signed_hours_value": "{{sign}}{{count}}h",
-  "refresh": "Aktualisieren",
-  "no_filtered_transactions": "Keine passenden Transaktionen",
-  "no_filtered_transactions_desc": "Versuchen Sie einen anderen Filter, um mehr Wallet-Aktivität zu sehen.",
-  "transaction_fallback": "Wallet-Transaktion"
+  "transfer_summary": "Sie sind dabei, {{amount}} {{unit}} an {{name}} zu senden"
 }
