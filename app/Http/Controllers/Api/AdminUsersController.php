@@ -1826,7 +1826,7 @@ class AdminUsersController extends BaseApiController
 
                 if ($existing) {
                     DB::rollBack();
-                    \Illuminate\Support\Facades\Log::warning("[AdminUsers] Welcome credits already exist for user #{$userId} (tenant {$userTenantId}) — skipping");
+                    try { \Illuminate\Support\Facades\Log::warning("[AdminUsers] Welcome credits already exist for user #{$userId} (tenant {$userTenantId}) — skipping"); } catch (\Throwable) {}
                     return 0;
                 }
 
@@ -1844,17 +1844,20 @@ class AdminUsersController extends BaseApiController
                 );
 
                 DB::commit();
-
-                ActivityLog::log($adminId, 'welcome_credits_issued', "Awarded {$creditAmount} welcome credits to user #{$userId} ({$user['email']}) on approval");
-                \Illuminate\Support\Facades\Log::warning("[AdminUsers] Granted {$creditAmount} welcome credits to user #{$userId} (tenant {$userTenantId})");
-
-                return $creditAmount;
             } catch (\Throwable $e) {
                 DB::rollBack();
                 throw $e;
             }
+
+            // Post-commit: activity log and diagnostic log — failures here are non-fatal
+            // and must NOT re-throw (a log permission error must never roll back credits
+            // that have already committed, and must never surface as a 500).
+            try { ActivityLog::log($adminId, 'welcome_credits_issued', "Awarded {$creditAmount} welcome credits to user #{$userId} ({$user['email']}) on approval"); } catch (\Throwable) {}
+            try { \Illuminate\Support\Facades\Log::info("[AdminUsers] Granted {$creditAmount} welcome credits to user #{$userId} (tenant {$userTenantId})"); } catch (\Throwable) {}
+
+            return $creditAmount;
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning("[AdminUsers] Failed to grant welcome credits to user #{$user['id']}: " . $e->getMessage());
+            try { \Illuminate\Support\Facades\Log::warning("[AdminUsers] Failed to grant welcome credits to user #{$user['id']}: " . $e->getMessage()); } catch (\Throwable) {}
             return 0;
         }
     }
@@ -1911,15 +1914,15 @@ class AdminUsersController extends BaseApiController
                 $result = EmailDispatchService::sendRaw($user['email'], $subject, $html, null, null, null, 'approval', ['tenant_id' => $tenant['tenant_id']]);
 
                 if ($result) {
-                    \Illuminate\Support\Facades\Log::info("[AdminUsers] Welcome email sent to user #{$user['id']} (credits: {$creditsAwarded})");
+                    try { \Illuminate\Support\Facades\Log::info("[AdminUsers] Welcome email sent to user #{$user['id']} (credits: {$creditsAwarded})"); } catch (\Throwable) {}
                 } else {
-                    \Illuminate\Support\Facades\Log::warning("[AdminUsers] Mailer returned false for welcome email to user #{$user['id']} — check SMTP/Gmail config");
+                    try { \Illuminate\Support\Facades\Log::warning("[AdminUsers] Mailer returned false for welcome email to user #{$user['id']} — check SMTP/Gmail config"); } catch (\Throwable) {}
                 }
 
                 return (bool) $result;
             });
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning("[AdminUsers] Failed to send welcome email to user #{$user['id']}: " . $e->getMessage());
+            try { \Illuminate\Support\Facades\Log::warning("[AdminUsers] Failed to send welcome email to user #{$user['id']}: " . $e->getMessage()); } catch (\Throwable) {}
             return false;
         }
     }
@@ -1957,7 +1960,7 @@ class AdminUsersController extends BaseApiController
                 );
             });
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning("[AdminUsers] Failed to create approval notification for user #{$user['id']}: " . $e->getMessage());
+            try { \Illuminate\Support\Facades\Log::warning("[AdminUsers] Failed to create approval notification for user #{$user['id']}: " . $e->getMessage()); } catch (\Throwable) {}
         }
     }
 
