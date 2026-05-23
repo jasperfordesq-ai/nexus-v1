@@ -1,14 +1,14 @@
 {
   "critical": {
-    "subject": "Critical safeguarding report submitted",
-    "greeting": "Hello {{name}},",
-    "urgency": "A critical-severity safeguarding report has been submitted in your community and requires immediate attention.",
-    "report_category": "Category: {{category}}",
-    "report_severity": "Severity: {{severity}}",
-    "sla_hours": "Response window: {{hours}} hours",
-    "time_remaining": "Time remaining: {{remaining}}",
-    "action_label": "Open report in admin",
-    "footer": "This is an automated alert from the safeguarding workflow. Please act promptly.",
-    "fallback_text_subject": "URGENT: Critical safeguarding report"
+    "subject": "重大なセーフガードレポートが提出されました",
+    "greeting": "{{name}}様、",
+    "urgency": "重大度の高いセーフガードレポートがコミュニティで提出されました。早急な対応が必要です。",
+    "report_category": "カテゴリー：{{category}}",
+    "report_severity": "重大度：{{severity}}",
+    "sla_hours": "対応期限：{{hours}}時間",
+    "time_remaining": "残り時間：{{remaining}}",
+    "action_label": "管理画面でレポートを開く",
+    "footer": "これはセーフガードワークフローからの自動アラートです。迅速にご対応ください。",
+    "fallback_text_subject": "緊急：重大なセーフガードレポート"
   }
 }

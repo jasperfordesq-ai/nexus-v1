@@ -1,14 +1,14 @@
 {
   "critical": {
-    "subject": "Critical safeguarding report submitted",
-    "greeting": "Hello {{name}},",
-    "urgency": "A critical-severity safeguarding report has been submitted in your community and requires immediate attention.",
-    "report_category": "Category: {{category}}",
-    "report_severity": "Severity: {{severity}}",
-    "sla_hours": "Response window: {{hours}} hours",
-    "time_remaining": "Time remaining: {{remaining}}",
-    "action_label": "Open report in admin",
-    "footer": "This is an automated alert from the safeguarding workflow. Please act promptly.",
-    "fallback_text_subject": "URGENT: Critical safeguarding report"
+    "subject": "Kritiek beschermingsrapport ingediend",
+    "greeting": "Hallo {{name}},",
+    "urgency": "Er is een beschermingsrapport met kritieke ernst ingediend in uw gemeenschap en dit vereist onmiddellijke aandacht.",
+    "report_category": "Categorie: {{category}}",
+    "report_severity": "Ernst: {{severity}}",
+    "sla_hours": "Reactievenster: {{hours}} uur",
+    "time_remaining": "Resterende tijd: {{remaining}}",
+    "action_label": "Rapport openen in beheer",
+    "footer": "Dit is een geautomatiseerde melding van de beschermingsworkflow. Handel alstublieft snel.",
+    "fallback_text_subject": "DRINGEND: Kritiek beschermingsrapport"
   }
 }

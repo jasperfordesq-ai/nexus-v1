@@ -992,10 +992,7 @@
     "hint": "Cuir ceist ar bith orm faoin bpost seo - cáilíochtaí, tuarastal, conas iarratas a dhéanamh, leideanna agallaimh ...",
     "placeholder": "Cuir ceist faoin bpost seo...",
     "error_response": "Tá brón orm, ní raibh mé in ann do iarratas a phróiseáil.",
-    "error_generic": "Tá brón orm, tharla rud éigin mícheart.",
-    "thinking": "Ag smaoineamh...",
-    "clear": "Glan an comhrá",
-    "suggestions": "Ceisteanna molta"
+    "error_generic": "Tá brón orm, tharla rud éigin mícheart."
   },
   "page_meta": {
     "bias_audit": {
@@ -1030,14 +1027,6 @@
     },
     "employer_brand": {
       "title": "Branda Fostóra"
-    },
-    "index": {
-      "title": "Folúntais Poist",
-      "description": "Brabhsáil deiseanna oibre agus róil atá ar fáil i do phobal"
-    },
-    "detail": {
-      "title": "{{title}} — Poist",
-      "description": "Féach ar shonraí an phoist agus déan iarratas"
     }
   },
   "jobs": {

@@ -1,24 +1,24 @@
 {
   "legal_update": {
-    "subject": "Important: Updated {{doc_type}} — {{community}}",
-    "title": "Policy Update",
-    "preview": "{{community}} has updated its {{doc_type}}",
-    "body": "{{community}} has published an updated {{doc_type}}. Please review and accept the updated terms to continue using the platform.",
-    "action_required": "Your continued use of the platform requires acceptance of the latest terms.",
-    "cta": "Review & Accept"
+    "subject": "هام: تحديث {{doc_type}} — {{community}}",
+    "title": "تحديث السياسة",
+    "preview": "قام {{community}} بتحديث {{doc_type}}",
+    "body": "نشر {{community}} {{doc_type}} محدثاً. يرجى مراجعة الشروط المحدثة والموافقة عليها لمواصلة استخدام المنصة.",
+    "action_required": "يتطلب استمرار استخدامك للمنصة الموافقة على أحدث الشروط.",
+    "cta": "مراجعة والموافقة"
   },
   "kb_published": {
-    "subject": "Your article is live: {{title}} — {{community}}",
-    "title": "Article Published!",
-    "preview": "Your knowledge base article \"{{title}}\" is now live",
-    "body": "Your article has been published to the {{community}} knowledge base and is now visible to all members.",
-    "cta": "View Article"
+    "subject": "مقالتك منشورة الآن: {{title}} — {{community}}",
+    "title": "تم نشر المقالة!",
+    "preview": "مقالة قاعدة المعرفة \"{{title}}\" متاحة الآن",
+    "body": "تم نشر مقالتك في قاعدة معرفة {{community}} وأصبحت مرئية لجميع الأعضاء.",
+    "cta": "عرض المقالة"
   },
   "kb_updated": {
-    "subject": "Article updated: {{title}} — {{community}}",
-    "title": "Article Updated",
-    "preview": "Your knowledge base article has been updated",
-    "body": "A new version of your article <strong>\"{{title}}\"</strong> has been published to the {{community}} knowledge base.",
-    "cta": "View Article"
+    "subject": "تم تحديث المقالة: {{title}} — {{community}}",
+    "title": "تم تحديث المقالة",
+    "preview": "تم تحديث مقالة قاعدة المعرفة الخاصة بك",
+    "body": "تم نشر نسخة جديدة من مقالتك <strong>\"{{title}}\"</strong> في قاعدة معرفة {{community}}.",
+    "cta": "عرض المقالة"
   }
 }

@@ -573,8 +573,7 @@
       "declined": "Rifiutata",
       "completed": "Completata",
       "cancelled": "Annullata"
-    },
-    "offers_title": "Offerte di Consegna"
+    }
   },
   "pickup": {
     "my_pickups_title": "I miei ritiri",

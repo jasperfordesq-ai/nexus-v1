@@ -1,33 +1,33 @@
 {
   "admin": {
     "federation": {
-      "unknown_key": "Unknown key: :key",
-      "must_be_array": ":field must be an array",
-      "failed_to_load_partner": "Failed to load partner"
+      "unknown_key": "不明なキー：:key",
+      "must_be_array": ":field は配列である必要があります",
+      "failed_to_load_partner": "パートナーの読み込みに失敗しました"
     }
   },
   "validation": {
-    "badge_keys_must_be_array": "badge_keys must be an array",
-    "member_ids_must_be_array": "member_ids must be an array"
+    "badge_keys_must_be_array": "badge_keys は配列である必要があります",
+    "member_ids_must_be_array": "member_ids は配列である必要があります"
   },
   "group_files": {
-    "listing_failed": "Error listing files",
-    "upload_failed": "Upload failed",
-    "download_failed": "Download failed",
-    "delete_failed": "Delete failed"
+    "listing_failed": "ファイル一覧の取得エラー",
+    "upload_failed": "アップロードに失敗しました",
+    "download_failed": "ダウンロードに失敗しました",
+    "delete_failed": "削除に失敗しました"
   },
   "group_invites": {
-    "listing_failed": "Error listing invites",
-    "create_failed": "Error creating invite link",
-    "send_failed": "Error sending invites",
-    "revoke_failed": "Error revoking invite",
-    "accept_failed": "Error accepting invite"
+    "listing_failed": "招待一覧の取得エラー",
+    "create_failed": "招待リンクの作成エラー",
+    "send_failed": "招待の送信エラー",
+    "revoke_failed": "招待の取り消しエラー",
+    "accept_failed": "招待の承認エラー"
   },
   "generic": {
-    "export_failed": "Export failed",
-    "update_failed": "Failed to update"
+    "export_failed": "エクスポートに失敗しました",
+    "update_failed": "更新に失敗しました"
   },
   "federation": {
-    "feature_disabled": "Federation is not enabled for this community"
+    "feature_disabled": "このコミュニティではフェデレーションが有効になっていません"
   }
 }

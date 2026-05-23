@@ -1,33 +1,33 @@
 {
   "admin": {
     "federation": {
-      "unknown_key": "Unknown key: :key",
-      "must_be_array": ":field must be an array",
-      "failed_to_load_partner": "Failed to load partner"
+      "unknown_key": "Clave desconocida: :key",
+      "must_be_array": ":field debe ser un array",
+      "failed_to_load_partner": "Error al cargar el socio"
     }
   },
   "validation": {
-    "badge_keys_must_be_array": "badge_keys must be an array",
-    "member_ids_must_be_array": "member_ids must be an array"
+    "badge_keys_must_be_array": "badge_keys debe ser un array",
+    "member_ids_must_be_array": "member_ids debe ser un array"
   },
   "group_files": {
-    "listing_failed": "Error listing files",
-    "upload_failed": "Upload failed",
-    "download_failed": "Download failed",
-    "delete_failed": "Delete failed"
+    "listing_failed": "Error al listar archivos",
+    "upload_failed": "Error al subir",
+    "download_failed": "Error al descargar",
+    "delete_failed": "Error al eliminar"
   },
   "group_invites": {
-    "listing_failed": "Error listing invites",
-    "create_failed": "Error creating invite link",
-    "send_failed": "Error sending invites",
-    "revoke_failed": "Error revoking invite",
-    "accept_failed": "Error accepting invite"
+    "listing_failed": "Error al listar invitaciones",
+    "create_failed": "Error al crear enlace de invitación",
+    "send_failed": "Error al enviar invitaciones",
+    "revoke_failed": "Error al revocar invitación",
+    "accept_failed": "Error al aceptar invitación"
   },
   "generic": {
-    "export_failed": "Export failed",
-    "update_failed": "Failed to update"
+    "export_failed": "Error en la exportación",
+    "update_failed": "Error al actualizar"
   },
   "federation": {
-    "feature_disabled": "Federation is not enabled for this community"
+    "feature_disabled": "La federación no está habilitada para esta comunidad"
   }
 }

@@ -1,24 +1,24 @@
 {
   "legal_update": {
-    "subject": "Important: Updated {{doc_type}} — {{community}}",
-    "title": "Policy Update",
-    "preview": "{{community}} has updated its {{doc_type}}",
-    "body": "{{community}} has published an updated {{doc_type}}. Please review and accept the updated terms to continue using the platform.",
-    "action_required": "Your continued use of the platform requires acceptance of the latest terms.",
-    "cta": "Review & Accept"
+    "subject": "重要：{{doc_type}}の更新 — {{community}}",
+    "title": "ポリシーの更新",
+    "preview": "{{community}}が{{doc_type}}を更新しました",
+    "body": "{{community}}が更新された{{doc_type}}を公開しました。プラットフォームをご利用いただくために、更新された利用規約をご確認の上、同意してください。",
+    "action_required": "プラットフォームを引き続きご利用いただくには、最新の利用規約への同意が必要です。",
+    "cta": "確認して同意する"
   },
   "kb_published": {
-    "subject": "Your article is live: {{title}} — {{community}}",
-    "title": "Article Published!",
-    "preview": "Your knowledge base article \"{{title}}\" is now live",
-    "body": "Your article has been published to the {{community}} knowledge base and is now visible to all members.",
-    "cta": "View Article"
+    "subject": "記事が公開されました：{{title}} — {{community}}",
+    "title": "記事が公開されました！",
+    "preview": "ナレッジベース記事「{{title}}」が公開されました",
+    "body": "あなたの記事が{{community}}のナレッジベースに公開され、すべてのメンバーに表示されるようになりました。",
+    "cta": "記事を表示"
   },
   "kb_updated": {
-    "subject": "Article updated: {{title}} — {{community}}",
-    "title": "Article Updated",
-    "preview": "Your knowledge base article has been updated",
-    "body": "A new version of your article <strong>\"{{title}}\"</strong> has been published to the {{community}} knowledge base.",
-    "cta": "View Article"
+    "subject": "記事が更新されました：{{title}} — {{community}}",
+    "title": "記事が更新されました",
+    "preview": "ナレッジベース記事が更新されました",
+    "body": "あなたの記事<strong>「{{title}}」</strong>の新しいバージョンが{{community}}のナレッジベースに公開されました。",
+    "cta": "記事を表示"
   }
 }

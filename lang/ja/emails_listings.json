@@ -1,56 +1,56 @@
 {
   "listings": {
     "expired": {
-      "notification": "Your listing \"{{title}}\" has expired. You can renew it to make it active again.",
-      "subject": "Your listing has expired",
-      "heading": "Your listing has expired",
-      "subheading": "Renew your listing to keep it active.",
-      "body_expired": "Your listing <strong>\"{{title}}\"</strong> has expired.",
-      "body_renew": "You can renew it to make it visible to the community again.",
-      "cta": "Renew Listing"
+      "notification": "リスティング「{{title}}」の有効期限が切れました。更新して再度アクティブにすることができます。",
+      "subject": "リスティングの有効期限が切れました",
+      "heading": "リスティングの有効期限が切れました",
+      "subheading": "リスティングを更新してアクティブな状態を維持しましょう。",
+      "body_expired": "あなたのリスティング<strong>「{{title}}」</strong>の有効期限が切れました。",
+      "body_renew": "更新すると、コミュニティに再度表示されるようになります。",
+      "cta": "リスティングを更新"
     },
     "expiry_reminder": {
-      "notification": "Your listing \"{{title}}\" expires in {{days_text}} (on {{expiry_date}}) — renew it to keep it active.",
-      "subject": "Your listing expires in {{days_text}}",
-      "heading": "Your listing expires in {{days_text}}",
-      "subheading": "Don't miss out — renew your listing to keep it active.",
-      "body_expires": "Your listing <strong>\"{{title}}\"</strong> expires in {{days_text}} (on {{expiry_date}}).",
-      "body_renew": "Renew it now to keep it visible to the community.",
-      "cta": "View Listing",
-      "days_one": "1 day",
-      "days_other": "{{count}} days",
-      "urgent_note": "Act soon to keep your listing visible!",
-      "expired_subject": "出品商品「{{title}}」の有効期限が切れました",
-      "expired_title": "Listing Expired",
-      "expired_preview": "Your listing has expired — renew it to stay visible",
-      "expired_body": "あなたのリスト<strong>「{{title}}」</strong> の有効期限が切れました。コミュニティ メンバーからの回答を引き続き受け取るには、今すぐ更新してください。",
-      "expired_cta": "Renew Listing"
+      "notification": "リスティング「{{title}}」は{{days_text}}後（{{expiry_date}}）に期限切れになります — 更新してアクティブな状態を維持しましょう。",
+      "subject": "リスティングは{{days_text}}後に期限切れになります",
+      "heading": "リスティングは{{days_text}}後に期限切れになります",
+      "subheading": "お見逃しなく — リスティングを更新してアクティブな状態を維持しましょう。",
+      "body_expires": "あなたのリスティング<strong>「{{title}}」</strong>は{{days_text}}後（{{expiry_date}}）に期限切れになります。",
+      "body_renew": "今すぐ更新して、コミュニティに表示され続けましょう。",
+      "cta": "リスティングを表示",
+      "days_one": "1日",
+      "days_other": "{{count}}日",
+      "urgent_note": "早めに対応して、リスティングを表示し続けましょう！",
+      "expired_subject": "リスティング「{{title}}」の有効期限が切れました",
+      "expired_title": "リスティングの期限切れ",
+      "expired_preview": "リスティングの有効期限が切れました — 更新して表示を維持しましょう",
+      "expired_body": "あなたのリスティング<strong>「{{title}}」</strong>の有効期限が切れました。コミュニティメンバーからの返信を引き続き受け取るために、今すぐ更新してください。",
+      "expired_cta": "リスティングを更新"
     },
     "approved": {
-      "notification": "Your listing \"{{title}}\" has been approved and is now active.",
-      "notification_short": "Your listing \"{{title}}\" has been approved!",
-      "email_subject": "Your listing has been approved — {{title}}",
-      "email_title": "Listing Approved",
-      "email_body": "Great news! Your listing <strong>\"{{title}}\"</strong> has been approved and is now active in the community.",
-      "email_cta": "View Listing"
+      "notification": "リスティング「{{title}}」が承認され、現在アクティブです。",
+      "notification_short": "リスティング「{{title}}」が承認されました！",
+      "email_subject": "リスティングが承認されました — {{title}}",
+      "email_title": "リスティングが承認されました",
+      "email_body": "おめでとうございます！あなたのリスティング<strong>「{{title}}」</strong>が承認され、コミュニティでアクティブになりました。",
+      "email_cta": "リスティングを表示"
     },
     "rejected": {
-      "notification": "Your listing \"{{title}}\" was not approved. Reason: {{reason}}",
-      "notification_no_reason": "Your listing \"{{title}}\" was not approved.",
-      "subject": "Your listing needs changes",
-      "heading": "Your listing needs changes",
-      "subheading": "Your listing was not approved — here's what to do next.",
-      "body_not_approved": "Your listing <strong>\"{{title}}\"</strong> was not approved.",
-      "body_reason": "<strong>Reason:</strong> {{reason}}",
-      "body_resubmit": "Please review and update your listing, then resubmit for approval.",
-      "cta": "Edit Listing"
+      "notification": "リスティング「{{title}}」は承認されませんでした。理由：{{reason}}",
+      "notification_no_reason": "リスティング「{{title}}」は承認されませんでした。",
+      "subject": "リスティングに修正が必要です",
+      "heading": "リスティングに修正が必要です",
+      "subheading": "リスティングは承認されませんでした — 次の手順をご確認ください。",
+      "body_not_approved": "あなたのリスティング<strong>「{{title}}」</strong>は承認されませんでした。",
+      "body_reason": "<strong>理由：</strong>{{reason}}",
+      "body_resubmit": "リスティングを確認・修正の上、再度承認申請してください。",
+      "cta": "リスティングを編集"
     },
     "removed": {
-      "notification": "Your listing \"{{title}}\" has been removed by a moderator.",
-      "email_subject": "Your listing has been removed — {{title}}",
-      "email_title": "Listing Removed",
-      "email_body": "Your listing <strong>\"{{title}}\"</strong> has been removed by a moderator.",
-      "email_cta": "Browse Listings"
+      "notification": "リスティング「{{title}}」がモデレーターによって削除されました。",
+      "email_subject": "リスティングが削除されました — {{title}}",
+      "email_title": "リスティングが削除されました",
+      "email_body": "あなたのリスティング<strong>「{{title}}」</strong>がモデレーターによって削除されました。",
+      "email_cta": "リスティングを閲覧"
     }
   }
 }

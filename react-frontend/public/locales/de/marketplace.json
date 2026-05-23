@@ -573,36 +573,7 @@
       "declined": "Abgelehnt",
       "completed": "Abgeschlossen",
       "cancelled": "Storniert"
-    },
-    "offers_title": "Lieferangebote"
-  },
-  "pickup": {
-    "my_pickups_title": "Meine Abholungen",
-    "my_pickups_subtitle": "Zeigen Sie diesen Code am Verkäuferstandort, um Ihre Bestellung abzuholen.",
-    "no_pickups": "Keine anstehenden Abholungen.",
-    "order_n": "Bestellung Nr. {{id}}",
-    "window": "Abholzeitfenster",
-    "show_this_code": "Zeigen Sie diesen Code dem Verkäufer",
-    "status_reserved": "Reserviert",
-    "status_picked_up": "Abgeholt",
-    "status_cancelled": "Storniert",
-    "status_no_show": "Nicht erschienen",
-    "choose_slot": "Abholtermin wählen",
-    "no_slot_selected": "Kein Abholtermin",
-    "left": "übrig",
-    "slot_fallback": "Steckplatz #{{id}}",
-    "status_unknown": "Unbekannt"
-  },
-  "inventory": {
-    "section_title": "Bestand",
-    "section_subtitle": "Bestand verfolgen und Überverkäufe verhindern.",
-    "unlimited": "Unbegrenzter Bestand",
-    "count": "Bestandsmenge",
-    "low_stock_threshold": "Warnung bei niedrigem Bestand ab",
-    "oversold_protected": "Bestellungen ablehnen, die den Bestand überschreiten",
-    "sold_out": "Ausverkauft",
-    "low_chip": "Bestand: {{count}} (niedrig)",
-    "count_chip": "Bestand: {{count}}"
+    }
   },
   "pickup": {
     "my_pickups_title": "Meine Abholungen",

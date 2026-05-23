@@ -1,14 +1,14 @@
 {
   "critical": {
-    "subject": "Critical safeguarding report submitted",
-    "greeting": "Hello {{name}},",
-    "urgency": "A critical-severity safeguarding report has been submitted in your community and requires immediate attention.",
-    "report_category": "Category: {{category}}",
-    "report_severity": "Severity: {{severity}}",
-    "sla_hours": "Response window: {{hours}} hours",
-    "time_remaining": "Time remaining: {{remaining}}",
-    "action_label": "Open report in admin",
-    "footer": "This is an automated alert from the safeguarding workflow. Please act promptly.",
-    "fallback_text_subject": "URGENT: Critical safeguarding report"
+    "subject": "تم تقديم تقرير حماية حرج",
+    "greeting": "عزيزي {{name}}،",
+    "urgency": "تم تقديم تقرير حماية بالغ الأهمية في مجتمعك ويتطلب اهتماماً فورياً.",
+    "report_category": "الفئة: {{category}}",
+    "report_severity": "الخطورة: {{severity}}",
+    "sla_hours": "نافذة الاستجابة: {{hours}} ساعة",
+    "time_remaining": "الوقت المتبقي: {{remaining}}",
+    "action_label": "فتح التقرير في لوحة الإدارة",
+    "footer": "هذا تنبيه تلقائي من سير عمل الحماية. يرجى التصرف فوراً.",
+    "fallback_text_subject": "عاجل: تقرير حماية حرج"
   }
 }

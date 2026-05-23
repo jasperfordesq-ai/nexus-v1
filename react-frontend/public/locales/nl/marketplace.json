@@ -573,8 +573,7 @@
       "declined": "Geweigerd",
       "completed": "Voltooid",
       "cancelled": "Geannuleerd"
-    },
-    "offers_title": "Leveringsaanbiedingen"
+    }
   },
   "pickup": {
     "my_pickups_title": "Mijn afhalingen",

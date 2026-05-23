@@ -40,9 +40,7 @@
     "cta_manage_prefs": "Digest-voorkeuren beheren",
     "footer": "Je ontvangt dit omdat je je hebt aangemeld voor de civieke digest van {{community}}. Je kunt de frequentie aanpassen of je op elk moment afmelden.",
     "match_score": "Match {{score}}",
-    "view_all": "Volledige digest bekijken",
-    "subject_weekly": "Your weekly civic digest — {{community}}",
-    "intro_weekly": "Here's your weekly round-up — {{count}} update(s) selected for you based on your sub-region and interests."
+    "view_all": "Volledige digest bekijken"
   },
   "push": {
     "title": "Jouw civieke digest is klaar",
@@ -60,6 +58,5 @@
     "reason_safety": "Veiligheidswaarschuwing",
     "reason_announcement": "Officiële aankondiging",
     "no_reasons": "Standaardrangschikking"
-  },
-  "prefs_cadence_weekly": "Weekly summary"
+  }
 }

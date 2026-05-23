@@ -341,8 +341,7 @@
     "daily": "Giornaliero",
     "monthly": "Mensile",
     "fortnightly": "Quindicinale",
-    "never": "Mai",
-    "weekly": "Settimanale"
+    "never": "Mai"
   },
   "activity_digest": {
     "off": "Disattivato",

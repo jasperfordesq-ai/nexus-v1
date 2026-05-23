@@ -1,56 +1,56 @@
 {
   "listings": {
     "expired": {
-      "notification": "Your listing \"{{title}}\" has expired. You can renew it to make it active again.",
-      "subject": "Your listing has expired",
-      "heading": "Your listing has expired",
-      "subheading": "Renew your listing to keep it active.",
-      "body_expired": "Your listing <strong>\"{{title}}\"</strong> has expired.",
-      "body_renew": "You can renew it to make it visible to the community again.",
-      "cta": "Renew Listing"
+      "notification": "La tua inserzione \"{{title}}\" è scaduta. Puoi rinnovarla per renderla nuovamente attiva.",
+      "subject": "La tua inserzione è scaduta",
+      "heading": "La tua inserzione è scaduta",
+      "subheading": "Rinnova la tua inserzione per mantenerla attiva.",
+      "body_expired": "La tua inserzione <strong>\"{{title}}\"</strong> è scaduta.",
+      "body_renew": "Puoi rinnovarla per renderla nuovamente visibile alla comunità.",
+      "cta": "Rinnova l'inserzione"
     },
     "expiry_reminder": {
-      "notification": "Your listing \"{{title}}\" expires in {{days_text}} (on {{expiry_date}}) — renew it to keep it active.",
-      "subject": "Your listing expires in {{days_text}}",
-      "heading": "Your listing expires in {{days_text}}",
-      "subheading": "Don't miss out — renew your listing to keep it active.",
-      "body_expires": "Your listing <strong>\"{{title}}\"</strong> expires in {{days_text}} (on {{expiry_date}}).",
-      "body_renew": "Renew it now to keep it visible to the community.",
-      "cta": "View Listing",
-      "days_one": "1 day",
-      "days_other": "{{count}} days",
-      "urgent_note": "Act soon to keep your listing visible!",
+      "notification": "La tua inserzione \"{{title}}\" scade tra {{days_text}} (il {{expiry_date}}) — rinnovala per mantenerla attiva.",
+      "subject": "La tua inserzione scade tra {{days_text}}",
+      "heading": "La tua inserzione scade tra {{days_text}}",
+      "subheading": "Non perdere questa opportunità — rinnova la tua inserzione per mantenerla attiva.",
+      "body_expires": "La tua inserzione <strong>\"{{title}}\"</strong> scade tra {{days_text}} (il {{expiry_date}}).",
+      "body_renew": "Rinnovala adesso per mantenerla visibile alla comunità.",
+      "cta": "Visualizza l'inserzione",
+      "days_one": "1 giorno",
+      "days_other": "{{count}} giorni",
+      "urgent_note": "Agisci presto per mantenere la tua inserzione visibile!",
       "expired_subject": "La tua inserzione \"{{title}}\" è scaduta",
-      "expired_title": "Listing Expired",
-      "expired_preview": "Your listing has expired — renew it to stay visible",
-      "expired_body": "La tua scheda <strong>\"{{title}}\"</strong> è scaduta. Rinnovalo ora per continuare a ricevere risposte dai membri della community.",
-      "expired_cta": "Renew Listing"
+      "expired_title": "Inserzione scaduta",
+      "expired_preview": "La tua inserzione è scaduta — rinnovala per restare visibile",
+      "expired_body": "La tua inserzione <strong>\"{{title}}\"</strong> è scaduta. Rinnovala ora per continuare a ricevere risposte dai membri della comunità.",
+      "expired_cta": "Rinnova l'inserzione"
     },
     "approved": {
-      "notification": "Your listing \"{{title}}\" has been approved and is now active.",
-      "notification_short": "Your listing \"{{title}}\" has been approved!",
-      "email_subject": "Your listing has been approved — {{title}}",
-      "email_title": "Listing Approved",
-      "email_body": "Great news! Your listing <strong>\"{{title}}\"</strong> has been approved and is now active in the community.",
-      "email_cta": "View Listing"
+      "notification": "La tua inserzione \"{{title}}\" è stata approvata ed è ora attiva.",
+      "notification_short": "La tua inserzione \"{{title}}\" è stata approvata!",
+      "email_subject": "La tua inserzione è stata approvata — {{title}}",
+      "email_title": "Inserzione approvata",
+      "email_body": "Ottime notizie! La tua inserzione <strong>\"{{title}}\"</strong> è stata approvata ed è ora attiva nella comunità.",
+      "email_cta": "Visualizza l'inserzione"
     },
     "rejected": {
-      "notification": "Your listing \"{{title}}\" was not approved. Reason: {{reason}}",
-      "notification_no_reason": "Your listing \"{{title}}\" was not approved.",
-      "subject": "Your listing needs changes",
-      "heading": "Your listing needs changes",
-      "subheading": "Your listing was not approved — here's what to do next.",
-      "body_not_approved": "Your listing <strong>\"{{title}}\"</strong> was not approved.",
-      "body_reason": "<strong>Reason:</strong> {{reason}}",
-      "body_resubmit": "Please review and update your listing, then resubmit for approval.",
-      "cta": "Edit Listing"
+      "notification": "La tua inserzione \"{{title}}\" non è stata approvata. Motivo: {{reason}}",
+      "notification_no_reason": "La tua inserzione \"{{title}}\" non è stata approvata.",
+      "subject": "La tua inserzione richiede delle modifiche",
+      "heading": "La tua inserzione richiede delle modifiche",
+      "subheading": "La tua inserzione non è stata approvata — ecco cosa fare.",
+      "body_not_approved": "La tua inserzione <strong>\"{{title}}\"</strong> non è stata approvata.",
+      "body_reason": "<strong>Motivo:</strong> {{reason}}",
+      "body_resubmit": "Rivedi e aggiorna la tua inserzione, quindi inviala nuovamente per l'approvazione.",
+      "cta": "Modifica l'inserzione"
     },
     "removed": {
-      "notification": "Your listing \"{{title}}\" has been removed by a moderator.",
-      "email_subject": "Your listing has been removed — {{title}}",
-      "email_title": "Listing Removed",
-      "email_body": "Your listing <strong>\"{{title}}\"</strong> has been removed by a moderator.",
-      "email_cta": "Browse Listings"
+      "notification": "La tua inserzione \"{{title}}\" è stata rimossa da un moderatore.",
+      "email_subject": "La tua inserzione è stata rimossa — {{title}}",
+      "email_title": "Inserzione rimossa",
+      "email_body": "La tua inserzione <strong>\"{{title}}\"</strong> è stata rimossa da un moderatore.",
+      "email_cta": "Sfoglia le inserzioni"
     }
   }
 }

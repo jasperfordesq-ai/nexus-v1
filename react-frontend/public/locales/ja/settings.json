@@ -341,8 +341,7 @@
     "daily": "毎日",
     "monthly": "毎月",
     "fortnightly": "2週間ごと",
-    "never": "なし",
-    "weekly": "毎週"
+    "never": "なし"
   },
   "activity_digest": {
     "off": "オフ",

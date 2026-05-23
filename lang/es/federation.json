@@ -1,5 +1,5 @@
 {
-  "relay_no_remote_node": "Cannot determine remote node for account: :account",
-  "relay_no_route_to_node": "No route to node: :node",
-  "relay_url_blocked": "Relay target URL blocked by security filter"
+  "relay_no_remote_node": "No se puede determinar el nodo remoto para la cuenta: :account",
+  "relay_no_route_to_node": "Sin ruta al nodo: :node",
+  "relay_url_blocked": "URL de destino del relay bloqueada por el filtro de seguridad"
 }

@@ -1,24 +1,24 @@
 {
   "legal_update": {
-    "subject": "Important: Updated {{doc_type}} — {{community}}",
-    "title": "Policy Update",
-    "preview": "{{community}} has updated its {{doc_type}}",
-    "body": "{{community}} has published an updated {{doc_type}}. Please review and accept the updated terms to continue using the platform.",
-    "action_required": "Your continued use of the platform requires acceptance of the latest terms.",
-    "cta": "Review & Accept"
+    "subject": "Importante: aggiornamento {{doc_type}} — {{community}}",
+    "title": "Aggiornamento delle norme",
+    "preview": "{{community}} ha aggiornato il proprio {{doc_type}}",
+    "body": "{{community}} ha pubblicato un aggiornamento del {{doc_type}}. Vi invitiamo a leggere e accettare i termini aggiornati per continuare a utilizzare la piattaforma.",
+    "action_required": "Per continuare a utilizzare la piattaforma è necessario accettare i termini più recenti.",
+    "cta": "Leggi e accetta"
   },
   "kb_published": {
-    "subject": "Your article is live: {{title}} — {{community}}",
-    "title": "Article Published!",
-    "preview": "Your knowledge base article \"{{title}}\" is now live",
-    "body": "Your article has been published to the {{community}} knowledge base and is now visible to all members.",
-    "cta": "View Article"
+    "subject": "Il tuo articolo è pubblicato: {{title}} — {{community}}",
+    "title": "Articolo pubblicato!",
+    "preview": "Il tuo articolo della knowledge base \"{{title}}\" è ora disponibile",
+    "body": "Il tuo articolo è stato pubblicato nella knowledge base di {{community}} ed è ora visibile a tutti i membri.",
+    "cta": "Visualizza l'articolo"
   },
   "kb_updated": {
-    "subject": "Article updated: {{title}} — {{community}}",
-    "title": "Article Updated",
-    "preview": "Your knowledge base article has been updated",
-    "body": "A new version of your article <strong>\"{{title}}\"</strong> has been published to the {{community}} knowledge base.",
-    "cta": "View Article"
+    "subject": "Articolo aggiornato: {{title}} — {{community}}",
+    "title": "Articolo aggiornato",
+    "preview": "Il tuo articolo della knowledge base è stato aggiornato",
+    "body": "Una nuova versione del tuo articolo <strong>\"{{title}}\"</strong> è stata pubblicata nella knowledge base di {{community}}.",
+    "cta": "Visualizza l'articolo"
   }
 }

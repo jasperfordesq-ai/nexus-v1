@@ -341,8 +341,7 @@
     "daily": "Dagelijks",
     "monthly": "Maandelijks",
     "fortnightly": "Tweewekelijks",
-    "never": "Nooit",
-    "weekly": "Wekelijks"
+    "never": "Nooit"
   },
   "activity_digest": {
     "off": "Uit",

@@ -40,12 +40,7 @@
     "credential_type_placeholder": "認証情報の種類を選択してください",
     "document_label": "書類",
     "expiry_date_label": "有効期限 (オプション)",
-    "expiry_date_placeholder": "有効期限がない場合は空白のままにしてください",
-    "subtitle": "あなたの貢献とスキルを証明する",
-    "empty_state": "資格情報はまだありません",
-    "empty_state_desc": "交換を完了してスキルの認定を取得しましょう",
-    "view_all": "すべて表示",
-    "awarded_on": "{{date}}に授与"
+    "expiry_date_placeholder": "有効期限がない場合は空白のままにしてください"
   },
   "swaps": {
     "heading": "コミュニティスワップ",
@@ -66,12 +61,7 @@
     "load_error": "シフト スワップ リクエストをロードできません。もう一度試してください。",
     "accept_failed": "スワップ要求の受け入れに失敗しました。もう一度試してください。",
     "reject_failed": "スワップ要求を拒否できませんでした。もう一度試してください。",
-    "reject_confirm": "この交換リクエストを拒否してもよろしいですか?",
-    "subtitle": "他のメンバーとのサービス交換を追跡する",
-    "empty_state": "まだスワップはありません",
-    "empty_state_desc": "今日初めての交換を始めましょう",
-    "view_all": "すべて表示",
-    "load_failed": "スワップを読み込めませんでした"
+    "reject_confirm": "この交換リクエストを拒否してもよろしいですか?"
   },
   "waitlist": {
     "heading": "順番待ちリスト",
@@ -86,12 +76,7 @@
     "load_error": "待機リストのエントリをロードできません。もう一度試してください。",
     "leave_confirm": "この順番待ちリストを解除してもよろしいですか?立場を失うことになります。",
     "leave_success": "待機リストから外れました。",
-    "leave_failed": "待機リストから抜けられませんでした。もう一度試してください。",
-    "subtitle": "保留中のメンバーシップリクエストを管理する",
-    "empty_state": "順番待ちリストは空です",
-    "approve": "承認",
-    "reject": "却下",
-    "load_failed": "順番待ちリストを読み込めませんでした"
+    "leave_failed": "待機リストから抜けられませんでした。もう一度試してください。"
   },
   "wellbeing": {
     "heading": "コミュニティの幸福",
@@ -139,12 +124,7 @@
     "tip_boundaries": "可用性の境界線を設定する",
     "tip_connect": "サポートのために仲間のボランティアとつながる",
     "tip_celebrate": "自分の影響力を称賛しましょう -- 一時間一秒が大切です",
-    "tip_reduce": "圧倒されていると感じる場合は、頻度を減らすことを検討してください",
-    "subtitle": "コミュニティの健全性と活動を追跡する",
-    "load_failed": "幸福データを読み込めませんでした",
-    "members_active": "アクティブメンバー",
-    "exchanges_this_month": "今月の交換数",
-    "hours_exchanged": "交換された時間"
+    "tip_reduce": "圧倒されていると感じる場合は、頻度を減らすことを検討してください"
   },
   "organisations": {
     "page_title": "組織",
@@ -204,15 +184,7 @@
     "terms_agreement": "上記の組織登録規約を読み、同意します。",
     "terms_required": "組織を登録するには、規約に同意する必要があります。",
     "opportunity_count_one": "{{count}} の機会",
-    "opportunity_count_other": "{{count}} の機会",
-    "load_failed": "組織を読み込めませんでした",
-    "load_error": "組織の読み込みエラー",
-    "register_cta": "組織を登録する",
-    "register_cta_desc": "コミュニティ組織ネットワークに参加する",
-    "filter_all": "すべて",
-    "filter_verified": "認証済み",
-    "no_results": "組織が見つかりませんでした",
-    "no_results_desc": "別の検索語を試すか、すべての組織を閲覧してください"
+    "opportunity_count_other": "{{count}} の機会"
   },
   "organisation_detail": {
     "page_title": "組織",
@@ -245,12 +217,7 @@
     "cover_message_placeholder": "ボランティアをしたい理由を組織に伝えてください...",
     "cancel": "キャンセル",
     "submit_application": "申請書の提出",
-    "job_openings": "求人情報",
-    "load_failed": "組織の詳細を読み込めませんでした",
-    "members_count": "{{count}}人のメンバー",
-    "join": "組織に参加する",
-    "leave": "組織を退会する",
-    "edit": "編集"
+    "job_openings": "求人情報"
   },
   "emergency_alerts": {
     "heading": "緊急アラート",
@@ -269,10 +236,7 @@
     "accepted": "承認されました",
     "declined": "拒否されました",
     "from_coordinator": "{{name}} から",
-    "expires": "期限切れ {{date}}",
-    "subtitle": "コミュニティメンバーに緊急通知を送信する",
-    "send": "アラートを送信",
-    "no_alerts": "アクティブなアラートはありません"
+    "expires": "期限切れ {{date}}"
   },
   "group_signups": {
     "heading": "グループ登録",
@@ -292,11 +256,7 @@
     "email_placeholder": "member@example.com",
     "cancel": "キャンセル",
     "add_member_failed": "メンバーの追加に失敗しました。すでにグループに参加しているか、電子メールが無効である可能性があります。",
-    "add_member_error": "メンバーを追加できません。メールを確認して、もう一度お試しください。",
-    "subtitle": "グループ参加リクエストを管理する",
-    "empty_state": "保留中の登録リクエストはありません",
-    "approve": "承認",
-    "reject": "却下"
+    "add_member_error": "メンバーを追加できません。メールを確認して、もう一度お試しください。"
   },
   "recommended_shifts": {
     "heading": "おすすめのシフト",
@@ -306,9 +266,7 @@
     "no_recommendations_desc": "プロフィールにスキルを追加して、パーソナライズされたシフトの推奨を取得します。",
     "match_score": "{{score}}% 一致",
     "load_failed": "おすすめシフトを読み込めませんでした",
-    "load_error": "推奨事項を読み込めません。もう一度試してください。",
-    "subtitle": "スキルと空き状況に基づく提案シフト",
-    "empty_state": "おすすめのシフトはありません"
+    "load_error": "推奨事項を読み込めません。もう一度試してください。"
   },
   "certificates_tab": {
     "heading": "証明書",
@@ -325,9 +283,7 @@
     "no_verified_hours": "確認されたボランティア時間は見つかりませんでした。証明書を生成する前に、時間数を承認する必要があります。",
     "generate_failed": "証明書の生成に失敗しました。もう一度試してください。",
     "load_failed": "証明書を読み込めませんでした",
-    "load_error": "証明書の読み込みエラー",
-    "subtitle": "取得した証明書とバッジ",
-    "empty_state": "まだ証明書はありません"
+    "load_error": "証明書の読み込みエラー"
   },
   "remote": "リモート",
   "closes_date": "{{date}}に締め切り",

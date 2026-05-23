@@ -1,14 +1,14 @@
 {
   "critical": {
-    "subject": "Critical safeguarding report submitted",
-    "greeting": "Hello {{name}},",
-    "urgency": "A critical-severity safeguarding report has been submitted in your community and requires immediate attention.",
-    "report_category": "Category: {{category}}",
-    "report_severity": "Severity: {{severity}}",
-    "sla_hours": "Response window: {{hours}} hours",
-    "time_remaining": "Time remaining: {{remaining}}",
-    "action_label": "Open report in admin",
-    "footer": "This is an automated alert from the safeguarding workflow. Please act promptly.",
-    "fallback_text_subject": "URGENT: Critical safeguarding report"
+    "subject": "Tuarascáil chosanta chriticiúil curtha isteach",
+    "greeting": "Dia duit {{name}},",
+    "urgency": "Cuireadh isteach tuarascáil chosanta de thromchúis chriticiúil i do phobal agus tá aird láithreach ag teastáil.",
+    "report_category": "Catagóir: {{category}}",
+    "report_severity": "Tromchúis: {{severity}}",
+    "sla_hours": "Fuinneog freagartha: {{hours}} uair an chloig",
+    "time_remaining": "Am fágtha: {{remaining}}",
+    "action_label": "Oscail an tuarascáil san riarachán",
+    "footer": "Is foláireamh uathoibrithe é seo ón sreabhadh oibre cosanta. Déan gníomh go pras.",
+    "fallback_text_subject": "PRÁINNEACH: Tuarascáil chosanta chriticiúil"
   }
 }

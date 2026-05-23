@@ -573,8 +573,7 @@
       "declined": "مرفوض",
       "completed": "مكتمل",
       "cancelled": "ملغى"
-    },
-    "offers_title": "عروض التوصيل"
+    }
   },
   "pickup": {
     "my_pickups_title": "عمليات الاستلام الخاصة بي",

@@ -1,139 +1,139 @@
 {
   "badge_collection": {
-    "collection_complete": "Collection Complete! You finished '{{name}}' and earned {{xp}} bonus XP! {{icon}}"
+    "collection_complete": "コレクション完了！「{{name}}」を達成し、ボーナスXP {{xp}} を獲得しました！{{icon}}"
   },
   "safeguarding": {
-    "critical_report_submitted": "Critical safeguarding report submitted"
+    "critical_report_submitted": "重大なセーフガーディングレポートが提出されました"
   },
   "broker": {
-    "message_for_review": "New message for review from {{sender}}"
+    "message_for_review": "{{sender}} からの新しいレビュー待ちメッセージが届いています"
   },
   "federation": {
-    "message_received": "New federated message from {{sender}} ({{partner}})",
-    "transaction_received": "You received {{amount}} time credits from {{sender}} ({{partner}})",
-    "connection_request": "{{sender}} from {{community}} wants to connect with you",
-    "connection_accepted": "{{name}} accepted your connection request",
-    "connection_declined": "Your connection request was declined"
+    "message_received": "{{sender}}（{{partner}}）からの新しいフェデレーションメッセージが届いています",
+    "transaction_received": "{{sender}}（{{partner}}）から {{amount}} タイムクレジットを受け取りました",
+    "connection_request": "{{community}} コミュニティの {{sender}} さんがつながりを求めています",
+    "connection_accepted": "{{name}} さんがあなたのつながりリクエストを承認しました",
+    "connection_declined": "つながりリクエストが拒否されました"
   },
   "job_application": {
-    "owner_applied": ":name があなたのジョブに応募しました:「:title」",
-    "shortlisted": "Your application for {{title}} has been shortlisted!",
-    "rejected": "Your application for {{title}} was not successful",
-    "hired": "Congratulations! You've been hired for {{title}}",
-    "status_updated": "Your application for {{title}} status updated to {{status}}",
-    "status_updated_generic": "Your application status has been updated",
-    "stuck_in_stage": "Application #{{id}} has been in '{{stage}}' for {{days}}+ days"
+    "owner_applied": ":name があなたのジョブに応募しました：「:title」",
+    "shortlisted": "{{title}} への応募が選考に通過しました！",
+    "rejected": "{{title}} への応募は不採用となりました",
+    "hired": "おめでとうございます！{{title}} に採用されました",
+    "status_updated": "{{title}} への応募状況が {{status}} に更新されました",
+    "status_updated_generic": "応募状況が更新されました",
+    "stuck_in_stage": "応募 #{{id}} は「{{stage}}」ステージに {{days}}+ 日間滞留しています"
   },
   "job_team": {
-    "added_as_role": "You've been added as a {{role}} for '{{title}}'"
+    "added_as_role": "「{{title}}」の {{role}} として追加されました"
   },
   "shift_swap": {
-    "requested": "You have a new shift swap request",
-    "declined": "Your shift swap request was declined",
-    "accepted": "Your shift swap request was accepted",
-    "declined_by_admin": "Your shift swap request was declined by an admin",
-    "accepted_swap_declined_by_admin": "A shift swap you accepted was declined by an admin",
-    "approved_by_admin": "Your shift swap was approved by an admin",
-    "accepted_swap_approved_by_admin": "A shift swap you accepted was approved by an admin"
+    "requested": "新しいシフト交換リクエストが届いています",
+    "declined": "シフト交換リクエストが拒否されました",
+    "accepted": "シフト交換リクエストが承認されました",
+    "declined_by_admin": "シフト交換リクエストが管理者によって拒否されました",
+    "accepted_swap_declined_by_admin": "承認したシフト交換が管理者によって拒否されました",
+    "approved_by_admin": "シフト交換が管理者によって承認されました",
+    "accepted_swap_approved_by_admin": "承認したシフト交換が管理者によって承認されました"
   },
   "user_security": {
-    "email_changed": "Your email address has been changed. If you did not do this, contact support immediately."
+    "email_changed": "メールアドレスが変更されました。ご自身で変更していない場合は、直ちにサポートにお問い合わせください。"
   },
   "group_mention": {
-    "mentioned_in_group": "You were mentioned in {{group}}"
+    "mentioned_in_group": "{{group}} であなたがメンションされました"
   },
   "idea_team": {
-    "added_to_group": "You've been added to {{group}}"
+    "added_to_group": "{{group}} に追加されました"
   },
   "challenge": {
-    "complete_claim": "Challenge Complete! You finished '{{title}}' — claim your reward!",
-    "complete_earned": "Challenge Complete! You finished '{{title}}' and earned {{xp}} XP!"
+    "complete_claim": "チャレンジ達成！「{{title}}」をクリアしました — 報酬を受け取ってください！",
+    "complete_earned": "チャレンジ達成！「{{title}}」をクリアし、{{xp}} XP を獲得しました！"
   },
   "gamification": {
-    "badge_earned": "You earned the '{{name}}' badge! {{icon}}",
-    "level_up": "Congratulations! You've reached Level {{level}}!"
+    "badge_earned": "「{{name}}」バッジを獲得しました！{{icon}}",
+    "level_up": "おめでとうございます！レベル {{level}} に到達しました！"
   },
   "job_offer": {
-    "received_bell": "You have received a job offer for {{title}}",
-    "received_push_title": "Job Offer Received!",
-    "received_push_message": "You have received a job offer for {{title}}",
-    "credits_earned_bell": "You earned {{amount}} time credits for completing {{title}}!",
-    "credits_earned_push_title": "Time Credits Earned!",
-    "credits_earned_push_message": "You earned {{amount}} time credits for completing {{title}}!",
-    "accepted_bell": "Offer accepted for {{title}}",
-    "accepted_push_title": "Offer accepted for {{title}}",
-    "accepted_push_message": "Offer accepted for {{title}}",
-    "rejected_bell": "Offer rejected for {{title}}",
-    "rejected_push_title": "Offer rejected for {{title}}",
-    "rejected_push_message": "Offer rejected for {{title}}",
-    "withdrawn_bell": "Job offer withdrawn for {{title}}",
-    "withdrawn_push_title": "Job offer withdrawn for {{title}}",
-    "withdrawn_push_message": "Job offer withdrawn for {{title}}"
+    "received_bell": "{{title}} の求人オファーを受け取りました",
+    "received_push_title": "求人オファーが届きました！",
+    "received_push_message": "{{title}} の求人オファーを受け取りました",
+    "credits_earned_bell": "{{title}} を完了し、{{amount}} タイムクレジットを獲得しました！",
+    "credits_earned_push_title": "タイムクレジットを獲得しました！",
+    "credits_earned_push_message": "{{title}} を完了し、{{amount}} タイムクレジットを獲得しました！",
+    "accepted_bell": "{{title}} のオファーが承諾されました",
+    "accepted_push_title": "{{title}} のオファーが承諾されました",
+    "accepted_push_message": "{{title}} のオファーが承諾されました",
+    "rejected_bell": "{{title}} のオファーが拒否されました",
+    "rejected_push_title": "{{title}} のオファーが拒否されました",
+    "rejected_push_message": "{{title}} のオファーが拒否されました",
+    "withdrawn_bell": "{{title}} の求人オファーが取り消されました",
+    "withdrawn_push_title": "{{title}} の求人オファーが取り消されました",
+    "withdrawn_push_message": "{{title}} の求人オファーが取り消されました"
   },
   "job_alert": {
-    "match_bell": "New job matching your alert: {{title}}",
-    "match_push_title": "New Job Match",
-    "match_push_message": "New job matching your alert: {{title}}"
+    "match_bell": "アラートに一致する新しい求人が届きました：{{title}}",
+    "match_push_title": "新しい求人マッチ",
+    "match_push_message": "アラートに一致する新しい求人が届きました：{{title}}"
   },
   "legal": {
-    "update_title": "Updated: {{title}}",
-    "update_message": "Please review version {{version}} of our {{title}}"
+    "update_title": "更新：{{title}}",
+    "update_message": "{{title}} のバージョン {{version}} をご確認ください"
   },
   "verification_badge": {
-    "granted": "You have been granted the '{{label}}' verification badge"
+    "granted": "「{{label}}」認証バッジが付与されました"
   },
   "mention": {
-    "mentioned_in": "@{{name}} mentioned you in a {{entity}}",
-    "mentioned_in_with_preview": "@{{name}} mentioned you in a {{entity}}: \"{{preview}}\""
+    "mentioned_in": "@{{name}} さんが {{entity}} であなたをメンションしました",
+    "mentioned_in_with_preview": "@{{name}} さんが {{entity}} であなたをメンションしました：「{{preview}}」"
   },
   "story": {
-    "reaction": "{{name}} reacted {{emoji}} to your story"
+    "reaction": "{{name}} さんがあなたのストーリーに {{emoji}} でリアクションしました"
   },
   "sub_account": {
-    "management_request": "{{name}} has requested to manage your account as a {{type}}"
+    "management_request": "{{name}} さんが {{type}} としてあなたのアカウントを管理することを申請しました"
   },
   "totp": {
-    "rate_limited": "Too many failed attempts. Please try again in {{minutes}} minutes."
+    "rate_limited": "試行回数が多すぎます。{{minutes}} 分後に再試行してください。"
   },
   "registration": {
-    "admin_pending_approval": "New user {{name}} ({{email}}) requires approval"
+    "admin_pending_approval": "新規ユーザー {{name}}（{{email}}）の承認が必要です"
   },
   "nexus_score": {
-    "strength_title": ":name is your strongest area!",
-    "strength_message": "You're in the top tier with :percentage% in :name.",
-    "improvement_title": "Grow your :name score",
-    "tip_engagement": "Try sending and receiving time credits with different community members.",
-    "tip_quality": "Focus on completing transactions successfully and earning positive reviews.",
-    "tip_volunteer": "Log your volunteer hours regularly and maintain consistency.",
-    "tip_activity": "Create listings, join groups, and maintain a daily login streak.",
-    "tip_badges": "Complete challenges to earn more badges and achievements.",
-    "tip_impact": "Share posts and engage with the community feed.",
-    "tip_default": "Keep participating in the community!",
-    "suggestion_connect_title": "Connect with more community members",
-    "suggestion_connect_message": "Exchange credits with new people to increase your network diversity.",
-    "suggestion_exchanges_title": "Complete more exchanges",
-    "suggestion_exchanges_message": "Build your reputation by completing transactions and earning reviews."
+    "strength_title": ":name はあなたの最も得意な分野です！",
+    "strength_message": ":name において上位 :percentage% に入っています。",
+    "improvement_title": ":name スコアを伸ばしましょう",
+    "tip_engagement": "さまざまなコミュニティメンバーとタイムクレジットを送受信してみましょう。",
+    "tip_quality": "取引を成功させ、ポジティブなレビューを獲得することに集中しましょう。",
+    "tip_volunteer": "ボランティア時間を定期的に記録し、継続性を保ちましょう。",
+    "tip_activity": "掲示板を作成し、グループに参加し、毎日のログイン連続記録を維持しましょう。",
+    "tip_badges": "チャレンジを達成して、より多くのバッジや実績を獲得しましょう。",
+    "tip_impact": "投稿をシェアし、コミュニティフィードに参加しましょう。",
+    "tip_default": "コミュニティへの参加を続けましょう！",
+    "suggestion_connect_title": "より多くのコミュニティメンバーとつながりましょう",
+    "suggestion_connect_message": "新しい人々とクレジットを交換して、ネットワークの多様性を広げましょう。",
+    "suggestion_exchanges_title": "より多くの交換を完了しましょう",
+    "suggestion_exchanges_message": "取引を完了してレビューを獲得し、評判を築きましょう。"
   },
-  "vetting_approved_title": "Your verification has been approved!",
-  "vetting_approved_heading": "Verification Approved",
-  "vetting_approved_body": "Your background check verification has been approved. Your verified status is now active on your profile.",
-  "vetting_go_to_dashboard": "Go to Dashboard",
-  "vetting_rejected_title": "Your verification could not be completed. Please contact support.",
-  "vetting_rejected_heading": "Verification Not Completed",
-  "vetting_rejected_body": "Your background check verification could not be completed at this time. Please contact your community coordinator for more information or to resubmit.",
-  "vetting_contact_support": "Contact Support",
-  "suspended_by_admin": "Suspended by admin",
-  "account_suspended_title": "Account Suspended",
-  "account_banned_title": "Account Banned",
-  "banned_by_admin": "Banned by admin",
-  "account_deleted_title": "Account Deleted",
-  "reset_by_admin": "Reset by admin",
-  "password_changed_title": "Password Changed",
-  "get_started": "Get Started",
-  "account_reactivated_title": "Account Reactivated",
+  "vetting_approved_title": "本人確認が承認されました！",
+  "vetting_approved_heading": "本人確認承認済み",
+  "vetting_approved_body": "バックグラウンドチェックの認証が承認されました。認証済みステータスがプロフィールで有効になりました。",
+  "vetting_go_to_dashboard": "ダッシュボードへ",
+  "vetting_rejected_title": "本人確認が完了できませんでした。サポートにお問い合わせください。",
+  "vetting_rejected_heading": "本人確認未完了",
+  "vetting_rejected_body": "現時点でバックグラウンドチェックの認証を完了できませんでした。詳細または再申請については、コミュニティコーディネーターにお問い合わせください。",
+  "vetting_contact_support": "サポートに連絡",
+  "suspended_by_admin": "管理者により停止されました",
+  "account_suspended_title": "アカウント停止",
+  "account_banned_title": "アカウント禁止",
+  "banned_by_admin": "管理者により禁止されました",
+  "account_deleted_title": "アカウント削除",
+  "reset_by_admin": "管理者によりリセットされました",
+  "password_changed_title": "パスワード変更完了",
+  "get_started": "始める",
+  "account_reactivated_title": "アカウント再有効化",
   "goal": {
-    "reminder_bell": "Goal reminder: \"{{title}}\"",
-    "reminder_push_title": "Goal Reminder",
-    "reminder_push_message": "Don't forget your goal: \"{{title}}\""
+    "reminder_bell": "目標リマインダー：「{{title}}」",
+    "reminder_push_title": "目標リマインダー",
+    "reminder_push_message": "目標を忘れずに：「{{title}}」"
   }
 }

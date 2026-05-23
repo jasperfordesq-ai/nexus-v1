@@ -40,12 +40,7 @@
     "credential_type_placeholder": "Selecteer het identificatietype",
     "document_label": "Document",
     "expiry_date_label": "Vervaldatum (optioneel)",
-    "expiry_date_placeholder": "Laat leeg als er geen vervaldatum is",
-    "subtitle": "Bewijs jouw bijdragen en vaardigheden",
-    "empty_state": "Nog geen referenties",
-    "empty_state_desc": "Voltooi uitwisselingen en ontvang erkenning voor jouw vaardigheden",
-    "view_all": "Alles weergeven",
-    "awarded_on": "Toegekend op {{date}}"
+    "expiry_date_placeholder": "Laat leeg als er geen vervaldatum is"
   },
   "swaps": {
     "heading": "Gemeenschapsruilingen",
@@ -66,12 +61,7 @@
     "load_error": "Kan verzoeken om ploegwissels niet laden. Probeer het opnieuw.",
     "accept_failed": "Kan het ruilverzoek niet accepteren. Probeer het opnieuw.",
     "reject_failed": "Kan het ruilverzoek niet weigeren. Probeer het opnieuw.",
-    "reject_confirm": "Weet u zeker dat u dit ruilverzoek wilt weigeren?",
-    "subtitle": "Houd dienstruilingen met andere leden bij",
-    "empty_state": "Nog geen ruilingen",
-    "empty_state_desc": "Begin vandaag met je eerste ruiling",
-    "view_all": "Alles weergeven",
-    "load_failed": "Ruilingen konden niet worden geladen"
+    "reject_confirm": "Weet u zeker dat u dit ruilverzoek wilt weigeren?"
   },
   "waitlist": {
     "heading": "Wachtlijst",
@@ -86,12 +76,7 @@
     "load_error": "Kan uw wachtlijstvermeldingen niet laden. Probeer het opnieuw.",
     "leave_confirm": "Weet u zeker dat u deze wachtlijst wilt verlaten? Je verliest je positie.",
     "leave_success": "U heeft de wachtlijst verlaten.",
-    "leave_failed": "Kan de wachtlijst niet verlaten. Probeer het opnieuw.",
-    "subtitle": "Beheer openstaande lidmaatschapsverzoeken",
-    "empty_state": "Wachtlijst is leeg",
-    "approve": "Goedkeuren",
-    "reject": "Afwijzen",
-    "load_failed": "Wachtlijst kon niet worden geladen"
+    "leave_failed": "Kan de wachtlijst niet verlaten. Probeer het opnieuw."
   },
   "wellbeing": {
     "heading": "Gemeenschapswelzijn",
@@ -139,12 +124,7 @@
     "tip_boundaries": "Stel grenzen aan uw beschikbaarheid",
     "tip_connect": "Maak contact met collega-vrijwilligers voor ondersteuning",
     "tip_celebrate": "Vier uw impact: elk uur telt",
-    "tip_reduce": "Overweeg om de frequentie te verlagen als u zich overweldigd voelt",
-    "subtitle": "Volg de gezondheid en activiteit van je gemeenschap",
-    "load_failed": "Welzijnsgegevens konden niet worden geladen",
-    "members_active": "Actieve leden",
-    "exchanges_this_month": "Uitwisselingen deze maand",
-    "hours_exchanged": "Geruilte uren"
+    "tip_reduce": "Overweeg om de frequentie te verlagen als u zich overweldigd voelt"
   },
   "organisations": {
     "page_title": "Organisaties",
@@ -204,15 +184,7 @@
     "terms_agreement": "Ik heb de bovenstaande registratievoorwaarden voor de organisatie gelezen en ga ermee akkoord.",
     "terms_required": "Om uw organisatie te kunnen registreren, moet u akkoord gaan met de voorwaarden.",
     "opportunity_count_one": "{{count}} mogelijkheid",
-    "opportunity_count_other": "{{count}} mogelijkheden",
-    "load_failed": "Organisaties konden niet worden geladen",
-    "load_error": "Fout bij laden van organisaties",
-    "register_cta": "Registreer je organisatie",
-    "register_cta_desc": "Word lid van ons netwerk van gemeenschapsorganisaties",
-    "filter_all": "Alle",
-    "filter_verified": "Geverifieerd",
-    "no_results": "Geen organisaties gevonden",
-    "no_results_desc": "Probeer een andere zoekterm of blader door alle organisaties"
+    "opportunity_count_other": "{{count}} mogelijkheden"
   },
   "organisation_detail": {
     "page_title": "Organisatie",
@@ -245,12 +217,7 @@
     "cover_message_placeholder": "Vertel de organisatie waarom je vrijwilligerswerk wilt doen...",
     "cancel": "Annuleren",
     "submit_application": "Aanvraag indienen",
-    "job_openings": "Vacatures",
-    "load_failed": "Organisatiedetails konden niet worden geladen",
-    "members_count": "{{count}} leden",
-    "join": "Lid worden van organisatie",
-    "leave": "Organisatie verlaten",
-    "edit": "Bewerken"
+    "job_openings": "Vacatures"
   },
   "emergency_alerts": {
     "heading": "Noodmeldingen",
@@ -269,10 +236,7 @@
     "accepted": "Geaccepteerd",
     "declined": "Afgewezen",
     "from_coordinator": "Van {{name}}",
-    "expires": "Verloopt {{date}}",
-    "subtitle": "Stuur urgente meldingen naar gemeenschapsleden",
-    "send": "Melding verzenden",
-    "no_alerts": "Geen actieve meldingen"
+    "expires": "Verloopt {{date}}"
   },
   "group_signups": {
     "heading": "Groepsaanmeldingen",
@@ -292,11 +256,7 @@
     "email_placeholder": "lid@voorbeeld.com",
     "cancel": "Annuleren",
     "add_member_failed": "Kan lid niet toevoegen. Mogelijk zitten ze al in de groep of is de e-mail ongeldig.",
-    "add_member_error": "Kan lid niet toevoegen. Controleer de e-mail en probeer het opnieuw.",
-    "subtitle": "Beheer verzoeken om toe te treden tot groepen",
-    "empty_state": "Geen openstaande aanmeldingsverzoeken",
-    "approve": "Goedkeuren",
-    "reject": "Afwijzen"
+    "add_member_error": "Kan lid niet toevoegen. Controleer de e-mail en probeer het opnieuw."
   },
   "recommended_shifts": {
     "heading": "Aanbevolen diensten",
@@ -306,9 +266,7 @@
     "no_recommendations_desc": "Voeg vaardigheden toe aan uw profiel om gepersonaliseerde dienstaanbevelingen te krijgen.",
     "match_score": "{{score}}% overeenkomst",
     "load_failed": "Aanbevolen diensten konden niet worden geladen",
-    "load_error": "Kan aanbevelingen niet laden. Probeer het opnieuw.",
-    "subtitle": "Voorgestelde diensten op basis van jouw vaardigheden en beschikbaarheid",
-    "empty_state": "Geen aanbevolen diensten"
+    "load_error": "Kan aanbevelingen niet laden. Probeer het opnieuw."
   },
   "certificates_tab": {
     "heading": "Certificaten",
@@ -325,9 +283,7 @@
     "no_verified_hours": "Geen geverifieerde vrijwilligersuren gevonden. Uren moeten worden goedgekeurd voordat een certificaat wordt gegenereerd.",
     "generate_failed": "Kan certificaat niet genereren. Probeer het opnieuw.",
     "load_failed": "Certificaten konden niet worden geladen",
-    "load_error": "Fout bij laden van certificaten",
-    "subtitle": "Behaalde certificaten en badges",
-    "empty_state": "Nog geen certificaten"
+    "load_error": "Fout bij laden van certificaten"
   },
   "remote": "Op afstand",
   "closes_date": "Sluit {{date}}",

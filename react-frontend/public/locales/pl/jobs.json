@@ -20,12 +20,7 @@
     "all": "Wszystkie typy",
     "paid": "Płatny",
     "volunteer": "Wolontariusz",
-    "timebank": "Bank czasu",
-    "full_time": "Pełny etat",
-    "part_time": "Niepełny etat",
-    "contract": "Umowa",
-    "internship": "Staż",
-    "freelance": "Freelance"
+    "timebank": "Bank czasu"
   },
   "commitment": {
     "all": "Wszystko",
@@ -38,10 +33,7 @@
     "open": "Otwarte",
     "closed": "Zamknięty",
     "filled": "Obsadzony",
-    "draft": "Szkic",
-    "active": "Aktywny",
-    "expired": "Wygasły",
-    "paused": "Wstrzymany"
+    "draft": "Szkic"
   },
   "application_status": {
     "applied": "Stosowany",
@@ -53,10 +45,7 @@
     "accepted": "Zaakceptowany",
     "rejected": "Odrzucony",
     "withdrawn": "Wycofany",
-    "unknown": "Nieznany",
-    "reviewing": "W trakcie przeglądu",
-    "shortlisted": "Na krótkiej liście",
-    "offered": "Złożono ofertę"
+    "unknown": "Nieznany"
   },
   "views": "{{count}} wyświetleń",
   "applications": "{{count}} aplikacji",
@@ -490,13 +479,7 @@
     "accept": "Przyjąć",
     "decline": "Spadek",
     "minutes": "min",
-    "download_ics": "Pobierz .ics",
-    "scheduled": "Rozmowa kwalifikacyjna zaplanowana",
-    "date": "Data",
-    "time": "Godzina",
-    "notes": "Notatki",
-    "virtual": "Wirtualna",
-    "in_person": "Osobiście"
+    "download_ics": "Pobierz .ics"
   },
   "offer": {
     "title": "Oferta pracy",
@@ -507,12 +490,7 @@
     "accepted": "Oferta zaakceptowana",
     "rejected": "Oferta Odrzucona",
     "send": "Wyślij Ofertę",
-    "modal_title": "Wyślij Ofertę Pracy",
-    "deadline": "Termin odpowiedzi",
-    "decline": "Odrzuć ofertę",
-    "declined": "Oferta odrzucona",
-    "expired": "Oferta wygasła",
-    "notes": "Notatki do oferty"
+    "modal_title": "Wyślij Ofertę Pracy"
   },
   "org": {
     "job_openings": "Oferty Pracy"
@@ -521,14 +499,7 @@
     "parse": "Umiejętności zostaną wyodrębnione po przesłaniu",
     "parsing": "Analizowanie CV...",
     "detected": "Umiejętności wykryte w CV",
-    "parsed_toast": "Aplikacja została złożona! {{count}} umiejętności wykryte w Twoim CV.",
-    "title": "Życiorys",
-    "upload": "Prześlij CV",
-    "download": "Pobierz CV",
-    "remove": "Usuń CV",
-    "no_cv": "Nie przesłano CV",
-    "uploaded": "CV przesłane",
-    "required": "CV jest wymagane"
+    "parsed_toast": "Aplikacja została złożona! {{count}} umiejętności wykryte w Twoim CV."
   },
   "branding": {
     "section": "Marka Pracodawcy",
@@ -538,11 +509,7 @@
     "size_label": "Wielkość firmy",
     "benefits_label": "Korzyści i dodatki",
     "benefits_placeholder": "Wpisz korzyść i naciśnij Enter",
-    "about_company": "O firmie",
-    "logo": "Logo firmy",
-    "cover": "Zdjęcie w tle",
-    "upload_logo": "Prześlij logo",
-    "upload_cover": "Prześlij zdjęcie w tle"
+    "about_company": "O firmie"
   },
   "referral": {
     "share": "Udostępnij i zarabiaj",
@@ -560,11 +527,7 @@
     "technical": "Umiejętności techniczne",
     "cultural_fit": "Dopasowanie kulturowe",
     "experience": "Doświadczenie",
-    "motivation": "Motywacja",
-    "add_criterion": "Dodaj kryterium",
-    "criterion": "Kryterium",
-    "weight": "Waga",
-    "score": "Wynik"
+    "motivation": "Motywacja"
   },
   "saved_profile": {
     "found": "Znaleziono zapisany profil aplikacji",
@@ -589,10 +552,7 @@
     "role_manager": "Menedżer",
     "added": "Członek zespołu dodany",
     "removed": "Członek zespołu usunięty",
-    "edit_only": "Dostępne po zapisaniu oferty pracy",
-    "reviewer": "Recenzent",
-    "interviewer": "Prowadzący rozmowę",
-    "hiring_manager": "Menedżer ds. rekrutacji"
+    "edit_only": "Dostępne po zapisaniu oferty pracy"
   },
   "search": {
     "label": "Szukaj ofert pracy",
@@ -687,14 +647,7 @@
       "deadline_past": "Termin musi być datą w przyszłości",
       "salary_required": "Zakres wynagrodzenia jest wymagany. Możesz zaznaczyć 'Wynagrodzenie do negocjacji', aby pominąć.",
       "salary_range_invalid": "Minimalne wynagrodzenie nie może przekraczać maksymalnego wynagrodzenia"
-    },
-    "title": "Tytuł stanowiska",
-    "description": "Opis",
-    "requirements": "Wymagania",
-    "location": "Lokalizacja",
-    "salary_min": "Minimalne wynagrodzenie",
-    "salary_max": "Maksymalne wynagrodzenie",
-    "closing_date": "Data zamknięcia"
+    }
   },
   "ai_generate": {
     "button": "Generowanie AI",
@@ -741,8 +694,7 @@
       "pending_review": "Oczekujące na Przegląd",
       "approved": "Zatwierdzony",
       "rejected": "Odrzucony",
-      "flagged": "Oznaczony flagą",
-      "pending": "Oczekujący"
+      "flagged": "Oznaczony flagą"
     },
     "confirm_approve": "Czy zatwierdzić to ogłoszenie o pracy? Zostanie opublikowane natychmiast.",
     "confirm_reject": "Czy na pewno chcesz odrzucić to ogłoszenie o pracy?",
@@ -965,11 +917,7 @@
     "first_time_banner": "Pierwszy raz publikujesz?",
     "first_time_desc": "Nasz kreator wprowadzenia poprowadzi Cię przez publikację Twojej pierwszej oferty pracy.",
     "start_wizard": "Rozpocznij kreatora",
-    "aria_progress": "Postęp w onboardingu",
-    "step1": "Utwórz swoją pierwszą ofertę pracy",
-    "step2": "Przeglądaj aplikacje",
-    "step3": "Skontaktuj się z kandydatami",
-    "complete": "Konfiguracja zakończona"
+    "aria_progress": "Postęp w onboardingu"
   },
   "preview": {
     "title": "Podgląd oferty pracy",
@@ -1044,10 +992,7 @@
     "hint": "Zapytaj mnie o wszystko dotyczące tej pracy — kwalifikacje, wynagrodzenie, jak aplikować, porady dotyczące rozmowy kwalifikacyjnej...",
     "placeholder": "Zadaj pytanie dotyczące tej oferty...",
     "error_response": "Przepraszam, nie mogłem przetworzyć Twojego żądania.",
-    "error_generic": "Przepraszam, coś poszło nie tak.",
-    "thinking": "Myślę...",
-    "clear": "Wyczyść rozmowę",
-    "suggestions": "Sugerowane pytania"
+    "error_generic": "Przepraszam, coś poszło nie tak."
   },
   "page_meta": {
     "bias_audit": {
@@ -1082,14 +1027,6 @@
     },
     "employer_brand": {
       "title": "Marka pracodawcy"
-    },
-    "index": {
-      "title": "Oferty pracy",
-      "description": "Przeglądaj dostępne możliwości zatrudnienia i role w swojej społeczności"
-    },
-    "detail": {
-      "title": "{{title}} — Oferty pracy",
-      "description": "Zobacz szczegóły oferty i aplikuj"
     }
   },
   "jobs": {

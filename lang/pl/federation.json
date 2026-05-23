@@ -1,5 +1,5 @@
 {
-  "relay_no_remote_node": "Cannot determine remote node for account: :account",
-  "relay_no_route_to_node": "No route to node: :node",
-  "relay_url_blocked": "Relay target URL blocked by security filter"
+  "relay_no_remote_node": "Nie można określić zdalnego węzła dla konta: :account",
+  "relay_no_route_to_node": "Brak trasy do węzła: :node",
+  "relay_url_blocked": "Docelowy adres URL przekaźnika zablokowany przez filtr bezpieczeństwa"
 }

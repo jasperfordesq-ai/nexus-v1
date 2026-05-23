@@ -40,12 +40,7 @@
     "credential_type_placeholder": "Wybierz typ poświadczenia",
     "document_label": "Dokument",
     "expiry_date_label": "Data ważności (opcjonalnie)",
-    "expiry_date_placeholder": "Pozostaw puste, jeśli nie ma wygaśnięcia",
-    "subtitle": "Udowodnij swój wkład i umiejętności",
-    "empty_state": "Brak poświadczeń",
-    "empty_state_desc": "Ukończ wymiany i zdobądź uznanie za swoje umiejętności",
-    "view_all": "Wyświetl wszystkie",
-    "awarded_on": "Przyznano {{date}}"
+    "expiry_date_placeholder": "Pozostaw puste, jeśli nie ma wygaśnięcia"
   },
   "swaps": {
     "heading": "Wymiany w społeczności",
@@ -66,12 +61,7 @@
     "load_error": "Nie można wczytać żądań zamiany zmiany. Spróbuj ponownie.",
     "accept_failed": "Nie udało się zaakceptować prośby o wymianę. Spróbuj ponownie.",
     "reject_failed": "Nie udało się odrzucić prośby o wymianę. Spróbuj ponownie.",
-    "reject_confirm": "Czy na pewno chcesz odrzucić tę prośbę o wymianę?",
-    "subtitle": "Śledź wymiany usług z innymi członkami",
-    "empty_state": "Brak wymian",
-    "empty_state_desc": "Rozpocznij swoją pierwszą wymianę już dziś",
-    "view_all": "Wyświetl wszystkie",
-    "load_failed": "Nie udało się załadować wymian"
+    "reject_confirm": "Czy na pewno chcesz odrzucić tę prośbę o wymianę?"
   },
   "waitlist": {
     "heading": "Lista oczekujących",
@@ -86,12 +76,7 @@
     "load_error": "Nie można załadować wpisów na listę oczekujących. Spróbuj ponownie.",
     "leave_confirm": "Czy na pewno chcesz opuścić tę listę oczekujących? Stracisz swoje stanowisko.",
     "leave_success": "Opuściłeś listę oczekujących.",
-    "leave_failed": "Nie udało się opuścić listy oczekujących. Spróbuj ponownie.",
-    "subtitle": "Zarządzaj oczekującymi wnioskami o członkostwo",
-    "empty_state": "Lista oczekujących jest pusta",
-    "approve": "Zatwierdź",
-    "reject": "Odrzuć",
-    "load_failed": "Nie udało się załadować listy oczekujących"
+    "leave_failed": "Nie udało się opuścić listy oczekujących. Spróbuj ponownie."
   },
   "wellbeing": {
     "heading": "Dobrostan społeczności",
@@ -139,12 +124,7 @@
     "tip_boundaries": "Ustaw granice swojej dostępności",
     "tip_connect": "Nawiąż kontakt z innymi wolontariuszami, aby uzyskać wsparcie",
     "tip_celebrate": "Świętuj swój wpływ – liczy się każda godzina",
-    "tip_reduce": "Rozważ zmniejszenie częstotliwości, jeśli czujesz się przytłoczony",
-    "subtitle": "Śledź kondycję i aktywność swojej społeczności",
-    "load_failed": "Nie udało się załadować danych dotyczących dobrostanu",
-    "members_active": "Aktywni członkowie",
-    "exchanges_this_month": "Wymiany w tym miesiącu",
-    "hours_exchanged": "Wymienione godziny"
+    "tip_reduce": "Rozważ zmniejszenie częstotliwości, jeśli czujesz się przytłoczony"
   },
   "organisations": {
     "page_title": "Organizacje",
@@ -204,15 +184,7 @@
     "terms_agreement": "Przeczytałem i zgadzam się z powyższymi warunkami rejestracji organizacji.",
     "terms_required": "Aby zarejestrować swoją organizację, musisz zaakceptować warunki.",
     "opportunity_count_one": "Możliwość {{count}}",
-    "opportunity_count_other": "{{count}} możliwości",
-    "load_failed": "Nie udało się załadować organizacji",
-    "load_error": "Błąd ładowania organizacji",
-    "register_cta": "Zarejestruj swoją organizację",
-    "register_cta_desc": "Dołącz do naszej sieci organizacji społecznych",
-    "filter_all": "Wszystkie",
-    "filter_verified": "Zweryfikowane",
-    "no_results": "Nie znaleziono organizacji",
-    "no_results_desc": "Spróbuj innego wyszukiwania lub przeglądaj wszystkie organizacje"
+    "opportunity_count_other": "{{count}} możliwości"
   },
   "organisation_detail": {
     "page_title": "Organizacja",
@@ -245,12 +217,7 @@
     "cover_message_placeholder": "Powiedz organizacji, dlaczego chcesz zostać wolontariuszem...",
     "cancel": "Anulować",
     "submit_application": "Prześlij wniosek",
-    "job_openings": "Oferty pracy",
-    "load_failed": "Nie udało się załadować szczegółów organizacji",
-    "members_count": "{{count}} członków",
-    "join": "Dołącz do organizacji",
-    "leave": "Opuść organizację",
-    "edit": "Edytuj"
+    "job_openings": "Oferty pracy"
   },
   "emergency_alerts": {
     "heading": "Alerty awaryjne",
@@ -269,10 +236,7 @@
     "accepted": "Przyjęty",
     "declined": "Odrzucony",
     "from_coordinator": "Z {{name}}",
-    "expires": "Wygasa {{date}}",
-    "subtitle": "Wysyłaj pilne powiadomienia do członków społeczności",
-    "send": "Wyślij alert",
-    "no_alerts": "Brak aktywnych alertów"
+    "expires": "Wygasa {{date}}"
   },
   "group_signups": {
     "heading": "Zapisy do grup",
@@ -292,11 +256,7 @@
     "email_placeholder": "członek@przykład.com",
     "cancel": "Anulować",
     "add_member_failed": "Nie udało się dodać członka. Być może są już w grupie lub adres e-mail jest nieprawidłowy.",
-    "add_member_error": "Nie można dodać członka. Sprawdź e-mail i spróbuj ponownie.",
-    "subtitle": "Zarządzaj wnioskami o dołączenie do grup",
-    "empty_state": "Brak oczekujących wniosków o zapis",
-    "approve": "Zatwierdź",
-    "reject": "Odrzuć"
+    "add_member_error": "Nie można dodać członka. Sprawdź e-mail i spróbuj ponownie."
   },
   "recommended_shifts": {
     "heading": "Zalecane zmiany",
@@ -306,9 +266,7 @@
     "no_recommendations_desc": "Dodaj umiejętności do swojego profilu, aby otrzymywać spersonalizowane rekomendacje dotyczące zmian.",
     "match_score": "{{score}}% dopasowania",
     "load_failed": "Nie udało się załadować zalecanych zmian",
-    "load_error": "Nie można wczytać rekomendacji. Spróbuj ponownie.",
-    "subtitle": "Proponowane zmiany na podstawie Twoich umiejętności i dostępności",
-    "empty_state": "Brak zalecanych zmian"
+    "load_error": "Nie można wczytać rekomendacji. Spróbuj ponownie."
   },
   "certificates_tab": {
     "heading": "Certyfikaty",
@@ -325,9 +283,7 @@
     "no_verified_hours": "Nie znaleziono zweryfikowanych godzin wolontariatu. Godziny muszą zostać zatwierdzone przed wygenerowaniem certyfikatu.",
     "generate_failed": "Nie udało się wygenerować certyfikatu. Spróbuj ponownie.",
     "load_failed": "Nie udało się załadować certyfikatów",
-    "load_error": "Błąd ładowania certyfikatów",
-    "subtitle": "Zdobyte certyfikaty i odznaki",
-    "empty_state": "Brak certyfikatów"
+    "load_error": "Błąd ładowania certyfikatów"
   },
   "remote": "Zdalnie",
   "closes_date": "Zamknięcie {{date}}",

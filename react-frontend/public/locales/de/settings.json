@@ -341,8 +341,7 @@
     "daily": "Täglich",
     "monthly": "Monatlich",
     "fortnightly": "Zweiwöchentlich",
-    "never": "Nie",
-    "weekly": "Wöchentlich"
+    "never": "Nie"
   },
   "activity_digest": {
     "off": "Aus",

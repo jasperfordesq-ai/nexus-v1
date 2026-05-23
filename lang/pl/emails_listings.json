@@ -1,56 +1,56 @@
 {
   "listings": {
     "expired": {
-      "notification": "Your listing \"{{title}}\" has expired. You can renew it to make it active again.",
-      "subject": "Your listing has expired",
-      "heading": "Your listing has expired",
-      "subheading": "Renew your listing to keep it active.",
-      "body_expired": "Your listing <strong>\"{{title}}\"</strong> has expired.",
-      "body_renew": "You can renew it to make it visible to the community again.",
-      "cta": "Renew Listing"
+      "notification": "Twoje ogłoszenie \"{{title}}\" wygasło. Możesz je odnowić, aby ponownie je aktywować.",
+      "subject": "Twoje ogłoszenie wygasło",
+      "heading": "Twoje ogłoszenie wygasło",
+      "subheading": "Odnów swoje ogłoszenie, aby zachować jego aktywność.",
+      "body_expired": "Twoje ogłoszenie <strong>\"{{title}}\"</strong> wygasło.",
+      "body_renew": "Możesz je odnowić, aby ponownie było widoczne dla społeczności.",
+      "cta": "Odnów ogłoszenie"
     },
     "expiry_reminder": {
-      "notification": "Your listing \"{{title}}\" expires in {{days_text}} (on {{expiry_date}}) — renew it to keep it active.",
-      "subject": "Your listing expires in {{days_text}}",
-      "heading": "Your listing expires in {{days_text}}",
-      "subheading": "Don't miss out — renew your listing to keep it active.",
-      "body_expires": "Your listing <strong>\"{{title}}\"</strong> expires in {{days_text}} (on {{expiry_date}}).",
-      "body_renew": "Renew it now to keep it visible to the community.",
-      "cta": "View Listing",
-      "days_one": "1 day",
-      "days_other": "{{count}} days",
-      "urgent_note": "Act soon to keep your listing visible!",
-      "expired_subject": "Twój wpis „{{title}}” wygasł",
-      "expired_title": "Listing Expired",
-      "expired_preview": "Your listing has expired — renew it to stay visible",
-      "expired_body": "Twój wpis <strong>„{{title}}”</strong> wygasł. Odnów ją teraz, aby nadal otrzymywać odpowiedzi od członków społeczności.",
-      "expired_cta": "Renew Listing"
+      "notification": "Twoje ogłoszenie \"{{title}}\" wygasa za {{days_text}} ({{expiry_date}}) — odnów je, aby zachować aktywność.",
+      "subject": "Twoje ogłoszenie wygasa za {{days_text}}",
+      "heading": "Twoje ogłoszenie wygasa za {{days_text}}",
+      "subheading": "Nie przegap — odnów swoje ogłoszenie, aby zachować jego aktywność.",
+      "body_expires": "Twoje ogłoszenie <strong>\"{{title}}\"</strong> wygasa za {{days_text}} ({{expiry_date}}).",
+      "body_renew": "Odnów je teraz, aby pozostało widoczne dla społeczności.",
+      "cta": "Zobacz ogłoszenie",
+      "days_one": "1 dzień",
+      "days_other": "{{count}} dni",
+      "urgent_note": "Działaj szybko, aby Twoje ogłoszenie pozostało widoczne!",
+      "expired_subject": "Twoje ogłoszenie \"{{title}}\" wygasło",
+      "expired_title": "Ogłoszenie wygasło",
+      "expired_preview": "Twoje ogłoszenie wygasło — odnów je, aby pozostać widocznym",
+      "expired_body": "Twoje ogłoszenie <strong>\"{{title}}\"</strong> wygasło. Odnów je teraz, aby nadal otrzymywać odpowiedzi od członków społeczności.",
+      "expired_cta": "Odnów ogłoszenie"
     },
     "approved": {
-      "notification": "Your listing \"{{title}}\" has been approved and is now active.",
-      "notification_short": "Your listing \"{{title}}\" has been approved!",
-      "email_subject": "Your listing has been approved — {{title}}",
-      "email_title": "Listing Approved",
-      "email_body": "Great news! Your listing <strong>\"{{title}}\"</strong> has been approved and is now active in the community.",
-      "email_cta": "View Listing"
+      "notification": "Twoje ogłoszenie \"{{title}}\" zostało zatwierdzone i jest teraz aktywne.",
+      "notification_short": "Twoje ogłoszenie \"{{title}}\" zostało zatwierdzone!",
+      "email_subject": "Twoje ogłoszenie zostało zatwierdzone — {{title}}",
+      "email_title": "Ogłoszenie zatwierdzone",
+      "email_body": "Świetna wiadomość! Twoje ogłoszenie <strong>\"{{title}}\"</strong> zostało zatwierdzone i jest teraz aktywne w społeczności.",
+      "email_cta": "Zobacz ogłoszenie"
     },
     "rejected": {
-      "notification": "Your listing \"{{title}}\" was not approved. Reason: {{reason}}",
-      "notification_no_reason": "Your listing \"{{title}}\" was not approved.",
-      "subject": "Your listing needs changes",
-      "heading": "Your listing needs changes",
-      "subheading": "Your listing was not approved — here's what to do next.",
-      "body_not_approved": "Your listing <strong>\"{{title}}\"</strong> was not approved.",
-      "body_reason": "<strong>Reason:</strong> {{reason}}",
-      "body_resubmit": "Please review and update your listing, then resubmit for approval.",
-      "cta": "Edit Listing"
+      "notification": "Twoje ogłoszenie \"{{title}}\" nie zostało zatwierdzone. Powód: {{reason}}",
+      "notification_no_reason": "Twoje ogłoszenie \"{{title}}\" nie zostało zatwierdzone.",
+      "subject": "Twoje ogłoszenie wymaga zmian",
+      "heading": "Twoje ogłoszenie wymaga zmian",
+      "subheading": "Twoje ogłoszenie nie zostało zatwierdzone — oto co zrobić dalej.",
+      "body_not_approved": "Twoje ogłoszenie <strong>\"{{title}}\"</strong> nie zostało zatwierdzone.",
+      "body_reason": "<strong>Powód:</strong> {{reason}}",
+      "body_resubmit": "Prosimy przejrzeć i zaktualizować ogłoszenie, a następnie przesłać je ponownie do zatwierdzenia.",
+      "cta": "Edytuj ogłoszenie"
     },
     "removed": {
-      "notification": "Your listing \"{{title}}\" has been removed by a moderator.",
-      "email_subject": "Your listing has been removed — {{title}}",
-      "email_title": "Listing Removed",
-      "email_body": "Your listing <strong>\"{{title}}\"</strong> has been removed by a moderator.",
-      "email_cta": "Browse Listings"
+      "notification": "Twoje ogłoszenie \"{{title}}\" zostało usunięte przez moderatora.",
+      "email_subject": "Twoje ogłoszenie zostało usunięte — {{title}}",
+      "email_title": "Ogłoszenie usunięte",
+      "email_body": "Twoje ogłoszenie <strong>\"{{title}}\"</strong> zostało usunięte przez moderatora.",
+      "email_cta": "Przeglądaj ogłoszenia"
     }
   }
 }

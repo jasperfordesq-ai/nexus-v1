@@ -20,12 +20,7 @@
     "all": "すべてのタイプ",
     "paid": "有料",
     "volunteer": "ボランティア",
-    "timebank": "タイムバンク",
-    "full_time": "フルタイム",
-    "part_time": "パートタイム",
-    "contract": "契約社員",
-    "internship": "インターンシップ",
-    "freelance": "フリーランス"
+    "timebank": "タイムバンク"
   },
   "commitment": {
     "all": "全て",
@@ -38,10 +33,7 @@
     "open": "開ける",
     "closed": "締め切り",
     "filled": "採用済み",
-    "draft": "下書き",
-    "active": "公開中",
-    "expired": "期限切れ",
-    "paused": "一時停止"
+    "draft": "下書き"
   },
   "application_status": {
     "applied": "適用済み",
@@ -53,10 +45,7 @@
     "accepted": "承諾済み",
     "rejected": "不採用",
     "withdrawn": "取り下げ済み",
-    "unknown": "不明",
-    "reviewing": "審査中",
-    "shortlisted": "候補者リスト入り",
-    "offered": "オファー済み"
+    "unknown": "不明"
   },
   "views": "{{count}} 回の閲覧",
   "applications": "{{count}} 件の応募",
@@ -490,13 +479,7 @@
     "accept": "受け入れる",
     "decline": "衰退",
     "minutes": "分",
-    "download_ics": ".ics をダウンロード",
-    "scheduled": "面接がスケジュールされました",
-    "date": "日付",
-    "time": "時間",
-    "notes": "メモ",
-    "virtual": "オンライン",
-    "in_person": "対面"
+    "download_ics": ".ics をダウンロード"
   },
   "offer": {
     "title": "内定通知",
@@ -507,12 +490,7 @@
     "accepted": "オファー承諾済み",
     "rejected": "オファーが辞退されました",
     "send": "オファーを送信する",
-    "modal_title": "求人オファーを送信する",
-    "deadline": "返答期限",
-    "decline": "オファーを辞退",
-    "declined": "オファー辞退済み",
-    "expired": "オファーの期限が切れました",
-    "notes": "オファーのメモ"
+    "modal_title": "求人オファーを送信する"
   },
   "org": {
     "job_openings": "求人情報"
@@ -521,14 +499,7 @@
     "parse": "スキルは提出後に抽出されます",
     "parsing": "履歴書を分析中...",
     "detected": "履歴書から検出されたスキル",
-    "parsed_toast": "応募が提出されました！{{count}} あなたの履歴書から検出されたスキル。",
-    "title": "履歴書",
-    "upload": "履歴書をアップロード",
-    "download": "履歴書をダウンロード",
-    "remove": "履歴書を削除",
-    "no_cv": "履歴書がアップロードされていません",
-    "uploaded": "履歴書がアップロードされました",
-    "required": "履歴書は必須です"
+    "parsed_toast": "応募が提出されました！{{count}} あなたの履歴書から検出されたスキル。"
   },
   "branding": {
     "section": "雇用主ブランディング",
@@ -538,11 +509,7 @@
     "size_label": "会社の規模",
     "benefits_label": "福利厚生",
     "benefits_placeholder": "福利厚生を入力してEnterを押してください",
-    "about_company": "会社について",
-    "logo": "会社ロゴ",
-    "cover": "カバー画像",
-    "upload_logo": "ロゴをアップロード",
-    "upload_cover": "カバー画像をアップロード"
+    "about_company": "会社について"
   },
   "referral": {
     "share": "共有して稼ぐ",
@@ -560,11 +527,7 @@
     "technical": "技術スキル",
     "cultural_fit": "文化的適合",
     "experience": "経験",
-    "motivation": "モチベーション",
-    "add_criterion": "評価基準を追加",
-    "criterion": "評価基準",
-    "weight": "重み",
-    "score": "スコア"
+    "motivation": "モチベーション"
   },
   "saved_profile": {
     "found": "保存された応募プロフィールが見つかりました",
@@ -589,10 +552,7 @@
     "role_manager": "マネージャー",
     "added": "チームメンバーが追加されました",
     "removed": "チームメンバーが削除されました",
-    "edit_only": "仕事を保存した後に利用可能",
-    "reviewer": "レビュアー",
-    "interviewer": "面接官",
-    "hiring_manager": "採用マネージャー"
+    "edit_only": "仕事を保存した後に利用可能"
   },
   "search": {
     "label": "求人を検索",
@@ -687,14 +647,7 @@
       "deadline_past": "締切は未来の日付でなければなりません",
       "salary_required": "給与範囲が必要です。「給与交渉可」をチェックして省略できます。",
       "salary_range_invalid": "最低給与は最高給与を超えることはできません"
-    },
-    "title": "求人タイトル",
-    "description": "説明",
-    "requirements": "応募要件",
-    "location": "勤務地",
-    "salary_min": "最低給与",
-    "salary_max": "最高給与",
-    "closing_date": "締め切り日"
+    }
   },
   "ai_generate": {
     "button": "AI生成",
@@ -741,8 +694,7 @@
       "pending_review": "レビュー待ち",
       "approved": "承認済み",
       "rejected": "却下済み",
-      "flagged": "フラグ済み",
-      "pending": "審査待ち"
+      "flagged": "フラグ済み"
     },
     "confirm_approve": "この求人を承認しますか？すぐに公開されます。",
     "confirm_reject": "この求人を拒否してもよろしいですか？",
@@ -965,11 +917,7 @@
     "first_time_banner": "初めての投稿ですか？",
     "first_time_desc": "私たちのオンボーディングウィザードが、初めての求人投稿をサポートします。",
     "start_wizard": "ウィザードを開始",
-    "aria_progress": "オンボーディングの進捗",
-    "step1": "最初の求人を作成する",
-    "step2": "応募を確認する",
-    "step3": "候補者と連絡を取る",
-    "complete": "セットアップ完了"
+    "aria_progress": "オンボーディングの進捗"
   },
   "preview": {
     "title": "求人プレビュー",
@@ -1044,10 +992,7 @@
     "hint": "この仕事について何でも聞いてください — 資格、給与、応募方法、面接のヒント...",
     "placeholder": "この求人について質問する...",
     "error_response": "申し訳ありませんが、リクエストを処理できませんでした。",
-    "error_generic": "申し訳ありませんが、エラーが発生しました。",
-    "thinking": "考え中...",
-    "clear": "会話をクリア",
-    "suggestions": "おすすめの質問"
+    "error_generic": "申し訳ありませんが、エラーが発生しました。"
   },
   "page_meta": {
     "bias_audit": {
@@ -1082,14 +1027,6 @@
     },
     "employer_brand": {
       "title": "雇用主ブランド"
-    },
-    "index": {
-      "title": "求人情報",
-      "description": "コミュニティで利用可能な仕事の機会や役割を探す"
-    },
-    "detail": {
-      "title": "{{title}} — 求人",
-      "description": "求人詳細を見て応募する"
     }
   },
   "jobs": {

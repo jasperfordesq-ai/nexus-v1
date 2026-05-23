@@ -1,56 +1,56 @@
 {
   "listings": {
     "expired": {
-      "notification": "Your listing \"{{title}}\" has expired. You can renew it to make it active again.",
-      "subject": "Your listing has expired",
-      "heading": "Your listing has expired",
-      "subheading": "Renew your listing to keep it active.",
-      "body_expired": "Your listing <strong>\"{{title}}\"</strong> has expired.",
-      "body_renew": "You can renew it to make it visible to the community again.",
-      "cta": "Renew Listing"
+      "notification": "انتهت صلاحية إعلانك \"{{title}}\". يمكنك تجديده لجعله نشطاً مجدداً.",
+      "subject": "انتهت صلاحية إعلانك",
+      "heading": "انتهت صلاحية إعلانك",
+      "subheading": "جدِّد إعلانك للحفاظ عليه نشطاً.",
+      "body_expired": "انتهت صلاحية إعلانك <strong>\"{{title}}\"</strong>.",
+      "body_renew": "يمكنك تجديده ليصبح مرئياً للمجتمع مجدداً.",
+      "cta": "تجديد الإعلان"
     },
     "expiry_reminder": {
-      "notification": "Your listing \"{{title}}\" expires in {{days_text}} (on {{expiry_date}}) — renew it to keep it active.",
-      "subject": "Your listing expires in {{days_text}}",
-      "heading": "Your listing expires in {{days_text}}",
-      "subheading": "Don't miss out — renew your listing to keep it active.",
-      "body_expires": "Your listing <strong>\"{{title}}\"</strong> expires in {{days_text}} (on {{expiry_date}}).",
-      "body_renew": "Renew it now to keep it visible to the community.",
-      "cta": "View Listing",
-      "days_one": "1 day",
-      "days_other": "{{count}} days",
-      "urgent_note": "Act soon to keep your listing visible!",
-      "expired_subject": "لقد انتهت صلاحية قائمتك \"{{title}}\".",
-      "expired_title": "Listing Expired",
-      "expired_preview": "Your listing has expired — renew it to stay visible",
-      "expired_body": "لقد انتهت صلاحية قائمتك <strong>\"{{title}}\"</strong>. قم بتجديده الآن لمواصلة تلقي الردود من أفراد المجتمع.",
-      "expired_cta": "Renew Listing"
+      "notification": "إعلانك \"{{title}}\" تنتهي صلاحيته خلال {{days_text}} (في {{expiry_date}}) — جدِّده للحفاظ عليه نشطاً.",
+      "subject": "إعلانك تنتهي صلاحيته خلال {{days_text}}",
+      "heading": "إعلانك تنتهي صلاحيته خلال {{days_text}}",
+      "subheading": "لا تفوّت الفرصة — جدِّد إعلانك للحفاظ عليه نشطاً.",
+      "body_expires": "إعلانك <strong>\"{{title}}\"</strong> تنتهي صلاحيته خلال {{days_text}} (في {{expiry_date}}).",
+      "body_renew": "جدِّده الآن للحفاظ على ظهوره للمجتمع.",
+      "cta": "عرض الإعلان",
+      "days_one": "يوم واحد",
+      "days_other": "{{count}} أيام",
+      "urgent_note": "تصرف سريعاً للحفاظ على ظهور إعلانك!",
+      "expired_subject": "انتهت صلاحية إعلانك \"{{title}}\"",
+      "expired_title": "انتهت صلاحية الإعلان",
+      "expired_preview": "انتهت صلاحية إعلانك — جدِّده للحفاظ على ظهوره",
+      "expired_body": "انتهت صلاحية إعلانك <strong>\"{{title}}\"</strong>. جدِّده الآن لمواصلة تلقي الردود من أعضاء المجتمع.",
+      "expired_cta": "تجديد الإعلان"
     },
     "approved": {
-      "notification": "Your listing \"{{title}}\" has been approved and is now active.",
-      "notification_short": "Your listing \"{{title}}\" has been approved!",
-      "email_subject": "Your listing has been approved — {{title}}",
-      "email_title": "Listing Approved",
-      "email_body": "Great news! Your listing <strong>\"{{title}}\"</strong> has been approved and is now active in the community.",
-      "email_cta": "View Listing"
+      "notification": "تمت الموافقة على إعلانك \"{{title}}\" وهو نشط الآن.",
+      "notification_short": "تمت الموافقة على إعلانك \"{{title}}\"!",
+      "email_subject": "تمت الموافقة على إعلانك — {{title}}",
+      "email_title": "تمت الموافقة على الإعلان",
+      "email_body": "أخبار رائعة! تمت الموافقة على إعلانك <strong>\"{{title}}\"</strong> وأصبح نشطاً في المجتمع.",
+      "email_cta": "عرض الإعلان"
     },
     "rejected": {
-      "notification": "Your listing \"{{title}}\" was not approved. Reason: {{reason}}",
-      "notification_no_reason": "Your listing \"{{title}}\" was not approved.",
-      "subject": "Your listing needs changes",
-      "heading": "Your listing needs changes",
-      "subheading": "Your listing was not approved — here's what to do next.",
-      "body_not_approved": "Your listing <strong>\"{{title}}\"</strong> was not approved.",
-      "body_reason": "<strong>Reason:</strong> {{reason}}",
-      "body_resubmit": "Please review and update your listing, then resubmit for approval.",
-      "cta": "Edit Listing"
+      "notification": "لم تتم الموافقة على إعلانك \"{{title}}\". السبب: {{reason}}",
+      "notification_no_reason": "لم تتم الموافقة على إعلانك \"{{title}}\".",
+      "subject": "إعلانك يحتاج إلى تعديلات",
+      "heading": "إعلانك يحتاج إلى تعديلات",
+      "subheading": "لم تتم الموافقة على إعلانك — إليك ما يجب فعله.",
+      "body_not_approved": "لم تتم الموافقة على إعلانك <strong>\"{{title}}\"</strong>.",
+      "body_reason": "<strong>السبب:</strong> {{reason}}",
+      "body_resubmit": "يرجى مراجعة إعلانك وتحديثه ثم إعادة تقديمه للموافقة.",
+      "cta": "تعديل الإعلان"
     },
     "removed": {
-      "notification": "Your listing \"{{title}}\" has been removed by a moderator.",
-      "email_subject": "Your listing has been removed — {{title}}",
-      "email_title": "Listing Removed",
-      "email_body": "Your listing <strong>\"{{title}}\"</strong> has been removed by a moderator.",
-      "email_cta": "Browse Listings"
+      "notification": "تمت إزالة إعلانك \"{{title}}\" بواسطة مشرف.",
+      "email_subject": "تمت إزالة إعلانك — {{title}}",
+      "email_title": "تمت إزالة الإعلان",
+      "email_body": "تمت إزالة إعلانك <strong>\"{{title}}\"</strong> بواسطة مشرف.",
+      "email_cta": "تصفح الإعلانات"
     }
   }
 }

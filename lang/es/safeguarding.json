@@ -1,14 +1,14 @@
 {
   "critical": {
-    "subject": "Critical safeguarding report submitted",
-    "greeting": "Hello {{name}},",
-    "urgency": "A critical-severity safeguarding report has been submitted in your community and requires immediate attention.",
-    "report_category": "Category: {{category}}",
-    "report_severity": "Severity: {{severity}}",
-    "sla_hours": "Response window: {{hours}} hours",
-    "time_remaining": "Time remaining: {{remaining}}",
-    "action_label": "Open report in admin",
-    "footer": "This is an automated alert from the safeguarding workflow. Please act promptly.",
-    "fallback_text_subject": "URGENT: Critical safeguarding report"
+    "subject": "Informe de protección crítico enviado",
+    "greeting": "Hola {{name}},",
+    "urgency": "Se ha enviado un informe de protección de gravedad crítica en su comunidad y requiere atención inmediata.",
+    "report_category": "Categoría: {{category}}",
+    "report_severity": "Gravedad: {{severity}}",
+    "sla_hours": "Ventana de respuesta: {{hours}} horas",
+    "time_remaining": "Tiempo restante: {{remaining}}",
+    "action_label": "Abrir informe en la administración",
+    "footer": "Esta es una alerta automática del flujo de trabajo de protección. Por favor, actúe con prontitud.",
+    "fallback_text_subject": "URGENTE: Informe de protección crítico"
   }
 }

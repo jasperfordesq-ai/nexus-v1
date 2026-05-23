@@ -20,12 +20,7 @@
     "all": "Alle Types",
     "paid": "Betaald",
     "volunteer": "Vrijwilliger",
-    "timebank": "Tijdbank",
-    "full_time": "Voltijd",
-    "part_time": "Deeltijd",
-    "contract": "Contract",
-    "internship": "Stage",
-    "freelance": "Freelance"
+    "timebank": "Tijdbank"
   },
   "commitment": {
     "all": "Alle",
@@ -38,10 +33,7 @@
     "open": "Open",
     "closed": "Gesloten",
     "filled": "Ingevuld",
-    "draft": "Concept",
-    "active": "Actief",
-    "expired": "Verlopen",
-    "paused": "Gepauzeerd"
+    "draft": "Concept"
   },
   "application_status": {
     "applied": "Toegepast",
@@ -53,10 +45,7 @@
     "accepted": "Geaccepteerd",
     "rejected": "Afgewezen",
     "withdrawn": "Ingetrokken",
-    "unknown": "Onbekend",
-    "reviewing": "In beoordeling",
-    "shortlisted": "Op shortlist",
-    "offered": "Aanbod gedaan"
+    "unknown": "Onbekend"
   },
   "views": "{{count}} weergaven",
   "applications": "{{count}} aanvragen",
@@ -490,13 +479,7 @@
     "accept": "Accepteren",
     "decline": "Afwijzen",
     "minutes": "min",
-    "download_ics": ".ics downloaden",
-    "scheduled": "Sollicitatiegesprek gepland",
-    "date": "Datum",
-    "time": "Tijd",
-    "notes": "Notities",
-    "virtual": "Virtueel",
-    "in_person": "Persoonlijk"
+    "download_ics": ".ics downloaden"
   },
   "offer": {
     "title": "Jobaanbieding",
@@ -507,12 +490,7 @@
     "accepted": "Aanbod geaccepteerd",
     "rejected": "Aanbod Geweigerd",
     "send": "Stuur Aanbod",
-    "modal_title": "Stuur Vacature Aanbieding",
-    "deadline": "Reactiedeadline",
-    "decline": "Aanbod afwijzen",
-    "declined": "Aanbod afgewezen",
-    "expired": "Aanbod verlopen",
-    "notes": "Notities bij aanbod"
+    "modal_title": "Stuur Vacature Aanbieding"
   },
   "org": {
     "job_openings": "Vacatures"
@@ -521,14 +499,7 @@
     "parse": "Vaardigheden worden na indiening geëxtraheerd",
     "parsing": "CV aan het analyseren...",
     "detected": "Vaardigheden gedetecteerd uit CV",
-    "parsed_toast": "Aanvraag ingediend! {{count}} vaardigheden gedetecteerd uit uw CV.",
-    "title": "Curriculum Vitae",
-    "upload": "CV uploaden",
-    "download": "CV downloaden",
-    "remove": "CV verwijderen",
-    "no_cv": "Geen CV geüpload",
-    "uploaded": "CV geüpload",
-    "required": "CV is verplicht"
+    "parsed_toast": "Aanvraag ingediend! {{count}} vaardigheden gedetecteerd uit uw CV."
   },
   "branding": {
     "section": "Werkgeversmerk",
@@ -538,11 +509,7 @@
     "size_label": "Bedrijfsgrootte",
     "benefits_label": "Voordelen & Extra's",
     "benefits_placeholder": "Typ een voordeel en druk op Enter",
-    "about_company": "Over het Bedrijf",
-    "logo": "Bedrijfslogo",
-    "cover": "Omslagafbeelding",
-    "upload_logo": "Logo uploaden",
-    "upload_cover": "Omslagafbeelding uploaden"
+    "about_company": "Over het Bedrijf"
   },
   "referral": {
     "share": "Deel & Verdien",
@@ -560,11 +527,7 @@
     "technical": "Technische Vaardigheden",
     "cultural_fit": "Culturele Geschiktheid",
     "experience": "Ervaring",
-    "motivation": "Motivatie",
-    "add_criterion": "Criterium toevoegen",
-    "criterion": "Criterium",
-    "weight": "Gewicht",
-    "score": "Score"
+    "motivation": "Motivatie"
   },
   "saved_profile": {
     "found": "Opgeslagen aanvraagprofiel gevonden",
@@ -589,10 +552,7 @@
     "role_manager": "Manager",
     "added": "Teamlid toegevoegd",
     "removed": "Teamlid verwijderd",
-    "edit_only": "Beschikbaar na het opslaan van de vacature",
-    "reviewer": "Beoordelaar",
-    "interviewer": "Interviewer",
-    "hiring_manager": "Wervingsmanager"
+    "edit_only": "Beschikbaar na het opslaan van de vacature"
   },
   "search": {
     "label": "Zoek naar vacatures",
@@ -687,14 +647,7 @@
       "deadline_past": "Deadline moet een toekomstige datum zijn",
       "salary_required": "Salarisrange vereist. Je kunt 'Salaris bespreekbaar' aanvinken om dit over te slaan.",
       "salary_range_invalid": "Minimum salaris mag niet hoger zijn dan maximum salaris"
-    },
-    "title": "Functietitel",
-    "description": "Beschrijving",
-    "requirements": "Vereisten",
-    "location": "Locatie",
-    "salary_min": "Minimumsalaris",
-    "salary_max": "Maximumsalaris",
-    "closing_date": "Sluitingsdatum"
+    }
   },
   "ai_generate": {
     "button": "AI Genereren",
@@ -741,8 +694,7 @@
       "pending_review": "In Afwachting van Beoordeling",
       "approved": "Goedgekeurd",
       "rejected": "Afgewezen",
-      "flagged": "Gemarkeerd",
-      "pending": "In afwachting"
+      "flagged": "Gemarkeerd"
     },
     "confirm_approve": "Deze vacature goedkeuren? Het zal onmiddellijk worden gepubliceerd.",
     "confirm_reject": "Weet je zeker dat je deze vacature wilt afwijzen?",
@@ -965,11 +917,7 @@
     "first_time_banner": "Eerste keer plaatsen?",
     "first_time_desc": "Onze onboarding wizard begeleidt je bij het plaatsen van je eerste baan.",
     "start_wizard": "Wizard starten",
-    "aria_progress": "Onboarding voortgang",
-    "step1": "Maak uw eerste vacature aan",
-    "step2": "Bekijk sollicitaties",
-    "step3": "Neem contact op met kandidaten",
-    "complete": "Instelling voltooid"
+    "aria_progress": "Onboarding voortgang"
   },
   "preview": {
     "title": "Vacaturevoorbeeld",
@@ -1044,10 +992,7 @@
     "hint": "Vraag me alles over deze baan — kwalificaties, salaris, hoe te solliciteren, sollicitatietips...",
     "placeholder": "Stel een vraag over deze vacature...",
     "error_response": "Sorry, ik kon uw verzoek niet verwerken.",
-    "error_generic": "Sorry, er is iets misgegaan.",
-    "thinking": "Nadenken...",
-    "clear": "Gesprek wissen",
-    "suggestions": "Voorgestelde vragen"
+    "error_generic": "Sorry, er is iets misgegaan."
   },
   "page_meta": {
     "bias_audit": {
@@ -1082,14 +1027,6 @@
     },
     "employer_brand": {
       "title": "Werkgever Merk"
-    },
-    "index": {
-      "title": "Vacatures",
-      "description": "Blader door beschikbare werkmogelijkheden en rollen in uw gemeenschap"
-    },
-    "detail": {
-      "title": "{{title}} — Vacatures",
-      "description": "Bekijk vacaturedetails en solliciteer"
     }
   },
   "jobs": {

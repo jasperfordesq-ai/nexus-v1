@@ -1,139 +1,139 @@
 {
   "badge_collection": {
-    "collection_complete": "Collection Complete! You finished '{{name}}' and earned {{xp}} bonus XP! {{icon}}"
+    "collection_complete": "اكتملت المجموعة! لقد أنهيت '{{name}}' وحصلت على {{xp}} نقطة XP إضافية! {{icon}}"
   },
   "safeguarding": {
-    "critical_report_submitted": "Critical safeguarding report submitted"
+    "critical_report_submitted": "تم تقديم تقرير حماية حرج"
   },
   "broker": {
-    "message_for_review": "New message for review from {{sender}}"
+    "message_for_review": "رسالة جديدة في انتظار المراجعة من {{sender}}"
   },
   "federation": {
-    "message_received": "New federated message from {{sender}} ({{partner}})",
-    "transaction_received": "You received {{amount}} time credits from {{sender}} ({{partner}})",
-    "connection_request": "{{sender}} from {{community}} wants to connect with you",
-    "connection_accepted": "{{name}} accepted your connection request",
-    "connection_declined": "Your connection request was declined"
+    "message_received": "رسالة فيدرالية جديدة من {{sender}} ({{partner}})",
+    "transaction_received": "لقد استلمت {{amount}} رصيد وقت من {{sender}} ({{partner}})",
+    "connection_request": "{{sender}} من مجتمع {{community}} يرغب في التواصل معك",
+    "connection_accepted": "قبل {{name}} طلب التواصل الخاص بك",
+    "connection_declined": "تم رفض طلب التواصل الخاص بك"
   },
   "job_application": {
     "owner_applied": "تقدمت :name لوظيفتك: \":title\"",
-    "shortlisted": "Your application for {{title}} has been shortlisted!",
-    "rejected": "Your application for {{title}} was not successful",
-    "hired": "Congratulations! You've been hired for {{title}}",
-    "status_updated": "Your application for {{title}} status updated to {{status}}",
-    "status_updated_generic": "Your application status has been updated",
-    "stuck_in_stage": "Application #{{id}} has been in '{{stage}}' for {{days}}+ days"
+    "shortlisted": "تم إدراج طلبك لـ {{title}} في القائمة المختصرة!",
+    "rejected": "لم يكن طلبك لـ {{title}} ناجحاً",
+    "hired": "تهانينا! لقد تم توظيفك في {{title}}",
+    "status_updated": "تم تحديث حالة طلبك لـ {{title}} إلى {{status}}",
+    "status_updated_generic": "تم تحديث حالة طلبك",
+    "stuck_in_stage": "الطلب رقم #{{id}} في مرحلة '{{stage}}' منذ {{days}}+ يوم"
   },
   "job_team": {
-    "added_as_role": "You've been added as a {{role}} for '{{title}}'"
+    "added_as_role": "تمت إضافتك بصفة {{role}} لـ '{{title}}'"
   },
   "shift_swap": {
-    "requested": "You have a new shift swap request",
-    "declined": "Your shift swap request was declined",
-    "accepted": "Your shift swap request was accepted",
-    "declined_by_admin": "Your shift swap request was declined by an admin",
-    "accepted_swap_declined_by_admin": "A shift swap you accepted was declined by an admin",
-    "approved_by_admin": "Your shift swap was approved by an admin",
-    "accepted_swap_approved_by_admin": "A shift swap you accepted was approved by an admin"
+    "requested": "لديك طلب تبادل وردية جديد",
+    "declined": "تم رفض طلب تبادل الوردية الخاص بك",
+    "accepted": "تم قبول طلب تبادل الوردية الخاص بك",
+    "declined_by_admin": "تم رفض طلب تبادل الوردية الخاص بك من قبل مسؤول",
+    "accepted_swap_declined_by_admin": "تم رفض تبادل وردية قبلته من قبل مسؤول",
+    "approved_by_admin": "تمت الموافقة على تبادل الوردية الخاص بك من قبل مسؤول",
+    "accepted_swap_approved_by_admin": "تمت الموافقة على تبادل وردية قبلته من قبل مسؤول"
   },
   "user_security": {
-    "email_changed": "Your email address has been changed. If you did not do this, contact support immediately."
+    "email_changed": "تم تغيير عنوان بريدك الإلكتروني. إذا لم تقم بذلك، تواصل مع الدعم فوراً."
   },
   "group_mention": {
-    "mentioned_in_group": "You were mentioned in {{group}}"
+    "mentioned_in_group": "تم ذكرك في {{group}}"
   },
   "idea_team": {
-    "added_to_group": "You've been added to {{group}}"
+    "added_to_group": "تمت إضافتك إلى {{group}}"
   },
   "challenge": {
-    "complete_claim": "Challenge Complete! You finished '{{title}}' — claim your reward!",
-    "complete_earned": "Challenge Complete! You finished '{{title}}' and earned {{xp}} XP!"
+    "complete_claim": "اكتمل التحدي! لقد أنهيت '{{title}}' — احصل على مكافأتك!",
+    "complete_earned": "اكتمل التحدي! لقد أنهيت '{{title}}' وحصلت على {{xp}} نقطة XP!"
   },
   "gamification": {
-    "badge_earned": "You earned the '{{name}}' badge! {{icon}}",
-    "level_up": "Congratulations! You've reached Level {{level}}!"
+    "badge_earned": "لقد حصلت على شارة '{{name}}'! {{icon}}",
+    "level_up": "تهانينا! لقد وصلت إلى المستوى {{level}}!"
   },
   "job_offer": {
-    "received_bell": "You have received a job offer for {{title}}",
-    "received_push_title": "Job Offer Received!",
-    "received_push_message": "You have received a job offer for {{title}}",
-    "credits_earned_bell": "You earned {{amount}} time credits for completing {{title}}!",
-    "credits_earned_push_title": "Time Credits Earned!",
-    "credits_earned_push_message": "You earned {{amount}} time credits for completing {{title}}!",
-    "accepted_bell": "Offer accepted for {{title}}",
-    "accepted_push_title": "Offer accepted for {{title}}",
-    "accepted_push_message": "Offer accepted for {{title}}",
-    "rejected_bell": "Offer rejected for {{title}}",
-    "rejected_push_title": "Offer rejected for {{title}}",
-    "rejected_push_message": "Offer rejected for {{title}}",
-    "withdrawn_bell": "Job offer withdrawn for {{title}}",
-    "withdrawn_push_title": "Job offer withdrawn for {{title}}",
-    "withdrawn_push_message": "Job offer withdrawn for {{title}}"
+    "received_bell": "لقد استلمت عرض عمل لـ {{title}}",
+    "received_push_title": "تم استلام عرض عمل!",
+    "received_push_message": "لقد استلمت عرض عمل لـ {{title}}",
+    "credits_earned_bell": "لقد حصلت على {{amount}} رصيد وقت مقابل إكمال {{title}}!",
+    "credits_earned_push_title": "تم الحصول على أرصدة وقت!",
+    "credits_earned_push_message": "لقد حصلت على {{amount}} رصيد وقت مقابل إكمال {{title}}!",
+    "accepted_bell": "تم قبول العرض لـ {{title}}",
+    "accepted_push_title": "تم قبول العرض لـ {{title}}",
+    "accepted_push_message": "تم قبول العرض لـ {{title}}",
+    "rejected_bell": "تم رفض العرض لـ {{title}}",
+    "rejected_push_title": "تم رفض العرض لـ {{title}}",
+    "rejected_push_message": "تم رفض العرض لـ {{title}}",
+    "withdrawn_bell": "تم سحب عرض العمل لـ {{title}}",
+    "withdrawn_push_title": "تم سحب عرض العمل لـ {{title}}",
+    "withdrawn_push_message": "تم سحب عرض العمل لـ {{title}}"
   },
   "job_alert": {
-    "match_bell": "New job matching your alert: {{title}}",
-    "match_push_title": "New Job Match",
-    "match_push_message": "New job matching your alert: {{title}}"
+    "match_bell": "وظيفة جديدة تطابق تنبيهك: {{title}}",
+    "match_push_title": "تطابق وظيفي جديد",
+    "match_push_message": "وظيفة جديدة تطابق تنبيهك: {{title}}"
   },
   "legal": {
-    "update_title": "Updated: {{title}}",
-    "update_message": "Please review version {{version}} of our {{title}}"
+    "update_title": "تم التحديث: {{title}}",
+    "update_message": "يرجى مراجعة الإصدار {{version}} من {{title}}"
   },
   "verification_badge": {
-    "granted": "You have been granted the '{{label}}' verification badge"
+    "granted": "تم منحك شارة التحقق '{{label}}'"
   },
   "mention": {
-    "mentioned_in": "@{{name}} mentioned you in a {{entity}}",
-    "mentioned_in_with_preview": "@{{name}} mentioned you in a {{entity}}: \"{{preview}}\""
+    "mentioned_in": "أشار إليك @{{name}} في {{entity}}",
+    "mentioned_in_with_preview": "أشار إليك @{{name}} في {{entity}}: \"{{preview}}\""
   },
   "story": {
-    "reaction": "{{name}} reacted {{emoji}} to your story"
+    "reaction": "تفاعل {{name}} بـ {{emoji}} على قصتك"
   },
   "sub_account": {
-    "management_request": "{{name}} has requested to manage your account as a {{type}}"
+    "management_request": "طلب {{name}} إدارة حسابك بصفة {{type}}"
   },
   "totp": {
-    "rate_limited": "Too many failed attempts. Please try again in {{minutes}} minutes."
+    "rate_limited": "محاولات فاشلة كثيرة جداً. يرجى المحاولة مجدداً بعد {{minutes}} دقيقة."
   },
   "registration": {
-    "admin_pending_approval": "New user {{name}} ({{email}}) requires approval"
+    "admin_pending_approval": "المستخدم الجديد {{name}} ({{email}}) يحتاج إلى موافقة"
   },
   "nexus_score": {
-    "strength_title": ":name is your strongest area!",
-    "strength_message": "You're in the top tier with :percentage% in :name.",
-    "improvement_title": "Grow your :name score",
-    "tip_engagement": "Try sending and receiving time credits with different community members.",
-    "tip_quality": "Focus on completing transactions successfully and earning positive reviews.",
-    "tip_volunteer": "Log your volunteer hours regularly and maintain consistency.",
-    "tip_activity": "Create listings, join groups, and maintain a daily login streak.",
-    "tip_badges": "Complete challenges to earn more badges and achievements.",
-    "tip_impact": "Share posts and engage with the community feed.",
-    "tip_default": "Keep participating in the community!",
-    "suggestion_connect_title": "Connect with more community members",
-    "suggestion_connect_message": "Exchange credits with new people to increase your network diversity.",
-    "suggestion_exchanges_title": "Complete more exchanges",
-    "suggestion_exchanges_message": "Build your reputation by completing transactions and earning reviews."
+    "strength_title": ":name هو مجالك الأقوى!",
+    "strength_message": "أنت في الفئة العليا بنسبة :percentage% في :name.",
+    "improvement_title": "طور نقاطك في :name",
+    "tip_engagement": "حاول إرسال واستقبال أرصدة الوقت مع أعضاء مختلفين في المجتمع.",
+    "tip_quality": "ركز على إتمام المعاملات بنجاح والحصول على تقييمات إيجابية.",
+    "tip_volunteer": "سجّل ساعات تطوعك بانتظام وحافظ على الاتساق.",
+    "tip_activity": "أنشئ إعلانات وانضم إلى مجموعات وحافظ على سلسلة تسجيل الدخول اليومية.",
+    "tip_badges": "أكمل التحديات للحصول على المزيد من الشارات والإنجازات.",
+    "tip_impact": "شارك المنشورات وتفاعل مع خلاصة المجتمع.",
+    "tip_default": "واصل المشاركة في المجتمع!",
+    "suggestion_connect_title": "تواصل مع المزيد من أعضاء المجتمع",
+    "suggestion_connect_message": "تبادل الأرصدة مع أشخاص جدد لزيادة تنوع شبكتك.",
+    "suggestion_exchanges_title": "أكمل المزيد من التبادلات",
+    "suggestion_exchanges_message": "ابنِ سمعتك بإتمام المعاملات والحصول على التقييمات."
   },
-  "vetting_approved_title": "Your verification has been approved!",
-  "vetting_approved_heading": "Verification Approved",
-  "vetting_approved_body": "Your background check verification has been approved. Your verified status is now active on your profile.",
-  "vetting_go_to_dashboard": "Go to Dashboard",
-  "vetting_rejected_title": "Your verification could not be completed. Please contact support.",
-  "vetting_rejected_heading": "Verification Not Completed",
-  "vetting_rejected_body": "Your background check verification could not be completed at this time. Please contact your community coordinator for more information or to resubmit.",
-  "vetting_contact_support": "Contact Support",
-  "suspended_by_admin": "Suspended by admin",
-  "account_suspended_title": "Account Suspended",
-  "account_banned_title": "Account Banned",
-  "banned_by_admin": "Banned by admin",
-  "account_deleted_title": "Account Deleted",
-  "reset_by_admin": "Reset by admin",
-  "password_changed_title": "Password Changed",
-  "get_started": "Get Started",
-  "account_reactivated_title": "Account Reactivated",
+  "vetting_approved_title": "تمت الموافقة على التحقق من هويتك!",
+  "vetting_approved_heading": "تم التحقق والموافقة",
+  "vetting_approved_body": "تمت الموافقة على التحقق من خلفيتك. حالتك الموثقة أصبحت الآن نشطة على ملفك الشخصي.",
+  "vetting_go_to_dashboard": "الذهاب إلى لوحة التحكم",
+  "vetting_rejected_title": "تعذر اكتمال التحقق من هويتك. يرجى التواصل مع الدعم.",
+  "vetting_rejected_heading": "لم يكتمل التحقق",
+  "vetting_rejected_body": "تعذر اكتمال التحقق من خلفيتك في الوقت الحالي. يرجى التواصل مع منسق مجتمعك للحصول على مزيد من المعلومات أو لإعادة التقديم.",
+  "vetting_contact_support": "تواصل مع الدعم",
+  "suspended_by_admin": "موقوف من قبل المسؤول",
+  "account_suspended_title": "الحساب موقوف",
+  "account_banned_title": "الحساب محظور",
+  "banned_by_admin": "محظور من قبل المسؤول",
+  "account_deleted_title": "تم حذف الحساب",
+  "reset_by_admin": "تمت إعادة تعيينه من قبل المسؤول",
+  "password_changed_title": "تم تغيير كلمة المرور",
+  "get_started": "ابدأ الآن",
+  "account_reactivated_title": "تم إعادة تفعيل الحساب",
   "goal": {
-    "reminder_bell": "Goal reminder: \"{{title}}\"",
-    "reminder_push_title": "Goal Reminder",
-    "reminder_push_message": "Don't forget your goal: \"{{title}}\""
+    "reminder_bell": "تذكير بالهدف: \"{{title}}\"",
+    "reminder_push_title": "تذكير بالهدف",
+    "reminder_push_message": "لا تنسَ هدفك: \"{{title}}\""
   }
 }

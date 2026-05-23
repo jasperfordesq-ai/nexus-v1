@@ -1,14 +1,14 @@
 {
   "critical": {
-    "subject": "Critical safeguarding report submitted",
-    "greeting": "Hello {{name}},",
-    "urgency": "A critical-severity safeguarding report has been submitted in your community and requires immediate attention.",
-    "report_category": "Category: {{category}}",
-    "report_severity": "Severity: {{severity}}",
-    "sla_hours": "Response window: {{hours}} hours",
-    "time_remaining": "Time remaining: {{remaining}}",
-    "action_label": "Open report in admin",
-    "footer": "This is an automated alert from the safeguarding workflow. Please act promptly.",
-    "fallback_text_subject": "URGENT: Critical safeguarding report"
+    "subject": "Segnalazione critica di tutela presentata",
+    "greeting": "Gentile {{name}},",
+    "urgency": "Nella sua comunità è stata presentata una segnalazione di tutela di gravità critica che richiede attenzione immediata.",
+    "report_category": "Categoria: {{category}}",
+    "report_severity": "Gravità: {{severity}}",
+    "sla_hours": "Finestra di risposta: {{hours}} ore",
+    "time_remaining": "Tempo rimanente: {{remaining}}",
+    "action_label": "Apri la segnalazione nel pannello di amministrazione",
+    "footer": "Questo è un avviso automatico dal flusso di lavoro per la tutela. Si prega di agire tempestivamente.",
+    "fallback_text_subject": "URGENTE: Segnalazione critica di tutela"
   }
 }

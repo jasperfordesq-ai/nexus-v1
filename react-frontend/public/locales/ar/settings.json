@@ -341,8 +341,7 @@
     "daily": "يومياً",
     "monthly": "شهريًا",
     "fortnightly": "كل أسبوعين",
-    "never": "أبداً",
-    "weekly": "أسبوعياً"
+    "never": "أبداً"
   },
   "activity_digest": {
     "off": "إيقاف",

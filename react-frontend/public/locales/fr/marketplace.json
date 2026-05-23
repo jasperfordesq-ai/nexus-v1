@@ -573,8 +573,7 @@
       "declined": "Refusée",
       "completed": "Terminée",
       "cancelled": "Annulée"
-    },
-    "offers_title": "Offres de livraison"
+    }
   },
   "pickup": {
     "my_pickups_title": "Mes retraits",

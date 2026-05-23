@@ -1,56 +1,56 @@
 {
   "listings": {
     "expired": {
-      "notification": "Your listing \"{{title}}\" has expired. You can renew it to make it active again.",
-      "subject": "Your listing has expired",
-      "heading": "Your listing has expired",
-      "subheading": "Renew your listing to keep it active.",
-      "body_expired": "Your listing <strong>\"{{title}}\"</strong> has expired.",
-      "body_renew": "You can renew it to make it visible to the community again.",
-      "cta": "Renew Listing"
+      "notification": "Uw advertentie \"{{title}}\" is verlopen. U kunt deze verlengen om deze weer actief te maken.",
+      "subject": "Uw advertentie is verlopen",
+      "heading": "Uw advertentie is verlopen",
+      "subheading": "Verleng uw advertentie om deze actief te houden.",
+      "body_expired": "Uw advertentie <strong>\"{{title}}\"</strong> is verlopen.",
+      "body_renew": "U kunt deze verlengen om deze weer zichtbaar te maken voor de gemeenschap.",
+      "cta": "Advertentie verlengen"
     },
     "expiry_reminder": {
-      "notification": "Your listing \"{{title}}\" expires in {{days_text}} (on {{expiry_date}}) — renew it to keep it active.",
-      "subject": "Your listing expires in {{days_text}}",
-      "heading": "Your listing expires in {{days_text}}",
-      "subheading": "Don't miss out — renew your listing to keep it active.",
-      "body_expires": "Your listing <strong>\"{{title}}\"</strong> expires in {{days_text}} (on {{expiry_date}}).",
-      "body_renew": "Renew it now to keep it visible to the community.",
-      "cta": "View Listing",
-      "days_one": "1 day",
-      "days_other": "{{count}} days",
-      "urgent_note": "Act soon to keep your listing visible!",
-      "expired_subject": "Uw vermelding '{{title}}' is verlopen",
-      "expired_title": "Listing Expired",
-      "expired_preview": "Your listing has expired — renew it to stay visible",
-      "expired_body": "Uw vermelding <strong>\"{{title}}\"</strong> is verlopen. Verleng het nu om reacties van communityleden te blijven ontvangen.",
-      "expired_cta": "Renew Listing"
+      "notification": "Uw advertentie \"{{title}}\" verloopt over {{days_text}} (op {{expiry_date}}) — verleng deze om actief te blijven.",
+      "subject": "Uw advertentie verloopt over {{days_text}}",
+      "heading": "Uw advertentie verloopt over {{days_text}}",
+      "subheading": "Mis het niet — verleng uw advertentie om deze actief te houden.",
+      "body_expires": "Uw advertentie <strong>\"{{title}}\"</strong> verloopt over {{days_text}} (op {{expiry_date}}).",
+      "body_renew": "Verleng nu om zichtbaar te blijven voor de gemeenschap.",
+      "cta": "Advertentie bekijken",
+      "days_one": "1 dag",
+      "days_other": "{{count}} dagen",
+      "urgent_note": "Handel snel om uw advertentie zichtbaar te houden!",
+      "expired_subject": "Uw advertentie \"{{title}}\" is verlopen",
+      "expired_title": "Advertentie verlopen",
+      "expired_preview": "Uw advertentie is verlopen — verleng deze om zichtbaar te blijven",
+      "expired_body": "Uw advertentie <strong>\"{{title}}\"</strong> is verlopen. Verleng nu om reacties van gemeenschapsleden te blijven ontvangen.",
+      "expired_cta": "Advertentie verlengen"
     },
     "approved": {
-      "notification": "Your listing \"{{title}}\" has been approved and is now active.",
-      "notification_short": "Your listing \"{{title}}\" has been approved!",
-      "email_subject": "Your listing has been approved — {{title}}",
-      "email_title": "Listing Approved",
-      "email_body": "Great news! Your listing <strong>\"{{title}}\"</strong> has been approved and is now active in the community.",
-      "email_cta": "View Listing"
+      "notification": "Uw advertentie \"{{title}}\" is goedgekeurd en nu actief.",
+      "notification_short": "Uw advertentie \"{{title}}\" is goedgekeurd!",
+      "email_subject": "Uw advertentie is goedgekeurd — {{title}}",
+      "email_title": "Advertentie goedgekeurd",
+      "email_body": "Goed nieuws! Uw advertentie <strong>\"{{title}}\"</strong> is goedgekeurd en nu actief in de gemeenschap.",
+      "email_cta": "Advertentie bekijken"
     },
     "rejected": {
-      "notification": "Your listing \"{{title}}\" was not approved. Reason: {{reason}}",
-      "notification_no_reason": "Your listing \"{{title}}\" was not approved.",
-      "subject": "Your listing needs changes",
-      "heading": "Your listing needs changes",
-      "subheading": "Your listing was not approved — here's what to do next.",
-      "body_not_approved": "Your listing <strong>\"{{title}}\"</strong> was not approved.",
-      "body_reason": "<strong>Reason:</strong> {{reason}}",
-      "body_resubmit": "Please review and update your listing, then resubmit for approval.",
-      "cta": "Edit Listing"
+      "notification": "Uw advertentie \"{{title}}\" is niet goedgekeurd. Reden: {{reason}}",
+      "notification_no_reason": "Uw advertentie \"{{title}}\" is niet goedgekeurd.",
+      "subject": "Uw advertentie heeft wijzigingen nodig",
+      "heading": "Uw advertentie heeft wijzigingen nodig",
+      "subheading": "Uw advertentie is niet goedgekeurd — dit is wat u vervolgens kunt doen.",
+      "body_not_approved": "Uw advertentie <strong>\"{{title}}\"</strong> is niet goedgekeurd.",
+      "body_reason": "<strong>Reden:</strong> {{reason}}",
+      "body_resubmit": "Bekijk en update uw advertentie en dien deze vervolgens opnieuw in ter goedkeuring.",
+      "cta": "Advertentie bewerken"
     },
     "removed": {
-      "notification": "Your listing \"{{title}}\" has been removed by a moderator.",
-      "email_subject": "Your listing has been removed — {{title}}",
-      "email_title": "Listing Removed",
-      "email_body": "Your listing <strong>\"{{title}}\"</strong> has been removed by a moderator.",
-      "email_cta": "Browse Listings"
+      "notification": "Uw advertentie \"{{title}}\" is verwijderd door een moderator.",
+      "email_subject": "Uw advertentie is verwijderd — {{title}}",
+      "email_title": "Advertentie verwijderd",
+      "email_body": "Uw advertentie <strong>\"{{title}}\"</strong> is verwijderd door een moderator.",
+      "email_cta": "Advertenties bekijken"
     }
   }
 }
