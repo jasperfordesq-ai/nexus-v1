@@ -119,16 +119,16 @@
     "learn_more_1_description": "Unsere 5-Jahres-Vision für Wachstum und Föderation",
     "learn_more_2_title": "Zeitbank-Ratgeber",
     "learn_more_2_description": "Erfahren Sie, wie Zeitbanking funktioniert",
+    "tech_partner_label": "Technologiepartner",
+    "tech_partner_logo_alt": "Projekt NEXUS-Logo",
+    "tech_partner_heading": "TimeBank Ireland und Projekt NEXUS",
+    "tech_partner_description": "hOUR Timebank wird stolz von Project NEXUS unterstützt – einer Open-Source-Timebanking-Plattform, die dazu entwickelt wurde, Gemeinschaften beim Austausch von Fähigkeiten und der Stärkung sozialer Bindungen zu unterstützen. Unsere Technologiepartnerschaft stellt sicher, dass jedes Mitglied von einem modernen, zugänglichen und Community-orientierten digitalen Erlebnis profitiert.",
+    "our_partners_heading": "Unsere Partner und Unterstützer",
+    "partners_banner_alt": "Partnerlogos: West Cork Development Partnership, SICAP, Cork County Council, Department of Housing Planning Community and Local Government, Europäische Struktur- und Investitionsfonds, Europäischer Sozialfonds",
     "cta_heading": "Gemeinsam stärkere Gemeinschaften aufbauen",
     "cta_subtitle": "Ob Unternehmen, Geldgeber, Forscher oder Gemeinschaftsleiter — es gibt ein Partnerschaftsmodell, das für Sie funktioniert.",
     "cta_contact": "Gespräch beginnen",
-    "cta_view_plan": "Strategieplan ansehen",
-    "our_partners_heading": "Our Partners & Supporters",
-    "partners_banner_alt": "Partner logos: West Cork Development Partnership, SICAP, Cork County Council, Department of Housing Planning Community and Local Government, European Structural and Investment Funds, European Social Fund",
-    "tech_partner_label": "Technology Partner",
-    "tech_partner_logo_alt": "Project NEXUS logo",
-    "tech_partner_heading": "TimeBank Ireland and Project NEXUS",
-    "tech_partner_description": "hOUR Timebank is proudly powered by Project NEXUS — an open-source timebanking platform built to help communities exchange skills and strengthen social bonds. Our technology partnership ensures every member benefits from a modern, accessible, and community-first digital experience."
+    "cta_view_plan": "Strategieplan ansehen"
   },
   "social_prescribing": {
     "page_title": "Soziale Verschreibung",
@@ -231,10 +231,15 @@
     "sroi_breakdown_heading": "SROI-Aufschlüsselung",
     "sroi_component_header": "Komponente",
     "sroi_value_header": "Wert",
+    "sroi_result_value": "16 €: 1 €",
     "sroi_total_investment": "Gesamtinvestition (Input)",
+    "sroi_total_investment_value": "50.000 €",
     "sroi_total_present_value": "Gesamter Barwert der Ergebnisse",
+    "sroi_total_present_value_amount": "803.184 €",
     "sroi_net_social_value": "Sozialer Nettowert",
+    "sroi_net_social_value_amount": "753.184 €",
     "sroi_ratio_label": "SROI-Verhältnis",
+    "sroi_ratio_value": "16,06 € : 1 €",
     "sroi_benchmark_note": "Dieses SROI-Verhältnis von 16:1 übertrifft deutlich den Benchmark für Gemeindeentwicklungsprogramme, die typischerweise zwischen 2:1 und 5:1 liegen. Das hohe Verhältnis spiegelt die Hebelwirkung des Zeitbankings wider — bescheidener finanzieller Einsatz generiert umfangreiche ehrenamtlich getriebene soziale Aktivität.",
     "discussion_para": "Die Studie identifiziert mehrere Faktoren, die zum ausserordentlich hohen SROI und zur Wirksamkeit des Programms als Gemeindeentwicklungsmodell beitragen.",
     "discussion_factor_0_title": "Freiwilligen-Multiplikatoreffekt",
@@ -263,12 +268,7 @@
     "cta_full_report": "Vollständigen Bericht herunterladen",
     "cta_exec_summary": "Zusammenfassung",
     "cta_questions": "Fragen zur Forschung?",
-    "cta_contact": "Kontaktieren Sie uns",
-    "sroi_result_value": "€16 : €1",
-    "sroi_total_investment_value": "€50,000",
-    "sroi_total_present_value_amount": "€803,184",
-    "sroi_net_social_value_amount": "€753,184",
-    "sroi_ratio_value": "€16.06 : €1"
+    "cta_contact": "Kontaktieren Sie uns"
   },
   "strategic_plan": {
     "page_title": "Strategieplan 2026–2030",
@@ -415,5 +415,5 @@
     "cta_download": "Vollständigen Plan herunterladen",
     "cta_contact": "Kontakt aufnehmen"
   },
-  "age_band": "Age {{band}}"
+  "age_band": "Alter {{band}}"
 }
