@@ -1,7 +1,431 @@
 {
+  "features_page": {
+    "chips": {
+      "beta": "Beta",
+      "preview": "Anteprima"
+    },
+    "title": "Funzionalità",
+    "meta_title": "Funzionalità - Project NEXUS v1.5",
+    "meta_description": "Ogni modulo rilasciato in Project NEXUS v1.5, con indicazioni oneste di maturità per federazione, banca del tempo, marketplace, strumenti di comunità, sicurezza, analytics e infrastruttura open source.",
+    "heading": "Cosa fa Project NEXUS",
+    "subheading": "Project NEXUS è una piattaforma di comunità multi-tenant di livello enterprise. Tutti i moduli sotto sono inclusi nella v1.5 di oggi. Indichiamo la maturità in modo onesto: gli elementi non contrassegnati sono in disponibilità generale; le superfici più recenti o ancora in fase di consolidamento riportano una etichetta Beta o Anteprima.",
+    "maturity_key_title": "Come indichiamo la maturità",
+    "maturity_ga": "Disponibilità generale - stabile, supportato, in produzione presso i tenant pilota.",
+    "maturity_beta": "Già in produzione, ma la superficie pubblica o il protocollo di comunicazione è ancora in fase di consolidamento.",
+    "maturity_preview": "Rilasciato di recente e disponibile su opt-in. Aspettati iterazioni rapide - API e UX possono cambiare.",
+    "tech_stack_title": "Stack tecnologico moderno",
+    "open_source_title": "Open source - AGPL-3.0",
+    "open_source_body": "Project NEXUS è interamente open source con licenza AGPL-3.0. Ogni riga di codice è verificabile, forkabile e ospitabile in autonomia. I protocolli di federazione sono documentati come standard aperti, così nessuna singola piattaforma controlla la rete globale delle banche del tempo.",
+    "link_repo": "Repository sorgente",
+    "link_changelog": "Registro delle modifiche",
+    "link_report_bug": "Segnala un bug",
+    "link_about": "Informazioni su questo tenant",
+    "security_title": "Divulgazione di sicurezza",
+    "security_body_before": "Hai trovato un problema di sicurezza? Per favore segnalalo in privato a ",
+    "security_body_after": " invece di aprire una segnalazione pubblica. La policy completa di divulgazione delle vulnerabilità è in SECURITY.md nel repository sorgente.",
+    "security_email": "jasper@hour-timebank.ie",
+    "tech_stack": {
+      "ai_label": "IA",
+      "ai_value": "OpenAI text-embedding-3-small",
+      "backend_label": "Backend",
+      "backend_value": "Laravel 12 + PHP 8.2+",
+      "database_label": "Banca dati",
+      "database_value": "MariaDB 10.11",
+      "frontend_label": "Fine frontale",
+      "frontend_value": "React 18 + TypeScript + HeroUI + Tailwind CSS 4",
+      "infrastructure_label": "Infrastruttura",
+      "infrastructure_value": "Docker, Redis, PWA completa",
+      "mobile_label": "Mobile",
+      "mobile_value": "Condensatore (iOS + Android)",
+      "realtime_label": "Tempo reale",
+      "realtime_value": "Pusher WebSocket, Firebase Cloud Messaging",
+      "search_label": "Ricerca",
+      "search_value": "Meilisearch v1.7"
+    },
+    "groups": {
+      "core_platform": {
+        "title": "Piattaforma principale",
+        "items": {
+          "timebanking_engine": {
+            "title": "Motore della banca del tempo",
+            "description": "Sistema completo di scambio crediti con portafoglio, transazioni e controlli del broker."
+          },
+          "multi_tenancy": {
+            "title": "Multi-tenant",
+            "description": "Ospita comunità illimitate su una singola piattaforma, ognuna con il proprio branding, configurazione e set di funzionalità."
+          },
+          "tenant_hierarchy": {
+            "title": "Gerarchia dei tenant",
+            "description": "Relazioni padre–figlio tra tenant con attivazione delle funzionalità e ambito di federazione."
+          },
+          "smart_matching": {
+            "title": "Matching intelligente",
+            "description": "Matching basato su IA con embedding semantici, filtraggio collaborativo, pianificazione delle disponibilità e preferenze apprese."
+          },
+          "real_time_messaging": {
+            "title": "Messaggistica in tempo reale",
+            "description": "Conversazioni private con integrazione WebSocket Pusher e presenza in tempo reale."
+          },
+          "progressive_web_app": {
+            "title": "Applicazione Web progressiva",
+            "description": "Installabile come PWA su qualsiasi dispositivo — shell offline, notifiche push, flusso di aggiornamento NetworkFirst."
+          },
+          "native_mobile_app": {
+            "title": "App mobile nativa",
+            "description": "Build per iOS e Android dalla stessa base di codice React tramite Capacitor.",
+            "note": "Il web è il canale di distribuzione principale; le build native sono testate ma non ancora in rilascio continuo."
+          }
+        }
+      },
+      "federation": {
+        "title": "Federazione",
+        "intro": "Un livello di federazione a quattro protocolli per lo scambio tra comunità — Nexus (nativo), Komunitin (15 endpoint), Credit Commons Protocol (11 endpoint, compatibile CEN) e TimeOverflow.",
+        "items": {
+          "federation_network": {
+            "title": "Rete di federazione",
+            "description": "Collega più comunità NEXUS in una rete per scoperta, annunci, eventi e messaggi tra comunità."
+          },
+          "external_partner_federation": {
+            "title": "Federazione con partner esterni",
+            "description": "Live con piattaforme esterne di banca del tempo — partnership avviate, messaggi in transito, scambio crediti in test attivo.",
+            "note": "Esistono partnership reali che scambiano dati quotidianamente. I protocolli di comunicazione sono ancora in fase di consolidamento contro casi limite — considera i trasferimenti esterni di crediti come supervisionati, non automatici."
+          },
+          "multi_protocol_adapters": {
+            "title": "Adattatori multi-protocollo",
+            "description": "Sincronizzazione bidirezionale per 9 tipi di entità: membri, annunci, eventi, gruppi, connessioni, volontariato, recensioni, trasferimenti, messaggi."
+          },
+          "federation_neighborhoods": {
+            "title": "Vicinati della federazione",
+            "description": "Cluster geografici di comunità federate per il coordinamento regionale."
+          },
+          "credit_agreements": {
+            "title": "Accordi sui crediti",
+            "description": "Termini di cambio negoziati tra comunità federate."
+          },
+          "federation_analytics": {
+            "title": "Analytics della federazione",
+            "description": "Dashboard di amministrazione live per attività dei partner, stato della sincronizzazione e volume di transazioni federate."
+          }
+        }
+      },
+      "member_experience": {
+        "title": "Esperienza membro",
+        "items": {
+          "service_listings": {
+            "title": "Annunci di servizi",
+            "description": "Pubblica offerte e richieste, sfoglia e abbina annunci in modo intelligente."
+          },
+          "marketplace": {
+            "title": "Mercato",
+            "description": "Modulo di annunci classificati indipendente con accrediti Stripe Connect, ordini, profili venditore e suggerimenti di risposta basati su IA."
+          },
+          "donations": {
+            "title": "Donazioni",
+            "description": "Donazioni una tantum e ricorrenti tramite Stripe con dashboard complete e ricevute per le organizzazioni."
+          },
+          "identity_verification": {
+            "title": "Verifica dell'identità",
+            "description": "Flusso opzionale Stripe Identity (documento + selfie + corrispondenza nome/data di nascita) con badge di membro verificato."
+          },
+          "exchange_workflow": {
+            "title": "Flusso di scambio",
+            "description": "Ciclo di vita strutturato dello scambio di servizi con approvazione del broker e gestione delle controversie."
+          },
+          "group_exchanges": {
+            "title": "Scambi di gruppo",
+            "description": "Scambi di servizi comunitari in blocco tra più membri."
+          },
+          "social_feed": {
+            "title": "Feed sociale",
+            "description": "Post, commenti, like, sondaggi, hashtag, messaggi vocali, allegati multimediali, anteprime dei link e menzioni @."
+          },
+          "stories": {
+            "title": "Storie",
+            "description": "Storie effimere di foto e video di 24 ore con reazioni, sondaggi e highlight."
+          },
+          "presence_system": {
+            "title": "Sistema di presenza",
+            "description": "Stato online/offline in tempo reale con controlli di privacy e messaggi di stato personalizzati."
+          },
+          "events_and_groups": {
+            "title": "Eventi e gruppi",
+            "description": "Ritrovi della comunità, gruppi per interessi e promemoria degli eventi."
+          },
+          "connections": {
+            "title": "Connessioni",
+            "description": "Segui e connettiti con altri membri della comunità."
+          },
+          "members_directory": {
+            "title": "Directory dei membri",
+            "description": "Sfoglia, filtra e scopri le persone della tua comunità."
+          },
+          "gamification": {
+            "title": "Ludicizzazione",
+            "description": "Badge di verifica, percorsi, XP, classifiche, traguardi, sfide, serie, ricompense dello shop XP, dashboard della comunità e competizioni stagionali."
+          },
+          "goals_and_impact": {
+            "title": "Obiettivi e impatto",
+            "description": "Monitora obiettivi personali e impatto comunitario con mentorship e tracciamento dei deliverable."
+          },
+          "ideation_challenges": {
+            "title": "Sfide di idee",
+            "description": "Hub dell'innovazione con campagne, idee, votazioni e tracciamento dei risultati."
+          },
+          "volunteering": {
+            "title": "Volontariato",
+            "description": "Opportunità di volontariato, tracciamento delle ore, check-in, spese, certificati, monitoraggio del benessere, allerte di emergenza e un portafoglio dell'organizzazione di volontariato che eroga crediti di tempo sulle ore approvate."
+          },
+          "job_vacancies": {
+            "title": "Offerte di lavoro",
+            "description": "Modulo di reclutamento completo con avvisi, analytics e un feed pubblico RSS/JSON di offerte per gli aggregatori."
+          },
+          "organisations": {
+            "title": "Organizzazioni",
+            "description": "Profili aziendali e di datore di lavoro con sotto-account e un portafoglio dedicato per l'organizzazione."
+          },
+          "sub_accounts_family_accounts": {
+            "title": "Sotto-account / Account famiglia",
+            "description": "Relazioni padre–figlio tra account per la gestione di famiglia e nucleo domestico."
+          },
+          "reviews_and_ratings": {
+            "title": "Recensioni e valutazioni",
+            "description": "Costruisci fiducia tramite feedback strutturato dei membri."
+          },
+          "endorsements": {
+            "title": "Endorsement",
+            "description": "Endorsement tra pari su competenze ed esperienze."
+          },
+          "polls": {
+            "title": "Sondaggi",
+            "description": "Votazioni e sondaggi della comunità con vari tipi di domanda."
+          },
+          "skills_browse": {
+            "title": "Sfoglia competenze",
+            "description": "Esplora la tassonomia delle competenze e scopri esperienza."
+          },
+          "availability_scheduling": {
+            "title": "Pianificazione disponibilità",
+            "description": "Pianificazione di fasce orarie con fuso orario per matching intelligente e prenotazioni."
+          }
+        }
+      },
+      "content_and_communication": {
+        "title": "Contenuti e comunicazione",
+        "items": {
+          "blog": {
+            "title": "Blog",
+            "description": "Gestione di contenuti e notizie della comunità a cura del tenant."
+          },
+          "resources_and_knowledge_base": {
+            "title": "Risorse e base di conoscenza",
+            "description": "Articoli strutturati e una biblioteca condivisa di risorse."
+          },
+          "help_center": {
+            "title": "Centro assistenza",
+            "description": "Hub di documentazione e FAQ."
+          },
+          "custom_pages": {
+            "title": "Pagine personalizzate",
+            "description": "Pagine CMS gestite dal tenant per i contenuti della comunità."
+          },
+          "newsletter_system": {
+            "title": "Sistema di newsletter",
+            "description": "Gestore di campagne email con test A/B, segmenti intelligenti, targeting geografico, invii ricorrenti, modelli, ottimizzazione dell'orario di invio e analytics complete su aperture e clic."
+          },
+          "ai_chat": {
+            "title": "Chat IA",
+            "description": "Assistente basato su OpenAI per guidare l'utilizzo della piattaforma."
+          },
+          "legal_hub": {
+            "title": "Hub legale",
+            "description": "Documenti legali versionati con barriere di accettazione e log di audit."
+          },
+          "impact_reports": {
+            "title": "Report di impatto",
+            "description": "Analisi SROI, report sugli esiti dei membri e casi di studio di impatto sociale."
+          },
+          "social_prescribing": {
+            "title": "Prescrizione sociale",
+            "description": "Informazioni e strumenti per i flussi di integrazione con la salute di comunità."
+          }
+        }
+      },
+      "trust_reputation_and_safety": {
+        "title": "Fiducia, reputazione e sicurezza",
+        "items": {
+          "member_verification_badges": {
+            "title": "Badge di verifica dei membri",
+            "description": "Indicatori di stato verificato sui profili dei membri."
+          },
+          "nexusscore": {
+            "title": "NexusScore",
+            "description": "Punteggio proprietario di reputazione e affidabilità."
+          },
+          "streaks": {
+            "title": "Serie",
+            "description": "Tracciamento di attività consecutive per premiare un coinvolgimento costante."
+          },
+          "personal_insights_dashboard": {
+            "title": "Dashboard di insight personali",
+            "description": "Metriche di coinvolgimento individuale, ore date/ricevute, ripartizione delle competenze, grafici mensili e raccomandazioni personalizzate."
+          },
+          "safeguarding_module": {
+            "title": "Modulo di tutela",
+            "description": "Flusso di revisione dei contenuti segnalati, segnalazione incidenti, tracciamento degli incarichi di tutela e dashboard di sicurezza della comunità."
+          },
+          "crm": {
+            "title": "CRM",
+            "description": "Gestione contatti lato admin con note, attività, tag, timeline di attività ed export."
+          }
+        }
+      },
+      "ai_and_recommendation_engine": {
+        "title": "Motore IA e di raccomandazioni",
+        "items": {
+          "semantic_search": {
+            "title": "Ricerca semantica",
+            "description": "Ricerca full-text basata su Meilisearch su annunci, membri, eventi e gruppi con tolleranza ai refusi, sinonimi e isolamento per tenant."
+          },
+          "collaborative_filtering": {
+            "title": "Filtraggio collaborativo",
+            "description": "Raccomandazioni basate sugli item a partire dai dati reali di interazione della comunità."
+          },
+          "semantic_embeddings": {
+            "title": "Embedding semantici",
+            "description": "Corrispondenza dei contenuti basata su OpenAI per annunci, membri e richieste."
+          },
+          "edgerank_feed": {
+            "title": "Feed EdgeRank",
+            "description": "Ranking del feed pesato per decadimento temporale, affinità e coinvolgimento."
+          },
+          "matchrank_and_communityrank": {
+            "title": "MatchRank e CommunityRank",
+            "description": "Scoring bayesiano della qualità con intervalli di confidenza di Wilson."
+          },
+          "group_recommendations": {
+            "title": "Raccomandazioni di gruppi",
+            "description": "Scoperta di gruppi per trend e affinità."
+          },
+          "match_learning": {
+            "title": "Apprendimento delle corrispondenze",
+            "description": "Ciclo di feedback che migliora le raccomandazioni a partire dalle interazioni dell'utente."
+          },
+          "algorithm_health_dashboard": {
+            "title": "Dashboard di salute degli algoritmi",
+            "description": "Monitoraggio e regolazione live da admin di tutti i sistemi di ranking."
+          }
+        }
+      },
+      "caring_community_layer": {
+        "title": "Livello di comunità solidale",
+        "intro": "Un livello di governance per preparare i pilota in deployment civici e di comunità solidali — la maggior parte dei moduli è stata rilasciata tra aprile e maggio 2026.",
+        "items": {
+          "civic_digest": {
+            "title": "Digest civico",
+            "description": "Riassunto periodico dell'attività e dei risultati della comunità per gli stakeholder."
+          },
+          "success_stories": {
+            "title": "Storie di successo",
+            "description": "Casi di studio selezionati di risultati guidati dai membri."
+          },
+          "feedback_inbox": {
+            "title": "Casella dei feedback",
+            "description": "Raccolta centralizzata dei feedback del pilota con triage lato admin."
+          },
+          "integration_showcase": {
+            "title": "Vetrina integrazioni",
+            "description": "Superficie pubblica per partner e integrazioni collegati."
+          },
+          "lead_nurture": {
+            "title": "Coltivazione dei lead",
+            "description": "Strumenti di workflow per il follow-up degli stakeholder del pilota."
+          },
+          "copilot": {
+            "title": "Copilota",
+            "description": "Assistente IA contestuale per gli amministratori della comunità."
+          }
+        }
+      },
+      "built_for_production": {
+        "title": "Costruito per la produzione",
+        "items": {
+          "enterprise_security": {
+            "title": "Sicurezza enterprise",
+            "description": "CSRF, rate limiting, 2FA TOTP, passkey WebAuthn, nonce CSP, lista permessi CORS, validazione Form Request, barriere di verifica email e registrazione tramite codice di invito."
+          },
+          "stripe_payments_layer": {
+            "title": "Livello pagamenti Stripe",
+            "description": "Abbonamenti, donazioni, marketplace (Connect) e verifica dell'identità, con gestione idempotente dei webhook e copertura di test approfondita sui flussi di denaro."
+          },
+          "gdpr_compliance_suite": {
+            "title": "Suite di conformità GDPR",
+            "description": "Richieste sui dati, gestione del consenso, consenso ai cookie, tracciamento dei data breach e log di audit completo."
+          },
+          "fraud_and_abuse_detection": {
+            "title": "Rilevamento di frodi e abusi",
+            "description": "Allerte automatiche per attività sospette e moderazione dei contenuti."
+          },
+          "insurance_certificate_tracking": {
+            "title": "Tracciamento certificati assicurativi",
+            "description": "Gestione e verifica delle assicurazioni dei volontari."
+          },
+          "enterprise_rbac": {
+            "title": "RBAC enterprise",
+            "description": "Controllo accessi basato sui ruoli su 13+ moduli con matrice completa dei permessi."
+          },
+          "wcag_2_1_aa_accessibility": {
+            "title": "Accessibilità WCAG 2.1 AA",
+            "description": "Conformità di accessibilità verificata su tutta la superficie rivolta all'utente."
+          },
+          "multi_language_support": {
+            "title": "Supporto multilingue",
+            "description": "11 lingue: inglese, irlandese, tedesco, francese, italiano, portoghese, spagnolo, olandese, polacco, giapponese e arabo (RTL completo)."
+          },
+          "self_hosted_prerendering": {
+            "title": "Pre-rendering self-hosted",
+            "description": "Snapshot Playwright riservati ai bot e serviti ai crawler SEO; gli utenti ricevono sempre la SPA live."
+          },
+          "guided_onboarding": {
+            "title": "Onboarding guidato",
+            "description": "Procedura guidata per i nuovi membri con valori predefiniti intelligenti."
+          },
+          "admin_panel": {
+            "title": "Pannello di amministrazione",
+            "description": "Controlli sugli algoritmi, diagnostica, monitoraggio dei job cron e della deliverability email."
+          },
+          "email_webhook_processing": {
+            "title": "Elaborazione webhook email",
+            "description": "Gestione degli eventi SendGrid di bounce, reclamo e consegna."
+          },
+          "500plus_phpunit_tests": {
+            "title": "500+ test PHPUnit",
+            "description": "Flussi di denaro, webhook, federazione, gruppi, marketplace — oltre alle suite frontend Vitest."
+          },
+          "openapi_3_0_specification": {
+            "title": "Specifica OpenAPI 3.0",
+            "description": "Specifica API completa con documentazione Swagger UI."
+          },
+          "fully_dockerized": {
+            "title": "Completamente dockerizzato",
+            "description": "Produzione e sviluppo girano sulle stesse fondamenta di Docker Compose."
+          }
+        }
+      }
+    }
+  },
+  "changelog_page": {
+    "title": "Registro delle modifiche",
+    "meta_title": "Registro delle modifiche - Progetto NEXUS",
+    "meta_description": "Ogni modifica notevole fornita nel Progetto NEXUS, nel formato Keep-a-Changelog, seguendo il controllo delle versioni semantico. Tratto da CHANGELOG.md nel repository dei sorgenti pubblici.",
+    "heading": "Registro delle modifiche",
+    "subheading": "Ogni modifica notevole al Progetto NEXUS, nel formato Keep-a-Changelog. La piattaforma segue il Versioning Semantico.",
+    "view_on_github": "Visualizza su GitHub",
+    "loading": "Caricamento registro modifiche...",
+    "error": "Impossibile caricare il registro delle modifiche. Puoi leggerlo direttamente su GitHub."
+  },
   "home": {
-    "meta_title": "Community Timebanking Platform",
-    "meta_description": "Exchange skills using time credits — every hour is valued equally. Join a community where neighbours share help, build trust, and strengthen local connections.",
+    "meta_title": "Piattaforma comunitaria di banca del tempo",
+    "meta_description": "Scambia competenze utilizzando i crediti temporali: ogni ora ha lo stesso valore. Unisciti a una comunità in cui i vicini condividono aiuto, creano fiducia e rafforzano le connessioni locali.",
     "meta_keywords": "banca del tempo, scambio di competenze, comunità, volontariato, crediti di tempo",
     "badge": "Il futuro della banca del tempo",
     "headline_1": "Scambia competenze,",
@@ -18,7 +442,7 @@
       },
       "1": {
         "title": "Comunità",
-        "description": "Connect with neighbours offering help"
+        "description": "Connettiti con i vicini che offrono aiuto"
       },
       "2": {
         "title": "Istantaneo",
@@ -32,6 +456,9 @@
       "communities": "Comunità"
     },
     "scroll_down": "Scorri verso il basso",
+    "audience_cards": {
+      "title": "Da dove vorresti iniziare?"
+    },
     "how_it_works": {
       "title": "Come funziona",
       "subtitle": "Inizi in quattro semplici passaggi",
@@ -64,7 +491,7 @@
         },
         "1": {
           "title": "Costruire fiducia",
-          "description": "Reviews and ratings help you find reliable community members and build your reputation in the community."
+          "description": "Recensioni e valutazioni ti aiutano a trovare membri affidabili della comunità e a costruire la tua reputazione nella comunità."
         },
         "2": {
           "title": "Restare locali",
@@ -74,16 +501,13 @@
     },
     "cta_section": {
       "title": "Pronto per iniziare?",
-      "description": "Join a growing community already exchanging skills and building meaningful connections.",
+      "description": "Unisciti a una comunità in crescita che già scambia competenze e crea connessioni significative.",
       "button": "Crei il Suo account gratuito"
-    },
-    "audience_cards": {
-      "title": "Where would you like to start?"
     }
   },
   "about": {
     "meta_title": "Informazioni su {{name}}",
-    "meta_description": "Learn how {{name}} brings neighbours together to share skills using time credits. Every hour given earns an hour back — a fairer way to support each other.",
+    "meta_description": "Scopri come {{name}} riunisce i vicini per condividere competenze utilizzando crediti temporali. Ogni ora donata ne guadagna un'ora in cambio: un modo più giusto per sostenersi a vicenda.",
     "hero_title": "Informazioni su {{name}}",
     "hero_description": "{{name}} è una moderna piattaforma di banca del tempo dove ogni ora di servizio ha lo stesso valore. Aiutiamo le comunità a scambiare competenze, costruire fiducia e creare un'economia locale più equa — un'ora alla volta.",
     "how_it_works": {
@@ -160,7 +584,7 @@
     }
   },
   "contact": {
-    "meta_description": "Get in touch with the team — questions about joining, partnering, social prescribing, accessibility, or how timebanking works. We're happy to help.",
+    "meta_description": "Mettiti in contatto con il team: domande su adesione, partnership, prescrizione sociale, accessibilità o come funziona la banca del tempo. Siamo felici di aiutarti.",
     "title": "Ci contatti",
     "subtitle": "Ha una domanda su {{name}}? Ci piacerebbe sentirLa.",
     "success_title": "Messaggio inviato!",
@@ -191,8 +615,8 @@
     "turnstile_error": "Impossibile caricare il controllo di sicurezza. Aggiorna la pagina e riprova."
   },
   "faq": {
-    "page_title": "Frequently Asked Questions",
-    "meta_description": "Common questions about timebanking, time credits, listings, exchanges, trust and safety, and community membership — everything you need to get started.",
+    "page_title": "Domande frequenti",
+    "meta_description": "Domande comuni su timebanking, crediti temporali, elenchi, scambi, fiducia e sicurezza e appartenenza alla comunità: tutto ciò di cui hai bisogno per iniziare.",
     "title": "Domande frequenti",
     "subtitle_before_link": "Non trova quello che cerca? Visiti il nostro",
     "help_center_link": "Centro assistenza",
@@ -404,431 +828,7 @@
       "title": "Stato dello Sviluppo"
     },
     "maintenance": {
-      "title": "Maintenance"
-    }
-  },
-  "changelog_page": {
-    "title": "Changelog",
-    "meta_title": "Changelog - Project NEXUS",
-    "meta_description": "Every notable change shipped in Project NEXUS, in Keep-a-Changelog format, following Semantic Versioning. Sourced from CHANGELOG.md in the public source repository.",
-    "heading": "Changelog",
-    "subheading": "Every notable change to Project NEXUS, in Keep-a-Changelog format. The platform follows Semantic Versioning.",
-    "view_on_github": "View on GitHub",
-    "loading": "Loading changelog...",
-    "error": "Could not load the changelog. You can read it directly on GitHub."
-  },
-  "features_page": {
-    "chips": {
-      "beta": "Beta",
-      "preview": "Anteprima"
-    },
-    "title": "Funzionalità",
-    "meta_title": "Funzionalità - Project NEXUS v1.5",
-    "meta_description": "Ogni modulo rilasciato in Project NEXUS v1.5, con indicazioni oneste di maturità per federazione, banca del tempo, marketplace, strumenti di comunità, sicurezza, analytics e infrastruttura open source.",
-    "heading": "Cosa fa Project NEXUS",
-    "subheading": "Project NEXUS è una piattaforma di comunità multi-tenant di livello enterprise. Tutti i moduli sotto sono inclusi nella v1.5 di oggi. Indichiamo la maturità in modo onesto: gli elementi non contrassegnati sono in disponibilità generale; le superfici più recenti o ancora in fase di consolidamento riportano una etichetta Beta o Anteprima.",
-    "maturity_key_title": "Come indichiamo la maturità",
-    "maturity_ga": "Disponibilità generale - stabile, supportato, in produzione presso i tenant pilota.",
-    "maturity_beta": "Già in produzione, ma la superficie pubblica o il protocollo di comunicazione è ancora in fase di consolidamento.",
-    "maturity_preview": "Rilasciato di recente e disponibile su opt-in. Aspettati iterazioni rapide - API e UX possono cambiare.",
-    "tech_stack_title": "Stack tecnologico moderno",
-    "open_source_title": "Open source - AGPL-3.0",
-    "open_source_body": "Project NEXUS è interamente open source con licenza AGPL-3.0. Ogni riga di codice è verificabile, forkabile e ospitabile in autonomia. I protocolli di federazione sono documentati come standard aperti, così nessuna singola piattaforma controlla la rete globale delle banche del tempo.",
-    "link_repo": "Repository sorgente",
-    "link_changelog": "Changelog",
-    "link_report_bug": "Segnala un bug",
-    "link_about": "Informazioni su questo tenant",
-    "security_title": "Divulgazione di sicurezza",
-    "security_body_before": "Hai trovato un problema di sicurezza? Per favore segnalalo in privato a ",
-    "security_body_after": " invece di aprire una segnalazione pubblica. La policy completa di divulgazione delle vulnerabilità è in SECURITY.md nel repository sorgente.",
-    "security_email": "jasper@hour-timebank.ie",
-    "tech_stack": {
-      "ai_label": "IA",
-      "ai_value": "OpenAI text-embedding-3-small",
-      "backend_label": "Backend",
-      "backend_value": "Laravel 12 + PHP 8.2+",
-      "database_label": "Database",
-      "database_value": "MariaDB 10.11",
-      "frontend_label": "Frontend",
-      "frontend_value": "React 18 + TypeScript + HeroUI + Tailwind CSS 4",
-      "infrastructure_label": "Infrastruttura",
-      "infrastructure_value": "Docker, Redis, PWA completa",
-      "mobile_label": "Mobile",
-      "mobile_value": "Capacitor (iOS + Android)",
-      "realtime_label": "Tempo reale",
-      "realtime_value": "Pusher WebSockets, Firebase Cloud Messaging",
-      "search_label": "Ricerca",
-      "search_value": "Meilisearch v1.7"
-    },
-    "groups": {
-      "core_platform": {
-        "title": "Piattaforma principale",
-        "items": {
-          "timebanking_engine": {
-            "title": "Motore della banca del tempo",
-            "description": "Sistema completo di scambio crediti con portafoglio, transazioni e controlli del broker."
-          },
-          "multi_tenancy": {
-            "title": "Multi-tenant",
-            "description": "Ospita comunità illimitate su una singola piattaforma, ognuna con il proprio branding, configurazione e set di funzionalità."
-          },
-          "tenant_hierarchy": {
-            "title": "Gerarchia dei tenant",
-            "description": "Relazioni padre–figlio tra tenant con attivazione delle funzionalità e ambito di federazione."
-          },
-          "smart_matching": {
-            "title": "Matching intelligente",
-            "description": "Matching basato su IA con embedding semantici, filtraggio collaborativo, pianificazione delle disponibilità e preferenze apprese."
-          },
-          "real_time_messaging": {
-            "title": "Messaggistica in tempo reale",
-            "description": "Conversazioni private con integrazione WebSocket Pusher e presenza in tempo reale."
-          },
-          "progressive_web_app": {
-            "title": "Progressive Web App",
-            "description": "Installabile come PWA su qualsiasi dispositivo — shell offline, notifiche push, flusso di aggiornamento NetworkFirst."
-          },
-          "native_mobile_app": {
-            "title": "App mobile nativa",
-            "description": "Build per iOS e Android dalla stessa base di codice React tramite Capacitor.",
-            "note": "Il web è il canale di distribuzione principale; le build native sono testate ma non ancora in rilascio continuo."
-          }
-        }
-      },
-      "federation": {
-        "title": "Federazione",
-        "intro": "Un livello di federazione a quattro protocolli per lo scambio tra comunità — Nexus (nativo), Komunitin (15 endpoint), Credit Commons Protocol (11 endpoint, compatibile CEN) e TimeOverflow.",
-        "items": {
-          "federation_network": {
-            "title": "Rete di federazione",
-            "description": "Collega più comunità NEXUS in una rete per scoperta, annunci, eventi e messaggi tra comunità."
-          },
-          "external_partner_federation": {
-            "title": "Federazione con partner esterni",
-            "description": "Live con piattaforme esterne di banca del tempo — partnership avviate, messaggi in transito, scambio crediti in test attivo.",
-            "note": "Esistono partnership reali che scambiano dati quotidianamente. I protocolli di comunicazione sono ancora in fase di consolidamento contro casi limite — considera i trasferimenti esterni di crediti come supervisionati, non automatici."
-          },
-          "multi_protocol_adapters": {
-            "title": "Adattatori multi-protocollo",
-            "description": "Sincronizzazione bidirezionale per 9 tipi di entità: membri, annunci, eventi, gruppi, connessioni, volontariato, recensioni, trasferimenti, messaggi."
-          },
-          "federation_neighborhoods": {
-            "title": "Vicinati della federazione",
-            "description": "Cluster geografici di comunità federate per il coordinamento regionale."
-          },
-          "credit_agreements": {
-            "title": "Accordi sui crediti",
-            "description": "Termini di cambio negoziati tra comunità federate."
-          },
-          "federation_analytics": {
-            "title": "Analytics della federazione",
-            "description": "Dashboard di amministrazione live per attività dei partner, stato della sincronizzazione e volume di transazioni federate."
-          }
-        }
-      },
-      "member_experience": {
-        "title": "Esperienza membro",
-        "items": {
-          "service_listings": {
-            "title": "Annunci di servizi",
-            "description": "Pubblica offerte e richieste, sfoglia e abbina annunci in modo intelligente."
-          },
-          "marketplace": {
-            "title": "Marketplace",
-            "description": "Modulo di annunci classificati indipendente con accrediti Stripe Connect, ordini, profili venditore e suggerimenti di risposta basati su IA."
-          },
-          "donations": {
-            "title": "Donazioni",
-            "description": "Donazioni una tantum e ricorrenti tramite Stripe con dashboard complete e ricevute per le organizzazioni."
-          },
-          "identity_verification": {
-            "title": "Verifica dell'identità",
-            "description": "Flusso opzionale Stripe Identity (documento + selfie + corrispondenza nome/data di nascita) con badge di membro verificato."
-          },
-          "exchange_workflow": {
-            "title": "Flusso di scambio",
-            "description": "Ciclo di vita strutturato dello scambio di servizi con approvazione del broker e gestione delle controversie."
-          },
-          "group_exchanges": {
-            "title": "Scambi di gruppo",
-            "description": "Scambi di servizi comunitari in blocco tra più membri."
-          },
-          "social_feed": {
-            "title": "Feed sociale",
-            "description": "Post, commenti, like, sondaggi, hashtag, messaggi vocali, allegati multimediali, anteprime dei link e menzioni @."
-          },
-          "stories": {
-            "title": "Storie",
-            "description": "Storie effimere di foto e video di 24 ore con reazioni, sondaggi e highlight."
-          },
-          "presence_system": {
-            "title": "Sistema di presenza",
-            "description": "Stato online/offline in tempo reale con controlli di privacy e messaggi di stato personalizzati."
-          },
-          "events_and_groups": {
-            "title": "Eventi e gruppi",
-            "description": "Ritrovi della comunità, gruppi per interessi e promemoria degli eventi."
-          },
-          "connections": {
-            "title": "Connessioni",
-            "description": "Segui e connettiti con altri membri della comunità."
-          },
-          "members_directory": {
-            "title": "Directory dei membri",
-            "description": "Sfoglia, filtra e scopri le persone della tua comunità."
-          },
-          "gamification": {
-            "title": "Gamification",
-            "description": "Badge di verifica, percorsi, XP, classifiche, traguardi, sfide, serie, ricompense dello shop XP, dashboard della comunità e competizioni stagionali."
-          },
-          "goals_and_impact": {
-            "title": "Obiettivi e impatto",
-            "description": "Monitora obiettivi personali e impatto comunitario con mentorship e tracciamento dei deliverable."
-          },
-          "ideation_challenges": {
-            "title": "Sfide di idee",
-            "description": "Hub dell'innovazione con campagne, idee, votazioni e tracciamento dei risultati."
-          },
-          "volunteering": {
-            "title": "Volontariato",
-            "description": "Opportunità di volontariato, tracciamento delle ore, check-in, spese, certificati, monitoraggio del benessere, allerte di emergenza e un portafoglio dell'organizzazione di volontariato che eroga crediti di tempo sulle ore approvate."
-          },
-          "job_vacancies": {
-            "title": "Offerte di lavoro",
-            "description": "Modulo di reclutamento completo con avvisi, analytics e un feed pubblico RSS/JSON di offerte per gli aggregatori."
-          },
-          "organisations": {
-            "title": "Organizzazioni",
-            "description": "Profili aziendali e di datore di lavoro con sotto-account e un portafoglio dedicato per l'organizzazione."
-          },
-          "sub_accounts_family_accounts": {
-            "title": "Sotto-account / Account famiglia",
-            "description": "Relazioni padre–figlio tra account per la gestione di famiglia e nucleo domestico."
-          },
-          "reviews_and_ratings": {
-            "title": "Recensioni e valutazioni",
-            "description": "Costruisci fiducia tramite feedback strutturato dei membri."
-          },
-          "endorsements": {
-            "title": "Endorsement",
-            "description": "Endorsement tra pari su competenze ed esperienze."
-          },
-          "polls": {
-            "title": "Sondaggi",
-            "description": "Votazioni e sondaggi della comunità con vari tipi di domanda."
-          },
-          "skills_browse": {
-            "title": "Sfoglia competenze",
-            "description": "Esplora la tassonomia delle competenze e scopri esperienza."
-          },
-          "availability_scheduling": {
-            "title": "Pianificazione disponibilità",
-            "description": "Pianificazione di fasce orarie con fuso orario per matching intelligente e prenotazioni."
-          }
-        }
-      },
-      "content_and_communication": {
-        "title": "Contenuti e comunicazione",
-        "items": {
-          "blog": {
-            "title": "Blog",
-            "description": "Gestione di contenuti e notizie della comunità a cura del tenant."
-          },
-          "resources_and_knowledge_base": {
-            "title": "Risorse e base di conoscenza",
-            "description": "Articoli strutturati e una biblioteca condivisa di risorse."
-          },
-          "help_center": {
-            "title": "Centro assistenza",
-            "description": "Hub di documentazione e FAQ."
-          },
-          "custom_pages": {
-            "title": "Pagine personalizzate",
-            "description": "Pagine CMS gestite dal tenant per i contenuti della comunità."
-          },
-          "newsletter_system": {
-            "title": "Sistema di newsletter",
-            "description": "Gestore di campagne email con test A/B, segmenti intelligenti, targeting geografico, invii ricorrenti, modelli, ottimizzazione dell'orario di invio e analytics complete su aperture e clic."
-          },
-          "ai_chat": {
-            "title": "Chat IA",
-            "description": "Assistente basato su OpenAI per guidare l'utilizzo della piattaforma."
-          },
-          "legal_hub": {
-            "title": "Hub legale",
-            "description": "Documenti legali versionati con barriere di accettazione e log di audit."
-          },
-          "impact_reports": {
-            "title": "Report di impatto",
-            "description": "Analisi SROI, report sugli esiti dei membri e casi di studio di impatto sociale."
-          },
-          "social_prescribing": {
-            "title": "Prescrizione sociale",
-            "description": "Informazioni e strumenti per i flussi di integrazione con la salute di comunità."
-          }
-        }
-      },
-      "trust_reputation_and_safety": {
-        "title": "Fiducia, reputazione e sicurezza",
-        "items": {
-          "member_verification_badges": {
-            "title": "Badge di verifica dei membri",
-            "description": "Indicatori di stato verificato sui profili dei membri."
-          },
-          "nexusscore": {
-            "title": "NexusScore",
-            "description": "Punteggio proprietario di reputazione e affidabilità."
-          },
-          "streaks": {
-            "title": "Serie",
-            "description": "Tracciamento di attività consecutive per premiare un coinvolgimento costante."
-          },
-          "personal_insights_dashboard": {
-            "title": "Dashboard di insight personali",
-            "description": "Metriche di coinvolgimento individuale, ore date/ricevute, ripartizione delle competenze, grafici mensili e raccomandazioni personalizzate."
-          },
-          "safeguarding_module": {
-            "title": "Modulo di tutela",
-            "description": "Flusso di revisione dei contenuti segnalati, segnalazione incidenti, tracciamento degli incarichi di tutela e dashboard di sicurezza della comunità."
-          },
-          "crm": {
-            "title": "CRM",
-            "description": "Gestione contatti lato admin con note, attività, tag, timeline di attività ed export."
-          }
-        }
-      },
-      "ai_and_recommendation_engine": {
-        "title": "Motore IA e di raccomandazioni",
-        "items": {
-          "semantic_search": {
-            "title": "Ricerca semantica",
-            "description": "Ricerca full-text basata su Meilisearch su annunci, membri, eventi e gruppi con tolleranza ai refusi, sinonimi e isolamento per tenant."
-          },
-          "collaborative_filtering": {
-            "title": "Filtraggio collaborativo",
-            "description": "Raccomandazioni basate sugli item a partire dai dati reali di interazione della comunità."
-          },
-          "semantic_embeddings": {
-            "title": "Embedding semantici",
-            "description": "Corrispondenza dei contenuti basata su OpenAI per annunci, membri e richieste."
-          },
-          "edgerank_feed": {
-            "title": "Feed EdgeRank",
-            "description": "Ranking del feed pesato per decadimento temporale, affinità e coinvolgimento."
-          },
-          "matchrank_and_communityrank": {
-            "title": "MatchRank e CommunityRank",
-            "description": "Scoring bayesiano della qualità con intervalli di confidenza di Wilson."
-          },
-          "group_recommendations": {
-            "title": "Raccomandazioni di gruppi",
-            "description": "Scoperta di gruppi per trend e affinità."
-          },
-          "match_learning": {
-            "title": "Apprendimento delle corrispondenze",
-            "description": "Ciclo di feedback che migliora le raccomandazioni a partire dalle interazioni dell'utente."
-          },
-          "algorithm_health_dashboard": {
-            "title": "Dashboard di salute degli algoritmi",
-            "description": "Monitoraggio e regolazione live da admin di tutti i sistemi di ranking."
-          }
-        }
-      },
-      "caring_community_layer": {
-        "title": "Livello di comunità solidale",
-        "intro": "Un livello di governance per preparare i pilota in deployment civici e di comunità solidali — la maggior parte dei moduli è stata rilasciata tra aprile e maggio 2026.",
-        "items": {
-          "civic_digest": {
-            "title": "Digest civico",
-            "description": "Riassunto periodico dell'attività e dei risultati della comunità per gli stakeholder."
-          },
-          "success_stories": {
-            "title": "Storie di successo",
-            "description": "Casi di studio selezionati di risultati guidati dai membri."
-          },
-          "feedback_inbox": {
-            "title": "Casella dei feedback",
-            "description": "Raccolta centralizzata dei feedback del pilota con triage lato admin."
-          },
-          "integration_showcase": {
-            "title": "Vetrina integrazioni",
-            "description": "Superficie pubblica per partner e integrazioni collegati."
-          },
-          "lead_nurture": {
-            "title": "Coltivazione dei lead",
-            "description": "Strumenti di workflow per il follow-up degli stakeholder del pilota."
-          },
-          "copilot": {
-            "title": "Copilot",
-            "description": "Assistente IA contestuale per gli amministratori della comunità."
-          }
-        }
-      },
-      "built_for_production": {
-        "title": "Costruito per la produzione",
-        "items": {
-          "enterprise_security": {
-            "title": "Sicurezza enterprise",
-            "description": "CSRF, rate limiting, 2FA TOTP, passkey WebAuthn, nonce CSP, lista permessi CORS, validazione Form Request, barriere di verifica email e registrazione tramite codice di invito."
-          },
-          "stripe_payments_layer": {
-            "title": "Livello pagamenti Stripe",
-            "description": "Abbonamenti, donazioni, marketplace (Connect) e verifica dell'identità, con gestione idempotente dei webhook e copertura di test approfondita sui flussi di denaro."
-          },
-          "gdpr_compliance_suite": {
-            "title": "Suite di conformità GDPR",
-            "description": "Richieste sui dati, gestione del consenso, consenso ai cookie, tracciamento dei data breach e log di audit completo."
-          },
-          "fraud_and_abuse_detection": {
-            "title": "Rilevamento di frodi e abusi",
-            "description": "Allerte automatiche per attività sospette e moderazione dei contenuti."
-          },
-          "insurance_certificate_tracking": {
-            "title": "Tracciamento certificati assicurativi",
-            "description": "Gestione e verifica delle assicurazioni dei volontari."
-          },
-          "enterprise_rbac": {
-            "title": "RBAC enterprise",
-            "description": "Controllo accessi basato sui ruoli su 13+ moduli con matrice completa dei permessi."
-          },
-          "wcag_2_1_aa_accessibility": {
-            "title": "Accessibilità WCAG 2.1 AA",
-            "description": "Conformità di accessibilità verificata su tutta la superficie rivolta all'utente."
-          },
-          "multi_language_support": {
-            "title": "Supporto multilingue",
-            "description": "11 lingue: inglese, irlandese, tedesco, francese, italiano, portoghese, spagnolo, olandese, polacco, giapponese e arabo (RTL completo)."
-          },
-          "self_hosted_prerendering": {
-            "title": "Pre-rendering self-hosted",
-            "description": "Snapshot Playwright riservati ai bot e serviti ai crawler SEO; gli utenti ricevono sempre la SPA live."
-          },
-          "guided_onboarding": {
-            "title": "Onboarding guidato",
-            "description": "Procedura guidata per i nuovi membri con valori predefiniti intelligenti."
-          },
-          "admin_panel": {
-            "title": "Pannello di amministrazione",
-            "description": "Controlli sugli algoritmi, diagnostica, monitoraggio dei job cron e della deliverability email."
-          },
-          "email_webhook_processing": {
-            "title": "Elaborazione webhook email",
-            "description": "Gestione degli eventi SendGrid di bounce, reclamo e consegna."
-          },
-          "500plus_phpunit_tests": {
-            "title": "500+ test PHPUnit",
-            "description": "Flussi di denaro, webhook, federazione, gruppi, marketplace — oltre alle suite frontend Vitest."
-          },
-          "openapi_3_0_specification": {
-            "title": "Specifica OpenAPI 3.0",
-            "description": "Specifica API completa con documentazione Swagger UI."
-          },
-          "fully_dockerized": {
-            "title": "Completamente dockerizzato",
-            "description": "Produzione e sviluppo girano sulle stesse fondamenta di Docker Compose."
-          }
-        }
-      }
+      "title": "Manutenzione"
     }
   }
 }
