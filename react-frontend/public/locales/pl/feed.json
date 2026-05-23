@@ -1,7 +1,8 @@
 {
-  "page_title": "Feed",
+  "page_title": "Karmić",
   "title": "Kanał społecznościowy",
   "subtitle": "Zobacz, co się dzieje w Twojej społeczności",
+  "meta_description": "Prywatny strumień społeczności dla aktualizacji, ogłoszeń, wydarzeń, ankiet, celów i rozmów.",
   "new_post": "Nowy post",
   "whats_on_your_mind": "Co masz na myśli?",
   "add_image_aria": "Dodaj obraz",
@@ -15,9 +16,12 @@
   "session_expired": "Twoja sesja wygasła. Proszę zalogować się ponownie.",
   "error_load": "Nie udało się załadować kanału.",
   "error_load_retry": "Nie udało się załadować kanału. Proszę spróbować ponownie.",
+  "error_hint": "Twoje filtry i edytor wersji roboczych są nadal tutaj. Odśwież strumień, gdy połączenie będzie gotowe.",
+  "loading_label": "Ładowanie aktualizacji społeczności...",
   "empty_title": "Brak postów",
   "empty_desc": "Bądź pierwszym, który podzieli się czymś ze swoją społecznością!",
   "empty_filtered": "Nic nie pasuje teraz do tego widoku. Spr?buj innego filtra.",
+  "empty_filtered_with_filter": "Nie ma teraz aktualizacji typu {{filter}}. Spróbuj wszystkich wpisów lub rozpocznij nową rozmowę.",
   "filter": {
     "all": "Wszystkie",
     "posts": "Wpisy",
@@ -28,14 +32,14 @@
     "jobs": "Praca",
     "challenges": "Wyzwania",
     "volunteering": "Wolontariat",
-    "blogs": "Blog",
+    "blogs": "Bloga",
     "discussions": "Dyskusje",
     "following": "Obserwowane",
     "saved": "Zapisane",
     "clear": "Wyczyść filtry kanału",
+    "show_all": "Pokaż wszystkie wpisy",
     "more": "Więcej",
-    "select": "Wybierz filtr kanału",
-    "show_all": "Pokaż wszystkie wpisy"
+    "select": "Wybierz filtr kanału"
   },
   "report": {
     "title": "Zgłoś post",
@@ -80,6 +84,7 @@
     "description_label": "Opis",
     "location_label": "Lokalizacja",
     "location_placeholder": "Szukaj lokalizacji...",
+    "location_from_profile": "Z Twojego profilu — zaktualizuj w Ustawieniach",
     "post_created": "Post utworzony!",
     "post_failed": "Nie udało się utworzyć posta.",
     "post_button": "Opublikuj",
@@ -208,16 +213,15 @@
     "media_rejected": "{{count}} plik(i) pominięty(e) (zły typ lub za duży)",
     "media_compression_failed": "{{count}} obraz(y) nie udało się przetworzyć",
     "media_upload_error": "Nie udało się przetworzyć obrazów",
+    "upload_preview_alt": "Podgląd przesyłania {{number}}",
+    "image_remove_number_aria": "Usuń obraz {{number}}",
+    "alt_text_add": "Dodaj tekst alternatywny",
+    "alt_text_edit": "Edytuj tekst alternatywny",
     "sdg_selected_one": "{{count}} cel wybrany",
     "sdg_selected_other": "{{count}} cele wybrane",
     "content_required": "Treść wpisu nie może być pusta.",
     "content_too_long": "Wpis jest za długi (maks. {{max}} znaków).",
     "groups_load_error": "Nie udało się załadować grup.",
-    "upload_preview_alt": "Podgląd przesyłania {{number}}",
-    "image_remove_number_aria": "Usuń obraz {{number}}",
-    "alt_text_add": "Dodaj tekst alternatywny",
-    "alt_text_edit": "Edytuj tekst alternatywny",
-    "location_from_profile": "Z Twojego profilu — zaktualizuj w Ustawieniach",
     "video_invalid_type": "Nieprawidłowy format wideo. Użyj MP4, WebM, OGG lub MOV.",
     "video_too_large": "Wideo musi być mniejsze niż {{size}}MB.",
     "video": "Wideo",
@@ -266,8 +270,9 @@
     "type_job": "Praca",
     "type_challenge": "Wyzwanie",
     "type_volunteer": "Wolontariusz",
-    "type_blog": "Blog",
+    "type_blog": "Bloga",
     "type_discussion": "Dyskusja",
+    "type_resource": "Zasób",
     "type_badge_earned": "Odznaka zdobyta",
     "type_level_up": "Poziom wyżej",
     "badge_earned_message": "{{name}} zdobył odznakę \"{{badge}}\"!",
@@ -332,8 +337,7 @@
     "milestone": {
       "badge_unlocked": "Odznaka odblokowana",
       "level_reached": "Osiągnięto poziom"
-    },
-    "type_resource": "Zasób"
+    }
   },
   "poll": {
     "load_failed": "Nie udało się załadować danych ankiety.",
@@ -390,7 +394,7 @@
     "cannot_share_own_post": "Nie możesz udostępnić własnego wpisu",
     "menu_label": "Opcje udostępniania",
     "default_title": "Post",
-    "repost": "Repost",
+    "repost": "Opublikuj ponownie",
     "repost_desc": "Udostępnij na swoim kanale",
     "repost_remove": "Usuń repost",
     "repost_remove_desc": "Usuń repost z twojego kanału",
@@ -598,9 +602,5 @@
     "back": "Wróć do kanału",
     "not_found": "Nie znaleziono elementu",
     "load_failed": "Nie udało się załadować elementu"
-  },
-  "meta_description": "Prywatny strumień społeczności dla aktualizacji, ogłoszeń, wydarzeń, ankiet, celów i rozmów.",
-  "error_hint": "Twoje filtry i edytor wersji roboczych są nadal tutaj. Odśwież strumień, gdy połączenie będzie gotowe.",
-  "loading_label": "Ładowanie aktualizacji społeczności...",
-  "empty_filtered_with_filter": "Nie ma teraz aktualizacji typu {{filter}}. Spróbuj wszystkich wpisów lub rozpocznij nową rozmowę."
+  }
 }

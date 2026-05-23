@@ -1,7 +1,8 @@
 {
-  "page_title": "Feed",
+  "page_title": "Füttern",
   "title": "Community-Feed",
   "subtitle": "Sehen Sie, was in Ihrer Gemeinschaft passiert",
+  "meta_description": "Ein privater Community-Feed für Aktualisierungen, Einträge, Veranstaltungen, Umfragen, Ziele und Gespräche.",
   "new_post": "Neuer Beitrag",
   "whats_on_your_mind": "Was beschäftigt Sie?",
   "add_image_aria": "Bild hinzufügen",
@@ -15,9 +16,12 @@
   "session_expired": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
   "error_load": "Feed konnte nicht geladen werden.",
   "error_load_retry": "Feed konnte nicht geladen werden. Bitte versuchen Sie es erneut.",
+  "error_hint": "Ihre Filter und der Entwurfseditor sind noch hier. Aktualisieren Sie den Feed, sobald Ihre Verbindung bereit ist.",
+  "loading_label": "Community-Aktualisierungen werden geladen...",
   "empty_title": "Noch keine Beiträge",
   "empty_desc": "Seien Sie die erste Person, die etwas mit Ihrer Gemeinschaft teilt!",
   "empty_filtered": "Nichts passt derzeit zu dieser Ansicht. Versuche einen anderen Filter.",
+  "empty_filtered_with_filter": "Es gibt derzeit keine {{filter}}-Aktualisierungen. Versuchen Sie alle Beiträge oder starten Sie ein neues Gespräch.",
   "filter": {
     "all": "Alle",
     "posts": "Beiträge",
@@ -33,9 +37,9 @@
     "following": "Folge ich",
     "saved": "Gespeichert",
     "clear": "Feed-Filter zurücksetzen",
+    "show_all": "Alle Beiträge anzeigen",
     "more": "Mehr",
-    "select": "Feed-Filter auswählen",
-    "show_all": "Alle Beiträge anzeigen"
+    "select": "Feed-Filter auswählen"
   },
   "report": {
     "title": "Beitrag melden",
@@ -80,6 +84,7 @@
     "description_label": "Beschreibung",
     "location_label": "Standort",
     "location_placeholder": "Nach einem Standort suchen...",
+    "location_from_profile": "Aus Ihrem Profil — in Einstellungen aktualisieren",
     "post_created": "Beitrag erstellt!",
     "post_failed": "Beitrag konnte nicht erstellt werden.",
     "post_button": "Posten",
@@ -183,7 +188,7 @@
     "template_listing_offer": "Eine Fähigkeit anbieten",
     "template_listing_request": "Hilfe suchen",
     "template_event_gathering": "Gemeinschaftstreffen",
-    "template_event_workshop": "Workshop",
+    "template_event_workshop": "Werkstatt",
     "template_event_social": "Gesellige Veranstaltung",
     "template_goal_hours": "Stunden diesen Monat geben",
     "template_goal_skills": "Eine neue Fähigkeit erlernen",
@@ -208,21 +213,20 @@
     "media_rejected": "{{count}} Datei(en) übersprungen (falscher Typ oder zu gross)",
     "media_compression_failed": "{{count}} Bild(er) konnten nicht verarbeitet werden",
     "media_upload_error": "Bilder konnten nicht verarbeitet werden",
+    "upload_preview_alt": "Upload-Vorschau {{number}}",
+    "image_remove_number_aria": "Bild {{number}} entfernen",
+    "alt_text_add": "Alternativtext hinzufügen",
+    "alt_text_edit": "Alternativtext bearbeiten",
     "sdg_selected_one": "{{count}} Ziel ausgewählt",
     "sdg_selected_other": "{{count}} Ziele ausgewählt",
     "content_required": "Der Beitragsinhalt darf nicht leer sein.",
     "content_too_long": "Der Beitrag ist zu lang (max. {{max}} Zeichen).",
     "groups_load_error": "Gruppen konnten nicht geladen werden.",
-    "upload_preview_alt": "Upload-Vorschau {{number}}",
-    "image_remove_number_aria": "Bild {{number}} entfernen",
-    "alt_text_add": "Alternativtext hinzufügen",
-    "alt_text_edit": "Alternativtext bearbeiten",
-    "location_from_profile": "Aus Ihrem Profil — in Einstellungen aktualisieren",
     "video_invalid_type": "Ungültiges Videoformat. Verwenden Sie MP4, WebM, OGG oder MOV.",
     "video_too_large": "Video muss kleiner als {{size}}MB sein.",
     "video": "Video",
     "video_remove": "Video entfernen",
-    "file_size_mb": "{{name}} ({{size}}MB)"
+    "file_size_mb": "{{name}} ({{size}} MB)"
   },
   "moderation": {
     "unauthorized": "Sie sind nicht berechtigt, diese Aktion auszuführen."
@@ -268,6 +272,7 @@
     "type_volunteer": "Freiwilliger",
     "type_blog": "Blog",
     "type_discussion": "Diskussion",
+    "type_resource": "Ressource",
     "type_badge_earned": "Abzeichen erhalten",
     "type_level_up": "Level-Aufstieg",
     "badge_earned_message": "{{name}} hat das Abzeichen \"{{badge}}\" erhalten!",
@@ -332,8 +337,7 @@
     "milestone": {
       "badge_unlocked": "Abzeichen freigeschaltet",
       "level_reached": "Stufe erreicht"
-    },
-    "type_resource": "Ressource"
+    }
   },
   "poll": {
     "load_failed": "Umfragedaten konnten nicht geladen werden.",
@@ -598,9 +602,5 @@
     "back": "Zurück zum Feed",
     "not_found": "Element nicht gefunden",
     "load_failed": "Element konnte nicht geladen werden"
-  },
-  "meta_description": "Ein privater Community-Feed für Aktualisierungen, Einträge, Veranstaltungen, Umfragen, Ziele und Gespräche.",
-  "error_hint": "Ihre Filter und der Entwurfseditor sind noch hier. Aktualisieren Sie den Feed, sobald Ihre Verbindung bereit ist.",
-  "loading_label": "Community-Aktualisierungen werden geladen...",
-  "empty_filtered_with_filter": "Es gibt derzeit keine {{filter}}-Aktualisierungen. Versuchen Sie alle Beiträge oder starten Sie ein neues Gespräch."
+  }
 }

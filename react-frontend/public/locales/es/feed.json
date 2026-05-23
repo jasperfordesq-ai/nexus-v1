@@ -2,6 +2,7 @@
   "page_title": "Muro",
   "title": "Feed de la Comunidad",
   "subtitle": "Mira lo que está pasando en tu comunidad",
+  "meta_description": "Un feed comunitario privado para actualizaciones, anuncios, eventos, encuestas, objetivos y conversaciones.",
   "new_post": "Nueva Publicación",
   "whats_on_your_mind": "¿Qué tienes en mente?",
   "add_image_aria": "Agregar imagen",
@@ -15,9 +16,12 @@
   "session_expired": "Tu sesión ha expirado. Por favor, inicia sesión de nuevo.",
   "error_load": "Error al cargar el feed.",
   "error_load_retry": "Error al cargar el feed. Por favor intenta de nuevo.",
+  "error_hint": "Tus filtros y el redactor de borrador siguen aquí. Actualiza el feed cuando tu conexión esté lista.",
+  "loading_label": "Cargando actualizaciones de la comunidad...",
   "empty_title": "Aún no hay publicaciones",
   "empty_desc": "¡Sé el primero en compartir algo con tu comunidad!",
   "empty_filtered": "Nada coincide con esta vista ahora mismo. Prueba otro filtro.",
+  "empty_filtered_with_filter": "No hay actualizaciones de tipo {{filter}} en este momento. Prueba todas las publicaciones o inicia una nueva conversación.",
   "filter": {
     "all": "Todo",
     "posts": "Publicaciones",
@@ -33,9 +37,9 @@
     "following": "Siguiendo",
     "saved": "Guardado",
     "clear": "Limpiar filtros del feed",
+    "show_all": "Mostrar todas las publicaciones",
     "more": "Más",
-    "select": "Seleccionar filtro del feed",
-    "show_all": "Mostrar todas las publicaciones"
+    "select": "Seleccionar filtro del feed"
   },
   "report": {
     "title": "Reportar Publicación",
@@ -80,6 +84,7 @@
     "description_label": "Descripción",
     "location_label": "Ubicación",
     "location_placeholder": "Buscar una ubicación...",
+    "location_from_profile": "De tu perfil — actualiza en Ajustes",
     "post_created": "¡Publicación creada!",
     "post_failed": "Error al crear la publicación.",
     "post_button": "Publicar",
@@ -208,16 +213,15 @@
     "media_rejected": "{{count}} archivo(s) omitido(s) (tipo incorrecto o demasiado grande)",
     "media_compression_failed": "{{count}} imagen(es) no se pudieron procesar",
     "media_upload_error": "Error al procesar las imágenes",
+    "upload_preview_alt": "Vista previa de carga {{number}}",
+    "image_remove_number_aria": "Eliminar imagen {{number}}",
+    "alt_text_add": "Añadir texto alternativo",
+    "alt_text_edit": "Editar texto alternativo",
     "sdg_selected_one": "{{count}} objetivo seleccionado",
     "sdg_selected_other": "{{count}} objetivos seleccionados",
     "content_required": "El contenido de la publicación no puede estar vacío.",
     "content_too_long": "La publicación es demasiado larga (máx. {{max}} caracteres).",
     "groups_load_error": "Error al cargar los grupos.",
-    "upload_preview_alt": "Vista previa de carga {{number}}",
-    "image_remove_number_aria": "Eliminar imagen {{number}}",
-    "alt_text_add": "Añadir texto alternativo",
-    "alt_text_edit": "Editar texto alternativo",
-    "location_from_profile": "De tu perfil — actualiza en Ajustes",
     "video_invalid_type": "Formato de vídeo no válido. Usa MP4, WebM, OGG o MOV.",
     "video_too_large": "El vídeo debe ser inferior a {{size}}MB.",
     "video": "Vídeo",
@@ -268,6 +272,7 @@
     "type_volunteer": "Voluntariado",
     "type_blog": "Blog",
     "type_discussion": "Discusión",
+    "type_resource": "Recurso",
     "type_badge_earned": "Insignia obtenida",
     "type_level_up": "Subida de nivel",
     "badge_earned_message": "¡{{name}} ha obtenido la insignia \"{{badge}}\"!",
@@ -332,8 +337,7 @@
     "milestone": {
       "badge_unlocked": "Insignia desbloqueada",
       "level_reached": "Nivel alcanzado"
-    },
-    "type_resource": "Recurso"
+    }
   },
   "poll": {
     "load_failed": "Error al cargar los datos de la encuesta.",
@@ -390,7 +394,7 @@
     "cannot_share_own_post": "No puedes compartir tu propia publicación",
     "menu_label": "Opciones para compartir",
     "default_title": "Correo",
-    "repost": "Repost",
+    "repost": "Volver a publicar",
     "repost_desc": "Compartir en tu feed",
     "repost_remove": "Eliminar Repost",
     "repost_remove_desc": "Eliminar repost de tu feed",
@@ -505,7 +509,7 @@
     "global": "Global",
     "nearby": "Cerca de Mí",
     "radius": "{{km}} km",
-    "km": "km",
+    "km": "kilómetros",
     "add_location": "Añadir ubicación en el perfil"
   },
   "subfilter": {
@@ -598,9 +602,5 @@
     "back": "Volver al Feed",
     "not_found": "Elemento no encontrado",
     "load_failed": "Error al cargar el elemento"
-  },
-  "meta_description": "Un feed comunitario privado para actualizaciones, anuncios, eventos, encuestas, objetivos y conversaciones.",
-  "error_hint": "Tus filtros y el redactor de borrador siguen aquí. Actualiza el feed cuando tu conexión esté lista.",
-  "loading_label": "Cargando actualizaciones de la comunidad...",
-  "empty_filtered_with_filter": "No hay actualizaciones de tipo {{filter}} en este momento. Prueba todas las publicaciones o inicia una nueva conversación."
+  }
 }

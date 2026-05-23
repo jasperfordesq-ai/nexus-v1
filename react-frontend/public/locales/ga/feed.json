@@ -2,10 +2,11 @@
   "page_title": "Fotha",
   "title": "Fotha an Phobail",
   "subtitle": "Feic cad atá ag tarlú i do phobal",
+  "meta_description": "Fotha pobail príobháideach do nuashonruithe, liostáin, imeachtaí, vótaíochtaí, spriocanna agus comhráite.",
   "new_post": "Postáil Nua",
   "whats_on_your_mind": "Cad atá ar d'intinn?",
   "add_image_aria": "Cuir íomhá leis",
-  "quoted_post_image": "Quoted post image",
+  "quoted_post_image": "Íomhá postála luaite",
   "create_poll_aria": "Cruthaigh vóta",
   "create_post": "Cruthaigh Postáil",
   "author_unknown": "Anaithnid",
@@ -15,9 +16,12 @@
   "session_expired": "Tá do sheisiún imithe in éag. Logáil isteach arís le do thoil.",
   "error_load": "Theip ar lódáil an fhotha.",
   "error_load_retry": "Theip ar lódáil an fhotha. Bain triail eile as.",
+  "error_hint": "Tá do scagairí agus an cumadóir dréachta fós anseo. Athnuaigh an fotha nuair atá do cheangal réidh.",
+  "loading_label": "Nuashonruithe pobail á luchtú...",
   "empty_title": "Níl aon phostálacha fós",
   "empty_desc": "Bí ar an gcéad duine rud éigin a roinnt le do phobal!",
   "empty_filtered": "N? mheaitse?lann aon rud an radharc seo faoi l?thair. Bain triail as scagaire eile.",
+  "empty_filtered_with_filter": "Níl aon nuashonrú de chineál {{filter}} ann faoi láthair. Bain triail as gach postáil nó tosaigh comhrá nua.",
   "filter": {
     "all": "Uile",
     "posts": "Postálacha",
@@ -33,9 +37,9 @@
     "following": "Á Leanúint",
     "saved": "Sábháilte",
     "clear": "Glan scagairí beatha",
+    "show_all": "Taispeáin gach postáil",
     "more": "Níos mó",
-    "select": "Roghnaigh scagaire beatha",
-    "show_all": "Taispeáin gach postáil"
+    "select": "Roghnaigh scagaire beatha"
   },
   "report": {
     "title": "Tuairiscigh Postáil",
@@ -80,6 +84,7 @@
     "description_label": "Cur Síos",
     "location_label": "Suíomh",
     "location_placeholder": "Cuardaigh suíomh...",
+    "location_from_profile": "Ó do phróifíl — nuashonraigh i Socruithe",
     "post_created": "Postáil cruthaithe!",
     "post_failed": "Theip ar phostáil a chruthú.",
     "post_button": "Postáil",
@@ -208,16 +213,15 @@
     "media_rejected": "{{count}} comhad curtha ar leataobh (cineál mícheart nó ró-mhór)",
     "media_compression_failed": "Theip ar {{count}} íomhá a phróiseáil",
     "media_upload_error": "Theip ar íomhánna a phróiseáil",
+    "upload_preview_alt": "Réamhamharc uaslódála {{number}}",
+    "image_remove_number_aria": "Bain íomhá {{number}}",
+    "alt_text_add": "Cuir téacs malartach leis",
+    "alt_text_edit": "Cuir téacs malartach in eagar",
     "sdg_selected_one": "{{count}} sprioc roghnaithe",
     "sdg_selected_other": "{{count}} sprioc roghnaithe",
     "content_required": "Ní féidir ábhar an phost a bheith folamh.",
     "content_too_long": "Tá an post ró-fhada (uasmhéid {{max}} carachtar).",
     "groups_load_error": "Theip ar ghrúpaí a luchtú.",
-    "upload_preview_alt": "Réamhamharc uaslódála {{number}}",
-    "image_remove_number_aria": "Bain íomhá {{number}}",
-    "alt_text_add": "Cuir téacs malartach leis",
-    "alt_text_edit": "Cuir téacs malartach in eagar",
-    "location_from_profile": "Ó do phróifíl — nuashonraigh i Socruithe",
     "video_invalid_type": "Formáid físeáin neamhbhailí. Úsáid MP4, WebM, OGG, nó MOV.",
     "video_too_large": "Caithfidh an físeán a bheith níos lú ná {{size}}MB.",
     "video": "Físeán",
@@ -235,7 +239,7 @@
     "delete_post": "Scrios Postáil",
     "hide_post": "Folaigh Postáil",
     "mute_user": "Balbhaigh {{name}}",
-    "block_user": "Block {{name}}",
+    "block_user": "Cuir bac ar {{name}}",
     "report_post": "Tuairiscigh Postáil",
     "read_more": "Léigh tuilleadh",
     "reviewed": "Athbhreithnithe",
@@ -268,6 +272,7 @@
     "type_volunteer": "Oibrí Deonach",
     "type_blog": "Blag",
     "type_discussion": "Plé",
+    "type_resource": "Acmhainn",
     "type_badge_earned": "Suaitheantas Tuillte",
     "type_level_up": "Ardú Leibhéil",
     "badge_earned_message": "Bhuaigh {{name}} an suaitheantas \"{{badge}}\"!",
@@ -332,8 +337,7 @@
     "milestone": {
       "badge_unlocked": "Suaitheantas díghlasáilte",
       "level_reached": "Leibhéal bainte amach"
-    },
-    "type_resource": "Acmhainn"
+    }
   },
   "poll": {
     "load_failed": "Theip ar shonraí an vóta a luchtú.",
@@ -598,9 +602,5 @@
     "back": "Ar ais go dtí an Fotha",
     "not_found": "Mír gan fáil",
     "load_failed": "Theip ar mhír a luchtú"
-  },
-  "meta_description": "Fotha pobail príobháideach do nuashonruithe, liostáin, imeachtaí, vótaíochtaí, spriocanna agus comhráite.",
-  "error_hint": "Tá do scagairí agus an cumadóir dréachta fós anseo. Athnuaigh an fotha nuair atá do cheangal réidh.",
-  "loading_label": "Nuashonruithe pobail á luchtú...",
-  "empty_filtered_with_filter": "Níl aon nuashonrú de chineál {{filter}} ann faoi láthair. Bain triail as gach postáil nó tosaigh comhrá nua."
+  }
 }

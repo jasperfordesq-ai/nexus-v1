@@ -1,7 +1,8 @@
 {
-  "page_title": "Feed",
+  "page_title": "餌",
   "title": "コミュニティフィード",
   "subtitle": "あなたのコミュニティで何が起こっているか見てみましょう",
+  "meta_description": "アップデート、リスティング、イベント、投票、目標、会話のためのプライベートなコミュニティフィードです。",
   "new_post": "新しい投稿",
   "whats_on_your_mind": "何を考えていますか？",
   "add_image_aria": "画像を追加",
@@ -15,9 +16,12 @@
   "session_expired": "あなたのセッションは期限切れです。再度ログインしてください。",
   "error_load": "フィードの読み込みに失敗しました。",
   "error_load_retry": "フィードの読み込みに失敗しました。もう一度お試しください。",
+  "error_hint": "フィルターと下書きエディタはそのままです。接続が安定したらフィードを更新してください。",
+  "loading_label": "コミュニティの更新を読み込み中...",
   "empty_title": "まだ投稿はありません",
   "empty_desc": "コミュニティと何かを共有する最初の人になりましょう！",
   "empty_filtered": "??????????????????????????????????????",
+  "empty_filtered_with_filter": "現在 {{filter}} の更新はありません。すべての投稿を見るか、新しい会話を始めてみてください。",
   "filter": {
     "all": "すべて",
     "posts": "投稿",
@@ -28,14 +32,14 @@
     "jobs": "求人",
     "challenges": "チャレンジ",
     "volunteering": "ボランティア",
-    "blogs": "Blog",
+    "blogs": "ブログ",
     "discussions": "ディスカッション",
     "following": "フォロー中",
     "saved": "保存済み",
     "clear": "フィードフィルターをクリア",
+    "show_all": "すべての投稿を表示",
     "more": "もっと見る",
-    "select": "フィードフィルターを選択",
-    "show_all": "すべての投稿を表示"
+    "select": "フィードフィルターを選択"
   },
   "report": {
     "title": "投稿を報告",
@@ -80,6 +84,7 @@
     "description_label": "説明",
     "location_label": "場所",
     "location_placeholder": "場所を検索...",
+    "location_from_profile": "プロフィールから — 設定で更新",
     "post_created": "投稿が作成されました！",
     "post_failed": "投稿の作成に失敗しました。",
     "post_button": "投稿する",
@@ -208,16 +213,15 @@
     "media_rejected": "{{count}}ファイルがスキップされました（タイプが間違っているか、サイズが大きすぎます）",
     "media_compression_failed": "{{count}}画像の処理に失敗しました",
     "media_upload_error": "画像の処理に失敗しました",
+    "upload_preview_alt": "アップロードプレビュー {{number}}",
+    "image_remove_number_aria": "画像 {{number}} を削除",
+    "alt_text_add": "代替テキストを追加",
+    "alt_text_edit": "代替テキストを編集",
     "sdg_selected_one": "{{count}}目標が選択されました",
     "sdg_selected_other": "{{count}}目標が選択されました",
     "content_required": "投稿内容を空にすることはできません。",
     "content_too_long": "投稿が長すぎます（最大{{max}}文字）。",
     "groups_load_error": "グループの読み込みに失敗しました。",
-    "upload_preview_alt": "アップロードプレビュー {{number}}",
-    "image_remove_number_aria": "画像 {{number}} を削除",
-    "alt_text_add": "代替テキストを追加",
-    "alt_text_edit": "代替テキストを編集",
-    "location_from_profile": "プロフィールから — 設定で更新",
     "video_invalid_type": "無効な動画形式です。MP4、WebM、OGG、またはMOVを使用してください。",
     "video_too_large": "動画は{{size}}MB未満でなければなりません。",
     "video": "動画",
@@ -268,6 +272,7 @@
     "type_volunteer": "ボランティア",
     "type_blog": "ブログ",
     "type_discussion": "ディスカッション",
+    "type_resource": "リソース",
     "type_badge_earned": "バッジ獲得",
     "type_level_up": "レベルアップ",
     "badge_earned_message": "{{name}}が「{{badge}}」バッジを獲得しました！",
@@ -332,8 +337,7 @@
     "milestone": {
       "badge_unlocked": "バッジ解除",
       "level_reached": "レベル到達"
-    },
-    "type_resource": "リソース"
+    }
   },
   "poll": {
     "load_failed": "投票データの読み込みに失敗しました。",
@@ -598,9 +602,5 @@
     "back": "フィードに戻る",
     "not_found": "アイテムが見つかりません",
     "load_failed": "アイテムの読み込みに失敗しました"
-  },
-  "meta_description": "アップデート、リスティング、イベント、投票、目標、会話のためのプライベートなコミュニティフィードです。",
-  "error_hint": "フィルターと下書きエディタはそのままです。接続が安定したらフィードを更新してください。",
-  "loading_label": "コミュニティの更新を読み込み中...",
-  "empty_filtered_with_filter": "現在 {{filter}} の更新はありません。すべての投稿を見るか、新しい会話を始めてみてください。"
+  }
 }
