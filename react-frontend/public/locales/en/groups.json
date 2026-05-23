@@ -1,4 +1,5 @@
 {
+  "member_fallback": "User",
   "title": "Groups",
   "discover": "Discover Groups",
   "create_group": "Create Group",

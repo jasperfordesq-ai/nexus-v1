@@ -851,7 +851,14 @@
   "map_unavailable": "La visualizzazione mappa non è disponibile",
   "identity_not_verified": "Identità non verificata",
   "verification": {
-    "not_id_verified": "Non verificato ID"
+    "not_id_verified": "Non verificato ID",
+    "badge": {
+      "email_verified": "Email Verified",
+      "phone_verified": "Phone Verified",
+      "id_verified": "ID Verified",
+      "dbs_checked": "DBS Checked",
+      "admin_verified": "Admin Verified"
+    }
   },
   "radius_5": "5 km",
   "radius_10": "10 km",
@@ -1617,7 +1624,11 @@
     "webhook_signing_title": "Verifica le firme",
     "webhook_signing_body": "Calcola HMAC-SHA256 del corpo grezzo della richiesta usando il secret della sottoscrizione. Confrontalo con l'header X-Partner-Signature in tempo costante.",
     "webhook_create_title": "Crea una sottoscrizione",
-    "webhook_create_body": "POST a /api/partner/v1/webhooks/subscriptions con event_types (array) e target_url (solo https). La risposta include un secret monouso — conservalo."
+    "webhook_create_body": "POST a /api/partner/v1/webhooks/subscriptions con event_types (array) e target_url (solo https). La risposta include un secret monouso — conservalo.",
+    "tabs": {
+      "code_examples": "Code examples",
+      "verification_examples": "Verification examples"
+    }
   },
   "regional_analytics": {
     "page_title": "Analisi regionale",
@@ -2183,5 +2194,7 @@
   "level_plain": "Livello {{level}}",
   "level_named": "Livello {{level}} - {{name}}",
   "xp_progress": "{{current}} / {{required}} XP",
-  "level_progress_aria": "Avanzamento livello {{level}}: {{percentage}}%"
+  "level_progress_aria": "Avanzamento livello {{level}}: {{percentage}}%",
+  "user_fallback": "User",
+  "release_stage": "Generally Available (v1.5.1)"
 }

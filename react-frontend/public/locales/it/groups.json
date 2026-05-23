@@ -701,5 +701,6 @@
     "primary_color": "Colore principale",
     "accent_color": "Colore accento",
     "preview": "Anteprima"
-  }
+  },
+  "member_fallback": "User"
 }

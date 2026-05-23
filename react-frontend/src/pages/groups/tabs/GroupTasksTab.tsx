@@ -8,6 +8,7 @@
  * Renders the TeamTasks ideation component for a group.
  */
 
+import { useTranslation } from 'react-i18next';
 import { GlassCard } from '@/components/ui';
 import { TeamTasks } from '@/components/ideation';
 import type { GroupMember } from './GroupMembersTab';
@@ -19,9 +20,10 @@ interface GroupTasksTabProps {
 }
 
 export function GroupTasksTab({ groupId, isGroupAdmin, members }: GroupTasksTabProps) {
+  const { t } = useTranslation('groups');
   const taskMembers = (members || []).map((m) => ({
     id: m.id,
-    name: m.first_name && m.last_name ? `${m.first_name} ${m.last_name}` : m.name ?? 'User',
+    name: m.first_name && m.last_name ? `${m.first_name} ${m.last_name}` : m.name ?? t('member_fallback'),
     avatar_url: m.avatar_url ?? m.avatar ?? null,
   }));
 

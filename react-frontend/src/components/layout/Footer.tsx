@@ -222,7 +222,7 @@ export function Footer({ children, copyright }: FooterProps) {
             <div className="border-t border-theme-default pt-4 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-xs text-theme-subtle">
               <Sparkles className="w-3.5 h-3.5 shrink-0 text-success" aria-hidden="true" />
               <span>
-                <span className="font-semibold text-theme-primary">{RELEASE_STATUS.stageLabel}</span>
+                <span className="font-semibold text-theme-primary">{t('release_stage')}</span>
                 {' — '}
                 {t('release_status.summary')}
               </span>

@@ -701,5 +701,6 @@
     "primary_color": "プライマリカラー",
     "accent_color": "アクセントカラー",
     "preview": "プレビュー"
-  }
+  },
+  "member_fallback": "User"
 }

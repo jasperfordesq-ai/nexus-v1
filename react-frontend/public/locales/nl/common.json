@@ -851,7 +851,14 @@
   "map_unavailable": "Kaartweergave is niet beschikbaar",
   "identity_not_verified": "Identiteit niet geverifieerd",
   "verification": {
-    "not_id_verified": "Niet ID Geverifieerd"
+    "not_id_verified": "Niet ID Geverifieerd",
+    "badge": {
+      "email_verified": "Email Verified",
+      "phone_verified": "Phone Verified",
+      "id_verified": "ID Verified",
+      "dbs_checked": "DBS Checked",
+      "admin_verified": "Admin Verified"
+    }
   },
   "radius_5": "5 km",
   "radius_10": "10 km",
@@ -1617,7 +1624,11 @@
     "webhook_signing_title": "Handtekeningen verifiëren",
     "webhook_signing_body": "Bereken HMAC-SHA256 van de ruwe request body met je abonnement-secret. Vergelijk in constante tijd met de X-Partner-Signature-header.",
     "webhook_create_title": "Een abonnement aanmaken",
-    "webhook_create_body": "POST naar /api/partner/v1/webhooks/subscriptions met event_types (array) en target_url (alleen https). Het antwoord bevat een eenmalig secret — bewaar het."
+    "webhook_create_body": "POST naar /api/partner/v1/webhooks/subscriptions met event_types (array) en target_url (alleen https). Het antwoord bevat een eenmalig secret — bewaar het.",
+    "tabs": {
+      "code_examples": "Code examples",
+      "verification_examples": "Verification examples"
+    }
   },
   "regional_analytics": {
     "page_title": "Regionale analyses",
@@ -2183,5 +2194,7 @@
   "level_plain": "Niveau {{level}}",
   "level_named": "Niveau {{level}} - {{name}}",
   "xp_progress": "{{current}} / {{required}} XP",
-  "level_progress_aria": "Voortgang niveau {{level}}: {{percentage}}%"
+  "level_progress_aria": "Voortgang niveau {{level}}: {{percentage}}%",
+  "user_fallback": "User",
+  "release_stage": "Generally Available (v1.5.1)"
 }

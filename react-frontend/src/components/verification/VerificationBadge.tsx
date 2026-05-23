@@ -43,49 +43,53 @@ export interface VerificationBadgeData {
 // Badge Config — GREEN for ID Verified (trust signal)
 // ─────────────────────────────────────────────────────────────────────────────
 
-const badgeConfig: Record<string, {
+type BadgeConfigEntry = {
   icon: React.ReactNode;
   iconSm: React.ReactNode;
   color: string;
   bgColor: string;
   label: string;
-}> = {
-  email_verified: {
-    icon: <Mail className="w-3.5 h-3.5" />,
-    iconSm: <Mail className="w-3 h-3" />,
-    color: 'text-blue-600 dark:text-blue-400',
-    bgColor: 'bg-blue-500/10',
-    label: 'Email Verified',
-  },
-  phone_verified: {
-    icon: <Phone className="w-3.5 h-3.5" />,
-    iconSm: <Phone className="w-3 h-3" />,
-    color: 'text-emerald-600 dark:text-emerald-400',
-    bgColor: 'bg-emerald-500/10',
-    label: 'Phone Verified',
-  },
-  id_verified: {
-    icon: <ShieldCheck className="w-3.5 h-3.5" />,
-    iconSm: <ShieldCheck className="w-3 h-3" />,
-    color: 'text-emerald-700 dark:text-emerald-300',
-    bgColor: 'bg-emerald-500/15 dark:bg-emerald-500/20',
-    label: 'ID Verified',
-  },
-  dbs_checked: {
-    icon: <FileCheck className="w-3.5 h-3.5" />,
-    iconSm: <FileCheck className="w-3 h-3" />,
-    color: 'text-amber-600 dark:text-amber-400',
-    bgColor: 'bg-amber-500/10',
-    label: 'DBS Checked',
-  },
-  admin_verified: {
-    icon: <UserCheck className="w-3.5 h-3.5" />,
-    iconSm: <UserCheck className="w-3 h-3" />,
-    color: 'text-indigo-600 dark:text-indigo-400',
-    bgColor: 'bg-indigo-500/10',
-    label: 'Admin Verified',
-  },
 };
+
+function getBadgeConfig(t: (key: string) => string): Record<string, BadgeConfigEntry> {
+  return {
+    email_verified: {
+      icon: <Mail className="w-3.5 h-3.5" />,
+      iconSm: <Mail className="w-3 h-3" />,
+      color: 'text-blue-600 dark:text-blue-400',
+      bgColor: 'bg-blue-500/10',
+      label: t('verification.badge.email_verified'),
+    },
+    phone_verified: {
+      icon: <Phone className="w-3.5 h-3.5" />,
+      iconSm: <Phone className="w-3 h-3" />,
+      color: 'text-emerald-600 dark:text-emerald-400',
+      bgColor: 'bg-emerald-500/10',
+      label: t('verification.badge.phone_verified'),
+    },
+    id_verified: {
+      icon: <ShieldCheck className="w-3.5 h-3.5" />,
+      iconSm: <ShieldCheck className="w-3 h-3" />,
+      color: 'text-emerald-700 dark:text-emerald-300',
+      bgColor: 'bg-emerald-500/15 dark:bg-emerald-500/20',
+      label: t('verification.badge.id_verified'),
+    },
+    dbs_checked: {
+      icon: <FileCheck className="w-3.5 h-3.5" />,
+      iconSm: <FileCheck className="w-3 h-3" />,
+      color: 'text-amber-600 dark:text-amber-400',
+      bgColor: 'bg-amber-500/10',
+      label: t('verification.badge.dbs_checked'),
+    },
+    admin_verified: {
+      icon: <UserCheck className="w-3.5 h-3.5" />,
+      iconSm: <UserCheck className="w-3 h-3" />,
+      color: 'text-indigo-600 dark:text-indigo-400',
+      bgColor: 'bg-indigo-500/10',
+      label: t('verification.badge.admin_verified'),
+    },
+  };
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers — normalize API response
@@ -110,6 +114,8 @@ export function VerificationBadgeIcon({
   badge: VerificationBadgeData;
   size?: 'sm' | 'md' | 'lg';
 }) {
+  const { t } = useTranslation('common');
+  const badgeConfig = getBadgeConfig(t);
   const config = badgeConfig[badge.type] || {
     icon: <ShieldCheck className="w-3.5 h-3.5" />,
     iconSm: <ShieldCheck className="w-3 h-3" />,
@@ -150,6 +156,7 @@ export function VerificationBadgeRow({
   size?: 'sm' | 'md' | 'lg';
 }) {
   const { t } = useTranslation('common');
+  const badgeConfig = getBadgeConfig(t);
   const [badges, setBadges] = useState<VerificationBadgeData[]>(propBadges || []);
   const [isLoaded, setIsLoaded] = useState(!!propBadges);
 
@@ -244,6 +251,7 @@ export function VerificationBadgeSummary({
   userId: number;
 }) {
   const { t } = useTranslation('common');
+  const badgeConfig = getBadgeConfig(t);
   const [badges, setBadges] = useState<VerificationBadgeData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 

@@ -83,5 +83,6 @@
   "initial_tip_people": "الأشخاص",
   "initial_tip_events": "الفعاليات",
   "saved_result_count_one": "({{count}} نتيجة)",
-  "saved_result_count_other": "({{count}} نتائج)"
+  "saved_result_count_other": "({{count}} نتائج)",
+  "listing_image_alt": "Listing image"
 }

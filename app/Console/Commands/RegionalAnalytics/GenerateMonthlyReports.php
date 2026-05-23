@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace App\Console\Commands\RegionalAnalytics;
 
 use App\Core\TenantContext;
+use App\I18n\LocaleContext;
 use App\Services\EmailDispatchService;
 use App\Services\RegionalAnalytics\RegionalAnalyticsService;
 use App\Services\RegionalAnalytics\RegionalReportPdfGenerator;
@@ -44,6 +45,10 @@ class GenerateMonthlyReports extends Command
         $periodLabel = $periodStart->format('Y-m');
 
         $query = DB::table('regional_analytics_subscriptions')
+            ->select([
+                'id', 'tenant_id', 'contact_email', 'contact_language',
+                'enabled_modules', 'status',
+            ])
             ->whereIn('status', ['active', 'trialing']);
 
         if ($subId = $this->option('subscription')) {
@@ -158,29 +163,35 @@ class GenerateMonthlyReports extends Command
                 return ['sent' => false, 'error' => 'missing_subscription_tenant'];
             }
 
-            // Route through the platform Mailer. The Laravel Mail facade uses
-            // SMTP in production and does not create unified audit evidence.
-            $body = '<p>' . e(__('emails.regional_analytics.report_ready', ['period' => $periodLabel])) . '</p>'
-                . '<p><a href="' . e($fileUrl) . '">' . e(__('emails.regional_analytics.download_report')) . '</a></p>'
-                . '<p>' . e(__('emails.regional_analytics.privacy_note')) . '</p>';
+            // Render subject + body in the recipient's preferred language.
+            // Without this wrap the queue worker's default locale (en) leaks through.
+            $language = (string) ($sub->contact_language ?? 'en') ?: 'en';
 
-            if (!EmailDispatchService::sendRaw(
-                $email,
-                (string) __('emails.regional_analytics.subject', ['period' => $periodLabel]),
-                $body,
-                null,
-                null,
-                null,
-                'regional_analytics',
-                ['tenant_id' => $tenantId]
-            )) {
-                Log::warning('Regional analytics report email send returned false', [
-                    'tenant_id' => $tenantId,
-                ]);
-                return ['sent' => false, 'error' => 'email_dispatch_returned_false'];
-            }
+            return LocaleContext::withLocale($language, function () use ($email, $fileUrl, $periodLabel, $tenantId): array {
+                // Route through the platform Mailer. The Laravel Mail facade uses
+                // SMTP in production and does not create unified audit evidence.
+                $body = '<p>' . e(__('emails.regional_analytics.report_ready', ['period' => $periodLabel])) . '</p>'
+                    . '<p><a href="' . e($fileUrl) . '">' . e(__('emails.regional_analytics.download_report')) . '</a></p>'
+                    . '<p>' . e(__('emails.regional_analytics.privacy_note')) . '</p>';
 
-            return ['sent' => true, 'error' => null];
+                if (!EmailDispatchService::sendRaw(
+                    $email,
+                    (string) __('emails.regional_analytics.subject', ['period' => $periodLabel]),
+                    $body,
+                    null,
+                    null,
+                    null,
+                    'regional_analytics',
+                    ['tenant_id' => $tenantId]
+                )) {
+                    Log::warning('Regional analytics report email send returned false', [
+                        'tenant_id' => $tenantId,
+                    ]);
+                    return ['sent' => false, 'error' => 'email_dispatch_returned_false'];
+                }
+
+                return ['sent' => true, 'error' => null];
+            });
         } catch (\Throwable $e) {
             Log::warning('Regional analytics report email exception', [
                 'tenant_id' => $sub->tenant_id ?? null,

@@ -851,7 +851,14 @@
   "map_unavailable": "地図表示は利用できません",
   "identity_not_verified": "本人確認未完了",
   "verification": {
-    "not_id_verified": "ID確認されていません"
+    "not_id_verified": "ID確認されていません",
+    "badge": {
+      "email_verified": "Email Verified",
+      "phone_verified": "Phone Verified",
+      "id_verified": "ID Verified",
+      "dbs_checked": "DBS Checked",
+      "admin_verified": "Admin Verified"
+    }
   },
   "radius_5": "5km",
   "radius_10": "10km",
@@ -1617,7 +1624,11 @@
     "webhook_signing_title": "署名の検証",
     "webhook_signing_body": "サブスクリプションシークレットを鍵に、リクエスト本体のHMAC-SHA256を計算します。X-Partner-Signatureヘッダーと定数時間で比較します。",
     "webhook_create_title": "サブスクリプションを作成",
-    "webhook_create_body": "/api/partner/v1/webhooks/subscriptionsにevent_types（配列）とtarget_url（httpsのみ）を付けてPOST。応答にはワンタイムのシークレットが含まれます — 保管してください。"
+    "webhook_create_body": "/api/partner/v1/webhooks/subscriptionsにevent_types（配列）とtarget_url（httpsのみ）を付けてPOST。応答にはワンタイムのシークレットが含まれます — 保管してください。",
+    "tabs": {
+      "code_examples": "Code examples",
+      "verification_examples": "Verification examples"
+    }
   },
   "regional_analytics": {
     "page_title": "地域分析",
@@ -2183,5 +2194,7 @@
   "level_plain": "レベル{{level}}",
   "level_named": "レベル{{level}} - {{name}}",
   "xp_progress": "{{current}} / {{required}} XP",
-  "level_progress_aria": "レベル{{level}}の進捗：{{percentage}}%"
+  "level_progress_aria": "レベル{{level}}の進捗：{{percentage}}%",
+  "user_fallback": "User",
+  "release_stage": "Generally Available (v1.5.1)"
 }

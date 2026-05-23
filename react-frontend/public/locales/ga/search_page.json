@@ -83,5 +83,6 @@
   "initial_tip_people": "Daoine",
   "initial_tip_events": "Imeachtaí",
   "saved_result_count_one": "({{count}} toradh)",
-  "saved_result_count_other": "({{count}} toradh)"
+  "saved_result_count_other": "({{count}} toradh)",
+  "listing_image_alt": "Listing image"
 }

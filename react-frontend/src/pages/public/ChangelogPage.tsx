@@ -21,7 +21,6 @@ import ExternalLink from 'lucide-react/icons/external-link';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { MarkdownRenderer } from '@/components/content/MarkdownRenderer';
-import { RELEASE_STATUS } from '@/config/releaseStatus';
 
 type FetchState =
   | { status: 'loading' }
@@ -43,7 +42,7 @@ export function ChangelogPage() {
       })
       .catch((err: unknown) => {
         if (!cancelled) {
-          const message = err instanceof Error ? err.message : 'Unknown error';
+          const message = err instanceof Error ? err.message : t('unknown_error');
           setState({ status: 'error', message });
         }
       });
@@ -67,7 +66,7 @@ export function ChangelogPage() {
             {t('changelog_page.heading')}
           </h1>
           <Chip color="success" variant="flat" size="sm">
-            {RELEASE_STATUS.stageLabel}
+            {t('release_stage')}
           </Chip>
         </div>
         <p className="text-sm text-foreground-600">

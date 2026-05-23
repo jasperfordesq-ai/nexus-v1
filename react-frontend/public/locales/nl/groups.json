@@ -701,5 +701,6 @@
     "primary_color": "Primaire kleur",
     "accent_color": "Accentkleur",
     "preview": "Voorbeeld"
-  }
+  },
+  "member_fallback": "User"
 }

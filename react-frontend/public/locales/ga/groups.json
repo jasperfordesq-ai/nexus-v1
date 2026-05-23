@@ -701,5 +701,6 @@
     "primary_color": "Príomhdhath",
     "accent_color": "Dath Béime",
     "preview": "Réamhamharc"
-  }
+  },
+  "member_fallback": "User"
 }

@@ -851,7 +851,14 @@
   "map_unavailable": "Níl an radharc léarscáile ar fáil",
   "identity_not_verified": "Aitheantas neamhfhíoraithe",
   "verification": {
-    "not_id_verified": "Aitheantas gan fhíorú"
+    "not_id_verified": "Aitheantas gan fhíorú",
+    "badge": {
+      "email_verified": "Email Verified",
+      "phone_verified": "Phone Verified",
+      "id_verified": "ID Verified",
+      "dbs_checked": "DBS Checked",
+      "admin_verified": "Admin Verified"
+    }
   },
   "radius_5": "5 km",
   "radius_10": "10 km",
@@ -1617,7 +1624,11 @@
     "webhook_signing_title": "Fíorú sínithe",
     "webhook_signing_body": "Ríomh HMAC-SHA256 chorp amh an iarratais le rún an tsíntiúis. Comparáid leis an gceanntásc X-Partner-Signature in am tairiseach.",
     "webhook_create_title": "Cruthaigh síntiús",
-    "webhook_create_body": "POST chuig /api/partner/v1/webhooks/subscriptions le event_types (eagar) agus target_url (https amháin). Áirítear rún aon uaire san fhreagra — stóráil é."
+    "webhook_create_body": "POST chuig /api/partner/v1/webhooks/subscriptions le event_types (eagar) agus target_url (https amháin). Áirítear rún aon uaire san fhreagra — stóráil é.",
+    "tabs": {
+      "code_examples": "Code examples",
+      "verification_examples": "Verification examples"
+    }
   },
   "regional_analytics": {
     "page_title": "Anailísí Réigiúnacha",
@@ -2183,5 +2194,7 @@
   "level_plain": "Leibhéal {{level}}",
   "level_named": "Leibhéal {{level}} - {{name}}",
   "xp_progress": "{{current}} / {{required}} XP",
-  "level_progress_aria": "Dul chun cinn leibhéal {{level}}: {{percentage}}%"
+  "level_progress_aria": "Dul chun cinn leibhéal {{level}}: {{percentage}}%",
+  "user_fallback": "User",
+  "release_stage": "Generally Available (v1.5.1)"
 }

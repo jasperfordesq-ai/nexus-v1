@@ -83,5 +83,6 @@
   "initial_tip_people": "Personnes",
   "initial_tip_events": "Événements",
   "saved_result_count_one": "({{count}} résultat)",
-  "saved_result_count_other": "({{count}} résultats)"
+  "saved_result_count_other": "({{count}} résultats)",
+  "listing_image_alt": "Listing image"
 }

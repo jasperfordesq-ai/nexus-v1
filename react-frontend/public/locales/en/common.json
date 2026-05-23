@@ -851,7 +851,14 @@
   "map_unavailable": "Map view is not available",
   "identity_not_verified": "Identity not verified",
   "verification": {
-    "not_id_verified": "Not ID Verified"
+    "not_id_verified": "Not ID Verified",
+    "badge": {
+      "email_verified": "Email Verified",
+      "phone_verified": "Phone Verified",
+      "id_verified": "ID Verified",
+      "dbs_checked": "DBS Checked",
+      "admin_verified": "Admin Verified"
+    }
   },
   "radius_5": "5 km",
   "radius_10": "10 km",
@@ -1617,7 +1624,11 @@
     "webhook_signing_title": "Verifying signatures",
     "webhook_signing_body": "Compute HMAC-SHA256 of the raw request body using your subscription secret. Compare with the X-Partner-Signature header in constant time.",
     "webhook_create_title": "Create a subscription",
-    "webhook_create_body": "POST /api/partner/v1/webhooks/subscriptions with event_types (array) and target_url (https only). The response includes a one-time secret — store it."
+    "webhook_create_body": "POST /api/partner/v1/webhooks/subscriptions with event_types (array) and target_url (https only). The response includes a one-time secret — store it.",
+    "tabs": {
+      "code_examples": "Code examples",
+      "verification_examples": "Verification examples"
+    }
   },
   "regional_analytics": {
     "page_title": "Regional Analytics",
@@ -2183,5 +2194,7 @@
   "level_plain": "Level {{level}}",
   "level_named": "Level {{level}} - {{name}}",
   "xp_progress": "{{current}} / {{required}} XP",
-  "level_progress_aria": "Level {{level}} progress: {{percentage}}%"
+  "level_progress_aria": "Level {{level}} progress: {{percentage}}%",
+  "user_fallback": "User",
+  "release_stage": "Generally Available (v1.5.1)"
 }

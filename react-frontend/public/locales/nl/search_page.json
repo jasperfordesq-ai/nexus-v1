@@ -83,5 +83,6 @@
   "initial_tip_people": "Mensen",
   "initial_tip_events": "Evenementen",
   "saved_result_count_one": "({{count}} resultaat)",
-  "saved_result_count_other": "({{count}} resultaten)"
+  "saved_result_count_other": "({{count}} resultaten)",
+  "listing_image_alt": "Listing image"
 }

@@ -148,7 +148,32 @@
     "heading": "Prossimamente",
     "description": "{{feature}} è attualmente in sviluppo. Torna presto!",
     "dashboard": "Pannello di controllo",
-    "go_back": "Torna indietro"
+    "go_back": "Torna indietro",
+    "features": {
+      "events": "Events",
+      "groups": "Groups",
+      "job_vacancies": "Job Vacancies",
+      "marketplace": "Marketplace",
+      "coupons": "Coupons",
+      "caring_community": "Caring Community",
+      "volunteering": "Volunteering",
+      "resources": "Resources",
+      "knowledge_base": "Knowledge Base",
+      "organisations": "Organisations",
+      "ideation_challenges": "Ideation Challenges",
+      "regional_points": "Regional Points",
+      "group_exchanges": "Group Exchanges",
+      "exchanges": "Exchanges",
+      "members_directory": "Members Directory",
+      "connections": "Connections",
+      "ai_assistant": "AI Assistant",
+      "achievements": "Achievements",
+      "leaderboard": "Leaderboard",
+      "nexus_score": "NexusScore",
+      "goals": "Goals",
+      "polls": "Polls",
+      "federation": "Federation"
+    }
   },
   "newsletter": {
     "page_title": "Cancellazione dalla newsletter",

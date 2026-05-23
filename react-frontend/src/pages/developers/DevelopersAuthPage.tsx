@@ -88,7 +88,7 @@ export default function DevelopersAuthPage() {
       </section>
 
       <section>
-        <Tabs aria-label="Code examples">
+        <Tabs aria-label={t('developers.tabs.code_examples')}>
           <Tab key="curl" title={t('developers.curl_example')}>
             <Card shadow="sm">
               <CardBody className="p-0">

@@ -851,7 +851,14 @@
   "map_unavailable": "عرض الخريطة غير متاح",
   "identity_not_verified": "الهوية غير مُحقّقة",
   "verification": {
-    "not_id_verified": "غير موثق الهوية"
+    "not_id_verified": "غير موثق الهوية",
+    "badge": {
+      "email_verified": "Email Verified",
+      "phone_verified": "Phone Verified",
+      "id_verified": "ID Verified",
+      "dbs_checked": "DBS Checked",
+      "admin_verified": "Admin Verified"
+    }
   },
   "radius_5": "5 كم",
   "radius_10": "10 كم",
@@ -1617,7 +1624,11 @@
     "webhook_signing_title": "التحقق من التواقيع",
     "webhook_signing_body": "احسب HMAC-SHA256 لجسم الطلب الخام باستخدام secret الاشتراك. قارنه مع رأس X-Partner-Signature بزمن ثابت.",
     "webhook_create_title": "إنشاء اشتراك",
-    "webhook_create_body": "أرسل POST إلى /api/partner/v1/webhooks/subscriptions مع event_types (مصفوفة) وtarget_url (https فقط). تتضمن الاستجابة secret لمرة واحدة — احتفظ به."
+    "webhook_create_body": "أرسل POST إلى /api/partner/v1/webhooks/subscriptions مع event_types (مصفوفة) وtarget_url (https فقط). تتضمن الاستجابة secret لمرة واحدة — احتفظ به.",
+    "tabs": {
+      "code_examples": "Code examples",
+      "verification_examples": "Verification examples"
+    }
   },
   "regional_analytics": {
     "page_title": "التحليلات الإقليمية",
@@ -2183,5 +2194,7 @@
   "level_plain": "المستوى {{level}}",
   "level_named": "المستوى {{level}} - {{name}}",
   "xp_progress": "{{current}} / {{required}} XP",
-  "level_progress_aria": "تقدّم المستوى {{level}}: {{percentage}}%"
+  "level_progress_aria": "تقدّم المستوى {{level}}: {{percentage}}%",
+  "user_fallback": "User",
+  "release_stage": "Generally Available (v1.5.1)"
 }

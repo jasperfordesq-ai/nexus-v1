@@ -83,5 +83,6 @@
   "initial_tip_people": "メンバー",
   "initial_tip_events": "イベント",
   "saved_result_count_one": "({{count}} 件の結果)",
-  "saved_result_count_other": "({{count}} 件の結果)"
+  "saved_result_count_other": "({{count}} 件の結果)",
+  "listing_image_alt": "Listing image"
 }

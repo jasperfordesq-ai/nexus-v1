@@ -16,7 +16,7 @@
     "connection_declined": "Twoja prośba o połączenie została odrzucona"
   },
   "job_application": {
-    "owner_applied": ":name aplikował/a na Twoją ofertę pracy: „:title"",
+    "owner_applied": ":name aplikował/a na Twoją ofertę pracy: „:title",
     "shortlisted": "Twoja aplikacja na stanowisko {{title}} została umieszczona na liście kandydatów!",
     "rejected": "Twoja aplikacja na stanowisko {{title}} nie powiodła się",
     "hired": "Gratulacje! Zostałeś/aś zatrudniony/a do {{title}}",

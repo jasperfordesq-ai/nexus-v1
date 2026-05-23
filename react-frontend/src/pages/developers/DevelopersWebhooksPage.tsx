@@ -111,7 +111,7 @@ export default function DevelopersWebhooksPage() {
         <p className="text-sm text-[var(--color-text-muted)] mb-3">
           {t('developers.webhook_signing_body')}
         </p>
-        <Tabs aria-label="Verification examples">
+        <Tabs aria-label={t('developers.tabs.verification_examples')}>
           <Tab key="node" title="Node.js">
             <Card shadow="sm">
               <CardBody className="p-0">

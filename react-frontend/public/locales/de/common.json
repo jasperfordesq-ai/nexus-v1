@@ -851,7 +851,14 @@
   "map_unavailable": "Kartenansicht ist nicht verfügbar",
   "identity_not_verified": "Identität nicht verifiziert",
   "verification": {
-    "not_id_verified": "Nicht ID-verifiziert"
+    "not_id_verified": "Nicht ID-verifiziert",
+    "badge": {
+      "email_verified": "Email Verified",
+      "phone_verified": "Phone Verified",
+      "id_verified": "ID Verified",
+      "dbs_checked": "DBS Checked",
+      "admin_verified": "Admin Verified"
+    }
   },
   "radius_5": "5 km",
   "radius_10": "10 km",
@@ -1617,7 +1624,11 @@
     "webhook_signing_title": "Signaturen verifizieren",
     "webhook_signing_body": "Berechnen Sie den HMAC-SHA256 des Roh-Request-Bodys mit Ihrem Abonnement-Secret. Vergleichen Sie ihn in konstanter Zeit mit dem X-Partner-Signature-Header.",
     "webhook_create_title": "Ein Abonnement erstellen",
-    "webhook_create_body": "POST an /api/partner/v1/webhooks/subscriptions mit event_types (Array) und target_url (nur https). Die Antwort enthält ein einmaliges Secret — speichern Sie es."
+    "webhook_create_body": "POST an /api/partner/v1/webhooks/subscriptions mit event_types (Array) und target_url (nur https). Die Antwort enthält ein einmaliges Secret — speichern Sie es.",
+    "tabs": {
+      "code_examples": "Code examples",
+      "verification_examples": "Verification examples"
+    }
   },
   "regional_analytics": {
     "page_title": "Regionale Analysen",
@@ -2183,5 +2194,7 @@
   "level_plain": "Stufe {{level}}",
   "level_named": "Stufe {{level}} - {{name}}",
   "xp_progress": "{{current}} / {{required}} XP",
-  "level_progress_aria": "Fortschritt Stufe {{level}}: {{percentage}}%"
+  "level_progress_aria": "Fortschritt Stufe {{level}}: {{percentage}}%",
+  "user_fallback": "User",
+  "release_stage": "Generally Available (v1.5.1)"
 }

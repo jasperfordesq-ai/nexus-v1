@@ -51,31 +51,31 @@ import { compressImage } from '@/lib/compress-image';
 type StoryMode = 'photo' | 'video' | 'text' | 'poll';
 
 const GRADIENT_PRESETS = [
-  { label: 'Purple Blue', class: 'from-purple-600 to-blue-500', css: 'linear-gradient(135deg, #9333ea, #3b82f6)' },
-  { label: 'Orange Pink', class: 'from-orange-500 to-pink-500', css: 'linear-gradient(135deg, #f97316, #ec4899)' },
-  { label: 'Green Teal', class: 'from-green-500 to-teal-500', css: 'linear-gradient(135deg, #22c55e, #14b8a6)' },
-  { label: 'Blue Indigo', class: 'from-blue-600 to-indigo-500', css: 'linear-gradient(135deg, #2563eb, #6366f1)' },
-  { label: 'Red Yellow', class: 'from-red-500 to-yellow-500', css: 'linear-gradient(135deg, #ef4444, #eab308)' },
-  { label: 'Dark', class: 'from-gray-700 to-gray-900', css: 'linear-gradient(135deg, #374151, #111827)' },
-  { label: 'Pink Rose', class: 'from-pink-500 to-rose-400', css: 'linear-gradient(135deg, #ec4899, #fb7185)' },
-  { label: 'Cyan Blue', class: 'from-cyan-500 to-blue-500', css: 'linear-gradient(135deg, #06b6d4, #3b82f6)' },
+  { labelKey: 'creator.gradient_purple_blue', class: 'from-purple-600 to-blue-500', css: 'linear-gradient(135deg, #9333ea, #3b82f6)' },
+  { labelKey: 'creator.gradient_orange_pink', class: 'from-orange-500 to-pink-500', css: 'linear-gradient(135deg, #f97316, #ec4899)' },
+  { labelKey: 'creator.gradient_green_teal', class: 'from-green-500 to-teal-500', css: 'linear-gradient(135deg, #22c55e, #14b8a6)' },
+  { labelKey: 'creator.gradient_blue_indigo', class: 'from-blue-600 to-indigo-500', css: 'linear-gradient(135deg, #2563eb, #6366f1)' },
+  { labelKey: 'creator.gradient_red_yellow', class: 'from-red-500 to-yellow-500', css: 'linear-gradient(135deg, #ef4444, #eab308)' },
+  { labelKey: 'creator.gradient_dark', class: 'from-gray-700 to-gray-900', css: 'linear-gradient(135deg, #374151, #111827)' },
+  { labelKey: 'creator.gradient_pink_rose', class: 'from-pink-500 to-rose-400', css: 'linear-gradient(135deg, #ec4899, #fb7185)' },
+  { labelKey: 'creator.gradient_cyan_blue', class: 'from-cyan-500 to-blue-500', css: 'linear-gradient(135deg, #06b6d4, #3b82f6)' },
 ];
 
 const FONT_STYLES = [
-  { label: 'Sans', family: 'sans-serif' },
-  { label: 'Serif', family: 'serif' },
-  { label: 'Mono', family: 'monospace' },
+  { labelKey: 'creator.font_sans', family: 'sans-serif' },
+  { labelKey: 'creator.font_serif', family: 'serif' },
+  { labelKey: 'creator.font_mono', family: 'monospace' },
 ];
 
 const STORY_TEMPLATES = [
-  { label: 'Ask Me Anything', text: 'Ask me anything!', gradient: 0, font: 0 },
-  { label: 'Good Morning', text: 'Good morning! \u2600\uFE0F', gradient: 1, font: 1 },
-  { label: 'Grateful For', text: "I'm grateful for...", gradient: 2, font: 0 },
-  { label: 'Hot Take', text: 'Hot take: ', gradient: 4, font: 2 },
-  { label: 'Currently Reading', text: 'Currently reading: ', gradient: 5, font: 1 },
-  { label: 'This or That', text: 'This or That?', gradient: 6, font: 0 },
-  { label: 'Unpopular Opinion', text: 'Unpopular opinion: ', gradient: 3, font: 2 },
-  { label: 'Weekend Plans', text: 'Weekend plans: ', gradient: 7, font: 0 },
+  { labelKey: 'creator.template_ama', text: 'Ask me anything!', gradient: 0, font: 0 },
+  { labelKey: 'creator.template_morning', text: 'Good morning! \u2600\uFE0F', gradient: 1, font: 1 },
+  { labelKey: 'creator.template_grateful', text: "I'm grateful for...", gradient: 2, font: 0 },
+  { labelKey: 'creator.template_hot_take', text: 'Hot take: ', gradient: 4, font: 2 },
+  { labelKey: 'creator.template_reading', text: 'Currently reading: ', gradient: 5, font: 1 },
+  { labelKey: 'creator.template_this_that', text: 'This or That?', gradient: 6, font: 0 },
+  { labelKey: 'creator.template_unpopular', text: 'Unpopular opinion: ', gradient: 3, font: 2 },
+  { labelKey: 'creator.template_weekend', text: 'Weekend plans: ', gradient: 7, font: 0 },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -325,13 +325,13 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
 
   // Image filter definitions
   const IMAGE_FILTERS = [
-    { label: 'None', value: 'none', css: 'none' },
-    { label: 'Warm', value: 'warm', css: 'sepia(0.3) saturate(1.4) brightness(1.1)' },
-    { label: 'Cool', value: 'cool', css: 'saturate(0.8) hue-rotate(15deg) brightness(1.05)' },
-    { label: 'B&W', value: 'bw', css: 'grayscale(1)' },
-    { label: 'Vivid', value: 'vivid', css: 'saturate(1.8) contrast(1.1)' },
-    { label: 'Fade', value: 'fade', css: 'contrast(0.85) brightness(1.15) saturate(0.7)' },
-    { label: 'Drama', value: 'drama', css: 'contrast(1.3) brightness(0.9) saturate(1.2)' },
+    { labelKey: 'creator.filter_none', value: 'none', css: 'none' },
+    { labelKey: 'creator.filter_warm', value: 'warm', css: 'sepia(0.3) saturate(1.4) brightness(1.1)' },
+    { labelKey: 'creator.filter_cool', value: 'cool', css: 'saturate(0.8) hue-rotate(15deg) brightness(1.05)' },
+    { labelKey: 'creator.filter_bw', value: 'bw', css: 'grayscale(1)' },
+    { labelKey: 'creator.filter_vivid', value: 'vivid', css: 'saturate(1.8) contrast(1.1)' },
+    { labelKey: 'creator.filter_fade', value: 'fade', css: 'contrast(0.85) brightness(1.15) saturate(0.7)' },
+    { labelKey: 'creator.filter_drama', value: 'drama', css: 'contrast(1.3) brightness(0.9) saturate(1.2)' },
   ];
 
   const activeFilterCss = IMAGE_FILTERS.find((f) => f.value === imageFilter)?.css || 'none';
@@ -685,7 +685,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                         className={`flex-shrink-0 flex flex-col items-center gap-1 h-auto min-w-0 p-0 ${
                           imageFilter === f.value ? 'opacity-100' : 'opacity-60 hover:opacity-80'
                         }`}
-                        aria-label={`${f.label} filter`}
+                        aria-label={`${t(f.labelKey)} filter`}
                         aria-pressed={imageFilter === f.value}
                       >
                         <div
@@ -695,12 +695,12 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                         >
                           <img
                             src={imagePreview ?? ''}
-                            alt={`${f.label} filter preview`}
+                            alt={`${t(f.labelKey)} filter preview`}
                             className="w-full h-full object-cover"
                             style={{ filter: f.css }}
                           />
                         </div>
-                        <span className="text-white text-[10px]">{f.label}</span>
+                        <span className="text-white text-[10px]">{t(f.labelKey)}</span>
                       </Button>
                     ))}
                   </div>
@@ -942,18 +942,18 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                 <div>
                   <p className="text-white/50 text-xs mb-2 uppercase tracking-wider">{t('creator.templates_label')}</p>
                   <div className="flex gap-2 overflow-x-auto pb-1">
-                    {STORY_TEMPLATES.map((t, idx) => (
+                    {STORY_TEMPLATES.map((tpl, idx) => (
                       <Button
                         key={idx}
                         variant="flat"
                         onPress={() => {
-                          setTextContent(t.text);
-                          setSelectedGradient(t.gradient);
-                          setSelectedFont(t.font);
+                          setTextContent(tpl.text);
+                          setSelectedGradient(tpl.gradient);
+                          setSelectedFont(tpl.font);
                         }}
                         className="flex-shrink-0 px-3 py-1.5 rounded-full bg-white/10 text-white/70 text-xs hover:bg-white/20 transition-colors whitespace-nowrap h-auto min-w-0"
                       >
-                        {t.label}
+                        {t(tpl.labelKey)}
                       </Button>
                     ))}
                   </div>
@@ -990,7 +990,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                         selectedGradient === idx ? 'ring-2 ring-white ring-offset-2 ring-offset-black scale-110' : 'hover:scale-105'
                       }`}
                       style={{ background: g.css }}
-                      aria-label={g.label}
+                      aria-label={t(g.labelKey)}
                       aria-pressed={selectedGradient === idx}
                     />
                   ))}
@@ -1012,10 +1012,10 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                           : 'bg-white/10 text-white/70 hover:bg-white/20'
                       }`}
                       style={{ fontFamily: f.family }}
-                      aria-label={`${f.label} font`}
+                      aria-label={`${t(f.labelKey)} font`}
                       aria-pressed={selectedFont === idx}
                     >
-                      {f.label}
+                      {t(f.labelKey)}
                     </Button>
                   ))}
                 </div>
@@ -1121,7 +1121,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                         pollGradient === idx ? 'ring-2 ring-white ring-offset-2 ring-offset-black scale-110' : 'hover:scale-105'
                       }`}
                       style={{ background: g.css }}
-                      aria-label={g.label}
+                      aria-label={t(g.labelKey)}
                       aria-pressed={pollGradient === idx}
                     />
                   ))}
@@ -1137,10 +1137,10 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
         {/* Audience selector */}
         <div className="flex items-center gap-2 justify-center">
           {([
-            { key: 'everyone' as const, icon: Globe, label: 'Everyone' },
-            { key: 'connections' as const, icon: Users, label: 'Connections' },
-            { key: 'close_friends' as const, icon: Heart, label: 'Close Friends' },
-          ]).map(({ key, icon: Icon, label }) => (
+            { key: 'everyone' as const, icon: Globe, labelKey: 'creator.audience_everyone' },
+            { key: 'connections' as const, icon: Users, labelKey: 'creator.audience_connections' },
+            { key: 'close_friends' as const, icon: Heart, labelKey: 'creator.audience_close_friends' },
+          ]).map(({ key, icon: Icon, labelKey }) => (
             <Button
               key={key}
               variant="flat"
@@ -1150,11 +1150,11 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                   ? 'bg-white text-black'
                   : 'bg-white/10 text-white/60 hover:bg-white/20'
               }`}
-              aria-label={`Share with ${label}`}
+              aria-label={t(labelKey)}
               aria-pressed={audience === key}
             >
               <Icon className="w-3.5 h-3.5" />
-              {label}
+              {t(labelKey)}
             </Button>
           ))}
         </div>

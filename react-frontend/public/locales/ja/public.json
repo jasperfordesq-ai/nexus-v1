@@ -830,5 +830,7 @@
     "maintenance": {
       "title": "メンテナンス"
     }
-  }
+  },
+  "unknown_error": "Unknown error",
+  "release_stage": "Generally Available (v1.5.1)"
 }

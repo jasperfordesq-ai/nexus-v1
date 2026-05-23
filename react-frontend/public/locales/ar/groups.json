@@ -701,5 +701,6 @@
     "primary_color": "اللون الأساسي",
     "accent_color": "لون التمييز",
     "preview": "معاينة"
-  }
+  },
+  "member_fallback": "User"
 }

@@ -16,7 +16,7 @@
     "connection_declined": "Ihre Verbindungsanfrage wurde abgelehnt"
   },
   "job_application": {
-    "owner_applied": ":name hat sich auf Ihre Stelle beworben: „:title"",
+    "owner_applied": ":name hat sich auf Ihre Stelle beworben: „:title",
     "shortlisted": "Ihre Bewerbung für {{title}} wurde in die engere Wahl genommen!",
     "rejected": "Ihre Bewerbung für {{title}} war leider nicht erfolgreich",
     "hired": "Herzlichen Glückwunsch! Sie wurden für {{title}} eingestellt",

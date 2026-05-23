@@ -31,7 +31,6 @@ import ExternalLink from 'lucide-react/icons/external-link';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useTenant } from '@/contexts';
-import { RELEASE_STATUS } from '@/config/releaseStatus';
 
 // ---------------------------------------------------------------------------
 // Maturity chip
@@ -454,7 +453,7 @@ export function FeaturesPage() {
             {t('features_page.heading')}
           </h1>
           <Chip color="success" variant="flat" size="sm">
-            {RELEASE_STATUS.stageLabel}
+            {t('release_stage')}
           </Chip>
         </div>
         <p className="text-sm sm:text-base text-foreground-600">

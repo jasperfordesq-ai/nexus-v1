@@ -75,6 +75,7 @@ function lazyWithRetry(
   );
 }
 import { HelmetProvider } from 'react-helmet-async';
+import { useTranslation } from 'react-i18next';
 
 // Contexts (app-wide only — tenant-scoped contexts are inside TenantShell)
 import { ToastProvider } from '@/contexts/ToastContext';
@@ -338,6 +339,7 @@ function TenantSlugGate({ slug, children }: { slug: string; children: React.Reac
  * This is rendered identically at both / and /:tenantSlug/ prefixes.
  */
 function AppRoutes() {
+  const { t } = useTranslation('utility');
   return (
     <>
       {/* Auth Routes (no navbar/footer) */}
@@ -444,7 +446,7 @@ function AppRoutes() {
 
         {/* Public: Events (feature-gated, view-only) */}
         <Route path="events" element={
-          <FeatureGate feature="events" fallback={<ComingSoonPage feature="Events" />}>
+          <FeatureGate feature="events" fallback={<ComingSoonPage feature={t('coming_soon.features.events')} />}>
             <FeatureErrorBoundary featureName="Events">
               <EventsPage />
             </FeatureErrorBoundary>
@@ -460,7 +462,7 @@ function AppRoutes() {
 
         {/* Public: Groups (feature-gated, view-only) */}
         <Route path="groups" element={
-          <FeatureGate feature="groups" fallback={<ComingSoonPage feature="Groups" />}>
+          <FeatureGate feature="groups" fallback={<ComingSoonPage feature={t('coming_soon.features.groups')} />}>
             <FeatureErrorBoundary featureName="Groups">
               <GroupsPage />
             </FeatureErrorBoundary>
@@ -476,7 +478,7 @@ function AppRoutes() {
 
         {/* Public: Job Vacancies (feature-gated, view-only) */}
         <Route path="jobs" element={
-          <FeatureGate feature="job_vacancies" fallback={<ComingSoonPage feature="Job Vacancies" />}>
+          <FeatureGate feature="job_vacancies" fallback={<ComingSoonPage feature={t('coming_soon.features.job_vacancies')} />}>
             <FeatureErrorBoundary featureName="Job Vacancies">
               <JobsPage />
             </FeatureErrorBoundary>
@@ -492,7 +494,7 @@ function AppRoutes() {
 
         {/* Public: Marketplace (feature-gated, view-only) */}
         <Route path="marketplace" element={
-          <FeatureGate feature="marketplace" fallback={<ComingSoonPage feature="Marketplace" />}>
+          <FeatureGate feature="marketplace" fallback={<ComingSoonPage feature={t('coming_soon.features.marketplace')} />}>
             <FeatureErrorBoundary featureName="Marketplace">
               <MarketplacePage />
             </FeatureErrorBoundary>
@@ -548,7 +550,7 @@ function AppRoutes() {
           </FeatureGate>
         } />
         <Route path="marketplace/free" element={
-          <FeatureGate feature="marketplace" fallback={<ComingSoonPage feature="Marketplace" />}>
+          <FeatureGate feature="marketplace" fallback={<ComingSoonPage feature={t('coming_soon.features.marketplace')} />}>
             <FeatureErrorBoundary featureName="Marketplace">
               <FreeItemsPage />
             </FeatureErrorBoundary>
@@ -576,7 +578,7 @@ function AppRoutes() {
           </FeatureGate>
         } />
         <Route path="coupons" element={
-          <FeatureGate feature="merchant_coupons" fallback={<ComingSoonPage feature="Coupons" />}>
+          <FeatureGate feature="merchant_coupons" fallback={<ComingSoonPage feature={t('coming_soon.features.coupons')} />}>
             <FeatureErrorBoundary featureName="Coupons">
               <CouponsPage />
             </FeatureErrorBoundary>
@@ -606,7 +608,7 @@ function AppRoutes() {
 
         {/* Public: Caring Community (feature-gated hub) */}
         <Route path={CARING_COMMUNITY_ROUTE.path} element={
-          <FeatureGate feature={CARING_COMMUNITY_ROUTE.feature} fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature={CARING_COMMUNITY_ROUTE.feature} fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <CaringCommunityPage />
             </FeatureErrorBoundary>
@@ -616,7 +618,7 @@ function AppRoutes() {
         <Route element={<ProtectedRoute />}>
         {/* Member-facing: Low-friction help request (AG10) */}
         <Route path="caring-community/request-help" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <RequestHelpPage />
             </FeatureErrorBoundary>
@@ -625,7 +627,7 @@ function AppRoutes() {
 
         {/* Member-facing: My Support Relationships (AG4) */}
         <Route path="caring-community/my-relationships" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <MySupportRelationshipsPage />
             </FeatureErrorBoundary>
@@ -634,7 +636,7 @@ function AppRoutes() {
 
         {/* Caring Community — Offer a Favour (AG11) */}
         <Route path="caring-community/offer-favour" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <OfferFavourPage />
             </FeatureErrorBoundary>
@@ -643,7 +645,7 @@ function AppRoutes() {
 
         {/* Caring Community — Unified Marktplatz (AG13) */}
         <Route path="caring-community/markt" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <MarktPage />
             </FeatureErrorBoundary>
@@ -652,7 +654,7 @@ function AppRoutes() {
 
         {/* Caring Community — Time-credit ↔ marketplace loyalty redemption history */}
         <Route path="caring-community/loyalty/history" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <LoyaltyHistoryPage />
             </FeatureErrorBoundary>
@@ -661,7 +663,7 @@ function AppRoutes() {
 
         {/* Caring Community — Future Care Fund (Zeitvorsorge) (K1) */}
         <Route path="caring-community/future-care-fund" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <FutureCareFundPage />
             </FeatureErrorBoundary>
@@ -670,7 +672,7 @@ function AppRoutes() {
 
         {/* Caring Community — Cooperative-to-cooperative hour transfer (K3) */}
         <Route path="caring-community/hour-transfer" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <HourTransferPage />
             </FeatureErrorBoundary>
@@ -679,7 +681,7 @@ function AppRoutes() {
 
         {/* Caring Community — Time-credit gifting (K5) */}
         <Route path="caring-community/hour-gift" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <HourGiftPage />
             </FeatureErrorBoundary>
@@ -688,7 +690,7 @@ function AppRoutes() {
 
         {/* Caring Community — Safeguarding report submission (K9) */}
         <Route path="caring-community/safeguarding/report" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <SafeguardingReportPage />
             </FeatureErrorBoundary>
@@ -697,7 +699,7 @@ function AppRoutes() {
 
         {/* Caring Community — Member's own safeguarding reports (K9) */}
         <Route path="caring-community/safeguarding/my-reports" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <MySafeguardingReportsPage />
             </FeatureErrorBoundary>
@@ -706,7 +708,7 @@ function AppRoutes() {
 
         {/* AG64 — Care-provider directory */}
         <Route path="caring-community/providers" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <CareProviderDirectoryPage />
             </FeatureErrorBoundary>
@@ -715,7 +717,7 @@ function AppRoutes() {
 
         {/* AG67 — Trust tier */}
         <Route path="caring-community/my-trust-tier" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <MyTrustTierPage />
             </FeatureErrorBoundary>
@@ -724,7 +726,7 @@ function AppRoutes() {
 
         {/* E3 — Member-side GDPR/FADP data export */}
         <Route path="caring-community/my-data-export" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <MyDataExportPage />
             </FeatureErrorBoundary>
@@ -732,7 +734,7 @@ function AppRoutes() {
         } />
 
         <Route path="caring-community/warmth-pass" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <WarmthPassPage />
             </FeatureErrorBoundary>
@@ -741,49 +743,49 @@ function AppRoutes() {
 
         {/* AG68 — Caregiver dashboard + link flow */}
         <Route path="caring-community/caregiver" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <CaregiverDashboardPage />
             </FeatureErrorBoundary>
           </FeatureGate>
         } />
         <Route path="caring-community/caregiver/link" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <LinkCareReceiverPage />
             </FeatureErrorBoundary>
           </FeatureGate>
         } />
         <Route path="caring-community/caregiver/cover" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <CoverCarePage />
             </FeatureErrorBoundary>
           </FeatureGate>
         } />
         <Route path="caring-community/surveys" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <MunicipalSurveyPage />
             </FeatureErrorBoundary>
           </FeatureGate>
         } />
         <Route path="caring-community/surveys/:id" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <MunicipalSurveyPage />
             </FeatureErrorBoundary>
           </FeatureGate>
         } />
         <Route path="caring-community/projects" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <ProjectAnnouncementsPage />
             </FeatureErrorBoundary>
           </FeatureGate>
         } />
         <Route path="caring-community/projects/:id" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <ProjectAnnouncementsPage />
             </FeatureErrorBoundary>
@@ -792,7 +794,7 @@ function AppRoutes() {
 
         {/* AG90 — Personalised Civic Digest */}
         <Route path="caring-community/civic-digest" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <CivicDigestPage />
             </FeatureErrorBoundary>
@@ -801,7 +803,7 @@ function AppRoutes() {
 
         {/* AG91 — Success Stories */}
         <Route path="caring-community/success-stories" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <SuccessStoriesPage />
             </FeatureErrorBoundary>
@@ -810,7 +812,7 @@ function AppRoutes() {
 
         {/* AG92 — Two-Way Municipality Feedback */}
         <Route path="caring-community/feedback" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Caring Community">
               <MunicipalityFeedbackPage />
             </FeatureErrorBoundary>
@@ -824,7 +826,7 @@ function AppRoutes() {
         {/* Clubs & Associations directory (AG15) — public, no feature gate */}
         <Route path="clubs" element={<ErrorBoundary><ClubsPage /></ErrorBoundary>} />
         <Route path="clubs/:id/admin/import" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Verein Import">
               <VereinMembersImportPage />
             </FeatureErrorBoundary>
@@ -833,14 +835,14 @@ function AppRoutes() {
 
         {/* AG54 — Verein membership dues */}
         <Route path="clubs/:id/admin/dues" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Verein Dues">
               <VereinDuesManagementPage />
             </FeatureErrorBoundary>
           </FeatureGate>
         } />
         <Route path="me/verein-dues" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="My Verein Dues">
               <MyVereinDuesPage />
             </FeatureErrorBoundary>
@@ -849,14 +851,14 @@ function AppRoutes() {
 
         {/* AG55 — Verein-to-Verein federation */}
         <Route path="me/verein-invitations" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Verein Invitations">
               <MyVereinInvitationsPage />
             </FeatureErrorBoundary>
           </FeatureGate>
         } />
         <Route path="municipality-calendar" element={
-          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Caring Community" />}>
+          <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.caring_community')} />}>
             <FeatureErrorBoundary featureName="Municipality Calendar">
               <MunicipalityCalendarPage />
             </FeatureErrorBoundary>
@@ -884,7 +886,7 @@ function AppRoutes() {
 
         {/* Public: Volunteering (feature-gated, view-only) */}
         <Route path="volunteering" element={
-          <FeatureGate feature="volunteering" fallback={<ComingSoonPage feature="Volunteering" />}>
+          <FeatureGate feature="volunteering" fallback={<ComingSoonPage feature={t('coming_soon.features.volunteering')} />}>
             <FeatureErrorBoundary featureName="Volunteering">
               <VolunteeringPage />
             </FeatureErrorBoundary>
@@ -900,7 +902,7 @@ function AppRoutes() {
 
         {/* Public: Resources (feature-gated) */}
         <Route path="resources" element={
-          <FeatureGate feature="resources" fallback={<ComingSoonPage feature="Resources" />}>
+          <FeatureGate feature="resources" fallback={<ComingSoonPage feature={t('coming_soon.features.resources')} />}>
             <FeatureErrorBoundary featureName="Resources">
               <ResourcesPage />
             </FeatureErrorBoundary>
@@ -909,7 +911,7 @@ function AppRoutes() {
 
         {/* Public: Knowledge Base (feature-gated) */}
         <Route path="kb" element={
-          <FeatureGate feature="resources" fallback={<ComingSoonPage feature="Knowledge Base" />}>
+          <FeatureGate feature="resources" fallback={<ComingSoonPage feature={t('coming_soon.features.knowledge_base')} />}>
             <FeatureErrorBoundary featureName="Knowledge Base">
               <KnowledgeBasePage />
             </FeatureErrorBoundary>
@@ -925,7 +927,7 @@ function AppRoutes() {
 
         {/* Public: Organisations (feature-gated, view-only) */}
         <Route path="organisations" element={
-          <FeatureGate feature="organisations" fallback={<ComingSoonPage feature="Organisations" />}>
+          <FeatureGate feature="organisations" fallback={<ComingSoonPage feature={t('coming_soon.features.organisations')} />}>
             <FeatureErrorBoundary featureName="Organisations">
               <OrganisationsPage />
             </FeatureErrorBoundary>
@@ -941,7 +943,7 @@ function AppRoutes() {
 
         {/* Public: Ideation (feature-gated, view-only) */}
         <Route path="ideation" element={
-          <FeatureGate feature="ideation_challenges" fallback={<ComingSoonPage feature="Ideation Challenges" />}>
+          <FeatureGate feature="ideation_challenges" fallback={<ComingSoonPage feature={t('coming_soon.features.ideation_challenges')} />}>
             <FeatureErrorBoundary featureName="Ideation Challenges">
               <IdeationPage />
             </FeatureErrorBoundary>
@@ -1015,7 +1017,7 @@ function AppRoutes() {
             </FeatureGate>
           } />
           <Route path="wallet/regional-points" element={
-            <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature="Regional Points" />}>
+            <FeatureGate feature="caring_community" fallback={<ComingSoonPage feature={t('coming_soon.features.regional_points')} />}>
               <FeatureErrorBoundary featureName="Regional Points">
                 <RegionalPointsPage />
               </FeatureErrorBoundary>
@@ -1091,7 +1093,7 @@ function AppRoutes() {
 
           {/* Feature-gated: Group Exchanges */}
           <Route path="group-exchanges" element={
-            <FeatureGate feature="group_exchanges" fallback={<ComingSoonPage feature="Group Exchanges" />}>
+            <FeatureGate feature="group_exchanges" fallback={<ComingSoonPage feature={t('coming_soon.features.group_exchanges')} />}>
               <FeatureErrorBoundary featureName="Group Exchanges">
                 <GroupExchangesPage />
               </FeatureErrorBoundary>
@@ -1114,7 +1116,7 @@ function AppRoutes() {
 
           {/* Feature-gated: Exchanges */}
           <Route path="exchanges" element={
-            <FeatureGate feature="exchange_workflow" fallback={<ComingSoonPage feature="Exchanges" />}>
+            <FeatureGate feature="exchange_workflow" fallback={<ComingSoonPage feature={t('coming_soon.features.exchanges')} />}>
               <FeatureErrorBoundary featureName="Exchanges">
                 <ExchangesPage />
               </FeatureErrorBoundary>
@@ -1137,14 +1139,14 @@ function AppRoutes() {
 
           {/* Feature-gated: Members/Connections */}
           <Route path="members" element={
-            <FeatureGate feature="connections" fallback={<ComingSoonPage feature="Members Directory" />}>
+            <FeatureGate feature="connections" fallback={<ComingSoonPage feature={t('coming_soon.features.members_directory')} />}>
               <FeatureErrorBoundary featureName="Members Directory">
                 <MembersPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="connections" element={
-            <FeatureGate feature="connections" fallback={<ComingSoonPage feature="Connections" />}>
+            <FeatureGate feature="connections" fallback={<ComingSoonPage feature={t('coming_soon.features.connections')} />}>
               <FeatureErrorBoundary featureName="Connections">
                 <ConnectionsPage />
               </FeatureErrorBoundary>
@@ -1167,7 +1169,7 @@ function AppRoutes() {
 
           {/* Feature-gated: AI Chat */}
           <Route path="chat" element={
-            <FeatureGate feature="ai_chat" fallback={<ComingSoonPage feature="AI Assistant" />}>
+            <FeatureGate feature="ai_chat" fallback={<ComingSoonPage feature={t('coming_soon.features.ai_assistant')} />}>
               <FeatureErrorBoundary featureName="AI Assistant">
                 <AiChatPage />
               </FeatureErrorBoundary>
@@ -1208,21 +1210,21 @@ function AppRoutes() {
 
           {/* Feature-gated: Gamification */}
           <Route path="achievements" element={
-            <FeatureGate feature="gamification" fallback={<ComingSoonPage feature="Achievements" />}>
+            <FeatureGate feature="gamification" fallback={<ComingSoonPage feature={t('coming_soon.features.achievements')} />}>
               <FeatureErrorBoundary featureName="Achievements">
                 <AchievementsPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="leaderboard" element={
-            <FeatureGate feature="gamification" fallback={<ComingSoonPage feature="Leaderboard" />}>
+            <FeatureGate feature="gamification" fallback={<ComingSoonPage feature={t('coming_soon.features.leaderboard')} />}>
               <FeatureErrorBoundary featureName="Leaderboard">
                 <LeaderboardPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="nexus-score" element={
-            <FeatureGate feature="gamification" fallback={<ComingSoonPage feature="NexusScore" />}>
+            <FeatureGate feature="gamification" fallback={<ComingSoonPage feature={t('coming_soon.features.nexus_score')} />}>
               <FeatureErrorBoundary featureName="NexusScore">
                 <NexusScorePage />
               </FeatureErrorBoundary>
@@ -1231,14 +1233,14 @@ function AppRoutes() {
 
           {/* Feature-gated: Goals */}
           <Route path="goals" element={
-            <FeatureGate feature="goals" fallback={<ComingSoonPage feature="Goals" />}>
+            <FeatureGate feature="goals" fallback={<ComingSoonPage feature={t('coming_soon.features.goals')} />}>
               <FeatureErrorBoundary featureName="Goals">
                 <GoalsPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="goals/:id" element={
-            <FeatureGate feature="goals" fallback={<ComingSoonPage feature="Goals" />}>
+            <FeatureGate feature="goals" fallback={<ComingSoonPage feature={t('coming_soon.features.goals')} />}>
               <FeatureErrorBoundary featureName="Goals">
                 <GoalDetailPage />
               </FeatureErrorBoundary>
@@ -1247,7 +1249,7 @@ function AppRoutes() {
 
           {/* Feature-gated: Polls */}
           <Route path="polls" element={
-            <FeatureGate feature="polls" fallback={<ComingSoonPage feature="Polls" />}>
+            <FeatureGate feature="polls" fallback={<ComingSoonPage feature={t('coming_soon.features.polls')} />}>
               <FeatureErrorBoundary featureName="Polls">
                 <PollsPage />
               </FeatureErrorBoundary>
@@ -1455,21 +1457,21 @@ function AppRoutes() {
 
           {/* Feature-gated: Volunteering (create/manage only — view routes are public) */}
           <Route path="volunteering/create" element={
-            <FeatureGate feature="volunteering" fallback={<ComingSoonPage feature="Volunteering" />}>
+            <FeatureGate feature="volunteering" fallback={<ComingSoonPage feature={t('coming_soon.features.volunteering')} />}>
               <FeatureErrorBoundary featureName="Volunteering">
                 <CreateOpportunityPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="volunteering/org/:orgId/dashboard" element={
-            <FeatureGate feature="volunteering" fallback={<ComingSoonPage feature="Volunteering" />}>
+            <FeatureGate feature="volunteering" fallback={<ComingSoonPage feature={t('coming_soon.features.volunteering')} />}>
               <FeatureErrorBoundary featureName="Volunteering">
                 <VolOrgDashboardPage />
               </FeatureErrorBoundary>
             </FeatureGate>
           } />
           <Route path="volunteering/my-organisations" element={
-            <FeatureGate feature="volunteering" fallback={<ComingSoonPage feature="Volunteering" />}>
+            <FeatureGate feature="volunteering" fallback={<ComingSoonPage feature={t('coming_soon.features.volunteering')} />}>
               <FeatureErrorBoundary featureName="Volunteering">
                 <MyOrganisationsPage />
               </FeatureErrorBoundary>
@@ -1477,7 +1479,7 @@ function AppRoutes() {
           } />
           <Route path="volunteering/my-applications" element={<Navigate to="../volunteering?tab=applications" replace />} />
           <Route path="donations/:id/receipt" element={
-            <FeatureGate feature="volunteering" fallback={<ComingSoonPage feature="Volunteering" />}>
+            <FeatureGate feature="volunteering" fallback={<ComingSoonPage feature={t('coming_soon.features.volunteering')} />}>
               <FeatureErrorBoundary featureName="Donations">
                 <DonationReceiptPage />
               </FeatureErrorBoundary>
@@ -1486,7 +1488,7 @@ function AppRoutes() {
 
           {/* Feature-gated: Organisations (register only — view routes are public) */}
           <Route path="organisations/register" element={
-            <FeatureGate feature="organisations" fallback={<ComingSoonPage feature="Organisations" />}>
+            <FeatureGate feature="organisations" fallback={<ComingSoonPage feature={t('coming_soon.features.organisations')} />}>
               <FeatureErrorBoundary featureName="Organisations">
                 <RegisterOrganisationPage />
               </FeatureErrorBoundary>
@@ -1539,7 +1541,7 @@ function AppRoutes() {
 
           {/* Feature-gated: Federation */}
           <Route path="federation" element={
-            <FeatureGate feature="federation" fallback={<ComingSoonPage feature="Federation" />}>
+            <FeatureGate feature="federation" fallback={<ComingSoonPage feature={t('coming_soon.features.federation')} />}>
               <FeatureErrorBoundary featureName="Federation">
                 <FederationHubPage />
               </FeatureErrorBoundary>
