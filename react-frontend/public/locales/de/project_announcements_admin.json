@@ -1,76 +1,76 @@
 {
-  "title": "Community Projects",
-  "subtitle": "Track staged municipality and cooperative announcements.",
-  "create_project": "Create project",
-  "empty": "No projects match this view.",
-  "date_unknown": "Not set",
+  "title": "Gemeinschaftsprojekte",
+  "subtitle": "Verfolgen Sie inszenierte Ankündigungen von Kommunen und Genossenschaften.",
+  "create_project": "Projekt erstellen",
+  "empty": "Keine Projekte stimmen mit dieser Ansicht überein.",
+  "date_unknown": "Nicht festgelegt",
   "progress_value": "{{value}}%",
   "filters": {
     "status": "Status",
-    "all": "All statuses"
+    "all": "Alle Status"
   },
   "status": {
-    "draft": "Draft",
-    "active": "Active",
-    "paused": "Paused",
-    "completed": "Completed",
-    "cancelled": "Cancelled"
+    "draft": "Entwurf",
+    "active": "Aktiv",
+    "paused": "Angehalten",
+    "completed": "Vollendet",
+    "cancelled": "Abgesagt"
   },
   "table": {
-    "aria": "Community projects",
-    "project": "Project",
+    "aria": "Gemeinschaftsprojekte",
+    "project": "Projekt",
     "status": "Status",
-    "progress": "Progress",
-    "subscribers": "Followers",
-    "updated": "Updated",
-    "actions": "Actions"
+    "progress": "Fortschritt",
+    "subscribers": "Anhänger",
+    "updated": "Aktualisiert",
+    "actions": "Aktionen"
   },
   "actions": {
-    "publish": "Publish",
-    "add_update": "Add update",
-    "pause": "Pause",
-    "complete": "Complete",
-    "cancel": "Cancel"
+    "publish": "Veröffentlichen",
+    "add_update": "Update hinzufügen",
+    "pause": "Pausieren",
+    "complete": "Vollständig",
+    "cancel": "Stornieren"
   },
   "fields": {
-    "title": "Title",
-    "summary": "Summary",
-    "location": "Location",
-    "stage": "Stage",
-    "progress": "Progress percent",
-    "publish_now": "Publish now",
-    "update_title": "Update title",
-    "update_body": "Update body",
-    "milestone": "Milestone",
-    "publish_update_now": "Publish update now",
-    "current_stage": "Current stage"
+    "title": "Titel",
+    "summary": "Zusammenfassung",
+    "location": "Standort",
+    "stage": "Bühne",
+    "progress": "Fortschritt in Prozent",
+    "publish_now": "Jetzt veröffentlichen",
+    "update_title": "Titel aktualisieren",
+    "update_body": "Körper aktualisieren",
+    "milestone": "Meilenstein",
+    "publish_update_now": "Jetzt Update veröffentlichen",
+    "current_stage": "Aktueller Stand"
   },
   "create_modal": {
-    "title": "Create community project",
-    "submit": "Create"
+    "title": "Community-Projekt erstellen",
+    "submit": "Erstellen"
   },
   "update_modal": {
-    "title": "Add project update",
-    "submit": "Save update"
+    "title": "Projektaktualisierung hinzufügen",
+    "submit": "Update speichern"
   },
   "errors": {
-    "load": "Could not load community projects.",
-    "create": "Could not create the project.",
-    "update": "Could not save the update.",
-    "publish": "Could not publish the project.",
-    "status": "Could not change project status."
+    "load": "Community-Projekte konnten nicht geladen werden.",
+    "create": "Das Projekt konnte nicht erstellt werden.",
+    "update": "Das Update konnte nicht gespeichert werden.",
+    "publish": "Das Projekt konnte nicht veröffentlicht werden.",
+    "status": "Der Projektstatus konnte nicht geändert werden."
   },
-  "meta_title": "Project Announcements",
+  "meta_title": "Projektankündigungen",
   "about": {
-    "title": "About this page",
-    "body": "Project announcements are non-urgent updates posted to the community feed and member notification centre. Use them for programme news, volunteer recruitment, event notices, and impact updates. Unlike emergency alerts, announcements are queued and delivered on the platform's normal notification schedule.",
-    "draft": "Not visible to members; edit freely before publishing.",
-    "active": "Published and visible in the community feed. Use add update to post milestone updates to subscribers.",
-    "paused_completed_label": "Paused / completed",
-    "paused_completed": "Archived from the active feed. Subscribers are notified on completion."
+    "title": "Über diese Seite",
+    "body": "Bei Projektankündigungen handelt es sich um nicht dringende Aktualisierungen, die im Community-Feed und im Benachrichtigungscenter für Mitglieder veröffentlicht werden. Verwenden Sie sie für Programmnachrichten, die Rekrutierung von Freiwilligen, Veranstaltungshinweise und Aktualisierungen zu Auswirkungen. Im Gegensatz zu Notfallwarnungen werden Ankündigungen in die Warteschlange gestellt und nach dem normalen Benachrichtigungsplan der Plattform übermittelt.",
+    "draft": "Für Mitglieder nicht sichtbar; vor der Veröffentlichung frei bearbeiten.",
+    "active": "Veröffentlicht und im Community-Feed sichtbar. Verwenden Sie „Update hinzufügen“, um Meilensteinaktualisierungen für Abonnenten zu veröffentlichen.",
+    "paused_completed_label": "Angehalten / abgeschlossen",
+    "paused_completed": "Aus dem aktiven Feed archiviert. Abonnenten werden nach Abschluss benachrichtigt."
   },
   "list": {
-    "title": "Project announcements",
-    "subtitle": "Publish initiatives and milestone updates that members can subscribe to."
+    "title": "Projektankündigungen",
+    "subtitle": "Veröffentlichen Sie Initiativen und Meilensteinaktualisierungen, die Mitglieder abonnieren können."
   }
 }

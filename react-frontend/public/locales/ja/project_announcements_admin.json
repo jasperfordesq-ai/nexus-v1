@@ -1,76 +1,76 @@
 {
-  "title": "Community Projects",
-  "subtitle": "Track staged municipality and cooperative announcements.",
-  "create_project": "Create project",
-  "empty": "No projects match this view.",
-  "date_unknown": "Not set",
+  "meta_title": "プロジェクトのお知らせ",
+  "title": "コミュニティプロジェクト",
+  "subtitle": "段階的に行われた自治体や協同組合の発表を追跡します。",
+  "create_project": "プロジェクトの作成",
+  "empty": "このビューに一致するプロジェクトはありません。",
+  "date_unknown": "未設定",
   "progress_value": "{{value}}%",
-  "filters": {
-    "status": "Status",
-    "all": "All statuses"
-  },
-  "status": {
-    "draft": "Draft",
-    "active": "Active",
-    "paused": "Paused",
-    "completed": "Completed",
-    "cancelled": "Cancelled"
-  },
-  "table": {
-    "aria": "Community projects",
-    "project": "Project",
-    "status": "Status",
-    "progress": "Progress",
-    "subscribers": "Followers",
-    "updated": "Updated",
-    "actions": "Actions"
-  },
-  "actions": {
-    "publish": "Publish",
-    "add_update": "Add update",
-    "pause": "Pause",
-    "complete": "Complete",
-    "cancel": "Cancel"
-  },
-  "fields": {
-    "title": "Title",
-    "summary": "Summary",
-    "location": "Location",
-    "stage": "Stage",
-    "progress": "Progress percent",
-    "publish_now": "Publish now",
-    "update_title": "Update title",
-    "update_body": "Update body",
-    "milestone": "Milestone",
-    "publish_update_now": "Publish update now",
-    "current_stage": "Current stage"
-  },
-  "create_modal": {
-    "title": "Create community project",
-    "submit": "Create"
-  },
-  "update_modal": {
-    "title": "Add project update",
-    "submit": "Save update"
-  },
-  "errors": {
-    "load": "Could not load community projects.",
-    "create": "Could not create the project.",
-    "update": "Could not save the update.",
-    "publish": "Could not publish the project.",
-    "status": "Could not change project status."
-  },
-  "meta_title": "Project Announcements",
   "about": {
-    "title": "About this page",
-    "body": "Project announcements are non-urgent updates posted to the community feed and member notification centre. Use them for programme news, volunteer recruitment, event notices, and impact updates. Unlike emergency alerts, announcements are queued and delivered on the platform's normal notification schedule.",
-    "draft": "Not visible to members; edit freely before publishing.",
-    "active": "Published and visible in the community feed. Use add update to post milestone updates to subscribers.",
-    "paused_completed_label": "Paused / completed",
-    "paused_completed": "Archived from the active feed. Subscribers are notified on completion."
+    "title": "このページについて",
+    "body": "プロジェクトのお知らせは、コミュニティ フィードおよびメンバー通知センターに投稿される緊急ではない更新情報です。プログラムのニュース、ボランティアの募集、イベントの通知、影響に関する最新情報などに使用してください。緊急警報とは異なり、アナウンスはキューに入れられ、プラットフォームの通常の通知スケジュールに従って配信されます。",
+    "draft": "メンバーには表示されません。公開する前に自由に編集してください。",
+    "active": "公開され、コミュニティ フィードに表示されます。 add update を使用してマイルストーン更新をサブスクライバーに投稿します。",
+    "paused_completed_label": "一時停止/完了",
+    "paused_completed": "アクティブなフィードからアーカイブされました。完了すると購読者に通知されます。"
   },
   "list": {
-    "title": "Project announcements",
-    "subtitle": "Publish initiatives and milestone updates that members can subscribe to."
+    "title": "プロジェクトのお知らせ",
+    "subtitle": "メンバーが購読できるイニシアチブとマイルストーンの更新を公開します。"
+  },
+  "filters": {
+    "status": "状態",
+    "all": "すべてのステータス"
+  },
+  "status": {
+    "draft": "下書き",
+    "active": "アクティブ",
+    "paused": "一時停止中",
+    "completed": "完了しました",
+    "cancelled": "キャンセル"
+  },
+  "table": {
+    "aria": "コミュニティプロジェクト",
+    "project": "プロジェクト",
+    "status": "状態",
+    "progress": "進捗",
+    "subscribers": "フォロワー",
+    "updated": "更新されました",
+    "actions": "アクション"
+  },
+  "actions": {
+    "publish": "公開",
+    "add_update": "アップデートを追加",
+    "pause": "一時停止",
+    "complete": "完了",
+    "cancel": "キャンセル"
+  },
+  "fields": {
+    "title": "タイトル",
+    "summary": "まとめ",
+    "location": "位置",
+    "current_stage": "現在の段階",
+    "stage": "ステージ",
+    "progress": "進捗率",
+    "publish_now": "今すぐ公開",
+    "update_title": "タイトルを更新",
+    "update_body": "本文を更新する",
+    "milestone": "マイルストーン",
+    "publish_update_now": "今すぐアップデートを公開"
+  },
+  "create_modal": {
+    "title": "コミュニティプロジェクトを作成する",
+    "submit": "作成する"
+  },
+  "update_modal": {
+    "title": "プロジェクトの更新を追加",
+    "submit": "更新を保存する"
+  },
+  "errors": {
+    "load": "コミュニティ プロジェクトを読み込めませんでした。",
+    "create": "プロジェクトを作成できませんでした。",
+    "update": "アップデートを保存できませんでした。",
+    "publish": "プロジェクトを公開できませんでした。",
+    "status": "プロジェクトのステータスを変更できませんでした。"
   }
 }

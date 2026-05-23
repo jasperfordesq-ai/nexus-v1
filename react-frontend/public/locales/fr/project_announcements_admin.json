@@ -1,76 +1,76 @@
 {
-  "title": "Community Projects",
-  "subtitle": "Track staged municipality and cooperative announcements.",
-  "create_project": "Create project",
-  "empty": "No projects match this view.",
-  "date_unknown": "Not set",
+  "meta_title": "Annonces de projets",
+  "title": "Projets communautaires",
+  "subtitle": "Suivez les annonces organisées par la municipalité et les coopératives.",
+  "create_project": "Créer un projet",
+  "empty": "Aucun projet ne correspond à cette vision.",
+  "date_unknown": "Non défini",
   "progress_value": "{{value}}%",
-  "filters": {
-    "status": "Status",
-    "all": "All statuses"
-  },
-  "status": {
-    "draft": "Draft",
-    "active": "Active",
-    "paused": "Paused",
-    "completed": "Completed",
-    "cancelled": "Cancelled"
-  },
-  "table": {
-    "aria": "Community projects",
-    "project": "Project",
-    "status": "Status",
-    "progress": "Progress",
-    "subscribers": "Followers",
-    "updated": "Updated",
-    "actions": "Actions"
-  },
-  "actions": {
-    "publish": "Publish",
-    "add_update": "Add update",
-    "pause": "Pause",
-    "complete": "Complete",
-    "cancel": "Cancel"
-  },
-  "fields": {
-    "title": "Title",
-    "summary": "Summary",
-    "location": "Location",
-    "stage": "Stage",
-    "progress": "Progress percent",
-    "publish_now": "Publish now",
-    "update_title": "Update title",
-    "update_body": "Update body",
-    "milestone": "Milestone",
-    "publish_update_now": "Publish update now",
-    "current_stage": "Current stage"
-  },
-  "create_modal": {
-    "title": "Create community project",
-    "submit": "Create"
-  },
-  "update_modal": {
-    "title": "Add project update",
-    "submit": "Save update"
-  },
-  "errors": {
-    "load": "Could not load community projects.",
-    "create": "Could not create the project.",
-    "update": "Could not save the update.",
-    "publish": "Could not publish the project.",
-    "status": "Could not change project status."
-  },
-  "meta_title": "Project Announcements",
   "about": {
-    "title": "About this page",
-    "body": "Project announcements are non-urgent updates posted to the community feed and member notification centre. Use them for programme news, volunteer recruitment, event notices, and impact updates. Unlike emergency alerts, announcements are queued and delivered on the platform's normal notification schedule.",
-    "draft": "Not visible to members; edit freely before publishing.",
-    "active": "Published and visible in the community feed. Use add update to post milestone updates to subscribers.",
-    "paused_completed_label": "Paused / completed",
-    "paused_completed": "Archived from the active feed. Subscribers are notified on completion."
+    "title": "À propos de cette page",
+    "body": "Les annonces de projet sont des mises à jour non urgentes publiées sur le fil de la communauté et le centre de notification des membres. Utilisez-les pour les actualités du programme, le recrutement de bénévoles, les avis d'événements et les mises à jour d'impact. Contrairement aux alertes d'urgence, les annonces sont mises en file d'attente et diffusées selon le calendrier de notification normal de la plateforme.",
+    "draft": "Non visible pour les membres ; éditer librement avant de publier.",
+    "active": "Publié et visible dans le fil de la communauté. Utilisez Ajouter une mise à jour pour publier des mises à jour de jalons aux abonnés.",
+    "paused_completed_label": "En pause / terminé",
+    "paused_completed": "Archivé du flux actif. Les abonnés sont informés de la fin."
   },
   "list": {
-    "title": "Project announcements",
-    "subtitle": "Publish initiatives and milestone updates that members can subscribe to."
+    "title": "Annonces de projets",
+    "subtitle": "Publiez des initiatives et des mises à jour sur les jalons auxquelles les membres peuvent s'abonner."
+  },
+  "filters": {
+    "status": "Statut",
+    "all": "Tous les statuts"
+  },
+  "status": {
+    "draft": "Brouillon",
+    "active": "Actif",
+    "paused": "En pause",
+    "completed": "Complété",
+    "cancelled": "Annulé"
+  },
+  "table": {
+    "aria": "Projets communautaires",
+    "project": "Projet",
+    "status": "Statut",
+    "progress": "Progrès",
+    "subscribers": "Abonnés",
+    "updated": "Mis à jour",
+    "actions": "Actes"
+  },
+  "actions": {
+    "publish": "Publier",
+    "add_update": "Ajouter une mise à jour",
+    "pause": "Suspendre",
+    "complete": "Complet",
+    "cancel": "Annuler"
+  },
+  "fields": {
+    "title": "Titre",
+    "summary": "Résumé",
+    "location": "Emplacement",
+    "current_stage": "Stade actuel",
+    "stage": "Scène",
+    "progress": "Pourcentage de progression",
+    "publish_now": "Publier maintenant",
+    "update_title": "Mettre à jour le titre",
+    "update_body": "Mettre à jour le corps",
+    "milestone": "Jalon",
+    "publish_update_now": "Publier la mise à jour maintenant"
+  },
+  "create_modal": {
+    "title": "Créer un projet communautaire",
+    "submit": "Créer"
+  },
+  "update_modal": {
+    "title": "Ajouter une mise à jour du projet",
+    "submit": "Enregistrer la mise à jour"
+  },
+  "errors": {
+    "load": "Impossible de charger les projets communautaires.",
+    "create": "Impossible de créer le projet.",
+    "update": "Impossible d'enregistrer la mise à jour.",
+    "publish": "Impossible de publier le projet.",
+    "status": "Impossible de modifier le statut du projet."
   }
 }

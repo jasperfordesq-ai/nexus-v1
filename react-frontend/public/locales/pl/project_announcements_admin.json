@@ -1,76 +1,76 @@
 {
-  "title": "Community Projects",
-  "subtitle": "Track staged municipality and cooperative announcements.",
-  "create_project": "Create project",
-  "empty": "No projects match this view.",
-  "date_unknown": "Not set",
+  "meta_title": "Ogłoszenia o projektach",
+  "title": "Projekty społecznościowe",
+  "subtitle": "Śledź wystawiane ogłoszenia gmin i spółdzielni.",
+  "create_project": "Utwórz projekt",
+  "empty": "Żaden projekt nie pasuje do tego poglądu.",
+  "date_unknown": "Nie ustawiono",
   "progress_value": "{{value}}%",
-  "filters": {
-    "status": "Status",
-    "all": "All statuses"
-  },
-  "status": {
-    "draft": "Draft",
-    "active": "Active",
-    "paused": "Paused",
-    "completed": "Completed",
-    "cancelled": "Cancelled"
-  },
-  "table": {
-    "aria": "Community projects",
-    "project": "Project",
-    "status": "Status",
-    "progress": "Progress",
-    "subscribers": "Followers",
-    "updated": "Updated",
-    "actions": "Actions"
-  },
-  "actions": {
-    "publish": "Publish",
-    "add_update": "Add update",
-    "pause": "Pause",
-    "complete": "Complete",
-    "cancel": "Cancel"
-  },
-  "fields": {
-    "title": "Title",
-    "summary": "Summary",
-    "location": "Location",
-    "stage": "Stage",
-    "progress": "Progress percent",
-    "publish_now": "Publish now",
-    "update_title": "Update title",
-    "update_body": "Update body",
-    "milestone": "Milestone",
-    "publish_update_now": "Publish update now",
-    "current_stage": "Current stage"
-  },
-  "create_modal": {
-    "title": "Create community project",
-    "submit": "Create"
-  },
-  "update_modal": {
-    "title": "Add project update",
-    "submit": "Save update"
-  },
-  "errors": {
-    "load": "Could not load community projects.",
-    "create": "Could not create the project.",
-    "update": "Could not save the update.",
-    "publish": "Could not publish the project.",
-    "status": "Could not change project status."
-  },
-  "meta_title": "Project Announcements",
   "about": {
-    "title": "About this page",
-    "body": "Project announcements are non-urgent updates posted to the community feed and member notification centre. Use them for programme news, volunteer recruitment, event notices, and impact updates. Unlike emergency alerts, announcements are queued and delivered on the platform's normal notification schedule.",
-    "draft": "Not visible to members; edit freely before publishing.",
-    "active": "Published and visible in the community feed. Use add update to post milestone updates to subscribers.",
-    "paused_completed_label": "Paused / completed",
-    "paused_completed": "Archived from the active feed. Subscribers are notified on completion."
+    "title": "O tej stronie",
+    "body": "Ogłoszenia o projektach to niepilne aktualizacje publikowane w kanale społeczności i centrum powiadomień dla członków. Używaj ich, aby wyświetlać aktualności dotyczące programów, rekrutację wolontariuszy, powiadomienia o wydarzeniach i aktualizacje dotyczące wpływu. W przeciwieństwie do alertów awaryjnych, ogłoszenia są ustawiane w kolejce i dostarczane zgodnie ze zwykłym harmonogramem powiadomień platformy.",
+    "draft": "Niewidoczne dla członków; swobodnie edytować przed publikacją.",
+    "active": "Opublikowane i widoczne w kanale społeczności. Użyj opcji Dodaj aktualizację, aby publikować subskrybentom aktualizacje kamieni milowych.",
+    "paused_completed_label": "Wstrzymano/zakończono",
+    "paused_completed": "Zarchiwizowane z aktywnego kanału. Abonenci są powiadamiani o zakończeniu."
   },
   "list": {
-    "title": "Project announcements",
-    "subtitle": "Publish initiatives and milestone updates that members can subscribe to."
+    "title": "Ogłoszenia projektu",
+    "subtitle": "Publikuj inicjatywy i aktualizacje kamieni milowych, które członkowie mogą subskrybować."
+  },
+  "filters": {
+    "status": "Status",
+    "all": "Wszystkie statusy"
+  },
+  "status": {
+    "draft": "Projekt",
+    "active": "Aktywny",
+    "paused": "Wstrzymano",
+    "completed": "Zakończony",
+    "cancelled": "Odwołany"
+  },
+  "table": {
+    "aria": "Projekty społecznościowe",
+    "project": "Projekt",
+    "status": "Status",
+    "progress": "Postęp",
+    "subscribers": "Świta",
+    "updated": "Zaktualizowano",
+    "actions": "Działania"
+  },
+  "actions": {
+    "publish": "Publikować",
+    "add_update": "Dodaj aktualizację",
+    "pause": "Pauza",
+    "complete": "Kompletny",
+    "cancel": "Anulować"
+  },
+  "fields": {
+    "title": "Tytuł",
+    "summary": "Streszczenie",
+    "location": "Lokalizacja",
+    "current_stage": "Aktualny etap",
+    "stage": "Scena",
+    "progress": "Procent postępu",
+    "publish_now": "Opublikuj teraz",
+    "update_title": "Zaktualizuj tytuł",
+    "update_body": "Zaktualizuj treść",
+    "milestone": "Kamień milowy",
+    "publish_update_now": "Opublikuj aktualizację teraz"
+  },
+  "create_modal": {
+    "title": "Utwórz projekt społecznościowy",
+    "submit": "Tworzyć"
+  },
+  "update_modal": {
+    "title": "Dodaj aktualizację projektu",
+    "submit": "Zapisz aktualizację"
+  },
+  "errors": {
+    "load": "Nie można wczytać projektów społeczności.",
+    "create": "Nie można utworzyć projektu.",
+    "update": "Nie udało się zapisać aktualizacji.",
+    "publish": "Nie udało się opublikować projektu.",
+    "status": "Nie można zmienić stanu projektu."
   }
 }

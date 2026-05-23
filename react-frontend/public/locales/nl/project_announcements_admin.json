@@ -1,76 +1,76 @@
 {
-  "title": "Community Projects",
-  "subtitle": "Track staged municipality and cooperative announcements.",
-  "create_project": "Create project",
-  "empty": "No projects match this view.",
-  "date_unknown": "Not set",
+  "meta_title": "Projectaankondigingen",
+  "title": "Gemeenschapsprojecten",
+  "subtitle": "Volg geënsceneerde aankondigingen van gemeenten en coöperaties.",
+  "create_project": "Project aanmaken",
+  "empty": "Er zijn geen projecten die aan deze visie voldoen.",
+  "date_unknown": "Niet ingesteld",
   "progress_value": "{{value}}%",
-  "filters": {
-    "status": "Status",
-    "all": "All statuses"
-  },
-  "status": {
-    "draft": "Draft",
-    "active": "Active",
-    "paused": "Paused",
-    "completed": "Completed",
-    "cancelled": "Cancelled"
-  },
-  "table": {
-    "aria": "Community projects",
-    "project": "Project",
-    "status": "Status",
-    "progress": "Progress",
-    "subscribers": "Followers",
-    "updated": "Updated",
-    "actions": "Actions"
-  },
-  "actions": {
-    "publish": "Publish",
-    "add_update": "Add update",
-    "pause": "Pause",
-    "complete": "Complete",
-    "cancel": "Cancel"
-  },
-  "fields": {
-    "title": "Title",
-    "summary": "Summary",
-    "location": "Location",
-    "stage": "Stage",
-    "progress": "Progress percent",
-    "publish_now": "Publish now",
-    "update_title": "Update title",
-    "update_body": "Update body",
-    "milestone": "Milestone",
-    "publish_update_now": "Publish update now",
-    "current_stage": "Current stage"
-  },
-  "create_modal": {
-    "title": "Create community project",
-    "submit": "Create"
-  },
-  "update_modal": {
-    "title": "Add project update",
-    "submit": "Save update"
-  },
-  "errors": {
-    "load": "Could not load community projects.",
-    "create": "Could not create the project.",
-    "update": "Could not save the update.",
-    "publish": "Could not publish the project.",
-    "status": "Could not change project status."
-  },
-  "meta_title": "Project Announcements",
   "about": {
-    "title": "About this page",
-    "body": "Project announcements are non-urgent updates posted to the community feed and member notification centre. Use them for programme news, volunteer recruitment, event notices, and impact updates. Unlike emergency alerts, announcements are queued and delivered on the platform's normal notification schedule.",
-    "draft": "Not visible to members; edit freely before publishing.",
-    "active": "Published and visible in the community feed. Use add update to post milestone updates to subscribers.",
-    "paused_completed_label": "Paused / completed",
-    "paused_completed": "Archived from the active feed. Subscribers are notified on completion."
+    "title": "Over deze pagina",
+    "body": "Projectaankondigingen zijn niet-dringende updates die worden geplaatst op de communityfeed en het ledenmeldingscentrum. Gebruik ze voor programmanieuws, vrijwilligerswerving, aankondigingen van evenementen en impactupdates. In tegenstelling tot noodwaarschuwingen worden aankondigingen in de wachtrij geplaatst en afgeleverd volgens het normale meldingsschema van het platform.",
+    "draft": "Niet zichtbaar voor leden; vrij bewerken voordat u publiceert.",
+    "active": "Gepubliceerd en zichtbaar in de communityfeed. Gebruik Update toevoegen om mijlpaalupdates voor abonnees te posten.",
+    "paused_completed_label": "Onderbroken/voltooid",
+    "paused_completed": "Gearchiveerd vanuit de actieve feed. Abonnees worden geïnformeerd over de voltooiing ervan."
   },
   "list": {
-    "title": "Project announcements",
-    "subtitle": "Publish initiatives and milestone updates that members can subscribe to."
+    "title": "Projectaankondigingen",
+    "subtitle": "Publiceer initiatieven en mijlpaalupdates waarop leden zich kunnen abonneren."
+  },
+  "filters": {
+    "status": "Status",
+    "all": "Alle statussen"
+  },
+  "status": {
+    "draft": "Voorlopige versie",
+    "active": "Actief",
+    "paused": "Gepauzeerd",
+    "completed": "Voltooid",
+    "cancelled": "Geannuleerd"
+  },
+  "table": {
+    "aria": "Gemeenschapsprojecten",
+    "project": "Project",
+    "status": "Status",
+    "progress": "Voortgang",
+    "subscribers": "Volgers",
+    "updated": "Bijgewerkt",
+    "actions": "Acties"
+  },
+  "actions": {
+    "publish": "Publiceren",
+    "add_update": "Update toevoegen",
+    "pause": "Pauze",
+    "complete": "Compleet",
+    "cancel": "Annuleren"
+  },
+  "fields": {
+    "title": "Titel",
+    "summary": "Samenvatting",
+    "location": "Locatie",
+    "current_stage": "Huidige fase",
+    "stage": "Fase",
+    "progress": "Vooruitgang procent",
+    "publish_now": "Publiceer nu",
+    "update_title": "Titel bijwerken",
+    "update_body": "Lichaam bijwerken",
+    "milestone": "Mijlpaal",
+    "publish_update_now": "Update nu publiceren"
+  },
+  "create_modal": {
+    "title": "Creëer een gemeenschapsproject",
+    "submit": "Creëren"
+  },
+  "update_modal": {
+    "title": "Projectupdate toevoegen",
+    "submit": "Update opslaan"
+  },
+  "errors": {
+    "load": "Kan communityprojecten niet laden.",
+    "create": "Kan het project niet maken.",
+    "update": "Kan de update niet opslaan.",
+    "publish": "Kan het project niet publiceren.",
+    "status": "Kan de projectstatus niet wijzigen."
   }
 }
