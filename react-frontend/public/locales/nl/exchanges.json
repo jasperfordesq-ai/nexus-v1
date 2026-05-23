@@ -107,7 +107,7 @@
     "prep_time": "Voorbereidingstijd",
     "ratings": "Beoordelingen",
     "rate_exchange": "Beoordeel Deze Uitwisseling",
-    "prep_time_value": "{{count}}h"
+    "prep_time_value": "{{count}}u"
   },
   "modal": {
     "decline_title": "Weiger Uitwisselingsverzoek",

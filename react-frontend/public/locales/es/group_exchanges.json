@@ -148,7 +148,7 @@
     "step_of_named": "Paso {{current}} de {{total}}: {{name}}",
     "hours_value": "{{hours}} h",
     "hours_suffix": "h",
-    "weight_suffix": "x"
+    "weight_suffix": "incógnita"
   },
   "toast": {
     "load_more_failed": "Error al cargar más intercambios",

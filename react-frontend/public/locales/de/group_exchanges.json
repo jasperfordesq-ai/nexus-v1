@@ -148,7 +148,7 @@
     "step_of_named": "Schritt {{current}} von {{total}}: {{name}}",
     "hours_value": "{{hours}} Std.",
     "hours_suffix": "Std.",
-    "weight_suffix": "x"
+    "weight_suffix": "X"
   },
   "toast": {
     "load_more_failed": "Weitere Tauschvorgänge konnten nicht geladen werden",

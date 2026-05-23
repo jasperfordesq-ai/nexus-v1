@@ -148,7 +148,7 @@
     "step_of_named": "Krok {{current}} z {{total}}: {{name}}",
     "hours_value": "{{hours}} godz.",
     "hours_suffix": "godz.",
-    "weight_suffix": "x"
+    "weight_suffix": "X"
   },
   "toast": {
     "load_more_failed": "Nie udało się załadować więcej wymian",
