@@ -65,6 +65,8 @@ class AdminConfigController extends BaseApiController
         'partner_logo_url',
         'powered_by_label',
         'powered_by_url',
+        'powered_by_image_light',
+        'powered_by_image_dark',
         'map_provider', 'geocoding_provider',
         'google_maps_api_key', 'google_maps_map_id', 'maptiler_api_key',
     ];
