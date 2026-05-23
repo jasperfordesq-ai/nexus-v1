@@ -1,4 +1,15 @@
 {
+  "detail": {
+    "back_to_goals": "Volver a los objetivos",
+    "view_all_goals": "Ver todos los objetivos",
+    "not_found_title": "Objetivo no encontrado",
+    "not_found_description": "Es posible que este objetivo haya sido eliminado o nunca haya existido.",
+    "private_title": "Este objetivo es privado",
+    "private_description": "Solo el propietario del objetivo puede verlo.",
+    "meta_description": "{{owner}} está siguiendo \"{{title}}\" con un {{progress}} % de progreso en este objetivo comunitario.",
+    "overdue_chip": "Vencido",
+    "checkin_frequency": "Frecuencia de check-in"
+  },
   "checkin_recorded": "¡Registro completado!",
   "checkin_failed": "Error al registrar el seguimiento.",
   "reminder_set_failed": "Error al configurar el recordatorio.",
@@ -13,15 +24,15 @@
     "history": "Historial",
     "no_checkins": "Sin registros aún. ¡Registra tu primero!",
     "progress_label": "Progreso",
+    "progress_help": "Establece esto al progreso real que quieres mostrar en el objetivo. Registrar un check-in actualiza la barra del objetivo y la línea de tiempo.",
+    "progress_value": "{{percent}}%",
+    "progress_unknown": "Progreso no registrado",
     "mood_label": "¿Cómo te sientes?",
     "note_label": "Nota (opcional)",
     "note_placeholder": "¿Cómo te va? ¿Algún logro o desafío?",
     "cancel": "Cancelar",
     "submit": "Registrar",
-    "check_in_button": "Registrarse",
-    "progress_help": "Establece esto al progreso real que quieres mostrar en el objetivo. Registrar un check-in actualiza la barra del objetivo y la línea de tiempo.",
-    "progress_value": "{{percent}}%",
-    "progress_unknown": "Progreso no registrado"
+    "check_in_button": "Registrarse"
   },
   "mood": {
     "great": "Excelente",
@@ -41,11 +52,11 @@
     "reminder_set_success": "Recordatorio establecido: {{frequency}}"
   },
   "frequency": {
+    "none": "Sin cadencia",
     "daily": "Diario",
     "weekly": "Semanal",
     "biweekly": "Cada 2 semanas",
-    "monthly": "Mensual",
-    "none": "Sin cadencia"
+    "monthly": "Mensual"
   },
   "template": {
     "title": "Comenzar desde Plantilla",
@@ -66,7 +77,7 @@
     "progress_aria": "Progreso: {{percent}}%",
     "event": {
       "progress_update": "Actualización de progreso",
-      "checkin": "Check-in",
+      "checkin": "Registrarse",
       "milestone": "Hito",
       "buddy_joined": "Compañero unido",
       "buddy_action": "Apoyo del compañero",
@@ -74,38 +85,18 @@
       "created": "Creado"
     }
   },
-  "template_picker": {
-    "load_error": "Error al cargar las plantillas. Por favor, inténtalo de nuevo.",
-    "try_again": "Inténtalo de nuevo",
-    "none_available": "Aún no hay plantillas disponibles.",
-    "none_in_category": "No hay plantillas en esta categoría."
-  },
-  "detail": {
-    "back_to_goals": "Volver a los objetivos",
-    "view_all_goals": "Ver todos los objetivos",
-    "not_found_title": "Objetivo no encontrado",
-    "not_found_description": "Es posible que este objetivo haya sido eliminado o nunca haya existido.",
-    "private_title": "Este objetivo es privado",
-    "private_description": "Solo el propietario del objetivo puede verlo.",
-    "overdue_chip": "Vencido",
-    "checkin_frequency": "Frecuencia de check-in",
-    "meta_description": "{{owner}} está siguiendo \"{{title}}\" con un {{progress}} % de progreso en este objetivo comunitario."
-  },
-  "goals": {
-    "load_error": "Error al cargar los objetivos. Por favor, inténtalo de nuevo."
-  },
   "insights": {
     "loading": "Cargando perspectivas del objetivo",
     "load_failed": "Error al cargar las perspectivas del objetivo.",
     "current_streak": "Racha actual",
-    "streak_value": "{{count}} check-ins",
+    "streak_value": "{{count}} registros",
     "best_streak": "Mejor racha: {{count}}",
     "next_checkin": "Próximo check-in",
     "no_cadence": "Sin cadencia establecida",
     "no_cadence_helper": "Establece una cadencia al editar este objetivo.",
     "checkin_due": "Hay un check-in pendiente",
     "frequency": "Cadencia {{frequency}}",
-    "checkins": "Check-ins",
+    "checkins": "Registros",
     "checkins_value": "{{count}} registrados",
     "last_checkin": "Último check-in {{time}}",
     "no_checkins": "Aún no hay check-ins",
@@ -130,5 +121,14 @@
       "celebration": "Celebración",
       "note": "Nota"
     }
+  },
+  "template_picker": {
+    "load_error": "Error al cargar las plantillas. Por favor, inténtalo de nuevo.",
+    "try_again": "Inténtalo de nuevo",
+    "none_available": "Aún no hay plantillas disponibles.",
+    "none_in_category": "No hay plantillas en esta categoría."
+  },
+  "goals": {
+    "load_error": "Error al cargar los objetivos. Por favor, inténtalo de nuevo."
   }
 }
