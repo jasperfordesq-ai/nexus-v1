@@ -1,6 +1,9 @@
 {
   "back": "خلف",
+  "empty_dash": "-",
+  "refresh": "تحديث",
   "hours_short": "{{count}} س",
+  "not_available": "غير متاح",
   "error_title": "حدث خطأ ما",
   "nav": {
     "dashboard": "لوحة التحكم",
@@ -74,6 +77,10 @@
   "location": {
     "powered_by_google": "مدعوم من Google",
     "powered_by_osm": "© مساهمو OpenStreetMap"
+  },
+  "keyboard": {
+    "command_symbol": "⌘",
+    "k_key": "K"
   },
   "nav_desc": {
     "feed": "موجز المجتمع",
@@ -171,10 +178,10 @@
     "legal_hub": "المركز القانوني",
     "terms_of_service": "شروط الخدمة",
     "privacy_policy": "سياسة الخصوصية",
-    "type_community_guidelines": "إرشادات المجتمع",
-    "type_acceptable_use": "الاستخدام المقبول",
     "cookie_policy": "سياسة ملفات تعريف الارتباط",
-    "accessibility": "إمكانية الوصول"
+    "accessibility": "إمكانية الوصول",
+    "type_community_guidelines": "إرشادات المجتمع",
+    "type_acceptable_use": "الاستخدام المقبول"
   },
   "admin_tools": {
     "section": "أدوات الإدارة",
@@ -220,11 +227,11 @@
     "switch_to_light": "التبديل إلى الوضع الفاتح",
     "switch_to_dark": "التبديل إلى الوضع الداكن",
     "skip_to_content": "تخطي إلى المحتوى الرئيسي",
+    "accessibility_alpha_new_tab": "افتح إمكانية الوصول (تجريبي) في علامة تبويب جديدة",
     "menu_opened": "تم فتح قائمة التنقل",
     "close": "إغلاق",
     "scroll_to_top": "التمرير إلى الأعلى",
-    "breadcrumb": "مسار التنقل",
-    "accessibility_alpha_new_tab": "افتح إمكانية الوصول (تجريبي) في علامة تبويب جديدة"
+    "breadcrumb": "مسار التنقل"
   },
   "cookie_consent": {
     "banner_label": "موافقة ملفات تعريف الارتباط",
@@ -247,7 +254,7 @@
     "save": "حفظ التفضيلات"
   },
   "footer": {
-    "project_nexus": "Project NEXUS",
+    "project_nexus": "مشروع نيكزس",
     "source_repo": "مستودع GitHub",
     "source_repo_aria": "افتح مستودع Project NEXUS على GitHub",
     "source_repo_tooltip": "افتح مستودع مصدر Project NEXUS على GitHub",
@@ -281,6 +288,8 @@
   "members": {
     "title": "الأعضاء",
     "subtitle": "تواصل مع أعضاء المجتمع",
+    "hero_eyebrow": "دليل المجتمع",
+    "count_label": "الأعضاء المعروضون",
     "quick_filters": "عوامل تصفية الأعضاء",
     "all": "جميع الأعضاء",
     "new": "أعضاء جدد",
@@ -305,6 +314,9 @@
     "no_members": "لم يتم العثور على أعضاء",
     "no_members_search": "جرّب مصطلح بحث مختلف",
     "no_members_community": "لا يوجد أعضاء في هذا المجتمع بعد",
+    "empty_tip_profiles": "تصفح الملفات الكاملة",
+    "empty_tip_skills": "ابحث حسب المهارة",
+    "empty_tip_location": "جرّب الأعضاء القريبين",
     "load_more": "تحميل المزيد",
     "results_matching": "{{shown}} من {{total}} عضو مطابق لـ \"{{query}}\"",
     "results_count": "{{count}} عضو معروض",
@@ -324,12 +336,7 @@
     "load_failed": "فشل تحميل الأعضاء",
     "load_more_failed": "فشل تحميل المزيد من الأعضاء",
     "my_profile": "ملفي الشخصي",
-    "load_more_count": "تحميل المزيد (يتبقى {{remaining}})",
-    "hero_eyebrow": "دليل المجتمع",
-    "count_label": "الأعضاء المعروضون",
-    "empty_tip_profiles": "تصفح الملفات الكاملة",
-    "empty_tip_skills": "ابحث حسب المهارة",
-    "empty_tip_location": "جرّب الأعضاء القريبين"
+    "load_more_count": "تحميل المزيد (يتبقى {{remaining}})"
   },
   "error_boundary": {
     "title": "حدث خطأ ما",
@@ -374,7 +381,7 @@
       "coordinate_org_sub": "أدِر منظمات التطوع الخاصة بك",
       "my_relationships": "علاقات الدعم الخاصة بي",
       "my_relationships_sub": "اعرض روابط الدعم الجارية",
-      "markt": "Marktplatz",
+      "markt": "ساحة السوق",
       "markt_sub": "تصفّح الخدمات والسلع وعروض رصيد الوقت المحلية.",
       "loyalty_history": "استبدالات رصيد الوقت",
       "loyalty_history_sub": "تابع كيف استخدمت ساعاتك المكتسبة لدى التجار المحليين.",
@@ -455,7 +462,7 @@
         "title": "الأندية والجمعيات",
         "description": "اربط الجمعيات والأندية ومجموعات الأعضاء بشبكة الرعاية."
       },
-      "markt": "Marktplatz",
+      "markt": "ساحة السوق",
       "projects": {
         "title": "مشاريع مجتمعية",
         "description": "تابع أعمال البلديات ومحطات التعاونيات ومبادرات الأحياء."
@@ -481,6 +488,7 @@
       "description": "اطلب الدعم من مجتمعك"
     },
     "subtitle": "جيرانك يهتمون. أخبرنا بما تحتاجه وسنبذل قصارى جهدنا للمساعدة.",
+    "on_behalf_notice": "أنت تنشئ هذا الطلب نيابة عن شخص تدعمه كمقدم رعاية.",
     "form": {
       "what_label": "ما نوع المساعدة التي تحتاجها؟",
       "what_placeholder": "مثال: مساعدة في التسوق، توصيلة لموعد طبي، رفقة في نزهة...",
@@ -514,8 +522,7 @@
       "filled_hint": "لقد ملأنا النموذج من تسجيلك. يرجى المراجعة قبل الإرسال.",
       "transcript_label": "ما سمعناه"
     },
-    "back": "العودة إلى مركز المجتمع",
-    "on_behalf_notice": "أنت تنشئ هذا الطلب نيابة عن شخص تدعمه كمقدم رعاية."
+    "back": "العودة إلى مركز المجتمع"
   },
   "hour_gift": {
     "meta": {
@@ -598,13 +605,13 @@
     },
     "history": {
       "title": "سجل التحويلات الخاص بك",
+      "aria": "سجل تحويل الساعات",
       "date": "التاريخ",
       "destination": "الوجهة",
       "hours": "الساعات",
       "status": "الحالة",
       "reason": "السبب",
-      "empty": "لا توجد تحويلات بعد.",
-      "aria": "سجل تحويل الساعات"
+      "empty": "لا توجد تحويلات بعد."
     },
     "status": {
       "pending": "بانتظار الموافقة",
@@ -772,15 +779,18 @@
     "clear": "مسح",
     "scroll_left": "التمرير لليسار",
     "scroll_right": "التمرير لليمين",
+    "current_language": "اللغة: {{language}}",
     "select_language": "اختر اللغة",
     "clear_location": "مسح الموقع",
     "select_category": "اختر فئة",
     "verification_badges": "شارات التحقق",
-    "search_skills": "البحث عن مهارات",
-    "current_language": "اللغة: {{language}}"
+    "search_skills": "البحث عن مهارات"
   },
   "skills": {
     "browse_title": "دليل مهارات المجتمع",
+    "explainer": "تصفح المهارات التي يشاركها الأعضاء في مجتمعك، وابحث عن الأشخاص الذين يقدمون المساعدة، واكتشف الأعضاء الذين يرغبون في التعلم.",
+    "unable_to_load": "تعذر التحميل",
+    "try_again": "حاول مرة أخرى",
     "load_failed": "تعذر تحميل فئات المهارات",
     "load_failed_retry": "تعذر تحميل فئات المهارات. يرجى المحاولة مرة أخرى.",
     "offering_label": "عرض",
@@ -823,10 +833,7 @@
     "aria_clear_search": "مسح البحث",
     "aria_close_members_list": "إغلاق قائمة الأعضاء",
     "category_optional": "الفئة (اختياري)",
-    "proficiency_level": "مستوى الإتقان",
-    "explainer": "تصفح المهارات التي يشاركها الأعضاء في مجتمعك، وابحث عن الأشخاص الذين يقدمون المساعدة، واكتشف الأعضاء الذين يرغبون في التعلم.",
-    "unable_to_load": "تعذر التحميل",
-    "try_again": "حاول مرة أخرى"
+    "proficiency_level": "مستوى الإتقان"
   },
   "hours_display_one": "{{count}} ????",
   "hours_display_other": "{{count}} ساعات",
@@ -921,12 +928,12 @@
       "title": "دعوة غير صالحة",
       "body": "رابط الدعوة غير صالح. يرجى التحقق منه والمحاولة مرة أخرى."
     },
-    "loading": "جارٍ التحقق من دعوتك...",
     "error": {
       "title": "تعذّر علينا التحقق من هذه الدعوة",
       "body": "يرجى التحقق من الاتصال والمحاولة مرة أخرى.",
       "retry": "حاول مجددًا"
-    }
+    },
+    "loading": "جارٍ التحقق من دعوتك..."
   },
   "markt": {
     "meta": {
@@ -1034,12 +1041,12 @@
       "subtitle": "اطّلع على كيفية استخدامك للساعات التي كسبتها لدى الشركات المحلية.",
       "back": "العودة إلى مركز المجتمع",
       "table": {
+        "aria": "سجل استبدال نقاط الولاء",
         "date": "التاريخ",
         "merchant": "التاجر",
         "item": "العنصر",
         "credits": "الساعات المستخدمة",
-        "discount": "الخصم",
-        "aria": "سجل استبدال نقاط الولاء"
+        "discount": "الخصم"
       },
       "empty": {
         "title": "لا توجد عمليات استرداد بعد",
@@ -1077,8 +1084,8 @@
       "date": "تاريخ الطلب",
       "format": "التنسيق",
       "size": "الحجم",
-      "empty": "لم تقم بتصدير بياناتك بعد.",
-      "count": "{{count}} عمليات تصدير"
+      "count": "{{count}} عمليات تصدير",
+      "empty": "لم تقم بتصدير بياناتك بعد."
     },
     "errors": {
       "rate_limit": "يمكنك طلب 5 عمليات تصدير في اليوم. يُرجى المحاولة غدًا.",
@@ -1213,6 +1220,7 @@
     "col_impressions": "مرات الظهور",
     "col_clicks": "النقرات",
     "col_ctr": "CTR",
+    "date_range": "{{start}} إلى {{end}}",
     "status_draft": "مسودة",
     "status_pending": "قيد الانتظار",
     "status_active": "نشطة",
@@ -1230,13 +1238,12 @@
     "field_budget_desc": "الحد الأقصى للإنفاق الإجمالي باليورو.",
     "field_radius": "نطاق الاستهداف (اختياري)",
     "field_radius_desc": "اعرض فقط للأعضاء ضمن هذه المسافة.",
+    "table_aria": "حملات الإعلانات",
     "validation_required": "يُرجى ملء جميع الحقول المطلوبة.",
     "created_success": "تم إنشاء الحملة بنجاح.",
     "create_error": "تعذّر إنشاء الحملة. يُرجى المحاولة مرة أخرى.",
     "submit_create": "إنشاء الحملة",
-    "feature_disabled": "الإعلان المحلي غير متاح لحسابك.",
-    "date_range": "{{start}} إلى {{end}}",
-    "table_aria": "حملات الإعلانات"
+    "feature_disabled": "الإعلان المحلي غير متاح لحسابك."
   },
   "push_campaign": {
     "meta": {
@@ -1284,6 +1291,7 @@
     "load_error": "تعذّر تحميل الحملات. يرجى المحاولة مرة أخرى.",
     "retry": "حاول مرة أخرى",
     "create_first": "أنشئ أول حملة دفع لك",
+    "table_aria": "حملات الإشعارات",
     "col_name": "الاسم",
     "col_title": "عنوان الإشعار",
     "col_status": "الحالة",
@@ -1299,6 +1307,7 @@
     "tier_member": "عضو",
     "tier_trusted": "موثوق",
     "tier_verified": "موثّق",
+    "radius_km": "{{radius}} كم",
     "field_name": "اسم الحملة",
     "field_name_placeholder": "مثال: تنبيه فعالية صيفية",
     "field_title": "عنوان الإشعار",
@@ -1321,14 +1330,15 @@
     "created_success": "تم إنشاء حملة الدفع بنجاح.",
     "create_error": "تعذّر إنشاء حملة الدفع. يرجى المحاولة مرة أخرى.",
     "submit_create": "إنشاء الحملة",
-    "feature_disabled": "حملات الدفع غير متاحة لحسابك.",
-    "table_aria": "حملات الإشعارات",
-    "radius_km": "{{radius}} كم"
+    "feature_disabled": "حملات الدفع غير متاحة لحسابك."
   },
   "push_campaign_opt_in": "تلقّي إشعارات دفع تروج لها",
   "push_campaign_opt_in_description": "اسمح للشركات والمنظمات المحلية بإرسال إشعارات دفع مستهدفة إليك. يمكنك إلغاء الاشتراك في أي وقت.",
   "coupon": {
     "page_title": "قسائم الخصم",
+    "meta_description": "تصفح كوبونات المجتمع النشطة وخصومات التجار والعروض المحلية المتاحة في منطقتك.",
+    "detail_meta_description": "اعرض كوبون المجتمع هذا، أو انسخ رمز العرض، أو أنشئ رمز QR للاستبدال في المتجر.",
+    "detail_meta_description_named": "اعرض {{title}}، أو انسخ رمز الكوبون {{code}}، أو أنشئ رمز QR للاستبدال في المتجر.",
     "page_subtitle": "تصفّح خصومات التجار المتاحة في مجتمعك",
     "code": "الرمز",
     "title": "العنوان",
@@ -1372,31 +1382,29 @@
       "valid_from": "صالحة من",
       "valid_until": "صالحة حتى",
       "status": "الحالة",
+      "status_draft": "مسودة",
+      "status_active": "نشط",
+      "status_paused": "متوقف مؤقتاً",
+      "status_expired": "منتهي الصلاحية",
       "applies_to": "ينطبق على",
+      "amount_cents_help": "المبلغ بالسنتات",
       "all_listings": "كل إعلاناتي",
       "specific_listings": "إعلانات محددة",
       "specific_categories": "فئات محددة",
       "save": "حفظ",
       "delete_confirm": "حذف هذه القسيمة؟ لا يمكن التراجع عن ذلك.",
       "no_coupons": "لم تنشئ أي قسائم بعد.",
+      "table_aria": "كوبونات البائع",
       "redemptions": "الاستبدالات",
       "view_redemptions": "عرض الاستبدالات",
       "usage_count": "استُخدمت {{count}} مرة",
       "saved": "تم حفظ القسيمة",
-      "deleted": "تم حذف القسيمة",
-      "status_draft": "مسودة",
-      "status_active": "نشط",
-      "status_paused": "متوقف مؤقتاً",
-      "status_expired": "منتهي الصلاحية",
-      "amount_cents_help": "المبلغ بالسنتات",
-      "table_aria": "كوبونات البائع"
-    },
-    "meta_description": "تصفح كوبونات المجتمع النشطة وخصومات التجار والعروض المحلية المتاحة في منطقتك.",
-    "detail_meta_description": "اعرض كوبون المجتمع هذا، أو انسخ رمز العرض، أو أنشئ رمز QR للاستبدال في المتجر.",
-    "detail_meta_description_named": "اعرض {{title}}، أو انسخ رمز الكوبون {{code}}، أو أنشئ رمز QR للاستبدال في المتجر."
+      "deleted": "تم حذف القسيمة"
+    }
   },
   "regional_points": {
     "title": "النقاط الإقليمية",
+    "default_symbol": "نقطة",
     "subtitle": "عملة إقليمية يمكنك كسبها وإنفاقها مع الجيران والتجار المحليين.",
     "balance": "الرصيد",
     "lifetime_earned": "إجمالي المكتسب",
@@ -1408,17 +1416,17 @@
     "transfer": {
       "title": "إرسال نقاط إلى عضو آخر",
       "recipient_id": "معرّف العضو المستلم",
+      "recipient_placeholder": "مثال: 123",
       "amount": "المبلغ",
+      "amount_placeholder": "0.00",
       "message": "الرسالة (اختيارية)",
+      "message_placeholder": "أضف ملاحظة للمستلم",
       "submit": "إرسال التحويل",
       "success": "تم إرسال التحويل",
       "errors": {
         "invalid_recipient": "أدخل معرّف عضو مستلم صالحًا",
         "invalid_amount": "أدخل مبلغًا موجبًا"
-      },
-      "recipient_placeholder": "مثال: 123",
-      "amount_placeholder": "0.00",
-      "message_placeholder": "أضف ملاحظة للمستلم"
+      }
     },
     "history": {
       "title": "النشاط الأخير",
@@ -1433,8 +1441,7 @@
     "errors": {
       "load_failed": "فشل تحميل النقاط الإقليمية",
       "transfer_failed": "فشل التحويل"
-    },
-    "default_symbol": "نقطة"
+    }
   },
   "verein_import": {
     "title": "استيراد أعضاء النادي",
@@ -1444,9 +1451,16 @@
     "csv_format": "صف رأس مطلوب: email,first_name,last_name,phone,role",
     "file_label": "ملف CSV",
     "csv_label": "أو الصق CSV",
+    "csv_placeholder": "البريد الإلكتروني، الاسم الأول، الاسم الأخير، الهاتف، الدور\nalice@example.org،أليس، سميث،+1 555 123 4567، عضو",
     "preview": "معاينة",
     "confirm": "استيراد الأعضاء",
     "success": "اكتمل الاستيراد: تم إنشاء {{created}}، ربط {{linked}}",
+    "actions": {
+      "already": "موجود مسبقاً",
+      "create": "إنشاء",
+      "invalid": "غير صالح",
+      "link": "ربط"
+    },
     "summary": {
       "total": "الإجمالي",
       "create": "إنشاء",
@@ -1476,13 +1490,6 @@
       "import_failed": "فشل الاستيراد",
       "has_invalid": "أصلح الصفوف غير الصالحة قبل الاستيراد",
       "has_invalid_summary": "بعض الصفوف غير صالحة. أصلحها في ملف CSV الخاص بك وأعد تشغيل المعاينة قبل الاستيراد."
-    },
-    "csv_placeholder": "email,first_name,last_name,phone,role\nalice@example.org,Alice,Smith,+1 555 123 4567,member",
-    "actions": {
-      "already": "موجود مسبقاً",
-      "create": "إنشاء",
-      "invalid": "غير صالح",
-      "link": "ربط"
     }
   },
   "premium": {
@@ -1554,6 +1561,10 @@
   },
   "developers": {
     "page_title": "المطورون",
+    "meta_description": "استكشف واجهة برمجة تطبيقات شركاء NEXUS لمصادقة OAuth2، ونقاط النهاية المحددة النطاق، وخطافات الويب الموقعة، والوصول إلى التكامل.",
+    "auth_meta_title": "مصادقة API",
+    "endpoints_meta_title": "نقاط نهاية API",
+    "webhooks_meta_title": "خطافات ويب API",
     "hero_title": "ابنِ مع NEXUS",
     "hero_subtitle": "واجهة REST API مختارة لشركاء البنوك والدفع والإدارة البلدية. OAuth2 Client Credentials وWebhooks موقّعة وبيئة اختبار يمكنك الوصول إليها خلال خمس دقائق.",
     "request_access_cta": "طلب الوصول",
@@ -1562,7 +1573,7 @@
       "overview": "نظرة عامة",
       "auth": "المصادقة",
       "endpoints": "نقاط النهاية",
-      "webhooks": "Webhooks"
+      "webhooks": "خطافات الويب"
     },
     "feature_oauth_title": "OAuth2 Client Credentials",
     "feature_oauth_body": "مصادقة من خادم إلى خادم. رموز bearer قصيرة العمر، نطاق لكل شريك.",
@@ -1586,17 +1597,6 @@
     "method_label": "الطريقة",
     "path_label": "المسار",
     "description_label": "الوصف",
-    "webhooks_intro": "اشترك في الأحداث عبر روابط callback بصيغة HTTPS. يتضمن كل تسليم رأس X-Partner-Signature — وهو HMAC-SHA256 للجسم الخام موقّع بـ secret الاشتراك المُعاد عند الإنشاء.",
-    "webhook_events_title": "الأحداث المتاحة",
-    "webhook_event_wallet_credited": "wallet.credited — يُطلق عندما يضيف شريك ساعات وقت عبر /wallet/credit",
-    "webhook_signing_title": "التحقق من التواقيع",
-    "webhook_signing_body": "احسب HMAC-SHA256 لجسم الطلب الخام باستخدام secret الاشتراك. قارنه مع رأس X-Partner-Signature بزمن ثابت.",
-    "webhook_create_title": "إنشاء اشتراك",
-    "webhook_create_body": "أرسل POST إلى /api/partner/v1/webhooks/subscriptions مع event_types (مصفوفة) وtarget_url (https فقط). تتضمن الاستجابة secret لمرة واحدة — احتفظ به.",
-    "meta_description": "استكشف واجهة برمجة تطبيقات شركاء NEXUS لمصادقة OAuth2، ونقاط النهاية المحددة النطاق، وخطافات الويب الموقعة، والوصول إلى التكامل.",
-    "auth_meta_title": "مصادقة API",
-    "endpoints_meta_title": "نقاط نهاية API",
-    "webhooks_meta_title": "خطافات ويب API",
     "endpoints_table_aria": "نقاط نهاية API الشريكة",
     "endpoint_descriptions": {
       "oauth_token": "تبادل بيانات اعتماد العميل برمز حامل (منح client_credentials).",
@@ -1609,10 +1609,20 @@
       "aggregates_community": "إجماليات المجتمع المُجمَّعة (بدون معلومات شخصية). مفيدة للوحات الشركاء.",
       "webhooks_list": "عرض اشتراكات خطافات الويب الخاصة بك.",
       "webhooks_create": "الاشتراك في الأحداث. الجسم: event_types[]، target_url (https://)."
-    }
+    },
+    "webhooks_intro": "اشترك في الأحداث عبر روابط callback بصيغة HTTPS. يتضمن كل تسليم رأس X-Partner-Signature — وهو HMAC-SHA256 للجسم الخام موقّع بـ secret الاشتراك المُعاد عند الإنشاء.",
+    "webhook_events_title": "الأحداث المتاحة",
+    "webhook_event_wallet_credited": "wallet.credited — يُطلق عندما يضيف شريك ساعات وقت عبر /wallet/credit",
+    "webhook_signing_title": "التحقق من التواقيع",
+    "webhook_signing_body": "احسب HMAC-SHA256 لجسم الطلب الخام باستخدام secret الاشتراك. قارنه مع رأس X-Partner-Signature بزمن ثابت.",
+    "webhook_create_title": "إنشاء اشتراك",
+    "webhook_create_body": "أرسل POST إلى /api/partner/v1/webhooks/subscriptions مع event_types (مصفوفة) وtarget_url (https فقط). تتضمن الاستجابة secret لمرة واحدة — احتفظ به."
   },
   "regional_analytics": {
     "page_title": "التحليلات الإقليمية",
+    "meta_description": "اكتشف تحليلات إقليمية تركز على الخصوصية للبلديات وشركاء الشركات الصغيرة والمتوسطة باستخدام اتجاهات المجتمع المجهولة والتقارير المُجمَّعة.",
+    "partner_dashboard_title": "التحليلات الإقليمية",
+    "partner_dashboard_meta_description": "لوحة تحليلات إقليمية خاصة للشركاء المعتمدين.",
     "contact_subject": "التحليلات الإقليمية - استفسار الشركاء",
     "privacy_badge": "الخصوصية أولاً حسب التصميم",
     "hero_title": "فهم منطقتك. دون المساس بالخصوصية.",
@@ -1658,10 +1668,49 @@
         "feature_3": "ورش عمل للمراجعة الفصلية",
         "feature_4": "مدير نجاح مخصص"
       }
-    },
-    "meta_description": "اكتشف تحليلات إقليمية تركز على الخصوصية للبلديات وشركاء الشركات الصغيرة والمتوسطة باستخدام اتجاهات المجتمع المجهولة والتقارير المُجمَّعة.",
-    "partner_dashboard_title": "التحليلات الإقليمية",
-    "partner_dashboard_meta_description": "لوحة تحليلات إقليمية خاصة للشركاء المعتمدين."
+    }
+  },
+  "partner_analytics": {
+    "no_token_title": "رمز الاشتراك مطلوب",
+    "no_token_body": "يرجى استخدام الرابط الآمن المقدم من مدير حسابك. يتضمن الرابط رمز اشتراك فريد.",
+    "error_title": "تعذر تحميل التحليلات",
+    "error_unauthorized": "رمز اشتراكك غير صالح أو منتهي الصلاحية.",
+    "error_generic": "حدث خطأ ما أثناء جلب تحليلاتك. يرجى إعادة المحاولة.",
+    "retry": "إعادة المحاولة",
+    "title": "التحليلات الإقليمية",
+    "subtitle": "رؤى مجهولة الهوية لمنطقتك. يتم تحديثها يومياً.",
+    "period_label": "الفترة",
+    "period_30d": "آخر 30 يوماً",
+    "period_90d": "آخر 90 يوماً",
+    "period_year": "آخر سنة",
+    "tabs_aria": "علامات تبويب التحليلات",
+    "tab_trends": "الاتجاهات",
+    "tab_demand_supply": "الطلب والعرض",
+    "tab_demographics": "البيانات الديموغرافية",
+    "tab_footfall": "حركة الزوار",
+    "reports_title": "التقارير الشهرية",
+    "no_reports": "لم يتم إنشاء تقارير بعد.",
+    "download_pdf": "تنزيل PDF",
+    "privacy_footer": "جميع المقاييس مُجمَّعة ومجهولة الهوية. يتم إخفاء الشرائح التي يكون فيها N<10.",
+    "metric_active_members": "الأعضاء النشطون",
+    "metric_categories": "الفئات",
+    "metric_partner_orgs": "منظمات الشركاء",
+    "metric_event_participation": "المشاركة في الفعاليات",
+    "metric_volunteer_hours": "ساعات التطوع",
+    "engagement_overview": "نظرة عامة على المشاركة (نقاط الوسط)",
+    "ds_by_postcode": "العروض مقابل الطلبات حسب الرمز البريدي (3 أرقام)",
+    "no_data": "لا توجد بيانات متاحة.",
+    "offers": "العروض",
+    "requests": "الطلبات",
+    "match_heatmap": "خلايا معدل التطابق",
+    "category_short": "فئة",
+    "age_distribution": "توزيع الأعمار",
+    "gender_distribution": "توزيع الجنس",
+    "footfall_by_area": "مشاهدات الصفحة حسب المنطقة",
+    "page_views": "مشاهدات الصفحة",
+    "distinct_visitors": "زوار مميزون",
+    "suppressed_value": "مخفي",
+    "suppressed_short": "--"
   },
   "provisioning": {
     "meta": {
@@ -1918,7 +1967,7 @@
     "my_page_heading": "رسوم عضوية Verein الخاصة بي",
     "my_page_subtitle": "ادفع رسوم العضوية السنوية للـ Vereine التي تنتمي إليها.",
     "empty_state": "ليس لديك أي سجلات رسوم عضوية بعد.",
-    "unnamed_verein": "Verein",
+    "unnamed_verein": "فيرين",
     "year_label": "السنة",
     "due_label": "تاريخ الاستحقاق",
     "paid_label": "مدفوع",
@@ -1975,7 +2024,13 @@
     "col_status": "الحالة",
     "col_due": "تاريخ الاستحقاق",
     "col_reminders": "التذكيرات",
+    "col_email_delivery": "تسليم البريد الإلكتروني",
     "col_actions": "الإجراءات",
+    "email_status": {
+      "failed": "فشل",
+      "pending": "لا يوجد دليل",
+      "sent": "تم الإرسال"
+    },
     "errors": {
       "load_failed": "فشل تحميل رسوم العضوية.",
       "start_payment_failed": "تعذّر بدء الدفع. يرجى المحاولة مرة أخرى.",
@@ -1983,12 +2038,6 @@
       "generate_failed": "فشل الإنشاء.",
       "reminder_failed": "تعذّر إرسال التذكير.",
       "waive_failed": "تعذّر إعفاء الرسوم."
-    },
-    "col_email_delivery": "تسليم البريد الإلكتروني",
-    "email_status": {
-      "failed": "فشل",
-      "pending": "لا يوجد دليل",
-      "sent": "تم الإرسال"
     }
   },
   "collections": {
@@ -2061,13 +2110,13 @@
     "ios_add_to_home": "أضِف إلى الشاشة الرئيسية",
     "ios_step_2_after": ".",
     "ios_step_3": "اضغط على إضافة. سيظهر NEXUS على شاشتك الرئيسية كتطبيق مستقل.",
-    "got_it": "فهمت",
     "generic_title": "تثبيت NEXUS",
     "generic_intro": "ابحث عن خيار التثبيت في قائمة متصفحك:",
     "generic_step_1": "افتح قائمة المتصفح، عادة أيقونة النقاط الثلاث أو الخطوط الثلاثة.",
     "generic_step_2": "ابحث عن تثبيت التطبيق، أو تثبيت هذا الموقع، أو إضافة إلى الشاشة الرئيسية.",
     "generic_step_3": "أكّد لإضافة NEXUS إلى جهازك.",
     "manual_note": "إذا لم تجد الخيار، فقد يكون متصفحك قد ثبّت التطبيق بالفعل أو قد لا يدعمه جهازك.",
+    "got_it": "فهمت",
     "android_chrome_title": "التثبيت على Android",
     "android_chrome_intro": "أضف NEXUS إلى شاشتك الرئيسية من قائمة Chrome:",
     "android_chrome_step_1": "اضغط على قائمة النقاط الثلاث في أعلى يمين Chrome.",
@@ -2133,54 +2182,5 @@
   "level_plain": "المستوى {{level}}",
   "level_named": "المستوى {{level}} - {{name}}",
   "xp_progress": "{{current}} / {{required}} XP",
-  "level_progress_aria": "تقدّم المستوى {{level}}: {{percentage}}%",
-  "empty_dash": "-",
-  "refresh": "تحديث",
-  "not_available": "غير متاح",
-  "keyboard": {
-    "command_symbol": "⌘",
-    "k_key": "K"
-  },
-  "partner_analytics": {
-    "no_token_title": "رمز الاشتراك مطلوب",
-    "no_token_body": "يرجى استخدام الرابط الآمن المقدم من مدير حسابك. يتضمن الرابط رمز اشتراك فريد.",
-    "error_title": "تعذر تحميل التحليلات",
-    "error_unauthorized": "رمز اشتراكك غير صالح أو منتهي الصلاحية.",
-    "error_generic": "حدث خطأ ما أثناء جلب تحليلاتك. يرجى إعادة المحاولة.",
-    "retry": "إعادة المحاولة",
-    "title": "التحليلات الإقليمية",
-    "subtitle": "رؤى مجهولة الهوية لمنطقتك. يتم تحديثها يومياً.",
-    "period_label": "الفترة",
-    "period_30d": "آخر 30 يوماً",
-    "period_90d": "آخر 90 يوماً",
-    "period_year": "آخر سنة",
-    "tabs_aria": "علامات تبويب التحليلات",
-    "tab_trends": "الاتجاهات",
-    "tab_demand_supply": "الطلب والعرض",
-    "tab_demographics": "البيانات الديموغرافية",
-    "tab_footfall": "حركة الزوار",
-    "reports_title": "التقارير الشهرية",
-    "no_reports": "لم يتم إنشاء تقارير بعد.",
-    "download_pdf": "تنزيل PDF",
-    "privacy_footer": "جميع المقاييس مُجمَّعة ومجهولة الهوية. يتم إخفاء الشرائح التي يكون فيها N<10.",
-    "metric_active_members": "الأعضاء النشطون",
-    "metric_categories": "الفئات",
-    "metric_partner_orgs": "منظمات الشركاء",
-    "metric_event_participation": "المشاركة في الفعاليات",
-    "metric_volunteer_hours": "ساعات التطوع",
-    "engagement_overview": "نظرة عامة على المشاركة (نقاط الوسط)",
-    "ds_by_postcode": "العروض مقابل الطلبات حسب الرمز البريدي (3 أرقام)",
-    "no_data": "لا توجد بيانات متاحة.",
-    "offers": "العروض",
-    "requests": "الطلبات",
-    "match_heatmap": "خلايا معدل التطابق",
-    "category_short": "فئة",
-    "age_distribution": "توزيع الأعمار",
-    "gender_distribution": "توزيع الجنس",
-    "footfall_by_area": "مشاهدات الصفحة حسب المنطقة",
-    "page_views": "مشاهدات الصفحة",
-    "distinct_visitors": "زوار مميزون",
-    "suppressed_value": "مخفي",
-    "suppressed_short": "--"
-  }
+  "level_progress_aria": "تقدّم المستوى {{level}}: {{percentage}}%"
 }
