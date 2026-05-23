@@ -1,4 +1,9 @@
 {
+  "push_status": {
+    "unsupported": "Je browser ondersteunt geen pushmeldingen.",
+    "denied": "Je hebt meldingen geblokkeerd. Werk je browserinstellingen bij om ze opnieuw in te schakelen.",
+    "subscribed": "Je bent geabonneerd op dit apparaat."
+  },
   "identity": {
     "page_title": "Identiteit Verifiëren",
     "page_title_dob": "Identiteit Verifiëren — Geboortedatum",
@@ -50,7 +55,7 @@
   "marketing_consent_confirm_button": "Ja, schrijf me in",
   "cancel": "Annuleren",
   "title": "Instellingen",
-  "account": "Account",
+  "account": "Rekening",
   "notifications": "Meldingen",
   "privacy": "Privacy",
   "language": "Taal",
@@ -113,7 +118,7 @@
   "biometric": {
     "label_builtin": "Ingebouwde authenticator",
     "label_external": "Externe authenticator",
-    "label_passkey": "Passkey",
+    "label_passkey": "Wachtwoord",
     "platform_windows_title": "Instellen op Windows",
     "platform_windows_step1": "Klik op \"Deze pc\" om een passkey aan te maken die op deze computer is opgeslagen. Je bevestigt met je Windows Hello-pincode, vingerafdruk of gezicht.",
     "platform_windows_step2": "Vereiste: Je moet Windows Hello eerst instellen. Ga naar Windows-instellingen > Accounts > Aanmeldopties > Pincode om dit in te stellen.",
@@ -191,7 +196,7 @@
     "type_organisation": "Organisatie",
     "org_name": "Organisatienaam",
     "org_name_placeholder": "Je organisatienaam",
-    "tagline": "Tagline",
+    "tagline": "Slogan",
     "tagline_placeholder": "Een korte beschrijving over jezelf",
     "bio": "Bio",
     "bio_placeholder": "Vertel anderen over jezelf...",
@@ -210,15 +215,15 @@
     "listing_activity": "Lijstactiviteit",
     "credit_transactions": "Krediettransacties",
     "new_reviews": "Nieuwe beoordelingen",
-    "gamification_digest": "Gamification Digest",
+    "gamification_digest": "Gamificatieoverzicht",
     "achievement_milestones": "Prestatie mijlpalen",
     "weekly_digest": "Wekelijkse samenvatting",
     "payment_notifications": "Betalingsmeldingen",
     "transfer_notifications": "Overdrachtsmeldingen",
     "membership_updates": "Lidmaatschapsupdates",
     "admin_notifications": "Beheerder meldingen",
-    "hot_match_alerts": "Hot Match Alerts",
-    "mutual_match_alerts": "Mutual Match Alerts",
+    "hot_match_alerts": "Hot Match-waarschuwingen",
+    "mutual_match_alerts": "Wederzijdse wedstrijdwaarschuwingen",
     "enable_push": "Schakel pushmeldingen in",
     "marketing_emails": "Marketing E-mails",
     "caring_smart_nudges": "Slimme herinneringen van zorgzame community",
@@ -251,7 +256,7 @@
     "employers_liability": "Werkgeversaansprakelijkheid",
     "product_liability": "Productaansprakelijkheid",
     "personal_accident": "Persoonlijk ongeval",
-    "other": "Other",
+    "other": "Ander",
     "uploading": "Uploaden...",
     "upload_certificate": "Certificaat uploaden",
     "status_verified": "Geverifieerd",
@@ -334,9 +339,15 @@
     "frequency": "Digest Frequentie",
     "frequency_description": "Hoe vaak je match digest e-mails ontvangt",
     "daily": "Dagelijks",
-    "weekly": "Wekelijks",
+    "monthly": "Maandelijks",
     "fortnightly": "Tweewekelijks",
     "never": "Nooit",
+    "weekly": "Wekelijks"
+  },
+  "activity_digest": {
+    "off": "Uit",
+    "instant": "Direct",
+    "daily": "Dagelijks",
     "monthly": "Maandelijks"
   },
   "privacy_sections": {
@@ -560,6 +571,9 @@
     "title": "Geblokkeerde Gebruikers",
     "subtitle": "Beheer gebruikers die je hebt geblokkeerd",
     "description": "Geblokkeerde leden kunnen uw profiel niet bekijken, u geen berichten sturen of interactie aangaan met uw inhoud.",
+    "privacy_badge": "Privacy-instelling",
+    "summary_label": "Geblokkeerde leden",
+    "count": "{{count}} geblokkeerd",
     "empty": "Geen geblokkeerde gebruikers",
     "empty_desc": "Gebruikers die je blokkeert kunnen je profiel niet zien, je niet berichten of interactie hebben met je inhoud.",
     "unblock": "Deblokkeren",
@@ -569,10 +583,7 @@
     "unblocked_desc": "{{name}} is ontgrendeld.",
     "unblock_error": "Kon gebruiker niet ontgrendelen",
     "blocked_on": "Geblokkeerd op {{date}}",
-    "link": "Geblokkeerde gebruikers",
-    "privacy_badge": "Privacy-instelling",
-    "summary_label": "Geblokkeerde leden",
-    "count": "{{count}} geblokkeerd"
+    "link": "Geblokkeerde gebruikers"
   },
   "block_user": {
     "title": "Blokkeer {{name}}?",
@@ -597,16 +608,5 @@
     "stay": "Blijven"
   },
   "push_campaign_opt_in": "Gesponsorde pushmeldingen ontvangen",
-  "push_campaign_opt_in_description": "Sta lokale bedrijven en organisaties toe om gerichte pushmeldingen naar je te sturen. Je kunt je op elk moment afmelden.",
-  "push_status": {
-    "unsupported": "Je browser ondersteunt geen pushmeldingen.",
-    "denied": "Je hebt meldingen geblokkeerd. Werk je browserinstellingen bij om ze opnieuw in te schakelen.",
-    "subscribed": "Je bent geabonneerd op dit apparaat."
-  },
-  "activity_digest": {
-    "off": "Uit",
-    "instant": "Direct",
-    "daily": "Dagelijks",
-    "monthly": "Maandelijks"
-  }
+  "push_campaign_opt_in_description": "Sta lokale bedrijven en organisaties toe om gerichte pushmeldingen naar je te sturen. Je kunt je op elk moment afmelden."
 }
