@@ -119,6 +119,11 @@ function TenantGuard({
   const { user } = useAuth();
   const location = useLocation();
 
+  // Invoke appRoutes() unconditionally so any hooks inside (e.g. useTranslation
+  // in AppRoutes) are called on every render. Conditional invocation later would
+  // violate React's rules of hooks (different hook count per render).
+  const nestedRouteContent = appRoutes ? appRoutes() : undefined;
+
   // While tenant is loading, block page rendering to prevent API calls before
   // X-Tenant-ID is set in localStorage. Bootstrap is fast (50-200ms, Redis-cached).
   // Without this, pages on custom domains (hour-timebank.ie) fire API calls before
@@ -168,13 +173,13 @@ function TenantGuard({
 
   // If there's a slug prefix, render a nested Routes with the slug stripped
   // so child routes like "dashboard" match "/hour-timebank/dashboard" correctly
-  if (slugPrefix && appRoutes) {
+  if (slugPrefix && nestedRouteContent) {
     const strippedPath = location.pathname.replace(new RegExp(`^/${slugPrefix}`, 'i'), '') || '/';
     return (
       <>
         <SlugUrlGuard slug={slugPrefix} />
         <Routes location={{ ...location, pathname: strippedPath }}>
-          {appRoutes()}
+          {nestedRouteContent}
         </Routes>
       </>
     );
