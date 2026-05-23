@@ -1,5 +1,7 @@
 {
   "title": "Offerte di Lavoro",
+  "page_title": "Offerte di lavoro",
+  "page_description": "Sfoglia le opportunità di lavoro, i ruoli di volontariato e le posizioni della banca del tempo offerte dai membri della comunità e dalle organizzazioni partner vicino a te.",
   "subtitle": "Trova opportunita nella tua comunita",
   "create_vacancy": "Pubblica Offerta",
   "edit_vacancy": "Modifica Offerta",
@@ -55,6 +57,7 @@
   "posted_by": "Pubblicata da",
   "load_more": "Carica Altro",
   "try_again": "Riprova",
+  "cancel": "Annulla",
   "featured": "In Evidenza",
   "empty_title": "Nessuna offerta trovata",
   "empty_description": "Non ci sono offerte di lavoro che corrispondono ai tuoi criteri",
@@ -127,12 +130,12 @@
   "employer": {
     "page_title": "Profilo Datore di Lavoro",
     "open_roles": "posizioni aperte",
+    "open_roles_count": "{{count}} posizioni aperte",
     "open_roles_heading": "Posizioni Aperte",
     "no_roles": "Nessuna posizione aperta al momento",
     "error": "Impossibile caricare il profilo del datore di lavoro",
     "employer_jobs": "Lavori del Datore",
     "employees": "{{size}} dipendenti",
-    "open_roles_count": "{{count}} posizioni aperte",
     "meta_description": "Visualizza il profilo del datore di lavoro, le posizioni aperte e le recensioni della comunità su {{count}} opportunità attuali.",
     "review_submit_failed": "Invio della recensione non riuscito",
     "reviews_heading": "Recensioni del datore di lavoro",
@@ -232,13 +235,13 @@
     "views_over_time": "Visualizzazioni nel Tempo",
     "applications_by_stage": "Candidature per Fase",
     "no_data": "Nessun dato analitico ancora",
+    "load_error": "Impossibile caricare le analisi",
     "weekly_trend": "Candidature Settimanali",
     "referral_shares": "Condivisioni Totali",
     "referral_apps": "Candidature da Referral",
     "referral_conversion": "Conversione Referral",
     "scorecard_avg": "Media Scheda Valutazione",
     "export_csv": "Esporta CSV",
-    "load_error": "Impossibile caricare le analisi",
     "views_tooltip": "{{date}}: {{count}} visualizzazioni",
     "applications_tooltip": "{{week}}: {{count}} candidature",
     "stage_progress_aria": "Progresso fase di candidatura {{stage}}",
@@ -252,7 +255,7 @@
     "avg": "Media",
     "salary_comparison": "Stipendio vs Mercato",
     "yours": "Il tuo",
-    "versus": "vs",
+    "versus": "contro",
     "market_avg": "Media di mercato",
     "ai_insights": "Approfondimenti IA",
     "days_short_value": "{{count}} g",
@@ -356,29 +359,31 @@
   "kanban": {
     "pipeline_title": "Pipeline Kanban",
     "not_authorized": "Non sei autorizzato a visualizzare questa pipeline.",
+    "select_applicant": "Seleziona {{name}}",
+    "ai_score": "IA: {{score}}/100",
     "download_cv": "Scarica CV",
     "drop_here": "Rilascia qui",
-    "duration_90": "1,5 ore",
-    "salary_monthly": "Mensile",
-    "personal_message": "Messaggio Personale",
-    "personal_message_placeholder": "Una nota per il candidato...",
-    "select_applicant": "Seleziona {{name}}",
-    "ai_score": "AI: {{score}}/100",
     "ai_rank": "Rango IA",
     "ai_ranked": "Candidati classificati dall'IA",
     "ai_rank_failed": "Classificazione IA non riuscita",
-    "tab_pipeline": "Pipeline",
+    "tab_pipeline": "Conduttura",
     "tab_activity": "Registro attività",
     "no_activity": "Nessuna attività ancora",
     "no_activity_hint": "Gli eventi appariranno qui man mano che il processo di assunzione procede.",
     "previous": "Precedente",
     "next": "Successivo",
+    "duration_90": "1,5 ore",
+    "salary_monthly": "Mensile",
+    "personal_message": "Messaggio Personale",
+    "personal_message_placeholder": "Una nota per il candidato...",
     "interview_location_placeholder": "https://meet.google.com/...",
     "offer_salary_placeholder": "es. 45000"
   },
   "apply": {
     "button": "Candidati Ora",
     "button_label": "Candidati per {{title}}",
+    "this_job": "questo lavoro",
+    "view": "Visualizza",
     "applied": "Candidatura inviata",
     "title": "Candidati per questa posizione",
     "message_label": "Il tuo messaggio (opzionale)",
@@ -397,12 +402,10 @@
     "cv_dropzone_aria": "Clicca o trascina un file per caricare il CV",
     "cv_too_large": "Il file del CV deve essere inferiore a 5MB",
     "cv_invalid_type": "Sono supportati solo file PDF, DOC o DOCX",
+    "cv_size_kb": "({{count}} KB)",
     "message_employer": "Messaggio al Datore",
     "cv_parse_error": "Impossibile analizzare il CV. Puoi comunque inviare la candidatura manualmente.",
-    "cv_size_kb": "({{count}} KB)",
-    "quick_apply": "Candidatura rapida con profilo salvato",
-    "this_job": "questo lavoro",
-    "view": "Visualizza"
+    "quick_apply": "Candidatura rapida con profilo salvato"
   },
   "detail": {
     "loading": "Caricamento offerta...",
@@ -419,7 +422,7 @@
     "time_credits_label": "Crediti Tempo",
     "location_label": "Localita",
     "contact_label": "Informazioni di Contatto",
-    "contact_email": "Email",
+    "contact_email": "E-mail",
     "contact_phone": "Telefono",
     "deadline_label": "Scadenza Candidatura",
     "category_label": "Categoria",
@@ -454,7 +457,7 @@
     "refresh": "Aggiorna",
     "message_applicant": "Messaggio",
     "kanban_board": "Bacheca Kanban",
-    "cv_download_error": "Failed to download CV"
+    "cv_download_error": "Impossibile scaricare il CV"
   },
   "interview": {
     "schedule": "Pianifica Colloquio",
@@ -464,6 +467,11 @@
     "duration": "Durata",
     "datetime": "Data e Ora",
     "location": "Link Riunione / Luogo",
+    "join_call": "Unisciti alla videochiamata",
+    "add_to_calendar": "Aggiungi al calendario",
+    "calendar_google": "Google",
+    "calendar_outlook": "Veduta",
+    "calendar_ics": ".ics",
     "send_request": "Invia Richiesta Colloquio",
     "accepted": "Colloquio Confermato",
     "proposed": "Colloquio Richiesto",
@@ -471,11 +479,6 @@
     "accept": "Accetta",
     "decline": "Rifiuta",
     "minutes": "min",
-    "join_call": "Unisciti alla videochiamata",
-    "add_to_calendar": "Aggiungi al calendario",
-    "calendar_google": "Google",
-    "calendar_outlook": "Outlook",
-    "calendar_ics": ".ics",
     "download_ics": "Scarica .ics"
   },
   "offer": {
@@ -519,12 +522,12 @@
     "save": "Salva Scheda",
     "saved": "Scheda salvata",
     "notes_placeholder": "Note facoltative su questo candidato...",
+    "max_score_suffix": "/10",
     "communication": "Comunicazione",
     "technical": "Competenze Tecniche",
     "cultural_fit": "Adattamento Culturale",
     "experience": "Esperienza",
-    "motivation": "Motivazione",
-    "max_score_suffix": "/ 10"
+    "motivation": "Motivazione"
   },
   "saved_profile": {
     "found": "Profilo di candidatura salvato trovato",
@@ -629,6 +632,8 @@
     "salary_transparency_hint": "Obbligatorio ai sensi della Direttiva UE sulla Trasparenza Retributiva (giugno 2026)",
     "submit_create": "Pubblica Offerta",
     "submit_update": "Salva Modifiche",
+    "save_draft": "Salva come bozza",
+    "draft_saved": "Bozza salvata",
     "cancel": "Annulla",
     "creating": "Pubblicazione...",
     "updating": "Salvataggio...",
@@ -642,9 +647,7 @@
       "deadline_past": "La scadenza deve essere una data futura",
       "salary_required": "Fascia salariale obbligatoria. Puoi selezionare \"Stipendio negoziabile\" per ometterla.",
       "salary_range_invalid": "Lo stipendio minimo non può superare il massimo"
-    },
-    "save_draft": "Salva come bozza",
-    "draft_saved": "Bozza salvata"
+    }
   },
   "ai_generate": {
     "button": "Genera con IA",
@@ -702,10 +705,10 @@
     "spam_flags_label": "Segnalazioni Rilevate",
     "refresh": "Aggiorna",
     "loading": "Caricamento...",
+    "load_error": "Impossibile caricare la coda di moderazione",
     "cancel": "Annulla",
     "no_description": "Nessuna descrizione",
     "no_flags": "Nessuna segnalazione",
-    "load_error": "Impossibile caricare la coda di moderazione",
     "flags_tooltip": "Segnalazioni: {{flags}}",
     "user_fallback": "Utente #{{id}}",
     "pagination_label": "Pagine della coda di moderazione"
@@ -782,10 +785,13 @@
     "acceptance_rate": "Tasso di Accettazione",
     "rejection_rate": "Tasso di Rifiuto",
     "days": "giorni",
+    "stages": "fasi",
+    "not_available": "N/D",
     "funnel_title": "Funnel delle Candidature",
     "funnel_description": "Come i candidati progrediscono attraverso le fasi della pipeline",
     "rejection_rates_title": "Tassi di Rifiuto per Fase",
     "rejection_rates_description": "Percentuale di candidati rifiutati in ogni fase",
+    "rejection_rates_table_aria": "Tassi di rifiuto per fase di assunzione",
     "time_in_stage_title": "Tempo Medio nella Fase",
     "time_in_stage_description": "Numero medio di giorni che i candidati trascorrono in ogni fase della pipeline",
     "skills_match_title": "Correlazione Corrispondenza Competenze",
@@ -816,12 +822,9 @@
     "generate": "Genera Report",
     "loading": "Generazione report...",
     "no_data": "Nessun dato di candidatura disponibile per il periodo selezionato",
-    "load_error": "Impossibile caricare il report dell'audit sui pregiudizi",
-    "note_privacy": "Questo report analizza solo metriche di processo. Nessun dato demografico viene raccolto o utilizzato.",
-    "stages": "fasi",
-    "not_available": "N/D",
     "access_denied": "Accesso negato",
-    "rejection_rates_table_aria": "Tassi di rifiuto per fase di assunzione"
+    "load_error": "Impossibile caricare il report dell'audit sui pregiudizi",
+    "note_privacy": "Questo report analizza solo metriche di processo. Nessun dato demografico viene raccolto o utilizzato."
   },
   "self_scheduling": {
     "title": "Slot per Colloqui",
@@ -999,6 +1002,10 @@
       "title": "Pubblica un lavoro",
       "description": "Crea un'offerta di lavoro, volontariato o banca del tempo per la tua comunità."
     },
+    "edit": {
+      "title": "Modifica lavoro",
+      "description": "Aggiorna dettagli del posto, compenso, impostazioni del team e opzioni di pubblicazione."
+    },
     "talent_search": {
       "title": "Ricerca talenti"
     },
@@ -1020,16 +1027,9 @@
     },
     "employer_brand": {
       "title": "Brand del datore di lavoro"
-    },
-    "edit": {
-      "title": "Modifica lavoro",
-      "description": "Aggiorna dettagli del posto, compenso, impostazioni del team e opzioni di pubblicazione."
     }
   },
-  "page_title": "Offerte di lavoro",
-  "page_description": "Sfoglia le opportunità di lavoro, i ruoli di volontariato e le posizioni della banca del tempo offerte dai membri della comunità e dalle organizzazioni partner vicino a te.",
   "jobs": {
     "view_details": "Visualizza dettagli offerta"
-  },
-  "cancel": "Annulla"
+  }
 }
