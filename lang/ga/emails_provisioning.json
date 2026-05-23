@@ -1,22 +1,22 @@
 {
   "welcome": {
-    "subject": "Your community {name} is ready",
-    "title": "Welcome to Project NEXUS",
-    "preview": "Your community {name} is ready to launch",
-    "body": "Great news — your community {name} has been provisioned and is ready for you to set up. Use the credentials below to log in for the first time.",
-    "tenant_url_label": "Community URL",
-    "login_url_label": "Admin login",
-    "admin_email_label": "Admin email",
-    "temp_password_label": "Temporary password",
-    "next_steps": "First steps: change your temporary password, invite your coordinators, customise your community branding, and review the default settings under Admin → Settings.",
-    "cta": "Open your admin panel"
+    "subject": "Tá do phobal {name} réidh",
+    "title": "Fáilte go Project NEXUS",
+    "preview": "Tá do phobal {name} réidh le seoladh",
+    "body": "Nuacht mhaith — soláthraíodh do phobal {name} agus tá sé réidh le socrú agat. Úsáid na creidiúintí thíos chun logáil isteach den chéad uair.",
+    "tenant_url_label": "URL Pobail",
+    "login_url_label": "Logáil isteach riaracháin",
+    "admin_email_label": "Ríomhphost riaracháin",
+    "temp_password_label": "Focal faire sealadach",
+    "next_steps": "Céimeanna tosaigh: athraigh do fhocal faire sealadach, tabhair cuireadh do chomhordaitheoirí, cuir branda do phobail in oiriúint, agus déan athbhreithniú ar na socruithe réamhshocraithe faoi Riarachán → Socruithe.",
+    "cta": "Oscail do phainéal riaracháin"
   },
   "rejection": {
-    "subject": "Update on your Project NEXUS application",
-    "title": "Application update",
-    "preview": "An update on your community application",
-    "body": "Thank you for your interest in setting up {org} on Project NEXUS. After review, we are unable to proceed with provisioning at this time.",
-    "reason_label": "Reason",
-    "followup": "If you would like to discuss this further or re-apply with a different scope, please reply to this email and our team will be in touch."
+    "subject": "Nuashonrú ar d'iarratas Project NEXUS",
+    "title": "Nuashonrú Iarratais",
+    "preview": "Nuashonrú ar d'iarratas pobail",
+    "body": "Go raibh maith agat as do spéis i socrú {org} ar Project NEXUS. Tar éis athbhreithnithe, ní féidir linn dul ar aghaidh le soláthar ag an am seo.",
+    "reason_label": "Cúis",
+    "followup": "Má theastaíonn uait é seo a phlé tuilleadh nó iarratas nua a chur isteach le raon difriúil, freagair an ríomhphost seo agus déanfaidh ár bhfoireann teagmháil leat."
   }
 }

@@ -1,22 +1,22 @@
 {
   "welcome": {
-    "subject": "Your community {name} is ready",
-    "title": "Welcome to Project NEXUS",
-    "preview": "Your community {name} is ready to launch",
-    "body": "Great news — your community {name} has been provisioned and is ready for you to set up. Use the credentials below to log in for the first time.",
-    "tenant_url_label": "Community URL",
-    "login_url_label": "Admin login",
-    "admin_email_label": "Admin email",
-    "temp_password_label": "Temporary password",
-    "next_steps": "First steps: change your temporary password, invite your coordinators, customise your community branding, and review the default settings under Admin → Settings.",
-    "cta": "Open your admin panel"
+    "subject": "Su comunidad {name} está lista",
+    "title": "Bienvenido/a a Project NEXUS",
+    "preview": "Su comunidad {name} está lista para lanzarse",
+    "body": "Excelentes noticias — su comunidad {name} ha sido aprovisionada y está lista para configurar. Utilice las credenciales a continuación para iniciar sesión por primera vez.",
+    "tenant_url_label": "URL de la Comunidad",
+    "login_url_label": "Acceso de administrador",
+    "admin_email_label": "Correo del administrador",
+    "temp_password_label": "Contraseña temporal",
+    "next_steps": "Primeros pasos: cambie su contraseña temporal, invite a sus coordinadores, personalice la identidad visual de su comunidad y revise la configuración predeterminada en Administración → Configuración.",
+    "cta": "Abrir su panel de administración"
   },
   "rejection": {
-    "subject": "Update on your Project NEXUS application",
-    "title": "Application update",
-    "preview": "An update on your community application",
-    "body": "Thank you for your interest in setting up {org} on Project NEXUS. After review, we are unable to proceed with provisioning at this time.",
-    "reason_label": "Reason",
-    "followup": "If you would like to discuss this further or re-apply with a different scope, please reply to this email and our team will be in touch."
+    "subject": "Actualización sobre su solicitud a Project NEXUS",
+    "title": "Actualización de Solicitud",
+    "preview": "Una actualización sobre su solicitud de comunidad",
+    "body": "Gracias por su interés en configurar {org} en Project NEXUS. Tras la revisión, no nos es posible proceder con el aprovisionamiento en este momento.",
+    "reason_label": "Motivo",
+    "followup": "Si desea discutir esto más a fondo o volver a postularse con un alcance diferente, responda a este correo electrónico y nuestro equipo se pondrá en contacto."
   }
 }

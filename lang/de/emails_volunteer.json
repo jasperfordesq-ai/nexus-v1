@@ -1,27 +1,27 @@
 {
   "shift_reminder": {
-    "subject": "Reminder: Volunteer shift tomorrow — {{title}} — {{community}}",
-    "title": "Shift Reminder",
-    "preview": "Your volunteer shift for {{title}} is coming up",
-    "body": "This is a friendly reminder about your upcoming volunteer shift.",
-    "label_opportunity": "Opportunity",
-    "label_when": "When",
-    "label_location": "Location",
-    "cta": "View Details"
+    "subject": "Erinnerung: Ehrenamtsschicht morgen — {{title}} — {{community}}",
+    "title": "Schichterinnerung",
+    "preview": "Ihre Ehrenamtsschicht für {{title}} steht bevor",
+    "body": "Dies ist eine freundliche Erinnerung an Ihre bevorstehende Ehrenamtsschicht.",
+    "label_opportunity": "Möglichkeit",
+    "label_when": "Wann",
+    "label_location": "Ort",
+    "cta": "Details ansehen"
   },
   "shift_starting_soon": {
-    "subject": "Your volunteer shift starts soon — {{title}}",
-    "title": "Shift Starting Soon",
-    "preview": "Your volunteer shift for {{title}} starts soon",
-    "body": "Your volunteer shift is starting soon. Thank you for your commitment to the community!",
-    "cta": "View Shift Details"
+    "subject": "Ihre Ehrenamtsschicht beginnt bald — {{title}}",
+    "title": "Schicht beginnt bald",
+    "preview": "Ihre Ehrenamtsschicht für {{title}} beginnt bald",
+    "body": "Ihre Ehrenamtsschicht beginnt bald. Vielen Dank für Ihr Engagement in der Gemeinschaft!",
+    "cta": "Schichtdetails ansehen"
   },
   "post_shift_feedback": {
-    "subject": "Thank you for volunteering — {{title}}",
-    "title": "Thank You for Volunteering!",
-    "preview": "Thank you for your volunteer shift with {{title}}",
-    "body": "Thank you for completing your volunteer shift with <strong>{{title}}</strong>. Your contribution makes a real difference!",
-    "log_hours_prompt": "Please remember to log your hours so your contribution is recorded.",
-    "cta": "Log Your Hours"
+    "subject": "Vielen Dank für Ihren Einsatz — {{title}}",
+    "title": "Vielen Dank für Ihren Einsatz!",
+    "preview": "Vielen Dank für Ihre Ehrenamtsschicht bei {{title}}",
+    "body": "Vielen Dank, dass Sie Ihre Ehrenamtsschicht bei <strong>{{title}}</strong> abgeschlossen haben. Ihr Beitrag macht einen echten Unterschied!",
+    "log_hours_prompt": "Bitte denken Sie daran, Ihre Stunden zu erfassen, damit Ihr Beitrag dokumentiert wird.",
+    "cta": "Stunden erfassen"
   }
 }

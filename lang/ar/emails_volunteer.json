@@ -1,27 +1,27 @@
 {
   "shift_reminder": {
-    "subject": "Reminder: Volunteer shift tomorrow — {{title}} — {{community}}",
-    "title": "Shift Reminder",
-    "preview": "Your volunteer shift for {{title}} is coming up",
-    "body": "This is a friendly reminder about your upcoming volunteer shift.",
-    "label_opportunity": "Opportunity",
-    "label_when": "When",
-    "label_location": "Location",
-    "cta": "View Details"
+    "subject": "تذكير: وردية التطوع غدًا — {{title}} — {{community}}",
+    "title": "تذكير بالوردية",
+    "preview": "وردية التطوع الخاصة بك لـ {{title}} اقتربت",
+    "body": "هذا تذكير ودّي بشأن وردية التطوع القادمة.",
+    "label_opportunity": "الفرصة",
+    "label_when": "الموعد",
+    "label_location": "الموقع",
+    "cta": "عرض التفاصيل"
   },
   "shift_starting_soon": {
-    "subject": "Your volunteer shift starts soon — {{title}}",
-    "title": "Shift Starting Soon",
-    "preview": "Your volunteer shift for {{title}} starts soon",
-    "body": "Your volunteer shift is starting soon. Thank you for your commitment to the community!",
-    "cta": "View Shift Details"
+    "subject": "وردية التطوع الخاصة بك ستبدأ قريبًا — {{title}}",
+    "title": "الوردية ستبدأ قريبًا",
+    "preview": "وردية التطوع الخاصة بك لـ {{title}} ستبدأ قريبًا",
+    "body": "وردية التطوع الخاصة بك ستبدأ قريبًا. شكرًا على التزامك بالمجتمع!",
+    "cta": "عرض تفاصيل الوردية"
   },
   "post_shift_feedback": {
-    "subject": "Thank you for volunteering — {{title}}",
-    "title": "Thank You for Volunteering!",
-    "preview": "Thank you for your volunteer shift with {{title}}",
-    "body": "Thank you for completing your volunteer shift with <strong>{{title}}</strong>. Your contribution makes a real difference!",
-    "log_hours_prompt": "Please remember to log your hours so your contribution is recorded.",
-    "cta": "Log Your Hours"
+    "subject": "شكرًا على تطوعك — {{title}}",
+    "title": "شكرًا على تطوعك!",
+    "preview": "شكرًا على وردية التطوع مع {{title}}",
+    "body": "شكرًا لإتمامك وردية التطوع مع <strong>{{title}}</strong>. مساهمتك تُحدث فرقًا حقيقيًا!",
+    "log_hours_prompt": "يُرجى تذكّر تسجيل ساعاتك حتى يُوثَّق إسهامك.",
+    "cta": "تسجيل ساعاتك"
   }
 }

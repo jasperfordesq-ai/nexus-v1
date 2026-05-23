@@ -1,27 +1,27 @@
 {
   "shift_reminder": {
-    "subject": "Reminder: Volunteer shift tomorrow — {{title}} — {{community}}",
-    "title": "Shift Reminder",
-    "preview": "Your volunteer shift for {{title}} is coming up",
-    "body": "This is a friendly reminder about your upcoming volunteer shift.",
-    "label_opportunity": "Opportunity",
-    "label_when": "When",
-    "label_location": "Location",
-    "cta": "View Details"
+    "subject": "Herinnering: Vrijwilligersdienst morgen — {{title}} — {{community}}",
+    "title": "Dienst Herinnering",
+    "preview": "Uw vrijwilligersdienst voor {{title}} staat voor de deur",
+    "body": "Dit is een vriendelijke herinnering over uw aankomende vrijwilligersdienst.",
+    "label_opportunity": "Kans",
+    "label_when": "Wanneer",
+    "label_location": "Locatie",
+    "cta": "Details Bekijken"
   },
   "shift_starting_soon": {
-    "subject": "Your volunteer shift starts soon — {{title}}",
-    "title": "Shift Starting Soon",
-    "preview": "Your volunteer shift for {{title}} starts soon",
-    "body": "Your volunteer shift is starting soon. Thank you for your commitment to the community!",
-    "cta": "View Shift Details"
+    "subject": "Uw vrijwilligersdienst begint binnenkort — {{title}}",
+    "title": "Dienst Begint Binnenkort",
+    "preview": "Uw vrijwilligersdienst voor {{title}} begint binnenkort",
+    "body": "Uw vrijwilligersdienst begint binnenkort. Dank u voor uw inzet voor de gemeenschap!",
+    "cta": "Dienstdetails Bekijken"
   },
   "post_shift_feedback": {
-    "subject": "Thank you for volunteering — {{title}}",
-    "title": "Thank You for Volunteering!",
-    "preview": "Thank you for your volunteer shift with {{title}}",
-    "body": "Thank you for completing your volunteer shift with <strong>{{title}}</strong>. Your contribution makes a real difference!",
-    "log_hours_prompt": "Please remember to log your hours so your contribution is recorded.",
-    "cta": "Log Your Hours"
+    "subject": "Bedankt voor uw vrijwilligerswerk — {{title}}",
+    "title": "Bedankt voor Uw Vrijwilligerswerk!",
+    "preview": "Bedankt voor uw vrijwilligersdienst bij {{title}}",
+    "body": "Bedankt voor het voltooien van uw vrijwilligersdienst bij <strong>{{title}}</strong>. Uw bijdrage maakt echt een verschil!",
+    "log_hours_prompt": "Vergeet niet uw uren te registreren zodat uw bijdrage wordt vastgelegd.",
+    "cta": "Uw Uren Registreren"
   }
 }

@@ -1,50 +1,50 @@
 {
   "listing": {
-    "subject": "Your listing is live: {{title}} — {{community}}",
-    "title": "Listing Posted!",
-    "preview": "Your listing \"{{title}}\" is now live on {{community}}",
-    "body": "Your listing is now live on {{community}} and can be discovered by other members.",
-    "cta": "View Your Listing"
+    "subject": "إعلانك منشور الآن: {{title}} — {{community}}",
+    "title": "تم نشر الإعلان!",
+    "preview": "إعلانك «{{title}}» منشور الآن على {{community}}",
+    "body": "إعلانك منشور الآن على {{community}} ويمكن للأعضاء الآخرين اكتشافه.",
+    "cta": "عرض إعلانك"
   },
   "event": {
-    "subject": "Your event is scheduled: {{title}} — {{community}}",
-    "title": "Event Created!",
-    "preview": "Your event \"{{title}}\" has been scheduled on {{community}}",
-    "body": "Your event has been created and is now visible to the community. Members can start RSVPing.",
-    "cta": "View Your Event"
+    "subject": "تمت جدولة فعاليتك: {{title}} — {{community}}",
+    "title": "تم إنشاء الفعالية!",
+    "preview": "تمت جدولة فعاليتك «{{title}}» على {{community}}",
+    "body": "تم إنشاء فعاليتك وأصبحت مرئية للمجتمع. يمكن للأعضاء البدء في التسجيل.",
+    "cta": "عرض فعاليتك"
   },
   "group": {
-    "subject": "Your group is live: {{name}} — {{community}}",
-    "title": "Group Created!",
-    "preview": "Your group \"{{name}}\" is now live on {{community}}",
-    "body": "Your group has been created on {{community}}. Invite members to get things started.",
-    "cta": "View Your Group"
+    "subject": "مجموعتك منشورة الآن: {{name}} — {{community}}",
+    "title": "تم إنشاء المجموعة!",
+    "preview": "مجموعتك «{{name}}» منشورة الآن على {{community}}",
+    "body": "تم إنشاء مجموعتك على {{community}}. ادعُ الأعضاء للبدء.",
+    "cta": "عرض مجموعتك"
   },
   "credits_sent": {
-    "subject": "You sent {{amount}} hour(s) to {{recipient}} — {{community}}",
-    "title": "Time Credits Sent",
-    "preview": "You sent {{amount}} hour(s) to {{recipient}} on {{community}}",
-    "body": "Your time credit transfer to <strong>{{recipient}}</strong> has been processed successfully.",
-    "label_amount": "Amount",
-    "label_recipient": "Sent To",
-    "label_description": "Description",
-    "cta": "View Your Wallet"
+    "subject": "أرسلت {{amount}} ساعة إلى {{recipient}} — {{community}}",
+    "title": "تم إرسال رصيد الوقت",
+    "preview": "أرسلت {{amount}} ساعة إلى {{recipient}} على {{community}}",
+    "body": "تمت معالجة تحويل رصيد الوقت إلى <strong>{{recipient}}</strong> بنجاح.",
+    "label_amount": "المبلغ",
+    "label_recipient": "أُرسل إلى",
+    "label_description": "الوصف",
+    "cta": "عرض محفظتك"
   },
   "donation": {
-    "subject": "Thank you for your donation to {{community}}",
-    "title": "Donation Received",
-    "preview": "Thank you for your generous donation to {{community}}",
-    "body": "Thank you for your generous donation to <strong>{{community}}</strong>. Your support makes a real difference.",
-    "label_amount": "Amount",
-    "label_date": "Date",
-    "recurring_note": "This is a recurring donation. You can manage your donations from your account settings.",
-    "cta": "View Your Account"
+    "subject": "شكرًا على تبرعك لـ {{community}}",
+    "title": "تم استلام التبرع",
+    "preview": "شكرًا على تبرعك الكريم لـ {{community}}",
+    "body": "شكرًا على تبرعك الكريم لـ <strong>{{community}}</strong>. دعمك يُحدث فرقًا حقيقيًا.",
+    "label_amount": "المبلغ",
+    "label_date": "التاريخ",
+    "recurring_note": "هذا تبرع متكرر. يمكنك إدارة تبرعاتك من إعدادات حسابك.",
+    "cta": "عرض حسابك"
   },
   "listing_updated": {
-    "subject": "A listing you saved has been updated — {{community}}",
-    "title": "Saved Listing Updated",
-    "preview": "\"{{title}}\" has been updated on {{community}}",
-    "body": "A listing you saved, <strong>\"{{title}}\"</strong>, has been updated on {{community}}.",
-    "cta": "View Listing"
+    "subject": "تم تحديث إعلان حفظته — {{community}}",
+    "title": "تم تحديث الإعلان المحفوظ",
+    "preview": "تم تحديث «{{title}}» على {{community}}",
+    "body": "تم تحديث الإعلان الذي حفظته <strong>«{{title}}»</strong> على {{community}}.",
+    "cta": "عرض الإعلان"
   }
 }

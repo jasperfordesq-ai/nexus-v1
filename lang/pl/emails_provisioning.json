@@ -1,22 +1,22 @@
 {
   "welcome": {
-    "subject": "Your community {name} is ready",
-    "title": "Welcome to Project NEXUS",
-    "preview": "Your community {name} is ready to launch",
-    "body": "Great news — your community {name} has been provisioned and is ready for you to set up. Use the credentials below to log in for the first time.",
-    "tenant_url_label": "Community URL",
-    "login_url_label": "Admin login",
-    "admin_email_label": "Admin email",
-    "temp_password_label": "Temporary password",
-    "next_steps": "First steps: change your temporary password, invite your coordinators, customise your community branding, and review the default settings under Admin → Settings.",
-    "cta": "Open your admin panel"
+    "subject": "Twoja społeczność {name} jest gotowa",
+    "title": "Witamy w Project NEXUS",
+    "preview": "Twoja społeczność {name} jest gotowa do uruchomienia",
+    "body": "Wspaniałe wiadomości — Twoja społeczność {name} została skonfigurowana i jest gotowa do ustawienia. Użyj poniższych danych logowania, aby zalogować się po raz pierwszy.",
+    "tenant_url_label": "URL społeczności",
+    "login_url_label": "Logowanie administratora",
+    "admin_email_label": "E-mail administratora",
+    "temp_password_label": "Tymczasowe hasło",
+    "next_steps": "Pierwsze kroki: zmień tymczasowe hasło, zaproś swoich koordynatorów, dostosuj wygląd swojej społeczności i przejrzyj domyślne ustawienia w sekcji Admin → Ustawienia.",
+    "cta": "Otwórz panel administratora"
   },
   "rejection": {
-    "subject": "Update on your Project NEXUS application",
-    "title": "Application update",
-    "preview": "An update on your community application",
-    "body": "Thank you for your interest in setting up {org} on Project NEXUS. After review, we are unable to proceed with provisioning at this time.",
-    "reason_label": "Reason",
-    "followup": "If you would like to discuss this further or re-apply with a different scope, please reply to this email and our team will be in touch."
+    "subject": "Aktualizacja dotycząca Twojego wniosku do Project NEXUS",
+    "title": "Aktualizacja wniosku",
+    "preview": "Aktualizacja dotycząca Twojego wniosku o społeczność",
+    "body": "Dziękujemy za zainteresowanie założeniem {org} na Project NEXUS. Po weryfikacji nie jesteśmy w stanie w tej chwili przystąpić do konfiguracji.",
+    "reason_label": "Powód",
+    "followup": "Jeśli chciałbyś(chciałabyś) omówić to dalej lub złożyć ponowny wniosek o innym zakresie, odpowiedz na tę wiadomość e-mail, a nasz zespół skontaktuje się z Tobą."
   }
 }

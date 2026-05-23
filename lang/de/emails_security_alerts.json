@@ -1,38 +1,38 @@
 {
   "2fa_enabled": {
-    "subject": "Security Alert: Two-factor authentication enabled — {{community}}",
-    "title": "Two-Factor Authentication Enabled",
-    "preview": "Two-factor authentication has been enabled on your account",
-    "body": "Two-factor authentication has been enabled on your account. Your account is now more secure.",
-    "warning": "If you did not make this change, please contact support immediately to secure your account."
+    "subject": "Sicherheitshinweis: Zwei-Faktor-Authentifizierung aktiviert — {{community}}",
+    "title": "Zwei-Faktor-Authentifizierung aktiviert",
+    "preview": "Die Zwei-Faktor-Authentifizierung wurde für Ihr Konto aktiviert",
+    "body": "Die Zwei-Faktor-Authentifizierung wurde für Ihr Konto aktiviert. Ihr Konto ist jetzt sicherer.",
+    "warning": "Wenn Sie diese Änderung nicht vorgenommen haben, kontaktieren Sie bitte sofort den Support, um Ihr Konto zu sichern."
   },
   "2fa_disabled": {
-    "subject": "Security Alert: Two-factor authentication disabled — {{community}}",
-    "title": "Two-Factor Authentication Disabled",
-    "preview": "Two-factor authentication has been disabled on your account",
-    "body": "Two-factor authentication has been disabled on your account.",
-    "warning": "If you did not make this change, please contact support immediately as your account may be at risk."
+    "subject": "Sicherheitshinweis: Zwei-Faktor-Authentifizierung deaktiviert — {{community}}",
+    "title": "Zwei-Faktor-Authentifizierung deaktiviert",
+    "preview": "Die Zwei-Faktor-Authentifizierung wurde für Ihr Konto deaktiviert",
+    "body": "Die Zwei-Faktor-Authentifizierung wurde für Ihr Konto deaktiviert.",
+    "warning": "Wenn Sie diese Änderung nicht vorgenommen haben, kontaktieren Sie bitte sofort den Support, da Ihr Konto gefährdet sein könnte."
   },
   "passkey_registered": {
-    "subject": "Security Alert: New passkey registered — {{community}}",
-    "title": "New Passkey Registered",
-    "preview": "A new passkey has been added to your account",
-    "body": "A new passkey has been registered on your {{community}} account.",
-    "warning": "If you did not register this passkey, please contact support immediately to secure your account."
+    "subject": "Sicherheitshinweis: Neuer Passkey registriert — {{community}}",
+    "title": "Neuer Passkey registriert",
+    "preview": "Ihrem Konto wurde ein neuer Passkey hinzugefügt",
+    "body": "Auf Ihrem {{community}}-Konto wurde ein neuer Passkey registriert.",
+    "warning": "Wenn Sie diesen Passkey nicht registriert haben, kontaktieren Sie bitte sofort den Support, um Ihr Konto zu sichern."
   },
   "passkey_removed": {
-    "subject": "Security Alert: Passkey removed — {{community}}",
-    "title": "Passkey Removed",
-    "preview": "A passkey has been removed from your account",
-    "body": "A passkey has been removed from your {{community}} account.",
-    "warning": "If you did not make this change, please contact support immediately to secure your account."
+    "subject": "Sicherheitshinweis: Passkey entfernt — {{community}}",
+    "title": "Passkey entfernt",
+    "preview": "Ein Passkey wurde von Ihrem Konto entfernt",
+    "body": "Von Ihrem {{community}}-Konto wurde ein Passkey entfernt.",
+    "warning": "Wenn Sie diese Änderung nicht vorgenommen haben, kontaktieren Sie bitte sofort den Support, um Ihr Konto zu sichern."
   },
   "connection_declined": {
-    "subject": "Your connection request was not accepted — {{community}}",
-    "title": "Connection Request Update",
-    "preview": "Your connection request to {{name}} was not accepted",
-    "body": "Your connection request to <strong>{{name}}</strong> on {{community}} was not accepted at this time.",
-    "suggestion": "Don't be discouraged — there are many other members in your community to connect with.",
-    "cta": "Discover Members"
+    "subject": "Ihre Verbindungsanfrage wurde nicht angenommen — {{community}}",
+    "title": "Aktualisierung zur Verbindungsanfrage",
+    "preview": "Ihre Verbindungsanfrage an {{name}} wurde nicht angenommen",
+    "body": "Ihre Verbindungsanfrage an <strong>{{name}}</strong> auf {{community}} wurde derzeit nicht angenommen.",
+    "suggestion": "Lassen Sie sich nicht entmutigen — in Ihrer Gemeinschaft gibt es viele weitere Mitglieder, mit denen Sie sich vernetzen können.",
+    "cta": "Mitglieder entdecken"
   }
 }

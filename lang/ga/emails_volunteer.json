@@ -1,27 +1,27 @@
 {
   "shift_reminder": {
-    "subject": "Reminder: Volunteer shift tomorrow — {{title}} — {{community}}",
-    "title": "Shift Reminder",
-    "preview": "Your volunteer shift for {{title}} is coming up",
-    "body": "This is a friendly reminder about your upcoming volunteer shift.",
-    "label_opportunity": "Opportunity",
-    "label_when": "When",
-    "label_location": "Location",
-    "cta": "View Details"
+    "subject": "Meabhrúchán: Sealaíocht deonachais amárach — {{title}} — {{community}}",
+    "title": "Meabhrúchán Sealaíochta",
+    "preview": "Tá do shealaíocht deonachais le haghaidh {{title}} ag teacht aníos",
+    "body": "Seo meabhrúchán cairdiúil faoi do shealaíocht deonachais atá le teacht.",
+    "label_opportunity": "Deis",
+    "label_when": "Cathain",
+    "label_location": "Suíomh",
+    "cta": "Féach ar Shonraí"
   },
   "shift_starting_soon": {
-    "subject": "Your volunteer shift starts soon — {{title}}",
-    "title": "Shift Starting Soon",
-    "preview": "Your volunteer shift for {{title}} starts soon",
-    "body": "Your volunteer shift is starting soon. Thank you for your commitment to the community!",
-    "cta": "View Shift Details"
+    "subject": "Tosaíonn do shealaíocht deonachais go luath — {{title}}",
+    "title": "Sealaíocht ag Tosú go Luath",
+    "preview": "Tosaíonn do shealaíocht deonachais le haghaidh {{title}} go luath",
+    "body": "Tá do shealaíocht deonachais ar tí tosú. Go raibh maith agat as do thiomantas don phobal!",
+    "cta": "Féach ar Shonraí na Sealaíochta"
   },
   "post_shift_feedback": {
-    "subject": "Thank you for volunteering — {{title}}",
-    "title": "Thank You for Volunteering!",
-    "preview": "Thank you for your volunteer shift with {{title}}",
-    "body": "Thank you for completing your volunteer shift with <strong>{{title}}</strong>. Your contribution makes a real difference!",
-    "log_hours_prompt": "Please remember to log your hours so your contribution is recorded.",
-    "cta": "Log Your Hours"
+    "subject": "Go raibh maith agat as deonú — {{title}}",
+    "title": "Go Raibh Maith Agat as Deonú!",
+    "preview": "Go raibh maith agat as do shealaíocht deonachais le {{title}}",
+    "body": "Go raibh maith agat as do shealaíocht deonachais a chríochnú le <strong>{{title}}</strong>. Déanann do rannchuidiú difríocht fíor!",
+    "log_hours_prompt": "Cuimhnigh le do thoil do chuid uaireanta a logáil ionas go dtaifeadfar do rannchuidiú.",
+    "cta": "Logáil Do Chuid Uaireanta"
   }
 }

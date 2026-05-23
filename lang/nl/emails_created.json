@@ -1,50 +1,50 @@
 {
   "listing": {
-    "subject": "Your listing is live: {{title}} — {{community}}",
-    "title": "Listing Posted!",
-    "preview": "Your listing \"{{title}}\" is now live on {{community}}",
-    "body": "Your listing is now live on {{community}} and can be discovered by other members.",
-    "cta": "View Your Listing"
+    "subject": "Uw advertentie is live: {{title}} — {{community}}",
+    "title": "Advertentie Geplaatst!",
+    "preview": "Uw advertentie \"{{title}}\" is nu live op {{community}}",
+    "body": "Uw advertentie is nu live op {{community}} en kan door andere leden worden gevonden.",
+    "cta": "Uw Advertentie Bekijken"
   },
   "event": {
-    "subject": "Your event is scheduled: {{title}} — {{community}}",
-    "title": "Event Created!",
-    "preview": "Your event \"{{title}}\" has been scheduled on {{community}}",
-    "body": "Your event has been created and is now visible to the community. Members can start RSVPing.",
-    "cta": "View Your Event"
+    "subject": "Uw evenement is gepland: {{title}} — {{community}}",
+    "title": "Evenement Aangemaakt!",
+    "preview": "Uw evenement \"{{title}}\" is gepland op {{community}}",
+    "body": "Uw evenement is aangemaakt en is nu zichtbaar voor de gemeenschap. Leden kunnen beginnen met aanmelden.",
+    "cta": "Uw Evenement Bekijken"
   },
   "group": {
-    "subject": "Your group is live: {{name}} — {{community}}",
-    "title": "Group Created!",
-    "preview": "Your group \"{{name}}\" is now live on {{community}}",
-    "body": "Your group has been created on {{community}}. Invite members to get things started.",
-    "cta": "View Your Group"
+    "subject": "Uw groep is live: {{name}} — {{community}}",
+    "title": "Groep Aangemaakt!",
+    "preview": "Uw groep \"{{name}}\" is nu live op {{community}}",
+    "body": "Uw groep is aangemaakt op {{community}}. Nodig leden uit om op gang te komen.",
+    "cta": "Uw Groep Bekijken"
   },
   "credits_sent": {
-    "subject": "You sent {{amount}} hour(s) to {{recipient}} — {{community}}",
-    "title": "Time Credits Sent",
-    "preview": "You sent {{amount}} hour(s) to {{recipient}} on {{community}}",
-    "body": "Your time credit transfer to <strong>{{recipient}}</strong> has been processed successfully.",
-    "label_amount": "Amount",
-    "label_recipient": "Sent To",
-    "label_description": "Description",
-    "cta": "View Your Wallet"
+    "subject": "U heeft {{amount}} uur verstuurd naar {{recipient}} — {{community}}",
+    "title": "Tijdcredits Verstuurd",
+    "preview": "U heeft {{amount}} uur verstuurd naar {{recipient}} op {{community}}",
+    "body": "Uw tijdcreditoverdracht naar <strong>{{recipient}}</strong> is succesvol verwerkt.",
+    "label_amount": "Bedrag",
+    "label_recipient": "Verstuurd Aan",
+    "label_description": "Beschrijving",
+    "cta": "Uw Portemonnee Bekijken"
   },
   "donation": {
-    "subject": "Thank you for your donation to {{community}}",
-    "title": "Donation Received",
-    "preview": "Thank you for your generous donation to {{community}}",
-    "body": "Thank you for your generous donation to <strong>{{community}}</strong>. Your support makes a real difference.",
-    "label_amount": "Amount",
-    "label_date": "Date",
-    "recurring_note": "This is a recurring donation. You can manage your donations from your account settings.",
-    "cta": "View Your Account"
+    "subject": "Bedankt voor uw donatie aan {{community}}",
+    "title": "Donatie Ontvangen",
+    "preview": "Bedankt voor uw genereuze donatie aan {{community}}",
+    "body": "Bedankt voor uw genereuze donatie aan <strong>{{community}}</strong>. Uw steun maakt echt een verschil.",
+    "label_amount": "Bedrag",
+    "label_date": "Datum",
+    "recurring_note": "Dit is een periodieke donatie. U kunt uw donaties beheren via uw accountinstellingen.",
+    "cta": "Uw Account Bekijken"
   },
   "listing_updated": {
-    "subject": "A listing you saved has been updated — {{community}}",
-    "title": "Saved Listing Updated",
-    "preview": "\"{{title}}\" has been updated on {{community}}",
-    "body": "A listing you saved, <strong>\"{{title}}\"</strong>, has been updated on {{community}}.",
-    "cta": "View Listing"
+    "subject": "Een opgeslagen advertentie is bijgewerkt — {{community}}",
+    "title": "Opgeslagen Advertentie Bijgewerkt",
+    "preview": "\"{{title}}\" is bijgewerkt op {{community}}",
+    "body": "Een advertentie die u heeft opgeslagen, <strong>\"{{title}}\"</strong>, is bijgewerkt op {{community}}.",
+    "cta": "Advertentie Bekijken"
   }
 }

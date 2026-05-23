@@ -1,22 +1,22 @@
 {
   "welcome": {
-    "subject": "Your community {name} is ready",
-    "title": "Welcome to Project NEXUS",
-    "preview": "Your community {name} is ready to launch",
-    "body": "Great news — your community {name} has been provisioned and is ready for you to set up. Use the credentials below to log in for the first time.",
-    "tenant_url_label": "Community URL",
-    "login_url_label": "Admin login",
-    "admin_email_label": "Admin email",
-    "temp_password_label": "Temporary password",
-    "next_steps": "First steps: change your temporary password, invite your coordinators, customise your community branding, and review the default settings under Admin → Settings.",
-    "cta": "Open your admin panel"
+    "subject": "コミュニティ {name} の準備が整いました",
+    "title": "Project NEXUS へようこそ",
+    "preview": "コミュニティ {name} の開始準備が整いました",
+    "body": "お知らせがあります — コミュニティ {name} のプロビジョニングが完了し、セットアップの準備が整いました。以下の認証情報を使用して初回ログインしてください。",
+    "tenant_url_label": "コミュニティURL",
+    "login_url_label": "管理者ログイン",
+    "admin_email_label": "管理者メール",
+    "temp_password_label": "仮パスワード",
+    "next_steps": "最初のステップ：仮パスワードの変更、コーディネーターの招待、コミュニティブランディングのカスタマイズ、管理者 → 設定でのデフォルト設定の確認を行ってください。",
+    "cta": "管理パネルを開く"
   },
   "rejection": {
-    "subject": "Update on your Project NEXUS application",
-    "title": "Application update",
-    "preview": "An update on your community application",
-    "body": "Thank you for your interest in setting up {org} on Project NEXUS. After review, we are unable to proceed with provisioning at this time.",
-    "reason_label": "Reason",
-    "followup": "If you would like to discuss this further or re-apply with a different scope, please reply to this email and our team will be in touch."
+    "subject": "Project NEXUS 申請のご連絡",
+    "title": "申請の更新",
+    "preview": "コミュニティ申請に関するお知らせ",
+    "body": "Project NEXUS での {org} 設立にご関心をいただきありがとうございます。審査の結果、現時点ではプロビジョニングを進めることができません。",
+    "reason_label": "理由",
+    "followup": "詳細についてご相談されたい場合、または異なるスコープで再申請をご希望の場合は、このメールに返信してください。担当者からご連絡いたします。"
   }
 }

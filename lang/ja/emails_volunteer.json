@@ -1,27 +1,27 @@
 {
   "shift_reminder": {
-    "subject": "Reminder: Volunteer shift tomorrow — {{title}} — {{community}}",
-    "title": "Shift Reminder",
-    "preview": "Your volunteer shift for {{title}} is coming up",
-    "body": "This is a friendly reminder about your upcoming volunteer shift.",
-    "label_opportunity": "Opportunity",
-    "label_when": "When",
-    "label_location": "Location",
-    "cta": "View Details"
+    "subject": "リマインダー：明日のボランティアシフト — {{title}} — {{community}}",
+    "title": "シフトのリマインダー",
+    "preview": "{{title}} のボランティアシフトが近づいています",
+    "body": "予定されているボランティアシフトについてのリマインダーです。",
+    "label_opportunity": "機会",
+    "label_when": "日時",
+    "label_location": "場所",
+    "cta": "詳細を表示する"
   },
   "shift_starting_soon": {
-    "subject": "Your volunteer shift starts soon — {{title}}",
-    "title": "Shift Starting Soon",
-    "preview": "Your volunteer shift for {{title}} starts soon",
-    "body": "Your volunteer shift is starting soon. Thank you for your commitment to the community!",
-    "cta": "View Shift Details"
+    "subject": "ボランティアシフトがまもなく始まります — {{title}}",
+    "title": "シフトがまもなく開始されます",
+    "preview": "{{title}} のボランティアシフトがまもなく始まります",
+    "body": "ボランティアシフトがまもなく始まります。コミュニティへのご尽力に感謝します！",
+    "cta": "シフトの詳細を表示する"
   },
   "post_shift_feedback": {
-    "subject": "Thank you for volunteering — {{title}}",
-    "title": "Thank You for Volunteering!",
-    "preview": "Thank you for your volunteer shift with {{title}}",
-    "body": "Thank you for completing your volunteer shift with <strong>{{title}}</strong>. Your contribution makes a real difference!",
-    "log_hours_prompt": "Please remember to log your hours so your contribution is recorded.",
-    "cta": "Log Your Hours"
+    "subject": "ボランティアへのご参加ありがとうございました — {{title}}",
+    "title": "ボランティアへのご参加ありがとうございました！",
+    "preview": "{{title}} でのボランティアシフトへのご参加ありがとうございました",
+    "body": "<strong>{{title}}</strong> でのボランティアシフトを完了していただきありがとうございました。あなたの貢献は大きな違いをもたらします！",
+    "log_hours_prompt": "あなたの貢献が記録されるよう、時間を記録することをお忘れなく。",
+    "cta": "時間を記録する"
   }
 }

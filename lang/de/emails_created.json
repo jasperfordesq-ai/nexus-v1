@@ -1,50 +1,50 @@
 {
   "listing": {
-    "subject": "Your listing is live: {{title}} — {{community}}",
-    "title": "Listing Posted!",
-    "preview": "Your listing \"{{title}}\" is now live on {{community}}",
-    "body": "Your listing is now live on {{community}} and can be discovered by other members.",
-    "cta": "View Your Listing"
+    "subject": "Ihr Eintrag ist aktiv: {{title}} — {{community}}",
+    "title": "Eintrag veröffentlicht!",
+    "preview": "Ihr Eintrag \"{{title}}\" ist jetzt auf {{community}} aktiv",
+    "body": "Ihr Eintrag ist jetzt auf {{community}} aktiv und kann von anderen Mitgliedern gefunden werden.",
+    "cta": "Ihren Eintrag ansehen"
   },
   "event": {
-    "subject": "Your event is scheduled: {{title}} — {{community}}",
-    "title": "Event Created!",
-    "preview": "Your event \"{{title}}\" has been scheduled on {{community}}",
-    "body": "Your event has been created and is now visible to the community. Members can start RSVPing.",
-    "cta": "View Your Event"
+    "subject": "Ihre Veranstaltung ist geplant: {{title}} — {{community}}",
+    "title": "Veranstaltung erstellt!",
+    "preview": "Ihre Veranstaltung \"{{title}}\" wurde auf {{community}} geplant",
+    "body": "Ihre Veranstaltung wurde erstellt und ist nun für die Gemeinschaft sichtbar. Mitglieder können sich bereits anmelden.",
+    "cta": "Ihre Veranstaltung ansehen"
   },
   "group": {
-    "subject": "Your group is live: {{name}} — {{community}}",
-    "title": "Group Created!",
-    "preview": "Your group \"{{name}}\" is now live on {{community}}",
-    "body": "Your group has been created on {{community}}. Invite members to get things started.",
-    "cta": "View Your Group"
+    "subject": "Ihre Gruppe ist aktiv: {{name}} — {{community}}",
+    "title": "Gruppe erstellt!",
+    "preview": "Ihre Gruppe \"{{name}}\" ist jetzt auf {{community}} aktiv",
+    "body": "Ihre Gruppe wurde auf {{community}} erstellt. Laden Sie Mitglieder ein, um loszulegen.",
+    "cta": "Ihre Gruppe ansehen"
   },
   "credits_sent": {
-    "subject": "You sent {{amount}} hour(s) to {{recipient}} — {{community}}",
-    "title": "Time Credits Sent",
-    "preview": "You sent {{amount}} hour(s) to {{recipient}} on {{community}}",
-    "body": "Your time credit transfer to <strong>{{recipient}}</strong> has been processed successfully.",
-    "label_amount": "Amount",
-    "label_recipient": "Sent To",
-    "label_description": "Description",
-    "cta": "View Your Wallet"
+    "subject": "Sie haben {{amount}} Stunde(n) an {{recipient}} gesendet — {{community}}",
+    "title": "Zeitgutschriften gesendet",
+    "preview": "Sie haben {{amount}} Stunde(n) an {{recipient}} auf {{community}} gesendet",
+    "body": "Ihre Zeitgutschriften-Überweisung an <strong>{{recipient}}</strong> wurde erfolgreich verarbeitet.",
+    "label_amount": "Betrag",
+    "label_recipient": "Gesendet an",
+    "label_description": "Beschreibung",
+    "cta": "Ihre Brieftasche ansehen"
   },
   "donation": {
-    "subject": "Thank you for your donation to {{community}}",
-    "title": "Donation Received",
-    "preview": "Thank you for your generous donation to {{community}}",
-    "body": "Thank you for your generous donation to <strong>{{community}}</strong>. Your support makes a real difference.",
-    "label_amount": "Amount",
-    "label_date": "Date",
-    "recurring_note": "This is a recurring donation. You can manage your donations from your account settings.",
-    "cta": "View Your Account"
+    "subject": "Vielen Dank für Ihre Spende an {{community}}",
+    "title": "Spende erhalten",
+    "preview": "Vielen Dank für Ihre großzügige Spende an {{community}}",
+    "body": "Vielen Dank für Ihre großzügige Spende an <strong>{{community}}</strong>. Ihre Unterstützung macht einen echten Unterschied.",
+    "label_amount": "Betrag",
+    "label_date": "Datum",
+    "recurring_note": "Dies ist eine wiederkehrende Spende. Sie können Ihre Spenden über Ihre Kontoeinstellungen verwalten.",
+    "cta": "Ihr Konto ansehen"
   },
   "listing_updated": {
-    "subject": "A listing you saved has been updated — {{community}}",
-    "title": "Saved Listing Updated",
-    "preview": "\"{{title}}\" has been updated on {{community}}",
-    "body": "A listing you saved, <strong>\"{{title}}\"</strong>, has been updated on {{community}}.",
-    "cta": "View Listing"
+    "subject": "Ein von Ihnen gespeicherter Eintrag wurde aktualisiert — {{community}}",
+    "title": "Gespeicherter Eintrag aktualisiert",
+    "preview": "\"{{title}}\" wurde auf {{community}} aktualisiert",
+    "body": "Ein von Ihnen gespeicherter Eintrag, <strong>\"{{title}}\"</strong>, wurde auf {{community}} aktualisiert.",
+    "cta": "Eintrag ansehen"
   }
 }

@@ -1,29 +1,29 @@
 {
   "started": {
-    "subject": "Identity verification in progress — {{community}}",
-    "title": "Identity Verification Started",
-    "preview": "Your identity verification is in progress",
-    "body": "You have started the identity verification process on {{community}}. This usually takes just a few minutes.",
-    "next_steps": "You will receive another email once your verification is complete.",
-    "cta": "Check Verification Status",
-    "note": "Your documents are processed securely by Stripe Identity."
+    "subject": "本人確認が進行中 — {{community}}",
+    "title": "本人確認が開始されました",
+    "preview": "本人確認が進行中です",
+    "body": "{{community}} で本人確認プロセスを開始しました。通常、数分で完了します。",
+    "next_steps": "確認が完了しましたら、別のメールでご連絡いたします。",
+    "cta": "確認状況を確認する",
+    "note": "書類はStripe Identityにより安全に処理されます。"
   },
   "passed": {
-    "subject": "Identity verified! — {{community}}",
-    "title": "Identity Verified",
-    "preview": "Your identity has been successfully verified",
-    "body": "Your identity has been successfully verified on {{community}}. A verified member badge has been added to your profile.",
-    "highlight": "Verified Member",
-    "cta": "View Your Profile",
-    "badge_note": "Your verified badge is now visible to other members."
+    "subject": "本人確認が完了しました！ — {{community}}",
+    "title": "本人確認済み",
+    "preview": "本人確認が正常に完了しました",
+    "body": "{{community}} で本人確認が正常に完了しました。プロフィールに「確認済みメンバー」バッジが追加されました。",
+    "highlight": "確認済みメンバー",
+    "cta": "プロフィールを表示する",
+    "badge_note": "確認済みバッジが他のメンバーに表示されるようになりました。"
   },
   "failed": {
-    "subject": "Identity verification could not be completed — {{community}}",
-    "title": "Verification Unsuccessful",
-    "preview": "Your identity verification was not completed",
-    "body": "We were unable to complete your identity verification on {{community}}.",
-    "reason_label": "Reason:",
-    "retry_note": "You may try again from your profile settings. If you continue to have issues, please contact support.",
-    "cta": "Try Again"
+    "subject": "本人確認を完了できませんでした — {{community}}",
+    "title": "確認が完了しませんでした",
+    "preview": "本人確認が完了しませんでした",
+    "body": "{{community}} での本人確認を完了できませんでした。",
+    "reason_label": "理由：",
+    "retry_note": "プロフィール設定から再度お試しいただけます。問題が続く場合は、サポートにお問い合わせください。",
+    "cta": "再試行する"
   }
 }

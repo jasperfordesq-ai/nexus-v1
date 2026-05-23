@@ -1,22 +1,22 @@
 {
   "welcome": {
-    "subject": "Your community {name} is ready",
-    "title": "Welcome to Project NEXUS",
-    "preview": "Your community {name} is ready to launch",
-    "body": "Great news — your community {name} has been provisioned and is ready for you to set up. Use the credentials below to log in for the first time.",
-    "tenant_url_label": "Community URL",
-    "login_url_label": "Admin login",
-    "admin_email_label": "Admin email",
-    "temp_password_label": "Temporary password",
-    "next_steps": "First steps: change your temporary password, invite your coordinators, customise your community branding, and review the default settings under Admin → Settings.",
-    "cta": "Open your admin panel"
+    "subject": "Uw gemeenschap {name} is klaar",
+    "title": "Welkom bij Project NEXUS",
+    "preview": "Uw gemeenschap {name} is klaar om te lanceren",
+    "body": "Goed nieuws — uw gemeenschap {name} is ingericht en klaar voor u om in te stellen. Gebruik de onderstaande inloggegevens om voor de eerste keer in te loggen.",
+    "tenant_url_label": "Gemeenschap URL",
+    "login_url_label": "Admin-aanmelding",
+    "admin_email_label": "Admin-e-mail",
+    "temp_password_label": "Tijdelijk wachtwoord",
+    "next_steps": "Eerste stappen: wijzig uw tijdelijke wachtwoord, nodig uw coördinatoren uit, pas de uitstraling van uw gemeenschap aan en bekijk de standaardinstellingen onder Admin → Instellingen.",
+    "cta": "Open uw beheerderspaneel"
   },
   "rejection": {
-    "subject": "Update on your Project NEXUS application",
-    "title": "Application update",
-    "preview": "An update on your community application",
-    "body": "Thank you for your interest in setting up {org} on Project NEXUS. After review, we are unable to proceed with provisioning at this time.",
-    "reason_label": "Reason",
-    "followup": "If you would like to discuss this further or re-apply with a different scope, please reply to this email and our team will be in touch."
+    "subject": "Update over uw Project NEXUS-aanmelding",
+    "title": "Aanmelding update",
+    "preview": "Een update over uw gemeenschapsaanmelding",
+    "body": "Bedankt voor uw interesse in het opzetten van {org} op Project NEXUS. Na beoordeling zijn we op dit moment niet in staat om door te gaan met inrichting.",
+    "reason_label": "Reden",
+    "followup": "Als u dit verder wilt bespreken of opnieuw wilt aanmelden met een andere scope, beantwoord dan deze e-mail en ons team neemt contact met u op."
   }
 }
