@@ -34,5 +34,14 @@
   },
   "federation": {
     "feature_disabled": "A federação não está ativada para esta comunidade"
-  }
+  },
+  "update_available": "Atualiza??o dispon?vel",
+  "version_info": "Atual: {{currentVersion}} ? Dispon?vel: {{clientVersion}}",
+  "whats_new": "Novidades",
+  "later": "Mais tarde",
+  "download_update": "Transferir atualiza??o",
+  "offline_message": "Parece que est? offline",
+  "session_expired": "Sess?o expirada",
+  "session_expired_message": "A sua sess?o expirou. Inicie sess?o novamente para continuar.",
+  "dismiss": "Fechar"
 }

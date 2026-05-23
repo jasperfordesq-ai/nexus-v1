@@ -373,7 +373,8 @@
     "empty_title": "Noch keine Dokumente",
     "empty_description": "Laden Sie Dateien hoch, um sie mit Ihrem Team zu teilen.",
     "delete_confirm": "Dieses Dokument löschen?",
-    "max_size": "Maximale Dateigrösse: 10 MB"
+    "max_size": "Maximale Dateigrösse: 10 MB",
+    "download": "Herunterladen"
   },
   "chatrooms": {
     "title": "Kanäle",

@@ -1758,6 +1758,7 @@ export interface AdminSettingsResponse {
     admin_approval: string | null;
     maintenance_mode: string | null;
     footer_text: string | null;
+    partner_logo_url: string | null;
     default_currency: string | null;
     map_provider: string | null;
     geocoding_provider: string | null;

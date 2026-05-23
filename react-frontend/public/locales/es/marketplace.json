@@ -384,7 +384,8 @@
     "save_changes": "Guardar cambios",
     "updated_success": "Listado actualizado con éxito!",
     "updated_error": "Error al actualizar el listado",
-    "updated_error_retry": "Error al actualizar el listado. Por favor, inténtalo de nuevo."
+    "updated_error_retry": "Error al actualizar el listado. Por favor, inténtalo de nuevo.",
+    "action_edit": "Editar"
   },
   "my_listings": {
     "page_title": "Mis listados - Mercado",

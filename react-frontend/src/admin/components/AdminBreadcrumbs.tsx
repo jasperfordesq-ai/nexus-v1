@@ -187,6 +187,7 @@ const SEGMENT_LABEL_KEYS: Record<string, string> = {
 
   // Deliverability
   deliverability: 'breadcrumbs.deliverability',
+  'email-deliverability': 'breadcrumbs.email_deliverability',
 
   // Diagnostics
   'matching-diagnostic': 'breadcrumbs.matching_diagnostic',
@@ -305,6 +306,9 @@ const SEGMENT_LABEL_KEYS: Record<string, string> = {
 
   // Logs
   'log-files': 'breadcrumbs.log_files',
+  prerender: 'breadcrumbs.prerender',
+  'module-docs': 'breadcrumbs.module_docs',
+  metrics: 'breadcrumbs.metrics',
 };
 
 export function AdminBreadcrumbs({ items }: AdminBreadcrumbsProps) {
@@ -362,7 +366,7 @@ export function AdminBreadcrumbs({ items }: AdminBreadcrumbsProps) {
   if (breadcrumbs.length <= 1) return null;
 
   return (
-    <nav aria-label={"Breadcrumbs"} className="mb-4 max-w-full overflow-x-auto pb-1">
+    <nav aria-label={t('aria.breadcrumbs')} className="mb-4 max-w-full overflow-x-auto pb-1">
       <ol className="flex w-max max-w-full items-center gap-1.5 text-sm text-default-500">
         {breadcrumbs.map((crumb, index) => (
           <li key={crumb.label} className="flex min-w-0 items-center gap-1.5">

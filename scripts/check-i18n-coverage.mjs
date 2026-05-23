@@ -97,14 +97,30 @@ function extractCalls(source) {
   //   const { t } = useTranslation()               → t → DEFAULT (null)
   //   const { t } = useTranslation(['ns1','ns2'])  → t → ns1 (first)
   const aliases = new Map();
-  aliases.set('t', null); // fallback when no namespace known
+  aliases.set('t', [{ line: 0, ns: null }]); // fallback when no namespace known
 
   const hookRE = /const\s*\{\s*t(?:\s*:\s*(\w+))?\s*\}\s*=\s*useTranslation\(\s*(?:\[\s*)?['"]([^'"]+)['"]/g;
   let m;
   while ((m = hookRE.exec(source)) !== null) {
     const alias = m[1] || 't';
     const ns = m[2];
-    aliases.set(alias, ns);
+    const line = source.slice(0, m.index).split('\n').length;
+    if (!aliases.has(alias)) aliases.set(alias, []);
+    aliases.get(alias).push({ line, ns });
+  }
+
+  for (const entries of aliases.values()) {
+    entries.sort((a, b) => a.line - b.line);
+  }
+
+  function resolveAliasNamespace(alias, line) {
+    const entries = aliases.get(alias) ?? [];
+    let resolved = null;
+    for (const entry of entries) {
+      if (entry.line > line) break;
+      resolved = entry.ns;
+    }
+    return resolved;
   }
 
   // Extract calls: aliasName('key.path' or 'ns:key.path') possibly with interpolation arg
@@ -121,10 +137,17 @@ function extractCalls(source) {
       const alias = cm[1];
       const quote = cm[2];
       const keyStr = cm[3];
-      const aliasNs = aliases.get(alias);
+      const aliasNs = resolveAliasNamespace(alias, lineNum + 1);
+      const remainder = line.slice(lineRE.lastIndex);
+      const nextChar = remainder.trimStart()[0];
+      const optionNs = remainder.match(/^\s*,[\s\S]*?\bns\s*:\s*['"]([\w_]+)['"]/);
 
       if (quote === '`' && keyStr.includes('${')) {
         dynamic.push({ key: keyStr, alias, ns: aliasNs, line: lineNum + 1 });
+        continue;
+      }
+      if (nextChar === '+') {
+        dynamic.push({ key: `${keyStr}+...`, alias, ns: aliasNs, line: lineNum + 1 });
         continue;
       }
 
@@ -134,6 +157,9 @@ function extractCalls(source) {
       if (colonIdx !== -1 && /^[\w_]+$/.test(keyStr.slice(0, colonIdx))) {
         ns = keyStr.slice(0, colonIdx);
         key = keyStr.slice(colonIdx + 1);
+      }
+      if (optionNs) {
+        ns = optionNs[1];
       }
 
       if (!ns) continue; // can't resolve
@@ -146,6 +172,7 @@ function extractCalls(source) {
 
 function keyExists(keyset, key) {
   if (keyset.has(key)) return true;
+  if (PLURAL_SUFFIXES.some((s) => keyset.has(`${key}${s}`))) return true;
   for (const suf of PLURAL_SUFFIXES) {
     if (key.endsWith(suf)) {
       const base = key.slice(0, -suf.length);

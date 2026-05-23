@@ -321,7 +321,10 @@
     "load_more": "Load More",
     "load_error": "Could not load events. Please try again.",
     "load_more_error": "Could not load more events.",
-    "online": "Online"
+    "online": "Online",
+    "date_at_time": "{{date}} at {{time}}",
+    "attendees_going_one": "{{count}} going",
+    "attendees_going_other": "{{count}} going"
   },
   "groups": {
     "page_title": "Federation Groups",
@@ -388,7 +391,11 @@
     "federation_partner_badge": "Federation Partner",
     "browse_members": "Browse Members",
     "browse_listings": "Browse Listings",
-    "available_features": "Available Features"
+    "available_features": "Available Features",
+    "level_prefix": "Level {{level}}",
+    "member_count_one": "{{count}} member",
+    "member_count_other": "{{count}} members",
+    "partner_since": "Partner since {{date}}"
   },
   "onboarding": {
     "page_title": "Federation Setup",
@@ -460,7 +467,14 @@
     "toast_enabled": "Federation Enabled",
     "toast_welcome": "Welcome to the federation network!",
     "toast_generic_error": "An unexpected error occurred. Please try again.",
-    "kilometers_short": "km"
+    "kilometers_short": "km",
+    "progress_aria": "Step {{current}} of {{total}}",
+    "up_to_km": "up to {{km}} km",
+    "partners_available_one": "{{count}} partner community available",
+    "partners_available_other": "{{count}} partner communities available",
+    "member_count_one": "{{count}} member",
+    "member_count_other": "{{count}} members",
+    "and_more": "+{{count}} more"
   },
   "member_profile": {
     "page_title": "Member Profile",
@@ -513,6 +527,7 @@
     "unavailable": "Reviews not yet available for this federated member",
     "anonymous": "Anonymous",
     "rating_label": "Rated {{rating}} out of 5",
-    "from_partner": "via {{partner}}"
+    "from_partner": "via {{partner}}",
+    "title": "Reviews"
   }
 }

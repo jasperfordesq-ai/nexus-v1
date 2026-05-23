@@ -226,7 +226,9 @@
     "video_too_large": "Caithfidh an físeán a bheith níos lú ná {{size}}MB.",
     "video": "Físeán",
     "video_remove": "Bain físeán",
-    "file_size_mb": "{{name}} ({{size}}MB)"
+    "file_size_mb": "{{name}} ({{size}}MB)",
+    "listing_preview_alt": "R?amhamharc liost?la",
+    "image_preview_alt": "R?amhamharc uasl?d?la"
   },
   "moderation": {
     "unauthorized": "Níl cead agat an gníomh seo a dhéanamh."
@@ -434,7 +436,10 @@
     "play": "Seinn",
     "aria_label": "Físeán",
     "unavailable": "Físeán gan fáil",
-    "unavailable_desc": "Níorbh fhéidir an físeán seo a luchtú."
+    "unavailable_desc": "Níorbh fhéidir an físeán seo a luchtú.",
+    "default_title": "F?se?n",
+    "play_label": "Seinn f?se?n: {{title}}",
+    "thumbnail_alt": "Mionsamhail do {{title}}"
   },
   "trending": {
     "title": "Ag Treocht",
@@ -536,7 +541,8 @@
     "next": "Íomhá ar aghaidh",
     "go_to_image": "Téigh chuig íomhá {{number}}",
     "more_images": "{{count}} íomhá eile",
-    "video_of": "Físeán {{current}} as {{total}}"
+    "video_of": "Físeán {{current}} as {{total}}",
+    "role_description": "timpeall?n"
   },
   "lightbox": {
     "aria_label": "Amharcóir íomhánna",

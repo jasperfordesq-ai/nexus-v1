@@ -250,7 +250,7 @@ export function MyAdCampaignsPage() {
         ) : campaigns.length === 0 ? (
           <div className="flex flex-col items-center py-12 text-center gap-3">
             <Megaphone size={40} className="text-default-300" aria-hidden="true" />
-            <p className="text-default-500">{t('advertise.empty')}</p>
+            <p className="text-default-500">{t('advertise.empty.title')}</p>
             <Button color="primary" onPress={createModal.onOpen}>
               {t('advertise.create_first')}
             </Button>

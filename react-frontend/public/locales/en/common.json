@@ -1400,7 +1400,8 @@
       "usage_count": "Used {{count}} times",
       "saved": "Coupon saved",
       "deleted": "Coupon deleted"
-    }
+    },
+    "qr_code_alt": "QR code"
   },
   "regional_points": {
     "title": "Regional Points",

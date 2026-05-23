@@ -34,5 +34,14 @@
   },
   "federation": {
     "feature_disabled": "La federazione non è abilitata per questa comunità"
-  }
+  },
+  "update_available": "Aggiornamento disponibile",
+  "version_info": "Attuale: {{currentVersion}} ? Disponibile: {{clientVersion}}",
+  "whats_new": "Novit?",
+  "later": "Pi? tardi",
+  "download_update": "Scarica aggiornamento",
+  "offline_message": "Sembra che tu sia offline",
+  "session_expired": "Sessione scaduta",
+  "session_expired_message": "La sessione ? scaduta. Accedi di nuovo per continuare.",
+  "dismiss": "Chiudi"
 }

@@ -226,7 +226,9 @@
     "video_too_large": "Video moet kleiner zijn dan {{size}}MB.",
     "video": "Video",
     "video_remove": "Video verwijderen",
-    "file_size_mb": "{{name}} ({{size}}MB)"
+    "file_size_mb": "{{name}} ({{size}}MB)",
+    "listing_preview_alt": "Voorbeeld van vermelding",
+    "image_preview_alt": "Uploadvoorbeeld"
   },
   "moderation": {
     "unauthorized": "Je hebt geen toestemming om deze actie uit te voeren."
@@ -434,7 +436,10 @@
     "play": "Afspelen",
     "aria_label": "Video",
     "unavailable": "Video niet beschikbaar",
-    "unavailable_desc": "Deze video kon niet worden geladen."
+    "unavailable_desc": "Deze video kon niet worden geladen.",
+    "default_title": "Videobeeld",
+    "play_label": "Video afspelen: {{title}}",
+    "thumbnail_alt": "Miniatuur voor {{title}}"
   },
   "trending": {
     "title": "Populair",
@@ -536,7 +541,8 @@
     "next": "Volgende afbeelding",
     "go_to_image": "Ga naar afbeelding {{number}}",
     "more_images": "{{count}} meer afbeeldingen",
-    "video_of": "Video {{current}} van {{total}}"
+    "video_of": "Video {{current}} van {{total}}",
+    "role_description": "carrousel"
   },
   "lightbox": {
     "aria_label": "Afbeelding viewer",

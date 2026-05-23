@@ -373,7 +373,8 @@
     "empty_title": "Brak dokumentów jeszcze",
     "empty_description": "Prześlij pliki, aby podzielić się z zespołem.",
     "delete_confirm": "Usunąć ten dokument?",
-    "max_size": "Maksymalny rozmiar pliku: 10 MB"
+    "max_size": "Maksymalny rozmiar pliku: 10 MB",
+    "download": "Pobierz"
   },
   "chatrooms": {
     "title": "Kanały",

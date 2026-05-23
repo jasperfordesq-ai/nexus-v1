@@ -373,7 +373,8 @@
     "empty_title": "No Documents Yet",
     "empty_description": "Upload files to share with your team.",
     "delete_confirm": "Delete this document?",
-    "max_size": "Max file size: 10 MB"
+    "max_size": "Max file size: 10 MB",
+    "download": "Download"
   },
   "chatrooms": {
     "title": "Channels",

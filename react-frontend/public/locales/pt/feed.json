@@ -226,7 +226,9 @@
     "video_too_large": "O vídeo deve ter menos de {{size}}MB.",
     "video": "Vídeo",
     "video_remove": "Remover vídeo",
-    "file_size_mb": "{{name}} ({{size}}MB)"
+    "file_size_mb": "{{name}} ({{size}}MB)",
+    "listing_preview_alt": "Pr?-visualiza??o do an?ncio",
+    "image_preview_alt": "Pr?-visualiza??o do envio"
   },
   "moderation": {
     "unauthorized": "Não tem permissão para realizar esta ação."
@@ -434,7 +436,10 @@
     "play": "Reproduzir",
     "aria_label": "Vídeo",
     "unavailable": "Vídeo indisponível",
-    "unavailable_desc": "Este vídeo não pôde ser carregado."
+    "unavailable_desc": "Este vídeo não pôde ser carregado.",
+    "default_title": "V?deo",
+    "play_label": "Reproduzir v?deo: {{title}}",
+    "thumbnail_alt": "Miniatura de {{title}}"
   },
   "trending": {
     "title": "Em alta",
@@ -536,7 +541,8 @@
     "next": "Próxima imagem",
     "go_to_image": "Ir para imagem {{number}}",
     "more_images": "mais {{count}} imagens",
-    "video_of": "Vídeo {{current}} de {{total}}"
+    "video_of": "Vídeo {{current}} de {{total}}",
+    "role_description": "carrossel"
   },
   "lightbox": {
     "aria_label": "Visualizador de imagens",

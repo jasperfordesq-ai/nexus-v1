@@ -321,7 +321,10 @@
     "load_more": "Załaduj więcej",
     "load_error": "Nie udało się wczytać wydarzeń. Spróbuj ponownie.",
     "load_more_error": "Nie można załadować więcej wydarzeń.",
-    "online": "W Internecie"
+    "online": "W Internecie",
+    "date_at_time": "{{date}} o {{time}}",
+    "attendees_going_one": "{{count}} uczestnik",
+    "attendees_going_other": "{{count}} uczestnik?w"
   },
   "groups": {
     "page_title": "Grupy Federacji",
@@ -388,7 +391,11 @@
     "federation_partner_badge": "Partner Federacji",
     "browse_members": "Przeglądaj członków",
     "browse_listings": "Przeglądaj oferty",
-    "available_features": "Dostępne funkcje"
+    "available_features": "Dostępne funkcje",
+    "level_prefix": "Poziom {{level}}",
+    "member_count_one": "{{count}} cz?onek",
+    "member_count_other": "{{count}} cz?onk?w",
+    "partner_since": "Partner od {{date}}"
   },
   "onboarding": {
     "page_title": "Konfiguracja Federacji",
@@ -460,7 +467,14 @@
     "toast_enabled": "Federacja włączona",
     "toast_welcome": "Witamy w sieci federacji!",
     "toast_generic_error": "Wystąpił nieoczekiwany błąd. Spróbuj ponownie.",
-    "kilometers_short": "km"
+    "kilometers_short": "km",
+    "progress_aria": "Krok {{current}} z {{total}}",
+    "up_to_km": "do {{km}} km",
+    "partners_available_one": "{{count}} spo?eczno?? partnerska dost?pna",
+    "partners_available_other": "{{count}} spo?eczno?ci partnerskich dost?pnych",
+    "member_count_one": "{{count}} cz?onek",
+    "member_count_other": "{{count}} cz?onk?w",
+    "and_more": "+{{count}} wi?cej"
   },
   "member_profile": {
     "page_title": "Profil członka",
@@ -513,6 +527,7 @@
     "unavailable": "Recenzje tego członka federacji nie są jeszcze dostępne",
     "anonymous": "Anonimowy",
     "rating_label": "Ocena {{rating}} na 5",
-    "from_partner": "przez {{partner}}"
+    "from_partner": "przez {{partner}}",
+    "title": "Recenzje"
   }
 }

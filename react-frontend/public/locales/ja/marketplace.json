@@ -384,7 +384,8 @@
     "save_changes": "変更を保存",
     "updated_success": "リスティングを更新しました!",
     "updated_error": "リスティングの更新に失敗しました",
-    "updated_error_retry": "リスティングの更新に失敗しました。もう一度お試しください。"
+    "updated_error_retry": "リスティングの更新に失敗しました。もう一度お試しください。",
+    "action_edit": "??"
   },
   "my_listings": {
     "page_title": "マイリスティング - マーケットプレイス",

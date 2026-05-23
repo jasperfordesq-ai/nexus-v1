@@ -567,7 +567,7 @@ export function TenantShow() {
                           : <XCircle size={12} />
                       }
                     >
-                      {t(FEATURE_LABEL_KEYS[feature])}
+                      {t(FEATURE_LABEL_KEYS[feature] ?? feature)}
                     </Chip>
                   );
                 })}

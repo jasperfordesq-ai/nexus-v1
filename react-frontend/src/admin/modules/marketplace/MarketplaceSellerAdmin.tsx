@@ -92,9 +92,9 @@ export function MarketplaceSellerAdmin() {
         if (filter === 'private' || filter === 'business') {
           params.set('seller_type', filter);
         } else if (filter === 'verified') {
-          params.set('verified');
+          params.set('verified', '1');
         } else if (filter === 'unverified') {
-          params.set('verified');
+          params.set('verified', '0');
         }
       }
 

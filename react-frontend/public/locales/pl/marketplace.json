@@ -384,7 +384,8 @@
     "save_changes": "Zapisz zmiany",
     "updated_success": "Ogłoszenie zaktualizowane pomyślnie!",
     "updated_error": "Nie udało się zaktualizować ogłoszenia",
-    "updated_error_retry": "Nie udało się zaktualizować ogłoszenia. Spróbuj ponownie."
+    "updated_error_retry": "Nie udało się zaktualizować ogłoszenia. Spróbuj ponownie.",
+    "action_edit": "Edytuj"
   },
   "my_listings": {
     "page_title": "Moje ogłoszenia - Marketplace",

@@ -321,7 +321,10 @@
     "load_more": "Charger plus",
     "load_error": "Impossible de charger les événements. Veuillez réessayer.",
     "load_more_error": "Impossible de charger plus d'événements.",
-    "online": "En ligne"
+    "online": "En ligne",
+    "date_at_time": "{{date}} ? {{time}}",
+    "attendees_going_one": "{{count}} participant",
+    "attendees_going_other": "{{count}} participants"
   },
   "groups": {
     "page_title": "Groupes de fédération",
@@ -388,7 +391,11 @@
     "federation_partner_badge": "Partenaire de la Fédération",
     "browse_members": "Parcourir les membres",
     "browse_listings": "Parcourir les annonces",
-    "available_features": "Fonctionnalités disponibles"
+    "available_features": "Fonctionnalités disponibles",
+    "level_prefix": "Niveau {{level}}",
+    "member_count_one": "{{count}} membre",
+    "member_count_other": "{{count}} membres",
+    "partner_since": "Partenaire depuis {{date}}"
   },
   "onboarding": {
     "page_title": "Configuration de la fédération",
@@ -460,7 +467,14 @@
     "toast_enabled": "Fédération activée",
     "toast_welcome": "Bienvenue sur le réseau de la fédération !",
     "toast_generic_error": "Une erreur inattendue s'est produite. Veuillez réessayer.",
-    "kilometers_short": "kilomètres"
+    "kilometers_short": "kilomètres",
+    "progress_aria": "?tape {{current}} sur {{total}}",
+    "up_to_km": "jusqu?? {{km}} km",
+    "partners_available_one": "{{count}} communaut? partenaire disponible",
+    "partners_available_other": "{{count}} communaut?s partenaires disponibles",
+    "member_count_one": "{{count}} membre",
+    "member_count_other": "{{count}} membres",
+    "and_more": "+{{count}} de plus"
   },
   "member_profile": {
     "page_title": "Profil de membre",
@@ -513,6 +527,7 @@
     "unavailable": "Avis pas encore disponibles pour ce membre fédéré",
     "anonymous": "Anonyme",
     "rating_label": "Noté {{rating}} sur 5",
-    "from_partner": "via {{partner}}"
+    "from_partner": "via {{partner}}",
+    "title": "Avis"
   }
 }

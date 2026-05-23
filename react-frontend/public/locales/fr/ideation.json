@@ -373,7 +373,8 @@
     "empty_title": "Aucun document pour le moment",
     "empty_description": "Telechargez des fichiers a partager avec votre equipe.",
     "delete_confirm": "Supprimer ce document ?",
-    "max_size": "Taille max. du fichier : 10 Mo"
+    "max_size": "Taille max. du fichier : 10 Mo",
+    "download": "T?l?charger"
   },
   "chatrooms": {
     "title": "Canaux",

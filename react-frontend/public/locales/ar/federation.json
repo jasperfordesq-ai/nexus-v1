@@ -321,7 +321,10 @@
     "load_more": "تحميل المزيد",
     "load_error": "تعذر تحميل الأحداث. يرجى المحاولة مرة أخرى.",
     "load_more_error": "تعذر تحميل المزيد من الأحداث.",
-    "online": "متصل"
+    "online": "متصل",
+    "date_at_time": "{{date}} ?? {{time}}",
+    "attendees_going_one": "{{count}} ?????",
+    "attendees_going_other": "{{count}} ???????"
   },
   "groups": {
     "page_title": "مجموعات الاتحاد",
@@ -388,7 +391,11 @@
     "federation_partner_badge": "شريك الاتحاد",
     "browse_members": "تصفح الأعضاء",
     "browse_listings": "تصفح القوائم",
-    "available_features": "الميزات المتوفرة"
+    "available_features": "الميزات المتوفرة",
+    "level_prefix": "??????? {{level}}",
+    "member_count_one": "??? ????",
+    "member_count_other": "{{count}} ?????",
+    "partner_since": "???? ??? {{date}}"
   },
   "onboarding": {
     "page_title": "إعداد الاتحاد",
@@ -460,7 +467,14 @@
     "toast_enabled": "تمكين الاتحاد",
     "toast_welcome": "مرحبا بكم في شبكة الاتحاد!",
     "toast_generic_error": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.",
-    "kilometers_short": "كم"
+    "kilometers_short": "كم",
+    "progress_aria": "?????? {{current}} ?? {{total}}",
+    "up_to_km": "??? {{km}} ??",
+    "partners_available_one": "????? ???? ???? ????",
+    "partners_available_other": "{{count}} ??????? ????? ?????",
+    "member_count_one": "??? ????",
+    "member_count_other": "{{count}} ?????",
+    "and_more": "+{{count}} ??????"
   },
   "member_profile": {
     "page_title": "الملف الشخصي للعضو",
@@ -513,6 +527,7 @@
     "unavailable": "المراجعات ليست متاحة بعد لهذا العضو المتحد",
     "anonymous": "مجهول",
     "rating_label": "تم تقييمه بـ {{rating}} من أصل 5",
-    "from_partner": "عبر {{partner}}"
+    "from_partner": "عبر {{partner}}",
+    "title": "?????????"
   }
 }

@@ -1400,7 +1400,8 @@
       "usage_count": "{{count}} keer gebruikt",
       "saved": "Kortingsbon opgeslagen",
       "deleted": "Kortingsbon verwijderd"
-    }
+    },
+    "qr_code_alt": "QR-code"
   },
   "regional_points": {
     "title": "Regionale punten",

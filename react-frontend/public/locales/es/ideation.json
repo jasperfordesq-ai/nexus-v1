@@ -373,7 +373,8 @@
     "empty_title": "Aún No Hay Documentos",
     "empty_description": "Sube archivos para compartir con tu equipo.",
     "delete_confirm": "¿Eliminar este documento?",
-    "max_size": "Tamaño máximo: 10 MB"
+    "max_size": "Tamaño máximo: 10 MB",
+    "download": "Descargar"
   },
   "chatrooms": {
     "title": "Canales",

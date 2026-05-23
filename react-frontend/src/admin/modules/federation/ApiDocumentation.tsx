@@ -1003,6 +1003,7 @@ print(data['message_id'])  # 1234`,
 type ExampleLang = 'curl' | 'js' | 'python';
 
 function ExamplesTab() {
+  const { t } = useTranslation('admin');
   const [lang, setLang] = useState<ExampleLang>('curl');
 
   const langLabels: Record<ExampleLang, string> = {

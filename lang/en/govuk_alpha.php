@@ -213,6 +213,7 @@ return [
         'invite_code_label' => 'Invite code',
         'invite_code_hint' => 'This community is invite-only. Enter the 8-character code you received from a community administrator.',
         'password_confirmation_label' => 'Confirm password',
+        'honeypot_website_label' => 'Website (leave blank)',
         'consents_legend' => 'Agreements',
         'terms_label' => 'I agree to the :terms and the :privacy.',
         'terms_link_text' => 'terms of service',

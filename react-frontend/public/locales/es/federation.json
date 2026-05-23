@@ -321,7 +321,10 @@
     "load_more": "Cargar más",
     "load_error": "No se pudieron cargar eventos. Por favor inténtalo de nuevo.",
     "load_more_error": "No se pudieron cargar más eventos.",
-    "online": "En línea"
+    "online": "En línea",
+    "date_at_time": "{{date}} a las {{time}}",
+    "attendees_going_one": "{{count}} asistir?",
+    "attendees_going_other": "{{count}} asistir?n"
   },
   "groups": {
     "page_title": "Grupos de federación",
@@ -388,7 +391,11 @@
     "federation_partner_badge": "Socio de la Federación",
     "browse_members": "Explorar miembros",
     "browse_listings": "Explorar listados",
-    "available_features": "Funciones disponibles"
+    "available_features": "Funciones disponibles",
+    "level_prefix": "Nivel {{level}}",
+    "member_count_one": "{{count}} miembro",
+    "member_count_other": "{{count}} miembros",
+    "partner_since": "Socio desde {{date}}"
   },
   "onboarding": {
     "page_title": "Configuración de la federación",
@@ -460,7 +467,14 @@
     "toast_enabled": "Federación habilitada",
     "toast_welcome": "¡Bienvenidos a la red de la federación!",
     "toast_generic_error": "Se produjo un error inesperado. Por favor inténtalo de nuevo.",
-    "kilometers_short": "kilómetros"
+    "kilometers_short": "kilómetros",
+    "progress_aria": "Paso {{current}} de {{total}}",
+    "up_to_km": "hasta {{km}} km",
+    "partners_available_one": "{{count}} comunidad socia disponible",
+    "partners_available_other": "{{count}} comunidades socias disponibles",
+    "member_count_one": "{{count}} miembro",
+    "member_count_other": "{{count}} miembros",
+    "and_more": "+{{count}} m?s"
   },
   "member_profile": {
     "page_title": "Perfil de miembro",
@@ -513,6 +527,7 @@
     "unavailable": "Opiniones aún no disponibles para este federado",
     "anonymous": "Anónimo",
     "rating_label": "Calificado {{rating}} sobre 5",
-    "from_partner": "vía {{partner}}"
+    "from_partner": "vía {{partner}}",
+    "title": "Rese?as"
   }
 }

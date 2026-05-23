@@ -226,7 +226,9 @@
     "video_too_large": "يجب أن يكون حجم الفيديو أقل من {{size}}MB.",
     "video": "فيديو",
     "video_remove": "إزالة الفيديو",
-    "file_size_mb": "{{name}} ({{size}}ميجابايت)"
+    "file_size_mb": "{{name}} ({{size}}ميجابايت)",
+    "listing_preview_alt": "?????? ???????",
+    "image_preview_alt": "?????? ?????"
   },
   "moderation": {
     "unauthorized": "ليس لديك صلاحية لتنفيذ هذا الإجراء."
@@ -434,7 +436,10 @@
     "play": "تشغيل",
     "aria_label": "فيديو",
     "unavailable": "الفيديو غير متاح",
-    "unavailable_desc": "تعذّر تحميل هذا الفيديو."
+    "unavailable_desc": "تعذّر تحميل هذا الفيديو.",
+    "default_title": "?????",
+    "play_label": "????? ???????: {{title}}",
+    "thumbnail_alt": "???? ????? ?? {{title}}"
   },
   "trending": {
     "title": "الأكثر رواجاً",
@@ -536,7 +541,8 @@
     "next": "الصورة التالية",
     "go_to_image": "اذهب إلى الصورة {{number}}",
     "more_images": "{{count}} صور إضافية",
-    "video_of": "فيديو {{current}} من {{total}}"
+    "video_of": "فيديو {{current}} من {{total}}",
+    "role_description": "?????"
   },
   "lightbox": {
     "aria_label": "عارض الصور",

@@ -384,7 +384,8 @@
     "save_changes": "Sábháil na hAthruithe",
     "updated_success": "Nuashonraíodh an liosta go rathúil!",
     "updated_error": "Theip ar nuashonrú an liosta",
-    "updated_error_retry": "Theip ar nuashonrú an liosta. Bain triail eile as."
+    "updated_error_retry": "Theip ar nuashonrú an liosta. Bain triail eile as.",
+    "action_edit": "Cuir in eagar"
   },
   "my_listings": {
     "page_title": "Mo Liostaí - Margadh",

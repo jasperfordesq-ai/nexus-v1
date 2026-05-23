@@ -321,7 +321,10 @@
     "load_more": "もっと読み込む",
     "load_error": "イベントを読み込めませんでした。もう一度試してください。",
     "load_more_error": "これ以上のイベントを読み込むことができませんでした。",
-    "online": "オンライン"
+    "online": "オンライン",
+    "date_at_time": "{{date}} {{time}}",
+    "attendees_going_one": "{{count}}??????",
+    "attendees_going_other": "{{count}}??????"
   },
   "groups": {
     "page_title": "フェデレーショングループ",
@@ -388,7 +391,11 @@
     "federation_partner_badge": "フェデレーションパートナー",
     "browse_members": "メンバーを参照",
     "browse_listings": "リストを参照する",
-    "available_features": "利用可能な機能"
+    "available_features": "利用可能な機能",
+    "level_prefix": "???{{level}}",
+    "member_count_one": "{{count}}??????",
+    "member_count_other": "{{count}}??????",
+    "partner_since": "{{date}}????"
   },
   "onboarding": {
     "page_title": "フェデレーションのセットアップ",
@@ -460,7 +467,14 @@
     "toast_enabled": "フェデレーションが有効になっています",
     "toast_welcome": "フェデレーション ネットワークへようこそ!",
     "toast_generic_error": "予期しないエラーが発生しました。もう一度試してください。",
-    "kilometers_short": "km"
+    "kilometers_short": "km",
+    "progress_aria": "{{total}}?{{current}}????",
+    "up_to_km": "??{{km}} km",
+    "partners_available_one": "{{count}}?????????????????",
+    "partners_available_other": "{{count}}?????????????????",
+    "member_count_one": "{{count}}??????",
+    "member_count_other": "{{count}}??????",
+    "and_more": "???{{count}}?"
   },
   "member_profile": {
     "page_title": "メンバープロフィール",
@@ -513,6 +527,7 @@
     "unavailable": "このフェデレーション メンバーのレビューはまだ利用できません",
     "anonymous": "匿名",
     "rating_label": "5 段階中 {{rating}} と評価されました",
-    "from_partner": "{{partner}}経由"
+    "from_partner": "{{partner}}経由",
+    "title": "????"
   }
 }

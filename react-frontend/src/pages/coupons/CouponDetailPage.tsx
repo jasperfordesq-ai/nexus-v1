@@ -196,7 +196,7 @@ export default function CouponDetailPage() {
           <ModalHeader>{t('coupon.show_qr')}</ModalHeader>
           <ModalBody className="text-center pb-6">
             {qrImageUrl && (
-              <img src={qrImageUrl} alt="QR code" className="mx-auto mb-4 max-w-full" />
+              <img src={qrImageUrl} alt={t('coupon.qr_code_alt')} className="mx-auto mb-4 max-w-full" />
             )}
             <p className="text-sm text-[var(--color-text-secondary)] mb-2">
               {t('coupon.scan_at_checkout')}

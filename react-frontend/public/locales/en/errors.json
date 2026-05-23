@@ -34,5 +34,14 @@
   },
   "federation": {
     "feature_disabled": "Federation is not enabled for this community"
-  }
+  },
+  "update_available": "Update available",
+  "version_info": "Current: {{currentVersion}} ? Available: {{clientVersion}}",
+  "whats_new": "What's new",
+  "later": "Later",
+  "download_update": "Download update",
+  "offline_message": "You appear to be offline",
+  "session_expired": "Session expired",
+  "session_expired_message": "Your session has expired. Please log in again to continue.",
+  "dismiss": "Dismiss"
 }

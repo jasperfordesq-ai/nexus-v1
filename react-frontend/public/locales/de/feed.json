@@ -226,7 +226,9 @@
     "video_too_large": "Video muss kleiner als {{size}}MB sein.",
     "video": "Video",
     "video_remove": "Video entfernen",
-    "file_size_mb": "{{name}} ({{size}} MB)"
+    "file_size_mb": "{{name}} ({{size}} MB)",
+    "listing_preview_alt": "Vorschau des Eintrags",
+    "image_preview_alt": "Upload-Vorschau"
   },
   "moderation": {
     "unauthorized": "Sie sind nicht berechtigt, diese Aktion auszuführen."
@@ -434,7 +436,10 @@
     "play": "Abspielen",
     "aria_label": "Video",
     "unavailable": "Video nicht verfügbar",
-    "unavailable_desc": "Dieses Video konnte nicht geladen werden."
+    "unavailable_desc": "Dieses Video konnte nicht geladen werden.",
+    "default_title": "Videobeitrag",
+    "play_label": "Video abspielen: {{title}}",
+    "thumbnail_alt": "Vorschaubild f?r {{title}}"
   },
   "trending": {
     "title": "Im Trend",
@@ -536,7 +541,8 @@
     "next": "Nächstes Bild",
     "go_to_image": "Zu Bild {{number}} gehen",
     "more_images": "{{count}} weitere Bilder",
-    "video_of": "Video {{current}} von {{total}}"
+    "video_of": "Video {{current}} von {{total}}",
+    "role_description": "Karussell"
   },
   "lightbox": {
     "aria_label": "Bildansicht",

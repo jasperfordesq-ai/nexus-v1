@@ -321,7 +321,10 @@
     "load_more": "Mehr laden",
     "load_error": "Ereignisse konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
     "load_more_error": "Es konnten keine weiteren Ereignisse geladen werden.",
-    "online": "Online"
+    "online": "Online",
+    "date_at_time": "{{date}} um {{time}}",
+    "attendees_going_one": "{{count}} nimmt teil",
+    "attendees_going_other": "{{count}} nehmen teil"
   },
   "groups": {
     "page_title": "Föderationsgruppen",
@@ -388,7 +391,11 @@
     "federation_partner_badge": "Föderationspartner",
     "browse_members": "Durchsuchen Sie Mitglieder",
     "browse_listings": "Einträge durchsuchen",
-    "available_features": "Verfügbare Funktionen"
+    "available_features": "Verfügbare Funktionen",
+    "level_prefix": "Stufe {{level}}",
+    "member_count_one": "{{count}} Mitglied",
+    "member_count_other": "{{count}} Mitglieder",
+    "partner_since": "Partner seit {{date}}"
   },
   "onboarding": {
     "page_title": "Föderations-Setup",
@@ -460,7 +467,14 @@
     "toast_enabled": "Föderation aktiviert",
     "toast_welcome": "Willkommen im Verbandsnetzwerk!",
     "toast_generic_error": "Es ist ein unerwarteter Fehler aufgetreten. Bitte versuchen Sie es erneut.",
-    "kilometers_short": "km"
+    "kilometers_short": "km",
+    "progress_aria": "Schritt {{current}} von {{total}}",
+    "up_to_km": "bis zu {{km}} km",
+    "partners_available_one": "{{count}} Partner-Community verf?gbar",
+    "partners_available_other": "{{count}} Partner-Communitys verf?gbar",
+    "member_count_one": "{{count}} Mitglied",
+    "member_count_other": "{{count}} Mitglieder",
+    "and_more": "+{{count}} weitere"
   },
   "member_profile": {
     "page_title": "Mitgliederprofil",
@@ -513,6 +527,7 @@
     "unavailable": "Für dieses Verbundmitglied sind noch keine Bewertungen verfügbar",
     "anonymous": "Anonym",
     "rating_label": "Bewertet mit {{rating}} von 5",
-    "from_partner": "über {{partner}}"
+    "from_partner": "über {{partner}}",
+    "title": "Bewertungen"
   }
 }

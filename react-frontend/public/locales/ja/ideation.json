@@ -373,7 +373,8 @@
     "empty_title": "まだドキュメントはありません",
     "empty_description": "チームと共有するファイルをアップロードしましょう。",
     "delete_confirm": "このドキュメントを削除しますか？",
-    "max_size": "最大ファイルサイズ：10 MB"
+    "max_size": "最大ファイルサイズ：10 MB",
+    "download": "??????"
   },
   "chatrooms": {
     "title": "チャンネル",

@@ -91,8 +91,10 @@ interface StoryViewerListItem {
 // Reaction emojis
 // ─────────────────────────────────────────────────────────────────────────────
 
+const HEART_EMOJI = String.fromCodePoint(0x2764, 0xfe0f);
+
 const REACTIONS = [
-  { emoji: '\u2764\uFE0F', type: 'heart' },
+  { emoji: HEART_EMOJI, type: 'heart' },
   { emoji: '\uD83D\uDE02', type: 'laugh' },
   { emoji: '\uD83D\uDE2E', type: 'wow' },
   { emoji: '\uD83D\uDD25', type: 'fire' },
@@ -828,7 +830,7 @@ export function StoryViewer({ storyUsers, initialUserIndex, onClose }: StoryView
                   transition={{ duration: 0.4 }}
                   className="absolute inset-0 flex items-center justify-center z-40 pointer-events-none"
                 >
-                  <span className="text-7xl drop-shadow-lg">{'\u2764\uFE0F'}</span>
+                  <span className="text-7xl drop-shadow-lg">{HEART_EMOJI}</span>
                 </motion.div>
               )}
             </AnimatePresence>

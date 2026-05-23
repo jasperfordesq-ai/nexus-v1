@@ -226,7 +226,9 @@
     "video_too_large": "Il video deve essere inferiore a {{size}}MB.",
     "video": "Video",
     "video_remove": "Rimuovi video",
-    "file_size_mb": "{{name}} ({{size}}MB)"
+    "file_size_mb": "{{name}} ({{size}}MB)",
+    "listing_preview_alt": "Anteprima dell?annuncio",
+    "image_preview_alt": "Anteprima del caricamento"
   },
   "moderation": {
     "unauthorized": "Non hai il permesso di eseguire questa azione."
@@ -434,7 +436,10 @@
     "play": "Riproduci",
     "aria_label": "Video",
     "unavailable": "Video non disponibile",
-    "unavailable_desc": "Questo video non ha potuto essere caricato."
+    "unavailable_desc": "Questo video non ha potuto essere caricato.",
+    "default_title": "Filmato",
+    "play_label": "Riproduci filmato: {{title}}",
+    "thumbnail_alt": "Miniatura di {{title}}"
   },
   "trending": {
     "title": "Di tendenza",
@@ -536,7 +541,8 @@
     "next": "Immagine successiva",
     "go_to_image": "Vai all'immagine {{number}}",
     "more_images": "{{count}} altre immagini",
-    "video_of": "Video {{current}} di {{total}}"
+    "video_of": "Video {{current}} di {{total}}",
+    "role_description": "carosello"
   },
   "lightbox": {
     "aria_label": "Visualizzatore immagini",

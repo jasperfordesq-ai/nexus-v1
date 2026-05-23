@@ -226,7 +226,9 @@
     "video_too_large": "El vídeo debe ser inferior a {{size}}MB.",
     "video": "Vídeo",
     "video_remove": "Eliminar vídeo",
-    "file_size_mb": "{{name}} ({{size}}MB)"
+    "file_size_mb": "{{name}} ({{size}}MB)",
+    "listing_preview_alt": "Vista previa del anuncio",
+    "image_preview_alt": "Vista previa de la carga"
   },
   "moderation": {
     "unauthorized": "No tienes permiso para realizar esta acción."
@@ -434,7 +436,10 @@
     "play": "Reproducir",
     "aria_label": "Vídeo",
     "unavailable": "Vídeo no disponible",
-    "unavailable_desc": "Este vídeo no se pudo cargar."
+    "unavailable_desc": "Este vídeo no se pudo cargar.",
+    "default_title": "V?deo",
+    "play_label": "Reproducir v?deo: {{title}}",
+    "thumbnail_alt": "Miniatura de {{title}}"
   },
   "trending": {
     "title": "Tendencias",
@@ -536,7 +541,8 @@
     "next": "Imagen siguiente",
     "go_to_image": "Ir a imagen {{number}}",
     "more_images": "{{count}} imágenes más",
-    "video_of": "Vídeo {{current}} de {{total}}"
+    "video_of": "Vídeo {{current}} de {{total}}",
+    "role_description": "carrusel"
   },
   "lightbox": {
     "aria_label": "Visor de imágenes",

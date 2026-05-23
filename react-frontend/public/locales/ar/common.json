@@ -1400,7 +1400,8 @@
       "usage_count": "استُخدمت {{count}} مرة",
       "saved": "تم حفظ القسيمة",
       "deleted": "تم حذف القسيمة"
-    }
+    },
+    "qr_code_alt": "??? QR"
   },
   "regional_points": {
     "title": "النقاط الإقليمية",

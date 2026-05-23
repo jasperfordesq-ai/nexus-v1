@@ -18,6 +18,9 @@ import Sparkles from 'lucide-react/icons/sparkles';
 import { RELEASE_STATUS } from '@/config/releaseStatus';
 import { SourceRepositoryLink } from './SourceRepositoryLink';
 
+const PROJECT_NEXUS_URL = 'https://project-nexus.ie';
+const PROJECT_NEXUS_HOST = new URL(PROJECT_NEXUS_URL).hostname;
+
 export interface FooterProps {
   /** Footer content/links */
   children?: ReactNode;
@@ -52,15 +55,15 @@ export function Footer({ children, copyright }: FooterProps) {
         <div className="flex flex-col items-center gap-4">
           {/* NEXUS banner — clickable, links to project-nexus.ie */}
           <a
-            href="https://project-nexus.ie"
+            href={PROJECT_NEXUS_URL}
             target="_blank"
             rel="noopener noreferrer"
-            title="Project NEXUS — Open-source timebanking and community platform"
+            title={t('footer.nexus_link_label')}
             className="transition-opacity hover:opacity-80"
           >
             <img
               src="/images/project-nexus-open-source-community-platform.png"
-              alt="Project NEXUS — Open-source timebanking and community platform"
+              alt={t('footer.nexus_link_label')}
               className="h-24 w-auto object-contain"
               width="1536"
               height="1024"
@@ -280,28 +283,28 @@ export function Footer({ children, copyright }: FooterProps) {
                     {t('footer.powered_by')}
                   </span>
                   <a
-                    href="https://project-nexus.ie"
+                    href={PROJECT_NEXUS_URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    title="Project NEXUS — Open-source timebanking and community platform"
+                    title={t('footer.nexus_link_label')}
                     aria-label={t('footer.nexus_link_label')}
                     className="transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
                   >
                     <img
                       src="/images/project-nexus-open-source-community-platform.png"
-                      alt="Project NEXUS — Open-source timebanking and community platform"
+                      alt={t('footer.nexus_link_label')}
                       className="h-32 w-auto object-contain"
                       width="1536"
                       height="1024"
                     />
                   </a>
                   <a
-                    href="https://project-nexus.ie"
+                    href={PROJECT_NEXUS_URL}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs text-theme-muted hover:text-theme-primary transition-colors"
                   >
-                    project-nexus.ie ↗
+                    {PROJECT_NEXUS_HOST} <span aria-hidden="true">↗</span>
                   </a>
                 </div>
 

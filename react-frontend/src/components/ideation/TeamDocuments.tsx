@@ -280,7 +280,7 @@ export function TeamDocuments({ groupId, isGroupAdmin }: TeamDocumentsProps) {
                       href={resolveAssetUrl(doc.url)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      aria-label="Download"
+                      aria-label={t('documents.download')}
                     >
                       <Download className="w-4 h-4 text-[var(--color-text-tertiary)]" />
                     </Button>

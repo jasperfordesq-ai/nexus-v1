@@ -294,7 +294,7 @@ export function ListingTab({ onSuccess, onClose, templateData }: TabSubmitProps)
           <div className="relative inline-block rounded-xl overflow-hidden border border-[var(--border-default)]">
             <img
               src={imagePreview}
-              alt="Listing preview"
+              alt={t('compose.listing_preview_alt')}
               className="h-24 w-auto max-w-full object-cover rounded-xl"
             />
             <Button

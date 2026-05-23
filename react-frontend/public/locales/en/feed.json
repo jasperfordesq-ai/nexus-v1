@@ -226,7 +226,9 @@
     "video_too_large": "Video must be under {{size}}MB.",
     "video": "Video",
     "video_remove": "Remove video",
-    "file_size_mb": "{{name}} ({{size}}MB)"
+    "file_size_mb": "{{name}} ({{size}}MB)",
+    "listing_preview_alt": "Listing preview",
+    "image_preview_alt": "Upload preview"
   },
   "moderation": {
     "unauthorized": "You do not have permission to perform this action."
@@ -434,7 +436,10 @@
     "play": "Play",
     "aria_label": "Video",
     "unavailable": "Video unavailable",
-    "unavailable_desc": "This video could not be loaded."
+    "unavailable_desc": "This video could not be loaded.",
+    "default_title": "Video",
+    "play_label": "Play video: {{title}}",
+    "thumbnail_alt": "Thumbnail for {{title}}"
   },
   "trending": {
     "title": "Trending",
@@ -536,7 +541,8 @@
     "next": "Next image",
     "go_to_image": "Go to image {{number}}",
     "more_images": "{{count}} more images",
-    "video_of": "Video {{current}} of {{total}}"
+    "video_of": "Video {{current}} of {{total}}",
+    "role_description": "carousel"
   },
   "lightbox": {
     "aria_label": "Image viewer",

@@ -226,7 +226,9 @@
     "video_too_large": "動画は{{size}}MB未満でなければなりません。",
     "video": "動画",
     "video_remove": "動画を削除",
-    "file_size_mb": "{{name}} ({{size}}MB)"
+    "file_size_mb": "{{name}} ({{size}}MB)",
+    "listing_preview_alt": "??????????",
+    "image_preview_alt": "????????????"
   },
   "moderation": {
     "unauthorized": "この操作を実行する権限がありません。"
@@ -434,7 +436,10 @@
     "play": "再生",
     "aria_label": "動画",
     "unavailable": "動画を視聴できません",
-    "unavailable_desc": "この動画を読み込めませんでした。"
+    "unavailable_desc": "この動画を読み込めませんでした。",
+    "default_title": "??",
+    "play_label": "?????: {{title}}",
+    "thumbnail_alt": "{{title}} ??????"
   },
   "trending": {
     "title": "トレンド",
@@ -536,7 +541,8 @@
     "next": "次の画像",
     "go_to_image": "画像 {{number}} に移動",
     "more_images": "{{count}} 枚の画像がさらにあります",
-    "video_of": "動画 {{current}} / {{total}}"
+    "video_of": "動画 {{current}} / {{total}}",
+    "role_description": "?????"
   },
   "lightbox": {
     "aria_label": "画像ビューア",

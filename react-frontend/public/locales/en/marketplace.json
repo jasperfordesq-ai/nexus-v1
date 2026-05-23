@@ -384,7 +384,8 @@
     "save_changes": "Save Changes",
     "updated_success": "Listing updated successfully!",
     "updated_error": "Failed to update listing",
-    "updated_error_retry": "Failed to update listing. Please try again."
+    "updated_error_retry": "Failed to update listing. Please try again.",
+    "action_edit": "Edit"
   },
   "my_listings": {
     "page_title": "My Listings - Marketplace",

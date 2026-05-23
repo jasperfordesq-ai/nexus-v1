@@ -384,7 +384,8 @@
     "save_changes": "Salva modifiche",
     "updated_success": "Annuncio aggiornato con successo!",
     "updated_error": "Impossibile aggiornare l'annuncio",
-    "updated_error_retry": "Impossibile aggiornare l'annuncio. Per favore riprova."
+    "updated_error_retry": "Impossibile aggiornare l'annuncio. Per favore riprova.",
+    "action_edit": "Modifica"
   },
   "my_listings": {
     "page_title": "I miei annunci - Marketplace",

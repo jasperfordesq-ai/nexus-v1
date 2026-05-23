@@ -55,7 +55,7 @@ function statusColor(status: string): 'success' | 'warning' | 'danger' | 'defaul
   }
 }
 
-type StatusLabelTranslator = (key: string, defaultValue: string) => string;
+type StatusLabelTranslator = (key: string, defaultValue?: string) => string;
 
 function statusLabel(status: string, t: StatusLabelTranslator): string {
   switch (status) {
@@ -288,7 +288,9 @@ export function BillingPage() {
                       {t('billing.tier')} {subscription.plan_tier_level}
                     </Chip>
                     <Chip size="sm" variant="flat" color={statusColor(subscription.status)}>
-                      {statusLabel(subscription.status, (key, defaultValue) => t(key, defaultValue))}
+                      {statusLabel(subscription.status, (key, defaultValue) =>
+                        defaultValue === undefined ? t(key) : t(key, defaultValue)
+                      )}
                     </Chip>
                   </div>
 

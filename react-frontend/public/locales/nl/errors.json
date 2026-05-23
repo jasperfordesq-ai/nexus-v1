@@ -34,5 +34,14 @@
   },
   "federation": {
     "feature_disabled": "Federatie is niet ingeschakeld voor deze gemeenschap"
-  }
+  },
+  "update_available": "Update beschikbaar",
+  "version_info": "Huidig: {{currentVersion}} ? Beschikbaar: {{clientVersion}}",
+  "whats_new": "Nieuw",
+  "later": "Later",
+  "download_update": "Update downloaden",
+  "offline_message": "Je lijkt offline te zijn",
+  "session_expired": "Sessie verlopen",
+  "session_expired_message": "Je sessie is verlopen. Log opnieuw in om door te gaan.",
+  "dismiss": "Sluiten"
 }

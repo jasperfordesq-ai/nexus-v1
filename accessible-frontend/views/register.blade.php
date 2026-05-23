@@ -74,7 +74,7 @@
                      like `confirm_email` and `address_line_2` regardless of autocomplete=off,
                      which silently blocked legitimate users. --}}
                 <div aria-hidden="true" style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden;">
-                    <label for="website">Website (leave blank)</label>
+                    <label for="website">{{ __('govuk_alpha.auth.honeypot_website_label') }}</label>
                     <input type="text" id="website" name="website" tabindex="-1" autocomplete="off" value="">
                 </div>
 

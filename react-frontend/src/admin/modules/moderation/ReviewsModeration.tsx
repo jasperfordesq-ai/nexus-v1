@@ -77,9 +77,9 @@ export default function ReviewsModeration() {
     if (!isSuperAdmin) return;
     adminSuper.listTenants().then((res) => {
       if (res.success && Array.isArray(res.data)) {
-        setTenants(res.data.map((t) => ({
-          id: Number(t.id),
-          name: String(t.name || t('moderation.unknown_tenant')),
+        setTenants(res.data.map((tenant) => ({
+          id: Number(tenant.id),
+          name: String(tenant.name || t('moderation.unknown_tenant')),
         })));
       }
     }).catch(() => {

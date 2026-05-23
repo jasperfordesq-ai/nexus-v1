@@ -321,7 +321,10 @@
     "load_more": "Laad meer",
     "load_error": "Kan gebeurtenissen niet laden. Probeer het opnieuw.",
     "load_more_error": "Kan niet meer evenementen laden.",
-    "online": "Online"
+    "online": "Online",
+    "date_at_time": "{{date}} om {{time}}",
+    "attendees_going_one": "{{count}} gaat",
+    "attendees_going_other": "{{count}} gaan"
   },
   "groups": {
     "page_title": "Federatie groepen",
@@ -388,7 +391,11 @@
     "federation_partner_badge": "Federatiepartner",
     "browse_members": "Blader door leden",
     "browse_listings": "Blader door vermeldingen",
-    "available_features": "Beschikbare functies"
+    "available_features": "Beschikbare functies",
+    "level_prefix": "Niveau {{level}}",
+    "member_count_one": "{{count}} lid",
+    "member_count_other": "{{count}} leden",
+    "partner_since": "Partner sinds {{date}}"
   },
   "onboarding": {
     "page_title": "Federatie-opstelling",
@@ -460,7 +467,14 @@
     "toast_enabled": "Federatie ingeschakeld",
     "toast_welcome": "Welkom bij het federatienetwerk!",
     "toast_generic_error": "Er is een onverwachte fout opgetreden. Probeer het opnieuw.",
-    "kilometers_short": "km"
+    "kilometers_short": "km",
+    "progress_aria": "Stap {{current}} van {{total}}",
+    "up_to_km": "tot {{km}} km",
+    "partners_available_one": "{{count}} partnercommunity beschikbaar",
+    "partners_available_other": "{{count}} partnercommunity?s beschikbaar",
+    "member_count_one": "{{count}} lid",
+    "member_count_other": "{{count}} leden",
+    "and_more": "+{{count}} meer"
   },
   "member_profile": {
     "page_title": "Ledenprofiel",
@@ -513,6 +527,7 @@
     "unavailable": "Er zijn nog geen beoordelingen beschikbaar voor dit federatieve lid",
     "anonymous": "Anoniem",
     "rating_label": "Beoordeeld {{rating}} uit 5",
-    "from_partner": "via {{partner}}"
+    "from_partner": "via {{partner}}",
+    "title": "Beoordelingen"
   }
 }

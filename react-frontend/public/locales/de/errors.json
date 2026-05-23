@@ -34,5 +34,14 @@
   },
   "federation": {
     "feature_disabled": "Föderation ist für diese Gemeinschaft nicht aktiviert"
-  }
+  },
+  "update_available": "Update verf?gbar",
+  "version_info": "Aktuell: {{currentVersion}} ? Verf?gbar: {{clientVersion}}",
+  "whats_new": "Neuigkeiten",
+  "later": "Sp?ter",
+  "download_update": "Update herunterladen",
+  "offline_message": "Sie scheinen offline zu sein",
+  "session_expired": "Sitzung abgelaufen",
+  "session_expired_message": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an, um fortzufahren.",
+  "dismiss": "Schlie?en"
 }

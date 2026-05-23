@@ -384,7 +384,8 @@
     "save_changes": "حفظ التغييرات",
     "updated_success": "تم تحديث القائمة بنجاح!",
     "updated_error": "فشل في تحديث القائمة",
-    "updated_error_retry": "فشل في تحديث القائمة. يرجى المحاولة مرة أخرى."
+    "updated_error_retry": "فشل في تحديث القائمة. يرجى المحاولة مرة أخرى.",
+    "action_edit": "?????"
   },
   "my_listings": {
     "page_title": "قوائمي - السوق",

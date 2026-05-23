@@ -1400,7 +1400,8 @@
       "usage_count": "Użyto {{count}} razy",
       "saved": "Kupon zapisany",
       "deleted": "Kupon usunięty"
-    }
+    },
+    "qr_code_alt": "Kod QR"
   },
   "regional_points": {
     "title": "Punkty regionalne",

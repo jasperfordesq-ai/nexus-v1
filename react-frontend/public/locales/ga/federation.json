@@ -321,7 +321,10 @@
     "load_more": "Luchtaigh Níos mó",
     "load_error": "Níorbh fhéidir imeachtaí a lódáil. Bain triail eile as.",
     "load_more_error": "Níorbh fhéidir tuilleadh imeachtaí a lódáil.",
-    "online": "Ar líne"
+    "online": "Ar líne",
+    "date_at_time": "{{date}} ag {{time}}",
+    "attendees_going_one": "{{count}} ag dul",
+    "attendees_going_other": "{{count}} ag dul"
   },
   "groups": {
     "page_title": "Grúpaí Cónaidhme",
@@ -388,7 +391,11 @@
     "federation_partner_badge": "Comhpháirtí Cónaidhme",
     "browse_members": "Brabhsáil Baill",
     "browse_listings": "Brabhsáil Liostaí",
-    "available_features": "Gnéithe atá ar Fáil"
+    "available_features": "Gnéithe atá ar Fáil",
+    "level_prefix": "Leibh?al {{level}}",
+    "member_count_one": "{{count}} bhall",
+    "member_count_other": "{{count}} ball",
+    "partner_since": "Comhph?irt? ? {{date}}"
   },
   "onboarding": {
     "page_title": "Socrú Cónaidhm",
@@ -460,7 +467,14 @@
     "toast_enabled": "Cónaidhm Cumasaithe",
     "toast_welcome": "Fáilte chuig líonra na Cónaidhme!",
     "toast_generic_error": "Tharla earráid gan choinne. Bain triail eile as.",
-    "kilometers_short": "km"
+    "kilometers_short": "km",
+    "progress_aria": "C?im {{current}} as {{total}}",
+    "up_to_km": "suas le {{km}} km",
+    "partners_available_one": "{{count}} phobal comhph?irt?ochta ar f?il",
+    "partners_available_other": "{{count}} pobal comhph?irt?ochta ar f?il",
+    "member_count_one": "{{count}} bhall",
+    "member_count_other": "{{count}} ball",
+    "and_more": "+{{count}} eile"
   },
   "member_profile": {
     "page_title": "Próifíl na mBall",
@@ -513,6 +527,7 @@
     "unavailable": "Níl léirmheasanna ar fáil go fóill don chomhalta cónasctha seo",
     "anonymous": "Gan ainm",
     "rating_label": "Rátáilte {{rating}} as 5",
-    "from_partner": "trí {{partner}}"
+    "from_partner": "trí {{partner}}",
+    "title": "L?irmheasanna"
   }
 }

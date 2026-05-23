@@ -384,7 +384,8 @@
     "save_changes": "Änderungen speichern",
     "updated_success": "Inserat erfolgreich aktualisiert!",
     "updated_error": "Inserat konnte nicht aktualisiert werden",
-    "updated_error_retry": "Inserat konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut."
+    "updated_error_retry": "Inserat konnte nicht aktualisiert werden. Bitte versuchen Sie es erneut.",
+    "action_edit": "Bearbeiten"
   },
   "my_listings": {
     "page_title": "Meine Inserate – Marktplatz",
@@ -589,7 +590,7 @@
     "choose_slot": "Abholtermin wählen",
     "no_slot_selected": "Kein Abholtermin",
     "left": "übrig",
-    "slot_fallback": "Slot #{{id}}",
+    "slot_fallback": "Abholfenster #{{id}}",
     "status_unknown": "Unbekannt"
   },
   "inventory": {

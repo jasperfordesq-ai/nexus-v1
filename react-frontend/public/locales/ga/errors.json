@@ -34,5 +34,14 @@
   },
   "federation": {
     "feature_disabled": "Níl an chónaidhm cumasaithe don phobal seo"
-  }
+  },
+  "update_available": "Nuashonr? ar f?il",
+  "version_info": "Reatha: {{currentVersion}} ? Ar f?il: {{clientVersion}}",
+  "whats_new": "Cad at? nua",
+  "later": "N?os d?ana?",
+  "download_update": "?osl?d?il an nuashonr?",
+  "offline_message": "Is cos?il go bhfuil t? as l?ne",
+  "session_expired": "Seisi?n imithe in ?ag",
+  "session_expired_message": "T? do sheisi?n imithe in ?ag. Log?il isteach ar?s chun lean?int ar aghaidh.",
+  "dismiss": "D?n"
 }

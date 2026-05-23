@@ -384,7 +384,8 @@
     "save_changes": "Salvar Alterações",
     "updated_success": "Anúncio atualizado com sucesso!",
     "updated_error": "Falha ao atualizar o anúncio",
-    "updated_error_retry": "Falha ao atualizar o anúncio. Por favor, tente novamente."
+    "updated_error_retry": "Falha ao atualizar o anúncio. Por favor, tente novamente.",
+    "action_edit": "Editar"
   },
   "my_listings": {
     "page_title": "Meus Anúncios - Mercado",

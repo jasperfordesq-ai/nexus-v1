@@ -1400,7 +1400,8 @@
       "usage_count": "{{count}}-mal verwendet",
       "saved": "Gutschein gespeichert",
       "deleted": "Gutschein gelöscht"
-    }
+    },
+    "qr_code_alt": "QR-Code"
   },
   "regional_points": {
     "title": "Regionale Punkte",

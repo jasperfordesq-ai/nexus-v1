@@ -1400,7 +1400,8 @@
       "usage_count": "Úsáidte {{count}} uair",
       "saved": "Cúpón sábháilte",
       "deleted": "Cúpón scriosta"
-    }
+    },
+    "qr_code_alt": "C?d QR"
   },
   "regional_points": {
     "title": "Pointí Réigiúnacha",

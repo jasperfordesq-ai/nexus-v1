@@ -1400,7 +1400,8 @@
       "usage_count": "{{count}}回使用",
       "saved": "クーポンを保存しました",
       "deleted": "クーポンを削除しました"
-    }
+    },
+    "qr_code_alt": "QR???"
   },
   "regional_points": {
     "title": "地域ポイント",

@@ -384,7 +384,8 @@
     "save_changes": "Wijzigingen Opslaan",
     "updated_success": "Vermelding succesvol bijgewerkt!",
     "updated_error": "Bijwerken van vermelding mislukt",
-    "updated_error_retry": "Bijwerken van vermelding mislukt. Probeer het opnieuw."
+    "updated_error_retry": "Bijwerken van vermelding mislukt. Probeer het opnieuw.",
+    "action_edit": "Bewerken"
   },
   "my_listings": {
     "page_title": "Mijn Vermeldingen - Marketplace",

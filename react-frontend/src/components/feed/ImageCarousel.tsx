@@ -105,7 +105,7 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
         className={`relative overflow-hidden rounded-xl group ${className}`}
         role="region"
         aria-label={t('carousel.aria_label', { current: currentIndex + 1, total })}
-        aria-roledescription="carousel"
+        aria-roledescription={t('carousel.role_description')}
         tabIndex={0}
         onKeyDown={handleKeyDown}
       >

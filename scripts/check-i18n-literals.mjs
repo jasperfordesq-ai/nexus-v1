@@ -79,6 +79,7 @@ function runI18nextLint() {
 
 function parseLiterals(output) {
   const literals = [];
+  let diagnosticCount = 0;
   let currentFile = '';
 
   for (const rawLine of output.split(/\r?\n/)) {
@@ -97,6 +98,8 @@ function parseLiterals(output) {
       continue;
     }
 
+    diagnosticCount += 1;
+
     const match = line.match(/^\s*(\d+):\s*Error: Found hardcoded string:\s*(.*)$/);
     const value = match ? match[2] : line.trim();
     if (isIgnorableLiteral(value)) {
@@ -110,7 +113,7 @@ function parseLiterals(output) {
     });
   }
 
-  return literals;
+  return { literals, diagnosticCount };
 }
 
 function normaliseLiteralValue(rawValue) {
@@ -152,10 +155,11 @@ function summarizeByFile(literals) {
 }
 
 const lintResult = runI18nextLint();
-const literals = parseLiterals(lintResult.output);
+const parsedLint = parseLiterals(lintResult.output);
+const literals = parsedLint.literals;
 const byFile = summarizeByFile(literals);
 
-if (lintResult.status !== 0 && literals.length === 0) {
+if (lintResult.status !== 0 && parsedLint.diagnosticCount === 0) {
   console.error('i18next-cli lint failed, but no hardcoded-string diagnostics were parsed.');
   console.error(lintResult.output.trim());
   process.exit(lintResult.status);

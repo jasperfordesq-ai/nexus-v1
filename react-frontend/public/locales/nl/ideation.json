@@ -373,7 +373,8 @@
     "empty_title": "Nog Geen Documenten",
     "empty_description": "Upload bestanden om te delen met je team.",
     "delete_confirm": "Dit document verwijderen?",
-    "max_size": "Maximale bestandsgrootte: 10 MB"
+    "max_size": "Maximale bestandsgrootte: 10 MB",
+    "download": "Downloaden"
   },
   "chatrooms": {
     "title": "Kanalen",
