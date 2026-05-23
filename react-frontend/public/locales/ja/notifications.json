@@ -27,7 +27,7 @@
   "flyout": {
     "bell_aria": "Notifications",
     "bell_unread_aria": "通知、{{count}} 件の未読",
-    "unread_count": "unread",
+    "unread_count": "未読",
     "empty": "まだ通知はありません",
     "view_all": "すべての通知を見る",
     "close": "通知を閉じる",

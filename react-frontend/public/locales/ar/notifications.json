@@ -27,7 +27,7 @@
   "flyout": {
     "bell_aria": "Notifications",
     "bell_unread_aria": "الإشعارات، {{count}} غير مقروءة",
-    "unread_count": "unread",
+    "unread_count": "غير مقروءة",
     "empty": "لا توجد إشعارات بعد",
     "view_all": "عرض جميع الإشعارات",
     "close": "إغلاق الإخطارات",
