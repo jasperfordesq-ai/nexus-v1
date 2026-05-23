@@ -3,16 +3,29 @@
     "title": "لوحة التحكم",
     "description": "لوحة التحكم الشخصية الخاصة بك. عرض رصيدك، القوائم، والنشاط."
   },
+  "fallback_name": "مرحباً",
   "welcome_back": "مرحبًا بعودتك، {{name}}!",
   "community_activity": "إليك ما يحدث في مجتمعك {{community}}",
   "unable_to_load": "غير قادر على تحميل لوحة التحكم",
   "try_again": "حاول مرة أخرى",
+  "common": {
+    "loading": "جارٍ التحميل"
+  },
   "onboarding": {
     "banner_title": "أكمل إعداد ملفك الشخصي",
     "banner_subtitle": "أخبرنا عن اهتماماتك ومهاراتك للحصول على تطابقات مخصصة",
     "get_started": "ابدأ الآن"
   },
   "new_listing": "قائمة جديدة",
+  "caring_community": {
+    "title": "مجتمع الرعاية",
+    "subtitle": "نسّق طلبات المساعدة، وعروض الوقت، وساعات التطوع الموثقة، والدعم الموثوق من مكان واحد.",
+    "actions": {
+      "open_hub": "فتح المركز",
+      "request_help": "طلب مساعدة",
+      "log_hours": "تسجيل الساعات"
+    }
+  },
   "stats": {
     "balance": "الرصيد",
     "active_listings": "القوائم النشطة",
@@ -42,18 +55,18 @@
     "view_wallet": "عرض المحفظة",
     "find_members": "البحث عن الأعضاء",
     "browse_events": "تصفح الفعاليات",
-    "notifications": "الإشعارات",
-    "caring_community": "مركز الرعاية"
+    "caring_community": "مركز الرعاية",
+    "notifications": "الإشعارات"
   },
   "listings": {
     "offering": "يقدم",
     "requesting": "يطلب",
     "offer": "عرض",
     "request": "طلب",
-    "empty": "لا توجد قوائم حديثة",
-    "create_first": "أنشئ قائمتك الأولى",
     "user_fallback": "المستخدم",
-    "empty_description": "أنشئ طلبًا أو عرضًا لبدء التطابق مع أشخاص بالقرب منك."
+    "empty": "لا توجد قوائم حديثة",
+    "empty_description": "أنشئ طلبًا أو عرضًا لبدء التطابق مع أشخاص بالقرب منك.",
+    "create_first": "أنشئ قائمتك الأولى"
   },
   "activity": {
     "action_listing": "شارك قائمة",
@@ -62,8 +75,8 @@
     "action_goal": "حدد هدفًا جديدًا",
     "action_post": "شارك منشورًا",
     "empty": "لا توجد أنشطة حديثة",
-    "check_feed": "تحقق من الخلاصة",
-    "empty_description": "ستظهر تحديثات المجتمع هنا بمجرد أن يبدأ الأشخاص في النشر."
+    "empty_description": "ستظهر تحديثات المجتمع هنا بمجرد أن يبدأ الأشخاص في النشر.",
+    "check_feed": "تحقق من الخلاصة"
   },
   "suggestions": {
     "empty": "لا توجد اقتراحات بعد",
@@ -72,24 +85,24 @@
   "groups": {
     "members_count": "{{count}} أعضاء",
     "empty": "لم تنضم إلى أي مجموعات بعد",
-    "discover": "اكتشف المجموعات",
-    "empty_description": "تساعدك المجموعات على متابعة الاهتمامات المشتركة والمشاريع والدوائر المحلية."
+    "empty_description": "تساعدك المجموعات على متابعة الاهتمامات المشتركة والمشاريع والدوائر المحلية.",
+    "discover": "اكتشف المجموعات"
   },
   "events": {
     "online_event": "حدث عبر الإنترنت",
     "empty": "لا توجد أحداث قادمة",
-    "browse": "تصفح الأحداث",
-    "empty_description": "ستظهر فعاليات مجتمعك هنا عند جدولتها."
+    "empty_description": "ستظهر فعاليات مجتمعك هنا عند جدولتها.",
+    "browse": "تصفح الأحداث"
   },
   "gamification": {
     "level": "المستوى {{level}}",
     "badges": "الشارات",
     "streak": "سلسلة",
+    "xp_value": "{{count}} XP",
     "xp_progress": "تقدم XP",
     "start_earning": "ابدأ في كسب XP من خلال المشاركة في المجتمع!",
     "streak_days_one": "{{count}} يوم",
-    "streak_days_other": "{{count}} أيام",
-    "xp_value": "{{count}} XP"
+    "streak_days_other": "{{count}} أيام"
   },
   "aria": {
     "loading_listings": "جارٍ تحميل القوائم",
@@ -114,21 +127,8 @@
     "received": "استلم {{amount}} ساعة",
     "review": "تقييم",
     "none_pending": "لا توجد مراجعات معلقة",
+    "none_pending_description": "ستظهر هنا التبادلات المكتملة التي تحتاج إلى تقييم.",
     "pending_subtitle": "افتح هذا الطلب",
-    "view_all_pending": "عرض جميع المعلقة",
-    "none_pending_description": "ستظهر هنا التبادلات المكتملة التي تحتاج إلى تقييم."
-  },
-  "fallback_name": "مرحباً",
-  "common": {
-    "loading": "جارٍ التحميل"
-  },
-  "caring_community": {
-    "title": "مجتمع الرعاية",
-    "subtitle": "نسّق طلبات المساعدة، وعروض الوقت، وساعات التطوع الموثقة، والدعم الموثوق من مكان واحد.",
-    "actions": {
-      "open_hub": "فتح المركز",
-      "request_help": "طلب مساعدة",
-      "log_hours": "تسجيل الساعات"
-    }
+    "view_all_pending": "عرض جميع المعلقة"
   }
 }

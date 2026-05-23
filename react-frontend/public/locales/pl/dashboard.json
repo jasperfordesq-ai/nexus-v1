@@ -3,16 +3,29 @@
     "title": "Panel",
     "description": "Twój osobisty pulpit nawigacyjny. Zobacz swoje saldo, oferty i aktywność."
   },
+  "fallback_name": "tam",
   "welcome_back": "Witaj ponownie, {{name}}!",
   "community_activity": "Oto, co się dzieje w Twojej społeczności {{community}}",
   "unable_to_load": "Nie można załadować pulpitu nawigacyjnego",
   "try_again": "Spróbuj ponownie",
+  "common": {
+    "loading": "Ładowanie"
+  },
   "onboarding": {
     "banner_title": "Uzupełnij konfigurację swojego profilu",
     "banner_subtitle": "Powiedz nam o swoich zainteresowaniach i umiejętnościach, aby uzyskać spersonalizowane dopasowania",
     "get_started": "Zacznij"
   },
   "new_listing": "Nowa oferta",
+  "caring_community": {
+    "title": "Wspólnota opiekuńcza",
+    "subtitle": "Koordynuj prośby o pomoc, oferty czasu, zweryfikowane godziny wolontariatu i zaufane wsparcie z jednego miejsca.",
+    "actions": {
+      "open_hub": "Otwórz centrum",
+      "request_help": "Poproś o pomoc",
+      "log_hours": "Zapisz godziny"
+    }
+  },
   "stats": {
     "balance": "Saldo",
     "active_listings": "Aktywne oferty",
@@ -42,18 +55,18 @@
     "view_wallet": "Zobacz portfel",
     "find_members": "Znajdź członków",
     "browse_events": "Przeglądaj wydarzenia",
-    "notifications": "Powiadomienia",
-    "caring_community": "Centrum opieki"
+    "caring_community": "Centrum opieki",
+    "notifications": "Powiadomienia"
   },
   "listings": {
     "offering": "Oferowanie",
     "requesting": "Wnioskowanie",
     "offer": "Oferta",
     "request": "Prośba",
-    "empty": "Brak niedawnych ofert",
-    "create_first": "Utwórz swoją pierwszą ofertę",
     "user_fallback": "Użytkownik",
-    "empty_description": "Utwórz prośbę lub ofertę, aby zacząć dopasowywać się do osób w pobliżu."
+    "empty": "Brak niedawnych ofert",
+    "empty_description": "Utwórz prośbę lub ofertę, aby zacząć dopasowywać się do osób w pobliżu.",
+    "create_first": "Utwórz swoją pierwszą ofertę"
   },
   "activity": {
     "action_listing": "podzielił się ofertą",
@@ -62,8 +75,8 @@
     "action_goal": "ustawił nowy cel",
     "action_post": "podzielił się postem",
     "empty": "Brak ostatnich aktywności",
-    "check_feed": "Sprawdź feed",
-    "empty_description": "Aktualności społeczności pojawią się tutaj, gdy ludzie zaczną publikować."
+    "empty_description": "Aktualności społeczności pojawią się tutaj, gdy ludzie zaczną publikować.",
+    "check_feed": "Sprawdź feed"
   },
   "suggestions": {
     "empty": "Brak sugestii na razie",
@@ -72,24 +85,24 @@
   "groups": {
     "members_count": "{{count}} członków",
     "empty": "Nie dołączyłeś jeszcze do żadnych grup",
-    "discover": "Odkryj grupy",
-    "empty_description": "Grupy pomagają śledzić wspólne zainteresowania, projekty i lokalne kręgi."
+    "empty_description": "Grupy pomagają śledzić wspólne zainteresowania, projekty i lokalne kręgi.",
+    "discover": "Odkryj grupy"
   },
   "events": {
     "online_event": "Wydarzenie online",
     "empty": "Brak nadchodzących wydarzeń",
-    "browse": "Przeglądaj wydarzenia",
-    "empty_description": "Wydarzenia z Twojej społeczności pojawią się tutaj, gdy zostaną zaplanowane."
+    "empty_description": "Wydarzenia z Twojej społeczności pojawią się tutaj, gdy zostaną zaplanowane.",
+    "browse": "Przeglądaj wydarzenia"
   },
   "gamification": {
     "level": "Poziom {{level}}",
     "badges": "Odznaki",
     "streak": "Seria",
+    "xp_value": "{{count}} PD",
     "xp_progress": "Postęp XP",
     "start_earning": "Zacznij zdobywać XP, uczestnicząc w społeczności!",
     "streak_days_one": "{{count}} dzień",
-    "streak_days_other": "{{count}} dni",
-    "xp_value": "{{count}} XP"
+    "streak_days_other": "{{count}} dni"
   },
   "aria": {
     "loading_listings": "Ładowanie ofert",
@@ -114,21 +127,8 @@
     "received": "Otrzymano {{amount}}h",
     "review": "Recenzja",
     "none_pending": "Brak oczekujących recenzji",
+    "none_pending_description": "Zakończone wymiany wymagające oceny pojawią się tutaj.",
     "pending_subtitle": "Otwórz to żądanie recenzji",
-    "view_all_pending": "Zobacz wszystkie oczekujące",
-    "none_pending_description": "Zakończone wymiany wymagające oceny pojawią się tutaj."
-  },
-  "fallback_name": "tam",
-  "common": {
-    "loading": "Ładowanie"
-  },
-  "caring_community": {
-    "title": "Wspólnota opiekuńcza",
-    "subtitle": "Koordynuj prośby o pomoc, oferty czasu, zweryfikowane godziny wolontariatu i zaufane wsparcie z jednego miejsca.",
-    "actions": {
-      "open_hub": "Otwórz centrum",
-      "request_help": "Poproś o pomoc",
-      "log_hours": "Zapisz godziny"
-    }
+    "view_all_pending": "Zobacz wszystkie oczekujące"
   }
 }

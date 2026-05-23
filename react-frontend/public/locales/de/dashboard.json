@@ -1,18 +1,31 @@
 {
   "meta": {
-    "title": "Dashboard",
+    "title": "Armaturenbrett",
     "description": "Ihr persönliches Dashboard. Zeigen Sie Ihr Guthaben, Inserate und Aktivitäten an."
   },
+  "fallback_name": "dort",
   "welcome_back": "Willkommen zurück, {{name}}!",
   "community_activity": "Das passiert gerade in Ihrer {{community}}-Gemeinschaft",
   "unable_to_load": "Dashboard konnte nicht geladen werden",
   "try_again": "Erneut versuchen",
+  "common": {
+    "loading": "Wird geladen"
+  },
   "onboarding": {
     "banner_title": "Vervollständigen Sie Ihre Profileinrichtung",
     "banner_subtitle": "Teilen Sie uns Ihre Interessen und Fähigkeiten mit, um personalisierte Treffer zu erhalten",
     "get_started": "Jetzt starten"
   },
   "new_listing": "Neues Inserat",
+  "caring_community": {
+    "title": "Pflegende Gemeinschaft",
+    "subtitle": "Koordinieren Sie Hilfeanfragen, Zeitangebote, verifizierte Freiwilligenstunden und vertrauenswürdige Unterstützung von einem Ort aus.",
+    "actions": {
+      "open_hub": "Hub öffnen",
+      "request_help": "Hilfe anfordern",
+      "log_hours": "Stunden erfassen"
+    }
+  },
   "stats": {
     "balance": "Guthaben",
     "active_listings": "Aktive Inserate",
@@ -42,18 +55,18 @@
     "view_wallet": "Zeitkonto anzeigen",
     "find_members": "Mitglieder finden",
     "browse_events": "Veranstaltungen suchen",
-    "notifications": "Benachrichtigungen",
-    "caring_community": "Pflegehub"
+    "caring_community": "Pflegehub",
+    "notifications": "Benachrichtigungen"
   },
   "listings": {
     "offering": "Angebot",
     "requesting": "Gesuch",
     "offer": "Angebot",
     "request": "Gesuch",
-    "empty": "Keine aktuellen Inserate",
-    "create_first": "Erstellen Sie Ihr erstes Inserat",
     "user_fallback": "Benutzer",
-    "empty_description": "Erstelle ein Gesuch oder Angebot, um Übereinstimmungen mit Menschen in deiner Nähe zu finden."
+    "empty": "Keine aktuellen Inserate",
+    "empty_description": "Erstelle ein Gesuch oder Angebot, um Übereinstimmungen mit Menschen in deiner Nähe zu finden.",
+    "create_first": "Erstellen Sie Ihr erstes Inserat"
   },
   "activity": {
     "action_listing": "hat ein Inserat geteilt",
@@ -62,8 +75,8 @@
     "action_goal": "hat ein neues Ziel gesetzt",
     "action_post": "hat einen Beitrag geteilt",
     "empty": "Keine aktuelle Aktivität",
-    "check_feed": "Den Feed ansehen",
-    "empty_description": "Community-Updates erscheinen hier, sobald Mitglieder beginnen, Beiträge zu veröffentlichen."
+    "empty_description": "Community-Updates erscheinen hier, sobald Mitglieder beginnen, Beiträge zu veröffentlichen.",
+    "check_feed": "Den Feed ansehen"
   },
   "suggestions": {
     "empty": "Noch keine Empfehlungen",
@@ -72,24 +85,24 @@
   "groups": {
     "members_count": "{{count}} Mitglieder",
     "empty": "Sie sind noch keiner Gruppe beigetreten",
-    "discover": "Gruppen entdecken",
-    "empty_description": "Gruppen helfen dir, gemeinsamen Interessen, Projekten und lokalen Kreisen zu folgen."
+    "empty_description": "Gruppen helfen dir, gemeinsamen Interessen, Projekten und lokalen Kreisen zu folgen.",
+    "discover": "Gruppen entdecken"
   },
   "events": {
     "online_event": "Online-Veranstaltung",
     "empty": "Keine bevorstehenden Veranstaltungen",
-    "browse": "Veranstaltungen suchen",
-    "empty_description": "Veranstaltungen aus deiner Community erscheinen hier, sobald sie geplant sind."
+    "empty_description": "Veranstaltungen aus deiner Community erscheinen hier, sobald sie geplant sind.",
+    "browse": "Veranstaltungen suchen"
   },
   "gamification": {
     "level": "Stufe {{level}}",
     "badges": "Abzeichen",
     "streak": "Serie",
+    "xp_value": "{{count}} XP",
     "xp_progress": "XP-Fortschritt",
     "start_earning": "Verdienen Sie XP, indem Sie an der Gemeinschaft teilnehmen!",
     "streak_days_one": "{{count}} Tag",
-    "streak_days_other": "{{count}} Tage",
-    "xp_value": "{{count}} XP"
+    "streak_days_other": "{{count}} Tage"
   },
   "aria": {
     "loading_listings": "Inserate werden geladen",
@@ -114,21 +127,8 @@
     "received": "Erhalten {{amount}}h",
     "review": "Bewertung",
     "none_pending": "Keine ausstehenden Bewertungen",
+    "none_pending_description": "Abgeschlossene Tausche, die noch eine Bewertung benötigen, erscheinen hier.",
     "pending_subtitle": "Diese Rezensionsanfrage öffnen",
-    "view_all_pending": "Alle ausstehenden anzeigen",
-    "none_pending_description": "Abgeschlossene Tausche, die noch eine Bewertung benötigen, erscheinen hier."
-  },
-  "fallback_name": "dort",
-  "common": {
-    "loading": "Wird geladen"
-  },
-  "caring_community": {
-    "title": "Pflegende Gemeinschaft",
-    "subtitle": "Koordinieren Sie Hilfeanfragen, Zeitangebote, verifizierte Freiwilligenstunden und vertrauenswürdige Unterstützung von einem Ort aus.",
-    "actions": {
-      "open_hub": "Hub öffnen",
-      "request_help": "Hilfe anfordern",
-      "log_hours": "Stunden erfassen"
-    }
+    "view_all_pending": "Alle ausstehenden anzeigen"
   }
 }
