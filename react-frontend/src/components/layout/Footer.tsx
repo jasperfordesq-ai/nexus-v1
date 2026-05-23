@@ -75,20 +75,20 @@ export function Footer({ children, copyright }: FooterProps) {
             title={pbLabel || t('footer.powered_by')}
             className="transition-opacity hover:opacity-80"
           >
-            <img src={pbImage} alt={pbLabel || t('footer.powered_by')} className="h-20 w-auto max-w-[14rem] object-contain" />
+            <img src={pbImage} alt={pbLabel || t('footer.powered_by')} className="h-24 w-auto object-contain" />
           </a>
           <SourceRepositoryLink compact className="w-full max-w-[18rem] justify-center" />
           {/* Tenant partner logo — real or placeholder */}
           {partnerLogoUrl ? (
             partnerLinkUrl ? (
               <a href={partnerLinkUrl} target="_blank" rel="noopener noreferrer" className="transition-opacity hover:opacity-80">
-                <img src={partnerLogoUrl} alt={branding.name} className="h-20 w-auto max-w-[14rem] object-contain" />
+                <img src={partnerLogoUrl} alt={branding.name} className="max-h-16 w-auto max-w-[22rem] object-contain" />
               </a>
             ) : (
-              <img src={partnerLogoUrl} alt={branding.name} className="h-20 w-auto max-w-[14rem] object-contain" />
+              <img src={partnerLogoUrl} alt={branding.name} className="max-h-16 w-auto max-w-[22rem] object-contain" />
             )
           ) : (
-            <div className="w-full max-w-[18rem] border-2 border-dashed border-theme-default/40 rounded-xl h-20 flex items-center justify-center">
+            <div className="w-full max-w-[22rem] border-2 border-dashed border-theme-default/40 rounded-xl h-16 flex items-center justify-center">
               <span className="text-xs text-theme-subtle/40">{t('footer.tenant_logo_placeholder')}</span>
             </div>
           )}
@@ -264,13 +264,13 @@ export function Footer({ children, copyright }: FooterProps) {
                   {partnerLogoUrl ? (
                     partnerLinkUrl ? (
                       <a href={partnerLinkUrl} target="_blank" rel="noopener noreferrer" className="transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg">
-                        <img src={partnerLogoUrl} alt={branding.name} className="h-28 w-auto max-w-[14rem] object-contain" />
+                        <img src={partnerLogoUrl} alt={branding.name} className="max-h-20 w-auto max-w-[22rem] object-contain" />
                       </a>
                     ) : (
-                      <img src={partnerLogoUrl} alt={branding.name} className="h-28 w-auto max-w-[14rem] object-contain" />
+                      <img src={partnerLogoUrl} alt={branding.name} className="max-h-20 w-auto max-w-[22rem] object-contain" />
                     )
                   ) : (
-                    <div className="h-28 w-48 border-2 border-dashed border-theme-default/40 rounded-xl flex items-center justify-center">
+                    <div className="h-20 w-48 border-2 border-dashed border-theme-default/40 rounded-xl flex items-center justify-center">
                       <span className="text-xs text-theme-subtle/40 text-center leading-snug px-3">
                         {t('footer.tenant_logo_placeholder')}
                       </span>
@@ -305,7 +305,7 @@ export function Footer({ children, copyright }: FooterProps) {
                     <img
                       src={pbImage}
                       alt={pbLabel || t('footer.powered_by')}
-                      className="h-28 w-auto max-w-[14rem] object-contain"
+                      className="h-32 w-auto object-contain"
                     />
                   </a>
                 </div>
