@@ -1,61 +1,61 @@
 {
   "meta": {
-    "title": "Become a Pilot Region",
-    "description": "Join the Caring Community platform as a pilot region"
+    "title": "تصبح منطقة تجريبية",
+    "description": "انضم إلى منصة Caring Community كمنطقة تجريبية"
   },
-  "hero_title": "Become a Pilot Region",
-  "hero_subtitle": "Jetzt Pilotregion werden — be among the first municipalities to offer a trusted digital community platform",
-  "step": "Step {{current}} of {{total}}",
+  "hero_title": "تصبح منطقة تجريبية",
+  "hero_subtitle": "Jetzt Pilotregion werden - كن من بين البلديات الأولى التي تقدم منصة مجتمعية رقمية موثوقة",
+  "step": "الخطوة {{current}} من {{total}}",
   "steps": {
-    "municipality": "Your Municipality",
-    "needs": "Your Needs",
-    "contact": "Contact Details"
+    "municipality": "بلديتك",
+    "needs": "احتياجاتك",
+    "contact": "تفاصيل الاتصال"
   },
   "fields": {
-    "municipality_name": "Municipality name",
-    "region": "Region / Canton",
-    "country": "Country",
-    "population": "Population",
-    "has_kiss": "KISS cooperative present in your area",
-    "modules": "Modules of interest",
-    "has_existing_tool": "Already using a digital tool",
-    "existing_tool": "Which tool?",
-    "timeline": "Expected timeline",
-    "budget": "Budget indication",
-    "contact_name": "Your name",
-    "contact_email": "Email address",
-    "contact_phone": "Phone (optional)",
-    "contact_role": "Your role",
-    "notes": "Additional notes"
+    "municipality_name": "اسم البلدية",
+    "region": "المنطقة / الكانتون",
+    "country": "دولة",
+    "population": "سكان",
+    "has_kiss": "تعاونية KISS موجودة في منطقتك",
+    "modules": "وحدات من الفائدة",
+    "has_existing_tool": "بالفعل باستخدام أداة رقمية",
+    "existing_tool": "أي أداة؟",
+    "timeline": "الجدول الزمني المتوقع",
+    "budget": "إشارة الميزانية",
+    "contact_name": "اسمك",
+    "contact_email": "عنوان البريد الإلكتروني",
+    "contact_phone": "الهاتف (اختياري)",
+    "contact_role": "دورك",
+    "notes": "ملاحظات إضافية"
   },
   "timeline_options": {
-    "asap": "As soon as possible",
-    "6m": "Within 6 months",
-    "1y": "Within 1 year",
-    "2y": "Within 2 years",
-    "explore": "Just exploring"
+    "asap": "في أسرع وقت ممكن",
+    "6m": "في غضون 6 أشهر",
+    "1y": "في غضون 1 سنة",
+    "2y": "في غضون عامين",
+    "explore": "مجرد استكشاف"
   },
   "budget_options": {
-    "under_5k": "Under €5,000/year",
-    "5k_10k": "€5,000–10,000/year",
-    "10k_25k": "€10,000–25,000/year",
-    "25k_plus": "Over €25,000/year",
-    "unknown": "Not sure yet"
+    "under_5k": "أقل من 5000 يورو في السنة",
+    "5k_10k": "5,000-10,000 يورو في السنة",
+    "10k_25k": "10.000-25.000 يورو في السنة",
+    "25k_plus": "أكثر من 25000 يورو في السنة",
+    "unknown": "لست متأكدا بعد"
   },
   "modules": {
-    "time_banking": "Time banking",
-    "caring_community": "Caring community",
-    "local_marketplace": "Local marketplace",
-    "municipal_announcements": "Municipal announcements"
+    "time_banking": "الوقت المصرفي",
+    "caring_community": "مجتمع الرعاية",
+    "local_marketplace": "السوق المحلية",
+    "municipal_announcements": "اعلانات البلدية"
   },
-  "next": "Next",
-  "back": "Back",
-  "submit": "Submit inquiry",
-  "submitting": "Submitting…",
-  "success_title": "Thank you for your interest!",
-  "success_excellent": "Excellent fit",
-  "success_good": "Good fit",
-  "success_interested": "Interesting inquiry",
-  "success_followup": "We will be in touch within 2 business days.",
-  "success_back": "Back to home"
+  "next": "التالي",
+  "back": "خلف",
+  "submit": "إرسال الاستفسار",
+  "submitting": "تقديم…",
+  "success_title": "شكرا لاهتمامك!",
+  "success_excellent": "تناسب ممتاز",
+  "success_good": "مناسبا جيدا",
+  "success_interested": "استفسار مثير للاهتمام",
+  "success_followup": "سنكون على اتصال خلال يومي عمل.",
+  "success_back": "العودة إلى المنزل"
 }

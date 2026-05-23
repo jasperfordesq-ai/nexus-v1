@@ -1,61 +1,61 @@
 {
   "meta": {
-    "title": "Become a Pilot Region",
-    "description": "Join the Caring Community platform as a pilot region"
+    "title": "Torne-se uma região piloto",
+    "description": "Junte-se à plataforma Caring Community como região piloto"
   },
-  "hero_title": "Become a Pilot Region",
-  "hero_subtitle": "Jetzt Pilotregion werden — be among the first municipalities to offer a trusted digital community platform",
-  "step": "Step {{current}} of {{total}}",
+  "hero_title": "Torne-se uma região piloto",
+  "hero_subtitle": "Jetzt Pilotregion werden — esteja entre os primeiros municípios a oferecer uma plataforma comunitária digital confiável",
+  "step": "Etapa {{current}} de {{total}}",
   "steps": {
-    "municipality": "Your Municipality",
-    "needs": "Your Needs",
-    "contact": "Contact Details"
+    "municipality": "Seu município",
+    "needs": "Suas necessidades",
+    "contact": "Detalhes de contato"
   },
   "fields": {
-    "municipality_name": "Municipality name",
-    "region": "Region / Canton",
-    "country": "Country",
-    "population": "Population",
-    "has_kiss": "KISS cooperative present in your area",
-    "modules": "Modules of interest",
-    "has_existing_tool": "Already using a digital tool",
-    "existing_tool": "Which tool?",
-    "timeline": "Expected timeline",
-    "budget": "Budget indication",
-    "contact_name": "Your name",
-    "contact_email": "Email address",
-    "contact_phone": "Phone (optional)",
-    "contact_role": "Your role",
-    "notes": "Additional notes"
+    "municipality_name": "Nome do município",
+    "region": "Região / Cantão",
+    "country": "País",
+    "population": "População",
+    "has_kiss": "Cooperativa KISS presente na sua região",
+    "modules": "Módulos de interesse",
+    "has_existing_tool": "Já utiliza uma ferramenta digital",
+    "existing_tool": "Qual ferramenta?",
+    "timeline": "Cronograma esperado",
+    "budget": "Indicação de orçamento",
+    "contact_name": "Seu nome",
+    "contact_email": "Endereço de email",
+    "contact_phone": "Telefone (opcional)",
+    "contact_role": "Seu papel",
+    "notes": "Notas adicionais"
   },
   "timeline_options": {
-    "asap": "As soon as possible",
-    "6m": "Within 6 months",
-    "1y": "Within 1 year",
-    "2y": "Within 2 years",
-    "explore": "Just exploring"
+    "asap": "O mais breve possível",
+    "6m": "Dentro de 6 meses",
+    "1y": "Dentro de 1 ano",
+    "2y": "Dentro de 2 anos",
+    "explore": "Apenas explorando"
   },
   "budget_options": {
-    "under_5k": "Under €5,000/year",
-    "5k_10k": "€5,000–10,000/year",
-    "10k_25k": "€10,000–25,000/year",
-    "25k_plus": "Over €25,000/year",
-    "unknown": "Not sure yet"
+    "under_5k": "Menos de 5.000€/ano",
+    "5k_10k": "5.000–10.000€/ano",
+    "10k_25k": "10.000–25.000€/ano",
+    "25k_plus": "Mais de 25.000€/ano",
+    "unknown": "Ainda não tenho certeza"
   },
   "modules": {
-    "time_banking": "Time banking",
-    "caring_community": "Caring community",
-    "local_marketplace": "Local marketplace",
-    "municipal_announcements": "Municipal announcements"
+    "time_banking": "Banco de tempo",
+    "caring_community": "Comunidade atenciosa",
+    "local_marketplace": "Mercado local",
+    "municipal_announcements": "Anúncios municipais"
   },
-  "next": "Next",
-  "back": "Back",
-  "submit": "Submit inquiry",
-  "submitting": "Submitting…",
-  "success_title": "Thank you for your interest!",
-  "success_excellent": "Excellent fit",
-  "success_good": "Good fit",
-  "success_interested": "Interesting inquiry",
-  "success_followup": "We will be in touch within 2 business days.",
-  "success_back": "Back to home"
+  "next": "Próximo",
+  "back": "Voltar",
+  "submit": "Enviar consulta",
+  "submitting": "Enviando…",
+  "success_title": "Obrigado pelo seu interesse!",
+  "success_excellent": "Excelente ajuste",
+  "success_good": "Bom ajuste",
+  "success_interested": "Inquérito interessante",
+  "success_followup": "Entraremos em contato em até 2 dias úteis.",
+  "success_back": "De volta para casa"
 }
