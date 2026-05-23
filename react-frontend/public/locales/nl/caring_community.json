@@ -712,7 +712,7 @@
         "last_7_days": "Laatste 7 dagen",
         "by_status": "Op status:",
         "by_category": "Per categorie:",
-        "sentiment": "Sentiment:"
+        "sentiment": "Sentimentanalyse:"
       },
       "filters": {
         "status": "Status",
@@ -889,7 +889,7 @@
         "trust_tiers_body": "Nieuwkomer, Lid, Vertrouwd, Geverifieerd, Coördinator - weergegeven voor de ontvanger en elke supporter.",
         "safeguarding_label": "Vlaggen beveiligen:",
         "safeguarding_body": "Een vlagtelling die niet nul is, duidt op actieve beveiligingsproblemen die tegen dit lid zijn geregistreerd. Bekijk ze in het gedeelte Beveiliging.",
-        "privacy_label": "Privacy:",
+        "privacy_label": "Privacyinstelling:",
         "privacy_body": "Kringgegevens zijn alleen zichtbaar voor kringleden en tenantbeheerders. Het is niet opgenomen in rapporten voor de hele gemeenschap of in de ledenlijst."
       },
       "lookup": {

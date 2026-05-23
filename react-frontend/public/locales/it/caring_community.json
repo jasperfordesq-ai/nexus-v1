@@ -889,7 +889,7 @@
         "trust_tiers_body": "Nuovo arrivato, Membro, Affidabile, Verificato, Coordinatore: mostrato per il destinatario e ciascun sostenitore.",
         "safeguarding_label": "Salvaguardia delle bandiere:",
         "safeguarding_body": "Un conteggio di flag diverso da zero indica problemi di protezione attivi registrati nei confronti di questo membro. Esaminateli nella sezione Salvaguardia.",
-        "privacy_label": "Privacy:",
+        "privacy_label": "Riservatezza:",
         "privacy_body": "I dati della cerchia sono visibili solo ai membri della cerchia e agli amministratori dei tenant. Non è incluso nei report a livello di comunità o nella directory dei membri."
       },
       "lookup": {
