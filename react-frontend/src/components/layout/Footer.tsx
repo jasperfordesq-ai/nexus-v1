@@ -46,7 +46,9 @@ export function Footer({ children, copyright }: FooterProps) {
   // Custom powered-by branding (God-configured per tenant)
   const pbImageLight = tenant?.config?.powered_by_image_light as string | undefined;
   const pbImageDark  = tenant?.config?.powered_by_image_dark  as string | undefined;
-  const pbImage = resolvedTheme === 'dark' ? (pbImageDark || pbImageLight) : (pbImageLight || pbImageDark);
+  // No cross-mode fallback: each variant only shows in its matching theme.
+  // If a variant isn't uploaded, that theme falls back to the default NEXUS logo.
+  const pbImage = resolvedTheme === 'dark' ? pbImageDark : pbImageLight;
   const pbUrl   = tenant?.config?.powered_by_url   as string | undefined;
   const pbLabel = tenant?.config?.powered_by_label as string | undefined;
   const hasCustomPoweredBy = Boolean(pbImage);
