@@ -18,8 +18,6 @@ import Sparkles from 'lucide-react/icons/sparkles';
 import { RELEASE_STATUS } from '@/config/releaseStatus';
 import { SourceRepositoryLink } from './SourceRepositoryLink';
 
-const PROJECT_NEXUS_URL = 'https://project-nexus.ie';
-const PROJECT_NEXUS_HOST = new URL(PROJECT_NEXUS_URL).hostname;
 
 export interface FooterProps {
   /** Footer content/links */
@@ -43,15 +41,17 @@ export function Footer({ children, copyright }: FooterProps) {
   const { resetConsent } = useCookieConsent();
   const year = new Date().getFullYear();
 
-  // Custom powered-by branding (God-configured per tenant)
-  const pbImageLight = tenant?.config?.powered_by_image_light as string | undefined;
-  const pbImageDark  = tenant?.config?.powered_by_image_dark  as string | undefined;
-  // No cross-mode fallback: each variant only shows in its matching theme.
-  // If a variant isn't uploaded, that theme falls back to the default NEXUS logo.
+  // Powered-by branding: hardcoded NEXUS defaults, overridable per-tenant by God only.
+  // God-uploaded images take priority; otherwise the built-in assets ship with every fork/clone.
+  const DEFAULT_PB_IMAGE_LIGHT = '/images/powered-by-nexus-light.png';
+  const DEFAULT_PB_IMAGE_DARK  = '/images/powered-by-nexus-dark.png';
+  const DEFAULT_PB_URL         = 'https://project-nexus.ie';
+
+  const pbImageLight = (tenant?.config?.powered_by_image_light as string | undefined) || DEFAULT_PB_IMAGE_LIGHT;
+  const pbImageDark  = (tenant?.config?.powered_by_image_dark  as string | undefined) || DEFAULT_PB_IMAGE_DARK;
   const pbImage = resolvedTheme === 'dark' ? pbImageDark : pbImageLight;
-  const pbUrl   = tenant?.config?.powered_by_url   as string | undefined;
+  const pbUrl   = (tenant?.config?.powered_by_url   as string | undefined) || DEFAULT_PB_URL;
   const pbLabel = tenant?.config?.powered_by_label as string | undefined;
-  const hasCustomPoweredBy = Boolean(pbImage);
 
   // Use tenant's footer_text from config if set, otherwise build a default
   const footerText = tenant?.config?.footer_text?.trim()
@@ -64,37 +64,16 @@ export function Footer({ children, copyright }: FooterProps) {
     <footer className="relative z-10 border-t border-theme-default mt-auto glass-surface backdrop-blur-sm" data-nosnippet>
       <div className="md:hidden px-4 py-6 pb-[calc(var(--safe-area-bottom)+5rem)]">
         <div className="flex flex-col items-center gap-4">
-          {/* Powered-by banner (custom or default NEXUS) */}
-          {hasCustomPoweredBy ? (
-            pbUrl ? (
-              <a
-                href={pbUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="transition-opacity hover:opacity-80"
-              >
-                <img src={pbImage} alt={pbLabel || t('footer.powered_by')} className="h-24 w-auto object-contain" />
-              </a>
-            ) : (
-              <img src={pbImage} alt={pbLabel || t('footer.powered_by')} className="h-24 w-auto object-contain" />
-            )
-          ) : (
-            <a
-              href={PROJECT_NEXUS_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              title={t('footer.nexus_link_label')}
-              className="transition-opacity hover:opacity-80"
-            >
-              <img
-                src="/images/project-nexus-open-source-community-platform.png"
-                alt={t('footer.nexus_link_label')}
-                className="h-24 w-auto object-contain"
-                width="1536"
-                height="1024"
-              />
-            </a>
-          )}
+          {/* Powered-by banner — always shown; defaults to NEXUS branding, overridable by God */}
+          <a
+            href={pbUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={pbLabel || t('footer.powered_by')}
+            className="transition-opacity hover:opacity-80"
+          >
+            <img src={pbImage} alt={pbLabel || t('footer.powered_by')} className="h-24 w-auto object-contain" />
+          </a>
           <SourceRepositoryLink compact className="w-full max-w-[18rem] justify-center" />
           {/* Tenant partner logo — real or placeholder */}
           {tenant?.config?.partner_logo_url ? (
@@ -303,60 +282,25 @@ export function Footer({ children, copyright }: FooterProps) {
                   </p>
                 </div>
 
-                {/* COL 3: Powered by (custom or default NEXUS) */}
+                {/* COL 3: Powered by — always shown; defaults to NEXUS branding, overridable by God */}
                 <div className="flex flex-col items-start sm:items-end gap-2">
                   <span className="text-[10px] font-semibold uppercase tracking-widest text-theme-subtle/50">
                     {pbLabel || t('footer.powered_by')}
                   </span>
-                  {hasCustomPoweredBy ? (
-                    pbUrl ? (
-                      <a
-                        href={pbUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
-                      >
-                        <img
-                          src={pbImage}
-                          alt={pbLabel || t('footer.powered_by')}
-                          className="h-32 w-auto object-contain"
-                        />
-                      </a>
-                    ) : (
-                      <img
-                        src={pbImage}
-                        alt={pbLabel || t('footer.powered_by')}
-                        className="h-32 w-auto object-contain"
-                      />
-                    )
-                  ) : (
-                    <>
-                      <a
-                        href={PROJECT_NEXUS_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        title={t('footer.nexus_link_label')}
-                        aria-label={t('footer.nexus_link_label')}
-                        className="transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
-                      >
-                        <img
-                          src="/images/project-nexus-open-source-community-platform.png"
-                          alt={t('footer.nexus_link_label')}
-                          className="h-32 w-auto object-contain"
-                          width="1536"
-                          height="1024"
-                        />
-                      </a>
-                      <a
-                        href={PROJECT_NEXUS_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs text-theme-muted hover:text-theme-primary transition-colors"
-                      >
-                        {PROJECT_NEXUS_HOST} <span aria-hidden="true">↗</span>
-                      </a>
-                    </>
-                  )}
+                  <a
+                    href={pbUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title={pbLabel || t('footer.powered_by')}
+                    aria-label={pbLabel || t('footer.powered_by')}
+                    className="transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
+                  >
+                    <img
+                      src={pbImage}
+                      alt={pbLabel || t('footer.powered_by')}
+                      className="h-32 w-auto object-contain"
+                    />
+                  </a>
                 </div>
 
               </div>
