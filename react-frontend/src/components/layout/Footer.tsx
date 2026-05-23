@@ -284,9 +284,6 @@ export function Footer({ children, copyright }: FooterProps) {
                     {t('footer.open_source')}
                   </span>
                   <SourceRepositoryLink />
-                  <p className="text-xs text-theme-subtle/60 text-left sm:text-center max-w-[16rem] leading-relaxed">
-                    {t('footer.agpl_short')}
-                  </p>
                 </div>
 
                 {/* COL 3: Powered by — always shown; defaults to NEXUS branding, overridable by God */}
