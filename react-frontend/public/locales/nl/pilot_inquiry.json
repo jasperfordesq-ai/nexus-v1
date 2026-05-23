@@ -1,61 +1,61 @@
 {
   "meta": {
-    "title": "Become a Pilot Region",
-    "description": "Join the Caring Community platform as a pilot region"
+    "title": "Word een pilotregio",
+    "description": "Sluit u aan bij het Caring Community-platform als pilotregio"
   },
-  "hero_title": "Become a Pilot Region",
-  "hero_subtitle": "Jetzt Pilotregion werden — be among the first municipalities to offer a trusted digital community platform",
-  "step": "Step {{current}} of {{total}}",
+  "hero_title": "Word een pilotregio",
+  "hero_subtitle": "Jetzt Pilotregion werden – wees een van de eerste gemeenten die een vertrouwd digitaal gemeenschapsplatform aanbiedt",
+  "step": "Stap {{current}} van {{total}}",
   "steps": {
-    "municipality": "Your Municipality",
-    "needs": "Your Needs",
-    "contact": "Contact Details"
+    "municipality": "Uw gemeente",
+    "needs": "Uw behoeften",
+    "contact": "Contactgegevens"
   },
   "fields": {
-    "municipality_name": "Municipality name",
-    "region": "Region / Canton",
-    "country": "Country",
-    "population": "Population",
-    "has_kiss": "KISS cooperative present in your area",
-    "modules": "Modules of interest",
-    "has_existing_tool": "Already using a digital tool",
-    "existing_tool": "Which tool?",
-    "timeline": "Expected timeline",
-    "budget": "Budget indication",
-    "contact_name": "Your name",
-    "contact_email": "Email address",
-    "contact_phone": "Phone (optional)",
-    "contact_role": "Your role",
-    "notes": "Additional notes"
+    "municipality_name": "Naam gemeente",
+    "region": "Regio / Kanton",
+    "country": "Land",
+    "population": "Bevolking",
+    "has_kiss": "KISS-coöperatie aanwezig bij u in de buurt",
+    "modules": "Interessante modules",
+    "has_existing_tool": "Maakt al gebruik van een digitaal hulpmiddel",
+    "existing_tool": "Welk hulpmiddel?",
+    "timeline": "Verwachte tijdlijn",
+    "budget": "Budgetindicatie",
+    "contact_name": "Jouw naam",
+    "contact_email": "E-mailadres",
+    "contact_phone": "Telefoon (optioneel)",
+    "contact_role": "Jouw rol",
+    "notes": "Aanvullende opmerkingen"
   },
   "timeline_options": {
-    "asap": "As soon as possible",
-    "6m": "Within 6 months",
-    "1y": "Within 1 year",
-    "2y": "Within 2 years",
-    "explore": "Just exploring"
+    "asap": "Zo snel mogelijk",
+    "6m": "Binnen 6 maanden",
+    "1y": "Binnen 1 jaar",
+    "2y": "Binnen 2 jaar",
+    "explore": "Gewoon verkennen"
   },
   "budget_options": {
-    "under_5k": "Under €5,000/year",
-    "5k_10k": "€5,000–10,000/year",
-    "10k_25k": "€10,000–25,000/year",
-    "25k_plus": "Over €25,000/year",
-    "unknown": "Not sure yet"
+    "under_5k": "Minder dan € 5.000/jaar",
+    "5k_10k": "€ 5.000–10.000/jaar",
+    "10k_25k": "€ 10.000–25.000/jaar",
+    "25k_plus": "Ruim € 25.000/jaar",
+    "unknown": "Nog niet zeker"
   },
   "modules": {
-    "time_banking": "Time banking",
-    "caring_community": "Caring community",
-    "local_marketplace": "Local marketplace",
-    "municipal_announcements": "Municipal announcements"
+    "time_banking": "Tijdbankieren",
+    "caring_community": "Zorgzame gemeenschap",
+    "local_marketplace": "Lokale marktplaats",
+    "municipal_announcements": "Gemeentelijke mededelingen"
   },
-  "next": "Next",
-  "back": "Back",
-  "submit": "Submit inquiry",
-  "submitting": "Submitting…",
-  "success_title": "Thank you for your interest!",
-  "success_excellent": "Excellent fit",
-  "success_good": "Good fit",
-  "success_interested": "Interesting inquiry",
-  "success_followup": "We will be in touch within 2 business days.",
-  "success_back": "Back to home"
+  "next": "Volgende",
+  "back": "Rug",
+  "submit": "Vraag indienen",
+  "submitting": "Verzenden…",
+  "success_title": "Bedankt voor uw interesse!",
+  "success_excellent": "Uitstekende pasvorm",
+  "success_good": "Goede pasvorm",
+  "success_interested": "Interessant onderzoek",
+  "success_followup": "Wij nemen binnen 2 werkdagen contact met u op.",
+  "success_back": "Terug naar huis"
 }

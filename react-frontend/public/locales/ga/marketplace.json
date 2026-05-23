@@ -26,9 +26,9 @@
     "saved_items": "Earraí Sábháilte",
     "unable_to_load": "Ní féidir na liostaí a luchtú",
     "load_more_failed": "Theip ar luchtú tuilleadh liostaí",
-    "my_listings": "My Listings",
-    "my_offers": "My Offers",
-    "my_orders": "My Orders"
+    "my_listings": "Mo Liostaí",
+    "my_offers": "Mo Tairiscintí",
+    "my_orders": "Mo Orduithe"
   },
   "hub_feature_gate": {
     "title": "Níl an Margadh ar Fáil",
@@ -94,7 +94,7 @@
     "modal_title": "Déan Tairiscint",
     "asking_price": "Praghas iarrtha:",
     "your_offer": "Do Thairiscint",
-    "amount_placeholder": "0.00",
+    "amount_placeholder": "0. 00",
     "message_label": "Teachtaireacht (roghnach)",
     "message_placeholder": "Cuir teachtaireacht leis don díoltóir...",
     "cancel": "Cealaigh",
@@ -573,7 +573,8 @@
       "declined": "Diúltaithe",
       "completed": "Críochnaithe",
       "cancelled": "Cealaithe"
-    }
+    },
+    "offers_title": "Tairiscintí Seachadta"
   },
   "pickup": {
     "my_pickups_title": "Mo bhailiúcháin",
@@ -642,7 +643,7 @@
     "courier_name": "Ainm an Teachtaire",
     "courier_name_placeholder": "m.sh. An Post, Royal Mail, DHL",
     "price": "Praghas",
-    "price_placeholder": "0.00",
+    "price_placeholder": "0. 00",
     "currency": "Airgeadra",
     "estimated_days": "Laethanta Measta",
     "estimated_days_placeholder": "m.sh. 3",

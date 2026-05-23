@@ -1,4 +1,7 @@
 {
+  "empty": {
+    "no_stories": "Geen verhalen beschikbaar"
+  },
   "creator": {
     "title": "Verhaal Aanmaken",
     "close": "Sluit maker",
@@ -30,7 +33,7 @@
     "gradient_dark": "Donker",
     "gradient_pink_rose": "Roze Roos",
     "gradient_cyan_blue": "Cyaan Blauw",
-    "font_sans": "Sans",
+    "font_sans": "Zonder",
     "font_serif": "Serif",
     "font_mono": "Mono",
     "template_ama": "Vraag Mij Alles",
@@ -64,7 +67,10 @@
     "error_image_size": "Afbeelding moet kleiner zijn dan 10MB",
     "error_video_type": "Selecteer alstublieft een videobestand",
     "error_video_size": "Video moet kleiner zijn dan 50MB",
+    "share_story": "Verhaal delen",
     "error_camera": "Kon de camera niet openen. Controleer de machtigingen.",
+    "error_camera_permission": "Cameratoegang werd geweigerd. Schakel het in via de browserinstellingen.",
+    "error_camera_not_found": "Geen camera gevonden op dit apparaat.",
     "error_process": "Verwerken van afbeelding mislukt",
     "error_create": "Verhaal maken mislukt",
     "flip_camera": "Draai camera",
@@ -92,9 +98,6 @@
     "or_divider": "of",
     "poll_add_option_button": "Optie toevoegen",
     "videos_trimmed_notice": "Video's langer dan 60s worden bijgeknipt tot 60s weergaveduur",
-    "share_story": "Verhaal delen",
-    "error_camera_permission": "Cameratoegang werd geweigerd. Schakel het in via de browserinstellingen.",
-    "error_camera_not_found": "Geen camera gevonden op dit apparaat.",
     "video_duration_seconds": "{{count}}s"
   },
   "viewer": {
@@ -129,9 +132,6 @@
     "reply_placeholder_generic": "Beantwoord verhaal...",
     "react_with": "Reageer met {{type}}",
     "viewers_title_count": "Kijkers ({{count}})"
-  },
-  "empty": {
-    "no_stories": "Geen verhalen beschikbaar"
   },
   "highlights": {
     "no_stories": "Dit highlight heeft geen verhalen",

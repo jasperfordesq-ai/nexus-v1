@@ -1,18 +1,31 @@
 {
   "meta": {
-    "title": "Dashboard",
+    "title": "Pannello di controllo",
     "description": "La Sua dashboard personale. Visualizzi il Suo saldo, gli annunci e l'attività."
   },
+  "fallback_name": "là",
   "welcome_back": "Bentornato/a, {{name}}!",
   "community_activity": "Ecco cosa sta accadendo nella comunità {{community}}",
   "unable_to_load": "Impossibile Caricare la Dashboard",
   "try_again": "Riprova",
+  "common": {
+    "loading": "Caricamento"
+  },
   "onboarding": {
     "banner_title": "Completi la configurazione del Suo profilo",
     "banner_subtitle": "Ci dica i Suoi interessi e le Sue competenze per ottenere corrispondenze personalizzate",
     "get_started": "Inizia"
   },
   "new_listing": "Nuovo Annuncio",
+  "caring_community": {
+    "title": "Comunità solidale",
+    "subtitle": "Coordina le richieste di aiuto, le offerte di tempo, le ore di volontariato verificate e il supporto affidabile da un unico posto.",
+    "actions": {
+      "open_hub": "Apri hub",
+      "request_help": "Richiedi aiuto",
+      "log_hours": "Registra ore"
+    }
+  },
   "stats": {
     "balance": "Saldo",
     "active_listings": "Annunci Attivi",
@@ -42,18 +55,18 @@
     "view_wallet": "Vedi Portafoglio",
     "find_members": "Trova Membri",
     "browse_events": "Sfoglia Eventi",
-    "notifications": "Notifiche",
-    "caring_community": "Centro cura"
+    "caring_community": "Centro cura",
+    "notifications": "Notifiche"
   },
   "listings": {
     "offering": "Offerta",
     "requesting": "Richiesta",
     "offer": "Offerta",
     "request": "Richiesta",
-    "empty": "Nessun annuncio recente",
-    "create_first": "Crei il Suo primo annuncio",
     "user_fallback": "Utente",
-    "empty_description": "Crea una richiesta o un'offerta per iniziare a trovare corrispondenze con persone vicine."
+    "empty": "Nessun annuncio recente",
+    "empty_description": "Crea una richiesta o un'offerta per iniziare a trovare corrispondenze con persone vicine.",
+    "create_first": "Crei il Suo primo annuncio"
   },
   "activity": {
     "action_listing": "ha condiviso un annuncio",
@@ -62,8 +75,8 @@
     "action_goal": "ha fissato un nuovo obiettivo",
     "action_post": "ha condiviso un post",
     "empty": "Nessuna attività recente",
-    "check_feed": "Consulti il Feed",
-    "empty_description": "Gli aggiornamenti della community appariranno qui quando le persone inizieranno a pubblicare."
+    "empty_description": "Gli aggiornamenti della community appariranno qui quando le persone inizieranno a pubblicare.",
+    "check_feed": "Consulti il Feed"
   },
   "suggestions": {
     "empty": "Ancora nessun suggerimento",
@@ -72,24 +85,24 @@
   "groups": {
     "members_count": "{{count}} membri",
     "empty": "Non ha ancora aderito a nessun gruppo",
-    "discover": "Scopri i gruppi",
-    "empty_description": "I gruppi ti aiutano a seguire interessi condivisi, progetti e cerchie locali."
+    "empty_description": "I gruppi ti aiutano a seguire interessi condivisi, progetti e cerchie locali.",
+    "discover": "Scopri i gruppi"
   },
   "events": {
     "online_event": "Evento online",
     "empty": "Nessun evento in programma",
-    "browse": "Sfoglia eventi",
-    "empty_description": "Gli eventi della tua community appariranno qui quando saranno programmati."
+    "empty_description": "Gli eventi della tua community appariranno qui quando saranno programmati.",
+    "browse": "Sfoglia eventi"
   },
   "gamification": {
     "level": "Livello {{level}}",
     "badges": "Badge",
     "streak": "Serie",
+    "xp_value": "{{count}} XP",
     "xp_progress": "Progresso XP",
     "start_earning": "Inizi a guadagnare XP partecipando alla comunità!",
     "streak_days_one": "{{count}} giorno",
-    "streak_days_other": "{{count}} giorni",
-    "xp_value": "{{count}} XP"
+    "streak_days_other": "{{count}} giorni"
   },
   "aria": {
     "loading_listings": "Caricamento annunci",
@@ -114,21 +127,8 @@
     "received": "Ricevuto {{amount}}h",
     "review": "Recensione",
     "none_pending": "Nessuna recensione in sospeso",
+    "none_pending_description": "Gli scambi completati che necessitano di un riscontro appariranno qui.",
     "pending_subtitle": "Apri questa richiesta di recensione",
-    "view_all_pending": "Vedi tutti i pendenti",
-    "none_pending_description": "Gli scambi completati che necessitano di un riscontro appariranno qui."
-  },
-  "fallback_name": "là",
-  "common": {
-    "loading": "Caricamento"
-  },
-  "caring_community": {
-    "title": "Comunità solidale",
-    "subtitle": "Coordina le richieste di aiuto, le offerte di tempo, le ore di volontariato verificate e il supporto affidabile da un unico posto.",
-    "actions": {
-      "open_hub": "Apri hub",
-      "request_help": "Richiedi aiuto",
-      "log_hours": "Registra ore"
-    }
+    "view_all_pending": "Vedi tutti i pendenti"
   }
 }

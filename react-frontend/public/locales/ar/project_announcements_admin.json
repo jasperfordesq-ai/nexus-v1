@@ -1,76 +1,76 @@
 {
-  "title": "Community Projects",
-  "subtitle": "Track staged municipality and cooperative announcements.",
-  "create_project": "Create project",
-  "empty": "No projects match this view.",
-  "date_unknown": "Not set",
+  "meta_title": "إعلانات المشروع",
+  "title": "المشاريع المجتمعية",
+  "subtitle": "تتبع إعلانات البلدية والتعاونية التي تم تنظيمها.",
+  "create_project": "إنشاء مشروع",
+  "empty": "لا توجد مشاريع تطابق هذا الرأي.",
+  "date_unknown": "لم يتم ضبطه",
   "progress_value": "{{value}}%",
-  "filters": {
-    "status": "Status",
-    "all": "All statuses"
-  },
-  "status": {
-    "draft": "Draft",
-    "active": "Active",
-    "paused": "Paused",
-    "completed": "Completed",
-    "cancelled": "Cancelled"
-  },
-  "table": {
-    "aria": "Community projects",
-    "project": "Project",
-    "status": "Status",
-    "progress": "Progress",
-    "subscribers": "Followers",
-    "updated": "Updated",
-    "actions": "Actions"
-  },
-  "actions": {
-    "publish": "Publish",
-    "add_update": "Add update",
-    "pause": "Pause",
-    "complete": "Complete",
-    "cancel": "Cancel"
-  },
-  "fields": {
-    "title": "Title",
-    "summary": "Summary",
-    "location": "Location",
-    "stage": "Stage",
-    "progress": "Progress percent",
-    "publish_now": "Publish now",
-    "update_title": "Update title",
-    "update_body": "Update body",
-    "milestone": "Milestone",
-    "publish_update_now": "Publish update now",
-    "current_stage": "Current stage"
-  },
-  "create_modal": {
-    "title": "Create community project",
-    "submit": "Create"
-  },
-  "update_modal": {
-    "title": "Add project update",
-    "submit": "Save update"
-  },
-  "errors": {
-    "load": "Could not load community projects.",
-    "create": "Could not create the project.",
-    "update": "Could not save the update.",
-    "publish": "Could not publish the project.",
-    "status": "Could not change project status."
-  },
-  "meta_title": "Project Announcements",
   "about": {
-    "title": "About this page",
-    "body": "Project announcements are non-urgent updates posted to the community feed and member notification centre. Use them for programme news, volunteer recruitment, event notices, and impact updates. Unlike emergency alerts, announcements are queued and delivered on the platform's normal notification schedule.",
-    "draft": "Not visible to members; edit freely before publishing.",
-    "active": "Published and visible in the community feed. Use add update to post milestone updates to subscribers.",
-    "paused_completed_label": "Paused / completed",
-    "paused_completed": "Archived from the active feed. Subscribers are notified on completion."
+    "title": "حول هذه الصفحة",
+    "body": "إعلانات المشروع هي تحديثات غير عاجلة يتم نشرها في موجز المجتمع ومركز إشعارات الأعضاء. استخدمها للحصول على أخبار البرنامج وتجنيد المتطوعين وإشعارات الأحداث وتحديثات التأثير. على عكس تنبيهات الطوارئ، يتم وضع الإعلانات في قائمة الانتظار وتسليمها وفقًا لجدول الإشعارات العادي للمنصة.",
+    "draft": "غير مرئية للأعضاء. تحرير بحرية قبل النشر.",
+    "active": "منشورة ومرئية في خلاصة المجتمع. استخدم إضافة تحديث لنشر التحديثات الهامة للمشتركين.",
+    "paused_completed_label": "متوقف مؤقتًا / مكتمل",
+    "paused_completed": "مؤرشف من الخلاصة النشطة. يتم إخطار المشتركين عند الانتهاء."
   },
   "list": {
-    "title": "Project announcements",
-    "subtitle": "Publish initiatives and milestone updates that members can subscribe to."
+    "title": "اعلانات المشروع",
+    "subtitle": "نشر المبادرات والتحديثات الهامة التي يمكن للأعضاء الاشتراك فيها."
+  },
+  "filters": {
+    "status": "حالة",
+    "all": "جميع الحالات"
+  },
+  "status": {
+    "draft": "مسودة",
+    "active": "نشيط",
+    "paused": "متوقف مؤقتًا",
+    "completed": "مكتمل",
+    "cancelled": "تم الإلغاء"
+  },
+  "table": {
+    "aria": "المشاريع المجتمعية",
+    "project": "مشروع",
+    "status": "حالة",
+    "progress": "تقدم",
+    "subscribers": "المتابعون",
+    "updated": "تم التحديث",
+    "actions": "الإجراءات"
+  },
+  "actions": {
+    "publish": "نشر",
+    "add_update": "إضافة التحديث",
+    "pause": "يوقف",
+    "complete": "مكتمل",
+    "cancel": "يلغي"
+  },
+  "fields": {
+    "title": "عنوان",
+    "summary": "ملخص",
+    "location": "موقع",
+    "current_stage": "المرحلة الحالية",
+    "stage": "منصة",
+    "progress": "نسبة التقدم",
+    "publish_now": "انشر الآن",
+    "update_title": "تحديث العنوان",
+    "update_body": "تحديث الجسم",
+    "milestone": "منعطف",
+    "publish_update_now": "نشر التحديث الآن"
+  },
+  "create_modal": {
+    "title": "إنشاء مشروع مجتمعي",
+    "submit": "يخلق"
+  },
+  "update_modal": {
+    "title": "إضافة تحديث المشروع",
+    "submit": "حفظ التحديث"
+  },
+  "errors": {
+    "load": "لا يمكن تحميل مشاريع المجتمع.",
+    "create": "لا يمكن إنشاء المشروع.",
+    "update": "لا يمكن حفظ التحديث.",
+    "publish": "لا يمكن نشر المشروع.",
+    "status": "لا يمكن تغيير حالة المشروع."
   }
 }

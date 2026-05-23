@@ -54,6 +54,9 @@
     "search_placeholder": "Cuardaigh de réir ainm",
     "searching": "Baill á gcuardach...",
     "no_search_results": "Níor aimsíodh aon bhall meaitseála",
+    "search_results_aria": "Baill mheaitseála",
+    "search_error": "Níorbh fhéidir linn baill a chuardach. Bain triail eile as.",
+    "select_member_error": "Roghnaigh ball sula nascfaidh tú glacadóir cúraim.",
     "relationship_label": "Gaol",
     "start_date_label": "Thosaigh cúram",
     "notes_label": "Nótaí",
@@ -62,10 +65,7 @@
     "upcoming_care": "Cúram atá le teacht",
     "recent_care": "Cúram le déanaí",
     "no_upcoming_care": "Níl aon tacaíocht sceidealaithe fós",
-    "no_recent_care": "Níl aon logaí cúraim le déanaí fós",
-    "search_results_aria": "Baill mheaitseála",
-    "search_error": "Níorbh fhéidir linn baill a chuardach. Bain triail eile as.",
-    "select_member_error": "Roghnaigh ball sula nascfaidh tú glacadóir cúraim."
+    "no_recent_care": "Níl aon logaí cúraim le déanaí fós"
   },
   "cover": {
     "title": "Clúdach Cúram",
@@ -223,6 +223,7 @@
     "error": "Níorbh fhéidir do Phas Teasa a lódáil"
   },
   "panel": {
+    "meta_title": "Riarachán Pobail Cúramach",
     "header": {
       "toggle_sidebar": "Scoránaigh barra taoibh",
       "back_to_site": "Ar ais go dtí an suíomh",
@@ -231,6 +232,10 @@
       "user_menu": "Roghchlár úsáideora",
       "my_profile": "Mo Phróifíl",
       "sign_out": "Sínigh amach"
+    },
+    "navigation": {
+      "label": "Loingseoireacht pobail chúramach",
+      "close": "Nascleanúint pobail chomhbhách"
     },
     "breadcrumbs": {
       "aria": "Brioscáin aráin",
@@ -275,15 +280,15 @@
       }
     },
     "sidebar": {
-      "search_aria": "Search caring community navigation",
-      "search_placeholder": "Search navigation...",
-      "clear_search": "Glan cuardach",
-      "no_search_results": "No matching pages found",
       "brand": "Cúram Pobail",
       "expand": "Leathnaigh barra taoibh",
       "collapse": "Laghdaigh an barra taoibh",
       "help_centre": "Ionad Cabhrach",
       "full_admin": "Riarachán Iomlán",
+      "search_aria": "Search caring community navigation",
+      "search_placeholder": "Search navigation...",
+      "clear_search": "Glan cuardach",
+      "no_search_results": "No matching pages found",
       "sections": {
         "overview": "Forbhreathnú",
         "operations": "Oibríochtaí",
@@ -332,14 +337,16 @@
         "municipal_roi": "ROI cathrach",
         "category_coefficients": "Comhéifeachtaí Catagóire"
       }
-    },
-    "navigation": {
-      "label": "Loingseoireacht pobail chúramach",
-      "close": "Nascleanúint pobail chomhbhách"
-    },
-    "meta_title": "Riarachán Pobail Cúramach"
+    }
   },
   "admin": {
+    "common": {
+      "refresh": "Athnuaigh",
+      "cancel": "Cealaigh",
+      "all": "Gach",
+      "close": "Dún",
+      "empty_dash": "-"
+    },
     "providers": {
       "meta_title": "Eolaire Soláthraí Cúraim - Riarachán",
       "title": "Eolaire Soláthraí Cúraim",
@@ -448,63 +455,6 @@
         "volunteer": "Grúpa Oibrithe Deonacha"
       }
     },
-    "warmth_pass": {
-      "title": "Cuardach Pas Teas",
-      "subtitle": "Féach ar dhintiúir iontaobhais phobail aon bhall",
-      "eligible": "Incháilithe",
-      "not_eligible": "Níl sé incháilithe",
-      "verified": "Fíoraithe",
-      "not_verified": "Gan fíorú",
-      "loading": "Pas ball á lódáil...",
-      "empty_date": "Gan socraithe",
-      "no_categories": "Níl aon chatagóir ar taifead.",
-      "tier_chip": "{{label}} (Sraith {{tier}})",
-      "about": {
-        "title": "Maidir leis an leathanach seo",
-        "body": "Is éard atá i bPas Teasa ná dintiúir iontaobhais iniompartha a thaispeánann go bhfuil leibhéal Iontaofa bainte amach ag ball, go bhfuil athbhreithnithe piaraí faighte aige, agus go bhfuil sé incháilithe chun cúram comharsanachta neamhfhoirmiúil a sholáthar. Is féidir le faighteoirí iarraidh féachaint ar Phas Teasa an chúntóra sula nglacann siad le cúnamh. Bain úsáid as an gcuardach seo chun dintiúr ball a fhíorú ar iarratas, nó chun cabhrú le comhalta nach bhfuil cinnte faoina cháilitheacht."
-      },
-      "lookup": {
-        "title": "Cuardach Ball",
-        "member_id": "Aitheantas Ball",
-        "placeholder": "Cuir isteach ID ball uimhriúil",
-        "button": "Féach suas"
-      },
-      "errors": {
-        "no_data": "Níor tugadh aon sonraí ar ais don aitheantas ball seo.",
-        "lookup_failed": "Níor aimsíodh ball nó tharla earráid."
-      },
-      "not_eligible_notice": {
-        "title": "Níl an ball ag leibhéal Iontaofa fós agus níl Pas Teasa aige.",
-        "body": "Le bheith incháilithe, caithfidh siad níos mó uaireanta cúraim a logáil agus athbhreithniú piaraí amháin ar a laghad a fháil. Is féidir leo a ndul chun cinn féin a sheiceáil ar leathanach próifíle an Iontaobhais."
-      },
-      "fields": {
-        "help_categories": "Catagóirí Cabhrach",
-        "hours_logged": "Uaireanta Logáilte",
-        "identity_verified": "Aitheantais Deimhnithe",
-        "member_since": "Ball Since",
-        "pass_active_since": "Pas Gníomhach Since",
-        "reviews_received": "Léirmheasanna Faighte",
-        "trust_tier": "Sraith Iontaobhais"
-      }
-    },
-    "trust_tier": {
-      "recompute_confirm": "An bhfuil tú in ann sraitheanna iontaobhais a ríomh do gach ball gníomhach? Féadfaidh sé seo nóiméad a ghlacadh.",
-      "messages": {
-        "saved": "Sábháladh cumraíocht sraithe iontaobhais. Beidh athruithe i bhfeidhm ar an gcéad rith ríomha eile.",
-        "recomputed": "Na sraitheanna athríomh do bhaill {{count}}."
-      },
-      "errors": {
-        "save_failed": "Theip ar an chumraíocht a shábháil.",
-        "recompute_failed": "Theip ar na sraitheanna a athríomh."
-      }
-    },
-    "common": {
-      "refresh": "Athnuaigh",
-      "cancel": "Cealaigh",
-      "empty_dash": "-",
-      "all": "Gach",
-      "close": "Dún"
-    },
     "loyalty": {
       "title": "Clár Dílseachta",
       "description": "Creidmheas ama go dtí an droichead margadh. Tuilleann baill uaireanta, roghnaíonn ceannaithe glacadh leo mar lascaine CHF ar a liostaí.",
@@ -594,34 +544,15 @@
       },
       "pending": {
         "title": "Ag feitheamh le do cheadú",
-        "empty": "Gan aon aistrithe ar feitheamh.",
         "description": "Caithfidh gach aistriú a bheith ceadaithe de láimh ag riarthóir. Cinntigh go meaitseálann ríomhphost an bhaill sprice le cuntas nua an bhaill sula gceadaítear é.",
+        "empty": "Gan aon aistrithe ar feitheamh.",
         "table_aria": "Ar feitheamh aistrithe uair an chloig amach"
       },
       "inbound": {
         "title": "Fuarthas ó chomharchumainn eile (90 lá anuas)",
-        "empty": "Ní bhfuarthas aon aistrithe le 90 lá anuas.",
         "description": "Is logáil iniúchta amháin é seo - déantar aistrithe isteach a phróiseáil go huathoibríoch nuair a cheadaíonn an comharchumann foinse iad. Níl aon ghníomh ag teastáil anseo.",
+        "empty": "Ní bhfuarthas aon aistrithe le 90 lá anuas.",
         "table_aria": "Aistrithe uair an chloig isteach"
-      },
-      "actions": {
-        "approve": "Cheadaigh",
-        "reject": "Diúltaigh"
-      },
-      "reject_modal": {
-        "title": "Diúltaigh aistriú",
-        "reason_label": "An chúis leis an diúltú (roghnach)",
-        "reason_placeholder": "Cuir comhthéacs leis an loga iniúchta"
-      },
-      "messages": {
-        "approved": "Aistriú ceadaithe agus seachadta.",
-        "rejected": "Aistriú diúltaithe."
-      },
-      "errors": {
-        "load_pending": "Theip ar lódáil aistrithe ar feitheamh",
-        "load_inbound": "Theip ar aistrithe isteach a lódáil",
-        "approve": "Theip ar cheadú",
-        "reject": "Theip ar an diúltú"
       },
       "table": {
         "actions": "Gníomhartha",
@@ -641,14 +572,28 @@
         "received": "Faighte",
         "rejected": "Diúltaithe",
         "sent": "Seolta"
+      },
+      "actions": {
+        "approve": "Cheadaigh",
+        "reject": "Diúltaigh"
+      },
+      "reject_modal": {
+        "title": "Diúltaigh aistriú",
+        "reason_label": "An chúis leis an diúltú (roghnach)",
+        "reason_placeholder": "Cuir comhthéacs leis an loga iniúchta"
+      },
+      "messages": {
+        "approved": "Aistriú ceadaithe agus seachadta.",
+        "rejected": "Aistriú diúltaithe."
+      },
+      "errors": {
+        "load_pending": "Theip ar lódáil aistrithe ar feitheamh",
+        "load_inbound": "Theip ar aistrithe isteach a lódáil",
+        "approve": "Theip ar cheadú",
+        "reject": "Theip ar an diúltú"
       }
     },
     "surveys": {
-      "errors": {
-        "export_failed": "Theip ar easpórtáil freagraí suirbhé.",
-        "load": "Theip ar na suirbhéanna a lódáil",
-        "create": "Theip ar an suirbhé a chruthú"
-      },
       "meta_title": "Suirbhéanna Bardais",
       "title": "Suirbhéanna Bardais",
       "subtitle": "Bailigh aiseolas struchtúrtha ó chónaitheoirí, ó chomhpháirtithe bardasach, agus ó fhoirne cláir.",
@@ -738,24 +683,16 @@
         "yes": "Tá",
         "no": "Níl",
         "date_unknown": "Gan socraithe"
+      },
+      "errors": {
+        "load": "Theip ar na suirbhéanna a lódáil",
+        "create": "Theip ar an suirbhé a chruthú",
+        "export_failed": "Theip ar easpórtáil freagraí suirbhé."
       }
     },
     "feedback": {
       "title": "Bosca Isteach Aiseolais Bhardas",
       "subtitle": "Aiseolas ó chónaitheoirí a fháil, a thriáiseáil agus a réiteach: ceisteanna, smaointe, saincheisteanna agus gearáin a chuirtear faoi bhráid na foirne bardais nó pobail.",
-      "messages": {
-        "triage_saved": "Triáis shábháil",
-        "resolved": "Marcáilte mar a réitíodh",
-        "closed": "Dúnta"
-      },
-      "errors": {
-        "load": "Theip ar aiseolas a lódáil",
-        "save_triage": "Theip ar an triáis a shábháil",
-        "resolution_required": "Tá nótaí réitigh ag teastáil",
-        "resolve": "Theip ar réiteach",
-        "close": "Theip ar dhúnadh",
-        "export": "Theip ar easpórtáil"
-      },
       "about": {
         "title": "Maidir leis an leathanach seo",
         "body": "Bailíonn an bosca isteach seo aiseolas a chuireann cónaitheoirí isteach tríd an ardán. Déantar gach mír a chatagóiriú mar cheist, smaoineamh, tuairisc eisiúna, nó nóta meon agus sanntar scór meon. Bain úsáid as na rialuithe triage chun úinéireacht a shannadh, nótaí inmheánacha a chur leis, agus réiteach a rianú. Déantar míreanna atá le feiceáil ag gach cónaitheoir a mharcáil mar earraí poiblí; féadfaidh an t-aighnitheoir agus comhaltaí eile na freagraí a fheiceáil.",
@@ -866,6 +803,19 @@
         "days_ago_other": "{{count}}d ó shin",
         "months_ago_one": "{{count}}mo shin",
         "months_ago_other": "{{count}}mo shin"
+      },
+      "messages": {
+        "triage_saved": "Triáis shábháil",
+        "resolved": "Marcáilte mar a réitíodh",
+        "closed": "Dúnta"
+      },
+      "errors": {
+        "load": "Theip ar aiseolas a lódáil",
+        "save_triage": "Theip ar an triáis a shábháil",
+        "resolution_required": "Tá nótaí réitigh ag teastáil",
+        "resolve": "Theip ar réiteach",
+        "close": "Theip ar dhúnadh",
+        "export": "Theip ar easpórtáil"
       }
     },
     "civic_digest": {
@@ -1092,6 +1042,56 @@
         "escalate": "Theip ar an ardú céime",
         "status": "Theip ar athrú stádais",
         "note": "Theip ar an nóta"
+      }
+    },
+    "warmth_pass": {
+      "title": "Cuardach Pas Teas",
+      "subtitle": "Féach ar dhintiúir iontaobhais phobail aon bhall",
+      "eligible": "Incháilithe",
+      "not_eligible": "Níl sé incháilithe",
+      "verified": "Fíoraithe",
+      "not_verified": "Gan fíorú",
+      "loading": "Pas ball á lódáil...",
+      "empty_date": "Gan socraithe",
+      "no_categories": "Níl aon chatagóir ar taifead.",
+      "tier_chip": "{{label}} (Sraith {{tier}})",
+      "about": {
+        "title": "Maidir leis an leathanach seo",
+        "body": "Is éard atá i bPas Teasa ná dintiúir iontaobhais iniompartha a thaispeánann go bhfuil leibhéal Iontaofa bainte amach ag ball, go bhfuil athbhreithnithe piaraí faighte aige, agus go bhfuil sé incháilithe chun cúram comharsanachta neamhfhoirmiúil a sholáthar. Is féidir le faighteoirí iarraidh féachaint ar Phas Teasa an chúntóra sula nglacann siad le cúnamh. Bain úsáid as an gcuardach seo chun dintiúr ball a fhíorú ar iarratas, nó chun cabhrú le comhalta nach bhfuil cinnte faoina cháilitheacht."
+      },
+      "lookup": {
+        "title": "Cuardach Ball",
+        "member_id": "Aitheantas Ball",
+        "placeholder": "Cuir isteach ID ball uimhriúil",
+        "button": "Féach suas"
+      },
+      "errors": {
+        "no_data": "Níor tugadh aon sonraí ar ais don aitheantas ball seo.",
+        "lookup_failed": "Níor aimsíodh ball nó tharla earráid."
+      },
+      "not_eligible_notice": {
+        "title": "Níl an ball ag leibhéal Iontaofa fós agus níl Pas Teasa aige.",
+        "body": "Le bheith incháilithe, caithfidh siad níos mó uaireanta cúraim a logáil agus athbhreithniú piaraí amháin ar a laghad a fháil. Is féidir leo a ndul chun cinn féin a sheiceáil ar leathanach próifíle an Iontaobhais."
+      },
+      "fields": {
+        "help_categories": "Catagóirí Cabhrach",
+        "hours_logged": "Uaireanta Logáilte",
+        "identity_verified": "Aitheantais Deimhnithe",
+        "member_since": "Ball Since",
+        "pass_active_since": "Pas Gníomhach Since",
+        "reviews_received": "Léirmheasanna Faighte",
+        "trust_tier": "Sraith Iontaobhais"
+      }
+    },
+    "trust_tier": {
+      "recompute_confirm": "An bhfuil tú in ann sraitheanna iontaobhais a ríomh do gach ball gníomhach? Féadfaidh sé seo nóiméad a ghlacadh.",
+      "messages": {
+        "saved": "Sábháladh cumraíocht sraithe iontaobhais. Beidh athruithe i bhfeidhm ar an gcéad rith ríomha eile.",
+        "recomputed": "Na sraitheanna athríomh do bhaill {{count}}."
+      },
+      "errors": {
+        "save_failed": "Theip ar an chumraíocht a shábháil.",
+        "recompute_failed": "Theip ar na sraitheanna a athríomh."
       }
     },
     "regional_points": {

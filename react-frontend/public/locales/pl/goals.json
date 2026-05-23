@@ -1,4 +1,15 @@
 {
+  "detail": {
+    "back_to_goals": "Powrót do celów",
+    "view_all_goals": "Zobacz wszystkie cele",
+    "not_found_title": "Cel nie został znaleziony",
+    "not_found_description": "Ten cel mógł zostać usunięty lub nigdy nie istniał.",
+    "private_title": "Ten cel jest prywatny",
+    "private_description": "Tylko właściciel celu może go zobaczyć.",
+    "meta_description": "{{owner}} śledzi „{{title}}” z postępem {{progress}}% w tym celu społeczności.",
+    "overdue_chip": "Zaległe",
+    "checkin_frequency": "Częstotliwość check-inów"
+  },
   "checkin_recorded": "Zapisano meldunek!",
   "checkin_failed": "Nie udało się zapisać meldunku.",
   "reminder_set_failed": "Nie udało się ustawić przypomnienia.",
@@ -13,15 +24,15 @@
     "history": "Historia",
     "no_checkins": "Brak zameldowań. Zarejestruj swoje pierwsze!",
     "progress_label": "Postęp",
+    "progress_help": "Ustaw to na rzeczywisty postęp, który chcesz pokazać dla celu. Zapisanie check-inu aktualizuje pasek celu i oś czasu.",
+    "progress_value": "{{percent}}%",
+    "progress_unknown": "Postęp nie został zarejestrowany",
     "mood_label": "Jak się czujesz?",
     "note_label": "Notatka (opcjonalnie)",
     "note_placeholder": "Jak leci? Jakieś sukcesy lub wyzwania?",
     "cancel": "Anuluj",
     "submit": "Zarejestruj zameldowanie",
-    "check_in_button": "Zameldowanie",
-    "progress_help": "Ustaw to na rzeczywisty postęp, który chcesz pokazać dla celu. Zapisanie check-inu aktualizuje pasek celu i oś czasu.",
-    "progress_value": "{{percent}}%",
-    "progress_unknown": "Postęp nie został zarejestrowany"
+    "check_in_button": "Zameldowanie"
   },
   "mood": {
     "great": "Świetnie",
@@ -41,11 +52,11 @@
     "reminder_set_success": "Przypomnienie ustawione: {{frequency}}"
   },
   "frequency": {
+    "none": "Brak rytmu",
     "daily": "Codziennie",
     "weekly": "Co tydzień",
     "biweekly": "Co 2 tygodnie",
-    "monthly": "Co miesiąc",
-    "none": "Brak rytmu"
+    "monthly": "Co miesiąc"
   },
   "template": {
     "title": "Rozpocznij od szablonu",
@@ -66,33 +77,13 @@
     "progress_aria": "Postęp: {{percent}}%",
     "event": {
       "progress_update": "Aktualizacja postępu",
-      "checkin": "Check-in",
+      "checkin": "Zameldować się",
       "milestone": "Kamień milowy",
       "buddy_joined": "Dołączył partner",
       "buddy_action": "Wsparcie partnera",
       "completed": "Ukończono",
       "created": "Utworzono"
     }
-  },
-  "template_picker": {
-    "load_error": "Nie udało się załadować szablonów. Proszę spróbować ponownie.",
-    "try_again": "Spróbuj ponownie",
-    "none_available": "Nie ma jeszcze dostępnych szablonów.",
-    "none_in_category": "Brak szablonów w tej kategorii."
-  },
-  "detail": {
-    "back_to_goals": "Powrót do celów",
-    "view_all_goals": "Zobacz wszystkie cele",
-    "not_found_title": "Cel nie został znaleziony",
-    "not_found_description": "Ten cel mógł zostać usunięty lub nigdy nie istniał.",
-    "private_title": "Ten cel jest prywatny",
-    "private_description": "Tylko właściciel celu może go zobaczyć.",
-    "overdue_chip": "Zaległe",
-    "checkin_frequency": "Częstotliwość check-inów",
-    "meta_description": "{{owner}} śledzi „{{title}}” z postępem {{progress}}% w tym celu społeczności."
-  },
-  "goals": {
-    "load_error": "Nie udało się załadować celów. Spróbuj ponownie."
   },
   "insights": {
     "loading": "Ładowanie spostrzeżeń dotyczących celu",
@@ -130,5 +121,14 @@
       "celebration": "Świętowanie",
       "note": "Notatka"
     }
+  },
+  "template_picker": {
+    "load_error": "Nie udało się załadować szablonów. Proszę spróbować ponownie.",
+    "try_again": "Spróbuj ponownie",
+    "none_available": "Nie ma jeszcze dostępnych szablonów.",
+    "none_in_category": "Brak szablonów w tej kategorii."
+  },
+  "goals": {
+    "load_error": "Nie udało się załadować celów. Spróbuj ponownie."
   }
 }

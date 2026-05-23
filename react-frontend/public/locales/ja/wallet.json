@@ -3,6 +3,8 @@
   "balance": "残高",
   "time_credits": "タイムクレジット",
   "hours": "時間",
+  "hours_value": "{{count}}h",
+  "signed_hours_value": "{{sign}}{{count}}h",
   "transactions": "取引",
   "pending": "保留中",
   "completed": "完了",
@@ -15,6 +17,7 @@
   "subtitle": "あなたのタイムクレジットと取引を追跡します",
   "unable_to_load": "ウォレットを読み込めませんでした",
   "try_again": "もう一度試してください",
+  "refresh": "更新",
   "your_balance": "あなたの残高",
   "pending_in": "+{{count}}時間の保留中",
   "no_pending": "保留中の取引はありません",
@@ -24,6 +27,9 @@
   "load_more": "もっと読み込む",
   "no_transactions": "取引はありません",
   "no_transactions_desc": "あなたの取引履歴はここに表示されます",
+  "no_filtered_transactions": "一致する取引はありません",
+  "no_filtered_transactions_desc": "別のフィルターを試して、より多くのウォレット活動を確認してください。",
+  "transaction_fallback": "ウォレット取引",
   "stats": {
     "earned": "獲得",
     "spent": "使用",
@@ -122,14 +128,20 @@
   },
   "aria": {
     "export_csv": "取引をCSVにエクスポート",
-    "loading_transactions": "取引を読み込んでいます",
-    "transaction_detail": "{{direction}} {{amount}}時間 {{name}}",
     "refresh_wallet": "ウォレットデータを更新",
     "send_credits": "タイムクレジットを送る",
     "donate_credits": "タイムクレジットを寄付",
     "loading_balance": "ウォレット残高を読み込み中",
+    "loading_transactions": "取引を読み込んでいます",
     "load_more_transactions": "さらに取引を読み込む",
-    "transaction_filters": "取引フィルター"
+    "transaction_filters": "取引フィルター",
+    "transaction_detail": "{{direction}} {{amount}}時間 {{name}}"
+  },
+  "validation": {
+    "select_recipient": "受取人を選択してください",
+    "valid_amount": "有効な金額を入力してください",
+    "insufficient_balance": "残高不足",
+    "max_transfer": "最大転送は{{max}}時間です"
   },
   "available_balance": "利用可能残高",
   "recipient": "受取人",
@@ -143,17 +155,5 @@
   "optional": "任意",
   "description_placeholder": "この送金は何のためですか？",
   "new_balance_after": "あなたの新しい残高は{{balance}}時間になります",
-  "transfer_summary": "{{amount}} {{unit}}を {{name}} に送ろうとしています",
-  "validation": {
-    "select_recipient": "受取人を選択してください",
-    "valid_amount": "有効な金額を入力してください",
-    "insufficient_balance": "残高不足",
-    "max_transfer": "最大転送は{{max}}時間です"
-  },
-  "hours_value": "{{count}}h",
-  "signed_hours_value": "{{sign}}{{count}}h",
-  "refresh": "更新",
-  "no_filtered_transactions": "一致する取引はありません",
-  "no_filtered_transactions_desc": "別のフィルターを試して、より多くのウォレット活動を確認してください。",
-  "transaction_fallback": "ウォレット取引"
+  "transfer_summary": "{{amount}} {{unit}}を {{name}} に送ろうとしています"
 }

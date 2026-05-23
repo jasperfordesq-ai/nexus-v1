@@ -1,5 +1,7 @@
 {
-  "page_title": "Blog",
+  "page_title": "Blogue",
+  "hero_eyebrow": "Histoires de la communauté",
+  "hero_posts_label": "Articles affichés",
   "title": "Blog et actualités",
   "subtitle": "Histoires communautaires, mises à jour et annonces",
   "search_placeholder": "Rechercher des articles...",
@@ -11,6 +13,9 @@
   "empty_title": "Aucun article trouvé",
   "empty_desc": "Aucun article de blog n'a encore été publié",
   "empty_desc_filtered": "Essayez d'autres termes de recherche ou réinitialisez vos filtres",
+  "empty_tip_stories": "Récits des membres",
+  "empty_tip_guides": "Guides",
+  "empty_tip_updates": "Mises à jour",
   "load_more": "Charger plus d'articles",
   "min_read": "{{count}} min de lecture",
   "min_read_short": "{{count}}m",
@@ -42,6 +47,7 @@
     "reply_count": "{{count}} réponses",
     "hide": "Masquer",
     "you": "Vous",
+    "unknown_author": "Auteur inconnu",
     "aria_add_reaction": "Ajouter une réaction",
     "aria_send_reply": "Envoyer la réponse",
     "reaction_heart": "J'adore",
@@ -49,17 +55,11 @@
     "reaction_thumbs_down": "Je n'aime pas",
     "reaction_laugh": "Haha",
     "reaction_angry": "En colère",
-    "unknown_author": "Auteur inconnu",
     "reaction_love": "J'adore",
     "reaction_like": "J'aime",
-    "reaction_wow": "Wow",
+    "reaction_wow": "Ouah",
     "reaction_sad": "Triste",
     "reaction_celebrate": "Célébrer"
   },
-  "page_description": "Histoires, guides et mises à jour de la communauté de banque du temps — des échanges réussis, des leçons apprises et les dernières nouvelles des groupes locaux et partenaires.",
-  "hero_eyebrow": "Histoires de la communauté",
-  "hero_posts_label": "Articles affichés",
-  "empty_tip_stories": "Récits des membres",
-  "empty_tip_guides": "Guides",
-  "empty_tip_updates": "Mises à jour"
+  "page_description": "Histoires, guides et mises à jour de la communauté de banque du temps — des échanges réussis, des leçons apprises et les dernières nouvelles des groupes locaux et partenaires."
 }

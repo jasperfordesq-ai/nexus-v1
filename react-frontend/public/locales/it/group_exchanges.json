@@ -147,8 +147,8 @@
     "current_step": "Passaggio corrente",
     "step_of_named": "Passaggio {{current}} di {{total}}: {{name}}",
     "hours_value": "{{hours}} h",
-    "hours_suffix": "h",
-    "weight_suffix": "x"
+    "hours_suffix": "H",
+    "weight_suffix": "X"
   },
   "toast": {
     "load_more_failed": "Impossibile caricare altri scambi",

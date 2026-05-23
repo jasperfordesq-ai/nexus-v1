@@ -1,7 +1,8 @@
 {
-  "page_title": "Feed",
+  "page_title": "Foraggio",
   "title": "Feed della comunità",
   "subtitle": "Scopra cosa succede nella Sua comunità",
+  "meta_description": "Un feed comunitario privato per aggiornamenti, annunci, eventi, sondaggi, obiettivi e conversazioni.",
   "new_post": "Nuovo post",
   "whats_on_your_mind": "Cosa Le passa per la mente?",
   "add_image_aria": "Aggiungi immagine",
@@ -15,9 +16,12 @@
   "session_expired": "La tua sessione è scaduta. Accedi di nuovo.",
   "error_load": "Impossibile caricare il feed.",
   "error_load_retry": "Impossibile caricare il feed. La preghiamo di riprovare.",
+  "error_hint": "I tuoi filtri e l'editor di bozze sono ancora qui. Aggiorna il feed quando la tua connessione è pronta.",
+  "loading_label": "Caricamento degli aggiornamenti della comunità...",
   "empty_title": "Nessun post ancora",
   "empty_desc": "Sia la prima persona a condividere qualcosa con la Sua comunità!",
   "empty_filtered": "Al momento nulla corrisponde a questa vista. Prova un filtro diverso.",
+  "empty_filtered_with_filter": "Al momento non ci sono aggiornamenti {{filter}}. Prova tutti i post o avvia una nuova conversazione.",
   "filter": {
     "all": "Tutto",
     "posts": "Post",
@@ -33,9 +37,9 @@
     "following": "Seguiti",
     "saved": "Salvati",
     "clear": "Cancella filtri del feed",
+    "show_all": "Mostra tutti i post",
     "more": "Altro",
-    "select": "Seleziona filtro del feed",
-    "show_all": "Mostra tutti i post"
+    "select": "Seleziona filtro del feed"
   },
   "report": {
     "title": "Segnala post",
@@ -70,7 +74,7 @@
   },
   "compose": {
     "create_title": "Crea {{type}}",
-    "tab_post": "Post",
+    "tab_post": "Inviare",
     "tab_poll": "Sondaggio",
     "tab_listing": "Annuncio",
     "tab_event": "Evento",
@@ -80,6 +84,7 @@
     "description_label": "Descrizione",
     "location_label": "Posizione",
     "location_placeholder": "Cerca una posizione...",
+    "location_from_profile": "Dal tuo profilo — aggiorna nelle Impostazioni",
     "post_created": "Post creato!",
     "post_failed": "Impossibile creare il post.",
     "post_button": "Pubblica",
@@ -208,16 +213,15 @@
     "media_rejected": "{{count}} file ignorato/i (tipo errato o troppo grande)",
     "media_compression_failed": "{{count}} immagine/i non elaborata/e",
     "media_upload_error": "Impossibile elaborare le immagini",
+    "upload_preview_alt": "Anteprima caricamento {{number}}",
+    "image_remove_number_aria": "Rimuovi immagine {{number}}",
+    "alt_text_add": "Aggiungi testo alternativo",
+    "alt_text_edit": "Modifica testo alternativo",
     "sdg_selected_one": "{{count}} obiettivo selezionato",
     "sdg_selected_other": "{{count}} obiettivi selezionati",
     "content_required": "Il contenuto del post non può essere vuoto.",
     "content_too_long": "Il post è troppo lungo (max {{max}} caratteri).",
     "groups_load_error": "Impossibile caricare i gruppi.",
-    "upload_preview_alt": "Anteprima caricamento {{number}}",
-    "image_remove_number_aria": "Rimuovi immagine {{number}}",
-    "alt_text_add": "Aggiungi testo alternativo",
-    "alt_text_edit": "Modifica testo alternativo",
-    "location_from_profile": "Dal tuo profilo — aggiorna nelle Impostazioni",
     "video_invalid_type": "Formato video non valido. Usa MP4, WebM, OGG o MOV.",
     "video_too_large": "Il video deve essere inferiore a {{size}}MB.",
     "video": "Video",
@@ -257,7 +261,7 @@
     "not_interested": "Non interessato",
     "admin_delete": "Elimina (Admin)",
     "view_analytics": "Visualizza Analytics",
-    "type_post": "Post",
+    "type_post": "Inviare",
     "type_listing": "Annuncio",
     "type_event": "Evento",
     "type_poll": "Sondaggio",
@@ -268,6 +272,7 @@
     "type_volunteer": "Volontariato",
     "type_blog": "Blog",
     "type_discussion": "Discussione",
+    "type_resource": "Risorsa",
     "type_badge_earned": "Badge ottenuto",
     "type_level_up": "Livello superiore",
     "badge_earned_message": "{{name}} ha ottenuto il badge \"{{badge}}\"!",
@@ -314,7 +319,7 @@
       "type_volunteer": "Volontario",
       "type_timebank": "Crediti Tempo",
       "commitment_full_time": "Tempo pieno",
-      "commitment_part_time": "Part-time",
+      "commitment_part_time": "Part time",
       "commitment_contract": "Contratto",
       "commitment_flexible": "Flessibile"
     },
@@ -332,8 +337,7 @@
     "milestone": {
       "badge_unlocked": "Badge sbloccato",
       "level_reached": "Livello raggiunto"
-    },
-    "type_resource": "Risorsa"
+    }
   },
   "poll": {
     "load_failed": "Impossibile caricare i dati del sondaggio.",
@@ -390,7 +394,7 @@
     "cannot_share_own_post": "Non puoi condividere il tuo post",
     "menu_label": "Opzioni di condivisione",
     "default_title": "Inviare",
-    "repost": "Repost",
+    "repost": "Ripubblicare",
     "repost_desc": "Condividi nel tuo feed",
     "repost_remove": "Rimuovi Ripost",
     "repost_remove_desc": "Rimuovi il ripost dal tuo feed",
@@ -544,7 +548,7 @@
     "like": "Mi Piace",
     "love": "Amore",
     "laugh": "Risata",
-    "wow": "Wow",
+    "wow": "Oh",
     "sad": "Triste",
     "celebrate": "Festeggia",
     "clap": "Applauso",
@@ -594,13 +598,9 @@
   "you": "Tu",
   "items_loaded": "{{count}} post",
   "post_detail": {
-    "title": "Post",
+    "title": "Inviare",
     "back": "Torna al Feed",
     "not_found": "Elemento non trovato",
     "load_failed": "Impossibile caricare l'elemento"
-  },
-  "meta_description": "Un feed comunitario privato per aggiornamenti, annunci, eventi, sondaggi, obiettivi e conversazioni.",
-  "error_hint": "I tuoi filtri e l'editor di bozze sono ancora qui. Aggiorna il feed quando la tua connessione è pronta.",
-  "loading_label": "Caricamento degli aggiornamenti della comunità...",
-  "empty_filtered_with_filter": "Al momento non ci sono aggiornamenti {{filter}}. Prova tutti i post o avvia una nuova conversazione."
+  }
 }

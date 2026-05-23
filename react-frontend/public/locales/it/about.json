@@ -119,16 +119,16 @@
     "learn_more_1_description": "La nostra visione quinquennale per crescita e federazione",
     "learn_more_2_title": "Guida al Timebanking",
     "learn_more_2_description": "Scopra come funziona il timebanking",
+    "tech_partner_label": "Partner tecnologico",
+    "tech_partner_logo_alt": "Logo del progetto NEXUS",
+    "tech_partner_heading": "TimeBank Irlanda e Progetto NEXUS",
+    "tech_partner_description": "hOUR Timebank è orgogliosamente alimentata dal Project NEXUS, una piattaforma di banca del tempo open source creata per aiutare le comunità a scambiare competenze e rafforzare i legami sociali. La nostra partnership tecnologica garantisce che ogni membro tragga vantaggio da un'esperienza digitale moderna, accessibile e incentrata sulla comunità.",
+    "our_partners_heading": "I nostri partner e sostenitori",
+    "partners_banner_alt": "Loghi dei partner: West Cork Development Partnership, SICAP, Consiglio della contea di Cork, Dipartimento per la pianificazione abitativa comunitaria e del governo locale, Fondi strutturali e di investimento europei, Fondo sociale europeo",
     "cta_heading": "Costruiamo comunità più forti insieme",
     "cta_subtitle": "Che Lei sia un'azienda, un finanziatore, un ricercatore o un leader comunitario — esiste un modello di partnership adatto alle Sue esigenze.",
     "cta_contact": "Avvia una conversazione",
-    "cta_view_plan": "Visualizza il piano strategico",
-    "our_partners_heading": "Our Partners & Supporters",
-    "partners_banner_alt": "Partner logos: West Cork Development Partnership, SICAP, Cork County Council, Department of Housing Planning Community and Local Government, European Structural and Investment Funds, European Social Fund",
-    "tech_partner_label": "Technology Partner",
-    "tech_partner_logo_alt": "Project NEXUS logo",
-    "tech_partner_heading": "TimeBank Ireland and Project NEXUS",
-    "tech_partner_description": "hOUR Timebank is proudly powered by Project NEXUS — an open-source timebanking platform built to help communities exchange skills and strengthen social bonds. Our technology partnership ensures every member benefits from a modern, accessible, and community-first digital experience."
+    "cta_view_plan": "Visualizza il piano strategico"
   },
   "social_prescribing": {
     "page_title": "Prescrizione sociale",
@@ -174,7 +174,7 @@
     "meta_description": "Lo studio completo d'impatto sociale 2023 di hOUR Timebank — analisi SROI indipendente che mostra €16 di ritorno sociale per ogni €1 investito.",
     "breadcrumb_about": "Chi siamo",
     "hero_title": "Studio d'impatto sociale",
-    "hero_org_year": "hOUR Timebank — 2023",
+    "hero_org_year": "Banca del tempo delle ORE — 2023",
     "hero_description": "Un'analisi indipendente del Ritorno Sociale sull'Investimento che valuta l'impatto sociale, economico e comunitario del programma hOUR Timebank di Timebanking Ireland.",
     "download_full_report": "Scarica il rapporto completo",
     "executive_summary_pdf": "Sintesi esecutiva",
@@ -197,7 +197,7 @@
     "case_study_label": "Caso di studio",
     "case_study_monica_name": "Monica",
     "case_study_monica_quote": "Il mio medico mi ha indirizzata dopo un anno davvero difficile. La banca del tempo mi ha dato uno scopo — ho iniziato ad aiutare con il giardinaggio e prima di rendermene conto avevo un'intera rete di amici. Ha davvero cambiato la mia vita.",
-    "case_study_elaine_name": "Elaine",
+    "case_study_elaine_name": "Elena",
     "case_study_elaine_quote": "Mi sono iscritta dopo il pensionamento senza sapere cosa aspettarmi. In poche settimane insegnavo competenze informatiche e ricevevo passaggi per gli appuntamenti. Non è carità — è comunità.",
     "literature_para": "La ricerca si basa su ampie evidenze che collegano il timebanking a framework consolidati nella teoria del capitale sociale, nella resilienza comunitaria e nei risultati di salute pubblica.",
     "lit_review_0_title": "Teoria del capitale sociale",
@@ -231,10 +231,15 @@
     "sroi_breakdown_heading": "Dettaglio SROI",
     "sroi_component_header": "Componente",
     "sroi_value_header": "Valore",
+    "sroi_result_value": "16€: 1€",
     "sroi_total_investment": "Investimento totale (Input)",
+    "sroi_total_investment_value": "€ 50.000",
     "sroi_total_present_value": "Valore attuale totale dei risultati",
+    "sroi_total_present_value_amount": "€ 803.184",
     "sroi_net_social_value": "Valore sociale netto",
+    "sroi_net_social_value_amount": "€ 753.184",
     "sroi_ratio_label": "Rapporto SROI",
+    "sroi_ratio_value": "16,06 €: 1 €",
     "sroi_benchmark_note": "Questo rapporto SROI di 16:1 supera significativamente il benchmark per i programmi di sviluppo comunitario, che tipicamente si collocano tra 2:1 e 5:1. L'alto rapporto riflette la natura a leva del timebanking — un modesto input finanziario genera un'ampia attività sociale guidata dai volontari.",
     "discussion_para": "Lo studio identifica diversi fattori che contribuiscono allo SROI eccezionalmente alto e all'efficacia del programma come modello di sviluppo comunitario.",
     "discussion_factor_0_title": "Effetto moltiplicatore dei volontari",
@@ -263,12 +268,7 @@
     "cta_full_report": "Scarica il rapporto completo",
     "cta_exec_summary": "Sintesi esecutiva",
     "cta_questions": "Domande sulla ricerca?",
-    "cta_contact": "Ci contatti",
-    "sroi_result_value": "€16 : €1",
-    "sroi_total_investment_value": "€50,000",
-    "sroi_total_present_value_amount": "€803,184",
-    "sroi_net_social_value_amount": "€753,184",
-    "sroi_ratio_value": "€16.06 : €1"
+    "cta_contact": "Ci contatti"
   },
   "strategic_plan": {
     "page_title": "Piano strategico 2026–2030",
@@ -415,5 +415,5 @@
     "cta_download": "Scarica il piano completo",
     "cta_contact": "Ci contatti"
   },
-  "age_band": "Age {{band}}"
+  "age_band": "Età {{band}}"
 }

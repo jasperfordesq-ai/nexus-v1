@@ -1,22 +1,22 @@
 {
   "meta": {
-    "description": "Segui i progetti municipali, cooperativi e di quartiere dall'annuncio al traguardo.",
     "title": "Progetti comunitari",
+    "description": "Segui i progetti municipali, cooperativi e di quartiere dall'annuncio al traguardo.",
     "detail_title": "{{title}}",
-    "detail_description_fallback": "{{title}} is {{status}} at {{progress}}% progress. Stage: {{stage}}. Location: {{location}}.",
-    "stage_unknown": "Stage pending",
-    "location_unknown": "Location pending"
+    "detail_description_fallback": "{{title}} è {{status}} al {{progress}}% di avanzamento. Palcoscenico: {{stage}}. Posizione: {{location}}.",
+    "stage_unknown": "Fase in sospeso",
+    "location_unknown": "Posizione in sospeso"
   },
   "status": {
-    "active": "Attivo",
-    "cancelled": "Annullato",
-    "completed": "Completato",
     "draft": "Bozza",
-    "paused": "In pausa"
+    "active": "Attivo",
+    "paused": "In pausa",
+    "completed": "Completato",
+    "cancelled": "Annullato"
   },
   "progress_label": "Avanzamento del progetto",
   "progress_value": "{{value}}% completato",
-  "subscriber_count_one": "{{count}} follower",
+  "subscriber_count_one": "{{count}} seguace",
   "subscriber_count_other": "{{count}} follower",
   "date_unknown": "Data in attesa",
   "back_to_projects": "Torna ai progetti",
@@ -31,11 +31,11 @@
     "subscribe": "Impossibile aggiornare le notifiche del progetto."
   },
   "share": {
-    "share_text": "{{title}} - {{description}}",
-    "title": "Share project",
-    "copy_link": "Copy link",
-    "native": "Share",
-    "link_copied": "Link copied",
-    "copy_failed": "Could not copy link"
+    "title": "Condividi progetto",
+    "copy_link": "Copia collegamento",
+    "native": "Condividere",
+    "link_copied": "Collegamento copiato",
+    "copy_failed": "Impossibile copiare il collegamento",
+    "share_text": "{{title}} - {{description}}"
   }
 }

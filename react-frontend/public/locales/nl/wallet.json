@@ -3,6 +3,8 @@
   "balance": "Saldo",
   "time_credits": "Tijdcredits",
   "hours": "Uren",
+  "hours_value": "{{count}}u",
+  "signed_hours_value": "{{sign}}{{count}}u",
   "transactions": "Transacties",
   "pending": "In behandeling",
   "completed": "Voltooid",
@@ -15,6 +17,7 @@
   "subtitle": "Volg je tijdcredits en transacties",
   "unable_to_load": "Kon portemonnee niet laden",
   "try_again": "Probeer het opnieuw",
+  "refresh": "Vernieuwen",
   "your_balance": "Je saldo",
   "pending_in": "+{{count}}h in afwachting",
   "no_pending": "Geen uitstaande transacties",
@@ -24,6 +27,9 @@
   "load_more": "Laad meer",
   "no_transactions": "Geen transacties",
   "no_transactions_desc": "Je transactiegeschiedenis verschijnt hier",
+  "no_filtered_transactions": "Geen overeenkomende transacties",
+  "no_filtered_transactions_desc": "Probeer een ander filter om meer portemonnee-activiteit te zien.",
+  "transaction_fallback": "Portemonneetransactie",
   "stats": {
     "earned": "Verdiend",
     "spent": "Besteed",
@@ -122,14 +128,20 @@
   },
   "aria": {
     "export_csv": "Exporteer transacties naar CSV",
-    "loading_transactions": "Transacties laden",
-    "transaction_detail": "{{direction}} {{amount}} uur {{name}}",
     "refresh_wallet": "Portemonneegegevens vernieuwen",
     "send_credits": "Tijdtegoed verzenden",
     "donate_credits": "Tijdtegoed doneren",
     "loading_balance": "Portemonneesaldo wordt geladen",
+    "loading_transactions": "Transacties laden",
     "load_more_transactions": "Meer transacties laden",
-    "transaction_filters": "Transactiefilters"
+    "transaction_filters": "Transactiefilters",
+    "transaction_detail": "{{direction}} {{amount}} uur {{name}}"
+  },
+  "validation": {
+    "select_recipient": "Selecteer een ontvanger",
+    "valid_amount": "Voer een geldig bedrag in",
+    "insufficient_balance": "Onvoldoende saldo",
+    "max_transfer": "Maximale overdracht is {{max}} uur"
   },
   "available_balance": "Beschikbaar saldo",
   "recipient": "Ontvanger",
@@ -143,17 +155,5 @@
   "optional": "optioneel",
   "description_placeholder": "Waar is deze overdracht voor?",
   "new_balance_after": "Uw nieuwe saldo is {{balance}} uren",
-  "transfer_summary": "U staat op het punt {{amount}} {{unit}} te sturen naar {{name}}",
-  "validation": {
-    "select_recipient": "Selecteer een ontvanger",
-    "valid_amount": "Voer een geldig bedrag in",
-    "insufficient_balance": "Onvoldoende saldo",
-    "max_transfer": "Maximale overdracht is {{max}} uur"
-  },
-  "hours_value": "{{count}}u",
-  "signed_hours_value": "{{sign}}{{count}}u",
-  "refresh": "Vernieuwen",
-  "no_filtered_transactions": "Geen overeenkomende transacties",
-  "no_filtered_transactions_desc": "Probeer een ander filter om meer portemonnee-activiteit te zien.",
-  "transaction_fallback": "Portemonneetransactie"
+  "transfer_summary": "U staat op het punt {{amount}} {{unit}} te sturen naar {{name}}"
 }

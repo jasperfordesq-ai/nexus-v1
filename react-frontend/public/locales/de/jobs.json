@@ -1,5 +1,7 @@
 {
   "title": "Stellenangebote",
+  "page_title": "Stellenangebote",
+  "page_description": "Durchsuchen Sie Stellenangebote, Freiwilligenstellen und Zeitbank-Positionen von Gemeinschaftsmitgliedern und Partnerorganisationen in Ihrer Nähe.",
   "subtitle": "Finden Sie Möglichkeiten in Ihrer Gemeinschaft",
   "create_vacancy": "Stelle ausschreiben",
   "edit_vacancy": "Stelle bearbeiten",
@@ -47,7 +49,7 @@
   },
   "views": "{{count}} Aufrufe",
   "applications": "{{count}} Bewerbungen",
-  "remote": "Remote",
+  "remote": "Fernbedienung",
   "deadline_label": "Frist",
   "deadline_passed": "Frist abgelaufen",
   "hours_per_week": "{{count}} Std./Woche",
@@ -55,6 +57,7 @@
   "posted_by": "Veröffentlicht von",
   "load_more": "Mehr laden",
   "try_again": "Erneut versuchen",
+  "cancel": "Abbrechen",
   "featured": "Hervorgehoben",
   "empty_title": "Keine Stellen gefunden",
   "empty_description": "Es gibt keine Stellenangebote, die Ihren Kriterien entsprechen",
@@ -127,12 +130,12 @@
   "employer": {
     "page_title": "Arbeitgeberprofil",
     "open_roles": "offene Stellen",
+    "open_roles_count": "{{count}} offene Stellen",
     "open_roles_heading": "Offene Stellen",
     "no_roles": "Derzeit keine offenen Stellen",
     "error": "Arbeitgeberprofil konnte nicht geladen werden",
     "employer_jobs": "Arbeitgeber-Stellen",
     "employees": "{{size}} Mitarbeiter",
-    "open_roles_count": "{{count}} offene Stellen",
     "meta_description": "Sehen Sie das Arbeitgeberprofil, offene Stellen und Community-Bewertungen über {{count}} aktuelle Möglichkeiten an.",
     "review_submit_failed": "Bewertung konnte nicht übermittelt werden",
     "reviews_heading": "Arbeitgeberbewertungen",
@@ -232,13 +235,13 @@
     "views_over_time": "Aufrufe im Zeitverlauf",
     "applications_by_stage": "Bewerbungen nach Phase",
     "no_data": "Noch keine Analysedaten",
+    "load_error": "Analysen konnten nicht geladen werden",
     "weekly_trend": "Wöchentliche Bewerbungen",
     "referral_shares": "Gesamt geteilt",
     "referral_apps": "Empfehlungsbewerbungen",
     "referral_conversion": "Empfehlungskonversion",
     "scorecard_avg": "Durchschn. Scorecard",
     "export_csv": "CSV exportieren",
-    "load_error": "Analysen konnten nicht geladen werden",
     "views_tooltip": "{{date}}: {{count}} Aufrufe",
     "applications_tooltip": "{{week}}: {{count}} Bewerbungen",
     "stage_progress_aria": "Fortschritt der Bewerbungsphase {{stage}}",
@@ -268,7 +271,7 @@
     "annual": "pro Jahr",
     "time_credits": "Zeitguthaben",
     "form_min_label": "Minimum",
-    "form_max_label": "Maximum",
+    "form_max_label": "Maximal",
     "form_type_label": "Vergütungsart",
     "form_currency_label": "Währung",
     "form_currency_placeholder": "z.B. USD, EUR, GBP",
@@ -356,14 +359,10 @@
   "kanban": {
     "pipeline_title": "Kanban-Pipeline",
     "not_authorized": "Sie sind nicht berechtigt, diese Pipeline einzusehen.",
-    "download_cv": "Lebenslauf herunterladen",
-    "drop_here": "Hier ablegen",
-    "duration_90": "1,5 Stunden",
-    "salary_monthly": "Monatlich",
-    "personal_message": "Persönliche Nachricht",
-    "personal_message_placeholder": "Eine Notiz an den Kandidaten...",
     "select_applicant": "{{name}} auswählen",
     "ai_score": "AI: {{score}}/100",
+    "download_cv": "Lebenslauf herunterladen",
+    "drop_here": "Hier ablegen",
     "ai_rank": "KI-Rang",
     "ai_ranked": "Kandidaten von KI eingestuft",
     "ai_rank_failed": "KI-Ranking fehlgeschlagen",
@@ -373,12 +372,18 @@
     "no_activity_hint": "Ereignisse erscheinen hier im Verlauf des Einstellungsprozesses.",
     "previous": "Zurück",
     "next": "Weiter",
+    "duration_90": "1,5 Stunden",
+    "salary_monthly": "Monatlich",
+    "personal_message": "Persönliche Nachricht",
+    "personal_message_placeholder": "Eine Notiz an den Kandidaten...",
     "interview_location_placeholder": "https://meet.google.com/...",
     "offer_salary_placeholder": "z. B. 45000"
   },
   "apply": {
     "button": "Jetzt bewerben",
     "button_label": "Für {{title}} bewerben",
+    "this_job": "diese Stelle",
+    "view": "Ansehen",
     "applied": "Beworben",
     "title": "Für diese Stelle bewerben",
     "message_label": "Ihre Nachricht (optional)",
@@ -397,12 +402,10 @@
     "cv_dropzone_aria": "Klicken oder Datei ablegen zum Hochladen des Lebenslaufs",
     "cv_too_large": "Lebenslauf-Datei muss unter 5MB sein",
     "cv_invalid_type": "Nur PDF-, DOC- oder DOCX-Dateien werden unterstützt",
+    "cv_size_kb": "({{count}} KB)",
     "message_employer": "Arbeitgeber kontaktieren",
     "cv_parse_error": "Lebenslauf konnte nicht analysiert werden. Sie können Ihre Bewerbung trotzdem manuell einreichen.",
-    "cv_size_kb": "({{count}} KB)",
-    "quick_apply": "Schnell bewerben mit gespeichertem Profil",
-    "this_job": "diese Stelle",
-    "view": "Ansehen"
+    "quick_apply": "Schnell bewerben mit gespeichertem Profil"
   },
   "detail": {
     "loading": "Stelle wird geladen...",
@@ -454,7 +457,7 @@
     "refresh": "Aktualisieren",
     "message_applicant": "Nachricht",
     "kanban_board": "Kanban-Board",
-    "cv_download_error": "Failed to download CV"
+    "cv_download_error": "Lebenslauf konnte nicht heruntergeladen werden"
   },
   "interview": {
     "schedule": "Vorstellungsgespräch planen",
@@ -464,6 +467,11 @@
     "duration": "Dauer",
     "datetime": "Datum & Uhrzeit",
     "location": "Meeting-Link / Standort",
+    "join_call": "Videoanruf beitreten",
+    "add_to_calendar": "Zum Kalender hinzufügen",
+    "calendar_google": "Google",
+    "calendar_outlook": "Ausblick",
+    "calendar_ics": ".ics",
     "send_request": "Gesprächsanfrage senden",
     "accepted": "Vorstellungsgespräch bestätigt",
     "proposed": "Vorstellungsgespräch angefragt",
@@ -471,11 +479,6 @@
     "accept": "Akzeptieren",
     "decline": "Ablehnen",
     "minutes": "Min",
-    "join_call": "Videoanruf beitreten",
-    "add_to_calendar": "Zum Kalender hinzufügen",
-    "calendar_google": "Google",
-    "calendar_outlook": "Outlook",
-    "calendar_ics": ".ics",
     "download_ics": ".ics herunterladen"
   },
   "offer": {
@@ -519,18 +522,18 @@
     "save": "Scorecard speichern",
     "saved": "Scorecard gespeichert",
     "notes_placeholder": "Optionale Notizen zu diesem Bewerber...",
+    "max_score_suffix": "/ 10",
     "communication": "Kommunikation",
     "technical": "Technische Fähigkeiten",
     "cultural_fit": "Kulturelle Passung",
     "experience": "Erfahrung",
-    "motivation": "Motivation",
-    "max_score_suffix": "/ 10"
+    "motivation": "Motivation"
   },
   "saved_profile": {
     "found": "Gespeichertes Bewerbungsprofil gefunden",
     "use": "Gespeichertes Profil verwenden",
     "start_fresh": "Neu beginnen",
-    "inline_cv": "- CV: {{filename}}",
+    "inline_cv": "- Lebenslauf: {{filename}}",
     "cv_label": "Gespeicherter Lebenslauf: {{filename}}"
   },
   "team": {
@@ -621,7 +624,7 @@
     "deadline_label": "Bewerbungsfrist",
     "salary_section": "Vergütung",
     "salary_min_label": "Minimum",
-    "salary_max_label": "Maximum",
+    "salary_max_label": "Maximal",
     "salary_type_label": "Vergütungsart",
     "salary_currency_label": "Währung",
     "salary_currency_placeholder": "z.B. USD, EUR, GBP",
@@ -629,6 +632,8 @@
     "salary_transparency_hint": "Erforderlich gemäss EU-Gehaltstransparenzrichtlinie (Juni 2026)",
     "submit_create": "Stelle veröffentlichen",
     "submit_update": "Änderungen speichern",
+    "save_draft": "Als Entwurf speichern",
+    "draft_saved": "Entwurf gespeichert",
     "cancel": "Abbrechen",
     "creating": "Wird veröffentlicht...",
     "updating": "Wird gespeichert...",
@@ -642,9 +647,7 @@
       "deadline_past": "Frist muss in der Zukunft liegen",
       "salary_required": "Gehaltsbereich erforderlich. Sie können 'Gehalt verhandelbar' ankreuzen, um ihn wegzulassen.",
       "salary_range_invalid": "Das Mindestgehalt darf das Maximalgehalt nicht überschreiten"
-    },
-    "save_draft": "Als Entwurf speichern",
-    "draft_saved": "Entwurf gespeichert"
+    }
   },
   "ai_generate": {
     "button": "KI-Generierung",
@@ -702,10 +705,10 @@
     "spam_flags_label": "Erkennungsmarkierungen",
     "refresh": "Aktualisieren",
     "loading": "Wird geladen...",
+    "load_error": "Moderationswarteschlange konnte nicht geladen werden",
     "cancel": "Abbrechen",
     "no_description": "Keine Beschreibung",
     "no_flags": "Keine Markierungen",
-    "load_error": "Moderationswarteschlange konnte nicht geladen werden",
     "flags_tooltip": "Markierungen: {{flags}}",
     "user_fallback": "Benutzer #{{id}}",
     "pagination_label": "Seiten der Moderationswarteschlange"
@@ -782,10 +785,13 @@
     "acceptance_rate": "Annahmequote",
     "rejection_rate": "Ablehnungsquote",
     "days": "Tage",
+    "stages": "Stufen",
+    "not_available": "N/V",
     "funnel_title": "Bewerbungstrichter",
     "funnel_description": "Wie Kandidaten die Pipeline-Phasen durchlaufen",
     "rejection_rates_title": "Ablehnungsquoten nach Phase",
     "rejection_rates_description": "Prozentsatz abgelehnter Kandidaten in jeder Phase",
+    "rejection_rates_table_aria": "Ablehnungsraten nach Einstellungsphase",
     "time_in_stage_title": "Durchschnittliche Zeit in Phase",
     "time_in_stage_description": "Durchschnittliche Anzahl an Tagen, die Kandidaten in jeder Pipeline-Phase verbringen",
     "skills_match_title": "Fähigkeiten-Übereinstimmungskorrelation",
@@ -816,12 +822,9 @@
     "generate": "Bericht erstellen",
     "loading": "Bericht wird erstellt...",
     "no_data": "Keine Bewerbungsdaten für den ausgewählten Zeitraum verfügbar",
-    "load_error": "Vorurteils-Audit-Bericht konnte nicht geladen werden",
-    "note_privacy": "Dieser Bericht analysiert nur Prozesskennzahlen. Es werden keine demographischen Daten erhoben oder verwendet.",
-    "stages": "Stufen",
-    "not_available": "N/V",
     "access_denied": "Zugriff verweigert",
-    "rejection_rates_table_aria": "Ablehnungsraten nach Einstellungsphase"
+    "load_error": "Vorurteils-Audit-Bericht konnte nicht geladen werden",
+    "note_privacy": "Dieser Bericht analysiert nur Prozesskennzahlen. Es werden keine demographischen Daten erhoben oder verwendet."
   },
   "self_scheduling": {
     "title": "Gesprächszeitfenster",
@@ -889,7 +892,7 @@
     "org_size_11_50": "11-50 Mitarbeiter",
     "org_size_51_200": "51-200 Mitarbeiter",
     "org_size_201_plus": "201+ Mitarbeiter",
-    "org_website": "Website",
+    "org_website": "Webseite",
     "org_website_placeholder": "https://beispiel.de",
     "org_linked": "Mit Ihrer Organisation verknüpft",
     "next": "Weiter",
@@ -999,6 +1002,10 @@
       "title": "Job posten",
       "description": "Erstellen Sie eine Stellen-, Freiwilligen- oder Timebanking-Ausschreibung für Ihre Community."
     },
+    "edit": {
+      "title": "Stelle bearbeiten",
+      "description": "Aktualisieren Sie Stellendetails, Vergütung, Teameinstellungen und Veröffentlichungsoptionen."
+    },
     "talent_search": {
       "title": "Talentsuche"
     },
@@ -1020,16 +1027,9 @@
     },
     "employer_brand": {
       "title": "Arbeitgebermarke"
-    },
-    "edit": {
-      "title": "Stelle bearbeiten",
-      "description": "Aktualisieren Sie Stellendetails, Vergütung, Teameinstellungen und Veröffentlichungsoptionen."
     }
   },
-  "page_title": "Stellenangebote",
-  "page_description": "Durchsuchen Sie Stellenangebote, Freiwilligenstellen und Zeitbank-Positionen von Gemeinschaftsmitgliedern und Partnerorganisationen in Ihrer Nähe.",
   "jobs": {
     "view_details": "Stellendetails anzeigen"
-  },
-  "cancel": "Abbrechen"
+  }
 }

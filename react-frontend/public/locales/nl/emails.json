@@ -63,13 +63,25 @@
   },
   "password_reset": {
     "subject": "Reset je wachtwoord ? {{community}}",
+    "title": "Stel je wachtwoord opnieuw in",
+    "preview": "Je hebt een link voor het opnieuw instellen van het wachtwoord aangevraagd",
     "greeting": "Hallo {{name}},",
     "body": "Je hebt een wachtwoordreset aangevraagd. Klik op de onderstaande knop om een nieuw wachtwoord in te stellen.",
     "cta": "Wachtwoord opnieuw instellen",
     "expiry": "Deze link verloopt over 1 uur.",
-    "ignore": "Als je dit niet hebt aangevraagd, kun je deze e-mail veilig negeren.",
-    "title": "Stel je wachtwoord opnieuw in",
-    "preview": "Je hebt een link voor het opnieuw instellen van het wachtwoord aangevraagd"
+    "ignore": "Als je dit niet hebt aangevraagd, kun je deze e-mail veilig negeren."
+  },
+  "security": {
+    "password_changed_subject": "Beveiligingswaarschuwing: je wachtwoord is gewijzigd — {{community}}",
+    "password_changed_title": "Wachtwoord gewijzigd",
+    "password_changed_preview": "Het wachtwoord van je account is onlangs gewijzigd",
+    "password_changed_body": "Het wachtwoord van je account is onlangs gewijzigd. Als jij deze wijziging hebt aangebracht, hoef je niets te doen.",
+    "password_changed_warning": "Als je deze wijziging niet hebt aangebracht, neem dan onmiddellijk contact op met de ondersteuning om je account te beveiligen.",
+    "email_changed_subject": "Beveiligingswaarschuwing: je e-mailadres is gewijzigd — {{community}}",
+    "email_changed_title": "E-mailadres gewijzigd",
+    "email_changed_preview": "Het e-mailadres van je account is gewijzigd",
+    "email_changed_body": "Het e-mailadres van je <strong>{{community}}</strong>-account is bijgewerkt naar een nieuw adres.",
+    "email_changed_warning": "Als je deze wijziging niet hebt aangebracht, neem dan onmiddellijk contact op met de ondersteuning om je account te beveiligen."
   },
   "transaction": {
     "subject": "Tijdcredit-transactie — {{amount}}u",
@@ -90,6 +102,17 @@
     "body": "{{sender}} heeft je een bericht gestuurd.",
     "cta": "Bericht bekijken"
   },
+  "message": {
+    "in_app_content": "{{sender}} heeft je een bericht gestuurd",
+    "title": "Nieuw bericht",
+    "preview": "{{sender}} heeft je een bericht gestuurd",
+    "body_intro": "Je hebt een nieuw bericht van <strong>{{sender}}</strong>.",
+    "voice_notice": "Dit is een gesproken bericht — luister ernaar op het platform.",
+    "view_button": "Gesprek bekijken",
+    "footer_note": "Je kunt direct vanaf het platform antwoorden. Om geen bericht-e-mails meer te ontvangen, werk je <a href=\"{{url}}\">notificatievoorkeuren</a> bij.",
+    "fallback_recipient_name": "daar",
+    "fallback_sender_name": "Iemand"
+  },
   "common": {
     "greeting": "Hallo {{name}},",
     "button_fallback": "Als de knop hierboven niet werkt, kopieer en plak deze link in je browser:",
@@ -101,10 +124,10 @@
     "fallback_federation_member": "Een federatielid",
     "fallback_partner_community": "een partner-community",
     "fallback_federation_level": "Niveau {{level}}",
-    "or_separator": "or",
     "fallback_job": "een baan",
     "fallback_manager": "Manager",
-    "fallback_organization": "Organisatie"
+    "fallback_organization": "Organisatie",
+    "or_separator": "of"
   },
   "footer": {
     "unsubscribe": "Uitschrijven voor deze e-mails",
@@ -178,7 +201,7 @@
     "label_community": "Gemeenschap",
     "label_amount": "Bedrag",
     "label_description": "Beschrijving",
-    "label_to": "To",
+    "label_to": "Naar",
     "label_new_balance": "Nieuw saldo",
     "label_from_community": "Van community",
     "label_requested_level": "Aangevraagd niveau",
@@ -389,29 +412,20 @@
     "exchange_disputed": "⚠️ Uitwisselingsgeschil - bemiddelaarsbeoordeling nodig",
     "default": "Notificatie van Project NEXUS"
   },
-  "security": {
-    "password_changed_subject": "Beveiligingswaarschuwing: je wachtwoord is gewijzigd — {{community}}",
-    "password_changed_title": "Wachtwoord gewijzigd",
-    "password_changed_preview": "Het wachtwoord van je account is onlangs gewijzigd",
-    "password_changed_body": "Het wachtwoord van je account is onlangs gewijzigd. Als jij deze wijziging hebt aangebracht, hoef je niets te doen.",
-    "password_changed_warning": "Als je deze wijziging niet hebt aangebracht, neem dan onmiddellijk contact op met de ondersteuning om je account te beveiligen.",
-    "email_changed_subject": "Beveiligingswaarschuwing: je e-mailadres is gewijzigd — {{community}}",
-    "email_changed_title": "E-mailadres gewijzigd",
-    "email_changed_preview": "Het e-mailadres van je account is gewijzigd",
-    "email_changed_body": "Het e-mailadres van je <strong>{{community}}</strong>-account is bijgewerkt naar een nieuw adres.",
-    "email_changed_warning": "Als je deze wijziging niet hebt aangebracht, neem dan onmiddellijk contact op met de ondersteuning om je account te beveiligen."
+  "exchange_dispute": {
+    "subject": "Je uitwisseling is gemarkeerd voor beoordeling",
+    "title": "Uitwisseling wordt beoordeeld",
+    "preview": "Een uitwisseling waaraan je hebt deelgenomen vereist aandacht",
+    "body": "Je recente uitwisseling is als betwist gemarkeerd vanwege een verschil in gerapporteerde uren. Een coördinator zal dit beoordelen en binnenkort contact opnemen.",
+    "next_steps": "Een bemiddelaar of coördinator kan contact met je opnemen om dit op te lossen. Ondertussen kun je de uitwisselingsdetails bekijken.",
+    "cta": "Uitwisseling bekijken"
   },
-  "message": {
-    "in_app_content": "{{sender}} heeft je een bericht gestuurd",
-    "title": "Nieuw bericht",
-    "preview": "{{sender}} heeft je een bericht gestuurd",
-    "body_intro": "Je hebt een nieuw bericht van <strong>{{sender}}</strong>.",
-    "voice_notice": "Dit is een gesproken bericht — luister ernaar op het platform.",
-    "view_button": "Gesprek bekijken",
-    "footer_note": "Je kunt direct vanaf het platform antwoorden. Om geen bericht-e-mails meer te ontvangen, werk je <a href=\"{{url}}\">notificatievoorkeuren</a> bij.",
-    "fallback_recipient_name": "daar",
-    "fallback_sender_name": "Iemand"
-  },
+  "dispute_resolved_subject": "Je uitwisselingsgeschil is opgelost",
+  "dispute_resolved_title": "Geschil opgelost",
+  "dispute_resolved_preview": "Je uitwisseling is succesvol voltooid",
+  "dispute_resolved_body": "Je uitwisseling is beoordeeld en er is een definitieve overeenkomst van :hours uur bereikt.",
+  "dispute_resolved_hours_label": "Definitieve uren overeengekomen",
+  "dispute_resolved_cta": "Uitwisseling bekijken",
   "donation": {
     "sent_subject": "Je hebt :amount tijdcredits gedoneerd",
     "sent_title": "Donatie verzonden",
@@ -473,14 +487,6 @@
     "hours_declined_body": "Je vrijwilligersuren voor ':opportunity' konden op dit moment niet worden bevestigd. Neem contact op met je coördinator.",
     "hours_declined_cta": "Vrijwilligerswerk bekijken"
   },
-  "exchange_dispute": {
-    "subject": "Je uitwisseling is gemarkeerd voor beoordeling",
-    "title": "Uitwisseling wordt beoordeeld",
-    "preview": "Een uitwisseling waaraan je hebt deelgenomen vereist aandacht",
-    "body": "Je recente uitwisseling is als betwist gemarkeerd vanwege een verschil in gerapporteerde uren. Een coördinator zal dit beoordelen en binnenkort contact opnemen.",
-    "next_steps": "Een bemiddelaar of coördinator kan contact met je opnemen om dit op te lossen. Ondertussen kun je de uitwisselingsdetails bekijken.",
-    "cta": "Uitwisseling bekijken"
-  },
   "onboarding_nurture": {
     "day2_subject": "Vul je profiel in om meer verbindingen te krijgen",
     "day2_title": "Je profiel is bijna klaar",
@@ -500,11 +506,5 @@
     "day7_greeting": "Hallo :name,",
     "day7_body": "Je bent al een week onderdeel van :community! Hier is een snelle herinnering aan alles wat je kunt doen: aanbiedingen bekijken, verbindingen maken, lid worden van groepen en evenementen bijwonen.",
     "day7_cta": "Verken je community"
-  },
-  "dispute_resolved_subject": "Je uitwisselingsgeschil is opgelost",
-  "dispute_resolved_title": "Geschil opgelost",
-  "dispute_resolved_preview": "Je uitwisseling is succesvol voltooid",
-  "dispute_resolved_body": "Je uitwisseling is beoordeeld en er is een definitieve overeenkomst van :hours uur bereikt.",
-  "dispute_resolved_hours_label": "Definitieve uren overeengekomen",
-  "dispute_resolved_cta": "Uitwisseling bekijken"
+  }
 }

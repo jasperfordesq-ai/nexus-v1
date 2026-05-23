@@ -3,16 +3,29 @@
     "title": "ダッシュボード",
     "description": "あなたの個人ダッシュボード。残高、リスト、アクティビティを表示します。"
   },
+  "fallback_name": "こんにちは",
   "welcome_back": "おかえりなさい、{{name}}！",
   "community_activity": "{{community}}コミュニティでの出来事はこちらです",
   "unable_to_load": "ダッシュボードを読み込めませんでした",
   "try_again": "再試行",
+  "common": {
+    "loading": "読み込み中"
+  },
   "onboarding": {
     "banner_title": "プロフィール設定を完了してください",
     "banner_subtitle": "あなたの興味やスキルについて教えて、パーソナライズされたマッチを得ましょう",
     "get_started": "始める"
   },
   "new_listing": "新しいリスト",
+  "caring_community": {
+    "title": "ケアコミュニティ",
+    "subtitle": "ヘルプリクエスト、時間の提供、認証済みボランティア時間、信頼できるサポートを一か所から調整できます。",
+    "actions": {
+      "open_hub": "ハブを開く",
+      "request_help": "助けを求める",
+      "log_hours": "時間を記録する"
+    }
+  },
   "stats": {
     "balance": "残高",
     "active_listings": "アクティブなリスト",
@@ -42,18 +55,18 @@
     "view_wallet": "ウォレットを表示",
     "find_members": "メンバーを探す",
     "browse_events": "イベントをブラウズ",
-    "notifications": "通知",
-    "caring_community": "ケアハブ"
+    "caring_community": "ケアハブ",
+    "notifications": "通知"
   },
   "listings": {
     "offering": "提供中",
     "requesting": "リクエスト中",
     "offer": "提供",
     "request": "リクエスト",
-    "empty": "最近のリストはありません",
-    "create_first": "最初のリストを作成してください",
     "user_fallback": "ユーザー",
-    "empty_description": "リクエストまたはオファーを作成して、近くの人とのマッチングを始めましょう。"
+    "empty": "最近のリストはありません",
+    "empty_description": "リクエストまたはオファーを作成して、近くの人とのマッチングを始めましょう。",
+    "create_first": "最初のリストを作成してください"
   },
   "activity": {
     "action_listing": "リストを共有しました",
@@ -62,8 +75,8 @@
     "action_goal": "新しい目標を設定しました",
     "action_post": "投稿を共有しました",
     "empty": "最近の活動はありません",
-    "check_feed": "フィードをチェックしてください",
-    "empty_description": "メンバーが投稿を始めると、コミュニティのアップデートがここに表示されます。"
+    "empty_description": "メンバーが投稿を始めると、コミュニティのアップデートがここに表示されます。",
+    "check_feed": "フィードをチェックしてください"
   },
   "suggestions": {
     "empty": "まだ提案はありません",
@@ -72,24 +85,24 @@
   "groups": {
     "members_count": "{{count}} メンバー",
     "empty": "まだグループに参加していません",
-    "discover": "グループを見つける",
-    "empty_description": "グループは共通の興味、プロジェクト、地域のサークルをフォローするのに役立ちます。"
+    "empty_description": "グループは共通の興味、プロジェクト、地域のサークルをフォローするのに役立ちます。",
+    "discover": "グループを見つける"
   },
   "events": {
     "online_event": "オンラインイベント",
     "empty": "今後のイベントはありません",
-    "browse": "イベントをブラウズする",
-    "empty_description": "コミュニティのイベントが予定されると、ここに表示されます。"
+    "empty_description": "コミュニティのイベントが予定されると、ここに表示されます。",
+    "browse": "イベントをブラウズする"
   },
   "gamification": {
     "level": "レベル {{level}}",
     "badges": "バッジ",
     "streak": "ストリーク",
+    "xp_value": "{{count}} XP",
     "xp_progress": "XPの進捗",
     "start_earning": "コミュニティに参加してXPを獲得し始めましょう！",
     "streak_days_one": "{{count}} 日",
-    "streak_days_other": "{{count}} 日間",
-    "xp_value": "{{count}} XP"
+    "streak_days_other": "{{count}} 日間"
   },
   "aria": {
     "loading_listings": "リストを読み込み中",
@@ -114,21 +127,8 @@
     "received": "{{amount}}hを受信しました",
     "review": "レビュー",
     "none_pending": "保留中のレビューはありません",
+    "none_pending_description": "フィードバックが必要な完了済みの交換がここに表示されます。",
     "pending_subtitle": "このレビューリクエストを開く",
-    "view_all_pending": "保留中をすべて表示",
-    "none_pending_description": "フィードバックが必要な完了済みの交換がここに表示されます。"
-  },
-  "fallback_name": "こんにちは",
-  "common": {
-    "loading": "読み込み中"
-  },
-  "caring_community": {
-    "title": "ケアコミュニティ",
-    "subtitle": "ヘルプリクエスト、時間の提供、認証済みボランティア時間、信頼できるサポートを一か所から調整できます。",
-    "actions": {
-      "open_hub": "ハブを開く",
-      "request_help": "助けを求める",
-      "log_hours": "時間を記録する"
-    }
+    "view_all_pending": "保留中をすべて表示"
   }
 }

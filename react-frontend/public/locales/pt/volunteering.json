@@ -223,7 +223,7 @@
     "note_prefix": "Nota:",
     "modal_title": "Submeter Despesa",
     "form": {
-      "organisation": "Organisation",
+      "organisation": "Organização",
       "type": "Tipo de Despesa",
       "amount": "Montante",
       "currency": "Moeda",
@@ -320,7 +320,7 @@
     "payment_methods": {
       "card": "cartão",
       "bank_transfer": "transferência bancária",
-      "paypal": "paypal"
+      "paypal": "PayPal"
     },
     "status": {
       "completed": "Concluído",

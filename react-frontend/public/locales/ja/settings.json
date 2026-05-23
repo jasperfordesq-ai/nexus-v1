@@ -1,4 +1,9 @@
 {
+  "push_status": {
+    "unsupported": "お使いのブラウザはプッシュ通知に対応していません。",
+    "denied": "通知をブロックしました。ブラウザの設定を更新して再度有効にしてください。",
+    "subscribed": "このデバイスで購読中です。"
+  },
   "identity": {
     "page_title": "本人確認",
     "page_title_dob": "本人確認 — 生年月日",
@@ -113,7 +118,7 @@
   "biometric": {
     "label_builtin": "内蔵認証",
     "label_external": "外部認証",
-    "label_passkey": "Passkey",
+    "label_passkey": "パスキー",
     "platform_windows_title": "Windowsでの設定",
     "platform_windows_step1": "「このPC」をクリックして、このコンピューターに保存されるパスキーを作成します。Windows HelloのPIN、指紋、または顔認証で確認します。",
     "platform_windows_step2": "要件：まずWindows Helloを設定する必要があります。Windowsの設定 > アカウント > サインインオプション > PINで設定してください。",
@@ -251,7 +256,7 @@
     "employers_liability": "雇用者責任",
     "product_liability": "製品責任",
     "personal_accident": "個人事故",
-    "other": "Other",
+    "other": "他の",
     "uploading": "アップロード中...",
     "upload_certificate": "証明書をアップロードする",
     "status_verified": "確認済み",
@@ -334,8 +339,15 @@
     "frequency": "ダイジェストの頻度",
     "frequency_description": "マッチダイジェストメールを受け取る頻度",
     "daily": "毎日",
+    "monthly": "毎月",
     "fortnightly": "2週間ごと",
     "never": "なし",
+    "weekly": "毎週"
+  },
+  "activity_digest": {
+    "off": "オフ",
+    "instant": "即時",
+    "daily": "毎日",
     "monthly": "毎月"
   },
   "privacy_sections": {
@@ -541,7 +553,7 @@
     "font_large": "L",
     "density": "レイアウトの密度",
     "density_desc": "インターフェース要素の間隔とパディングを制御します",
-    "density_compact": "Compact",
+    "density_compact": "コンパクト",
     "density_comfortable": "快適",
     "density_spacious": "広々",
     "accessibility_profile": "アクセシビリティプロフィール",
@@ -559,6 +571,9 @@
     "title": "ブロックしたユーザー",
     "subtitle": "ブロックしたユーザーを管理します",
     "description": "ブロックされたメンバーは、あなたのプロフィールを閲覧したり、メッセージを送信したり、コンテンツを操作したりすることができません。",
+    "privacy_badge": "プライバシー設定",
+    "summary_label": "ブロック済みメンバー",
+    "count": "{{count}} 件ブロック中",
     "empty": "ブロックしたユーザーはいません",
     "empty_desc": "ブロックしたユーザーはあなたのプロフィールを見ることができず、メッセージを送ったり、あなたのコンテンツとやり取りしたりすることはできません。",
     "unblock": "ブロック解除",
@@ -568,10 +583,7 @@
     "unblocked_desc": "{{name}}のブロックを解除しました。",
     "unblock_error": "ユーザーのブロック解除に失敗しました",
     "blocked_on": "{{date}}をブロックしました",
-    "link": "ブロックされたユーザー",
-    "privacy_badge": "プライバシー設定",
-    "summary_label": "ブロック済みメンバー",
-    "count": "{{count}} 件ブロック中"
+    "link": "ブロックされたユーザー"
   },
   "block_user": {
     "title": "{{name}}をブロックしますか？",
@@ -596,16 +608,5 @@
     "stay": "留まる"
   },
   "push_campaign_opt_in": "プロモーションのプッシュ通知を受け取る",
-  "push_campaign_opt_in_description": "地域のビジネスや団体がターゲット型プッシュ通知を送信することを許可します。いつでも解除できます。",
-  "push_status": {
-    "unsupported": "お使いのブラウザはプッシュ通知に対応していません。",
-    "denied": "通知をブロックしました。ブラウザの設定を更新して再度有効にしてください。",
-    "subscribed": "このデバイスで購読中です。"
-  },
-  "activity_digest": {
-    "off": "オフ",
-    "instant": "即時",
-    "daily": "毎日",
-    "monthly": "毎月"
-  }
+  "push_campaign_opt_in_description": "地域のビジネスや団体がターゲット型プッシュ通知を送信することを許可します。いつでも解除できます。"
 }

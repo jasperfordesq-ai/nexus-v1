@@ -69,7 +69,7 @@
     "try_again": "Réessayer",
     "no_entries_title": "Aucune inscription en liste d'attente",
     "no_entries_desc": "Vous n'êtes actuellement sur aucune liste d'attente de quart. Lorsqu'un quart est complet, vous pouvez rejoindre la liste d'attente et être notifié(e) lorsqu'une place se libère.",
-    "position": "Position {{position}}",
+    "position": "Poste {{position}}",
     "spots": "{{count}} places",
     "joined": "Inscrit(e) à la liste d'attente",
     "leave": "Quitter",
@@ -128,8 +128,11 @@
   },
   "organisations": {
     "page_title": "Organisations",
+    "page_description": "Découvrez des organisations bénévoles, des partenaires locaux et des groupes communautaires offrant des opportunités, un soutien et des services via votre réseau de banque de temps.",
     "heading": "Organisations",
     "subtitle": "Découvrez les organisations bénévoles de votre communauté",
+    "hero_eyebrow": "Partenaires locaux de confiance",
+    "hero_partners_label": "Partenaires affichés",
     "breadcrumb_volunteering": "Bénévolat",
     "breadcrumb_organisations": "Organisations",
     "search_placeholder": "Rechercher des organisations...",
@@ -140,6 +143,9 @@
     "no_organisations_found": "Aucune organisation trouvée",
     "try_different_search": "Essayez un autre terme de recherche",
     "no_organisations_available": "Aucune organisation bénévole disponible pour le moment",
+    "empty_tip_volunteer": "Groupes de bénévoles",
+    "empty_tip_partner": "Partenaires communautaires",
+    "empty_tip_register": "Enregistrer une organisation",
     "load_more": "Charger plus",
     "volunteer_count": "{{count}} bénévoles",
     "hours_logged": "{{hours}}h enregistrées",
@@ -178,13 +184,7 @@
     "terms_agreement": "J'ai lu et j'accepte les conditions d'enregistrement d'organisation ci-dessus.",
     "terms_required": "Vous devez accepter les conditions pour enregistrer votre organisation.",
     "opportunity_count_one": "{{count}} opportunité",
-    "opportunity_count_other": "{{count}} opportunités",
-    "page_description": "Découvrez des organisations bénévoles, des partenaires locaux et des groupes communautaires offrant des opportunités, un soutien et des services via votre réseau de banque de temps.",
-    "hero_eyebrow": "Partenaires locaux de confiance",
-    "hero_partners_label": "Partenaires affichés",
-    "empty_tip_volunteer": "Groupes de bénévoles",
-    "empty_tip_partner": "Partenaires communautaires",
-    "empty_tip_register": "Enregistrer une organisation"
+    "opportunity_count_other": "{{count}} opportunités"
   },
   "organisation_detail": {
     "page_title": "Organisation",
@@ -195,6 +195,7 @@
     "not_found": "Organisation non trouvée.",
     "error_load_retry": "Le chargement des détails de l'organisation a échoué. Veuillez réessayer.",
     "unable_to_load": "Impossible de charger l'organisation",
+    "meta_description_fallback": "Explorez {{name}} et {{count}} opportunités de bénévolat actives sur cette banque de temps communautaire.",
     "try_again": "Réessayer",
     "browse_organisations": "Parcourir les organisations",
     "website": "Site web",
@@ -216,8 +217,7 @@
     "cover_message_placeholder": "Expliquez à l'organisation pourquoi vous souhaitez faire du bénévolat...",
     "cancel": "Annuler",
     "submit_application": "Envoyer la candidature",
-    "job_openings": "Offres d'emploi",
-    "meta_description_fallback": "Explorez {{name}} et {{count}} opportunités de bénévolat actives sur cette banque de temps communautaire."
+    "job_openings": "Offres d'emploi"
   },
   "emergency_alerts": {
     "heading": "Alertes d'urgence",
@@ -285,11 +285,11 @@
     "load_failed": "Échec du chargement des certificats",
     "load_error": "Impossible de charger les certificats."
   },
+  "remote": "À distance",
+  "closes_date": "Ferme le {{date}}",
   "page_meta": {
     "register_organisation": {
       "title": "Enregistrer l'organisation"
     }
-  },
-  "remote": "À distance",
-  "closes_date": "Ferme le {{date}}"
+  }
 }

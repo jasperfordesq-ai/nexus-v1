@@ -238,7 +238,7 @@
     "avg_rating": "Avaliação Média",
     "response_time": "Tempo de Resposta",
     "active_listings": "Anúncios Ativos",
-    "na": "N/A",
+    "na": "N / D",
     "tab_listings": "Anúncios",
     "tab_reviews": "Avaliações",
     "no_listings_title": "Sem Anúncios",
@@ -457,7 +457,7 @@
     "public": "Pública",
     "private": "Privada",
     "item_count": "{{count}} itens",
-    "item_count_one": "{{count}} item",
+    "item_count_one": "item {{count}}",
     "item_count_other": "{{count}} itens",
     "category": "Categoria",
     "created": "Coleção criada",
@@ -573,7 +573,8 @@
       "declined": "Recusada",
       "completed": "Concluída",
       "cancelled": "Cancelada"
-    }
+    },
+    "offers_title": "Ofertas de Entrega"
   },
   "pickup": {
     "my_pickups_title": "Os meus levantamentos",
@@ -618,10 +619,10 @@
     "breadcrumb": "Busca no Mapa",
     "search_placeholder": "Buscar listagens próximas...",
     "radius_label": "Raio de busca",
-    "radius_option": "{{km}} km",
+    "radius_option": "{{km}}km",
     "radius_chip": "{{km}} km de raio",
     "results_count": "{{count}} listagens encontradas nas proximidades",
-    "refresh": "Refresh",
+    "refresh": "Atualizar",
     "map_view": "Visualização do mapa",
     "list_view": "Visualização em lista",
     "location_required": "Define a tua localização no perfil para usar esta funcionalidade",

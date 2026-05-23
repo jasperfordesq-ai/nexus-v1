@@ -1,5 +1,7 @@
 {
   "page_title": "Blog",
+  "hero_eyebrow": "Storie della comunità",
+  "hero_posts_label": "Post mostrati",
   "title": "Blog e notizie",
   "subtitle": "Storie della comunità, aggiornamenti e annunci",
   "search_placeholder": "Cerca articoli...",
@@ -11,6 +13,9 @@
   "empty_title": "Nessun articolo trovato",
   "empty_desc": "Non sono stati ancora pubblicati articoli sul blog",
   "empty_desc_filtered": "Provi con termini di ricerca diversi o reimposti i filtri",
+  "empty_tip_stories": "Storie dei membri",
+  "empty_tip_guides": "Guide",
+  "empty_tip_updates": "Aggiornamenti",
   "load_more": "Carica altri articoli",
   "min_read": "{{count}} min di lettura",
   "min_read_short": "{{count}}m",
@@ -42,6 +47,7 @@
     "reply_count": "{{count}} risposte",
     "hide": "Nascondi",
     "you": "Lei",
+    "unknown_author": "Autore sconosciuto",
     "aria_add_reaction": "Aggiunga una reazione",
     "aria_send_reply": "Invii la risposta",
     "reaction_heart": "Amore",
@@ -49,17 +55,11 @@
     "reaction_thumbs_down": "Non mi piace",
     "reaction_laugh": "Ahah",
     "reaction_angry": "Arrabbiato",
-    "unknown_author": "Autore sconosciuto",
     "reaction_love": "Adoro",
     "reaction_like": "Mi piace",
-    "reaction_wow": "Wow",
+    "reaction_wow": "Oh",
     "reaction_sad": "Triste",
     "reaction_celebrate": "Celebrare"
   },
-  "page_description": "Storie, guide e aggiornamenti dalla comunità di banca del tempo — scambi riusciti, lezioni apprese e le ultime notizie dai gruppi locali e dai partner.",
-  "hero_eyebrow": "Storie della comunità",
-  "hero_posts_label": "Post mostrati",
-  "empty_tip_stories": "Storie dei membri",
-  "empty_tip_guides": "Guide",
-  "empty_tip_updates": "Aggiornamenti"
+  "page_description": "Storie, guide e aggiornamenti dalla comunità di banca del tempo — scambi riusciti, lezioni apprese e le ultime notizie dai gruppi locali e dai partner."
 }

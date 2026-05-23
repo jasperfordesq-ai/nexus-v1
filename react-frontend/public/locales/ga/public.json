@@ -1,422 +1,4 @@
 {
-  "home": {
-    "meta_description": "Exchange skills using time credits — every hour is valued equally. Join a community where neighbours share help, build trust, and strengthen local connections.",
-    "meta_keywords": "baincéireacht ama, malartú scileanna, pobal, obair dheonach, creidmheasanna ama",
-    "badge": "Todhchaí na Baincéireachta Ama",
-    "headline_1": "Malartaigh Scileanna,",
-    "headline_2": "Tóg Pobal",
-    "subheadline": "Is ardán nua-aimseartha baincéireachta ama é {{name}} ina bhfuil gach uair an chloig seirbhíse ar comhluach. Malartaigh do chuid scileanna, tuill creidmheasanna ama, agus ceangail le do phobal.",
-    "cta_dashboard": "Téigh chuig an Deais",
-    "cta_feed": "Téigh chuig an bhFotha",
-    "cta_get_started": "Tosaigh Saor in Aisce",
-    "cta_learn_more": "Foghlaim Tuilleadh",
-    "features": {
-      "0": {
-        "title": "Creidmheasanna Ama",
-        "description": "Malartaigh scileanna ag baint úsáide as am mar airgeadra"
-      },
-      "1": {
-        "title": "Pobal",
-        "description": "Connect with neighbours offering help"
-      },
-      "2": {
-        "title": "Láithreach",
-        "description": "Idirbhearta tapa agus réidh"
-      }
-    },
-    "stats": {
-      "active_members": "Baill Ghníomhacha",
-      "hours_exchanged": "Uaireanta Malartaithe",
-      "active_listings": "Liostaí Gníomhacha",
-      "communities": "Pobail"
-    },
-    "scroll_down": "Scrollaigh síos",
-    "how_it_works": {
-      "title": "Conas a Oibríonn Sé",
-      "subtitle": "Tosaigh i gceithre chéim shimplí",
-      "steps": {
-        "0": {
-          "title": "Cláraigh Saor in Aisce",
-          "description": "Cruthaigh do phróifíl i nóiméid agus liostáil na scileanna is féidir leat a thairiscint."
-        },
-        "1": {
-          "title": "Brabhsáil agus Ceangail",
-          "description": "Aimsigh seirbhísí a theastaíonn uait agus ceangail le baill áitiúla an phobail."
-        },
-        "2": {
-          "title": "Malartaigh Seirbhísí",
-          "description": "Eagraigh malartuithe scileanna agus cabhraigh le chéile."
-        },
-        "3": {
-          "title": "Tuill Creidmheasanna",
-          "description": "Faigh creidmheas ama amháin do gach uair a thugann tú. Caith iad mar is mian leat."
-        }
-      }
-    },
-    "why_timebanking": {
-      "title": "Cén Fáth Baincéireacht Ama?",
-      "subtitle": "Na croíphrionsabail a chuireann ár bpobal ag obair",
-      "values": {
-        "0": {
-          "title": "Comhluach",
-          "description": "Tá gach uair an chloig ar an luach céanna. Cibé an bhfuil tú ag múineadh pianó nó ag baint féir, tá comhluach ar d'am."
-        },
-        "1": {
-          "title": "Tóg Muinín",
-          "description": "Reviews and ratings help you find reliable community members and build your reputation in the community."
-        },
-        "2": {
-          "title": "Fan Áitiúil",
-          "description": "Ceangail le comharsana agus neartaigh do phobal áitiúil trí mhalartuithe scileanna fiúntacha."
-        }
-      }
-    },
-    "cta_section": {
-      "title": "Réidh le tosú?",
-      "description": "Join a growing community already exchanging skills and building meaningful connections.",
-      "button": "Cruthaigh Do Chuntas Saor in Aisce"
-    },
-    "meta_title": "Community Timebanking Platform",
-    "audience_cards": {
-      "title": "Where would you like to start?"
-    }
-  },
-  "about": {
-    "meta_title": "Maidir le {{name}}",
-    "meta_description": "Learn how {{name}} brings neighbours together to share skills using time credits. Every hour given earns an hour back — a fairer way to support each other.",
-    "hero_title": "Maidir le {{name}}",
-    "hero_description": "Is ardán nua-aimseartha baincéireachta ama é {{name}} ina bhfuil gach uair an chloig seirbhíse ar comhluach. Cabhraímid le pobail scileanna a mhalartú, muinín a thógáil, agus geilleagar áitiúil níos cothroime a chruthú — uair amháin san am.",
-    "how_it_works": {
-      "title": "Conas a Oibríonn Sé",
-      "subtitle": "Is simplí tosú. Ceithre chéim le dul isteach agus tosú ag malartú scileanna i do phobal.",
-      "steps": {
-        "0": {
-          "title": "Cruthaigh Do Phróifíl",
-          "description": "Cláraigh saor in aisce agus liostáil na scileanna is féidir leat a thairiscint do do phobal."
-        },
-        "1": {
-          "title": "Aimsigh a bhFuil Uait",
-          "description": "Brabhsáil liostaí chun seirbhísí a aimsiú atá á dtairiscint ag baill in aice leat."
-        },
-        "2": {
-          "title": "Malartaigh Seirbhísí",
-          "description": "Ceangail le baill agus eagraigh malartuithe scileanna a oibríonn don bheirt agaibh."
-        },
-        "3": {
-          "title": "Tuill agus Caith Creidmheasanna",
-          "description": "Tuill creidmheas ama amháin do gach uair a thugann tú, agus caith iad ar sheirbhísí a theastaíonn uait."
-        }
-      }
-    },
-    "values": {
-      "title": "Ár Luachanna",
-      "subtitle": "Na prionsabail a threoraíonn gach rud a dhéanaimid ag {{name}}.",
-      "items": {
-        "0": {
-          "title": "Comhionannas",
-          "description": "Tá am gach duine ar comhluach. Tá uair an chloig garraíodóireachta ar an luach céanna le huair an chloig teagaisc."
-        },
-        "1": {
-          "title": "Pobal",
-          "description": "Creidimid i naisc áitiúla láidre a thógáil. Neartaíonn gach malartú fíochán do chomharsanachta."
-        },
-        "2": {
-          "title": "Muinín agus Sábháilteacht",
-          "description": "Cinntíonn athbhreithnithe, rátálacha agus maoirseacht bróicéirí timpeallacht shábháilte do gach ball a bheith páirteach."
-        },
-        "3": {
-          "title": "Inbhuanaitheacht",
-          "description": "Trí scileanna a roinnt go háitiúil, laghdaímid dramhaíl, tacaímid le geilleagair chiorclacha, agus neartaímid athléimneacht áitiúil."
-        }
-      }
-    },
-    "stats": {
-      "members": "Baill",
-      "hours_exchanged": "Uaireanta Malartaithe",
-      "active_listings": "Liostaí Gníomhacha",
-      "communities": "Pobail"
-    },
-    "credits": {
-      "title": "Cumhachtaithe ag Project NEXUS",
-      "subtitle": "Ardán pobail foinse oscailte cruthaithe ag Jasper Ford. Ceadúnaithe faoi AGPL v3.",
-      "creator": "Cruthaitheoir",
-      "founders_heading": "Bunathóirí hOUR Timebank CLG",
-      "contributors": "Rannpháirtithe",
-      "research_heading": "Bunús Taighde",
-      "research_description": "Bunaithe ar staidéar tionchair shóisialta a choimisiúnaigh {{name}}.",
-      "acknowledgements": "Buíochas",
-      "open_source": "Foinse Oscailte",
-      "license_text": "Ceadúnaithe faoin gCeadúnas Poiblí Ginearálta Affero GNU v3 (AGPL-3.0).",
-      "v1_source": "Cód Foinse V1 (PHP + React)",
-      "v2_source": "Cód Foinse V2 (ASP.NET Core)"
-    },
-    "cta": {
-      "title": "Réidh le Bheith Páirteach?",
-      "description": "Cibé an bhfuil tú ag iarraidh do scileanna a roinnt nó cabhair a fháil le rud éigin, tá ár bpobal anseo duit.",
-      "dashboard": "Téigh chuig an Deais",
-      "join": "Bí Páirteach Saor in Aisce",
-      "help_center": "Ionad Cabhrach",
-      "contact_us": "Déan Teagmháil Linn"
-    }
-  },
-  "contact": {
-    "title": "Déan Teagmháil Linn",
-    "subtitle": "An bhfuil ceist agat faoi {{name}}? Ba bhreá linn cloisteáil uait.",
-    "success_title": "Teachtaireacht Seolta!",
-    "success_message": "Fillfimid ort chomh luath agus is féidir.",
-    "back_to_help": "Ar Ais chuig an Ionad Cabhrach",
-    "error_fallback": "Theip ar an teachtaireacht a sheoladh. Bain triail eile as le do thoil.",
-    "form": {
-      "name_label": "Ainm",
-      "name_placeholder": "D'ainm",
-      "email_label": "Ríomhphost",
-      "email_placeholder": "tu@sampla.com",
-      "subject_label": "Ábhar",
-      "subject_placeholder": "Cad é seo faoi?",
-      "subjects": {
-        "general": "Fiosrúchán Ginearálta",
-        "account": "Cabhair le Cuntas",
-        "technical": "Fadhb Theicniúil",
-        "feedback": "Aiseolas / Moladh",
-        "other": "Eile"
-      },
-      "message_label": "Teachtaireacht",
-      "message_placeholder": "Conas is féidir linn cabhrú?",
-      "submit": "Seol Teachtaireacht",
-      "login_prompt_before": "An bhfuil cuntas agat cheana?",
-      "login_link": "Logáil isteach",
-      "login_prompt_after": "le haghaidh tacaíocht níos tapúla."
-    },
-    "meta_description": "Get in touch with the team — questions about joining, partnering, social prescribing, accessibility, or how timebanking works. We're happy to help.",
-    "turnstile_error": "Couldn't load security check. Refresh the page to try again."
-  },
-  "faq": {
-    "title": "Ceisteanna Coitianta",
-    "subtitle_before_link": "Ní féidir leat a bhfuil uait a aimsiú? Tabhair cuairt ar ár",
-    "help_center_link": "nIonad Cabhrach",
-    "subtitle_after_link": "le haghaidh treoracha mionsonraithe.",
-    "search_placeholder": "Cuardaigh ceisteanna...",
-    "no_results": "Níor aimsíodh aon cheisteanna comhoiriúnacha. Bain triail as téarma cuardaigh eile.",
-    "cta_title": "An bhfuil ceisteanna agat fós?",
-    "cta_description": "Tá ár bhfoireann tacaíochta anseo chun cabhrú.",
-    "cta_button": "Déan Teagmháil le Tacaíocht",
-    "categories": {
-      "getting_started": {
-        "title": "Ag Tosú",
-        "q1": {
-          "question": "Cad é baincéireacht ama?",
-          "answer_p1": "Is córas malartaithe pobail é baincéireacht ama ina bhfuil uair amháin cabhrach cothrom le creidmheas ama amháin, beag beann ar an tseirbhís a chuirtear ar fáil. Cibé an bhfuil tú ag múineadh teanga, ag cabhrú le garraíodóireacht, nó ag soláthar tacaíocht theicniúil, tá comhluach ar d'am.",
-          "answer_p2": "Is bealach é chun naisc phobail a thógáil agus scileanna agus seirbhísí a mhalartú gan airgead traidisiúnta."
-        },
-        "q2": {
-          "question": "An bhfuil sé saor in aisce dul isteach?",
-          "answer_p1": "Sea! Tá ballraíocht saor in aisce ar fad. Is iad creidmheasanna ama an t-aon airgeadra a úsáidtear, a thuilleann tú trí chabhrú le daoine eile sa phobal.",
-          "answer_p2": "Faigheann baill nua líon beag creidmheasanna tosaigh go minic chun cabhrú leo tosú."
-        },
-        "q3": {
-          "question": "Conas a thosaím?",
-          "answer_intro": "Seo mar a thosaíonn tú:",
-          "step1_bold": "Comhlánaigh do phróifíl",
-          "step1_text": "Cuir grianghraf, beathaisnéis agus do scileanna leis",
-          "step2_bold": "Brabhsáil an margadh",
-          "step2_text": "Féach cad iad na seirbhísí atá á dtairiscint agus ag teastáil",
-          "step3_bold": "Cuir tairiscint suas",
-          "step3_text": "Roinn an méid is féidir leat cabhrú le daoine eile",
-          "step4_bold": "Déan iarratas",
-          "step4_text": "Iarr rud éigin a theastaíonn uait",
-          "step5_bold": "Ceangail le baill",
-          "step5_text": "Tóg do líonra"
-        },
-        "q4": {
-          "question": "Cad iad na scileanna is féidir liom a thairiscint?",
-          "answer_intro": "Beagnach rud ar bith! I measc na dtairiscintí coitianta tá:",
-          "skill1": "Cabhair sa bhaile (garraíodóireacht, glanadh, miondeisiúcháin)",
-          "skill2": "Tacaíocht theicniúil (cabhair ríomhaire, socrú fóin)",
-          "skill3": "Teagasc (teangacha, ceol, ábhair acadúla)",
-          "skill4": "Seirbhísí cruthaitheacha (dearadh, grianghrafadóireacht, scríbhneoireacht)",
-          "skill5": "Iompar (turais, turais ghnó)",
-          "skill6": "Compánachas (siúlóidí, cuairteanna, comhrá)",
-          "skill7": "Scileanna gairmiúla (cuntasaíocht, comhairle dlí, srl.)",
-          "answer_outro": "Tá rud éigin luachmhar le tairiscint ag gach duine!"
-        }
-      },
-      "time_credits": {
-        "title": "Creidmheasanna Ama",
-        "q1": {
-          "question": "Cad é creidmheas ama?",
-          "answer_p1": "Is ionann creidmheas ama amháin agus uair amháin seirbhíse. Is é airgeadra ár bpobail é.",
-          "answer_p2": "Is féidir leat uaireanta páirteacha a mhalartú freisin: 30 nóiméad = 0.5 creidmheas, 15 nóiméad = 0.25 creidmheas."
-        },
-        "q2": {
-          "question": "Conas a thuilim creidmheasanna ama?",
-          "answer_intro": "Tuilleann tú creidmheasanna trí:",
-          "way1_bold": "Seirbhísí a sholáthar",
-          "way1_text": "do bhaill eile",
-          "way2_bold": "Uaireanta deonacha a logáil",
-          "way2_text": "le heagraíochtaí ceadaithe",
-          "way3_bold": "Síntiúis a fháil",
-          "way3_text": "ó bhaill eile",
-          "way4_bold": "Creidmheasanna tosaigh",
-          "way4_text": "nuair a chláraíonn tú den chéad uair"
-        },
-        "q3": {
-          "question": "An féidir liom mo chreidmheasanna a bhronnadh?",
-          "answer_intro": "Is féidir! Is féidir leat:",
-          "option1": "Creidmheasanna a aistriú chuig aon bhall eile",
-          "option2": "Bronnadh ar phota an phobail (cabhraíonn sé le baill a dteastaíonn tacaíocht bhreise uathu)",
-          "answer_link_before": "Téigh chuig do ",
-          "wallet_link": "Sparán",
-          "answer_link_after": " chun creidmheasanna a sheoladh."
-        },
-        "q4": {
-          "question": "An féidir le m'iarmhéid dul diúltach?",
-          "answer": "Ceadaíonn roinnt pobal iarmhéideanna diúltacha teoranta chun cabhrú le baill nua tosú sula mbíonn deis acu creidmheasanna a thuilleamh. Seiceáil le comhordaitheoir do phobail le haghaidh na rialacha sonracha i do bhanc ama."
-        },
-        "q5": {
-          "question": "Cad a tharlaíonn má sheol mé creidmheasanna chuig an duine mícheart?",
-          "answer_intro": "Ní féidir idirbhearta a chúlghairm go huathoibríoch. Má rinne tú botún:",
-          "step1": "Déan teagmháil leis an bhfaighteoir agus iarr orthu na creidmheasanna a sheoladh ar ais",
-          "step2": "Mura féidir leat é a réiteach, déan teagmháil le tacaíocht le haghaidh cúnamh",
-          "answer_outro": "Seiceáil an faighteoir i gcónaí sula ndeimhníonn tú aistriú."
-        }
-      },
-      "exchanges_safety": {
-        "title": "Malartuithe agus Sábháilteacht",
-        "q1": {
-          "question": "Conas a eagraím malartú?",
-          "answer_intro": "Is é an gnáthphróiseas ná:",
-          "step1": "Aimsigh tairiscint nó iarratas a bhfuil suim agat ann",
-          "step2": "Seol teachtaireacht chuig an mball chun sonraí a phlé",
-          "step3": "Aontaigh ar cathain, cá háit, agus am measta",
-          "step4": "Buail le chéile agus comhlánaigh an malartú",
-          "step5": "Seolann an duine a fuair cabhair creidmheasanna ama",
-          "step6": "Fág athbhreithniú dá chéile"
-        },
-        "q2": {
-          "question": "An bhfuil sé sábháilte bualadh le strainséirí?",
-          "answer_intro": "Molaimid na cleachtais sábháilteachta seo:",
-          "tip1": "Buail le chéile in áiteanna poiblí do na chéad mhalartuithe",
-          "tip2": "Seiceáil próifíl agus athbhreithnithe an bhaill",
-          "tip3": "Inis do dhuine éigin cá bhfuil tú ag dul",
-          "tip4": "Bíodh muinín agat as d'instinní — má bhraitheann tú rud éigin mícheart, fág",
-          "tip5": "Tosaigh le malartuithe beaga, ísealriosca",
-          "answer_outro": "Tuairiscigh aon iompar imníoch dár bhfoireann tacaíochta."
-        },
-        "q3": {
-          "question": "Cad a tharlaíonn mura dtaispeánann duine éigin nó mura gcomhlánaíonn siad an tseirbhís?",
-          "answer_intro": "Is é an chumarsáid an eochair. Má tá fadhb ann:",
-          "step1": "Seol teachtaireacht chuig an mball chun a phlé cad a tharla",
-          "step2": "Déan iarracht réiteach a aimsiú le chéile",
-          "step3": "Mura féidir leat é a réiteach, déan teagmháil le tacaíocht",
-          "answer_outro": "D'fhéadfadh srianta cuntais a bheith mar thoradh ar neamhláithreachtaí athfhillteacha nó iompar bocht."
-        },
-        "q4": {
-          "question": "An bhfuil na seirbhísí árachaithe?",
-          "answer": "Is socruithe neamhfhoirmiúla idir baill phobail iad malartuithe. Ní sholáthraímid clúdach árachais do sheirbhísí. I gcás gníomhaíochtaí ardriosca, pléigh dliteanas leis an mball eile roimh ré. Tá a gcuid árachais ghairmiúil féin ag roinnt ball."
-        }
-      },
-      "badges_rewards": {
-        "title": "Suaitheantais agus Duaiseanna",
-        "q1": {
-          "question": "Cad iad suaitheantais agus XP?",
-          "answer_intro": "Tugann ár gcóras cluichíochta aitheantas do rannpháirtíocht phobail:",
-          "item1_bold": "XP (Pointí Taithí)",
-          "item1_text": "Tuillte as gníomhaíochtaí éagsúla, ag cabhrú leat leibhéal a ardú",
-          "item2_bold": "Suaitheantais",
-          "item2_text": "Éachtaí as clocha míle a bhaint amach (60+ le bailiú!)",
-          "item3_bold": "Leibhéil",
-          "item3_text": "Dul chun cinn ó Nuatheachtaí go Finscéal Banc Ama",
-          "item4_bold": "Sraitheanna",
-          "item4_text": "Duaiseanna as rannpháirtíocht laethúil"
-        },
-        "q2": {
-          "question": "Conas a thuilim XP?",
-          "answer_intro": "Tuilleann tú XP as go leor gníomhaíochtaí:",
-          "activity1": "Creidmheasanna ama a sheoladh/a fháil",
-          "activity2": "Liostaí a chruthú",
-          "activity3": "Uaireanta deonacha a logáil",
-          "activity4": "Freastal ar imeachtaí",
-          "activity5": "Naisc a dhéanamh",
-          "activity6": "Logáil isteach laethúil",
-          "activity7": "Suaitheantais a thuilleamh"
-        },
-        "q3": {
-          "question": "An féidir liom rogha an diúltaithe a fháil ó chláir ceannairí?",
-          "answer_before_link": "Is féidir! Más fearr leat príobháideacht, is féidir leat rogha an diúltaithe a dhéanamh ó bheith le feiceáil ar chláir ceannairí poiblí i do ",
-          "settings_link": "Socruithe",
-          "answer_after_link": ". Tuillfidh tú XP agus suaitheantais fós, ní bheidh siad le feiceáil ag daoine eile ar na ranguithe."
-        }
-      },
-      "account_privacy": {
-        "title": "Cuntas agus Príobháideacht",
-        "q1": {
-          "question": "Conas a athraím mo phasfhocal?",
-          "answer_before_link": "Téigh chuig ",
-          "settings_link": "Socruithe",
-          "answer_after_link": " > Slándáil chun do phasfhocal a athrú. Beidh ort do phasfhocal reatha a chur isteach ar dtús. Má tá do phasfhocal dearmadta agat, úsáid an nasc \"Pasfhocal Dearmadta\" ar an leathanach logáil isteach."
-        },
-        "q2": {
-          "question": "Cé atá in ann mo phróifíl a fheiceáil?",
-          "answer_intro": "De réir réamhshocraithe, tá do phróifíl le feiceáil ag baill eile an phobail. Is féidir leat smacht a fháil ar:",
-          "item1": "Cad iad na sonraí teagmhála a thaispeántar",
-          "item2": "An mbíonn tú le feiceáil ar chláir ceannairí",
-          "item3": "Infheictheacht do shuímh ghinearálta",
-          "answer_link_before": "Coigeartaigh iad seo i do ",
-          "settings_link": "Socruithe",
-          "answer_link_after": "."
-        },
-        "q3": {
-          "question": "Conas a scriosann mé mo chuntas?",
-          "answer_intro": "Más mian leat an pobal a fhágáil:",
-          "step1": "Téigh chuig Socruithe > Cuntas",
-          "step2": "Cliceáil \"Scrios Cuntas\"",
-          "step3": "Deimhnigh do chinneadh",
-          "answer_outro": "Nóta: Coinneofar do stair idirbheart le haghaidh taifid, ach bainfear d'fhaisnéis phearsanta."
-        },
-        "q4": {
-          "question": "Conas a chosnaítear mo shonraí?",
-          "answer_intro": "Glacaimid le príobháideacht go dáiríre:",
-          "item1": "Tá do shonraí criptithe agus stóráilte go slán",
-          "item2": "Ní dhíolaimid d'fhaisnéis riamh",
-          "item3": "Is féidir leat cóip de do shonraí a iarraidh am ar bith",
-          "item4": "Comhlíonaimid GDPR agus rialacháin cosanta sonraí"
-        }
-      }
-    },
-    "page_title": "Frequently Asked Questions",
-    "meta_description": "Common questions about timebanking, time credits, listings, exchanges, trust and safety, and community membership — everything you need to get started."
-  },
-  "maintenance": {
-    "title": "Beimid ar ais go luath!",
-    "description": "tá cothabháil sceidealaithe ar siúl faoi láthair chun do thaithí a fheabhsú.",
-    "apology": "Gabh ár leithscéal as aon mhíchaoithiúlacht. Seiceáil ar ais i gceann tamaillín le do thoil.",
-    "thanks": "Go raibh maith agat as d'fhoighne!",
-    "admin_login": "Logáil Isteach Riaracháin",
-    "deploy_notice": "Tá an t-ardán seo fós á thógáil go gníomhach, mar sin d'fhéadfadh tréimhsí imscartha tapa a bheith ann. Le linn na dtréimhsí sin, téann an freastalaí isteach i mód cothabhála go huathoibríoch. De ghnáth ní mhaireann sé seo ach timpeall cúig nóiméad agus athruithe nua á gcur i bhfeidhm."
-  },
-  "kb": {
-    "title": "Bonn Eolais",
-    "description": "Faigh freagraí, treoir, agus acmhainní cabhrach",
-    "search_placeholder": "Cuardaigh an bonn eolais..."
-  },
-  "page_meta": {
-    "development_status": {
-      "title": "Development Status"
-    },
-    "maintenance": {
-      "title": "Maintenance"
-    }
-  },
-  "changelog_page": {
-    "title": "Changelog",
-    "meta_title": "Changelog - Project NEXUS",
-    "meta_description": "Every notable change shipped in Project NEXUS, in Keep-a-Changelog format, following Semantic Versioning. Sourced from CHANGELOG.md in the public source repository.",
-    "heading": "Changelog",
-    "subheading": "Every notable change to Project NEXUS, in Keep-a-Changelog format. The platform follows Semantic Versioning.",
-    "view_on_github": "View on GitHub",
-    "loading": "Loading changelog...",
-    "error": "Could not load the changelog. You can read it directly on GitHub."
-  },
   "features_page": {
     "chips": {
       "beta": "Béite",
@@ -444,17 +26,17 @@
     "security_email": "jasper@hour-timebank.ie",
     "tech_stack": {
       "ai_label": "IS",
-      "ai_value": "OpenAI text-embedding-3-small",
+      "ai_value": "Téacs-leabú OpenAI-3-beag",
       "backend_label": "Cúl",
       "backend_value": "Laravel 12 + PHP 8.2+",
       "database_label": "Bunachar sonraí",
       "database_value": "MariaDB 10.11",
       "frontend_label": "Tosach",
-      "frontend_value": "React 18 + TypeScript + HeroUI + Tailwind CSS 4",
+      "frontend_value": "Freagair 18 + TypeScript + HeroUI + Tailwind CSS 4",
       "infrastructure_label": "Bonneagar",
       "infrastructure_value": "Docker, Redis, PWA iomlán",
       "mobile_label": "Soghluaiste",
-      "mobile_value": "Capacitor (iOS + Android)",
+      "mobile_value": "Toilleoir (iOS + Android)",
       "realtime_label": "Fíor-ama",
       "realtime_value": "Pusher WebSockets, Firebase Cloud Messaging",
       "search_label": "Cuardach",
@@ -676,7 +258,7 @@
             "description": "Táscairí stádais fíoraithe ar phróifílí ball."
           },
           "nexusscore": {
-            "title": "NexusScore",
+            "title": "NexusScór",
             "description": "Scóráil dhílseánaigh do chlú agus iontaofacht."
           },
           "streaks": {
@@ -759,7 +341,7 @@
             "description": "Uirlisí sreabhadh oibre le haghaidh leantóireachta ar pháirtithe leasmhara píolóta."
           },
           "copilot": {
-            "title": "Copilot",
+            "title": "Cóipchirt",
             "description": "Cúntóir IS comhthéacsúil do riarthóirí pobail."
           }
         }
@@ -829,6 +411,424 @@
           }
         }
       }
+    }
+  },
+  "changelog_page": {
+    "title": "Loga athrú",
+    "meta_title": "Changelog - Tionscadal NEXUS",
+    "meta_description": "Gach athrú suntasach seolta i Project NEXUS, i bhformáid Keep-a-Changelog, tar éis Leagan Séimeantach. Foinsithe ó CHANGELOG.md sa stór foinsí poiblí.",
+    "heading": "Loga athrú",
+    "subheading": "Gach athrú suntasach ar Project NEXUS, i bhformáid Keep-a-Changelog. Leanann an t-ardán Leagan Séimeantach.",
+    "view_on_github": "Amharc ar GitHub",
+    "loading": "Loga athruithe á lódáil...",
+    "error": "Níorbh fhéidir an loga athraithe a lódáil. Is féidir leat é a léamh go díreach ar GitHub."
+  },
+  "home": {
+    "meta_title": "Ardán Bainc Ama Pobail",
+    "meta_description": "Scileanna malartaithe ag úsáid creidmheasanna ama — cuirtear an luach céanna ar gach uair an chloig. Glac páirt i bpobal ina roinneann comharsana cabhair, cothaíonn muinín agus neartaíonn siad naisc áitiúla.",
+    "meta_keywords": "baincéireacht ama, malartú scileanna, pobal, obair dheonach, creidmheasanna ama",
+    "badge": "Todhchaí na Baincéireachta Ama",
+    "headline_1": "Malartaigh Scileanna,",
+    "headline_2": "Tóg Pobal",
+    "subheadline": "Is ardán nua-aimseartha baincéireachta ama é {{name}} ina bhfuil gach uair an chloig seirbhíse ar comhluach. Malartaigh do chuid scileanna, tuill creidmheasanna ama, agus ceangail le do phobal.",
+    "cta_dashboard": "Téigh chuig an Deais",
+    "cta_feed": "Téigh chuig an bhFotha",
+    "cta_get_started": "Tosaigh Saor in Aisce",
+    "cta_learn_more": "Foghlaim Tuilleadh",
+    "features": {
+      "0": {
+        "title": "Creidmheasanna Ama",
+        "description": "Malartaigh scileanna ag baint úsáide as am mar airgeadra"
+      },
+      "1": {
+        "title": "Pobal",
+        "description": "Déan teagmháil le comharsana ag tairiscint cabhrach"
+      },
+      "2": {
+        "title": "Láithreach",
+        "description": "Idirbhearta tapa agus réidh"
+      }
+    },
+    "stats": {
+      "active_members": "Baill Ghníomhacha",
+      "hours_exchanged": "Uaireanta Malartaithe",
+      "active_listings": "Liostaí Gníomhacha",
+      "communities": "Pobail"
+    },
+    "scroll_down": "Scrollaigh síos",
+    "audience_cards": {
+      "title": "Cá háit ar mhaith leat tosú?"
+    },
+    "how_it_works": {
+      "title": "Conas a Oibríonn Sé",
+      "subtitle": "Tosaigh i gceithre chéim shimplí",
+      "steps": {
+        "0": {
+          "title": "Cláraigh Saor in Aisce",
+          "description": "Cruthaigh do phróifíl i nóiméid agus liostáil na scileanna is féidir leat a thairiscint."
+        },
+        "1": {
+          "title": "Brabhsáil agus Ceangail",
+          "description": "Aimsigh seirbhísí a theastaíonn uait agus ceangail le baill áitiúla an phobail."
+        },
+        "2": {
+          "title": "Malartaigh Seirbhísí",
+          "description": "Eagraigh malartuithe scileanna agus cabhraigh le chéile."
+        },
+        "3": {
+          "title": "Tuill Creidmheasanna",
+          "description": "Faigh creidmheas ama amháin do gach uair a thugann tú. Caith iad mar is mian leat."
+        }
+      }
+    },
+    "why_timebanking": {
+      "title": "Cén Fáth Baincéireacht Ama?",
+      "subtitle": "Na croíphrionsabail a chuireann ár bpobal ag obair",
+      "values": {
+        "0": {
+          "title": "Comhluach",
+          "description": "Tá gach uair an chloig ar an luach céanna. Cibé an bhfuil tú ag múineadh pianó nó ag baint féir, tá comhluach ar d'am."
+        },
+        "1": {
+          "title": "Tóg Muinín",
+          "description": "Cabhraíonn léirmheasanna agus rátálacha leat baill iontaofa den phobal a aimsiú agus do chlú a chothú sa phobal."
+        },
+        "2": {
+          "title": "Fan Áitiúil",
+          "description": "Ceangail le comharsana agus neartaigh do phobal áitiúil trí mhalartuithe scileanna fiúntacha."
+        }
+      }
+    },
+    "cta_section": {
+      "title": "Réidh le tosú?",
+      "description": "Glac páirt i bpobal atá ag dul i méid agus atá ag malartú scileanna cheana féin agus ag tógáil naisc bhríocha.",
+      "button": "Cruthaigh Do Chuntas Saor in Aisce"
+    }
+  },
+  "about": {
+    "meta_title": "Maidir le {{name}}",
+    "meta_description": "Foghlaim conas a thugann {{name}} comharsana le chéile chun scileanna a roinnt ag baint úsáide as creidmheasanna ama. Tuilleann gach uair a thugtar uair an chloig ar ais - bealach níos cothroime chun tacú lena chéile.",
+    "hero_title": "Maidir le {{name}}",
+    "hero_description": "Is ardán nua-aimseartha baincéireachta ama é {{name}} ina bhfuil gach uair an chloig seirbhíse ar comhluach. Cabhraímid le pobail scileanna a mhalartú, muinín a thógáil, agus geilleagar áitiúil níos cothroime a chruthú — uair amháin san am.",
+    "how_it_works": {
+      "title": "Conas a Oibríonn Sé",
+      "subtitle": "Is simplí tosú. Ceithre chéim le dul isteach agus tosú ag malartú scileanna i do phobal.",
+      "steps": {
+        "0": {
+          "title": "Cruthaigh Do Phróifíl",
+          "description": "Cláraigh saor in aisce agus liostáil na scileanna is féidir leat a thairiscint do do phobal."
+        },
+        "1": {
+          "title": "Aimsigh a bhFuil Uait",
+          "description": "Brabhsáil liostaí chun seirbhísí a aimsiú atá á dtairiscint ag baill in aice leat."
+        },
+        "2": {
+          "title": "Malartaigh Seirbhísí",
+          "description": "Ceangail le baill agus eagraigh malartuithe scileanna a oibríonn don bheirt agaibh."
+        },
+        "3": {
+          "title": "Tuill agus Caith Creidmheasanna",
+          "description": "Tuill creidmheas ama amháin do gach uair a thugann tú, agus caith iad ar sheirbhísí a theastaíonn uait."
+        }
+      }
+    },
+    "values": {
+      "title": "Ár Luachanna",
+      "subtitle": "Na prionsabail a threoraíonn gach rud a dhéanaimid ag {{name}}.",
+      "items": {
+        "0": {
+          "title": "Comhionannas",
+          "description": "Tá am gach duine ar comhluach. Tá uair an chloig garraíodóireachta ar an luach céanna le huair an chloig teagaisc."
+        },
+        "1": {
+          "title": "Pobal",
+          "description": "Creidimid i naisc áitiúla láidre a thógáil. Neartaíonn gach malartú fíochán do chomharsanachta."
+        },
+        "2": {
+          "title": "Muinín agus Sábháilteacht",
+          "description": "Cinntíonn athbhreithnithe, rátálacha agus maoirseacht bróicéirí timpeallacht shábháilte do gach ball a bheith páirteach."
+        },
+        "3": {
+          "title": "Inbhuanaitheacht",
+          "description": "Trí scileanna a roinnt go háitiúil, laghdaímid dramhaíl, tacaímid le geilleagair chiorclacha, agus neartaímid athléimneacht áitiúil."
+        }
+      }
+    },
+    "stats": {
+      "members": "Baill",
+      "hours_exchanged": "Uaireanta Malartaithe",
+      "active_listings": "Liostaí Gníomhacha",
+      "communities": "Pobail"
+    },
+    "credits": {
+      "title": "Cumhachtaithe ag Project NEXUS",
+      "subtitle": "Ardán pobail foinse oscailte cruthaithe ag Jasper Ford. Ceadúnaithe faoi AGPL v3.",
+      "creator": "Cruthaitheoir",
+      "founders_heading": "Bunathóirí hOUR Timebank CLG",
+      "contributors": "Rannpháirtithe",
+      "research_heading": "Bunús Taighde",
+      "research_description": "Bunaithe ar staidéar tionchair shóisialta a choimisiúnaigh {{name}}.",
+      "acknowledgements": "Buíochas",
+      "open_source": "Foinse Oscailte",
+      "license_text": "Ceadúnaithe faoin gCeadúnas Poiblí Ginearálta Affero GNU v3 (AGPL-3.0).",
+      "v1_source": "Cód Foinse V1 (PHP + React)",
+      "v2_source": "Cód Foinse V2 (ASP.NET Core)"
+    },
+    "cta": {
+      "title": "Réidh le Bheith Páirteach?",
+      "description": "Cibé an bhfuil tú ag iarraidh do scileanna a roinnt nó cabhair a fháil le rud éigin, tá ár bpobal anseo duit.",
+      "dashboard": "Téigh chuig an Deais",
+      "join": "Bí Páirteach Saor in Aisce",
+      "help_center": "Ionad Cabhrach",
+      "contact_us": "Déan Teagmháil Linn"
+    }
+  },
+  "contact": {
+    "meta_description": "Téigh i dteagmháil leis an bhfoireann — ceisteanna faoi pháirtnéireacht, comhpháirtíochta, oideas sóisialta, inrochtaineacht, nó conas a oibríonn baincéireacht ama. Táimid sásta cabhrú leat.",
+    "title": "Déan Teagmháil Linn",
+    "subtitle": "An bhfuil ceist agat faoi {{name}}? Ba bhreá linn cloisteáil uait.",
+    "success_title": "Teachtaireacht Seolta!",
+    "success_message": "Fillfimid ort chomh luath agus is féidir.",
+    "back_to_help": "Ar Ais chuig an Ionad Cabhrach",
+    "error_fallback": "Theip ar an teachtaireacht a sheoladh. Bain triail eile as le do thoil.",
+    "form": {
+      "name_label": "Ainm",
+      "name_placeholder": "D'ainm",
+      "email_label": "Ríomhphost",
+      "email_placeholder": "tu@sampla.com",
+      "subject_label": "Ábhar",
+      "subject_placeholder": "Cad é seo faoi?",
+      "subjects": {
+        "general": "Fiosrúchán Ginearálta",
+        "account": "Cabhair le Cuntas",
+        "technical": "Fadhb Theicniúil",
+        "feedback": "Aiseolas / Moladh",
+        "other": "Eile"
+      },
+      "message_label": "Teachtaireacht",
+      "message_placeholder": "Conas is féidir linn cabhrú?",
+      "submit": "Seol Teachtaireacht",
+      "login_prompt_before": "An bhfuil cuntas agat cheana?",
+      "login_link": "Logáil isteach",
+      "login_prompt_after": "le haghaidh tacaíocht níos tapúla."
+    },
+    "turnstile_error": "Níorbh fhéidir seiceáil slándála a lódáil. Athnuaigh an leathanach chun triail eile a bhaint as."
+  },
+  "faq": {
+    "page_title": "Ceisteanna Coitianta",
+    "meta_description": "Ceisteanna coitianta faoi bhainc ama, creidmheasanna ama, liostaí, malartuithe, muinín agus sábháilteacht, agus ballraíocht pobail - gach rud atá uait le tosú.",
+    "title": "Ceisteanna Coitianta",
+    "subtitle_before_link": "Ní féidir leat a bhfuil uait a aimsiú? Tabhair cuairt ar ár",
+    "help_center_link": "nIonad Cabhrach",
+    "subtitle_after_link": "le haghaidh treoracha mionsonraithe.",
+    "search_placeholder": "Cuardaigh ceisteanna...",
+    "no_results": "Níor aimsíodh aon cheisteanna comhoiriúnacha. Bain triail as téarma cuardaigh eile.",
+    "cta_title": "An bhfuil ceisteanna agat fós?",
+    "cta_description": "Tá ár bhfoireann tacaíochta anseo chun cabhrú.",
+    "cta_button": "Déan Teagmháil le Tacaíocht",
+    "categories": {
+      "getting_started": {
+        "title": "Ag Tosú",
+        "q1": {
+          "question": "Cad é baincéireacht ama?",
+          "answer_p1": "Is córas malartaithe pobail é baincéireacht ama ina bhfuil uair amháin cabhrach cothrom le creidmheas ama amháin, beag beann ar an tseirbhís a chuirtear ar fáil. Cibé an bhfuil tú ag múineadh teanga, ag cabhrú le garraíodóireacht, nó ag soláthar tacaíocht theicniúil, tá comhluach ar d'am.",
+          "answer_p2": "Is bealach é chun naisc phobail a thógáil agus scileanna agus seirbhísí a mhalartú gan airgead traidisiúnta."
+        },
+        "q2": {
+          "question": "An bhfuil sé saor in aisce dul isteach?",
+          "answer_p1": "Sea! Tá ballraíocht saor in aisce ar fad. Is iad creidmheasanna ama an t-aon airgeadra a úsáidtear, a thuilleann tú trí chabhrú le daoine eile sa phobal.",
+          "answer_p2": "Faigheann baill nua líon beag creidmheasanna tosaigh go minic chun cabhrú leo tosú."
+        },
+        "q3": {
+          "question": "Conas a thosaím?",
+          "answer_intro": "Seo mar a thosaíonn tú:",
+          "step1_bold": "Comhlánaigh do phróifíl",
+          "step1_text": "Cuir grianghraf, beathaisnéis agus do scileanna leis",
+          "step2_bold": "Brabhsáil an margadh",
+          "step2_text": "Féach cad iad na seirbhísí atá á dtairiscint agus ag teastáil",
+          "step3_bold": "Cuir tairiscint suas",
+          "step3_text": "Roinn an méid is féidir leat cabhrú le daoine eile",
+          "step4_bold": "Déan iarratas",
+          "step4_text": "Iarr rud éigin a theastaíonn uait",
+          "step5_bold": "Ceangail le baill",
+          "step5_text": "Tóg do líonra"
+        },
+        "q4": {
+          "question": "Cad iad na scileanna is féidir liom a thairiscint?",
+          "answer_intro": "Beagnach rud ar bith! I measc na dtairiscintí coitianta tá:",
+          "skill1": "Cabhair sa bhaile (garraíodóireacht, glanadh, miondeisiúcháin)",
+          "skill2": "Tacaíocht theicniúil (cabhair ríomhaire, socrú fóin)",
+          "skill3": "Teagasc (teangacha, ceol, ábhair acadúla)",
+          "skill4": "Seirbhísí cruthaitheacha (dearadh, grianghrafadóireacht, scríbhneoireacht)",
+          "skill5": "Iompar (turais, turais ghnó)",
+          "skill6": "Compánachas (siúlóidí, cuairteanna, comhrá)",
+          "skill7": "Scileanna gairmiúla (cuntasaíocht, comhairle dlí, srl.)",
+          "answer_outro": "Tá rud éigin luachmhar le tairiscint ag gach duine!"
+        }
+      },
+      "time_credits": {
+        "title": "Creidmheasanna Ama",
+        "q1": {
+          "question": "Cad é creidmheas ama?",
+          "answer_p1": "Is ionann creidmheas ama amháin agus uair amháin seirbhíse. Is é airgeadra ár bpobail é.",
+          "answer_p2": "Is féidir leat uaireanta páirteacha a mhalartú freisin: 30 nóiméad = 0.5 creidmheas, 15 nóiméad = 0.25 creidmheas."
+        },
+        "q2": {
+          "question": "Conas a thuilim creidmheasanna ama?",
+          "answer_intro": "Tuilleann tú creidmheasanna trí:",
+          "way1_bold": "Seirbhísí a sholáthar",
+          "way1_text": "do bhaill eile",
+          "way2_bold": "Uaireanta deonacha a logáil",
+          "way2_text": "le heagraíochtaí ceadaithe",
+          "way3_bold": "Síntiúis a fháil",
+          "way3_text": "ó bhaill eile",
+          "way4_bold": "Creidmheasanna tosaigh",
+          "way4_text": "nuair a chláraíonn tú den chéad uair"
+        },
+        "q3": {
+          "question": "An féidir liom mo chreidmheasanna a bhronnadh?",
+          "answer_intro": "Is féidir! Is féidir leat:",
+          "option1": "Creidmheasanna a aistriú chuig aon bhall eile",
+          "option2": "Bronnadh ar phota an phobail (cabhraíonn sé le baill a dteastaíonn tacaíocht bhreise uathu)",
+          "answer_link_before": "Téigh chuig do ",
+          "wallet_link": "Sparán",
+          "answer_link_after": " chun creidmheasanna a sheoladh."
+        },
+        "q4": {
+          "question": "An féidir le m'iarmhéid dul diúltach?",
+          "answer": "Ceadaíonn roinnt pobal iarmhéideanna diúltacha teoranta chun cabhrú le baill nua tosú sula mbíonn deis acu creidmheasanna a thuilleamh. Seiceáil le comhordaitheoir do phobail le haghaidh na rialacha sonracha i do bhanc ama."
+        },
+        "q5": {
+          "question": "Cad a tharlaíonn má sheol mé creidmheasanna chuig an duine mícheart?",
+          "answer_intro": "Ní féidir idirbhearta a chúlghairm go huathoibríoch. Má rinne tú botún:",
+          "step1": "Déan teagmháil leis an bhfaighteoir agus iarr orthu na creidmheasanna a sheoladh ar ais",
+          "step2": "Mura féidir leat é a réiteach, déan teagmháil le tacaíocht le haghaidh cúnamh",
+          "answer_outro": "Seiceáil an faighteoir i gcónaí sula ndeimhníonn tú aistriú."
+        }
+      },
+      "exchanges_safety": {
+        "title": "Malartuithe agus Sábháilteacht",
+        "q1": {
+          "question": "Conas a eagraím malartú?",
+          "answer_intro": "Is é an gnáthphróiseas ná:",
+          "step1": "Aimsigh tairiscint nó iarratas a bhfuil suim agat ann",
+          "step2": "Seol teachtaireacht chuig an mball chun sonraí a phlé",
+          "step3": "Aontaigh ar cathain, cá háit, agus am measta",
+          "step4": "Buail le chéile agus comhlánaigh an malartú",
+          "step5": "Seolann an duine a fuair cabhair creidmheasanna ama",
+          "step6": "Fág athbhreithniú dá chéile"
+        },
+        "q2": {
+          "question": "An bhfuil sé sábháilte bualadh le strainséirí?",
+          "answer_intro": "Molaimid na cleachtais sábháilteachta seo:",
+          "tip1": "Buail le chéile in áiteanna poiblí do na chéad mhalartuithe",
+          "tip2": "Seiceáil próifíl agus athbhreithnithe an bhaill",
+          "tip3": "Inis do dhuine éigin cá bhfuil tú ag dul",
+          "tip4": "Bíodh muinín agat as d'instinní — má bhraitheann tú rud éigin mícheart, fág",
+          "tip5": "Tosaigh le malartuithe beaga, ísealriosca",
+          "answer_outro": "Tuairiscigh aon iompar imníoch dár bhfoireann tacaíochta."
+        },
+        "q3": {
+          "question": "Cad a tharlaíonn mura dtaispeánann duine éigin nó mura gcomhlánaíonn siad an tseirbhís?",
+          "answer_intro": "Is é an chumarsáid an eochair. Má tá fadhb ann:",
+          "step1": "Seol teachtaireacht chuig an mball chun a phlé cad a tharla",
+          "step2": "Déan iarracht réiteach a aimsiú le chéile",
+          "step3": "Mura féidir leat é a réiteach, déan teagmháil le tacaíocht",
+          "answer_outro": "D'fhéadfadh srianta cuntais a bheith mar thoradh ar neamhláithreachtaí athfhillteacha nó iompar bocht."
+        },
+        "q4": {
+          "question": "An bhfuil na seirbhísí árachaithe?",
+          "answer": "Is socruithe neamhfhoirmiúla idir baill phobail iad malartuithe. Ní sholáthraímid clúdach árachais do sheirbhísí. I gcás gníomhaíochtaí ardriosca, pléigh dliteanas leis an mball eile roimh ré. Tá a gcuid árachais ghairmiúil féin ag roinnt ball."
+        }
+      },
+      "badges_rewards": {
+        "title": "Suaitheantais agus Duaiseanna",
+        "q1": {
+          "question": "Cad iad suaitheantais agus XP?",
+          "answer_intro": "Tugann ár gcóras cluichíochta aitheantas do rannpháirtíocht phobail:",
+          "item1_bold": "XP (Pointí Taithí)",
+          "item1_text": "Tuillte as gníomhaíochtaí éagsúla, ag cabhrú leat leibhéal a ardú",
+          "item2_bold": "Suaitheantais",
+          "item2_text": "Éachtaí as clocha míle a bhaint amach (60+ le bailiú!)",
+          "item3_bold": "Leibhéil",
+          "item3_text": "Dul chun cinn ó Nuatheachtaí go Finscéal Banc Ama",
+          "item4_bold": "Sraitheanna",
+          "item4_text": "Duaiseanna as rannpháirtíocht laethúil"
+        },
+        "q2": {
+          "question": "Conas a thuilim XP?",
+          "answer_intro": "Tuilleann tú XP as go leor gníomhaíochtaí:",
+          "activity1": "Creidmheasanna ama a sheoladh/a fháil",
+          "activity2": "Liostaí a chruthú",
+          "activity3": "Uaireanta deonacha a logáil",
+          "activity4": "Freastal ar imeachtaí",
+          "activity5": "Naisc a dhéanamh",
+          "activity6": "Logáil isteach laethúil",
+          "activity7": "Suaitheantais a thuilleamh"
+        },
+        "q3": {
+          "question": "An féidir liom rogha an diúltaithe a fháil ó chláir ceannairí?",
+          "answer_before_link": "Is féidir! Más fearr leat príobháideacht, is féidir leat rogha an diúltaithe a dhéanamh ó bheith le feiceáil ar chláir ceannairí poiblí i do ",
+          "settings_link": "Socruithe",
+          "answer_after_link": ". Tuillfidh tú XP agus suaitheantais fós, ní bheidh siad le feiceáil ag daoine eile ar na ranguithe."
+        }
+      },
+      "account_privacy": {
+        "title": "Cuntas agus Príobháideacht",
+        "q1": {
+          "question": "Conas a athraím mo phasfhocal?",
+          "answer_before_link": "Téigh chuig ",
+          "settings_link": "Socruithe",
+          "answer_after_link": " > Slándáil chun do phasfhocal a athrú. Beidh ort do phasfhocal reatha a chur isteach ar dtús. Má tá do phasfhocal dearmadta agat, úsáid an nasc \"Pasfhocal Dearmadta\" ar an leathanach logáil isteach."
+        },
+        "q2": {
+          "question": "Cé atá in ann mo phróifíl a fheiceáil?",
+          "answer_intro": "De réir réamhshocraithe, tá do phróifíl le feiceáil ag baill eile an phobail. Is féidir leat smacht a fháil ar:",
+          "item1": "Cad iad na sonraí teagmhála a thaispeántar",
+          "item2": "An mbíonn tú le feiceáil ar chláir ceannairí",
+          "item3": "Infheictheacht do shuímh ghinearálta",
+          "answer_link_before": "Coigeartaigh iad seo i do ",
+          "settings_link": "Socruithe",
+          "answer_link_after": "."
+        },
+        "q3": {
+          "question": "Conas a scriosann mé mo chuntas?",
+          "answer_intro": "Más mian leat an pobal a fhágáil:",
+          "step1": "Téigh chuig Socruithe > Cuntas",
+          "step2": "Cliceáil \"Scrios Cuntas\"",
+          "step3": "Deimhnigh do chinneadh",
+          "answer_outro": "Nóta: Coinneofar do stair idirbheart le haghaidh taifid, ach bainfear d'fhaisnéis phearsanta."
+        },
+        "q4": {
+          "question": "Conas a chosnaítear mo shonraí?",
+          "answer_intro": "Glacaimid le príobháideacht go dáiríre:",
+          "item1": "Tá do shonraí criptithe agus stóráilte go slán",
+          "item2": "Ní dhíolaimid d'fhaisnéis riamh",
+          "item3": "Is féidir leat cóip de do shonraí a iarraidh am ar bith",
+          "item4": "Comhlíonaimid GDPR agus rialacháin cosanta sonraí"
+        }
+      }
+    }
+  },
+  "maintenance": {
+    "title": "Beimid ar ais go luath!",
+    "description": "tá cothabháil sceidealaithe ar siúl faoi láthair chun do thaithí a fheabhsú.",
+    "apology": "Gabh ár leithscéal as aon mhíchaoithiúlacht. Seiceáil ar ais i gceann tamaillín le do thoil.",
+    "thanks": "Go raibh maith agat as d'fhoighne!",
+    "admin_login": "Logáil Isteach Riaracháin",
+    "deploy_notice": "Tá an t-ardán seo fós á thógáil go gníomhach, mar sin d'fhéadfadh tréimhsí imscartha tapa a bheith ann. Le linn na dtréimhsí sin, téann an freastalaí isteach i mód cothabhála go huathoibríoch. De ghnáth ní mhaireann sé seo ach timpeall cúig nóiméad agus athruithe nua á gcur i bhfeidhm."
+  },
+  "kb": {
+    "title": "Bonn Eolais",
+    "description": "Faigh freagraí, treoir, agus acmhainní cabhrach",
+    "search_placeholder": "Cuardaigh an bonn eolais..."
+  },
+  "page_meta": {
+    "development_status": {
+      "title": "Stádas Forbartha"
+    },
+    "maintenance": {
+      "title": "Cothabháil"
     }
   }
 }

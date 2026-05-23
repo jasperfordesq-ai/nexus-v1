@@ -63,13 +63,25 @@
   },
   "password_reset": {
     "subject": "?????????? ? {{community}}",
+    "title": "パスワードをリセット",
+    "preview": "パスワードリセットリンクをリクエストしました",
     "greeting": "こんにちは {{name}} さん、",
     "body": "パスワードリセットをリクエストしました。下のボタンをクリックして新しいパスワードを設定してください。",
     "cta": "パスワードをリセット",
     "expiry": "??????1?????????????",
-    "ignore": "これをリクエストしていない場合は、このメールを無視してかまいません。",
-    "title": "パスワードをリセット",
-    "preview": "パスワードリセットリンクをリクエストしました"
+    "ignore": "これをリクエストしていない場合は、このメールを無視してかまいません。"
+  },
+  "security": {
+    "password_changed_subject": "セキュリティアラート: パスワードが変更されました — {{community}}",
+    "password_changed_title": "パスワードが変更されました",
+    "password_changed_preview": "アカウントのパスワードが最近変更されました",
+    "password_changed_body": "アカウントのパスワードが最近変更されました。この変更を行った場合、対応は不要です。",
+    "password_changed_warning": "この変更を行っていない場合は、すぐにサポートにお問い合わせいただき、アカウントを保護してください。",
+    "email_changed_subject": "セキュリティアラート: メールアドレスが変更されました — {{community}}",
+    "email_changed_title": "メールアドレスが変更されました",
+    "email_changed_preview": "アカウントのメールアドレスが変更されました",
+    "email_changed_body": "<strong>{{community}}</strong> アカウントのメールアドレスが新しいアドレスに更新されました。",
+    "email_changed_warning": "この変更を行っていない場合は、すぐにサポートにお問い合わせいただき、アカウントを保護してください。"
   },
   "transaction": {
     "subject": "タイムクレジット取引 — {{amount}} 時間",
@@ -90,6 +102,17 @@
     "body": "{{sender}} さんからメッセージが届きました。",
     "cta": "メッセージを見る"
   },
+  "message": {
+    "in_app_content": "{{sender}} さんからメッセージが届きました",
+    "title": "新しいメッセージ",
+    "preview": "{{sender}} さんからメッセージが届きました",
+    "body_intro": "<strong>{{sender}}</strong> さんから新しいメッセージが届きました。",
+    "voice_notice": "これは音声メッセージです — プラットフォームで聞いてください。",
+    "view_button": "会話を見る",
+    "footer_note": "プラットフォームから直接返信できます。メッセージのメール受信を停止するには、<a href=\"{{url}}\">通知設定</a>を更新してください。",
+    "fallback_recipient_name": "こんにちは",
+    "fallback_sender_name": "誰か"
+  },
   "common": {
     "greeting": "こんにちは {{name}} さん、",
     "button_fallback": "上のボタンが機能しない場合は、このリンクをブラウザにコピー＆ペーストしてください：",
@@ -101,10 +124,10 @@
     "fallback_federation_member": "連合メンバー",
     "fallback_partner_community": "パートナーコミュニティ",
     "fallback_federation_level": "レベル {{level}}",
-    "or_separator": "or",
     "fallback_job": "求人",
     "fallback_manager": "マネージャー",
-    "fallback_organization": "組織"
+    "fallback_organization": "組織",
+    "or_separator": "または"
   },
   "footer": {
     "unsubscribe": "これらのメールの配信を停止",
@@ -178,7 +201,7 @@
     "label_community": "コミュニティ",
     "label_amount": "金額",
     "label_description": "説明",
-    "label_to": "To",
+    "label_to": "に",
     "label_new_balance": "新しい残高",
     "label_from_community": "コミュニティから",
     "label_requested_level": "要求レベル",
@@ -389,29 +412,20 @@
     "exchange_disputed": "⚠️ 交換紛争 - ブローカーの確認が必要",
     "default": "Project NEXUS からの通知"
   },
-  "security": {
-    "password_changed_subject": "セキュリティアラート: パスワードが変更されました — {{community}}",
-    "password_changed_title": "パスワードが変更されました",
-    "password_changed_preview": "アカウントのパスワードが最近変更されました",
-    "password_changed_body": "アカウントのパスワードが最近変更されました。この変更を行った場合、対応は不要です。",
-    "password_changed_warning": "この変更を行っていない場合は、すぐにサポートにお問い合わせいただき、アカウントを保護してください。",
-    "email_changed_subject": "セキュリティアラート: メールアドレスが変更されました — {{community}}",
-    "email_changed_title": "メールアドレスが変更されました",
-    "email_changed_preview": "アカウントのメールアドレスが変更されました",
-    "email_changed_body": "<strong>{{community}}</strong> アカウントのメールアドレスが新しいアドレスに更新されました。",
-    "email_changed_warning": "この変更を行っていない場合は、すぐにサポートにお問い合わせいただき、アカウントを保護してください。"
+  "exchange_dispute": {
+    "subject": "あなたの交換が確認のためにフラグ付けされました",
+    "title": "交換は審査中です",
+    "preview": "参加した交換に対応が必要です",
+    "body": "報告された時間に差異があったため、最近の交換が紛争としてフラグ付けされました。コーディネーターが確認し、まもなく連絡いたします。",
+    "next_steps": "解決のためにブローカーまたはコーディネーターから連絡が来る場合があります。その間、交換の詳細を確認できます。",
+    "cta": "交換を見る"
   },
-  "message": {
-    "in_app_content": "{{sender}} さんからメッセージが届きました",
-    "title": "新しいメッセージ",
-    "preview": "{{sender}} さんからメッセージが届きました",
-    "body_intro": "<strong>{{sender}}</strong> さんから新しいメッセージが届きました。",
-    "voice_notice": "これは音声メッセージです — プラットフォームで聞いてください。",
-    "view_button": "会話を見る",
-    "footer_note": "プラットフォームから直接返信できます。メッセージのメール受信を停止するには、<a href=\"{{url}}\">通知設定</a>を更新してください。",
-    "fallback_recipient_name": "こんにちは",
-    "fallback_sender_name": "誰か"
-  },
+  "dispute_resolved_subject": "交換の紛争が解決されました",
+  "dispute_resolved_title": "紛争が解決されました",
+  "dispute_resolved_preview": "あなたの交換は正常に完了しました",
+  "dispute_resolved_body": "あなたの交換が確認され、:hours 時間で最終合意に達しました。",
+  "dispute_resolved_hours_label": "合意された最終時間",
+  "dispute_resolved_cta": "交換を見る",
   "donation": {
     "sent_subject": "あなたは :amount タイムクレジットを寄付しました",
     "sent_title": "寄付を送信しました",
@@ -473,14 +487,6 @@
     "hours_declined_body": "':opportunity' のボランティア時間を現時点で確認できませんでした。コーディネーターにご連絡ください。",
     "hours_declined_cta": "ボランティアを見る"
   },
-  "exchange_dispute": {
-    "subject": "あなたの交換が確認のためにフラグ付けされました",
-    "title": "交換は審査中です",
-    "preview": "参加した交換に対応が必要です",
-    "body": "報告された時間に差異があったため、最近の交換が紛争としてフラグ付けされました。コーディネーターが確認し、まもなく連絡いたします。",
-    "next_steps": "解決のためにブローカーまたはコーディネーターから連絡が来る場合があります。その間、交換の詳細を確認できます。",
-    "cta": "交換を見る"
-  },
   "onboarding_nurture": {
     "day2_subject": "プロフィールを完成させて、より多くのつながりを得ましょう",
     "day2_title": "プロフィールはあと少しで完成です",
@@ -500,11 +506,5 @@
     "day7_greeting": "こんにちは :name さん、",
     "day7_body": "あなたは 1 週間前から :community のメンバーです！できることの簡単なリマインダーをご紹介します：リストの閲覧、つながり作り、グループ参加、イベント出席。",
     "day7_cta": "コミュニティを探索"
-  },
-  "dispute_resolved_subject": "交換の紛争が解決されました",
-  "dispute_resolved_title": "紛争が解決されました",
-  "dispute_resolved_preview": "あなたの交換は正常に完了しました",
-  "dispute_resolved_body": "あなたの交換が確認され、:hours 時間で最終合意に達しました。",
-  "dispute_resolved_hours_label": "合意された最終時間",
-  "dispute_resolved_cta": "交換を見る"
+  }
 }

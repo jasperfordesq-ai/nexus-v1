@@ -238,7 +238,7 @@
     "avg_rating": "Calificación Promedio",
     "response_time": "Tiempo de Respuesta",
     "active_listings": "Listados Activos",
-    "na": "N/A",
+    "na": "N / A",
     "tab_listings": "Anuncios",
     "tab_reviews": "Reseñas",
     "no_listings_title": "Sin Listados",
@@ -573,7 +573,8 @@
       "declined": "Rechazada",
       "completed": "Completada",
       "cancelled": "Cancelada"
-    }
+    },
+    "offers_title": "Ofertas de Entrega"
   },
   "pickup": {
     "my_pickups_title": "Mis recogidas",
@@ -621,7 +622,7 @@
     "radius_option": "{{km}} km",
     "radius_chip": "{{km}} km de radio",
     "results_count": "{{count}} listados encontrados cerca",
-    "refresh": "Refresh",
+    "refresh": "Refrescar",
     "map_view": "Vista de mapa",
     "list_view": "Vista de lista",
     "location_required": "Establece tu ubicación en tu perfil para usar esta función",

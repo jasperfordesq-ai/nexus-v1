@@ -1,4 +1,15 @@
 {
+  "detail": {
+    "back_to_goals": "Retour aux objectifs",
+    "view_all_goals": "Voir tous les objectifs",
+    "not_found_title": "Objectif introuvable",
+    "not_found_description": "Cet objectif a peut-être été supprimé ou n'a jamais existé.",
+    "private_title": "Cet objectif est privé",
+    "private_description": "Seul le propriétaire de l'objectif peut le consulter.",
+    "meta_description": "{{owner}} suit \"{{title}}\" avec {{progress}} % de progression dans cet objectif communautaire.",
+    "overdue_chip": "En retard",
+    "checkin_frequency": "Fréquence de check-in"
+  },
   "checkin_recorded": "Pointage enregistré !",
   "checkin_failed": "Échec de l'enregistrement du pointage.",
   "reminder_set_failed": "Échec de la définition du rappel.",
@@ -13,15 +24,15 @@
     "history": "Historique",
     "no_checkins": "Aucun suivi pour le moment. Enregistrez votre premier !",
     "progress_label": "Progression",
+    "progress_help": "Définissez ceci sur le progrès réel que vous souhaitez afficher pour l'objectif. Enregistrer un check-in met à jour la barre de l'objectif et la chronologie.",
+    "progress_value": "{{percent}}%",
+    "progress_unknown": "Progrès non enregistré",
     "mood_label": "Comment vous sentez-vous ?",
     "note_label": "Note (facultatif)",
     "note_placeholder": "Comment ça se passe ? Des victoires ou des défis ?",
     "cancel": "Annuler",
     "submit": "Enregistrer le suivi",
-    "check_in_button": "Faire le point",
-    "progress_help": "Définissez ceci sur le progrès réel que vous souhaitez afficher pour l'objectif. Enregistrer un check-in met à jour la barre de l'objectif et la chronologie.",
-    "progress_value": "{{percent}}%",
-    "progress_unknown": "Progrès non enregistré"
+    "check_in_button": "Faire le point"
   },
   "mood": {
     "great": "Formidable",
@@ -41,11 +52,11 @@
     "reminder_set_success": "Rappel défini : {{frequency}}"
   },
   "frequency": {
+    "none": "Aucune cadence",
     "daily": "Quotidien",
     "weekly": "Hebdomadaire",
     "biweekly": "Toutes les 2 semaines",
-    "monthly": "Mensuel",
-    "none": "Aucune cadence"
+    "monthly": "Mensuel"
   },
   "template": {
     "title": "Commencer à partir d’un modèle",
@@ -66,7 +77,7 @@
     "progress_aria": "Progression : {{percent}} %",
     "event": {
       "progress_update": "Mise à jour du progrès",
-      "checkin": "Check-in",
+      "checkin": "Enregistrement",
       "milestone": "Étape",
       "buddy_joined": "Binôme rejoint",
       "buddy_action": "Soutien du binôme",
@@ -74,38 +85,18 @@
       "created": "Créé"
     }
   },
-  "template_picker": {
-    "load_error": "Échec du chargement des modèles. Veuillez réessayer.",
-    "try_again": "Réessayer",
-    "none_available": "Aucun modèle disponible pour le moment.",
-    "none_in_category": "Aucun modèle dans cette catégorie."
-  },
-  "detail": {
-    "back_to_goals": "Retour aux objectifs",
-    "view_all_goals": "Voir tous les objectifs",
-    "not_found_title": "Objectif introuvable",
-    "not_found_description": "Cet objectif a peut-être été supprimé ou n'a jamais existé.",
-    "private_title": "Cet objectif est privé",
-    "private_description": "Seul le propriétaire de l'objectif peut le consulter.",
-    "overdue_chip": "En retard",
-    "checkin_frequency": "Fréquence de check-in",
-    "meta_description": "{{owner}} suit \"{{title}}\" avec {{progress}} % de progression dans cet objectif communautaire."
-  },
-  "goals": {
-    "load_error": "Échec du chargement des objectifs. Veuillez réessayer."
-  },
   "insights": {
     "loading": "Chargement des aperçus de l'objectif",
     "load_failed": "Échec du chargement des aperçus de l'objectif.",
     "current_streak": "Série actuelle",
-    "streak_value": "{{count}} check-ins",
+    "streak_value": "{{count}} enregistrements",
     "best_streak": "Meilleure série : {{count}}",
     "next_checkin": "Prochain check-in",
     "no_cadence": "Aucune cadence définie",
     "no_cadence_helper": "Définissez une cadence lors de la modification de cet objectif.",
     "checkin_due": "Un check-in est dû",
     "frequency": "Cadence {{frequency}}",
-    "checkins": "Check-ins",
+    "checkins": "Enregistrements",
     "checkins_value": "{{count}} enregistrés",
     "last_checkin": "Dernier check-in {{time}}",
     "no_checkins": "Pas encore de check-ins",
@@ -130,5 +121,14 @@
       "celebration": "Célébration",
       "note": "Note"
     }
+  },
+  "template_picker": {
+    "load_error": "Échec du chargement des modèles. Veuillez réessayer.",
+    "try_again": "Réessayer",
+    "none_available": "Aucun modèle disponible pour le moment.",
+    "none_in_category": "Aucun modèle dans cette catégorie."
+  },
+  "goals": {
+    "load_error": "Échec du chargement des objectifs. Veuillez réessayer."
   }
 }

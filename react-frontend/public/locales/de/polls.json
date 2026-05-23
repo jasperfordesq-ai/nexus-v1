@@ -25,6 +25,10 @@
     "open": "Offen",
     "closed": "Geschlossen"
   },
+  "badges": {
+    "ranked": "Gewichtet",
+    "anonymous": "Anonym"
+  },
   "tabs": {
     "open": "Offen",
     "closed": "Geschlossen",
@@ -74,14 +78,6 @@
   "category_placeholder": "z. B. Community, Veranstaltungen, Feedback",
   "anonymous_voting": "Anonyme Abstimmung",
   "anonymous_voting_desc": "Wähleridentitäten in Ergebnissen verbergen",
-  "aria": {
-    "export_csv": "Ergebnisse als CSV exportieren",
-    "move_rank_down": "{{option}} nach unten verschieben",
-    "move_rank_up": "{{option}} nach oben verschieben"
-  },
-  "page_meta": {
-    "title": "Abstimmungen"
-  },
   "ranked_results_title": "Runde-für-Runde-Ergebnisse",
   "round_number": "Runde {{number}}",
   "eliminated_candidate": "Ausgeschieden: {{name}}",
@@ -92,8 +88,12 @@
   "view_ranked_results": "Rangwahlergebnisse anzeigen",
   "winner_label": "Gewinner: {{name}}",
   "submit_rankings": "Rangfolge absenden",
-  "badges": {
-    "ranked": "Gewichtet",
-    "anonymous": "Anonym"
+  "aria": {
+    "export_csv": "Ergebnisse als CSV exportieren",
+    "move_rank_down": "{{option}} nach unten verschieben",
+    "move_rank_up": "{{option}} nach oben verschieben"
+  },
+  "page_meta": {
+    "title": "Abstimmungen"
   }
 }

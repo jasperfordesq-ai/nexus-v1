@@ -1,18 +1,21 @@
 {
   "back": "Rug",
+  "empty_dash": "-",
+  "refresh": "Vernieuwen",
   "hours_short": "{{count}} u",
+  "not_available": "Niet beschikbaar",
   "error_title": "Er is iets misgegaan",
   "nav": {
     "dashboard": "Dashboard",
-    "feed": "Feed",
+    "feed": "Voer",
     "listings": "Advertenties",
     "messages": "Berichten",
     "community": "Gemeenschap",
-    "caring_community": "Caring Community",
+    "caring_community": "Zorgzame gemeenschap",
     "members": "Leden",
     "events": "Evenementen",
     "groups": "Groepen",
-    "blog": "Blog",
+    "blog": "Bloggen",
     "volunteering": "Vrijwilligerswerk",
     "organisations": "Organisaties",
     "resources": "Bronnen",
@@ -52,7 +55,7 @@
     "polls": "Peilingen",
     "jobs": "Vacatures",
     "ideation": "Ideewedstrijden",
-    "matches": "Matches",
+    "matches": "Wedstrijden",
     "connections": "Verbindingen",
     "ai_chat": "AI-assistent",
     "skills": "Vaardigheden",
@@ -61,8 +64,8 @@
     "unread_notifications": "{{count}} ongelezen meldingen",
     "timebanking": "Tijdbank",
     "explore": "Ontdekken",
-    "marketplace": "Marketplace",
-    "premium": "Premium",
+    "marketplace": "Marktplaats",
+    "premium": "Premie",
     "verify_identity": "Verifieer uw identiteit",
     "accessibility_alpha": "Toegankelijkheid (alfa)",
     "features": "Functies"
@@ -74,6 +77,10 @@
   "location": {
     "powered_by_google": "Mogelijk gemaakt door Google",
     "powered_by_osm": "© OpenStreetMap-bijdragers"
+  },
+  "keyboard": {
+    "command_symbol": "⌘",
+    "k_key": "K"
   },
   "nav_desc": {
     "feed": "Gemeenschapsfeed",
@@ -171,10 +178,10 @@
     "legal_hub": "Juridisch centrum",
     "terms_of_service": "Servicevoorwaarden",
     "privacy_policy": "Privacybeleid",
-    "type_community_guidelines": "Communityrichtlijnen",
-    "type_acceptable_use": "Acceptabel gebruik",
     "cookie_policy": "Cookiebeleid",
-    "accessibility": "Toegankelijkheid"
+    "accessibility": "Toegankelijkheid",
+    "type_community_guidelines": "Communityrichtlijnen",
+    "type_acceptable_use": "Acceptabel gebruik"
   },
   "admin_tools": {
     "section": "Beheertools",
@@ -182,7 +189,7 @@
     "legacy_admin": "Oud beheerpaneel"
   },
   "account": {
-    "section": "Account",
+    "section": "Rekening",
     "settings": "Instellingen",
     "log_out": "Uitloggen"
   },
@@ -202,12 +209,12 @@
     "support": "Ondersteuning",
     "legal": "Juridisch",
     "admin": "Beheer",
-    "account": "Account",
+    "account": "Rekening",
     "language": "Taal",
     "engage": "Meedoen",
     "progress": "Voortgang",
     "tools": "Hulpmiddelen",
-    "impact": "Impact"
+    "impact": "Invloed"
   },
   "accessibility": {
     "open_menu": "Menu openen",
@@ -220,11 +227,11 @@
     "switch_to_light": "Naar lichte modus schakelen",
     "switch_to_dark": "Naar donkere modus schakelen",
     "skip_to_content": "Naar hoofdinhoud springen",
+    "accessibility_alpha_new_tab": "Toegankelijkheid (alpha) in een nieuw tabblad openen",
     "menu_opened": "Navigatiemenu geopend",
     "close": "Sluiten",
     "scroll_to_top": "Naar boven scrollen",
-    "breadcrumb": "Kruimelpad",
-    "accessibility_alpha_new_tab": "Toegankelijkheid (alpha) in een nieuw tabblad openen"
+    "breadcrumb": "Kruimelpad"
   },
   "cookie_consent": {
     "banner_label": "Cookie toestemming",
@@ -281,6 +288,8 @@
   "members": {
     "title": "Leden",
     "subtitle": "Verbind met leden van de gemeenschap",
+    "hero_eyebrow": "Community-overzicht",
+    "count_label": "Weergegeven leden",
     "quick_filters": "Ledenfilters",
     "all": "Alle leden",
     "new": "Nieuwe leden",
@@ -294,7 +303,7 @@
     "nearby_filter": "Binnen {{radius}} km",
     "clear_search": "Zoekopdracht wissen",
     "radius_label": "Straal",
-    "sort_communityrank": "Community Rank",
+    "sort_communityrank": "Gemeenschapsrang",
     "sort_name": "Naam",
     "sort_newest": "Nieuwste",
     "sort_rated": "Hoogst beoordeeld",
@@ -305,6 +314,9 @@
     "no_members": "Geen leden gevonden",
     "no_members_search": "Probeer een andere zoekterm",
     "no_members_community": "Nog geen leden in deze gemeenschap",
+    "empty_tip_profiles": "Bekijk volledige profielen",
+    "empty_tip_skills": "Zoeken op vaardigheid",
+    "empty_tip_location": "Probeer leden in de buurt",
     "load_more": "Meer laden",
     "results_matching": "{{shown}} van {{total}} leden die overeenkomen met \"{{query}}\"",
     "results_count": "{{count}} leden getoond",
@@ -312,7 +324,7 @@
     "fallback_name": "Lid",
     "avatar_alt": "Avatar van {{name}}",
     "profile_aria": "Profiel van {{name}} bekijken",
-    "distance_km": "{{distance}} km",
+    "distance_km": "{{distance}} kilometer",
     "location_distance": "{{location}} · {{distance}}",
     "joined_date": "Lid sinds {{date}}",
     "showcased_badges": "Uitgelichte badges",
@@ -324,12 +336,7 @@
     "load_failed": "Kan leden niet laden",
     "load_more_failed": "Kan meer leden niet laden",
     "my_profile": "Mijn profiel",
-    "load_more_count": "Meer laden ({{remaining}} resterend)",
-    "hero_eyebrow": "Community-overzicht",
-    "count_label": "Weergegeven leden",
-    "empty_tip_profiles": "Bekijk volledige profielen",
-    "empty_tip_skills": "Zoeken op vaardigheid",
-    "empty_tip_location": "Probeer leden in de buurt"
+    "load_more_count": "Meer laden ({{remaining}} resterend)"
   },
   "error_boundary": {
     "title": "Er ging iets mis",
@@ -374,7 +381,7 @@
       "coordinate_org_sub": "Beheer je vrijwilligersorganisaties",
       "my_relationships": "Mijn ondersteuningsrelaties",
       "my_relationships_sub": "Bekijk je lopende ondersteuningsverbindingen",
-      "markt": "Marktplatz",
+      "markt": "Marktplaats",
       "markt_sub": "Blader door lokale diensten, goederen en tijdtegoed-aanbiedingen.",
       "loyalty_history": "Mijn tijdtegoed-inwisselingen",
       "loyalty_history_sub": "Zie hoe je je verdiende uren bij lokale handelaars hebt gebruikt.",
@@ -455,7 +462,7 @@
         "title": "Clubs en verenigingen",
         "description": "Verbind verenigingen, clubs en ledengroepen met het zorgnetwerk."
       },
-      "markt": "Marktplatz",
+      "markt": "Marktplaats",
       "projects": {
         "title": "Gemeenschapsprojecten",
         "description": "Volg gemeentelijke werken, coöperatie-mijlpalen en buurtinitiatieven."
@@ -481,6 +488,7 @@
       "description": "Vraag uw gemeenschap om ondersteuning"
     },
     "subtitle": "Uw buren geven om u. Vertel ons wat u nodig heeft en we doen ons best om te helpen.",
+    "on_behalf_notice": "U maakt dit verzoek voor iemand die u ondersteunt als mantelzorger.",
     "form": {
       "what_label": "Wat voor soort hulp heeft u nodig?",
       "what_placeholder": "bijv. Hulp met boodschappen, vervoer naar een medische afspraak, gezelschap voor een wandeling...",
@@ -514,8 +522,7 @@
       "filled_hint": "We hebben het formulier ingevuld op basis van uw opname. Controleer voor het verzenden.",
       "transcript_label": "Wat we hoorden"
     },
-    "back": "Terug naar gemeenschapshub",
-    "on_behalf_notice": "U maakt dit verzoek voor iemand die u ondersteunt als mantelzorger."
+    "back": "Terug naar gemeenschapshub"
   },
   "hour_gift": {
     "meta": {
@@ -526,7 +533,7 @@
     "subtitle": "Gespaarde uren kunnen geschonken worden aan familie, vrienden of iedereen die ze nodig heeft.",
     "tabs": {
       "send": "Versturen",
-      "inbox": "Inbox",
+      "inbox": "Postvak IN",
       "sent": "Verzonden"
     },
     "send": {
@@ -598,13 +605,13 @@
     },
     "history": {
       "title": "Uw overdrachtgeschiedenis",
+      "aria": "Geschiedenis uurovermakingen",
       "date": "Datum",
       "destination": "Bestemming",
       "hours": "Uren",
       "status": "Status",
       "reason": "Reden",
-      "empty": "Nog geen overdrachten.",
-      "aria": "Geschiedenis uurovermakingen"
+      "empty": "Nog geen overdrachten."
     },
     "status": {
       "pending": "Wacht op goedkeuring",
@@ -722,7 +729,7 @@
   },
   "gif": {
     "search_placeholder": "GIF's zoeken...",
-    "trending": "Trending",
+    "trending": "Populair",
     "no_results": "Geen GIF's gevonden",
     "powered_by": "Mogelijk gemaakt door GIPHY",
     "button_label": "GIF toevoegen",
@@ -772,15 +779,18 @@
     "clear": "Wissen",
     "scroll_left": "Naar links scrollen",
     "scroll_right": "Naar rechts scrollen",
+    "current_language": "Taal: {{language}}",
     "select_language": "Taal selecteren",
     "clear_location": "Locatie wissen",
     "select_category": "Selecteer een categorie",
     "verification_badges": "Verificatiebadges",
-    "search_skills": "Vaardigheden zoeken",
-    "current_language": "Taal: {{language}}"
+    "search_skills": "Vaardigheden zoeken"
   },
   "skills": {
     "browse_title": "Gemeenschaps vaardigheidsgids",
+    "explainer": "Bekijk vaardigheden die door leden in jouw community worden gedeeld, vind mensen die hulp aanbieden en ontdek leden die willen leren.",
+    "unable_to_load": "Kan niet laden",
+    "try_again": "Opnieuw proberen",
     "load_failed": "Kan vaardigheidscategorieën niet laden",
     "load_failed_retry": "Kan vaardigheidscategorieën niet laden. Probeer het opnieuw.",
     "offering_label": "Aanbod",
@@ -809,7 +819,7 @@
       "beginner": "Beginner",
       "intermediate": "Gemiddeld",
       "advanced": "Gevorderd",
-      "expert": "Expert"
+      "expert": "Deskundige"
     },
     "proficiency_aria": "Vaardigheidsniveau: {{level}}",
     "remove_skill_aria": "{{skill}} verwijderen",
@@ -823,10 +833,7 @@
     "aria_clear_search": "Zoekopdracht wissen",
     "aria_close_members_list": "Ledenlijst sluiten",
     "category_optional": "Categorie (optioneel)",
-    "proficiency_level": "Vaardigheidsniveau",
-    "explainer": "Bekijk vaardigheden die door leden in jouw community worden gedeeld, vind mensen die hulp aanbieden en ontdek leden die willen leren.",
-    "unable_to_load": "Kan niet laden",
-    "try_again": "Opnieuw proberen"
+    "proficiency_level": "Vaardigheidsniveau"
   },
   "hours_display_one": "{{count}} uur",
   "hours_display_other": "{{count}} uren",
@@ -849,7 +856,7 @@
   "radius_5": "5 km",
   "radius_10": "10 km",
   "radius_25": "25 km",
-  "radius_50": "50 km",
+  "radius_50": "50 kilometer",
   "radius_100": "100 km",
   "page_meta": {
     "skills_browse": {
@@ -921,16 +928,16 @@
       "title": "Ongeldige uitnodiging",
       "body": "Deze uitnodigingslink is niet geldig. Controleer de link en probeer het opnieuw."
     },
-    "loading": "Uitnodiging controleren...",
     "error": {
       "title": "We konden deze uitnodiging niet controleren",
       "body": "Controleer uw verbinding en probeer het opnieuw.",
       "retry": "Opnieuw proberen"
-    }
+    },
+    "loading": "Uitnodiging controleren..."
   },
   "markt": {
     "meta": {
-      "title": "Marktplatz",
+      "title": "Marktplaats",
       "description": "Vind diensten, goederen en communityaanbiedingen bij u in de buurt"
     },
     "subtitle": "Ontdek diensten op tijdtegoed-basis en lokale goederen uit uw gemeenschap — alles op één plek.",
@@ -961,7 +968,7 @@
   "proximity": {
     "label": "Bij mij in de buurt",
     "off": "Uit",
-    "radius_option": "{{km}} km",
+    "radius_option": "{{km}} kilometer",
     "active_label": "Binnen {{km}} km",
     "requesting": "Uw locatie ophalen…",
     "error": {
@@ -1034,12 +1041,12 @@
       "subtitle": "Bekijk hoe u uw verdiende uren bij lokale bedrijven heeft besteed.",
       "back": "Terug naar het Communitycentrum",
       "table": {
+        "aria": "Geschiedenis loyaliteit-inwisselingen",
         "date": "Datum",
         "merchant": "Handelaar",
         "item": "Artikel",
         "credits": "Gebruikte uren",
-        "discount": "Korting",
-        "aria": "Geschiedenis loyaliteit-inwisselingen"
+        "discount": "Korting"
       },
       "empty": {
         "title": "Nog geen verzilveringen",
@@ -1077,8 +1084,8 @@
       "date": "Aangevraagd",
       "format": "Formaat",
       "size": "Grootte",
-      "empty": "Je hebt je gegevens nog niet geëxporteerd.",
-      "count": "{{count}} exports"
+      "count": "{{count}} exporteert",
+      "empty": "Je hebt je gegevens nog niet geëxporteerd."
     },
     "errors": {
       "rate_limit": "Je kunt 5 exports per dag aanvragen. Probeer het morgen opnieuw.",
@@ -1171,7 +1178,7 @@
       "type_discovery": "Ontdekkingspagina",
       "start_date_label": "Startdatum",
       "end_date_label": "Einddatum",
-      "budget_label": "Budget (€)",
+      "budget_label": "Begroting (€)",
       "radius_label": "Doelradius (km, optioneel)",
       "submit": "Campagne aanmaken",
       "submitting": "Bezig met aanmaken..."
@@ -1189,7 +1196,7 @@
       "impressions": "Vertoningen",
       "clicks": "Kliks",
       "ctr": "CTR",
-      "budget": "Budget"
+      "budget": "Begroting"
     },
     "empty": {
       "title": "Nog geen campagnes",
@@ -1208,18 +1215,19 @@
     "col_name": "Naam",
     "col_type": "Type",
     "col_status": "Status",
-    "col_budget": "Budget",
+    "col_budget": "Begroting",
     "col_dates": "Data",
     "col_impressions": "Vertoningen",
     "col_clicks": "Kliks",
     "col_ctr": "CTR",
+    "date_range": "{{start}} tot {{end}}",
     "status_draft": "Concept",
     "status_pending": "In behandeling",
     "status_active": "Actief",
     "status_paused": "Gepauzeerd",
     "status_ended": "Beëindigd",
     "status_rejected": "Afgewezen",
-    "type_feed": "Feed",
+    "type_feed": "Voer",
     "type_discovery": "Ontdekken",
     "field_name": "Campagnenaam",
     "field_name_placeholder": "bijv. Voorjaarsactie",
@@ -1230,13 +1238,12 @@
     "field_budget_desc": "Maximale totale uitgaven in euro's.",
     "field_radius": "Doelradius (optioneel)",
     "field_radius_desc": "Alleen tonen aan leden binnen deze afstand.",
+    "table_aria": "Advertentiecampagnes",
     "validation_required": "Vul alle verplichte velden in.",
     "created_success": "Campagne succesvol aangemaakt.",
     "create_error": "Campagne kon niet worden aangemaakt. Probeer het opnieuw.",
     "submit_create": "Campagne aanmaken",
-    "feature_disabled": "Lokale advertenties zijn niet beschikbaar voor je account.",
-    "date_range": "{{start}} tot {{end}}",
-    "table_aria": "Advertentiecampagnes"
+    "feature_disabled": "Lokale advertenties zijn niet beschikbaar voor je account."
   },
   "push_campaign": {
     "meta": {
@@ -1284,6 +1291,7 @@
     "load_error": "Campagnes konden niet worden geladen. Probeer opnieuw.",
     "retry": "Opnieuw proberen",
     "create_first": "Maak uw eerste pushcampagne aan",
+    "table_aria": "Pushcampagnes",
     "col_name": "Naam",
     "col_title": "Titel van melding",
     "col_status": "Status",
@@ -1299,6 +1307,7 @@
     "tier_member": "Lid",
     "tier_trusted": "Vertrouwd",
     "tier_verified": "Geverifieerd",
+    "radius_km": "{{radius}} kilometer",
     "field_name": "Campagnenaam",
     "field_name_placeholder": "bijv. Aankondiging zomerevenement",
     "field_title": "Titel van melding",
@@ -1321,14 +1330,15 @@
     "created_success": "Pushcampagne succesvol aangemaakt.",
     "create_error": "Pushcampagne kon niet worden aangemaakt. Probeer opnieuw.",
     "submit_create": "Campagne aanmaken",
-    "feature_disabled": "Pushcampagnes zijn niet beschikbaar voor uw account.",
-    "table_aria": "Pushcampagnes",
-    "radius_km": "{{radius}} km"
+    "feature_disabled": "Pushcampagnes zijn niet beschikbaar voor uw account."
   },
   "push_campaign_opt_in": "Gepromote pushmeldingen ontvangen",
   "push_campaign_opt_in_description": "Sta lokale bedrijven en organisaties toe u gerichte pushmeldingen te sturen. U kunt zich op elk moment afmelden.",
   "coupon": {
     "page_title": "Kortingsbonnen",
+    "meta_description": "Bekijk actieve community-coupons, kortingen van handelaren en lokale aanbiedingen in jouw omgeving.",
+    "detail_meta_description": "Bekijk deze community-coupon, kopieer de aanbiedingscode of genereer een QR-code voor inwisseling in de winkel.",
+    "detail_meta_description_named": "Bekijk {{title}}, kopieer couponcode {{code}} of genereer een QR-code voor inwisseling in de winkel.",
     "page_subtitle": "Blader door handelaarskortingen in je gemeenschap",
     "code": "Code",
     "title": "Titel",
@@ -1372,31 +1382,29 @@
       "valid_from": "Geldig vanaf",
       "valid_until": "Geldig tot",
       "status": "Status",
+      "status_draft": "Concept",
+      "status_active": "Actief",
+      "status_paused": "Gepauzeerd",
+      "status_expired": "Verlopen",
       "applies_to": "Geldt voor",
+      "amount_cents_help": "Bedrag in centen",
       "all_listings": "Al mijn advertenties",
       "specific_listings": "Specifieke advertenties",
       "specific_categories": "Specifieke categorieën",
       "save": "Opslaan",
       "delete_confirm": "Deze kortingsbon verwijderen? Dit kan niet ongedaan worden gemaakt.",
       "no_coupons": "Je hebt nog geen kortingsbonnen aangemaakt.",
+      "table_aria": "Verkoperscoupons",
       "redemptions": "Inwisselingen",
       "view_redemptions": "Inwisselingen bekijken",
       "usage_count": "{{count}} keer gebruikt",
       "saved": "Kortingsbon opgeslagen",
-      "deleted": "Kortingsbon verwijderd",
-      "status_draft": "Concept",
-      "status_active": "Actief",
-      "status_paused": "Gepauzeerd",
-      "status_expired": "Verlopen",
-      "amount_cents_help": "Bedrag in centen",
-      "table_aria": "Verkoperscoupons"
-    },
-    "meta_description": "Bekijk actieve community-coupons, kortingen van handelaren en lokale aanbiedingen in jouw omgeving.",
-    "detail_meta_description": "Bekijk deze community-coupon, kopieer de aanbiedingscode of genereer een QR-code voor inwisseling in de winkel.",
-    "detail_meta_description_named": "Bekijk {{title}}, kopieer couponcode {{code}} of genereer een QR-code voor inwisseling in de winkel."
+      "deleted": "Kortingsbon verwijderd"
+    }
   },
   "regional_points": {
     "title": "Regionale punten",
+    "default_symbol": "pt",
     "subtitle": "Een regionale valuta die u kunt verdienen en besteden bij buren en lokale handelaren.",
     "balance": "Saldo",
     "lifetime_earned": "Totaal verdiend",
@@ -1408,17 +1416,17 @@
     "transfer": {
       "title": "Punten naar een ander lid sturen",
       "recipient_id": "Lid-ID ontvanger",
+      "recipient_placeholder": "bijv. 123",
       "amount": "Bedrag",
+      "amount_placeholder": "0,00",
       "message": "Bericht (optioneel)",
+      "message_placeholder": "Voeg een notitie voor de ontvanger toe",
       "submit": "Overdracht verzenden",
       "success": "Overdracht verzonden",
       "errors": {
         "invalid_recipient": "Voer een geldig lid-ID voor de ontvanger in",
         "invalid_amount": "Voer een positief bedrag in"
-      },
-      "recipient_placeholder": "bijv. 123",
-      "amount_placeholder": "0,00",
-      "message_placeholder": "Voeg een notitie voor de ontvanger toe"
+      }
     },
     "history": {
       "title": "Recente activiteit",
@@ -1433,8 +1441,7 @@
     "errors": {
       "load_failed": "Regionale punten konden niet worden geladen",
       "transfer_failed": "Overdracht mislukt"
-    },
-    "default_symbol": "pt"
+    }
   },
   "verein_import": {
     "title": "Clubleden importeren",
@@ -1444,9 +1451,16 @@
     "csv_format": "Vereiste koprij: email,first_name,last_name,phone,role",
     "file_label": "CSV-bestand",
     "csv_label": "Of plak CSV",
+    "csv_placeholder": "e-mailadres, voornaam, achternaam, telefoon, rol\nalice@example.org,Alice,Smith,+1 555 123 4567,lid",
     "preview": "Voorbeeld",
     "confirm": "Leden importeren",
     "success": "Import voltooid: {{created}} aangemaakt, {{linked}} gekoppeld",
+    "actions": {
+      "already": "al aanwezig",
+      "create": "aanmaken",
+      "invalid": "ongeldig",
+      "link": "koppelen"
+    },
     "summary": {
       "total": "Totaal",
       "create": "Aanmaken",
@@ -1476,17 +1490,10 @@
       "import_failed": "Import mislukt",
       "has_invalid": "Repareer ongeldige rijen voor het importeren",
       "has_invalid_summary": "Sommige rijen zijn ongeldig. Repareer ze in uw CSV en voer het voorbeeld opnieuw uit voor het importeren."
-    },
-    "csv_placeholder": "email,first_name,last_name,phone,role\nalice@example.org,Alice,Smith,+1 555 123 4567,member",
-    "actions": {
-      "already": "al aanwezig",
-      "create": "aanmaken",
-      "invalid": "ongeldig",
-      "link": "koppelen"
     }
   },
   "premium": {
-    "pricing_title": "Premium",
+    "pricing_title": "Premie",
     "pricing_subtitle": "Ontgrendel premium-functies om meer uit uw gemeenschap te halen.",
     "monthly": "Maandelijks",
     "yearly": "Jaarlijks",
@@ -1554,6 +1561,10 @@
   },
   "developers": {
     "page_title": "Ontwikkelaars",
+    "meta_description": "Ontdek de Project NEXUS partner-API voor OAuth2-authenticatie, scoped endpoints, ondertekende webhooks en integratietoegang.",
+    "auth_meta_title": "API-authenticatie",
+    "endpoints_meta_title": "API-endpoints",
+    "webhooks_meta_title": "API-webhooks",
     "hero_title": "Bouw met NEXUS",
     "hero_subtitle": "Een gecureerde REST API voor bank-, betalings- en gemeentelijke administratiepartners. OAuth2 Client Credentials, ondertekende webhooks en een sandbox die je binnen vijf minuten kunt aanspreken.",
     "request_access_cta": "Toegang aanvragen",
@@ -1561,8 +1572,8 @@
     "nav": {
       "overview": "Overzicht",
       "auth": "Authenticatie",
-      "endpoints": "Endpoints",
-      "webhooks": "Webhooks"
+      "endpoints": "Eindpunten",
+      "webhooks": "Webhaken"
     },
     "feature_oauth_title": "OAuth2 Client Credentials",
     "feature_oauth_body": "Server-naar-server authenticatie. Kortlevende bearer-tokens, scope per partner.",
@@ -1582,21 +1593,10 @@
     "curl_example": "curl-voorbeeld",
     "js_example": "JavaScript-voorbeeld",
     "endpoints_intro": "Geselecteerde REST-endpoints. Alle paden hebben het prefix /api/partner/v1. Alle antwoorden zijn JSON met API-Version: 2.0 header.",
-    "scope_label": "Scope",
+    "scope_label": "Domein",
     "method_label": "Methode",
     "path_label": "Pad",
     "description_label": "Beschrijving",
-    "webhooks_intro": "Abonneer je op events met HTTPS-callback-URL's. Elke bezorging bevat een X-Partner-Signature-header — een HMAC-SHA256 van de ruwe body, ondertekend met het abonnement-secret dat bij aanmaak werd geretourneerd.",
-    "webhook_events_title": "Beschikbare events",
-    "webhook_event_wallet_credited": "wallet.credited — geactiveerd wanneer een partner tijduren crediteert via /wallet/credit",
-    "webhook_signing_title": "Handtekeningen verifiëren",
-    "webhook_signing_body": "Bereken HMAC-SHA256 van de ruwe request body met je abonnement-secret. Vergelijk in constante tijd met de X-Partner-Signature-header.",
-    "webhook_create_title": "Een abonnement aanmaken",
-    "webhook_create_body": "POST naar /api/partner/v1/webhooks/subscriptions met event_types (array) en target_url (alleen https). Het antwoord bevat een eenmalig secret — bewaar het.",
-    "meta_description": "Ontdek de Project NEXUS partner-API voor OAuth2-authenticatie, scoped endpoints, ondertekende webhooks en integratietoegang.",
-    "auth_meta_title": "API-authenticatie",
-    "endpoints_meta_title": "API-endpoints",
-    "webhooks_meta_title": "API-webhooks",
     "endpoints_table_aria": "Partner-API-endpoints",
     "endpoint_descriptions": {
       "oauth_token": "Wissel clientgegevens in voor een bearer-token (client_credentials grant).",
@@ -1609,10 +1609,20 @@
       "aggregates_community": "Gebucketeerde community-totalen (geen PII). Handig voor partnerdashboards.",
       "webhooks_list": "Lijst je webhook-abonnementen.",
       "webhooks_create": "Abonneer je op events. Body: event_types[], target_url (https://)."
-    }
+    },
+    "webhooks_intro": "Abonneer je op events met HTTPS-callback-URL's. Elke bezorging bevat een X-Partner-Signature-header — een HMAC-SHA256 van de ruwe body, ondertekend met het abonnement-secret dat bij aanmaak werd geretourneerd.",
+    "webhook_events_title": "Beschikbare events",
+    "webhook_event_wallet_credited": "wallet.credited — geactiveerd wanneer een partner tijduren crediteert via /wallet/credit",
+    "webhook_signing_title": "Handtekeningen verifiëren",
+    "webhook_signing_body": "Bereken HMAC-SHA256 van de ruwe request body met je abonnement-secret. Vergelijk in constante tijd met de X-Partner-Signature-header.",
+    "webhook_create_title": "Een abonnement aanmaken",
+    "webhook_create_body": "POST naar /api/partner/v1/webhooks/subscriptions met event_types (array) en target_url (alleen https). Het antwoord bevat een eenmalig secret — bewaar het."
   },
   "regional_analytics": {
     "page_title": "Regionale analyses",
+    "meta_description": "Ontdek privacyvriendelijke regionale analytics voor gemeenten en mkb-partners met geanonimiseerde community-trends en aggregatierapportages.",
+    "partner_dashboard_title": "Regionale analytics",
+    "partner_dashboard_meta_description": "Privé regionale analytics-dashboard voor geautoriseerde partners.",
     "contact_subject": "Regionale analyse - Partneraanvraag",
     "privacy_badge": "Privacy voorop door ontwerp",
     "hero_title": "Begrijp uw regio. Zonder de privacy in gevaar te brengen.",
@@ -1658,10 +1668,49 @@
         "feature_3": "Kwartaaloverzichtworkshops",
         "feature_4": "Toegewijde succesmanager"
       }
-    },
-    "meta_description": "Ontdek privacyvriendelijke regionale analytics voor gemeenten en mkb-partners met geanonimiseerde community-trends en aggregatierapportages.",
-    "partner_dashboard_title": "Regionale analytics",
-    "partner_dashboard_meta_description": "Privé regionale analytics-dashboard voor geautoriseerde partners."
+    }
+  },
+  "partner_analytics": {
+    "no_token_title": "Abonnementstoken vereist",
+    "no_token_body": "Gebruik de beveiligde link die je accountmanager heeft verstrekt. De link bevat een uniek abonnementstoken.",
+    "error_title": "Kan analytics niet laden",
+    "error_unauthorized": "Je abonnementstoken is ongeldig of verlopen.",
+    "error_generic": "Er is iets misgegaan bij het ophalen van je analytics. Probeer het opnieuw.",
+    "retry": "Opnieuw proberen",
+    "title": "Regionale analytics",
+    "subtitle": "Privacy-gebucketeerde inzichten voor jouw regio. Dagelijks ververst.",
+    "period_label": "Periode",
+    "period_30d": "Laatste 30 dagen",
+    "period_90d": "Laatste 90 dagen",
+    "period_year": "Afgelopen jaar",
+    "tabs_aria": "Analytics-tabs",
+    "tab_trends": "Trends",
+    "tab_demand_supply": "Vraag en aanbod",
+    "tab_demographics": "Demografie",
+    "tab_footfall": "Bezoekersaantal",
+    "reports_title": "Maandelijkse rapporten",
+    "no_reports": "Nog geen rapporten gegenereerd.",
+    "download_pdf": "PDF downloaden",
+    "privacy_footer": "Alle metrieken zijn gebucketeerd en geanonimiseerd. Segmenten met N<10 worden onderdrukt.",
+    "metric_active_members": "Actieve leden",
+    "metric_categories": "Categorieën",
+    "metric_partner_orgs": "Partnerorganisaties",
+    "metric_event_participation": "Evenementdeelname",
+    "metric_volunteer_hours": "Vrijwilligersuren",
+    "engagement_overview": "Engagement-overzicht (bucketmiddens)",
+    "ds_by_postcode": "Aanbod versus vraag per postcode (3-cijferig)",
+    "no_data": "Geen gegevens beschikbaar.",
+    "offers": "Aanbod",
+    "requests": "Vraag",
+    "match_heatmap": "Cellen matchpercentage",
+    "category_short": "cat.",
+    "age_distribution": "Leeftijdsverdeling",
+    "gender_distribution": "Geslachtsverdeling",
+    "footfall_by_area": "Paginaweergaven per gebied",
+    "page_views": "Paginaweergaven",
+    "distinct_visitors": "Unieke bezoekers",
+    "suppressed_value": "Onderdrukt",
+    "suppressed_short": "--"
   },
   "provisioning": {
     "meta": {
@@ -1691,7 +1740,7 @@
     },
     "categories": {
       "kiss_cooperative": "KISS-coöperatie",
-      "caring_community": "Caring community",
+      "caring_community": "Zorgzame gemeenschap",
       "agoris_node": "Caring Community knooppunt",
       "community": "Algemene gemeenschap / tijdbank"
     },
@@ -1799,7 +1848,7 @@
       "count_chip": "Voorraad: {{count}}"
     },
     "onboarding": {
-      "partner_badge": "Marketplace Partner",
+      "partner_badge": "Marktplaatspartner",
       "nudge_title": "Rond uw handelaarsregistratie af",
       "nudge_description": "Voeg bedrijfsgegevens, branding en uitbetalingen toe om de Marketplace Partner-badge te ontgrendelen.",
       "start_cta": "Registratie starten"
@@ -1975,7 +2024,13 @@
     "col_status": "Status",
     "col_due": "Vervaldatum",
     "col_reminders": "Herinneringen",
+    "col_email_delivery": "E-mailbezorging",
     "col_actions": "Acties",
+    "email_status": {
+      "failed": "Mislukt",
+      "pending": "Geen bewijs",
+      "sent": "Verzonden"
+    },
     "errors": {
       "load_failed": "Laden van ledencontributies mislukt.",
       "start_payment_failed": "Kon betaling niet starten. Probeer opnieuw.",
@@ -1983,12 +2038,6 @@
       "generate_failed": "Genereren mislukt.",
       "reminder_failed": "Kon herinnering niet verzenden.",
       "waive_failed": "Kon contributies niet kwijtschelden."
-    },
-    "col_email_delivery": "E-mailbezorging",
-    "email_status": {
-      "failed": "Mislukt",
-      "pending": "Geen bewijs",
-      "sent": "Verzonden"
     }
   },
   "collections": {
@@ -2004,7 +2053,7 @@
     "created": "Collectie aangemaakt",
     "detail_title": "Collectie",
     "back_to_my": "Terug naar mijn collecties",
-    "items_count": "{{n}} items",
+    "items_count": "{{n}} artikelen",
     "no_items": "Nog geen opgeslagen items",
     "no_items_desc": "Sla items in deze collectie op vanuit elk deel van het platform.",
     "remove_item": "Uit collectie verwijderen",
@@ -2061,13 +2110,13 @@
     "ios_add_to_home": "Aan startscherm toevoegen",
     "ios_step_2_after": ".",
     "ios_step_3": "Tik op Voeg toe. NEXUS verschijnt als zelfstandige app op uw startscherm.",
-    "got_it": "Begrepen",
     "generic_title": "NEXUS installeren",
     "generic_intro": "Zoek naar een installatieoptie in het menu van je browser:",
     "generic_step_1": "Open het browsermenu, meestal een pictogram met drie puntjes of drie lijntjes.",
     "generic_step_2": "Zoek naar App installeren, Deze site installeren of Toevoegen aan startscherm.",
     "generic_step_3": "Bevestig om NEXUS aan je apparaat toe te voegen.",
     "manual_note": "Als je de optie niet ziet, heeft je browser de app mogelijk al geïnstalleerd of ondersteunt je apparaat dit niet.",
+    "got_it": "Begrepen",
     "android_chrome_title": "Installeren op Android",
     "android_chrome_intro": "Voeg NEXUS toe aan je startscherm vanuit het Chrome-menu:",
     "android_chrome_step_1": "Tik op het menu met drie puntjes rechtsboven in Chrome.",
@@ -2133,54 +2182,5 @@
   "level_plain": "Niveau {{level}}",
   "level_named": "Niveau {{level}} - {{name}}",
   "xp_progress": "{{current}} / {{required}} XP",
-  "level_progress_aria": "Voortgang niveau {{level}}: {{percentage}}%",
-  "empty_dash": "-",
-  "refresh": "Vernieuwen",
-  "not_available": "Niet beschikbaar",
-  "keyboard": {
-    "command_symbol": "⌘",
-    "k_key": "K"
-  },
-  "partner_analytics": {
-    "no_token_title": "Abonnementstoken vereist",
-    "no_token_body": "Gebruik de beveiligde link die je accountmanager heeft verstrekt. De link bevat een uniek abonnementstoken.",
-    "error_title": "Kan analytics niet laden",
-    "error_unauthorized": "Je abonnementstoken is ongeldig of verlopen.",
-    "error_generic": "Er is iets misgegaan bij het ophalen van je analytics. Probeer het opnieuw.",
-    "retry": "Opnieuw proberen",
-    "title": "Regionale analytics",
-    "subtitle": "Privacy-gebucketeerde inzichten voor jouw regio. Dagelijks ververst.",
-    "period_label": "Periode",
-    "period_30d": "Laatste 30 dagen",
-    "period_90d": "Laatste 90 dagen",
-    "period_year": "Afgelopen jaar",
-    "tabs_aria": "Analytics-tabs",
-    "tab_trends": "Trends",
-    "tab_demand_supply": "Vraag en aanbod",
-    "tab_demographics": "Demografie",
-    "tab_footfall": "Bezoekersaantal",
-    "reports_title": "Maandelijkse rapporten",
-    "no_reports": "Nog geen rapporten gegenereerd.",
-    "download_pdf": "PDF downloaden",
-    "privacy_footer": "Alle metrieken zijn gebucketeerd en geanonimiseerd. Segmenten met N<10 worden onderdrukt.",
-    "metric_active_members": "Actieve leden",
-    "metric_categories": "Categorieën",
-    "metric_partner_orgs": "Partnerorganisaties",
-    "metric_event_participation": "Evenementdeelname",
-    "metric_volunteer_hours": "Vrijwilligersuren",
-    "engagement_overview": "Engagement-overzicht (bucketmiddens)",
-    "ds_by_postcode": "Aanbod versus vraag per postcode (3-cijferig)",
-    "no_data": "Geen gegevens beschikbaar.",
-    "offers": "Aanbod",
-    "requests": "Vraag",
-    "match_heatmap": "Cellen matchpercentage",
-    "category_short": "cat.",
-    "age_distribution": "Leeftijdsverdeling",
-    "gender_distribution": "Geslachtsverdeling",
-    "footfall_by_area": "Paginaweergaven per gebied",
-    "page_views": "Paginaweergaven",
-    "distinct_visitors": "Unieke bezoekers",
-    "suppressed_value": "Onderdrukt",
-    "suppressed_short": "--"
-  }
+  "level_progress_aria": "Voortgang niveau {{level}}: {{percentage}}%"
 }

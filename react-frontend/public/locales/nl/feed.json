@@ -1,7 +1,8 @@
 {
-  "page_title": "Feed",
+  "page_title": "Voer",
   "title": "Gemeenschapsfeed",
   "subtitle": "Bekijk wat er gebeurt in jouw gemeenschap",
+  "meta_description": "Een privé-communityfeed voor updates, advertenties, evenementen, polls, doelen en gesprekken.",
   "new_post": "Nieuwe Post",
   "whats_on_your_mind": "Wat heb je op je hart?",
   "add_image_aria": "Afbeelding toevoegen",
@@ -15,9 +16,12 @@
   "session_expired": "Je sessie is verlopen. Log alsjeblieft opnieuw in.",
   "error_load": "Kon feed niet laden.",
   "error_load_retry": "Kon feed niet laden. Probeer het opnieuw.",
+  "error_hint": "Je filters en concept-editor staan er nog. Ververs de feed zodra je verbinding klaar is.",
+  "loading_label": "Community-updates worden geladen...",
   "empty_title": "Nog geen berichten",
   "empty_desc": "Wees de eerste om iets te delen met jouw gemeenschap!",
   "empty_filtered": "Niets komt momenteel overeen met deze weergave. Probeer een ander filter.",
+  "empty_filtered_with_filter": "Er zijn nu geen {{filter}}-updates. Probeer alle berichten of start een nieuw gesprek.",
   "filter": {
     "all": "Alles",
     "posts": "Berichten",
@@ -28,14 +32,14 @@
     "jobs": "Vacatures",
     "challenges": "Uitdagingen",
     "volunteering": "Vrijwilligerswerk",
-    "blogs": "Blog",
+    "blogs": "Bloggen",
     "discussions": "Discussies",
     "following": "Gevolgde",
     "saved": "Opgeslagen",
     "clear": "Feedfilters wissen",
+    "show_all": "Alle berichten tonen",
     "more": "Meer",
-    "select": "Selecteer feedfilter",
-    "show_all": "Alle berichten tonen"
+    "select": "Selecteer feedfilter"
   },
   "report": {
     "title": "Post rapporteren",
@@ -80,6 +84,7 @@
     "description_label": "Beschrijving",
     "location_label": "Locatie",
     "location_placeholder": "Zoek naar een locatie...",
+    "location_from_profile": "Uit je profiel — bijwerken in Instellingen",
     "post_created": "Bericht aangemaakt!",
     "post_failed": "Bericht aanmaken mislukt.",
     "post_button": "Plaatsen",
@@ -183,7 +188,7 @@
     "template_listing_offer": "Een vaardigheid aanbieden",
     "template_listing_request": "Op zoek naar hulp",
     "template_event_gathering": "Gemeenschapsbijeenkomst",
-    "template_event_workshop": "Workshop",
+    "template_event_workshop": "Werkplaats",
     "template_event_social": "Sociaal evenement",
     "template_goal_hours": "Geef deze maand uren",
     "template_goal_skills": "Leer een nieuwe vaardigheid",
@@ -208,16 +213,15 @@
     "media_rejected": "{{count}} bestand(en) overgeslagen (verkeerd type of te groot)",
     "media_compression_failed": "{{count}} afbeelding(en) konden niet worden verwerkt",
     "media_upload_error": "Verwerken van afbeeldingen mislukt",
+    "upload_preview_alt": "Uploadvoorvertoning {{number}}",
+    "image_remove_number_aria": "Verwijder afbeelding {{number}}",
+    "alt_text_add": "Alternatieve tekst toevoegen",
+    "alt_text_edit": "Alternatieve tekst bewerken",
     "sdg_selected_one": "{{count}} doel geselecteerd",
     "sdg_selected_other": "{{count}} doelen geselecteerd",
     "content_required": "Berichtinhoud mag niet leeg zijn.",
     "content_too_long": "Bericht is te lang (max {{max}} tekens).",
     "groups_load_error": "Groepen laden mislukt.",
-    "upload_preview_alt": "Uploadvoorvertoning {{number}}",
-    "image_remove_number_aria": "Verwijder afbeelding {{number}}",
-    "alt_text_add": "Alternatieve tekst toevoegen",
-    "alt_text_edit": "Alternatieve tekst bewerken",
-    "location_from_profile": "Uit je profiel — bijwerken in Instellingen",
     "video_invalid_type": "Ongeldig videoformaat. Gebruik MP4, WebM, OGG of MOV.",
     "video_too_large": "Video moet kleiner zijn dan {{size}}MB.",
     "video": "Video",
@@ -266,8 +270,9 @@
     "type_job": "Vacature",
     "type_challenge": "Uitdaging",
     "type_volunteer": "Vrijwilliger",
-    "type_blog": "Blog",
+    "type_blog": "Bloggen",
     "type_discussion": "Discussie",
+    "type_resource": "Hulpbron",
     "type_badge_earned": "Badge Verdiend",
     "type_level_up": "Niveau omhoog",
     "badge_earned_message": "{{name}} heeft de \"{{badge}}\" badge verdiend!",
@@ -332,8 +337,7 @@
     "milestone": {
       "badge_unlocked": "Badge ontgrendeld",
       "level_reached": "Niveau bereikt"
-    },
-    "type_resource": "Hulpbron"
+    }
   },
   "poll": {
     "load_failed": "Peilinggegevens laden mislukt.",
@@ -433,7 +437,7 @@
     "unavailable_desc": "Deze video kon niet worden geladen."
   },
   "trending": {
-    "title": "Trending",
+    "title": "Populair",
     "view_all": "Bekijk alle hashtags",
     "post_count_one": "{{count}} bericht",
     "post_count_other": "{{count}} berichten"
@@ -504,7 +508,7 @@
   "location": {
     "global": "Wereldwijd",
     "nearby": "Dichtbij Mij",
-    "radius": "{{km}} km",
+    "radius": "{{km}} kilometer",
     "km": "km",
     "add_location": "Voeg locatie toe in profiel"
   },
@@ -598,9 +602,5 @@
     "back": "Terug naar feed",
     "not_found": "Item niet gevonden",
     "load_failed": "Item laden mislukt"
-  },
-  "meta_description": "Een privé-communityfeed voor updates, advertenties, evenementen, polls, doelen en gesprekken.",
-  "error_hint": "Je filters en concept-editor staan er nog. Ververs de feed zodra je verbinding klaar is.",
-  "loading_label": "Community-updates worden geladen...",
-  "empty_filtered_with_filter": "Er zijn nu geen {{filter}}-updates. Probeer alle berichten of start een nieuw gesprek."
+  }
 }

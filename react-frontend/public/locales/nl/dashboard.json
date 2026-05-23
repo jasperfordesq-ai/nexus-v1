@@ -3,16 +3,29 @@
     "title": "Dashboard",
     "description": "Je persoonlijke dashboard. Bekijk je saldo, aanbiedingen en activiteiten."
   },
+  "fallback_name": "daar",
   "welcome_back": "Welkom terug, {{name}}!",
   "community_activity": "Dit is wat er gebeurt in jouw {{community}} gemeenschap",
   "unable_to_load": "Dashboard kan niet worden geladen",
   "try_again": "Probeer het opnieuw",
+  "common": {
+    "loading": "Laden"
+  },
   "onboarding": {
     "banner_title": "Voltooi je profielinstellingen",
     "banner_subtitle": "Vertel ons over je interesses en vaardigheden om gepersonaliseerde matches te krijgen",
     "get_started": "Aan de slag"
   },
   "new_listing": "Nieuwe aanbieding",
+  "caring_community": {
+    "title": "Zorgzame gemeenschap",
+    "subtitle": "Coördineer hulpverzoeken, tijdaanbiedingen, geverifieerde vrijwilligersuren en betrouwbare ondersteuning vanuit één plek.",
+    "actions": {
+      "open_hub": "Hub openen",
+      "request_help": "Hulp aanvragen",
+      "log_hours": "Uren registreren"
+    }
+  },
   "stats": {
     "balance": "Saldo",
     "active_listings": "Actieve aanbiedingen",
@@ -42,18 +55,18 @@
     "view_wallet": "Bekijk portemonnee",
     "find_members": "Vind leden",
     "browse_events": "Blader door evenementen",
-    "notifications": "Meldingen",
-    "caring_community": "Zorghub"
+    "caring_community": "Zorghub",
+    "notifications": "Meldingen"
   },
   "listings": {
     "offering": "Aanbod",
     "requesting": "Aanvragen",
     "offer": "Aanbod",
     "request": "Aanvraag",
-    "empty": "Geen recente aanbiedingen",
-    "create_first": "Maak je eerste aanbieding",
     "user_fallback": "Gebruiker",
-    "empty_description": "Maak een verzoek of aanbod om matches te vinden met mensen in de buurt."
+    "empty": "Geen recente aanbiedingen",
+    "empty_description": "Maak een verzoek of aanbod om matches te vinden met mensen in de buurt.",
+    "create_first": "Maak je eerste aanbieding"
   },
   "activity": {
     "action_listing": "deelde een aanbieding",
@@ -62,8 +75,8 @@
     "action_goal": "heeft een nieuw doel gesteld",
     "action_post": "heeft een bericht gedeeld",
     "empty": "Geen recente activiteit",
-    "check_feed": "Bekijk de feed",
-    "empty_description": "Community-updates verschijnen hier zodra mensen beginnen te plaatsen."
+    "empty_description": "Community-updates verschijnen hier zodra mensen beginnen te plaatsen.",
+    "check_feed": "Bekijk de feed"
   },
   "suggestions": {
     "empty": "Nog geen suggesties",
@@ -72,24 +85,24 @@
   "groups": {
     "members_count": "{{count}} leden",
     "empty": "Je bent nog niet lid van groepen",
-    "discover": "Ontdek groepen",
-    "empty_description": "Groepen helpen je gedeelde interesses, projecten en lokale kringen te volgen."
+    "empty_description": "Groepen helpen je gedeelde interesses, projecten en lokale kringen te volgen.",
+    "discover": "Ontdek groepen"
   },
   "events": {
     "online_event": "Online evenement",
     "empty": "Geen aankomende evenementen",
-    "browse": "Blader door evenementen",
-    "empty_description": "Evenementen uit jouw community verschijnen hier zodra ze gepland zijn."
+    "empty_description": "Evenementen uit jouw community verschijnen hier zodra ze gepland zijn.",
+    "browse": "Blader door evenementen"
   },
   "gamification": {
     "level": "Niveau {{level}}",
-    "badges": "Badges",
+    "badges": "Insignes",
     "streak": "Reeks",
+    "xp_value": "{{count}} XP",
     "xp_progress": "XP Vooruitgang",
     "start_earning": "Begin XP te verdienen door deel te nemen aan de gemeenschap!",
     "streak_days_one": "{{count}} dag",
-    "streak_days_other": "{{count}} dagen",
-    "xp_value": "{{count}} XP"
+    "streak_days_other": "{{count}} dagen"
   },
   "aria": {
     "loading_listings": "Laden van lijsten",
@@ -114,21 +127,8 @@
     "received": "Ontvangen {{amount}}h",
     "review": "Beoordeling",
     "none_pending": "Geen uitstaande beoordelingen",
+    "none_pending_description": "Voltooide uitwisselingen die feedback nodig hebben, verschijnen hier.",
     "pending_subtitle": "Dit beoordelingsverzoek openen",
-    "view_all_pending": "Alle openstaande bekijken",
-    "none_pending_description": "Voltooide uitwisselingen die feedback nodig hebben, verschijnen hier."
-  },
-  "fallback_name": "daar",
-  "common": {
-    "loading": "Laden"
-  },
-  "caring_community": {
-    "title": "Zorgzame gemeenschap",
-    "subtitle": "Coördineer hulpverzoeken, tijdaanbiedingen, geverifieerde vrijwilligersuren en betrouwbare ondersteuning vanuit één plek.",
-    "actions": {
-      "open_hub": "Hub openen",
-      "request_help": "Hulp aanvragen",
-      "log_hours": "Uren registreren"
-    }
+    "view_all_pending": "Alle openstaande bekijken"
   }
 }

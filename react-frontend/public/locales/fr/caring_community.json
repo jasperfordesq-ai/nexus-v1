@@ -54,6 +54,9 @@
     "search_placeholder": "Rechercher par nom",
     "searching": "Recherche de membres...",
     "no_search_results": "Aucun membre correspondant trouvé",
+    "search_results_aria": "Membres correspondants",
+    "search_error": "Nous n'avons pas pu rechercher les membres. Veuillez réessayer.",
+    "select_member_error": "Choisissez un membre avant de lier un bénéficiaire de soins.",
     "relationship_label": "Relation",
     "start_date_label": "Accompagnement commencé le",
     "notes_label": "Remarques",
@@ -62,10 +65,7 @@
     "upcoming_care": "Accompagnement à venir",
     "recent_care": "Accompagnement récent",
     "no_upcoming_care": "Aucun accompagnement planifié",
-    "no_recent_care": "Aucun journal d'accompagnement récent",
-    "search_results_aria": "Membres correspondants",
-    "search_error": "Nous n'avons pas pu rechercher les membres. Veuillez réessayer.",
-    "select_member_error": "Choisissez un membre avant de lier un bénéficiaire de soins."
+    "no_recent_care": "Aucun journal d'accompagnement récent"
   },
   "cover": {
     "title": "Accompagnement de remplacement",
@@ -223,6 +223,7 @@
     "error": "Impossible de charger votre laissez-passer de confiance"
   },
   "panel": {
+    "meta_title": "Administrateur de la communauté bienveillante",
     "header": {
       "toggle_sidebar": "Basculer la barre latérale",
       "back_to_site": "Retour au site",
@@ -231,6 +232,10 @@
       "user_menu": "Menu utilisateur",
       "my_profile": "Mon profil",
       "sign_out": "se déconnecter"
+    },
+    "navigation": {
+      "label": "Navigation communautaire bienveillante",
+      "close": "Fermer la navigation de la communauté bienveillante"
     },
     "breadcrumbs": {
       "aria": "Fil d'Ariane",
@@ -275,15 +280,15 @@
       }
     },
     "sidebar": {
-      "search_aria": "Search caring community navigation",
-      "search_placeholder": "Search navigation...",
-      "clear_search": "Effacer la recherche",
-      "no_search_results": "No matching pages found",
       "brand": "Prendre soin de la communauté",
       "expand": "Développer la barre latérale",
       "collapse": "Réduire la barre latérale",
       "help_centre": "Centre d'aide",
       "full_admin": "Administrateur complet",
+      "search_aria": "Search caring community navigation",
+      "search_placeholder": "Search navigation...",
+      "clear_search": "Effacer la recherche",
+      "no_search_results": "No matching pages found",
       "sections": {
         "overview": "Aperçu",
         "operations": "Opérations",
@@ -332,14 +337,16 @@
         "municipal_roi": "Retour sur investissement municipal",
         "category_coefficients": "Coefficients de catégorie"
       }
-    },
-    "navigation": {
-      "label": "Navigation communautaire bienveillante",
-      "close": "Fermer la navigation de la communauté bienveillante"
-    },
-    "meta_title": "Administrateur de la communauté bienveillante"
+    }
   },
   "admin": {
+    "common": {
+      "refresh": "Rafraîchir",
+      "cancel": "Annuler",
+      "all": "Tous",
+      "close": "Fermer",
+      "empty_dash": "-"
+    },
     "providers": {
       "meta_title": "Annuaire des prestataires de soins - Administrateur",
       "title": "Annuaire des prestataires de soins",
@@ -448,63 +455,6 @@
         "volunteer": "Groupe de bénévoles"
       }
     },
-    "warmth_pass": {
-      "title": "Recherche de passe de chaleur",
-      "subtitle": "Afficher les informations d'identification de confiance de la communauté d'un membre",
-      "eligible": "Admissible",
-      "not_eligible": "Non éligible",
-      "verified": "Vérifié",
-      "not_verified": "Non vérifié",
-      "loading": "Chargement du pass membre...",
-      "empty_date": "Non défini",
-      "no_categories": "Aucune catégorie enregistrée.",
-      "tier_chip": "{{label}} (Niveau {{tier}})",
-      "about": {
-        "title": "À propos de cette page",
-        "body": "Un Warmth Pass est un identifiant de confiance portable montrant qu'un membre a atteint le niveau de confiance, a reçu des évaluations par les pairs et est éligible pour fournir des soins de quartier informels. Recipients can request to see a helper's Warmth Pass before accepting assistance. Use this lookup to verify a member's credential on request, or to assist a member who is unsure of their eligibility."
-      },
-      "lookup": {
-        "title": "Recherche de membres",
-        "member_id": "Identifiant du membre",
-        "placeholder": "Entrez l'ID de membre numérique",
-        "button": "Chercher"
-      },
-      "errors": {
-        "no_data": "Aucune donnée renvoyée pour cet ID de membre.",
-        "lookup_failed": "Membre introuvable ou une erreur s'est produite."
-      },
-      "not_eligible_notice": {
-        "title": "Le membre n’a pas encore atteint le niveau Confiance et ne détient pas de Warmth Pass.",
-        "body": "Pour devenir éligibles, ils doivent enregistrer plus d’heures de soins et recevoir au moins une évaluation par les pairs. Ils peuvent vérifier leurs propres progrès sur la page de profil Trust."
-      },
-      "fields": {
-        "help_categories": "Catégories d'aide",
-        "hours_logged": "Heures enregistrées",
-        "identity_verified": "Identité vérifiée",
-        "member_since": "Membre depuis",
-        "pass_active_since": "Passe actif depuis",
-        "reviews_received": "Commentaires reçus",
-        "trust_tier": "Niveau de confiance"
-      }
-    },
-    "trust_tier": {
-      "recompute_confirm": "Recalculer les niveaux de confiance pour tous les membres actifs ? Cela peut prendre un moment.",
-      "messages": {
-        "saved": "Configuration du niveau de confiance enregistrée. Les modifications s’appliquent lors de la prochaine exécution de recalcul.",
-        "recomputed": "Niveaux recalculés pour les membres {{count}}."
-      },
-      "errors": {
-        "save_failed": "Échec de l'enregistrement de la configuration.",
-        "recompute_failed": "Échec du recalcul des niveaux."
-      }
-    },
-    "common": {
-      "refresh": "Rafraîchir",
-      "cancel": "Annuler",
-      "empty_dash": "-",
-      "all": "Tous",
-      "close": "Fermer"
-    },
     "loyalty": {
       "title": "Programme de fidélité",
       "description": "Crédit de temps pour le pont du marché. Les membres gagnent des heures, les commerçants choisissent de les accepter sous forme de réduction en CHF sur leurs annonces.",
@@ -594,34 +544,15 @@
       },
       "pending": {
         "title": "En attente de votre approbation",
-        "empty": "Aucun transfert en attente.",
         "description": "Chaque transfert doit être approuvé manuellement par un administrateur. Vérifiez que l'e-mail du membre de destination correspond au nouveau compte du membre avant d'approuver.",
+        "empty": "Aucun transfert en attente.",
         "table_aria": "Transferts horaires sortants en attente"
       },
       "inbound": {
         "title": "Reçus d'autres coopératives (90 derniers jours)",
-        "empty": "Aucun virement reçu au cours des 90 derniers jours.",
         "description": "Il s'agit uniquement d'un journal d'audit : les transferts entrants sont traités automatiquement lorsque la coopérative source les approuve. Aucune action n’est requise ici.",
+        "empty": "Aucun virement reçu au cours des 90 derniers jours.",
         "table_aria": "Transferts horaires entrants"
-      },
-      "actions": {
-        "approve": "Approuver",
-        "reject": "Rejeter"
-      },
-      "reject_modal": {
-        "title": "Refuser le transfert",
-        "reason_label": "Motif du refus (facultatif)",
-        "reason_placeholder": "Ajouter un contexte pour le journal d'audit"
-      },
-      "messages": {
-        "approved": "Transfert approuvé et livré.",
-        "rejected": "Transfert refusé."
-      },
-      "errors": {
-        "load_pending": "Échec du chargement des transferts en attente",
-        "load_inbound": "Échec du chargement des transferts entrants",
-        "approve": "Échec de l'approbation",
-        "reject": "Le rejet a échoué"
       },
       "table": {
         "actions": "Actes",
@@ -641,14 +572,28 @@
         "received": "Reçu",
         "rejected": "Rejeté",
         "sent": "Envoyé"
+      },
+      "actions": {
+        "approve": "Approuver",
+        "reject": "Rejeter"
+      },
+      "reject_modal": {
+        "title": "Refuser le transfert",
+        "reason_label": "Motif du refus (facultatif)",
+        "reason_placeholder": "Ajouter un contexte pour le journal d'audit"
+      },
+      "messages": {
+        "approved": "Transfert approuvé et livré.",
+        "rejected": "Transfert refusé."
+      },
+      "errors": {
+        "load_pending": "Échec du chargement des transferts en attente",
+        "load_inbound": "Échec du chargement des transferts entrants",
+        "approve": "Échec de l'approbation",
+        "reject": "Le rejet a échoué"
       }
     },
     "surveys": {
-      "errors": {
-        "export_failed": "Échec de l'exportation des réponses à l'enquête.",
-        "load": "Échec du chargement des enquêtes",
-        "create": "Échec de la création de l'enquête"
-      },
       "meta_title": "Enquêtes municipales",
       "title": "Enquêtes municipales",
       "subtitle": "Recueillez des commentaires structurés auprès des résidents, des partenaires municipaux et des équipes de programme.",
@@ -738,24 +683,16 @@
         "yes": "Oui",
         "no": "Non",
         "date_unknown": "Non défini"
+      },
+      "errors": {
+        "load": "Échec du chargement des enquêtes",
+        "create": "Échec de la création de l'enquête",
+        "export_failed": "Échec de l'exportation des réponses à l'enquête."
       }
     },
     "feedback": {
       "title": "Boîte de réception des commentaires de la municipalité",
       "subtitle": "Recevoir, trier et résoudre les commentaires des résidents: questions, idées, problèmes et plaintes acheminés vers la municipalité ou l'équipe communautaire.",
-      "messages": {
-        "triage_saved": "Triage enregistré",
-        "resolved": "Marqué comme résolu",
-        "closed": "Fermé"
-      },
-      "errors": {
-        "load": "Échec du chargement des commentaires",
-        "save_triage": "Échec de l'enregistrement du tri",
-        "resolution_required": "Des notes de résolution sont requises",
-        "resolve": "Échec de la résolution",
-        "close": "Échec de la fermeture",
-        "export": "Échec de l'exportation"
-      },
       "about": {
         "title": "À propos de cette page",
         "body": "Cette boîte de réception recueille les commentaires soumis par les résidents via la plateforme. Chaque élément est classé comme question, idée, rapport de problème ou note de sentiment et se voit attribuer un score de sentiment. Utilisez les contrôles de tri pour attribuer la propriété, ajouter des notes internes et suivre la résolution. Les éléments visibles par tous les résidents sont marqués comme publics; les réponses peuvent être vues par l'auteur de la soumission et par les autres membres.",
@@ -866,6 +803,19 @@
         "days_ago_other": "{{count}}il y a j",
         "months_ago_one": "{{count}}il y a mois",
         "months_ago_other": "{{count}}il y a mois"
+      },
+      "messages": {
+        "triage_saved": "Triage enregistré",
+        "resolved": "Marqué comme résolu",
+        "closed": "Fermé"
+      },
+      "errors": {
+        "load": "Échec du chargement des commentaires",
+        "save_triage": "Échec de l'enregistrement du tri",
+        "resolution_required": "Des notes de résolution sont requises",
+        "resolve": "Échec de la résolution",
+        "close": "Échec de la fermeture",
+        "export": "Échec de l'exportation"
       }
     },
     "civic_digest": {
@@ -1092,6 +1042,56 @@
         "escalate": "L'escalade a échoué",
         "status": "Le changement de statut a échoué",
         "note": "Échec de la note"
+      }
+    },
+    "warmth_pass": {
+      "title": "Recherche de passe de chaleur",
+      "subtitle": "Afficher les informations d'identification de confiance de la communauté d'un membre",
+      "eligible": "Admissible",
+      "not_eligible": "Non éligible",
+      "verified": "Vérifié",
+      "not_verified": "Non vérifié",
+      "loading": "Chargement du pass membre...",
+      "empty_date": "Non défini",
+      "no_categories": "Aucune catégorie enregistrée.",
+      "tier_chip": "{{label}} (Niveau {{tier}})",
+      "about": {
+        "title": "À propos de cette page",
+        "body": "Un Warmth Pass est un identifiant de confiance portable montrant qu'un membre a atteint le niveau de confiance, a reçu des évaluations par les pairs et est éligible pour fournir des soins de quartier informels. Recipients can request to see a helper's Warmth Pass before accepting assistance. Use this lookup to verify a member's credential on request, or to assist a member who is unsure of their eligibility."
+      },
+      "lookup": {
+        "title": "Recherche de membres",
+        "member_id": "Identifiant du membre",
+        "placeholder": "Entrez l'ID de membre numérique",
+        "button": "Chercher"
+      },
+      "errors": {
+        "no_data": "Aucune donnée renvoyée pour cet ID de membre.",
+        "lookup_failed": "Membre introuvable ou une erreur s'est produite."
+      },
+      "not_eligible_notice": {
+        "title": "Le membre n’a pas encore atteint le niveau Confiance et ne détient pas de Warmth Pass.",
+        "body": "Pour devenir éligibles, ils doivent enregistrer plus d’heures de soins et recevoir au moins une évaluation par les pairs. Ils peuvent vérifier leurs propres progrès sur la page de profil Trust."
+      },
+      "fields": {
+        "help_categories": "Catégories d'aide",
+        "hours_logged": "Heures enregistrées",
+        "identity_verified": "Identité vérifiée",
+        "member_since": "Membre depuis",
+        "pass_active_since": "Passe actif depuis",
+        "reviews_received": "Commentaires reçus",
+        "trust_tier": "Niveau de confiance"
+      }
+    },
+    "trust_tier": {
+      "recompute_confirm": "Recalculer les niveaux de confiance pour tous les membres actifs ? Cela peut prendre un moment.",
+      "messages": {
+        "saved": "Configuration du niveau de confiance enregistrée. Les modifications s’appliquent lors de la prochaine exécution de recalcul.",
+        "recomputed": "Niveaux recalculés pour les membres {{count}}."
+      },
+      "errors": {
+        "save_failed": "Échec de l'enregistrement de la configuration.",
+        "recompute_failed": "Échec du recalcul des niveaux."
       }
     },
     "regional_points": {

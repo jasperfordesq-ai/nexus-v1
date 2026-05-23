@@ -573,7 +573,36 @@
       "declined": "辞退",
       "completed": "完了",
       "cancelled": "キャンセル済み"
-    }
+    },
+    "offers_title": "配達オファー"
+  },
+  "pickup": {
+    "my_pickups_title": "私の受け取り",
+    "my_pickups_subtitle": "売り手の場所でこのコードを提示して注文を受け取ってください。",
+    "no_pickups": "予定されている受け取りはありません。",
+    "order_n": "注文 #{{id}}",
+    "window": "受け取り時間帯",
+    "show_this_code": "売り手にこのコードを提示してください",
+    "status_reserved": "予約済み",
+    "status_picked_up": "受け取り済み",
+    "status_cancelled": "キャンセル済み",
+    "status_no_show": "未到着",
+    "choose_slot": "受取スロットを選択",
+    "no_slot_selected": "受取スロットなし",
+    "left": "残り",
+    "slot_fallback": "スロット #{{id}}",
+    "status_unknown": "不明"
+  },
+  "inventory": {
+    "section_title": "在庫",
+    "section_subtitle": "在庫を追跡し、過剰販売を防ぎます。",
+    "unlimited": "在庫無制限",
+    "count": "在庫数",
+    "low_stock_threshold": "在庫不足アラート",
+    "oversold_protected": "在庫を超える注文を拒否",
+    "sold_out": "売り切れ",
+    "low_chip": "在庫: {{count}}（少）",
+    "count_chip": "在庫: {{count}}"
   },
   "pickup": {
     "my_pickups_title": "私の受け取り",

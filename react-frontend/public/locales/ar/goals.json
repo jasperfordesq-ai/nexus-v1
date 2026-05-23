@@ -1,4 +1,15 @@
 {
+  "detail": {
+    "back_to_goals": "العودة إلى الأهداف",
+    "view_all_goals": "عرض جميع الأهداف",
+    "not_found_title": "الهدف غير موجود",
+    "not_found_description": "ربما تم حذف هذا الهدف أو أنه لم يكن موجوداً.",
+    "private_title": "هذا الهدف خاص",
+    "private_description": "فقط صاحب الهدف يستطيع مشاهدته.",
+    "meta_description": "{{owner}} يتابع \"{{title}}\" بنسبة تقدم {{progress}}٪ في هدف المجتمع هذا.",
+    "overdue_chip": "متأخر",
+    "checkin_frequency": "تكرار تسجيل الدخول"
+  },
   "checkin_recorded": "تم تسجيل الدخول!",
   "checkin_failed": "فشل تسجيل الدخول.",
   "reminder_set_failed": "فشل في ضبط التذكير.",
@@ -13,15 +24,15 @@
     "history": "السجل",
     "no_checkins": "لا توجد تسجيلات دخول حتى الآن. سجل أول واحدة لك!",
     "progress_label": "التقدم",
+    "progress_help": "اضبط هذا على التقدم الحقيقي الذي تريد إظهاره في الهدف. يؤدي تسجيل دخول إلى تحديث شريط الهدف والجدول الزمني.",
+    "progress_value": "{{percent}}%",
+    "progress_unknown": "لم يُسجَّل التقدم",
     "mood_label": "كيف تشعر؟",
     "note_label": "ملاحظة (اختياري)",
     "note_placeholder": "كيف تسير الأمور؟ هل لديك أي انتصارات أو تحديات؟",
     "cancel": "إلغاء",
     "submit": "سجل تسجيل الدخول",
-    "check_in_button": "تسجيل الدخول",
-    "progress_help": "اضبط هذا على التقدم الحقيقي الذي تريد إظهاره في الهدف. يؤدي تسجيل دخول إلى تحديث شريط الهدف والجدول الزمني.",
-    "progress_value": "{{percent}}%",
-    "progress_unknown": "لم يُسجَّل التقدم"
+    "check_in_button": "تسجيل الدخول"
   },
   "mood": {
     "great": "رائع",
@@ -41,11 +52,11 @@
     "reminder_set_success": "تم ضبط التذكير: {{frequency}}"
   },
   "frequency": {
+    "none": "بدون تكرار",
     "daily": "يومي",
     "weekly": "أسبوعي",
     "biweekly": "كل أسبوعين",
-    "monthly": "شهري",
-    "none": "بدون تكرار"
+    "monthly": "شهري"
   },
   "template": {
     "title": "ابدأ من القالب",
@@ -73,26 +84,6 @@
       "completed": "مكتمل",
       "created": "تم الإنشاء"
     }
-  },
-  "template_picker": {
-    "load_error": "فشل في تحميل القوالب. يرجى المحاولة مرة أخرى.",
-    "try_again": "حاول مرة أخرى",
-    "none_available": "لا توجد قوالب متاحة بعد.",
-    "none_in_category": "لا توجد قوالب في هذه الفئة."
-  },
-  "detail": {
-    "back_to_goals": "العودة إلى الأهداف",
-    "view_all_goals": "عرض جميع الأهداف",
-    "not_found_title": "الهدف غير موجود",
-    "not_found_description": "ربما تم حذف هذا الهدف أو أنه لم يكن موجوداً.",
-    "private_title": "هذا الهدف خاص",
-    "private_description": "فقط صاحب الهدف يستطيع مشاهدته.",
-    "overdue_chip": "متأخر",
-    "checkin_frequency": "تكرار تسجيل الدخول",
-    "meta_description": "{{owner}} يتابع \"{{title}}\" بنسبة تقدم {{progress}}٪ في هدف المجتمع هذا."
-  },
-  "goals": {
-    "load_error": "فشل تحميل الأهداف. يرجى المحاولة مرة أخرى."
   },
   "insights": {
     "loading": "تحميل رؤى الهدف",
@@ -130,5 +121,14 @@
       "celebration": "احتفال",
       "note": "ملاحظة"
     }
+  },
+  "template_picker": {
+    "load_error": "فشل في تحميل القوالب. يرجى المحاولة مرة أخرى.",
+    "try_again": "حاول مرة أخرى",
+    "none_available": "لا توجد قوالب متاحة بعد.",
+    "none_in_category": "لا توجد قوالب في هذه الفئة."
+  },
+  "goals": {
+    "load_error": "فشل تحميل الأهداف. يرجى المحاولة مرة أخرى."
   }
 }

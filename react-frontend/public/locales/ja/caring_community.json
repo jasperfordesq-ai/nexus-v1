@@ -54,6 +54,9 @@
     "search_placeholder": "名前で検索",
     "searching": "メンバーを検索中...",
     "no_search_results": "一致するメンバーが見つかりませんでした",
+    "search_results_aria": "メンバーのマッチング",
+    "search_error": "メンバーを検索できませんでした。もう一度試してください。",
+    "select_member_error": "被介護者をリンクする前にメンバーを選択してください。",
     "relationship_label": "関係",
     "start_date_label": "ケアが始まりました",
     "notes_label": "注意事項",
@@ -62,10 +65,7 @@
     "upcoming_care": "今後のケア",
     "recent_care": "最近のケア",
     "no_upcoming_care": "まだサポート予定はありません",
-    "no_recent_care": "最近のケアログはまだありません",
-    "search_results_aria": "メンバーのマッチング",
-    "search_error": "メンバーを検索できませんでした。もう一度試してください。",
-    "select_member_error": "被介護者をリンクする前にメンバーを選択してください。"
+    "no_recent_care": "最近のケアログはまだありません"
   },
   "cover": {
     "title": "カバーケア",
@@ -223,6 +223,7 @@
     "error": "Warmth パスをロードできませんでした"
   },
   "panel": {
+    "meta_title": "思いやりのあるコミュニティ管理者",
     "header": {
       "toggle_sidebar": "サイドバーの切り替え",
       "back_to_site": "サイトに戻る",
@@ -231,6 +232,10 @@
       "user_menu": "ユーザーメニュー",
       "my_profile": "私のプロフィール",
       "sign_out": "サインアウト"
+    },
+    "navigation": {
+      "label": "思いやりのあるコミュニティナビゲーション",
+      "close": "寄り添うコミュニティナビゲーション"
     },
     "breadcrumbs": {
       "aria": "ブレッドクラム",
@@ -275,15 +280,15 @@
       }
     },
     "sidebar": {
-      "search_aria": "Search caring community navigation",
-      "search_placeholder": "Search navigation...",
-      "clear_search": "検索をクリア",
-      "no_search_results": "No matching pages found",
       "brand": "地域社会への思いやり",
       "expand": "サイドバーを展開する",
       "collapse": "サイドバーを折りたたむ",
       "help_centre": "ヘルプセンター",
       "full_admin": "完全な管理者",
+      "search_aria": "Search caring community navigation",
+      "search_placeholder": "Search navigation...",
+      "clear_search": "検索をクリア",
+      "no_search_results": "No matching pages found",
       "sections": {
         "overview": "概要",
         "operations": "運営",
@@ -332,14 +337,16 @@
         "municipal_roi": "自治体の ROI",
         "category_coefficients": "カテゴリ係数"
       }
-    },
-    "navigation": {
-      "label": "思いやりのあるコミュニティナビゲーション",
-      "close": "寄り添うコミュニティナビゲーション"
-    },
-    "meta_title": "思いやりのあるコミュニティ管理者"
+    }
   },
   "admin": {
+    "common": {
+      "refresh": "リフレッシュ",
+      "cancel": "キャンセル",
+      "all": "全て",
+      "close": "近い",
+      "empty_dash": "-"
+    },
     "providers": {
       "meta_title": "介護提供者ディレクトリ - 管理者",
       "title": "介護提供者ディレクトリ",
@@ -448,63 +455,6 @@
         "volunteer": "ボランティアグループ"
       }
     },
-    "warmth_pass": {
-      "title": "暖かさパスの検索",
-      "subtitle": "メンバーのコミュニティ信頼資格情報を表示する",
-      "eligible": "適格",
-      "not_eligible": "対象外",
-      "verified": "確認済み",
-      "not_verified": "未検証",
-      "loading": "メンバーパスを読み込み中...",
-      "empty_date": "未設定",
-      "no_categories": "記録にカテゴリはありません。",
-      "tier_chip": "{{label}} (ティア {{tier}})",
-      "about": {
-        "title": "このページについて",
-        "body": "Warmth Pass は、メンバーが Trusted レベルに到達し、ピアレビューを受け、非公式の近隣ケアを提供する資格があることを示す、ポータブルな信頼資格です。受信者は、支援を受け入れる前に、ヘルパーの Warmth Pass の閲覧をリクエストできます。この検索を使用して、リクエストに応じてメンバーの資格情報を確認したり、資格が不明なメンバーを支援したりできます。"
-      },
-      "lookup": {
-        "title": "メンバー検索",
-        "member_id": "会員ID",
-        "placeholder": "数値の会員IDを入力してください",
-        "button": "見上げる"
-      },
-      "errors": {
-        "no_data": "このメンバー ID についてはデータが返されませんでした。",
-        "lookup_failed": "メンバーが見つからないか、エラーが発生しました。"
-      },
-      "not_eligible_notice": {
-        "title": "メンバーはまだ Trusted レベルに達しておらず、Warmth Pass を保持していません。",
-        "body": "資格を得るには、より多くのケア時間を記録し、少なくとも 1 回のピアレビューを受ける必要があります。 Trust プロフィール ページで自分の進捗状況を確認できます。"
-      },
-      "fields": {
-        "help_categories": "ヘルプカテゴリ",
-        "hours_logged": "記録された時間数",
-        "identity_verified": "本人確認済み",
-        "member_since": "メンバー歴",
-        "pass_active_since": "パスがアクティブになってから",
-        "reviews_received": "受け取ったレビュー",
-        "trust_tier": "トラスト層"
-      }
-    },
-    "trust_tier": {
-      "recompute_confirm": "すべてのアクティブなメンバーの信頼層を再計算しますか?これには少し時間がかかる場合があります。",
-      "messages": {
-        "saved": "信頼層構成が保存されました。変更は次回の再計算実行時に適用されます。",
-        "recomputed": "{{count}} メンバーの階層が再計算されました。"
-      },
-      "errors": {
-        "save_failed": "設定の保存に失敗しました。",
-        "recompute_failed": "層の再計算に失敗しました。"
-      }
-    },
-    "common": {
-      "refresh": "リフレッシュ",
-      "cancel": "キャンセル",
-      "empty_dash": "-",
-      "all": "全て",
-      "close": "近い"
-    },
     "loyalty": {
       "title": "ロイヤルティ プログラム",
       "description": "マーケットプレイスへのタイムクレジットのブリッジ。メンバーは時間を獲得し、販売者はリストのスイスフラン割引としてそれを受け入れることをオプトインします。",
@@ -594,34 +544,15 @@
       },
       "pending": {
         "title": "あなたの承認を待っています",
-        "empty": "保留中の転送はありません。",
         "description": "各転送は管理者が手動で承認する必要があります。承認する前に、宛先のメンバーのメールアドレスがメンバーの新しいアカウントと一致することを確認してください。",
+        "empty": "保留中の転送はありません。",
         "table_aria": "保留中のアウトバウンド時間転送"
       },
       "inbound": {
         "title": "他の協同組合から受け取ったもの（過去90日間）",
-        "empty": "過去 90 日間に送金は受領されていません。",
         "description": "これは監査ログのみです。受信転送は、ソース協同組合が承認すると自動的に処理されます。ここでは何もする必要はありません。",
+        "empty": "過去 90 日間に送金は受領されていません。",
         "table_aria": "到着時間内の転送"
-      },
-      "actions": {
-        "approve": "承認する",
-        "reject": "拒否する"
-      },
-      "reject_modal": {
-        "title": "転送を拒否する",
-        "reason_label": "拒否の理由 (オプション)",
-        "reason_placeholder": "監査ログのコンテキストを追加する"
-      },
-      "messages": {
-        "approved": "転送が承認され、配信されました。",
-        "rejected": "転送が拒否されました。"
-      },
-      "errors": {
-        "load_pending": "保留中の転送をロードできませんでした",
-        "load_inbound": "インバウンド転送のロードに失敗しました",
-        "approve": "承認に失敗しました",
-        "reject": "拒否に失敗しました"
       },
       "table": {
         "actions": "アクション",
@@ -641,14 +572,28 @@
         "received": "受け取った",
         "rejected": "拒否されました",
         "sent": "送信済み"
+      },
+      "actions": {
+        "approve": "承認する",
+        "reject": "拒否する"
+      },
+      "reject_modal": {
+        "title": "転送を拒否する",
+        "reason_label": "拒否の理由 (オプション)",
+        "reason_placeholder": "監査ログのコンテキストを追加する"
+      },
+      "messages": {
+        "approved": "転送が承認され、配信されました。",
+        "rejected": "転送が拒否されました。"
+      },
+      "errors": {
+        "load_pending": "保留中の転送をロードできませんでした",
+        "load_inbound": "インバウンド転送のロードに失敗しました",
+        "approve": "承認に失敗しました",
+        "reject": "拒否に失敗しました"
       }
     },
     "surveys": {
-      "errors": {
-        "export_failed": "アンケート回答をエクスポートできませんでした。",
-        "load": "アンケートの読み込みに失敗しました",
-        "create": "アンケートの作成に失敗しました"
-      },
       "meta_title": "自治体調査",
       "title": "自治体調査",
       "subtitle": "住民、地方自治体のパートナー、プログラム チームから構造化されたフィードバックを収集します。",
@@ -738,24 +683,16 @@
         "yes": "はい",
         "no": "いいえ",
         "date_unknown": "未設定"
+      },
+      "errors": {
+        "load": "アンケートの読み込みに失敗しました",
+        "create": "アンケートの作成に失敗しました",
+        "export_failed": "アンケート回答をエクスポートできませんでした。"
       }
     },
     "feedback": {
       "title": "自治体のフィードバック受信箱",
       "subtitle": "住民のフィードバックを受け取り、優先順位を付け、解決します。質問、アイデア、問題、苦情は自治体またはコミュニティ チームに送られます。",
-      "messages": {
-        "triage_saved": "トリアージが保存されました",
-        "resolved": "解決済みとしてマークされています",
-        "closed": "閉店"
-      },
-      "errors": {
-        "load": "フィードバックを読み込めませんでした",
-        "save_triage": "トリアージを保存できませんでした",
-        "resolution_required": "解決メモは必須です",
-        "resolve": "解決できませんでした",
-        "close": "閉じられませんでした",
-        "export": "エクスポートに失敗しました"
-      },
       "about": {
         "title": "このページについて",
         "body": "この受信箱は、プラットフォームを通じて住民から送信されたフィードバックを収集します。各アイテムは質問、アイデア、問題レポート、または感情メモとして分類され、感情スコアが割り当てられます。優先順位付けコントロールを使用して、所有権を割り当て、内部メモを追加し、解決策を追跡します。すべての居住者に表示されるアイテムは公開としてマークされます。返信は送信者や他のメンバーが見ることができます。",
@@ -866,6 +803,19 @@
         "days_ago_other": "{{count}}日前",
         "months_ago_one": "{{count}}1 か月前",
         "months_ago_other": "{{count}}1 か月前"
+      },
+      "messages": {
+        "triage_saved": "トリアージが保存されました",
+        "resolved": "解決済みとしてマークされています",
+        "closed": "閉店"
+      },
+      "errors": {
+        "load": "フィードバックを読み込めませんでした",
+        "save_triage": "トリアージを保存できませんでした",
+        "resolution_required": "解決メモは必須です",
+        "resolve": "解決できませんでした",
+        "close": "閉じられませんでした",
+        "export": "エクスポートに失敗しました"
       }
     },
     "civic_digest": {
@@ -1092,6 +1042,56 @@
         "escalate": "エスカレーションに失敗しました",
         "status": "ステータス変更に失敗しました",
         "note": "メモは失敗しました"
+      }
+    },
+    "warmth_pass": {
+      "title": "暖かさパスの検索",
+      "subtitle": "メンバーのコミュニティ信頼資格情報を表示する",
+      "eligible": "適格",
+      "not_eligible": "対象外",
+      "verified": "確認済み",
+      "not_verified": "未検証",
+      "loading": "メンバーパスを読み込み中...",
+      "empty_date": "未設定",
+      "no_categories": "記録にカテゴリはありません。",
+      "tier_chip": "{{label}} (ティア {{tier}})",
+      "about": {
+        "title": "このページについて",
+        "body": "Warmth Pass は、メンバーが Trusted レベルに到達し、ピアレビューを受け、非公式の近隣ケアを提供する資格があることを示す、ポータブルな信頼資格です。受信者は、支援を受け入れる前に、ヘルパーの Warmth Pass の閲覧をリクエストできます。この検索を使用して、リクエストに応じてメンバーの資格情報を確認したり、資格が不明なメンバーを支援したりできます。"
+      },
+      "lookup": {
+        "title": "メンバー検索",
+        "member_id": "会員ID",
+        "placeholder": "数値の会員IDを入力してください",
+        "button": "見上げる"
+      },
+      "errors": {
+        "no_data": "このメンバー ID についてはデータが返されませんでした。",
+        "lookup_failed": "メンバーが見つからないか、エラーが発生しました。"
+      },
+      "not_eligible_notice": {
+        "title": "メンバーはまだ Trusted レベルに達しておらず、Warmth Pass を保持していません。",
+        "body": "資格を得るには、より多くのケア時間を記録し、少なくとも 1 回のピアレビューを受ける必要があります。 Trust プロフィール ページで自分の進捗状況を確認できます。"
+      },
+      "fields": {
+        "help_categories": "ヘルプカテゴリ",
+        "hours_logged": "記録された時間数",
+        "identity_verified": "本人確認済み",
+        "member_since": "メンバー歴",
+        "pass_active_since": "パスがアクティブになってから",
+        "reviews_received": "受け取ったレビュー",
+        "trust_tier": "トラスト層"
+      }
+    },
+    "trust_tier": {
+      "recompute_confirm": "すべてのアクティブなメンバーの信頼層を再計算しますか?これには少し時間がかかる場合があります。",
+      "messages": {
+        "saved": "信頼層構成が保存されました。変更は次回の再計算実行時に適用されます。",
+        "recomputed": "{{count}} メンバーの階層が再計算されました。"
+      },
+      "errors": {
+        "save_failed": "設定の保存に失敗しました。",
+        "recompute_failed": "層の再計算に失敗しました。"
       }
     },
     "regional_points": {

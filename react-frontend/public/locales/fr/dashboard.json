@@ -3,16 +3,29 @@
     "title": "Tableau de bord",
     "description": "Votre tableau de bord personnel. Consultez votre solde, vos annonces et votre activité."
   },
+  "fallback_name": "là",
   "welcome_back": "Content de vous revoir, {{name}} !",
   "community_activity": "Voici ce qui se passe dans votre communauté {{community}}",
   "unable_to_load": "Impossible de charger le tableau de bord",
   "try_again": "Réessayer",
+  "common": {
+    "loading": "Chargement"
+  },
   "onboarding": {
     "banner_title": "Complétez la configuration de votre profil",
     "banner_subtitle": "Parlez-nous de vos intérêts et compétences pour obtenir des correspondances personnalisées",
     "get_started": "Commencer"
   },
   "new_listing": "Nouvelle annonce",
+  "caring_community": {
+    "title": "Communauté bienveillante",
+    "subtitle": "Coordonnez les demandes d'aide, les offres de temps, les heures de bénévolat vérifiées et le soutien de confiance depuis un seul endroit.",
+    "actions": {
+      "open_hub": "Ouvrir le hub",
+      "request_help": "Demander de l'aide",
+      "log_hours": "Enregistrer les heures"
+    }
+  },
   "stats": {
     "balance": "Solde",
     "active_listings": "Annonces actives",
@@ -42,18 +55,18 @@
     "view_wallet": "Voir le portefeuille",
     "find_members": "Trouver des membres",
     "browse_events": "Parcourir les événements",
-    "notifications": "Notifications",
-    "caring_community": "Centre de soin"
+    "caring_community": "Centre de soin",
+    "notifications": "Notifications"
   },
   "listings": {
     "offering": "Offre",
     "requesting": "Demande",
     "offer": "Offre",
     "request": "Demande",
-    "empty": "Aucune annonce récente",
-    "create_first": "Créez votre première annonce",
     "user_fallback": "Utilisateur",
-    "empty_description": "Créez une demande ou une offre pour commencer à trouver des correspondances avec des personnes près de chez vous."
+    "empty": "Aucune annonce récente",
+    "empty_description": "Créez une demande ou une offre pour commencer à trouver des correspondances avec des personnes près de chez vous.",
+    "create_first": "Créez votre première annonce"
   },
   "activity": {
     "action_listing": "a partagé une annonce",
@@ -62,8 +75,8 @@
     "action_goal": "a défini un nouvel objectif",
     "action_post": "a partagé une publication",
     "empty": "Aucune activité récente",
-    "check_feed": "Consultez le fil d'actualité",
-    "empty_description": "Les actualités de la communauté apparaîtront ici dès que les membres commenceront à publier."
+    "empty_description": "Les actualités de la communauté apparaîtront ici dès que les membres commenceront à publier.",
+    "check_feed": "Consultez le fil d'actualité"
   },
   "suggestions": {
     "empty": "Aucune suggestion pour l'instant",
@@ -72,24 +85,24 @@
   "groups": {
     "members_count": "{{count}} membres",
     "empty": "Vous n'avez rejoint aucun groupe",
-    "discover": "Découvrir des groupes",
-    "empty_description": "Les groupes vous aident à suivre des centres d'intérêt communs, des projets et des cercles locaux."
+    "empty_description": "Les groupes vous aident à suivre des centres d'intérêt communs, des projets et des cercles locaux.",
+    "discover": "Découvrir des groupes"
   },
   "events": {
     "online_event": "Événement en ligne",
     "empty": "Aucun événement à venir",
-    "browse": "Parcourir les événements",
-    "empty_description": "Les événements de votre communauté apparaîtront ici lorsqu'ils seront programmés."
+    "empty_description": "Les événements de votre communauté apparaîtront ici lorsqu'ils seront programmés.",
+    "browse": "Parcourir les événements"
   },
   "gamification": {
     "level": "Niveau {{level}}",
-    "badges": "Badges",
+    "badges": "Insignes",
     "streak": "Série",
+    "xp_value": "{{count}} XP",
     "xp_progress": "Progression XP",
     "start_earning": "Commencez à gagner des XP en participant à la communauté !",
     "streak_days_one": "{{count}} jour",
-    "streak_days_other": "{{count}} jours",
-    "xp_value": "{{count}} XP"
+    "streak_days_other": "{{count}} jours"
   },
   "aria": {
     "loading_listings": "Chargement des annonces",
@@ -114,21 +127,8 @@
     "received": "Reçu {{amount}}h",
     "review": "Évaluation",
     "none_pending": "Aucun avis en attente",
+    "none_pending_description": "Les échanges terminés qui nécessitent un retour apparaîtront ici.",
     "pending_subtitle": "Ouvrir cette demande d'évaluation",
-    "view_all_pending": "Voir tous les en attente",
-    "none_pending_description": "Les échanges terminés qui nécessitent un retour apparaîtront ici."
-  },
-  "fallback_name": "là",
-  "common": {
-    "loading": "Chargement"
-  },
-  "caring_community": {
-    "title": "Communauté bienveillante",
-    "subtitle": "Coordonnez les demandes d'aide, les offres de temps, les heures de bénévolat vérifiées et le soutien de confiance depuis un seul endroit.",
-    "actions": {
-      "open_hub": "Ouvrir le hub",
-      "request_help": "Demander de l'aide",
-      "log_hours": "Enregistrer les heures"
-    }
+    "view_all_pending": "Voir tous les en attente"
   }
 }

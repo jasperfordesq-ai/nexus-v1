@@ -1,4 +1,15 @@
 {
+  "detail": {
+    "back_to_goals": "Voltar aos objetivos",
+    "view_all_goals": "Ver todos os objetivos",
+    "not_found_title": "Objetivo não encontrado",
+    "not_found_description": "Este objetivo pode ter sido eliminado ou nunca existiu.",
+    "private_title": "Este objetivo é privado",
+    "private_description": "Apenas o proprietário do objetivo pode ver este objetivo.",
+    "meta_description": "{{owner}} está a acompanhar \"{{title}}\" com {{progress}}% de progresso neste objetivo da comunidade.",
+    "overdue_chip": "Em atraso",
+    "checkin_frequency": "Frequência de check-in"
+  },
   "checkin_recorded": "Check-in registrado!",
   "checkin_failed": "Falha ao registrar o check-in.",
   "reminder_set_failed": "Falha ao definir o lembrete.",
@@ -13,15 +24,15 @@
     "history": "Histórico",
     "no_checkins": "Sem check-ins ainda. Registe o seu primeiro!",
     "progress_label": "Progresso",
+    "progress_help": "Defina isto para o progresso real que quer mostrar no objetivo. Registar um check-in atualiza a barra do objetivo e a linha do tempo.",
+    "progress_value": "{{percent}}%",
+    "progress_unknown": "Progresso não registado",
     "mood_label": "Como se está a sentir?",
     "note_label": "Nota (opcional)",
     "note_placeholder": "Como vai? Alguma conquista ou desafio?",
     "cancel": "Cancelar",
     "submit": "Registar Check-in",
-    "check_in_button": "Check-in",
-    "progress_help": "Defina isto para o progresso real que quer mostrar no objetivo. Registar um check-in atualiza a barra do objetivo e a linha do tempo.",
-    "progress_value": "{{percent}}%",
-    "progress_unknown": "Progresso não registado"
+    "check_in_button": "Check-in"
   },
   "mood": {
     "great": "Ótimo",
@@ -41,11 +52,11 @@
     "reminder_set_success": "Lembrete definido: {{frequency}}"
   },
   "frequency": {
+    "none": "Sem cadência",
     "daily": "Diário",
     "weekly": "Semanal",
     "biweekly": "Quinzenal",
-    "monthly": "Mensal",
-    "none": "Sem cadência"
+    "monthly": "Mensal"
   },
   "template": {
     "title": "Começar a Partir de Modelo",
@@ -73,26 +84,6 @@
       "completed": "Concluído",
       "created": "Criado"
     }
-  },
-  "template_picker": {
-    "load_error": "Falha ao carregar os modelos. Por favor, tente novamente.",
-    "try_again": "Tente novamente",
-    "none_available": "Ainda não há modelos disponíveis.",
-    "none_in_category": "Não há modelos nesta categoria."
-  },
-  "detail": {
-    "back_to_goals": "Voltar aos objetivos",
-    "view_all_goals": "Ver todos os objetivos",
-    "not_found_title": "Objetivo não encontrado",
-    "not_found_description": "Este objetivo pode ter sido eliminado ou nunca existiu.",
-    "private_title": "Este objetivo é privado",
-    "private_description": "Apenas o proprietário do objetivo pode ver este objetivo.",
-    "overdue_chip": "Em atraso",
-    "checkin_frequency": "Frequência de check-in",
-    "meta_description": "{{owner}} está a acompanhar \"{{title}}\" com {{progress}}% de progresso neste objetivo da comunidade."
-  },
-  "goals": {
-    "load_error": "Falha ao carregar objetivos. Por favor, tente novamente."
   },
   "insights": {
     "loading": "A carregar perspetivas do objetivo",
@@ -124,11 +115,20 @@
     "buddy_failed": "Falha ao enviar apoio do parceiro.",
     "recent_buddy_support": "Apoio recente do parceiro",
     "note_type": {
-      "nudge": "Nudge",
+      "nudge": "Cutucar",
       "encouragement": "Encorajamento",
       "offer_help": "Oferta de ajuda",
       "celebration": "Celebração",
       "note": "Nota"
     }
+  },
+  "template_picker": {
+    "load_error": "Falha ao carregar os modelos. Por favor, tente novamente.",
+    "try_again": "Tente novamente",
+    "none_available": "Ainda não há modelos disponíveis.",
+    "none_in_category": "Não há modelos nesta categoria."
+  },
+  "goals": {
+    "load_error": "Falha ao carregar objetivos. Por favor, tente novamente."
   }
 }

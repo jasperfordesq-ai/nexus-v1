@@ -1,4 +1,9 @@
 {
+  "push_status": {
+    "unsupported": "متصفحك لا يدعم إشعارات الدفع.",
+    "denied": "لقد حظرت الإشعارات. قم بتحديث إعدادات متصفحك لإعادة تفعيلها.",
+    "subscribed": "أنت مشترك على هذا الجهاز."
+  },
   "identity": {
     "page_title": "تحقق من الهوية",
     "page_title_dob": "تحقق من الهوية — تاريخ الميلاد",
@@ -113,7 +118,7 @@
   "biometric": {
     "label_builtin": "المصادق المدمج",
     "label_external": "المصادق الخارجي",
-    "label_passkey": "Passkey",
+    "label_passkey": "مفتاح المرور",
     "platform_windows_title": "الإعداد على Windows",
     "platform_windows_step1": "انقر على «هذا الحاسوب» لإنشاء مفتاح مرور مخزّن على هذا الجهاز. ستؤكد برقم PIN الخاص بـ Windows Hello أو بصمة الإصبع أو الوجه.",
     "platform_windows_step2": "الشرط: يجب إعداد Windows Hello أولاً. انتقل إلى إعدادات Windows > الحسابات > خيارات تسجيل الدخول > PIN لإعداده.",
@@ -251,7 +256,7 @@
     "employers_liability": "مسؤولية صاحب العمل",
     "product_liability": "مسؤولية المنتج",
     "personal_accident": "الحوادث الشخصية",
-    "other": "Other",
+    "other": "آخر",
     "uploading": "جارٍ التحميل...",
     "upload_certificate": "تحميل الشهادة",
     "status_verified": "تم التحقق",
@@ -334,8 +339,15 @@
     "frequency": "تكرار الملخص",
     "frequency_description": "مدى تكرار تلقيك لرسائل ملخص المطابقة",
     "daily": "يومياً",
+    "monthly": "شهريًا",
     "fortnightly": "كل أسبوعين",
     "never": "أبداً",
+    "weekly": "أسبوعياً"
+  },
+  "activity_digest": {
+    "off": "إيقاف",
+    "instant": "فوري",
+    "daily": "يوميًا",
     "monthly": "شهريًا"
   },
   "privacy_sections": {
@@ -519,7 +531,7 @@
     "modal_title": "إضافة حساب مرتبط",
     "modal_description": "أدخل عنوان البريد الإلكتروني للشخص الذي تريد ربطه. سيتلقى إشعارًا للموافقة على الطلب.",
     "email_label": "عنوان البريد الإلكتروني",
-    "email_placeholder": "child@example.com",
+    "email_placeholder": "Child@example.com",
     "name_label": "الاسم (اختياري)",
     "name_placeholder": "اسم العرض الخاص بهم",
     "cancel": "إلغاء",
@@ -559,6 +571,9 @@
     "title": "المستخدمون المحظورون",
     "subtitle": "إدارة المستخدمين الذين قمت بحظرهم",
     "description": "لا يمكن للأعضاء المحظورين عرض ملفك الشخصي أو إرسال رسائل إليك أو التفاعل مع المحتوى الخاص بك.",
+    "privacy_badge": "ضبط الخصوصية",
+    "summary_label": "الأعضاء المحظورون",
+    "count": "{{count}} محظور",
     "empty": "لا يوجد مستخدمون محظورون",
     "empty_desc": "المستخدمون الذين تحظرهم لن يتمكنوا من رؤية ملفك الشخصي، أو مراسلتك، أو التفاعل مع محتواك.",
     "unblock": "إلغاء الحظر",
@@ -568,10 +583,7 @@
     "unblocked_desc": "تم فك حظر {{name}}.",
     "unblock_error": "فشل في فك حظر المستخدم",
     "blocked_on": "محظور على {{date}}",
-    "link": "المستخدمون المحظورون",
-    "privacy_badge": "ضبط الخصوصية",
-    "summary_label": "الأعضاء المحظورون",
-    "count": "{{count}} محظور"
+    "link": "المستخدمون المحظورون"
   },
   "block_user": {
     "title": "هل تريد حظر {{name}}؟",
@@ -596,16 +608,5 @@
     "stay": "البقاء"
   },
   "push_campaign_opt_in": "تلقي إشعارات دفع مروّجة",
-  "push_campaign_opt_in_description": "السماح للشركات والمنظمات المحلية بإرسال إشعارات دفع مستهدفة إليك. يمكنك إلغاء الاشتراك في أي وقت.",
-  "push_status": {
-    "unsupported": "متصفحك لا يدعم إشعارات الدفع.",
-    "denied": "لقد حظرت الإشعارات. قم بتحديث إعدادات متصفحك لإعادة تفعيلها.",
-    "subscribed": "أنت مشترك على هذا الجهاز."
-  },
-  "activity_digest": {
-    "off": "إيقاف",
-    "instant": "فوري",
-    "daily": "يوميًا",
-    "monthly": "شهريًا"
-  }
+  "push_campaign_opt_in_description": "السماح للشركات والمنظمات المحلية بإرسال إشعارات دفع مستهدفة إليك. يمكنك إلغاء الاشتراك في أي وقت."
 }

@@ -119,16 +119,16 @@
     "learn_more_1_description": "Ár bhfís 5 bliana d'fhás agus cónascadh",
     "learn_more_2_title": "Treoir Ama-bhaincireachta",
     "learn_more_2_description": "Foghlaim conas a oibríonn ama-bhaincireacht",
+    "tech_partner_label": "Comhpháirtí Teicneolaíochta",
+    "tech_partner_logo_alt": "Lógó Tionscadal NEXUS",
+    "tech_partner_heading": "TimeBank Ireland agus Tionscadal NEXUS",
+    "tech_partner_description": "HOUR Tá Timebank á thiomáint go bródúil ag Project NEXUS - ardán bainc ama foinse oscailte a tógadh chun cabhrú le pobail scileanna a mhalartú agus bannaí sóisialta a neartú. Cinntíonn ár gcomhpháirtíocht teicneolaíochta go mbaineann gach ball leas as eispéireas digiteach nua-aimseartha, inrochtana agus den chéad scoth don phobal.",
+    "our_partners_heading": "Ár gComhpháirtithe & Tacadóirí",
+    "partners_banner_alt": "Lógónna na gcomhpháirtithe: Comhpháirtíocht Forbartha Iarthar Chorcaí, SICAP, Comhairle Contae Chorcaí, An Roinn Pleanála Tithíochta, Pobail agus Rialtais Áitiúil, Cistí Struchtúrtha agus Infheistíochta na hEorpa, Ciste Sóisialta na hEorpa",
     "cta_heading": "Tógaimis Pobail Níos Láidre Le Chéile",
     "cta_subtitle": "Cibé corparáid, maoinitheoir, taighdeoir, nó ceannaire pobail thú — tá múnla comhpháirtíochta ann a oibríonn duit.",
     "cta_contact": "Tosaigh Comhrá",
-    "cta_view_plan": "Féach ar an bPlean Straitéiseach",
-    "our_partners_heading": "Our Partners & Supporters",
-    "partners_banner_alt": "Partner logos: West Cork Development Partnership, SICAP, Cork County Council, Department of Housing Planning Community and Local Government, European Structural and Investment Funds, European Social Fund",
-    "tech_partner_label": "Technology Partner",
-    "tech_partner_logo_alt": "Project NEXUS logo",
-    "tech_partner_heading": "TimeBank Ireland and Project NEXUS",
-    "tech_partner_description": "hOUR Timebank is proudly powered by Project NEXUS — an open-source timebanking platform built to help communities exchange skills and strengthen social bonds. Our technology partnership ensures every member benefits from a modern, accessible, and community-first digital experience."
+    "cta_view_plan": "Féach ar an bPlean Straitéiseach"
   },
   "social_prescribing": {
     "page_title": "Oideasacht Shóisialta",
@@ -174,7 +174,7 @@
     "meta_description": "Staidéar Tionchair Shóisialta iomlán 2023 do hOUR Timebank — anailís neamhspleách SROI a léiríonn toradh sóisialta €16 do gach €1 infheistithe.",
     "breadcrumb_about": "Faoi",
     "hero_title": "Staidéar Tionchair Shóisialta",
-    "hero_org_year": "hOUR Timebank — 2023",
+    "hero_org_year": "Uair Banc - 2023",
     "hero_description": "Anailís neamhspleách ar Thoradh Sóisialta ar Infheistíocht ag measúnú an tionchair shóisialta, eacnamaíoch, agus phobail de chlár hOUR Timebank Ama-bhaincireachta Éireann.",
     "download_full_report": "Íoslódáil an Tuarascáil Iomlán",
     "executive_summary_pdf": "Achoimre Feidhmeannais",
@@ -231,10 +231,15 @@
     "sroi_breakdown_heading": "Miondealú SROI",
     "sroi_component_header": "Comhpháirt",
     "sroi_value_header": "Luach",
+    "sroi_result_value": "€16 : €1",
     "sroi_total_investment": "Infheistíocht Iomlán (Ionchur)",
+    "sroi_total_investment_value": "€50,000",
     "sroi_total_present_value": "Luach Reatha Iomlán na dTorthaí",
+    "sroi_total_present_value_amount": "€803,184",
     "sroi_net_social_value": "Glanluach Sóisialta",
+    "sroi_net_social_value_amount": "€753,184",
     "sroi_ratio_label": "Cóimheas SROI",
+    "sroi_ratio_value": "€16.06 : €1",
     "sroi_benchmark_note": "Sáraíonn an cóimheas SROI seo de 16:1 go suntasach an tagarmharc le haghaidh cláir forbartha pobail, a bhíonn de ghnáth idir 2:1 agus 5:1. Léiríonn an cóimheas ard nádúr giaraithe na hama-bhaincireachta — gineann ionchur airgeadais measartha gníomhaíocht shóisialta fhairsing faoi stiúir oibrithe deonacha.",
     "discussion_para": "Aithníonn an staidéar roinnt tosca a chuireann leis an SROI eisceachtúil ard agus le héifeachtacht an chláir mar mhúnla forbartha pobail.",
     "discussion_factor_0_title": "Éifeacht Iolraitheora Oibrithe Deonacha",
@@ -263,12 +268,7 @@
     "cta_full_report": "Íoslódáil an Tuarascáil Iomlán",
     "cta_exec_summary": "Achoimre Feidhmeannais",
     "cta_questions": "Ceisteanna faoin taighde?",
-    "cta_contact": "Déan Teagmháil Linn",
-    "sroi_result_value": "€16 : €1",
-    "sroi_total_investment_value": "€50,000",
-    "sroi_total_present_value_amount": "€803,184",
-    "sroi_net_social_value_amount": "€753,184",
-    "sroi_ratio_value": "€16.06 : €1"
+    "cta_contact": "Déan Teagmháil Linn"
   },
   "strategic_plan": {
     "page_title": "Plean Straitéiseach 2026–2030",
@@ -415,5 +415,5 @@
     "cta_download": "Íoslódáil an Plean Iomlán",
     "cta_contact": "Déan Teagmháil"
   },
-  "age_band": "Age {{band}}"
+  "age_band": "Aois {{band}}"
 }

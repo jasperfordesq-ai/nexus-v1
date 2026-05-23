@@ -1,4 +1,15 @@
 {
+  "detail": {
+    "back_to_goals": "Terug naar doelen",
+    "view_all_goals": "Alle doelen bekijken",
+    "not_found_title": "Doel niet gevonden",
+    "not_found_description": "Dit doel is mogelijk verwijderd of heeft nooit bestaan.",
+    "private_title": "Dit doel is privé",
+    "private_description": "Alleen de doeleigenaar kan dit doel bekijken.",
+    "meta_description": "{{owner}} houdt \"{{title}}\" bij met {{progress}}% voortgang in dit communitydoel.",
+    "overdue_chip": "Achterstallig",
+    "checkin_frequency": "Check-in frequentie"
+  },
   "checkin_recorded": "Incheck geregistreerd!",
   "checkin_failed": "Incheck kon niet worden geregistreerd.",
   "reminder_set_failed": "Herinnering kon niet worden ingesteld.",
@@ -13,15 +24,15 @@
     "history": "Geschiedenis",
     "no_checkins": "Nog geen inchecks. Registreer je eerste!",
     "progress_label": "Voortgang",
+    "progress_help": "Stel dit in op de werkelijke voortgang die je wilt weergeven op het doel. Het vastleggen van een check-in werkt de doelenbalk en de tijdlijn bij.",
+    "progress_value": "{{percent}}%",
+    "progress_unknown": "Voortgang niet geregistreerd",
     "mood_label": "Hoe voel je je?",
     "note_label": "Opmerking (optioneel)",
     "note_placeholder": "Hoe gaat het? Zijn er overwinningen of uitdagingen?",
     "cancel": "Annuleren",
     "submit": "Incheck registreren",
-    "check_in_button": "Inchecken",
-    "progress_help": "Stel dit in op de werkelijke voortgang die je wilt weergeven op het doel. Het vastleggen van een check-in werkt de doelenbalk en de tijdlijn bij.",
-    "progress_value": "{{percent}}%",
-    "progress_unknown": "Voortgang niet geregistreerd"
+    "check_in_button": "Inchecken"
   },
   "mood": {
     "great": "Geweldig",
@@ -41,11 +52,11 @@
     "reminder_set_success": "Herinnering ingesteld: {{frequency}}"
   },
   "frequency": {
+    "none": "Geen cadans",
     "daily": "Dagelijks",
     "weekly": "Wekelijks",
     "biweekly": "Elke 2 weken",
-    "monthly": "Maandelijks",
-    "none": "Geen cadans"
+    "monthly": "Maandelijks"
   },
   "template": {
     "title": "Begin vanuit Sjabloon",
@@ -66,33 +77,13 @@
     "progress_aria": "Voortgang: {{percent}}%",
     "event": {
       "progress_update": "Voortgangsupdate",
-      "checkin": "Check-in",
+      "checkin": "Inchecken",
       "milestone": "Mijlpaal",
       "buddy_joined": "Buddy aangesloten",
       "buddy_action": "Buddy-ondersteuning",
       "completed": "Voltooid",
       "created": "Aangemaakt"
     }
-  },
-  "template_picker": {
-    "load_error": "Sjablonen konden niet worden geladen. Probeer het opnieuw.",
-    "try_again": "Probeer het opnieuw",
-    "none_available": "Er zijn nog geen sjablonen beschikbaar.",
-    "none_in_category": "Geen sjablonen in deze categorie."
-  },
-  "detail": {
-    "back_to_goals": "Terug naar doelen",
-    "view_all_goals": "Alle doelen bekijken",
-    "not_found_title": "Doel niet gevonden",
-    "not_found_description": "Dit doel is mogelijk verwijderd of heeft nooit bestaan.",
-    "private_title": "Dit doel is privé",
-    "private_description": "Alleen de doeleigenaar kan dit doel bekijken.",
-    "overdue_chip": "Achterstallig",
-    "checkin_frequency": "Check-in frequentie",
-    "meta_description": "{{owner}} houdt \"{{title}}\" bij met {{progress}}% voortgang in dit communitydoel."
-  },
-  "goals": {
-    "load_error": "Doelen konden niet worden geladen. Probeer het opnieuw."
   },
   "insights": {
     "loading": "Doelinzichten laden",
@@ -105,7 +96,7 @@
     "no_cadence_helper": "Stel een cadans in bij het bewerken van dit doel.",
     "checkin_due": "Een check-in is verschuldigd",
     "frequency": "{{frequency}}-cadans",
-    "checkins": "Check-ins",
+    "checkins": "Inchecken",
     "checkins_value": "{{count}} geregistreerd",
     "last_checkin": "Laatste check-in {{time}}",
     "no_checkins": "Nog geen check-ins",
@@ -124,11 +115,20 @@
     "buddy_failed": "Buddy-ondersteuning sturen mislukt.",
     "recent_buddy_support": "Recente buddy-ondersteuning",
     "note_type": {
-      "nudge": "Nudge",
+      "nudge": "Por",
       "encouragement": "Aanmoediging",
       "offer_help": "Aanbod tot hulp",
       "celebration": "Viering",
       "note": "Notitie"
     }
+  },
+  "template_picker": {
+    "load_error": "Sjablonen konden niet worden geladen. Probeer het opnieuw.",
+    "try_again": "Probeer het opnieuw",
+    "none_available": "Er zijn nog geen sjablonen beschikbaar.",
+    "none_in_category": "Geen sjablonen in deze categorie."
+  },
+  "goals": {
+    "load_error": "Doelen konden niet worden geladen. Probeer het opnieuw."
   }
 }

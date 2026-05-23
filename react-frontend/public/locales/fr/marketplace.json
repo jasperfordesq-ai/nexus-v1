@@ -238,7 +238,7 @@
     "avg_rating": "Note moyenne",
     "response_time": "Temps de réponse",
     "active_listings": "Annonces actives",
-    "na": "N/A",
+    "na": "N / A",
     "tab_listings": "Annonces",
     "tab_reviews": "Avis",
     "no_listings_title": "Aucune annonce",
@@ -573,7 +573,8 @@
       "declined": "Refusée",
       "completed": "Terminée",
       "cancelled": "Annulée"
-    }
+    },
+    "offers_title": "Offres de livraison"
   },
   "pickup": {
     "my_pickups_title": "Mes retraits",
@@ -618,10 +619,10 @@
     "breadcrumb": "Recherche sur la carte",
     "search_placeholder": "Rechercher des annonces à proximité...",
     "radius_label": "Rayon de recherche",
-    "radius_option": "{{km}} km",
+    "radius_option": "{{km}} km",
     "radius_chip": "{{km}} km de rayon",
     "results_count": "{{count}} annonces trouvées à proximité",
-    "refresh": "Refresh",
+    "refresh": "Rafraîchir",
     "map_view": "Vue carte",
     "list_view": "Vue liste",
     "location_required": "Définissez votre emplacement dans votre profil pour utiliser cette fonctionnalité",

@@ -3,16 +3,29 @@
     "title": "Painéal",
     "description": "Do phainéal pearsanta. Féach ar d'iarmhéid, liostaí, agus gníomhaíocht."
   },
+  "fallback_name": "a chara",
   "welcome_back": "Fáilte ar ais, {{name}}!",
   "community_activity": "Seo a tharlaíonn i do phobal {{community}}",
   "unable_to_load": "Ní féidir an Painéal a Luchtú",
   "try_again": "Bain triail eile as",
+  "common": {
+    "loading": "Ag luchtú"
+  },
   "onboarding": {
     "banner_title": "Críochnaigh socrú do phróifíle",
     "banner_subtitle": "Inis dúinn faoi do spéiseanna agus scileanna chun meaitseálacha pearsantaithe a fháil",
     "get_started": "Tosaigh"
   },
   "new_listing": "Liosta Nua",
+  "caring_community": {
+    "title": "Pobal Cúraim",
+    "subtitle": "Comhordaigh iarratais cabhrach, tairiscintí ama, uaireanta deonaíochta fíoraithe, agus tacaíocht iontaofa ó aon áit amháin.",
+    "actions": {
+      "open_hub": "Oscail mol",
+      "request_help": "Iarr cabhair",
+      "log_hours": "Logáil uaireanta"
+    }
+  },
   "stats": {
     "balance": "Iarmhéid",
     "active_listings": "Liostaí Gníomhacha",
@@ -42,18 +55,18 @@
     "view_wallet": "Féach ar Sparán",
     "find_members": "Faigh Comhaltaí",
     "browse_events": "Brabhsáil Imeachtaí",
-    "notifications": "Fógraí",
-    "caring_community": "Mol Cúraim"
+    "caring_community": "Mol Cúraim",
+    "notifications": "Fógraí"
   },
   "listings": {
     "offering": "Ag Tairiscint",
     "requesting": "Ag Iarraidh",
     "offer": "Tairiscint",
     "request": "Iarratas",
-    "empty": "Gan liostaí le déanaí",
-    "create_first": "Cruthaigh do chéad liosta",
     "user_fallback": "Úsáideoir",
-    "empty_description": "Cruthaigh iarratas nó tairiscint chun tús a chur le meaitseáil le daoine in aice leat."
+    "empty": "Gan liostaí le déanaí",
+    "empty_description": "Cruthaigh iarratas nó tairiscint chun tús a chur le meaitseáil le daoine in aice leat.",
+    "create_first": "Cruthaigh do chéad liosta"
   },
   "activity": {
     "action_listing": "roinnt liosta",
@@ -62,8 +75,8 @@
     "action_goal": "leag sprioc nua síos",
     "action_post": "roinnt postáil",
     "empty": "Gan gníomhaíocht le déanaí",
-    "check_feed": "Féach ar an sruth",
-    "empty_description": "Taispeánfar nuashonruithe an phobail anseo nuair a thosaíonn daoine ag postáil."
+    "empty_description": "Taispeánfar nuashonruithe an phobail anseo nuair a thosaíonn daoine ag postáil.",
+    "check_feed": "Féach ar an sruth"
   },
   "suggestions": {
     "empty": "Gan moltaí fós",
@@ -72,24 +85,24 @@
   "groups": {
     "members_count": "{{count}} comhalta",
     "empty": "Níl tú páirteach in aon ghrúpa fós",
-    "discover": "Faigh grúpaí",
-    "empty_description": "Cuidíonn grúpaí leat leanúint le suimeanna comhroinnte, tionscadail, agus ciorcail áitiúla."
+    "empty_description": "Cuidíonn grúpaí leat leanúint le suimeanna comhroinnte, tionscadail, agus ciorcail áitiúla.",
+    "discover": "Faigh grúpaí"
   },
   "events": {
     "online_event": "Imeacht ar líne",
     "empty": "Gan imeachtaí atá le teacht",
-    "browse": "Brabhsáil imeachtaí",
-    "empty_description": "Taispeánfar imeachtaí ó do phobal anseo nuair a sceidealtar iad."
+    "empty_description": "Taispeánfar imeachtaí ó do phobal anseo nuair a sceidealtar iad.",
+    "browse": "Brabhsáil imeachtaí"
   },
   "gamification": {
     "level": "Leibhéal {{level}}",
     "badges": "Suaitheantas",
     "streak": "Sraith",
+    "xp_value": "{{count}} XP",
     "xp_progress": "Dul Chun Cinn XP",
     "start_earning": "Tosaigh ag tuilleamh XP trí bheith rannpháirteach sa phobal!",
     "streak_days_one": "{{count}} la",
-    "streak_days_other": "{{count}} la",
-    "xp_value": "{{count}} XP"
+    "streak_days_other": "{{count}} la"
   },
   "aria": {
     "loading_listings": "Liostaí á luchtú",
@@ -114,21 +127,8 @@
     "received": "Faighte {{amount}}u",
     "review": "Léirmheas",
     "none_pending": "Gan léirmheasanna ar feitheamh",
+    "none_pending_description": "Taispeánfar malartuithe críochnaithe a bhfuil aiseolas de dhíth orthu anseo.",
     "pending_subtitle": "Oscail an t-iarratas athbhreithniúcháin seo",
-    "view_all_pending": "Féach ar Gach Ceann Ar Feitheamh",
-    "none_pending_description": "Taispeánfar malartuithe críochnaithe a bhfuil aiseolas de dhíth orthu anseo."
-  },
-  "fallback_name": "a chara",
-  "common": {
-    "loading": "Ag luchtú"
-  },
-  "caring_community": {
-    "title": "Pobal Cúraim",
-    "subtitle": "Comhordaigh iarratais cabhrach, tairiscintí ama, uaireanta deonaíochta fíoraithe, agus tacaíocht iontaofa ó aon áit amháin.",
-    "actions": {
-      "open_hub": "Oscail mol",
-      "request_help": "Iarr cabhair",
-      "log_hours": "Logáil uaireanta"
-    }
+    "view_all_pending": "Féach ar Gach Ceann Ar Feitheamh"
   }
 }

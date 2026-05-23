@@ -1,4 +1,9 @@
 {
+  "push_status": {
+    "unsupported": "Ihr Browser unterstützt keine Push-Benachrichtigungen.",
+    "denied": "Sie haben Benachrichtigungen blockiert. Aktualisieren Sie Ihre Browsereinstellungen, um sie wieder zu aktivieren.",
+    "subscribed": "Sie sind auf diesem Gerät angemeldet."
+  },
   "identity": {
     "page_title": "Identität verifizieren",
     "page_title_dob": "Identität verifizieren — Geburtsdatum",
@@ -66,7 +71,7 @@
     "title": "Design",
     "light": "Hell",
     "dark": "Dunkel",
-    "system": "System"
+    "system": "Systemeinstellung"
   },
   "security_settings": "Sicherheitseinstellungen",
   "change_password": "Passwort ändern",
@@ -113,7 +118,7 @@
   "biometric": {
     "label_builtin": "Integrierter Authenticator",
     "label_external": "Externer Authenticator",
-    "label_passkey": "Passkey",
+    "label_passkey": "Hauptschlüssel",
     "platform_windows_title": "Einrichtung unter Windows",
     "platform_windows_step1": "Klicken Sie auf „Dieser PC“, um einen Passkey zu erstellen, der auf diesem Computer gespeichert ist. Sie bestätigen mit Ihrem Windows Hello PIN, Fingerabdruck oder Gesicht.",
     "platform_windows_step2": "Anforderung: Sie müssen zuerst Windows Hello einrichten. Gehen Sie zu Windows-Einstellungen > Konten > Anmeldeoptionen > PIN, um es einzurichten.",
@@ -334,8 +339,15 @@
     "frequency": "Zusammenfassungshäufigkeit",
     "frequency_description": "Wie oft Sie Treffer-Zusammenfassungs-E-Mails erhalten",
     "daily": "Täglich",
+    "monthly": "Monatlich",
     "fortnightly": "Zweiwöchentlich",
     "never": "Nie",
+    "weekly": "Wöchentlich"
+  },
+  "activity_digest": {
+    "off": "Aus",
+    "instant": "Sofort",
+    "daily": "Täglich",
     "monthly": "Monatlich"
   },
   "privacy_sections": {
@@ -559,6 +571,9 @@
     "title": "Blockierte Benutzer",
     "subtitle": "Verwalten Sie die Benutzer, die Sie blockiert haben",
     "description": "Blockierte Mitglieder können Ihr Profil nicht sehen, Ihnen keine Nachrichten senden oder mit Ihren Inhalten interagieren.",
+    "privacy_badge": "Datenschutzeinstellung",
+    "summary_label": "Blockierte Mitglieder",
+    "count": "{{count}} blockiert",
     "empty": "Keine blockierten Benutzer",
     "empty_desc": "Benutzer, die Sie blockieren, können Ihr Profil nicht sehen, Ihnen keine Nachrichten senden oder mit Ihren Inhalten interagieren.",
     "unblock": "Entsperren",
@@ -568,10 +583,7 @@
     "unblocked_desc": "{{name}} wurde entsperrt.",
     "unblock_error": "Fehler beim Entsperren des Benutzers",
     "blocked_on": "Blockiert am {{date}}",
-    "link": "Blockierte Benutzer",
-    "privacy_badge": "Datenschutzeinstellung",
-    "summary_label": "Blockierte Mitglieder",
-    "count": "{{count}} blockiert"
+    "link": "Blockierte Benutzer"
   },
   "block_user": {
     "title": "{{name}} blockieren?",
@@ -596,16 +608,5 @@
     "stay": "Bleiben"
   },
   "push_campaign_opt_in": "Geförderte Push-Benachrichtigungen erhalten",
-  "push_campaign_opt_in_description": "Erlauben Sie lokalen Unternehmen und Organisationen, Ihnen gezielte Push-Benachrichtigungen zu senden. Sie können sich jederzeit abmelden.",
-  "push_status": {
-    "unsupported": "Ihr Browser unterstützt keine Push-Benachrichtigungen.",
-    "denied": "Sie haben Benachrichtigungen blockiert. Aktualisieren Sie Ihre Browsereinstellungen, um sie wieder zu aktivieren.",
-    "subscribed": "Sie sind auf diesem Gerät angemeldet."
-  },
-  "activity_digest": {
-    "off": "Aus",
-    "instant": "Sofort",
-    "daily": "Täglich",
-    "monthly": "Monatlich"
-  }
+  "push_campaign_opt_in_description": "Erlauben Sie lokalen Unternehmen und Organisationen, Ihnen gezielte Push-Benachrichtigungen zu senden. Sie können sich jederzeit abmelden."
 }

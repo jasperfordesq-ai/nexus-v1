@@ -1,4 +1,15 @@
 {
+  "detail": {
+    "back_to_goals": "Zurück zu den Zielen",
+    "view_all_goals": "Alle Ziele ansehen",
+    "not_found_title": "Ziel nicht gefunden",
+    "not_found_description": "Dieses Ziel wurde möglicherweise gelöscht oder hat nie existiert.",
+    "private_title": "Dieses Ziel ist privat",
+    "private_description": "Nur der Zieleigentümer kann dieses Ziel ansehen.",
+    "meta_description": "{{owner}} verfolgt „{{title}}“ mit {{progress}} % Fortschritt in diesem Community-Ziel.",
+    "overdue_chip": "Überfällig",
+    "checkin_frequency": "Check-in-Häufigkeit"
+  },
   "checkin_recorded": "Check-in aufgezeichnet!",
   "checkin_failed": "Check-in konnte nicht aufgezeichnet werden.",
   "reminder_set_failed": "Erinnerung konnte nicht gesetzt werden.",
@@ -13,15 +24,15 @@
     "history": "Verlauf",
     "no_checkins": "Noch keine Eincheck-Einträge. Erfassen Sie Ihren ersten!",
     "progress_label": "Fortschritt",
+    "progress_help": "Setze dies auf den tatsächlichen Fortschritt, den du beim Ziel anzeigen möchtest. Das Aufzeichnen eines Check-ins aktualisiert den Zielbalken und die Zeitleiste.",
+    "progress_value": "{{percent}}%",
+    "progress_unknown": "Fortschritt nicht aufgezeichnet",
     "mood_label": "Wie fühlen Sie sich?",
     "note_label": "Notiz (optional)",
     "note_placeholder": "Wie läuft es? Erfolge oder Herausforderungen?",
     "cancel": "Abbrechen",
     "submit": "Einchecken erfassen",
-    "check_in_button": "Einchecken",
-    "progress_help": "Setze dies auf den tatsächlichen Fortschritt, den du beim Ziel anzeigen möchtest. Das Aufzeichnen eines Check-ins aktualisiert den Zielbalken und die Zeitleiste.",
-    "progress_value": "{{percent}}%",
-    "progress_unknown": "Fortschritt nicht aufgezeichnet"
+    "check_in_button": "Einchecken"
   },
   "mood": {
     "great": "Grossartig",
@@ -41,11 +52,11 @@
     "reminder_set_success": "Erinnerung gesetzt: {{frequency}}"
   },
   "frequency": {
+    "none": "Kein Rhythmus",
     "daily": "Täglich",
     "weekly": "Wöchentlich",
     "biweekly": "Alle 2 Wochen",
-    "monthly": "Monatlich",
-    "none": "Kein Rhythmus"
+    "monthly": "Monatlich"
   },
   "template": {
     "title": "Von Vorlage starten",
@@ -66,33 +77,13 @@
     "progress_aria": "Fortschritt: {{percent}}%",
     "event": {
       "progress_update": "Fortschrittsupdate",
-      "checkin": "Check-in",
+      "checkin": "Einchecken",
       "milestone": "Meilenstein",
       "buddy_joined": "Buddy beigetreten",
       "buddy_action": "Buddy-Unterstützung",
       "completed": "Abgeschlossen",
       "created": "Erstellt"
     }
-  },
-  "template_picker": {
-    "load_error": "Vorlagen konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
-    "try_again": "Erneut versuchen",
-    "none_available": "Noch keine Vorlagen verfügbar.",
-    "none_in_category": "Keine Vorlagen in dieser Kategorie."
-  },
-  "detail": {
-    "back_to_goals": "Zurück zu den Zielen",
-    "view_all_goals": "Alle Ziele ansehen",
-    "not_found_title": "Ziel nicht gefunden",
-    "not_found_description": "Dieses Ziel wurde möglicherweise gelöscht oder hat nie existiert.",
-    "private_title": "Dieses Ziel ist privat",
-    "private_description": "Nur der Zieleigentümer kann dieses Ziel ansehen.",
-    "overdue_chip": "Überfällig",
-    "checkin_frequency": "Check-in-Häufigkeit",
-    "meta_description": "{{owner}} verfolgt „{{title}}“ mit {{progress}} % Fortschritt in diesem Community-Ziel."
-  },
-  "goals": {
-    "load_error": "Ziele konnten nicht geladen werden. Bitte versuche es erneut."
   },
   "insights": {
     "loading": "Zieleinblicke laden",
@@ -130,5 +121,14 @@
       "celebration": "Feier",
       "note": "Notiz"
     }
+  },
+  "template_picker": {
+    "load_error": "Vorlagen konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
+    "try_again": "Erneut versuchen",
+    "none_available": "Noch keine Vorlagen verfügbar.",
+    "none_in_category": "Keine Vorlagen in dieser Kategorie."
+  },
+  "goals": {
+    "load_error": "Ziele konnten nicht geladen werden. Bitte versuche es erneut."
   }
 }

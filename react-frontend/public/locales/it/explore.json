@@ -22,7 +22,7 @@
   "upcoming_events": {
     "title": "Prossimi Eventi",
     "subtitle": "Unisciti alla tua comunità",
-    "online": "Online",
+    "online": "In linea",
     "attending": "{{count}} partecipanti"
   },
   "active_groups": {
@@ -34,7 +34,7 @@
   "top_contributors": {
     "title": "Migliori Contributori",
     "subtitle": "Leader della comunità per esperienza",
-    "level": "Lv.{{level}}"
+    "level": "Liv.{{level}}"
   },
   "trending_hashtags": {
     "title": "Hashtag di Tendenza",

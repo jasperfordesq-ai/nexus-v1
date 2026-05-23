@@ -1,5 +1,7 @@
 {
   "title": "Ofertas de Empleo",
+  "page_title": "Ofertas de empleo",
+  "page_description": "Explora oportunidades de trabajo, roles de voluntariado y puestos de banco de tiempo ofrecidos por miembros de la comunidad y organizaciones asociadas cerca de ti.",
   "subtitle": "Encuentra oportunidades en tu comunidad",
   "create_vacancy": "Publicar Oferta",
   "edit_vacancy": "Editar Oferta",
@@ -55,6 +57,7 @@
   "posted_by": "Publicado por",
   "load_more": "Cargar Más",
   "try_again": "Intentar de Nuevo",
+  "cancel": "Cancelar",
   "featured": "Destacado",
   "empty_title": "No se encontraron ofertas",
   "empty_description": "No hay ofertas de empleo que coincidan con tus criterios",
@@ -127,12 +130,12 @@
   "employer": {
     "page_title": "Perfil del Empleador",
     "open_roles": "puestos abiertos",
+    "open_roles_count": "{{count}} puestos abiertos",
     "open_roles_heading": "Puestos Abiertos",
     "no_roles": "Sin puestos abiertos en este momento",
     "error": "No se pudo cargar el perfil del empleador",
     "employer_jobs": "Empleos del Empleador",
     "employees": "{{size}} empleados",
-    "open_roles_count": "{{count}} puestos abiertos",
     "meta_description": "Ve el perfil del empleador, los puestos abiertos y las reseñas de la comunidad a través de {{count}} oportunidades actuales.",
     "review_submit_failed": "No se pudo enviar la reseña",
     "reviews_heading": "Reseñas del empleador",
@@ -232,13 +235,13 @@
     "views_over_time": "Vistas a lo Largo del Tiempo",
     "applications_by_stage": "Solicitudes por Etapa",
     "no_data": "Aún no hay datos analíticos",
+    "load_error": "Error al cargar las analíticas",
     "weekly_trend": "Solicitudes Semanales",
     "referral_shares": "Total de Compartidos",
     "referral_apps": "Solicitudes por Referencia",
     "referral_conversion": "Conversión de Referencias",
     "scorecard_avg": "Puntuación Media",
     "export_csv": "Exportar CSV",
-    "load_error": "Error al cargar las analíticas",
     "views_tooltip": "{{date}}: {{count}} vistas",
     "applications_tooltip": "{{week}}: {{count}} solicitudes",
     "stage_progress_aria": "Progreso de la etapa de solicitud {{stage}}",
@@ -343,11 +346,11 @@
   "geo": {
     "near_me": "Cerca de mí",
     "radius_label": "Radio de búsqueda",
-    "radius_5": "5 km",
-    "radius_10": "10 km",
-    "radius_25": "25 km",
-    "radius_50": "50 km",
-    "radius_100": "100 km",
+    "radius_5": "5 kilometros",
+    "radius_10": "10 kilometros",
+    "radius_25": "25 kilometros",
+    "radius_50": "50 kilometros",
+    "radius_100": "100 kilometros",
     "within": "A {{radius}}km",
     "clear": "Borrar filtro de ubicación",
     "not_supported": "La geolocalización no es compatible con tu navegador",
@@ -356,29 +359,31 @@
   "kanban": {
     "pipeline_title": "Pipeline Kanban",
     "not_authorized": "No estás autorizado para ver este pipeline.",
+    "select_applicant": "Seleccionar {{name}}",
+    "ai_score": "IA: {{score}}/100",
     "download_cv": "Descargar CV",
     "drop_here": "Soltar aquí",
-    "duration_90": "1,5 horas",
-    "salary_monthly": "Mensual",
-    "personal_message": "Mensaje Personal",
-    "personal_message_placeholder": "Una nota para el candidato...",
-    "select_applicant": "Seleccionar {{name}}",
-    "ai_score": "AI: {{score}}/100",
     "ai_rank": "Rango IA",
     "ai_ranked": "Candidatos clasificados por IA",
     "ai_rank_failed": "Falló la clasificación por IA",
-    "tab_pipeline": "Pipeline",
+    "tab_pipeline": "Tubería",
     "tab_activity": "Registro de actividad",
     "no_activity": "Aún no hay actividad",
     "no_activity_hint": "Los eventos aparecerán aquí a medida que avance el proceso de contratación.",
     "previous": "Anterior",
     "next": "Siguiente",
+    "duration_90": "1,5 horas",
+    "salary_monthly": "Mensual",
+    "personal_message": "Mensaje Personal",
+    "personal_message_placeholder": "Una nota para el candidato...",
     "interview_location_placeholder": "https://meet.google.com/...",
     "offer_salary_placeholder": "p. ej., 45000"
   },
   "apply": {
     "button": "Solicitar Ahora",
     "button_label": "Solicitar {{title}}",
+    "this_job": "este empleo",
+    "view": "Ver",
     "applied": "Solicitado",
     "title": "Solicitar este puesto",
     "message_label": "Tu mensaje (opcional)",
@@ -397,12 +402,10 @@
     "cv_dropzone_aria": "Haz clic o suelta un archivo para subir el CV",
     "cv_too_large": "El archivo del CV debe ser menor de 5MB",
     "cv_invalid_type": "Solo se admiten archivos PDF, DOC o DOCX",
+    "cv_size_kb": "({{count}} KB)",
     "message_employer": "Mensaje al Empleador",
     "cv_parse_error": "No se pudo analizar el CV. Aún puede enviar su solicitud manualmente.",
-    "cv_size_kb": "({{count}} KB)",
-    "quick_apply": "Solicitud rápida con perfil guardado",
-    "this_job": "este empleo",
-    "view": "Ver"
+    "quick_apply": "Solicitud rápida con perfil guardado"
   },
   "detail": {
     "loading": "Cargando oferta...",
@@ -454,7 +457,7 @@
     "refresh": "Actualizar",
     "message_applicant": "Mensaje",
     "kanban_board": "Tablero Kanban",
-    "cv_download_error": "Failed to download CV"
+    "cv_download_error": "No se pudo descargar el CV"
   },
   "interview": {
     "schedule": "Programar Entrevista",
@@ -464,18 +467,18 @@
     "duration": "Duración",
     "datetime": "Fecha y Hora",
     "location": "Enlace de Reunión / Ubicación",
+    "join_call": "Unirse a la videollamada",
+    "add_to_calendar": "Añadir al calendario",
+    "calendar_google": "Google",
+    "calendar_outlook": "Perspectiva",
+    "calendar_ics": ".ics",
     "send_request": "Enviar Solicitud de Entrevista",
     "accepted": "Entrevista Confirmada",
     "proposed": "Entrevista Solicitada",
     "declined": "Entrevista Rechazada",
     "accept": "Aceptar",
     "decline": "Rechazar",
-    "minutes": "min",
-    "join_call": "Unirse a la videollamada",
-    "add_to_calendar": "Añadir al calendario",
-    "calendar_google": "Google",
-    "calendar_outlook": "Outlook",
-    "calendar_ics": ".ics",
+    "minutes": "mín.",
     "download_ics": "Descargar .ics"
   },
   "offer": {
@@ -519,12 +522,12 @@
     "save": "Guardar Puntuación",
     "saved": "Puntuación guardada",
     "notes_placeholder": "Notas opcionales sobre este candidato...",
+    "max_score_suffix": "/ 10",
     "communication": "Comunicación",
     "technical": "Habilidades Técnicas",
     "cultural_fit": "Afinidad Cultural",
     "experience": "Experiencia",
-    "motivation": "Motivación",
-    "max_score_suffix": "/ 10"
+    "motivation": "Motivación"
   },
   "saved_profile": {
     "found": "Perfil de solicitud guardado encontrado",
@@ -629,6 +632,8 @@
     "salary_transparency_hint": "Requerido por la Directiva de Transparencia Salarial de la UE (junio 2026)",
     "submit_create": "Publicar Oferta",
     "submit_update": "Guardar Cambios",
+    "save_draft": "Guardar como borrador",
+    "draft_saved": "Borrador guardado",
     "cancel": "Cancelar",
     "creating": "Publicando...",
     "updating": "Guardando...",
@@ -642,9 +647,7 @@
       "deadline_past": "La fecha límite debe ser una fecha futura",
       "salary_required": "Se requiere rango salarial. Puede marcar 'Salario negociable' para omitirlo.",
       "salary_range_invalid": "El salario mínimo no puede superar el salario máximo"
-    },
-    "save_draft": "Guardar como borrador",
-    "draft_saved": "Borrador guardado"
+    }
   },
   "ai_generate": {
     "button": "Generar con IA",
@@ -702,10 +705,10 @@
     "spam_flags_label": "Indicadores de Detección",
     "refresh": "Actualizar",
     "loading": "Cargando...",
+    "load_error": "Error al cargar la cola de moderación",
     "cancel": "Cancelar",
     "no_description": "Sin descripción",
     "no_flags": "Sin marcas",
-    "load_error": "Error al cargar la cola de moderación",
     "flags_tooltip": "Marcas: {{flags}}",
     "user_fallback": "Usuario #{{id}}",
     "pagination_label": "Páginas de la cola de moderación"
@@ -782,10 +785,13 @@
     "acceptance_rate": "Tasa de Aceptación",
     "rejection_rate": "Tasa de Rechazo",
     "days": "días",
+    "stages": "etapas",
+    "not_available": "N/D",
     "funnel_title": "Embudo de Solicitudes",
     "funnel_description": "Cómo progresan los candidatos a través de las etapas del pipeline",
     "rejection_rates_title": "Tasas de Rechazo por Etapa",
     "rejection_rates_description": "Porcentaje de candidatos rechazados en cada etapa",
+    "rejection_rates_table_aria": "Tasas de rechazo por etapa de contratación",
     "time_in_stage_title": "Tiempo Medio en Etapa",
     "time_in_stage_description": "Número medio de días que los candidatos pasan en cada etapa del pipeline",
     "skills_match_title": "Correlación de Coincidencia de Habilidades",
@@ -816,12 +822,9 @@
     "generate": "Generar Informe",
     "loading": "Generando informe...",
     "no_data": "No hay datos de solicitudes disponibles para el período seleccionado",
-    "load_error": "No se pudo cargar el informe de auditoría de sesgo",
-    "note_privacy": "Este informe solo analiza métricas de proceso. No se recopilan ni utilizan datos demográficos.",
-    "stages": "etapas",
-    "not_available": "N/D",
     "access_denied": "Acceso denegado",
-    "rejection_rates_table_aria": "Tasas de rechazo por etapa de contratación"
+    "load_error": "No se pudo cargar el informe de auditoría de sesgo",
+    "note_privacy": "Este informe solo analiza métricas de proceso. No se recopilan ni utilizan datos demográficos."
   },
   "self_scheduling": {
     "title": "Horarios de Entrevista",
@@ -999,6 +1002,10 @@
       "title": "Publicar un trabajo",
       "description": "Crea una vacante de empleo, voluntariado o banco de tiempo para tu comunidad."
     },
+    "edit": {
+      "title": "Editar empleo",
+      "description": "Actualiza los detalles de la vacante, la remuneración, la configuración del equipo y las opciones de publicación."
+    },
     "talent_search": {
       "title": "Búsqueda de talento"
     },
@@ -1020,16 +1027,9 @@
     },
     "employer_brand": {
       "title": "Marca del empleador"
-    },
-    "edit": {
-      "title": "Editar empleo",
-      "description": "Actualiza los detalles de la vacante, la remuneración, la configuración del equipo y las opciones de publicación."
     }
   },
-  "page_title": "Ofertas de empleo",
-  "page_description": "Explora oportunidades de trabajo, roles de voluntariado y puestos de banco de tiempo ofrecidos por miembros de la comunidad y organizaciones asociadas cerca de ti.",
   "jobs": {
     "view_details": "Ver detalles del empleo"
-  },
-  "cancel": "Cancelar"
+  }
 }

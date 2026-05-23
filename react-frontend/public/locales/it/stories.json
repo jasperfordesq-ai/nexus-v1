@@ -1,4 +1,7 @@
 {
+  "empty": {
+    "no_stories": "Nessuna storia disponibile"
+  },
   "creator": {
     "title": "Crea storia",
     "close": "Chiudi creazione",
@@ -64,7 +67,10 @@
     "error_image_size": "L'immagine deve essere inferiore a 10MB",
     "error_video_type": "Seleziona un file video",
     "error_video_size": "Il video deve essere inferiore a 50MB",
+    "share_story": "Condividi storia",
     "error_camera": "Impossibile accedere alla fotocamera. Controlla i permessi.",
+    "error_camera_permission": "Accesso alla fotocamera negato. Abilitalo nelle impostazioni del browser.",
+    "error_camera_not_found": "Nessuna fotocamera trovata su questo dispositivo.",
     "error_process": "Elaborazione dell'immagine non riuscita",
     "error_create": "Creazione della storia non riuscita",
     "flip_camera": "Inverti fotocamera",
@@ -92,9 +98,6 @@
     "or_divider": "o",
     "poll_add_option_button": "Aggiungi opzione",
     "videos_trimmed_notice": "I video più lunghi di 60s saranno tagliati a 60s di durata di visualizzazione",
-    "share_story": "Condividi storia",
-    "error_camera_permission": "Accesso alla fotocamera negato. Abilitalo nelle impostazioni del browser.",
-    "error_camera_not_found": "Nessuna fotocamera trovata su questo dispositivo.",
     "video_duration_seconds": "{{count}}s"
   },
   "viewer": {
@@ -129,9 +132,6 @@
     "reply_placeholder_generic": "Rispondi alla storia...",
     "react_with": "Reagisci con {{type}}",
     "viewers_title_count": "Spettatori ({{count}})"
-  },
-  "empty": {
-    "no_stories": "Nessuna storia disponibile"
   },
   "highlights": {
     "no_stories": "Questo highlight non ha storie",

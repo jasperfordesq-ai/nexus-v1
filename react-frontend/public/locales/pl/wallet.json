@@ -3,6 +3,8 @@
   "balance": "Saldo",
   "time_credits": "Kredyty Czasowe",
   "hours": "Godziny",
+  "hours_value": "{{count}}godz",
+  "signed_hours_value": "{{sign}}{{count}}godz",
   "transactions": "Transakcje",
   "pending": "Oczekujące",
   "completed": "Ukończone",
@@ -15,6 +17,7 @@
   "subtitle": "Śledź swoje kredyty czasowe i transakcje",
   "unable_to_load": "Nie można załadować portfela",
   "try_again": "Spróbuj ponownie",
+  "refresh": "Odśwież",
   "your_balance": "Twoje Saldo",
   "pending_in": "+{{count}}h oczekujące",
   "no_pending": "Brak oczekujących transakcji",
@@ -24,6 +27,9 @@
   "load_more": "Załaduj Więcej",
   "no_transactions": "Brak transakcji",
   "no_transactions_desc": "Twoja historia transakcji pojawi się tutaj",
+  "no_filtered_transactions": "Brak pasujących transakcji",
+  "no_filtered_transactions_desc": "Wypróbuj inny filtr, aby zobaczyć więcej aktywności portfela.",
+  "transaction_fallback": "Transakcja portfela",
   "stats": {
     "earned": "Zarobione",
     "spent": "Wydane",
@@ -122,14 +128,20 @@
   },
   "aria": {
     "export_csv": "Eksportuj transakcje do CSV",
-    "loading_transactions": "Ładowanie transakcji",
-    "transaction_detail": "{{direction}} {{amount}} godzin {{name}}",
     "refresh_wallet": "Odśwież dane portfela",
     "send_credits": "Wyślij kredyty czasu",
     "donate_credits": "Przekaż kredyty czasu",
     "loading_balance": "Ładowanie salda portfela",
+    "loading_transactions": "Ładowanie transakcji",
     "load_more_transactions": "Załaduj więcej transakcji",
-    "transaction_filters": "Filtry transakcji"
+    "transaction_filters": "Filtry transakcji",
+    "transaction_detail": "{{direction}} {{amount}} godzin {{name}}"
+  },
+  "validation": {
+    "select_recipient": "Proszę wybrać odbiorcę",
+    "valid_amount": "Proszę wprowadzić prawidłową kwotę",
+    "insufficient_balance": "Niewystarczające saldo",
+    "max_transfer": "Maksymalny transfer to {{max}} godzin"
   },
   "available_balance": "Dostępny bilans",
   "recipient": "Odbiorca",
@@ -143,17 +155,5 @@
   "optional": "opcjonalne",
   "description_placeholder": "Na co jest ten przelew?",
   "new_balance_after": "Twój nowy bilans wyniesie {{balance}} godzin",
-  "transfer_summary": "Zamierzasz wysłać {{amount}} {{unit}} do {{name}}",
-  "validation": {
-    "select_recipient": "Proszę wybrać odbiorcę",
-    "valid_amount": "Proszę wprowadzić prawidłową kwotę",
-    "insufficient_balance": "Niewystarczające saldo",
-    "max_transfer": "Maksymalny transfer to {{max}} godzin"
-  },
-  "hours_value": "{{count}}h",
-  "signed_hours_value": "{{sign}}{{count}}h",
-  "refresh": "Odśwież",
-  "no_filtered_transactions": "Brak pasujących transakcji",
-  "no_filtered_transactions_desc": "Wypróbuj inny filtr, aby zobaczyć więcej aktywności portfela.",
-  "transaction_fallback": "Transakcja portfela"
+  "transfer_summary": "Zamierzasz wysłać {{amount}} {{unit}} do {{name}}"
 }

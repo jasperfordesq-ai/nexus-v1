@@ -91,20 +91,20 @@
     "save": "Salva annuncio"
   },
   "offer": {
-    "modal_title": "Make an Offer",
-    "asking_price": "Asking price:",
-    "your_offer": "Your Offer",
+    "modal_title": "Fai un'offerta",
+    "asking_price": "Prezzo richiesto:",
+    "your_offer": "La tua offerta",
     "amount_placeholder": "0,00",
-    "message_label": "Message (optional)",
-    "message_placeholder": "Add a message for the seller...",
+    "message_label": "Messaggio (facoltativo)",
+    "message_placeholder": "Aggiungi un messaggio per il venditore...",
     "cancel": "Annulla",
-    "send": "Send Offer",
-    "sent_success": "Offer sent successfully!",
-    "sent_error": "Failed to send offer",
+    "send": "Invia offerta",
+    "sent_success": "Offerta inviata con successo!",
+    "sent_error": "Impossibile inviare l'offerta",
     "amount_invalid": "Inserisci un importo di offerta valido",
-    "matches_price": "Matches the listing price",
-    "above_price": "{{percent}}% above the listing price",
-    "below_price": "{{percent}}% below the listing price",
+    "matches_price": "Corrisponde al prezzo di inserzione",
+    "above_price": "{{percent}}% sopra il prezzo di quotazione",
+    "below_price": "{{percent}}% inferiore al prezzo di listino",
     "status": {
       "pending": "In attesa",
       "accepted": "Accettata",
@@ -114,12 +114,12 @@
       "expired": "Scaduta",
       "unknown": "Sconosciuto"
     },
-    "counter_amount": "Counter: {{amount}}",
+    "counter_amount": "Contatore: {{amount}}",
     "accept": "Accetta",
     "decline": "Rifiuta",
     "counter": "Controfferta",
     "withdraw": "Ritira",
-    "accept_counter": "Accept Counter"
+    "accept_counter": "Accetta contatore"
   },
   "create": {
     "page_title": "Vendi qualcosa - Mercato",
@@ -573,7 +573,8 @@
       "declined": "Rifiutata",
       "completed": "Completata",
       "cancelled": "Annullata"
-    }
+    },
+    "offers_title": "Offerte di Consegna"
   },
   "pickup": {
     "my_pickups_title": "I miei ritiri",
@@ -621,7 +622,7 @@
     "radius_option": "{{km}} km",
     "radius_chip": "{{km}} km di raggio",
     "results_count": "{{count}} annunci trovati nelle vicinanze",
-    "refresh": "Refresh",
+    "refresh": "Aggiorna",
     "map_view": "Vista mappa",
     "list_view": "Vista elenco",
     "location_required": "Imposta la tua posizione nel profilo per usare questa funzione",

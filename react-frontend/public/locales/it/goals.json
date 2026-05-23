@@ -1,4 +1,15 @@
 {
+  "detail": {
+    "back_to_goals": "Torna agli obiettivi",
+    "view_all_goals": "Vedi tutti gli obiettivi",
+    "not_found_title": "Obiettivo non trovato",
+    "not_found_description": "Questo obiettivo potrebbe essere stato eliminato o non è mai esistito.",
+    "private_title": "Questo obiettivo è privato",
+    "private_description": "Solo il proprietario dell'obiettivo può visualizzarlo.",
+    "meta_description": "{{owner}} sta seguendo \"{{title}}\" con un avanzamento del {{progress}}% in questo obiettivo della comunità.",
+    "overdue_chip": "In ritardo",
+    "checkin_frequency": "Frequenza di check-in"
+  },
   "checkin_recorded": "Check-in registrato!",
   "checkin_failed": "Impossibile registrare il check-in.",
   "reminder_set_failed": "Impossibile impostare il promemoria.",
@@ -13,15 +24,15 @@
     "history": "Cronologia",
     "no_checkins": "Nessun check-in ancora. Registra il primo!",
     "progress_label": "Progresso",
+    "progress_help": "Imposta questo al progresso reale che desideri visualizzare sull'obiettivo. Registrare un check-in aggiorna la barra dell'obiettivo e la cronologia.",
+    "progress_value": "{{percent}}%",
+    "progress_unknown": "Progresso non registrato",
     "mood_label": "Come ti senti?",
     "note_label": "Nota (opzionale)",
     "note_placeholder": "Come va? Qualche vittoria o difficoltà?",
     "cancel": "Annulla",
     "submit": "Registra Check-in",
-    "check_in_button": "Check-in",
-    "progress_help": "Imposta questo al progresso reale che desideri visualizzare sull'obiettivo. Registrare un check-in aggiorna la barra dell'obiettivo e la cronologia.",
-    "progress_value": "{{percent}}%",
-    "progress_unknown": "Progresso non registrato"
+    "check_in_button": "Check-in"
   },
   "mood": {
     "great": "Ottimo",
@@ -41,11 +52,11 @@
     "reminder_set_success": "Promemoria impostato: {{frequency}}"
   },
   "frequency": {
+    "none": "Nessuna cadenza",
     "daily": "Giornaliero",
     "weekly": "Settimanale",
     "biweekly": "Ogni 2 settimane",
-    "monthly": "Mensile",
-    "none": "Nessuna cadenza"
+    "monthly": "Mensile"
   },
   "template": {
     "title": "Inizia da un Modello",
@@ -73,26 +84,6 @@
       "completed": "Completato",
       "created": "Creato"
     }
-  },
-  "template_picker": {
-    "load_error": "Impossibile caricare i modelli. Per favore riprova.",
-    "try_again": "Riprova",
-    "none_available": "Nessun modello disponibile ancora.",
-    "none_in_category": "Nessun modello in questa categoria."
-  },
-  "detail": {
-    "back_to_goals": "Torna agli obiettivi",
-    "view_all_goals": "Vedi tutti gli obiettivi",
-    "not_found_title": "Obiettivo non trovato",
-    "not_found_description": "Questo obiettivo potrebbe essere stato eliminato o non è mai esistito.",
-    "private_title": "Questo obiettivo è privato",
-    "private_description": "Solo il proprietario dell'obiettivo può visualizzarlo.",
-    "overdue_chip": "In ritardo",
-    "checkin_frequency": "Frequenza di check-in",
-    "meta_description": "{{owner}} sta seguendo \"{{title}}\" con un avanzamento del {{progress}}% in questo obiettivo della comunità."
-  },
-  "goals": {
-    "load_error": "Caricamento obiettivi non riuscito. Riprova."
   },
   "insights": {
     "loading": "Caricamento approfondimenti obiettivo",
@@ -130,5 +121,14 @@
       "celebration": "Celebrazione",
       "note": "Nota"
     }
+  },
+  "template_picker": {
+    "load_error": "Impossibile caricare i modelli. Per favore riprova.",
+    "try_again": "Riprova",
+    "none_available": "Nessun modello disponibile ancora.",
+    "none_in_category": "Nessun modello in questa categoria."
+  },
+  "goals": {
+    "load_error": "Caricamento obiettivi non riuscito. Riprova."
   }
 }

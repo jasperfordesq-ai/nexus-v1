@@ -573,7 +573,8 @@
       "declined": "مرفوض",
       "completed": "مكتمل",
       "cancelled": "ملغى"
-    }
+    },
+    "offers_title": "عروض التوصيل"
   },
   "pickup": {
     "my_pickups_title": "عمليات الاستلام الخاصة بي",
@@ -621,7 +622,7 @@
     "radius_option": "{{km}} كم",
     "radius_chip": "{{km}} كم نطاق",
     "results_count": "{{count}} قوائم وجدت بالقرب",
-    "refresh": "Refresh",
+    "refresh": "ينعش",
     "map_view": "عرض الخريطة",
     "list_view": "عرض القائمة",
     "location_required": "حدد موقعك في ملفك الشخصي لاستخدام هذه الميزة",

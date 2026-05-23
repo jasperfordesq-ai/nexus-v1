@@ -3,6 +3,8 @@
   "balance": "Saldo",
   "time_credits": "Créditos de Tiempo",
   "hours": "Horas",
+  "hours_value": "{{count}}h",
+  "signed_hours_value": "{{sign}}{{count}}h",
   "transactions": "Transacciones",
   "pending": "Pendiente",
   "completed": "Completado",
@@ -15,6 +17,7 @@
   "subtitle": "Rastrea tus créditos de tiempo y transacciones",
   "unable_to_load": "No se Pudo Cargar la Billetera",
   "try_again": "Intentar de Nuevo",
+  "refresh": "Actualizar",
   "your_balance": "Tu Saldo",
   "pending_in": "+{{count}}h pendientes",
   "no_pending": "Sin transacciones pendientes",
@@ -24,6 +27,9 @@
   "load_more": "Cargar Más",
   "no_transactions": "Sin transacciones",
   "no_transactions_desc": "Tu historial de transacciones aparecerá aquí",
+  "no_filtered_transactions": "No hay transacciones coincidentes",
+  "no_filtered_transactions_desc": "Prueba con otro filtro para ver más actividad de la cartera.",
+  "transaction_fallback": "Transacción de cartera",
   "stats": {
     "earned": "Ganado",
     "spent": "Gastado",
@@ -122,14 +128,20 @@
   },
   "aria": {
     "export_csv": "Exportar transacciones a CSV",
-    "loading_transactions": "Cargando transacciones",
-    "transaction_detail": "{{direction}} {{amount}} horas {{name}}",
     "refresh_wallet": "Actualizar datos de la cartera",
     "send_credits": "Enviar créditos de tiempo",
     "donate_credits": "Donar créditos de tiempo",
     "loading_balance": "Cargando saldo de la cartera",
+    "loading_transactions": "Cargando transacciones",
     "load_more_transactions": "Cargar más transacciones",
-    "transaction_filters": "Filtros de transacciones"
+    "transaction_filters": "Filtros de transacciones",
+    "transaction_detail": "{{direction}} {{amount}} horas {{name}}"
+  },
+  "validation": {
+    "select_recipient": "Por favor, selecciona un destinatario",
+    "valid_amount": "Por favor, introduce una cantidad válida",
+    "insufficient_balance": "Saldo insuficiente",
+    "max_transfer": "La transferencia máxima es {{max}} horas"
   },
   "available_balance": "Saldo disponible",
   "recipient": "Destinatario",
@@ -143,17 +155,5 @@
   "optional": "opcional",
   "description_placeholder": "¿Para qué es esta transferencia?",
   "new_balance_after": "Tu nuevo saldo será de {{balance}} horas",
-  "transfer_summary": "Estás a punto de enviar {{amount}} {{unit}} a {{name}}",
-  "validation": {
-    "select_recipient": "Por favor, selecciona un destinatario",
-    "valid_amount": "Por favor, introduce una cantidad válida",
-    "insufficient_balance": "Saldo insuficiente",
-    "max_transfer": "La transferencia máxima es {{max}} horas"
-  },
-  "hours_value": "{{count}}h",
-  "signed_hours_value": "{{sign}}{{count}}h",
-  "refresh": "Actualizar",
-  "no_filtered_transactions": "No hay transacciones coincidentes",
-  "no_filtered_transactions_desc": "Prueba con otro filtro para ver más actividad de la cartera.",
-  "transaction_fallback": "Transacción de cartera"
+  "transfer_summary": "Estás a punto de enviar {{amount}} {{unit}} a {{name}}"
 }

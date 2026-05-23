@@ -7,8 +7,8 @@
     "last_updated": "Ostatnia aktualizacja: luty 2026",
     "nav_time_credits": "Kredyty Czasowe",
     "nav_community_rules": "Zasady Społeczności",
-    "nav_prohibited": "Prohibited",
-    "nav_liability": "Liability",
+    "nav_prohibited": "Zabroniony",
+    "nav_liability": "Obciążenie",
     "welcome_title": "Witamy w {{name}}",
     "welcome_body_1": "Korzystając z naszej platformy, zgadzasz się na przestrzeganie tych Warunków korzystania z usługi. Prosimy o ich uważne przeczytanie przed przystąpieniem do naszej społeczności.",
     "welcome_body_2_before": "Te warunki ustanawiają ramy dla",
@@ -19,7 +19,7 @@
     "section1_intro_emphasis": "czas każdego jest równy",
     "one_hour_service": "1 godzina usługi",
     "one_time_credit": "1 Kredyt Czasowy",
-    "important": "Important",
+    "important": "Ważny",
     "credits_no_monetary_value": "Kredyty Czasowe nie mają wartości pieniężnej i nie mogą być wymieniane na gotówkę. Istnieją wyłącznie w celu ułatwienia wymian w społeczności.",
     "credit_rule_1": "Jedna godzina świadczonej usługi równa się jednemu zdobytemu Kredytowi Czasowemu",
     "credit_rule_2": "Kredyty mogą być używane do otrzymywania usług od innych członków",
@@ -57,7 +57,7 @@
     "prohibited_fraud": "Oszuńcze wymiany",
     "prohibited_illegal": "Nielegalne usługi lub działania",
     "prohibited_spam": "Spam lub namawianie",
-    "prohibited_impersonation": "Impersonation",
+    "prohibited_impersonation": "Personifikacja",
     "prohibited_sharing_private": "Udostępnianie prywatnych informacji innych osób",
     "section5_title": "Bezpieczeństwo i spotkania",
     "section5_intro": "Twoje bezpieczeństwo jest ważne. Zalecamy przestrzeganie tych zasad:",
@@ -105,12 +105,12 @@
     "nav_data_collection": "Zbieranie Danych",
     "nav_data_usage": "Jak Używamy Danych",
     "nav_your_rights": "Twoje Prawa",
-    "nav_cookies": "Cookies",
+    "nav_cookies": "Ciastka",
     "commitment_title": "Nasze Zobowiązanie do Twojej Prywatności",
     "commitment_body_1": "{{name}} zobowiązuje się do ochrony Twojej prywatności i zapewnienia, że Twoje dane osobowe są przetwarzane odpowiedzialnie. Ta polityka wyjaśnia, jakie informacje zbieramy, dlaczego je zbieramy i jak możesz zarządzać swoimi danymi.",
     "commitment_body_2_before": "Wierzymy w",
-    "commitment_body_2_transparency": "transparency",
-    "commitment_body_2_and": "and",
+    "commitment_body_2_transparency": "przezroczystość",
+    "commitment_body_2_and": "I",
     "commitment_body_2_control": "kontrolę użytkownika",
     "commitment_body_2_after": "Masz prawo rozumieć i zarządzać tym, jak Twoje informacje są wykorzystywane.",
     "data_collection_title": "Informacje, które Zbieramy",
@@ -118,15 +118,15 @@
     "data_account_type": "Informacje o Koncie",
     "data_account_collected": "Imię, adres e-mail, hasło (szyfrowane)",
     "data_account_why": "Wymagane do utworzenia i zarządzania Twoim kontem",
-    "data_account_basis": "Contract",
+    "data_account_basis": "Umowa",
     "data_profile_type": "Szczegóły Profilu",
     "data_profile_collected": "Biografia, umiejętności, lokalizacja, zdjęcie profilowe",
     "data_profile_why": "Pomaga połączyć Cię z członkami społeczności",
-    "data_profile_basis": "Consent",
+    "data_profile_basis": "Zgoda",
     "data_activity_type": "Dane Aktywności",
     "data_activity_collected": "Wymiany, wiadomości, transakcje kredytów czasowych",
     "data_activity_why": "Niezbędne do funkcjonalności platformy",
-    "data_activity_basis": "Contract",
+    "data_activity_basis": "Umowa",
     "data_device_type": "Informacje o Urządzeniu",
     "data_device_collected": "Typ przeglądarki, adres IP, typ urządzenia",
     "data_device_why": "Monitorowanie bezpieczeństwa i rozwiązywanie problemów",
@@ -139,11 +139,11 @@
     "data_usage_intro": "Twoje dane są wykorzystywane wyłącznie w następujących celach:",
     "usage_delivery_label": "Świadczenie usług",
     "usage_delivery_desc": "Ułatwianie wymiany czasu i połączeń w społeczności",
-    "usage_communication_label": "Communication",
+    "usage_communication_label": "Komunikacja",
     "usage_communication_desc": "Wysyłanie ważnych aktualizacji, powiadomień i wiadomości od innych członków",
-    "usage_security_label": "Security",
+    "usage_security_label": "Bezpieczeństwo",
     "usage_security_desc": "Ochrona Twojego konta i zapobieganie oszustwom lub nadużyciom",
-    "usage_improvement_label": "Improvement",
+    "usage_improvement_label": "Poprawa",
     "usage_improvement_desc": "Analizowanie wzorców użytkowania w celu ulepszania funkcji platformy",
     "usage_legal_label": "Zgodność z przepisami prawa",
     "usage_legal_desc": "Spełnianie wymogów regulacyjnych, gdy jest to konieczne",
@@ -155,7 +155,7 @@
     "visibility_body_2_after": "Niektóre informacje, takie jak Twoje imię i ogólna lokalizacja, są wymagane do znaczącego uczestnictwa w społeczności.",
     "protection_title": "Jak chronimy Twoje dane",
     "protection_intro": "Wprowadzamy solidne środki bezpieczeństwa, aby chronić Twoje informacje:",
-    "protect_encryption_label": "Encryption",
+    "protect_encryption_label": "Szyfrowanie",
     "protect_encryption_desc": "Wszystkie dane szyfrowane w tranzycie (HTTPS) i w spoczynku",
     "protect_passwords_label": "Bezpieczne hasła",
     "protect_passwords_desc": "Hasła haszowane przy użyciu standardowych algorytmów branżowych",
@@ -188,9 +188,9 @@
     "cookie_preference_desc": "Zapamiętują Twoje ustawienia, takie jak preferencje dotyczące motywu, języka i opcji wyświetlania.",
     "cookie_analytics_name": "Ciasteczka analityczne",
     "cookie_analytics_desc": "Pomagają nam zrozumieć, jak ludzie korzystają z platformy, abyśmy mogli poprawić funkcje. Wszystkie dane są anonimizowane.",
-    "cookie_required": "Required",
+    "cookie_required": "Wymagany",
     "cookies_no_ads_before": "Nie robimy",
-    "cookies_no_ads_not": "not",
+    "cookies_no_ads_not": "nie",
     "cookies_no_ads_after": "używamy ciasteczek reklamowych ani nie dzielimy się danymi z sieciami reklamowymi. Możesz zarządzać preferencjami ciasteczek w ustawieniach przeglądarki. Aby uzyskać więcej informacji, zobacz naszą",
     "cookie_policy_link": "Politykę Ciasteczek",
     "retention_title": "Przechowywanie danych",
@@ -214,7 +214,7 @@
     "subtitle": "Jak używamy plików cookie i podobnych technologii na naszej platformie",
     "last_updated": "Ostatnia aktualizacja: luty 2026",
     "nav_what_are": "Czym są pliki cookie",
-    "nav_categories": "Categories",
+    "nav_categories": "Kategorie",
     "nav_cookie_list": "Lista plików cookie",
     "nav_manage": "Zarządzaj plikami cookie",
     "what_are_title": "Czym są pliki cookie?",
@@ -222,7 +222,7 @@
     "what_are_body_2": "{{name}} używa plików cookie i podobnych technologii, aby zapewnić Ci najlepsze doświadczenia na naszej platformie. Ta polityka wyjaśnia, które pliki cookie używamy, dlaczego je stosujemy i jak możesz je kontrolować.",
     "categories_title": "Kategorie plików cookie",
     "always_active": "Zawsze aktywne",
-    "optional": "Optional",
+    "optional": "Fakultatywny",
     "cat_essential_name": "Niezbędne pliki cookie",
     "cat_essential_desc": "Te pliki cookie są ściśle niezbędne do działania platformy. Umożliwiają podstawowe funkcje, takie jak uwierzytelnianie, bezpieczeństwo i zarządzanie sesjami. Bez tych plików cookie platforma nie może działać prawidłowo.",
     "cat_essential_ex1": "Uwierzytelnianie użytkowników i tokeny sesji",
@@ -243,14 +243,14 @@
     "cat_preference_ex4": "Preferencje powiadomień",
     "no_marketing": "Nie używamy ciasteczek marketingowych ani reklamowych. Nigdy nie dzielimy się Twoimi danymi z reklamodawcami ani sieciami reklamowymi.",
     "list_title": "Ciasteczka, które używamy",
-    "provider_label": "Provider",
-    "expiry_label": "Expiry",
-    "provider_platform": "Platform",
-    "provider_sentry": "Sentry",
-    "type_essential": "Essential",
-    "type_preference": "Preference",
-    "type_analytics": "Analytics",
-    "expiry_session": "Session",
+    "provider_label": "Dostawca",
+    "expiry_label": "Wygaśnięcie",
+    "provider_platform": "Platforma",
+    "provider_sentry": "Wartownik",
+    "type_essential": "Niezbędny",
+    "type_preference": "Pierwszeństwo",
+    "type_analytics": "Analityka",
+    "expiry_session": "Sesja",
     "expiry_7_days": "7 dni",
     "expiry_30_days": "30 dni",
     "expiry_1_year": "1 rok",
@@ -266,9 +266,9 @@
     "cookie_sentry_purpose": "Śledzenie błędów i monitorowanie wydajności (tylko za zgodą na analitykę)",
     "third_party_title": "Ciasteczka stron trzecich",
     "third_party_intro": "W niektórych przypadkach korzystamy z usług stron trzecich, które mogą ustawiać własne ciasteczka. Usługi te obejmują:",
-    "third_party_sentry_label": "Sentry",
+    "third_party_sentry_label": "Wartownik",
     "third_party_sentry_desc": "Śledzenie błędów i monitorowanie wydajności (aktywne tylko za zgodą na analitykę)",
-    "third_party_pusher_label": "Pusher",
+    "third_party_pusher_label": "Popychacz",
     "third_party_pusher_desc": "Do powiadomień w czasie rzeczywistym i funkcjonalności wiadomości",
     "third_party_compliance": "Starannie wybieramy naszych partnerów zewnętrznych i zapewniamy, że przestrzegają obowiązujących przepisów o ochronie danych. Ciasteczka stron trzecich są regulowane przez politykę prywatności odpowiedniej strony trzeciej.",
     "manage_title": "Jak zarządzać ciasteczkami",
@@ -276,13 +276,13 @@
     "manage_warning": "Wyłączenie niezbędnych plików cookie uniemożliwi Ci logowanie się i korzystanie z podstawowych funkcji platformy. Zalecamy pozostawienie włączonych niezbędnych plików cookie.",
     "browser_settings_title": "Ustawienia plików cookie przeglądarki",
     "browser_settings_intro": "Większość przeglądarek internetowych pozwala zarządzać plikami cookie poprzez swoje ustawienia. Oto gdzie znaleźć ustawienia plików cookie w popularnych przeglądarkach:",
-    "browser_chrome": "Chrome",
+    "browser_chrome": "Chrom",
     "browser_chrome_path": "Ustawienia > Prywatność i bezpieczeństwo > Pliki cookie i inne dane witryn",
-    "browser_firefox": "Firefox",
+    "browser_firefox": "Firefoksa",
     "browser_firefox_path": "Ustawienia > Prywatność i bezpieczeństwo > Pliki cookie i dane witryn",
     "browser_safari": "Safari",
     "browser_safari_path": "Preferencje > Prywatność > Zarządzaj danymi witryn",
-    "browser_edge": "Edge",
+    "browser_edge": "Krawędź",
     "browser_edge_path": "Ustawienia > Pliki cookie i uprawnienia witryn > Pliki cookie i dane witryn",
     "cta_title": "Pytania dotyczące plików cookie?",
     "cta_body": "Jeśli masz jakiekolwiek pytania dotyczące naszego użycia plików cookie lub tej polityki, nie wahaj się z nami skontaktować.",
@@ -291,7 +291,7 @@
   },
   "accessibility": {
     "meta_description": "Nasze zobowiązanie do uczynienia platformy dostępną dla wszystkich, zgodnie z normami WCAG 2.1 AA.",
-    "page_title": "Accessibility",
+    "page_title": "Dostępność",
     "heading": "Oświadczenie o dostępności",
     "subtitle": "{{name}} zobowiązuje się do zapewnienia dostępności cyfrowej dla osób o różnych umiejętnościach.",
     "commitment_title": "Nasze zobowiązanie",
@@ -315,13 +315,13 @@
     "standard_aria": "WAI-ARIA 1.2 dla interaktywnych komponentów",
     "standard_508": "Zgodność z sekcją 508",
     "standard_en301549": "EN 301 549 (europejski standard dostępności)",
-    "feedback_title": "Feedback",
+    "feedback_title": "Informacja zwrotna",
     "feedback_intro": "Cenimy Twoje opinie na temat dostępności {{name}}. Daj nam znać, jeśli napotkasz bariery dostępności:",
-    "feedback_email_label": "Email",
+    "feedback_email_label": "E-mail",
     "feedback_email_desc": "Użyj naszego formularza kontaktowego, aby zgłosić problemy",
-    "feedback_response_label": "Response",
+    "feedback_response_label": "Odpowiedź",
     "feedback_response_desc": "Staramy się odpowiedzieć na opinie dotyczące dostępności w ciągu 5 dni roboczych",
-    "feedback_updates_label": "Updates",
+    "feedback_updates_label": "Aktualizacje",
     "feedback_updates_desc": "Powiadomimy Cię o postępach w rozwiązywaniu problemu",
     "report_issue": "Zgłoś problem",
     "help_center": "Centrum pomocy",
@@ -337,7 +337,7 @@
     "last_updated": "To oświadczenie zostało ostatnio zaktualizowane w lutym 2026 roku."
   },
   "hub": {
-    "page_title": "Legal",
+    "page_title": "Prawny",
     "heading": "Prawo i zgodność",
     "subtitle": "Przejrzystość i zaufanie są podstawą wszystkiego, co robimy. Tutaj znajdziesz wszystkie nasze dokumenty prawne i polityki.",
     "commitment_title": "Nasze zobowiązanie do przejrzystości",
@@ -352,7 +352,7 @@
     "doc_cookies_title": "Polityka plików cookie",
     "doc_cookies_desc": "Szczegóły dotyczące plików cookie, które używamy, dlaczego je stosujemy i jak możesz zarządzać swoimi preferencjami dotyczącymi plików cookie.",
     "doc_accessibility_title": "Oświadczenie o dostępności",
-    "doc_accessibility_desc": "Our commitment to making the platform accessible to everyone, including our progress toward WCAG 2.1 AA conformance.",
+    "doc_accessibility_desc": "Nasze zaangażowanie w udostępnienie platformy każdemu, w tym nasze postępy w kierunku zgodności z WCAG 2.1 AA.",
     "doc_community_guidelines_title": "Wytyczne społeczności",
     "doc_community_guidelines_desc": "Standardy i oczekiwania dotyczące szacunkowego, konstruktywnego uczestnictwa w naszej społeczności.",
     "doc_acceptable_use_title": "Polityka akceptowalnego użytkowania",
@@ -363,27 +363,27 @@
     "cta_body": "Jeśli masz jakiekolwiek pytania dotyczące naszych dokumentów prawnych, praktyk dotyczących danych lub chcesz skorzystać ze swoich praw wynikających z RODO, skontaktuj się z nami.",
     "contact_team": "Skontaktuj się z naszym zespołem",
     "privacy_policy_link": "Polityka prywatności",
-    "doc_trust_safety_title": "Trust & Safety",
-    "doc_trust_safety_desc": "Plain-English guide to how exchanges work, what we do to keep the community safe, what we don’t, and how to report a safeguarding concern.",
-    "platform_section_title": "Platform Provider Legal",
-    "platform_section_desc": "These documents govern the Project NEXUS platform infrastructure and are separate from your community's policies.",
-    "platform_terms": "Platform Terms",
-    "platform_privacy": "Platform Privacy",
-    "platform_disclaimer": "Disclaimer"
+    "doc_trust_safety_title": "Zaufanie i bezpieczeństwo",
+    "doc_trust_safety_desc": "Prosty przewodnik po angielsku o tym, jak działają giełdy, co robimy, aby zapewnić bezpieczeństwo społeczności, a czego nie i jak zgłaszać obawy dotyczące bezpieczeństwa.",
+    "platform_section_title": "Dostawca platformy Informacje prawne",
+    "platform_section_desc": "Dokumenty te regulują infrastrukturę platformy Project NEXUS i są niezależne od zasad obowiązujących w Twojej społeczności.",
+    "platform_terms": "Warunki platformy",
+    "platform_privacy": "Prywatność platformy",
+    "platform_disclaimer": "Zastrzeżenie"
   },
   "version_history": {
     "page_title": "Historia wersji",
     "heading": "Historia wersji",
     "not_found": "Typ dokumentu nie został znaleziony.",
     "back_to": "Powrót do {{title}}",
-    "document": "document",
+    "document": "dokument",
     "subtitle_with_title": "Poprzednie wersje \"{{title}}\"",
     "subtitle_generic": "Poprzednie wersje tego dokumentu",
     "no_versions": "Nie znaleziono opublikowanych wersji tego dokumentu.",
     "view_current": "Zobacz aktualny dokument",
     "version_number": "Wersja {{number}}",
-    "current": "Current",
-    "original": "Original",
+    "current": "Aktualny",
+    "original": "Oryginalny",
     "effective": "Ważne od {{date}}",
     "summary_of_changes": "Podsumowanie zmian",
     "back_to_current": "Powrót do aktualnego {{title}}",
@@ -401,7 +401,7 @@
     "provider_notice_title": "Informacja dla dostawcy platformy",
     "provider_notice_body": "Ten dokument reguluje relacje między Tobą a Project NEXUS (dostawcą platformy). Jest oddzielny od jakichkolwiek warunków ustalonych przez {{tenant}} (Twojego operatora społecznościowego).",
     "view_tenant_legal": "Zobacz dokumenty prawne {{tenant}}",
-    "contents": "Contents",
+    "contents": "Zawartość",
     "related_documents": "Powiązane dokumenty platformy",
     "cta_title": "Masz pytania dotyczące tego dokumentu?",
     "cta_body": "Jeśli masz pytania dotyczące tego dokumentu na poziomie platformy, skontaktuj się z zespołem Project NEXUS. W przypadku pytań dotyczących polityki Twojej społeczności, skontaktuj się bezpośrednio z {{tenant}}.",
@@ -475,8 +475,8 @@
     "type_accessibility": "Oświadczenie o dostępności",
     "type_community_guidelines": "Zasady społeczności",
     "type_acceptable_use": "Polityka akceptowalnego użytkowania",
-    "updated": "Updated",
-    "read": "Read",
+    "updated": "Zaktualizowano",
+    "read": "Czytać",
     "consent_text": "Klikając Akceptuj, potwierdzasz, że przeczytałeś i zgadzasz się z dokumentami wymienionymi powyżej.",
     "accept_aria": "Akceptuj wszystkie zaktualizowane dokumenty prawne i kontynuuj",
     "accepting": "Akceptowanie…",
@@ -484,134 +484,18 @@
   },
   "custom": {
     "effective_label": "Ważne: {{date}}",
-    "contents": "Contents",
+    "contents": "Zawartość",
     "view_previous_versions": "Zobacz poprzednie wersje tego dokumentu",
     "cta_title": "Masz pytania?",
     "cta_body": "Jeśli masz jakiekolwiek pytania dotyczące tego dokumentu, skontaktuj się z nami.",
     "contact_us": "Skontaktuj się z nami"
   },
   "fadp": {
-    "fadp_banner_title": "Swiss Data Protection (nDSG)",
-    "fadp_banner_body": "Under the Swiss Federal Act on Data Protection, we need your explicit consent before using AI-powered features like smart matching and personalisation.",
-    "fadp_accept": "Accept AI features",
-    "fadp_decline": "Use basic features only",
-    "fadp_learn_more": "Learn more about your rights"
-  },
-  "page_meta": {
-    "platform_terms": {
-      "title": "Warunki korzystania z platformy",
-      "description": "Warunki korzystania regulujące korzystanie z platformy czasowej NEXUS."
-    },
-    "platform_privacy": {
-      "title": "Polityka prywatności platformy",
-      "description": "Jak platforma NEXUS zbiera, przetwarza i chroni Twoje dane osobowe."
-    },
-    "platform_disclaimer": {
-      "title": "Zrzeczenie się odpowiedzialności platformy",
-      "description": "Wažne zrzeczenia dotyczące korzystania z platformy czasowej NEXUS."
-    },
-    "community_guidelines": {
-      "title": "Zasady społeczności",
-      "description": "Zasady społeczności dotyczące szacunku i produktywnego korzystania z czasowego bankowania."
-    },
-    "acceptable_use": {
-      "title": "Polityka akceptowalnego użytkowania",
-      "description": "Polityka akceptowalnego użytkowania naszej platformy czasowego bankowania społeczności."
-    },
-    "legal_hub": {
-      "title": "Informacje prawne",
-      "description": "Dokumenty prawne, polityki i informacje o zgodności."
-    },
-    "legal_version_history": {
-      "title": "Historia wersji prawnych",
-      "description": "Historia wersji naszych dokumentów prawnych i polityk."
-    },
-    "trust_safety": {
-      "title": "Trust & Safety",
-      "description": "How exchanges work on {{name}}, what we do to keep the community safe, what we don’t do, and how to report a concern. Plain-English trust and safeguarding."
-    }
-  },
-  "trust_safety": {
-    "page_title": "Trust & Safety",
-    "meta_description": "How exchanges work on {{name}}, what we do to keep the community safe, what we don’t do, and how to report a concern. Plain-English trust and safeguarding.",
-    "heading": "Trust & Safety",
-    "subtitle": "{{name}} connects neighbours so they can share skills using time credits. This page explains how that works in practice — what the platform does, what it doesn’t, and how you can stay safe.",
-    "safeguarding_title": "Report a safeguarding concern",
-    "safeguarding_body": "If you’re worried about a member, an exchange, or something you’ve seen on the platform, please tell us. We respond to safeguarding reports within one working day.",
-    "safeguarding_step_1": "Use the Report button on the relevant listing, message, or profile.",
-    "safeguarding_step_2": "Or email us via the Contact page — mark the subject as “Safeguarding”.",
-    "safeguarding_step_3": "If anyone is in immediate danger, contact An Garda Síochána on 999 or 112 first.",
-    "how_exchanges_title": "How an exchange works",
-    "how_exchanges_intro": "Every exchange follows the same simple flow. There is no money involved — just time credits.",
-    "how_exchanges_steps": {
-      "0": "Find a member offering what you need, or post a request describing what you’re looking for.",
-      "1": "Message them through the platform to agree the details — time, place, and what’s involved.",
-      "2": "Complete the exchange. You only meet in person if you both want to.",
-      "3": "Log the hours. Both members confirm — that’s the receipt.",
-      "4": "Time credits transfer automatically. One hour of help = one time credit, no matter what skill was shared."
-    },
-    "what_we_do_title": "What the platform does",
-    "what_we_do_items": {
-      "0": "Verifies every member’s email address at registration; offers optional photo-ID verification with a Verified Member badge for those who want extra trust signals.",
-      "1": "Shows reviews and ratings on member profiles so the community can see who’s been a reliable exchange partner.",
-      "2": "Asks every member to accept our Community Guidelines and Acceptable Use Policy at signup, and to keep to them while they’re here.",
-      "3": "Gives every listing, message, and profile a Report button that goes straight to coordinators.",
-      "4": "Has human coordinators who can mediate, support, and step in when something goes wrong.",
-      "5": "Connects with other timebanks across Ireland and Europe through federation, so reputation travels with you."
-    },
-    "what_we_dont_title": "What the platform doesn’t do",
-    "what_we_dont_intro": "Timebanking is built on neighbours helping neighbours, not on us standing between you. That’s a feature, not a bug — but it does mean we need to be clear about our limits.",
-    "what_we_dont_items": {
-      "0": "We don’t vet, train, or certify members for specific services. We’re not a recruitment agency.",
-      "1": "We don’t provide insurance coverage for the work members do for each other.",
-      "2": "We don’t supervise exchanges or act as anyone’s employer or service provider.",
-      "3": "We don’t guarantee any specific outcome, level of skill, or punctuality. Reviews are how the community keeps itself accountable."
-    },
-    "precautions_title": "Sensible precautions for a first exchange",
-    "precautions_intro": "You’d apply the same common sense here as you would meeting anyone new through a community group.",
-    "precautions_items": {
-      "0": "Meet in a public place the first time, or bring a friend if you’re inviting someone to your home.",
-      "1": "Read the other member’s reviews and check how long they’ve been on the platform.",
-      "2": "For services involving children, vulnerable adults, or work inside your home, ask about Garda vetting before agreeing.",
-      "3": "Trust your instincts. You can say no, end an exchange, or report a concern at any time."
-    },
-    "vetting_title": "Background checks and vetting",
-    "vetting_body": "Some exchanges — for example childcare, elderly care, or support for vulnerable adults — may legally require a background check or vetting under local law (such as Garda vetting in Ireland, an enhanced DBS check in the UK, or equivalent schemes elsewhere). Members offering these kinds of services are responsible for holding current, valid vetting where their jurisdiction requires it, and you’re entitled to ask to see it before you agree to an exchange. The platform doesn’t hold vetting on members’ behalf and doesn’t verify it.",
-    "insurance_title": "Insurance and liability",
-    "insurance_items": {
-      "0": "{{name}} does not provide insurance for exchanges between members. The platform is a connection service — it does not insure, indemnify, or underwrite the work members do for each other.",
-      "1": "Members are NOT covered by any platform insurance for the work they do for each other. Exchanges are entirely between members and at members’ own risk. See our Terms of Service for the full liability and indemnity position.",
-      "2": "If you offer professional services (plumbing, electrical, healthcare, legal, financial advice), you’re responsible for your own professional indemnity insurance and any regulatory obligations that apply.",
-      "3": "Time credits have no monetary value. They can’t be exchanged for cash, sold, or used outside the timebanking community."
-    },
-    "disputes_title": "When something goes wrong",
-    "disputes_intro": "Most disagreements can be sorted out between members. If they can’t, we’ll help.",
-    "disputes_steps": {
-      "0": "Try first to resolve it directly through messages — most misunderstandings are just that.",
-      "1": "If that doesn’t work, contact a coordinator via the Contact page. Coordinators can mediate.",
-      "2": "If a member breaches our Community Guidelines, we take action — warnings, mediation, suspension, or removal, depending on severity.",
-      "3": "Time-credit disputes (hours logged in error, etc.) are reviewed by an admin who can adjust balances on either side."
-    },
-    "responsibilities_title": "Your responsibilities as a member",
-    "responsibilities_intro": "By using {{name}} you agree to:",
-    "responsibilities_items": {
-      "0": "Treat other members with respect (Community Guidelines).",
-      "1": "Be honest about your skills, qualifications, and limitations.",
-      "2": "Show up when you commit, or cancel with reasonable notice.",
-      "3": "Log hours fairly — for the time actually given.",
-      "4": "Use the platform only for community time exchanges, not paid work, sales solicitation, or anything illegal (Acceptable Use Policy)."
-    },
-    "rights_title": "Your rights",
-    "rights_items": {
-      "0": "Leave at any time and request your data be deleted (GDPR).",
-      "1": "Block other members so they can’t contact you.",
-      "2": "Make your profile invisible to search or browsing.",
-      "3": "Opt out of all optional cookies, analytics, and email notifications."
-    },
-    "contact_cta_title": "Have a question we haven’t answered?",
-    "contact_cta_body": "Get in touch and a coordinator will get back to you. Most messages are answered within one working day.",
-    "contact_cta_button": "Contact us",
-    "community_guidelines_link": "Read the Community Guidelines"
+    "fadp_banner_title": "Szwajcarska ochrona danych (nDSG)",
+    "fadp_banner_body": "Zgodnie ze szwajcarską federalną ustawą o ochronie danych potrzebujemy Twojej wyraźnej zgody przed użyciem funkcji opartych na sztucznej inteligencji, takich jak inteligentne dopasowywanie i personalizacja.",
+    "fadp_accept": "Zaakceptuj funkcje AI",
+    "fadp_decline": "Używaj tylko podstawowych funkcji",
+    "fadp_learn_more": "Dowiedz się więcej o swoich prawach"
   },
   "community_guidelines": {
     "default_community_name": "ta społeczność",
@@ -791,5 +675,121 @@
         "body": "Możemy aktualizować tę politykę wraz z rozwojem platformy i zmianami otoczenia regulacyjnego. Istotne zmiany będą ogłaszane i odnotowywane w historii wersji dokumentów prawnych."
       }
     }
+  },
+  "page_meta": {
+    "platform_terms": {
+      "title": "Warunki korzystania z platformy",
+      "description": "Warunki korzystania regulujące korzystanie z platformy czasowej NEXUS."
+    },
+    "platform_privacy": {
+      "title": "Polityka prywatności platformy",
+      "description": "Jak platforma NEXUS zbiera, przetwarza i chroni Twoje dane osobowe."
+    },
+    "platform_disclaimer": {
+      "title": "Zrzeczenie się odpowiedzialności platformy",
+      "description": "Wažne zrzeczenia dotyczące korzystania z platformy czasowej NEXUS."
+    },
+    "community_guidelines": {
+      "title": "Zasady społeczności",
+      "description": "Zasady społeczności dotyczące szacunku i produktywnego korzystania z czasowego bankowania."
+    },
+    "acceptable_use": {
+      "title": "Polityka akceptowalnego użytkowania",
+      "description": "Polityka akceptowalnego użytkowania naszej platformy czasowego bankowania społeczności."
+    },
+    "legal_hub": {
+      "title": "Informacje prawne",
+      "description": "Dokumenty prawne, polityki i informacje o zgodności."
+    },
+    "legal_version_history": {
+      "title": "Historia wersji prawnych",
+      "description": "Historia wersji naszych dokumentów prawnych i polityk."
+    },
+    "trust_safety": {
+      "title": "Zaufanie i bezpieczeństwo",
+      "description": "Jak działają giełdy na {{name}}, co robimy, aby zapewnić bezpieczeństwo społeczności, czego nie robimy i jak zgłosić problem. Prosto angielskie zaufanie i ochrona."
+    }
+  },
+  "trust_safety": {
+    "page_title": "Zaufanie i bezpieczeństwo",
+    "meta_description": "Jak działają giełdy na {{name}}, co robimy, aby zapewnić bezpieczeństwo społeczności, czego nie robimy i jak zgłosić problem. Prosto angielskie zaufanie i ochrona.",
+    "heading": "Zaufanie i bezpieczeństwo",
+    "subtitle": "{{name}} łączy sąsiadów, dzięki czemu mogą dzielić się umiejętnościami za pomocą kredytów czasowych. Na tej stronie wyjaśniono, jak to działa w praktyce — co platforma robi, a czego nie i jak możesz zachować bezpieczeństwo.",
+    "safeguarding_title": "Zgłoś problem dotyczący bezpieczeństwa",
+    "safeguarding_body": "Jeśli martwisz się o członka, giełdę lub coś, co widziałeś na platformie, powiedz nam. Na zgłoszenia zabezpieczające odpowiadamy w ciągu jednego dnia roboczego.",
+    "safeguarding_step_1": "Użyj przycisku Zgłoś w odpowiednim wpisie, wiadomości lub profilu.",
+    "safeguarding_step_2": "Lub napisz do nas e-mail za pośrednictwem strony Kontakt — zaznacz temat jako „Ochrona”.",
+    "safeguarding_step_3": "If anyone is in immediate danger, contact An Garda Síochána on 999 or 112 first.",
+    "how_exchanges_title": "Jak działa wymiana",
+    "how_exchanges_intro": "Każda wymiana odbywa się według tego samego prostego schematu. Nie są tu zaangażowane żadne pieniądze – wystarczą kredyty czasowe.",
+    "how_exchanges_steps": {
+      "0": "Znajdź członka oferującego to, czego potrzebujesz, lub opublikuj prośbę opisującą, czego szukasz.",
+      "1": "Wyślij im wiadomość za pośrednictwem platformy, aby uzgodnić szczegóły — czas, miejsce i zakres.",
+      "2": "Dokończ wymianę. Spotykacie się osobiście tylko wtedy, gdy oboje tego chcecie.",
+      "3": "Rejestruj godziny. Obaj członkowie potwierdzają – to jest pokwitowanie.",
+      "4": "Kredyty czasowe przesyłane są automatycznie. Jedna godzina pomocy = jednorazowa nagroda, niezależnie od tego, jaką umiejętnością się podzielono."
+    },
+    "what_we_do_title": "Co robi platforma",
+    "what_we_do_items": {
+      "0": "Weryfikuje adres e-mail każdego członka podczas rejestracji; oferuje opcjonalną weryfikację dokumentu tożsamości ze zdjęciem za pomocą plakietki zweryfikowanego członka dla tych, którzy chcą dodatkowych sygnałów zaufania.",
+      "1": "Pokazuje recenzje i oceny na profilach członków, dzięki czemu społeczność może zobaczyć, kto jest wiarygodnym partnerem wymiany.",
+      "2": "Prosi każdego członka o zaakceptowanie naszych Wytycznych dla społeczności i Zasad dopuszczalnego użytkowania podczas rejestracji oraz o przestrzeganie ich podczas pobytu tutaj.",
+      "3": "Daje każdemu wpisowi, wiadomości i profilowi ​​przycisk Zgłoś, który trafia bezpośrednio do koordynatorów.",
+      "4": "Ma koordynatorów ludzkich, którzy mogą pośredniczyć, wspierać i wkraczać, gdy coś pójdzie nie tak.",
+      "5": "Connects with other timebanks across Ireland and Europe through federation, so reputation travels with you."
+    },
+    "what_we_dont_title": "Czego platforma nie robi",
+    "what_we_dont_intro": "Banki czasu opierają się na tym, że sąsiedzi pomagają sąsiadom, a nie na tym, że stoimy pomiędzy wami. To funkcja, a nie błąd — ale oznacza to, że musimy jasno określić nasze ograniczenia.",
+    "what_we_dont_items": {
+      "0": "Nie sprawdzamy, nie szkolimy ani nie certyfikujemy członków w zakresie określonych usług. Nie jesteśmy agencją rekrutacyjną.",
+      "1": "Nie zapewniamy ubezpieczenia pracy, którą członkowie wykonują dla siebie nawzajem.",
+      "2": "Nie nadzorujemy giełd ani nie pełnimy roli niczyjego pracodawcy lub usługodawcy.",
+      "3": "Nie gwarantujemy żadnego konkretnego wyniku, poziomu umiejętności ani punktualności. Recenzje pozwalają społeczności zachować odpowiedzialność."
+    },
+    "precautions_title": "Rozsądne środki ostrożności przy pierwszej wymianie",
+    "precautions_intro": "Zastosowałbyś tutaj ten sam zdrowy rozsądek, co w przypadku poznawania kogokolwiek nowego za pośrednictwem grupy społecznościowej.",
+    "precautions_items": {
+      "0": "Spotkaj się po raz pierwszy w miejscu publicznym lub przyprowadź znajomego, jeśli zapraszasz kogoś do swojego domu.",
+      "1": "Przeczytaj recenzje innych użytkowników i sprawdź, jak długo przebywają na platformie.",
+      "2": "For services involving children, vulnerable adults, or work inside your home, ask about Garda vetting before agreeing.",
+      "3": "Zaufaj swojemu instynktowi. W dowolnym momencie możesz odmówić, zakończyć wymianę lub zgłosić problem."
+    },
+    "vetting_title": "Sprawdzanie przeszłości i weryfikacja",
+    "vetting_body": "Some exchanges — for example childcare, elderly care, or support for vulnerable adults — may legally require a background check or vetting under local law (such as Garda vetting in Ireland, an enhanced DBS check in the UK, or equivalent schemes elsewhere). Members offering these kinds of services are responsible for holding current, valid vetting where their jurisdiction requires it, and you’re entitled to ask to see it before you agree to an exchange. The platform doesn’t hold vetting on members’ behalf and doesn’t verify it.",
+    "insurance_title": "Ubezpieczenie i odpowiedzialność",
+    "insurance_items": {
+      "0": "{{name}} nie zapewnia ubezpieczenia wymian między członkami. Platforma jest usługą połączenia — nie ubezpiecza, nie zabezpiecza ani nie gwarantuje pracy, jaką członkowie wykonują dla siebie nawzajem.",
+      "1": "Członkowie NIE są objęci żadnym ubezpieczeniem platformy za pracę, którą wykonują dla siebie nawzajem. Wymiany odbywają się wyłącznie pomiędzy członkami i na własne ryzyko członków. Zapoznaj się z naszymi Warunkami korzystania z usługi, aby zapoznać się z pełną informacją o odpowiedzialności i zabezpieczeniu.",
+      "2": "Jeśli oferujesz usługi profesjonalne (hydraulika, elektryka, opieka zdrowotna, doradztwo prawne, finansowe), jesteś odpowiedzialny za własne ubezpieczenie od odpowiedzialności zawodowej i wszelkie mające zastosowanie obowiązki regulacyjne.",
+      "3": "Kredyty czasowe nie mają wartości pieniężnej. Nie można ich wymienić na gotówkę, sprzedać ani wykorzystać poza społecznością banków czasu."
+    },
+    "disputes_title": "Kiedy coś pójdzie nie tak",
+    "disputes_intro": "Większość nieporozumień można rozwiązać między członkami. Jeśli nie mogą, pomożemy.",
+    "disputes_steps": {
+      "0": "Spróbuj najpierw rozwiązać problem bezpośrednio za pomocą wiadomości — większość nieporozumień właśnie na tym polega.",
+      "1": "Jeśli to nie zadziała, skontaktuj się z koordynatorem za pośrednictwem strony Kontakt. Koordynatorzy mogą pośredniczyć.",
+      "2": "Jeśli członek naruszy nasze Wytyczne dla społeczności, podejmujemy działania — ostrzeżenia, mediację, zawieszenie lub usunięcie, w zależności od wagi.",
+      "3": "Spory dotyczące kredytu czasowego (błędne zarejestrowane godziny itp.) są rozpatrywane przez administratora, który może dostosować saldo po obu stronach."
+    },
+    "responsibilities_title": "Twoje obowiązki jako członka",
+    "responsibilities_intro": "Korzystając z {{name}} wyrażasz zgodę na:",
+    "responsibilities_items": {
+      "0": "Traktuj innych członków z szacunkiem (Wytyczne społeczności).",
+      "1": "Bądź szczery w kwestii swoich umiejętności, kwalifikacji i ograniczeń.",
+      "2": "Pokaż się po zatwierdzeniu lub anuluj z rozsądnym wyprzedzeniem.",
+      "3": "Rejestruj godziny rzetelnie – według czasu faktycznie podanego.",
+      "4": "Korzystaj z platformy wyłącznie w celu wymiany czasu w społeczności, pracy zarobkowej, pozyskiwania sprzedaży lub wszelkich działań nielegalnych (Zasady dopuszczalnego użytkowania)."
+    },
+    "rights_title": "Twoje prawa",
+    "rights_items": {
+      "0": "Wyjdź w dowolnym momencie i zażądaj usunięcia swoich danych (RODO).",
+      "1": "Blokuj innych członków, aby nie mogli się z Tobą skontaktować.",
+      "2": "Spraw, aby Twój profil był niewidoczny podczas wyszukiwania lub przeglądania.",
+      "3": "Zrezygnuj ze wszystkich opcjonalnych plików cookie, analiz i powiadomień e-mail."
+    },
+    "contact_cta_title": "Masz pytanie, na które nie odpowiedzieliśmy?",
+    "contact_cta_body": "Skontaktuj się z nami, a koordynator skontaktuje się z Tobą. Na większość wiadomości odpowiadamy w ciągu jednego dnia roboczego.",
+    "contact_cta_button": "Skontaktuj się z nami",
+    "community_guidelines_link": "Przeczytaj Wytyczne dla społeczności"
   }
 }

@@ -32,7 +32,7 @@
   },
   "challenge": {
     "ideas_count": "{{count}} idee",
-    "ideas_count_one": "{{count}} idea",
+    "ideas_count_one": "{{count}}idea",
     "submission_deadline": "Scadenza invii {{date}}",
     "voting_deadline": "Votazione termina il {{date}}",
     "prize": "Premio",

@@ -1,5 +1,7 @@
 {
   "page_title": "Blogue",
+  "hero_eyebrow": "Histórias da comunidade",
+  "hero_posts_label": "Publicações exibidas",
   "title": "Blogue e Notícias",
   "subtitle": "Histórias da comunidade, atualizações e comunicados",
   "search_placeholder": "Pesquisar artigos...",
@@ -11,6 +13,9 @@
   "empty_title": "Nenhum artigo encontrado",
   "empty_desc": "Ainda não foram publicados artigos no blogue",
   "empty_desc_filtered": "Tente termos de pesquisa diferentes ou limpe os filtros",
+  "empty_tip_stories": "Histórias dos membros",
+  "empty_tip_guides": "Guias",
+  "empty_tip_updates": "Atualizações",
   "load_more": "Carregar Mais Artigos",
   "min_read": "{{count}} min de leitura",
   "min_read_short": "{{count}}m",
@@ -42,6 +47,7 @@
     "reply_count": "{{count}} respostas",
     "hide": "Ocultar",
     "you": "Você",
+    "unknown_author": "Autor desconhecido",
     "aria_add_reaction": "Adicionar reação",
     "aria_send_reply": "Enviar resposta",
     "reaction_heart": "Adorar",
@@ -49,17 +55,11 @@
     "reaction_thumbs_down": "Não gosto",
     "reaction_laugh": "Haha",
     "reaction_angry": "Zangado",
-    "unknown_author": "Autor desconhecido",
     "reaction_love": "Adorei",
     "reaction_like": "Gostei",
     "reaction_wow": "Uau",
     "reaction_sad": "Triste",
     "reaction_celebrate": "Celebrar"
   },
-  "page_description": "Histórias, guias e atualizações da comunidade de banco de tempo — trocas que funcionaram, lições aprendidas e as últimas novidades de grupos locais e parceiros.",
-  "hero_eyebrow": "Histórias da comunidade",
-  "hero_posts_label": "Publicações exibidas",
-  "empty_tip_stories": "Histórias dos membros",
-  "empty_tip_guides": "Guias",
-  "empty_tip_updates": "Atualizações"
+  "page_description": "Histórias, guias e atualizações da comunidade de banco de tempo — trocas que funcionaram, lições aprendidas e as últimas novidades de grupos locais e parceiros."
 }

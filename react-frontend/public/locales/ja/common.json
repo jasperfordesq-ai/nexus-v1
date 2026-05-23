@@ -1,6 +1,9 @@
 {
   "back": "戻る",
+  "empty_dash": "-",
+  "refresh": "更新",
   "hours_short": "{{count}}時間",
+  "not_available": "利用できません",
   "error_title": "何か問題が発生しました",
   "nav": {
     "dashboard": "ダッシュボード",
@@ -56,7 +59,7 @@
     "connections": "つながり",
     "ai_chat": "AIアシスタント",
     "skills": "スキル",
-    "nexus_score": "NexusScore",
+    "nexus_score": "ネクサススコア",
     "knowledge_base": "ナレッジベース",
     "unread_notifications": "未読通知 {{count}}件",
     "timebanking": "タイムバンキング",
@@ -72,8 +75,12 @@
     "aria_label": "コミュニティのセクションを探索"
   },
   "location": {
-    "powered_by_google": "Powered by Google",
+    "powered_by_google": "Google の提供",
     "powered_by_osm": "© OpenStreetMap 寄稿者"
+  },
+  "keyboard": {
+    "command_symbol": "⌘",
+    "k_key": "K"
   },
   "nav_desc": {
     "feed": "コミュニティフィード",
@@ -171,10 +178,10 @@
     "legal_hub": "法務センター",
     "terms_of_service": "利用規約",
     "privacy_policy": "プライバシーポリシー",
-    "type_community_guidelines": "コミュニティガイドライン",
-    "type_acceptable_use": "利用規約",
     "cookie_policy": "Cookieポリシー",
-    "accessibility": "アクセシビリティ"
+    "accessibility": "アクセシビリティ",
+    "type_community_guidelines": "コミュニティガイドライン",
+    "type_acceptable_use": "利用規約"
   },
   "admin_tools": {
     "section": "管理ツール",
@@ -220,11 +227,11 @@
     "switch_to_light": "ライトモードに切り替え",
     "switch_to_dark": "ダークモードに切り替え",
     "skip_to_content": "メインコンテンツへスキップ",
+    "accessibility_alpha_new_tab": "アクセシビリティ（アルファ）を新しいタブで開く",
     "menu_opened": "ナビゲーションメニューが開きました",
     "close": "閉じる",
     "scroll_to_top": "トップへスクロール",
-    "breadcrumb": "パンくずリスト",
-    "accessibility_alpha_new_tab": "アクセシビリティ（アルファ）を新しいタブで開く"
+    "breadcrumb": "パンくずリスト"
   },
   "cookie_consent": {
     "banner_label": "Cookie同意",
@@ -247,7 +254,7 @@
     "save": "設定を保存"
   },
   "footer": {
-    "project_nexus": "Project NEXUS",
+    "project_nexus": "プロジェクトネクサス",
     "source_repo": "GitHubリポジトリ",
     "source_repo_aria": "Project NEXUS の GitHub リポジトリを開く",
     "source_repo_tooltip": "Project NEXUS のソースリポジトリを GitHub で開く",
@@ -268,7 +275,7 @@
     "community_partner": "コミュニティパートナー",
     "tenant_logo_placeholder": "ここにあなたのロゴ",
     "open_source": "オープンソース",
-    "powered_by": "Powered by",
+    "powered_by": "搭載",
     "agpl_short": "フリーかつオープンソースソフトウェア。AGPL-3.0でライセンスされています。",
     "nexus_link_label": "Project NEXUSのウェブサイトを訪問"
   },
@@ -281,6 +288,8 @@
   "members": {
     "title": "メンバー",
     "subtitle": "コミュニティメンバーとつながる",
+    "hero_eyebrow": "コミュニティディレクトリ",
+    "count_label": "表示中のメンバー",
     "quick_filters": "メンバーフィルター",
     "all": "全メンバー",
     "new": "新しいメンバー",
@@ -305,6 +314,9 @@
     "no_members": "メンバーが見つかりません",
     "no_members_search": "別の検索キーワードをお試しください",
     "no_members_community": "このコミュニティにはまだメンバーがいません",
+    "empty_tip_profiles": "プロフィール全文を見る",
+    "empty_tip_skills": "スキルで検索",
+    "empty_tip_location": "近くのメンバーを探す",
     "load_more": "もっと読み込む",
     "results_matching": "\"{{query}}\"に一致する{{total}}人中{{shown}}人のメンバー",
     "results_count": "{{count}}人のメンバーを表示",
@@ -324,12 +336,7 @@
     "load_failed": "メンバーの読み込みに失敗しました",
     "load_more_failed": "追加のメンバーの読み込みに失敗しました",
     "my_profile": "マイプロフィール",
-    "load_more_count": "さらに読み込む (残り {{remaining}} 件)",
-    "hero_eyebrow": "コミュニティディレクトリ",
-    "count_label": "表示中のメンバー",
-    "empty_tip_profiles": "プロフィール全文を見る",
-    "empty_tip_skills": "スキルで検索",
-    "empty_tip_location": "近くのメンバーを探す"
+    "load_more_count": "さらに読み込む (残り {{remaining}} 件)"
   },
   "error_boundary": {
     "title": "問題が発生しました",
@@ -374,7 +381,7 @@
       "coordinate_org_sub": "ボランティア組織を管理します",
       "my_relationships": "サポート関係",
       "my_relationships_sub": "進行中のサポートのつながりを確認します",
-      "markt": "Marktplatz",
+      "markt": "マルクト広場",
       "markt_sub": "地元のサービス、商品、タイムクレジットのオファーを閲覧します。",
       "loyalty_history": "タイムクレジット利用履歴",
       "loyalty_history_sub": "獲得した時間を地元店舗でどう使ったかを確認します。",
@@ -455,7 +462,7 @@
         "title": "クラブと協会",
         "description": "Verein型の協会、クラブ、会員グループをケアネットワークに接続します。"
       },
-      "markt": "Marktplatz",
+      "markt": "マルクト広場",
       "projects": {
         "title": "コミュニティプロジェクト",
         "description": "自治体の事業、協同組合のマイルストーン、地域の取り組みを追跡します。"
@@ -481,6 +488,7 @@
       "description": "コミュニティにサポートを求めましょう"
     },
     "subtitle": "ご近所の皆さんが気にかけています。必要なことを教えてください、できる限りお手伝いします。",
+    "on_behalf_notice": "あなたが介護者として支援している人のために、このリクエストを作成しています。",
     "form": {
       "what_label": "どのような助けが必要ですか？",
       "what_placeholder": "例: 買い物の手伝い、通院の付き添い、散歩の同行...",
@@ -514,8 +522,7 @@
       "filled_hint": "録音からフォームを入力しました。送信前にご確認ください。",
       "transcript_label": "聞き取った内容"
     },
-    "back": "コミュニティハブに戻る",
-    "on_behalf_notice": "あなたが介護者として支援している人のために、このリクエストを作成しています。"
+    "back": "コミュニティハブに戻る"
   },
   "hour_gift": {
     "meta": {
@@ -598,13 +605,13 @@
     },
     "history": {
       "title": "あなたの移行履歴",
+      "aria": "時間の譲渡履歴",
       "date": "日付",
       "destination": "送り先",
       "hours": "時間",
       "status": "ステータス",
       "reason": "理由",
-      "empty": "まだ移行はありません。",
-      "aria": "時間の譲渡履歴"
+      "empty": "まだ移行はありません。"
     },
     "status": {
       "pending": "承認待ち",
@@ -772,15 +779,18 @@
     "clear": "クリア",
     "scroll_left": "左にスクロール",
     "scroll_right": "右にスクロール",
+    "current_language": "言語: {{language}}",
     "select_language": "言語を選択",
     "clear_location": "位置情報をクリア",
     "select_category": "カテゴリを選択",
     "verification_badges": "認証バッジ",
-    "search_skills": "スキルを検索",
-    "current_language": "言語: {{language}}"
+    "search_skills": "スキルを検索"
   },
   "skills": {
     "browse_title": "コミュニティスキルディレクトリ",
+    "explainer": "コミュニティのメンバーが共有しているスキルを閲覧し、サポートを提供する人を見つけたり、学びたいメンバーを発見したりできます。",
+    "unable_to_load": "読み込めません",
+    "try_again": "もう一度試す",
     "load_failed": "スキルカテゴリを読み込めません",
     "load_failed_retry": "スキルカテゴリを読み込めません。もう一度お試しください。",
     "offering_label": "提供",
@@ -823,10 +833,7 @@
     "aria_clear_search": "検索をクリア",
     "aria_close_members_list": "メンバーリストを閉じる",
     "category_optional": "カテゴリ（任意）",
-    "proficiency_level": "習熟度",
-    "explainer": "コミュニティのメンバーが共有しているスキルを閲覧し、サポートを提供する人を見つけたり、学びたいメンバーを発見したりできます。",
-    "unable_to_load": "読み込めません",
-    "try_again": "もう一度試す"
+    "proficiency_level": "習熟度"
   },
   "hours_display_one": "{{count}}時間",
   "hours_display_other": "{{count}}時間",
@@ -846,11 +853,11 @@
   "verification": {
     "not_id_verified": "ID確認されていません"
   },
-  "radius_5": "5 km",
-  "radius_10": "10 km",
-  "radius_25": "25 km",
-  "radius_50": "50 km",
-  "radius_100": "100 km",
+  "radius_5": "5km",
+  "radius_10": "10km",
+  "radius_25": "25km",
+  "radius_50": "50km",
+  "radius_100": "100km",
   "page_meta": {
     "skills_browse": {
       "title": "スキルをブラウズ",
@@ -921,16 +928,16 @@
       "title": "無効な招待",
       "body": "この招待リンクは有効ではありません。リンクを確認して、もう一度お試しください。"
     },
-    "loading": "招待を確認しています...",
     "error": {
       "title": "この招待を確認できませんでした",
       "body": "接続を確認して、もう一度お試しください。",
       "retry": "もう一度試す"
-    }
+    },
+    "loading": "招待を確認しています..."
   },
   "markt": {
     "meta": {
-      "title": "Marktplatz",
+      "title": "マルクト広場",
       "description": "近くのサービス、商品、コミュニティのオファーを見つけよう"
     },
     "subtitle": "コミュニティのタイムクレジットサービスや地元の商品を一か所で発見しましょう。",
@@ -1034,12 +1041,12 @@
       "subtitle": "獲得した時間を地元のお店でどのように使ったか確認しましょう。",
       "back": "コミュニティハブに戻る",
       "table": {
+        "aria": "ロイヤリティ交換履歴",
         "date": "日付",
         "merchant": "加盟店",
         "item": "商品",
         "credits": "使用時間",
-        "discount": "割引",
-        "aria": "ロイヤリティ交換履歴"
+        "discount": "割引"
       },
       "empty": {
         "title": "引き換え履歴なし",
@@ -1077,8 +1084,8 @@
       "date": "リクエスト日",
       "format": "形式",
       "size": "サイズ",
-      "empty": "データをまだエクスポートしていません。",
-      "count": "{{count}}件のエクスポート"
+      "count": "{{count}}件のエクスポート",
+      "empty": "データをまだエクスポートしていません。"
     },
     "errors": {
       "rate_limit": "エクスポートは1日5回まで可能です。明日もう一度お試しください。",
@@ -1213,6 +1220,7 @@
     "col_impressions": "インプレッション",
     "col_clicks": "クリック数",
     "col_ctr": "CTR",
+    "date_range": "{{start}}〜{{end}}",
     "status_draft": "下書き",
     "status_pending": "保留中",
     "status_active": "アクティブ",
@@ -1230,13 +1238,12 @@
     "field_budget_desc": "ユーロ建ての最大合計支出。",
     "field_radius": "ターゲティング範囲（任意）",
     "field_radius_desc": "この距離内のメンバーにのみ表示します。",
+    "table_aria": "広告キャンペーン",
     "validation_required": "必須項目をすべて入力してください。",
     "created_success": "キャンペーンを作成しました。",
     "create_error": "キャンペーンを作成できませんでした。もう一度お試しください。",
     "submit_create": "キャンペーンを作成",
-    "feature_disabled": "ローカル広告はこのアカウントでは利用できません。",
-    "date_range": "{{start}}〜{{end}}",
-    "table_aria": "広告キャンペーン"
+    "feature_disabled": "ローカル広告はこのアカウントでは利用できません。"
   },
   "push_campaign": {
     "meta": {
@@ -1284,6 +1291,7 @@
     "load_error": "キャンペーンを読み込めませんでした。もう一度お試しください。",
     "retry": "もう一度試す",
     "create_first": "最初のプッシュキャンペーンを作成",
+    "table_aria": "プッシュキャンペーン",
     "col_name": "名前",
     "col_title": "通知タイトル",
     "col_status": "ステータス",
@@ -1299,6 +1307,7 @@
     "tier_member": "メンバー",
     "tier_trusted": "信頼済み",
     "tier_verified": "認証済み",
+    "radius_km": "{{radius}} km",
     "field_name": "キャンペーン名",
     "field_name_placeholder": "例: サマーイベントのお知らせ",
     "field_title": "通知タイトル",
@@ -1321,14 +1330,15 @@
     "created_success": "プッシュキャンペーンを正常に作成しました。",
     "create_error": "プッシュキャンペーンを作成できませんでした。もう一度お試しください。",
     "submit_create": "キャンペーンを作成",
-    "feature_disabled": "このアカウントではプッシュキャンペーンは利用できません。",
-    "table_aria": "プッシュキャンペーン",
-    "radius_km": "{{radius}} km"
+    "feature_disabled": "このアカウントではプッシュキャンペーンは利用できません。"
   },
   "push_campaign_opt_in": "プロモーションプッシュ通知を受け取る",
   "push_campaign_opt_in_description": "地元の企業や団体から、ターゲットを絞ったプッシュ通知を受け取ることを許可します。いつでもオプトアウトできます。",
   "coupon": {
     "page_title": "割引クーポン",
+    "meta_description": "お住まいの地域で利用できる、コミュニティのクーポン、加盟店割引、地域オファーをご覧ください。",
+    "detail_meta_description": "このコミュニティクーポンを表示し、オファーコードをコピーするか、店舗で利用するQRコードを生成します。",
+    "detail_meta_description_named": "{{title}}を表示し、クーポンコード {{code}} をコピーするか、店舗で利用するQRコードを生成します。",
     "page_subtitle": "コミュニティで利用可能な店舗割引を閲覧",
     "code": "コード",
     "title": "タイトル",
@@ -1372,31 +1382,29 @@
       "valid_from": "有効開始日",
       "valid_until": "有効期限",
       "status": "ステータス",
+      "status_draft": "下書き",
+      "status_active": "有効",
+      "status_paused": "一時停止中",
+      "status_expired": "期限切れ",
       "applies_to": "対象",
+      "amount_cents_help": "セント単位の金額",
       "all_listings": "自分のすべての掲載",
       "specific_listings": "特定の掲載",
       "specific_categories": "特定のカテゴリー",
       "save": "保存",
       "delete_confirm": "このクーポンを削除しますか？元に戻せません。",
       "no_coupons": "まだクーポンを作成していません。",
+      "table_aria": "販売者クーポン",
       "redemptions": "利用",
       "view_redemptions": "利用履歴を表示",
       "usage_count": "{{count}}回使用",
       "saved": "クーポンを保存しました",
-      "deleted": "クーポンを削除しました",
-      "status_draft": "下書き",
-      "status_active": "有効",
-      "status_paused": "一時停止中",
-      "status_expired": "期限切れ",
-      "amount_cents_help": "セント単位の金額",
-      "table_aria": "販売者クーポン"
-    },
-    "meta_description": "お住まいの地域で利用できる、コミュニティのクーポン、加盟店割引、地域オファーをご覧ください。",
-    "detail_meta_description": "このコミュニティクーポンを表示し、オファーコードをコピーするか、店舗で利用するQRコードを生成します。",
-    "detail_meta_description_named": "{{title}}を表示し、クーポンコード {{code}} をコピーするか、店舗で利用するQRコードを生成します。"
+      "deleted": "クーポンを削除しました"
+    }
   },
   "regional_points": {
     "title": "地域ポイント",
+    "default_symbol": "pt",
     "subtitle": "ご近所の方や地元の店舗で獲得・使用できる地域通貨です。",
     "balance": "残高",
     "lifetime_earned": "獲得総額",
@@ -1408,17 +1416,17 @@
     "transfer": {
       "title": "他のメンバーにポイントを送信",
       "recipient_id": "受取人メンバー ID",
+      "recipient_placeholder": "例: 123",
       "amount": "金額",
+      "amount_placeholder": "0.00",
       "message": "メッセージ（任意）",
+      "message_placeholder": "受信者へのメモを追加",
       "submit": "送金を送信",
       "success": "送金されました",
       "errors": {
         "invalid_recipient": "有効な受取人メンバー ID を入力してください",
         "invalid_amount": "正の金額を入力してください"
-      },
-      "recipient_placeholder": "例: 123",
-      "amount_placeholder": "0.00",
-      "message_placeholder": "受信者へのメモを追加"
+      }
     },
     "history": {
       "title": "最近のアクティビティ",
@@ -1433,8 +1441,7 @@
     "errors": {
       "load_failed": "地域ポイントの読み込みに失敗しました",
       "transfer_failed": "送金に失敗しました"
-    },
-    "default_symbol": "pt"
+    }
   },
   "verein_import": {
     "title": "クラブメンバーをインポート",
@@ -1444,9 +1451,16 @@
     "csv_format": "必須ヘッダー行: email,first_name,last_name,phone,role",
     "file_label": "CSV ファイル",
     "csv_label": "または CSV を貼り付け",
+    "csv_placeholder": "メールアドレス、名、姓、電話番号、役割\nalice@example.org、アリス、スミス、+1 555 123 4567、メンバー",
     "preview": "プレビュー",
     "confirm": "メンバーをインポート",
     "success": "インポート完了: {{created}} 名作成、{{linked}} 名リンク",
+    "actions": {
+      "already": "登録済み",
+      "create": "作成",
+      "invalid": "無効",
+      "link": "リンク"
+    },
     "summary": {
       "total": "合計",
       "create": "作成",
@@ -1476,13 +1490,6 @@
       "import_failed": "インポートに失敗しました",
       "has_invalid": "インポート前に無効な行を修正してください",
       "has_invalid_summary": "一部の行が無効です。CSV で修正し、インポート前にプレビューを再実行してください。"
-    },
-    "csv_placeholder": "email,first_name,last_name,phone,role\nalice@example.org,Alice,Smith,+1 555 123 4567,member",
-    "actions": {
-      "already": "登録済み",
-      "create": "作成",
-      "invalid": "無効",
-      "link": "リンク"
     }
   },
   "premium": {
@@ -1554,6 +1561,10 @@
   },
   "developers": {
     "page_title": "開発者",
+    "meta_description": "OAuth2認証、スコープ付きエンドポイント、署名付きWebhook、統合アクセスのためのProject NEXUSパートナーAPIをご紹介します。",
+    "auth_meta_title": "API認証",
+    "endpoints_meta_title": "APIエンドポイント",
+    "webhooks_meta_title": "API Webhook",
     "hero_title": "NEXUSで構築",
     "hero_subtitle": "銀行、決済、自治体管理パートナー向けの厳選REST API。OAuth2 Client Credentials、署名付きWebhook、5分でアクセスできるサンドボックス。",
     "request_access_cta": "アクセスをリクエスト",
@@ -1586,17 +1597,6 @@
     "method_label": "メソッド",
     "path_label": "パス",
     "description_label": "説明",
-    "webhooks_intro": "HTTPSコールバックURLでイベントを購読します。各配信にはX-Partner-Signatureヘッダー — 作成時に返されるサブスクリプションシークレットで署名された生本体のHMAC-SHA256 — が含まれます。",
-    "webhook_events_title": "利用可能なイベント",
-    "webhook_event_wallet_credited": "wallet.credited — パートナーが/wallet/credit経由で時間を入金したときに発火",
-    "webhook_signing_title": "署名の検証",
-    "webhook_signing_body": "サブスクリプションシークレットを鍵に、リクエスト本体のHMAC-SHA256を計算します。X-Partner-Signatureヘッダーと定数時間で比較します。",
-    "webhook_create_title": "サブスクリプションを作成",
-    "webhook_create_body": "/api/partner/v1/webhooks/subscriptionsにevent_types（配列）とtarget_url（httpsのみ）を付けてPOST。応答にはワンタイムのシークレットが含まれます — 保管してください。",
-    "meta_description": "OAuth2認証、スコープ付きエンドポイント、署名付きWebhook、統合アクセスのためのProject NEXUSパートナーAPIをご紹介します。",
-    "auth_meta_title": "API認証",
-    "endpoints_meta_title": "APIエンドポイント",
-    "webhooks_meta_title": "API Webhook",
     "endpoints_table_aria": "パートナーAPIエンドポイント",
     "endpoint_descriptions": {
       "oauth_token": "クライアント認証情報をベアラートークンと交換します（client_credentialsグラント）。",
@@ -1609,10 +1609,20 @@
       "aggregates_community": "バケット化されたコミュニティ合計（PIIなし）。パートナーダッシュボードに有用。",
       "webhooks_list": "Webhookサブスクリプションを一覧表示します。",
       "webhooks_create": "イベントをサブスクライブします。ボディ: event_types[], target_url (https://)。"
-    }
+    },
+    "webhooks_intro": "HTTPSコールバックURLでイベントを購読します。各配信にはX-Partner-Signatureヘッダー — 作成時に返されるサブスクリプションシークレットで署名された生本体のHMAC-SHA256 — が含まれます。",
+    "webhook_events_title": "利用可能なイベント",
+    "webhook_event_wallet_credited": "wallet.credited — パートナーが/wallet/credit経由で時間を入金したときに発火",
+    "webhook_signing_title": "署名の検証",
+    "webhook_signing_body": "サブスクリプションシークレットを鍵に、リクエスト本体のHMAC-SHA256を計算します。X-Partner-Signatureヘッダーと定数時間で比較します。",
+    "webhook_create_title": "サブスクリプションを作成",
+    "webhook_create_body": "/api/partner/v1/webhooks/subscriptionsにevent_types（配列）とtarget_url（httpsのみ）を付けてPOST。応答にはワンタイムのシークレットが含まれます — 保管してください。"
   },
   "regional_analytics": {
     "page_title": "地域分析",
+    "meta_description": "匿名化されたコミュニティトレンドと集計レポートを使用した、自治体および中小企業パートナー向けのプライバシー重視の地域分析をご紹介します。",
+    "partner_dashboard_title": "地域分析",
+    "partner_dashboard_meta_description": "認可されたパートナー向けのプライベート地域分析ダッシュボード。",
     "contact_subject": "地域分析 - パートナーへの問い合わせ",
     "privacy_badge": "プライバシー優先の設計",
     "hero_title": "自分の地域を理解してください。プライバシーを損なうことなく。",
@@ -1658,10 +1668,49 @@
         "feature_3": "四半期レビューワークショップ",
         "feature_4": "専任のサクセスマネージャー"
       }
-    },
-    "meta_description": "匿名化されたコミュニティトレンドと集計レポートを使用した、自治体および中小企業パートナー向けのプライバシー重視の地域分析をご紹介します。",
-    "partner_dashboard_title": "地域分析",
-    "partner_dashboard_meta_description": "認可されたパートナー向けのプライベート地域分析ダッシュボード。"
+    }
+  },
+  "partner_analytics": {
+    "no_token_title": "サブスクリプショントークンが必要です",
+    "no_token_body": "アカウントマネージャーから提供された安全なリンクを使用してください。リンクには一意のサブスクリプショントークンが含まれます。",
+    "error_title": "分析を読み込めません",
+    "error_unauthorized": "サブスクリプショントークンが無効または期限切れです。",
+    "error_generic": "分析の取得中に問題が発生しました。再試行してください。",
+    "retry": "再試行",
+    "title": "地域分析",
+    "subtitle": "地域向けのプライバシーバケット化されたインサイト。毎日更新されます。",
+    "period_label": "期間",
+    "period_30d": "過去30日間",
+    "period_90d": "過去90日間",
+    "period_year": "過去1年間",
+    "tabs_aria": "分析タブ",
+    "tab_trends": "トレンド",
+    "tab_demand_supply": "需要と供給",
+    "tab_demographics": "人口統計",
+    "tab_footfall": "来訪者数",
+    "reports_title": "月次レポート",
+    "no_reports": "まだレポートは生成されていません。",
+    "download_pdf": "PDFをダウンロード",
+    "privacy_footer": "すべての指標はバケット化され匿名化されています。N<10のセグメントは抑制されます。",
+    "metric_active_members": "アクティブメンバー",
+    "metric_categories": "カテゴリー",
+    "metric_partner_orgs": "パートナー組織",
+    "metric_event_participation": "イベント参加",
+    "metric_volunteer_hours": "ボランティア時間",
+    "engagement_overview": "エンゲージメント概要（バケット中央値）",
+    "ds_by_postcode": "郵便番号別（3桁）の提供と需要",
+    "no_data": "データがありません。",
+    "offers": "提供",
+    "requests": "依頼",
+    "match_heatmap": "マッチ率セル",
+    "category_short": "カテゴリー",
+    "age_distribution": "年齢分布",
+    "gender_distribution": "性別分布",
+    "footfall_by_area": "エリア別ページビュー",
+    "page_views": "ページビュー",
+    "distinct_visitors": "ユニーク訪問者",
+    "suppressed_value": "非表示",
+    "suppressed_short": "--"
   },
   "provisioning": {
     "meta": {
@@ -1918,7 +1967,7 @@
     "my_page_heading": "私の Verein 会員会費",
     "my_page_subtitle": "所属する Vereine の年会費を支払います。",
     "empty_state": "まだ会員会費の記録はありません。",
-    "unnamed_verein": "Verein",
+    "unnamed_verein": "ベライン",
     "year_label": "年",
     "due_label": "期日",
     "paid_label": "支払済み",
@@ -1975,7 +2024,13 @@
     "col_status": "ステータス",
     "col_due": "期日",
     "col_reminders": "リマインダー",
+    "col_email_delivery": "メール配信",
     "col_actions": "アクション",
+    "email_status": {
+      "failed": "失敗",
+      "pending": "記録なし",
+      "sent": "送信済み"
+    },
     "errors": {
       "load_failed": "会員会費の読み込みに失敗しました。",
       "start_payment_failed": "支払いを開始できませんでした。もう一度お試しください。",
@@ -1983,12 +2038,6 @@
       "generate_failed": "生成に失敗しました。",
       "reminder_failed": "リマインダーを送信できませんでした。",
       "waive_failed": "会費を免除できませんでした。"
-    },
-    "col_email_delivery": "メール配信",
-    "email_status": {
-      "failed": "失敗",
-      "pending": "記録なし",
-      "sent": "送信済み"
     }
   },
   "collections": {
@@ -2059,15 +2108,15 @@
     "ios_step_1_after": "Safari下部の共有ボタン。",
     "ios_step_2": "下にスクロールしてタップ：",
     "ios_add_to_home": "ホーム画面に追加",
-    "ios_step_2_after": ".",
+    "ios_step_2_after": "。",
     "ios_step_3": "「追加」をタップ。NEXUSが独立したアプリとしてホーム画面に表示されます。",
-    "got_it": "了解",
     "generic_title": "NEXUSをインストール",
     "generic_intro": "ブラウザのメニューでインストールオプションを探してください:",
     "generic_step_1": "通常は3点または3本線のアイコンであるブラウザメニューを開きます。",
     "generic_step_2": "アプリをインストール、このサイトをインストール、またはホーム画面に追加を探します。",
     "generic_step_3": "確認して、NEXUSをデバイスに追加します。",
     "manual_note": "オプションが表示されない場合、ブラウザがすでにアプリをインストールしているか、お使いのデバイスが対応していない可能性があります。",
+    "got_it": "了解",
     "android_chrome_title": "Androidにインストール",
     "android_chrome_intro": "ChromeメニューからNEXUSをホーム画面に追加します:",
     "android_chrome_step_1": "Chromeの右上にある3点メニューをタップします。",
@@ -2133,54 +2182,5 @@
   "level_plain": "レベル{{level}}",
   "level_named": "レベル{{level}} - {{name}}",
   "xp_progress": "{{current}} / {{required}} XP",
-  "level_progress_aria": "レベル{{level}}の進捗：{{percentage}}%",
-  "empty_dash": "-",
-  "refresh": "更新",
-  "not_available": "利用できません",
-  "keyboard": {
-    "command_symbol": "⌘",
-    "k_key": "K"
-  },
-  "partner_analytics": {
-    "no_token_title": "サブスクリプショントークンが必要です",
-    "no_token_body": "アカウントマネージャーから提供された安全なリンクを使用してください。リンクには一意のサブスクリプショントークンが含まれます。",
-    "error_title": "分析を読み込めません",
-    "error_unauthorized": "サブスクリプショントークンが無効または期限切れです。",
-    "error_generic": "分析の取得中に問題が発生しました。再試行してください。",
-    "retry": "再試行",
-    "title": "地域分析",
-    "subtitle": "地域向けのプライバシーバケット化されたインサイト。毎日更新されます。",
-    "period_label": "期間",
-    "period_30d": "過去30日間",
-    "period_90d": "過去90日間",
-    "period_year": "過去1年間",
-    "tabs_aria": "分析タブ",
-    "tab_trends": "トレンド",
-    "tab_demand_supply": "需要と供給",
-    "tab_demographics": "人口統計",
-    "tab_footfall": "来訪者数",
-    "reports_title": "月次レポート",
-    "no_reports": "まだレポートは生成されていません。",
-    "download_pdf": "PDFをダウンロード",
-    "privacy_footer": "すべての指標はバケット化され匿名化されています。N<10のセグメントは抑制されます。",
-    "metric_active_members": "アクティブメンバー",
-    "metric_categories": "カテゴリー",
-    "metric_partner_orgs": "パートナー組織",
-    "metric_event_participation": "イベント参加",
-    "metric_volunteer_hours": "ボランティア時間",
-    "engagement_overview": "エンゲージメント概要（バケット中央値）",
-    "ds_by_postcode": "郵便番号別（3桁）の提供と需要",
-    "no_data": "データがありません。",
-    "offers": "提供",
-    "requests": "依頼",
-    "match_heatmap": "マッチ率セル",
-    "category_short": "カテゴリー",
-    "age_distribution": "年齢分布",
-    "gender_distribution": "性別分布",
-    "footfall_by_area": "エリア別ページビュー",
-    "page_views": "ページビュー",
-    "distinct_visitors": "ユニーク訪問者",
-    "suppressed_value": "非表示",
-    "suppressed_short": "--"
-  }
+  "level_progress_aria": "レベル{{level}}の進捗：{{percentage}}%"
 }

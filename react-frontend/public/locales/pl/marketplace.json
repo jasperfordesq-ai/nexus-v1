@@ -38,7 +38,7 @@
     "not_found_title": "Nie znaleziono ogłoszenia",
     "not_found_description": "To ogłoszenie mogło zostać usunięte lub jest niedostępne.",
     "back_to_marketplace": "Powrót do marketplace",
-    "marketplace": "Marketplace",
+    "marketplace": "Rynek",
     "negotiable": "Do negocjacji",
     "free": "Za darmo",
     "featured": "Wyróżnione",
@@ -178,7 +178,7 @@
     "created_success": "Ogłoszenie utworzone pomyślnie!",
     "created_error": "Nie udało się utworzyć ogłoszenia",
     "created_error_retry": "Nie udało się utworzyć ogłoszenia. Spróbuj ponownie.",
-    "draft_saved": "Draft saved"
+    "draft_saved": "Wersja robocza zapisana"
   },
   "search": {
     "page_title": "Przeszukaj marketplace",
@@ -227,7 +227,7 @@
     "not_found_title": "Nie znaleziono sprzedawcy",
     "not_found_description": "Nie można odnaleźć tego profilu sprzedawcy.",
     "back_to_marketplace": "Powrót do marketplace",
-    "marketplace": "Marketplace",
+    "marketplace": "Rynek",
     "verified": "Zweryfikowany",
     "seller_type_business": "Firma",
     "seller_type_private": "Sprzedawca prywatny",
@@ -255,7 +255,7 @@
     "not_found_title": "Nie znaleziono kategorii",
     "not_found_description": "Ta kategoria nie istnieje.",
     "back_to_marketplace": "Powrót do marketplace",
-    "marketplace": "Marketplace",
+    "marketplace": "Rynek",
     "listings_count_one": "{{count}} ogłoszenie",
     "listings_count_other": "{{count}} ogłoszeń",
     "search_placeholder": "Szukaj w {{name}}...",
@@ -489,7 +489,7 @@
     "frequency_daily": "Codziennie",
     "frequency_weekly": "Co tydzień",
     "channel_email": "E-mail",
-    "channel_push": "Push",
+    "channel_push": "Naciskać",
     "channel_both": "E-mail i push"
   },
   "promotions": {
@@ -552,7 +552,7 @@
     "offers_title_count": "Oferty dostawy ({{count}})",
     "unknown": "Nieznany",
     "time_credits_value": "{{count}} KC",
-    "estimated_minutes": "~{{count}} min",
+    "estimated_minutes": "~{{count}}min",
     "accept": "Akceptuj",
     "confirm": "Potwierdź dostawę",
     "offer_to_deliver": "Zaoferuj dostawę",
@@ -573,7 +573,8 @@
       "declined": "Odrzucona",
       "completed": "Zakończona",
       "cancelled": "Anulowana"
-    }
+    },
+    "offers_title": "Oferty dostawy"
   },
   "pickup": {
     "my_pickups_title": "Moje odbiory",

@@ -1,4 +1,15 @@
 {
+  "detail": {
+    "back_to_goals": "Ar ais go dtí cuspóirí",
+    "view_all_goals": "Féach ar gach cuspóir",
+    "not_found_title": "Cuspóir gan aimsiú",
+    "not_found_description": "Seans gur scriosadh an cuspóir seo nó nach raibh sé ann riamh.",
+    "private_title": "Tá an cuspóir seo príobháideach",
+    "private_description": "Ní féidir ach úinéir an chuspóra féachaint air.",
+    "meta_description": "Tá {{owner}} ag rianú \"{{title}}\" le dul chun cinn {{progress}}% sa sprioc phobail seo.",
+    "overdue_chip": "Moillithe",
+    "checkin_frequency": "Minicíocht cláraithe isteach"
+  },
   "checkin_recorded": "Seiceail taifeadta!",
   "checkin_failed": "Theip ar an seiceail a thaifeadadh.",
   "reminder_set_failed": "Theip ar an meabhruchan a shocru.",
@@ -13,15 +24,15 @@
     "history": "Stair",
     "no_checkins": "Níl seiceálacha isteach ann fós. Taifead do chéad cheann!",
     "progress_label": "Dul Chun Cinn",
+    "progress_help": "Socraigh seo ar an dul chun cinn fíor a theastaíonn uait a thaispeáint ar an gcuspóir. Nuair a chláraíonn tú isteach, nuashonraíonn sé barra an chuspóra agus an amlíne.",
+    "progress_value": "{{percent}}%",
+    "progress_unknown": "Dul chun cinn gan taifead",
     "mood_label": "Conas atá tú ag mothú?",
     "note_label": "Nóta (roghnach)",
     "note_placeholder": "Conas atá ag éirí leat? Aon bhuanna nó dúshláin?",
     "cancel": "Cealaigh",
     "submit": "Taifead Seiceáil Isteach",
-    "check_in_button": "Seiceáil Isteach",
-    "progress_help": "Socraigh seo ar an dul chun cinn fíor a theastaíonn uait a thaispeáint ar an gcuspóir. Nuair a chláraíonn tú isteach, nuashonraíonn sé barra an chuspóra agus an amlíne.",
-    "progress_value": "{{percent}}%",
-    "progress_unknown": "Dul chun cinn gan taifead"
+    "check_in_button": "Seiceáil Isteach"
   },
   "mood": {
     "great": "Iontach",
@@ -41,11 +52,11 @@
     "reminder_set_success": "Meabhrúchán socraithe: {{frequency}}"
   },
   "frequency": {
+    "none": "Gan cadence",
     "daily": "Laethúil",
     "weekly": "Seachtainiúil",
     "biweekly": "Gach 2 sheachtain",
-    "monthly": "Míosúil",
-    "none": "Gan cadence"
+    "monthly": "Míosúil"
   },
   "template": {
     "title": "Tosaigh ó Theimpléad",
@@ -73,26 +84,6 @@
       "completed": "Críochnaithe",
       "created": "Cruthaithe"
     }
-  },
-  "template_picker": {
-    "load_error": "Theip ar luchtú teimpléid. Déan iarracht arís.",
-    "try_again": "Déan iarracht arís",
-    "none_available": "Níl aon teimpléad ar fáil go fóill.",
-    "none_in_category": "Níl aon teimpléad sa chatagóir seo."
-  },
-  "detail": {
-    "back_to_goals": "Ar ais go dtí cuspóirí",
-    "view_all_goals": "Féach ar gach cuspóir",
-    "not_found_title": "Cuspóir gan aimsiú",
-    "not_found_description": "Seans gur scriosadh an cuspóir seo nó nach raibh sé ann riamh.",
-    "private_title": "Tá an cuspóir seo príobháideach",
-    "private_description": "Ní féidir ach úinéir an chuspóra féachaint air.",
-    "overdue_chip": "Moillithe",
-    "checkin_frequency": "Minicíocht cláraithe isteach",
-    "meta_description": "Tá {{owner}} ag rianú \"{{title}}\" le dul chun cinn {{progress}}% sa sprioc phobail seo."
-  },
-  "goals": {
-    "load_error": "Theip ar luchtú cuspóirí. Déan iarracht arís."
   },
   "insights": {
     "loading": "Ag luchtú léargais cuspóra",
@@ -130,5 +121,14 @@
       "celebration": "Ceiliúradh",
       "note": "Nóta"
     }
+  },
+  "template_picker": {
+    "load_error": "Theip ar luchtú teimpléid. Déan iarracht arís.",
+    "try_again": "Déan iarracht arís",
+    "none_available": "Níl aon teimpléad ar fáil go fóill.",
+    "none_in_category": "Níl aon teimpléad sa chatagóir seo."
+  },
+  "goals": {
+    "load_error": "Theip ar luchtú cuspóirí. Déan iarracht arís."
   }
 }

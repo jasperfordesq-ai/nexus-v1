@@ -265,7 +265,7 @@
     "unsubscribe": "Abmelden",
     "manage_preferences": "Einstellungen verwalten",
     "manage_email_preferences": "E-Mail-Einstellungen verwalten",
-    "test_prefix": "[TEST]",
+    "test_prefix": "[PRÜFEN]",
     "no_subject": "Kein Betreff"
   },
   "notification": {

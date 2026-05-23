@@ -1,4 +1,7 @@
 {
+  "empty": {
+    "no_stories": "Brak dostępnych historii"
+  },
   "creator": {
     "title": "Utwórz historię",
     "close": "Zamknij twórcę",
@@ -30,9 +33,9 @@
     "gradient_dark": "Ciemny",
     "gradient_pink_rose": "Różowy Róż",
     "gradient_cyan_blue": "Cyjan Niebieski",
-    "font_sans": "Sans",
-    "font_serif": "Serif",
-    "font_mono": "Mono",
+    "font_sans": "Bez",
+    "font_serif": "Szeryf",
+    "font_mono": "Mononukleoza",
     "template_ama": "Zapytaj mnie o cokolwiek",
     "template_morning": "Dzień dobry",
     "template_grateful": "Wdzięczny za",
@@ -64,7 +67,10 @@
     "error_image_size": "Obraz musi mieć mniej niż 10MB",
     "error_video_type": "Proszę wybrać plik wideo",
     "error_video_size": "Wideo musi mieć mniej niż 50MB",
+    "share_story": "Udostępnij historię",
     "error_camera": "Nie można uzyskać dostępu do kamery. Proszę sprawdzić uprawnienia.",
+    "error_camera_permission": "Odmówiono dostępu do kamery. Włącz go w ustawieniach przeglądarki.",
+    "error_camera_not_found": "Nie znaleziono kamery na tym urządzeniu.",
     "error_process": "Nie udało się przetworzyć obrazu",
     "error_create": "Nie udało się stworzyć historii",
     "flip_camera": "Przełącz kamerę",
@@ -92,9 +98,6 @@
     "or_divider": "lub",
     "poll_add_option_button": "Dodaj opcję",
     "videos_trimmed_notice": "Filmy dłuższe niż 60s zostaną skrócone do 60s czasu wyświetlania",
-    "share_story": "Udostępnij historię",
-    "error_camera_permission": "Odmówiono dostępu do kamery. Włącz go w ustawieniach przeglądarki.",
-    "error_camera_not_found": "Nie znaleziono kamery na tym urządzeniu.",
     "video_duration_seconds": "{{count}}s"
   },
   "viewer": {
@@ -129,9 +132,6 @@
     "reply_placeholder_generic": "Odpowiedz na historię...",
     "react_with": "Zareaguj z {{type}}",
     "viewers_title_count": "Widzowie ({{count}})"
-  },
-  "empty": {
-    "no_stories": "Brak dostępnych historii"
   },
   "highlights": {
     "no_stories": "Ten wyróżnienie nie ma historii",

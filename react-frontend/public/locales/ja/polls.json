@@ -25,6 +25,10 @@
     "open": "受付中",
     "closed": "締め切り"
   },
+  "badges": {
+    "ranked": "順位付き",
+    "anonymous": "匿名"
+  },
   "tabs": {
     "open": "受付中",
     "closed": "締め切り済み",
@@ -39,7 +43,7 @@
   },
   "time_remaining": "{{time}}が残っています",
   "expired": "期限切れ",
-  "created_by": "by",
+  "created_by": "による",
   "delete_poll": "投票を削除",
   "confirm_delete": {
     "title": "投票を削除",
@@ -74,14 +78,6 @@
   "category_placeholder": "例：コミュニティ、イベント、フィードバック",
   "anonymous_voting": "匿名投票",
   "anonymous_voting_desc": "結果に投票者の身元を隠す",
-  "aria": {
-    "export_csv": "結果をCSVとしてエクスポート",
-    "move_rank_down": "{{option}} を下に移動",
-    "move_rank_up": "{{option}} を上に移動"
-  },
-  "page_meta": {
-    "title": "投票"
-  },
   "ranked_results_title": "ラウンドごとの結果",
   "round_number": "ラウンド {{number}}",
   "eliminated_candidate": "脱落: {{name}}",
@@ -92,8 +88,12 @@
   "view_ranked_results": "順位結果を見る",
   "winner_label": "勝者: {{name}}",
   "submit_rankings": "順位を送信",
-  "badges": {
-    "ranked": "順位付き",
-    "anonymous": "匿名"
+  "aria": {
+    "export_csv": "結果をCSVとしてエクスポート",
+    "move_rank_down": "{{option}} を下に移動",
+    "move_rank_up": "{{option}} を上に移動"
+  },
+  "page_meta": {
+    "title": "投票"
   }
 }

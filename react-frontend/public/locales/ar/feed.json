@@ -1,7 +1,8 @@
 {
-  "page_title": "Feed",
+  "page_title": "يٌطعم",
   "title": "تغذية المجتمع",
   "subtitle": "شاهد ما يحدث في مجتمعك",
+  "meta_description": "موجز مجتمعي خاص للتحديثات والقوائم والفعاليات والاستطلاعات والأهداف والمحادثات.",
   "new_post": "منشور جديد",
   "whats_on_your_mind": "ما الذي يدور في ذهنك؟",
   "add_image_aria": "أضف صورة",
@@ -15,9 +16,12 @@
   "session_expired": "انتهت صلاحية جلستك. يرجى تسجيل الدخول مرة أخرى.",
   "error_load": "فشل في تحميل التغذية.",
   "error_load_retry": "فشل في تحميل التغذية. يرجى المحاولة مرة أخرى.",
+  "error_hint": "لا تزال عوامل التصفية ومحرر المسودات هنا. حدّث الموجز عند جاهزية الاتصال.",
+  "loading_label": "جارٍ تحميل تحديثات المجتمع...",
   "empty_title": "لا توجد منشورات حتى الآن",
   "empty_desc": "كن أول من يشارك شيئًا مع مجتمعك!",
   "empty_filtered": "?? ???? ?? ????? ??? ????? ????. ???? ?????? ???????.",
+  "empty_filtered_with_filter": "لا توجد تحديثات من نوع {{filter}} الآن. جرّب جميع المنشورات أو ابدأ محادثة جديدة.",
   "filter": {
     "all": "الكل",
     "posts": "المنشورات",
@@ -28,14 +32,14 @@
     "jobs": "الوظائف",
     "challenges": "التحديات",
     "volunteering": "التطوع",
-    "blogs": "Blog",
+    "blogs": "مدونة",
     "discussions": "النقاشات",
     "following": "المتابَعون",
     "saved": "المحفوظات",
     "clear": "مسح تصفية الخلاصة",
+    "show_all": "عرض كل المنشورات",
     "more": "المزيد",
-    "select": "اختر تصفية الخلاصة",
-    "show_all": "عرض كل المنشورات"
+    "select": "اختر تصفية الخلاصة"
   },
   "report": {
     "title": "الإبلاغ عن المنشور",
@@ -80,6 +84,7 @@
     "description_label": "الوصف",
     "location_label": "الموقع",
     "location_placeholder": "ابحث عن موقع...",
+    "location_from_profile": "من ملفك الشخصي — حدّث في الإعدادات",
     "post_created": "تم إنشاء المنشور!",
     "post_failed": "فشل في إنشاء المنشور.",
     "post_button": "نشر",
@@ -208,21 +213,20 @@
     "media_rejected": "{{count}} ملف(ملفات) تم تخطيها (نوع خاطئ أو كبيرة جدًا)",
     "media_compression_failed": "{{count}} صورة(صور) فشلت في المعالجة",
     "media_upload_error": "فشل في معالجة الصور",
+    "upload_preview_alt": "معاينة التحميل {{number}}",
+    "image_remove_number_aria": "إزالة الصورة {{number}}",
+    "alt_text_add": "إضافة نص بديل",
+    "alt_text_edit": "تعديل النص البديل",
     "sdg_selected_one": "{{count}} هدف محدد",
     "sdg_selected_other": "{{count}} أهداف محددة",
     "content_required": "لا يمكن أن يكون محتوى المنشور فارغاً.",
     "content_too_long": "المنشور طويل جداً (الحد الأقصى {{max}} حرف).",
     "groups_load_error": "فشل في تحميل المجموعات.",
-    "upload_preview_alt": "معاينة التحميل {{number}}",
-    "image_remove_number_aria": "إزالة الصورة {{number}}",
-    "alt_text_add": "إضافة نص بديل",
-    "alt_text_edit": "تعديل النص البديل",
-    "location_from_profile": "من ملفك الشخصي — حدّث في الإعدادات",
     "video_invalid_type": "صيغة الفيديو غير صالحة. استخدم MP4 أو WebM أو OGG أو MOV.",
     "video_too_large": "يجب أن يكون حجم الفيديو أقل من {{size}}MB.",
     "video": "فيديو",
     "video_remove": "إزالة الفيديو",
-    "file_size_mb": "{{name}} ({{size}}MB)"
+    "file_size_mb": "{{name}} ({{size}}ميجابايت)"
   },
   "moderation": {
     "unauthorized": "ليس لديك صلاحية لتنفيذ هذا الإجراء."
@@ -268,6 +272,7 @@
     "type_volunteer": "متطوع",
     "type_blog": "مدونة",
     "type_discussion": "نقاش",
+    "type_resource": "مورد",
     "type_badge_earned": "الشارة المكتسبة",
     "type_level_up": "ترقية المستوى",
     "badge_earned_message": "{{name}} حصل على شارة \"{{badge}}\"!",
@@ -332,8 +337,7 @@
     "milestone": {
       "badge_unlocked": "تم إطلاق الشارة",
       "level_reached": "تم الوصول إلى المستوى"
-    },
-    "type_resource": "مورد"
+    }
   },
   "poll": {
     "load_failed": "فشل في تحميل بيانات الاستطلاع.",
@@ -598,9 +602,5 @@
     "back": "العودة إلى الخلاصة",
     "not_found": "العنصر غير موجود",
     "load_failed": "فشل في تحميل العنصر"
-  },
-  "meta_description": "موجز مجتمعي خاص للتحديثات والقوائم والفعاليات والاستطلاعات والأهداف والمحادثات.",
-  "error_hint": "لا تزال عوامل التصفية ومحرر المسودات هنا. حدّث الموجز عند جاهزية الاتصال.",
-  "loading_label": "جارٍ تحميل تحديثات المجتمع...",
-  "empty_filtered_with_filter": "لا توجد تحديثات من نوع {{filter}} الآن. جرّب جميع المنشورات أو ابدأ محادثة جديدة."
+  }
 }

@@ -403,7 +403,7 @@
     "refresh_error": "Échec de l'actualisation",
     "refresh": "Rafraîchir",
     "try_again": "Essayer à nouveau",
-    "top_percent": "Top {{percent}}%",
+    "top_percent": "{{percent}} % supérieurs",
     "remaining_count": "{{count}} restant",
     "category_progress_aria": "{{category}}: {{score}} of {{max}}",
     "tier_threshold": "{{tier}} ({{min}}+)",

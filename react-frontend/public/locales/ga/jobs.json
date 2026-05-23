@@ -259,7 +259,7 @@
     "market_avg": "Meán an Mhargaidh",
     "ai_insights": "Léargais IS",
     "days_short_value": "{{count}} lá",
-    "not_available": "N/A"
+    "not_available": "N/B"
   },
   "salary": {
     "label": "Cúiteamh",
@@ -457,7 +457,7 @@
     "refresh": "Athnuaigh",
     "message_applicant": "Teachtaireacht",
     "kanban_board": "Clár Kanban",
-    "cv_download_error": "Failed to download CV"
+    "cv_download_error": "Theip ar CV a íoslódáil"
   },
   "interview": {
     "schedule": "Sceideal Agallamh",
@@ -479,7 +479,7 @@
     "accept": "Glac",
     "decline": "Diúltaigh",
     "minutes": "nóim",
-    "download_ics": "Download .ics"
+    "download_ics": "Íosluchtaigh ics"
   },
   "offer": {
     "title": "Fuair tú tairiscint!",
@@ -522,7 +522,7 @@
     "save": "Sábháil Cárta Scóir",
     "saved": "Cárta scóir sábháilte",
     "notes_placeholder": "Nótaí roghnacha faoin iarratasóir seo...",
-    "max_score_suffix": "/ 10",
+    "max_score_suffix": "/10",
     "communication": "Cumarsáid",
     "technical": "Scileanna Teicniúla",
     "cultural_fit": "Oiriúnacht Chultúrtha",
@@ -985,21 +985,24 @@
   "deadline_countdown_one": "Ag dúnadh i gceann {{count}} lá",
   "deadline_countdown_other": "Ag dúnadh i gceann {{count}} lá",
   "ai_chat": {
-    "open": "Ask AI about this job",
-    "close": "Close AI chat",
+    "open": "Cuir ceist ar AI faoin bpost seo",
+    "close": "Dún comhrá AI",
     "send": "Seol",
     "title": "Cúntóir Poist AI",
-    "hint": "Ask me anything about this job — qualifications, salary, how to apply, interview tips...",
+    "hint": "Cuir ceist ar bith orm faoin bpost seo - cáilíochtaí, tuarastal, conas iarratas a dhéanamh, leideanna agallaimh ...",
     "placeholder": "Cuir ceist faoin bpost seo...",
     "error_response": "Tá brón orm, ní raibh mé in ann do iarratas a phróiseáil.",
-    "error_generic": "Tá brón orm, tharla rud éigin mícheart."
+    "error_generic": "Tá brón orm, tharla rud éigin mícheart.",
+    "thinking": "Ag smaoineamh...",
+    "clear": "Glan an comhrá",
+    "suggestions": "Ceisteanna molta"
   },
   "page_meta": {
     "bias_audit": {
-      "title": "Bias Audit"
+      "title": "Iniúchadh Laofachta"
     },
     "create": {
-      "title": "Post a Job",
+      "title": "Post a Post",
       "description": "Cruthaigh folúntas poist, oibre deonaí nó bainc ama do do phobal."
     },
     "edit": {
@@ -1007,26 +1010,34 @@
       "description": "Nuashonraigh sonraí an fholúntais, luach saothair, socruithe foirne agus roghanna foilsithe."
     },
     "talent_search": {
-      "title": "Talent Search"
+      "title": "Cuardach Talent"
     },
     "my_applications": {
-      "title": "My Applications",
+      "title": "Mo Iarratais",
       "description": "Lean iarratais ar phost, ar obair dheonach agus ar bhanc ama ó dheais príobháideach amháin."
     },
     "analytics": {
-      "title": "Job Analytics"
+      "title": "Anailísí Poist"
     },
     "kanban": {
-      "title": "Job Applications"
+      "title": "Iarratais Poist"
     },
     "alerts": {
-      "title": "Job Alerts"
+      "title": "Foláirimh Poist"
     },
     "employer_onboarding": {
-      "title": "Employer Onboarding"
+      "title": "Dul ar Bord Fostóra"
     },
     "employer_brand": {
-      "title": "Employer Brand"
+      "title": "Branda Fostóra"
+    },
+    "index": {
+      "title": "Folúntais Poist",
+      "description": "Brabhsáil deiseanna oibre agus róil atá ar fáil i do phobal"
+    },
+    "detail": {
+      "title": "{{title}} — Poist",
+      "description": "Féach ar shonraí an phoist agus déan iarratas"
     }
   },
   "jobs": {

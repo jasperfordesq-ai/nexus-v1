@@ -27,7 +27,7 @@
   "flyout": {
     "bell_aria": "Notifications",
     "bell_unread_aria": "Notificaties, {{count}} ongelezen",
-    "unread_count": "unread",
+    "unread_count": "ongelezen",
     "empty": "Nog geen notificaties",
     "view_all": "Bekijk alle notificaties",
     "close": "Meldingen sluiten",

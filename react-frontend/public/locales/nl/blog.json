@@ -1,5 +1,7 @@
 {
-  "page_title": "Blog",
+  "page_title": "Bloggen",
+  "hero_eyebrow": "Communityverhalen",
+  "hero_posts_label": "Getoonde berichten",
   "title": "Blog & Nieuws",
   "subtitle": "Verhalen, updates en aankondigingen uit de gemeenschap",
   "search_placeholder": "Zoek berichten...",
@@ -11,6 +13,9 @@
   "empty_title": "Geen berichten gevonden",
   "empty_desc": "Er zijn nog geen blogberichten gepubliceerd",
   "empty_desc_filtered": "Probeer andere zoektermen of wis je filters",
+  "empty_tip_stories": "Ledenverhalen",
+  "empty_tip_guides": "Gidsen",
+  "empty_tip_updates": "Updates",
   "load_more": "Laad Meer Berichten",
   "min_read": "{{count}} min lezen",
   "min_read_short": "{{count}}m",
@@ -42,6 +47,7 @@
     "reply_count": "{{count}} antwoorden",
     "hide": "Verbergen",
     "you": "Jij",
+    "unknown_author": "Onbekende auteur",
     "aria_add_reaction": "Voeg reactie toe",
     "aria_send_reply": "Verzend antwoord",
     "reaction_heart": "Liefde",
@@ -49,17 +55,11 @@
     "reaction_thumbs_down": "Vind ik niet leuk",
     "reaction_laugh": "Haha",
     "reaction_angry": "Boos",
-    "unknown_author": "Onbekende auteur",
     "reaction_love": "Geweldig",
     "reaction_like": "Vind ik leuk",
     "reaction_wow": "Wauw",
     "reaction_sad": "Verdrietig",
     "reaction_celebrate": "Vieren"
   },
-  "page_description": "Verhalen, gidsen en updates van de tijdbank-gemeenschap — uitwisselingen die werkten, geleerde lessen en het laatste nieuws van lokale groepen en partners.",
-  "hero_eyebrow": "Communityverhalen",
-  "hero_posts_label": "Getoonde berichten",
-  "empty_tip_stories": "Ledenverhalen",
-  "empty_tip_guides": "Gidsen",
-  "empty_tip_updates": "Updates"
+  "page_description": "Verhalen, gidsen en updates van de tijdbank-gemeenschap — uitwisselingen die werkten, geleerde lessen en het laatste nieuws van lokale groepen en partners."
 }

@@ -456,9 +456,9 @@
     "make_public": "Maak deze collectie openbaar",
     "public": "Openbaar",
     "private": "Privé",
-    "item_count": "{{count}} items",
+    "item_count": "{{count}} artikelen",
     "item_count_one": "{{count}} item",
-    "item_count_other": "{{count}} items",
+    "item_count_other": "{{count}} artikelen",
     "category": "Categorie",
     "created": "Collectie aangemaakt",
     "create_error": "Mislukt om collectie aan te maken",
@@ -573,7 +573,8 @@
       "declined": "Geweigerd",
       "completed": "Voltooid",
       "cancelled": "Geannuleerd"
-    }
+    },
+    "offers_title": "Leveringsaanbiedingen"
   },
   "pickup": {
     "my_pickups_title": "Mijn afhalingen",
@@ -618,10 +619,10 @@
     "breadcrumb": "Kaart Zoekopdracht",
     "search_placeholder": "Zoek naar vermeldingen in de buurt...",
     "radius_label": "Zoekradius",
-    "radius_option": "{{km}} km",
+    "radius_option": "{{km}} kilometer",
     "radius_chip": "{{km}} km straal",
     "results_count": "{{count}} vermeldingen gevonden in de buurt",
-    "refresh": "Refresh",
+    "refresh": "Vernieuwen",
     "map_view": "Kaartweergave",
     "list_view": "Lijstweergave",
     "location_required": "Stel je locatie in je profiel in om deze functie te gebruiken",

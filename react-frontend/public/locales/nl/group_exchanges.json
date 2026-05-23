@@ -148,7 +148,7 @@
     "step_of_named": "Stap {{current}} van {{total}}: {{name}}",
     "hours_value": "{{hours}} u",
     "hours_suffix": "u",
-    "weight_suffix": "x"
+    "weight_suffix": "X"
   },
   "toast": {
     "load_more_failed": "Kon meer uitwisselingen niet laden",

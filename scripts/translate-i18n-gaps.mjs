@@ -102,13 +102,45 @@ const SKIP_NAMESPACES = new Set([
   'super_admin.json',
 ]);
 
-// Strings matching these patterns are NOT translated (URLs, placeholders, etc.)
-const NO_TRANSLATE_PATTERNS = [
+// Strings matching these patterns are never translated (URLs, placeholders, codes,
+// formatter fragments, sample values, and product/technology names).
+const HARD_NO_TRANSLATE_PATTERNS = [
   /^https?:\/\//,           // URLs
   /^\{\{.*\}\}$/,           // pure Handlebars templates
-  /^[a-zA-Z0-9_]+$/,       // single words / identifiers (likely code values)
   /^\d+$/,                  // pure numbers
   /^[A-Z_]+$/,              // ALL_CAPS constants
+  /^[\s\-–—./…#∞⌘()]+$/u,   // punctuation / symbolic UI placeholders
+  /^[€$£]?\d[\d,.: ]*(?:[€$£])?(?:\s*[:–-]\s*[€$£]?\d[\d,.: ]*)?$/,
+  /^\d+(?:\.\d+)?\s*(?:km|m|h|TC)$/i,
+  /^\d+\s*minutes?$/i,
+  /^\d+d$/i,
+  /^\/\s?\d+$/,
+  /^\.[a-z0-9]+$/i,
+  /^(?:h|x|km|cr|min|vs|paypal)$/i,
+  /^\[TEST\]$/,
+  /^e\.g\.\s+.+$/i,
+  /^[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}$/, // sample email addresses
+  /^[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}(?:,\s*[\w.+-]+@[\w.-]+\.[A-Za-z]{2,})+$/,
+  /^[+\d ()-]{7,}$/,        // sample phone numbers
+  /^[•*]+$/,                // password placeholders
+  /^[A-Za-z0-9!@#$%^&*()_+=.,:;'"?/-]{8,}$/, // sample passwords / compact tokens
+  /^[-+~#x()/:\s]*\{\{[^}]+\}\}[-+~#x()/:\s]*(?:\{\{[^}]+\}\}[-+~#x()/:\s]*)*(?:%|h|d|m|km|KB|MB|GB|XP|cr|min|minutes?)?$/i,
+  /^\(?\{\{[^}]+\}\}\s*[/–-]\s*\{\{[^}]+\}\}\)?$/,
+  /^(?:AGPL|MIT|Apache|GPL|LGPL|BSD)[A-Za-z0-9 .—–©{}-]+.*$/i,
+  /^(?:PDF|DOCX?|XLSX?|TXT|CSV|JPG|JPEG|PNG|GIF|SVG)(?:,\s*(?:PDF|DOCX?|XLSX?|TXT|CSV|JPG|JPEG|PNG|GIF|SVG))*.*$/i,
+  /^Budget\s*\([€$£]\)$/i,
+  /^Name\s*\(optional\)$/i,
+  /^Onboarding\s+-\s+Broker$/i,
+  /^Capacitor\s+\(iOS\s+\+\s+Android\)$/i,
+  /^(?:AI|API|URL|ID|XP|CV|OAuth|GDPR|DSA|FAQ|UTC|HTTP|HTTPS|JSON|CSV|PDF|PNG|JPG|JPEG|WebP|MP4|MOV|WebM|ICS)$/i,
+  /^(?:Google|Facebook|Outlook|OpenAI|MariaDB|Meilisearch|Laravel|PHP|React|TypeScript|HeroUI|Tailwind CSS|Firebase Cloud Messaging|Pusher WebSockets|NexusScore|NEXUS|Verein|Vereine|Spitex)(?:\b.*)?$/i,
+  /^[A-Z][A-Za-z0-9+.-]*(?:\s+[A-Z][A-Za-z0-9+.-]*)*(?:\s+v?\d+(?:\.\d+)*(?:\+)?)*$/,
+];
+
+// Strings matching these patterns are skipped by default, but --include-simple
+// can still process them when intentionally translating short UI labels.
+const SIMPLE_NO_TRANSLATE_PATTERNS = [
+  /^[a-zA-Z0-9_]+$/,       // single words / identifiers (likely code values)
 ];
 
 // ── CLI args ─────────────────────────────────────────────────────────────────
@@ -153,13 +185,41 @@ function setNestedKey(obj, keyPath, value) {
 function shouldSkipValue(val) {
   if (typeof val !== 'string') return true;
   if (!val.trim()) return true;
+  if (HARD_NO_TRANSLATE_PATTERNS.some(p => p.test(val.trim()))) return true;
+  if (isTemplateFragment(val)) return true;
   if (INCLUDE_SIMPLE) {
-    return NO_TRANSLATE_PATTERNS
-      .filter(p => p.source !== '^[a-zA-Z0-9_]+$')
-      .some(p => p.test(val.trim()));
+    return false;
   }
-  if (NO_TRANSLATE_PATTERNS.some(p => p.test(val.trim()))) return true;
+  if (SIMPLE_NO_TRANSLATE_PATTERNS.some(p => p.test(val.trim()))) return true;
   return false;
+}
+
+function isTemplateFragment(val) {
+  const text = val.trim();
+  if (!text.includes('{{')) return false;
+
+  const withoutTemplates = text.replace(/\{\{[^}]+\}\}/g, ' ');
+  const words = withoutTemplates.match(/[A-Za-zÀ-ÿ]+/g) ?? [];
+  if (words.length <= 2) return true;
+
+  return words.every(word => [
+    'AI',
+    'CV',
+    'ID',
+    'KB',
+    'MB',
+    'TC',
+    'Lv',
+    'Ref',
+    'Image',
+    'Option',
+    'Version',
+    'Position',
+    'Deadline',
+    'Interview',
+    'Match',
+    'Platform',
+  ].includes(word));
 }
 
 // DeepL supports interpolation variables like {{name}} — preserve them.

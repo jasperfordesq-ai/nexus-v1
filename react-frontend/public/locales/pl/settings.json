@@ -1,4 +1,9 @@
 {
+  "push_status": {
+    "unsupported": "Twoja przeglądarka nie obsługuje powiadomień push.",
+    "denied": "Zablokowano powiadomienia. Zaktualizuj ustawienia przeglądarki, aby je ponownie włączyć.",
+    "subscribed": "Jesteś zasubskrybowany na tym urządzeniu."
+  },
   "identity": {
     "page_title": "Zweryfikuj tożsamość",
     "page_title_dob": "Zweryfikuj tożsamość — Data urodzenia",
@@ -49,24 +54,24 @@
   "marketing_consent_confirm_body": "Czy na pewno chcesz otrzymywać okazjonalne e-maile marketingowe, aktualizacje produktów i najważniejsze wiadomości ze społeczności? Możesz zrezygnować w dowolnym momencie.",
   "marketing_consent_confirm_button": "Tak, subskrybuj mnie",
   "cancel": "Anuluj",
-  "title": "Settings",
-  "account": "Account",
-  "notifications": "Notifications",
-  "privacy": "Privacy",
-  "language": "Language",
-  "appearance": "Appearance",
+  "title": "Ustawienia",
+  "account": "Konto",
+  "notifications": "Powiadomienia",
+  "privacy": "Prywatność",
+  "language": "Język",
+  "appearance": "Wygląd",
   "language_appearance": "Język i wygląd",
-  "security": "Security",
+  "security": "Bezpieczeństwo",
   "save": "Zapisz ustawienia",
   "saved": "Ustawienia zapisane",
   "notification_load_failed": "Nie udało się wczytać ustawień powiadomień",
   "language_preference": "Preferencje językowe",
   "select_language": "Wybierz preferowany język interfejsu",
   "theme": {
-    "title": "Theme",
-    "light": "Light",
-    "dark": "Dark",
-    "system": "System"
+    "title": "Temat",
+    "light": "Światło",
+    "dark": "Ciemny",
+    "system": "Systemowy"
   },
   "security_settings": "Ustawienia zabezpieczeń",
   "change_password": "Zmień hasło",
@@ -76,11 +81,11 @@
   "twofa_enabled": "Włączone",
   "twofa_backup_remaining": "{{count}} kody zapasowe pozostałe",
   "twofa_not_enabled": "Nie włączone",
-  "twofa_disable": "Disable",
-  "twofa_enable": "Enable",
+  "twofa_disable": "Wyłączyć",
+  "twofa_enable": "Włączać",
   "active_sessions": "Aktywne sesje",
-  "session_current": "Current",
-  "session_on": "on",
+  "session_current": "Aktualny",
+  "session_on": "NA",
   "session_last_active": "Ostatnia aktywność:",
   "sessions_coming_soon": "Zarządzanie sesjami wkrótce dostępne",
   "account_actions": "Akcje konta",
@@ -99,7 +104,7 @@
   "twofa_enter_code": "Wprowadź 6-cyfrowy kod",
   "twofa_code_description": "Wprowadź 6-cyfrowy kod z aplikacji uwierzytelniającej",
   "twofa_verify_enable": "Zweryfikuj i włącz",
-  "twofa_cancel": "Cancel",
+  "twofa_cancel": "Anulować",
   "twofa_disable_title": "Wyłącz uwierzytelnianie dwuskładnikowe",
   "twofa_disable_warning": "To zmniejszy bezpieczeństwo Twojego konta",
   "twofa_disable_desc": "Bez 2FA, Twoje konto będzie chronione tylko hasłem.",
@@ -113,7 +118,7 @@
   "biometric": {
     "label_builtin": "Wbudowany uwierzytelniacz",
     "label_external": "Zewnętrzny uwierzytelniacz",
-    "label_passkey": "Passkey",
+    "label_passkey": "Klucz uniwersalny",
     "platform_windows_title": "Konfiguracja na Windows",
     "platform_windows_step1": "Kliknij \"Ten komputer\", aby utworzyć klucz dostępu przechowywany na tym komputerze. Potwierdzisz za pomocą swojego kodu PIN Windows Hello, odcisku palca lub twarzy.",
     "platform_windows_step2": "Wymaganie: Musisz najpierw skonfigurować Windows Hello. Przejdź do Ustawienia Windows > Konta > Opcje logowania > PIN, aby to skonfigurować.",
@@ -158,7 +163,7 @@
   "passkey_remove_all_confirm": "Usuń wszystko",
   "passkey_confirm_remove_all_title": "Usuń wszystkie klucze dostępu",
   "passkey_confirm_remove_all_body": "Czy na pewno chcesz usunąć wszystkie klucze dostępu? Będziesz musiał je ponownie skonfigurować na każdym urządzeniu.",
-  "passkey_confirm_remove_all_cancel": "Cancel",
+  "passkey_confirm_remove_all_cancel": "Anulować",
   "passkey_confirm_remove_all_confirm": "Usuń wszystko",
   "passkey_rename": "Zmień nazwę klucza dostępu",
   "passkey_rename_input": "Nowa nazwa klucza dostępu",
@@ -251,7 +256,7 @@
     "employers_liability": "Odpowiedzialność pracodawcy",
     "product_liability": "Odpowiedzialność za produkt",
     "personal_accident": "Wypadek osobisty",
-    "other": "Other",
+    "other": "Inny",
     "uploading": "Przesyłanie...",
     "upload_certificate": "Prześlij certyfikat",
     "status_verified": "Zweryfikowany",
@@ -289,7 +294,7 @@
     "chip_vetted_only": "Tylko zweryfikowane kontakty"
   },
   "header": {
-    "title": "Settings",
+    "title": "Ustawienia",
     "subtitle": "Zarządzaj preferencjami swojego konta",
     "badge": "Ustawienia konta",
     "unsaved_badge": "Niezapisane zmiany",
@@ -334,8 +339,15 @@
     "frequency": "Częstotliwość podsumowania",
     "frequency_description": "Jak często otrzymujesz e-maile z podsumowaniem dopasowań",
     "daily": "Codziennie",
+    "monthly": "Miesięcznie",
     "fortnightly": "Co dwa tygodnie",
     "never": "Nigdy",
+    "weekly": "Co tydzień"
+  },
+  "activity_digest": {
+    "off": "Wyłączone",
+    "instant": "Natychmiast",
+    "daily": "Codziennie",
     "monthly": "Miesięcznie"
   },
   "privacy_sections": {
@@ -465,7 +477,7 @@
     "certificate_uploaded": "Certyfikat przesłany",
     "certificate_uploaded_desc": "Twój certyfikat ubezpieczenia został przesłany do przeglądu",
     "insurance_upload_failed_desc": "Nie udało się przesłać certyfikatu ubezpieczenia",
-    "copied": "Copied",
+    "copied": "Skopiowano",
     "backup_codes_copied_desc": "Kody zapasowe skopiowane do schowka",
     "copy_failed": "Kopiowanie nie powiodło się",
     "copy_failed_desc": "Nie można skopiować do schowka",
@@ -541,7 +553,7 @@
     "font_large": "L",
     "density": "Gęstość układu",
     "density_desc": "Kontroluj odstępy i wypełnienia elementów interfejsu",
-    "density_compact": "Compact",
+    "density_compact": "Kompaktowy",
     "density_comfortable": "Wygodny",
     "density_spacious": "Przestronny",
     "accessibility_profile": "Profil dostępności",
@@ -559,6 +571,9 @@
     "title": "Zablokowani użytkownicy",
     "subtitle": "Zarządzaj użytkownikami, których zablokowałeś",
     "description": "Zablokowani członkowie nie mogą przeglądać Twojego profilu, wysyłać Ci wiadomości ani wchodzić w interakcje z Twoją treścią.",
+    "privacy_badge": "Ustawienia prywatności",
+    "summary_label": "Zablokowani członkowie",
+    "count": "{{count}} zablokowanych",
     "empty": "Brak zablokowanych użytkowników",
     "empty_desc": "Użytkownicy, których zablokujesz, nie będą mogli zobaczyć Twojego profilu, wysłać Ci wiadomości ani wchodzić w interakcje z Twoimi treściami.",
     "unblock": "Odblokuj",
@@ -568,10 +583,7 @@
     "unblocked_desc": "{{name}} został odblokowany.",
     "unblock_error": "Nie udało się odblokować użytkownika",
     "blocked_on": "Zablokowany na {{date}}",
-    "link": "Zablokowani użytkownicy",
-    "privacy_badge": "Ustawienia prywatności",
-    "summary_label": "Zablokowani członkowie",
-    "count": "{{count}} zablokowanych"
+    "link": "Zablokowani użytkownicy"
   },
   "block_user": {
     "title": "Zablokować {{name}}?",
@@ -596,16 +608,5 @@
     "stay": "Zostań"
   },
   "push_campaign_opt_in": "Otrzymuj promowane powiadomienia push",
-  "push_campaign_opt_in_description": "Zezwól lokalnym firmom i organizacjom na wysyłanie ukierunkowanych powiadomień push. Możesz zrezygnować w dowolnym momencie.",
-  "push_status": {
-    "unsupported": "Twoja przeglądarka nie obsługuje powiadomień push.",
-    "denied": "Zablokowano powiadomienia. Zaktualizuj ustawienia przeglądarki, aby je ponownie włączyć.",
-    "subscribed": "Jesteś zasubskrybowany na tym urządzeniu."
-  },
-  "activity_digest": {
-    "off": "Wyłączone",
-    "instant": "Natychmiast",
-    "daily": "Codziennie",
-    "monthly": "Miesięcznie"
-  }
+  "push_campaign_opt_in_description": "Zezwól lokalnym firmom i organizacjom na wysyłanie ukierunkowanych powiadomień push. Możesz zrezygnować w dowolnym momencie."
 }

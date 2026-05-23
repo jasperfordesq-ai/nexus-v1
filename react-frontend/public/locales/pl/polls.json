@@ -25,6 +25,10 @@
     "open": "Otwarte",
     "closed": "Zamknięte"
   },
+  "badges": {
+    "ranked": "Z rankingiem",
+    "anonymous": "Anonimowy"
+  },
   "tabs": {
     "open": "Otwarte",
     "closed": "Zamknięte",
@@ -39,7 +43,7 @@
   },
   "time_remaining": "{{time}} pozostało",
   "expired": "Wygasłe",
-  "created_by": "by",
+  "created_by": "przez",
   "delete_poll": "Usuń ankietę",
   "confirm_delete": {
     "title": "Usuń ankietę",
@@ -74,14 +78,6 @@
   "category_placeholder": "np. Społeczność, Wydarzenia, Opinie",
   "anonymous_voting": "Anonimowe głosowanie",
   "anonymous_voting_desc": "Ukryj tożsamości głosujących w wynikach",
-  "aria": {
-    "export_csv": "Eksportuj wyniki jako CSV",
-    "move_rank_down": "Przenieś {{option}} w dół",
-    "move_rank_up": "Przenieś {{option}} w górę"
-  },
-  "page_meta": {
-    "title": "Ankiety"
-  },
   "ranked_results_title": "Wyniki runda po rundzie",
   "round_number": "Runda {{number}}",
   "eliminated_candidate": "Wyeliminowany: {{name}}",
@@ -92,8 +88,12 @@
   "view_ranked_results": "Zobacz wyniki rankingowe",
   "winner_label": "Zwycięzca: {{name}}",
   "submit_rankings": "Prześlij ranking",
-  "badges": {
-    "ranked": "Z rankingiem",
-    "anonymous": "Anonimowy"
+  "aria": {
+    "export_csv": "Eksportuj wyniki jako CSV",
+    "move_rank_down": "Przenieś {{option}} w dół",
+    "move_rank_up": "Przenieś {{option}} w górę"
+  },
+  "page_meta": {
+    "title": "Ankiety"
   }
 }

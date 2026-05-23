@@ -1,4 +1,7 @@
 {
+  "empty": {
+    "no_stories": "Aucune histoire disponible"
+  },
   "creator": {
     "title": "Créer une story",
     "close": "Fermer le créateur",
@@ -64,7 +67,10 @@
     "error_image_size": "L’image ne doit pas dépasser 10 Mo",
     "error_video_type": "Veuillez sélectionner un fichier vidéo",
     "error_video_size": "La vidéo ne doit pas dépasser 50 Mo",
+    "share_story": "Partager la story",
     "error_camera": "Impossible d’accéder à la caméra. Veuillez vérifier les autorisations.",
+    "error_camera_permission": "L'accès à la caméra a été refusé. Veuillez l'activer dans les paramètres du navigateur.",
+    "error_camera_not_found": "Aucune caméra trouvée sur cet appareil.",
     "error_process": "Impossible de traiter l’image",
     "error_create": "Impossible de créer la story",
     "flip_camera": "Retourner la caméra",
@@ -88,13 +94,10 @@
     "templates_label": "Modèles",
     "background_label": "Arrière-plan",
     "font_label": "Police",
-    "options_label": "Options",
+    "options_label": "Possibilités",
     "or_divider": "ou",
     "poll_add_option_button": "Ajouter une option",
     "videos_trimmed_notice": "Les vidéos de plus de 60s seront réduites à 60s de durée d'affichage",
-    "share_story": "Partager la story",
-    "error_camera_permission": "L'accès à la caméra a été refusé. Veuillez l'activer dans les paramètres du navigateur.",
-    "error_camera_not_found": "Aucune caméra trouvée sur cet appareil.",
     "video_duration_seconds": "{{count}}s"
   },
   "viewer": {
@@ -129,9 +132,6 @@
     "reply_placeholder_generic": "Répondre à la story...",
     "react_with": "Réagir avec {{type}}",
     "viewers_title_count": "Spectateurs ({{count}})"
-  },
-  "empty": {
-    "no_stories": "Aucune histoire disponible"
   },
   "highlights": {
     "no_stories": "Ce highlight n'a pas de stories",

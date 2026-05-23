@@ -1,14 +1,17 @@
 {
   "back": "Zurück",
+  "empty_dash": "-",
+  "refresh": "Aktualisieren",
   "hours_short": "{{count}} h",
+  "not_available": "Nicht verfügbar",
   "error_title": "Etwas ist schief gelaufen",
   "nav": {
-    "dashboard": "Dashboard",
-    "feed": "Feed",
+    "dashboard": "Armaturenbrett",
+    "feed": "Füttern",
     "listings": "Inserate",
     "messages": "Nachrichten",
     "community": "Gemeinschaft",
-    "caring_community": "Caring Community",
+    "caring_community": "Fürsorgliche Gemeinschaft",
     "members": "Mitglieder",
     "events": "Veranstaltungen",
     "groups": "Gruppen",
@@ -26,7 +29,7 @@
     "saved": "Gespeichert",
     "federation": "Föderation",
     "federation_hub": "Föderations-Hub",
-    "federation_hub_short": "Hub",
+    "federation_hub_short": "Nabe",
     "partner_communities": "Partnergemeinschaften",
     "federation_partners_short": "Partner",
     "federated_members": "Verbundene Mitglieder",
@@ -36,7 +39,7 @@
     "federated_listings": "Verbundene Inserate",
     "federation_listings_short": "Inserate",
     "federated_events": "Verbundene Veranstaltungen",
-    "federation_events_short": "Events",
+    "federation_events_short": "Veranstaltungen",
     "federation_settings": "Föderationseinstellungen",
     "federation_settings_short": "Einstellungen",
     "about": "Über uns",
@@ -62,7 +65,7 @@
     "timebanking": "Zeitbank",
     "explore": "Entdecken",
     "marketplace": "Marktplatz",
-    "premium": "Premium",
+    "premium": "Prämie",
     "verify_identity": "Identität verifizieren",
     "accessibility_alpha": "Barrierefreiheit (Alpha)",
     "features": "Funktionen"
@@ -72,8 +75,12 @@
     "aria_label": "Bereiche der Gemeinschaft erkunden"
   },
   "location": {
-    "powered_by_google": "Powered by Google",
+    "powered_by_google": "Unterstützt von Google",
     "powered_by_osm": "© OpenStreetMap-Mitwirkende"
+  },
+  "keyboard": {
+    "command_symbol": "⌘",
+    "k_key": "K"
   },
   "nav_desc": {
     "feed": "Community-Feed",
@@ -171,10 +178,10 @@
     "legal_hub": "Rechtliches",
     "terms_of_service": "Nutzungsbedingungen",
     "privacy_policy": "Datenschutzerklärung",
-    "type_community_guidelines": "Community-Richtlinien",
-    "type_acceptable_use": "Nutzungsrichtlinien",
     "cookie_policy": "Cookie-Richtlinie",
-    "accessibility": "Barrierefreiheit"
+    "accessibility": "Barrierefreiheit",
+    "type_community_guidelines": "Community-Richtlinien",
+    "type_acceptable_use": "Nutzungsrichtlinien"
   },
   "admin_tools": {
     "section": "Admin-Werkzeuge",
@@ -199,7 +206,7 @@
     "activity": "Aktivität",
     "partner_communities": "Partnergemeinschaften",
     "about": "Über uns",
-    "support": "Support",
+    "support": "Unterstützung",
     "legal": "Rechtliches",
     "admin": "Admin",
     "account": "Konto",
@@ -220,11 +227,11 @@
     "switch_to_light": "Zum hellen Modus wechseln",
     "switch_to_dark": "Zum dunklen Modus wechseln",
     "skip_to_content": "Zum Hauptinhalt springen",
+    "accessibility_alpha_new_tab": "Barrierefreiheit (Alpha) in neuem Tab öffnen",
     "menu_opened": "Navigationsmenü geöffnet",
     "close": "Schliessen",
     "scroll_to_top": "Nach oben scrollen",
-    "breadcrumb": "Brotkrümel",
-    "accessibility_alpha_new_tab": "Barrierefreiheit (Alpha) in neuem Tab öffnen"
+    "breadcrumb": "Brotkrümel"
   },
   "cookie_consent": {
     "banner_label": "Cookie-Zustimmung",
@@ -247,12 +254,12 @@
     "save": "Einstellungen speichern"
   },
   "footer": {
-    "project_nexus": "Project NEXUS",
+    "project_nexus": "Projekt NEXUS",
     "source_repo": "GitHub-Repo",
     "source_repo_aria": "Project NEXUS-GitHub-Repository öffnen",
     "source_repo_tooltip": "Project NEXUS-Quellrepository auf GitHub öffnen",
     "platform": "Plattform",
-    "support": "Support",
+    "support": "Unterstützung",
     "help_center": "Hilfezentrum",
     "contact_us": "Kontaktieren Sie uns",
     "about": "Über uns",
@@ -261,7 +268,7 @@
     "pages": "Seiten",
     "cookie_settings": "Cookie-Einstellungen",
     "built_on_nexus": "Erstellt auf Project NEXUS — Open-Source-Gemeinschaftsplattform",
-    "agpl_notice": "AGPL-3.0 — Copyright © 2024–{{year}} Jasper Ford",
+    "agpl_notice": "AGPL-3.0 – Copyright © 2024–{{year}} Jasper Ford",
     "terms": "AGB",
     "privacy": "Datenschutz",
     "trust_safety": "Vertrauen & Sicherheit",
@@ -281,6 +288,8 @@
   "members": {
     "title": "Mitglieder",
     "subtitle": "Vernetzen Sie sich mit Mitgliedern der Gemeinschaft",
+    "hero_eyebrow": "Community-Verzeichnis",
+    "count_label": "Angezeigte Mitglieder",
     "quick_filters": "Mitgliederfilter",
     "all": "Alle Mitglieder",
     "new": "Neue Mitglieder",
@@ -305,6 +314,9 @@
     "no_members": "Keine Mitglieder gefunden",
     "no_members_search": "Versuchen Sie einen anderen Suchbegriff",
     "no_members_community": "Noch keine Mitglieder in dieser Gemeinschaft",
+    "empty_tip_profiles": "Vollständige Profile durchsuchen",
+    "empty_tip_skills": "Nach Fähigkeit suchen",
+    "empty_tip_location": "Mitglieder in der Nähe ausprobieren",
     "load_more": "Mehr laden",
     "results_matching": "{{shown}} von {{total}} Mitgliedern, die \"{{query}}\" entsprechen",
     "results_count": "{{count}} Mitglieder angezeigt",
@@ -324,12 +336,7 @@
     "load_failed": "Mitglieder konnten nicht geladen werden",
     "load_more_failed": "Weitere Mitglieder konnten nicht geladen werden",
     "my_profile": "Mein Profil",
-    "load_more_count": "Mehr laden ({{remaining}} verbleibend)",
-    "hero_eyebrow": "Community-Verzeichnis",
-    "count_label": "Angezeigte Mitglieder",
-    "empty_tip_profiles": "Vollständige Profile durchsuchen",
-    "empty_tip_skills": "Nach Fähigkeit suchen",
-    "empty_tip_location": "Mitglieder in der Nähe ausprobieren"
+    "load_more_count": "Mehr laden ({{remaining}} verbleibend)"
   },
   "error_boundary": {
     "title": "Etwas ist schiefgelaufen",
@@ -481,6 +488,7 @@
       "description": "Bitte deine Gemeinschaft um Unterstützung"
     },
     "subtitle": "Deine Nachbarinnen und Nachbarn sind für dich da. Sag uns, was du brauchst – wir geben unser Bestes.",
+    "on_behalf_notice": "Sie erstellen diese Anfrage für jemanden, den Sie als Pflegeperson unterstützen.",
     "form": {
       "what_label": "Welche Art von Hilfe brauchst du?",
       "what_placeholder": "z. B. Hilfe beim Einkaufen, eine Fahrt zum Arzt, Begleitung bei einem Spaziergang...",
@@ -514,8 +522,7 @@
       "filled_hint": "Wir haben das Formular aus deiner Aufnahme befüllt. Bitte prüfe es vor dem Absenden.",
       "transcript_label": "Was wir gehört haben"
     },
-    "back": "Zurück zur Caring Community",
-    "on_behalf_notice": "Sie erstellen diese Anfrage für jemanden, den Sie als Pflegeperson unterstützen."
+    "back": "Zurück zur Caring Community"
   },
   "hour_gift": {
     "meta": {
@@ -598,13 +605,13 @@
     },
     "history": {
       "title": "Deine bisherigen Überträge",
+      "aria": "Verlauf der Stundenübertragungen",
       "date": "Datum",
       "destination": "Ziel",
       "hours": "Stunden",
       "status": "Status",
       "reason": "Grund",
-      "empty": "Noch keine Überträge.",
-      "aria": "Verlauf der Stundenübertragungen"
+      "empty": "Noch keine Überträge."
     },
     "status": {
       "pending": "Wartet auf Freigabe",
@@ -772,15 +779,18 @@
     "clear": "Löschen",
     "scroll_left": "Nach links scrollen",
     "scroll_right": "Nach rechts scrollen",
+    "current_language": "Sprache: {{language}}",
     "select_language": "Sprache auswählen",
     "clear_location": "Standort löschen",
     "select_category": "Kategorie auswählen",
     "verification_badges": "Verifizierungsabzeichen",
-    "search_skills": "Fähigkeiten suchen",
-    "current_language": "Sprache: {{language}}"
+    "search_skills": "Fähigkeiten suchen"
   },
   "skills": {
     "browse_title": "Gemeinschafts-Fähigkeitenverzeichnis",
+    "explainer": "Durchsuchen Sie die Fähigkeiten, die Mitglieder in Ihrer Community teilen, finden Sie Menschen, die Hilfe anbieten, und entdecken Sie Mitglieder, die lernen möchten.",
+    "unable_to_load": "Laden nicht möglich",
+    "try_again": "Erneut versuchen",
     "load_failed": "Fähigkeitskategorien konnten nicht geladen werden",
     "load_failed_retry": "Fähigkeitskategorien konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
     "offering_label": "Angeboten",
@@ -823,10 +833,7 @@
     "aria_clear_search": "Suche löschen",
     "aria_close_members_list": "Mitgliederliste schliessen",
     "category_optional": "Kategorie (optional)",
-    "proficiency_level": "Kompetenzstufe",
-    "explainer": "Durchsuchen Sie die Fähigkeiten, die Mitglieder in Ihrer Community teilen, finden Sie Menschen, die Hilfe anbieten, und entdecken Sie Mitglieder, die lernen möchten.",
-    "unable_to_load": "Laden nicht möglich",
-    "try_again": "Erneut versuchen"
+    "proficiency_level": "Kompetenzstufe"
   },
   "hours_display_one": "{{count}} Stunde",
   "hours_display_other": "{{count}} Stunden",
@@ -921,12 +928,12 @@
       "title": "Ungültige Einladung",
       "body": "Dieser Einladungslink ist ungültig. Bitte überprüfe den Link und versuche es erneut."
     },
-    "loading": "Einladung wird geprüft...",
     "error": {
       "title": "Diese Einladung konnte nicht geprüft werden",
       "body": "Bitte prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
       "retry": "Erneut versuchen"
-    }
+    },
+    "loading": "Einladung wird geprüft..."
   },
   "markt": {
     "meta": {
@@ -1034,12 +1041,12 @@
       "subtitle": "So haben Sie Ihre verdienten Stunden bei lokalen Unternehmen eingesetzt.",
       "back": "Zurück zum Community-Hub",
       "table": {
+        "aria": "Verlauf der Treuepunkte-Einlösungen",
         "date": "Datum",
         "merchant": "Händler",
         "item": "Artikel",
         "credits": "Stunden eingesetzt",
-        "discount": "Rabatt",
-        "aria": "Verlauf der Treuepunkte-Einlösungen"
+        "discount": "Rabatt"
       },
       "empty": {
         "title": "Noch keine Einlösungen",
@@ -1077,8 +1084,8 @@
       "date": "Angefragt",
       "format": "Format",
       "size": "Grösse",
-      "empty": "Du hast deine Daten noch nicht exportiert.",
-      "count": "{{count}} Exporte"
+      "count": "{{count}} Exporte",
+      "empty": "Du hast deine Daten noch nicht exportiert."
     },
     "errors": {
       "rate_limit": "Du kannst pro Tag 5 Exporte anfordern. Bitte versuche es morgen wieder.",
@@ -1213,13 +1220,14 @@
     "col_impressions": "Impressionen",
     "col_clicks": "Klicks",
     "col_ctr": "CTR",
+    "date_range": "{{start}} bis {{end}}",
     "status_draft": "Entwurf",
     "status_pending": "Ausstehend",
     "status_active": "Aktiv",
     "status_paused": "Pausiert",
     "status_ended": "Beendet",
     "status_rejected": "Abgelehnt",
-    "type_feed": "Feed",
+    "type_feed": "Füttern",
     "type_discovery": "Entdecken",
     "field_name": "Kampagnenname",
     "field_name_placeholder": "z. B. Frühjahrsaktion",
@@ -1230,13 +1238,12 @@
     "field_budget_desc": "Maximale Gesamtausgaben in Euro.",
     "field_radius": "Zielradius (optional)",
     "field_radius_desc": "Nur Mitgliedern innerhalb dieser Entfernung anzeigen.",
+    "table_aria": "Anzeigenkampagnen",
     "validation_required": "Bitte füllen Sie alle Pflichtfelder aus.",
     "created_success": "Kampagne erfolgreich erstellt.",
     "create_error": "Kampagne konnte nicht erstellt werden. Bitte erneut versuchen.",
     "submit_create": "Kampagne erstellen",
-    "feature_disabled": "Lokale Werbung ist für Ihr Konto nicht verfügbar.",
-    "date_range": "{{start}} bis {{end}}",
-    "table_aria": "Anzeigenkampagnen"
+    "feature_disabled": "Lokale Werbung ist für Ihr Konto nicht verfügbar."
   },
   "push_campaign": {
     "meta": {
@@ -1284,6 +1291,7 @@
     "load_error": "Kampagnen konnten nicht geladen werden. Bitte versuchen Sie es erneut.",
     "retry": "Erneut versuchen",
     "create_first": "Erstellen Sie Ihre erste Push-Kampagne",
+    "table_aria": "Push-Kampagnen",
     "col_name": "Name",
     "col_title": "Titel der Benachrichtigung",
     "col_status": "Status",
@@ -1299,6 +1307,7 @@
     "tier_member": "Mitglied",
     "tier_trusted": "Vertrauenswürdig",
     "tier_verified": "Verifiziert",
+    "radius_km": "{{radius}} km",
     "field_name": "Kampagnenname",
     "field_name_placeholder": "z. B. Sommer-Event-Hinweis",
     "field_title": "Titel der Benachrichtigung",
@@ -1321,14 +1330,15 @@
     "created_success": "Push-Kampagne erfolgreich erstellt.",
     "create_error": "Push-Kampagne konnte nicht erstellt werden. Bitte versuchen Sie es erneut.",
     "submit_create": "Kampagne erstellen",
-    "feature_disabled": "Push-Kampagnen sind für Ihr Konto nicht verfügbar.",
-    "table_aria": "Push-Kampagnen",
-    "radius_km": "{{radius}} km"
+    "feature_disabled": "Push-Kampagnen sind für Ihr Konto nicht verfügbar."
   },
   "push_campaign_opt_in": "Beworbene Push-Benachrichtigungen erhalten",
   "push_campaign_opt_in_description": "Erlauben Sie lokalen Unternehmen und Organisationen, Ihnen gezielte Push-Benachrichtigungen zu senden. Sie können sich jederzeit abmelden.",
   "coupon": {
     "page_title": "Rabatt-Gutscheine",
+    "meta_description": "Durchsuchen Sie aktive Community-Gutscheine, Händlerrabatte und lokale Angebote in Ihrer Region.",
+    "detail_meta_description": "Sehen Sie sich diesen Community-Gutschein an, kopieren Sie den Angebotscode oder erstellen Sie einen QR-Code zur Einlösung im Geschäft.",
+    "detail_meta_description_named": "Sehen Sie sich {{title}} an, kopieren Sie den Gutscheincode {{code}} oder erstellen Sie einen QR-Code zur Einlösung im Geschäft.",
     "page_subtitle": "Stöbern Sie durch Händlerrabatte in Ihrer Gemeinschaft",
     "code": "Code",
     "title": "Titel",
@@ -1372,31 +1382,29 @@
       "valid_from": "Gültig ab",
       "valid_until": "Gültig bis",
       "status": "Status",
+      "status_draft": "Entwurf",
+      "status_active": "Aktiv",
+      "status_paused": "Pausiert",
+      "status_expired": "Abgelaufen",
       "applies_to": "Gilt für",
+      "amount_cents_help": "Betrag in Cent",
       "all_listings": "Alle meine Inserate",
       "specific_listings": "Bestimmte Inserate",
       "specific_categories": "Bestimmte Kategorien",
       "save": "Speichern",
       "delete_confirm": "Diesen Gutschein löschen? Das kann nicht rückgängig gemacht werden.",
       "no_coupons": "Sie haben noch keine Gutscheine erstellt.",
+      "table_aria": "Händler-Gutscheine",
       "redemptions": "Einlösungen",
       "view_redemptions": "Einlösungen anzeigen",
       "usage_count": "{{count}}-mal verwendet",
       "saved": "Gutschein gespeichert",
-      "deleted": "Gutschein gelöscht",
-      "status_draft": "Entwurf",
-      "status_active": "Aktiv",
-      "status_paused": "Pausiert",
-      "status_expired": "Abgelaufen",
-      "amount_cents_help": "Betrag in Cent",
-      "table_aria": "Händler-Gutscheine"
-    },
-    "meta_description": "Durchsuchen Sie aktive Community-Gutscheine, Händlerrabatte und lokale Angebote in Ihrer Region.",
-    "detail_meta_description": "Sehen Sie sich diesen Community-Gutschein an, kopieren Sie den Angebotscode oder erstellen Sie einen QR-Code zur Einlösung im Geschäft.",
-    "detail_meta_description_named": "Sehen Sie sich {{title}} an, kopieren Sie den Gutscheincode {{code}} oder erstellen Sie einen QR-Code zur Einlösung im Geschäft."
+      "deleted": "Gutschein gelöscht"
+    }
   },
   "regional_points": {
     "title": "Regionale Punkte",
+    "default_symbol": "Pkt",
     "subtitle": "Eine regionale Währung, die Sie bei Nachbarn und lokalen Händlern verdienen und einlösen können.",
     "balance": "Guthaben",
     "lifetime_earned": "Gesamt verdient",
@@ -1408,17 +1416,17 @@
     "transfer": {
       "title": "Punkte an ein anderes Mitglied senden",
       "recipient_id": "Empfänger-Mitglieds-ID",
+      "recipient_placeholder": "z. B. 123",
       "amount": "Betrag",
+      "amount_placeholder": "0,00",
       "message": "Nachricht (optional)",
+      "message_placeholder": "Notiz für den Empfänger hinzufügen",
       "submit": "Übertragung senden",
       "success": "Übertragung gesendet",
       "errors": {
         "invalid_recipient": "Geben Sie eine gültige Empfänger-Mitglieds-ID ein",
         "invalid_amount": "Geben Sie einen positiven Betrag ein"
-      },
-      "recipient_placeholder": "z. B. 123",
-      "amount_placeholder": "0,00",
-      "message_placeholder": "Notiz für den Empfänger hinzufügen"
+      }
     },
     "history": {
       "title": "Letzte Aktivität",
@@ -1433,8 +1441,7 @@
     "errors": {
       "load_failed": "Regionale Punkte konnten nicht geladen werden",
       "transfer_failed": "Übertragung fehlgeschlagen"
-    },
-    "default_symbol": "Pkt"
+    }
   },
   "verein_import": {
     "title": "Vereinsmitglieder importieren",
@@ -1444,9 +1451,16 @@
     "csv_format": "Erforderliche Kopfzeile: email,first_name,last_name,phone,role",
     "file_label": "CSV-Datei",
     "csv_label": "Oder CSV einfügen",
+    "csv_placeholder": "E-Mail, Vorname, Nachname, Telefon, Rolle\nalice@example.org,Alice,Smith,+1 555 123 4567,Mitglied",
     "preview": "Vorschau",
     "confirm": "Mitglieder importieren",
     "success": "Import abgeschlossen: {{created}} erstellt, {{linked}} verknüpft",
+    "actions": {
+      "already": "bereits vorhanden",
+      "create": "erstellen",
+      "invalid": "ungültig",
+      "link": "verknüpfen"
+    },
     "summary": {
       "total": "Gesamt",
       "create": "Erstellen",
@@ -1476,17 +1490,10 @@
       "import_failed": "Import fehlgeschlagen",
       "has_invalid": "Ungültige Zeilen vor dem Importieren beheben",
       "has_invalid_summary": "Einige Zeilen sind ungültig. Beheben Sie diese in Ihrer CSV und führen Sie die Vorschau vor dem Import erneut aus."
-    },
-    "csv_placeholder": "email,first_name,last_name,phone,role\nalice@example.org,Alice,Smith,+1 555 123 4567,member",
-    "actions": {
-      "already": "bereits vorhanden",
-      "create": "erstellen",
-      "invalid": "ungültig",
-      "link": "verknüpfen"
     }
   },
   "premium": {
-    "pricing_title": "Premium",
+    "pricing_title": "Prämie",
     "pricing_subtitle": "Schalten Sie Premium-Funktionen frei und holen Sie mehr aus Ihrer Gemeinschaft heraus.",
     "monthly": "Monatlich",
     "yearly": "Jährlich",
@@ -1554,6 +1561,10 @@
   },
   "developers": {
     "page_title": "Entwickler",
+    "meta_description": "Entdecken Sie die Project NEXUS Partner-API für OAuth2-Authentifizierung, scoped Endpoints, signierte Webhooks und Integrationszugriff.",
+    "auth_meta_title": "API-Authentifizierung",
+    "endpoints_meta_title": "API-Endpoints",
+    "webhooks_meta_title": "API-Webhooks",
     "hero_title": "Mit NEXUS bauen",
     "hero_subtitle": "Eine kuratierte REST-API für Banking-, Zahlungs- und kommunale Verwaltungspartner. OAuth2 Client Credentials, signierte Webhooks und eine Sandbox, die Sie in fünf Minuten nutzen können.",
     "request_access_cta": "Zugang anfordern",
@@ -1582,21 +1593,10 @@
     "curl_example": "curl-Beispiel",
     "js_example": "JavaScript-Beispiel",
     "endpoints_intro": "Sorgfältig ausgewählte REST-Endpunkte. Alle Pfade beginnen mit /api/partner/v1. Alle Antworten sind JSON mit API-Version: 2.0 Header.",
-    "scope_label": "Scope",
+    "scope_label": "Umfang",
     "method_label": "Methode",
     "path_label": "Pfad",
     "description_label": "Beschreibung",
-    "webhooks_intro": "Abonnieren Sie Ereignisse mit HTTPS-Callback-URLs. Jede Auslieferung enthält einen X-Partner-Signature-Header — ein HMAC-SHA256 des Roh-Bodys, signiert mit dem bei der Erstellung zurückgegebenen Abonnement-Secret.",
-    "webhook_events_title": "Verfügbare Ereignisse",
-    "webhook_event_wallet_credited": "wallet.credited — wird ausgelöst, wenn ein Partner Zeitstunden über /wallet/credit gutschreibt",
-    "webhook_signing_title": "Signaturen verifizieren",
-    "webhook_signing_body": "Berechnen Sie den HMAC-SHA256 des Roh-Request-Bodys mit Ihrem Abonnement-Secret. Vergleichen Sie ihn in konstanter Zeit mit dem X-Partner-Signature-Header.",
-    "webhook_create_title": "Ein Abonnement erstellen",
-    "webhook_create_body": "POST an /api/partner/v1/webhooks/subscriptions mit event_types (Array) und target_url (nur https). Die Antwort enthält ein einmaliges Secret — speichern Sie es.",
-    "meta_description": "Entdecken Sie die Project NEXUS Partner-API für OAuth2-Authentifizierung, scoped Endpoints, signierte Webhooks und Integrationszugriff.",
-    "auth_meta_title": "API-Authentifizierung",
-    "endpoints_meta_title": "API-Endpoints",
-    "webhooks_meta_title": "API-Webhooks",
     "endpoints_table_aria": "Partner-API-Endpoints",
     "endpoint_descriptions": {
       "oauth_token": "Client-Anmeldedaten gegen ein Bearer-Token tauschen (client_credentials grant).",
@@ -1609,10 +1609,20 @@
       "aggregates_community": "Gebündelte Community-Summen (ohne PII). Nützlich für Partner-Dashboards.",
       "webhooks_list": "Ihre Webhook-Abonnements auflisten.",
       "webhooks_create": "Events abonnieren. Body: event_types[], target_url (https://)."
-    }
+    },
+    "webhooks_intro": "Abonnieren Sie Ereignisse mit HTTPS-Callback-URLs. Jede Auslieferung enthält einen X-Partner-Signature-Header — ein HMAC-SHA256 des Roh-Bodys, signiert mit dem bei der Erstellung zurückgegebenen Abonnement-Secret.",
+    "webhook_events_title": "Verfügbare Ereignisse",
+    "webhook_event_wallet_credited": "wallet.credited — wird ausgelöst, wenn ein Partner Zeitstunden über /wallet/credit gutschreibt",
+    "webhook_signing_title": "Signaturen verifizieren",
+    "webhook_signing_body": "Berechnen Sie den HMAC-SHA256 des Roh-Request-Bodys mit Ihrem Abonnement-Secret. Vergleichen Sie ihn in konstanter Zeit mit dem X-Partner-Signature-Header.",
+    "webhook_create_title": "Ein Abonnement erstellen",
+    "webhook_create_body": "POST an /api/partner/v1/webhooks/subscriptions mit event_types (Array) und target_url (nur https). Die Antwort enthält ein einmaliges Secret — speichern Sie es."
   },
   "regional_analytics": {
     "page_title": "Regionale Analysen",
+    "meta_description": "Entdecken Sie datenschutzfreundliche regionale Analysen für Kommunen und KMU-Partner mit anonymisierten Community-Trends und aggregierten Berichten.",
+    "partner_dashboard_title": "Regionale Analysen",
+    "partner_dashboard_meta_description": "Privates regionales Analyse-Dashboard für autorisierte Partner.",
     "contact_subject": "Regional Analytics – Partneranfrage",
     "privacy_badge": "Datenschutz steht beim Design an erster Stelle",
     "hero_title": "Verstehen Sie Ihre Region. Ohne die Privatsphäre zu beeinträchtigen.",
@@ -1658,10 +1668,49 @@
         "feature_3": "Vierteljährliche Review-Workshops",
         "feature_4": "Engagierter Erfolgsmanager"
       }
-    },
-    "meta_description": "Entdecken Sie datenschutzfreundliche regionale Analysen für Kommunen und KMU-Partner mit anonymisierten Community-Trends und aggregierten Berichten.",
-    "partner_dashboard_title": "Regionale Analysen",
-    "partner_dashboard_meta_description": "Privates regionales Analyse-Dashboard für autorisierte Partner."
+    }
+  },
+  "partner_analytics": {
+    "no_token_title": "Abonnement-Token erforderlich",
+    "no_token_body": "Bitte verwenden Sie den sicheren Link, den Ihr Account Manager bereitgestellt hat. Der Link enthält ein eindeutiges Abonnement-Token.",
+    "error_title": "Analysen können nicht geladen werden",
+    "error_unauthorized": "Ihr Abonnement-Token ist ungültig oder abgelaufen.",
+    "error_generic": "Beim Abrufen Ihrer Analysen ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+    "retry": "Erneut versuchen",
+    "title": "Regionale Analysen",
+    "subtitle": "Datenschutzgebündelte Einblicke für Ihre Region. Täglich aktualisiert.",
+    "period_label": "Zeitraum",
+    "period_30d": "Letzte 30 Tage",
+    "period_90d": "Letzte 90 Tage",
+    "period_year": "Letztes Jahr",
+    "tabs_aria": "Analyse-Tabs",
+    "tab_trends": "Trends",
+    "tab_demand_supply": "Angebot & Nachfrage",
+    "tab_demographics": "Demografie",
+    "tab_footfall": "Besucherzahlen",
+    "reports_title": "Monatsberichte",
+    "no_reports": "Noch keine Berichte erstellt.",
+    "download_pdf": "PDF herunterladen",
+    "privacy_footer": "Alle Metriken sind gebündelt und anonymisiert. Segmente mit N<10 werden unterdrückt.",
+    "metric_active_members": "Aktive Mitglieder",
+    "metric_categories": "Kategorien",
+    "metric_partner_orgs": "Partnerorganisationen",
+    "metric_event_participation": "Veranstaltungsteilnahme",
+    "metric_volunteer_hours": "Freiwilligenstunden",
+    "engagement_overview": "Engagement-Übersicht (Bucket-Mittelwerte)",
+    "ds_by_postcode": "Angebote vs. Anfragen nach Postleitzahl (3-stellig)",
+    "no_data": "Keine Daten verfügbar.",
+    "offers": "Angebote",
+    "requests": "Anfragen",
+    "match_heatmap": "Match-Rate-Zellen",
+    "category_short": "Kat",
+    "age_distribution": "Altersverteilung",
+    "gender_distribution": "Geschlechterverteilung",
+    "footfall_by_area": "Seitenaufrufe nach Gebiet",
+    "page_views": "Seitenaufrufe",
+    "distinct_visitors": "Eindeutige Besucher",
+    "suppressed_value": "Unterdrückt",
+    "suppressed_short": "--"
   },
   "provisioning": {
     "meta": {
@@ -1975,7 +2024,13 @@
     "col_status": "Status",
     "col_due": "Fällig",
     "col_reminders": "Erinnerungen",
+    "col_email_delivery": "E-Mail-Zustellung",
     "col_actions": "Aktionen",
+    "email_status": {
+      "failed": "Fehlgeschlagen",
+      "pending": "Kein Nachweis",
+      "sent": "Gesendet"
+    },
     "errors": {
       "load_failed": "Mitgliedsbeiträge konnten nicht geladen werden.",
       "start_payment_failed": "Zahlung konnte nicht gestartet werden. Bitte versuchen Sie es erneut.",
@@ -1983,12 +2038,6 @@
       "generate_failed": "Generierung fehlgeschlagen.",
       "reminder_failed": "Erinnerung konnte nicht gesendet werden.",
       "waive_failed": "Beiträge konnten nicht erlassen werden."
-    },
-    "col_email_delivery": "E-Mail-Zustellung",
-    "email_status": {
-      "failed": "Fehlgeschlagen",
-      "pending": "Kein Nachweis",
-      "sent": "Gesendet"
     }
   },
   "collections": {
@@ -2061,13 +2110,13 @@
     "ios_add_to_home": "Zum Startbildschirm hinzufügen",
     "ios_step_2_after": ".",
     "ios_step_3": "Tippen Sie auf Hinzufügen. NEXUS erscheint als eigenständige App auf Ihrem Startbildschirm.",
-    "got_it": "Verstanden",
     "generic_title": "NEXUS installieren",
     "generic_intro": "Suchen Sie im Menü Ihres Browsers nach einer Installationsoption:",
     "generic_step_1": "Öffnen Sie das Browsermenü, meist ein Drei-Punkte- oder Drei-Striche-Symbol.",
     "generic_step_2": "Suchen Sie nach App installieren, Diese Seite installieren oder Zum Startbildschirm hinzufügen.",
     "generic_step_3": "Bestätigen Sie, um NEXUS zu Ihrem Gerät hinzuzufügen.",
     "manual_note": "Wenn Sie die Option nicht sehen, hat Ihr Browser die App möglicherweise bereits installiert oder Ihr Gerät unterstützt dies nicht.",
+    "got_it": "Verstanden",
     "android_chrome_title": "Auf Android installieren",
     "android_chrome_intro": "Fügen Sie NEXUS über das Chrome-Menü zu Ihrem Startbildschirm hinzu:",
     "android_chrome_step_1": "Tippen Sie auf das Drei-Punkte-Menü oben rechts in Chrome.",
@@ -2133,54 +2182,5 @@
   "level_plain": "Stufe {{level}}",
   "level_named": "Stufe {{level}} - {{name}}",
   "xp_progress": "{{current}} / {{required}} XP",
-  "level_progress_aria": "Fortschritt Stufe {{level}}: {{percentage}}%",
-  "empty_dash": "-",
-  "refresh": "Aktualisieren",
-  "not_available": "Nicht verfügbar",
-  "keyboard": {
-    "command_symbol": "⌘",
-    "k_key": "K"
-  },
-  "partner_analytics": {
-    "no_token_title": "Abonnement-Token erforderlich",
-    "no_token_body": "Bitte verwenden Sie den sicheren Link, den Ihr Account Manager bereitgestellt hat. Der Link enthält ein eindeutiges Abonnement-Token.",
-    "error_title": "Analysen können nicht geladen werden",
-    "error_unauthorized": "Ihr Abonnement-Token ist ungültig oder abgelaufen.",
-    "error_generic": "Beim Abrufen Ihrer Analysen ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
-    "retry": "Erneut versuchen",
-    "title": "Regionale Analysen",
-    "subtitle": "Datenschutzgebündelte Einblicke für Ihre Region. Täglich aktualisiert.",
-    "period_label": "Zeitraum",
-    "period_30d": "Letzte 30 Tage",
-    "period_90d": "Letzte 90 Tage",
-    "period_year": "Letztes Jahr",
-    "tabs_aria": "Analyse-Tabs",
-    "tab_trends": "Trends",
-    "tab_demand_supply": "Angebot & Nachfrage",
-    "tab_demographics": "Demografie",
-    "tab_footfall": "Besucherzahlen",
-    "reports_title": "Monatsberichte",
-    "no_reports": "Noch keine Berichte erstellt.",
-    "download_pdf": "PDF herunterladen",
-    "privacy_footer": "Alle Metriken sind gebündelt und anonymisiert. Segmente mit N<10 werden unterdrückt.",
-    "metric_active_members": "Aktive Mitglieder",
-    "metric_categories": "Kategorien",
-    "metric_partner_orgs": "Partnerorganisationen",
-    "metric_event_participation": "Veranstaltungsteilnahme",
-    "metric_volunteer_hours": "Freiwilligenstunden",
-    "engagement_overview": "Engagement-Übersicht (Bucket-Mittelwerte)",
-    "ds_by_postcode": "Angebote vs. Anfragen nach Postleitzahl (3-stellig)",
-    "no_data": "Keine Daten verfügbar.",
-    "offers": "Angebote",
-    "requests": "Anfragen",
-    "match_heatmap": "Match-Rate-Zellen",
-    "category_short": "Kat",
-    "age_distribution": "Altersverteilung",
-    "gender_distribution": "Geschlechterverteilung",
-    "footfall_by_area": "Seitenaufrufe nach Gebiet",
-    "page_views": "Seitenaufrufe",
-    "distinct_visitors": "Eindeutige Besucher",
-    "suppressed_value": "Unterdrückt",
-    "suppressed_short": "--"
-  }
+  "level_progress_aria": "Fortschritt Stufe {{level}}: {{percentage}}%"
 }

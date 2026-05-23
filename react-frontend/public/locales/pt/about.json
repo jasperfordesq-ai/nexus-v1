@@ -119,16 +119,16 @@
     "learn_more_1_description": "A nossa visão de 5 anos para crescimento e federação",
     "learn_more_2_title": "Guia de Timebanking",
     "learn_more_2_description": "Saiba como funciona o timebanking",
+    "tech_partner_label": "Parceiro de tecnologia",
+    "tech_partner_logo_alt": "Logotipo do projeto NEXUS",
+    "tech_partner_heading": "TimeBank Irlanda e Projeto NEXUS",
+    "tech_partner_description": "hOUR Timebank é orgulhosamente desenvolvido pelo Projeto NEXUS — uma plataforma de timebanking de código aberto construída para ajudar comunidades a trocar habilidades e fortalecer laços sociais. Nossa parceria tecnológica garante que cada membro se beneficie de uma experiência digital moderna, acessível e voltada para a comunidade.",
+    "our_partners_heading": "Nossos parceiros e apoiadores",
+    "partners_banner_alt": "Logótipos de parceiros: West Cork Development Partnership, SICAP, Cork County Council, Departamento de Planeamento Habitacional Comunitário e Governo Local, Fundos Europeus Estruturais e de Investimento, Fundo Social Europeu",
     "cta_heading": "Vamos Construir Comunidades Mais Fortes Juntos",
     "cta_subtitle": "Seja uma empresa, financiador, investigador ou líder comunitário — existe um modelo de parceria que funciona para si.",
     "cta_contact": "Iniciar uma Conversa",
-    "cta_view_plan": "Ver Plano Estratégico",
-    "our_partners_heading": "Our Partners & Supporters",
-    "partners_banner_alt": "Partner logos: West Cork Development Partnership, SICAP, Cork County Council, Department of Housing Planning Community and Local Government, European Structural and Investment Funds, European Social Fund",
-    "tech_partner_label": "Technology Partner",
-    "tech_partner_logo_alt": "Project NEXUS logo",
-    "tech_partner_heading": "TimeBank Ireland and Project NEXUS",
-    "tech_partner_description": "hOUR Timebank is proudly powered by Project NEXUS — an open-source timebanking platform built to help communities exchange skills and strengthen social bonds. Our technology partnership ensures every member benefits from a modern, accessible, and community-first digital experience."
+    "cta_view_plan": "Ver Plano Estratégico"
   },
   "social_prescribing": {
     "page_title": "Prescrição Social",
@@ -151,7 +151,7 @@
     "strategic_fit_3": "Fornece dados estruturados de resultados para relatórios de saúde pública",
     "strategic_fit_4": "Modelo escalável através de rede comunitária federada",
     "testimonial_quote": "O banco de tempo não me deu apenas algo para fazer — deu-me um lugar a que pertencer. O meu médico encaminhou-me após um ano difícil, e agora sou eu que ajudo os outros.",
-    "testimonial_name": "Monica",
+    "testimonial_name": "Mônica",
     "testimonial_role": "Membro do hOUR Timebank, referenciação médica",
     "referral_pathway_heading": "A Via de Referenciação Gerida",
     "referral_pathway_subtitle": "Um processo em quatro etapas concebido para profissionais de saúde e trabalhadores de ligação comunitária.",
@@ -174,7 +174,7 @@
     "meta_description": "O Estudo de Impacto Social completo de 2023 do hOUR Timebank — análise SROI independente que mostra €16 de retorno social por cada €1 investido.",
     "breadcrumb_about": "Sobre",
     "hero_title": "Estudo de Impacto Social",
-    "hero_org_year": "hOUR Timebank — 2023",
+    "hero_org_year": "hora Timebank — 2023",
     "hero_description": "Uma análise independente de Retorno Social do Investimento que avalia o impacto social, económico e comunitário do programa hOUR Timebank da Timebanking Ireland.",
     "download_full_report": "Transferir Relatório Completo",
     "executive_summary_pdf": "Sumário Executivo",
@@ -195,7 +195,7 @@
     "study_objective_3": "Documentar a via de referenciação e o processo de envolvimento",
     "study_objective_4": "Fornecer recomendações baseadas em evidências para a expansão do programa",
     "case_study_label": "Estudo de Caso",
-    "case_study_monica_name": "Monica",
+    "case_study_monica_name": "Mônica",
     "case_study_monica_quote": "Fui referenciada pelo meu médico após um ano muito difícil. O banco de tempo deu-me um propósito — comecei a ajudar com jardinagem e, antes que percebesse, tinha toda uma rede de amigos. Mudou genuinamente a minha vida.",
     "case_study_elaine_name": "Elaine",
     "case_study_elaine_quote": "Aderi após a reforma e não sabia o que esperar. Em poucas semanas estava a ensinar informática e a receber boleias para consultas. Não é caridade — é comunidade.",
@@ -231,10 +231,15 @@
     "sroi_breakdown_heading": "Desagregação SROI",
     "sroi_component_header": "Componente",
     "sroi_value_header": "Valor",
+    "sroi_result_value": "16€: 1€",
     "sroi_total_investment": "Investimento Total (Entrada)",
+    "sroi_total_investment_value": "50.000€",
     "sroi_total_present_value": "Valor Presente Total dos Resultados",
+    "sroi_total_present_value_amount": "803.184€",
     "sroi_net_social_value": "Valor Social Líquido",
+    "sroi_net_social_value_amount": "753.184€",
     "sroi_ratio_label": "Rácio SROI",
+    "sroi_ratio_value": "16,06€: 1€",
     "sroi_benchmark_note": "Este rácio SROI de 16:1 excede significativamente o benchmark para programas de desenvolvimento comunitário, que normalmente variam entre 2:1 e 5:1. O rácio elevado reflete a natureza alavancada do timebanking — um investimento financeiro modesto gera atividade social voluntária extensiva.",
     "discussion_para": "O estudo identifica vários fatores que contribuem para o SROI excecionalmente elevado e a eficácia do programa como modelo de desenvolvimento comunitário.",
     "discussion_factor_0_title": "Efeito Multiplicador do Voluntariado",
@@ -263,12 +268,7 @@
     "cta_full_report": "Transferir Relatório Completo",
     "cta_exec_summary": "Sumário Executivo",
     "cta_questions": "Questões sobre a investigação?",
-    "cta_contact": "Contacte-nos",
-    "sroi_result_value": "€16 : €1",
-    "sroi_total_investment_value": "€50,000",
-    "sroi_total_present_value_amount": "€803,184",
-    "sroi_net_social_value_amount": "€753,184",
-    "sroi_ratio_value": "€16.06 : €1"
+    "cta_contact": "Contacte-nos"
   },
   "strategic_plan": {
     "page_title": "Plano Estratégico 2026–2030",
@@ -415,5 +415,5 @@
     "cta_download": "Transferir Plano Completo",
     "cta_contact": "Contacte-nos"
   },
-  "age_band": "Age {{band}}"
+  "age_band": "Idade {{band}}"
 }

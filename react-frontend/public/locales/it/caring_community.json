@@ -54,6 +54,9 @@
     "search_placeholder": "Cerca per nome",
     "searching": "Ricerca dei membri in corso...",
     "no_search_results": "Nessun membro corrispondente trovato",
+    "search_results_aria": "Membri corrispondenti",
+    "search_error": "Non è stato possibile cercare i membri. Per favore riprova.",
+    "select_member_error": "Scegli un membro prima di collegare un destinatario dell'assistenza.",
     "relationship_label": "Relazione",
     "start_date_label": "Accompagnamento iniziato il",
     "notes_label": "Note",
@@ -62,10 +65,7 @@
     "upcoming_care": "Prossimo accompagnamento",
     "recent_care": "Accompagnamento recente",
     "no_upcoming_care": "Nessun accompagnamento programmato",
-    "no_recent_care": "Nessun registro di accompagnamento recente",
-    "search_results_aria": "Membri corrispondenti",
-    "search_error": "Non è stato possibile cercare i membri. Per favore riprova.",
-    "select_member_error": "Scegli un membro prima di collegare un destinatario dell'assistenza."
+    "no_recent_care": "Nessun registro di accompagnamento recente"
   },
   "cover": {
     "title": "Accompagnamento sostitutivo",
@@ -223,6 +223,7 @@
     "error": "Impossibile caricare il tuo pass di fiducia"
   },
   "panel": {
+    "meta_title": "Amministratore della comunità premurosa",
     "header": {
       "toggle_sidebar": "Attiva/disattiva la barra laterale",
       "back_to_site": "Torna al sito",
@@ -231,6 +232,10 @@
       "user_menu": "Menù utente",
       "my_profile": "Il mio profilo",
       "sign_out": "disconnessione"
+    },
+    "navigation": {
+      "label": "Navigazione comunitaria premurosa",
+      "close": "Chiudi la navigazione della comunità premurosa"
     },
     "breadcrumbs": {
       "aria": "Pangrattato",
@@ -275,15 +280,15 @@
       }
     },
     "sidebar": {
-      "search_aria": "Search caring community navigation",
-      "search_placeholder": "Search navigation...",
-      "clear_search": "Cancella ricerca",
-      "no_search_results": "No matching pages found",
       "brand": "Cura della comunità",
       "expand": "Espandi la barra laterale",
       "collapse": "Comprimi la barra laterale",
       "help_centre": "Centro assistenza",
       "full_admin": "Amministrazione completa",
+      "search_aria": "Search caring community navigation",
+      "search_placeholder": "Search navigation...",
+      "clear_search": "Cancella ricerca",
+      "no_search_results": "No matching pages found",
       "sections": {
         "overview": "Panoramica",
         "operations": "Operazioni",
@@ -332,14 +337,16 @@
         "municipal_roi": "ROI comunale",
         "category_coefficients": "Coefficienti di categoria"
       }
-    },
-    "navigation": {
-      "label": "Navigazione comunitaria premurosa",
-      "close": "Chiudi la navigazione della comunità premurosa"
-    },
-    "meta_title": "Amministratore della comunità premurosa"
+    }
   },
   "admin": {
+    "common": {
+      "refresh": "Aggiorna",
+      "cancel": "Cancellare",
+      "all": "Tutto",
+      "close": "Vicino",
+      "empty_dash": "-"
+    },
     "providers": {
       "meta_title": "Directory dei fornitori di servizi sanitari - Admin",
       "title": "Elenco dei fornitori di servizi sanitari",
@@ -448,63 +455,6 @@
         "volunteer": "Gruppo di volontariato"
       }
     },
-    "warmth_pass": {
-      "title": "Ricerca del passaggio di calore",
-      "subtitle": "Visualizza le credenziali di fiducia della comunità di qualsiasi membro",
-      "eligible": "Idoneo",
-      "not_eligible": "Non idoneo",
-      "verified": "Verificato",
-      "not_verified": "Non verificato",
-      "loading": "Caricamento pass membro...",
-      "empty_date": "Non impostato",
-      "no_categories": "Nessuna categoria registrata.",
-      "tier_chip": "{{label}} (Livello {{tier}})",
-      "about": {
-        "title": "A proposito di questa pagina",
-        "body": "Un Warmth Pass è una credenziale di fiducia portatile che dimostra che un membro ha raggiunto il livello di fiducia, ha ricevuto revisioni tra pari ed è idoneo a fornire assistenza informale di quartiere. I destinatari possono richiedere di vedere il Warmth Pass di un aiutante prima di accettare l'assistenza. Utilizza questa ricerca per verificare le credenziali di un membro su richiesta o per assistere un membro che non è sicuro della propria idoneità."
-      },
-      "lookup": {
-        "title": "Ricerca membri",
-        "member_id": "ID membro",
-        "placeholder": "Inserisci l'ID membro numerico",
-        "button": "Cercare"
-      },
-      "errors": {
-        "no_data": "Nessun dato restituito per questo ID membro.",
-        "lookup_failed": "Membro non trovato o si è verificato un errore."
-      },
-      "not_eligible_notice": {
-        "title": "Il membro non è ancora al livello Affidabile e non possiede un Warmth Pass.",
-        "body": "Per diventare idonei, devono registrare più ore di assistenza e ricevere almeno una revisione tra pari. Possono controllare i propri progressi nella pagina del profilo Trust."
-      },
-      "fields": {
-        "help_categories": "Categorie di aiuto",
-        "hours_logged": "Ore registrate",
-        "identity_verified": "Identità verificata",
-        "member_since": "Membro dal",
-        "pass_active_since": "Passa attivo da",
-        "reviews_received": "Recensioni ricevute",
-        "trust_tier": "Livello di fiducia"
-      }
-    },
-    "trust_tier": {
-      "recompute_confirm": "Ricalcolare i livelli di fiducia per tutti i membri attivi? L'operazione potrebbe richiedere un momento.",
-      "messages": {
-        "saved": "Configurazione del livello di attendibilità salvata. Le modifiche verranno applicate alla successiva esecuzione di ricalcolo.",
-        "recomputed": "Livelli ricalcolati per i membri {{count}}."
-      },
-      "errors": {
-        "save_failed": "Impossibile salvare la configurazione.",
-        "recompute_failed": "Impossibile ricalcolare i livelli."
-      }
-    },
-    "common": {
-      "refresh": "Aggiorna",
-      "cancel": "Cancellare",
-      "empty_dash": "-",
-      "all": "Tutto",
-      "close": "Vicino"
-    },
     "loyalty": {
       "title": "Programma fedeltà",
       "description": "Credito temporale al ponte del mercato. I membri guadagnano ore, i commercianti scelgono di accettarle come sconto in CHF sulle loro inserzioni.",
@@ -594,34 +544,15 @@
       },
       "pending": {
         "title": "In attesa della tua approvazione",
-        "empty": "Nessun trasferimento in sospeso.",
         "description": "Ogni trasferimento deve essere approvato manualmente da un amministratore. Verifica che l'e-mail del membro di destinazione corrisponda al nuovo account del membro prima di approvare.",
+        "empty": "Nessun trasferimento in sospeso.",
         "table_aria": "Trasferimenti orari in uscita in sospeso"
       },
       "inbound": {
         "title": "Ricevuti da altre cooperative (ultimi 90 giorni)",
-        "empty": "Nessun trasferimento ricevuto negli ultimi 90 giorni.",
         "description": "Questo è solo un registro di controllo: i trasferimenti in entrata vengono elaborati automaticamente quando la cooperativa di origine li approva. Non è richiesta alcuna azione qui.",
+        "empty": "Nessun trasferimento ricevuto negli ultimi 90 giorni.",
         "table_aria": "Trasferimenti orari in entrata"
-      },
-      "actions": {
-        "approve": "Approvare",
-        "reject": "Rifiutare"
-      },
-      "reject_modal": {
-        "title": "Rifiuta il trasferimento",
-        "reason_label": "Motivo del rifiuto (facoltativo)",
-        "reason_placeholder": "Aggiungi contesto per il registro di controllo"
-      },
-      "messages": {
-        "approved": "Trasferimento approvato e consegnato.",
-        "rejected": "Trasferimento rifiutato."
-      },
-      "errors": {
-        "load_pending": "Impossibile caricare i trasferimenti in sospeso",
-        "load_inbound": "Impossibile caricare i trasferimenti in entrata",
-        "approve": "Approvazione non riuscita",
-        "reject": "Il rifiuto è fallito"
       },
       "table": {
         "actions": "Azioni",
@@ -641,14 +572,28 @@
         "received": "Ricevuto",
         "rejected": "Respinto",
         "sent": "Inviato"
+      },
+      "actions": {
+        "approve": "Approvare",
+        "reject": "Rifiutare"
+      },
+      "reject_modal": {
+        "title": "Rifiuta il trasferimento",
+        "reason_label": "Motivo del rifiuto (facoltativo)",
+        "reason_placeholder": "Aggiungi contesto per il registro di controllo"
+      },
+      "messages": {
+        "approved": "Trasferimento approvato e consegnato.",
+        "rejected": "Trasferimento rifiutato."
+      },
+      "errors": {
+        "load_pending": "Impossibile caricare i trasferimenti in sospeso",
+        "load_inbound": "Impossibile caricare i trasferimenti in entrata",
+        "approve": "Approvazione non riuscita",
+        "reject": "Il rifiuto è fallito"
       }
     },
     "surveys": {
-      "errors": {
-        "export_failed": "Impossibile esportare le risposte al sondaggio.",
-        "load": "Impossibile caricare i sondaggi",
-        "create": "Impossibile creare il sondaggio"
-      },
       "meta_title": "Indagini comunali",
       "title": "Indagini comunali",
       "subtitle": "Raccogli feedback strutturato da residenti, partner municipali e team di programma.",
@@ -738,24 +683,16 @@
         "yes": "SÌ",
         "no": "NO",
         "date_unknown": "Non impostato"
+      },
+      "errors": {
+        "load": "Impossibile caricare i sondaggi",
+        "create": "Impossibile creare il sondaggio",
+        "export_failed": "Impossibile esportare le risposte al sondaggio."
       }
     },
     "feedback": {
       "title": "Casella di feedback del Comune",
       "subtitle": "Ricevi, valuta e risolvi il feedback dei residenti: domande, idee, problemi e reclami indirizzati al comune o al team della comunità.",
-      "messages": {
-        "triage_saved": "Triage salvato",
-        "resolved": "Contrassegnato come risolto",
-        "closed": "Chiuso"
-      },
-      "errors": {
-        "load": "Impossibile caricare il feedback",
-        "save_triage": "Impossibile salvare il triage",
-        "resolution_required": "Sono necessarie note di risoluzione",
-        "resolve": "Impossibile risolvere",
-        "close": "Impossibile chiudere",
-        "export": "Impossibile esportare"
-      },
       "about": {
         "title": "A proposito di questa pagina",
         "body": "Questa casella di posta raccoglie i feedback inviati dai residenti attraverso la piattaforma. Ogni elemento è classificato come domanda, idea, rapporto sul problema o nota di opinione e gli viene assegnato un punteggio di opinione. Utilizza i controlli di valutazione per assegnare la proprietà, aggiungere note interne e monitorare la risoluzione. Gli elementi visibili a tutti i residenti sono contrassegnati come pubblici; le risposte possono essere viste dal mittente e dagli altri membri.",
@@ -866,6 +803,19 @@
         "days_ago_other": "{{count}}giorni fa",
         "months_ago_one": "{{count}}mo fa",
         "months_ago_other": "{{count}}mo fa"
+      },
+      "messages": {
+        "triage_saved": "Triage salvato",
+        "resolved": "Contrassegnato come risolto",
+        "closed": "Chiuso"
+      },
+      "errors": {
+        "load": "Impossibile caricare il feedback",
+        "save_triage": "Impossibile salvare il triage",
+        "resolution_required": "Sono necessarie note di risoluzione",
+        "resolve": "Impossibile risolvere",
+        "close": "Impossibile chiudere",
+        "export": "Impossibile esportare"
       }
     },
     "civic_digest": {
@@ -939,7 +889,7 @@
         "trust_tiers_body": "Nuovo arrivato, Membro, Affidabile, Verificato, Coordinatore: mostrato per il destinatario e ciascun sostenitore.",
         "safeguarding_label": "Salvaguardia delle bandiere:",
         "safeguarding_body": "Un conteggio di flag diverso da zero indica problemi di protezione attivi registrati nei confronti di questo membro. Esaminateli nella sezione Salvaguardia.",
-        "privacy_label": "Privacy:",
+        "privacy_label": "Riservatezza:",
         "privacy_body": "I dati della cerchia sono visibili solo ai membri della cerchia e agli amministratori dei tenant. Non è incluso nei report a livello di comunità o nella directory dei membri."
       },
       "lookup": {
@@ -1092,6 +1042,56 @@
         "escalate": "L'escalation non è riuscita",
         "status": "La modifica dello stato non è riuscita",
         "note": "Nota non riuscita"
+      }
+    },
+    "warmth_pass": {
+      "title": "Ricerca del passaggio di calore",
+      "subtitle": "Visualizza le credenziali di fiducia della comunità di qualsiasi membro",
+      "eligible": "Idoneo",
+      "not_eligible": "Non idoneo",
+      "verified": "Verificato",
+      "not_verified": "Non verificato",
+      "loading": "Caricamento pass membro...",
+      "empty_date": "Non impostato",
+      "no_categories": "Nessuna categoria registrata.",
+      "tier_chip": "{{label}} (Livello {{tier}})",
+      "about": {
+        "title": "A proposito di questa pagina",
+        "body": "Un Warmth Pass è una credenziale di fiducia portatile che dimostra che un membro ha raggiunto il livello di fiducia, ha ricevuto revisioni tra pari ed è idoneo a fornire assistenza informale di quartiere. I destinatari possono richiedere di vedere il Warmth Pass di un aiutante prima di accettare l'assistenza. Utilizza questa ricerca per verificare le credenziali di un membro su richiesta o per assistere un membro che non è sicuro della propria idoneità."
+      },
+      "lookup": {
+        "title": "Ricerca membri",
+        "member_id": "ID membro",
+        "placeholder": "Inserisci l'ID membro numerico",
+        "button": "Cercare"
+      },
+      "errors": {
+        "no_data": "Nessun dato restituito per questo ID membro.",
+        "lookup_failed": "Membro non trovato o si è verificato un errore."
+      },
+      "not_eligible_notice": {
+        "title": "Il membro non è ancora al livello Affidabile e non possiede un Warmth Pass.",
+        "body": "Per diventare idonei, devono registrare più ore di assistenza e ricevere almeno una revisione tra pari. Possono controllare i propri progressi nella pagina del profilo Trust."
+      },
+      "fields": {
+        "help_categories": "Categorie di aiuto",
+        "hours_logged": "Ore registrate",
+        "identity_verified": "Identità verificata",
+        "member_since": "Membro dal",
+        "pass_active_since": "Passa attivo da",
+        "reviews_received": "Recensioni ricevute",
+        "trust_tier": "Livello di fiducia"
+      }
+    },
+    "trust_tier": {
+      "recompute_confirm": "Ricalcolare i livelli di fiducia per tutti i membri attivi? L'operazione potrebbe richiedere un momento.",
+      "messages": {
+        "saved": "Configurazione del livello di attendibilità salvata. Le modifiche verranno applicate alla successiva esecuzione di ricalcolo.",
+        "recomputed": "Livelli ricalcolati per i membri {{count}}."
+      },
+      "errors": {
+        "save_failed": "Impossibile salvare la configurazione.",
+        "recompute_failed": "Impossibile ricalcolare i livelli."
       }
     },
     "regional_points": {

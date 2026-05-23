@@ -1,5 +1,7 @@
 {
-  "page_title": "Blog",
+  "page_title": "Bloga",
+  "hero_eyebrow": "Historie społeczności",
+  "hero_posts_label": "Wyświetlone wpisy",
   "title": "Blog i aktualności",
   "subtitle": "Historie społeczności, aktualizacje i ogłoszenia",
   "search_placeholder": "Szukaj wpisów...",
@@ -11,6 +13,9 @@
   "empty_title": "Nie znaleziono wpisów",
   "empty_desc": "Nie opublikowano jeszcze żadnych wpisów",
   "empty_desc_filtered": "Spróbuj innych wyszukiwanych haseł lub wyczyść filtry",
+  "empty_tip_stories": "Historie członków",
+  "empty_tip_guides": "Poradniki",
+  "empty_tip_updates": "Aktualizacje",
   "load_more": "Załaduj więcej",
   "min_read": "{{count}} min czytania",
   "min_read_short": "{{count}}m",
@@ -42,6 +47,7 @@
     "reply_count": "{{count}} odpowiedzi",
     "hide": "Ukryj",
     "you": "Ty",
+    "unknown_author": "Nieznany autor",
     "aria_add_reaction": "Dodaj reakcję",
     "aria_send_reply": "Wyślij odpowiedź",
     "reaction_heart": "Serce",
@@ -49,17 +55,11 @@
     "reaction_thumbs_down": "Nie lubię",
     "reaction_laugh": "Haha",
     "reaction_angry": "Zły",
-    "unknown_author": "Nieznany autor",
     "reaction_love": "Uwielbiam",
     "reaction_like": "Lubię to",
     "reaction_wow": "Wow",
     "reaction_sad": "Smutny",
     "reaction_celebrate": "Świętuj"
   },
-  "page_description": "Historie, przewodniki i aktualizacje ze społeczności banku czasu — udane wymiany, zdobyte doświadczenia i najnowsze wiadomości z lokalnych grup i od partnerów.",
-  "hero_eyebrow": "Historie społeczności",
-  "hero_posts_label": "Wyświetlone wpisy",
-  "empty_tip_stories": "Historie członków",
-  "empty_tip_guides": "Poradniki",
-  "empty_tip_updates": "Aktualizacje"
+  "page_description": "Historie, przewodniki i aktualizacje ze społeczności banku czasu — udane wymiany, zdobyte doświadczenia i najnowsze wiadomości z lokalnych grup i od partnerów."
 }
