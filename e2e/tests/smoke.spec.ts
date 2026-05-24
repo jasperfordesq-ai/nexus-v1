@@ -31,12 +31,10 @@ const hasAdminCredentials = Boolean(process.env.E2E_ADMIN_EMAIL && process.env.E
 
 async function waitForTenantHydration(page: Page): Promise<void> {
   const loadingShell = page
-    .locator('[aria-label="Loading community"], [aria-label="Loading"]')
+    .locator('[aria-label="Loading community"], [aria-label="Loading"], text=/Loading community|Loading\\.\\.\\./')
     .first();
 
-  if (await loadingShell.isVisible({ timeout: 1000 }).catch(() => false)) {
-    await expect(loadingShell).toBeHidden({ timeout: 15000 });
-  }
+  await expect(loadingShell).toBeHidden({ timeout: 20000 }).catch(() => undefined);
 
   await dismissBlockingModals(page);
 }
@@ -64,13 +62,8 @@ test.describe('Smoke Tests @smoke', () => {
       const body = page.locator('body');
       await expect(body).toBeVisible();
 
-      // Should have either a heading, hero section, or main content area
-      const hasContent = await page
-        .locator('main, [role="main"], h1, h2, .hero, header')
-        .first()
-        .isVisible({ timeout: 10000 })
-        .catch(() => false);
-      expect(hasContent).toBeTruthy();
+      await expect(page.getByRole('heading', { name: /Exchange Skills|Future of Time Banking/i }).first())
+        .toBeVisible({ timeout: 20000 });
 
       // No uncaught JS errors
       expect(consoleErrors).toHaveLength(0);
@@ -193,13 +186,10 @@ test.describe('Smoke Tests @smoke', () => {
 
       // The registration flow may render as a multi-step HeroUI form on narrow
       // viewports, so assert the shell and at least one actionable control.
-      const hasHeading = await page.getByRole('heading', { name: /Create your account|Create Account|Register|Sign Up/i }).isVisible({ timeout: 10000 }).catch(() => false);
-      const hasFirstName = await page.getByRole('textbox', { name: /First Name/i }).isVisible({ timeout: 3000 }).catch(() => false);
-      const hasEmail = await page.getByRole('textbox', { name: /^Email/i }).isVisible({ timeout: 3000 }).catch(() => false);
-      const hasPassword = await page.getByRole('textbox', { name: /^Password/i }).isVisible({ timeout: 3000 }).catch(() => false);
-      const hasCreateBtn = await page.getByRole('button', { name: /Continue|Create Account|Register|Sign Up/i }).isVisible({ timeout: 3000 }).catch(() => false);
-
-      expect(hasHeading && (hasFirstName || hasEmail || hasPassword || hasCreateBtn)).toBeTruthy();
+      await expect(page.getByRole('heading', { name: /Create your account|Create Account|Register|Sign Up/i }))
+        .toBeVisible({ timeout: 20000 });
+      await expect(page.getByRole('textbox', { name: /^Email/i }))
+        .toBeVisible({ timeout: 10000 });
     });
   });
 

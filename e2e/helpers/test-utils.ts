@@ -11,7 +11,7 @@ import { Page, expect, Locator } from '../../node_modules/@playwright/test';
 
 // Default tenant for tests
 export const DEFAULT_TENANT = process.env.E2E_TENANT || 'hour-timebank';
-export const BASE_URL = process.env.E2E_BASE_URL || 'http://staging.timebank.local';
+export const BASE_URL = process.env.E2E_BASE_URL || 'http://localhost:5173';
 
 /**
  * Build a tenant-scoped URL

@@ -37,7 +37,9 @@
   - `npm run check:i18n:gaps`
 - Browser/E2E workflows in active use include:
   - `npm run test:e2e`
-  - `npx playwright test e2e/tests/smoke.spec.ts --grep @smoke --project=chromium-modern`
+  - `npx playwright test e2e/tests/smoke.spec.ts --grep '@smoke' --project=chromium-modern`
+  - E2E defaults to `http://localhost:5173`; use `E2E_BASE_URL=...` only when deliberately targeting another environment.
+  - Run Playwright from the root dependency tree. Do not keep a nested `e2e/node_modules` alongside root Playwright, because mixed installs can trigger duplicate `@playwright/test` loading.
 - Accessible frontend changes should run:
   - `npm run build:accessible-frontend`
   - `npm run test:accessible-frontend:php`

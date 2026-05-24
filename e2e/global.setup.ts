@@ -35,7 +35,7 @@ const TEST_USERS = {
   },
 };
 
-const BASE_URL = process.env.E2E_BASE_URL || 'http://staging.timebank.local';
+const BASE_URL = process.env.E2E_BASE_URL || 'http://localhost:5173';
 const TENANT_SLUG = process.env.E2E_TENANT || 'hour-timebank';
 const HAS_USER_CREDENTIALS = Boolean(process.env.E2E_USER_EMAIL && process.env.E2E_USER_PASSWORD);
 const HAS_ADMIN_CREDENTIALS = Boolean(process.env.E2E_ADMIN_EMAIL && process.env.E2E_ADMIN_PASSWORD);

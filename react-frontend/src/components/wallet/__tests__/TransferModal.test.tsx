@@ -11,6 +11,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@/test/test-utils';
 import { api } from '@/lib/api';
 
+const mockToast = vi.hoisted(() => ({
+  success: vi.fn(),
+  error: vi.fn(),
+  info: vi.fn(),
+  warning: vi.fn(),
+}));
+
 vi.mock('@/lib/api', () => ({
   api: {
     get: vi.fn(),
@@ -22,7 +29,7 @@ vi.mock('@/lib/api', () => ({
 }));
 
 vi.mock('@/contexts', () => ({
-  useToast: vi.fn(() => ({ success: vi.fn(), error: vi.fn(), info: vi.fn() })),
+  useToast: vi.fn(() => mockToast),
 
   useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
   useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
@@ -61,6 +68,7 @@ const defaultProps = {
 describe('TransferModal', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(api.get).mockResolvedValue({ success: true, data: { max_transfer: 100 } });
   });
 
   it('renders when isOpen is true', () => {

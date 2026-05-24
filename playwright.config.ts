@@ -44,8 +44,9 @@ export default defineConfig({
   // Retry on CI only
   retries: process.env.CI ? 2 : 0,
 
-  // Use fewer workers to avoid resource contention
-  workers: process.env.CI ? 1 : 4,
+  // The local PHP/API stack is resource-sensitive on Docker Desktop. Keep the
+  // default serial and allow explicit opt-in parallelism when the stack can take it.
+  workers: process.env.E2E_WORKERS ? Number(process.env.E2E_WORKERS) : 1,
 
   // Reporter to use
   reporter: [
@@ -57,7 +58,7 @@ export default defineConfig({
   // Shared settings for all projects
   use: {
     // Base URL for the local development server
-    baseURL: process.env.E2E_BASE_URL || 'http://staging.timebank.local',
+    baseURL: process.env.E2E_BASE_URL || 'http://localhost:5173',
 
     // Default tenant for tests
     extraHTTPHeaders: {
