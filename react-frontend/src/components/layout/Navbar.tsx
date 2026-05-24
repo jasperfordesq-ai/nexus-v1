@@ -550,7 +550,9 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   size="sm"
                   className="lg:hidden text-theme-muted hover:text-theme-primary min-w-[44px] min-h-[44px]"
                   onPress={onMobileMenuOpen}
-                  aria-label={t('accessibility.open_menu')}
+                  aria-label={isMobileMenuOpen ? t('accessibility.close_menu') : t('accessibility.open_menu')}
+                  aria-expanded={isMobileMenuOpen ?? false}
+                  aria-controls="mobile-drawer"
                 >
                   <Menu className="w-5 h-5" aria-hidden="true" />
                 </Button>
