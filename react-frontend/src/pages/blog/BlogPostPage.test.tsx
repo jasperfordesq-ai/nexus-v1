@@ -89,7 +89,7 @@ vi.mock('@/components/social', () => ({
 }));
 
 vi.mock('dompurify', () => ({
-  default: { sanitize: (html: string) => html },
+  default: { addHook: vi.fn(), sanitize: (html: string) => html },
 }));
 
 vi.mock('react-router-dom', async () => {

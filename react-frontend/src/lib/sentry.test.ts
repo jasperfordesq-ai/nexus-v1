@@ -29,7 +29,9 @@ const mockReadStoredConsent = readStoredConsent as ReturnType<typeof vi.fn>;
 
 describe('sentry (disabled - no DSN)', () => {
   beforeEach(() => {
+    vi.resetModules();
     vi.clearAllMocks();
+    vi.stubEnv('VITE_SENTRY_DSN', '');
     // No VITE_SENTRY_DSN set — Sentry is disabled
     mockReadStoredConsent.mockReturnValue({ analytics: true });
   });

@@ -56,8 +56,14 @@ describe('ShareButton', () => {
     onShareChange: vi.fn(),
   };
 
+  const clickRepostAction = async (user: ReturnType<typeof userEvent.setup>) => {
+    await user.click(screen.getByRole('button'));
+    await user.click(await screen.findByRole('menuitem', { name: /repost/i }));
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(api.post).mockResolvedValue({ success: true, data: { shared: true, count: 6 } });
   });
 
   it('renders without crashing', () => {
@@ -89,8 +95,8 @@ describe('ShareButton', () => {
         onShareChange={onShareChange}
       />
     );
-    const btn = screen.getByRole('button');
-    await user.click(btn);
+    vi.mocked(api.post).mockResolvedValueOnce({ success: true, data: { shared: true, count: 6 } });
+    await clickRepostAction(user);
 
     await waitFor(() => {
       // Polymorphic endpoint — ShareButton always POSTs to /v2/shares.
@@ -101,9 +107,9 @@ describe('ShareButton', () => {
 
   it('calls api.post (toggle endpoint) when unsharing a shared post', async () => {
     const user = userEvent.setup();
+    vi.mocked(api.post).mockResolvedValueOnce({ success: true, data: { shared: false, count: 4 } });
     render(<ShareButton {...defaultProps} isShared={true} />);
-    const btn = screen.getByRole('button');
-    await user.click(btn);
+    await clickRepostAction(user);
 
     await waitFor(() => {
       expect(api.post).toHaveBeenCalledWith('/v2/shares', { type: 'post', id: 1 });
@@ -112,9 +118,9 @@ describe('ShareButton', () => {
 
   it('shows success toast after sharing', async () => {
     const user = userEvent.setup();
+    vi.mocked(api.post).mockResolvedValueOnce({ success: true, data: { shared: true, count: 6 } });
     render(<ShareButton {...defaultProps} isShared={false} />);
-    const btn = screen.getByRole('button');
-    await user.click(btn);
+    await clickRepostAction(user);
 
     await waitFor(() => {
       expect(mockToast.success).toHaveBeenCalled();
@@ -123,9 +129,9 @@ describe('ShareButton', () => {
 
   it('shows info toast after unsharing', async () => {
     const user = userEvent.setup();
+    vi.mocked(api.post).mockResolvedValueOnce({ success: true, data: { shared: false, count: 4 } });
     render(<ShareButton {...defaultProps} isShared={true} />);
-    const btn = screen.getByRole('button');
-    await user.click(btn);
+    await clickRepostAction(user);
 
     await waitFor(() => {
       expect(mockToast.info).toHaveBeenCalled();
@@ -136,8 +142,7 @@ describe('ShareButton', () => {
     vi.mocked(api.post).mockResolvedValueOnce({ success: false, error: 'Server error' });
     const user = userEvent.setup();
     render(<ShareButton {...defaultProps} isShared={false} />);
-    const btn = screen.getByRole('button');
-    await user.click(btn);
+    await clickRepostAction(user);
 
     await waitFor(() => {
       expect(mockToast.error).toHaveBeenCalledWith('Server error');
@@ -147,6 +152,7 @@ describe('ShareButton', () => {
   it('calls onShareChange on successful share', async () => {
     const user = userEvent.setup();
     const onShareChange = vi.fn();
+    vi.mocked(api.post).mockResolvedValueOnce({ success: true, data: { shared: true, count: 3 } });
     render(
       <ShareButton
         {...defaultProps}
@@ -155,8 +161,7 @@ describe('ShareButton', () => {
         onShareChange={onShareChange}
       />
     );
-    const btn = screen.getByRole('button');
-    await user.click(btn);
+    await clickRepostAction(user);
 
     await waitFor(() => {
       expect(onShareChange).toHaveBeenCalledWith(3, true);
@@ -166,12 +171,12 @@ describe('ShareButton', () => {
 
 describe('SharedByAttribution', () => {
   it('renders the sharer name', () => {
-    render(<SharedByAttribution sharerName="Alice" />);
+    render(<SharedByAttribution user={{ id: 7, name: 'Alice' }} />);
     expect(screen.getByText(/Alice/)).toBeInTheDocument();
   });
 
   it('renders the repeat icon', () => {
-    const { container } = render(<SharedByAttribution sharerName="Bob" />);
+    const { container } = render(<SharedByAttribution user={{ id: 8, name: 'Bob' }} />);
     // Lucide Repeat2 renders an SVG
     const svg = container.querySelector('svg');
     expect(svg).toBeInTheDocument();

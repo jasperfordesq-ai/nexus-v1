@@ -135,7 +135,7 @@ vi.mock('@/components/location', () => ({
 }));
 vi.mock('@/components/seo', () => ({ PageMeta: () => null }));
 vi.mock('dompurify', () => ({
-  default: { sanitize: (html: string) => html },
+  default: { addHook: vi.fn(), sanitize: (html: string) => html },
 }));
 vi.mock('framer-motion', () => {
   const motionProps = new Set(['variants', 'initial', 'animate', 'layout', 'transition', 'exit', 'whileHover', 'whileTap', 'whileInView', 'viewport']);

@@ -243,6 +243,7 @@ vi.mock('react-i18next', () => {
 
 vi.mock('dompurify', () => ({
   default: {
+    addHook: vi.fn(),
     sanitize: vi.fn((html: string) => html),
   },
 }));
@@ -356,10 +357,10 @@ describe('SettingsPage', () => {
 
   it('shows tab navigation with Profile, Notifications, Privacy, Security', () => {
     render(<SettingsPage />, { wrapper: Wrapper });
-    expect(screen.getByText('Profile')).toBeInTheDocument();
-    expect(screen.getByText('Notifications')).toBeInTheDocument();
-    expect(screen.getByText('Privacy')).toBeInTheDocument();
-    expect(screen.getByText('Security')).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Profile' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Notifications' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Privacy' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Security' })).toBeInTheDocument();
   });
 
   it('shows Profile Information section by default', () => {

@@ -27,7 +27,9 @@ vi.mock('framer-motion', () => ({
 }));
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: vi.fn() },
   useTranslation: () => ({
+    i18n: { language: 'en' },
     t: (key: string, opts?: Record<string, unknown>) =>
       (opts?.fallbackValue as string | undefined) ?? key,
   }),
@@ -161,7 +163,9 @@ describe('FederationMessagesPage', () => {
     vi.mocked(api.get).mockResolvedValue({ success: true, data: [] });
     render(<FederationMessagesPage />);
     await waitFor(() => {
-      expect(api.get).toHaveBeenCalledWith('/v2/federation/messages');
+      expect(api.get).toHaveBeenCalledWith('/v2/federation/messages', expect.objectContaining({
+        signal: expect.any(AbortSignal),
+      }));
     });
   });
 

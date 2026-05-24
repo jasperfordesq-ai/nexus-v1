@@ -30,6 +30,8 @@ const loggedMissingKeys = new Set<string>();
 const thrownMissingKeys = new Set<string>();
 const sentryReportedKeys = new Set<string>();
 const STRICT_MISSING_KEY_STORAGE_KEY = 'nexus_i18n_strict_missing_keys';
+const isVitest = import.meta.env.MODE === 'test' || Boolean(import.meta.env.VITEST);
+const isInteractiveDev = import.meta.env.DEV && !isVitest;
 const localeBackends = import.meta.env.DEV ? [HttpBackend] : [LocalStorageBackend, HttpBackend];
 const localeBackendOptions = import.meta.env.DEV
   ? [
@@ -61,7 +63,7 @@ const isStrictMissingKeyMode = () => {
 };
 
 const reportMissingKey = (identifier: string) => {
-  if (import.meta.env.DEV && !loggedMissingKeys.has(identifier)) {
+  if (isInteractiveDev && !loggedMissingKeys.has(identifier)) {
     loggedMissingKeys.add(identifier);
     console.error(`[i18n] Missing translation key: ${identifier}`);
   }
@@ -86,7 +88,7 @@ const formatMissingKey = (key: string, fallbackText?: string) => {
   if (typeof fallbackText === 'string' && fallbackText.length > 0 && fallbackText !== key) {
     return fallbackText;
   }
-  return import.meta.env.DEV ? `${DEV_MISSING_KEY_PREFIX} ${key}` : key;
+  return isInteractiveDev ? `${DEV_MISSING_KEY_PREFIX} ${key}` : key;
 };
 
 i18n
@@ -99,8 +101,8 @@ i18n
     nonExplicitSupportedLngs: false,
     load: 'currentOnly',
     cleanCode: true,
-    saveMissing: import.meta.env.DEV,
-    appendNamespaceToMissingKey: import.meta.env.DEV,
+    saveMissing: isInteractiveDev,
+    appendNamespaceToMissingKey: isInteractiveDev,
     parseMissingKeyHandler: formatMissingKey,
     missingKeyHandler: (lng, ns, key) => {
       const localeList = Array.isArray(lng) ? lng.join(',') : lng || 'unknown';
@@ -125,7 +127,7 @@ i18n
       'api_controllers_1', 'api_controllers_2', 'api_controllers_3',
       'svc_notifications', 'svc_notifications_2',
     ],
-    debug: import.meta.env.DEV,
+    debug: isInteractiveDev,
 
     interpolation: {
       escapeValue: false, // React already escapes values

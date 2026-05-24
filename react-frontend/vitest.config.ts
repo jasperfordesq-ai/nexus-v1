@@ -7,6 +7,9 @@ import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 
+const inheritedMaxOldSpace =
+  process.env.NODE_OPTIONS?.match(/--max-old-space-size=\S+/)?.[0] ?? '--max-old-space-size=8192';
+
 export default defineConfig({
   plugins: [react()],
   define: {
@@ -28,7 +31,8 @@ export default defineConfig({
         singleFork: false,
         // Each test file gets a fresh fork — prevents memory accumulation
         // that causes hangs after ~60 files in singleFork mode
-        execArgv: ['--max-old-space-size=4096'],
+        // Inherit npm test's worker heap cap and expose GC for setup cleanup.
+        execArgv: ['--expose-gc', inheritedMaxOldSpace],
       },
     },
     fileParallelism: false,

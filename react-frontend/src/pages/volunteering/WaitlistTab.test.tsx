@@ -34,12 +34,23 @@ vi.mock("framer-motion", () => ({
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
-    t: (_key: string, fallback: string, _opts?: object) => {
-      if (fallback && _opts) {
-        // handle interpolation like Position {{position}}
-        return fallback.replace(/\{\{(\w+)\}\}/g, (_: string, k: string) => String((_opts as Record<string,unknown>)[k] ?? ""));
-      }
-      return fallback ?? _key;
+    t: (key: string, opts?: Record<string, unknown>) => {
+      const translations: Record<string, string> = {
+        "waitlist.heading": "My Waitlists",
+        "waitlist.refresh": "Refresh",
+        "waitlist.load_error": "Unable to load your waitlist entries. Please try again.",
+        "waitlist.try_again": "Try again",
+        "waitlist.no_entries_title": "No waitlist entries",
+        "waitlist.no_entries_desc": "You are not currently waiting for any shifts.",
+        "waitlist.position": "Position {{position}}",
+        "waitlist.spots": "{{count}} spots",
+        "waitlist.joined": "Joined",
+        "waitlist.leave": "Leave",
+        "waitlist.leave_confirm": "Are you sure you want to leave this waitlist?",
+        cancel: "Cancel",
+      };
+      const template = translations[key] ?? key;
+      return template.replace(/\{\{(\w+)\}\}/g, (_: string, k: string) => String(opts?.[k] ?? ""));
     },
   }),
 }));

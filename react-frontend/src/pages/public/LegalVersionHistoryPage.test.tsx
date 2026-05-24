@@ -76,7 +76,7 @@ vi.mock('@/components/ui', () => ({
 }));
 
 vi.mock('dompurify', () => ({
-  default: { sanitize: (html: string) => html },
+  default: { addHook: vi.fn(), sanitize: (html: string) => html },
 }));
 
 // Mock useLocation to return a path with /terms/versions

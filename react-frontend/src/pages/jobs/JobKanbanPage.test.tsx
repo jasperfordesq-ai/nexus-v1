@@ -9,8 +9,18 @@ import type { ReactNode } from 'react';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, opts?: Record<string, unknown>) =>
-      (opts?.fallbackValue as string | undefined) ?? key,
+    t: (key: string, opts?: Record<string, unknown>) => {
+      const translations: Record<string, string> = {
+        'application_status.pending': 'Pending',
+        'application_status.screening': 'Screening',
+        'application_status.interview': 'Interview',
+        'application_status.offer': 'Offer',
+        'application_status.accepted': 'Accepted',
+        'application_status.rejected': 'Rejected',
+      };
+
+      return translations[key] ?? (opts?.fallbackValue as string | undefined) ?? key;
+    },
   }),
 }));
 
@@ -189,7 +199,7 @@ describe('JobKanbanPage', () => {
   it('renders all kanban columns', async () => {
     render(<JobKanbanPage />);
     await waitFor(() => {
-      expect(screen.getByText('Applied')).toBeInTheDocument();
+      expect(screen.getByText('Pending')).toBeInTheDocument();
       expect(screen.getByText('Screening')).toBeInTheDocument();
       expect(screen.getByText('Interview')).toBeInTheDocument();
       expect(screen.getByText('Offer')).toBeInTheDocument();

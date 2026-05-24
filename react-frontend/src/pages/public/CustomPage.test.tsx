@@ -103,7 +103,7 @@ vi.mock('framer-motion', () => {
 });
 
 vi.mock('dompurify', () => ({
-  default: { sanitize: (html: string) => html },
+  default: { addHook: vi.fn(), sanitize: (html: string) => html },
 }));
 
 import { CustomPage } from './CustomPage';

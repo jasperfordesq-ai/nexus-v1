@@ -82,6 +82,8 @@ export function TalentSearchPage() {
   // Refs
   const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+  const tRef = useRef(t);
+  tRef.current = t;
 
   // Debounce keyword input
   useEffect(() => {
@@ -140,17 +142,17 @@ export function TalentSearchPage() {
         setTotalCount(result.total || 0);
         setHasSearched(true);
       } else {
-        setError(t('talent_search.error'));
+        setError(tRef.current('talent_search.error'));
       }
     } catch (err) {
       if (controller.signal.aborted) return;
       logError('Failed to search candidates', err);
-      setError(t('talent_search.error'));
+      setError(tRef.current('talent_search.error'));
     } finally {
       setIsLoading(false);
       setIsLoadingMore(false);
     }
-  }, [debouncedKeywords, skillsInput, locationInput, t]);
+  }, [debouncedKeywords, skillsInput, locationInput]);
 
   // Auto-search when debounced keywords change
   useEffect(() => {

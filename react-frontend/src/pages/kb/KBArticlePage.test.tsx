@@ -50,7 +50,7 @@ vi.mock('@/lib/helpers', () => ({
 }));
 
 vi.mock('dompurify', () => ({
-  default: { sanitize: (html: string) => html },
+  default: { addHook: vi.fn(), sanitize: (html: string) => html },
 }));
 
 vi.mock('@/contexts/ToastContext', () => ({
@@ -124,17 +124,25 @@ const mockArticle = {
   title: 'Getting Started with Timebanking',
   slug: 'getting-started-timebanking',
   content: '<p>This is a comprehensive guide to timebanking.</p>',
+  content_type: 'html',
+  video_url: null,
   excerpt: 'A guide to get started.',
   category: 'Guides',
+  category_name: 'Guides',
   parent_id: null as number | null,
+  parent_article_id: null as number | null,
   parent_title: null as string | null,
   is_published: true,
   view_count: 150,
+  views_count: 150,
   helpful_count: 20,
+  helpful_yes: 20,
+  helpful_no: 3,
   not_helpful_count: 3,
   created_at: '2026-01-01T10:00:00Z',
   updated_at: '2026-03-15T10:00:00Z',
   children: [] as Array<{ id: number; title: string; slug: string; excerpt: string | null }>,
+  attachments: [],
 };
 
 describe('KBArticlePage', () => {
@@ -199,6 +207,7 @@ describe('KBArticlePage', () => {
     const articleWithParent = {
       ...mockArticle,
       parent_id: 10,
+      parent_article_id: 10,
       parent_title: 'Tutorials',
     };
     vi.mocked(api.get).mockResolvedValue({ success: true, data: articleWithParent });

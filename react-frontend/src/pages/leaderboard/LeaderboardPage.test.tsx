@@ -114,8 +114,8 @@ describe('LeaderboardPage', () => {
 
   it('renders page title and description', () => {
     render(<LeaderboardPage />);
-    expect(screen.getByText('Leaderboard')).toBeInTheDocument();
-    expect(screen.getByText("See who's leading the community")).toBeInTheDocument();
+    expect(screen.getByText('Community')).toBeInTheDocument();
+    expect(screen.getByText('See how our community is growing together')).toBeInTheDocument();
   });
 
   it('shows type selector with XP as default', () => {
