@@ -328,7 +328,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
         body: 'p-0',
       }}
     >
-      <DrawerContent style={{ paddingTop: 'var(--safe-area-top)', paddingRight: 'var(--safe-area-right)', paddingBottom: 'var(--safe-area-bottom)' }}>
+      <DrawerContent id="mobile-drawer" style={{ paddingTop: 'var(--safe-area-top)', paddingRight: 'var(--safe-area-right)', paddingBottom: 'var(--safe-area-bottom)' }}>
         {/* Header */}
         <DrawerHeader className="flex items-center justify-between">
           <TenantLogo size="lg" showName />
@@ -357,7 +357,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                   <Download className="w-5 h-5 shrink-0" aria-hidden="true" />
                   <div className="min-w-0 flex-1 text-start">
                     <div className="text-base font-semibold truncate">{label}</div>
-                    <div className="text-xs text-theme-muted truncate">{sublabel}</div>
+                    <div className="text-sm text-theme-muted truncate">{sublabel}</div>
                   </div>
                 </Button>
               </div>
@@ -417,7 +417,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                   <p className="text-lg font-bold text-theme-primary">
                     {user.balance ?? 0}
                   </p>
-                  <p className="max-w-full truncate text-xs sm:text-sm text-theme-muted">{t('stats.credits')}</p>
+                  <p className="max-w-full truncate text-sm text-theme-muted">{t('stats.credits')}</p>
                 </Button>
                 <Button
                   variant="flat"
@@ -427,7 +427,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                   <p className="text-lg font-bold text-theme-primary">
                     {counts.messages > 0 ? counts.messages : 0}
                   </p>
-                  <p className="max-w-full truncate text-xs sm:text-sm text-theme-muted">{t('stats.messages')}</p>
+                  <p className="max-w-full truncate text-sm text-theme-muted">{t('stats.messages')}</p>
                   {counts.messages > 0 && (
                     <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" aria-hidden="true" />
                   )}
@@ -440,7 +440,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                   <p className="text-lg font-bold text-theme-primary">
                     {unreadCount > 0 ? unreadCount : 0}
                   </p>
-                  <p className="max-w-full truncate text-xs sm:text-sm text-theme-muted">{t('stats.alerts')}</p>
+                  <p className="max-w-full truncate text-sm text-theme-muted">{t('stats.alerts')}</p>
                   {unreadCount > 0 && (
                     <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" aria-hidden="true" />
                   )}
