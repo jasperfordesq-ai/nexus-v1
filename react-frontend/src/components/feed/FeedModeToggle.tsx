@@ -43,7 +43,7 @@ export function FeedModeToggle({ mode, onModeChange }: FeedModeToggleProps) {
         key="ranking"
         title={
           <div className="flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5" />
+            <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
             <span>{t('mode.for_you')}</span>
           </div>
         }
@@ -52,7 +52,7 @@ export function FeedModeToggle({ mode, onModeChange }: FeedModeToggleProps) {
         key="recent"
         title={
           <div className="flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5" />
+            <Clock className="w-3.5 h-3.5" aria-hidden="true" />
             <span>{t('mode.recent')}</span>
           </div>
         }

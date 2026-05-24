@@ -591,7 +591,7 @@ export default function AiChatPage() {
           {!hasMessages ? (
             <EmptyState onQuestionClick={(q) => void sendMessage(q)} starters={starters} />
           ) : (
-            <div className="max-w-2xl mx-auto">
+            <div className="max-w-2xl mx-auto" aria-live="polite" aria-label={t('messages_region')}>
               <AnimatePresence initial={false}>
                 {messages.map((msg) => (
                   <MessageBubble

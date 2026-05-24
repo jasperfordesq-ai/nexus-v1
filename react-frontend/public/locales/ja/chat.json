@@ -38,5 +38,6 @@
   "card_wallet_transactions": "過去30日間の{{count}}件の取引",
   "tool_results": {
     "view": "表示"
-  }
+  },
+  "messages_region": "Chat messages"
 }

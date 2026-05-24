@@ -1,6 +1,7 @@
 {
   "page_title": "AI Assistant",
   "aria_chat": "AI Chat",
+  "messages_region": "Chat messages",
   "header_title": "AI Assistant",
   "header_subtitle": "Powered by AI",
   "limits_left_today": "{{count}} left today",

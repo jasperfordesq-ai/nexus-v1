@@ -38,5 +38,6 @@
   "card_wallet_transactions": "{{count}} transacties in de afgelopen 30 dagen",
   "tool_results": {
     "view": "Bekijken"
-  }
+  },
+  "messages_region": "Chat messages"
 }

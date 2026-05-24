@@ -38,5 +38,6 @@
   "card_wallet_transactions": "{{count}} idirbheart le 30 lá anuas",
   "tool_results": {
     "view": "Amharc"
-  }
+  },
+  "messages_region": "Chat messages"
 }

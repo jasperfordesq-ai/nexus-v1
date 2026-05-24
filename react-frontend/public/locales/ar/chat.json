@@ -38,5 +38,6 @@
   "card_wallet_transactions": "{{count}} معاملة خلال آخر 30 يوماً",
   "tool_results": {
     "view": "عرض"
-  }
+  },
+  "messages_region": "Chat messages"
 }
