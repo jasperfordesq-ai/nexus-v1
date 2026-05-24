@@ -14,7 +14,7 @@ import * as Sentry from '@sentry/react';
 import { createElement } from 'react';
 import { readStoredConsent } from '@/contexts/CookieConsentContext';
 import type { User } from '@/types';
-import type { ReactNode, ComponentType } from 'react';
+import type { ReactNode, ComponentType, ReactElement } from 'react';
 
 interface TenantInfo {
   id: number;
@@ -294,5 +294,6 @@ export function SentryProfiler({ children }: { children: ReactNode }): ReactNode
     return children;
   }
 
-  return Sentry.withProfiler(() => children as React.ReactElement)({});
+  const Profiled = Sentry.withProfiler(() => children as ReactElement);
+  return createElement(Profiled);
 }

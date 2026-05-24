@@ -83,8 +83,8 @@ export const UserHoverCard = memo(function UserHoverCard({
   const [userData, setUserData] = useState<HoverCardData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
-  const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
-  const leaveTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const leaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // Don't render hover card on touch devices
   const isTouch = useRef(isTouchDevice());

@@ -485,8 +485,8 @@ function MentionInput({
   const [showMentions, setShowMentions] = useState(false);
   const [mentionQuery, setMentionQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
-  const blurTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const blurTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (newValue: string) => {

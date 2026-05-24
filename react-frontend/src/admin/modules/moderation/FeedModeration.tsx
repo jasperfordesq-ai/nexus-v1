@@ -164,8 +164,8 @@ export default function FeedModeration() {
   const totalPages = meta?.total_pages || 1;
 
   // Build cell content for a post row
-  const renderCells = (post: AdminFeedPost): React.ReactElement[] => {
-    const cells: React.ReactElement[] = [
+  const renderCells = (post: AdminFeedPost): React.ReactElement<React.ComponentProps<typeof TableCell>>[] => {
+    const cells: React.ReactElement<React.ComponentProps<typeof TableCell>>[] = [
       <TableCell key="user">
         <div className="flex items-center gap-3">
           <Avatar

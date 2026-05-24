@@ -505,6 +505,7 @@ export const adminSettingsResponseSchema = z.object({
     email_verification: z.string().nullable(),
     admin_approval: z.string().nullable(),
     maintenance_mode: z.string().nullable(),
+    partner_logo_link_url: z.string().nullable().optional(),
   }).passthrough(),
 }).passthrough();
 

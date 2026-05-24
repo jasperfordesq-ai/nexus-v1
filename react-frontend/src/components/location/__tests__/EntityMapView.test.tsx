@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { HeroUIProvider } from '@heroui/react';
 
@@ -76,6 +76,7 @@ vi.mock('@vis.gl/react-google-maps', () => ({
 };
 
 import { EntityMapView } from '../EntityMapView';
+import { resetGoogleMapsConfigForTests } from '../GoogleMapsProvider';
 
 function W({ children }: { children: React.ReactNode }) {
   return (
@@ -101,6 +102,13 @@ const renderInfoContent = (item: TestItem) => <div>{item.title}</div>;
 describe('EntityMapView', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    resetGoogleMapsConfigForTests();
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({
+      data: { enabled: true, apiKey: 'test-key', mapId: null },
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    })));
     mapsEnabled = true;
     import.meta.env.VITE_GOOGLE_MAPS_API_KEY = 'test-key';
   });
@@ -134,7 +142,7 @@ describe('EntityMapView', () => {
     expect(screen.getByText('No items found')).toBeInTheDocument();
   });
 
-  it('renders map when items have coordinates', () => {
+  it('renders map when items have coordinates', async () => {
     const items: TestItem[] = [{ id: 1, title: 'Test', lat: 53, lng: -6 }];
     const { container } = render(
       <W>
@@ -146,7 +154,9 @@ describe('EntityMapView', () => {
         />
       </W>,
     );
-    expect(container.querySelector('[data-testid="google-map"]')).toBeTruthy();
+    await waitFor(() => {
+      expect(container.querySelector('[data-testid="google-map"]')).toBeTruthy();
+    });
   });
 
   it('shows loading state', () => {

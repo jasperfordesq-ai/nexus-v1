@@ -67,7 +67,7 @@ export function HashtagPage() {
   const [hasMore, setHasMore] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [postCount, setPostCount] = useState(0);
-  const cursorRef = useRef<string | undefined>();
+  const cursorRef = useRef<string | undefined>(undefined);
   const abortRef = useRef<AbortController | null>(null);
   const tRef = useRef(t);
   tRef.current = t;

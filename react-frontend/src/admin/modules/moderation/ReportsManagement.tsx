@@ -177,8 +177,8 @@ export default function ReportsManagement() {
   const totalPages = meta?.total_pages || 1;
 
   // Build cell content for a report row
-  const renderCells = (report: AdminReport): React.ReactElement[] => {
-    const cells: React.ReactElement[] = [
+  const renderCells = (report: AdminReport): React.ReactElement<React.ComponentProps<typeof TableCell>>[] => {
+    const cells: React.ReactElement<React.ComponentProps<typeof TableCell>>[] = [
       <TableCell key="reporter">
         <div className="flex items-center gap-3">
           <Avatar

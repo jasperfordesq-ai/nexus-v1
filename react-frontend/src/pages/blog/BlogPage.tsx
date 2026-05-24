@@ -106,7 +106,7 @@ export function BlogPage() {
     loadCategories();
   }, []);
 
-  const cursorRef = useRef<string | undefined>();
+  const cursorRef = useRef<string | undefined>(undefined);
 
   const loadPosts = useCallback(async (append = false) => {
     if (!append) {

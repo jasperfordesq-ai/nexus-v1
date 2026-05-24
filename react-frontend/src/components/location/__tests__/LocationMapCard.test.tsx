@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { HeroUIProvider } from '@heroui/react';
 
@@ -86,6 +86,7 @@ vi.mock('@googlemaps/markerclusterer', () => ({
 };
 
 import { LocationMapCard } from '../LocationMapCard';
+import { resetGoogleMapsConfigForTests } from '../GoogleMapsProvider';
 
 function W({ children }: { children: React.ReactNode }) {
   return (
@@ -98,6 +99,13 @@ function W({ children }: { children: React.ReactNode }) {
 describe('LocationMapCard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    resetGoogleMapsConfigForTests();
+    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify({
+      data: { enabled: true, apiKey: 'test-key', mapId: null },
+    }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    })));
     mapsEnabled = true;
     import.meta.env.VITE_GOOGLE_MAPS_API_KEY = 'test-key';
   });
@@ -152,7 +160,7 @@ describe('LocationMapCard', () => {
     expect(container.querySelector('h3')).toBeNull();
   });
 
-  it('shows map when maps are enabled and coordinates are provided', () => {
+  it('shows map when maps are enabled and coordinates are provided', async () => {
     const markers = [{ id: 1, lat: 53.35, lng: -6.26, title: 'Test' }];
     const { container } = render(
       <W>
@@ -163,7 +171,9 @@ describe('LocationMapCard', () => {
         />
       </W>,
     );
-    expect(container.querySelector('[data-testid="google-map"]')).toBeTruthy();
+    await waitFor(() => {
+      expect(container.querySelector('[data-testid="google-map"]')).toBeTruthy();
+    });
   });
 
   it('does not show map when MAPS_ENABLED is false', () => {

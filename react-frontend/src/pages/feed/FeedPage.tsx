@@ -193,7 +193,7 @@ export function FeedPage() {
   const [isReporting, setIsReporting] = useState(false);
 
   // Use a ref for cursor to avoid infinite re-render loop
-  const cursorRef = useRef<string | undefined>();
+  const cursorRef = useRef<string | undefined>(undefined);
 
   // Active ad creatives — stored in a ref so ad injection never triggers re-renders
   const adsRef = useRef<AdItem[]>([]);

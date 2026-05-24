@@ -118,7 +118,7 @@ export function GroupDetailPage() {
   const [feedLoaded, setFeedLoaded] = useState(false);
   const [feedHasMore, setFeedHasMore] = useState(false);
   const [feedLoadingMore, setFeedLoadingMore] = useState(false);
-  const feedCursorRef = useRef<string | undefined>();
+  const feedCursorRef = useRef<string | undefined>(undefined);
 
   // Compose Hub for group posts
   const { isOpen: isComposeOpen, onOpen: onComposeOpen, onClose: onComposeClose } = useDisclosure();

@@ -28,7 +28,7 @@ export function GifPicker({ onSelect }: GifPickerProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [hasFetchedTrending, setHasFetchedTrending] = useState(false);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // Load trending GIFs when popover opens
   useEffect(() => {

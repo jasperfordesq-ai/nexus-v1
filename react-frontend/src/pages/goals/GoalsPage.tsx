@@ -139,7 +139,7 @@ export function GoalsPage() {
   const [tab, setTab] = useState<GoalTab>('my');
   const [hasMore, setHasMore] = useState(false);
   const [, setCursor] = useState<string | undefined>();
-  const cursorRef = useRef<string | undefined>();
+  const cursorRef = useRef<string | undefined>(undefined);
 
   // Create modal
   const { isOpen, onOpen, onClose } = useDisclosure();

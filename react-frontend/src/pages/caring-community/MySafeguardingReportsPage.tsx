@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type JSX } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { Button, Chip, Spinner } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';

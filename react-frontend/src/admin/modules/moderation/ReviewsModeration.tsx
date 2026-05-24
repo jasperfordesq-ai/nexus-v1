@@ -175,8 +175,8 @@ export default function ReviewsModeration() {
   };
 
   // Build cell content for a review row
-  const renderCells = (review: AdminReview): React.ReactElement[] => {
-    const cells: React.ReactElement[] = [
+  const renderCells = (review: AdminReview): React.ReactElement<React.ComponentProps<typeof TableCell>>[] => {
+    const cells: React.ReactElement<React.ComponentProps<typeof TableCell>>[] = [
       <TableCell key="reviewer">
         <div className="flex items-center gap-3">
           <Avatar

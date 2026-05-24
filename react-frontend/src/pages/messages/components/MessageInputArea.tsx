@@ -51,7 +51,7 @@ export interface MessageInputAreaProps {
   // Attachments
   attachments: File[];
   attachmentPreviews: AttachmentPreview[];
-  fileInputRef: RefObject<HTMLInputElement>;
+  fileInputRef: RefObject<HTMLInputElement | null>;
   onFileSelect: (e: ChangeEvent<HTMLInputElement>) => void;
   onRemoveAttachment: (index: number) => void;
   // GIF picker

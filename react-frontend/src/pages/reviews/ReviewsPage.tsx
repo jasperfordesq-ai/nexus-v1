@@ -12,7 +12,7 @@
  *   DELETE /api/v2/reviews/{id}             — delete own review
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -33,7 +33,6 @@ import { resolveAvatarUrl } from '@/lib/helpers';
 import { PageMeta } from '@/components/seo';
 import { ReviewModal } from '@/components/reviews/ReviewModal';
 import { SocialInteractionPanel } from '@/components/social';
-import type { JSX } from 'react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

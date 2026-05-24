@@ -147,8 +147,8 @@ export default function CommentsModeration() {
   const totalPages = meta?.total_pages || 1;
 
   // Build cell content for a comment row
-  const renderCells = (comment: AdminComment): React.ReactElement[] => {
-    const cells: React.ReactElement[] = [
+  const renderCells = (comment: AdminComment): React.ReactElement<React.ComponentProps<typeof TableCell>>[] => {
+    const cells: React.ReactElement<React.ComponentProps<typeof TableCell>>[] = [
       <TableCell key="user">
         <div className="flex items-center gap-3">
           <Avatar

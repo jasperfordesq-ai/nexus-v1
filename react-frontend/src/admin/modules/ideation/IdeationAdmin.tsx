@@ -367,7 +367,7 @@ export function IdeationAdmin() {
         actions={
           <div className="flex gap-2 items-center">
             <Chip variant="flat" startContent={<Lightbulb size={14} />}>
-              {t('ideation.total_count', { count: total.toLocaleString() })}
+              {t('ideation.total_count', { count: total })}
             </Chip>
             <Button
               isIconOnly

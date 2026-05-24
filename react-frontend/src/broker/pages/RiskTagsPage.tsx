@@ -126,7 +126,7 @@ export function RiskTagsPage() {
   const [listingResults, setListingResults] = useState<ListingSearchResult[]>([]);
   const [searchingListings, setSearchingListings] = useState(false);
   const [selectedListing, setSelectedListing] = useState<ListingSearchResult | null>(null);
-  const searchDebounce = useRef<ReturnType<typeof setTimeout>>();
+  const searchDebounce = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const loadItems = useCallback(async () => {
     setLoading(true);

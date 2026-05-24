@@ -95,7 +95,7 @@ export function MentionInput({
   const [isLoading, setIsLoading] = useState(false);
   const [mentionedUsers, setMentionedUsers] = useState<MentionedUser[]>([]);
 
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const searchFn = searchMentions ?? defaultSearchMentions;
   const searchVersionRef = useRef(0);

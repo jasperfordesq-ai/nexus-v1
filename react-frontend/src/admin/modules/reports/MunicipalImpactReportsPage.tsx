@@ -1055,7 +1055,7 @@ function MunicipalityNarrativeSection({
                   <p className="text-xs text-default-500">{t('municipal_reports.narrative.logs_count', { count: org.log_count })}</p>
                 </div>
                 <Chip size="sm" variant="flat" color="success">
-                  {t('municipal_reports.values.hours', { count: org.hours.toLocaleString(undefined, { maximumFractionDigits: 1 }) })}
+                  {t('municipal_reports.values.hours', { count: Number(org.hours.toFixed(1)) })}
                 </Chip>
               </div>
             ))}
@@ -1076,7 +1076,7 @@ function MunicipalityNarrativeSection({
                   <p className="text-xs text-default-500">{t('municipal_reports.values.activities', { count: cat.count })}</p>
                 </div>
                 <Chip size="sm" variant="flat" color="primary">
-                  {t('municipal_reports.values.hours', { count: cat.hours.toLocaleString(undefined, { maximumFractionDigits: 1 }) })}
+                  {t('municipal_reports.values.hours', { count: Number(cat.hours.toFixed(1)) })}
                 </Chip>
               </div>
             ))}
@@ -1155,12 +1155,12 @@ function CooperativeNarrativeSection({
           <p className="text-xs uppercase text-default-500">{t('municipal_reports.narrative.cooperative.future_care_credit_pool')}</p>
           <p className="mt-1 text-2xl font-semibold">
             {t('municipal_reports.values.hours', {
-              count: variant.future_care_credit_pool.toLocaleString(undefined, { maximumFractionDigits: 1 }),
+              count: Number(variant.future_care_credit_pool.toFixed(1)),
             })}
           </p>
           <p className="text-xs text-default-500 mt-1">
             {t('municipal_reports.narrative.cooperative.future_care_credit_pool_desc', {
-              count: variant.active_members_total.toLocaleString(),
+              count: variant.active_members_total,
             })}
           </p>
         </div>

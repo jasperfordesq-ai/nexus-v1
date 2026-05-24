@@ -661,7 +661,7 @@ export default function OnboardingFunnel() {
                                 {formatPercent(stage.conversionFromPrevious ?? 0)}
                               </Chip>
                             </div>
-                            <span>{t('crm.loss_between_stages', { count: stage.lossFromPrevious.toLocaleString() })}</span>
+                            <span>{t('crm.loss_between_stages', { count: stage.lossFromPrevious })}</span>
                           </div>
                         )}
 
@@ -679,7 +679,7 @@ export default function OnboardingFunnel() {
                             <div className="space-y-2 text-right">
                               {index > 0 && (
                                 <Chip size="sm" color="danger" variant="flat" className="font-medium">
-                                  {t('crm.lost_since_previous_stage', { count: stage.lossFromPrevious.toLocaleString() })}
+                                  {t('crm.lost_since_previous_stage', { count: stage.lossFromPrevious })}
                                 </Chip>
                               )}
                               <p className="text-2xl font-semibold tracking-tight text-foreground">
@@ -860,7 +860,7 @@ export default function OnboardingFunnel() {
                         </div>
 
                         <div className="mb-3 flex items-center justify-between gap-3 text-sm text-default-500">
-                          <span>{t('crm.members_lost_at_step', { count: transition.loss.toLocaleString() })}</span>
+                          <span>{t('crm.members_lost_at_step', { count: transition.loss })}</span>
                           <Chip size="sm" color={tone.chipColor} variant="flat">
                             {transition.loss.toLocaleString()} {t('crm.dropped_off')}
                           </Chip>

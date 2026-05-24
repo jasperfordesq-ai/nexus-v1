@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type JSX } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { Button, Input, Select, SelectItem, Textarea } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
