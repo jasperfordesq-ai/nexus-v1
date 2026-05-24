@@ -175,6 +175,7 @@ dump.sql
 !OPEN_SOURCE_ANNOUNCEMENT_EMAIL.pdf
 
 # ─── Temporary Files ─────────────────────────────────────────────────────────
+/tmp/
 *.tmp
 *.temp
 *.bak
