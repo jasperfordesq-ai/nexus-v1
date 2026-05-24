@@ -2196,5 +2196,6 @@
   "xp_progress": "{{current}} / {{required}} XP",
   "level_progress_aria": "Voortgang niveau {{level}}: {{percentage}}%",
   "user_fallback": "User",
-  "release_stage": "Generally Available (v1.5.1)"
+  "release_stage": "Generally Available (v1.5.1)",
+  "confirm": "Confirm"
 }

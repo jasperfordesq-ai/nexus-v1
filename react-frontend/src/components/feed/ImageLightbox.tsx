@@ -23,6 +23,7 @@ import ChevronRight from 'lucide-react/icons/chevron-right';
 import Download from 'lucide-react/icons/download';
 import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
+import { FocusScope } from '@react-aria/focus';
 import { resolveAssetUrl } from '@/lib/helpers';
 import type { PostMedia } from './types';
 
@@ -130,6 +131,7 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
   };
 
   const lightboxContent = (
+    <FocusScope contain restoreFocus autoFocus>
     <motion.div
       ref={containerRef}
       className="fixed inset-0 z-[1000] bg-black/90 backdrop-blur-lg flex items-center justify-center"
@@ -206,13 +208,13 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
                 autoPlay
                 playsInline
                 className="max-w-full max-h-full object-contain select-none rounded-lg"
-                aria-label={current.alt_text || t('carousel.video_of', { current: currentIndex + 1, total })}
+                aria-label={current.alt_text || t('lightbox.aria_label')}
                 onClick={(e) => e.stopPropagation()}
               />
             ) : (
               <img
                 src={resolveAssetUrl(current.file_url)}
-                alt={current.alt_text || t('carousel.image_of', { current: currentIndex + 1, total })}
+                alt={current.alt_text || ''}
                 className="max-w-full max-h-full object-contain select-none rounded-lg"
                 draggable={false}
               />
@@ -308,6 +310,7 @@ export function ImageLightbox({ media, initialIndex = 0, onClose }: ImageLightbo
         </div>
       )}
     </motion.div>
+    </FocusScope>
   );
 
   return createPortal(

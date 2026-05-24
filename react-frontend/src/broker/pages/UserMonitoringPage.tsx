@@ -170,7 +170,7 @@ export function UserMonitoring() {
     setUserSearchQuery('');
     setUserSearchResults([]);
     // Focus the search input after clearing
-    setTimeout(() => inputRef.current?.focus(), 50);
+    requestAnimationFrame(() => inputRef.current?.focus());
   }, []);
 
   const resetModalState = useCallback(() => {

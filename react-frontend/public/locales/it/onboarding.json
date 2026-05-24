@@ -131,5 +131,6 @@
   },
   "page_meta": {
     "title": "Accoglienza"
-  }
+  },
+  "aria_step_progress": "Step {{step}} of {{total}}"
 }

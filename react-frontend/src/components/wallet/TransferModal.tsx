@@ -137,7 +137,7 @@ export function TransferModal({
           });
       } else {
         // Focus search input after animation (only when no pre-fill)
-        setTimeout(() => searchInputRef.current?.focus(), 100);
+        requestAnimationFrame(() => searchInputRef.current?.focus());
       }
     }
 
@@ -202,7 +202,7 @@ export function TransferModal({
   // Clear selected recipient
   const handleClearRecipient = () => {
     setFormData((prev) => ({ ...prev, recipient: null }));
-    setTimeout(() => searchInputRef.current?.focus(), 50);
+    requestAnimationFrame(() => searchInputRef.current?.focus());
   };
 
   // Validate form

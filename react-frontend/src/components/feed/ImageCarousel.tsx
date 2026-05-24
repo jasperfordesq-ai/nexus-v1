@@ -220,7 +220,7 @@ export function ImageCarousel({ media, className = '' }: ImageCarouselProps) {
                   onClick={(e) => {
                     e.stopPropagation();
                     goTo(idx, idx > currentIndex ? 1 : -1);
-                    setTimeout(() => carouselRef.current?.focus(), 50);
+                    requestAnimationFrame(() => carouselRef.current?.focus());
                   }}
                   aria-label={t('carousel.go_to_image', { number: idx + 1 })}
                   aria-current={idx === currentIndex ? 'true' : undefined}

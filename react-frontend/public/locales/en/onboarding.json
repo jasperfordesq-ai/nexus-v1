@@ -70,6 +70,7 @@
   "complete_redirecting": "Taking you to your dashboard...",
   "aria_upload_photo": "Upload profile photo",
   "aria_step": "Step {{step}}: {{label}}{{status}}",
+  "aria_step_progress": "Step {{step}} of {{total}}",
   "aria_completed": " (completed)",
   "aria_current": " (current)",
   "toast_invalid_file_type": "Invalid file type",

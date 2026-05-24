@@ -860,7 +860,7 @@ export function FeedPage() {
       />
       <div className="mx-auto flex w-full max-w-6xl items-start justify-center gap-6 px-0 sm:px-2">
         {/* Main Feed Column */}
-        <main className="w-full min-w-0 max-w-2xl flex-1 space-y-4" aria-label={t('feed.region_label')}>
+        <section className="w-full min-w-0 max-w-2xl flex-1 space-y-4" aria-label={t('feed.region_label')}>
 
       {/* Pull-to-refresh indicator (mobile only) */}
       {(pullDistance > 0 || isRefreshing) && (
@@ -1336,7 +1336,7 @@ export function FeedPage() {
           </ModalFooter>
         </ModalContent>
       </Modal>
-      </main>
+      </section>
 
       {/* Right Sidebar — full widget panel in normal document flow. */}
       {showDesktopSidebar && (

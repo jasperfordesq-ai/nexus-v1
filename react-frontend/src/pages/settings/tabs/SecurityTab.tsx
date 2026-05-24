@@ -353,6 +353,8 @@ export function SecurityTab({
                 label={t('password.current')}
                 value={passwordData.current_password}
                 onChange={(e) => onPasswordDataChange((prev) => ({ ...prev, current_password: e.target.value }))}
+                isRequired
+                autoComplete="current-password"
                 endContent={
                   <Button
                     isIconOnly
@@ -372,6 +374,8 @@ export function SecurityTab({
                 label={t('password.new')}
                 value={passwordData.new_password}
                 onChange={(e) => onPasswordDataChange((prev) => ({ ...prev, new_password: e.target.value }))}
+                isRequired
+                autoComplete="new-password"
                 endContent={
                   <Button
                     isIconOnly
@@ -391,6 +395,8 @@ export function SecurityTab({
                 label={t('password.confirm')}
                 value={passwordData.confirm_password}
                 onChange={(e) => onPasswordDataChange((prev) => ({ ...prev, confirm_password: e.target.value }))}
+                isRequired
+                autoComplete="new-password"
                 classNames={inputClassNames}
               />
             </div>

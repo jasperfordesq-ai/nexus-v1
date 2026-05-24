@@ -113,7 +113,7 @@ export function DonateModal({ isOpen, onClose, currentBalance, onDonationComplet
 
   const handleClearRecipient = () => {
     setSelectedRecipient(null);
-    setTimeout(() => searchInputRef.current?.focus(), 50);
+    requestAnimationFrame(() => searchInputRef.current?.focus());
   };
 
   async function handleDonate() {

@@ -28,7 +28,7 @@
   --text-primary: #ffffff;
   --text-secondary: rgba(255, 255, 255, 0.8);
   --text-muted: rgba(255, 255, 255, 0.6);
-  --text-subtle: rgba(255, 255, 255, 0.4);
+  --text-subtle: rgba(255, 255, 255, 0.55);   /* ↑ was 0.4 — lifted to pass WCAG 4.5:1 on dark bg */
   --text-inverse: #0a0a0f;
 
   /* SEMANTIC SURFACE COLORS */
@@ -66,7 +66,7 @@
   --glass-saturate: 180%;
 
   /* BRAND COLORS (solid) */
-  --color-primary: #6366f1;       /* Indigo */
+  --color-primary: #818cf8;       /* Indigo-400 — ↑ from #6366f1; gives 6.97:1 as link text on dark bg */
   --color-secondary: #a855f7;     /* Purple */
   --color-accent: #06b6d4;        /* Cyan */
 
@@ -109,7 +109,7 @@
   --input-bg: rgba(255, 255, 255, 0.05);
   --input-border: rgba(255, 255, 255, 0.10);
   --input-focus-border: rgba(99, 102, 241, 0.5);
-  --input-placeholder: rgba(255, 255, 255, 0.4);
+  --input-placeholder: rgba(255, 255, 255, 0.55);  /* ↑ was 0.4 — matches --text-subtle fix */
 
   /* Status colors */
   --color-success: #22c55e;
@@ -133,7 +133,7 @@
   --text-primary: #0f172a;
   --text-secondary: #334155;
   --text-muted: #64748b;
-  --text-subtle: #94a3b8;
+  --text-subtle: #475569;          /* ↑ was #94a3b8 (2.3:1) — Slate-600 gives 6.5:1 on light bg */
   --text-inverse: #ffffff;
 
   /* SEMANTIC SURFACE COLORS */

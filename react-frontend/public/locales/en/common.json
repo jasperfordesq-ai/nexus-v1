@@ -880,6 +880,7 @@
   "verify_identity": "Verify Identity",
   "level_short": "Lv. {{level}}",
   "cancel": "Cancel",
+  "confirm": "Confirm",
   "save": "Save",
   "offer_favour": {
     "meta": {

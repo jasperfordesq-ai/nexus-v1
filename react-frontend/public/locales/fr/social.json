@@ -157,5 +157,8 @@
     "hours_given": "{{count}} h données",
     "connections": "{{count}} connexions",
     "listings": "{{count}} annonces"
+  },
+  "comments": {
+    "edit_label": "Edit comment"
   }
 }

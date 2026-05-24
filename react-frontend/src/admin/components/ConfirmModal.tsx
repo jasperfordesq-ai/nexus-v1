@@ -18,6 +18,7 @@ import {
   Button,
 } from '@heroui/react';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import { useTranslation } from 'react-i18next';
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -50,8 +51,9 @@ export function ConfirmModal({
   isLoading = false,
   children,
 }: ConfirmModalProps) {
-  const resolvedConfirmLabel = confirmLabel ?? "Confirm";
-  const resolvedCancelLabel = cancelLabel ?? "Cancel";
+  const { t } = useTranslation('common');
+  const resolvedConfirmLabel = confirmLabel ?? t('confirm', 'Confirm');
+  const resolvedCancelLabel = cancelLabel ?? t('cancel', 'Cancel');
   // Synchronous double-click gate. `isLoading` becomes true after the parent
   // re-renders; in the microsecond window between the two clicks, the second
   // press still fires onConfirm. The ref blocks re-entry within the same
@@ -84,11 +86,10 @@ export function ConfirmModal({
           {children}
         </ModalBody>
         <ModalFooter>
-          <Button variant="flat" onPress={onClose} isDisabled={isLoading}>
+          <Button autoFocus variant="flat" onPress={onClose} isDisabled={isLoading}>
             {resolvedCancelLabel}
           </Button>
           <Button
-            autoFocus
             color={confirmColor}
             onPress={handleConfirm}
             isLoading={isLoading}

@@ -39,7 +39,7 @@ export function ScrollToTop() {
     <div
       className="sr-only"
       role="status"
-      aria-live="assertive"
+      aria-live="polite"
       aria-atomic="true"
     >
       {announcement}

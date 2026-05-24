@@ -157,5 +157,8 @@
     "hours_given": "{{count}} godz. podarowanych",
     "connections": "{{count}} połączeń",
     "listings": "{{count}} ogłoszeń"
+  },
+  "comments": {
+    "edit_label": "Edit comment"
   }
 }

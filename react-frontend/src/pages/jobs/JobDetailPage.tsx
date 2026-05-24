@@ -740,7 +740,7 @@ export function JobDetailPage() {
 
   return (
     <>
-      <main className="space-y-6">
+      <article className="space-y-6">
         <PageMeta
           title={vacancy.title}
           description={vacancy.description?.replace(/\s+/g, ' ').trim().slice(0, 160)}
@@ -982,7 +982,7 @@ export function JobDetailPage() {
 
         {/* Similar Jobs */}
         <SimilarJobs jobs={similarJobs} tenantPath={tenantPath} />
-      </main>
+      </article>
 
       {/* AI Chat Drawer */}
       {isAuthenticated && vacancy && !isOwner && (

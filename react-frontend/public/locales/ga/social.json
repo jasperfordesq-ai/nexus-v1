@@ -157,5 +157,8 @@
     "hours_given": "{{count}} uair tugtha",
     "connections": "{{count}} nasc",
     "listings": "{{count}} liostú"
+  },
+  "comments": {
+    "edit_label": "Edit comment"
   }
 }

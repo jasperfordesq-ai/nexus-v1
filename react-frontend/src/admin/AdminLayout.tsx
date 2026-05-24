@@ -39,8 +39,17 @@ function AdminLayoutShell() {
     setMobileDrawerOpen(false);
   }, [location.pathname]);
 
+  const { t } = useTranslation('admin_nav');
+
   return (
     <div className="min-h-screen bg-background">
+      {/* Skip navigation — screen-reader / keyboard users jump straight to content */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[9999] focus:rounded-lg focus:bg-primary focus:px-4 focus:py-2 focus:text-white focus:shadow-lg"
+      >
+        {t('skip_to_main', 'Skip to main content')}
+      </a>
       <AdminMetaTags />
       {/* Sidebar — hidden on mobile, shown on md+ */}
       <div className="hidden md:block">
@@ -70,7 +79,9 @@ function AdminLayoutShell() {
 
       {/* Main content */}
       <main
-        className={`min-h-screen pt-16 transition-all duration-300 ${
+        id="main-content"
+        tabIndex={-1}
+        className={`min-h-screen pt-16 transition-all duration-300 outline-none ${
           sidebarCollapsed ? 'md:ml-16' : 'md:ml-64'
         }`}
       >

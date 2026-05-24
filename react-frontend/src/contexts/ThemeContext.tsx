@@ -224,7 +224,13 @@ export function ThemeProvider({
     return getStoredTheme() ?? defaultTheme;
   });
   const [preferences, setPreferences] = useState<ThemePreferences>(() => {
-    return getStoredPreferences() ?? { ...DEFAULT_PREFERENCES };
+    const stored = getStoredPreferences();
+    if (stored) return stored;
+    // Seed reducedMotion from OS prefers-reduced-motion on first session
+    const osReducedMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    return { ...DEFAULT_PREFERENCES, reducedMotion: osReducedMotion };
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -297,6 +303,25 @@ export function ThemeProvider({
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
   }, [theme]);
+
+  // Mirror OS prefers-reduced-motion into the reducedMotion preference whenever
+  // the user has NOT explicitly set their own preference (no stored value).
+  // This fires once on mount and re-syncs if the OS setting changes at runtime.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const hasStoredPrefs = !!localStorage.getItem(THEME_PREFS_STORAGE_KEY);
+    if (hasStoredPrefs) return; // user has an explicit preference — don't override
+
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const sync = () => {
+      setPreferences((prev) => {
+        if (prev.reducedMotion === mq.matches) return prev;
+        return { ...prev, reducedMotion: mq.matches };
+      });
+    };
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []); // run once; re-checks on every OS change
 
   // Sync preferences to backend (debounced)
   const syncPreferencesToBackend = useCallback((prefs: ThemePreferences) => {

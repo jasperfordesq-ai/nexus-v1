@@ -157,5 +157,8 @@
     "hours_given": "{{count}} uur gegeven",
     "connections": "{{count}} verbindingen",
     "listings": "{{count}} advertenties"
+  },
+  "comments": {
+    "edit_label": "Edit comment"
   }
 }

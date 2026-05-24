@@ -157,5 +157,8 @@
     "hours_given": "{{count}} ore donate",
     "connections": "{{count}} connessioni",
     "listings": "{{count}} annunci"
+  },
+  "comments": {
+    "edit_label": "Edit comment"
   }
 }

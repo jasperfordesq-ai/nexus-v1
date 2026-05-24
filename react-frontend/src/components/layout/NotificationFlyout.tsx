@@ -267,7 +267,7 @@ export function NotificationFlyout() {
       variant="light"
       size="sm"
       className={`relative text-theme-muted hover:text-theme-primary ${unreadCount > 0 ? 'text-indigo-500 dark:text-indigo-400' : ''}`}
-      aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
+      aria-label={unreadCount > 0 ? t('flyout.bell_unread_aria', { count: unreadCount }) : t('flyout.bell_aria')}
       {...(isMobile ? { onPress: () => setIsOpen(true) } : {})}
     >
       <Bell className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />

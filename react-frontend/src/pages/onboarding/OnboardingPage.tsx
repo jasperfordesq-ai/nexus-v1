@@ -660,7 +660,7 @@ export function OnboardingPage() {
       </motion.div>
 
       {/* Step Content */}
-      <div ref={stepContentRef} tabIndex={-1} className="outline-none" aria-live="polite" aria-label={`Step ${currentStep} of ${TOTAL_STEPS}`}>
+      <div ref={stepContentRef} tabIndex={-1} className="outline-none" aria-live="polite" aria-label={t('aria_step_progress', { step: currentStep, total: TOTAL_STEPS })}>
       <AnimatePresence mode="wait" custom={slideDirection}>
         <motion.div
           key={currentStep}

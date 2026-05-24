@@ -175,6 +175,7 @@ function CommentItemInner({
               <Textarea
                 value={editContent}
                 onChange={(e) => setEditContent(e.target.value)}
+                aria-label={tr('comments.edit_label', 'Edit comment')}
                 minRows={1}
                 maxRows={4}
                 size="sm"

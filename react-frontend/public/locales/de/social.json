@@ -157,5 +157,8 @@
     "hours_given": "{{count}} Std. gegeben",
     "connections": "{{count}} Verbindungen",
     "listings": "{{count}} Inserate"
+  },
+  "comments": {
+    "edit_label": "Edit comment"
   }
 }

@@ -228,7 +228,7 @@ export function MegaMenu({
           variant="light"
           size="sm"
           aria-expanded={isOpen}
-          aria-haspopup="true"
+          aria-haspopup="menu"
           className={`flex items-center gap-1 px-3 py-2 text-sm font-medium transition-all ${
             isActive
               ? 'bg-theme-active text-theme-primary'

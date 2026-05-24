@@ -157,5 +157,8 @@
     "celebrate": "احتفال"
   },
   "cannot_share_own_content": "لا يمكنك مشاركة محتواك الخاص في الخلاصة",
-  "write_reply_to": "رد على {{name}}..."
+  "write_reply_to": "رد على {{name}}...",
+  "comments": {
+    "edit_label": "Edit comment"
+  }
 }
