@@ -271,6 +271,9 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
 
       {/* Modal panel */}
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label={t('search.placeholder')}
         className="absolute top-[calc(var(--safe-area-top)+1rem)] sm:top-[calc(var(--safe-area-top)+4.5rem)] left-1/2 -translate-x-1/2 w-[calc(100dvw-var(--safe-area-left)-var(--safe-area-right)-1rem)] max-w-xl"
         onClick={e => e.stopPropagation()}
       >

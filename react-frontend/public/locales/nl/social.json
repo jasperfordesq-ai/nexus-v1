@@ -84,7 +84,8 @@
     "status_label": "Status",
     "status_placeholder": "In een vergadering",
     "char_count": "{{current}}/80 tekens",
-    "offline": "Offline"
+    "offline": "Offline",
+    "set_status_current": "Set status (currently: {{status}})"
   },
   "endorse": {
     "tooltip_remove": "Verwijder goedkeuring voor {{skillName}}",

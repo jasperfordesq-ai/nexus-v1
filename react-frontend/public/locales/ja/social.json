@@ -63,7 +63,8 @@
     "status_label": "ステータス",
     "status_placeholder": "会議中",
     "char_count": "{{current}}/80文字",
-    "offline": "オフライン"
+    "offline": "オフライン",
+    "set_status_current": "Set status (currently: {{status}})"
   },
   "endorse": {
     "tooltip_remove": "{{skillName}}の推薦を削除",

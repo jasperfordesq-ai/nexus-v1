@@ -84,7 +84,8 @@
     "status_label": "Statut",
     "status_placeholder": "En réunion",
     "char_count": "{{current}}/80 caractères",
-    "offline": "Hors ligne"
+    "offline": "Hors ligne",
+    "set_status_current": "Set status (currently: {{status}})"
   },
   "endorse": {
     "tooltip_remove": "Retirer la recommandation pour {{skillName}}",

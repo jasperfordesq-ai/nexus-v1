@@ -84,7 +84,8 @@
     "status_label": "Stádas",
     "status_placeholder": "I gcruinniú",
     "char_count": "{{current}}/80 carachtar",
-    "offline": "As líne"
+    "offline": "As líne",
+    "set_status_current": "Set status (currently: {{status}})"
   },
   "endorse": {
     "tooltip_remove": "Bain formhuiniú do {{skillName}}",

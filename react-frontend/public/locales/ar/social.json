@@ -63,7 +63,8 @@
     "status_label": "الحالة",
     "status_placeholder": "في اجتماع",
     "char_count": "{{current}}/80 حرف",
-    "offline": "غير متصل"
+    "offline": "غير متصل",
+    "set_status_current": "Set status (currently: {{status}})"
   },
   "endorse": {
     "tooltip_remove": "إزالة التأييد لـ {{skillName}}",

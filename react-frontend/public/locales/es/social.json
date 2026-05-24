@@ -84,7 +84,8 @@
     "status_label": "Estado",
     "status_placeholder": "En una reunión",
     "char_count": "{{current}}/80 caracteres",
-    "offline": "Desconectado"
+    "offline": "Desconectado",
+    "set_status_current": "Set status (currently: {{status}})"
   },
   "endorse": {
     "tooltip_remove": "Quitar recomendación para {{skillName}}",

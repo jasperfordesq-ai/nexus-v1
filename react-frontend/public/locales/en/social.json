@@ -71,6 +71,7 @@
   },
   "status": {
     "set_status": "Set status",
+    "set_status_current": "Set status (currently: {{status}})",
     "online": "Online",
     "online_desc": "Visible to others",
     "away": "Away",

@@ -248,7 +248,7 @@ export function VolunteeringOverview() {
               onClick={() => alert.path && navigate(alert.path)}
               role="button"
               tabIndex={0}
-              onKeyDown={(e) => { if (e.key === 'Enter' && alert.path) navigate(alert.path); }}
+              onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && alert.path) { e.preventDefault(); navigate(alert.path); } }}
             >
               <AlertTriangle size={18} className="text-amber-500 shrink-0" />
               <span className="text-sm font-medium flex-1">{alert.message}</span>

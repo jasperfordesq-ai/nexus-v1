@@ -84,7 +84,8 @@
     "status_label": "Stato",
     "status_placeholder": "In riunione",
     "char_count": "{{current}}/80 caratteri",
-    "offline": "Non in linea"
+    "offline": "Non in linea",
+    "set_status_current": "Set status (currently: {{status}})"
   },
   "endorse": {
     "tooltip_remove": "Rimuovi raccomandazione per {{skillName}}",

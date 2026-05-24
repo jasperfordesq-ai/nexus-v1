@@ -135,7 +135,7 @@ export function StatusSelector({ children }: StatusSelectorProps) {
       variant="light"
       size="sm"
       className="min-w-0 px-2 gap-1.5"
-      aria-label={t('status.set_status')}
+      aria-label={t('status.set_status_current', { status: statusLabel })}
     >
       <Circle className={`w-3.5 h-3.5 ${statusColorClass}`} />
       <span className="text-xs font-medium hidden sm:block">{statusLabel}</span>

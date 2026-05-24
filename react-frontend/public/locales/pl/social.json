@@ -84,7 +84,8 @@
     "status_label": "Status",
     "status_placeholder": "Na spotkaniu",
     "char_count": "{{current}}/80 znaków",
-    "offline": "Nieaktywny"
+    "offline": "Nieaktywny",
+    "set_status_current": "Set status (currently: {{status}})"
   },
   "endorse": {
     "tooltip_remove": "Usuń poparcie dla {{skillName}}",
