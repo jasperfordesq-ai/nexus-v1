@@ -804,5 +804,6 @@
     "payment_error": "Er is een onverwachte fout opgetreden. Probeer het opnieuw.",
     "not_available_title": "Betalingsverwerking wordt ingesteld",
     "not_available_description": "Betalingsverwerking wordt ingesteld. Neem contact op met de verkoper om de betaling te regelen."
-  }
+  },
+  "breadcrumb": "Breadcrumb"
 }

@@ -50,5 +50,6 @@
   "page_description": "Artigos, guias e tutoriais para a comunidade.",
   "all_categories": "Tudo",
   "author_by": "por {{name}}",
-  "attachments": "Anexos"
+  "attachments": "Anexos",
+  "breadcrumb": "Breadcrumb"
 }

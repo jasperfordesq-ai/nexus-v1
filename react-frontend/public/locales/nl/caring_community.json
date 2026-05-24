@@ -336,7 +336,8 @@
         "kpi_baselines": "KPI-basislijnen",
         "municipal_roi": "Gemeentelijke ROI",
         "category_coefficients": "Categoriecoëfficiënten"
-      }
+      },
+      "nav_label": "Caring community navigation"
     }
   },
   "admin": {

@@ -336,7 +336,8 @@
         "kpi_baselines": "Wartości bazowe KPI",
         "municipal_roi": "Miejski zwrot z inwestycji",
         "category_coefficients": "Współczynniki kategorii"
-      }
+      },
+      "nav_label": "Caring community navigation"
     }
   },
   "admin": {

@@ -9,7 +9,8 @@
     "section_daily": "العمل اليومي",
     "section_compliance": "الامتثال والإشراف",
     "section_records": "السجلات",
-    "section_settings": "الإعدادات"
+    "section_settings": "الإعدادات",
+    "nav_label": "Broker navigation"
   },
   "header": {
     "toggle_sidebar": "تبديل الشريط الجانبي",

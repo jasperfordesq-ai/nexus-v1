@@ -228,31 +228,31 @@ export function ListingTab({ onSuccess, onClose, templateData }: TabSubmitProps)
         classNames={inputClasses}
       />
 
-      <div className="flex gap-2">
-        <Chip
-          size="sm"
-          variant={draft.type === 'offer' ? 'solid' : 'flat'}
-          className={`cursor-pointer transition-all ${
+      <div role="radiogroup" aria-label={t('compose.listing_type_label')} className="flex gap-2">
+        <button
+          role="radio"
+          aria-checked={draft.type === 'offer'}
+          onClick={() => setType('offer')}
+          className={`cursor-pointer rounded-full px-3 py-0.5 text-sm font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 ${
             draft.type === 'offer'
               ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white'
               : 'bg-[var(--surface-elevated)] text-[var(--text-muted)]'
           }`}
-          onClick={() => setType('offer')}
         >
           {t('compose.listing_offering')}
-        </Chip>
-        <Chip
-          size="sm"
-          variant={draft.type === 'request' ? 'solid' : 'flat'}
-          className={`cursor-pointer transition-all ${
+        </button>
+        <button
+          role="radio"
+          aria-checked={draft.type === 'request'}
+          onClick={() => setType('request')}
+          className={`cursor-pointer rounded-full px-3 py-0.5 text-sm font-medium transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 ${
             draft.type === 'request'
               ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white'
               : 'bg-[var(--surface-elevated)] text-[var(--text-muted)]'
           }`}
-          onClick={() => setType('request')}
         >
           {t('compose.listing_looking_for')}
-        </Chip>
+        </button>
       </div>
 
       <div>

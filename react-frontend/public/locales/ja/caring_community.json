@@ -336,7 +336,8 @@
         "kpi_baselines": "KPI ベースライン",
         "municipal_roi": "自治体の ROI",
         "category_coefficients": "カテゴリ係数"
-      }
+      },
+      "nav_label": "Caring community navigation"
     }
   },
   "admin": {

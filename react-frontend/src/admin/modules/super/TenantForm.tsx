@@ -320,7 +320,7 @@ export function TenantForm() {
 
   return (
     <div>
-      <nav className="flex items-center gap-1 text-sm text-default-500 mb-1">
+      <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-default-500 mb-1">
         <Link to={tenantPath('/admin/super')} className="hover:text-primary">{t('tenant_form.breadcrumb_super_admin')}</Link>
         <span>/</span>
         <Link to={tenantPath('/admin/super/tenants')} className="hover:text-primary">{t('tenant_form.breadcrumb_tenants')}</Link>

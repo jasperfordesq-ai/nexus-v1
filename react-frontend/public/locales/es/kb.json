@@ -47,5 +47,6 @@
   "page_description": "Artículos, guías y tutoriales para la comunidad.",
   "all_categories": "Todo",
   "author_by": "por {{name}}",
-  "attachments": "Archivos adjuntos"
+  "attachments": "Archivos adjuntos",
+  "breadcrumb": "Breadcrumb"
 }

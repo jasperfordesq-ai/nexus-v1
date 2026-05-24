@@ -185,7 +185,7 @@ export function TenantHierarchy() {
 
   return (
     <div>
-      <nav className="flex items-center gap-1 text-sm text-default-500 mb-1">
+      <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-default-500 mb-1">
         <Link to={tenantPath('/admin/super')} className="hover:text-primary">{t('super.super_dashboard_title')}</Link>
         <span>/</span>
         <Link to={tenantPath('/admin/super/tenants')} className="hover:text-primary">{t('super.tenants')}</Link>

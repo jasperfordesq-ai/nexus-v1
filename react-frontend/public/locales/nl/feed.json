@@ -228,7 +228,8 @@
     "video_remove": "Video verwijderen",
     "file_size_mb": "{{name}} ({{size}}MB)",
     "listing_preview_alt": "Voorbeeld van vermelding",
-    "image_preview_alt": "Uploadvoorbeeld"
+    "image_preview_alt": "Uploadvoorbeeld",
+    "listing_type_label": "Listing type"
   },
   "moderation": {
     "unauthorized": "Je hebt geen toestemming om deze actie uit te voeren."

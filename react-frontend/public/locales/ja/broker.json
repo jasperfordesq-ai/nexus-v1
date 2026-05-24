@@ -9,7 +9,8 @@
     "section_daily": "日々の業務",
     "section_compliance": "コンプライアンスと監督",
     "section_records": "記録",
-    "section_settings": "設定"
+    "section_settings": "設定",
+    "nav_label": "Broker navigation"
   },
   "header": {
     "toggle_sidebar": "サイドバーを切り替え",

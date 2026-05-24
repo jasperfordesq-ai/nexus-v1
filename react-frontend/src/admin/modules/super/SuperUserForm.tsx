@@ -139,7 +139,7 @@ export function SuperUserForm() {
 
   return (
     <div>
-      <nav className="flex items-center gap-1 text-sm text-default-500 mb-1">
+      <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-default-500 mb-1">
         <Link to={tenantPath('/admin/super')} className="hover:text-primary">{t('super.page_title')}</Link>
         <span>/</span>
         <Link to={tenantPath('/admin/super/users')} className="hover:text-primary">{t('super.users')}</Link>

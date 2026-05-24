@@ -9,7 +9,8 @@
     "section_daily": "Obair laethúil",
     "section_compliance": "Comhlíonadh agus maoirseacht",
     "section_records": "Taifid",
-    "section_settings": "Socruithe"
+    "section_settings": "Socruithe",
+    "nav_label": "Broker navigation"
   },
   "header": {
     "toggle_sidebar": "Scoránaigh an barra taoibh",

@@ -916,7 +916,7 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
         </div>
       )}
 
-      <ScrollShadow as="nav" className="min-h-0 flex-1 px-2 py-3" hideScrollBar>
+      <ScrollShadow as="nav" aria-label={t('admin_navigation')} className="min-h-0 flex-1 px-2 py-3" hideScrollBar>
         {searchQuery.trim() ? (
           <ul className="space-y-0.5 py-1">
             {filteredResults.length === 0 ? (

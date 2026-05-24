@@ -8389,7 +8389,8 @@
     "user_moved_and_promoted_to_tenant_super_admin": "Der Benutzer wurde verschoben und zum Mandanten-Superadministrator befördert",
     "user_with_id": "Benutzer #{{id}}",
     "users_error_detail": "Benutzer: {{error}}",
-    "view_full_details": "Vollständige Details anzeigen"
+    "view_full_details": "Vollständige Details anzeigen",
+    "breadcrumb_nav_aria": "Breadcrumb"
   },
   "system": {
     "active": "Aktiv",

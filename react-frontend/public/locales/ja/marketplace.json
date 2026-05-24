@@ -804,5 +804,6 @@
     "payment_error": "予期しないエラーが発生しました。もう一度お試しください。",
     "not_available_title": "決済処理を設定中",
     "not_available_description": "決済処理の設定中です。支払い方法については販売者にお問い合わせください。"
-  }
+  },
+  "breadcrumb": "Breadcrumb"
 }

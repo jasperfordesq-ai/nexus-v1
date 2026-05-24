@@ -336,7 +336,8 @@
         "kpi_baselines": "Bunlínte KPI",
         "municipal_roi": "ROI cathrach",
         "category_coefficients": "Comhéifeachtaí Catagóire"
-      }
+      },
+      "nav_label": "Caring community navigation"
     }
   },
   "admin": {

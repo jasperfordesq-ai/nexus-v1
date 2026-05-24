@@ -256,5 +256,6 @@
   "zone_communications": "Communicatie",
   "zone_commerce": "Handel",
   "zone_diagnostics": "Diagnostiek",
-  "skip_to_main": "Skip to main content"
+  "skip_to_main": "Skip to main content",
+  "admin_navigation": "Admin navigation"
 }

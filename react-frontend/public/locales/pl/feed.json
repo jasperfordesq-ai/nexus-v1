@@ -228,7 +228,8 @@
     "video_remove": "Usuń wideo",
     "file_size_mb": "{{name}} ({{size}}MB)",
     "listing_preview_alt": "Podgl?d og?oszenia",
-    "image_preview_alt": "Podgl?d przesy?ania"
+    "image_preview_alt": "Podgl?d przesy?ania",
+    "listing_type_label": "Listing type"
   },
   "moderation": {
     "unauthorized": "Nie masz uprawnień do wykonania tej czynności."

@@ -50,5 +50,6 @@
   "page_description": "Articoli, guide ed esercitazioni per la community.",
   "all_categories": "Tutto",
   "author_by": "di {{name}}",
-  "attachments": "Allegati"
+  "attachments": "Allegati",
+  "breadcrumb": "Breadcrumb"
 }

@@ -8389,7 +8389,8 @@
     "user_moved_and_promoted_to_tenant_super_admin": "Usuário movido e promovido a superadministrador de locatário",
     "user_with_id": "Usuário #{{id}}",
     "users_error_detail": "Usuários: {{error}}",
-    "view_full_details": "Ver detalhes completos"
+    "view_full_details": "Ver detalhes completos",
+    "breadcrumb_nav_aria": "Breadcrumb"
   },
   "system": {
     "active": "Ativo",

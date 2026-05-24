@@ -454,7 +454,7 @@ export function MarketplaceCategoryPage() {
 
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
         {/* Breadcrumbs */}
-        <nav className="flex items-center gap-2 text-sm flex-wrap">
+        <nav aria-label={t('breadcrumb')} className="flex items-center gap-2 text-sm flex-wrap">
           <Link
             to={tenantPath('/marketplace')}
             className="text-default-500 hover:text-primary transition-colors"

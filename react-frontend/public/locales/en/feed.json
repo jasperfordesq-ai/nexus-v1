@@ -100,6 +100,7 @@
     "create_poll": "Create Poll",
     "listing_title_label": "Title",
     "listing_title_placeholder": "What are you offering or looking for?",
+    "listing_type_label": "Listing type",
     "listing_offering": "Offering",
     "listing_looking_for": "Looking For",
     "listing_desc_placeholder": "Describe your listing...",

@@ -228,7 +228,8 @@
     "video_remove": "Rimuovi video",
     "file_size_mb": "{{name}} ({{size}}MB)",
     "listing_preview_alt": "Anteprima dell?annuncio",
-    "image_preview_alt": "Anteprima del caricamento"
+    "image_preview_alt": "Anteprima del caricamento",
+    "listing_type_label": "Listing type"
   },
   "moderation": {
     "unauthorized": "Non hai il permesso di eseguire questa azione."

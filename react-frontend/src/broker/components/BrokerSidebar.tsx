@@ -204,7 +204,7 @@ export function BrokerSidebar({ collapsed, onToggle, badges }: BrokerSidebarProp
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-2 py-3">
+      <nav aria-label={t('sidebar.nav_label')} className="flex-1 overflow-y-auto px-2 py-3">
         {sections.map((section, idx) => (
           <div key={section.key} className={idx > 0 ? 'mt-4' : ''}>
             {!collapsed && section.key !== 'overview' && (

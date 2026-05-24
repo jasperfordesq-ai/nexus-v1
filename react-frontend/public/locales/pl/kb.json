@@ -50,5 +50,6 @@
   "page_description": "Artykuły, przewodniki i samouczki dla społeczności.",
   "all_categories": "Wszystko",
   "author_by": "przez {{name}}",
-  "attachments": "Załączniki"
+  "attachments": "Załączniki",
+  "breadcrumb": "Breadcrumb"
 }

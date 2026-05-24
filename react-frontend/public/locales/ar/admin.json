@@ -8389,7 +8389,8 @@
     "user_moved_and_promoted_to_tenant_super_admin": "تم نقل المستخدم وترقيته إلى مشرف مستأجر متميز",
     "user_with_id": "المستخدم #{{id}}",
     "users_error_detail": "المستخدمون: {{error}}",
-    "view_full_details": "عرض التفاصيل الكاملة"
+    "view_full_details": "عرض التفاصيل الكاملة",
+    "breadcrumb_nav_aria": "Breadcrumb"
   },
   "system": {
     "active": "نشيط",

@@ -9,7 +9,8 @@
     "section_daily": "Praca codzienna",
     "section_compliance": "Zgodność i nadzór",
     "section_records": "Rekordy",
-    "section_settings": "Ustawienia"
+    "section_settings": "Ustawienia",
+    "nav_label": "Broker navigation"
   },
   "header": {
     "toggle_sidebar": "Przełącz pasek boczny",

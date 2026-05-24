@@ -336,7 +336,8 @@
         "kpi_baselines": "Linee di base KPI",
         "municipal_roi": "ROI comunale",
         "category_coefficients": "Coefficienti di categoria"
-      }
+      },
+      "nav_label": "Caring community navigation"
     }
   },
   "admin": {

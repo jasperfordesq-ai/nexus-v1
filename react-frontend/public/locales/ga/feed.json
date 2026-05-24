@@ -228,7 +228,8 @@
     "video_remove": "Bain físeán",
     "file_size_mb": "{{name}} ({{size}}MB)",
     "listing_preview_alt": "R?amhamharc liost?la",
-    "image_preview_alt": "R?amhamharc uasl?d?la"
+    "image_preview_alt": "R?amhamharc uasl?d?la",
+    "listing_type_label": "Listing type"
   },
   "moderation": {
     "unauthorized": "Níl cead agat an gníomh seo a dhéanamh."

@@ -8389,7 +8389,8 @@
     "user_moved_and_promoted_to_tenant_super_admin": "ユーザーがテナントのスーパー管理者に移動され、昇格されました",
     "user_with_id": "ユーザー番号{{id}}",
     "users_error_detail": "ユーザー: {{error}}",
-    "view_full_details": "詳細を表示"
+    "view_full_details": "詳細を表示",
+    "breadcrumb_nav_aria": "Breadcrumb"
   },
   "system": {
     "active": "アクティブ",

@@ -266,7 +266,7 @@ export function KBArticlePage() {
         </script>
       </Helmet>
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-theme-muted flex-wrap">
+      <nav aria-label={t('breadcrumb')} className="flex items-center gap-2 text-sm text-theme-muted flex-wrap">
         <Link
           to={tenantPath('/kb')}
           className="hover:text-theme-primary transition-colors flex items-center gap-1"

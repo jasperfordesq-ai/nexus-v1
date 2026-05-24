@@ -804,5 +804,6 @@
     "payment_error": "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.",
     "not_available_title": "جارٍ إعداد معالجة الدفع",
     "not_available_description": "جارٍ إعداد معالجة الدفع. يرجى التواصل مع البائع لترتيب الدفع."
-  }
+  },
+  "breadcrumb": "Breadcrumb"
 }

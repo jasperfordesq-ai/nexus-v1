@@ -804,5 +804,6 @@
     "payment_error": "Une erreur inattendue s'est produite. Veuillez réessayer.",
     "not_available_title": "Configuration du traitement des paiements",
     "not_available_description": "Le traitement des paiements est en cours de configuration. Veuillez contacter le vendeur pour convenir du paiement."
-  }
+  },
+  "breadcrumb": "Breadcrumb"
 }

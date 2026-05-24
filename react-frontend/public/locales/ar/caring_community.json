@@ -336,7 +336,8 @@
         "kpi_baselines": "خطوط الأساس لمؤشرات الأداء الرئيسية",
         "municipal_roi": "عائد الاستثمار البلدي",
         "category_coefficients": "معاملات الفئة"
-      }
+      },
+      "nav_label": "Caring community navigation"
     }
   },
   "admin": {

@@ -804,5 +804,6 @@
     "payment_error": "Ein unerwarteter Fehler ist aufgetreten. Bitte erneut versuchen.",
     "not_available_title": "Zahlungsabwicklung wird eingerichtet",
     "not_available_description": "Die Zahlungsabwicklung wird gerade eingerichtet. Bitte kontaktieren Sie den Verkäufer, um eine Zahlung zu vereinbaren."
-  }
+  },
+  "breadcrumb": "Breadcrumb"
 }

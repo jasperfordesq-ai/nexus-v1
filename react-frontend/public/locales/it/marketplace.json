@@ -804,5 +804,6 @@
     "payment_error": "Si è verificato un errore imprevisto. Riprova.",
     "not_available_title": "Configurazione del pagamento in corso",
     "not_available_description": "L'elaborazione dei pagamenti è in fase di configurazione. Contatta il venditore per concordare il pagamento."
-  }
+  },
+  "breadcrumb": "Breadcrumb"
 }

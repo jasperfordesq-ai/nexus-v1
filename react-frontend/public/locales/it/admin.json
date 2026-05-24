@@ -8389,7 +8389,8 @@
     "user_moved_and_promoted_to_tenant_super_admin": "L'utente è stato spostato e promosso a super amministratore del tenant",
     "user_with_id": "Utente n.{{id}}",
     "users_error_detail": "Utenti: {{error}}",
-    "view_full_details": "Visualizza i dettagli completi"
+    "view_full_details": "Visualizza i dettagli completi",
+    "breadcrumb_nav_aria": "Breadcrumb"
   },
   "system": {
     "active": "Attivo",

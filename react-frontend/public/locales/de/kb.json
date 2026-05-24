@@ -50,5 +50,6 @@
   "page_description": "Artikel, Leitfäden und Tutorials für die Community.",
   "all_categories": "Alle",
   "author_by": "von {{name}}",
-  "attachments": "Anhänge"
+  "attachments": "Anhänge",
+  "breadcrumb": "Breadcrumb"
 }

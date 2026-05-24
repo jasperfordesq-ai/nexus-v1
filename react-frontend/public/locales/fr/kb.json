@@ -50,5 +50,6 @@
   "page_description": "Articles, guides et tutoriels pour la communauté.",
   "all_categories": "Tout",
   "author_by": "par {{name}}",
-  "attachments": "Pièces jointes"
+  "attachments": "Pièces jointes",
+  "breadcrumb": "Breadcrumb"
 }

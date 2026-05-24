@@ -804,5 +804,6 @@
     "payment_error": "Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo.",
     "not_available_title": "Configurando el procesamiento de pagos",
     "not_available_description": "El procesamiento de pagos está siendo configurado. Por favor, contacta con el vendedor para acordar el pago."
-  }
+  },
+  "breadcrumb": "Breadcrumb"
 }

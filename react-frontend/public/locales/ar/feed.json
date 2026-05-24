@@ -228,7 +228,8 @@
     "video_remove": "إزالة الفيديو",
     "file_size_mb": "{{name}} ({{size}}ميجابايت)",
     "listing_preview_alt": "?????? ???????",
-    "image_preview_alt": "?????? ?????"
+    "image_preview_alt": "?????? ?????",
+    "listing_type_label": "Listing type"
   },
   "moderation": {
     "unauthorized": "ليس لديك صلاحية لتنفيذ هذا الإجراء."

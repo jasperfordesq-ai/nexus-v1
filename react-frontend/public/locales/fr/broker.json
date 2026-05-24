@@ -9,7 +9,8 @@
     "section_daily": "Travail quotidien",
     "section_compliance": "Conformité et supervision",
     "section_records": "Dossiers",
-    "section_settings": "Paramètres"
+    "section_settings": "Paramètres",
+    "nav_label": "Broker navigation"
   },
   "header": {
     "toggle_sidebar": "Basculer la barre latérale",

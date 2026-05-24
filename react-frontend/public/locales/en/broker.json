@@ -9,7 +9,8 @@
     "section_daily": "Daily Workflow",
     "section_compliance": "Compliance & Oversight",
     "section_records": "Records",
-    "section_settings": "Settings"
+    "section_settings": "Settings",
+    "nav_label": "Broker navigation"
   },
   "header": {
     "toggle_sidebar": "Toggle sidebar",

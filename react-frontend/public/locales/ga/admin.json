@@ -8389,7 +8389,8 @@
     "user_moved_and_promoted_to_tenant_super_admin": "Bogadh an t-úsáideoir agus tugadh ardú céime dó chuig sár-riarthóir an tionónta",
     "user_with_id": "Úsáideoir #{{id}}",
     "users_error_detail": "Úsáideoirí: {{error}}",
-    "view_full_details": "Féach ar na Sonraí Iomlána"
+    "view_full_details": "Féach ar na Sonraí Iomlána",
+    "breadcrumb_nav_aria": "Breadcrumb"
   },
   "system": {
     "active": "Gníomhach",

@@ -804,5 +804,6 @@
     "payment_error": "Tharla earráid gan choinne. Bain triail eile as.",
     "not_available_title": "Ag Socrú Próiseála Íocaíochtaí",
     "not_available_description": "Tá próiseáil íocaíochtaí á socrú. Déan teagmháil leis an díoltóir chun íocaíocht a shocrú."
-  }
+  },
+  "breadcrumb": "Breadcrumb"
 }

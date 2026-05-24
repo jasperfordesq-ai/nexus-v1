@@ -9,7 +9,8 @@
     "section_daily": "Tägliche Arbeit",
     "section_compliance": "Compliance & Aufsicht",
     "section_records": "Datensätze",
-    "section_settings": "Einstellungen"
+    "section_settings": "Einstellungen",
+    "nav_label": "Broker navigation"
   },
   "header": {
     "toggle_sidebar": "Seitenleiste umschalten",

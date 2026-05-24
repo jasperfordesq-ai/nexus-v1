@@ -804,5 +804,6 @@
     "payment_error": "Wystąpił nieoczekiwany błąd. Spróbuj ponownie.",
     "not_available_title": "Konfigurowanie przetwarzania płatności",
     "not_available_description": "Przetwarzanie płatności jest w trakcie konfiguracji. Skontaktuj się ze sprzedawcą, aby uzgodnić płatność."
-  }
+  },
+  "breadcrumb": "Breadcrumb"
 }

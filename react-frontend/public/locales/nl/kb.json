@@ -50,5 +50,6 @@
   "page_description": "Artikelen, handleidingen en tutorials voor de community.",
   "all_categories": "Alles",
   "author_by": "door {{name}}",
-  "attachments": "Bijlagen"
+  "attachments": "Bijlagen",
+  "breadcrumb": "Breadcrumb"
 }

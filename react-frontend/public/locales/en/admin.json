@@ -11644,6 +11644,7 @@
     "apply": "Apply",
     "apply_to_n_tenants": "Apply to {{count}} tenants",
     "breadcrumb_federation_controls": "Federation Controls",
+    "breadcrumb_nav_aria": "Breadcrumb",
     "breadcrumb_super_admin": "Super Admin",
     "bulk_operations_desc": "Perform bulk operations across multiple tenants",
     "bulk_operations_title": "Bulk Operations",

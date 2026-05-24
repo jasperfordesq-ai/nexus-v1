@@ -50,5 +50,6 @@
   "page_description": "مقالات وأدلة وبرامج تعليمية للمجتمع.",
   "all_categories": "الكل",
   "author_by": "بواسطة {{name}}",
-  "attachments": "المرفقات"
+  "attachments": "المرفقات",
+  "breadcrumb": "Breadcrumb"
 }

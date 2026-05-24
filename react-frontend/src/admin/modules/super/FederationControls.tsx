@@ -216,7 +216,7 @@ export function FederationControls() {
   return (
     <div className="space-y-6">
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-1 text-sm text-default-500">
+      <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-default-500">
         <Link to={tenantPath('/admin/super')} className="hover:text-primary">{t('super.breadcrumb_super_admin')}</Link>
         <span>/</span>
         <span className="text-foreground font-medium">{t('super.breadcrumb_federation_controls')}</span>

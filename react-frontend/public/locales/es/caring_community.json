@@ -336,7 +336,8 @@
         "kpi_baselines": "Líneas base de KPI",
         "municipal_roi": "Retorno de la inversión municipal",
         "category_coefficients": "Coeficientes de categoría"
-      }
+      },
+      "nav_label": "Caring community navigation"
     }
   },
   "admin": {

@@ -266,7 +266,7 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-2 py-3">
+      <nav aria-label={t('panel.sidebar.nav_label')} className="flex-1 overflow-y-auto px-2 py-3">
         {!collapsed && (
           <div className="mb-3 px-1">
             <Input
