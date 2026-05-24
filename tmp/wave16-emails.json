@@ -1,0 +1,69 @@
+{
+  "emails": {
+    "ar": {
+      "vetting.subject": "{{heading}} - {{tenant}}"
+    },
+    "de": {
+      "common.fallback_manager": "Manager",
+      "job_alert.remote": "Remote",
+      "match_hot.regional": "Regional",
+      "newsletter.test_prefix": "[TEST]"
+    },
+    "es": {
+      "federation.level_social": "Social",
+      "match_hot.regional": "Regional",
+      "vetting.subject": "{{heading}} - {{tenant}}"
+    },
+    "fr": {
+      "federation.label_description": "Description",
+      "federation.label_messages": "Messages",
+      "federation.label_transactions": "Transactions",
+      "federation.level_social": "Social",
+      "newsletter.test_prefix": "[TEST]",
+      "vetting.subject": "{{heading}} - {{tenant}}"
+    },
+    "ga": {
+      "vetting.subject": "{{heading}} - {{tenant}}"
+    },
+    "it": {
+      "announcement.section_marketplace_title": "Marketplace",
+      "newsletter.test_prefix": "[TEST]",
+      "vetting.subject": "{{heading}} - {{tenant}}"
+    },
+    "ja": {
+      "vetting.subject": "{{heading}} - {{tenant}}"
+    },
+    "nl": {
+      "common.fallback_manager": "Manager",
+      "common.greeting": "Hi {{name}},",
+      "events.update_subject": "Update: {{title}}",
+      "federation.label_community": "Community",
+      "identity_verification.failed_greeting": "Hi :name,",
+      "match_digest.greeting": "Hi {{name}},",
+      "match_hot.greeting": "Hi {{name}},",
+      "match_mutual.greeting": "Hi {{name}},",
+      "match_mutual.match_label": "Match",
+      "new_message.greeting": "Hi {{name}},",
+      "newsletter.test_prefix": "[TEST]",
+      "onboarding_nurture.day2_greeting": "Hi :name,",
+      "onboarding_nurture.day5_greeting": "Hi :name,",
+      "onboarding_nurture.day7_greeting": "Hi :name,",
+      "password_reset.greeting": "Hi {{name}},",
+      "transaction.greeting": "Hi {{name}},",
+      "verification.greeting": "Hi {{name}},",
+      "vetting.subject": "{{heading}} - {{tenant}}",
+      "weekly_digest.greeting": "Hi {{name}},"
+    },
+    "pl": {
+      "announcement.section_marketplace_title": "Marketplace",
+      "newsletter.test_prefix": "[TEST]",
+      "vetting.subject": "{{heading}} - {{tenant}}"
+    },
+    "pt": {
+      "announcement.section_marketplace_title": "Marketplace",
+      "federation.level_social": "Social",
+      "match_hot.regional": "Regional",
+      "vetting.subject": "{{heading}} - {{tenant}}"
+    }
+  }
+}

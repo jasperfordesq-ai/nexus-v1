@@ -1,0 +1,734 @@
+{
+  "kb": {
+    "ar": {
+      "all_categories": "الكل",
+      "attachments": "المرفقات",
+      "author_by": "بقلم {{name}}",
+      "feedback.yes": "نعم",
+      "general_category": "عام",
+      "page_description": "مقالات وأدلة ودروس تعليمية للمجتمع.",
+      "page_title": "قاعدة المعرفة"
+    },
+    "de": {
+      "all_categories": "Alle",
+      "attachments": "Anhänge",
+      "author_by": "von {{name}}",
+      "page_description": "Artikel, Leitfäden und Tutorials für die Gemeinschaft.",
+      "page_title": "Wissensdatenbank"
+    },
+    "es": {
+      "all_categories": "Todas",
+      "attachments": "Archivos adjuntos",
+      "author_by": "por {{name}}",
+      "general_category": "General",
+      "page_description": "Artículos, guías y tutoriales para la comunidad.",
+      "page_title": "Base de conocimientos"
+    },
+    "fr": {
+      "all_categories": "Toutes",
+      "attachments": "Pièces jointes",
+      "author_by": "par {{name}}",
+      "page_description": "Articles, guides et tutoriels pour la communauté.",
+      "page_title": "Base de connaissances"
+    },
+    "ga": {
+      "all_categories": "Uile",
+      "attachments": "Ceangaltáin",
+      "author_by": "le {{name}}",
+      "page_description": "Ailt, treoir agus teagaisc don phobal.",
+      "page_title": "Bonn Eolais"
+    },
+    "it": {
+      "all_categories": "Tutte",
+      "attachments": "Allegati",
+      "author_by": "di {{name}}",
+      "page_description": "Articoli, guide e tutorial per la comunità.",
+      "page_title": "Base di conoscenza"
+    },
+    "ja": {
+      "all_categories": "すべて",
+      "attachments": "添付ファイル",
+      "author_by": "{{name}} 著",
+      "feedback.yes": "はい",
+      "general_category": "全般",
+      "page_description": "コミュニティ向けの記事、ガイド、チュートリアル。",
+      "page_title": "ナレッジベース"
+    },
+    "nl": {
+      "all_categories": "Alles",
+      "attachments": "Bijlagen",
+      "author_by": "door {{name}}",
+      "feedback.yes": "Ja",
+      "general_category": "Algemeen",
+      "page_description": "Artikelen, handleidingen en tutorials voor de gemeenschap.",
+      "page_title": "Kennisbank"
+    },
+    "pl": {
+      "all_categories": "Wszystkie",
+      "attachments": "Załączniki",
+      "author_by": "przez {{name}}",
+      "feedback.yes": "Tak",
+      "general_category": "Ogólne",
+      "page_description": "Artykuły, przewodniki i samouczki dla społeczności.",
+      "page_title": "Baza wiedzy"
+    },
+    "pt": {
+      "all_categories": "Todas",
+      "attachments": "Anexos",
+      "author_by": "por {{name}}",
+      "page_description": "Artigos, guias e tutoriais para a comunidade.",
+      "page_title": "Base de conhecimento"
+    }
+  },
+  "activity": {
+    "ar": {
+      "activity_types.connection": "اتصال",
+      "activity_types.default": "نشاط",
+      "activity_types.event": "فعالية",
+      "activity_types.exchange": "تبادل",
+      "activity_types.listing": "إعلان",
+      "activity_types.message": "رسالة",
+      "activity_types.post": "منشور",
+      "activity_types.review": "مراجعة",
+      "chart.given": "مُعطى",
+      "chart.received": "مُستلم",
+      "refresh": "تحديث",
+      "skill_offer": "عرض",
+      "skill_request": "طلب",
+      "stats.connections": "الاتصالات",
+      "stats.exchanges": "التبادلات"
+    },
+    "de": {},
+    "es": {},
+    "fr": { "activity_types.message": "Message" },
+    "ga": { "page_meta.title": "Deais Gníomhaíochta" },
+    "it": { "activity_types.post": "Pubblicazione" },
+    "ja": {
+      "activity_types.connection": "つながり",
+      "activity_types.default": "アクティビティ",
+      "activity_types.event": "イベント",
+      "activity_types.exchange": "交換",
+      "activity_types.listing": "リスト",
+      "activity_types.message": "メッセージ",
+      "activity_types.post": "投稿",
+      "activity_types.review": "レビュー",
+      "chart.given": "提供済み",
+      "chart.received": "受け取り済み",
+      "refresh": "更新",
+      "skill_offer": "提供",
+      "skill_request": "リクエスト",
+      "stats.connections": "つながり",
+      "stats.exchanges": "交換"
+    },
+    "nl": {
+      "activity_types.connection": "Verbinding",
+      "activity_types.default": "Activiteit",
+      "activity_types.event": "Evenement",
+      "activity_types.exchange": "Uitwisseling",
+      "activity_types.listing": "Aanbieding",
+      "activity_types.message": "Bericht",
+      "activity_types.post": "Bericht",
+      "activity_types.review": "Beoordeling",
+      "chart.given": "Gegeven",
+      "chart.received": "Ontvangen",
+      "refresh": "Vernieuwen",
+      "skill_offer": "Aanbod",
+      "skill_request": "Verzoek",
+      "stats.connections": "Verbindingen",
+      "stats.exchanges": "Uitwisselingen"
+    },
+    "pl": {
+      "activity_types.connection": "Połączenie",
+      "activity_types.default": "Aktywność",
+      "activity_types.event": "Wydarzenie",
+      "activity_types.exchange": "Wymiana",
+      "activity_types.listing": "Ogłoszenie",
+      "activity_types.message": "Wiadomość",
+      "activity_types.post": "Wpis",
+      "activity_types.review": "Recenzja",
+      "chart.given": "Oddane",
+      "chart.received": "Otrzymane",
+      "refresh": "Odśwież",
+      "skill_offer": "Oferta",
+      "skill_request": "Prośba",
+      "stats.connections": "Połączenia",
+      "stats.exchanges": "Wymiany"
+    },
+    "pt": {}
+  },
+  "merchant_onboarding": {
+    "ar": {
+      "close_time": "وقت الإغلاق",
+      "open_time": "وقت الفتح"
+    },
+    "de": {
+      "close_time": "Schließzeit",
+      "open_time": "Öffnungszeit"
+    },
+    "es": {
+      "close_time": "Hora de cierre",
+      "open_time": "Hora de apertura"
+    },
+    "fr": {
+      "close_time": "Heure de fermeture",
+      "open_time": "Heure d'ouverture"
+    },
+    "ga": {
+      "address_city": "Cathair",
+      "address_country": "Tír",
+      "address_postal": "Cód poist",
+      "address_street": "Seoladh sráide",
+      "back": "Ar ais",
+      "badge_earned": "Gnóthaithe suaitheantas Marktplatz-Páirtí",
+      "bio": "Faoi do ghnó",
+      "business": "Gnó",
+      "business_name": "Ainm gnó",
+      "business_reg": "Clárú gnó (roghnach)",
+      "close_time": "Am dúnta",
+      "closed": "Dúnta",
+      "complete_summary": "Athbhreithnigh do phróifíl",
+      "complete_title": "Beagnach ann!",
+      "days.fri": "Aoine",
+      "days.mon": "Luan",
+      "days.sat": "Satharn",
+      "days.sun": "Domhnach",
+      "days.thu": "Déardaoin",
+      "days.tue": "Máirt",
+      "days.wed": "Céadaoin",
+      "display_name": "Ainm taispeána",
+      "errors.complete_failed": "Theip ar chur i gcrích an tsuiteála.",
+      "errors.save_failed": "Theip ar shábháil. Déan iarracht arís.",
+      "hero_subtitle": "Socraigh do ghnó i 4 chéim shimplí agus tosaigh ag díol go háitiúil",
+      "hero_title": "Bí i do Pháirtí Marktplatz",
+      "launch": "Seolaigh do shiopa",
+      "launching": "Ag seoladh…",
+      "meta.description": "Socraigh do ghnó áitiúil ar an margadh",
+      "meta.title": "Bí i do Pháirtí Marktplatz",
+      "next": "Ar aghaidh",
+      "open": "Oscailte",
+      "open_time": "Am oscailte",
+      "opening_hours": "Uaireanta oscailte",
+      "private": "Príobháideach",
+      "saving": "Ag sábháil…",
+      "seller_type": "Cineál díoltóra",
+      "step_of": "Céim {{current}} de {{total}}",
+      "steps.complete": "Críochnaigh",
+      "steps.location": "Suíomh agus Uaireanta",
+      "steps.photo": "Grianghraf Próifíle",
+      "steps.profile": "Próifíl Gnó",
+      "success_cta": "Cruthaigh do chéad liostú",
+      "success_title": "Fáilte go Marktplatz!",
+      "upload_cover": "Uaslódáil íomhá clúdaigh (roghnach)",
+      "upload_photo": "Uaslódáil grianghraf próifíle"
+    },
+    "it": {
+      "close_time": "Orario di chiusura",
+      "open_time": "Orario di apertura"
+    },
+    "ja": {
+      "close_time": "閉店時間",
+      "open_time": "開店時間"
+    },
+    "nl": {
+      "close_time": "Sluitingstijd",
+      "open": "Geopend",
+      "open_time": "Openingstijd"
+    },
+    "pl": {
+      "close_time": "Godzina zamknięcia",
+      "open_time": "Godzina otwarcia"
+    },
+    "pt": {
+      "close_time": "Hora de fechamento",
+      "open_time": "Hora de abertura"
+    }
+  },
+  "success_stories": {
+    "ar": {
+      "after_label": "بعد",
+      "audience_label": "الجمهور",
+      "before_label": "قبل",
+      "caveat_label": "الطريقة",
+      "demo_label": "عرض توضيحي / توضيحي",
+      "empty_state": "لم يتم نشر أي قصص نجاح بعد. تحقق قريباً — يقوم منسقو المجتمع بإعداد البطاقات.",
+      "error_loading": "لم نتمكن من تحميل قصص النجاح الآن. الرجاء المحاولة مرة أخرى بعد قليل.",
+      "evidence_label": "الدليل",
+      "intro": "بطاقات إثبات مرتبطة بمقاييس مباشرة من تجربتنا التجريبية. تُظهر كل قصة تغيراً قبل وبعد، والجمهور المتأثر، والمنهجية وراء الأرقام، ومصدر الأدلة.",
+      "page_title": "قصص النجاح"
+    },
+    "de": {},
+    "es": {
+      "after_label": "Después",
+      "audience_label": "Audiencia",
+      "before_label": "Antes",
+      "caveat_label": "Método",
+      "demo_label": "Demo / ilustrativo",
+      "empty_state": "Aún no se han publicado historias de éxito. Vuelve pronto — los coordinadores de la comunidad están preparando las tarjetas.",
+      "error_loading": "No pudimos cargar las historias de éxito en este momento. Por favor, inténtalo de nuevo en un momento.",
+      "evidence_label": "Evidencia",
+      "intro": "Tarjetas de prueba vinculadas a métricas en vivo de nuestro piloto. Cada historia muestra un cambio antes y después, el público afectado, el método detrás de la cifra y de dónde proviene la evidencia.",
+      "page_title": "Historias de éxito"
+    },
+    "fr": {},
+    "ga": {
+      "after_label": "Ina dhiaidh",
+      "audience_label": "Lucht féachana",
+      "before_label": "Roimhe",
+      "caveat_label": "Modh",
+      "demo_label": "Taispeántas / léiritheach",
+      "empty_state": "Níl aon scéalta ratha foilsithe go fóill. Seiceáil ar ais go luath — tá comhordaitheoirí an phobail ag cur cártaí le chéile.",
+      "error_loading": "Níorbh fhéidir linn na scéalta ratha a luchtú faoi láthair. Déan iarracht arís ar ball.",
+      "evidence_label": "Fianaise",
+      "intro": "Cártaí cruthúnais ceangailte le méadraí beo ónár gclár píolótach. Léiríonn gach scéal athrú roimh agus ina dhiaidh, an lucht a ndearnadh tionchar orthu, an modh taobh thiar den uimhir, agus cá dtagann an fhianaise.",
+      "page_title": "Scéalta Ratha"
+    },
+    "it": {},
+    "ja": {
+      "after_label": "後",
+      "audience_label": "対象者",
+      "before_label": "前",
+      "caveat_label": "手法",
+      "demo_label": "デモ / 説明用",
+      "empty_state": "まだ成功事例は公開されていません。近日中に再度ご確認ください — コミュニティのコーディネーターがカードを準備中です。",
+      "error_loading": "成功事例を現在読み込めません。しばらくしてからもう一度お試しください。",
+      "evidence_label": "根拠",
+      "intro": "パイロットのライブ指標に紐付けた証拠カード。各ストーリーは変化の前後、影響を受けた対象者、数値の根拠、証拠の出所を示します。",
+      "page_title": "成功事例"
+    },
+    "nl": {
+      "after_label": "Na",
+      "audience_label": "Doelgroep",
+      "before_label": "Voor",
+      "caveat_label": "Methode",
+      "demo_label": "Demo / illustratief",
+      "empty_state": "Er zijn nog geen succesverhalen gepubliceerd. Kom binnenkort terug — gemeenschapscoördinatoren zijn de kaarten aan het samenstellen.",
+      "error_loading": "We konden de succesverhalen nu niet laden. Probeer het over een ogenblik opnieuw.",
+      "evidence_label": "Bewijs",
+      "intro": "Bewijskaarten gekoppeld aan live statistieken van ons pilotproject. Elk verhaal toont een voor-en-na verandering, het getroffen publiek, de methode achter het cijfer en waar het bewijs vandaan komt.",
+      "page_title": "Succesverhalen"
+    },
+    "pl": {
+      "after_label": "Po",
+      "audience_label": "Odbiorcy",
+      "before_label": "Przed",
+      "caveat_label": "Metoda",
+      "demo_label": "Demo / ilustracyjne",
+      "empty_state": "Nie opublikowano jeszcze żadnych historii sukcesu. Wróć wkrótce — koordynatorzy społeczności przygotowują karty.",
+      "error_loading": "Nie udało się załadować historii sukcesu. Spróbuj ponownie za chwilę.",
+      "evidence_label": "Dowód",
+      "intro": "Karty dowodów powiązane z aktywnymi danymi z naszego pilotażu. Każda historia pokazuje zmianę przed i po, grupę docelową, metodę stojącą za liczbą oraz źródło dowodów.",
+      "page_title": "Historie sukcesu"
+    },
+    "pt": {
+      "after_label": "Depois",
+      "audience_label": "Público",
+      "before_label": "Antes",
+      "caveat_label": "Método",
+      "demo_label": "Demo / ilustrativo",
+      "empty_state": "Nenhuma história de sucesso foi publicada ainda. Volte em breve — os coordenadores da comunidade estão preparando os cartões.",
+      "error_loading": "Não conseguimos carregar as histórias de sucesso agora. Tente novamente em instantes.",
+      "evidence_label": "Evidência",
+      "intro": "Cartões de prova vinculados a métricas ao vivo do nosso piloto. Cada história mostra uma mudança antes e depois, o público afetado, o método por trás do número e de onde vem a evidência.",
+      "page_title": "Histórias de sucesso"
+    }
+  },
+  "chat": {
+    "ar": {
+      "card_online": "متصل",
+      "card_remote": "عن بُعد",
+      "card_wallet_title": "محفظتك",
+      "card_wallet_transactions": "{{count}} معاملة خلال آخر 30 يوماً",
+      "error_label": "خطأ",
+      "input_aria": "رسالة",
+      "thumbs_down_aria": "إجابة غير مفيدة",
+      "thumbs_up_aria": "إجابة مفيدة"
+    },
+    "de": {
+      "card_online": "Online",
+      "card_remote": "Fernarbeit",
+      "card_wallet_title": "Deine Geldbörse",
+      "card_wallet_transactions": "{{count}} Transaktionen in den letzten 30 Tagen",
+      "thumbs_down_aria": "Nicht hilfreiche Antwort",
+      "thumbs_up_aria": "Hilfreiche Antwort"
+    },
+    "es": {
+      "card_online": "En línea",
+      "card_remote": "Remoto",
+      "card_wallet_title": "Tu cartera",
+      "card_wallet_transactions": "{{count}} transacciones en los últimos 30 días",
+      "error_label": "Error",
+      "thumbs_down_aria": "Respuesta inútil",
+      "thumbs_up_aria": "Respuesta útil"
+    },
+    "fr": {
+      "card_online": "En ligne",
+      "card_remote": "À distance",
+      "card_wallet_title": "Votre portefeuille",
+      "card_wallet_transactions": "{{count}} transactions au cours des 30 derniers jours",
+      "input_aria": "Message",
+      "sources_label": "Sources",
+      "thumbs_down_aria": "Réponse inutile",
+      "thumbs_up_aria": "Réponse utile"
+    },
+    "ga": {
+      "card_online": "Ar líne",
+      "card_remote": "Cianda",
+      "card_wallet_title": "Do sparán",
+      "card_wallet_transactions": "{{count}} idirbheart le 30 lá anuas",
+      "page_meta.title": "Comhrá AI",
+      "thumbs_down_aria": "Freagra gan úsáid",
+      "thumbs_up_aria": "Freagra úsáideach"
+    },
+    "it": {
+      "card_online": "Online",
+      "card_remote": "Da remoto",
+      "card_wallet_title": "Il tuo portafoglio",
+      "card_wallet_transactions": "{{count}} transazioni negli ultimi 30 giorni",
+      "thumbs_down_aria": "Risposta non utile",
+      "thumbs_up_aria": "Risposta utile"
+    },
+    "ja": {
+      "card_online": "オンライン",
+      "card_remote": "リモート",
+      "card_wallet_title": "あなたのウォレット",
+      "card_wallet_transactions": "過去30日間の{{count}}件の取引",
+      "error_label": "エラー",
+      "input_aria": "メッセージ",
+      "thumbs_down_aria": "役に立たない回答",
+      "thumbs_up_aria": "役に立つ回答"
+    },
+    "nl": {
+      "aria_chat": "AI Gesprek",
+      "card_online": "Online",
+      "card_remote": "Op afstand",
+      "card_wallet_title": "Uw portemonnee",
+      "card_wallet_transactions": "{{count}} transacties in de afgelopen 30 dagen",
+      "error_label": "Fout",
+      "input_aria": "Bericht",
+      "page_meta.title": "AI Gesprek",
+      "thumbs_down_aria": "Niet nuttig antwoord",
+      "thumbs_up_aria": "Nuttig antwoord"
+    },
+    "pl": {
+      "card_online": "Online",
+      "card_remote": "Zdalny",
+      "card_wallet_title": "Twój portfel",
+      "card_wallet_transactions": "{{count}} transakcji w ciągu ostatnich 30 dni",
+      "error_label": "Błąd",
+      "input_aria": "Wiadomość",
+      "thumbs_down_aria": "Nieużyteczna odpowiedź",
+      "thumbs_up_aria": "Użyteczna odpowiedź"
+    },
+    "pt": {
+      "card_online": "Online",
+      "card_remote": "Remoto",
+      "card_wallet_title": "Sua carteira",
+      "card_wallet_transactions": "{{count}} transações nos últimos 30 dias",
+      "thumbs_down_aria": "Resposta inútil",
+      "thumbs_up_aria": "Resposta útil"
+    }
+  },
+  "search_page": {
+    "ar": {
+      "cancel": "إلغاء",
+      "delete": "حذف",
+      "filter_category": "الفئة",
+      "filter_events": "الفعاليات",
+      "filter_groups": "المجموعات",
+      "filter_listings": "الإعلانات",
+      "filter_location": "الموقع",
+      "filter_members": "الأعضاء",
+      "filter_relevance": "الصلة",
+      "filter_reset": "إعادة ضبط",
+      "listing_offering": "عرض",
+      "listing_requesting": "طلب",
+      "page_meta.title": "البحث",
+      "page_title": "البحث",
+      "save": "حفظ",
+      "search_button": "بحث",
+      "title": "البحث"
+    },
+    "de": { "page_meta.title": "Suche" },
+    "es": { "page_meta.title": "Búsqueda" },
+    "fr": {
+      "initial_tip_services": "Services",
+      "page_meta.title": "Recherche"
+    },
+    "ga": { "page_meta.title": "Cuardach" },
+    "it": { "page_meta.title": "Ricerca" },
+    "ja": {
+      "cancel": "キャンセル",
+      "delete": "削除",
+      "filter_category": "カテゴリ",
+      "filter_events": "イベント",
+      "filter_groups": "グループ",
+      "filter_listings": "リスト",
+      "filter_location": "場所",
+      "filter_members": "メンバー",
+      "filter_relevance": "関連性",
+      "filter_reset": "リセット",
+      "listing_offering": "提供",
+      "listing_requesting": "リクエスト",
+      "page_meta.title": "検索",
+      "page_title": "検索",
+      "save": "保存",
+      "search_button": "検索",
+      "title": "検索"
+    },
+    "nl": {
+      "cancel": "Annuleren",
+      "delete": "Verwijderen",
+      "filter_category": "Categorie",
+      "filter_events": "Evenementen",
+      "filter_groups": "Groepen",
+      "filter_listings": "Aanbiedingen",
+      "filter_location": "Locatie",
+      "filter_members": "Leden",
+      "filter_relevance": "Relevantie",
+      "filter_reset": "Opnieuw instellen",
+      "listing_offering": "Aanbod",
+      "listing_requesting": "Gezocht",
+      "page_meta.title": "Zoeken",
+      "page_title": "Zoeken",
+      "save": "Opslaan",
+      "search_button": "Zoeken",
+      "title": "Zoeken"
+    },
+    "pl": {
+      "cancel": "Anuluj",
+      "delete": "Usuń",
+      "filter_category": "Kategoria",
+      "filter_events": "Wydarzenia",
+      "filter_groups": "Grupy",
+      "filter_listings": "Ogłoszenia",
+      "filter_location": "Lokalizacja",
+      "filter_members": "Członkowie",
+      "filter_relevance": "Trafność",
+      "filter_reset": "Resetuj",
+      "listing_offering": "Oferta",
+      "listing_requesting": "Prośba",
+      "page_meta.title": "Wyszukiwanie",
+      "page_title": "Wyszukiwanie",
+      "save": "Zapisz",
+      "search_button": "Szukaj",
+      "title": "Wyszukiwanie"
+    },
+    "pt": { "page_meta.title": "Pesquisa" }
+  },
+  "explore": {
+    "ar": {
+      "heading": "اكتشف",
+      "new_members.connect": "تواصل",
+      "organisations.title": "المنظمات",
+      "page_description": "اعثر على قوائم وفعاليات ومجموعات وأعضاء وفرص في جميع أنحاء المجتمع — نقطة انطلاقك للمشاركة والتواصل محلياً.",
+      "page_title": "اكتشف",
+      "recently_viewed.clear": "مسح",
+      "retry": "إعادة المحاولة",
+      "stats.members": "الأعضاء",
+      "suggested_connections.connect": "تواصل",
+      "tabs.all": "الكل",
+      "tabs.events": "الفعاليات",
+      "tabs.groups": "المجموعات",
+      "tabs.listings": "الإعلانات",
+      "tabs.people": "الأشخاص",
+      "upcoming_events.online": "عبر الإنترنت"
+    },
+    "de": {
+      "page_description": "Finde Angebote, Veranstaltungen, Gruppen, Mitglieder und Möglichkeiten in der gesamten Gemeinschaft — Ihr Ausgangspunkt, um sich zu engagieren und lokal zu vernetzen.",
+      "top_contributors.level": "Stufe {{level}}",
+      "upcoming_events.online": "Online"
+    },
+    "es": {
+      "featured_challenges.ideas_count": "{{count}} ideas",
+      "page_description": "Encuentra listados, eventos, grupos, miembros y oportunidades en toda la comunidad — tu punto de partida para involucrarte y conectarte localmente."
+    },
+    "fr": {
+      "organisations.title": "Organisations",
+      "page_description": "Trouvez des annonces, des événements, des groupes, des membres et des opportunités dans toute la communauté — votre point de départ pour vous impliquer et vous connecter localement.",
+      "polls.options": "{{count}} options",
+      "polls.votes": "{{count}} votes"
+    },
+    "ga": {
+      "page_description": "Faigh liostaí, imeachtaí, grúpaí, comhaltaí agus deiseanna ar fud an phobail — do phointe tosaigh chun páirt a ghlacadh agus nasc a dhéanamh go háitiúil."
+    },
+    "it": {
+      "page_description": "Trova annunci, eventi, gruppi, membri e opportunità in tutta la comunità — il tuo punto di partenza per partecipare e connetterti localmente.",
+      "top_contributors.level": "Liv.{{level}}",
+      "upcoming_events.online": "Online"
+    },
+    "ja": {
+      "heading": "発見",
+      "new_members.connect": "つながる",
+      "organisations.title": "組織",
+      "page_description": "コミュニティ全体でのリスト、イベント、グループ、メンバー、機会を見つけましょう — 参加して地域でつながるための出発点。",
+      "page_title": "発見",
+      "recently_viewed.clear": "クリア",
+      "retry": "再試行",
+      "stats.members": "メンバー",
+      "suggested_connections.connect": "つながる",
+      "tabs.all": "すべて",
+      "tabs.events": "イベント",
+      "tabs.groups": "グループ",
+      "tabs.listings": "リスト",
+      "tabs.people": "人々",
+      "top_contributors.level": "Lv.{{level}}",
+      "upcoming_events.online": "オンライン"
+    },
+    "nl": {
+      "heading": "Ontdekken",
+      "jobs.deadline": "Deadline: {{date}}",
+      "new_members.connect": "Verbinden",
+      "organisations.title": "Organisaties",
+      "page_description": "Vind aanbiedingen, evenementen, groepen, leden en kansen in de hele gemeenschap — uw startpunt om betrokken te raken en lokaal te verbinden.",
+      "page_title": "Ontdekken",
+      "recently_viewed.clear": "Wissen",
+      "retry": "Opnieuw proberen",
+      "stats.members": "Leden",
+      "suggested_connections.connect": "Verbinden",
+      "tabs.all": "Alles",
+      "tabs.events": "Evenementen",
+      "tabs.groups": "Groepen",
+      "tabs.listings": "Aanbiedingen",
+      "tabs.people": "Mensen",
+      "top_contributors.level": "Niv.{{level}}",
+      "upcoming_events.online": "Online"
+    },
+    "pl": {
+      "heading": "Odkryj",
+      "new_members.connect": "Połącz",
+      "organisations.title": "Organizacje",
+      "page_description": "Znajdź oferty, wydarzenia, grupy, członków i możliwości w całej społeczności — twój punkt startowy do angażowania się i nawiązywania lokalnych kontaktów.",
+      "page_title": "Odkryj",
+      "recently_viewed.clear": "Wyczyść",
+      "retry": "Spróbuj ponownie",
+      "stats.members": "Członkowie",
+      "suggested_connections.connect": "Połącz",
+      "tabs.all": "Wszystkie",
+      "tabs.events": "Wydarzenia",
+      "tabs.groups": "Grupy",
+      "tabs.listings": "Ogłoszenia",
+      "tabs.people": "Ludzie",
+      "top_contributors.level": "Poz.{{level}}",
+      "upcoming_events.online": "Online"
+    },
+    "pt": {
+      "page_description": "Encontre listagens, eventos, grupos, membros e oportunidades em toda a comunidade — seu ponto de partida para se envolver e conectar localmente.",
+      "upcoming_events.online": "Online"
+    }
+  },
+  "caring_community": {
+    "ar": {
+      "admin.regional_points.ledger.user_fallback": "#{{id}}",
+      "admin.safeguarding_reports.actor_id": "#{{id}}"
+    },
+    "de": {
+      "admin.civic_digest.includes.sources.vereine": "Vereine",
+      "admin.feedback.filters.status": "Status",
+      "admin.feedback.sentiments.neutral": "Neutral",
+      "admin.feedback.table.status": "Status",
+      "admin.hour_transfers.table.status": "Status",
+      "admin.loyalty.ledger.status": "Status",
+      "admin.providers.fields.name": "Name",
+      "admin.providers.fields.status": "Status",
+      "admin.providers.table.name": "Name",
+      "admin.providers.table.status": "Status",
+      "admin.providers.types.spitex": "Spitex",
+      "admin.recipient_circle.relationships.status": "Status",
+      "admin.regional_points.config.symbol": "Symbol",
+      "admin.regional_points.ledger.user_fallback": "#{{id}}",
+      "admin.safeguarding_reports.actor_id": "#{{id}}",
+      "admin.safeguarding_reports.filters.status": "Status",
+      "admin.safeguarding_reports.subject_org": "Organisation #{{id}}",
+      "admin.safeguarding_reports.table.status": "Status",
+      "admin.surveys.fields.options_placeholder": "Option A\nOption B\nOption C",
+      "admin.surveys.table.status": "Status",
+      "panel.sidebar.sections.engagement": "Engagement",
+      "providers.filter_spitex": "Spitex"
+    },
+    "es": {
+      "admin.providers.types.spitex": "Spitex",
+      "admin.regional_points.ledger.user_fallback": "#{{id}}",
+      "admin.safeguarding_reports.actor_id": "#{{id}}",
+      "providers.filter_spitex": "Spitex"
+    },
+    "fr": {
+      "admin.feedback.categories.question": "Question",
+      "admin.feedback.categories.sentiment": "Sentiment",
+      "admin.feedback.modal.sentiment": "Sentiment",
+      "admin.hour_transfers.table.date": "Date",
+      "admin.loyalty.ledger.date": "Date",
+      "admin.providers.types.spitex": "Spitex",
+      "admin.providers.types.verein": "Association",
+      "admin.regional_points.ledger.date": "Date",
+      "admin.regional_points.ledger.points": "Points",
+      "admin.regional_points.ledger.user_fallback": "#{{id}}",
+      "admin.safeguarding_reports.actor_id": "#{{id}}",
+      "admin.safeguarding_reports.subject_org": "Organisation #{{id}}",
+      "admin.surveys.table.questions": "Questions",
+      "cover.urgency.urgent": "Urgent",
+      "panel.header.notifications": "Notifications",
+      "providers.filter_spitex": "Spitex",
+      "providers.filter_verein": "Associations"
+    },
+    "ga": {
+      "admin.civic_digest.includes.sources.vereine": "Vereine",
+      "admin.providers.types.spitex": "Spitex",
+      "admin.regional_points.ledger.user_fallback": "#{{id}}",
+      "admin.safeguarding_reports.actor_id": "#{{id}}",
+      "providers.filter_spitex": "Spitex"
+    },
+    "it": {
+      "admin.civic_digest.includes.sources.vereine": "Vereine",
+      "admin.feedback.categories.idea": "Idea",
+      "admin.providers.types.spitex": "Spitex",
+      "admin.recipient_circle.about.privacy_label": "Privacy:",
+      "admin.regional_points.ledger.user_fallback": "#{{id}}",
+      "admin.safeguarding_reports.actor_id": "#{{id}}",
+      "providers.filter_spitex": "Spitex"
+    },
+    "ja": {
+      "admin.regional_points.ledger.user_fallback": "#{{id}}",
+      "admin.safeguarding_reports.actor_id": "#{{id}}"
+    },
+    "nl": {
+      "admin.civic_digest.includes.sources.vereine": "Vereine",
+      "admin.feedback.categories.sentiment": "Sentiment",
+      "admin.feedback.filters.status": "Status",
+      "admin.feedback.modal.sentiment": "Sentiment",
+      "admin.feedback.modal.title": "Feedback #{{id}}",
+      "admin.feedback.stats.sentiment": "Sentiment:",
+      "admin.feedback.table.status": "Status",
+      "admin.hour_transfers.table.status": "Status",
+      "admin.loyalty.ledger.status": "Status",
+      "admin.providers.fields.status": "Status",
+      "admin.providers.fields.website": "Website",
+      "admin.providers.table.status": "Status",
+      "admin.providers.types.spitex": "Spitex",
+      "admin.recipient_circle.about.privacy_label": "Privacy:",
+      "admin.recipient_circle.relationships.status": "Status",
+      "admin.regional_points.ledger.user_fallback": "#{{id}}",
+      "admin.safeguarding_reports.actor_id": "#{{id}}",
+      "admin.safeguarding_reports.filters.status": "Status",
+      "admin.safeguarding_reports.table.status": "Status",
+      "admin.surveys.table.status": "Status",
+      "panel.breadcrumbs.segments.caring": "Dashboard",
+      "providers.filter_spitex": "Spitex",
+      "providers.website": "Website"
+    },
+    "pl": {
+      "admin.civic_digest.includes.sources.vereine": "Vereine",
+      "admin.providers.types.spitex": "Spitex",
+      "admin.regional_points.config.symbol": "Symbol",
+      "admin.regional_points.ledger.user_fallback": "#{{id}}",
+      "admin.safeguarding_reports.actor_id": "#{{id}}",
+      "providers.filter_spitex": "Spitex"
+    },
+    "pt": {
+      "admin.civic_digest.includes.sources.vereine": "Vereine",
+      "admin.providers.types.spitex": "Spitex",
+      "admin.regional_points.ledger.user_fallback": "#{{id}}",
+      "admin.safeguarding_reports.actor_id": "#{{id}}",
+      "providers.filter_spitex": "Spitex"
+    }
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "search_page": {
+    "ar": {
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "filter_category": "Category",
+      "filter_events": "Events",
+      "filter_groups": "Groups",
+      "filter_listings": "Listings",
+      "filter_location": "Location",
+      "filter_members": "Members",
+      "filter_relevance": "Relevance",
+      "filter_reset": "Reset",
+      "listing_offering": "Offering",
+      "listing_requesting": "Requesting",
+      "page_meta.title": "Search",
+      "page_title": "Search",
+      "save": "Save",
+      "search_button": "Search",
+      "title": "Search"
+    },
+    "de": {
+      "page_meta.title": "Search"
+    },
+    "es": {
+      "page_meta.title": "Search"
+    },
+    "fr": {
+      "initial_tip_services": "Services",
+      "page_meta.title": "Search"
+    },
+    "ga": {
+      "page_meta.title": "Search"
+    },
+    "it": {
+      "page_meta.title": "Search"
+    },
+    "ja": {
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "filter_category": "Category",
+      "filter_events": "Events",
+      "filter_groups": "Groups",
+      "filter_listings": "Listings",
+      "filter_location": "Location",
+      "filter_members": "Members",
+      "filter_relevance": "Relevance",
+      "filter_reset": "Reset",
+      "listing_offering": "Offering",
+      "listing_requesting": "Requesting",
+      "page_meta.title": "Search",
+      "page_title": "Search",
+      "save": "Save",
+      "search_button": "Search",
+      "title": "Search"
+    },
+    "nl": {
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "filter_category": "Category",
+      "filter_events": "Events",
+      "filter_groups": "Groups",
+      "filter_listings": "Listings",
+      "filter_location": "Location",
+      "filter_members": "Members",
+      "filter_relevance": "Relevance",
+      "filter_reset": "Reset",
+      "listing_offering": "Offering",
+      "listing_requesting": "Requesting",
+      "page_meta.title": "Search",
+      "page_title": "Search",
+      "save": "Save",
+      "search_button": "Search",
+      "title": "Search"
+    },
+    "pl": {
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "filter_category": "Category",
+      "filter_events": "Events",
+      "filter_groups": "Groups",
+      "filter_listings": "Listings",
+      "filter_location": "Location",
+      "filter_members": "Members",
+      "filter_relevance": "Relevance",
+      "filter_reset": "Reset",
+      "listing_offering": "Offering",
+      "listing_requesting": "Requesting",
+      "page_meta.title": "Search",
+      "page_title": "Search",
+      "save": "Save",
+      "search_button": "Search",
+      "title": "Search"
+    },
+    "pt": {
+      "page_meta.title": "Search"
+    }
+  }
+}

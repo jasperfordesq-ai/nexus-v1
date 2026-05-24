@@ -1,0 +1,83 @@
+{
+  "kb": {
+    "ar": {
+      "all_categories": "All",
+      "attachments": "Attachments",
+      "author_by": "by {{name}}",
+      "feedback.yes": "Yes",
+      "general_category": "General",
+      "page_description": "Articles, guides, and tutorials for the community.",
+      "page_title": "Knowledge Base"
+    },
+    "de": {
+      "all_categories": "All",
+      "attachments": "Attachments",
+      "author_by": "by {{name}}",
+      "page_description": "Articles, guides, and tutorials for the community.",
+      "page_title": "Knowledge Base"
+    },
+    "es": {
+      "all_categories": "All",
+      "attachments": "Attachments",
+      "author_by": "by {{name}}",
+      "general_category": "General",
+      "page_description": "Articles, guides, and tutorials for the community.",
+      "page_title": "Knowledge Base"
+    },
+    "fr": {
+      "all_categories": "All",
+      "attachments": "Attachments",
+      "author_by": "by {{name}}",
+      "page_description": "Articles, guides, and tutorials for the community.",
+      "page_title": "Knowledge Base"
+    },
+    "ga": {
+      "all_categories": "All",
+      "attachments": "Attachments",
+      "author_by": "by {{name}}",
+      "page_description": "Articles, guides, and tutorials for the community.",
+      "page_title": "Knowledge Base"
+    },
+    "it": {
+      "all_categories": "All",
+      "attachments": "Attachments",
+      "author_by": "by {{name}}",
+      "page_description": "Articles, guides, and tutorials for the community.",
+      "page_title": "Knowledge Base"
+    },
+    "ja": {
+      "all_categories": "All",
+      "attachments": "Attachments",
+      "author_by": "by {{name}}",
+      "feedback.yes": "Yes",
+      "general_category": "General",
+      "page_description": "Articles, guides, and tutorials for the community.",
+      "page_title": "Knowledge Base"
+    },
+    "nl": {
+      "all_categories": "All",
+      "attachments": "Attachments",
+      "author_by": "by {{name}}",
+      "feedback.yes": "Yes",
+      "general_category": "General",
+      "page_description": "Articles, guides, and tutorials for the community.",
+      "page_title": "Knowledge Base"
+    },
+    "pl": {
+      "all_categories": "All",
+      "attachments": "Attachments",
+      "author_by": "by {{name}}",
+      "feedback.yes": "Yes",
+      "general_category": "General",
+      "page_description": "Articles, guides, and tutorials for the community.",
+      "page_title": "Knowledge Base"
+    },
+    "pt": {
+      "all_categories": "All",
+      "attachments": "Attachments",
+      "author_by": "by {{name}}",
+      "page_description": "Articles, guides, and tutorials for the community.",
+      "page_title": "Knowledge Base"
+    }
+  }
+}

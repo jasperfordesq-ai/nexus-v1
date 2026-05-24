@@ -1,0 +1,117 @@
+{
+  "caring_community": {
+    "ar": {
+      "admin.regional_points.ledger.user_fallback": "#{{id}}",
+      "admin.safeguarding_reports.actor_id": "#{{id}}"
+    },
+    "de": {
+      "admin.civic_digest.includes.sources.vereine": "Vereine",
+      "admin.feedback.filters.status": "Status",
+      "admin.feedback.sentiments.neutral": "Neutral",
+      "admin.feedback.table.status": "Status",
+      "admin.hour_transfers.table.status": "Status",
+      "admin.loyalty.ledger.status": "Status",
+      "admin.providers.fields.name": "Name",
+      "admin.providers.fields.status": "Status",
+      "admin.providers.table.name": "Name",
+      "admin.providers.table.status": "Status",
+      "admin.providers.types.spitex": "Spitex",
+      "admin.recipient_circle.relationships.status": "Status",
+      "admin.regional_points.config.symbol": "Symbol",
+      "admin.regional_points.ledger.user_fallback": "#{{id}}",
+      "admin.safeguarding_reports.actor_id": "#{{id}}",
+      "admin.safeguarding_reports.filters.status": "Status",
+      "admin.safeguarding_reports.subject_org": "Organisation #{{id}}",
+      "admin.safeguarding_reports.table.status": "Status",
+      "admin.surveys.fields.options_placeholder": "Option A\nOption B\nOption C",
+      "admin.surveys.table.status": "Status",
+      "panel.sidebar.sections.engagement": "Engagement",
+      "providers.filter_spitex": "Spitex"
+    },
+    "es": {
+      "admin.providers.types.spitex": "Spitex",
+      "admin.regional_points.ledger.user_fallback": "#{{id}}",
+      "admin.safeguarding_reports.actor_id": "#{{id}}",
+      "providers.filter_spitex": "Spitex"
+    },
+    "fr": {
+      "admin.feedback.categories.question": "Question",
+      "admin.feedback.categories.sentiment": "Sentiment",
+      "admin.feedback.modal.sentiment": "Sentiment",
+      "admin.hour_transfers.table.date": "Date",
+      "admin.loyalty.ledger.date": "Date",
+      "admin.providers.types.spitex": "Spitex",
+      "admin.providers.types.verein": "Association",
+      "admin.regional_points.ledger.date": "Date",
+      "admin.regional_points.ledger.points": "Points",
+      "admin.regional_points.ledger.user_fallback": "#{{id}}",
+      "admin.safeguarding_reports.actor_id": "#{{id}}",
+      "admin.safeguarding_reports.subject_org": "Organisation #{{id}}",
+      "admin.surveys.table.questions": "Questions",
+      "cover.urgency.urgent": "Urgent",
+      "panel.header.notifications": "Notifications",
+      "providers.filter_spitex": "Spitex",
+      "providers.filter_verein": "Associations"
+    },
+    "ga": {
+      "admin.civic_digest.includes.sources.vereine": "Vereine",
+      "admin.providers.types.spitex": "Spitex",
+      "admin.regional_points.ledger.user_fallback": "#{{id}}",
+      "admin.safeguarding_reports.actor_id": "#{{id}}",
+      "providers.filter_spitex": "Spitex"
+    },
+    "it": {
+      "admin.civic_digest.includes.sources.vereine": "Vereine",
+      "admin.feedback.categories.idea": "Idea",
+      "admin.providers.types.spitex": "Spitex",
+      "admin.recipient_circle.about.privacy_label": "Privacy:",
+      "admin.regional_points.ledger.user_fallback": "#{{id}}",
+      "admin.safeguarding_reports.actor_id": "#{{id}}",
+      "providers.filter_spitex": "Spitex"
+    },
+    "ja": {
+      "admin.regional_points.ledger.user_fallback": "#{{id}}",
+      "admin.safeguarding_reports.actor_id": "#{{id}}"
+    },
+    "nl": {
+      "admin.civic_digest.includes.sources.vereine": "Vereine",
+      "admin.feedback.categories.sentiment": "Sentiment",
+      "admin.feedback.filters.status": "Status",
+      "admin.feedback.modal.sentiment": "Sentiment",
+      "admin.feedback.modal.title": "Feedback #{{id}}",
+      "admin.feedback.stats.sentiment": "Sentiment:",
+      "admin.feedback.table.status": "Status",
+      "admin.hour_transfers.table.status": "Status",
+      "admin.loyalty.ledger.status": "Status",
+      "admin.providers.fields.status": "Status",
+      "admin.providers.fields.website": "Website",
+      "admin.providers.table.status": "Status",
+      "admin.providers.types.spitex": "Spitex",
+      "admin.recipient_circle.about.privacy_label": "Privacy:",
+      "admin.recipient_circle.relationships.status": "Status",
+      "admin.regional_points.ledger.user_fallback": "#{{id}}",
+      "admin.safeguarding_reports.actor_id": "#{{id}}",
+      "admin.safeguarding_reports.filters.status": "Status",
+      "admin.safeguarding_reports.table.status": "Status",
+      "admin.surveys.table.status": "Status",
+      "panel.breadcrumbs.segments.caring": "Dashboard",
+      "providers.filter_spitex": "Spitex",
+      "providers.website": "Website"
+    },
+    "pl": {
+      "admin.civic_digest.includes.sources.vereine": "Vereine",
+      "admin.providers.types.spitex": "Spitex",
+      "admin.regional_points.config.symbol": "Symbol",
+      "admin.regional_points.ledger.user_fallback": "#{{id}}",
+      "admin.safeguarding_reports.actor_id": "#{{id}}",
+      "providers.filter_spitex": "Spitex"
+    },
+    "pt": {
+      "admin.civic_digest.includes.sources.vereine": "Vereine",
+      "admin.providers.types.spitex": "Spitex",
+      "admin.regional_points.ledger.user_fallback": "#{{id}}",
+      "admin.safeguarding_reports.actor_id": "#{{id}}",
+      "providers.filter_spitex": "Spitex"
+    }
+  }
+}

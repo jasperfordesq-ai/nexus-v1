@@ -1,0 +1,84 @@
+{
+  "activity": {
+    "ar": {
+      "activity_types.connection": "Connection",
+      "activity_types.default": "Activity",
+      "activity_types.event": "Event",
+      "activity_types.exchange": "Exchange",
+      "activity_types.listing": "Listing",
+      "activity_types.message": "Message",
+      "activity_types.post": "Post",
+      "activity_types.review": "Review",
+      "chart.given": "Given",
+      "chart.received": "Received",
+      "refresh": "Refresh",
+      "skill_offer": "Offer",
+      "skill_request": "Request",
+      "stats.connections": "Connections",
+      "stats.exchanges": "Exchanges"
+    },
+    "de": {},
+    "es": {},
+    "fr": {
+      "activity_types.message": "Message"
+    },
+    "ga": {
+      "page_meta.title": "Activity Dashboard"
+    },
+    "it": {
+      "activity_types.post": "Post"
+    },
+    "ja": {
+      "activity_types.connection": "Connection",
+      "activity_types.default": "Activity",
+      "activity_types.event": "Event",
+      "activity_types.exchange": "Exchange",
+      "activity_types.listing": "Listing",
+      "activity_types.message": "Message",
+      "activity_types.post": "Post",
+      "activity_types.review": "Review",
+      "chart.given": "Given",
+      "chart.received": "Received",
+      "refresh": "Refresh",
+      "skill_offer": "Offer",
+      "skill_request": "Request",
+      "stats.connections": "Connections",
+      "stats.exchanges": "Exchanges"
+    },
+    "nl": {
+      "activity_types.connection": "Connection",
+      "activity_types.default": "Activity",
+      "activity_types.event": "Event",
+      "activity_types.exchange": "Exchange",
+      "activity_types.listing": "Listing",
+      "activity_types.message": "Message",
+      "activity_types.post": "Post",
+      "activity_types.review": "Review",
+      "chart.given": "Given",
+      "chart.received": "Received",
+      "refresh": "Refresh",
+      "skill_offer": "Offer",
+      "skill_request": "Request",
+      "stats.connections": "Connections",
+      "stats.exchanges": "Exchanges"
+    },
+    "pl": {
+      "activity_types.connection": "Connection",
+      "activity_types.default": "Activity",
+      "activity_types.event": "Event",
+      "activity_types.exchange": "Exchange",
+      "activity_types.listing": "Listing",
+      "activity_types.message": "Message",
+      "activity_types.post": "Post",
+      "activity_types.review": "Review",
+      "chart.given": "Given",
+      "chart.received": "Received",
+      "refresh": "Refresh",
+      "skill_offer": "Offer",
+      "skill_request": "Request",
+      "stats.connections": "Connections",
+      "stats.exchanges": "Exchanges"
+    },
+    "pt": {}
+  }
+}

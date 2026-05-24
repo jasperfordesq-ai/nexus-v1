@@ -1,0 +1,338 @@
+{
+  "reviews": {
+    "de": {},
+    "ar": {
+      "given": {
+        "empty": "لم تكتب أي تقييمات بعد",
+        "empty_subtitle": "بعد إتمام التبادلات، يمكنك ترك تقييمات للأعضاء الآخرين."
+      },
+      "load_error": "فشل تحميل التقييمات. يرجى المحاولة مرة أخرى.",
+      "load_more": "تحميل المزيد",
+      "page_title": "التقييمات",
+      "pending": {
+        "empty": "لا توجد تقييمات معلقة",
+        "empty_subtitle": "أنت محدّث! ستظهر هنا تقييمات التبادلات المكتملة.",
+        "write_review": "كتابة تقييم"
+      },
+      "received": {
+        "empty": "لم تصلك أي تقييمات بعد",
+        "empty_subtitle": "أتمم التبادلات مع أعضاء المجتمع لتبدأ في الحصول على تقييمات."
+      },
+      "review_card": {
+        "anonymous": "مجهول",
+        "delete": "حذف التقييم",
+        "delete_confirm": "هل أنت متأكد أنك تريد حذف هذا التقييم؟",
+        "delete_error": "فشل حذف التقييم",
+        "delete_success": "تم حذف التقييم"
+      },
+      "stars": "{{count}} نجمة",
+      "stars_plural": "{{count}} نجوم",
+      "stats": {
+        "average": "متوسط التقييم",
+        "no_reviews": "لا توجد تقييمات بعد",
+        "total": "إجمالي التقييمات"
+      },
+      "tabs": {
+        "given": "التقييمات المُعطاة",
+        "pending": "التقييمات المعلقة",
+        "received": "التقييمات المستلمة"
+      }
+    },
+    "es": {
+      "given": {
+        "empty": "Todavía no has escrito ninguna reseña",
+        "empty_subtitle": "Tras completar intercambios, puedes dejar reseñas a otros miembros."
+      },
+      "load_error": "Error al cargar las reseñas. Por favor, inténtalo de nuevo.",
+      "load_more": "Cargar más",
+      "page_title": "Reseñas",
+      "pending": {
+        "empty": "No hay reseñas pendientes",
+        "empty_subtitle": "¡Estás al día! Aquí aparecerán las reseñas de tus intercambios completados.",
+        "write_review": "Escribir reseña"
+      },
+      "received": {
+        "empty": "Aún no has recibido ninguna reseña",
+        "empty_subtitle": "Completa intercambios con miembros de la comunidad para empezar a recibir reseñas."
+      },
+      "review_card": {
+        "anonymous": "Anónimo",
+        "delete": "Eliminar reseña",
+        "delete_confirm": "¿Estás seguro de que quieres eliminar esta reseña?",
+        "delete_error": "Error al eliminar la reseña",
+        "delete_success": "Reseña eliminada"
+      },
+      "stars": "{{count}} estrella",
+      "stars_plural": "{{count}} estrellas",
+      "stats": {
+        "average": "Valoración media",
+        "no_reviews": "Aún no hay reseñas",
+        "total": "Total de reseñas"
+      },
+      "tabs": {
+        "given": "Reseñas dadas",
+        "pending": "Reseñas pendientes",
+        "received": "Reseñas recibidas"
+      }
+    },
+    "fr": {
+      "given": {
+        "empty": "Vous n'avez encore écrit aucun avis",
+        "empty_subtitle": "Après avoir complété des échanges, vous pouvez laisser des avis à d'autres membres."
+      },
+      "load_error": "Échec du chargement des avis. Veuillez réessayer.",
+      "load_more": "Charger plus",
+      "page_title": "Avis",
+      "pending": {
+        "empty": "Aucun avis en attente",
+        "empty_subtitle": "Vous êtes à jour ! Les avis sur vos échanges complétés apparaîtront ici.",
+        "write_review": "Écrire un avis"
+      },
+      "received": {
+        "empty": "Aucun avis reçu pour l'instant",
+        "empty_subtitle": "Complétez des échanges avec des membres de la communauté pour commencer à recevoir des avis."
+      },
+      "review_card": {
+        "anonymous": "Anonyme",
+        "delete": "Supprimer l'avis",
+        "delete_confirm": "Êtes-vous sûr de vouloir supprimer cet avis ?",
+        "delete_error": "Échec de la suppression de l'avis",
+        "delete_success": "Avis supprimé"
+      },
+      "stars": "{{count}} étoile",
+      "stars_plural": "{{count}} étoiles",
+      "stats": {
+        "average": "Note moyenne",
+        "no_reviews": "Aucun avis pour l'instant",
+        "total": "Total des avis"
+      },
+      "tabs": {
+        "given": "Avis donnés",
+        "pending": "Avis en attente",
+        "received": "Avis reçus"
+      }
+    },
+    "ga": {
+      "given": {
+        "empty": "Níl aon léirmheas scríofa agat go fóill",
+        "empty_subtitle": "Tar éis malartuithe a chríochnú, is féidir leat léirmheasanna a fhágáil d'earcaigh eile."
+      },
+      "load_error": "Theip ar lódáil léirmheasanna. Déan iarracht eile le do thoil.",
+      "load_more": "Luchtaigh níos mó",
+      "page_title": "Léirmheasanna",
+      "pending": {
+        "empty": "Níl aon léirmheasanna ar feitheamh",
+        "empty_subtitle": "Tá tú suas chun dáta! Tiocfaidh léirmheasanna do mhalartuithe críochnaithe le feiceáil anseo.",
+        "write_review": "Scríobh léirmheas"
+      },
+      "received": {
+        "empty": "Níor faigheadh aon léirmheasanna go fóill",
+        "empty_subtitle": "Críochnaigh malartuithe le baill pobail chun léirmheasanna a thuilleadh."
+      },
+      "review_card": {
+        "anonymous": "Anaithnid",
+        "delete": "Scrios léirmheas",
+        "delete_confirm": "An bhfuil tú cinnte gur mhaith leat an léirmheas seo a scriosadh?",
+        "delete_error": "Theip ar scriosadh an léirmheasa",
+        "delete_success": "Léirmheas scriosta"
+      },
+      "stars": "{{count}} réalta",
+      "stars_plural": "{{count}} réalta",
+      "stats": {
+        "average": "Meánmharcáil",
+        "no_reviews": "Níl aon léirmheasanna go fóill",
+        "total": "Léirmheasanna iomlána"
+      },
+      "tabs": {
+        "given": "Léirmheasanna Tugtha",
+        "pending": "Léirmheasanna ar Feitheamh",
+        "received": "Léirmheasanna Faighte"
+      }
+    },
+    "it": {
+      "given": {
+        "empty": "Non hai ancora scritto nessuna recensione",
+        "empty_subtitle": "Dopo aver completato degli scambi, puoi lasciare recensioni ad altri membri."
+      },
+      "load_error": "Caricamento delle recensioni non riuscito. Riprova.",
+      "load_more": "Carica altro",
+      "page_title": "Recensioni",
+      "pending": {
+        "empty": "Nessuna recensione in sospeso",
+        "empty_subtitle": "Sei in pari! Le recensioni per i tuoi scambi completati appariranno qui.",
+        "write_review": "Scrivi recensione"
+      },
+      "received": {
+        "empty": "Nessuna recensione ricevuta ancora",
+        "empty_subtitle": "Completa scambi con i membri della comunità per iniziare a ricevere recensioni."
+      },
+      "review_card": {
+        "anonymous": "Anonimo",
+        "delete": "Elimina recensione",
+        "delete_confirm": "Sei sicuro di voler eliminare questa recensione?",
+        "delete_error": "Eliminazione della recensione non riuscita",
+        "delete_success": "Recensione eliminata"
+      },
+      "stars": "{{count}} stella",
+      "stars_plural": "{{count}} stelle",
+      "stats": {
+        "average": "Valutazione media",
+        "no_reviews": "Nessuna recensione ancora",
+        "total": "Recensioni totali"
+      },
+      "tabs": {
+        "given": "Recensioni date",
+        "pending": "Recensioni in sospeso",
+        "received": "Recensioni ricevute"
+      }
+    },
+    "ja": {
+      "given": {
+        "empty": "まだレビューを書いていません",
+        "empty_subtitle": "交換を完了した後、他のメンバーへのレビューを残すことができます。"
+      },
+      "load_error": "レビューの読み込みに失敗しました。もう一度お試しください。",
+      "load_more": "もっと読み込む",
+      "page_title": "レビュー",
+      "pending": {
+        "empty": "保留中のレビューはありません",
+        "empty_subtitle": "すべて確認済みです！完了した交換のレビューがここに表示されます。",
+        "write_review": "レビューを書く"
+      },
+      "received": {
+        "empty": "まだレビューを受け取っていません",
+        "empty_subtitle": "コミュニティメンバーとの交換を完了して、レビューを獲得しましょう。"
+      },
+      "review_card": {
+        "anonymous": "匿名",
+        "delete": "レビューを削除",
+        "delete_confirm": "このレビューを削除してもよろしいですか？",
+        "delete_error": "レビューの削除に失敗しました",
+        "delete_success": "レビューを削除しました"
+      },
+      "stars": "{{count}}つ星",
+      "stars_plural": "{{count}}つ星",
+      "stats": {
+        "average": "平均評価",
+        "no_reviews": "まだレビューはありません",
+        "total": "レビュー総数"
+      },
+      "tabs": {
+        "given": "書いたレビュー",
+        "pending": "保留中のレビュー",
+        "received": "受け取ったレビュー"
+      }
+    },
+    "nl": {
+      "given": {
+        "empty": "Je hebt nog geen beoordelingen geschreven",
+        "empty_subtitle": "Na het voltooien van uitwisselingen kun je beoordelingen achterlaten voor andere leden."
+      },
+      "load_error": "Laden van beoordelingen mislukt. Probeer het opnieuw.",
+      "load_more": "Meer laden",
+      "page_title": "Beoordelingen",
+      "pending": {
+        "empty": "Geen openstaande beoordelingen",
+        "empty_subtitle": "Je bent helemaal bij! Beoordelingen voor je voltooide uitwisselingen verschijnen hier.",
+        "write_review": "Beoordeling schrijven"
+      },
+      "received": {
+        "empty": "Nog geen beoordelingen ontvangen",
+        "empty_subtitle": "Voltooi uitwisselingen met communityleden om beoordelingen te verdienen."
+      },
+      "review_card": {
+        "anonymous": "Anoniem",
+        "delete": "Beoordeling verwijderen",
+        "delete_confirm": "Weet je zeker dat je deze beoordeling wilt verwijderen?",
+        "delete_error": "Verwijderen van beoordeling mislukt",
+        "delete_success": "Beoordeling verwijderd"
+      },
+      "stars": "{{count}} ster",
+      "stars_plural": "{{count}} sterren",
+      "stats": {
+        "average": "Gemiddelde beoordeling",
+        "no_reviews": "Nog geen beoordelingen",
+        "total": "Totaal beoordelingen"
+      },
+      "tabs": {
+        "given": "Gegeven beoordelingen",
+        "pending": "Openstaande beoordelingen",
+        "received": "Ontvangen beoordelingen"
+      }
+    },
+    "pl": {
+      "given": {
+        "empty": "Nie napisałeś jeszcze żadnych recenzji",
+        "empty_subtitle": "Po zakończeniu wymian możesz zostawiać recenzje innym członkom."
+      },
+      "load_error": "Nie udało się załadować recenzji. Spróbuj ponownie.",
+      "load_more": "Załaduj więcej",
+      "page_title": "Recenzje",
+      "pending": {
+        "empty": "Brak oczekujących recenzji",
+        "empty_subtitle": "Jesteś na bieżąco! Recenzje Twoich zakończonych wymian pojawią się tutaj.",
+        "write_review": "Napisz recenzję"
+      },
+      "received": {
+        "empty": "Nie otrzymano jeszcze żadnych recenzji",
+        "empty_subtitle": "Zakończ wymiany z członkami społeczności, aby zacząć zbierać recenzje."
+      },
+      "review_card": {
+        "anonymous": "Anonimowy",
+        "delete": "Usuń recenzję",
+        "delete_confirm": "Czy na pewno chcesz usunąć tę recenzję?",
+        "delete_error": "Nie udało się usunąć recenzji",
+        "delete_success": "Recenzja usunięta"
+      },
+      "stars": "{{count}} gwiazdka",
+      "stars_plural": "{{count}} gwiazdki",
+      "stats": {
+        "average": "Średnia ocena",
+        "no_reviews": "Brak recenzji",
+        "total": "Łączna liczba recenzji"
+      },
+      "tabs": {
+        "given": "Wystawione recenzje",
+        "pending": "Oczekujące recenzje",
+        "received": "Otrzymane recenzje"
+      }
+    },
+    "pt": {
+      "given": {
+        "empty": "Ainda não escreveste nenhuma avaliação",
+        "empty_subtitle": "Após concluir trocas, podes deixar avaliações para outros membros."
+      },
+      "load_error": "Falha ao carregar avaliações. Por favor, tenta novamente.",
+      "load_more": "Carregar mais",
+      "page_title": "Avaliações",
+      "pending": {
+        "empty": "Nenhuma avaliação pendente",
+        "empty_subtitle": "Estás em dia! As avaliações das tuas trocas concluídas aparecerão aqui.",
+        "write_review": "Escrever avaliação"
+      },
+      "received": {
+        "empty": "Nenhuma avaliação recebida ainda",
+        "empty_subtitle": "Conclui trocas com membros da comunidade para começares a receber avaliações."
+      },
+      "review_card": {
+        "anonymous": "Anónimo",
+        "delete": "Eliminar avaliação",
+        "delete_confirm": "Tens a certeza de que queres eliminar esta avaliação?",
+        "delete_error": "Falha ao eliminar avaliação",
+        "delete_success": "Avaliação eliminada"
+      },
+      "stars": "{{count}} estrela",
+      "stars_plural": "{{count}} estrelas",
+      "stats": {
+        "average": "Classificação média",
+        "no_reviews": "Ainda sem avaliações",
+        "total": "Total de avaliações"
+      },
+      "tabs": {
+        "given": "Avaliações dadas",
+        "pending": "Avaliações pendentes",
+        "received": "Avaliações recebidas"
+      }
+    }
+  }
+}

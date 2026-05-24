@@ -1,0 +1,103 @@
+{
+  "explore": {
+    "ar": {
+      "heading": "Discover",
+      "new_members.connect": "Connect",
+      "organisations.title": "Organisations",
+      "page_description": "Find listings, events, groups, members, and opportunities across the community — your starting point for getting involved and connecting locally.",
+      "page_title": "Discover",
+      "recently_viewed.clear": "Clear",
+      "retry": "Retry",
+      "stats.members": "Members",
+      "suggested_connections.connect": "Connect",
+      "tabs.all": "All",
+      "tabs.events": "Events",
+      "tabs.groups": "Groups",
+      "tabs.listings": "Listings",
+      "tabs.people": "People",
+      "upcoming_events.online": "Online"
+    },
+    "de": {
+      "page_description": "Find listings, events, groups, members, and opportunities across the community — your starting point for getting involved and connecting locally.",
+      "top_contributors.level": "Lv.{{level}}",
+      "upcoming_events.online": "Online"
+    },
+    "es": {
+      "featured_challenges.ideas_count": "{{count}} ideas",
+      "page_description": "Find listings, events, groups, members, and opportunities across the community — your starting point for getting involved and connecting locally."
+    },
+    "fr": {
+      "organisations.title": "Organisations",
+      "page_description": "Find listings, events, groups, members, and opportunities across the community — your starting point for getting involved and connecting locally.",
+      "polls.options": "{{count}} options",
+      "polls.votes": "{{count}} votes"
+    },
+    "ga": {
+      "page_description": "Find listings, events, groups, members, and opportunities across the community — your starting point for getting involved and connecting locally."
+    },
+    "it": {
+      "page_description": "Find listings, events, groups, members, and opportunities across the community — your starting point for getting involved and connecting locally.",
+      "top_contributors.level": "Lv.{{level}}",
+      "upcoming_events.online": "Online"
+    },
+    "ja": {
+      "heading": "Discover",
+      "new_members.connect": "Connect",
+      "organisations.title": "Organisations",
+      "page_description": "Find listings, events, groups, members, and opportunities across the community — your starting point for getting involved and connecting locally.",
+      "page_title": "Discover",
+      "recently_viewed.clear": "Clear",
+      "retry": "Retry",
+      "stats.members": "Members",
+      "suggested_connections.connect": "Connect",
+      "tabs.all": "All",
+      "tabs.events": "Events",
+      "tabs.groups": "Groups",
+      "tabs.listings": "Listings",
+      "tabs.people": "People",
+      "top_contributors.level": "Lv.{{level}}",
+      "upcoming_events.online": "Online"
+    },
+    "nl": {
+      "heading": "Discover",
+      "jobs.deadline": "Deadline: {{date}}",
+      "new_members.connect": "Connect",
+      "organisations.title": "Organisations",
+      "page_description": "Find listings, events, groups, members, and opportunities across the community — your starting point for getting involved and connecting locally.",
+      "page_title": "Discover",
+      "recently_viewed.clear": "Clear",
+      "retry": "Retry",
+      "stats.members": "Members",
+      "suggested_connections.connect": "Connect",
+      "tabs.all": "All",
+      "tabs.events": "Events",
+      "tabs.groups": "Groups",
+      "tabs.listings": "Listings",
+      "tabs.people": "People",
+      "top_contributors.level": "Lv.{{level}}",
+      "upcoming_events.online": "Online"
+    },
+    "pl": {
+      "heading": "Discover",
+      "new_members.connect": "Connect",
+      "organisations.title": "Organisations",
+      "page_description": "Find listings, events, groups, members, and opportunities across the community — your starting point for getting involved and connecting locally.",
+      "page_title": "Discover",
+      "recently_viewed.clear": "Clear",
+      "retry": "Retry",
+      "stats.members": "Members",
+      "suggested_connections.connect": "Connect",
+      "tabs.all": "All",
+      "tabs.events": "Events",
+      "tabs.groups": "Groups",
+      "tabs.listings": "Listings",
+      "tabs.people": "People",
+      "top_contributors.level": "Lv.{{level}}",
+      "upcoming_events.online": "Online"
+    },
+    "pt": {
+      "page_description": "Find listings, events, groups, members, and opportunities across the community — your starting point for getting involved and connecting locally.",
+      "upcoming_events.online": "Online"
+    }
+  }
+}
