@@ -20,7 +20,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import Heart from 'lucide-react/icons/heart';
 import MessageCircle from 'lucide-react/icons/message-circle';
 import MapPin from 'lucide-react/icons/map-pin';

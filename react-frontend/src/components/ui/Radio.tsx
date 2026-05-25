@@ -14,7 +14,7 @@ import {
   Label,
   Radio as HeroUIRadio,
   RadioGroup as HeroUIRadioGroup,
-} from '@heroui-v3/react';
+} from '@heroui/react';
 
 type HeroUIRadioProps = ComponentPropsWithoutRef<typeof HeroUIRadio>;
 type HeroUIRadioGroupProps = ComponentPropsWithoutRef<typeof HeroUIRadioGroup>;
@@ -53,6 +53,7 @@ export type RadioGroupProps = Omit<HeroUIRadioGroupProps, 'children' | 'classNam
   label?: ReactNode;
   onChange?: (value: string) => void;
   onValueChange?: (value: string) => void;
+  size?: RadioSize;
 };
 
 function combineClasses(...classes: Array<string | false | undefined>): string | undefined {
@@ -141,6 +142,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(function R
   label,
   onChange,
   onValueChange,
+  size: _size,
   ...props
 }, ref) {
   if (typeof children === 'function') {

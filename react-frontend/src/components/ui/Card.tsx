@@ -11,7 +11,7 @@ import {
   type MouseEvent,
   type ReactNode,
 } from 'react';
-import { Card as HeroUICard, type CardProps as HeroUICardProps } from '@heroui-v3/react';
+import { Card as HeroUICard, type CardProps as HeroUICardProps } from '@heroui/react';
 
 const HeroUICardRoot = HeroUICard as ComponentType<any>;
 

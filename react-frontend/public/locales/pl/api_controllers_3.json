@@ -1,124 +1,124 @@
 {
-    "federation_webhooks": {
-        "test_message": "To jest testowa dostawa webhooka z Project NEXUS."
-    },
-    "group_media": {
-        "media_deleted": "Media usunięte"
-    },
-    "group_notification_pref": {
-        "preferences_updated": "Preferencje zaktualizowane"
-    },
-    "group_qa": {
-        "answer_accepted": "Odpowiedź zaakceptowana",
-        "vote_recorded": "Głos zarejestrowany",
-        "failed_accept_answer": "Nie udało się zaakceptować odpowiedzi",
-        "failed_record_vote": "Nie udało się zarejestrować głosu",
-        "title_required": "Tytuł jest wymagany",
-        "body_required": "Treść jest wymagana",
-        "failed_create_question": "Nie udało się utworzyć pytania",
-        "question_not_found": "Pytanie nie zostało znalezione",
-        "failed_post_answer": "Nie udało się opublikować odpowiedzi",
-        "type_must_be_question_or_answer": "Typ musi być \"pytaniem\" lub \"odpowiedzią\"",
-        "valid_target_id_required": "Wymagany jest prawidłowy target_id",
-        "vote_must_be_up_down": "Głos musi być \"w górę\"/\"w dół\" lub 1/-1"
-    },
-    "group_scheduled_post": {
-        "cancelled": "Anulowane",
-        "not_found_or_published": "Nie znaleziono lub już opublikowane"
-    },
-    "group_webhook": {
-        "webhook_deleted": "Webhook usunięty",
-        "webhook_not_found": "Webhook nie został znaleziony"
-    },
-    "group_wiki": {
-        "wiki_page_deleted": "Strona Wiki usunięta"
-    },
-    "listings": {
-        "listing_saved_notification": ":saver_name zapisał/a Twoje ogłoszenie \":title\""
-    },
-    "goals": {
-        "progress_mentor": "{{name}} poczynił/a postępy w realizacji celu: \"{{title}}\"",
-        "completed_mentor": "{{name}} osiągnął/a swój cel: \"{{title}}\"",
-        "completed_self": "Gratulacje! Osiągnąłeś/aś swój cel: \"{{title}}\""
-    },
-    "feed": {
-        "post_shared": "{{name}} udostępnił/a Twój post"
-    },
-    "polls": {
-        "vote_received": "{{name}} zagłosował/a w Twojej ankiecie: \"{{title}}\"",
-        "ranking_received": "{{name}} przesłał/a ranking w Twojej ankiecie: \"{{title}}\""
-    },
-    "deliverable": {
-        "assigned": "Przypisano Ci element do dostarczenia: \"{{title}}\"",
-        "reassigned": "Zostałeś/aś przypisany/a do elementu do dostarczenia: \"{{title}}\""
-    },
-    "deliverable_comment": {
-        "posted": "{{name}} skomentował/a Twój element do dostarczenia \"{{title}}\""
-    },
-    "wallet_admin": {
-        "grant_received": "Otrzymałeś/aś {{amount}} {{unit}} od koordynatora banku czasu",
-        "balance_adjusted_added": "Twoje saldo zostało skorygowane: +{{amount}} {{unit}} dodanych przez koordynatora",
-        "balance_adjusted_removed": "Twoje saldo zostało skorygowane: -{{amount}} {{unit}} usuniętych przez koordynatora"
-    },
-    "comments": {
-        "reaction": "{{name}} zareagował/a na Twój komentarz"
-    },
-    "federation": {
-        "review_received": "{{name}} wystawił/a Ci ocenę {{rating}} gwiazdek"
-    },
-    "federation_credit": {
-        "action_taken": "{{tenant}} {{action}} Twoją umowę kredytu federacji."
-    },
-    "volunteer": {
-        "shift_signup_confirmed": "Jesteś zapisany/a na zmianę wolontariacką w dniu {{date}}",
-        "shift_signup_cancelled": "Twoja rejestracja na zmianę wolontariacką została anulowana",
-        "opportunity_cancelled": "Okazja wolontariacka \"{{title}}\" została odwołana"
-    },
-    "marketplace_offer": {
-        "received": "{{buyer}} złożył/a ofertę na {{amount}} za Twoje ogłoszenie \"{{title}}\"",
-        "accepted": "Twoja oferta na \"{{title}}\" została zaakceptowana!",
-        "declined": "Twoja oferta na \"{{title}}\" została odrzucona.",
-        "countered": "Sprzedawca odpowiedział/a na Twoją ofertę na \"{{title}}\" kwotą {{amount}}",
-        "counter_accepted": "Twoja kontroferta na \"{{title}}\" została zaakceptowana!",
-        "withdrawn": "{{buyer}} wycofał/a swoją ofertę na Twoje ogłoszenie \"{{title}}\""
-    },
-    "marketplace_order": {
-        "confirmed_buyer": "Zamówienie #{{order_number}} potwierdzone — \"{{title}}\"",
-        "confirmed_seller": "Masz nowe zamówienie #{{order_number}} na \"{{title}}\"",
-        "shipped": "Twoje zamówienie #{{order_number}} zostało wysłane!",
-        "delivered": "Zamówienie #{{order_number}} — kupujący potwierdził dostawę",
-        "cancelled": "Zamówienie #{{order_number}} zostało anulowane",
-        "completed": "Zamówienie #{{order_number}} zostało zakończone!",
-        "refunded": "Zwrot {{amount}} {{currency}} przetworzony dla zamówienia #{{order_number}}",
-        "partially_refunded": "Częściowy zwrot {{amount}} {{currency}} przetworzony dla zamówienia #{{order_number}}"
-    },
-    "admin_bells": {
-        "comment_hidden": "Twój komentarz został ukryty przez moderatora.",
-        "comment_removed": "Twój komentarz został usunięty przez moderatora.",
-        "post_hidden": "Twój post został ukryty przez moderatora.",
-        "post_removed": "Twój post został usunięty przez moderatora.",
-        "review_hidden": "Twoja recenzja została ukryta przez moderatora.",
-        "review_removed": "Twoja recenzja została usunięta przez moderatora.",
-        "event_approved": "Twoje wydarzenie zostało zatwierdzone!",
-        "group_member_approved": "Zostałeś/aś zatwierdzony/a do dołączenia do {{group}}",
-        "group_member_rejected": "Twoje żądanie dołączenia do {{group}} zostało odrzucone",
-        "group_approved": "Twoja grupa została zatwierdzona!",
-        "group_member_removed": "Zostałeś/aś usunięty/a z {{group}}",
-        "insurance_verified": "Twój certyfikat ubezpieczenia został zweryfikowany!",
-        "insurance_rejected": "Twój certyfikat ubezpieczenia nie został zatwierdzony. Skontaktuj się z pomocą techniczną, aby uzyskać szczegóły.",
-        "report_resolved": "Twoje zgłoszenie zostało przejrzane i rozwiązane.",
-        "report_reviewed": "Twoje zgłoszenie zostało przejrzane.",
-        "vetting_approved": "Twoja weryfikacja została zatwierdzona!",
-        "vetting_rejected": "Twoja weryfikacja nie mogła zostać ukończona. Skontaktuj się z pomocą techniczną.",
-        "vetting_removed": "Twój rekord weryfikacji został usunięty.",
-        "volunteer_approved": "Twój wniosek wolontariacki został zatwierdzony!",
-        "volunteer_declined": "Twój wniosek wolontariacki nie został przyjęty.",
-        "monitoring_restricted": "Koordynator banku czasu tymczasowo ograniczył Twoje wysyłanie wiadomości.",
-        "monitoring_under_review": "Twoje konto zostało poddane przeglądowi przez koordynatora banku czasu.",
-        "monitoring_lifted": "Twoje ograniczenia wiadomości zostały zniesione.",
-        "account_suspended": "Twoje konto zostało zawieszone. Skontaktuj się z pomocą techniczną, jeśli uważasz, że to błąd.",
-        "account_banned": "Twoje konto zostało zablokowane. Skontaktuj się z pomocą techniczną, jeśli uważasz, że to błąd.",
-        "super_admin_granted": "Przyznano Ci uprawnienia Super Administratora Najemcy.",
-        "super_admin_revoked": "Twoje uprawnienia Super Administratora Najemcy zostały usunięte."
-    }
+  "federation_webhooks": {
+    "test_message": "To jest testowa dostawa webhooka z Project NEXUS."
+  },
+  "group_media": {
+    "media_deleted": "Media usunięte"
+  },
+  "group_notification_pref": {
+    "preferences_updated": "Preferencje zaktualizowane"
+  },
+  "group_qa": {
+    "answer_accepted": "Odpowiedź zaakceptowana",
+    "vote_recorded": "Głos zarejestrowany",
+    "failed_accept_answer": "Nie udało się zaakceptować odpowiedzi",
+    "failed_record_vote": "Nie udało się zarejestrować głosu",
+    "title_required": "Tytuł jest wymagany",
+    "body_required": "Treść jest wymagana",
+    "failed_create_question": "Nie udało się utworzyć pytania",
+    "question_not_found": "Pytanie nie zostało znalezione",
+    "failed_post_answer": "Nie udało się opublikować odpowiedzi",
+    "type_must_be_question_or_answer": "Typ musi być \"pytaniem\" lub \"odpowiedzią\"",
+    "valid_target_id_required": "Wymagany jest prawidłowy target_id",
+    "vote_must_be_up_down": "Głos musi być \"w górę\"/\"w dół\" lub 1/-1"
+  },
+  "group_scheduled_post": {
+    "cancelled": "Anulowane",
+    "not_found_or_published": "Nie znaleziono lub już opublikowane"
+  },
+  "group_webhook": {
+    "webhook_deleted": "Webhook usunięty",
+    "webhook_not_found": "Webhook nie został znaleziony"
+  },
+  "group_wiki": {
+    "wiki_page_deleted": "Strona Wiki usunięta"
+  },
+  "listings": {
+    "listing_saved_notification": ":saver_name zapisał/a Twoje ogłoszenie \":title\""
+  },
+  "goals": {
+    "progress_mentor": "{{name}} poczynił/a postępy w realizacji celu: \"{{title}}\"",
+    "completed_mentor": "{{name}} osiągnął/a swój cel: \"{{title}}\"",
+    "completed_self": "Gratulacje! Osiągnąłeś/aś swój cel: \"{{title}}\""
+  },
+  "feed": {
+    "post_shared": "{{name}} udostępnił/a Twój post"
+  },
+  "polls": {
+    "vote_received": "{{name}} zagłosował/a w Twojej ankiecie: \"{{title}}\"",
+    "ranking_received": "{{name}} przesłał/a ranking w Twojej ankiecie: \"{{title}}\""
+  },
+  "deliverable": {
+    "assigned": "Przypisano Ci element do dostarczenia: \"{{title}}\"",
+    "reassigned": "Zostałeś/aś przypisany/a do elementu do dostarczenia: \"{{title}}\""
+  },
+  "deliverable_comment": {
+    "posted": "{{name}} skomentował/a Twój element do dostarczenia \"{{title}}\""
+  },
+  "wallet_admin": {
+    "grant_received": "Otrzymałeś/aś {{amount}} {{unit}} od koordynatora banku czasu",
+    "balance_adjusted_added": "Twoje saldo zostało skorygowane: +{{amount}} {{unit}} dodanych przez koordynatora",
+    "balance_adjusted_removed": "Twoje saldo zostało skorygowane: -{{amount}} {{unit}} usuniętych przez koordynatora"
+  },
+  "comments": {
+    "reaction": "{{name}} zareagował/a na Twój komentarz"
+  },
+  "federation": {
+    "review_received": "{{name}} wystawił/a Ci ocenę {{rating}} gwiazdek"
+  },
+  "federation_credit": {
+    "action_taken": "{{tenant}} {{action}} Twoją umowę kredytu federacji."
+  },
+  "volunteer": {
+    "shift_signup_confirmed": "Jesteś zapisany/a na zmianę wolontariacką w dniu {{date}}",
+    "shift_signup_cancelled": "Twoja rejestracja na zmianę wolontariacką została anulowana",
+    "opportunity_cancelled": "Okazja wolontariacka \"{{title}}\" została odwołana"
+  },
+  "marketplace_offer": {
+    "received": "{{buyer}} złożył/a ofertę na {{amount}} za Twoje ogłoszenie \"{{title}}\"",
+    "accepted": "Twoja oferta na \"{{title}}\" została zaakceptowana!",
+    "declined": "Twoja oferta na \"{{title}}\" została odrzucona.",
+    "countered": "Sprzedawca odpowiedział/a na Twoją ofertę na \"{{title}}\" kwotą {{amount}}",
+    "counter_accepted": "Twoja kontroferta na \"{{title}}\" została zaakceptowana!",
+    "withdrawn": "{{buyer}} wycofał/a swoją ofertę na Twoje ogłoszenie \"{{title}}\""
+  },
+  "marketplace_order": {
+    "confirmed_buyer": "Zamówienie #{{order_number}} potwierdzone — \"{{title}}\"",
+    "confirmed_seller": "Masz nowe zamówienie #{{order_number}} na \"{{title}}\"",
+    "shipped": "Twoje zamówienie #{{order_number}} zostało wysłane!",
+    "delivered": "Zamówienie #{{order_number}} — kupujący potwierdził dostawę",
+    "cancelled": "Zamówienie #{{order_number}} zostało anulowane",
+    "completed": "Zamówienie #{{order_number}} zostało zakończone!",
+    "refunded": "Zwrot {{amount}} {{currency}} przetworzony dla zamówienia #{{order_number}}",
+    "partially_refunded": "Częściowy zwrot {{amount}} {{currency}} przetworzony dla zamówienia #{{order_number}}"
+  },
+  "admin_bells": {
+    "comment_hidden": "Twój komentarz został ukryty przez moderatora.",
+    "comment_removed": "Twój komentarz został usunięty przez moderatora.",
+    "post_hidden": "Twój post został ukryty przez moderatora.",
+    "post_removed": "Twój post został usunięty przez moderatora.",
+    "review_hidden": "Twoja recenzja została ukryta przez moderatora.",
+    "review_removed": "Twoja recenzja została usunięta przez moderatora.",
+    "event_approved": "Twoje wydarzenie zostało zatwierdzone!",
+    "group_member_approved": "Zostałeś/aś zatwierdzony/a do dołączenia do {{group}}",
+    "group_member_rejected": "Twoje żądanie dołączenia do {{group}} zostało odrzucone",
+    "group_approved": "Twoja grupa została zatwierdzona!",
+    "group_member_removed": "Zostałeś/aś usunięty/a z {{group}}",
+    "insurance_verified": "Twój certyfikat ubezpieczenia został zweryfikowany!",
+    "insurance_rejected": "Twój certyfikat ubezpieczenia nie został zatwierdzony. Skontaktuj się z pomocą techniczną, aby uzyskać szczegóły.",
+    "report_resolved": "Twoje zgłoszenie zostało przejrzane i rozwiązane.",
+    "report_reviewed": "Twoje zgłoszenie zostało przejrzane.",
+    "vetting_approved": "Twoja weryfikacja została zatwierdzona!",
+    "vetting_rejected": "Twoja weryfikacja nie mogła zostać ukończona. Skontaktuj się z pomocą techniczną.",
+    "vetting_removed": "Twój rekord weryfikacji został usunięty.",
+    "volunteer_approved": "Twój wniosek wolontariacki został zatwierdzony!",
+    "volunteer_declined": "Twój wniosek wolontariacki nie został przyjęty.",
+    "monitoring_restricted": "Koordynator banku czasu tymczasowo ograniczył Twoje wysyłanie wiadomości.",
+    "monitoring_under_review": "Twoje konto zostało poddane przeglądowi przez koordynatora banku czasu.",
+    "monitoring_lifted": "Twoje ograniczenia wiadomości zostały zniesione.",
+    "account_suspended": "Twoje konto zostało zawieszone. Skontaktuj się z pomocą techniczną, jeśli uważasz, że to błąd.",
+    "account_banned": "Twoje konto zostało zablokowane. Skontaktuj się z pomocą techniczną, jeśli uważasz, że to błąd.",
+    "super_admin_granted": "Przyznano Ci uprawnienia Super Administratora Najemcy.",
+    "super_admin_revoked": "Twoje uprawnienia Super Administratora Najemcy zostały usunięte."
+  }
 }

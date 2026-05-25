@@ -19,7 +19,7 @@ import {
   Label,
   Separator,
   type Dropdown as HeroDropdownTypes,
-} from '@heroui-v3/react';
+} from '@heroui/react';
 import { cn } from '@/lib/helpers';
 
 type HeroDropdownProps = ComponentProps<typeof HeroDropdown>;

@@ -165,12 +165,12 @@ const mockCounts = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function wrapper({ children }: { children: ReactNode }) {
-  // HeroUIProvider omitted — these tests don't render HeroUI components.
+  // UI provider omitted — these tests don't render UI components.
   return <>{children}</>;
 }
 
 function notificationsWrapper({ children }: { children: ReactNode }) {
-  // HeroUIProvider is intentionally omitted here — NotificationsProvider does not
+  // UI provider is intentionally omitted here — NotificationsProvider does not
   // render any HeroUI components, and including it would inject CSS into JSDOM on
   // every test, accumulating hundreds of MB per test and causing OOM in the worker.
   return <NotificationsProvider>{children}</NotificationsProvider>;

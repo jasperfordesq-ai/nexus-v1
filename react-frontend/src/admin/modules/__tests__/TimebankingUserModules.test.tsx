@@ -14,7 +14,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import { HeroUIProvider } from '@heroui/react';
 
 // ─── Hoisted mock fns (required because vi.mock is hoisted above imports) ────
 
@@ -214,11 +213,11 @@ vi.mock('@/admin/components/StatCard', () => ({
 
 function W({ children }: { children: React.ReactNode }) {
   return (
-    <HeroUIProvider>
+    <>
       <MemoryRouter initialEntries={['/test/admin']}>
         {children}
       </MemoryRouter>
-    </HeroUIProvider>
+    </>
   );
 }
 
@@ -232,13 +231,13 @@ function WRoute({
   entry: string;
 }) {
   return (
-    <HeroUIProvider>
+    <>
       <MemoryRouter initialEntries={[entry]}>
         <Routes>
           <Route path={path} element={children} />
         </Routes>
       </MemoryRouter>
-    </HeroUIProvider>
+    </>
   );
 }
 

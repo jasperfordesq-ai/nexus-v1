@@ -12,7 +12,7 @@ import {
   Description,
   FieldError,
   Label,
-} from '@heroui-v3/react';
+} from '@heroui/react';
 
 type HeroUIDatePickerProps = ComponentProps<typeof HeroUIDatePicker>;
 type HeroUIDatePickerPopoverProps = ComponentProps<typeof HeroUIDatePicker.Popover>;

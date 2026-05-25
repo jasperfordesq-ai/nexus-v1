@@ -2,7 +2,7 @@ import { Card, CardBody, CardHeader, Button, Spinner, Chip, Input, Select, Selec
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import Save from 'lucide-react/icons/save';
 import Info from 'lucide-react/icons/info';

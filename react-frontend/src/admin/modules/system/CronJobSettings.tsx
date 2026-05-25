@@ -1,7 +1,7 @@
 import { Card, CardBody, CardHeader, Button, Input, Textarea, Spinner, Select, SelectItem, Switch } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import Settings from 'lucide-react/icons/settings';
 import Save from 'lucide-react/icons/save';
 import AlertCircle from 'lucide-react/icons/circle-alert';

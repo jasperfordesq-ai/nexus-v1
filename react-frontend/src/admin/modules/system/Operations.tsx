@@ -1,6 +1,6 @@
 import { Card, CardBody, CardHeader, Spinner, Button } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Trash2 from 'lucide-react/icons/trash-2';
 import Database from 'lucide-react/icons/database';

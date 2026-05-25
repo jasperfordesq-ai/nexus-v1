@@ -20,7 +20,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import Sparkles from 'lucide-react/icons/sparkles';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import ArrowLeft from 'lucide-react/icons/arrow-left';

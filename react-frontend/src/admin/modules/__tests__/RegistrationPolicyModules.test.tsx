@@ -17,7 +17,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { HeroUIProvider } from '@heroui/react';
 
 // ─── Common mocks ────────────────────────────────────────────────────────────
 
@@ -68,9 +67,9 @@ vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
 function renderWithProviders(ui: React.ReactElement) {
   return render(
-    <HeroUIProvider>
+    <>
       <MemoryRouter>{ui}</MemoryRouter>
-    </HeroUIProvider>
+    </>
   );
 }
 

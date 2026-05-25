@@ -14,7 +14,7 @@ import {
   CheckboxGroup as HeroUICheckboxGroup,
   Description,
   Label,
-} from '@heroui-v3/react';
+} from '@heroui/react';
 
 type HeroUICheckboxProps = ComponentPropsWithoutRef<typeof HeroUICheckbox>;
 type HeroUICheckboxGroupProps = ComponentPropsWithoutRef<typeof HeroUICheckboxGroup>;
@@ -56,6 +56,7 @@ export type CheckboxGroupProps = Omit<HeroUICheckboxGroupProps, 'children' | 'cl
   onChange?: (value: string[]) => void;
   onValueChange?: (value: string[]) => void;
   orientation?: 'horizontal' | 'vertical';
+  size?: CheckboxSize;
 };
 
 function combineClasses(...classes: Array<string | false | undefined>): string | undefined {
@@ -180,6 +181,7 @@ export const CheckboxGroup = forwardRef<HTMLDivElement, CheckboxGroupProps>(func
   onChange,
   onValueChange,
   orientation,
+  size: _size,
   ...props
 }, ref) {
   if (typeof children === 'function') {

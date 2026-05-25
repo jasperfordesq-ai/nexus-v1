@@ -5,7 +5,7 @@ import {
   useMemo,
   useState } from 'react';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import ClipboardList from 'lucide-react/icons/clipboard-list';
 import ExternalLink from 'lucide-react/icons/external-link';
 import FileCode from 'lucide-react/icons/file-code';

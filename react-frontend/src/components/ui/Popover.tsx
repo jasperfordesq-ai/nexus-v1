@@ -9,12 +9,13 @@ import {
   type ComponentPropsWithoutRef,
   type ReactNode,
 } from 'react';
-import { Popover as HeroUIPopover } from '@heroui-v3/react';
+import { Popover as HeroUIPopover } from '@heroui/react';
 
 type HeroUIPopoverProps = ComponentPropsWithoutRef<typeof HeroUIPopover>;
 type HeroUIPopoverContentProps = ComponentPropsWithoutRef<typeof HeroUIPopover.Content>;
 type HeroUIPopoverTriggerProps = ComponentPropsWithoutRef<typeof HeroUIPopover.Trigger>;
 type HeroUIPopoverDialogProps = ComponentPropsWithoutRef<typeof HeroUIPopover.Dialog>;
+type LegacyPlacement = HeroUIPopoverContentProps['placement'] | string;
 
 type LegacyPopoverClassNames = {
   base?: string;
@@ -28,7 +29,7 @@ type PopoverContextValue = {
   classNames?: LegacyPopoverClassNames;
   containerPadding?: HeroUIPopoverContentProps['containerPadding'];
   offset?: HeroUIPopoverContentProps['offset'];
-  placement?: HeroUIPopoverContentProps['placement'];
+  placement?: LegacyPlacement;
   portalContainer?: HTMLElement;
   shouldBlockScroll?: boolean;
   shouldFlip?: HeroUIPopoverContentProps['shouldFlip'];
@@ -45,7 +46,7 @@ export type PopoverProps = Omit<HeroUIPopoverProps, 'children'> & {
   containerPadding?: HeroUIPopoverContentProps['containerPadding'];
   motionProps?: unknown;
   offset?: HeroUIPopoverContentProps['offset'];
-  placement?: HeroUIPopoverContentProps['placement'];
+  placement?: LegacyPlacement;
   portalContainer?: HTMLElement;
   radius?: string;
   shadow?: string;
@@ -69,6 +70,10 @@ function combineClasses(...classes: Array<string | false | undefined>): string |
   const className = classes.filter(Boolean).join(' ');
 
   return className || undefined;
+}
+
+function normalizePlacement(placement?: LegacyPlacement): HeroUIPopoverContentProps['placement'] | undefined {
+  return placement?.replace('-', ' ') as HeroUIPopoverContentProps['placement'] | undefined;
 }
 
 export function Popover({
@@ -98,7 +103,7 @@ export function Popover({
         },
         containerPadding,
         offset,
-        placement,
+        placement: normalizePlacement(placement),
         portalContainer,
         shouldBlockScroll,
         shouldFlip,
@@ -145,7 +150,7 @@ export function PopoverContent({
       className={combineClasses(context.classNames?.base, context.classNames?.content, classNames?.content, className)}
       containerPadding={containerPadding ?? context.containerPadding}
       offset={offset ?? context.offset}
-      placement={placement ?? context.placement}
+      placement={(normalizePlacement(placement) ?? context.placement) as HeroUIPopoverContentProps['placement']}
       shouldFlip={shouldFlip ?? context.shouldFlip}
       UNSTABLE_portalContainer={context.portalContainer}
       {...props}

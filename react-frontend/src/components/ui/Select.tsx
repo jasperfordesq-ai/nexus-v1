@@ -14,7 +14,7 @@ import {
   Separator,
   type ListBox as HeroListBoxTypes,
   type Select as HeroSelectTypes,
-} from '@heroui-v3/react';
+} from '@heroui/react';
 import { cn } from '@/lib/helpers';
 
 type HeroSelectProps = HeroSelectTypes['Props'];

@@ -21,8 +21,8 @@ vi.mock('framer-motion', () => ({
 }));
 
 // Mock HeroUI Button
-vi.mock('@heroui/react', async () => {
-  const actual = await vi.importActual('@heroui/react');
+vi.mock('@/components/ui', async () => {
+  const actual = await vi.importActual('@/components/ui');
   return {
     ...actual,
     Button: ({ children, 'aria-label': ariaLabel, onPress, ...props }: Record<string, unknown>) => (

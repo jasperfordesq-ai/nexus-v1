@@ -1,4 +1,4 @@
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import { Link } from 'react-router-dom';
 import X from 'lucide-react/icons/x';
 import LightbulbIcon from 'lucide-react/icons/lightbulb';

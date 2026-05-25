@@ -2,7 +2,7 @@ import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Select, Selec
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import Network from 'lucide-react/icons/network';
 import Share2 from 'lucide-react/icons/share-2';
 import Calendar from 'lucide-react/icons/calendar';

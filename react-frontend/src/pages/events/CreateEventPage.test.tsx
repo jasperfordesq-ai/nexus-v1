@@ -51,6 +51,7 @@ vi.mock('@/contexts/ToastContext', () => ({
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/lib/helpers', () => ({
+  cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
   resolveAssetUrl: vi.fn((url) => url || null),
 }));
 
@@ -110,8 +111,8 @@ vi.mock('@/components/location', () => ({
 }));
 
 // Mock HeroUI date components
-vi.mock('@heroui/react', async () => {
-  const actual = await vi.importActual('@heroui/react');
+vi.mock('@/components/ui', async () => {
+  const actual = await vi.importActual('@/components/ui');
   return {
     ...actual,
     DatePicker: ({ label }: { label: string }) => <input aria-label={label} placeholder={label} />,

@@ -1,7 +1,7 @@
 import { Card, CardBody, CardHeader, Input, Button, Chip, Spinner, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Tooltip } from '@/components/ui';
 import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import Save from 'lucide-react/icons/save';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Send from 'lucide-react/icons/send';

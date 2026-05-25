@@ -34,7 +34,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render } from '@testing-library/react';
 import { axe } from 'vitest-axe';
 import type { AxeResults, Result } from 'axe-core';
-import { HeroUIProvider } from '@heroui/react';
 import { MemoryRouter } from 'react-router-dom';
 
 // ─── Mocks ────────────────────────────────────────────────────────────────────
@@ -153,11 +152,11 @@ import SafeguardingReportPage from '../SafeguardingReportPage';
 
 function renderWithProviders(ui: React.ReactElement) {
   return render(
-    <HeroUIProvider>
+    <>
       <MemoryRouter initialEntries={['/test-timebank/caring-community']}>
         {ui}
       </MemoryRouter>
-    </HeroUIProvider>,
+    </>,
   );
 }
 

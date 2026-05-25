@@ -16,7 +16,7 @@ import { Card, CardBody, Input, Button, Chip, Spinner, Select, SelectItem, Modal
 
 import { useState, useEffect, useCallback } from 'react';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import ExternalLink from 'lucide-react/icons/external-link';
 import Save from 'lucide-react/icons/save';
 import Info from 'lucide-react/icons/info';

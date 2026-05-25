@@ -153,9 +153,11 @@ vi.mock('framer-motion', async () => {
 });
 
 // ── Mock HeroUI components ──────────────────────────────────────────────────
-vi.mock('@heroui/react', async () => {
+vi.mock('@/components/ui', async () => {
   const React = await import('react');
   return {
+    GlassCard: ({ children, className }: { children: ReactNode; className?: string }) =>
+      React.createElement('div', { 'data-testid': 'glass-card', className }, children),
     Button: ({ children, onPress, isDisabled, isLoading, type, ...props }: Record<string, unknown>) =>
       React.createElement(
         'button',
@@ -193,9 +195,7 @@ vi.mock('@heroui/react', async () => {
       React.createElement('div', { 'data-testid': 'select' }, children as ReactNode),
     SelectItem: ({ children }: Record<string, unknown>) =>
       React.createElement('div', null, children as ReactNode),
-    HeroUIProvider: ({ children }: { children: ReactNode }) =>
-      React.createElement(React.Fragment, null, children),
-  };
+      };
 });
 
 // ── Mock lucide-react icons ─────────────────────────────────────────────────

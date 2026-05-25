@@ -10,7 +10,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { HeroUIProvider } from '@heroui/react';
 
 // ─── Set env before module imports ───────────────────────────────────────────
 import.meta.env.VITE_GOOGLE_MAPS_API_KEY = 'test-key';
@@ -90,9 +89,9 @@ import { resetGoogleMapsConfigForTests } from '../GoogleMapsProvider';
 
 function W({ children }: { children: React.ReactNode }) {
   return (
-    <HeroUIProvider>
+    <>
       <MemoryRouter>{children}</MemoryRouter>
-    </HeroUIProvider>
+    </>
   );
 }
 

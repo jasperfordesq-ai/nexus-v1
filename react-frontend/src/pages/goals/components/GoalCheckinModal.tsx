@@ -18,7 +18,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Slider } from '@/components/ui';
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import ClipboardCheck from 'lucide-react/icons/clipboard-check';
 import Smile from 'lucide-react/icons/smile';
 import Frown from 'lucide-react/icons/frown';

@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { type ComponentPropsWithoutRef, type ReactNode } from 'react';
-import { Table as HeroUITable } from '@heroui-v3/react';
+import { Table as HeroUITable } from '@heroui/react';
 
 type HeroUITableProps = ComponentPropsWithoutRef<typeof HeroUITable>;
 type HeroUITableContentProps = ComponentPropsWithoutRef<typeof HeroUITable.Content>;
@@ -59,15 +59,26 @@ export type TableProps = Omit<HeroUITableProps, 'children' | 'className' | 'vari
 };
 
 export type TableHeaderProps = HeroUITableHeaderProps;
-export type TableColumnProps = HeroUITableColumnProps;
-export type TableBodyProps = Omit<HeroUITableBodyProps, 'renderEmptyState'> & {
+export type TableColumnProps = Omit<HeroUITableColumnProps, 'align' | 'className' | 'scope' | 'title'> & {
+  align?: 'center' | 'end' | 'left' | 'right' | 'start' | string;
+  className?: string;
+  scope?: string;
+  title?: string;
+};
+export type TableBodyProps = Omit<HeroUITableBodyProps, 'children' | 'isLoading' | 'items' | 'renderEmptyState'> & {
+  children?: ReactNode | ((item: any) => ReactNode);
   emptyContent?: ReactNode;
+  isLoading?: boolean;
+  items?: Iterable<any>;
   loadingContent?: ReactNode;
   loadingState?: 'idle' | 'loading' | 'loadingMore' | 'sorting' | 'error' | 'filtering';
   renderEmptyState?: HeroUITableBodyProps['renderEmptyState'];
 };
 export type TableRowProps = HeroUITablerowProps;
-export type TableCellProps = HeroUITableCellProps;
+export type TableCellProps = Omit<HeroUITableCellProps, 'className' | 'title'> & {
+  className?: string;
+  title?: string;
+};
 export type Selection = HeroUITableContentProps['selectedKeys'];
 export type SortDescriptor = HeroUITableContentProps['sortDescriptor'];
 
@@ -153,23 +164,36 @@ export function TableHeader({ className, ...props }: TableHeaderProps) {
   return <HeroUITable.Header className={className} {...props} />;
 }
 
-export function TableColumn({ className, ...props }: TableColumnProps) {
-  return <HeroUITable.Column className={className} {...props} />;
+function getAlignClass(align?: TableColumnProps['align']): string | undefined {
+  if (align === 'center') {
+    return 'text-center';
+  }
+
+  if (align === 'end' || align === 'right') {
+    return 'text-right';
+  }
+
+  return undefined;
+}
+
+export function TableColumn({ align, className, scope: _scope, ...props }: TableColumnProps) {
+  return <HeroUITable.Column className={combineClasses(getAlignClass(align), className)} {...props} />;
 }
 
 export function TableBody({
   emptyContent,
+  isLoading: isLoadingProp,
   loadingContent,
   loadingState,
   renderEmptyState,
   ...props
 }: TableBodyProps) {
-  const isLoading = loadingState === 'loading' || loadingState === 'loadingMore';
+  const isLoading = isLoadingProp || loadingState === 'loading' || loadingState === 'loadingMore';
 
   return (
     <HeroUITable.Body
       renderEmptyState={renderEmptyState ?? (emptyContent ? () => emptyContent : undefined)}
-      {...props}
+      {...(props as HeroUITableBodyProps)}
     >
       {isLoading && loadingContent ? loadingContent : props.children}
     </HeroUITable.Body>
@@ -180,6 +204,6 @@ export function TableRow({ className, ...props }: TableRowProps) {
   return <HeroUITable.Row className={className} {...props} />;
 }
 
-export function TableCell({ className, ...props }: TableCellProps) {
+export function TableCell({ className, title: _title, ...props }: TableCellProps) {
   return <HeroUITable.Cell className={className} {...props} />;
 }

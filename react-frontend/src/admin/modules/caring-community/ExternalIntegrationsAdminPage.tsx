@@ -7,7 +7,7 @@ import { CardBody, Card, Select, SelectItem, useDisclosure, Button, Chip, Spinne
 import { useCallback, useEffect, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import Info from 'lucide-react/icons/info';
 import PlugZap from 'lucide-react/icons/plug-zap';
 import Pencil from 'lucide-react/icons/pencil';

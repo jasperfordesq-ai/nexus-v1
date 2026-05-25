@@ -12,7 +12,7 @@ import { Button, Card, CardHeader, CardBody, Input, Chip, Spinner, Select, Selec
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import Save from 'lucide-react/icons/save';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Plus from 'lucide-react/icons/plus';

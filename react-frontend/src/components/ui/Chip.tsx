@@ -8,7 +8,7 @@ import {
   Chip as HeroUIChip,
   CloseButton,
   type ChipProps as HeroUIChipProps,
-} from '@heroui-v3/react';
+} from '@heroui/react';
 
 type V2ChipColor =
   | 'default'

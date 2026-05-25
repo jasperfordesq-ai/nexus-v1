@@ -2,7 +2,7 @@ import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Sel
 import { useCallback, useEffect, useMemo, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import TriangleAlert from 'lucide-react/icons/triangle-alert';

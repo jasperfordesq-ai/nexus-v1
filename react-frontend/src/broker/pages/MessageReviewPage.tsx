@@ -17,7 +17,7 @@ import { Select, SelectItem, Button, Chip, Textarea, Modal, ModalContent, ModalH
 import { useState, useCallback, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Flag from 'lucide-react/icons/flag';

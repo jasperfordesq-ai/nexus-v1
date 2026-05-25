@@ -94,7 +94,7 @@ vi.mock('react-i18next', () => ({
 }));
 
 // Mock HeroUI components minimally
-vi.mock('@heroui/react', async () => {
+vi.mock('@/components/ui', async () => {
   const React = await import('react');
   return {
     Button: ({ children, onPress, isDisabled, isLoading, ...props }: Record<string, unknown>) =>

@@ -8,12 +8,15 @@ import {
   type ComponentPropsWithoutRef,
   type ReactNode,
 } from 'react';
-import { Pagination as HeroUIPagination } from '@heroui-v3/react';
+import { Pagination as HeroUIPagination } from '@heroui/react';
 
 type HeroUIPaginationProps = ComponentPropsWithoutRef<typeof HeroUIPagination>;
 type PaginationItem = number | 'ellipsis';
 
-export type PaginationProps = Omit<HeroUIPaginationProps, 'children' | 'className'> & {
+export type PaginationProps = Omit<
+  HeroUIPaginationProps,
+  'children' | 'className' | 'color' | 'onChange' | 'radius' | 'variant'
+> & {
   boundaries?: number;
   children?: ReactNode;
   className?: string;

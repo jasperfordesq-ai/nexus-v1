@@ -11,7 +11,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { ReactNode } from 'react';
-import { HeroUIProvider } from '@heroui/react';
 
 vi.mock('framer-motion');
 vi.mock('react-i18next', () => ({
@@ -91,17 +90,17 @@ const mockAuthenticateWithBiometric = vi.mocked(authenticateWithBiometric);
 // Wrapper for renderHook
 function wrapper({ children }: { children: ReactNode }) {
   return (
-    <HeroUIProvider>
+    <>
       {children}
-    </HeroUIProvider>
+    </>
   );
 }
 
 function authWrapper({ children }: { children: ReactNode }) {
   return (
-    <HeroUIProvider>
+    <>
       <AuthProvider>{children}</AuthProvider>
-    </HeroUIProvider>
+    </>
   );
 }
 

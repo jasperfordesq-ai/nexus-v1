@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import type { ComponentProps, ReactNode } from 'react';
-import { Description, FieldError, Label, TimeField, type TimeValue } from '@heroui-v3/react';
+import { Description, FieldError, Label, TimeField, type TimeValue } from '@heroui/react';
 import type { Time as InternationalizedTime } from '@internationalized/date';
 import { cn } from '@/lib/helpers';
 

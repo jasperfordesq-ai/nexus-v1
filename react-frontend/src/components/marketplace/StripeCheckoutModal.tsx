@@ -15,7 +15,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import CreditCard from 'lucide-react/icons/credit-card';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import AlertCircle from 'lucide-react/icons/circle-alert';

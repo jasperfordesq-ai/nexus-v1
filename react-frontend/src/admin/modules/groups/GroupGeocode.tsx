@@ -12,7 +12,7 @@ import { Card, CardBody, CardHeader, Code } from '@/components/ui';
  */
 
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import MapPin from 'lucide-react/icons/map-pin';
 import Info from 'lucide-react/icons/info';
 import { useTranslation } from 'react-i18next';

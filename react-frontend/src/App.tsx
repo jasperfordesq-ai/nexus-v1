@@ -17,8 +17,7 @@
  */
 
 import { Suspense, lazy, type ComponentType } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate, Navigate } from 'react-router-dom';
-import { HeroUIProvider } from '@heroui/react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 /**
  * Wrapper around React.lazy() that handles stale chunk errors after deployment.
@@ -1651,48 +1650,31 @@ function AppRoutes() {
   );
 }
 
-/**
- * HeroUIProvider wrapper that lives inside BrowserRouter so it can
- * pass React Router's navigate function to HeroUI components.
- * This enables client-side routing for HeroUI's href prop on
- * DropdownItem, Link, Breadcrumbs, etc.
- */
-function HeroUIRouterProvider({ children }: { children: React.ReactNode }) {
-  const navigate = useNavigate();
-  return (
-    <HeroUIProvider navigate={navigate}>
-      {children}
-    </HeroUIProvider>
-  );
-}
-
 function App() {
   return (
     <ErrorBoundary>
       <HelmetProvider>
         <ThemeProvider>
           <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-            <HeroUIRouterProvider>
-              <ScrollToTop />
-              <CookieConsentProvider>
-                <ToastProvider>
-                  <Suspense fallback={<LoadingScreen />}>
-                    <Routes>
-                      {/* Single catch-all route — TenantShell detects tenant slug from
-                          the first path segment (if it's not reserved like "admin").
-                          When a slug IS found, TenantShell renders a nested <Routes>
-                          with the slug stripped so child routes match correctly.
-                          This avoids the `:tenantSlug/*` dynamic param route which caused
-                          React Router v6 to rank `/:tenantSlug/listings` higher than
-                          `/admin/*` (splat routes rank lowest in RRv6). */}
-                      <Route path="/*" element={<TenantShell appRoutes={AppRoutes} />}>
-                        {AppRoutes()}
-                      </Route>
-                    </Routes>
-                  </Suspense>
-                </ToastProvider>
-              </CookieConsentProvider>
-            </HeroUIRouterProvider>
+            <ScrollToTop />
+            <CookieConsentProvider>
+              <ToastProvider>
+                <Suspense fallback={<LoadingScreen />}>
+                  <Routes>
+                    {/* Single catch-all route — TenantShell detects tenant slug from
+                        the first path segment (if it's not reserved like "admin").
+                        When a slug IS found, TenantShell renders a nested <Routes>
+                        with the slug stripped so child routes match correctly.
+                        This avoids the `:tenantSlug/*` dynamic param route which caused
+                        React Router v6 to rank `/:tenantSlug/listings` higher than
+                        `/admin/*` (splat routes rank lowest in RRv6). */}
+                    <Route path="/*" element={<TenantShell appRoutes={AppRoutes} />}>
+                      {AppRoutes()}
+                    </Route>
+                  </Routes>
+                </Suspense>
+              </ToastProvider>
+            </CookieConsentProvider>
           </BrowserRouter>
         </ThemeProvider>
       </HelmetProvider>

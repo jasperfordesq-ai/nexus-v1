@@ -9,7 +9,6 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { HeroUIProvider } from '@heroui/react';
 
 // ─── Stable mock references (prevent infinite re-render loops) ──────────────
 
@@ -65,7 +64,7 @@ import { usePresenceOptional } from '@/contexts/PresenceContext';
 // ─── Wrapper ────────────────────────────────────────────────────────────────
 
 function W({ children }: { children: React.ReactNode }) {
-  return <HeroUIProvider>{children}</HeroUIProvider>;
+  return <>{children}</>;
 }
 
 // ─── Tests ──────────────────────────────────────────────────────────────────

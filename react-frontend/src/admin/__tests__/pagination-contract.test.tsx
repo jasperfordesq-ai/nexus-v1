@@ -14,7 +14,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { HeroUIProvider } from '@heroui/react';
 
 // ─── Common mocks ────────────────────────────────────────────────────────────
 
@@ -100,7 +99,7 @@ function paginatedResponse(items: unknown[], total: number, page = 1, perPage = 
 function renderInRouter(component: React.ReactElement) {
   return render(
     <MemoryRouter>
-      <HeroUIProvider>{component}</HeroUIProvider>
+      <>{component}</>
     </MemoryRouter>
   );
 }

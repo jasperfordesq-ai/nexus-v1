@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import type { ComponentProps, ReactNode } from 'react';
-import { Link as HeroUILink } from '@heroui-v3/react';
+import { Link as HeroUILink } from '@heroui/react';
 
 type HeroUILinkProps = ComponentProps<typeof HeroUILink>;
 

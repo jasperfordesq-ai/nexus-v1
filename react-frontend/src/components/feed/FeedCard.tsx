@@ -15,7 +15,7 @@ import {
 import { motion,
   AnimatePresence } from 'framer-motion';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import Heart from 'lucide-react/icons/heart';
 import MessageCircle from 'lucide-react/icons/message-circle';
 import MoreHorizontal from 'lucide-react/icons/ellipsis';

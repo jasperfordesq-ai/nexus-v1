@@ -18,7 +18,7 @@ import {
   TextField,
   type InputProps as HeroUIInputProps,
   type TextFieldProps,
-} from '@heroui-v3/react';
+} from '@heroui/react';
 
 type LegacyVariant = 'flat' | 'bordered' | 'underlined' | 'faded';
 type V3Variant = NonNullable<HeroUIInputProps['variant']>;

@@ -1,6 +1,6 @@
 import { Card, CardBody, CardHeader, Chip } from '@/components/ui';
 import { type ReactNode } from 'react';
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import CheckCircle from 'lucide-react/icons/circle-check-big';

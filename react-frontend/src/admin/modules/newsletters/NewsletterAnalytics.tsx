@@ -1,7 +1,7 @@
 import { Card, CardBody, CardHeader, Chip, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { useState, useCallback, useEffect, useMemo } from 'react';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import Mail from 'lucide-react/icons/mail';
 import Users from 'lucide-react/icons/users';

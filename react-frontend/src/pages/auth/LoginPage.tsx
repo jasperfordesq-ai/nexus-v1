@@ -17,7 +17,7 @@ import { Select, SelectItem, GlassCard, Button, Input, Checkbox } from '@/compon
 import { useState, useEffect, useRef, useCallback, type FormEvent } from 'react';
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Mail from 'lucide-react/icons/mail';
 import Lock from 'lucide-react/icons/lock';

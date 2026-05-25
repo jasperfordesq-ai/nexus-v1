@@ -12,7 +12,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import X from 'lucide-react/icons/x';
 import Home from 'lucide-react/icons/house';
 import LayoutDashboard from 'lucide-react/icons/layout-dashboard';

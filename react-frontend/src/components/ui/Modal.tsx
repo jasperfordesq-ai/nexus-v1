@@ -14,7 +14,7 @@ import {
   useContext,
   useMemo,
 } from 'react';
-import { Modal as HeroUIModal } from '@heroui-v3/react';
+import { Modal as HeroUIModal } from '@heroui/react';
 
 import { cn } from '@/lib/helpers';
 

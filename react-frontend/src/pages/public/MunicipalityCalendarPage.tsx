@@ -2,7 +2,7 @@ import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner } from '@/comp
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import Calendar from 'lucide-react/icons/calendar';
 import ChevronLeft from 'lucide-react/icons/chevron-left';
 import ChevronRight from 'lucide-react/icons/chevron-right';

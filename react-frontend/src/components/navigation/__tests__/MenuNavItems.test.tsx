@@ -10,7 +10,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { HeroUIProvider } from '@heroui/react';
 import type { ApiMenu } from '@/types/menu';
 
 // ─── Mocks ──────────────────────────────────────────────────────────────────
@@ -50,11 +49,11 @@ import { DesktopMenuItems, MobileMenuItems } from '../MenuNavItems';
 
 function W({ children }: { children: React.ReactNode }) {
   return (
-    <HeroUIProvider>
+    <>
       <MemoryRouter initialEntries={['/test']}>
         {children}
       </MemoryRouter>
-    </HeroUIProvider>
+    </>
   );
 }
 

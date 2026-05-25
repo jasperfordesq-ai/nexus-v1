@@ -10,7 +10,7 @@ import { ScrollToTop } from './ScrollToTop';
 describe('ScrollToTop', () => {
   it('renders nothing visible', () => {
     const { container } = render(<ScrollToTop />);
-    // ScrollToTop returns null, but HeroUIProvider wraps with overlay container
+    // ScrollToTop returns null, while app providers may add overlay containers
     // Verify no visible content from ScrollToTop itself
     expect(container.querySelector('[data-scrolltop]')).toBeNull();
   });

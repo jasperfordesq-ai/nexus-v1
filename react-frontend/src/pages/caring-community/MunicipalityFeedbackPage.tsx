@@ -6,7 +6,7 @@ import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Input, Texta
 
 import { useCallback, useEffect, useState } from 'react';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import Inbox from 'lucide-react/icons/inbox';
 import MessageSquare from 'lucide-react/icons/message-square';
 import { useTranslation } from 'react-i18next';

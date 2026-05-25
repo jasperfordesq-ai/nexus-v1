@@ -12,7 +12,7 @@ import {
   type ReactElement,
   type ReactNode,
 } from 'react';
-import { Tabs as HeroUITabs } from '@heroui-v3/react';
+import { Tabs as HeroUITabs } from '@heroui/react';
 
 type HeroUITabsProps = ComponentPropsWithoutRef<typeof HeroUITabs>;
 type TabsVariant = 'solid' | 'bordered' | 'light' | 'underlined' | 'primary' | 'secondary';
@@ -23,7 +23,10 @@ export type TabProps = Omit<HTMLAttributes<HTMLDivElement>, 'title'> & {
   title?: ReactNode;
 };
 
-export type TabsProps = Omit<HeroUITabsProps, 'children' | 'className' | 'orientation' | 'variant'> & {
+export type TabsProps = Omit<
+  HeroUITabsProps,
+  'children' | 'className' | 'color' | 'onChange' | 'orientation' | 'variant'
+> & {
   'aria-label'?: string;
   children?: ReactNode;
   className?: string;

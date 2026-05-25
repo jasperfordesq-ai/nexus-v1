@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import type { ComponentProps, ReactNode } from 'react';
-import { Label, ProgressBar } from '@heroui-v3/react';
+import { Label, ProgressBar } from '@heroui/react';
 import { cn } from '@/lib/helpers';
 
 type ProgressBarProps = ComponentProps<typeof ProgressBar>;

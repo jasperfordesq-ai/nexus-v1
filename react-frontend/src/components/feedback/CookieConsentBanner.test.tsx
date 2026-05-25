@@ -10,7 +10,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { HeroUIProvider } from '@heroui/react';
 import { CookieConsentBanner } from './CookieConsentBanner';
 
 // Mock consent context
@@ -74,11 +73,11 @@ vi.mock('react-i18next', () => ({
 
 function renderBanner() {
   return render(
-    <HeroUIProvider>
+    <>
       <BrowserRouter>
         <CookieConsentBanner />
       </BrowserRouter>
-    </HeroUIProvider>
+    </>
   );
 }
 

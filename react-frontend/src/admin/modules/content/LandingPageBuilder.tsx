@@ -2,7 +2,7 @@ import { Card, CardBody, CardHeader, Input, Button, Textarea, Spinner, Select, S
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import ChevronUp from 'lucide-react/icons/chevron-up';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import Save from 'lucide-react/icons/save';

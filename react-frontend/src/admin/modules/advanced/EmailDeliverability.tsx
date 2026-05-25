@@ -6,7 +6,7 @@ import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Select, Selec
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Alert } from '@/components/ui';
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import Activity from 'lucide-react/icons/activity';
 import AlertTriangle from 'lucide-react/icons/alert-triangle';
 import CheckCircle2 from 'lucide-react/icons/check-circle-2';

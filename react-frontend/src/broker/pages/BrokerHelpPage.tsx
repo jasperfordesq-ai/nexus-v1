@@ -17,7 +17,7 @@ import { Card, CardBody, CardHeader, Accordion, AccordionItem } from '@/componen
  */
 
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import { Trans, useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import BookOpen from 'lucide-react/icons/book-open';

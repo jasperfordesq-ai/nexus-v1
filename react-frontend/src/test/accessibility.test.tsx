@@ -11,7 +11,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render } from '@testing-library/react';
 import { axe } from 'vitest-axe';
-import { HeroUIProvider } from '@heroui/react';
 import { MemoryRouter } from 'react-router-dom';
 import { EmptyState } from '@/components/feedback/EmptyState';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -105,11 +104,11 @@ vi.mock('@/contexts', () => ({
 
 function withProviders(ui: React.ReactElement) {
   return render(
-    <HeroUIProvider>
+    <>
       <MemoryRouter>
         {ui}
       </MemoryRouter>
-    </HeroUIProvider>
+    </>
   );
 }
 

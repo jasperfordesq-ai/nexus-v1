@@ -41,8 +41,10 @@ return [
             'https://timebank.global',
             'https://www.timebank.global',
             'http://localhost:5173',
+            'http://localhost:4174',
             'http://localhost:8090',
             'http://127.0.0.1:5173',
+            'http://127.0.0.1:4174',
         ],
         // Additional origins from environment (additive)
         array_map('trim', array_filter(
@@ -52,7 +54,7 @@ return [
 
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['Accept', 'Content-Type', 'Authorization', 'X-Requested-With', 'X-XSRF-TOKEN', 'X-CSRF-TOKEN', 'X-Socket-Id', 'X-Timezone', 'X-Locale', 'X-Tenant-ID', 'X-Trusted-Device', 'X-Request-Id', 'Cache-Control', 'Pragma'],
+    'allowed_headers' => ['Accept', 'Content-Type', 'Authorization', 'X-Requested-With', 'X-XSRF-TOKEN', 'X-CSRF-TOKEN', 'X-Socket-Id', 'X-Timezone', 'X-Locale', 'X-Tenant-ID', 'X-Tenant-Slug', 'X-Trusted-Device', 'X-Request-Id', 'Cache-Control', 'Pragma'],
 
     'exposed_headers' => ['X-Request-Id', 'X-Build'],
 

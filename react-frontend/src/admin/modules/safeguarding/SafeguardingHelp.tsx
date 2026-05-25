@@ -16,7 +16,7 @@
  */
 
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import BookOpen from 'lucide-react/icons/book-open';
 import Clock from 'lucide-react/icons/clock';
 import Eye from 'lucide-react/icons/eye';

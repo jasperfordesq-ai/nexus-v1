@@ -2,7 +2,7 @@ import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner } from '@/comp
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import CheckCircle from 'lucide-react/icons/check-circle';
 import Clock from 'lucide-react/icons/clock';
 import Info from 'lucide-react/icons/info';

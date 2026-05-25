@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useId } from 'react';
-import { useOverlayState, type UseOverlayStateProps } from '@heroui-v3/react';
+import { useOverlayState, type UseOverlayStateProps } from '@heroui/react';
 
 export interface UseDisclosureProps {
   defaultOpen?: boolean;

@@ -11,7 +11,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
-import { HeroUIProvider } from '@heroui/react';
 
 // ─── Stable mock references (prevent infinite re-render loops) ──────────────
 
@@ -79,11 +78,11 @@ import { useAuth } from '@/contexts/AuthContext';
 
 function W({ children }: { children: React.ReactNode }) {
   return (
-    <HeroUIProvider>
+    <>
       <MemoryRouter initialEntries={['/test']}>
         {children}
       </MemoryRouter>
-    </HeroUIProvider>
+    </>
   );
 }
 

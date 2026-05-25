@@ -18,7 +18,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { HeroUIProvider } from '@heroui/react';
 import Users from 'lucide-react/icons/users';
 
 vi.mock('@/contexts', () => ({
@@ -53,11 +52,11 @@ vi.mock('@/hooks', () => ({
 
 function Wrapper({ children }: { children: React.ReactNode }) {
   return (
-    <HeroUIProvider>
+    <>
       <MemoryRouter initialEntries={['/test/admin']}>
         {children}
       </MemoryRouter>
-    </HeroUIProvider>
+    </>
   );
 }
 
@@ -232,9 +231,9 @@ import { StatCard } from '../components/StatCard';
 describe('StatCard', () => {
   it('renders label and value', () => {
     render(
-      <HeroUIProvider>
+      <>
         <StatCard label="Total Users" value={1234} icon={Users} />
-      </HeroUIProvider>
+      </>
     );
     expect(screen.getByText('Total Users')).toBeInTheDocument();
     expect(screen.getByText('1,234')).toBeInTheDocument();
@@ -242,27 +241,27 @@ describe('StatCard', () => {
 
   it('shows loading state', () => {
     const { container } = render(
-      <HeroUIProvider>
+      <>
         <StatCard label="Total Users" value={0} icon={Users} loading={true} />
-      </HeroUIProvider>
+      </>
     );
     expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
   });
 
   it('renders string value', () => {
     render(
-      <HeroUIProvider>
+      <>
         <StatCard label="Status" value="Active" icon={Users} />
-      </HeroUIProvider>
+      </>
     );
     expect(screen.getByText('Active')).toBeInTheDocument();
   });
 
   it('shows positive trend indicator', () => {
     render(
-      <HeroUIProvider>
+      <>
         <StatCard label="Users" value={100} icon={Users} trend={15} trendLabel="vs last month" />
-      </HeroUIProvider>
+      </>
     );
     expect(screen.getByText('+15%')).toBeInTheDocument();
     expect(screen.getByText('vs last month')).toBeInTheDocument();
@@ -270,9 +269,9 @@ describe('StatCard', () => {
 
   it('shows negative trend indicator', () => {
     render(
-      <HeroUIProvider>
+      <>
         <StatCard label="Users" value={100} icon={Users} trend={-5} />
-      </HeroUIProvider>
+      </>
     );
     expect(screen.getByText('-5%')).toBeInTheDocument();
   });
@@ -283,9 +282,9 @@ describe('StatCard', () => {
     console.error = (...args: unknown[]) => { errors.push(args); };
     try {
       const { container } = render(
-        <HeroUIProvider>
+        <>
           <StatCard label="Total Users" value={1234} icon={Users} />
-        </HeroUIProvider>
+        </>
       );
       expect(container.querySelector('svg.lucide-users')).toBeInTheDocument();
     } finally {
@@ -300,9 +299,9 @@ describe('StatCard', () => {
 
   it('accepts a pre-rendered JSX icon node', () => {
     const { container } = render(
-      <HeroUIProvider>
+      <>
         <StatCard label="Custom" value={42} icon={<span data-testid="custom-icon">★</span>} />
-      </HeroUIProvider>
+      </>
     );
     expect(container.querySelector('[data-testid="custom-icon"]')).toBeInTheDocument();
   });
@@ -317,18 +316,18 @@ import { EmptyState } from '../components/EmptyState';
 describe('EmptyState', () => {
   it('renders title', () => {
     render(
-      <HeroUIProvider>
+      <>
         <EmptyState title="No users found" />
-      </HeroUIProvider>
+      </>
     );
     expect(screen.getByText('No users found')).toBeInTheDocument();
   });
 
   it('renders description', () => {
     render(
-      <HeroUIProvider>
+      <>
         <EmptyState title="No users" description="Try adjusting your filters" />
-      </HeroUIProvider>
+      </>
     );
     expect(screen.getByText('Try adjusting your filters')).toBeInTheDocument();
   });
@@ -336,9 +335,9 @@ describe('EmptyState', () => {
   it('renders action button when provided', () => {
     const onAction = vi.fn();
     render(
-      <HeroUIProvider>
+      <>
         <EmptyState title="No users" actionLabel="Create User" onAction={onAction} />
-      </HeroUIProvider>
+      </>
     );
     const btn = screen.getByText('Create User');
     expect(btn).toBeInTheDocument();
@@ -348,9 +347,9 @@ describe('EmptyState', () => {
 
   it('does not render action button without onAction', () => {
     render(
-      <HeroUIProvider>
+      <>
         <EmptyState title="No users" actionLabel="Create User" />
-      </HeroUIProvider>
+      </>
     );
     expect(screen.queryByText('Create User')).not.toBeInTheDocument();
   });
@@ -390,7 +389,7 @@ import { ConfirmModal } from '../components/ConfirmModal';
 describe('ConfirmModal', () => {
   it('renders when open', () => {
     render(
-      <HeroUIProvider>
+      <>
         <ConfirmModal
           isOpen={true}
           onClose={vi.fn()}
@@ -398,7 +397,7 @@ describe('ConfirmModal', () => {
           title="Delete User"
           message="Are you sure you want to delete this user?"
         />
-      </HeroUIProvider>
+      </>
     );
     expect(screen.getByText('Delete User')).toBeInTheDocument();
     expect(screen.getByText('Are you sure you want to delete this user?')).toBeInTheDocument();
@@ -406,7 +405,7 @@ describe('ConfirmModal', () => {
 
   it('shows default confirm label', () => {
     render(
-      <HeroUIProvider>
+      <>
         <ConfirmModal
           isOpen={true}
           onClose={vi.fn()}
@@ -414,14 +413,14 @@ describe('ConfirmModal', () => {
           title="Delete"
           message="Confirm?"
         />
-      </HeroUIProvider>
+      </>
     );
     expect(screen.getByText('Confirm')).toBeInTheDocument();
   });
 
   it('shows custom confirm label', () => {
     render(
-      <HeroUIProvider>
+      <>
         <ConfirmModal
           isOpen={true}
           onClose={vi.fn()}
@@ -430,14 +429,14 @@ describe('ConfirmModal', () => {
           message="Ban user?"
           confirmLabel="Ban User"
         />
-      </HeroUIProvider>
+      </>
     );
     expect(screen.getByText('Ban User')).toBeInTheDocument();
   });
 
   it('shows Cancel button', () => {
     render(
-      <HeroUIProvider>
+      <>
         <ConfirmModal
           isOpen={true}
           onClose={vi.fn()}
@@ -445,14 +444,14 @@ describe('ConfirmModal', () => {
           title="Delete"
           message="Confirm?"
         />
-      </HeroUIProvider>
+      </>
     );
     expect(screen.getByText('Cancel')).toBeInTheDocument();
   });
 
   it('renders children content', () => {
     render(
-      <HeroUIProvider>
+      <>
         <ConfirmModal
           isOpen={true}
           onClose={vi.fn()}
@@ -462,7 +461,7 @@ describe('ConfirmModal', () => {
         >
           <p>Extra warning text</p>
         </ConfirmModal>
-      </HeroUIProvider>
+      </>
     );
     expect(screen.getByText('Extra warning text')).toBeInTheDocument();
   });
@@ -477,27 +476,27 @@ import { StatusBadge } from '../components/DataTable';
 describe('StatusBadge', () => {
   it('renders status text', () => {
     render(
-      <HeroUIProvider>
+      <>
         <StatusBadge status="active" />
-      </HeroUIProvider>
+      </>
     );
     expect(screen.getByText('active')).toBeInTheDocument();
   });
 
   it('handles unknown status', () => {
     render(
-      <HeroUIProvider>
+      <>
         <StatusBadge status="custom_status" />
-      </HeroUIProvider>
+      </>
     );
     expect(screen.getByText('custom_status')).toBeInTheDocument();
   });
 
   it('handles empty status gracefully', () => {
     render(
-      <HeroUIProvider>
+      <>
         <StatusBadge status="" />
-      </HeroUIProvider>
+      </>
     );
     expect(screen.getByText('unknown')).toBeInTheDocument();
   });
@@ -522,9 +521,9 @@ describe('DataTable', () => {
 
   it('renders without crashing', () => {
     render(
-      <HeroUIProvider>
+      <>
         <DataTable columns={columns} data={data} />
-      </HeroUIProvider>
+      </>
     );
     expect(screen.getByText('Name')).toBeInTheDocument();
     expect(screen.getByText('Email')).toBeInTheDocument();
@@ -532,9 +531,9 @@ describe('DataTable', () => {
 
   it('renders data rows', () => {
     render(
-      <HeroUIProvider>
+      <>
         <DataTable columns={columns} data={data} />
-      </HeroUIProvider>
+      </>
     );
     expect(screen.getByText('Alice')).toBeInTheDocument();
     expect(screen.getByText('Bob')).toBeInTheDocument();
@@ -542,18 +541,18 @@ describe('DataTable', () => {
 
   it('shows empty content when no data', () => {
     render(
-      <HeroUIProvider>
+      <>
         <DataTable columns={columns} data={[]} emptyContent="No results" />
-      </HeroUIProvider>
+      </>
     );
     expect(screen.getByText('No results')).toBeInTheDocument();
   });
 
   it('renders search input when searchable', () => {
     render(
-      <HeroUIProvider>
+      <>
         <DataTable columns={columns} data={data} searchable={true} searchPlaceholder="Search users..." />
-      </HeroUIProvider>
+      </>
     );
     expect(screen.getByPlaceholderText('Search users...')).toBeInTheDocument();
   });
@@ -561,9 +560,9 @@ describe('DataTable', () => {
   it('renders refresh button when onRefresh provided', () => {
     const onRefresh = vi.fn();
     render(
-      <HeroUIProvider>
+      <>
         <DataTable columns={columns} data={data} onRefresh={onRefresh} />
-      </HeroUIProvider>
+      </>
     );
     const btn = screen.getByLabelText('Refresh');
     expect(btn).toBeInTheDocument();

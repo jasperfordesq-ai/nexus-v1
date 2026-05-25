@@ -16,7 +16,7 @@ import {
   useContext,
   useMemo,
 } from 'react';
-import { Drawer as HeroUIDrawer } from '@heroui-v3/react';
+import { Drawer as HeroUIDrawer } from '@heroui/react';
 
 import { cn } from '@/lib/helpers';
 

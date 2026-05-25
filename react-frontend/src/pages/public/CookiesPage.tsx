@@ -11,7 +11,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';import { Separator } from '@heroui-v3/react';
+import { motion } from 'framer-motion';import { Separator } from '@heroui/react';
 import Cookie from 'lucide-react/icons/cookie';
 import Shield from 'lucide-react/icons/shield';
 import Settings from 'lucide-react/icons/settings';

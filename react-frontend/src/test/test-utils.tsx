@@ -11,7 +11,6 @@
 import { ReactElement, ReactNode } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import { HeroUIProvider } from '@heroui/react';
 import { HelmetProvider } from 'react-helmet-async';
 import { ToastProvider } from '@/contexts/ToastContext';
 
@@ -20,7 +19,7 @@ import { ToastProvider } from '@/contexts/ToastContext';
  */
 function AllProviders({ children }: { children: ReactNode }) {
   return (
-    <HeroUIProvider>
+    <>
       <HelmetProvider>
         <BrowserRouter>
           <ToastProvider>
@@ -28,7 +27,7 @@ function AllProviders({ children }: { children: ReactNode }) {
           </ToastProvider>
         </BrowserRouter>
       </HelmetProvider>
-    </HeroUIProvider>
+    </>
   );
 }
 

@@ -14,7 +14,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { HeroUIProvider } from '@heroui/react';
 
 // ─── Common mocks ────────────────────────────────────────────────────────────
 
@@ -103,11 +102,11 @@ vi.mock('@lexical/react/LexicalLinkPlugin', () => ({
 
 function W({ children }: { children: React.ReactNode }) {
   return (
-    <HeroUIProvider>
+    <>
       <MemoryRouter initialEntries={['/test/admin/users']}>
         {children}
       </MemoryRouter>
-    </HeroUIProvider>
+    </>
   );
 }
 

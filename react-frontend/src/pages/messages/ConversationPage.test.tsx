@@ -75,7 +75,7 @@ vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: React.PropsWithChildren) => children,
 }));
 
-vi.mock('@heroui/react', () => {
+vi.mock('@/components/ui', () => {
   const React = require('react');
   const cleanProps = (props: Record<string, unknown>) => {
     const {
@@ -107,7 +107,8 @@ vi.mock('@heroui/react', () => {
     React.createElement('input', { value, onChange, placeholder, 'aria-label': ariaLabel });
 
   return {
-    HeroUIProvider: passthrough('div'),
+    GlassCard: ({ children, className }: React.PropsWithChildren<{ className?: string }>) =>
+      React.createElement('div', { className }, children),
     Button: button,
     Avatar: ({ src }: Record<string, unknown>) => React.createElement('div', {}, src ? React.createElement('img', { src }) : null),
     Modal: passthrough('div'),
@@ -125,29 +126,6 @@ vi.mock('@heroui/react', () => {
     Chip: passthrough('span'),
   };
 });
-
-vi.mock('@/components/ui', () => ({
-  GlassCard: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
-
-  GlassButton: ({ children }: Record<string, unknown>) => children as never,
-  GlassInput: () => null,
-  BackToTop: () => null,
-  AlgorithmLabel: () => null,
-  ImagePlaceholder: () => null,
-  DynamicIcon: () => null,
-  ICON_MAP: {},
-  ICON_NAMES: [],
-  ListingSkeleton: () => null,
-  MemberCardSkeleton: () => null,
-  StatCardSkeleton: () => null,
-  EventCardSkeleton: () => null,
-  GroupCardSkeleton: () => null,
-  ConversationSkeleton: () => null,
-  ExchangeCardSkeleton: () => null,
-  NotificationSkeleton: () => null,
-  ProfileHeaderSkeleton: () => null,
-  SkeletonList: () => null,
-}));
 
 vi.mock('@/components/feedback', () => ({
   LoadingScreen: () => <div data-testid="loading-screen">Loading...</div>,

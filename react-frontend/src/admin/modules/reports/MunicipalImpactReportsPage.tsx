@@ -2,7 +2,7 @@ import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Sel
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import { Link } from 'react-router-dom';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import Info from 'lucide-react/icons/info';

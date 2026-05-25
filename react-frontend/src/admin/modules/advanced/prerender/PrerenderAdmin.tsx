@@ -2,7 +2,7 @@ import { Card, CardBody, CardHeader, Button, Chip, Spinner, Input, Select, Selec
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Play from 'lucide-react/icons/play';
 import CheckCircle from 'lucide-react/icons/circle-check-big';

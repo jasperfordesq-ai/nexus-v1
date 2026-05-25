@@ -2,7 +2,7 @@ import { Card, CardBody, CardHeader, Chip, Spinner, Button, Table, TableHeader, 
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import Users from 'lucide-react/icons/users';
 import DollarSign from 'lucide-react/icons/dollar-sign';

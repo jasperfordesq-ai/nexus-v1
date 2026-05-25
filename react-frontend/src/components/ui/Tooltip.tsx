@@ -7,10 +7,11 @@ import {
   type ComponentPropsWithoutRef,
   type ReactNode,
 } from 'react';
-import { Tooltip as HeroUITooltip } from '@heroui-v3/react';
+import { Tooltip as HeroUITooltip } from '@heroui/react';
 
 type HeroUITooltipProps = ComponentPropsWithoutRef<typeof HeroUITooltip>;
 type HeroUITooltipContentProps = ComponentPropsWithoutRef<typeof HeroUITooltip.Content>;
+type LegacyPlacement = HeroUITooltipContentProps['placement'] | string;
 
 export type TooltipProps = Omit<HeroUITooltipProps, 'children' | 'className'> & {
   children?: ReactNode;
@@ -24,7 +25,7 @@ export type TooltipProps = Omit<HeroUITooltipProps, 'children' | 'className'> & 
   color?: 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | string;
   content?: ReactNode;
   offset?: HeroUITooltipContentProps['offset'];
-  placement?: HeroUITooltipContentProps['placement'];
+  placement?: LegacyPlacement;
   radius?: string;
   shadow?: string;
   showArrow?: boolean;
@@ -54,6 +55,10 @@ function mapColor(color?: TooltipProps['color']): string | undefined {
   }
 }
 
+function normalizePlacement(placement?: LegacyPlacement): HeroUITooltipContentProps['placement'] | undefined {
+  return placement?.replace('-', ' ') as HeroUITooltipContentProps['placement'] | undefined;
+}
+
 export function Tooltip({
   children,
   className,
@@ -80,7 +85,7 @@ export function Tooltip({
       <HeroUITooltip.Content
         className={combineClasses(mapColor(color), classNames?.base, classNames?.content, className)}
         offset={offset}
-        placement={placement}
+        placement={normalizePlacement(placement)}
         showArrow={showArrow}
       >
         {showArrow ? <HeroUITooltip.Arrow className={classNames?.arrow} /> : null}

@@ -1,6 +1,6 @@
 import { Button, Card, CardBody, CardHeader, Input, Spinner, Chip } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import Globe from 'lucide-react/icons/globe';
 import Save from 'lucide-react/icons/save';
 import RefreshCw from 'lucide-react/icons/refresh-cw';

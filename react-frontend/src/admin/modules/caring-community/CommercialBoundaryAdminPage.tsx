@@ -1,7 +1,7 @@
 import { Button, Card, CardBody, CardHeader, Chip, Spinner, Select, SelectItem, Accordion, AccordionItem, Tooltip } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import Building from 'lucide-react/icons/building';
 import Download from 'lucide-react/icons/download';
 import Info from 'lucide-react/icons/info';

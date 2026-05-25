@@ -10,7 +10,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import Lock from 'lucide-react/icons/lock';
 import Newspaper from 'lucide-react/icons/newspaper';
 import Plus from 'lucide-react/icons/plus';

@@ -22,7 +22,7 @@ import { ChangeEvent, useCallback, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import Upload from 'lucide-react/icons/upload';
 import FileText from 'lucide-react/icons/file-text';
 import CheckCircle2 from 'lucide-react/icons/circle-check';

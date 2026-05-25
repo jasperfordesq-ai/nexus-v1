@@ -2,7 +2,7 @@ import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Tab
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import Coins from 'lucide-react/icons/coins';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Send from 'lucide-react/icons/send';

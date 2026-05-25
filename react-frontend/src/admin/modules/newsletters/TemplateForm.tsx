@@ -2,7 +2,7 @@ import { Card, CardBody, CardHeader, Input, Textarea, Button, Chip, Spinner, Sel
 import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
 import Copy from 'lucide-react/icons/copy';

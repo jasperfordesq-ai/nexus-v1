@@ -16,7 +16,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Star from 'lucide-react/icons/star';
 import Clock from 'lucide-react/icons/clock';

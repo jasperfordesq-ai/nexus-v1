@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import Building2 from 'lucide-react/icons/building-2';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Edit from 'lucide-react/icons/square-pen';

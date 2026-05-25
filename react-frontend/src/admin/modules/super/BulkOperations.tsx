@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import Users from 'lucide-react/icons/users';
 import Building2 from 'lucide-react/icons/building-2';
 import ArrowRight from 'lucide-react/icons/arrow-right';

@@ -1,7 +1,7 @@
 import { Button, Card, CardBody, CardHeader, Chip, Spinner, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import ClipboardCheck from 'lucide-react/icons/clipboard-check';

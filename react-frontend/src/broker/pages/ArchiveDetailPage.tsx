@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ScrollShadow } from '@/components/ui';
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Lock from 'lucide-react/icons/lock';
 import Flag from 'lucide-react/icons/flag';

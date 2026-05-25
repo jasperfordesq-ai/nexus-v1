@@ -12,7 +12,7 @@ import {
   Description,
   Label,
   Switch as HeroUISwitch,
-} from '@heroui-v3/react';
+} from '@heroui/react';
 
 type HeroUISwitchProps = ComponentPropsWithoutRef<typeof HeroUISwitch>;
 type SwitchColor = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';

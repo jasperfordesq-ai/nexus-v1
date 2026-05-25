@@ -10,7 +10,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { HeroUIProvider } from '@heroui/react';
 
 // ─── Mocks ──────────────────────────────────────────────────────────────────
 
@@ -35,7 +34,7 @@ import { YouTubeEmbed } from '../YouTubeEmbed';
 // ─── Wrapper ────────────────────────────────────────────────────────────────
 
 function W({ children }: { children: React.ReactNode }) {
-  return <HeroUIProvider>{children}</HeroUIProvider>;
+  return <>{children}</>;
 }
 
 // ─── Test data ──────────────────────────────────────────────────────────────

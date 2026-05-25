@@ -10,7 +10,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { HeroUIProvider } from '@heroui/react';
 
 // ─── Mocks ──────────────────────────────────────────────────────────────────
 
@@ -75,9 +74,9 @@ import { LanguageSwitcher } from '../LanguageSwitcher';
 
 function W({ children }: { children: React.ReactNode }) {
   return (
-    <HeroUIProvider>
+    <>
       <MemoryRouter>{children}</MemoryRouter>
-    </HeroUIProvider>
+    </>
   );
 }
 

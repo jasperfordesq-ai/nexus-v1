@@ -10,7 +10,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { HeroUIProvider } from '@heroui/react';
 
 // ─── Set env before module imports ───────────────────────────────────────────
 
@@ -59,9 +58,9 @@ import { LocationMap } from '../LocationMap';
 
 function W({ children }: { children: React.ReactNode }) {
   return (
-    <HeroUIProvider>
+    <>
       <MemoryRouter>{children}</MemoryRouter>
-    </HeroUIProvider>
+    </>
   );
 }
 

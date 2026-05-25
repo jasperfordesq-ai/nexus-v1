@@ -7,7 +7,7 @@
  * Tests for SettingsPage
  *
  * Note: SettingsPage imports 15+ HeroUI components and 15+ Lucide icons.
- * We mock @heroui/react and lucide-react to keep compilation fast.
+ * We mock @/components/ui and lucide-react to keep compilation fast.
  */
 
 import React from 'react';
@@ -16,13 +16,14 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
-// ── Mock @heroui/react before any imports ────────────────────────────────────
-vi.mock('@heroui/react', async () => {
+// ── Mock @/components/ui before any imports ────────────────────────────────────
+vi.mock('@/components/ui', async () => {
   const R = await import('react');
   const noop = () => R.createElement(R.Fragment, null);
   const useDisclosureMock = () => ({ isOpen: false, onOpen: vi.fn(), onClose: vi.fn(), onOpenChange: vi.fn() });
   return {
-    HeroUIProvider: ({ children }: { children: ReactNode }) => R.createElement(R.Fragment, null, children),
+    GlassCard: ({ children, className }: { children: ReactNode; className?: string }) =>
+      R.createElement('div', { 'data-testid': 'glass-card', className }, children),
     Button: ({ children, onPress, isDisabled, isLoading, type, ...rest }: Record<string, unknown>) =>
       R.createElement('button', {
         onClick: onPress as () => void,
@@ -170,30 +171,6 @@ vi.mock('@/lib/logger', () => ({
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: vi.fn((url: string) => url || '/default-avatar.png'),
   formatRelativeTime: vi.fn(() => '2 hours ago'),
-}));
-
-vi.mock('@/components/ui', () => ({
-  GlassCard: ({ children, className }: { children: ReactNode; className?: string }) => (
-    <div data-testid="glass-card" className={className}>{children}</div>
-  ),
-  GlassButton: ({ children }: Record<string, unknown>) => children as never,
-  GlassInput: () => null,
-  BackToTop: () => null,
-  AlgorithmLabel: () => null,
-  ImagePlaceholder: () => null,
-  DynamicIcon: () => null,
-  ICON_MAP: {},
-  ICON_NAMES: [],
-  ListingSkeleton: () => null,
-  MemberCardSkeleton: () => null,
-  StatCardSkeleton: () => null,
-  EventCardSkeleton: () => null,
-  GroupCardSkeleton: () => null,
-  ConversationSkeleton: () => null,
-  ExchangeCardSkeleton: () => null,
-  NotificationSkeleton: () => null,
-  ProfileHeaderSkeleton: () => null,
-  SkeletonList: () => null,
 }));
 
 vi.mock('@/components/location', () => ({

@@ -10,7 +10,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { HeroUIProvider } from '@heroui/react';
 import { MemoryRouter } from 'react-router-dom';
 import type { ReactElement } from 'react';
 
@@ -85,9 +84,9 @@ import { SocialInteractionPanel } from '../SocialInteractionPanel';
 
 function renderPanel(ui: ReactElement) {
   return render(
-    <HeroUIProvider>
+    <>
       <MemoryRouter>{ui}</MemoryRouter>
-    </HeroUIProvider>,
+    </>,
   );
 }
 

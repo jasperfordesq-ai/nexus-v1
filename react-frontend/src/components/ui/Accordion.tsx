@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { isValidElement, type ComponentProps, type ReactNode } from 'react';
-import { Accordion as HeroAccordion, type Accordion as HeroAccordionTypes } from '@heroui-v3/react';
+import { Accordion as HeroAccordion, type Accordion as HeroAccordionTypes } from '@heroui/react';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import { cn } from '@/lib/helpers';
 

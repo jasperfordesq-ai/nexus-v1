@@ -11,7 +11,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';import { Separator } from '@heroui-v3/react';
+import { motion } from 'framer-motion';import { Separator } from '@heroui/react';
 import Shield from 'lucide-react/icons/shield';
 import Database from 'lucide-react/icons/database';
 import PieChart from 'lucide-react/icons/chart-pie';

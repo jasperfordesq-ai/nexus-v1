@@ -13,7 +13,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { HeroUIProvider } from '@heroui/react';
 
 // ─── Set env before module imports ───────────────────────────────────────────
 // GoogleMapsProvider reads VITE_GOOGLE_MAPS_API_KEY at module level,
@@ -132,11 +131,11 @@ function mockGoogleMapsConfig(enabled = true) {
 
 function W({ children }: { children: React.ReactNode }) {
   return (
-    <HeroUIProvider>
+    <>
       <MemoryRouter initialEntries={['/test']}>
         {children}
       </MemoryRouter>
-    </HeroUIProvider>
+    </>
   );
 }
 

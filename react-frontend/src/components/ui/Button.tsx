@@ -9,7 +9,7 @@ import {
   Button as HeroUIButton,
   Spinner as HeroUISpinner,
   type ButtonProps as HeroUIButtonProps,
-} from '@heroui-v3/react';
+} from '@heroui/react';
 
 type V2ButtonColor =
   | 'default'

@@ -7,7 +7,7 @@ import { type HTMLAttributes, type ReactNode } from 'react';
 import {
   Spinner as HeroUISpinner,
   type SpinnerProps as HeroUISpinnerProps,
-} from '@heroui-v3/react';
+} from '@heroui/react';
 
 type V2SpinnerColor =
   | 'default'

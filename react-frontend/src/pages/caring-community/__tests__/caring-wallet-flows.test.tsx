@@ -3,7 +3,6 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { HeroUIProvider } from '@heroui/react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -61,9 +60,9 @@ vi.mock('@/components/caring-community/FederationCommunityPicker', () => ({
 
 function renderPage(ui: React.ReactElement) {
   return render(
-    <HeroUIProvider>
+    <>
       <MemoryRouter initialEntries={['/hour-timebank/caring-community']}>{ui}</MemoryRouter>
-    </HeroUIProvider>,
+    </>,
   );
 }
 

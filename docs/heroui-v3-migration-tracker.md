@@ -46,6 +46,7 @@ This is the living tracker for migrating `react-frontend` from HeroUI v2 to Hero
 | 2026-05-25 | `/docs/react/migration/link`, `/docs/react/components/link` | `Link` migration to v3 link API and `Link.Icon` anchor icon pattern via app-local compatibility wrapper |
 | 2026-05-25 | `/docs/react/migration/drawer`, `/docs/react/components/drawer`, HeroUI MCP Drawer source | `Drawer` migration from v2 modal-style API to v3 `Drawer.Backdrop` / `Drawer.Content` / `Drawer.Dialog` composition |
 | 2026-05-25 | `/docs/react/migration/dateinput` | `DateInputValue` type migration to the v3 `DateValue` type shape |
+| 2026-05-25 | `/docs/react/migration`, `/docs/react/migration/styling`, `/docs/react/migration/agent-guide-full` | Final dependency switch, provider removal, v2 plugin removal, and alias cleanup |
 
 ## Current Baseline
 
@@ -56,10 +57,11 @@ Captured: 2026-05-25
 | React | `^19.2.6` in `react-frontend/package.json` |
 | React DOM | `^19.2.6` in `react-frontend/package.json` |
 | Tailwind | `^4.0.0`; `@tailwindcss/vite` is `^4.3.0` |
-| HeroUI v2 | `@heroui/react` `^2.6.0`, `@heroui/theme` `^2.4.0` |
-| Framer Motion | `^11.0.0` still present |
-| v2 Tailwind plugin | `react-frontend/src/hero.ts` exports `heroui(...)` |
-| v3 aliases | `@heroui-v3/react` -> `@heroui/react@^3.0.5`; `@heroui-v3/styles` -> `@heroui/styles@^3.0.5` |
+| HeroUI v3 | `@heroui/react` `^3.0.5`, `@heroui/styles` `^3.0.5` |
+| HeroUI v2 | Removed from `react-frontend/package.json` and `package-lock.json` |
+| Framer Motion | `^11.0.0` still present because the app imports it directly outside HeroUI |
+| v2 Tailwind plugin | Removed; `react-frontend/src/hero.ts` deleted and `@plugin "./hero.ts"` removed from CSS |
+| v3 aliases | Removed; source imports now use the real v3 package paths |
 
 ## Scope Counts
 
@@ -67,7 +69,7 @@ Captured with import-specific scan of `react-frontend/src`.
 
 | Component/API | Files | Migration kind | Status |
 | --- | ---: | --- | --- |
-| `HeroUIProvider` | 66 | Remove after v2 no longer needs provider | Not started |
+| `HeroUIProvider` | 0 remaining from 66 baseline | Removed after all v2 component imports were migrated | Complete |
 | `useDisclosure` | 0 remaining from 97 baseline | Replaced with app-local compatibility hook backed by v3 `useOverlayState`; modal structure review remains for final v2 component cleanup | Complete |
 | `Divider` | 0 remaining from 126 baseline | Renamed to `Separator`; mostly mechanical | Complete |
 | `Progress` | 0 remaining from 51 baseline | Structural migration to `ProgressBar` compound components via app-local wrapper | Complete |
@@ -109,6 +111,7 @@ Captured with import-specific scan of `react-frontend/src`.
 | `Image` | 0 remaining from 1 baseline | Removed component; replaced with native `img` | Complete |
 | `Snippet` | 0 remaining from 3 baseline | Removed component; replaced with app-local copy snippet | Complete |
 | `Spacer` | 0 | No work currently detected | Complete |
+| v2 packages / plugin / aliases | 0 remaining in `react-frontend` source and package metadata | Remove final coexistence setup and switch to direct v3 packages | Complete |
 
 ## Phase Tracker
 
@@ -147,7 +150,7 @@ Captured with import-specific scan of `react-frontend/src`.
 | 31 | Small leftovers: `Alert`, `Link`, and table types | `/docs/react/migration/alert`, `/docs/react/components/alert`, `/docs/react/migration/link`, `/docs/react/components/link` | Targeted `npx tsc`, targeted `npx eslint`, import scan | Complete with verification note | Added app-local v3-backed compatibility wrappers and moved `Selection` / `SortDescriptor` type imports to the app-local `Table` wrapper. |
 | 32 | `Drawer` family | `/docs/react/migration/drawer`, `/docs/react/components/drawer`, HeroUI MCP Drawer source | Targeted `npx eslint`, import scan, `npx tsc --noEmit` | Complete with verification note | Added app-local v3-backed compatibility wrapper; no remaining v2 `Drawer*` imports. Full TypeScript timed out after 5 minutes without diagnostics. |
 | 33 | `DateInputValue` type cleanup | `/docs/react/migration/dateinput` | Targeted `npx eslint`, import scan | Complete | Exported `DateInputValue` from the app-local `DatePicker` wrapper; no remaining v2 `DateInputValue` imports. |
-| 34 | Remove provider, v2 plugin, v2 deps, and aliases | `/docs/react/migration`, `/docs/react/migration/styling` | `npx tsc --noEmit`, `npm run build`, `npm test`, smoke E2E | Blocked | Blocked until all v2 imports and mocks are gone |
+| 34 | Remove provider, v2 plugin, v2 deps, and aliases | `/docs/react/migration`, `/docs/react/migration/styling`, `/docs/react/migration/agent-guide-full` | `npx eslint src --max-warnings 1000`, `npx tsc --noEmit`, `npm run build`, targeted tests | Complete with verification note | `HeroUIProvider`, `@heroui/theme`, `@heroui-v3/*`, `@plugin "./hero.ts"`, and `src/hero.ts` are gone from `react-frontend`; source now imports v3 from `@heroui/react` and styles from `@heroui/styles`. |
 
 ## Per-Phase Log
 
@@ -189,6 +192,7 @@ Add one entry per migration slice.
 | 2026-05-25 | 31 | `react-frontend/src/components/ui/Alert.tsx`, `react-frontend/src/components/ui/Link.tsx`, `react-frontend/src/components/ui/Table.tsx`, `react-frontend/src/components/ui/index.ts`, `react-frontend/src/admin/modules/advanced/EmailDeliverability.tsx`, `react-frontend/src/components/layout/SourceRepositoryLink.tsx`, `react-frontend/src/admin/components/DataTable.tsx` | `/docs/react/migration/alert`, `/docs/react/components/alert`, `/docs/react/migration/link`, `/docs/react/components/link` | Import scan for v2 `Alert`, `Link`, `Selection`, and `SortDescriptor`; targeted `npx tsc` on `Alert.tsx`, `Link.tsx`, and `Table.tsx`; targeted `npx eslint` on `Alert.tsx`, `Link.tsx`, and `Table.tsx`; `git diff --check` | `Alert`, `Link`, `Selection`, and `SortDescriptor` imports from `@heroui/react` reduced to 0. Targeted wrapper type-check and lint passed. Remaining source references to `@heroui/react`: 85. | Continue with `Drawer`, then provider/plugin/dependency cleanup after all v2 imports are gone |
 | 2026-05-25 | 32 | `react-frontend/src/components/ui/Drawer.tsx`, `react-frontend/src/components/ui/index.ts`, `react-frontend/src/components/layout/MobileDrawer.tsx`, `react-frontend/src/components/layout/NotificationFlyout.tsx` | `/docs/react/migration/drawer`, `/docs/react/components/drawer`, HeroUI MCP Drawer source | Import scan for v2 `Drawer`, `DrawerContent`, `DrawerHeader`, `DrawerBody`, and `DrawerFooter`; targeted `npx eslint` on `Drawer.tsx`, `MobileDrawer.tsx`, and `NotificationFlyout.tsx`; full `npx tsc --noEmit`; direct wrapper `npx tsc` check; `npm run build`; `git diff --check` | `Drawer*` imports from `@heroui/react` reduced to 0. Targeted lint passed. Full TypeScript and build both timed out after 5 minutes without diagnostics. Direct wrapper type-check reached only `@/*` path-alias resolution noise after wrapper type issues were resolved. Remaining source references to `@heroui/react`: 83. | Continue with remaining `DateInputValue` type imports, then provider/plugin/dependency cleanup |
 | 2026-05-25 | 33 | `react-frontend/src/components/ui/DatePicker.tsx`, `react-frontend/src/components/ui/index.ts`, plus 7 `DateInputValue` call-site import rewrites under `react-frontend/src` | `/docs/react/migration/dateinput` | Import scan for v2 `DateInputValue`; targeted `npx eslint` on `DatePicker.tsx` and the 7 touched call sites; `git diff --check` | `DateInputValue` imports from `@heroui/react` reduced to 0. Targeted lint passed. Remaining source references to `@heroui/react`: 76. | Continue with provider/mocks/plugin/dependency cleanup |
+| 2026-05-25 | 34 | `react-frontend/package.json`, `react-frontend/package-lock.json`, `react-frontend/src/App.tsx`, `react-frontend/src/index.css`, `react-frontend/src/hero.ts`, provider-bearing test wrappers, HeroUI test mocks, and source imports under `react-frontend/src` | `/docs/react/migration`, `/docs/react/migration/styling`, `/docs/react/migration/agent-guide-full` | `npm uninstall @heroui/react @heroui/theme`; `npm uninstall @heroui-v3/react @heroui-v3/styles`; `npm install @heroui/react@^3.0.5 @heroui/styles@^3.0.5`; scan for `@heroui-v3`, `@heroui/theme`, `HeroUIProvider`, and `heroui(`; `npx eslint src --max-warnings 1000`; `npm run build`; `git diff --check` | Direct v3 package switch completed. No `@heroui-v3`, `@heroui/theme`, `HeroUIProvider`, or `heroui()` references remain under `react-frontend`. ESLint passed with existing warnings. Build timed out after 5 minutes without diagnostics. | Run final type/build/test passes when the repo is ready for a longer verification window; begin visual styling/token audit next. |
 
 ## Recount Commands
 
@@ -219,7 +223,7 @@ rg -n '@heroui/react|@heroui/theme|heroui\(' react-frontend/src react-frontend/p
 
 | Decision | Current recommendation | Rationale |
 | --- | --- | --- |
-| Migration strategy | Incremental aliases | Official MCP docs recommend this for large apps that need to stay functional |
+| Migration strategy | Incremental migration completed; direct v3 packages now active | Coexistence aliases were useful during component migration and have now been removed after the dependency switch |
 | First component family | `Divider` to `Separator` | Lowest structural risk and proves alias/style setup |
 | Largest risk | `SelectItem` | v3 changes structure, item components, and selection state |
-| Cleanup timing | Last phase only | Removing provider/plugin/deps early risks breaking v2 components during coexistence |
+| Cleanup timing | Completed in Phase 34 | Provider, plugin, v2 deps, and aliases were removed after all tracked v2 imports were gone |

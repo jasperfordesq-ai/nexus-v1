@@ -8,11 +8,12 @@ import {
   forwardRef,
   isValidElement,
   type ComponentPropsWithoutRef,
+  type ElementType,
   type HTMLAttributes,
   type ImgHTMLAttributes,
   type ReactNode,
 } from 'react';
-import { Avatar as HeroUIAvatar } from '@heroui-v3/react';
+import { Avatar as HeroUIAvatar } from '@heroui/react';
 
 type HeroUIAvatarProps = ComponentPropsWithoutRef<typeof HeroUIAvatar>;
 type AvatarSize = 'sm' | 'md' | 'lg' | string;
@@ -20,6 +21,8 @@ type AvatarColor = 'default' | 'primary' | 'secondary' | 'success' | 'warning' |
 type AvatarRadius = 'none' | 'sm' | 'md' | 'lg' | 'full';
 
 export type AvatarProps = Omit<HTMLAttributes<HTMLDivElement>, 'color' | 'children'> & {
+  alt?: string;
+  as?: ElementType;
   children?: ReactNode;
   classNames?: {
     base?: string;
@@ -117,6 +120,8 @@ function radiusClass(radius?: AvatarRadius) {
 }
 
 export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(function Avatar({
+  alt,
+  as: _as,
   children,
   className,
   classNames,
@@ -154,7 +159,7 @@ export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(function Avatar({
     >
       {src ? (
         <HeroUIAvatar.Image
-          alt={imgProps?.alt ?? name ?? ''}
+          alt={imgProps?.alt ?? alt ?? name ?? ''}
           className={combineClasses(classNames?.img, radiusClass(radius), imgProps?.className)}
           src={src}
           {...imgProps}

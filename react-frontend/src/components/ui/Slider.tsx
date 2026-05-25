@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import type { ComponentProps, ReactNode } from 'react';
-import { Label, Slider as HeroUISlider } from '@heroui-v3/react';
+import { Label, Slider as HeroUISlider } from '@heroui/react';
 
 type HeroUISliderProps = ComponentProps<typeof HeroUISlider>;
 type SliderValue = number | number[];
@@ -112,7 +112,7 @@ export function Slider({
               {renderValue
                 ? ({ state }) => renderValue({ children: state.values.map((_, index) => state.getThumbValueLabel(index)).join(' - ') })
                 : getValue
-                  ? ({ state }) => getValue(state.values.length > 1 ? state.values : state.values[0])
+                  ? ({ state }) => getValue(state.values.length > 1 ? state.values : (state.values[0] ?? 0))
                   : undefined}
             </HeroUISlider.Output>
           ) : null}

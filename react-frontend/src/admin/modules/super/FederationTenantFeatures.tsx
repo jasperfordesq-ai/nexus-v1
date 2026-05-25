@@ -1,7 +1,7 @@
 import { Card, CardBody, CardHeader, Button, Chip, Spinner, Switch } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import { useParams } from 'react-router-dom';
 import Shield from 'lucide-react/icons/shield';
 import Network from 'lucide-react/icons/network';

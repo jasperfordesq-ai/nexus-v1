@@ -11,7 +11,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { ReactNode } from 'react';
-import { HeroUIProvider } from '@heroui/react';
 
 vi.mock('framer-motion');
 vi.mock('react-i18next', () => ({
@@ -142,23 +141,23 @@ const mockTenantConfig = {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function wrapper({ children }: { children: ReactNode }) {
-  return <HeroUIProvider>{children}</HeroUIProvider>;
+  return <>{children}</>;
 }
 
 function tenantWrapper({ children }: { children: ReactNode }) {
   return (
-    <HeroUIProvider>
+    <>
       <TenantProvider>{children}</TenantProvider>
-    </HeroUIProvider>
+    </>
   );
 }
 
 function tenantWrapperWithSlug(slug: string) {
   return function SlugWrapper({ children }: { children: ReactNode }) {
     return (
-      <HeroUIProvider>
+      <>
         <TenantProvider tenantSlug={slug}>{children}</TenantProvider>
-      </HeroUIProvider>
+      </>
     );
   };
 }

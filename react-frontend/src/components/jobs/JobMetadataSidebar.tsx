@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import MapPin from 'lucide-react/icons/map-pin';
 import Clock from 'lucide-react/icons/clock';
 import DollarSign from 'lucide-react/icons/dollar-sign';

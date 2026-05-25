@@ -10,7 +10,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { HeroUIProvider } from '@heroui/react';
 
 // ─── Mocks ──────────────────────────────────────────────────────────────────
 
@@ -59,9 +58,9 @@ import type { SearchFilters } from '../AdvancedSearchFilters';
 
 function W({ children }: { children: React.ReactNode }) {
   return (
-    <HeroUIProvider>
+    <>
       <MemoryRouter>{children}</MemoryRouter>
-    </HeroUIProvider>
+    </>
   );
 }
 

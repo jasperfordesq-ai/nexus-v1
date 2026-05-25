@@ -12,7 +12,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';import { Separator } from '@heroui-v3/react';
+import { motion } from 'framer-motion';import { Separator } from '@heroui/react';
 import FileText from 'lucide-react/icons/file-text';
 import Clock from 'lucide-react/icons/clock';
 import Users from 'lucide-react/icons/users';

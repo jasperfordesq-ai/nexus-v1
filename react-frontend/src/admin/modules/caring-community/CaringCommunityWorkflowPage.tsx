@@ -1,7 +1,7 @@
 import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Select, SelectItem, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState, type ChangeEvent, type JSX } from 'react';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Building2 from 'lucide-react/icons/building-2';

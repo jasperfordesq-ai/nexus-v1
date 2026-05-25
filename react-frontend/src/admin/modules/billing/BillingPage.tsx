@@ -2,7 +2,7 @@ import { Card, CardBody, CardHeader, Button, Chip, Spinner, Textarea, Progress, 
 import { useEffect, useState, useCallback } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import CreditCard from 'lucide-react/icons/credit-card';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import Receipt from 'lucide-react/icons/receipt';

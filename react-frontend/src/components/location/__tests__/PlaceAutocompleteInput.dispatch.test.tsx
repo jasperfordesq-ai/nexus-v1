@@ -11,7 +11,6 @@
 
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { HeroUIProvider } from '@heroui/react';
 import { MemoryRouter } from 'react-router-dom';
 
 vi.mock('react-i18next', () => ({
@@ -48,9 +47,9 @@ import { resetGoogleMapsConfigForTests } from '../GoogleMapsProvider';
 
 function W({ children }: { children: React.ReactNode }) {
   return (
-    <HeroUIProvider>
+    <>
       <MemoryRouter>{children}</MemoryRouter>
-    </HeroUIProvider>
+    </>
   );
 }
 

@@ -10,7 +10,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { HeroUIProvider } from '@heroui/react';
 
 // ─── Stable mock references ─────────────────────────────────────────────────
 
@@ -57,11 +56,11 @@ import { AdminBreadcrumbs } from '../AdminBreadcrumbs';
 
 function W({ children, path = '/test/admin/users' }: { children: React.ReactNode; path?: string }) {
   return (
-    <HeroUIProvider>
+    <>
       <MemoryRouter initialEntries={[path]}>
         {children}
       </MemoryRouter>
-    </HeroUIProvider>
+    </>
   );
 }
 

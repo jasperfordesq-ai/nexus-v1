@@ -15,7 +15,7 @@
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
 
-import { Separator } from '@heroui-v3/react';
+import { Separator } from '@heroui/react';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import Calendar from 'lucide-react/icons/calendar';

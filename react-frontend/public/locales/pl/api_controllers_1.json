@@ -1,231 +1,231 @@
 {
-    "admin_analytics_reports": {
-        "members_marked_notified": ":count członek/ów oznaczono jako powiadomionych"
-    },
-    "admin_cron": {
-        "log_not_found": "Dziennik nie został znaleziony",
-        "deleted_log_entries": "Usunięto :count wpisów dziennika"
-    },
-    "admin_enterprise": {
-        "breach_reported": "Naruszenie zostało pomyślnie zgłoszone",
-        "gdpr_request_created": "Wniosek RODO został pomyślnie utworzony",
-        "gdpr_request_create_failed": "Nie udało się utworzyć wniosku RODO",
-        "data_export_generated": "Eksport danych został pomyślnie wygenerowany",
-        "data_export_failed": "Nie udało się wygenerować eksportu danych",
-        "dpa_notification_recorded": "Powiadomienie organu ochrony danych zostało pomyślnie zarejestrowane",
-        "dpa_notification_failed": "Nie udało się zarejestrować powiadomienia organu ochrony danych",
-        "log_file_cleared": "Plik dziennika został pomyślnie wyczyszczony",
-        "log_file_only_allowed": "Dozwolone są tylko pliki .log",
-        "log_file_not_found": "Plik dziennika nie został znaleziony",
-        "log_file_clear_failed": "Nie udało się wyczyścić pliku dziennika",
-        "secret_rotation_requires_ssh": "Rotacja tajemnic wymaga dostępu do serwera. Użyj SSH, aby rotować tajemnice w pliku .env.",
-        "secret_deletion_requires_ssh": "Usunięcie tajemnic wymaga dostępu do serwera. Użyj SSH, aby usunąć tajemnice z pliku .env.",
-        "config_reset_failed": "Nie udało się zresetować konfiguracji",
-        "gdpr_request_not_found": "Wniosek RODO nie został znaleziony",
-        "gdpr_request_fetch_failed": "Nie udało się pobrać wniosku RODO",
-        "user_id_required": "Identyfikator użytkownika jest wymagany",
-        "assigned_to_required": "assigned_to (identyfikator użytkownika) jest wymagany",
-        "gdpr_request_assign_failed": "Nie udało się przypisać wniosku RODO",
-        "note_text_required": "Treść notatki jest wymagana",
-        "gdpr_request_note_failed": "Nie udało się dodać notatki do wniosku RODO",
-        "slug_and_name_required": "Slug i nazwa są wymagane",
-        "consent_type_create_failed": "Nie udało się utworzyć typu zgody",
-        "no_fields_to_update": "Brak pól do aktualizacji",
-        "consent_type_not_found": "Typ zgody nie został znaleziony",
-        "consent_type_update_failed": "Nie udało się zaktualizować typu zgody",
-        "consent_type_delete_failed": "Nie udało się usunąć typu zgody",
-        "breach_record_not_found": "Rekord naruszenia nie został znaleziony",
-        "breach_record_fetch_failed": "Nie udało się pobrać rekordu naruszenia",
-        "breach_record_update_failed": "Nie udało się zaktualizować rekordu naruszenia",
-        "invalid_request_type": "Nieprawidłowy typ wniosku. Musi być jednym z: :types",
-        "invalid_log_filename": "Nieprawidłowa nazwa pliku",
-        "log_file_read_failed": "Nie udało się odczytać pliku dziennika",
-        "feature_key_required": "Klucz jest wymagany",
-        "feature_type_invalid": "Typ musi być \"feature\" lub \"module\"",
-        "feature_flag_update_failed": "Nie udało się zaktualizować flagi funkcji"
-    },
-    "admin_federation": {
-        "partnership_request_failed": "Nie udało się wysłać wniosku o partnerstwo",
-        "partnership_detail_failed": "Nie udało się załadować szczegółów partnerstwa",
-        "counter_propose_failed": "Nie udało się złożyć kontroferty",
-        "counter_proposal_send_failed": "Nie udało się wysłać kontroferty",
-        "permissions_update_failed": "Nie udało się zaktualizować uprawnień",
-        "partnership_permissions_update_failed": "Nie udało się zaktualizować uprawnień partnerstwa",
-        "api_key_name_required": "Nazwa jest wymagana",
-        "api_keys_table_not_configured": "Tabela kluczy API federacji nie jest skonfigurowana",
-        "api_key_create_failed": "Nie udało się utworzyć klucza API",
-        "api_key_not_found": "Klucz API nie został znaleziony",
-        "api_key_already_revoked": "Klucz API został już unieważniony",
-        "api_key_revoke_failed": "Nie udało się unieważnić klucza API",
-        "max_topics_exceeded": "Dozwolone jest maksymalnie 10 tematów.",
-        "invalid_export_type": "Nieprawidłowy typ eksportu. Dozwolone: :types",
-        "federation_user_settings_not_found": "Tabela ustawień użytkownika federacji nie została znaleziona",
-        "federation_partnerships_not_found": "Tabela partnerstw federacji nie została znaleziona",
-        "federation_transactions_not_found": "Tabela transakcji federacji nie została znaleziona",
-        "federation_audit_log_not_found": "Tabela dziennika audytu federacji nie została znaleziona",
-        "export_failed": "Nie udało się wyeksportować danych",
-        "api_key_shown_once_warning": "Ten klucz jest wyświetlany JEDNORAZOWO. Przechowaj go bezpiecznie — nie można go pobrać ponownie."
-    },
-    "admin_feed": {
-        "item_hidden": "Element ukryty",
-        "item_deleted": "Element usunięty"
-    },
-    "admin_gamification": {
-        "badge_recheck_completed": "Ponowne sprawdzenie odznak zakończone dla :count użytkowników"
-    },
-    "admin_groups": {
-        "group_archived": "Grupa zarchiwizowana",
-        "group_unarchived": "Grupa przywrócona z archiwum",
-        "ownership_transferred": "Własność przeniesiona",
-        "groups_merged": "Grupy pomyślnie scalone",
-        "group_cloned": "Grupa sklonowana",
-        "tag_deleted": "Tag usunięty",
-        "collection_updated": "Zaktualizowano",
-        "collection_deleted": "Usunięto",
-        "collection_groups_set": "Grupy ustawione",
-        "rule_deleted": "Reguła usunięta"
-    },
-    "admin_impact_report": {
-        "config_updated": "Konfiguracja zaktualizowana"
-    },
-    "admin_marketplace": {
-        "feature_not_enabled": "Funkcja Marketplace nie jest włączona dla tego najemcy.",
-        "listing_approved": "Ogłoszenie zatwierdzone.",
-        "listing_rejected": "Ogłoszenie odrzucone.",
-        "listing_removed": "Ogłoszenie usunięte.",
-        "only_business_sellers_verified": "Weryfikacja dotyczy wyłącznie sprzedawców biznesowych.",
-        "seller_verified": "Sprzedawca zweryfikowany.",
-        "seller_suspended": "Sprzedawca zawieszony, wszystkie ogłoszenia dezaktywowane.",
-        "report_acknowledged": "Zgłoszenie potwierdzone.",
-        "report_resolved": "Zgłoszenie rozwiązane."
-    },
-    "admin_newsletter": {
-        "newsletter_queued": "Newsletter umieszczony w kolejce dla :count odbiorców",
-        "test_email_sent": "Testowy e-mail wysłany do :email"
-    },
-    "admin_onboarding": {
-        "settings_updated": "Ustawienia wdrożenia zaktualizowane",
-        "preset_applied": "Zastosowano ustawienie wstępne :preset"
-    },
-    "admin_reports": {
-        "report_resolved": "Zgłoszenie rozwiązane",
-        "report_dismissed": "Zgłoszenie odrzucone"
-    },
-    "admin_reviews": {
-        "review_flagged": "Recenzja oznaczona do sprawdzenia",
-        "review_hidden": "Recenzja ukryta",
-        "review_deleted": "Recenzja usunięta"
-    },
-    "admin_safeguarding": {
-        "guardian_assigned_notification": "Zostałeś/aś wyznaczony/a jako opiekun ochrony dla :name",
-        "ward_assigned_notification": ":guardian został/a wyznaczony/a jako Twój kontakt wsparcia ochrony. Możesz udzielić lub cofnąć zgodę w ustawieniach.",
-        "a_member": "członek",
-        "a_coordinator": "Koordynator społeczności"
-    },
-    "admin_safeguarding_options": {
-        "option_updated": "Opcja zaktualizowana",
-        "option_deactivated": "Opcja dezaktywowana",
-        "options_reordered": "Opcje ponownie uporządkowane"
-    },
-    "admin_super": {
-        "tenant_created": "Najemca ':name' pomyślnie utworzony",
-        "lockdown_activated": "Awaryjne blokowanie aktywowane",
-        "lockdown_lifted": "Awaryjne blokowanie zniesione"
-    },
-    "admin_tools": {
-        "connection_failed": "Połączenie nie powiodło się",
-        "conversion_queued": "Konwersja umieszczona w kolejce",
-        "seed_generation_queued": "Generowanie danych testowych umieszczone w kolejce",
-        "blog_backup_restore_queued": "Przywracanie kopii zapasowej bloga umieszczone w kolejce"
-    },
-    "admin_volunteer": {
-        "application_approved": "Wniosek zatwierdzony",
-        "application_declined": "Wniosek odrzucony",
-        "org_status_updated": "Status organizacji zaktualizowany do :status",
-        "amount_cannot_be_zero": "Kwota nie może wynosić zero",
-        "reason_required": "Powód jest wymagany",
-        "status_must_be_active_or_suspended": "Status musi być aktywny lub zawieszony",
-        "organization_not_found": "Organizacja nie została znaleziona",
-        "org_status_update_failed": "Nie udało się zaktualizować statusu organizacji"
-    },
-    "admin_wallet_grant": {
-        "credits_granted": "Kredyty zostały pomyślnie przyznane"
-    },
-    "ai_chat": {
-        "not_available": "Czat AI jest obecnie niedostępny. Spróbuj ponownie później.",
-        "connection_test_failed": "Test połączenia nie powiódł się"
-    },
-    "app": {
-        "log_recorded": "Dziennik zapisany"
-    },
-    "auth": {
-        "two_factor_required": "Wymagane uwierzytelnianie dwuskładnikowe",
-        "logged_out": "Wylogowano pomyślnie",
-        "session_refreshed": "Sesja odświeżona",
-        "session_restored": "Sesja przywrócona z tokenu",
-        "session_deprecated": "Ten punkt końcowy jest przestarzały. Aplikacje mobilne powinny używać tokenów Bearer bezpośrednio bez synchronizacji sesji.",
-        "tokens_revoked": "Wszystkie tokeny odświeżania zostały unieważnione. Musisz zalogować się ponownie na wszystkich urządzeniach."
-    },
-    "block_user": {
-        "user_blocked": "Użytkownik zablokowany",
-        "user_unblocked": "Użytkownik odblokowany",
-        "user_not_blocked": "Użytkownik nie był zablokowany"
-    },
-    "cookie_consent": {
-        "preferences_updated": "Preferencje zgody pomyślnie zaktualizowane",
-        "consent_withdrawn": "Zgoda pomyślnie wycofana"
-    },
-    "email_verification": {
-        "already_verified": "Adres e-mail jest już zweryfikowany",
-        "verified_successfully": "Adres e-mail pomyślnie zweryfikowany",
-        "verification_sent": "Wysłano wiadomość weryfikacyjną",
-        "generic_resend": "Jeśli istnieje konto z tym adresem e-mail i nie jest zweryfikowane, wysłano nową wiadomość weryfikacyjną."
-    },
-    "endorsement": {
-        "endorsement_added": "Rekomendacja dodana",
-        "endorsement_removed": "Rekomendacja usunięta"
-    },
-    "federation": {
-        "already_opted_in": "Już zapisano do federacji.",
-        "enabled_successfully": "Federacja pomyślnie włączona.",
-        "disabled_successfully": "Federacja pomyślnie wyłączona.",
-        "signature_verified": "Podpis pomyślnie zweryfikowany",
-        "settings_updated": "Ustawienia pomyślnie zaktualizowane."
-    },
-    "federation_v2": {
-        "receiver_id_required": "receiver_id jest wymagany.",
-        "receiver_tenant_id_required": "receiver_tenant_id jest wymagany.",
-        "message_body_required": "Treść wiadomości jest wymagana.",
-        "subject_max_length": "Temat nie może przekraczać 255 znaków.",
-        "body_max_length": "Treść wiadomości nie może przekraczać 10 000 znaków."
-    },
-    "feed_social": {
-        "post_unshared": "Post nie jest już udostępniony"
-    },
-    "gamification": {
-        "invalid_leaderboard_type": "Nieprawidłowy typ tabeli wyników",
-        "showcase_updated": "Witryna zaktualizowana",
-        "score_recalculation_initiated": "Przeliczanie wyników zainicjowane"
-    },
-    "gdpr": {
-        "request_submitted": "Twój wniosek został złożony i zostanie rozpatrzony w ciągu 30 dni.",
-        "account_deletion_submitted": "Wniosek o usunięcie konta został złożony. Potwierdzenie zostanie wysłane e-mailem."
-    },
-    "group_challenge": {
-        "challenge_deleted": "Wyzwanie usunięte"
-    },
-    "group_exchange": {
-        "exchange_cancelled": "Wymiana anulowana",
-        "exchange_completed": "Wymiana zakończona pomyślnie"
-    },
-    "group_files": {
-        "file_deleted": "Plik usunięty"
-    },
-    "group_invite": {
-        "invite_revoked": "Zaproszenie unieważnione"
-    },
-    "contact_form": {
-        "sent_successfully": "Wiadomość wysłana pomyślnie.",
-        "received_fallback": "Wiadomość odebrana. Wkrótce się z Tobą skontaktujemy."
-    }
+  "admin_analytics_reports": {
+    "members_marked_notified": ":count członek/ów oznaczono jako powiadomionych"
+  },
+  "admin_cron": {
+    "log_not_found": "Dziennik nie został znaleziony",
+    "deleted_log_entries": "Usunięto :count wpisów dziennika"
+  },
+  "admin_enterprise": {
+    "breach_reported": "Naruszenie zostało pomyślnie zgłoszone",
+    "gdpr_request_created": "Wniosek RODO został pomyślnie utworzony",
+    "gdpr_request_create_failed": "Nie udało się utworzyć wniosku RODO",
+    "data_export_generated": "Eksport danych został pomyślnie wygenerowany",
+    "data_export_failed": "Nie udało się wygenerować eksportu danych",
+    "dpa_notification_recorded": "Powiadomienie organu ochrony danych zostało pomyślnie zarejestrowane",
+    "dpa_notification_failed": "Nie udało się zarejestrować powiadomienia organu ochrony danych",
+    "log_file_cleared": "Plik dziennika został pomyślnie wyczyszczony",
+    "log_file_only_allowed": "Dozwolone są tylko pliki .log",
+    "log_file_not_found": "Plik dziennika nie został znaleziony",
+    "log_file_clear_failed": "Nie udało się wyczyścić pliku dziennika",
+    "secret_rotation_requires_ssh": "Rotacja tajemnic wymaga dostępu do serwera. Użyj SSH, aby rotować tajemnice w pliku .env.",
+    "secret_deletion_requires_ssh": "Usunięcie tajemnic wymaga dostępu do serwera. Użyj SSH, aby usunąć tajemnice z pliku .env.",
+    "config_reset_failed": "Nie udało się zresetować konfiguracji",
+    "gdpr_request_not_found": "Wniosek RODO nie został znaleziony",
+    "gdpr_request_fetch_failed": "Nie udało się pobrać wniosku RODO",
+    "user_id_required": "Identyfikator użytkownika jest wymagany",
+    "assigned_to_required": "assigned_to (identyfikator użytkownika) jest wymagany",
+    "gdpr_request_assign_failed": "Nie udało się przypisać wniosku RODO",
+    "note_text_required": "Treść notatki jest wymagana",
+    "gdpr_request_note_failed": "Nie udało się dodać notatki do wniosku RODO",
+    "slug_and_name_required": "Slug i nazwa są wymagane",
+    "consent_type_create_failed": "Nie udało się utworzyć typu zgody",
+    "no_fields_to_update": "Brak pól do aktualizacji",
+    "consent_type_not_found": "Typ zgody nie został znaleziony",
+    "consent_type_update_failed": "Nie udało się zaktualizować typu zgody",
+    "consent_type_delete_failed": "Nie udało się usunąć typu zgody",
+    "breach_record_not_found": "Rekord naruszenia nie został znaleziony",
+    "breach_record_fetch_failed": "Nie udało się pobrać rekordu naruszenia",
+    "breach_record_update_failed": "Nie udało się zaktualizować rekordu naruszenia",
+    "invalid_request_type": "Nieprawidłowy typ wniosku. Musi być jednym z: :types",
+    "invalid_log_filename": "Nieprawidłowa nazwa pliku",
+    "log_file_read_failed": "Nie udało się odczytać pliku dziennika",
+    "feature_key_required": "Klucz jest wymagany",
+    "feature_type_invalid": "Typ musi być \"feature\" lub \"module\"",
+    "feature_flag_update_failed": "Nie udało się zaktualizować flagi funkcji"
+  },
+  "admin_federation": {
+    "partnership_request_failed": "Nie udało się wysłać wniosku o partnerstwo",
+    "partnership_detail_failed": "Nie udało się załadować szczegółów partnerstwa",
+    "counter_propose_failed": "Nie udało się złożyć kontroferty",
+    "counter_proposal_send_failed": "Nie udało się wysłać kontroferty",
+    "permissions_update_failed": "Nie udało się zaktualizować uprawnień",
+    "partnership_permissions_update_failed": "Nie udało się zaktualizować uprawnień partnerstwa",
+    "api_key_name_required": "Nazwa jest wymagana",
+    "api_keys_table_not_configured": "Tabela kluczy API federacji nie jest skonfigurowana",
+    "api_key_create_failed": "Nie udało się utworzyć klucza API",
+    "api_key_not_found": "Klucz API nie został znaleziony",
+    "api_key_already_revoked": "Klucz API został już unieważniony",
+    "api_key_revoke_failed": "Nie udało się unieważnić klucza API",
+    "max_topics_exceeded": "Dozwolone jest maksymalnie 10 tematów.",
+    "invalid_export_type": "Nieprawidłowy typ eksportu. Dozwolone: :types",
+    "federation_user_settings_not_found": "Tabela ustawień użytkownika federacji nie została znaleziona",
+    "federation_partnerships_not_found": "Tabela partnerstw federacji nie została znaleziona",
+    "federation_transactions_not_found": "Tabela transakcji federacji nie została znaleziona",
+    "federation_audit_log_not_found": "Tabela dziennika audytu federacji nie została znaleziona",
+    "export_failed": "Nie udało się wyeksportować danych",
+    "api_key_shown_once_warning": "Ten klucz jest wyświetlany JEDNORAZOWO. Przechowaj go bezpiecznie — nie można go pobrać ponownie."
+  },
+  "admin_feed": {
+    "item_hidden": "Element ukryty",
+    "item_deleted": "Element usunięty"
+  },
+  "admin_gamification": {
+    "badge_recheck_completed": "Ponowne sprawdzenie odznak zakończone dla :count użytkowników"
+  },
+  "admin_groups": {
+    "group_archived": "Grupa zarchiwizowana",
+    "group_unarchived": "Grupa przywrócona z archiwum",
+    "ownership_transferred": "Własność przeniesiona",
+    "groups_merged": "Grupy pomyślnie scalone",
+    "group_cloned": "Grupa sklonowana",
+    "tag_deleted": "Tag usunięty",
+    "collection_updated": "Zaktualizowano",
+    "collection_deleted": "Usunięto",
+    "collection_groups_set": "Grupy ustawione",
+    "rule_deleted": "Reguła usunięta"
+  },
+  "admin_impact_report": {
+    "config_updated": "Konfiguracja zaktualizowana"
+  },
+  "admin_marketplace": {
+    "feature_not_enabled": "Funkcja Marketplace nie jest włączona dla tego najemcy.",
+    "listing_approved": "Ogłoszenie zatwierdzone.",
+    "listing_rejected": "Ogłoszenie odrzucone.",
+    "listing_removed": "Ogłoszenie usunięte.",
+    "only_business_sellers_verified": "Weryfikacja dotyczy wyłącznie sprzedawców biznesowych.",
+    "seller_verified": "Sprzedawca zweryfikowany.",
+    "seller_suspended": "Sprzedawca zawieszony, wszystkie ogłoszenia dezaktywowane.",
+    "report_acknowledged": "Zgłoszenie potwierdzone.",
+    "report_resolved": "Zgłoszenie rozwiązane."
+  },
+  "admin_newsletter": {
+    "newsletter_queued": "Newsletter umieszczony w kolejce dla :count odbiorców",
+    "test_email_sent": "Testowy e-mail wysłany do :email"
+  },
+  "admin_onboarding": {
+    "settings_updated": "Ustawienia wdrożenia zaktualizowane",
+    "preset_applied": "Zastosowano ustawienie wstępne :preset"
+  },
+  "admin_reports": {
+    "report_resolved": "Zgłoszenie rozwiązane",
+    "report_dismissed": "Zgłoszenie odrzucone"
+  },
+  "admin_reviews": {
+    "review_flagged": "Recenzja oznaczona do sprawdzenia",
+    "review_hidden": "Recenzja ukryta",
+    "review_deleted": "Recenzja usunięta"
+  },
+  "admin_safeguarding": {
+    "guardian_assigned_notification": "Zostałeś/aś wyznaczony/a jako opiekun ochrony dla :name",
+    "ward_assigned_notification": ":guardian został/a wyznaczony/a jako Twój kontakt wsparcia ochrony. Możesz udzielić lub cofnąć zgodę w ustawieniach.",
+    "a_member": "członek",
+    "a_coordinator": "Koordynator społeczności"
+  },
+  "admin_safeguarding_options": {
+    "option_updated": "Opcja zaktualizowana",
+    "option_deactivated": "Opcja dezaktywowana",
+    "options_reordered": "Opcje ponownie uporządkowane"
+  },
+  "admin_super": {
+    "tenant_created": "Najemca ':name' pomyślnie utworzony",
+    "lockdown_activated": "Awaryjne blokowanie aktywowane",
+    "lockdown_lifted": "Awaryjne blokowanie zniesione"
+  },
+  "admin_tools": {
+    "connection_failed": "Połączenie nie powiodło się",
+    "conversion_queued": "Konwersja umieszczona w kolejce",
+    "seed_generation_queued": "Generowanie danych testowych umieszczone w kolejce",
+    "blog_backup_restore_queued": "Przywracanie kopii zapasowej bloga umieszczone w kolejce"
+  },
+  "admin_volunteer": {
+    "application_approved": "Wniosek zatwierdzony",
+    "application_declined": "Wniosek odrzucony",
+    "org_status_updated": "Status organizacji zaktualizowany do :status",
+    "amount_cannot_be_zero": "Kwota nie może wynosić zero",
+    "reason_required": "Powód jest wymagany",
+    "status_must_be_active_or_suspended": "Status musi być aktywny lub zawieszony",
+    "organization_not_found": "Organizacja nie została znaleziona",
+    "org_status_update_failed": "Nie udało się zaktualizować statusu organizacji"
+  },
+  "admin_wallet_grant": {
+    "credits_granted": "Kredyty zostały pomyślnie przyznane"
+  },
+  "ai_chat": {
+    "not_available": "Czat AI jest obecnie niedostępny. Spróbuj ponownie później.",
+    "connection_test_failed": "Test połączenia nie powiódł się"
+  },
+  "app": {
+    "log_recorded": "Dziennik zapisany"
+  },
+  "auth": {
+    "two_factor_required": "Wymagane uwierzytelnianie dwuskładnikowe",
+    "logged_out": "Wylogowano pomyślnie",
+    "session_refreshed": "Sesja odświeżona",
+    "session_restored": "Sesja przywrócona z tokenu",
+    "session_deprecated": "Ten punkt końcowy jest przestarzały. Aplikacje mobilne powinny używać tokenów Bearer bezpośrednio bez synchronizacji sesji.",
+    "tokens_revoked": "Wszystkie tokeny odświeżania zostały unieważnione. Musisz zalogować się ponownie na wszystkich urządzeniach."
+  },
+  "block_user": {
+    "user_blocked": "Użytkownik zablokowany",
+    "user_unblocked": "Użytkownik odblokowany",
+    "user_not_blocked": "Użytkownik nie był zablokowany"
+  },
+  "cookie_consent": {
+    "preferences_updated": "Preferencje zgody pomyślnie zaktualizowane",
+    "consent_withdrawn": "Zgoda pomyślnie wycofana"
+  },
+  "email_verification": {
+    "already_verified": "Adres e-mail jest już zweryfikowany",
+    "verified_successfully": "Adres e-mail pomyślnie zweryfikowany",
+    "verification_sent": "Wysłano wiadomość weryfikacyjną",
+    "generic_resend": "Jeśli istnieje konto z tym adresem e-mail i nie jest zweryfikowane, wysłano nową wiadomość weryfikacyjną."
+  },
+  "endorsement": {
+    "endorsement_added": "Rekomendacja dodana",
+    "endorsement_removed": "Rekomendacja usunięta"
+  },
+  "federation": {
+    "already_opted_in": "Już zapisano do federacji.",
+    "enabled_successfully": "Federacja pomyślnie włączona.",
+    "disabled_successfully": "Federacja pomyślnie wyłączona.",
+    "signature_verified": "Podpis pomyślnie zweryfikowany",
+    "settings_updated": "Ustawienia pomyślnie zaktualizowane."
+  },
+  "federation_v2": {
+    "receiver_id_required": "receiver_id jest wymagany.",
+    "receiver_tenant_id_required": "receiver_tenant_id jest wymagany.",
+    "message_body_required": "Treść wiadomości jest wymagana.",
+    "subject_max_length": "Temat nie może przekraczać 255 znaków.",
+    "body_max_length": "Treść wiadomości nie może przekraczać 10 000 znaków."
+  },
+  "feed_social": {
+    "post_unshared": "Post nie jest już udostępniony"
+  },
+  "gamification": {
+    "invalid_leaderboard_type": "Nieprawidłowy typ tabeli wyników",
+    "showcase_updated": "Witryna zaktualizowana",
+    "score_recalculation_initiated": "Przeliczanie wyników zainicjowane"
+  },
+  "gdpr": {
+    "request_submitted": "Twój wniosek został złożony i zostanie rozpatrzony w ciągu 30 dni.",
+    "account_deletion_submitted": "Wniosek o usunięcie konta został złożony. Potwierdzenie zostanie wysłane e-mailem."
+  },
+  "group_challenge": {
+    "challenge_deleted": "Wyzwanie usunięte"
+  },
+  "group_exchange": {
+    "exchange_cancelled": "Wymiana anulowana",
+    "exchange_completed": "Wymiana zakończona pomyślnie"
+  },
+  "group_files": {
+    "file_deleted": "Plik usunięty"
+  },
+  "group_invite": {
+    "invite_revoked": "Zaproszenie unieważnione"
+  },
+  "contact_form": {
+    "sent_successfully": "Wiadomość wysłana pomyślnie.",
+    "received_fallback": "Wiadomość odebrana. Wkrótce się z Tobą skontaktujemy."
+  }
 }
