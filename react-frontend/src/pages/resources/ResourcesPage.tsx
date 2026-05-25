@@ -875,7 +875,7 @@ export function ResourcesPage() {
         }}
         size="sm"
         classNames={{
-          base: 'bg-content1 border border-theme-default',
+          base: 'bg-overlay border border-theme-default',
           header: 'border-b border-theme-default',
           footer: 'border-t border-theme-default',
         }}
@@ -924,7 +924,7 @@ export function ResourcesPage() {
         }}
         size="lg"
         classNames={{
-          base: 'bg-content1 border border-theme-default',
+          base: 'bg-overlay border border-theme-default',
           header: 'border-b border-theme-default',
           body: 'py-6',
           footer: 'border-t border-theme-default',

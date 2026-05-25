@@ -504,7 +504,7 @@ export function VolunteerOrganizations() {
 
   // Top content: search + filter
   const topContent = useMemo(() => (
-    <div className="flex flex-col gap-4 rounded-2xl border border-divider/70 bg-content1 p-3 shadow-sm shadow-black/[0.03] sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-4 rounded-2xl border border-divider/70 bg-surface p-3 shadow-sm shadow-black/[0.03] sm:flex-row sm:items-center sm:justify-between">
       <Input type="search" name="admin-search" autoComplete="off"
         className="max-w-xs"
         placeholder={t('volunteering.search_organizations')}
@@ -644,7 +644,7 @@ export function VolunteerOrganizations() {
                     {transactions.map((tx) => (
                       <div
                         key={tx.id}
-                        className="flex items-center justify-between rounded-xl border border-divider/70 bg-content2/30 p-3"
+                        className="flex items-center justify-between rounded-xl border border-divider/70 bg-surface-secondary/30 p-3"
                       >
                         <div>
                           <p className="text-sm font-medium">{tx.description || tx.type}</p>
@@ -765,7 +765,7 @@ export function VolunteerOrganizations() {
                     {members.map((m) => (
                       <div
                         key={m.id || m.user_id}
-                        className="flex items-center justify-between rounded-xl border border-divider/70 bg-content2/30 p-3"
+                        className="flex items-center justify-between rounded-xl border border-divider/70 bg-surface-secondary/30 p-3"
                       >
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-full bg-default-100 flex items-center justify-center text-xs font-semibold text-default-600">

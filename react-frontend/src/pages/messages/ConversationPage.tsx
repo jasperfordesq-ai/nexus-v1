@@ -1827,7 +1827,7 @@ export function ConversationPage() {
         isOpen={showArchiveModal}
         onOpenChange={setShowArchiveModal}
         classNames={{
-          base: 'bg-content1 border border-theme-default',
+          base: 'bg-overlay border border-theme-default',
           header: 'border-b border-theme-default',
           body: 'py-6',
           footer: 'border-t border-theme-default',
@@ -1870,7 +1870,7 @@ export function ConversationPage() {
         isOpen={pendingDeleteId !== null}
         onOpenChange={(open) => { if (!open) setPendingDeleteId(null); }}
         classNames={{
-          base: 'bg-content1 border border-theme-default',
+          base: 'bg-overlay border border-theme-default',
           header: 'border-b border-theme-default',
           body: 'py-6',
           footer: 'border-t border-theme-default',

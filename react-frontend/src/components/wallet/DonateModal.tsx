@@ -155,7 +155,7 @@ export function DonateModal({ isOpen, onClose, currentBalance, onDonationComplet
       isOpen={isOpen}
       onClose={onClose}
       classNames={{
-        base: 'bg-content1 border border-theme-default',
+        base: 'bg-overlay border border-theme-default',
         header: 'border-b border-theme-default',
         body: 'py-6',
         footer: 'border-t border-theme-default',
@@ -261,7 +261,7 @@ export function DonateModal({ isOpen, onClose, currentBalance, onDonationComplet
                         initial={{ opacity: 0, y: -8 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -8 }}
-                        className="absolute top-full left-0 right-0 mt-2 bg-content1 border border-theme-default rounded-lg shadow-xl overflow-hidden z-50 max-h-60 overflow-y-auto"
+                        className="absolute top-full left-0 right-0 mt-2 bg-overlay border border-theme-default rounded-lg shadow-xl overflow-hidden z-50 max-h-60 overflow-y-auto"
                         role="listbox"
                         aria-label={t('search_results')}
                       >
@@ -296,7 +296,7 @@ export function DonateModal({ isOpen, onClose, currentBalance, onDonationComplet
                   </AnimatePresence>
 
                   {showResults && searchQuery.length >= 2 && searchResults.length === 0 && !isSearching && (
-                    <div className="absolute top-full left-0 right-0 mt-2 bg-content1 border border-theme-default rounded-lg p-4 text-center z-50">
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-overlay border border-theme-default rounded-lg p-4 text-center z-50">
                       <User className="w-8 h-8 text-theme-subtle mx-auto mb-2" />
                       <p className="text-theme-muted text-sm">{t('no_members_found')}</p>
                     </div>

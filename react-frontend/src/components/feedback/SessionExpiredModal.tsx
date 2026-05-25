@@ -56,7 +56,7 @@ export function SessionExpiredModal() {
       onClose={() => setIsOpen(false)}
       size="sm"
       classNames={{
-        base: 'bg-content1 border border-theme-default',
+        base: 'bg-overlay border border-theme-default',
       }}
     >
       <ModalContent>

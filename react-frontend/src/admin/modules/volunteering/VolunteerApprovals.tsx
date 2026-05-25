@@ -300,7 +300,7 @@ export function VolunteerApprovals() {
 
   // Top content: search + filters + bulk actions
   const topContent = useMemo(() => (
-    <div className="flex flex-col gap-4 rounded-2xl border border-divider/70 bg-content1 p-3 shadow-sm shadow-black/[0.03]">
+    <div className="flex flex-col gap-4 rounded-2xl border border-divider/70 bg-surface p-3 shadow-sm shadow-black/[0.03]">
       {/* Status Tabs */}
       <Tabs
         selectedKey={statusTab}

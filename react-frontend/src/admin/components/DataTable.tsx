@@ -138,7 +138,7 @@ export function DataTable<T extends Record<string, any>>({
               onValueChange={handleSearchChange}
               size="sm"
               variant="bordered"
-              classNames={{ inputWrapper: 'bg-content2/40 border-divider/70' }}
+              classNames={{ inputWrapper: 'bg-surface-secondary/40 border-divider/70' }}
             />
           )}
           {onRefresh && (
@@ -193,9 +193,9 @@ export function DataTable<T extends Record<string, any>>({
       bottomContentPlacement="outside"
       classNames={{
         base: 'min-w-0',
-        wrapper: 'max-w-full overflow-x-auto border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03]',
+        wrapper: 'max-w-full overflow-x-auto border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]',
         table: 'min-w-max',
-        th: 'whitespace-nowrap bg-content2/70 text-xs font-semibold uppercase tracking-normal text-default-500',
+        th: 'whitespace-nowrap bg-surface-secondary/70 text-xs font-semibold uppercase tracking-normal text-default-500',
         td: 'align-top text-sm',
       }}
     >

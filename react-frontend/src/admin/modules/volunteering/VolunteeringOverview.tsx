@@ -270,7 +270,7 @@ export function VolunteeringOverview() {
       </div>
 
       {/* Trends Chart */}
-      <Card shadow="sm" className="border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03]">
+      <Card shadow="sm" className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
         <CardHeader className="flex flex-row items-center justify-between">
           <h3 className="text-lg font-semibold">{t('volunteering.trends_title')}</h3>
           <ButtonGroup size="sm" variant="flat">
@@ -373,7 +373,7 @@ export function VolunteeringOverview() {
             shadow="sm"
             isPressable
             onPress={() => navigate(action.path)}
-            className="border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03] transition-transform hover:-translate-y-0.5"
+            className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03] transition-transform hover:-translate-y-0.5"
           >
             <CardBody className="flex flex-row items-center gap-3 p-4">
               <div className={`p-2 rounded-lg ${cc.bg}`}>
@@ -391,7 +391,7 @@ export function VolunteeringOverview() {
       </div>
 
       {/* Recent Opportunities */}
-      <Card shadow="sm" className="border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03]">
+      <Card shadow="sm" className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
         <CardHeader><h3 className="text-lg font-semibold">{t('volunteering.recent_opportunities')}</h3></CardHeader>
         <CardBody>
           {opportunities.length === 0 ? (
@@ -402,7 +402,7 @@ export function VolunteeringOverview() {
           ) : (
             <div className="space-y-3">
               {opportunities.map((opp) => (
-                <div key={opp.id} className="flex items-center justify-between rounded-xl border border-divider/70 bg-content2/30 p-3">
+                <div key={opp.id} className="flex items-center justify-between rounded-xl border border-divider/70 bg-surface-secondary/30 p-3">
                   <div>
                     <p className="font-medium">{opp.title}</p>
                       <p className="text-xs text-default-400">
@@ -418,7 +418,7 @@ export function VolunteeringOverview() {
       </Card>
 
       {/* Activity Feed */}
-      <Card shadow="sm" className="border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03]">
+      <Card shadow="sm" className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
         <CardHeader><h3 className="text-lg font-semibold">{t('volunteering.activity_feed')}</h3></CardHeader>
         <CardBody>
           {activitiesLoading ? (

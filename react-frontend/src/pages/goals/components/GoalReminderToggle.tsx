@@ -144,7 +144,7 @@ export function GoalReminderToggle({ goalId, className = '' }: GoalReminderToggl
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="bg-content1 border border-theme-default p-3 w-52">
+      <PopoverContent className="bg-overlay border border-theme-default p-3 w-52">
         <div className="space-y-2">
           <p className="text-sm font-semibold text-theme-primary">
             {hasReminder ? t('reminder.active') : t('reminder.set')}

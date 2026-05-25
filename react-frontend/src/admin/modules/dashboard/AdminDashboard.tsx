@@ -233,7 +233,7 @@ export function AdminDashboard() {
       {((stats?.pending_users ?? 0) > 0 || (stats?.pending_listings ?? 0) > 0) && (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
           {stats?.pending_users !== undefined && stats.pending_users > 0 && (
-            <Card shadow="sm" className="border border-warning/20 bg-content1 shadow-sm shadow-warning/10">
+            <Card shadow="sm" className="border border-warning/20 bg-surface shadow-sm shadow-warning/10">
               <CardBody className="flex flex-row items-center gap-4 p-4">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-warning/10">
                   <UserCheck size={20} className="text-warning" />
@@ -256,7 +256,7 @@ export function AdminDashboard() {
           )}
 
           {stats?.pending_listings !== undefined && stats.pending_listings > 0 && (
-            <Card shadow="sm" className="border border-primary/20 bg-content1 shadow-sm shadow-primary/10">
+            <Card shadow="sm" className="border border-primary/20 bg-surface shadow-sm shadow-primary/10">
               <CardBody className="flex flex-row items-center gap-4 p-4">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                   <ListChecks size={20} className="text-primary" />
@@ -284,7 +284,7 @@ export function AdminDashboard() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
 
         {/* Quick Actions (matches legacy sidebar) */}
-        <Card shadow="sm" className="border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03]">
+        <Card shadow="sm" className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Rocket size={18} className="text-primary" />
             <h3 className="font-semibold">{t('quick_actions.card_title')}</h3>
@@ -297,7 +297,7 @@ export function AdminDashboard() {
                   <Link
                     key={action.path}
                     to={tenantPath(action.path)}
-                    className="flex flex-col items-center gap-2 rounded-xl border border-divider/70 bg-content2/30 p-3 text-center transition-all hover:-translate-y-0.5 hover:bg-default-100 hover:shadow-sm"
+                    className="flex flex-col items-center gap-2 rounded-xl border border-divider/70 bg-surface-secondary/30 p-3 text-center transition-all hover:-translate-y-0.5 hover:bg-default-100 hover:shadow-sm"
                   >
                     <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${action.color}`}>
                       <Icon size={20} />
@@ -323,7 +323,7 @@ export function AdminDashboard() {
         </Card>
 
         {/* Monthly Trends */}
-        <Card shadow="sm" className="border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03]">
+        <Card shadow="sm" className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <TrendingUp size={18} className="text-primary" />
             <h3 className="font-semibold">{t('trends.card_title')}</h3>
@@ -357,7 +357,7 @@ export function AdminDashboard() {
         </Card>
 
         {/* Recent Activity */}
-        <Card shadow="sm" className="border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03]">
+        <Card shadow="sm" className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
           <CardHeader className="flex items-center justify-between px-4 pt-4 pb-0">
             <div className="flex items-center gap-2">
               <Activity size={18} className="text-primary" />

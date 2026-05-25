@@ -153,7 +153,7 @@ export function PricingPage() {
             const cents = interval === 'yearly' ? tier.yearly_price_cents : tier.monthly_price_cents;
             const isFree = cents === 0;
             return (
-              <Card key={tier.id} className="flex flex-col border border-theme-default bg-content1" shadow="sm">
+              <Card key={tier.id} className="flex flex-col border border-theme-default bg-surface" shadow="sm">
                 <CardHeader className="flex flex-col items-start gap-2">
                   <div className="flex items-center gap-2">
                     <Crown size={20} className="text-yellow-500" />

@@ -1075,7 +1075,7 @@ export function CreateEventPage() {
                   trigger: 'bg-theme-elevated border-theme-default',
                   label: 'text-theme-muted',
                   value: 'text-theme-primary',
-                  popoverContent: 'bg-content1 border border-theme-default',
+                  popoverContent: 'bg-overlay border border-theme-default',
                 }}
               >
                 {availablePolls.map((poll) => (

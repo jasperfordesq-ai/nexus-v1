@@ -592,7 +592,7 @@ function OpportunitiesTab() {
 
       {/* Apply Modal */}
       <Modal isOpen={isOpen} onClose={onClose} size="lg" classNames={{
-        base: 'bg-content1 border border-theme-default',
+        base: 'bg-overlay border border-theme-default',
       }}>
         <ModalContent>
           <ModalHeader className="text-theme-primary">
@@ -1302,7 +1302,7 @@ function HoursTab() {
 
       {/* Log Hours Modal */}
       <Modal isOpen={isOpen} onClose={onClose} size="lg" classNames={{
-        base: 'bg-content1 border border-theme-default',
+        base: 'bg-overlay border border-theme-default',
       }}>
         <ModalContent>
           <ModalHeader className="text-theme-primary">{t('log_volunteering_hours')}</ModalHeader>

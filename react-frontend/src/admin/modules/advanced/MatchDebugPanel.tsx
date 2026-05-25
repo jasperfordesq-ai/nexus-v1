@@ -250,7 +250,7 @@ export function MatchDebugPanel() {
 
             {/* Dropdown results */}
             {showDropdown && userResults.length > 0 && (
-              <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-content1 border border-divider rounded-xl shadow-lg overflow-hidden">
+              <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-overlay border border-divider rounded-xl shadow-lg overflow-hidden">
                 {userResults.map((user) => (
                   <Button
                     key={user.id}

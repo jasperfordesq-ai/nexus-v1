@@ -463,7 +463,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
         variant="underlined"
         color="primary"
         classNames={{
-          tabList: 'w-full gap-2 overflow-x-auto rounded-lg border border-default-200 bg-content1 px-2',
+          tabList: 'w-full gap-2 overflow-x-auto rounded-lg border border-default-200 bg-surface px-2',
           tab: 'h-10 px-3',
         }}
       >

@@ -201,7 +201,7 @@ export function SavedSearches({ onRunSearch, currentQuery, currentFilters }: Sav
             {t('saved_searches', { count: savedSearches.length })}
           </h4>
           {savedSearches.map((search) => (
-            <div key={search.id} className="flex items-center gap-3 rounded-lg border border-divider bg-content2/50 p-3">
+            <div key={search.id} className="flex items-center gap-3 rounded-lg border border-divider bg-surface-secondary/50 p-3">
               <div className="flex-1 min-w-0">
                 <div className="font-medium text-sm text-theme-primary truncate">
                   {search.name}

@@ -66,7 +66,7 @@ export default function NewsletterUnsubscribePage() {
   }, [token]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-content2 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-surface-secondary px-4">
       <PageMeta title={t('page_meta.newsletter_unsubscribe.title')} noIndex />
       <Card className="w-full max-w-md">
       <CardBody className="p-8 text-center">

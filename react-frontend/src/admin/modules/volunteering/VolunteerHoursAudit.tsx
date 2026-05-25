@@ -336,7 +336,7 @@ export function VolunteerHoursAudit() {
   ], [actionInProgress, handleVerify, t]);
 
   const topContent = useMemo(() => (
-    <div className="flex flex-col gap-4 rounded-2xl border border-divider/70 bg-content1 p-3 shadow-sm shadow-black/[0.03]">
+    <div className="flex flex-col gap-4 rounded-2xl border border-divider/70 bg-surface p-3 shadow-sm shadow-black/[0.03]">
       <div className="flex flex-wrap items-end gap-3">
         <Select
           className="w-48"
@@ -444,7 +444,7 @@ export function VolunteerHoursAudit() {
 
       {/* Per-org breakdown */}
       {orgBreakdown.length > 0 && (
-        <Card className="border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03]">
+        <Card className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
           <CardHeader>
             <div className="flex items-center gap-2">
               <Building2 size={18} />
@@ -458,7 +458,7 @@ export function VolunteerHoursAudit() {
               {orgBreakdown.map((org) => (
                 <div
                   key={org.name}
-                  className="flex items-center justify-between rounded-xl border border-divider/70 bg-content2/30 p-3"
+                  className="flex items-center justify-between rounded-xl border border-divider/70 bg-surface-secondary/30 p-3"
                 >
                   <span className="font-medium text-sm truncate mr-2">{org.name}</span>
                   <div className="flex gap-3 text-xs shrink-0">
@@ -518,7 +518,7 @@ export function VolunteerHoursAudit() {
       )}
 
       {activeTab === 'payments' && (
-        <Card className="border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03]">
+        <Card className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
           <CardHeader>
             <div className="flex items-center gap-2">
               <Banknote size={18} />

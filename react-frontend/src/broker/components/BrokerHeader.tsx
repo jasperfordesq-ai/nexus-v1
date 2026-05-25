@@ -33,7 +33,7 @@ export function BrokerHeader({ sidebarCollapsed, onSidebarToggle }: BrokerHeader
 
   return (
     <header
-      className={`fixed top-0 right-0 z-30 flex h-16 items-center justify-between gap-2 border-b border-divider bg-content1/95 backdrop-blur px-3 sm:px-6 transition-all duration-300 left-0 ${
+      className={`fixed top-0 right-0 z-30 flex h-16 items-center justify-between gap-2 border-b border-divider bg-surface/95 backdrop-blur px-3 sm:px-6 transition-all duration-300 left-0 ${
         sidebarCollapsed ? 'md:left-16' : 'md:left-64'
       }`}
     >

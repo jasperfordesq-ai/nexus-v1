@@ -588,7 +588,7 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
                   ) : (
                     <ul className="space-y-2">
                       {detail.actions.map((a) => (
-                        <li key={a.id} className="rounded-2xl border border-divider/70 bg-content2/40 p-3">
+                        <li key={a.id} className="rounded-2xl border border-divider/70 bg-surface-secondary/40 p-3">
                           <div className="flex items-center justify-between">
                             <p className="text-sm font-medium">{a.action}</p>
                             <p className="text-xs text-default-500">

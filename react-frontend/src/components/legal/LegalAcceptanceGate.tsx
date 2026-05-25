@@ -81,7 +81,7 @@ export function LegalAcceptanceGate({
             return (
               <div
                 key={doc.document_id}
-                className="flex items-center justify-between gap-3 p-3 rounded-lg bg-content2"
+                className="flex items-center justify-between gap-3 p-3 rounded-lg bg-surface-secondary"
               >
                 <div className="flex items-center gap-2 min-w-0">
                   <FileText className="w-4 h-4 text-foreground-400 shrink-0" aria-hidden="true" />

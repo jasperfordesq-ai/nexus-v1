@@ -232,7 +232,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
   return (
     <div className="space-y-4">
       {/* Toolbar: filter chips + upload */}
-      <div className="flex flex-col gap-3 rounded-xl border border-default-200 bg-content1/80 p-3 shadow-sm sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-3 rounded-xl border border-default-200 bg-surface/80 p-3 shadow-sm sm:flex-row sm:items-center">
         <div className="flex flex-wrap gap-2 flex-1" role="group" aria-label={t('media.filter_group')}>
           {FILTER_CHIPS.map((chip) => (
             <Chip
@@ -300,7 +300,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
           {items.map((item, index) => (
             <GlassCard
               key={item.id}
-              className="relative group overflow-hidden cursor-pointer border border-default-200 bg-content1 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+              className="relative group overflow-hidden cursor-pointer border border-default-200 bg-surface shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
               onClick={() => openLightbox(index)}
             >
               {/* Thumbnail */}

@@ -429,7 +429,7 @@ export function GoalsPage() {
   const modalClasses = {
     backdrop: 'z-[9998]',
     wrapper: 'z-[9999] items-start px-3 py-4 pt-28 sm:px-4 sm:pt-32',
-    base: 'z-[10000] bg-content1 border border-theme-default my-0 max-h-[calc(100dvh_-_8rem)] sm:max-h-[calc(100dvh_-_9rem)]',
+    base: 'z-[10000] bg-overlay border border-theme-default my-0 max-h-[calc(100dvh_-_8rem)] sm:max-h-[calc(100dvh_-_9rem)]',
     body: 'overflow-y-auto',
   };
 

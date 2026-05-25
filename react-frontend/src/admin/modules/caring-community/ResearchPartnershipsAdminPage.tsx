@@ -377,7 +377,7 @@ export default function ResearchPartnershipsAdminPage() {
               {templates.map((template) => (
                 <div
                   key={template.key}
-                  className="rounded-lg border border-default-200 bg-content1 p-3"
+                  className="rounded-lg border border-default-200 bg-surface p-3"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1">

@@ -398,7 +398,7 @@ export default function CareProviderAdminPage() {
               {duplicates?.pairs.map((pair, idx) => (
                 <div
                   key={`${pair.provider_a.id}-${pair.provider_b.id}-${idx}`}
-                  className="rounded-lg border border-default-200 bg-content1 p-3"
+                  className="rounded-lg border border-default-200 bg-surface p-3"
                 >
                   <div className="flex items-start justify-between gap-3 flex-wrap">
                     <div className="flex-1 min-w-[260px]">

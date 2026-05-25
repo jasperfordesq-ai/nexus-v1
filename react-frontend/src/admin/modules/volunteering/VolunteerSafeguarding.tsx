@@ -374,7 +374,7 @@ export function VolunteerSafeguarding() {
               {dlpAssignments.map((assignment) => (
                 <div
                   key={assignment.organization_id}
-                  className="flex items-center justify-between rounded-2xl border border-divider/70 bg-content2/50 p-3"
+                  className="flex items-center justify-between rounded-2xl border border-divider/70 bg-surface-secondary/50 p-3"
                 >
                   <div>
                     <p className="font-medium">{assignment.organization_name}</p>

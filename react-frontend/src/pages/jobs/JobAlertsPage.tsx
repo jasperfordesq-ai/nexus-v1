@@ -465,7 +465,7 @@ export function JobAlertsPage() {
         isOpen={deleteTarget !== null}
         onOpenChange={(open) => !open && setDeleteTarget(null)}
         classNames={{
-          base: 'bg-content1 border border-theme-default',
+          base: 'bg-overlay border border-theme-default',
           header: 'border-b border-theme-default',
           footer: 'border-t border-theme-default',
         }}

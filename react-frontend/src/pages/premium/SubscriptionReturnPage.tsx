@@ -87,7 +87,7 @@ export function SubscriptionReturnPage() {
         description={t('premium.return_meta_description')}
         noIndex
       />
-      <Card className="border border-divider/70 bg-content1/95 shadow-lg shadow-primary/5">
+      <Card className="border border-divider/70 bg-surface/95 shadow-lg shadow-primary/5">
         <CardBody className="text-center py-10 flex flex-col items-center gap-4">
           {status === 'pending' && (
             <>

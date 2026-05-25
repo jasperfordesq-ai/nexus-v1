@@ -276,7 +276,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
         className="absolute top-[calc(var(--safe-area-top)+1rem)] sm:top-[calc(var(--safe-area-top)+4.5rem)] left-1/2 -translate-x-1/2 w-[calc(100dvw-var(--safe-area-left)-var(--safe-area-right)-1rem)] max-w-xl"
         onClick={e => e.stopPropagation()}
       >
-        <div className="flex max-h-[calc(100dvh-var(--safe-area-top)-var(--safe-area-bottom)-2rem)] flex-col overflow-hidden rounded-xl border border-divider bg-content1 shadow-large">
+        <div className="flex max-h-[calc(100dvh-var(--safe-area-top)-var(--safe-area-bottom)-2rem)] flex-col overflow-hidden rounded-xl border border-divider bg-overlay shadow-large">
           {/* Search input row */}
           <div className="flex shrink-0 items-center gap-2 px-3 sm:px-4 py-3 border-b border-divider">
             <Search className="w-5 h-5 text-default-400 flex-shrink-0" />

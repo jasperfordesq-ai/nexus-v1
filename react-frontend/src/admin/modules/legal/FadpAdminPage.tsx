@@ -362,7 +362,7 @@ export function FadpAdminPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-default-200 bg-content1 p-5 shadow-sm">
+      <div className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-default-200 bg-surface p-5 shadow-sm">
         <div className="min-w-0">
           <h1 className="flex items-center gap-2 text-2xl font-bold text-[var(--color-text)]">
             <ShieldCheck className="text-danger-500" size={24} />

@@ -599,7 +599,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
         onOpenChange={(open) => !open && createModal.onClose()}
         size="lg"
         classNames={{
-          base: 'bg-content1 border border-theme-default',
+          base: 'bg-overlay border border-theme-default',
           header: 'border-b border-theme-default',
           footer: 'border-t border-theme-default',
         }}
@@ -694,7 +694,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
           }
         }}
         classNames={{
-          base: 'bg-content1 border border-theme-default',
+          base: 'bg-overlay border border-theme-default',
           header: 'border-b border-theme-default',
           footer: 'border-t border-theme-default',
         }}

@@ -203,7 +203,7 @@ export function CommunityDeliveryCard({
               {offers.map(offer => (
                 <div
                   key={offer.id}
-                  className="flex flex-col gap-3 rounded-lg border border-default-200 bg-content1 p-3 shadow-sm sm:flex-row sm:items-center"
+                  className="flex flex-col gap-3 rounded-lg border border-default-200 bg-surface p-3 shadow-sm sm:flex-row sm:items-center"
                 >
                   {offer.deliverer && (
                     <Avatar

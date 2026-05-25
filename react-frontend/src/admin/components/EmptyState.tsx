@@ -29,7 +29,7 @@ export function EmptyState({
   onAction,
 }: EmptyStateProps) {
   return (
-    <Card shadow="sm" className="border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03]">
+    <Card shadow="sm" className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
       <CardBody className="flex flex-col items-center justify-center px-6 py-16 text-center">
         <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-default-100 ring-1 ring-inset ring-divider">
           <Icon size={32} className="text-default-500" />

@@ -202,7 +202,7 @@ function FeaturedListingsPanel() {
   return (
     <div className="space-y-6">
       {/* Feature new listing search */}
-      <Card shadow="sm" className="border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03]">
+      <Card shadow="sm" className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
         <CardBody className="p-4">
           <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
             <Plus size={16} />
@@ -228,7 +228,7 @@ function FeaturedListingsPanel() {
               {filteredResults.map((listing) => (
                 <div
                   key={listing.id}
-                  className="flex items-center justify-between rounded-xl border border-divider/70 bg-content2/30 p-3 transition-colors hover:bg-default-100"
+                  className="flex items-center justify-between rounded-xl border border-divider/70 bg-surface-secondary/30 p-3 transition-colors hover:bg-default-100"
                 >
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground truncate">
@@ -510,7 +510,7 @@ export function ListingsAdmin() {
       />
 
       {/* Top-level tabs: Content | Featured */}
-      <div className="rounded-2xl border border-divider/70 bg-content1 p-2 shadow-sm shadow-black/[0.03]">
+      <div className="rounded-2xl border border-divider/70 bg-surface p-2 shadow-sm shadow-black/[0.03]">
         <Tabs
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(key as string)}
@@ -535,7 +535,7 @@ export function ListingsAdmin() {
       {activeTab === 'content' && (
         <>
           {/* Status filter sub-tabs */}
-          <div className="rounded-2xl border border-divider/70 bg-content1 p-2 shadow-sm shadow-black/[0.03]">
+          <div className="rounded-2xl border border-divider/70 bg-surface p-2 shadow-sm shadow-black/[0.03]">
             <Tabs
               selectedKey={status}
               onSelectionChange={(key) => { setStatus(key as string); setPage(1); }}

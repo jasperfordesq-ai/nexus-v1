@@ -451,7 +451,7 @@ export function VolunteerExpenses() {
       </div>
 
       {/* Date range filter */}
-      <div className="flex flex-wrap items-end gap-3 rounded-2xl border border-divider/70 bg-content1 p-3 shadow-sm shadow-black/[0.03]">
+      <div className="flex flex-wrap items-end gap-3 rounded-2xl border border-divider/70 bg-surface p-3 shadow-sm shadow-black/[0.03]">
         <Input
           type="date"
           label={t('volunteering.date_from')}
@@ -494,7 +494,7 @@ export function VolunteerExpenses() {
 
       {/* Per-org expense breakdown */}
       {orgBreakdown.length > 0 && (
-        <Card className="border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03]">
+        <Card className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
           <CardHeader>
             <div className="flex items-center gap-2">
               <Building2 size={18} />
@@ -542,7 +542,7 @@ export function VolunteerExpenses() {
       )}
 
       {/* Expense Policies (collapsible) */}
-      <Card className="border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03]">
+      <Card className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
         <CardHeader>
           <div className="flex items-center gap-2">
             <Settings size={18} />

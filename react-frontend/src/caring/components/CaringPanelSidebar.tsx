@@ -236,7 +236,7 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
 
   return (
     <aside
-      className={`fixed left-0 top-0 z-40 h-screen border-r border-divider bg-content1 transition-all duration-300 flex flex-col ${
+      className={`fixed left-0 top-0 z-40 h-screen border-r border-divider bg-surface transition-all duration-300 flex flex-col ${
         collapsed ? 'w-16' : 'w-64'
       }`}
     >

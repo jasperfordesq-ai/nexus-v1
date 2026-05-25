@@ -139,7 +139,7 @@ export default function VolunteerConfig() {
         onSelectionChange={(key) => setActiveTab(String(key))}
         variant="underlined"
         classNames={{
-          tabList: 'rounded-2xl border border-divider/70 bg-content1 p-1 shadow-sm shadow-black/[0.03]',
+          tabList: 'rounded-2xl border border-divider/70 bg-surface p-1 shadow-sm shadow-black/[0.03]',
           cursor: 'rounded-xl',
         }}
       >
@@ -303,7 +303,7 @@ function FieldPreviewModal({
           {t('volunteering.field_preview')}: {field.label}
         </ModalHeader>
         <ModalBody>
-          <Card className="border border-divider/70 bg-content2/50">
+          <Card className="border border-divider/70 bg-surface-secondary/50">
             <CardBody className="p-4">
               <p className="mb-3 text-xs text-default-400">
                 {t('volunteering.preview_description')}
@@ -944,7 +944,7 @@ function RemindersTab() {
         )}
 
         {/* Filters */}
-        <div className="flex gap-2 rounded-2xl border border-divider/70 bg-content1 p-3 shadow-sm shadow-black/[0.03]">
+        <div className="flex gap-2 rounded-2xl border border-divider/70 bg-surface p-3 shadow-sm shadow-black/[0.03]">
           <Select
             label={t('volunteering.filter_type')}
             size="sm"
@@ -985,7 +985,7 @@ function RemindersTab() {
 
         {/* Log list */}
         {deliveryLoading ? (
-          <Card className="border border-divider/70 bg-content2/50">
+          <Card className="border border-divider/70 bg-surface-secondary/50">
             <CardBody className="p-6 flex justify-center">
               <div className="flex items-center gap-2 text-default-400">
                 <RefreshCw size={16} className="animate-spin" />
@@ -994,7 +994,7 @@ function RemindersTab() {
             </CardBody>
           </Card>
         ) : deliveryLogs.length === 0 ? (
-          <Card className="border border-divider/70 bg-content2/50">
+          <Card className="border border-divider/70 bg-surface-secondary/50">
             <CardBody className="p-6 text-center">
               <Clock size={32} className="mx-auto mb-3 text-default-300" />
               <p className="text-default-500 text-sm">

@@ -504,7 +504,7 @@ export function RiskTagsPage() {
                       startContent={searchingListings ? <Spinner size="sm" /> : <Search size={14} />}
                     />
                     {listingResults.length > 0 && (
-                      <div className="absolute z-50 w-full mt-1 bg-content1 border border-default-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                      <div className="absolute z-50 w-full mt-1 bg-overlay border border-default-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
                         {listingResults.map(listing => (
                           <Button
                             key={listing.id}

@@ -107,7 +107,7 @@ const inputClassNames = {
 };
 
 const modalClassNames = {
-  base: 'bg-content1 border border-theme-default',
+  base: 'bg-overlay border border-theme-default',
   header: 'border-b border-theme-default',
   body: 'py-6',
   footer: 'border-t border-theme-default',

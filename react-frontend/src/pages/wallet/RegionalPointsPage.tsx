@@ -198,7 +198,7 @@ export default function RegionalPointsPage() {
         description={t('regional_points.subtitle')}
       />
 
-      <div className="flex flex-col gap-4 rounded-2xl border border-default-200 bg-content1/80 p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 rounded-2xl border border-default-200 bg-surface/80 p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
           <h1 className="text-2xl font-bold flex items-center gap-2 text-foreground">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-warning/15 text-warning">
@@ -224,7 +224,7 @@ export default function RegionalPointsPage() {
 
       {/* Balance */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="border border-default-200 bg-content1/80 shadow-sm">
+        <Card className="border border-default-200 bg-surface/80 shadow-sm">
           <CardBody>
             <p className="text-xs uppercase text-default-500 tracking-wide">
               {t('regional_points.balance')}
@@ -234,7 +234,7 @@ export default function RegionalPointsPage() {
             </p>
           </CardBody>
         </Card>
-        <Card className="border border-default-200 bg-content1/80 shadow-sm">
+        <Card className="border border-default-200 bg-surface/80 shadow-sm">
           <CardBody>
             <p className="text-xs uppercase text-default-500 tracking-wide">
               {t('regional_points.lifetime_earned')}
@@ -244,7 +244,7 @@ export default function RegionalPointsPage() {
             </p>
           </CardBody>
         </Card>
-        <Card className="border border-default-200 bg-content1/80 shadow-sm">
+        <Card className="border border-default-200 bg-surface/80 shadow-sm">
           <CardBody>
             <p className="text-xs uppercase text-default-500 tracking-wide">
               {t('regional_points.lifetime_spent')}
@@ -258,7 +258,7 @@ export default function RegionalPointsPage() {
 
       {/* Transfer */}
       {cfg.member_transfers_enabled && (
-        <Card className="border border-default-200 bg-content1/80 shadow-sm">
+        <Card className="border border-default-200 bg-surface/80 shadow-sm">
           <CardHeader className="flex items-center gap-2">
             <Send className="w-5 h-5 text-primary" />
             <h2 className="text-base font-semibold">
@@ -309,7 +309,7 @@ export default function RegionalPointsPage() {
       )}
 
       {/* History */}
-      <Card className="border border-default-200 bg-content1/80 shadow-sm">
+      <Card className="border border-default-200 bg-surface/80 shadow-sm">
         <CardHeader className="flex items-center gap-2">
           <Coins className="w-5 h-5 text-warning" />
           <h2 className="text-base font-semibold">

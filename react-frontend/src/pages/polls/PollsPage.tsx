@@ -1143,7 +1143,7 @@ export function PollsPage() {
         isOpen={isRankedOpen}
         onClose={onRankedClose}
         size="lg"
-        classNames={{ base: 'bg-content1 border border-theme-default' }}
+        classNames={{ base: 'bg-overlay border border-theme-default' }}
       >
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">

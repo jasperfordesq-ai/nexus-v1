@@ -475,7 +475,7 @@ export default function VolunteerGivingDays() {
                   <p className="text-lg font-bold text-success">{donorStats.total_raised.toLocaleString()}</p>
                 </CardBody>
               </Card>
-              <Card className="border border-divider/70 bg-content2/50">
+              <Card className="border border-divider/70 bg-surface-secondary/50">
                 <CardBody className="p-3 text-center">
                   <p className="text-xs text-default-500">{t('volunteering.anonymous_donors')}</p>
                   <p className="text-lg font-bold text-default-600">{donorStats.anonymous_count}</p>
@@ -512,7 +512,7 @@ export default function VolunteerGivingDays() {
                         : donor.name || t('volunteering.guest_donor');
 
                       return (
-                        <div key={donor.id} className="flex items-center gap-3 rounded-2xl border border-divider/70 bg-content2/50 p-3 transition-colors hover:bg-content3">
+                        <div key={donor.id} className="flex items-center gap-3 rounded-2xl border border-divider/70 bg-surface-secondary/50 p-3 transition-colors hover:bg-surface-tertiary">
                           {donor.is_anonymous ? (
                             <div className="w-9 h-9 rounded-full bg-default-200 flex items-center justify-center">
                               <EyeOff size={16} className="text-default-400" />

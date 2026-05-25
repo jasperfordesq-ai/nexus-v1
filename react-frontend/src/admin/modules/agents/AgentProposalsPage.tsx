@@ -158,7 +158,7 @@ export default function AgentProposalsPage() {
       </Tabs>
 
       {loading && (
-        <Card shadow="sm" className="border border-divider/70 bg-content1">
+        <Card shadow="sm" className="border border-divider/70 bg-surface">
           <CardBody className="py-8 text-sm text-default-500">
             {t('agents.proposals.loading')}
           </CardBody>

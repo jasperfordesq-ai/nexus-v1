@@ -735,7 +735,7 @@ export function ExchangeDetailPage() {
         isOpen={showDeclineModal}
         onClose={() => setShowDeclineModal(false)}
         classNames={{
-          base: 'bg-content1 border border-theme-default',
+          base: 'bg-overlay border border-theme-default',
           header: 'border-b border-theme-default',
           body: 'py-6',
           footer: 'border-t border-theme-default',
@@ -775,7 +775,7 @@ export function ExchangeDetailPage() {
         isOpen={showConfirmModal}
         onClose={() => setShowConfirmModal(false)}
         classNames={{
-          base: 'bg-content1 border border-theme-default',
+          base: 'bg-overlay border border-theme-default',
           header: 'border-b border-theme-default',
           body: 'py-6',
           footer: 'border-t border-theme-default',
@@ -826,7 +826,7 @@ export function ExchangeDetailPage() {
         isOpen={showCancelModal}
         onClose={() => setShowCancelModal(false)}
         classNames={{
-          base: 'bg-content1 border border-theme-default',
+          base: 'bg-overlay border border-theme-default',
           header: 'border-b border-theme-default',
           body: 'py-6',
           footer: 'border-t border-theme-default',

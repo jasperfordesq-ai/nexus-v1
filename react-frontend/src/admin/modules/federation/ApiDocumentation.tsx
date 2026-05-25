@@ -29,7 +29,7 @@ import { PageHeader } from '../../components';
 
 function CodeBlock({ children }: { children: string }) {
   return (
-    <pre className="bg-content2 rounded-lg p-4 font-mono text-sm overflow-x-auto">
+    <pre className="bg-surface-secondary rounded-lg p-4 font-mono text-sm overflow-x-auto">
       {children.trim()}
     </pre>
   );

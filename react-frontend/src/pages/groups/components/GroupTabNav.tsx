@@ -66,7 +66,7 @@ export function GroupTabNav({
 
   return (
     <div
-      className="sticky top-2 z-20 -mx-1 flex items-center gap-1 overflow-x-auto rounded-xl border border-theme-default bg-content1/95 p-1 shadow-sm backdrop-blur scrollbar-hide sm:mx-0"
+      className="sticky top-2 z-20 -mx-1 flex items-center gap-1 overflow-x-auto rounded-xl border border-theme-default bg-surface/95 p-1 shadow-sm backdrop-blur scrollbar-hide sm:mx-0"
       role="tablist"
       aria-label={t('detail.tab_nav_aria')}
     >

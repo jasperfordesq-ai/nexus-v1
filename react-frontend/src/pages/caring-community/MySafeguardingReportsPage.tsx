@@ -142,7 +142,7 @@ export default function MySafeguardingReportsPage(): JSX.Element {
               {reports.map((r) => (
                 <li
                   key={r.id}
-                  className="rounded-lg border border-default-200 bg-content1/30 p-4"
+                  className="rounded-lg border border-default-200 bg-surface/30 p-4"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="flex-1">

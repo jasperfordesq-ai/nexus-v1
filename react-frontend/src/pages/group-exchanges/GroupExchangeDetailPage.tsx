@@ -727,7 +727,7 @@ export function GroupExchangeDetailPage() {
         isOpen={showCancelModal}
         onClose={() => setShowCancelModal(false)}
         classNames={{
-          base: 'bg-content1 border border-theme-default',
+          base: 'bg-overlay border border-theme-default',
           header: 'border-b border-theme-default',
           body: 'py-6',
           footer: 'border-t border-theme-default',
@@ -761,7 +761,7 @@ export function GroupExchangeDetailPage() {
         onClose={() => setShowAddParticipantModal(false)}
         size="lg"
         classNames={{
-          base: 'bg-content1 border border-theme-default',
+          base: 'bg-overlay border border-theme-default',
           header: 'border-b border-theme-default',
           body: 'py-6',
           footer: 'border-t border-theme-default',

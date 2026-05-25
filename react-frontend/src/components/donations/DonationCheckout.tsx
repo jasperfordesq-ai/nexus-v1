@@ -152,7 +152,7 @@ export function DonationCheckout({
       }}
       size="lg"
       classNames={{
-        base: 'bg-content1 border border-theme-default',
+        base: 'bg-overlay border border-theme-default',
         header: 'border-b border-theme-default',
         footer: 'border-t border-theme-default',
       }}
@@ -217,7 +217,7 @@ export function DonationCheckout({
                     onValueChange={setIsAnonymous}
                     size="sm"
                     classNames={{
-                      base: 'flex w-full max-w-none flex-row-reverse justify-between rounded-xl border border-theme-default bg-content2/60 p-3',
+                      base: 'flex w-full max-w-none flex-row-reverse justify-between rounded-xl border border-theme-default bg-surface-secondary/60 p-3',
                       label: 'text-sm text-theme-secondary',
                     }}
                   >

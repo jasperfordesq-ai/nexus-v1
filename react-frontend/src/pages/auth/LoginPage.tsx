@@ -475,7 +475,7 @@ export function LoginPage() {
                           trigger: 'bg-white/90 dark:bg-white/10 backdrop-blur-xl border border-gray-200 dark:border-white/10',
                           label: 'text-theme-muted',
                           value: 'text-theme-primary',
-                          popoverContent: 'bg-content1 border border-theme-default',
+                          popoverContent: 'bg-overlay border border-theme-default',
                         }}
                       >
                         {tenants.map((t) => (

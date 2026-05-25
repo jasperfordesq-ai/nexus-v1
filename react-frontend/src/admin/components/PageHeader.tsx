@@ -40,7 +40,7 @@ export function PageHeader({ title, description, subtitle, icon, actions }: Page
 
   return (
     <>
-      <div className="mb-6 rounded-2xl border border-divider/70 bg-content1 p-4 shadow-sm shadow-black/[0.03] sm:p-5">
+      <div className="mb-6 rounded-2xl border border-divider/70 bg-surface p-4 shadow-sm shadow-black/[0.03] sm:p-5">
         <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0 flex-1">
             <div className="flex min-w-0 items-center gap-3">

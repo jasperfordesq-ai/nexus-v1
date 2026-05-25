@@ -447,7 +447,7 @@ export function CredentialVerificationTab() {
 
       {/* Upload Credential Modal */}
       <Modal isOpen={isOpen} onClose={handleModalClose} size="lg" classNames={{
-        base: 'bg-content1 border border-theme-default',
+        base: 'bg-overlay border border-theme-default',
       }}>
         <ModalContent>
           <ModalHeader className="text-theme-primary">

@@ -265,7 +265,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
         isOpen={isOpen}
         onOpenChange={(open) => !open && onClose()}
         classNames={{
-          base: 'bg-content1 border border-theme-default',
+          base: 'bg-overlay border border-theme-default',
           header: 'border-b border-theme-default',
           footer: 'border-t border-theme-default',
         }}
@@ -334,7 +334,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
         isOpen={!!deleteTarget}
         onOpenChange={(open) => !open && setDeleteTarget(null)}
         classNames={{
-          base: 'bg-content1 border border-theme-default',
+          base: 'bg-overlay border border-theme-default',
           header: 'border-b border-theme-default',
           footer: 'border-t border-theme-default',
         }}

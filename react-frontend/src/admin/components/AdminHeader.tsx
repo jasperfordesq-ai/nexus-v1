@@ -34,7 +34,7 @@ export function AdminHeader({ sidebarCollapsed, onSidebarToggle }: AdminHeaderPr
 
   return (
     <header
-      className={`fixed top-0 right-0 z-30 flex h-16 items-center justify-between gap-2 border-b border-divider/70 bg-content1/90 px-3 shadow-sm shadow-black/[0.03] backdrop-blur-xl sm:px-6 transition-all duration-300 left-0 ${
+      className={`fixed top-0 right-0 z-30 flex h-16 items-center justify-between gap-2 border-b border-divider/70 bg-surface/90 px-3 shadow-sm shadow-black/[0.03] backdrop-blur-xl sm:px-6 transition-all duration-300 left-0 ${
         sidebarCollapsed ? 'md:left-16' : 'md:left-64'
       }`}
     >

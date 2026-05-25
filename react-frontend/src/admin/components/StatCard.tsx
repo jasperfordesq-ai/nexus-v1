@@ -115,14 +115,14 @@ export function StatCard({
         as={Link}
         to={to}
         aria-label={linkAriaLabel ?? resolvedLabel}
-        className="group border border-divider/70 bg-content1 text-left shadow-sm shadow-black/[0.03] transition-all hover:-translate-y-0.5 hover:shadow-md"
+        className="group border border-divider/70 bg-surface text-left shadow-sm shadow-black/[0.03] transition-all hover:-translate-y-0.5 hover:shadow-md"
       >
         {body}
       </Card>
     );
   }
 
-  return <Card shadow="sm" className="border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03]">{body}</Card>;
+  return <Card shadow="sm" className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">{body}</Card>;
 }
 
 export default StatCard;

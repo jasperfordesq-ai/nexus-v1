@@ -138,7 +138,7 @@ export default function AgentsAdminPage() {
       />
 
       {loading && (
-        <Card shadow="sm" className="border border-divider/70 bg-content1">
+        <Card shadow="sm" className="border border-divider/70 bg-surface">
           <CardBody className="py-8 text-sm text-default-500">
             {t('agents.definitions.loading')}
           </CardBody>

@@ -205,7 +205,7 @@ export function GdprRequestCreate() {
                   endContent={searchLoading ? <Spinner size="sm" /> : undefined}
                 />
                 {showDropdown && userResults.length > 0 && (
-                  <div className="absolute z-50 w-full mt-1 bg-content1 border border-divider rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                  <div className="absolute z-50 w-full mt-1 bg-overlay border border-divider rounded-xl shadow-lg max-h-60 overflow-y-auto">
                     {userResults.map((user) => (
                       <Button
                         key={user.id}

@@ -183,7 +183,7 @@ export function MarketplaceAdmin() {
       {/* Quick Actions */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Link to={tenantPath('/admin/marketplace/moderation')}>
-          <Card shadow="sm" isPressable className="w-full border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03] transition-transform hover:-translate-y-0.5">
+          <Card shadow="sm" isPressable className="w-full border border-divider/70 bg-surface shadow-sm shadow-black/[0.03] transition-transform hover:-translate-y-0.5">
             <CardBody className="flex flex-row items-center gap-4 p-4">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-warning bg-warning/10">
                 <Shield size={24} />
@@ -199,7 +199,7 @@ export function MarketplaceAdmin() {
           </Card>
         </Link>
         <Link to={tenantPath('/admin/marketplace/sellers')}>
-          <Card shadow="sm" isPressable className="w-full border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03] transition-transform hover:-translate-y-0.5">
+          <Card shadow="sm" isPressable className="w-full border border-divider/70 bg-surface shadow-sm shadow-black/[0.03] transition-transform hover:-translate-y-0.5">
             <CardBody className="flex flex-row items-center gap-4 p-4">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-primary bg-primary/10">
                 <Users size={24} />
@@ -217,7 +217,7 @@ export function MarketplaceAdmin() {
       </div>
 
       {/* Recent Listings Table */}
-      <Card shadow="sm" className="border border-divider/70 bg-content1 shadow-sm shadow-black/[0.03]">
+      <Card shadow="sm" className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
         <CardHeader className="flex items-center justify-between px-4 pt-4">
           <h3 className="text-lg font-semibold text-foreground">{t('marketplace.recent_listings')}</h3>
           <Link to={tenantPath('/admin/marketplace/moderation')}>

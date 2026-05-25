@@ -167,7 +167,7 @@ function getRateTone(rate: number): {
 
 function MetricCard({ icon: Icon, label, value, caption, accentClassName }: MetricCardProps) {
   return (
-    <Card className="border border-default-200/70 bg-content1/85 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-content1/75">
+    <Card className="border border-default-200/70 bg-surface/85 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-surface/75">
       <CardBody className="gap-4 p-5">
         <div className="flex items-start justify-between gap-3">
           <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${accentClassName}`}>
@@ -189,7 +189,7 @@ function MetricCard({ icon: Icon, label, value, caption, accentClassName }: Metr
 
 function GuideCard({ icon: Icon, title, body, accentClassName }: GuideCardProps) {
   return (
-    <div className="rounded-2xl border border-default-200/70 bg-content1/70 p-4 shadow-sm">
+    <div className="rounded-2xl border border-default-200/70 bg-surface/70 p-4 shadow-sm">
       <div className="flex items-start gap-3">
         <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${accentClassName}`}>
           <Icon size={18} />
@@ -205,7 +205,7 @@ function GuideCard({ icon: Icon, title, body, accentClassName }: GuideCardProps)
 
 function SnapshotCard({ eyebrow, value, body, accentClassName }: SnapshotCardProps) {
   return (
-    <div className="rounded-[26px] border border-default-200/70 bg-content1/80 p-5 shadow-sm">
+    <div className="rounded-[26px] border border-default-200/70 bg-surface/80 p-5 shadow-sm">
       <div className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${accentClassName}`}>
         {eyebrow}
       </div>
@@ -351,7 +351,7 @@ export default function OnboardingFunnel() {
   if (error || !data) {
     return (
       <div className="mx-auto max-w-5xl">
-        <Card className="overflow-hidden border border-danger/20 bg-content1/90 shadow-lg">
+        <Card className="overflow-hidden border border-danger/20 bg-surface/90 shadow-lg">
           <CardBody className="gap-5 p-8">
             <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-danger/10 text-danger">
               <TrendingDown size={24} />
@@ -596,7 +596,7 @@ export default function OnboardingFunnel() {
         />
       </div>
 
-      <Card className="border border-default-200/70 bg-content1/90 shadow-sm">
+      <Card className="border border-default-200/70 bg-surface/90 shadow-sm">
         <CardHeader className="flex flex-col items-start gap-2 px-6 pb-0 pt-6">
           <h2 className="text-lg font-semibold text-foreground">{t('crm.how_to_read_title')}</h2>
           <p className="text-sm text-default-500">{t('crm.how_to_read_desc')}</p>
@@ -608,7 +608,7 @@ export default function OnboardingFunnel() {
         </CardBody>
       </Card>
 
-      <Card className="border border-default-200/70 bg-content1/90 shadow-sm">
+      <Card className="border border-default-200/70 bg-surface/90 shadow-sm">
         <CardHeader className="flex flex-col items-start gap-2 px-6 pb-0 pt-6">
           <h2 className="text-lg font-semibold text-foreground">{t('crm.funnel_summary_title')}</h2>
           <p className="text-sm text-default-500">{t('crm.funnel_summary_desc')}</p>
@@ -621,7 +621,7 @@ export default function OnboardingFunnel() {
       </Card>
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.95fr)]">
-        <Card className="overflow-hidden border border-default-200/70 bg-content1/90 shadow-lg">
+        <Card className="overflow-hidden border border-default-200/70 bg-surface/90 shadow-lg">
           <CardHeader className="flex flex-col items-start gap-3 px-6 pb-0 pt-6">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
@@ -746,7 +746,7 @@ export default function OnboardingFunnel() {
         </Card>
 
         <div className="space-y-6">
-          <Card className="border border-default-200/70 bg-content1/90 shadow-sm">
+          <Card className="border border-default-200/70 bg-surface/90 shadow-sm">
             <CardHeader className="flex flex-col items-start gap-3 px-6 pb-0 pt-6">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-warning/10 text-warning">
@@ -820,7 +820,7 @@ export default function OnboardingFunnel() {
             </CardBody>
           </Card>
 
-          <Card className="border border-default-200/70 bg-content1/90 shadow-sm">
+          <Card className="border border-default-200/70 bg-surface/90 shadow-sm">
             <CardHeader className="flex flex-col items-start gap-3 px-6 pb-0 pt-6">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
@@ -892,7 +892,7 @@ export default function OnboardingFunnel() {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]">
-        <Card className="border border-default-200/70 bg-content1/90 shadow-lg">
+        <Card className="border border-default-200/70 bg-surface/90 shadow-lg">
           <CardHeader className="flex flex-col items-start gap-3 px-6 pb-0 pt-6">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-secondary/10 text-secondary">
@@ -984,7 +984,7 @@ export default function OnboardingFunnel() {
           </CardBody>
         </Card>
 
-        <Card className="border border-default-200/70 bg-content1/90 shadow-sm">
+        <Card className="border border-default-200/70 bg-surface/90 shadow-sm">
           <CardHeader className="flex flex-col items-start gap-3 px-6 pb-0 pt-6">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-success/10 text-success">

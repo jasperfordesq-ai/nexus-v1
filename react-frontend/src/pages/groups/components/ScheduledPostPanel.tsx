@@ -187,7 +187,7 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
           {posts.map((post) => (
             <div
               key={post.id}
-              className="flex items-start gap-3 rounded-lg border border-default-200 bg-content1 p-3 shadow-sm transition-colors hover:bg-default-50 dark:hover:bg-default-100/5"
+              className="flex items-start gap-3 rounded-lg border border-default-200 bg-surface p-3 shadow-sm transition-colors hover:bg-default-50 dark:hover:bg-default-100/5"
             >
               <div className="flex-1 min-w-0 space-y-1">
                 <p className="text-sm font-medium text-foreground">{post.title}</p>

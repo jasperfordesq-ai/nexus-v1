@@ -190,7 +190,7 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
           {webhooks.map((wh) => (
             <div
               key={wh.id}
-              className="flex flex-col gap-3 rounded-lg border border-default-200 bg-content1 p-3 shadow-sm sm:flex-row sm:items-start"
+              className="flex flex-col gap-3 rounded-lg border border-default-200 bg-surface p-3 shadow-sm sm:flex-row sm:items-start"
             >
               <div className="flex-1 min-w-0 space-y-1">
                 <p className="text-sm font-medium text-foreground truncate" title={wh.url}>

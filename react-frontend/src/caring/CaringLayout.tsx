@@ -135,7 +135,7 @@ export function CaringLayout() {
             aria-modal="true"
             aria-label={t('panel.navigation.label')}
             tabIndex={-1}
-            className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-divider bg-content1 transition-transform duration-300 md:hidden"
+            className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-divider bg-surface transition-transform duration-300 md:hidden"
           >
             <CaringPanelSidebar
               collapsed={false}

@@ -32,7 +32,7 @@ export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerPro
         role="dialog"
         aria-modal="true"
         aria-label={t('help_drawer.aria_label', { title: article.title })}
-        className={`fixed inset-y-0 right-0 z-50 flex w-full max-w-[min(24rem,calc(100dvw-var(--safe-area-left)-var(--safe-area-right)))] flex-col bg-content1 shadow-xl transition-transform duration-300 ${
+        className={`fixed inset-y-0 right-0 z-50 flex w-full max-w-[min(24rem,calc(100dvw-var(--safe-area-left)-var(--safe-area-right)))] flex-col bg-overlay shadow-xl transition-transform duration-300 ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >

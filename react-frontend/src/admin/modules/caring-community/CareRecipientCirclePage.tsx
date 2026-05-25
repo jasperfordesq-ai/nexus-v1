@@ -288,7 +288,7 @@ export default function CareRecipientCirclePage() {
                     aria-label={t('admin.recipient_circle.relationships.aria')}
                     removeWrapper
                     classNames={{
-                      th: 'bg-content2 text-xs font-semibold uppercase tracking-wide',
+                      th: 'bg-surface-secondary text-xs font-semibold uppercase tracking-wide',
                     }}
                   >
                   <TableHeader>
