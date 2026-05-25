@@ -9,7 +9,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Tooltip } from '@heroui/react';
+
 import Copy from 'lucide-react/icons/copy';
 import Trash2 from 'lucide-react/icons/trash-2';
 import Globe from 'lucide-react/icons/globe';
@@ -20,7 +20,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader, DataTable, ConfirmModal, EmptyState, type Column } from '../../components';
-import { Button, Chip } from '@/components/ui';
+import { Button, Chip, Tooltip } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

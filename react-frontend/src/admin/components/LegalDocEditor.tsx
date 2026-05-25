@@ -40,7 +40,7 @@ import { TOGGLE_LINK_COMMAND, $isLinkNode } from '@lexical/link';
 import {
   $getNearestNodeOfType, $findMatchingParent, $insertNodeToNearestRoot, } from '@lexical/utils';
 import { $isListNode, ListNode as ListNodeClass } from '@lexical/list';
-import { Tooltip } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import Bold from 'lucide-react/icons/bold';
 import Italic from 'lucide-react/icons/italic';
@@ -67,7 +67,7 @@ import {
   $createLegalNoticeNode,
   $isLegalNoticeNode,
 } from './LegalNoticeNode';
-import { Button } from '@/components/ui';
+import { Button, Tooltip } from '@/components/ui';
 
 /* ───────────────────────── Theme ───────────────────────── */
 

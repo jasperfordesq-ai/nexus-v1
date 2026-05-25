@@ -1,10 +1,10 @@
-import { Button, Card, CardBody, CardHeader, Chip, Spinner, Progress, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Spinner, Progress, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tooltip } from '@/components/ui';
 import {
   useCallback,
   useEffect,
   useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Tooltip } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';

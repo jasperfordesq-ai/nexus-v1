@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, MemberCardSkeleton, AlgorithmLabel, useAlgorithmInfo, Button, Chip, Input, Avatar } from '@/components/ui';
+import { Select, SelectItem, GlassCard, MemberCardSkeleton, AlgorithmLabel, useAlgorithmInfo, Button, Chip, Input, Avatar, Tooltip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,7 +11,7 @@ import { Select, SelectItem, GlassCard, MemberCardSkeleton, AlgorithmLabel, useA
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Tooltip } from '@heroui/react';
+
 import Search from 'lucide-react/icons/search';
 import Users from 'lucide-react/icons/users';
 import MapPin from 'lucide-react/icons/map-pin';

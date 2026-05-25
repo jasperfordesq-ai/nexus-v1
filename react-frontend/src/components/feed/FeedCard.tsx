@@ -1,4 +1,4 @@
-import { Button, Chip, Card, CardBody, GlassCard, BottomSheet, ConfettiCelebration, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Avatar } from '@/components/ui';
+import { Button, Chip, Card, CardBody, GlassCard, BottomSheet, ConfettiCelebration, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Avatar, Tooltip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -14,7 +14,7 @@ import {
   Link } from 'react-router-dom';
 import { motion,
   AnimatePresence } from 'framer-motion';
-import { Tooltip, Skeleton } from '@heroui/react';
+import { Skeleton } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Heart from 'lucide-react/icons/heart';
 import MessageCircle from 'lucide-react/icons/message-circle';

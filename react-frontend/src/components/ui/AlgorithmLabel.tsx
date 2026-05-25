@@ -9,10 +9,10 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Tooltip } from '@heroui/react';
+
 import Cpu from 'lucide-react/icons/cpu';
 import { api } from '@/lib/api';
-import { Chip } from '@/components/ui';
+import { Chip, Tooltip } from '@/components/ui';
 
 interface AlgorithmInfo {
   name: string;

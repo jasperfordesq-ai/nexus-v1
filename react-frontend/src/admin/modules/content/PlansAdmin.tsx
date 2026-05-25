@@ -10,7 +10,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Tooltip } from '@heroui/react';
+
 import CreditCard from 'lucide-react/icons/credit-card';
 import Plus from 'lucide-react/icons/plus';
 import Pencil from 'lucide-react/icons/pencil';
@@ -25,7 +25,7 @@ import { useTenant, useToast, useAuth } from '@/contexts';
 import { adminPlans, type PlanListItem } from '../../api/adminApi';
 import { PageHeader, DataTable, EmptyState, ConfirmModal, type Column } from '../../components';
 import { useTranslation } from 'react-i18next';
-import { Button, Chip, Spinner } from '@/components/ui';
+import { Button, Chip, Spinner, Tooltip } from '@/components/ui';
 
 export function PlansAdmin() {
   const { t } = useTranslation('admin');

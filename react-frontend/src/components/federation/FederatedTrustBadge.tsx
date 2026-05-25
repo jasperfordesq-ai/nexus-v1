@@ -12,10 +12,10 @@
  * federated partner link.
  */
 
-import { Tooltip } from '@heroui/react';
+
 import Shield from 'lucide-react/icons/shield';
 import { useTranslation } from 'react-i18next';
-import { Chip } from '@/components/ui';
+import { Chip, Tooltip } from '@/components/ui';
 
 export interface FederatedTrustBadgeProps {
   /** Average rating score, 0–5. */

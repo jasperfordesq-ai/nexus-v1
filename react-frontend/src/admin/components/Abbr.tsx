@@ -9,7 +9,7 @@
  * Admin panel is English-only — no i18n.
  */
 
-import { Tooltip } from '@heroui/react';
+
 
 export const ABBR_TERMS: Record<string, string> = {
   KISS: 'Koordination und Innovation für Soziales — Swiss methodology for community-based care coordination, developed with Age-Stiftung',
@@ -31,6 +31,7 @@ export const ABBR_TERMS: Record<string, string> = {
 
 import type { ReactNode } from 'react';
 
+import { Tooltip } from '@/components/ui';
 interface AbbrProps {
   /** Key from ABBR_TERMS dictionary */
   term: keyof typeof ABBR_TERMS;

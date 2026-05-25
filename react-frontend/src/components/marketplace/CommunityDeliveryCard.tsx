@@ -1,4 +1,4 @@
-import { CardBody, Card, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
+import { CardBody, Card, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tooltip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,7 +15,7 @@ import { CardBody, Card, useDisclosure, Button, Chip, Spinner, Input, Textarea, 
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Tooltip } from '@heroui/react';
+
 import Truck from 'lucide-react/icons/truck';
 import Clock from 'lucide-react/icons/clock';
 import Users from 'lucide-react/icons/users';

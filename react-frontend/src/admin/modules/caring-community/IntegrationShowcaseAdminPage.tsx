@@ -1,10 +1,10 @@
-import { Button, Card, CardBody, CardHeader, Chip, Spinner, Snippet, Accordion, AccordionItem } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Spinner, Snippet, Accordion, AccordionItem, Tooltip } from '@/components/ui';
 import {
   useCallback,
   useEffect,
   useMemo,
   useState } from 'react';
-import { Tooltip } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import ClipboardList from 'lucide-react/icons/clipboard-list';
 import ExternalLink from 'lucide-react/icons/external-link';

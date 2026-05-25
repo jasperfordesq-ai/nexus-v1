@@ -10,7 +10,7 @@
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Tooltip } from '@heroui/react';
+
 import Search from 'lucide-react/icons/search';
 import Users from 'lucide-react/icons/users';
 import Plus from 'lucide-react/icons/plus';
@@ -21,7 +21,7 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Star from 'lucide-react/icons/star';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, GroupCardSkeleton, Button, Input, Avatar, AvatarGroup } from '@/components/ui';
+import { GlassCard, GroupCardSkeleton, Button, Input, Avatar, AvatarGroup, Tooltip } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';

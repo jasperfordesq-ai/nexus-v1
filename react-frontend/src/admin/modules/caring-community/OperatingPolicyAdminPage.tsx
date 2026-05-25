@@ -1,7 +1,7 @@
-import { Button, Card, CardBody, CardHeader, Input, Spinner, Select, SelectItem } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Input, Spinner, Select, SelectItem, Tooltip } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tooltip } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';

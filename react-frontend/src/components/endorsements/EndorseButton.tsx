@@ -11,13 +11,13 @@
  */
 
 import { useState } from 'react';
-import { Tooltip } from '@heroui/react';
+
 import ThumbsUp from 'lucide-react/icons/thumbs-up';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { Button } from '@/components/ui';
+import { Button, Tooltip } from '@/components/ui';
 
 export interface EndorseButtonProps {
   memberId: number;

@@ -10,7 +10,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Tooltip } from '@heroui/react';
+
 import Bookmark from 'lucide-react/icons/bookmark';
 import Trash2 from 'lucide-react/icons/trash-2';
 import Play from 'lucide-react/icons/play';
@@ -19,7 +19,7 @@ import { useToast, useAuth } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { SavedSearch } from '@/types/api';
-import { Button, Spinner, Input } from '@/components/ui';
+import { Button, Spinner, Input, Tooltip } from '@/components/ui';
 
 interface SavedSearchesProps {
   /** Called when a saved search is run — parent should execute the search */

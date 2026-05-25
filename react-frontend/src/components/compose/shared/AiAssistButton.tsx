@@ -9,12 +9,12 @@
  */
 
 import { useState } from 'react';
-import { Tooltip } from '@heroui/react';
+
 import Sparkles from 'lucide-react/icons/sparkles';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
-import { Button } from '@/components/ui';
+import { Button, Tooltip } from '@/components/ui';
 
 interface AiAssistButtonProps {
   type: 'listing' | 'event';

@@ -1,9 +1,9 @@
-import { Card, CardBody, CardHeader, Chip, Spinner, Progress } from '@/components/ui';
+import { Card, CardBody, CardHeader, Chip, Spinner, Progress, Tooltip } from '@/components/ui';
 import {
   useState,
   useEffect,
   useCallback } from 'react';
-import { Tooltip } from '@heroui/react';
+
 import Activity from 'lucide-react/icons/activity';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';

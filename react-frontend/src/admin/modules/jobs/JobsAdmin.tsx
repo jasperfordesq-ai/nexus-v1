@@ -1,4 +1,4 @@
-import { Chip, Button, Spinner, Textarea, Card, CardBody, Select, SelectItem, Avatar, Tabs, Tab } from '@/components/ui';
+import { Chip, Button, Spinner, Textarea, Card, CardBody, Select, SelectItem, Avatar, Tabs, Tab, Tooltip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,7 +11,7 @@ import { Chip, Button, Spinner, Textarea, Card, CardBody, Select, SelectItem, Av
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Tooltip } from '@heroui/react';
+
 import Briefcase from 'lucide-react/icons/briefcase';
 import Star from 'lucide-react/icons/star';
 import StarOff from 'lucide-react/icons/star-off';

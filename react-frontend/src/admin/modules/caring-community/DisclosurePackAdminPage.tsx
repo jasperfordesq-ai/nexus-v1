@@ -1,6 +1,6 @@
-import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Tab, Tabs } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Tab, Tabs, Tooltip } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Tooltip } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import Download from 'lucide-react/icons/download';
 import FileText from 'lucide-react/icons/file-text';

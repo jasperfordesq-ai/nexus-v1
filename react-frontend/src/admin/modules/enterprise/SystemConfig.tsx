@@ -1,7 +1,7 @@
-import { Card, CardBody, CardHeader, Input, Button, Spinner, Textarea, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@/components/ui';
+import { Card, CardBody, CardHeader, Input, Button, Spinner, Textarea, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Tooltip } from '@/components/ui';
 import { useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { Tooltip } from '@heroui/react';
+
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import { useTenant } from '@/contexts';
 import Save from 'lucide-react/icons/save';

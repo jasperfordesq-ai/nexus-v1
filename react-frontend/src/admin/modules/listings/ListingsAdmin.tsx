@@ -1,4 +1,4 @@
-import { Button, Chip, Card, CardBody, Input, Spinner, Tabs, Tab } from '@/components/ui';
+import { Button, Chip, Card, CardBody, Input, Spinner, Tabs, Tab, Tooltip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,7 +12,7 @@ import { Button, Chip, Card, CardBody, Input, Spinner, Tabs, Tab } from '@/compo
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Tooltip } from '@heroui/react';
+
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
 import Trash2 from 'lucide-react/icons/trash-2';

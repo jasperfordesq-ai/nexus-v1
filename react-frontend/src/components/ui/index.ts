@@ -26,6 +26,7 @@ export { Input, type InputProps } from './Input';
 export { Textarea, type TextareaProps } from './Textarea';
 export { Switch, type SwitchProps } from './Switch';
 export { Tabs, Tab, type TabsProps, type TabProps } from './Tabs';
+export { Tooltip, type TooltipProps } from './Tooltip';
 export {
   Card,
   CardHeader,

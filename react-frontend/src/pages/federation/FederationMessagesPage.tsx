@@ -18,7 +18,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Tooltip } from '@heroui/react';
+
 import MessageSquare from 'lucide-react/icons/message-square';
 import Send from 'lucide-react/icons/send';
 import Mail from 'lucide-react/icons/mail';
@@ -31,7 +31,7 @@ import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Languages from 'lucide-react/icons/languages';
 
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tooltip } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
