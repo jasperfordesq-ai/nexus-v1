@@ -41,6 +41,12 @@ const HAS_USER_CREDENTIALS = Boolean(process.env.E2E_USER_EMAIL && process.env.E
 const HAS_ADMIN_CREDENTIALS = Boolean(process.env.E2E_ADMIN_EMAIL && process.env.E2E_ADMIN_PASSWORD);
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 2000;
+const COOKIE_CONSENT = {
+  essential: true,
+  analytics: false,
+  preferences: true,
+  timestamp: new Date().toISOString(),
+};
 
 async function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -128,7 +134,7 @@ async function authenticateViaApi(
     },
     headers: {
       'Content-Type': 'application/json',
-      'X-Tenant-ID': TENANT_SLUG,
+      'X-Tenant-Slug': TENANT_SLUG,
     },
   });
 
@@ -157,7 +163,7 @@ async function authenticateViaApi(
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${accessToken}`,
-        'X-Tenant-ID': TENANT_SLUG,
+        'X-Tenant-Slug': TENANT_SLUG,
       },
     });
   } catch {
@@ -174,7 +180,12 @@ async function authenticateViaApi(
 
   // Inject JWT tokens into localStorage
   await authPage.evaluate(
-    ({ accessToken, refreshToken, tenantId }: { accessToken: string; refreshToken?: string; tenantId?: string | number }) => {
+    ({ accessToken, refreshToken, tenantId, cookieConsent }: {
+      accessToken: string;
+      refreshToken?: string;
+      tenantId?: string | number;
+      cookieConsent: typeof COOKIE_CONSENT;
+    }) => {
       localStorage.setItem('nexus_access_token', accessToken);
       if (refreshToken) {
         localStorage.setItem('nexus_refresh_token', refreshToken);
@@ -184,8 +195,9 @@ async function authenticateViaApi(
       }
       // Dismiss dev notice
       localStorage.setItem('dev_notice_dismissed', '2.1');
+      localStorage.setItem('nexus_cookie_consent', JSON.stringify(cookieConsent));
     },
-    { accessToken, refreshToken, tenantId: tenantId ? String(tenantId) : undefined }
+    { accessToken, refreshToken, tenantId: tenantId ? String(tenantId) : undefined, cookieConsent: COOKIE_CONSENT }
   );
 
   // Save storage state (includes localStorage with JWT tokens)

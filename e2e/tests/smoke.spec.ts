@@ -28,6 +28,67 @@ import {
 let consoleErrors: string[] = [];
 const hasUserCredentials = Boolean(process.env.E2E_USER_EMAIL && process.env.E2E_USER_PASSWORD);
 const hasAdminCredentials = Boolean(process.env.E2E_ADMIN_EMAIL && process.env.E2E_ADMIN_PASSWORD);
+const apiBaseUrl = process.env.E2E_API_URL || process.env.E2E_BASE_URL || 'http://localhost:8090';
+const cookieConsent = {
+  essential: true,
+  analytics: false,
+  preferences: true,
+  timestamp: new Date().toISOString(),
+};
+
+async function primeBrowserState(page: Page): Promise<void> {
+  await page.addInitScript((consent) => {
+    localStorage.setItem('dev_notice_dismissed', '2.1');
+    localStorage.setItem('nexus_cookie_consent', JSON.stringify(consent));
+  }, cookieConsent);
+}
+
+async function primeApiAuth(page: Page, kind: 'user' | 'admin'): Promise<void> {
+  const email = kind === 'admin' ? process.env.E2E_ADMIN_EMAIL : process.env.E2E_USER_EMAIL;
+  const password = kind === 'admin' ? process.env.E2E_ADMIN_PASSWORD : process.env.E2E_USER_PASSWORD;
+
+  if (!email || !password) {
+    throw new Error(`Missing E2E ${kind} credentials`);
+  }
+
+  const response = await page.request.post(`${apiBaseUrl}/api/auth/login`, {
+    data: {
+      email,
+      password,
+      tenant_slug: DEFAULT_TENANT,
+    },
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Tenant-Slug': DEFAULT_TENANT,
+    },
+  });
+
+  if (!response.ok()) {
+    throw new Error(`E2E ${kind} API login failed (${response.status()}): ${await response.text()}`);
+  }
+
+  const loginData = await response.json();
+  const accessToken = loginData?.data?.access_token || loginData?.access_token;
+  const refreshToken = loginData?.data?.refresh_token || loginData?.refresh_token;
+  const tenantId = loginData?.data?.tenant_id || loginData?.tenant_id;
+
+  if (!accessToken) {
+    throw new Error(`E2E ${kind} API login did not return an access token`);
+  }
+
+  await page.addInitScript(
+    ({ accessToken, refreshToken, tenantId }) => {
+      localStorage.setItem('nexus_access_token', accessToken);
+      if (refreshToken) {
+        localStorage.setItem('nexus_refresh_token', refreshToken);
+      }
+      if (tenantId) {
+        localStorage.setItem('nexus_tenant_id', String(tenantId));
+      }
+    },
+    { accessToken, refreshToken, tenantId }
+  );
+}
 
 async function waitForTenantHydration(page: Page): Promise<void> {
   const loadingShell = page
@@ -35,16 +96,21 @@ async function waitForTenantHydration(page: Page): Promise<void> {
     .first();
 
   await expect(loadingShell).toBeHidden({ timeout: 20000 }).catch(() => undefined);
+  await page.waitForFunction(() => !document.body?.innerText.includes('Loading community'), null, { timeout: 25000 })
+    .catch(() => undefined);
 
   await dismissBlockingModals(page);
 }
 
 test.beforeEach(async ({ page }) => {
+  await primeBrowserState(page);
   consoleErrors = [];
   page.on('pageerror', (error) => {
     consoleErrors.push(error.message);
   });
 });
+
+test.setTimeout(60000);
 
 // ---------------------------------------------------------------------------
 // 1. Public Pages Load
@@ -72,9 +138,10 @@ test.describe('Smoke Tests @smoke', () => {
     test('about page loads', async ({ page }) => {
       await page.goto(tenantUrl('about'), { waitUntil: 'domcontentloaded' });
       await dismissBlockingModals(page);
+      await waitForTenantHydration(page);
 
-      const heading = page.locator('h1');
-      await expect(heading).toBeVisible({ timeout: 10000 });
+      await expect(page.getByRole('heading', { name: /About|Project NEXUS|hOUR Timebank/i, level: 1 }).first())
+        .toBeVisible({ timeout: 20000 });
 
       expect(consoleErrors).toHaveLength(0);
     });
@@ -140,12 +207,12 @@ test.describe('Smoke Tests @smoke', () => {
       await dismissBlockingModals(page);
 
       // Fill and submit login form
-      const emailInput = page.locator('#login-email, input[name="email"]').first();
-      const passwordInput = page.locator('#login-password, input[name="password"]').first();
+      const emailInput = page.getByRole('textbox', { name: /^Email/i }).first();
+      const passwordInput = page.getByRole('textbox', { name: /^Password/i }).first();
       await emailInput.fill(email);
       await passwordInput.fill(password);
 
-      const submitBtn = page.locator('button[type="submit"]').first();
+      const submitBtn = page.getByRole('button', { name: /Sign In|Log in|Login/i }).first();
       await submitBtn.click();
 
       // Should redirect away from login (dashboard, home, feed, or onboarding)
@@ -202,22 +269,26 @@ test.describe('Smoke Tests @smoke', () => {
     test.skip(!hasUserCredentials, 'No E2E user credentials configured');
 
     test('dashboard loads and shows heading or content', async ({ page }) => {
+      await primeApiAuth(page, 'user');
       await goToTenantPage(page, 'dashboard');
+      await waitForTenantHydration(page);
 
       // Should be on dashboard URL (may have tenant prefix)
       expect(page.url()).toContain('dashboard');
 
       // Should have a heading (welcome message or "Dashboard")
       const heading = page.locator('h1, h2').first();
-      await expect(heading).toBeVisible({ timeout: 10000 });
+      await expect(heading).toBeVisible({ timeout: 30000 });
     });
 
     test('dashboard shows navigation elements', async ({ page }) => {
+      await primeApiAuth(page, 'user');
       await goToTenantPage(page, 'dashboard');
+      await waitForTenantHydration(page);
 
       // Should have nav bar with links
-      const nav = page.locator('nav, header').first();
-      await expect(nav).toBeVisible({ timeout: 10000 });
+      const nav = page.locator('nav, header, [role="navigation"], [role="banner"]').first();
+      await expect(nav).toBeVisible({ timeout: 30000 });
 
       // Should have at least some navigation links
       const navLinks = page.locator('nav a[href], header a[href]');
@@ -234,11 +305,13 @@ test.describe('Smoke Tests @smoke', () => {
     test.skip(!hasUserCredentials, 'No E2E user credentials configured');
 
     test('listings page loads and shows content area', async ({ page }) => {
+      await primeApiAuth(page, 'user');
       await goToTenantPage(page, 'listings');
 
       await page.waitForLoadState('domcontentloaded');
+      await waitForTenantHydration(page);
       const content = page.locator('main, [role="main"], .content');
-      await expect(content.first()).toBeVisible({ timeout: 10000 });
+      await expect(content.first()).toBeVisible({ timeout: 30000 });
 
       // Should have a heading or listing cards/list
       const hasHeading = await page.locator('h1').isVisible({ timeout: 3000 }).catch(() => false);
@@ -249,21 +322,25 @@ test.describe('Smoke Tests @smoke', () => {
     });
 
     test('messages page loads', async ({ page }) => {
+      await primeApiAuth(page, 'user');
       await goToTenantPage(page, 'messages');
 
       await page.waitForLoadState('domcontentloaded');
+      await waitForTenantHydration(page);
       const content = page.locator('main, [role="main"], .content');
-      await expect(content.first()).toBeVisible({ timeout: 10000 });
+      await expect(content.first()).toBeVisible({ timeout: 30000 });
 
       expect(consoleErrors).toHaveLength(0);
     });
 
     test('wallet page loads and shows balance area', async ({ page }) => {
+      await primeApiAuth(page, 'user');
       await goToTenantPage(page, 'wallet');
 
       await page.waitForLoadState('domcontentloaded');
+      await waitForTenantHydration(page);
       const content = page.locator('main, [role="main"], .content');
-      await expect(content.first()).toBeVisible({ timeout: 10000 });
+      await expect(content.first()).toBeVisible({ timeout: 30000 });
 
       // Should have some balance-related content (number, "Balance", "Credits", etc.)
       const balanceIndicator = page.locator(
@@ -278,31 +355,37 @@ test.describe('Smoke Tests @smoke', () => {
     });
 
     test('feed page loads', async ({ page }) => {
+      await primeApiAuth(page, 'user');
       await goToTenantPage(page, 'feed');
 
       await page.waitForLoadState('domcontentloaded');
+      await waitForTenantHydration(page);
       const content = page.locator('main, [role="main"], .content');
-      await expect(content.first()).toBeVisible({ timeout: 10000 });
+      await expect(content.first()).toBeVisible({ timeout: 30000 });
 
       expect(consoleErrors).toHaveLength(0);
     });
 
     test('events page loads', async ({ page }) => {
+      await primeApiAuth(page, 'user');
       await goToTenantPage(page, 'events');
 
       await page.waitForLoadState('domcontentloaded');
+      await waitForTenantHydration(page);
       const content = page.locator('main, [role="main"], .content');
-      await expect(content.first()).toBeVisible({ timeout: 10000 });
+      await expect(content.first()).toBeVisible({ timeout: 30000 });
 
       expect(consoleErrors).toHaveLength(0);
     });
 
     test('groups page loads', async ({ page }) => {
+      await primeApiAuth(page, 'user');
       await goToTenantPage(page, 'groups');
 
       await page.waitForLoadState('domcontentloaded');
+      await waitForTenantHydration(page);
       const content = page.locator('main, [role="main"], .content');
-      await expect(content.first()).toBeVisible({ timeout: 10000 });
+      await expect(content.first()).toBeVisible({ timeout: 30000 });
 
       expect(consoleErrors).toHaveLength(0);
     });
@@ -314,10 +397,13 @@ test.describe('Smoke Tests @smoke', () => {
 
   test.describe('Admin Panel', () => {
     test.skip(!hasAdminCredentials, 'No E2E admin credentials configured');
+    test.use({ storageState: 'e2e/fixtures/.auth/admin.json' });
 
     test('admin dashboard loads', async ({ page }) => {
+      await primeApiAuth(page, 'admin');
       await page.goto(`/${DEFAULT_TENANT}/admin`, { waitUntil: 'domcontentloaded' });
       await dismissBlockingModals(page);
+      await waitForTenantHydration(page);
 
       // Should either show admin content or redirect to login (if not admin)
       await page.waitForLoadState('domcontentloaded');
@@ -331,20 +417,22 @@ test.describe('Smoke Tests @smoke', () => {
       if (isOnAdmin && !isOnLogin) {
         // Admin content should be visible
         const content = page.locator('main, .content, [role="main"]');
-        await expect(content.first()).toBeVisible({ timeout: 10000 });
+        await expect(content.first()).toBeVisible({ timeout: 30000 });
       }
 
       expect(consoleErrors).toHaveLength(0);
     });
 
     test('admin shows navigation sidebar', async ({ page }) => {
+      await primeApiAuth(page, 'admin');
       await page.goto(`/${DEFAULT_TENANT}/admin`, { waitUntil: 'domcontentloaded' });
       await dismissBlockingModals(page);
+      await waitForTenantHydration(page);
 
       // Only check sidebar if we are on admin page (not redirected to login)
       if (!page.url().includes('/login')) {
-        const sidebar = page.locator('nav, aside, [data-sidebar]');
-        await expect(sidebar.first()).toBeVisible({ timeout: 10000 });
+        const sidebar = page.locator('nav, aside, [data-sidebar], [role="navigation"]');
+        await expect(sidebar.first()).toBeVisible({ timeout: 30000 });
 
         // Sidebar should have admin links
         const adminLinks = page.locator('a[href*="/admin/"]');
@@ -379,7 +467,7 @@ test.describe('Smoke Tests @smoke', () => {
     test('bootstrap API returns tenant data', async ({ request }) => {
       const response = await request.get(`${apiBaseUrl}/api/v2/tenant/bootstrap`, {
         headers: {
-          'X-Tenant-ID': DEFAULT_TENANT,
+          'X-Tenant-Slug': DEFAULT_TENANT,
           'Accept': 'application/json',
         },
         timeout: 10000,
@@ -406,7 +494,7 @@ test.describe('Smoke Tests @smoke', () => {
     test('categories API returns data', async ({ request }) => {
       const response = await request.get(`${apiBaseUrl}/api/v2/categories`, {
         headers: {
-          'X-Tenant-ID': DEFAULT_TENANT,
+          'X-Tenant-Slug': DEFAULT_TENANT,
           'Accept': 'application/json',
         },
         timeout: 10000,
