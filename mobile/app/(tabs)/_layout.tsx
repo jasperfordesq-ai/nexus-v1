@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, View } from 'react-native';
+import { Animated, View } from 'react-native';
 import { Tabs, usePathname } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -39,37 +39,15 @@ function TabBadge({ count }: { count: number }) {
 
   return (
     <Animated.View
-      style={[
-        badgeStyles.badge,
-        { backgroundColor: primary, transform: [{ scale }] },
-      ]}
+      className="absolute -top-1 -right-2.5 min-w-[18px] h-[18px] rounded-full items-center justify-center px-1"
+      style={{ backgroundColor: primary, transform: [{ scale }] }}
     >
-      <Animated.Text style={badgeStyles.badgeText}>
+      <Animated.Text className="text-white text-[10px] font-bold text-center">
         {count > 99 ? '99+' : count}
       </Animated.Text>
     </Animated.View>
   );
 }
-
-const badgeStyles = StyleSheet.create({
-  badge: {
-    position: 'absolute',
-    top: -4,
-    right: -10,
-    minWidth: 18,
-    height: 18,
-    borderRadius: 9,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 4,
-  },
-  badgeText: {
-    color: '#fff',
-    fontSize: 10,
-    fontWeight: '700',
-    textAlign: 'center',
-  },
-});
 
 interface TabConfig {
   name: string;

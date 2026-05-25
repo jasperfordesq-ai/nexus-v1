@@ -3,38 +3,26 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useState, useMemo } from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  RefreshControl,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { useCallback, useState } from 'react';
+import { FlatList, Pressable, RefreshControl, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { Spinner } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import { getGroups, type Group, type GroupsResponse } from '@/lib/api/groups';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import OfflineBanner from '@/components/OfflineBanner';
 import EmptyState from '@/components/ui/EmptyState';
 import { SkeletonBox } from '@/components/ui/Skeleton';
-import { TYPOGRAPHY } from '@/lib/styles/typography';
-import { SPACING, RADIUS } from '@/lib/styles/spacing';
 
 type FilterValue = 'all' | 'public' | 'private';
 
-/** Extractor for cursor-based GroupsResponse. */
 function extractGroupPage(response: GroupsResponse) {
   return {
     items: response.data,
@@ -43,14 +31,10 @@ function extractGroupPage(response: GroupsResponse) {
   };
 }
 
-// ---------------------------------------------------------------------------
-// GroupCardSkeleton
-// ---------------------------------------------------------------------------
-
-function GroupCardSkeleton({ theme }: { theme: Theme }) {
+function GroupCardSkeleton() {
   return (
-    <View style={{ backgroundColor: theme.surface, borderRadius: RADIUS.lg, padding: 14, marginHorizontal: SPACING.md, marginVertical: 6 }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+    <View className="bg-surface rounded-xl p-3.5 mx-4 my-1.5">
+      <View className="flex-row justify-between mb-2">
         <SkeletonBox width="55%" height={16} />
         <SkeletonBox width={48} height={16} />
       </View>
@@ -61,115 +45,77 @@ function GroupCardSkeleton({ theme }: { theme: Theme }) {
   );
 }
 
-// ---------------------------------------------------------------------------
-// GroupCard
-// ---------------------------------------------------------------------------
-
-interface GroupCardProps {
+function GroupCard({
+  item,
+  primary,
+  t,
+  onPress,
+}: {
   item: Group;
   primary: string;
-  theme: Theme;
   t: (key: string, opts?: Record<string, unknown>) => string;
   onPress: () => void;
-}
-
-function GroupCard({ item, primary, theme, t, onPress }: GroupCardProps) {
+}) {
   return (
-    <TouchableOpacity
-      style={[
-        {
-          backgroundColor: theme.surface,
-          borderRadius: RADIUS.lg,
-          padding: 14,
-          marginHorizontal: SPACING.md,
-          marginVertical: 6,
-          borderWidth: 1,
-          borderColor: theme.border,
-        },
-      ]}
+    <Pressable
+      className="bg-surface rounded-xl p-3.5 mx-4 my-1.5 border border-border"
       onPress={onPress}
-      activeOpacity={0.8}
       accessibilityRole="button"
       accessibilityLabel={item.name ?? ''}
     >
       {/* Name row */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
+      <View className="flex-row items-center mb-1.5">
         <Ionicons
           name={item.visibility === 'private' ? 'lock-closed-outline' : 'globe-outline'}
           size={14}
-          color={theme.textMuted}
-          style={{ marginRight: 5 }}
+          className="text-muted-foreground mr-1"
         />
-        <Text
-          style={{ flex: 1, fontSize: 16, fontWeight: '700', color: theme.text } as const}
-          numberOfLines={1}
-        >
+        <Text className="flex-1 text-base font-bold text-foreground" numberOfLines={1}>
           {item.name}
         </Text>
         {/* Badges */}
-        <View style={{ flexDirection: 'row', gap: 6, marginLeft: 8 }}>
-          {item.is_featured && (
+        <View className="flex-row gap-1.5 ml-2">
+          {item.is_featured ? (
             <View
-              style={{
-                backgroundColor: withAlpha(primary, 0.13),
-                borderRadius: RADIUS.sm,
-                paddingHorizontal: 7,
-                paddingVertical: SPACING.xxs,
-              }}
+              className="rounded px-1.5 py-0.5"
+              style={{ backgroundColor: withAlpha(primary, 0.13) }}
             >
-              <Text style={{ fontSize: 11, fontWeight: '600', color: primary }}>
+              <Text className="text-[11px] font-semibold" style={{ color: primary }}>
                 {t('featured')}
               </Text>
             </View>
-          )}
-          {item.is_member && (
-            <View
-              style={{
-                backgroundColor: theme.successBg,
-                borderRadius: RADIUS.sm,
-                paddingHorizontal: 7,
-                paddingVertical: SPACING.xxs,
-              }}
-            >
-              <Text style={{ fontSize: 11, fontWeight: '600', color: theme.success }}>
+          ) : null}
+          {item.is_member ? (
+            <View className="bg-success/10 rounded px-1.5 py-0.5">
+              <Text className="text-[11px] font-semibold text-success">
                 {t('joined')}
               </Text>
             </View>
-          )}
+          ) : null}
         </View>
       </View>
 
       {/* Description */}
       {item.description ? (
-        <Text
-          style={{ ...TYPOGRAPHY.label, fontWeight: '400', color: theme.textSecondary, lineHeight: 20, marginBottom: SPACING.sm }}
-          numberOfLines={2}
-        >
+        <Text className="text-sm text-muted-foreground leading-5 mb-2" numberOfLines={2}>
           {item.description}
         </Text>
       ) : null}
 
       {/* Meta: member count */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: SPACING.xs }}>
-        <Ionicons name="people-outline" size={13} color={theme.textMuted} />
-        <Text style={{ ...TYPOGRAPHY.bodySmall, color: theme.textMuted }}>
+      <View className="flex-row items-center gap-1">
+        <Ionicons name="people-outline" size={13} className="text-muted-foreground" />
+        <Text className="text-xs text-muted-foreground">
           {t('members', { count: item.member_count ?? 0 })}
         </Text>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 }
-
-// ---------------------------------------------------------------------------
-// GroupsScreen
-// ---------------------------------------------------------------------------
 
 export default function GroupsScreen() {
   const { t } = useTranslation('groups');
   const primary = usePrimaryColor();
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 400);
   const [filter, setFilter] = useState<FilterValue>('all');
@@ -194,34 +140,32 @@ export default function GroupsScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-background">
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>{t('title')}</Text>
-        <TouchableOpacity
-          style={[styles.newButton, { backgroundColor: primary }]}
+      <View className="flex-row items-center justify-between px-4 pt-4 pb-2">
+        <Text className="text-xl font-bold text-foreground">{t('title')}</Text>
+        <Pressable
+          className="w-9 h-9 rounded-full items-center justify-center"
+          style={{ backgroundColor: primary }}
           onPress={() => {
             void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             router.push('/(modals)/group-detail');
           }}
-          activeOpacity={0.8}
           accessibilityLabel={t('newGroup')}
           accessibilityRole="button"
         >
-          {/* #fff = contrast on primary */}
           <Ionicons name="add" size={20} color="#fff" />
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       {/* Search bar */}
-      <View style={styles.searchContainer}>
-        <Ionicons name="search-outline" size={18} color={theme.textMuted} style={styles.searchIcon} />
+      <View className="flex-row items-center bg-surface mx-4 mb-2 rounded-xl border border-border px-3">
+        <Ionicons name="search-outline" size={18} className="text-muted-foreground mr-2" />
         <TextInput
-          style={styles.searchInput}
+          className="flex-1 py-2.5 text-base text-foreground"
           value={search}
           onChangeText={setSearch}
           placeholder={t('searchPlaceholder')}
-          placeholderTextColor={theme.textMuted}
           returnKeyType="search"
           clearButtonMode="while-editing"
           accessibilityLabel={t('searchPlaceholder')}
@@ -229,34 +173,30 @@ export default function GroupsScreen() {
       </View>
 
       {/* Filter pills */}
-      <View style={styles.filterRow}>
+      <View className="flex-row gap-2 px-4 mb-2">
         {filterOptions.map((opt) => (
-          <TouchableOpacity
+          <Pressable
             key={opt.value}
-            style={[
-              styles.filterPill,
+            className="rounded-full border px-3.5 py-1.5"
+            style={
               filter === opt.value
                 ? { backgroundColor: primary, borderColor: primary }
-                : { backgroundColor: theme.surface, borderColor: theme.border },
-            ]}
+                : { borderColor: '#d1d5db' }
+            }
             onPress={() => {
               void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               setFilter(opt.value);
             }}
-            activeOpacity={0.8}
             accessibilityRole="button"
             accessibilityLabel={opt.label}
           >
             <Text
-              style={[
-                styles.filterPillText,
-                // '#fff' = contrast on primary
-                { color: filter === opt.value ? '#fff' : theme.textSecondary },
-              ]}
+              className="text-xs font-semibold"
+              style={{ color: filter === opt.value ? '#fff' : '#6b7280' }}
             >
               {opt.label}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         ))}
       </View>
 
@@ -269,7 +209,6 @@ export default function GroupsScreen() {
           <GroupCard
             item={item}
             primary={primary}
-            theme={theme}
             t={t}
             onPress={() => {
               void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -278,101 +217,40 @@ export default function GroupsScreen() {
           />
         )}
         refreshControl={
-          <RefreshControl refreshing={isLoading && items.length > 0} onRefresh={refresh} tintColor={primary} colors={[primary]} />
+          <RefreshControl
+            refreshing={isLoading && items.length > 0}
+            onRefresh={refresh}
+            tintColor={primary}
+            colors={[primary]}
+          />
         }
         onEndReached={() => { if (hasMore) loadMore(); }}
         onEndReachedThreshold={0.3}
         ListEmptyComponent={
           isLoading ? (
-            <>
-              <GroupCardSkeleton theme={theme} />
-              <GroupCardSkeleton theme={theme} />
-              <GroupCardSkeleton theme={theme} />
-            </>
+            <><GroupCardSkeleton /><GroupCardSkeleton /><GroupCardSkeleton /></>
           ) : error ? (
-            <View style={styles.centered}>
-              <Text style={styles.errorText}>{error}</Text>
-              <TouchableOpacity onPress={() => void refresh()} style={styles.retryBtn}>
-                <Text style={{ color: primary, ...TYPOGRAPHY.button }}>
-                  {t('common:buttons.retry')}
-                </Text>
-              </TouchableOpacity>
+            <View className="flex-1 items-center justify-center p-8">
+              <Text className="text-danger text-sm text-center mb-3">{error}</Text>
+              <Pressable onPress={() => void refresh()} className="px-5 py-2.5">
+                <Text className="font-semibold" style={{ color: primary }}>{t('common:buttons.retry')}</Text>
+              </Pressable>
             </View>
           ) : (
-            <EmptyState
-              icon="people-outline"
-              title={t('empty')}
-            />
+            <EmptyState icon="people-outline" title={t('empty')} />
           )
         }
         ListFooterComponent={
           isLoadingMore ? (
-            <View style={styles.footer}>
-              <ActivityIndicator size="small" color={theme.textMuted} />
-            </View>
+            <View className="py-4 items-center"><Spinner size="sm" /></View>
           ) : !hasMore && items.length > 0 && !isLoading ? (
-            <View style={styles.footer}>
-              <Text style={styles.endOfListText}>{t('common:endOfList')}</Text>
+            <View className="py-4 items-center">
+              <Text className="text-xs text-muted-foreground">{t('common:endOfList')}</Text>
             </View>
           ) : null
         }
-        contentContainerStyle={styles.list}
+        contentContainerStyle={{ paddingBottom: 24 }}
       />
     </SafeAreaView>
   );
-}
-
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.bg },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: SPACING.md,
-      paddingTop: SPACING.md,
-      paddingBottom: SPACING.sm,
-    },
-    title: { ...TYPOGRAPHY.h2, color: theme.text },
-    newButton: {
-      width: 36,
-      height: 36,
-      borderRadius: 18,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    searchContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: theme.surface,
-      marginHorizontal: SPACING.md,
-      marginBottom: SPACING.sm,
-      borderRadius: RADIUS.md,
-      borderWidth: 1,
-      borderColor: theme.border,
-      paddingHorizontal: 12,
-    },
-    searchIcon: { marginRight: SPACING.sm },
-    searchInput: { flex: 1, paddingVertical: 10, ...TYPOGRAPHY.body, color: theme.text },
-    filterRow: {
-      flexDirection: 'row',
-      gap: SPACING.sm,
-      paddingHorizontal: SPACING.md,
-      marginBottom: SPACING.sm,
-    },
-    filterPill: {
-      borderRadius: RADIUS.xl,
-      borderWidth: 1,
-      paddingHorizontal: 14,
-      paddingVertical: 6,
-    },
-    filterPillText: { ...TYPOGRAPHY.buttonSmall },
-    list: { paddingBottom: SPACING.lg },
-    centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: SPACING.xl },
-    errorText: { ...TYPOGRAPHY.label, fontWeight: '400', color: theme.error, textAlign: 'center', marginBottom: 12 },
-    retryBtn: { paddingHorizontal: 20, paddingVertical: 10 },
-    emptyText: { ...TYPOGRAPHY.label, fontWeight: '400', color: theme.textMuted, textAlign: 'center' },
-    footer: { paddingVertical: SPACING.md, alignItems: 'center' },
-    endOfListText: { ...TYPOGRAPHY.bodySmall, color: theme.textMuted },
-  });
 }

@@ -3,44 +3,25 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useState, useMemo } from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  RefreshControl,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { useCallback, useState } from 'react';
+import { FlatList, Pressable, RefreshControl, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-
+import { Spinner } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import { getMembers, type Member, type MemberListResponse } from '@/lib/api/members';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import MemberCard from '@/components/MemberCard';
 import { SkeletonBox } from '@/components/ui/Skeleton';
-import { TYPOGRAPHY } from '@/lib/styles/typography';
-import { SPACING, RADIUS } from '@/lib/styles/spacing';
 
-/** Inline skeleton for a member card row. */
-function MemberCardSkeleton({ theme }: { theme: Theme }) {
+function MemberCardSkeleton() {
   return (
-    <View style={{
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingHorizontal: 16,
-      paddingVertical: 12,
-      backgroundColor: theme.surface,
-    }}>
+    <View className="flex-row items-center px-4 py-3 bg-surface">
       <SkeletonBox width={48} height={48} borderRadius={24} />
-      <View style={{ flex: 1, marginLeft: 12, gap: 6 }}>
+      <View className="flex-1 ml-3 gap-1.5">
         <SkeletonBox width="60%" height={14} />
         <SkeletonBox width="40%" height={11} />
       </View>
@@ -48,7 +29,6 @@ function MemberCardSkeleton({ theme }: { theme: Theme }) {
   );
 }
 
-/** Extractor for offset-based MemberListResponse — encodes next offset as cursor string. */
 function extractMembersPage(response: MemberListResponse) {
   const nextOffset = response.meta.offset + response.data.length;
   return {
@@ -61,8 +41,6 @@ function extractMembersPage(response: MemberListResponse) {
 export default function MembersScreen() {
   const { t } = useTranslation('members');
   const primary = usePrimaryColor();
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebounce(search, 400);
 
@@ -78,20 +56,19 @@ export default function MembersScreen() {
     usePaginatedApi<Member, MemberListResponse>(fetchMembers, extractMembersPage, [debouncedSearch]);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>{t('title')}</Text>
+    <SafeAreaView className="flex-1 bg-background">
+      <View className="px-4 pt-4 pb-2">
+        <Text className="text-xl font-bold text-foreground">{t('title')}</Text>
       </View>
 
       {/* Search bar */}
-      <View style={styles.searchContainer}>
-        <Ionicons name="search-outline" size={18} color={theme.textMuted} style={styles.searchIcon} />
+      <View className="flex-row items-center bg-surface mx-4 mb-2 rounded-xl border border-border px-3">
+        <Ionicons name="search-outline" size={18} className="text-muted-foreground mr-2" />
         <TextInput
-          style={styles.searchInput}
+          className="flex-1 py-2.5 text-base text-foreground"
           value={search}
           onChangeText={setSearch}
           placeholder={t('search.placeholder')}
-          placeholderTextColor={theme.textMuted}
           returnKeyType="search"
           clearButtonMode="while-editing"
           accessibilityLabel={t('search.placeholder')}
@@ -103,78 +80,49 @@ export default function MembersScreen() {
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => <MemberCard member={item} />}
         refreshControl={
-          <RefreshControl refreshing={isLoading && items.length > 0} onRefresh={refresh} tintColor={primary} colors={[primary]} />
+          <RefreshControl
+            refreshing={isLoading && items.length > 0}
+            onRefresh={refresh}
+            tintColor={primary}
+            colors={[primary]}
+          />
         }
         onEndReached={() => { if (hasMore) loadMore(); }}
         onEndReachedThreshold={0.3}
         ListEmptyComponent={
           isLoading ? (
             <>
-              <MemberCardSkeleton theme={theme} />
-              <MemberCardSkeleton theme={theme} />
-              <MemberCardSkeleton theme={theme} />
-              <MemberCardSkeleton theme={theme} />
-              <MemberCardSkeleton theme={theme} />
+              <MemberCardSkeleton />
+              <MemberCardSkeleton />
+              <MemberCardSkeleton />
+              <MemberCardSkeleton />
+              <MemberCardSkeleton />
             </>
           ) : error ? (
-            <View style={styles.centered}>
-              <Text style={styles.errorText}>{error}</Text>
-              <TouchableOpacity onPress={() => void refresh()} style={styles.retryBtn}>
-                <Text style={{ color: primary, ...TYPOGRAPHY.button }}>{t('common:buttons.retry')}</Text>
-              </TouchableOpacity>
+            <View className="flex-1 items-center justify-center p-8">
+              <Text className="text-danger text-sm text-center mb-3">{error}</Text>
+              <Pressable onPress={() => void refresh()} className="px-5 py-2.5">
+                <Text className="font-semibold" style={{ color: primary }}>{t('common:buttons.retry')}</Text>
+              </Pressable>
             </View>
           ) : (
-            <View style={styles.centered}>
-              <Text style={styles.emptyText}>{t('empty.title')}</Text>
-              <Text style={[styles.emptyText, { fontSize: 13, marginTop: 4 }]}>{t('empty.subtitle')}</Text>
+            <View className="flex-1 items-center justify-center p-8">
+              <Text className="text-muted-foreground text-sm text-center">{t('empty.title')}</Text>
+              <Text className="text-muted-foreground text-[13px] text-center mt-1">{t('empty.subtitle')}</Text>
             </View>
           )
         }
         ListFooterComponent={
           isLoadingMore ? (
-            <View style={styles.footer}>
-              <ActivityIndicator size="small" color={theme.textMuted} />
-            </View>
+            <View className="py-4 items-center"><Spinner size="sm" /></View>
           ) : !hasMore && items.length > 0 && !isLoading ? (
-            <View style={styles.footer}>
-              <Text style={styles.endOfListText}>{t('common:endOfList')}</Text>
+            <View className="py-4 items-center">
+              <Text className="text-xs text-muted-foreground">{t('common:endOfList')}</Text>
             </View>
           ) : null
         }
-        contentContainerStyle={styles.list}
+        contentContainerStyle={{ paddingBottom: 24 }}
       />
     </SafeAreaView>
   );
-}
-
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.bg },
-    header: {
-      paddingHorizontal: SPACING.md,
-      paddingTop: SPACING.md,
-      paddingBottom: SPACING.sm,
-    },
-    title: { ...TYPOGRAPHY.h2, color: theme.text },
-    searchContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: theme.surface,
-      marginHorizontal: SPACING.md,
-      marginBottom: SPACING.sm,
-      borderRadius: RADIUS.md,
-      borderWidth: 1,
-      borderColor: theme.border,
-      paddingHorizontal: 12,
-    },
-    searchIcon: { marginRight: SPACING.sm },
-    searchInput: { flex: 1, paddingVertical: 10, ...TYPOGRAPHY.body, color: theme.text },
-    list: { paddingBottom: SPACING.lg },
-    centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: SPACING.xl },
-    errorText: { ...TYPOGRAPHY.label, fontWeight: '400', color: theme.error, textAlign: 'center', marginBottom: 12 },
-    retryBtn: { paddingHorizontal: 20, paddingVertical: 10 },
-    emptyText: { ...TYPOGRAPHY.label, fontWeight: '400', color: theme.textMuted, textAlign: 'center' },
-    footer: { paddingVertical: SPACING.md, alignItems: 'center' },
-    endOfListText: { ...TYPOGRAPHY.bodySmall, color: theme.textMuted },
-  });
 }

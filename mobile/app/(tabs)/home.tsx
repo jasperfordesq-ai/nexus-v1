@@ -3,20 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import * as Haptics from 'expo-haptics';
-import {
-  ActivityIndicator,
-  FlatList,
-  RefreshControl,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { Spinner } from 'heroui-native';
 
 import * as Sentry from '@sentry/react-native';
 import { useTranslation } from 'react-i18next';
@@ -24,7 +17,6 @@ import { getFeed, type FeedItem as FeedItemType, type FeedResponse } from '@/lib
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { useRealtimeContext } from '@/lib/context/RealtimeContext';
 import FeedItem from '@/components/FeedItem';
 import OfflineBanner from '@/components/OfflineBanner';
@@ -32,8 +24,6 @@ import StoryCircles from '@/components/StoryCircles';
 import TenantBanner from '@/components/TenantBanner';
 import { FeedItemSkeleton } from '@/components/ui/Skeleton';
 import FAB from '@/components/ui/FAB';
-import { TYPOGRAPHY } from '@/lib/styles/typography';
-import { SPACING } from '@/lib/styles/spacing';
 
 function extractFeedPage(response: FeedResponse) {
   if (!response?.data || !response?.meta) {
@@ -41,7 +31,6 @@ function extractFeedPage(response: FeedResponse) {
     Sentry.captureException(new Error('Unexpected feed response shape'));
     return { items: [], cursor: null, hasMore: false };
   }
-  // Deduplicate — the API can return the same item across page boundaries
   const seen = new Set<string>();
   const unique = response.data.filter((item) => {
     const key = `${item.type}-${item.id}`;
@@ -60,13 +49,8 @@ export default function HomeScreen() {
   const { t } = useTranslation('home');
   const { user, displayName } = useAuth();
   const primary = usePrimaryColor();
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
 
-  const fetchFeed = useCallback(
-    (cursor: string | null) => getFeed(1, cursor),
-    [],
-  );
+  const fetchFeed = useCallback((cursor: string | null) => getFeed(1, cursor), []);
 
   const { items, isLoading, isLoadingMore, error, hasMore, loadMore, refresh } =
     usePaginatedApi<FeedItemType, FeedResponse>(fetchFeed, extractFeedPage);
@@ -80,7 +64,6 @@ export default function HomeScreen() {
     refresh();
   }, [refresh]);
 
-  // Clear the pull-to-refresh spinner once loading finishes
   useEffect(() => {
     if (wasRefreshingRef.current && !isLoading) {
       wasRefreshingRef.current = false;
@@ -88,10 +71,8 @@ export default function HomeScreen() {
     }
   }, [isLoading]);
 
-  // Read from the single source of truth — no duplicate API call
   const { unreadNotifications } = useRealtimeContext();
 
-  // Derive unique members from feed for story circles (exclude current user — "You" circle handles that)
   const storyMembers = useMemo(() => {
     const seen = new Set<number>();
     if (user?.id) seen.add(user.id);
@@ -110,17 +91,11 @@ export default function HomeScreen() {
     router.push({ pathname: '/(modals)/member-profile', params: { id: String(memberId) } });
   }, []);
 
-  const renderItem = useCallback(({ item }: { item: FeedItemType }) => {
-    return <FeedItem item={item} />;
-  }, []);
-
-  const keyExtractor = useCallback(
-    (item: FeedItemType) => `${item.type}-${item.id}`,
-    [],
-  );
+  const renderItem = useCallback(({ item }: { item: FeedItemType }) => <FeedItem item={item} />, []);
+  const keyExtractor = useCallback((item: FeedItemType) => `${item.type}-${item.id}`, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-background">
       <TenantBanner />
       <OfflineBanner />
 
@@ -133,40 +108,42 @@ export default function HomeScreen() {
         }
         onEndReached={loadMore}
         onEndReachedThreshold={0.3}
-        removeClippedSubviews={true}
+        removeClippedSubviews
         maxToRenderPerBatch={8}
         windowSize={5}
         ListHeaderComponent={
           <View>
-            {storyMembers.length > 0 && (
+            {storyMembers.length > 0 ? (
               <StoryCircles members={storyMembers} onPress={handleStoryPress} />
-            )}
-            <View style={styles.headerRow}>
+            ) : null}
+            <View className="flex-row items-start justify-between px-4 pt-4 pb-2">
               <View>
-                <Text style={styles.greetingText}>
+                <Text className="text-xl font-bold text-foreground">
                   {t('feed.greeting', { name: (displayName || '').split(' ')[0] || t('common:labels.friend') })} 👋
                 </Text>
-                <Text style={styles.subText}>{t('feed.subtitle')}</Text>
+                <Text className="text-sm text-muted-foreground mt-0.5">{t('feed.subtitle')}</Text>
               </View>
-              <TouchableOpacity
+              <Pressable
                 onPress={() => {
                   void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   router.push('/(modals)/notifications');
                 }}
-                style={styles.bellButton}
-                activeOpacity={0.7}
+                className="relative p-2.5"
                 accessibilityLabel={t('notifications.title')}
                 accessibilityRole="button"
               >
-                <Ionicons name="notifications-outline" size={24} color={theme.text} />
-                {unreadNotifications > 0 && (
-                  <View style={[styles.bellBadge, { backgroundColor: primary }]}>
-                    <Text style={styles.bellBadgeText}>
+                <Ionicons name="notifications-outline" size={24} className="text-foreground" />
+                {unreadNotifications > 0 ? (
+                  <View
+                    className="absolute top-0 right-0 min-w-[16px] h-4 rounded-full items-center justify-center px-0.5"
+                    style={{ backgroundColor: primary }}
+                  >
+                    <Text className="text-white text-[9px] font-bold">
                       {unreadNotifications > 9 ? '9+' : unreadNotifications}
                     </Text>
                   </View>
-                )}
-              </TouchableOpacity>
+                ) : null}
+              </Pressable>
             </View>
           </View>
         }
@@ -178,75 +155,34 @@ export default function HomeScreen() {
               <FeedItemSkeleton />
             </>
           ) : error ? (
-            <View style={styles.centered}>
-              <Text style={styles.errorText}>{error}</Text>
-              <TouchableOpacity onPress={() => void refresh()} style={styles.retryBtn}>
-                <Text style={{ color: primary, ...TYPOGRAPHY.button }}>{t('common:buttons.retry')}</Text>
-              </TouchableOpacity>
+            <View className="flex-1 items-center justify-center p-8">
+              <Text className="text-danger text-sm text-center mb-3">{error}</Text>
+              <Pressable onPress={() => void refresh()} className="px-5 py-2.5">
+                <Text className="font-semibold" style={{ color: primary }}>{t('common:buttons.retry')}</Text>
+              </Pressable>
             </View>
           ) : (
-            <View style={styles.centered}>
-              <Text style={styles.emptyTitle}>{t('feed.emptyTitle')}</Text>
-              <Text style={styles.emptySubText}>{t('feed.emptySubtitle')}</Text>
+            <View className="flex-1 items-center justify-center p-8">
+              <Text className="text-foreground text-[17px] font-semibold text-center mb-2">{t('feed.emptyTitle')}</Text>
+              <Text className="text-muted-foreground text-sm text-center leading-5">{t('feed.emptySubtitle')}</Text>
             </View>
           )
         }
         ListFooterComponent={
           isLoadingMore ? (
-            <View style={styles.footer}>
-              <ActivityIndicator size="small" color={theme.textSecondary} />
+            <View className="py-4 items-center">
+              <Spinner size="sm" />
             </View>
           ) : !hasMore && items.length > 0 && !isLoading ? (
-            <View style={styles.footer}>
-              <Text style={styles.endOfListText}>{t('common:endOfList')}</Text>
+            <View className="py-4 items-center">
+              <Text className="text-xs text-muted-foreground">{t('common:endOfList')}</Text>
             </View>
           ) : null
         }
-        contentContainerStyle={styles.list}
+        contentContainerStyle={{ paddingBottom: 24 }}
       />
 
-      <FAB
-        icon="add"
-        onPress={() => router.push('/(modals)/new-exchange')}
-        position="bottom-right"
-      />
+      <FAB icon="add" onPress={() => router.push('/(modals)/new-exchange')} position="bottom-right" />
     </SafeAreaView>
   );
-}
-
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.bg },
-    list: { paddingBottom: SPACING.lg },
-    headerRow: {
-      flexDirection: 'row',
-      alignItems: 'flex-start',
-      justifyContent: 'space-between',
-      paddingHorizontal: SPACING.md,
-      paddingTop: SPACING.md,
-      paddingBottom: SPACING.sm,
-    },
-    greetingText: { ...TYPOGRAPHY.h2, color: theme.text },
-    subText: { ...TYPOGRAPHY.label, fontWeight: '400', color: theme.textSecondary, marginTop: SPACING.xxs },
-    bellButton: { position: 'relative', padding: 10 },
-    bellBadge: {
-      position: 'absolute',
-      top: 0,
-      right: 0,
-      minWidth: SPACING.md,
-      height: SPACING.md,
-      borderRadius: SPACING.sm,
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingHorizontal: 3,
-    },
-    bellBadgeText: { color: '#fff', fontSize: 9, fontWeight: '700' },
-    centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: SPACING.xl },
-    errorText: { ...TYPOGRAPHY.label, fontWeight: '400', color: theme.error, textAlign: 'center', marginBottom: 12 },
-    retryBtn: { paddingHorizontal: 20, paddingVertical: 10 },
-    emptyTitle: { color: theme.text, fontSize: 17, fontWeight: '600', textAlign: 'center', marginBottom: SPACING.sm },
-    emptySubText: { ...TYPOGRAPHY.label, fontWeight: '400', color: theme.textSecondary, textAlign: 'center', lineHeight: 20 },
-    footer: { paddingVertical: SPACING.md, alignItems: 'center' },
-    endOfListText: { ...TYPOGRAPHY.bodySmall, color: theme.textMuted },
-  });
 }
