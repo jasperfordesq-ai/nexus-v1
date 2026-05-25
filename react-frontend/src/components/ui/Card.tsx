@@ -12,6 +12,7 @@ import {
   type ReactNode,
 } from 'react';
 import { Card as HeroUICard, type CardProps as HeroUICardProps } from '@heroui/react';
+import { cardVariants } from '@heroui/styles';
 
 const HeroUICardRoot = HeroUICard as ComponentType<any>;
 
@@ -154,18 +155,18 @@ export const Card = forwardRef<HTMLElement, CardProps>(
     };
 
     if (Component) {
+      const slots = cardVariants({ variant });
+
       return (
-        <HeroUICardRoot
+        <Component
           ref={ref}
-          {...sharedProps}
-          render={(renderProps: { children?: ReactNode }) => (
-            <Component {...renderProps} {...props}>
-              {renderProps.children}
-            </Component>
-          )}
+          {...props}
+          className={combineClasses(slots.base(), rootClassName)}
+          aria-disabled={isDisabled || undefined}
+          onClick={onClick || onPress ? handleClick : undefined}
         >
           {children}
-        </HeroUICardRoot>
+        </Component>
       );
     }
 

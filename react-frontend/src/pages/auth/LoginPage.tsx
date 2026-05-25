@@ -522,7 +522,7 @@ export function LoginPage() {
                       isRequired
                       autoComplete="username webauthn"
                       classNames={{
-                        inputWrapper: 'glass-card backdrop-blur-lg',
+                        inputWrapper: 'glass-card min-h-11 backdrop-blur-lg',
                         label: 'text-theme-muted',
                         input: 'text-theme-primary placeholder:text-theme-subtle',
                       }}
@@ -540,7 +540,7 @@ export function LoginPage() {
                           isIconOnly
                           size="sm"
                           variant="light"
-                          className="min-w-0 w-auto h-auto p-0 text-theme-subtle"
+                          className="size-8 min-w-8 p-0 text-theme-subtle"
                           onPress={() => setShowPassword(!showPassword)}
                           aria-label={showPassword ? t('login.hide_password') : t('login.show_password')}
                         >
@@ -554,7 +554,7 @@ export function LoginPage() {
                       isRequired
                       autoComplete="current-password"
                       classNames={{
-                        inputWrapper: 'glass-card backdrop-blur-lg',
+                        inputWrapper: 'glass-card min-h-11 backdrop-blur-lg',
                         label: 'text-theme-muted',
                         input: 'text-theme-primary placeholder:text-theme-subtle',
                       }}
@@ -680,7 +680,7 @@ export function LoginPage() {
                       autoComplete="one-time-code"
                       aria-label={useBackupCode ? t('login.twofa_backup_code_label') : t('login.two_factor_code_label')}
                       classNames={{
-                        inputWrapper: 'glass-card backdrop-blur-lg',
+                        inputWrapper: 'glass-card min-h-11 backdrop-blur-lg',
                         label: 'text-theme-muted',
                         input: 'text-theme-primary placeholder:text-theme-subtle text-center text-xl tracking-widest',
                       }}
