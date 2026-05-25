@@ -5,7 +5,7 @@
 
 import { Pressable, View, Text } from 'react-native';
 import { router } from 'expo-router';
-import * as Haptics from 'expo-haptics';
+import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 
 import { type Member } from '@/lib/api/members';

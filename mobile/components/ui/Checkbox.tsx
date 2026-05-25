@@ -6,7 +6,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { Checkbox as HeroCheckbox } from 'heroui-native';
-import * as Haptics from 'expo-haptics';
+import * as Haptics from '@/lib/haptics';
 
 interface CheckboxProps {
   checked: boolean;

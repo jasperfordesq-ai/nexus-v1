@@ -4,29 +4,35 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { AppState, type AppStateStatus } from 'react-native';
+import { AppState, Platform, type AppStateStatus } from 'react-native';
 import { API_BASE_URL } from '@/lib/constants';
 
 /** How long to wait for the health-check ping before treating as offline (ms). */
 const PING_TIMEOUT_MS = 5_000;
 
-/** URL to ping — the lightweight health endpoint on the NEXUS API. */
-const HEALTH_URL = `${API_BASE_URL}/health`;
+/** URL to ping — Laravel's lightweight health endpoint with CORS enabled. */
+const HEALTH_URL = `${API_BASE_URL}/up`;
 
 export interface NetworkStatus {
-  /** True when the API health check succeeds (or has not yet been checked). */
+  /** True when the device appears to have connectivity. */
   isOnline: boolean;
-  /** True while a connectivity check is in flight. */
+  /** True while a connectivity check is in flight (native only). */
   isChecking: boolean;
 }
 
 /**
- * Detects connectivity by pinging the API health endpoint every time the app
- * returns to the foreground (AppState → 'active').
+ * Detects connectivity by two different strategies depending on platform:
  *
- * Rationale for not using @react-native-community/netinfo:
- *  - A real HTTP ping is more reliable than the OS-level reachability flag
- *    because it confirms actual backend connectivity, not just local network.
+ * **Native (iOS / Android)**
+ *   Pings the API health endpoint (`/up`) on mount and every time the app
+ *   returns to the foreground. This confirms actual backend connectivity
+ *   rather than just local-network reachability.
+ *
+ * **Web**
+ *   Uses `navigator.onLine` and the browser's `online`/`offline` events.
+ *   An API ping is unreliable in web preview sandboxes (e.g. Codex, Expo
+ *   Snack) where outbound requests are blocked — a false offline state
+ *   would hide the entire app behind an "offline" banner.
  *
  * Default: `isOnline = true` to avoid false-positive "offline" banners on
  * first render before the first check completes.
@@ -35,6 +41,26 @@ export function useNetworkStatus(): NetworkStatus {
   const [isOnline, setIsOnline] = useState(true);
   const [isChecking, setIsChecking] = useState(false);
 
+  // ── Web path ────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (Platform.OS !== 'web') return;
+
+    // Sync to the browser's connectivity flag immediately.
+    setIsOnline(navigator.onLine);
+
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // ── Native path ─────────────────────────────────────────────────────────────
   const isMountedRef = useRef(true);
   const isCheckingRef = useRef(false); // guard against concurrent pings
 
@@ -46,6 +72,7 @@ export function useNetworkStatus(): NetworkStatus {
   }, []);
 
   const checkConnectivity = useCallback(async () => {
+    if (Platform.OS === 'web') return; // handled above
     if (isCheckingRef.current) return;
     isCheckingRef.current = true;
 
@@ -77,13 +104,16 @@ export function useNetworkStatus(): NetworkStatus {
     isCheckingRef.current = false;
   }, []);
 
-  // Run an immediate check on mount.
+  // Run an immediate check on mount (native only).
   useEffect(() => {
+    if (Platform.OS === 'web') return;
     void checkConnectivity();
   }, [checkConnectivity]);
 
-  // Re-check every time the app returns to the foreground.
+  // Re-check every time the app returns to the foreground (native only).
   useEffect(() => {
+    if (Platform.OS === 'web') return;
+
     const handleAppStateChange = (nextState: AppStateStatus) => {
       if (nextState === 'active') {
         void checkConnectivity();

@@ -37,6 +37,26 @@ export class ApiResponseError extends Error {
   }
 }
 
+function extractErrorMessage(data: unknown, fallback: string): string {
+  const body = data as {
+    message?: string;
+    errors?: Record<string, string[]> | Array<{ message?: string }>;
+  } | null;
+
+  if (body?.message) {
+    return body.message;
+  }
+
+  if (Array.isArray(body?.errors)) {
+    const firstMessage = body.errors.find((error) => error.message)?.message;
+    if (firstMessage) {
+      return firstMessage;
+    }
+  }
+
+  return fallback;
+}
+
 /** Called when the API returns 401 and refresh has failed — registered by AuthContext */
 let onUnauthorizedCallback: (() => void) | null = null;
 
@@ -198,7 +218,7 @@ async function request<T>(
   clearTimeout(timeoutId);
 
   // Handle 401: try silent token refresh, then retry once
-  if (response.status === 401) {
+  if (response.status === 401 && endpoint !== '/api/auth/login') {
     const newToken = await attemptTokenRefresh();
     if (newToken) {
       // Retry the original request with the refreshed token
@@ -231,8 +251,12 @@ async function request<T>(
             ? await retryRes.json()
             : null;
         if (!retryRes.ok) {
-          const eb = retryData as { message?: string; errors?: Record<string, string[]> } | null;
-          throw new ApiResponseError(retryRes.status, eb?.message ?? `Request failed with status ${retryRes.status}`, eb?.errors);
+          const eb = retryData as { errors?: Record<string, string[]> } | null;
+          throw new ApiResponseError(
+            retryRes.status,
+            extractErrorMessage(retryData, `Request failed with status ${retryRes.status}`),
+            eb?.errors,
+          );
         }
         return retryData as T;
       }
@@ -258,10 +282,10 @@ async function request<T>(
   }
 
   if (!response.ok) {
-    const errBody = data as { message?: string; errors?: Record<string, string[]> } | null;
+    const errBody = data as { errors?: Record<string, string[]> } | null;
     throw new ApiResponseError(
       response.status,
-      errBody?.message ?? `Request failed with status ${response.status}`,
+      extractErrorMessage(data, `Request failed with status ${response.status}`),
       errBody?.errors,
     );
   }

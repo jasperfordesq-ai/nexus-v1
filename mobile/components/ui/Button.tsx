@@ -6,7 +6,7 @@
 import React from 'react';
 import { ActivityIndicator, View, type ViewStyle, type StyleProp } from 'react-native';
 import { Button as HeroButton } from 'heroui-native';
-import * as Haptics from 'expo-haptics';
+import * as Haptics from '@/lib/haptics';
 
 // Legacy variant names kept for backwards compatibility with 32 importing screens.
 // 'solid' is mapped to HeroUI's 'primary'.
@@ -52,7 +52,7 @@ export default function Button({
   testID,
 }: ButtonProps) {
   const handlePress = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     onPress?.();
   };
 

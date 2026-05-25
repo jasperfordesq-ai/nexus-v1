@@ -4,7 +4,6 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useRef, useState, useMemo } from 'react';
-import * as Haptics from 'expo-haptics';
 import { FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -24,6 +23,7 @@ import StoryCircles from '@/components/StoryCircles';
 import TenantBanner from '@/components/TenantBanner';
 import { FeedItemSkeleton } from '@/components/ui/Skeleton';
 import FAB from '@/components/ui/FAB';
+import * as Haptics from '@/lib/haptics';
 
 function extractFeedPage(response: FeedResponse) {
   if (!response?.data || !response?.meta) {

@@ -17,11 +17,11 @@ import {
   Linking,
 } from 'react-native';
 import { Link } from 'expo-router';
-import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
+import * as Haptics from '@/lib/haptics';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { ApiResponseError } from '@/lib/api/client';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';

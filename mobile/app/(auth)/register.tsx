@@ -19,7 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import * as Haptics from 'expo-haptics';
+import * as Haptics from '@/lib/haptics';
 
 import { register as apiRegister, extractToken } from '@/lib/api/auth';
 import { ApiResponseError } from '@/lib/api/client';

@@ -17,7 +17,7 @@ import { useLocalSearchParams, useNavigation, router } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import * as Haptics from 'expo-haptics';
+import * as Haptics from '@/lib/haptics';
 import { Spinner } from 'heroui-native';
 
 import { getMember } from '@/lib/api/members';

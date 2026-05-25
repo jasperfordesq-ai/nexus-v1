@@ -6,7 +6,7 @@
 import React from 'react';
 import { Pressable, type StyleProp, type ViewStyle } from 'react-native';
 import { Card as HeroCard } from 'heroui-native';
-import * as Haptics from 'expo-haptics';
+import * as Haptics from '@/lib/haptics';
 
 type CardVariant = 'elevated' | 'outlined' | 'flat';
 
