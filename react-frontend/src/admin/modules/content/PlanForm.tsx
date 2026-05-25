@@ -1,6 +1,6 @@
-import { Card, CardBody, CardHeader, Input, Textarea, Button, Spinner, Chip } from '@/components/ui';
+import { Card, CardBody, CardHeader, Input, Textarea, Button, Spinner, Chip, Switch } from '@/components/ui';
 import { useState, useEffect } from 'react';
-import { Switch } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import CreditCard from 'lucide-react/icons/credit-card';
 import ArrowLeft from 'lucide-react/icons/arrow-left';

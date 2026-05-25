@@ -8,12 +8,12 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { Switch } from '@heroui/react';
+
 import Calendar from 'lucide-react/icons/calendar';
 import Plus from 'lucide-react/icons/plus';
 import Trash2 from 'lucide-react/icons/trash-2';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, useDisclosure, Button, Chip, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { GlassCard, useDisclosure, Button, Chip, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@/components/ui';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';

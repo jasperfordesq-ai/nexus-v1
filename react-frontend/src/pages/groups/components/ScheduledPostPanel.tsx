@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +10,7 @@ import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input, Textarea, 
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Switch, Tooltip } from '@heroui/react';
+import { Tooltip } from '@heroui/react';
 import CalendarClock from 'lucide-react/icons/calendar-clock';
 import Plus from 'lucide-react/icons/plus';
 import X from 'lucide-react/icons/x';

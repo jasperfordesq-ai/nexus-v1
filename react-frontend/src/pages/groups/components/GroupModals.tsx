@@ -15,7 +15,7 @@
 
 import { lazy, Suspense } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Switch } from '@heroui/react';
+
 import MessageSquare from 'lucide-react/icons/message-square';
 import Settings from 'lucide-react/icons/settings';
 import Lock from 'lucide-react/icons/lock';
@@ -31,7 +31,7 @@ import MapPin from 'lucide-react/icons/map-pin';
 import Flag from 'lucide-react/icons/flag';
 import { ErrorBoundary } from '@/components/feedback';
 import type { Group } from '@/types/api';
-import { Button, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Button, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@/components/ui';
 
 const RichTextEditor = lazy(() => import('@/admin/components/RichTextEditor'));
 

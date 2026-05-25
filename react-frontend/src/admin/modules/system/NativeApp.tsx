@@ -1,6 +1,6 @@
-import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Select, SelectItem } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Select, SelectItem, Switch } from '@/components/ui';
 import { useEffect, useMemo, useState } from 'react';
-import { Switch } from '@heroui/react';
+
 import Download from 'lucide-react/icons/download';
 import Save from 'lucide-react/icons/save';
 import Smartphone from 'lucide-react/icons/smartphone';

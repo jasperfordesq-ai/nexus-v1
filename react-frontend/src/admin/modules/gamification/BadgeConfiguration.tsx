@@ -1,4 +1,4 @@
-import { CardBody, Card, Button, Chip, Spinner } from '@/components/ui';
+import { CardBody, Card, Button, Chip, Spinner, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,7 +9,7 @@ import { CardBody, Card, Button, Chip, Spinner } from '@/components/ui';
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Switch, Tabs, Tab } from '@heroui/react';
+import { Tabs, Tab } from '@heroui/react';
 import Award from 'lucide-react/icons/award';
 import RotateCcw from 'lucide-react/icons/rotate-ccw';
 import Shield from 'lucide-react/icons/shield';

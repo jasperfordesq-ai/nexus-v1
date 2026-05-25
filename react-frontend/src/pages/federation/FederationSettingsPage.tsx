@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Spinner, Input } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Spinner, Input, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,7 +15,7 @@ import { Select, SelectItem, GlassCard, Button, Spinner, Input } from '@/compone
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Switch } from '@heroui/react';
+
 import Settings from 'lucide-react/icons/settings';
 import Eye from 'lucide-react/icons/eye';
 import MessageSquare from 'lucide-react/icons/message-square';

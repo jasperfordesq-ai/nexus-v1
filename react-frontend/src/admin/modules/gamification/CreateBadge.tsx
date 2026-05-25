@@ -1,7 +1,7 @@
-import { Card, CardBody, CardHeader, Button, Input, Textarea, Select, SelectItem } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Input, Textarea, Select, SelectItem, Switch } from '@/components/ui';
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Switch } from '@heroui/react';
+
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
 import Award from 'lucide-react/icons/award';

@@ -1,7 +1,7 @@
-import { Button, Card, CardBody, CardHeader, Chip, Input, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Switch } from '@heroui/react';
+
 import Bot from 'lucide-react/icons/bot';
 import Brain from 'lucide-react/icons/brain';
 import Edit3 from 'lucide-react/icons/edit-3';

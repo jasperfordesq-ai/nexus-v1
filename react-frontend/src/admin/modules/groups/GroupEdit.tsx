@@ -1,8 +1,8 @@
-import { Button, Card, CardBody, CardHeader, Input, Spinner, Textarea, Chip, Select, SelectItem, Avatar } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Input, Spinner, Textarea, Chip, Select, SelectItem, Avatar, Switch } from '@/components/ui';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Switch } from '@heroui/react';
+
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
 import Users from 'lucide-react/icons/users';

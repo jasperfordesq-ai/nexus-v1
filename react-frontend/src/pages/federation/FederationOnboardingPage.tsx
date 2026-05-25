@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Progress, Button, Chip, Spinner, Input } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Progress, Button, Chip, Spinner, Input, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -19,7 +19,7 @@ import { Select, SelectItem, GlassCard, Progress, Button, Chip, Spinner, Input }
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Switch } from '@heroui/react';
+
 import Globe from 'lucide-react/icons/globe';
 import Users from 'lucide-react/icons/users';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';

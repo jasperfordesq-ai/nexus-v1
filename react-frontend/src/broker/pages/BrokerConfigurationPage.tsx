@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardBody, Button, Input, Spinner } from '@/components/ui';
+import { Card, CardHeader, CardBody, Button, Input, Spinner, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,7 +11,7 @@ import { Card, CardHeader, CardBody, Button, Input, Spinner } from '@/components
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Switch } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';

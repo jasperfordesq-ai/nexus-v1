@@ -1,8 +1,8 @@
-import { Card, CardBody, CardHeader, Button, Chip, Select, SelectItem } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Chip, Select, SelectItem, Switch } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Switch, Checkbox, RadioGroup, Radio } from '@heroui/react';
+import { Checkbox, RadioGroup, Radio } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Users from 'lucide-react/icons/users';
 import Building2 from 'lucide-react/icons/building-2';

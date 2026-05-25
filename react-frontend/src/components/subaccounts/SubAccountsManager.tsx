@@ -1,4 +1,4 @@
-import { useDisclosure, Button, Chip, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
+import { useDisclosure, Button, Chip, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +10,7 @@ import { useDisclosure, Button, Chip, Spinner, Input, Modal, ModalContent, Modal
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { ReactNode } from 'react';
-import { Switch } from '@heroui/react';
+
 import Users from 'lucide-react/icons/users';
 import Plus from 'lucide-react/icons/plus';
 import UserPlus from 'lucide-react/icons/user-plus';

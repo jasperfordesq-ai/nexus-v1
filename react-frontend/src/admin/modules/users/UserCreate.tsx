@@ -1,4 +1,4 @@
-import { CardBody, Card, Select, SelectItem, Button, Input } from '@/components/ui';
+import { CardBody, Card, Select, SelectItem, Button, Input, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -13,7 +13,7 @@ import { CardBody, Card, Select, SelectItem, Button, Input } from '@/components/
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Switch } from '@heroui/react';
+
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
 import { usePageTitle } from '@/hooks';

@@ -1,6 +1,6 @@
-import { Button, Card, CardBody, CardHeader, Chip, Spinner } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Spinner, Switch } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Switch } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';

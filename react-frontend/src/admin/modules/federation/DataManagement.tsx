@@ -1,4 +1,4 @@
-import { Card, CardBody, CardHeader, Button, Input, Chip, Progress, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Input, Chip, Progress, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +10,7 @@ import { Card, CardBody, CardHeader, Button, Input, Chip, Progress, useDisclosur
  */
 
 import { useState, useCallback, useRef } from 'react';
-import { Switch } from '@heroui/react';
+
 import Download from 'lucide-react/icons/download';
 import Upload from 'lucide-react/icons/upload';
 import Trash2 from 'lucide-react/icons/trash-2';

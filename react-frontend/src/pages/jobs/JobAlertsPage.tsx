@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure, GlassCard, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, GlassCard, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -16,7 +16,7 @@ import { Select, SelectItem, useDisclosure, GlassCard, Button, Chip, Input, Moda
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Switch } from '@heroui/react';
+
 import Bell from 'lucide-react/icons/bell';
 import Plus from 'lucide-react/icons/plus';
 import ArrowLeft from 'lucide-react/icons/arrow-left';

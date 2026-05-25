@@ -9,12 +9,12 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Switch } from '@heroui/react';
+
 import HandHeart from 'lucide-react/icons/hand-heart';
 import Save from 'lucide-react/icons/save';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
-import { GlassCard, Button, Spinner, Textarea } from '@/components/ui';
+import { GlassCard, Button, Spinner, Textarea, Switch } from '@/components/ui';
 import { useTranslation } from 'react-i18next';
 
 interface WelcomeConfigPanelProps {

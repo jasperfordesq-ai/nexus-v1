@@ -1,6 +1,6 @@
-import { Card, CardBody, CardHeader, Button, Spinner, Input, Textarea, Chip, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Spinner, Input, Textarea, Chip, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
-import { Switch } from '@heroui/react';
+
 import Save from 'lucide-react/icons/save';
 import Sparkles from 'lucide-react/icons/sparkles';
 import UserCircle from 'lucide-react/icons/circle-user';

@@ -1,4 +1,4 @@
-import { CardBody, Card, Select, SelectItem, Button, Spinner, Input, Textarea } from '@/components/ui';
+import { CardBody, Card, Select, SelectItem, Button, Spinner, Input, Textarea, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,7 +11,7 @@ import { CardBody, Card, Select, SelectItem, Button, Spinner, Input, Textarea } 
 
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
-import { Switch, Tabs, Tab, Checkbox } from '@heroui/react';
+import { Tabs, Tab, Checkbox } from '@heroui/react';
 import Building2 from 'lucide-react/icons/building-2';
 import Save from 'lucide-react/icons/save';
 import ArrowLeft from 'lucide-react/icons/arrow-left';

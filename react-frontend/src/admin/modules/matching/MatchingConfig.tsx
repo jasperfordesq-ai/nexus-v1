@@ -1,7 +1,7 @@
-import { Card, CardBody, CardHeader, Input, Button, Spinner } from '@/components/ui';
+import { Card, CardBody, CardHeader, Input, Button, Spinner, Switch } from '@/components/ui';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Slider, Switch, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+import { Slider, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';

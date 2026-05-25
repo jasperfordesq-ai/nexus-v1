@@ -1,4 +1,4 @@
-import { Card, CardBody, Chip, Button } from '@/components/ui';
+import { Card, CardBody, Chip, Button, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,7 +9,7 @@ import { Card, CardBody, Chip, Button } from '@/components/ui';
  * alert frequency, active toggle, and delete button.
  */
 
-import { Switch } from '@heroui/react';
+
 import Search from 'lucide-react/icons/search';
 import Bell from 'lucide-react/icons/bell';
 import Trash2 from 'lucide-react/icons/trash-2';

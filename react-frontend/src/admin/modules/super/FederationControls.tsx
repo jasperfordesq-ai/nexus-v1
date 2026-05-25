@@ -1,11 +1,11 @@
-import { Card, CardBody, CardHeader, Button, Chip, Input, Spinner, Code, Snippet, Accordion, AccordionItem } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Chip, Input, Spinner, Code, Snippet, Accordion, AccordionItem, Switch } from '@/components/ui';
 import {
   useState,
   useCallback,
   useEffect,
   useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Switch } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import Globe from 'lucide-react/icons/globe';
 import Shield from 'lucide-react/icons/shield';

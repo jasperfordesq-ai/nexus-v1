@@ -1,6 +1,6 @@
-import { Card, CardBody, CardHeader, Input, Button, Textarea, Spinner, Chip, Select, SelectItem } from '@/components/ui';
+import { Card, CardBody, CardHeader, Input, Button, Textarea, Spinner, Chip, Select, SelectItem, Switch } from '@/components/ui';
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Switch, Tooltip } from '@heroui/react';
+import { Tooltip } from '@heroui/react';
 import Settings from 'lucide-react/icons/settings';
 import Save from 'lucide-react/icons/save';
 import ShieldCheck from 'lucide-react/icons/shield-check';

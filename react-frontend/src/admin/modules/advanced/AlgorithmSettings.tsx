@@ -1,6 +1,6 @@
-import { Card, CardBody, CardHeader, Button, Spinner, Chip } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Spinner, Chip, Switch } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
-import { Slider, Switch } from '@heroui/react';
+import { Slider } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Settings from 'lucide-react/icons/settings';
 import Save from 'lucide-react/icons/save';

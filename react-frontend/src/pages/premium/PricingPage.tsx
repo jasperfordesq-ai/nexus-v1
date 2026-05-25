@@ -1,7 +1,7 @@
-import { Card, CardBody, CardHeader, Button, Chip, Spinner } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Chip, Spinner, Switch } from '@/components/ui';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Switch } from '@heroui/react';
+
 import Crown from 'lucide-react/icons/crown';
 import CheckCircle2 from 'lucide-react/icons/check-circle-2';
 import { useTranslation } from 'react-i18next';

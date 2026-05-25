@@ -1,7 +1,7 @@
-import { Card, CardBody, CardHeader, Input, Button, Textarea, Spinner, Select, SelectItem } from '@/components/ui';
+import { Card, CardBody, CardHeader, Input, Button, Textarea, Spinner, Select, SelectItem, Switch } from '@/components/ui';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Switch } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import ChevronUp from 'lucide-react/icons/chevron-up';
 import ChevronDown from 'lucide-react/icons/chevron-down';

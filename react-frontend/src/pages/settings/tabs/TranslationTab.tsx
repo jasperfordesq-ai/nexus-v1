@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,7 +12,7 @@ import { Select, SelectItem, GlassCard, Button } from '@/components/ui';
  */
 
 import { useEffect, useState } from 'react';
-import { Switch } from '@heroui/react';
+
 import Languages from 'lucide-react/icons/languages';
 import Sparkles from 'lucide-react/icons/sparkles';
 import Save from 'lucide-react/icons/save';

@@ -1,6 +1,6 @@
-import { Card, CardBody, CardHeader, Input, Button, Spinner } from '@/components/ui';
+import { Card, CardBody, CardHeader, Input, Button, Spinner, Switch } from '@/components/ui';
 import { useState, useEffect } from 'react';
-import { Switch } from '@heroui/react';
+
 import Image from 'lucide-react/icons/image';
 import Save from 'lucide-react/icons/save';
 import { useTranslation } from 'react-i18next';

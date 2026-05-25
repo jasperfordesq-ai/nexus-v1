@@ -10,13 +10,13 @@
  */
 
 import { useState, useCallback } from 'react';
-import { Switch } from '@heroui/react';
+
 import MessageCircleHeart from 'lucide-react/icons/message-circle-heart';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
 import { logError } from '@/lib/logger';
-import { Button, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Button, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@/components/ui';
 
 interface AppreciationModalProps {
   isOpen: boolean;

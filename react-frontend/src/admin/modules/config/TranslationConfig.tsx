@@ -1,6 +1,6 @@
-import { Card, CardBody, CardHeader, Spinner, Button, Input, Select, SelectItem } from '@/components/ui';
+import { Card, CardBody, CardHeader, Spinner, Button, Input, Select, SelectItem, Switch } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
-import { Switch, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Settings from 'lucide-react/icons/settings';
 import BookOpen from 'lucide-react/icons/book-open';

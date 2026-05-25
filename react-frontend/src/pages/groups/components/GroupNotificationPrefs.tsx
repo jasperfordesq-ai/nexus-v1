@@ -9,13 +9,13 @@
  */
 
 import { useState, useEffect } from 'react';
-import { RadioGroup, Radio, Switch } from '@heroui/react';
+import { RadioGroup, Radio } from '@heroui/react';
 import Bell from 'lucide-react/icons/bell';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { useToast } from '@/contexts';
 import { useTranslation } from 'react-i18next';
-import { Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@/components/ui';
 
 interface GroupNotificationPrefsProps {
   groupId: number;

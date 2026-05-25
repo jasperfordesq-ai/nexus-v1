@@ -1,6 +1,6 @@
-import { Button, Card, CardBody, CardHeader, Input, Spinner } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Input, Spinner, Switch } from '@/components/ui';
 import { useState } from 'react';
-import { Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';

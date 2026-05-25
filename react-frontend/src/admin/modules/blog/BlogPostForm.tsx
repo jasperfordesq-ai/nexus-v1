@@ -1,4 +1,4 @@
-import { CardBody, Card, Select, SelectItem, Button, Spinner, Input, Textarea } from '@/components/ui';
+import { CardBody, Card, Select, SelectItem, Button, Spinner, Input, Textarea, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -13,7 +13,7 @@ import { CardBody, Card, Select, SelectItem, Button, Spinner, Input, Textarea } 
 
 import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Switch } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 const RichTextEditor = lazy(() =>
   import('../../components/RichTextEditor').then((m) => ({ default: m.RichTextEditor })),

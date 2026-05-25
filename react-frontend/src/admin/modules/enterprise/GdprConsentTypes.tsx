@@ -1,4 +1,4 @@
-import { CardBody, Card, Select, SelectItem, Progress, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { CardBody, Card, Select, SelectItem, Progress, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,7 +11,7 @@ import { CardBody, Card, Select, SelectItem, Progress, Button, Chip, Spinner, In
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { Switch } from '@heroui/react';
+
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Plus from 'lucide-react/icons/plus';
 import Edit from 'lucide-react/icons/square-pen';

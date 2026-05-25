@@ -10,12 +10,12 @@
  * to both localStorage and the backend API.
  */
 
-import { ButtonGroup, Switch } from '@heroui/react';
+import { ButtonGroup } from '@heroui/react';
 import Check from 'lucide-react/icons/check';
 import { useTheme } from '@/contexts';
 import { useTranslation } from 'react-i18next';
 import type { FontSize, Density } from '@/contexts/ThemeContext';
-import { Button } from '@/components/ui';
+import { Button, Switch } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Accent color presets
