@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, useDisclosure } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,14 +6,13 @@ import { Select, SelectItem } from '@/components/ui';
 
 /**
  * BillingControl
- * God-only billing dashboard — manage tenant subscriptions, custom pricing,
- * discounts, pause/resume, grace periods, and CSV export.
+ * God-only billing dashboard — manage tenant subscriptions, custom pricing, * discounts, pause/resume, grace periods, and CSV export.
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Button, Card, CardBody, CardHeader, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Switch, Spinner, useDisclosure, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+  Button, Card, CardBody, CardHeader, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Switch, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import CreditCard from 'lucide-react/icons/credit-card';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Leaf from 'lucide-react/icons/leaf';

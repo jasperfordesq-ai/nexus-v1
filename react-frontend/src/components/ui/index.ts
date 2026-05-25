@@ -45,6 +45,7 @@ export {
   type SelectItemProps,
   type SelectSectionProps,
 } from './Select';
+export { useDisclosure, type UseDisclosureProps } from './useDisclosure';
 
 // Skeleton Components
 export {

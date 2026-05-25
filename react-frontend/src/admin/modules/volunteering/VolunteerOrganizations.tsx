@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, useDisclosure } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,13 +6,12 @@ import { Select, SelectItem } from '@/components/ui';
 
 /**
  * Volunteer Organizations — Full CRUD management page.
- * Lists organizations with search/filter, wallet adjustments,
- * transaction history, and status toggling.
+ * Lists organizations with search/filter, wallet adjustments, * transaction history, and status toggling.
  */
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
-  Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea, useDisclosure } from '@heroui/react';
+  Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea } from '@heroui/react';
 import Building2 from 'lucide-react/icons/building-2';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Wallet from 'lucide-react/icons/wallet';

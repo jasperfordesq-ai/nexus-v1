@@ -1,3 +1,4 @@
+import { useDisclosure } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,16 +11,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import {
-  Button,
-  Spinner,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Input,
-  useDisclosure,
-} from '@heroui/react';
+  Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input } from '@heroui/react';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import Plus from 'lucide-react/icons/plus';
 import Trash2 from 'lucide-react/icons/trash-2';

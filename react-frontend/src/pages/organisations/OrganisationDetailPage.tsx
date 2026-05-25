@@ -17,17 +17,7 @@ import { Helmet } from 'react-helmet-async';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Button,
-  Avatar,
-  Chip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Textarea,
-  useDisclosure,
-} from '@heroui/react';
+  Button, Avatar, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea } from '@heroui/react';
 import MapPin from 'lucide-react/icons/map-pin';
 import Globe from 'lucide-react/icons/globe';
 import Mail from 'lucide-react/icons/mail';
@@ -43,7 +33,7 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import ExternalLink from 'lucide-react/icons/external-link';
 import Send from 'lucide-react/icons/send';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, useDisclosure } from '@/components/ui';
 import { EmptyState, LoadingScreen } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';
 import { useAuth, useTenant } from '@/contexts';

@@ -15,21 +15,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Button,
-  Avatar,
-  Card,
-  Checkbox,
-  Chip,
-  Input,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Textarea,
-  useDisclosure,
-  Spinner,
-} from '@heroui/react';
+  Button, Avatar, Card, Checkbox, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, Spinner } from '@heroui/react';
 import MapPin from 'lucide-react/icons/map-pin';
 import Calendar from 'lucide-react/icons/calendar';
 import Clock from 'lucide-react/icons/clock';
@@ -50,7 +36,7 @@ import MessageSquare from 'lucide-react/icons/message-square';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import QrCode from 'lucide-react/icons/qr-code';
 import { Helmet } from 'react-helmet-async';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, useDisclosure } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { LoadingScreen } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';

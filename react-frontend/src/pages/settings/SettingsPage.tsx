@@ -21,17 +21,7 @@ import type { Key } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Button,
-  Chip,
-  Tabs,
-  Tab,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-} from '@heroui/react';
+  Button, Chip, Tabs, Tab, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
 import User from 'lucide-react/icons/user';
 import Bell from 'lucide-react/icons/bell';
 import Shield from 'lucide-react/icons/shield';
@@ -43,7 +33,7 @@ import Users from 'lucide-react/icons/users';
 import Info from 'lucide-react/icons/info';
 import Languages from 'lucide-react/icons/languages';
 import { sanitizeRichText } from '@/lib/sanitize';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, useDisclosure } from '@/components/ui';
 import { AvailabilityGrid } from '@/components/availability/AvailabilityGrid';
 import { AppearanceSettings } from '@/components/settings/AppearanceSettings';
 import { useAuth, useToast, useTenant } from '@/contexts';

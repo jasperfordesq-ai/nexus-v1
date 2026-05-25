@@ -9,33 +9,9 @@
  * Includes test delivery, delivery logs with retry, and expandable log rows.
  */
 
+import { useState, useCallback, useEffect, useRef } from 'react';
 import {
-  useState,
-  useCallback,
-  useEffect,
-  useRef } from 'react';
-import {
-  Button,
-  Chip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Input,
-  Textarea,
-  Checkbox,
-  CheckboxGroup,
-  Spinner,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  useDisclosure,
-  Tooltip,
-} from '@heroui/react';
+  Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea, Checkbox, CheckboxGroup, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tooltip } from '@heroui/react';
 import Webhook from 'lucide-react/icons/webhook';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -51,13 +27,7 @@ import ChevronDown from 'lucide-react/icons/chevron-down';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
-import { Snippet,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-} from '@/components/ui';
+import { Snippet, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, useDisclosure } from '@/components/ui';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';

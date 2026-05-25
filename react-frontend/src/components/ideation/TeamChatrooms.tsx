@@ -1,3 +1,4 @@
+import { useDisclosure } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -16,19 +17,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import {
-  Button,
-  Chip,
-  Input,
-  Spinner,
-  Avatar,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Tooltip,
-  useDisclosure,
-} from '@heroui/react';
+  Button, Chip, Input, Spinner, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tooltip } from '@heroui/react';
 import Hash from 'lucide-react/icons/hash';
 import Lock from 'lucide-react/icons/lock';
 import Pin from 'lucide-react/icons/pin';

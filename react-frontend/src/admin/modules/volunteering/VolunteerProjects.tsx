@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, useDisclosure } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,7 +11,7 @@ import { Select, SelectItem } from '@/components/ui';
 
 import { useState, useCallback, useEffect } from 'react';
 import {
-  Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, useDisclosure } from '@heroui/react';
+  Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea } from '@heroui/react';
 import FolderKanban from 'lucide-react/icons/folder-kanban';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import ClipboardCheck from 'lucide-react/icons/clipboard-check';

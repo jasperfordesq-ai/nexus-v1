@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, useDisclosure } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,13 +6,12 @@ import { Select, SelectItem } from '@/components/ui';
 
 /**
  * Group Challenges Tab
- * Active and completed challenges with progress tracking, countdown timers,
- * and admin challenge creation.
+ * Active and completed challenges with progress tracking, countdown timers, * and admin challenge creation.
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
-  Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea, Chip, useDisclosure } from '@heroui/react';
+  Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea, Chip } from '@heroui/react';
 import Trophy from 'lucide-react/icons/trophy';
 import Target from 'lucide-react/icons/target';
 import Clock from 'lucide-react/icons/clock';

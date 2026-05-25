@@ -7,26 +7,10 @@
  * DonationsTab - Active giving days with progress and donation history
  */
 
-import {
-  useState,
-  useEffect,
-  useCallback,
-  useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Button,
-  Chip,
-  Input,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-  Textarea,
-  RadioGroup,
-  Radio,
-  } from '@heroui/react';
+  Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, RadioGroup, Radio } from '@heroui/react';
 import Heart from 'lucide-react/icons/heart';
 import Calendar from 'lucide-react/icons/calendar';
 import Users from 'lucide-react/icons/users';
@@ -37,9 +21,7 @@ import Plus from 'lucide-react/icons/plus';
 import Banknote from 'lucide-react/icons/banknote';
 import EyeOff from 'lucide-react/icons/eye-off';
 import { useTranslation } from 'react-i18next';
-import { GlassCard,
-  Progress,
-} from '@/components/ui';
+import { GlassCard, Progress, useDisclosure } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

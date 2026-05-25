@@ -1,12 +1,11 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, useDisclosure } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * BuyNowButton — Creates a marketplace order + Stripe payment intent,
- * then redirects to Stripe Checkout (or shows fallback for non-Stripe tenants).
+ * BuyNowButton — Creates a marketplace order + Stripe payment intent, * then redirects to Stripe Checkout (or shows fallback for non-Stripe tenants).
  *
  * Flow:
  *   1. POST /v2/marketplace/orders { listing_id } → order
@@ -18,7 +17,7 @@ import { Select, SelectItem } from '@/components/ui';
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Button, Input, useDisclosure } from '@heroui/react';
+import { Button, Input } from '@heroui/react';
 import CreditCard from 'lucide-react/icons/credit-card';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useToast } from '@/contexts';

@@ -1,3 +1,4 @@
+import { useDisclosure } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,10 +13,7 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
-  Card, CardBody, CardHeader, Button, Input,
-  Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure,
-  Chip, Spinner, Avatar,
-} from '@heroui/react';
+  Card, CardBody, CardHeader, Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Chip, Spinner, Avatar } from '@heroui/react';
 import Tag from 'lucide-react/icons/tag';
 import Plus from 'lucide-react/icons/plus';
 import Trash2 from 'lucide-react/icons/trash-2';

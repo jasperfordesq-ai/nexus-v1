@@ -8,23 +8,9 @@
  * Announcements with pinning, creation for admins.
  */
 
+import { useState, useEffect, useCallback } from 'react';
 import {
-  useState,
-  useEffect,
-  useCallback } from 'react';
-import {
-  Button,
-  Spinner,
-  Chip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Input,
-  Textarea,
-  useDisclosure,
-} from '@heroui/react';
+  Button, Spinner, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea } from '@heroui/react';
 import Megaphone from 'lucide-react/icons/megaphone';
 import Pin from 'lucide-react/icons/pin';
 import PinOff from 'lucide-react/icons/pin-off';
@@ -33,13 +19,7 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import { useTranslation } from 'react-i18next';
-import { GlassCard,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-} from '@/components/ui';
+import { GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, useDisclosure } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';

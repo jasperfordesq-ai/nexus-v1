@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, useDisclosure } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -16,7 +16,7 @@ import { Select, SelectItem } from '@/components/ui';
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import { Button, Card, CardBody, CardHeader, Checkbox, Chip, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, Input, useDisclosure } from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Checkbox, Chip, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, Input } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import AlertTriangle from 'lucide-react/icons/alert-triangle';
 import Bell from 'lucide-react/icons/bell';

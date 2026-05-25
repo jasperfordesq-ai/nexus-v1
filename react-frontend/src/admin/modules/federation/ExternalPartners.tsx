@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, useDisclosure } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,7 +12,7 @@ import { Select, SelectItem } from '@/components/ui';
 
 import { useState, useCallback, useEffect } from 'react';
 import {
-  Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Switch, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Textarea, useDisclosure } from '@heroui/react';
+  Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Switch, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Textarea } from '@heroui/react';
 import Globe from 'lucide-react/icons/globe';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';

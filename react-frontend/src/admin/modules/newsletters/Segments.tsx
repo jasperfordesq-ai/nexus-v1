@@ -12,7 +12,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  Button, Chip, useDisclosure } from '@heroui/react';
+  Button, Chip } from '@heroui/react';
 import Filter from 'lucide-react/icons/filter';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -23,18 +23,9 @@ import Users from 'lucide-react/icons/users';
 import { usePageTitle } from '@/hooks';
 import { useTenant } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
-import { DataTable,
-  PageHeader,
-  EmptyState,
-  ConfirmModal,
-  type Column } from '../../components';
+import { DataTable, PageHeader, EmptyState, ConfirmModal, type Column } from '../../components';
 
-import { Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-} from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, useDisclosure } from '@/components/ui';
 interface Segment {
   id: number;
   name: string;

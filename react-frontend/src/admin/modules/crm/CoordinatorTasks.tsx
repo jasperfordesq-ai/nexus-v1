@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, useDisclosure } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,7 +11,7 @@ import { Select, SelectItem } from '@/components/ui';
 
 import { useState, useCallback, useEffect } from 'react';
 import {
-  Card, CardBody, Button, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Chip, Spinner, Pagination, Avatar, Checkbox } from '@heroui/react';
+  Card, CardBody, Button, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Chip, Spinner, Pagination, Avatar, Checkbox } from '@heroui/react';
 import ClipboardList from 'lucide-react/icons/clipboard-list';
 import Plus from 'lucide-react/icons/plus';
 import Calendar from 'lucide-react/icons/calendar';

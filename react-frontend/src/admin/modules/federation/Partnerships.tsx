@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, useDisclosure } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -7,13 +7,12 @@ import { Select, SelectItem } from '@/components/ui';
 /**
  * Federation Partnerships
  * Lists and manages federation partnerships with other communities.
- * Features: Counter-proposals, detail drawer, permissions matrix, audit timeline,
- * incoming requests tab, partnership statistics.
+ * Features: Counter-proposals, detail drawer, permissions matrix, audit timeline, * incoming requests tab, partnership statistics.
  */
 
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import {
-  Button, Tabs, Tab, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Textarea, Card, CardBody, CardHeader, Spinner, useDisclosure } from '@heroui/react';
+  Button, Tabs, Tab, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Textarea, Card, CardBody, CardHeader, Spinner } from '@heroui/react';
 import Handshake from 'lucide-react/icons/handshake';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';

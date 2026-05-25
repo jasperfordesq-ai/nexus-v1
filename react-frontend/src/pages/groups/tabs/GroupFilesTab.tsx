@@ -8,24 +8,9 @@
  * File upload, download, folder organization within a group.
  */
 
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
-  useState,
-  useEffect,
-  useCallback,
-  useRef } from 'react';
-import {
-  Button,
-  Spinner,
-  Chip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Input,
-  Textarea,
-  useDisclosure,
-} from '@heroui/react';
+  Button, Spinner, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea } from '@heroui/react';
 import FolderOpen from 'lucide-react/icons/folder-open';
 import Upload from 'lucide-react/icons/upload';
 import Download from 'lucide-react/icons/download';
@@ -41,13 +26,7 @@ import FolderPlus from 'lucide-react/icons/folder-plus';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
-import { GlassCard,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-} from '@/components/ui';
+import { GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, useDisclosure } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

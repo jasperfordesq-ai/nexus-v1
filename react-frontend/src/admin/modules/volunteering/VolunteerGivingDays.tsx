@@ -8,30 +8,9 @@
  * Admin page to manage giving day campaigns and view donation summaries.
  */
 
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
-  useState,
-  useCallback,
-  useEffect,
-  useMemo } from 'react';
-import {
-  Button,
-  Chip,
-  Card,
-  CardBody,
-  CardHeader,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Input,
-  Textarea,
-  Spinner,
-  Avatar,
-  Tab,
-  Tabs,
-  useDisclosure,
-} from '@heroui/react';
+  Button, Chip, Card, CardBody, CardHeader, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea, Spinner, Avatar, Tab, Tabs } from '@heroui/react';
 import Gift from 'lucide-react/icons/gift';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Plus from 'lucide-react/icons/plus';
@@ -45,22 +24,13 @@ import BarChart3 from 'lucide-react/icons/chart-column';
 import EyeOff from 'lucide-react/icons/eye-off';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import {
-  BarChart,
-  Bar,
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
+  BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, } from 'recharts';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
 import { DataTable, PageHeader, StatCard, EmptyState, type Column } from '../../components';
 import { useTranslation } from 'react-i18next';
-import { Progress } from '@/components/ui';
+import { Progress, useDisclosure } from '@/components/ui';
 
 interface GivingDay {
   id: number;
