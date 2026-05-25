@@ -1,25 +1,6 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * AI Settings
- * Configure AI providers and integration settings for the platform.
- *
- * Backend keys (PUT /v2/admin/config/ai):
- *   ai_enabled, ai_provider,
- *   gemini_api_key, openai_api_key, anthropic_api_key,
- *   gemini_model, openai_model, claude_model,
- *   ollama_model, ollama_host,
- *   ai_chat_enabled, ai_content_gen_enabled,
- *   ai_recommendations_enabled, ai_analytics_enabled, ai_moderation_enabled,
- *   default_daily_limit, default_monthly_limit
- */
-
+import { Card, CardBody, CardHeader, Input, Button, Spinner, Chip, Select, SelectItem } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
-import { Card, CardBody, CardHeader, Input, Switch, Button, Spinner, Chip } from '@heroui/react';
+import { Switch } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Bot from 'lucide-react/icons/bot';
 import Save from 'lucide-react/icons/save';
@@ -32,6 +13,19 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * AI Settings
+ * Configure AI providers and integration settings for the platform.
+ *
+ * Backend keys (PUT /v2/admin/config/ai):
+ *   ai_enabled, ai_provider, *   gemini_api_key, openai_api_key, anthropic_api_key, *   gemini_model, openai_model, claude_model, *   ollama_model, ollama_host, *   ai_chat_enabled, ai_content_gen_enabled, *   ai_recommendations_enabled, ai_analytics_enabled, ai_moderation_enabled, *   default_daily_limit, default_monthly_limit
+ */
+
 
 // ---------------------------------------------------------------------------
 // Types

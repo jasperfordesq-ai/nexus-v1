@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, GlassCard, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -13,8 +13,7 @@ import { Select, SelectItem, useDisclosure } from '@/components/ui';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
-import {
-  Button, Input, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
+
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import Upload from 'lucide-react/icons/upload';
 import FileText from 'lucide-react/icons/file-text';
@@ -27,7 +26,6 @@ import Hourglass from 'lucide-react/icons/hourglass';
 import Calendar from 'lucide-react/icons/calendar';
 import Trash2 from 'lucide-react/icons/trash-2';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

@@ -12,7 +12,7 @@
 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import Compass from 'lucide-react/icons/compass';
 import Download from 'lucide-react/icons/download';
 import Eye from 'lucide-react/icons/eye';
@@ -29,7 +29,7 @@ import Calendar from 'lucide-react/icons/calendar';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import Mail from 'lucide-react/icons/mail';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
 import { useTenant } from '@/contexts';

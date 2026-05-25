@@ -1,3 +1,4 @@
+import { Button, Chip, Card, CardBody, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,27 +11,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import Papa from 'papaparse';
-import {
-  Button,
-  Avatar,
-  Chip,
-  Card,
-  CardBody,
-  Input,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Pagination,
-  Tooltip,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-} from '@heroui/react';
+import { Pagination, Tooltip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import Users from 'lucide-react/icons/users';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Download from 'lucide-react/icons/download';
@@ -203,7 +184,6 @@ export function Subscribers() {
     setAddLoading(false);
   }, [addForm, loadData, statusFilter, searchQuery, t, toast])
 
-
   // ───────────────────────────────────────────────────────────────────────────
   // Remove subscriber
   // ───────────────────────────────────────────────────────────────────────────
@@ -225,7 +205,6 @@ export function Subscribers() {
     }
     setRemoveLoading(false);
   }, [removeTarget, loadData, t, toast])
-
 
   // ───────────────────────────────────────────────────────────────────────────
   // Import CSV
@@ -279,7 +258,6 @@ export function Subscribers() {
     });
   }, [t, toast])
 
-
   const handleImport = useCallback(async () => {
     if (importRows.length === 0) return;
     setImportLoading(true);
@@ -299,7 +277,6 @@ export function Subscribers() {
     }
     setImportLoading(false);
   }, [importRows, loadData, statusFilter, searchQuery, t, toast])
-
 
   // ───────────────────────────────────────────────────────────────────────────
   // Export CSV
@@ -336,7 +313,6 @@ export function Subscribers() {
     setExportLoading(false);
   }, [t, toast])
 
-
   // ───────────────────────────────────────────────────────────────────────────
   // Sync members
   // ───────────────────────────────────────────────────────────────────────────
@@ -357,7 +333,6 @@ export function Subscribers() {
     setSyncLoading(false);
   }, [loadData, statusFilter, searchQuery, t, toast])
 
-
   // ───────────────────────────────────────────────────────────────────────────
   // Helpers
   // ───────────────────────────────────────────────────────────────────────────
@@ -372,7 +347,6 @@ export function Subscribers() {
     navigator.clipboard.writeText(subscribeUrl);
     toast.success(t('newsletters.subscribe_link_copied_to_clipboard'));
   }, [subscribeUrl, t, toast])
-
 
   const statusColor = (status: string): 'success' | 'warning' | 'danger' | 'default' => {
     switch (status) {
@@ -602,7 +576,6 @@ export function Subscribers() {
           ))}
         </TableBody>
       </Table>
-
 
       {/* Public subscribe link */}
       {showPublicSubscribeLink && subscribeUrl && (

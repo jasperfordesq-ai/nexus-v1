@@ -1,3 +1,4 @@
+import { CardBody, Card, Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +11,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Card, CardBody, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@heroui/react';
+import { Switch } from '@heroui/react';
 import Bookmark from 'lucide-react/icons/bookmark';
 import Plus from 'lucide-react/icons/plus';
 import FolderOpen from 'lucide-react/icons/folder-open';

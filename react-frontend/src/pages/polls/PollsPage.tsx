@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, GlassCard, Progress, Button, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -19,7 +19,7 @@ import { Select, SelectItem, useDisclosure } from '@/components/ui';
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button, Input, Textarea, Chip, Avatar, Tabs, Tab, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, DatePicker, Switch } from '@heroui/react';
+import { Tabs, Tab, DatePicker, Switch } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import type { DateInputValue } from '@heroui/react';
 import BarChart3 from 'lucide-react/icons/chart-column';
@@ -41,9 +41,6 @@ import Tag from 'lucide-react/icons/tag';
 import ListOrdered from 'lucide-react/icons/list-ordered';
 import Filter from 'lucide-react/icons/filter';
 import { useTranslation } from 'react-i18next';
-import { GlassCard,
-  Progress,
-} from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { SocialInteractionPanel } from '@/components/social';
 import { useAuth, useToast, useTenant } from '@/contexts';

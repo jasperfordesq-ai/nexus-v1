@@ -1,14 +1,8 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
+import { Button, Card, CardBody, CardHeader, Input, Spinner, Textarea, Chip, Select, SelectItem, Avatar } from '@/components/ui';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-import {
-  Button, Card, CardBody, CardHeader, Input, Spinner, Switch, Textarea, Avatar, Chip } from '@heroui/react';
+import { Switch } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
 import Users from 'lucide-react/icons/users';
@@ -27,6 +21,11 @@ import { api } from '@/lib/api';
 import { resolveAssetUrl } from '@/lib/helpers';
 import { PageHeader } from '../../components';
 import type { AdminGroup, GroupType } from '../../api/types';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 
 export function GroupEdit() {
   const { t } = useTranslation('admin');

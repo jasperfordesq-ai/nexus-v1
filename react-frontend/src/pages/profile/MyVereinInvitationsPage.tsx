@@ -1,3 +1,14 @@
+import { Button, Card, CardBody, CardHeader, Chip, Spinner } from '@/components/ui';
+import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Tab, Tabs } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
+import UserPlus from 'lucide-react/icons/user-plus';
+import { PageMeta } from '@/components/seo';
+import { useAuth, useToast } from '@/contexts';
+import { usePageTitle } from '@/hooks';
+import { api } from '@/lib/api';
+import { logError } from '@/lib/logger';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,16 +21,6 @@
  * Route: /me/verein-invitations
  */
 
-import { useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Button, Card, CardBody, CardHeader, Chip, Spinner, Tab, Tabs } from '@heroui/react';
-import { Separator } from '@heroui-v3/react';
-import UserPlus from 'lucide-react/icons/user-plus';
-import { PageMeta } from '@/components/seo';
-import { useAuth, useToast } from '@/contexts';
-import { usePageTitle } from '@/hooks';
-import { api } from '@/lib/api';
-import { logError } from '@/lib/logger';
 
 interface InvitationDto {
   id: number;

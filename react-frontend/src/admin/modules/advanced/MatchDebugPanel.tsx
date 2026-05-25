@@ -1,18 +1,6 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Match Debug Panel
- * Admin tool to inspect match score breakdowns for any user.
- * Shows top matches with per-component score bars (category, skill,
- * proximity, freshness, reciprocity, quality).
- */
-
+import { Card, CardBody, CardHeader, Chip, Input, Spinner, Button, Progress, Avatar } from '@/components/ui';
 import { useState, useCallback, useRef } from 'react';
-import {
-  Card, CardBody, CardHeader, Chip, Avatar, Input, Spinner, Button } from '@heroui/react';
+
 import Target from 'lucide-react/icons/target';
 import Search from 'lucide-react/icons/search';
 import User from 'lucide-react/icons/user';
@@ -24,9 +12,18 @@ import { api } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { PageHeader } from '../../components';
 import { adminUsers } from '../../api/adminApi';
-
 import { useTranslation } from 'react-i18next';
-import { Progress } from '@/components/ui';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Match Debug Panel
+ * Admin tool to inspect match score breakdowns for any user.
+ * Shows top matches with per-component score bars (category, skill, * proximity, freshness, reciprocity, quality).
+ */
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────

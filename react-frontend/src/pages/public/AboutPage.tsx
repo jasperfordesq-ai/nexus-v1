@@ -16,9 +16,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Button } from '@heroui/react';
-import Hexagon from 'lucide-react/icons/hexagon';
+import { motion } from 'framer-motion';import Hexagon from 'lucide-react/icons/hexagon';
 import UserPlus from 'lucide-react/icons/user-plus';
 import Search from 'lucide-react/icons/search';
 import Handshake from 'lucide-react/icons/handshake';
@@ -40,7 +38,7 @@ import Star from 'lucide-react/icons/star';
 import Award from 'lucide-react/icons/award';
 import BookOpen from 'lucide-react/icons/book-open';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useTenant, useAuth } from '@/contexts';
 import { usePageTitle } from '@/hooks';

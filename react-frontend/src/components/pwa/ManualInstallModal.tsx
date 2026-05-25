@@ -3,13 +3,14 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from '@heroui/react';
+
 import { useTranslation } from 'react-i18next';
 import MoreVertical from 'lucide-react/icons/more-vertical';
 import Menu from 'lucide-react/icons/menu';
 import Download from 'lucide-react/icons/download';
 import Plus from 'lucide-react/icons/plus';
 import type { BrowserKind } from '@/lib/installPrompt';
+import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 
 interface ManualInstallModalProps {
   isOpen: boolean;

@@ -6,7 +6,7 @@
 import { useState, useEffect, useRef, useCallback, memo, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Button, Avatar, Input } from '@heroui/react';
+
 import SmilePlus from 'lucide-react/icons/smile-plus';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import Pencil from 'lucide-react/icons/pencil';
@@ -21,6 +21,7 @@ import { useTenant } from '@/contexts/TenantContext';
 import type { Message } from '@/types/api';
 import { VoiceMessagePlayer } from './VoiceMessagePlayer';
 import { MessageLinkPreview } from './MessageLinkPreview';
+import { Button, Input, Avatar } from '@/components/ui';
 
 // Available reaction emojis
 const REACTION_EMOJIS = ['👍', '❤️', '😂', '😮', '😢', '🙏'];

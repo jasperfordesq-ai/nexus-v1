@@ -3,9 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState } from 'react';
-import { Button, Chip } from '@heroui/react';
-import Target from 'lucide-react/icons/target';
+import { useState } from 'react';import Target from 'lucide-react/icons/target';
 import Sparkles from 'lucide-react/icons/sparkles';
 import Building2 from 'lucide-react/icons/building-2';
 import ChevronUp from 'lucide-react/icons/chevron-up';
@@ -13,7 +11,7 @@ import ChevronDown from 'lucide-react/icons/chevron-down';
 import Check from 'lucide-react/icons/check';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import type { JobVacancy, MatchResult, QualificationData } from './JobDetailTypes';
 

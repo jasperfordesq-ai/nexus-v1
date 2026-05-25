@@ -18,9 +18,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
-import { Button, Spinner } from '@heroui/react';
-import Activity from 'lucide-react/icons/activity';
+import { motion } from 'framer-motion';import Activity from 'lucide-react/icons/activity';
 import ArrowUpRight from 'lucide-react/icons/arrow-up-right';
 import ArrowDownLeft from 'lucide-react/icons/arrow-down-left';
 import Users from 'lucide-react/icons/users';
@@ -34,7 +32,7 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Sparkles from 'lucide-react/icons/sparkles';
 import BarChart3 from 'lucide-react/icons/chart-column';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Spinner } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 // No context imports needed - standalone dashboard
 import { usePageTitle } from '@/hooks';

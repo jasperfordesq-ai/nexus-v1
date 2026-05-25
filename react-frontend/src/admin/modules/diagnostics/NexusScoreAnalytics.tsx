@@ -1,3 +1,12 @@
+import { Card, CardBody, CardHeader, Spinner } from '@/components/ui';
+import { useState, useEffect } from 'react';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import { useTranslation } from 'react-i18next';
+import { useAdminPageMeta } from '../../AdminMetaContext';
+import { useToast } from '@/contexts';
+import { adminDiagnostics } from '../../api/adminApi';
+import { PageHeader, StatCard } from '../../components';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,15 +18,6 @@
  * Wired to adminDiagnostics.getNexusScoreStats() API.
  */
 
-import { useState, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Spinner } from '@heroui/react';
-import BarChart3 from 'lucide-react/icons/chart-column';
-import TrendingUp from 'lucide-react/icons/trending-up';
-import { useTranslation } from 'react-i18next';
-import { useAdminPageMeta } from '../../AdminMetaContext';
-import { useToast } from '@/contexts';
-import { adminDiagnostics } from '../../api/adminApi';
-import { PageHeader, StatCard } from '../../components';
 
 interface NexusScoreData {
   total_badges_awarded: number;

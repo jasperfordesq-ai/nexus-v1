@@ -16,15 +16,13 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
-import { Button, Chip } from '@heroui/react';
-import Hexagon from 'lucide-react/icons/hexagon';
+import { motion } from 'framer-motion';import Hexagon from 'lucide-react/icons/hexagon';
 import CalendarDays from 'lucide-react/icons/calendar-days';
 import ExternalLink from 'lucide-react/icons/external-link';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import Info from 'lucide-react/icons/info';
 import type { LucideIcon } from 'lucide-react';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip } from '@/components/ui';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 

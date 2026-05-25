@@ -1,26 +1,10 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
+import { Button, Card, CardBody, CardHeader, Chip, Spinner, Progress, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@/components/ui';
 import {
   useCallback,
   useEffect,
   useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Spinner,
-  Tooltip,
-} from '@heroui/react';
+import { Tooltip } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
@@ -35,7 +19,11 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader } from '../../components';
-import { Progress } from '@/components/ui';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 
 type SectionStatus = 'ready' | 'needs_review' | 'not_started' | 'blocked';
 

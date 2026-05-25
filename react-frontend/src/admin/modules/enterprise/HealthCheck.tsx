@@ -1,16 +1,7 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Health Check
- * System health status indicators with history.
- */
-
+import { Card, CardBody, CardHeader, Button, Spinner, Chip } from '@/components/ui';
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardBody, CardHeader, Button, Spinner, Chip, Table, TableHeader, TableBody, TableRow, TableColumn, TableCell } from '@heroui/react';
+import { Table, TableHeader, TableBody, TableRow, TableColumn, TableCell } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
@@ -21,6 +12,16 @@ import { usePageTitle } from '@/hooks';
 import { adminEnterprise } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { HealthCheckResult, HealthCheckHistoryEntry } from '../../api/types';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Health Check
+ * System health status indicators with history.
+ */
+
 
 function statusBorderClass(status: string): string {
   switch (status) {

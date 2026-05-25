@@ -4,9 +4,10 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { Link } from 'react-router-dom';
-import { Avatar, Tooltip } from '@heroui/react';
+import { Tooltip } from '@heroui/react';
 import { motion } from 'framer-motion';
 import { useTenant } from '@/contexts';
+import { Avatar } from '@/components/ui';
 
 /** Extract 1–2 initials from a tenant name. */
 function getInitials(name: string): string {

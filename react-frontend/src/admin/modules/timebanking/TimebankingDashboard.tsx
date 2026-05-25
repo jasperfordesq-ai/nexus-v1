@@ -1,17 +1,6 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Timebanking Dashboard
- * Transaction analytics overview with top earners/spenders and quick links.
- * Parity: PHP Admin\TimebankingController::index()
- */
-
+import { Card, CardBody, CardHeader, Button, Spinner } from '@/components/ui';
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Spinner } from '@heroui/react';
 import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import TrendingUp from 'lucide-react/icons/trending-up';
@@ -27,6 +16,17 @@ import { adminTimebanking } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
 import type { TimebankingStats } from '../../api/types';
 import { useTranslation } from 'react-i18next';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Timebanking Dashboard
+ * Transaction analytics overview with top earners/spenders and quick links.
+ * Parity: PHP Admin\TimebankingController::index()
+ */
+
 
 export function TimebankingDashboard() {
   const { t: tNav } = useTranslation('admin_nav');

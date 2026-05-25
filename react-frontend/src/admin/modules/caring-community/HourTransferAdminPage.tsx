@@ -1,25 +1,7 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * HourTransferAdminPage — Admin console for cooperative-to-cooperative banked
- * hour transfers (K3).
- *
- * Two tabs:
- *   - Pending Outbound — transfers initiated by THIS tenant's members,
- *     awaiting admin approval. Approve debits source wallet + delivers to
- *     destination tenant atomically. Reject closes the row with no funds movement.
- *   - Recent Inbound — transfers received from other cooperatives in the
- *     last 90 days (read-only audit view).
- *
- * Admin English only — no t() calls.
- */
-
+import { Button, Card, CardBody, CardHeader, Chip, Spinner, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, CardBody, CardHeader, Chip, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Tab, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tabs, Textarea } from '@heroui/react';
+import { Tab, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tabs } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import Check from 'lucide-react/icons/check';
@@ -32,6 +14,24 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { canManageCaring } from '@/caring/access';
 import { PageHeader } from '../../components';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * HourTransferAdminPage — Admin console for cooperative-to-cooperative banked
+ * hour transfers (K3).
+ *
+ * Two tabs:
+ *   - Pending Outbound — transfers initiated by THIS tenant's members, *     awaiting admin approval. Approve debits source wallet + delivers to
+ *     destination tenant atomically. Reject closes the row with no funds movement.
+ *   - Recent Inbound — transfers received from other cooperatives in the
+ *     last 90 days (read-only audit view).
+ *
+ * Admin English only — no t() calls.
+ */
+
 
 type TransferStatus =
   | 'pending'

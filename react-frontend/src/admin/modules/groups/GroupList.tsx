@@ -9,25 +9,9 @@
  * Parity: PHP Admin groups management
  */
 
-import {
-  useState,
-  useCallback,
-  useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Tabs,
-  Tab,
-  Button,
-  Chip,
-  Avatar,
-  Checkbox,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Input,
-} from '@heroui/react';
+import { Tabs, Tab, Checkbox } from '@heroui/react';
 import Trash2 from 'lucide-react/icons/trash-2';
 import Users from 'lucide-react/icons/users';
 import Eye from 'lucide-react/icons/eye';
@@ -50,12 +34,7 @@ import { DataTable,
 import type { AdminGroup } from '../../api/types';
 
 import { resolveAssetUrl } from '@/lib/helpers';
-import { Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-} from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 const statusColors: Record<string, 'success' | 'warning' | 'danger' | 'default'> = {
   active: 'success',
   pending: 'warning',

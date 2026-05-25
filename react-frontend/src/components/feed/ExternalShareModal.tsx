@@ -8,20 +8,14 @@
  * Shows a grid of share targets (copy link, email, WhatsApp, X, Facebook, LinkedIn).
  */
 
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  Button,
-  Tooltip,
-} from '@heroui/react';
+import { Tooltip } from '@heroui/react';
 import Copy from 'lucide-react/icons/copy';
 import Mail from 'lucide-react/icons/mail';
 import Check from 'lucide-react/icons/check';
 import { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
+import { Button, Modal, ModalContent, ModalHeader, ModalBody } from '@/components/ui';
 
 interface ExternalShareModalProps {
   isOpen: boolean;

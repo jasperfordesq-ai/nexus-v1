@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input, Textarea } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -23,8 +23,7 @@ import { Select, SelectItem } from '@/components/ui';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import {
-  Button, Input, Textarea, RadioGroup, Radio, Spinner, Chip } from '@heroui/react';
+import { RadioGroup, Radio } from '@heroui/react';
 import Camera from 'lucide-react/icons/camera';
 import X from 'lucide-react/icons/x';
 import Plus from 'lucide-react/icons/plus';
@@ -37,7 +36,6 @@ import FileText from 'lucide-react/icons/file-text';
 import Upload from 'lucide-react/icons/upload';
 import Video from 'lucide-react/icons/video';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

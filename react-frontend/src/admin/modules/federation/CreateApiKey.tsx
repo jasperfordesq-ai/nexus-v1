@@ -1,15 +1,6 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Create Federation API Key
- * Form for generating a new federation API key.
- */
-
+import { Card, CardBody, CardHeader, Input, Button } from '@/components/ui';
 import { useState } from 'react';
-import { Card, CardBody, CardHeader, Input, Button, Checkbox } from '@heroui/react';
+import { Checkbox } from '@heroui/react';
 import Key from 'lucide-react/icons/key';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Copy from 'lucide-react/icons/copy';
@@ -20,8 +11,17 @@ import { useTenant, useToast } from '@/contexts';
 import { logError } from '@/lib/logger';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader } from '../../components';
-
 import { useTranslation } from 'react-i18next';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Create Federation API Key
+ * Form for generating a new federation API key.
+ */
+
 
 /** Scopes must match the `fedAuth('...')` permission strings in FederationController.php */
 const SCOPE_KEYS = [

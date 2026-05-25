@@ -1,4 +1,15 @@
-import { Select, SelectItem, useDisclosure } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Switch, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+import CreditCard from 'lucide-react/icons/credit-card';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Leaf from 'lucide-react/icons/leaf';
+import Download from 'lucide-react/icons/download';
+import { usePageTitle } from '@/hooks';
+import { useAuth, useToast } from '@/contexts';
+import { api } from '@/lib/api';
+import { PageHeader } from '../../components';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,18 +20,6 @@ import { Select, SelectItem, useDisclosure } from '@/components/ui';
  * God-only billing dashboard — manage tenant subscriptions, custom pricing, * discounts, pause/resume, grace periods, and CSV export.
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
-import {
-  Button, Card, CardBody, CardHeader, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Switch, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
-import CreditCard from 'lucide-react/icons/credit-card';
-import AlertTriangle from 'lucide-react/icons/triangle-alert';
-import Leaf from 'lucide-react/icons/leaf';
-import Download from 'lucide-react/icons/download';
-import { usePageTitle } from '@/hooks';
-import { useAuth, useToast } from '@/contexts';
-import { api } from '@/lib/api';
-import { PageHeader } from '../../components';
 
 // ---------------------------------------------------------------------------
 // Types

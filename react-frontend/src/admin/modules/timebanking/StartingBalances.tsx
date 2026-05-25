@@ -1,25 +1,5 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Starting Balances (W7)
- * Admin page for granting starting time credits to members.
- * Allows searching members, granting credits, and viewing grant history.
- */
-
+import { Card, CardBody, CardHeader, Input, Button, Spinner, Chip, Textarea } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Input,
-  Button,
-  Spinner,
-  Chip,
-  Textarea,
-} from '@heroui/react';
 import Wallet from 'lucide-react/icons/wallet';
 import Plus from 'lucide-react/icons/plus';
 import History from 'lucide-react/icons/history';
@@ -31,6 +11,17 @@ import { adminUsers, adminTimebanking } from '../../api/adminApi';
 import { DataTable, PageHeader, type Column } from '../../components';
 import type { AdminUser, WalletGrant } from '../../api/types';
 import { useTranslation } from 'react-i18next';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Starting Balances (W7)
+ * Admin page for granting starting time credits to members.
+ * Allows searching members, granting credits, and viewing grant history.
+ */
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Member Search + Grant Form

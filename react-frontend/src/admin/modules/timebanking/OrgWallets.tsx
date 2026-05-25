@@ -10,9 +10,7 @@
  */
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@heroui/react';
-import Building2 from 'lucide-react/icons/building-2';
+import { Link } from 'react-router-dom';import Building2 from 'lucide-react/icons/building-2';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant, useToast } from '@/contexts';
@@ -20,6 +18,7 @@ import { adminTimebanking } from '../../api/adminApi';
 import { DataTable, PageHeader, type Column } from '../../components';
 import type { OrgWallet } from '../../api/types';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui';
 
 export function OrgWallets() {
   const { t: tNav } = useTranslation('admin_nav');

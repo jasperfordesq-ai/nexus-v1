@@ -1,3 +1,4 @@
+import { CardBody, Card, Progress, Button, Chip, Spinner, Input } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,25 +11,8 @@
  *      DELETE /api/v2/admin/goals/{id}
  */
 
-import {
-  useState,
-  useEffect,
-  useCallback } from 'react';
-import {
-  Card,
-  CardBody,
-  Spinner,
-  Button,
-  Chip,
-  Input,
-  Pagination,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-} from '@heroui/react';
+import { useState, useEffect, useCallback } from 'react';
+import { Pagination, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import Target from 'lucide-react/icons/target';
 import Search from 'lucide-react/icons/search';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -39,7 +23,6 @@ import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader, ConfirmModal } from '../../components';
-import { Progress } from '@/components/ui';
 
 // ---------------------------------------------------------------------------
 // Types

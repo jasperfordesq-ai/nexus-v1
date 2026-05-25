@@ -9,15 +9,14 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Chip, Spinner } from '@heroui/react';
-import ShieldAlert from 'lucide-react/icons/shield-alert';
+import { useTranslation } from 'react-i18next';import ShieldAlert from 'lucide-react/icons/shield-alert';
 import Flag from 'lucide-react/icons/flag';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminGroups } from '../../api/adminApi';
 import { DataTable, PageHeader, EmptyState, StatusBadge, type Column } from '../../components';
 import type { GroupModerationItem } from '../../api/types';
+import { Chip, Spinner } from '@/components/ui';
 
 export function GroupModeration() {
   const { t } = useTranslation('admin');

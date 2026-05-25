@@ -9,9 +9,7 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Button, Chip } from '@heroui/react';
-import Plus from 'lucide-react/icons/plus';
+import { Link, useNavigate } from 'react-router-dom';import Plus from 'lucide-react/icons/plus';
 import Pencil from 'lucide-react/icons/pencil';
 import Trash2 from 'lucide-react/icons/trash-2';
 import FileText from 'lucide-react/icons/file-text';
@@ -24,6 +22,7 @@ import type { LegalDocument } from '../../api/types';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 
 import { useTranslation } from 'react-i18next';
+import { Button, Chip } from '@/components/ui';
 /** Human-friendly labels for legal document types */
 const DOC_TYPE_KEYS: Record<string, string> = {
   terms: 'enterprise.legal_doc_form.type_terms',

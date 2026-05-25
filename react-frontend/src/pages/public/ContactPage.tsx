@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Input, Textarea } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -13,9 +13,7 @@ import { Select, SelectItem } from '@/components/ui';
 import { useState, type FormEvent } from 'react';
 import { useTurnstile } from '@/hooks/useTurnstile';
 import { motion } from 'framer-motion';
-import { Helmet } from 'react-helmet-async';
-import { Button, Input, Textarea } from '@heroui/react';
-import Mail from 'lucide-react/icons/mail';
+import { Helmet } from 'react-helmet-async';import Mail from 'lucide-react/icons/mail';
 import MessageSquare from 'lucide-react/icons/message-square';
 import Loader2 from 'lucide-react/icons/loader-circle';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -23,7 +21,6 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTenant, useAuth } from '@/contexts';
 import { usePageTitle } from '@/hooks';
-import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,8 +12,7 @@ import { Select, SelectItem } from '@/components/ui';
 
 import { useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import {
-  Button, Avatar, Chip, Tabs, Tab, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
+import { Tabs, Tab } from '@heroui/react';
 import Plus from 'lucide-react/icons/plus';
 import Upload from 'lucide-react/icons/upload';
 import Download from 'lucide-react/icons/download';
@@ -48,12 +47,6 @@ import { DataTable,
 import type { AdminUser,
   UserListParams } from '../../api/types';
 
-import { Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-} from '@/components/ui';
 export function UserList() {
   const { t } = useTranslation('admin');
   useAdminPageMeta({ title: t('users.title') });

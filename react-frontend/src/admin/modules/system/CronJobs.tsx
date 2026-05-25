@@ -9,25 +9,26 @@
  * Parity: PHP CronJobController::index()
  */
 
-import { useState, useCallback, useEffect } from 'react';
-import { Card, CardBody, CardHeader, CardFooter, Button, Chip, Spinner } from '@heroui/react';
+import { useCallback, useEffect, useState } from 'react';
 import { Separator } from '@heroui-v3/react';
+import Activity from 'lucide-react/icons/activity';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Calendar from 'lucide-react/icons/calendar';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Clock from 'lucide-react/icons/clock';
 import Play from 'lucide-react/icons/play';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
-import CheckCircle from 'lucide-react/icons/circle-check-big';
-import XCircle from 'lucide-react/icons/circle-x';
-import Terminal from 'lucide-react/icons/terminal';
-import Calendar from 'lucide-react/icons/calendar';
 import Tag from 'lucide-react/icons/tag';
-import AlertTriangle from 'lucide-react/icons/triangle-alert';
-import Activity from 'lucide-react/icons/activity';
+import Terminal from 'lucide-react/icons/terminal';
+import XCircle from 'lucide-react/icons/circle-x';
 import { useTranslation } from 'react-i18next';
-import { usePageTitle } from '@/hooks';
+
 import { useToast } from '@/contexts';
-import { adminSystem, adminCron } from '../../api/adminApi';
+import { usePageTitle } from '@/hooks';
+import { Button, Card, CardBody, CardFooter, CardHeader, Chip, Spinner } from '@/components/ui';
+import { adminCron, adminSystem } from '../../api/adminApi';
+import type { CronHealthMetrics, CronJob } from '../../api/types';
 import { PageHeader, StatusBadge } from '../../components';
-import type { CronJob, CronHealthMetrics } from '../../api/types';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Extended type to include extra fields from the API

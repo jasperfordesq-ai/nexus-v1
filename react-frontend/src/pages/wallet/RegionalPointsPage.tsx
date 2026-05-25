@@ -1,21 +1,7 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * RegionalPointsPage — AG28 member-facing UI for the third currency.
- *
- * Shows balance, transaction history and a member-to-member transfer form.
- * Backed by /api/v2/caring-community/regional-points/{summary,history,transfer}.
- *
- * Disabled tenants see a friendly "not enabled here" message — backend
- * returns FEATURE_DISABLED in that case.
- */
-
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea } from '@heroui/react';
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Coins from 'lucide-react/icons/coins';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -28,6 +14,21 @@ import { useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * RegionalPointsPage — AG28 member-facing UI for the third currency.
+ *
+ * Shows balance, transaction history and a member-to-member transfer form.
+ * Backed by /api/v2/caring-community/regional-points/{summary, history, transfer}.
+ *
+ * Disabled tenants see a friendly "not enabled here" message — backend
+ * returns FEATURE_DISABLED in that case.
+ */
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

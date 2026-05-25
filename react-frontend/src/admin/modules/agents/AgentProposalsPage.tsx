@@ -1,25 +1,7 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
+import { Button, Card, CardBody, CardHeader, Chip, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Tab,
-  Tabs,
-  Textarea,
-} from '@heroui/react';
+import { Tab, Tabs } from '@heroui/react';
 import Bot from 'lucide-react/icons/bot';
 import CheckCircle2 from 'lucide-react/icons/check-circle-2';
 import XCircle from 'lucide-react/icons/x-circle';
@@ -30,6 +12,11 @@ import { api } from '@/lib/api';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { EmptyState } from '../../components/EmptyState';
 import { PageHeader } from '../../components/PageHeader';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 
 type ProposalStatus = 'pending' | 'approved' | 'rejected' | 'all';
 

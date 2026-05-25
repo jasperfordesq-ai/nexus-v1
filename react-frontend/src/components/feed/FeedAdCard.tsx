@@ -3,12 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import React, { useEffect, useRef, useState } from 'react';
-import { Button, Chip } from '@heroui/react';
-import ExternalLink from 'lucide-react/icons/external-link';
+import React, { useEffect, useRef, useState } from 'react';import ExternalLink from 'lucide-react/icons/external-link';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { Button, Chip } from '@/components/ui';
 
 export interface AdItem {
   campaign_id: number;

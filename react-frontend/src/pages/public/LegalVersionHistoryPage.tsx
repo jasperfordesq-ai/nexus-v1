@@ -22,9 +22,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Button, Chip, Spinner } from '@heroui/react';
-import { sanitizeRichText } from '@/lib/sanitize';
+import { motion, AnimatePresence } from 'framer-motion';import { sanitizeRichText } from '@/lib/sanitize';
 import History from 'lucide-react/icons/history';
 import CalendarDays from 'lucide-react/icons/calendar-days';
 import ChevronDown from 'lucide-react/icons/chevron-down';
@@ -37,7 +35,7 @@ import Info from 'lucide-react/icons/info';
 import GitCompareArrows from 'lucide-react/icons/git-compare-arrows';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';

@@ -10,19 +10,9 @@
  * Admin/Help/Theme/Language consolidated into a utility row at the bottom.
  */
 
-import {
-  useEffect,
-  useRef,
-  useState } from 'react';
-import { useNavigate,
-  useLocation } from 'react-router-dom';
-import { Button,
-  Avatar,
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerBody,
-} from '@heroui/react';
+import { useEffect, useRef, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Drawer, DrawerContent, DrawerHeader, DrawerBody } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import X from 'lucide-react/icons/x';
 import Home from 'lucide-react/icons/house';
@@ -88,9 +78,7 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useMenuContext } from '@/contexts';
 import { MobileMenuItems } from '@/components/navigation';
 
-import { Accordion,
-  AccordionItem,
-} from '@/components/ui';
+import { Accordion, AccordionItem, Button, Avatar } from '@/components/ui';
 interface IdentityStatusResponse {
   has_id_verified_badge: boolean;
 }

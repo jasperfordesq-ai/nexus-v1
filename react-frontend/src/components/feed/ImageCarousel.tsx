@@ -14,14 +14,13 @@
  */
 
 import { useState, useCallback, useRef } from 'react';
-import { motion, AnimatePresence, type PanInfo } from 'framer-motion';
-import { Button } from '@heroui/react';
-import ChevronLeft from 'lucide-react/icons/chevron-left';
+import { motion, AnimatePresence, type PanInfo } from 'framer-motion';import ChevronLeft from 'lucide-react/icons/chevron-left';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import { useTranslation } from 'react-i18next';
 import { resolveAssetUrl } from '@/lib/helpers';
 import type { PostMedia } from './types';
 import { ImageLightbox } from './ImageLightbox';
+import { Button } from '@/components/ui';
 
 interface ImageCarouselProps {
   media: PostMedia[];

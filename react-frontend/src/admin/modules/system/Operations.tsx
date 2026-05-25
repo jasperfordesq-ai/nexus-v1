@@ -1,3 +1,16 @@
+import { Card, CardBody, CardHeader, Spinner, Button } from '@/components/ui';
+import { useState, useCallback, useEffect } from 'react';
+import { Separator } from '@heroui-v3/react';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Database from 'lucide-react/icons/database';
+import Timer from 'lucide-react/icons/timer';
+import Play from 'lucide-react/icons/play';
+import { usePageTitle } from '@/hooks';
+import { useToast } from '@/contexts';
+import { adminConfig } from '../../api/adminApi';
+import { PageHeader } from '../../components';
+import type { CacheStats, BackgroundJob } from '../../api/types';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,19 +23,6 @@
  * Previously lived inside /admin/tenant-features (now retired).
  */
 
-import { useState, useCallback, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Spinner, Button } from '@heroui/react';
-import { Separator } from '@heroui-v3/react';
-import RefreshCw from 'lucide-react/icons/refresh-cw';
-import Trash2 from 'lucide-react/icons/trash-2';
-import Database from 'lucide-react/icons/database';
-import Timer from 'lucide-react/icons/timer';
-import Play from 'lucide-react/icons/play';
-import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
-import { adminConfig } from '../../api/adminApi';
-import { PageHeader } from '../../components';
-import type { CacheStats, BackgroundJob } from '../../api/types';
 
 export default function Operations() {
   usePageTitle('Operations');

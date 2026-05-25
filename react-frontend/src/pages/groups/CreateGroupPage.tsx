@@ -11,7 +11,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Input, Textarea, Switch, Avatar, Chip } from '@heroui/react';
+import { Switch } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
 import Users from 'lucide-react/icons/users';
@@ -23,7 +23,7 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import ImagePlus from 'lucide-react/icons/image-plus';
 import X from 'lucide-react/icons/x';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Input, Textarea, Avatar } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen } from '@/components/feedback';
 import { PlaceAutocompleteInput } from '@/components/location';

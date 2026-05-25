@@ -1,3 +1,4 @@
+import { CardBody, Card, Button, Textarea } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -14,7 +15,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import { Button, Textarea, Card, CardBody } from '@heroui/react';
+
 import Sparkles from 'lucide-react/icons/sparkles';
 import Copy from 'lucide-react/icons/copy';
 import Check from 'lucide-react/icons/check';

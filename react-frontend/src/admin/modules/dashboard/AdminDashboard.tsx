@@ -1,3 +1,30 @@
+import { Card, CardBody, CardHeader, Spinner, Button, Chip } from '@/components/ui';
+import { useEffect, useState, useCallback } from 'react';
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import Users from 'lucide-react/icons/users';
+import ListChecks from 'lucide-react/icons/list-checks';
+import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
+import Clock from 'lucide-react/icons/clock';
+import UserCheck from 'lucide-react/icons/user-check';
+import UserPlus from 'lucide-react/icons/user-plus';
+import FileCheck from 'lucide-react/icons/file-check';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Activity from 'lucide-react/icons/activity';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Send from 'lucide-react/icons/send';
+import PenSquare from 'lucide-react/icons/square-pen';
+import Trophy from 'lucide-react/icons/trophy';
+import Settings from 'lucide-react/icons/settings';
+import Rocket from 'lucide-react/icons/rocket';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import ShieldAlert from 'lucide-react/icons/shield-alert';
+import { useTenant, useToast } from '@/contexts';
+import { useOnboardingConfig } from '@/hooks/useOnboardingConfig';
+import { useAdminPageMeta } from '../../AdminMetaContext';
+import { adminDashboard } from '../../api/adminApi';
+import { StatCard, PageHeader } from '../../components';
+import type { AdminDashboardStats, ActivityLogEntry, MonthlyTrend } from '../../api/types';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -25,33 +52,6 @@
  * - Onboarding Tour -- low priority
  */
 
-import { useEffect, useState, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { Card, CardBody, CardHeader, Spinner, Button, Chip } from '@heroui/react';
-import Users from 'lucide-react/icons/users';
-import ListChecks from 'lucide-react/icons/list-checks';
-import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
-import Clock from 'lucide-react/icons/clock';
-import UserCheck from 'lucide-react/icons/user-check';
-import UserPlus from 'lucide-react/icons/user-plus';
-import FileCheck from 'lucide-react/icons/file-check';
-import TrendingUp from 'lucide-react/icons/trending-up';
-import Activity from 'lucide-react/icons/activity';
-import RefreshCw from 'lucide-react/icons/refresh-cw';
-import Send from 'lucide-react/icons/send';
-import PenSquare from 'lucide-react/icons/square-pen';
-import Trophy from 'lucide-react/icons/trophy';
-import Settings from 'lucide-react/icons/settings';
-import Rocket from 'lucide-react/icons/rocket';
-import ChevronRight from 'lucide-react/icons/chevron-right';
-import ShieldAlert from 'lucide-react/icons/shield-alert';
-import { useTenant, useToast } from '@/contexts';
-import { useOnboardingConfig } from '@/hooks/useOnboardingConfig';
-import { useAdminPageMeta } from '../../AdminMetaContext';
-import { adminDashboard } from '../../api/adminApi';
-import { StatCard, PageHeader } from '../../components';
-import type { AdminDashboardStats, ActivityLogEntry, MonthlyTrend } from '../../api/types';
 
 export function AdminDashboard() {
   const { t } = useTranslation('admin_dashboard');

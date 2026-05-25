@@ -9,7 +9,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { Button, Input, Avatar, DatePicker } from '@heroui/react';
+import { DatePicker } from '@heroui/react';
 import type { DateInputValue } from '@heroui/react';
 import { today, getLocalTimeZone } from '@internationalized/date';
 import Plus from 'lucide-react/icons/plus';
@@ -25,6 +25,7 @@ import { CharacterCount } from '../shared/CharacterCount';
 import { EmojiPicker } from '../shared/EmojiPicker';
 import { useComposeSubmit } from '../ComposeSubmitContext';
 import type { TabSubmitProps } from '../types';
+import { Button, Input, Avatar } from '@/components/ui';
 
 const MAX_QUESTION_CHARS = 500;
 

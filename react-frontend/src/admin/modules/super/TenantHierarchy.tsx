@@ -1,3 +1,4 @@
+import { CardBody, Card, Button, Chip, Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +11,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Card, CardBody, Button, Chip, Spinner } from '@heroui/react';
+
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import ChevronsDownUp from 'lucide-react/icons/chevrons-down-up';

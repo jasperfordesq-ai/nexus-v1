@@ -11,10 +11,7 @@
 
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Avatar, Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
-  Input, Textarea,
-} from '@heroui/react';
+
 import Users from 'lucide-react/icons/users';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Download from 'lucide-react/icons/download';
@@ -26,6 +23,7 @@ import { adminTimebanking } from '../../api/adminApi';
 import { DataTable, PageHeader, type Column } from '../../components';
 import type { UserFinancialReport as UserFinancialReportType } from '../../api/types';
 import { useTranslation } from 'react-i18next';
+import { Button, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 
 export function UserReport() {
   const { t: tNav } = useTranslation('admin_nav');

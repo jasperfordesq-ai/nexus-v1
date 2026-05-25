@@ -14,21 +14,14 @@
  * this component never renders — `hasPending` will always be false.
  */
 
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  Chip,
-} from '@heroui/react';
+
 import FileText from 'lucide-react/icons/file-text';
 import ExternalLink from 'lucide-react/icons/external-link';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { PendingDocument } from '@/hooks/useLegalGate';
 import { useTenant } from '@/contexts';
+import { Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 
 // Label keys are resolved via i18n below; this map serves as fallback
 const TYPE_LABEL_KEYS: Record<string, string> = {

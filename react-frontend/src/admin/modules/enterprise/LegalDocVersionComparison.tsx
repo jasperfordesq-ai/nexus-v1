@@ -4,14 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useEffect, useCallback } from 'react';
-import {
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  Spinner,
-  Chip,
-} from '@heroui/react';
+
 import { sanitizeRichText } from '@/lib/sanitize';
 import GitCompare from 'lucide-react/icons/git-compare';
 import FileText from 'lucide-react/icons/file-text';
@@ -20,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts/ToastContext';
 import { adminLegalDocs } from '@/admin/api/adminApi';
 import type { VersionComparison } from '@/admin/api/types';
+import { Button, Chip, Spinner, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 
 interface LegalDocVersionComparisonProps {
   documentId: number;

@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Button, Chip, Card, CardBody, Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,8 +10,7 @@ import { Select, SelectItem } from '@/components/ui';
  */
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import {
-  Button, Chip, Checkbox, Card, CardBody } from '@heroui/react';
+import { Checkbox } from '@heroui/react';
 import GraduationCap from 'lucide-react/icons/graduation-cap';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
@@ -102,7 +101,6 @@ export function VolunteerTraining() {
     }
     setLoading(false);
   }, [toast, t]);
-
 
   useEffect(() => { loadData(); }, [loadData]);
 

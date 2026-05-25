@@ -1,4 +1,14 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Select, SelectItem, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@/components/ui';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Switch, Tab, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tabs } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
+import Network from 'lucide-react/icons/network';
+import Share2 from 'lucide-react/icons/share-2';
+import Calendar from 'lucide-react/icons/calendar';
+import { useToast } from '@/contexts';
+import { api } from '@/lib/api';
+import { logError } from '@/lib/logger';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -7,22 +17,11 @@ import { Select, SelectItem } from '@/components/ui';
 /**
  * VereinFederationPanel — AG55
  *
- * Verein admin panel for federation consent, network browsing, event sharing,
- * and viewing incoming/outgoing shared events.
+ * Verein admin panel for federation consent, network browsing, event sharing, * and viewing incoming/outgoing shared events.
  *
  * Embed: <VereinFederationPanel organizationId={orgId} />
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Switch, Tab, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tabs } from '@heroui/react';
-import { Separator } from '@heroui-v3/react';
-import Network from 'lucide-react/icons/network';
-import Share2 from 'lucide-react/icons/share-2';
-import Calendar from 'lucide-react/icons/calendar';
-import { useToast } from '@/contexts';
-import { api } from '@/lib/api';
-import { logError } from '@/lib/logger';
 
 interface ConsentDto {
   organization_id: number;

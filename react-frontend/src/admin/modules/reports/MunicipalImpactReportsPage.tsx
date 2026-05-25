@@ -1,12 +1,7 @@
-import { Select, SelectItem, useDisclosure } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Select, SelectItem, useDisclosure, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@/components/ui';
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Switch, Textarea } from '@heroui/react';
+import { Switch } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import { Link } from 'react-router-dom';
 import BarChart3 from 'lucide-react/icons/chart-column';
@@ -28,6 +23,11 @@ import { useTenant, useToast } from '@/contexts';
 import { api, API_BASE, tokenManager } from '@/lib/api';
 import { PageHeader, StatCard, Abbr } from '../../components';
 import { VerifiedMunicipalityBadge } from '@/components/badges/VerifiedMunicipalityBadge';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 
 const reportCards = [
   { key: 'verified_hours', icon: Clock, href: '/admin/reports/hours', statKey: 'verified_hours' },

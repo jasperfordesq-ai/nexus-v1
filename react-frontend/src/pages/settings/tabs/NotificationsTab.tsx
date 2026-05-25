@@ -1,10 +1,10 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Button, Switch } from '@heroui/react';
+import { Switch } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import Save from 'lucide-react/icons/save';
 import Mail from 'lucide-react/icons/mail';
@@ -14,7 +14,6 @@ import CreditCard from 'lucide-react/icons/credit-card';
 import Trophy from 'lucide-react/icons/trophy';
 import Building2 from 'lucide-react/icons/building-2';
 import Search from 'lucide-react/icons/search';
-import { GlassCard } from '@/components/ui';
 import { useWebPush } from '@/hooks/useWebPush';
 
 // ─────────────────────────────────────────────────────────────────────────────

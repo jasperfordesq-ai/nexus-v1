@@ -11,9 +11,7 @@
  * added as a tab within GroupDetailPage.
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { Button, Spinner, Chip } from '@heroui/react';
-import ShoppingBag from 'lucide-react/icons/shopping-bag';
+import { useState, useEffect, useCallback } from 'react';import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import Plus from 'lucide-react/icons/plus';
 import Package from 'lucide-react/icons/package';
 import Users from 'lucide-react/icons/users';
@@ -25,6 +23,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { useTenant } from '@/contexts';
 import type { MarketplaceListingItem } from '@/types/marketplace';
+import { Button, Chip, Spinner } from '@/components/ui';
 
 interface GroupMarketplaceStats {
   active_listings: number;

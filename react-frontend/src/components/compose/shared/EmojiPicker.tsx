@@ -9,12 +9,13 @@
  */
 
 import { useMemo, useRef, useState } from 'react';
-import { Button, Input, Popover, PopoverContent, PopoverTrigger } from '@heroui/react';
+import { Popover, PopoverContent, PopoverTrigger } from '@heroui/react';
 import Search from 'lucide-react/icons/search';
 import Smile from 'lucide-react/icons/smile';
 import { useTranslation } from 'react-i18next';
 
 import { EMOJI_CATEGORIES, EMOJI_KEYWORDS } from '@/data/emoji-data';
+import { Button, Input } from '@/components/ui';
 
 interface EmojiPickerProps {
   onSelect: (emoji: string) => void;

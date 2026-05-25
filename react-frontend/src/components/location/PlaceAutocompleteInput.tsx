@@ -24,9 +24,7 @@
  * />
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Input, Button } from '@heroui/react';
-import MapPin from 'lucide-react/icons/map-pin';
+import { useState, useEffect, useRef, useCallback } from 'react';import MapPin from 'lucide-react/icons/map-pin';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { useMapsLibrary } from '@vis.gl/react-google-maps';
@@ -34,6 +32,7 @@ import type { PlaceAutocompleteInputProps, PlaceResult, AddressComponents } from
 import { GoogleMapsProvider } from './GoogleMapsProvider';
 import { NominatimAutocomplete } from './NominatimAutocomplete';
 import { useTenant } from '@/contexts';
+import { Button, Input } from '@/components/ui';
 
 /** Debounce delay for autocomplete requests (ms). */
 const DEBOUNCE_MS = 300;

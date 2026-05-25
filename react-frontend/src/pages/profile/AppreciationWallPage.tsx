@@ -1,3 +1,4 @@
+import { Button, Card, CardBody, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +11,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Avatar, Button, Card, CardBody, Pagination } from '@heroui/react';
+import { Pagination } from '@heroui/react';
 import Heart from 'lucide-react/icons/heart';
 import Sparkles from 'lucide-react/icons/sparkles';
 import Star from 'lucide-react/icons/star';

@@ -4,9 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import type { RefObject, ChangeEvent, FormEvent } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Button, Textarea } from '@heroui/react';
-import Send from 'lucide-react/icons/send';
+import { useTranslation } from 'react-i18next';import Send from 'lucide-react/icons/send';
 import Mic from 'lucide-react/icons/mic';
 import Square from 'lucide-react/icons/square';
 import Paperclip from 'lucide-react/icons/paperclip';
@@ -17,6 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTenant } from '@/contexts';
 import { GifPicker } from '@/components/compose/GifPicker';
 import { VoiceMessagePlayer } from './VoiceMessagePlayer';
+import { Button, Textarea } from '@/components/ui';
 
 export interface AttachmentPreview {
   file: File;

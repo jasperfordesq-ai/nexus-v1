@@ -7,11 +7,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Avatar, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
+
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import ShieldOff from 'lucide-react/icons/shield-off';
 import UserX from 'lucide-react/icons/user-x';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 import { EmptyState, LoadingScreen } from '@/components/feedback';
 import { useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';

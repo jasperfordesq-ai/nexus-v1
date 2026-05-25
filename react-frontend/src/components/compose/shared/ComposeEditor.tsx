@@ -48,9 +48,7 @@ import {
 } from '@lexical/list';
 import { TOGGLE_LINK_COMMAND, $isLinkNode } from '@lexical/link';
 import { $getNearestNodeOfType } from '@lexical/utils';
-import { $isListNode, ListNode as ListNodeClass } from '@lexical/list';
-import { Button, Input } from '@heroui/react';
-import Bold from 'lucide-react/icons/bold';
+import { $isListNode, ListNode as ListNodeClass } from '@lexical/list';import Bold from 'lucide-react/icons/bold';
 import Italic from 'lucide-react/icons/italic';
 import Underline from 'lucide-react/icons/underline';
 import List from 'lucide-react/icons/list';
@@ -59,6 +57,7 @@ import Link2 from 'lucide-react/icons/link-2';
 import Check from 'lucide-react/icons/check';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
+import { Button, Input } from '@/components/ui';
 
 /* ───────────────────────── Types ───────────────────────── */
 

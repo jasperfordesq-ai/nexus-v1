@@ -9,10 +9,7 @@
  * Parity: PHP Admin\NewsletterController::index()
  */
 
-import { useState, useCallback, useEffect } from 'react';
-import {
-  Button, Chip } from '@heroui/react';
-import Mail from 'lucide-react/icons/mail';
+import { useState, useCallback, useEffect } from 'react';import Mail from 'lucide-react/icons/mail';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
@@ -35,12 +32,7 @@ import { DataTable,
   type Column } from '../../components';
 import { NewsletterResend } from './NewsletterResend';
 
-import { Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-} from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Chip } from '@/components/ui';
 interface NewsletterItem {
   id: number;
   name: string;

@@ -1,18 +1,6 @@
-import { Select, SelectItem, useDisclosure } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Federation Credit Agreements (FD1)
- * Admin page for managing inter-tenant credit exchange agreements.
- * Features: Create, approve, suspend, terminate agreements. View balances, * settlement view, transaction history, agreement detail modal.
- */
-
+import { Card, CardBody, CardHeader, Button, Spinner, Chip, Input, Select, SelectItem, useDisclosure, Progress, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { useState, useEffect, useCallback, useRef } from 'react';
-import {
-  Card, CardBody, CardHeader, Button, Spinner, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Tabs, Tab } from '@heroui/react';
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tabs, Tab } from '@heroui/react';
 import Handshake from 'lucide-react/icons/handshake';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -36,9 +24,18 @@ import { adminFederation } from '../../api/adminApi';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
 import { PageHeader, StatCard, ConfirmModal } from '../../components';
-
 import { useTranslation } from 'react-i18next';
-import { Progress } from '@/components/ui';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Federation Credit Agreements (FD1)
+ * Admin page for managing inter-tenant credit exchange agreements.
+ * Features: Create, approve, suspend, terminate agreements. View balances, * settlement view, transaction history, agreement detail modal.
+ */
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

@@ -9,16 +9,10 @@
  */
 
 import { useRef } from 'react';
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-} from '@heroui/react';
+
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
+import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 
 interface ConfirmModalProps {
   isOpen: boolean;

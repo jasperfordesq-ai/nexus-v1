@@ -11,10 +11,9 @@
  * Includes image count badge and placeholder when no images are available.
  */
 
-import { useState, useRef, useCallback } from 'react';
-import { Button } from '@heroui/react';
-import Image from 'lucide-react/icons/image';
+import { useState, useRef, useCallback } from 'react';import Image from 'lucide-react/icons/image';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui';
 
 interface GalleryImage {
   id: number;

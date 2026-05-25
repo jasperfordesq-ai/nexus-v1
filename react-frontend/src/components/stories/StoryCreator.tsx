@@ -14,13 +14,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { motion } from 'framer-motion';
-import {
-  Button,
-  Textarea,
-  Input,
-} from '@heroui/react';
-import X from 'lucide-react/icons/x';
+import { motion } from 'framer-motion';import X from 'lucide-react/icons/x';
 import Camera from 'lucide-react/icons/camera';
 import Type from 'lucide-react/icons/type';
 import BarChart3 from 'lucide-react/icons/chart-column';
@@ -43,6 +37,7 @@ import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { compressImage } from '@/lib/compress-image';
+import { Button, Input, Textarea } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants

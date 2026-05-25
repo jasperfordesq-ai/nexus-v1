@@ -14,12 +14,7 @@ import {
   useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import {
-  Button,
-  Chip,
-  } from '@heroui/react';
-import Sparkles from 'lucide-react/icons/sparkles';
+import { motion } from 'framer-motion';import Sparkles from 'lucide-react/icons/sparkles';
 import MapPin from 'lucide-react/icons/map-pin';
 import Calendar from 'lucide-react/icons/calendar';
 import Clock from 'lucide-react/icons/clock';
@@ -29,9 +24,7 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Target from 'lucide-react/icons/target';
 import Zap from 'lucide-react/icons/zap';
 import ExternalLink from 'lucide-react/icons/external-link';
-import { GlassCard,
-  Progress,
-} from '@/components/ui';
+import { GlassCard, Progress, Button, Chip } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';

@@ -1,3 +1,13 @@
+import { Card, CardBody, CardHeader, Spinner } from '@/components/ui';
+import { useState, useEffect } from 'react';
+import Activity from 'lucide-react/icons/activity';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import { useTranslation } from 'react-i18next';
+import { usePageTitle } from '@/hooks';
+import { useToast } from '@/contexts';
+import { adminMatching } from '../../api/adminApi';
+import { PageHeader, StatCard } from '../../components';
+import type { MatchingStatsResponse } from '../../api/types';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,16 +19,6 @@
  * Wired to adminMatching.getMatchingStats() API (existing module).
  */
 
-import { useState, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Spinner } from '@heroui/react';
-import Activity from 'lucide-react/icons/activity';
-import BarChart3 from 'lucide-react/icons/chart-column';
-import { useTranslation } from 'react-i18next';
-import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
-import { adminMatching } from '../../api/adminApi';
-import { PageHeader, StatCard } from '../../components';
-import type { MatchingStatsResponse } from '../../api/types';
 
 export function SmartMatchMonitoring() {
   const { t } = useTranslation('admin');

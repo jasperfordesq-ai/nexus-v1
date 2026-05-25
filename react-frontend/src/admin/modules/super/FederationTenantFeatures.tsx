@@ -1,16 +1,6 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Federation Tenant Features
- * Manage federation-specific features for an individual tenant:
- * whitelist status, feature toggles, and partnerships.
- */
-
+import { Card, CardBody, CardHeader, Button, Chip, Spinner } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Button, Switch, Chip, Spinner } from '@heroui/react';
+import { Switch } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import { useParams } from 'react-router-dom';
 import Shield from 'lucide-react/icons/shield';
@@ -29,6 +19,17 @@ import { useTranslation } from 'react-i18next';
 import { adminSuper } from '../../api/adminApi';
 import { PageHeader, StatusBadge, ConfirmModal } from '../../components';
 import type { FederationWhitelistEntry, FederationPartnership } from '../../api/types';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Federation Tenant Features
+ * Manage federation-specific features for an individual tenant:
+ * whitelist status, feature toggles, and partnerships.
+ */
+
 
 interface TenantFeatureSet {
   cross_tenant_profiles_enabled: boolean;

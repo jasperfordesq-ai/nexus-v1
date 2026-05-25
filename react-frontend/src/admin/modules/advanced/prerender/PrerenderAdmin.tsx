@@ -1,27 +1,7 @@
-import { Select, SelectItem, useDisclosure } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Prerender Admin — control panel for the bot-only prerender engine.
- *
- * Tabs:
- *   Overview   — health, summary, last run, force-refresh actions
- *   Inventory  — every rendered HTML file with age/staleness, deep inspect drawer
- *   Coverage   — per-tenant expected-vs-rendered route matrix
- *   Jobs       — queued/running/completed force-refresh job history
- *   Events     — JSONL event stream (start/supersede/success/fail/partial)
- *   Failures   — recent failed cache paths inside the backoff window
- *
- * Read endpoints require admin; enqueue/cancel require super_admin and are
- * also blocked client-side via the disabled state derived from useAuth().
- */
-
+import { Card, CardBody, CardHeader, Button, Chip, Spinner, Input, Select, SelectItem, useDisclosure, Code, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Tabs, Tab, Chip, Spinner, Input, Switch, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tooltip, Checkbox } from '@heroui/react';
+import { Tabs, Tab, Switch, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tooltip, Checkbox } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Play from 'lucide-react/icons/play';
@@ -42,7 +22,6 @@ import Zap from 'lucide-react/icons/zap';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useAuth, usePusherOptional } from '@/contexts';
-import { Code } from '@/components/ui';
 import { PageHeader } from '../../../components';
 import {
   adminPrerender,
@@ -58,6 +37,26 @@ import {
   type PrerenderAuditEntry,
   type PrerenderTtlInspect,
 } from '../../../api/adminApi';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Prerender Admin — control panel for the bot-only prerender engine.
+ *
+ * Tabs:
+ *   Overview   — health, summary, last run, force-refresh actions
+ *   Inventory  — every rendered HTML file with age/staleness, deep inspect drawer
+ *   Coverage   — per-tenant expected-vs-rendered route matrix
+ *   Jobs       — queued/running/completed force-refresh job history
+ *   Events     — JSONL event stream (start/supersede/success/fail/partial)
+ *   Failures   — recent failed cache paths inside the backoff window
+ *
+ * Read endpoints require admin; enqueue/cancel require super_admin and are
+ * also blocked client-side via the disabled state derived from useAuth().
+ */
+
 
 // ─── helpers ───────────────────────────────────────────────────────────────
 

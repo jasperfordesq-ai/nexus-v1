@@ -10,20 +10,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Tabs,
-  Tab,
-  Button,
-  Chip,
-  Avatar,
-  Textarea,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Tooltip,
-} from '@heroui/react';
+import { Tabs, Tab, Tooltip } from '@heroui/react';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
 import Trash2 from 'lucide-react/icons/trash-2';
@@ -35,6 +22,7 @@ import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { adminMarketplace, type BulkActionResult } from '../../api/adminApi';
 import { PageHeader, DataTable, ConfirmModal, EmptyState, BulkActionToolbar, type BulkAction, type Column } from '../../components';
+import { Button, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

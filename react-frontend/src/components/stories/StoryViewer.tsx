@@ -17,7 +17,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Avatar, Button } from '@heroui/react';
+
 import X from 'lucide-react/icons/x';
 import Eye from 'lucide-react/icons/eye';
 import MoreHorizontal from 'lucide-react/icons/ellipsis';
@@ -32,6 +32,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
 import type { StoryUser } from '@/components/feed/StoriesBar';
+import { Button, Avatar } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

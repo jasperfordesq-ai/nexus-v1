@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Progress, Button, Chip, Spinner, Input } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -19,8 +19,7 @@ import { Select, SelectItem } from '@/components/ui';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Button, Switch, Input, Spinner, Chip } from '@heroui/react';
+import { Switch } from '@heroui/react';
 import Globe from 'lucide-react/icons/globe';
 import Users from 'lucide-react/icons/users';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
@@ -40,9 +39,6 @@ import Sparkles from 'lucide-react/icons/sparkles';
 import HandHeart from 'lucide-react/icons/hand-heart';
 import Network from 'lucide-react/icons/network';
 import { useTranslation } from 'react-i18next';
-import { GlassCard,
-  Progress,
-} from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useToast, useTenant } from '@/contexts';

@@ -10,11 +10,12 @@
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Avatar, Card, CardBody, CardHeader, Spinner } from '@heroui/react';
 import Award from 'lucide-react/icons/award';
 import { useTranslation } from 'react-i18next';
-import { api } from '@/lib/api';
+
 import { useTenant } from '@/contexts';
+import { api } from '@/lib/api';
+import { Avatar, Card, CardBody, CardHeader, Spinner } from '@/components/ui';
 
 interface LeaderboardEntry {
   user_id: number;

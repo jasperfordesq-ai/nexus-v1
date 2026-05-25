@@ -1,3 +1,13 @@
+import { Card, CardBody, CardHeader, Button, Spinner } from '@/components/ui';
+import { useState, useEffect } from 'react';
+import { Slider, Switch } from '@heroui/react';
+import Rss from 'lucide-react/icons/rss';
+import Save from 'lucide-react/icons/save';
+import { useTranslation } from 'react-i18next';
+import { usePageTitle } from '@/hooks';
+import { useToast } from '@/contexts';
+import { PageHeader } from '../../components';
+import { adminSettings } from '../../api/adminApi';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -8,15 +18,6 @@
  * Configure the social feed ranking algorithm parameters.
  */
 
-import { useState, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Slider, Switch, Button, Spinner } from '@heroui/react';
-import Rss from 'lucide-react/icons/rss';
-import Save from 'lucide-react/icons/save';
-import { useTranslation } from 'react-i18next';
-import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
-import { PageHeader } from '../../components';
-import { adminSettings } from '../../api/adminApi';
 
 export function FeedAlgorithm() {
   const { t } = useTranslation('admin');

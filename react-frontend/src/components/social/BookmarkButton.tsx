@@ -10,15 +10,14 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { Button } from '@heroui/react';
-import Bookmark from 'lucide-react/icons/bookmark';
+import { AnimatePresence, motion } from 'framer-motion';import Bookmark from 'lucide-react/icons/bookmark';
 import BookmarkCheck from 'lucide-react/icons/bookmark-check';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { useLongPress } from '@/hooks/useLongPress';
 import { BookmarkCollectionPicker } from './BookmarkCollectionPicker';
+import { Button } from '@/components/ui';
 
 export interface BookmarkButtonProps {
   type: string;

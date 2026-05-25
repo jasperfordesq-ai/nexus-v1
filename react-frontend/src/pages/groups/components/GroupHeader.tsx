@@ -4,12 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Avatar,
-  Chip,
-  Spinner,
-} from '@heroui/react';
+
 import Users from 'lucide-react/icons/users';
 import MessageSquare from 'lucide-react/icons/message-square';
 import Settings from 'lucide-react/icons/settings';
@@ -23,7 +18,7 @@ import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
 import Trash2 from 'lucide-react/icons/trash-2';
 import Megaphone from 'lucide-react/icons/megaphone';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner, Avatar } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { LocationMapCard } from '@/components/location';
 import { resolveAvatarUrl, formatDateValue, formatRelativeTime } from '@/lib/helpers';

@@ -1,11 +1,6 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Select, SelectItem } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState, type ChangeEvent, type JSX } from 'react';
-import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea } from '@heroui/react';
+import { Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -50,6 +45,11 @@ import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { MemberSearchPicker, PageHeader, StatCard, type MemberSearchMember } from '../../components';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 
 type PendingReview = {
   id: number;

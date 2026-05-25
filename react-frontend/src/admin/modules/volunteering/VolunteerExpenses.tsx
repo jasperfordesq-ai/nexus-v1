@@ -1,4 +1,3 @@
-import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,35 +8,46 @@ import { Select, SelectItem } from '@/components/ui';
  * Admin page for managing volunteer expense submissions, reviews, and policies.
  */
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
-import {
-  Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea, Card, CardBody, CardHeader, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
-import DollarSign from 'lucide-react/icons/dollar-sign';
-import RefreshCw from 'lucide-react/icons/refresh-cw';
-import Download from 'lucide-react/icons/download';
-import CheckCircle from 'lucide-react/icons/circle-check-big';
-import XCircle from 'lucide-react/icons/circle-x';
-import CreditCard from 'lucide-react/icons/credit-card';
-import Clock from 'lucide-react/icons/clock';
-import FileText from 'lucide-react/icons/file-text';
-import Settings from 'lucide-react/icons/settings';
-import CalendarRange from 'lucide-react/icons/calendar-range';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import Building2 from 'lucide-react/icons/building-2';
-import Eye from 'lucide-react/icons/eye';
+import CalendarRange from 'lucide-react/icons/calendar-range';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Clock from 'lucide-react/icons/clock';
+import CreditCard from 'lucide-react/icons/credit-card';
+import DollarSign from 'lucide-react/icons/dollar-sign';
+import Download from 'lucide-react/icons/download';
 import ExternalLink from 'lucide-react/icons/external-link';
-import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
-import { adminVolunteering } from '../../api/adminApi';
-import { DataTable,
-  PageHeader,
-  StatCard,
-  EmptyState,
-  type Column } from '../../components';
+import Eye from 'lucide-react/icons/eye';
+import FileText from 'lucide-react/icons/file-text';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Settings from 'lucide-react/icons/settings';
+import XCircle from 'lucide-react/icons/circle-x';
 import { useTranslation } from 'react-i18next';
 
-import { Accordion,
+import { useToast } from '@/contexts';
+import { usePageTitle } from '@/hooks';
+import {
+  Accordion,
   AccordionItem,
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Chip,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Select,
+  SelectItem,
+  Textarea,
 } from '@/components/ui';
+import { adminVolunteering } from '../../api/adminApi';
+import { DataTable, EmptyState, PageHeader, StatCard, type Column } from '../../components';
+
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 interface Expense {

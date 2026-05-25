@@ -1,4 +1,18 @@
-import { Select, SelectItem, useDisclosure } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, ChipProps, Input, Spinner, Textarea, Select, SelectItem, useDisclosure, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@/components/ui';
+import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Tab, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tabs } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
+import BarChart3 from 'lucide-react/icons/bar-chart-3';
+import Bell from 'lucide-react/icons/bell';
+import CheckCircle from 'lucide-react/icons/check-circle';
+import Clock from 'lucide-react/icons/clock';
+import Megaphone from 'lucide-react/icons/megaphone';
+import Send from 'lucide-react/icons/send';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Users from 'lucide-react/icons/users';
+import XCircle from 'lucide-react/icons/x-circle';
+import api from '@/lib/api';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -21,20 +35,6 @@ import { Select, SelectItem, useDisclosure } from '@/components/ui';
  *  - Create Campaign modal
  */
 
-import { useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Button, Card, CardBody, CardHeader, Chip, ChipProps, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Tab, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tabs, Textarea } from '@heroui/react';
-import { Separator } from '@heroui-v3/react';
-import BarChart3 from 'lucide-react/icons/bar-chart-3';
-import Bell from 'lucide-react/icons/bell';
-import CheckCircle from 'lucide-react/icons/check-circle';
-import Clock from 'lucide-react/icons/clock';
-import Megaphone from 'lucide-react/icons/megaphone';
-import Send from 'lucide-react/icons/send';
-import TrendingUp from 'lucide-react/icons/trending-up';
-import Users from 'lucide-react/icons/users';
-import XCircle from 'lucide-react/icons/x-circle';
-import api from '@/lib/api';
 
 // ---------------------------------------------------------------------------
 // Types

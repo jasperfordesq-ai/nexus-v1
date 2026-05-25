@@ -1,15 +1,6 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * SdgGoalsPicker — toggleable chips for the 17 UN Sustainable Development Goals.
- */
-
-import { Chip } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import { SDG_GOALS } from '@/data/sdg-goals';
+import { Chip } from '@/components/ui';
 
 interface SdgGoalsPickerProps {
   selected: number[];

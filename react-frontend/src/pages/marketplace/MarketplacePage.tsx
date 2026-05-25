@@ -16,9 +16,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
-import { Button, Input } from '@heroui/react';
-import Search from 'lucide-react/icons/search';
+import { Link, useSearchParams } from 'react-router-dom';import Search from 'lucide-react/icons/search';
 import Plus from 'lucide-react/icons/plus';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import Star from 'lucide-react/icons/star';
@@ -27,7 +25,7 @@ import Heart from 'lucide-react/icons/heart';
 import Package from 'lucide-react/icons/package';
 import HandCoins from 'lucide-react/icons/hand-coins';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Input } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
 import {

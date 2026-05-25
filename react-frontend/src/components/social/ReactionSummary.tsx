@@ -13,17 +13,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  Avatar,
-  Button,
-  Spinner,
-  Tabs,
-  Tab,
-} from '@heroui/react';
+import { Tabs, Tab } from '@heroui/react';
 import Clock from 'lucide-react/icons/clock';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
@@ -35,6 +25,7 @@ import {
   REACTION_LABEL_MAP,
   type ReactionType,
 } from './ReactionPicker';
+import { Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, Avatar } from '@/components/ui';
 
 /* ───────────────────────── Types ───────────────────────── */
 

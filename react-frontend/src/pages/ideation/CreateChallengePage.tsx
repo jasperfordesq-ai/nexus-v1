@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, GlassCard, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -19,14 +19,12 @@ import { Select, SelectItem, useDisclosure } from '@/components/ui';
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import {
-  Button, Input, Textarea, Spinner, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
+
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import FileText from 'lucide-react/icons/file-text';
 import Eye from 'lucide-react/icons/eye';
 import HelpCircle from 'lucide-react/icons/circle-help';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { PageMeta } from '@/components/seo';

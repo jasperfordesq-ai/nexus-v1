@@ -1,3 +1,16 @@
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner } from '@/components/ui';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Separator } from '@heroui-v3/react';
+import Calendar from 'lucide-react/icons/calendar';
+import ChevronLeft from 'lucide-react/icons/chevron-left';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import { PageMeta } from '@/components/seo';
+import { useTenant, useToast } from '@/contexts';
+import { usePageTitle } from '@/hooks';
+import { api } from '@/lib/api';
+import { logError } from '@/lib/logger';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,19 +24,6 @@
  * Route: /municipality-calendar
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner } from '@heroui/react';
-import { Separator } from '@heroui-v3/react';
-import Calendar from 'lucide-react/icons/calendar';
-import ChevronLeft from 'lucide-react/icons/chevron-left';
-import ChevronRight from 'lucide-react/icons/chevron-right';
-import { PageMeta } from '@/components/seo';
-import { useTenant, useToast } from '@/contexts';
-import { usePageTitle } from '@/hooks';
-import { api } from '@/lib/api';
-import { logError } from '@/lib/logger';
 
 interface CalendarEventDto {
   id: number;

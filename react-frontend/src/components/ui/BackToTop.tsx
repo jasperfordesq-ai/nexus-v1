@@ -10,9 +10,8 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@heroui/react';
-import ArrowUp from 'lucide-react/icons/arrow-up';
+import { motion, AnimatePresence } from 'framer-motion';import ArrowUp from 'lucide-react/icons/arrow-up';
+import { Button } from '@/components/ui';
 
 const SCROLL_THRESHOLD = 400;
 

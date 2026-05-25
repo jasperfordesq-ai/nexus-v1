@@ -13,9 +13,7 @@
  * placeholder.
  */
 
-import { motion } from 'framer-motion';
-import { Spinner } from '@heroui/react';
-import Users from 'lucide-react/icons/users';
+import { motion } from 'framer-motion';import Users from 'lucide-react/icons/users';
 import Heart from 'lucide-react/icons/heart';
 import Shield from 'lucide-react/icons/shield';
 import MessageCircle from 'lucide-react/icons/message-circle';
@@ -23,7 +21,7 @@ import EyeOff from 'lucide-react/icons/eye-off';
 import Flag from 'lucide-react/icons/flag';
 import Gavel from 'lucide-react/icons/gavel';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Spinner } from '@/components/ui';
 import { CustomLegalDocument } from '@/components/legal/CustomLegalDocument';
 import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';

@@ -10,9 +10,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router-dom';
-import { Button, Chip } from '@heroui/react';
-import Plus from 'lucide-react/icons/plus';
+import { Link, useNavigate } from 'react-router-dom';import Plus from 'lucide-react/icons/plus';
 import Pencil from 'lucide-react/icons/pencil';
 import Trash2 from 'lucide-react/icons/trash-2';
 import Shield from 'lucide-react/icons/shield';
@@ -22,6 +20,7 @@ import { adminEnterprise } from '../../api/adminApi';
 import { PageHeader, DataTable, ConfirmModal } from '../../components';
 import type { Column } from '../../components';
 import type { Role } from '../../api/types';
+import { Button, Chip } from '@/components/ui';
 
 export function RoleList() {
   const { t } = useTranslation('admin');

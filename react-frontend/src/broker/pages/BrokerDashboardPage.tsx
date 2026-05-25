@@ -1,18 +1,7 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Broker Controls Dashboard
- * Overview with key metrics and quick links to sub-pages.
- * Parity: PHP BrokerControlsController::dashboard()
- */
-
+import { Card, CardBody, CardHeader, Button, Spinner, Chip } from '@/components/ui';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Card, CardBody, CardHeader, Button, Spinner, Chip } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
 import MessageSquareWarning from 'lucide-react/icons/message-square-warning';
@@ -33,6 +22,17 @@ import { StatCard, PageHeader } from '@/admin/components';
 import type { BrokerDashboardStats, BrokerActivityEntry } from '@/admin/api/types';
 import { parseServerTimestamp } from '@/lib/serverTime';
 import { BrokerControlsHelp } from './BrokerHelpPage';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Broker Controls Dashboard
+ * Overview with key metrics and quick links to sub-pages.
+ * Parity: PHP BrokerControlsController::dashboard()
+ */
+
 
 // Quick-link metadata. Title + description are translated at render time
 // using the broker.dashboard.links.* namespace so the dashboard respects

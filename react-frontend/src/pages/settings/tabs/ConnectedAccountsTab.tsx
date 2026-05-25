@@ -12,10 +12,8 @@
  * backend returns 422 in that case).
  */
 
-import { useCallback, useEffect, useState } from 'react';
-import { Button } from '@heroui/react';
-import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { useCallback, useEffect, useState } from 'react';import { useTranslation } from 'react-i18next';
+import { GlassCard, Button } from '@/components/ui';
 import { GoogleIcon } from '@/components/icons/GoogleIcon';
 import { AppleIcon } from '@/components/icons/AppleIcon';
 import { FacebookIcon } from '@/components/icons/FacebookIcon';

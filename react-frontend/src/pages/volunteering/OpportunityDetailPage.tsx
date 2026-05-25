@@ -1,11 +1,11 @@
+import { Card, GlassCard, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * Opportunity Detail Page — view a single volunteering opportunity,
- * its shifts, and apply.
+ * Opportunity Detail Page — view a single volunteering opportunity, * its shifts, and apply.
  *
  * API: GET /api/v2/volunteering/opportunities/{id}
  *      POST /api/v2/volunteering/opportunities/{id}/apply
@@ -14,8 +14,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import {
-  Button, Avatar, Card, Checkbox, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, Spinner } from '@heroui/react';
+import { Checkbox } from '@heroui/react';
 import MapPin from 'lucide-react/icons/map-pin';
 import Calendar from 'lucide-react/icons/calendar';
 import Clock from 'lucide-react/icons/clock';
@@ -36,7 +35,6 @@ import MessageSquare from 'lucide-react/icons/message-square';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import QrCode from 'lucide-react/icons/qr-code';
 import { Helmet } from 'react-helmet-async';
-import { GlassCard, useDisclosure } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { LoadingScreen } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';

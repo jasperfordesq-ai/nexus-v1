@@ -1,3 +1,4 @@
+import { Card } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,7 +16,7 @@
  */
 
 import { useState } from 'react';
-import { Card, Skeleton } from '@heroui/react';
+import { Skeleton } from '@heroui/react';
 import ExternalLink from 'lucide-react/icons/external-link';
 import Globe from 'lucide-react/icons/globe';
 import { YouTubeEmbed } from './YouTubeEmbed';

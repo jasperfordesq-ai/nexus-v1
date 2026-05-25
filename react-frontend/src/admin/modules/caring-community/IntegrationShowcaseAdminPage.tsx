@@ -1,22 +1,10 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
+import { Button, Card, CardBody, CardHeader, Chip, Spinner, Snippet, Accordion, AccordionItem } from '@/components/ui';
 import {
   useCallback,
   useEffect,
   useMemo,
   useState } from 'react';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Spinner,
-  Tooltip,
-} from '@heroui/react';
+import { Tooltip } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ClipboardList from 'lucide-react/icons/clipboard-list';
 import ExternalLink from 'lucide-react/icons/external-link';
@@ -31,12 +19,12 @@ import Webhook from 'lucide-react/icons/webhook';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
-import { Snippet,
-  Accordion,
-  AccordionItem,
-} from '@/components/ui';
 import { api } from '@/lib/api';
 import { PageHeader } from '../../components';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
 
 interface ShowcaseItem {
   label: string;

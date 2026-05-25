@@ -1,25 +1,9 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * TemplatePicker — dropdown that pre-fills compose form fields with
- * template content. Templates are hardcoded per tab and use i18n for labels.
- */
-
-import { Button } from '@heroui/react';
 import FileText from 'lucide-react/icons/file-text';
 import { useTranslation } from 'react-i18next';
 
 import type { ComposeTab } from '../types';
 
-import { Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-} from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button } from '@/components/ui';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────

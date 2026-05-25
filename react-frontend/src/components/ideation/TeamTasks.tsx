@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, GlassCard, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,8 +15,7 @@ import { Select, SelectItem, useDisclosure } from '@/components/ui';
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import {
-  Button, Input, Textarea, Chip, Spinner, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
+
 import Plus from 'lucide-react/icons/plus';
 import CheckSquare from 'lucide-react/icons/square-check-big';
 import Clock from 'lucide-react/icons/clock';
@@ -25,7 +24,6 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import Calendar from 'lucide-react/icons/calendar';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';

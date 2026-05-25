@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Input } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -26,7 +26,7 @@ import { Select, SelectItem } from '@/components/ui';
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Input, Chip, Tabs, Tab, Switch } from '@heroui/react';
+import { Tabs, Tab, Switch } from '@heroui/react';
 import Briefcase from 'lucide-react/icons/briefcase';
 import Search from 'lucide-react/icons/search';
 import Plus from 'lucide-react/icons/plus';
@@ -50,7 +50,6 @@ import Rocket from 'lucide-react/icons/rocket';
 import ArrowUpDown from 'lucide-react/icons/arrow-up-down';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';

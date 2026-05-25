@@ -8,9 +8,7 @@
  * List, search, view, and delete polls with pagination.
  */
 
-import { useState, useCallback, useEffect } from 'react';
-import { Chip, Button } from '@heroui/react';
-import BarChart3 from 'lucide-react/icons/chart-column';
+import { useState, useCallback, useEffect } from 'react';import BarChart3 from 'lucide-react/icons/chart-column';
 import Eye from 'lucide-react/icons/eye';
 import Trash2 from 'lucide-react/icons/trash-2';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +16,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { DataTable, PageHeader, ConfirmModal, type Column } from '../../components';
+import { Button, Chip } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

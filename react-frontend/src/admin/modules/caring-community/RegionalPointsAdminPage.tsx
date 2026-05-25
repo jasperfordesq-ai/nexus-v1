@@ -1,3 +1,19 @@
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea } from '@/components/ui';
+import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tabs, Tab } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
+import Coins from 'lucide-react/icons/coins';
+import Info from 'lucide-react/icons/info';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Save from 'lucide-react/icons/save';
+import Plus from 'lucide-react/icons/plus';
+import SlidersHorizontal from 'lucide-react/icons/sliders-horizontal';
+import { usePageTitle } from '@/hooks';
+import { useToast } from '@/contexts';
+import { api } from '@/lib/api';
+import { logError } from '@/lib/logger';
+import { MemberSearchPicker, PageHeader, StatCard, type MemberSearchMember } from '../../components';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -14,21 +30,6 @@
  * Admin English only — no t() calls.
  */
 
-import { useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tabs, Tab, Textarea } from '@heroui/react';
-import { Separator } from '@heroui-v3/react';
-import Coins from 'lucide-react/icons/coins';
-import Info from 'lucide-react/icons/info';
-import RefreshCw from 'lucide-react/icons/refresh-cw';
-import Save from 'lucide-react/icons/save';
-import Plus from 'lucide-react/icons/plus';
-import SlidersHorizontal from 'lucide-react/icons/sliders-horizontal';
-import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
-import { api } from '@/lib/api';
-import { logError } from '@/lib/logger';
-import { MemberSearchPicker, PageHeader, StatCard, type MemberSearchMember } from '../../components';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

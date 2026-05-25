@@ -13,11 +13,12 @@
 
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button, ScrollShadow, Tabs, Tab } from '@heroui/react';
+import { ScrollShadow, Tabs, Tab } from '@heroui/react';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { useComposeSubmit } from './ComposeSubmitContext';
 import type { ComposeTab, ComposeTabConfig } from './types';
+import { Button } from '@/components/ui';
 
 interface MobileComposeOverlayProps {
   isOpen: boolean;

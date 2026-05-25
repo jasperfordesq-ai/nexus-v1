@@ -14,7 +14,7 @@
  */
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import { Modal, ModalContent, ModalHeader, ModalBody, Tabs, Tab } from '@heroui/react';
+import { Tabs, Tab } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
@@ -34,6 +34,7 @@ import { GoalTab } from './tabs/GoalTab';
 import { GroupSelector } from './shared/GroupSelector';
 import { TemplatePicker } from './shared/TemplatePicker';
 import type { ComposeHubProps, ComposeTab, ComposeTabConfig } from './types';
+import { Modal, ModalContent, ModalHeader, ModalBody } from '@/components/ui';
 
 const ALL_TABS: ComposeTabConfig[] = [
   { key: 'listing', label: 'Listing', icon: ShoppingBag, gate: { type: 'module', key: 'listings' } },

@@ -13,15 +13,14 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import {
-  Button, Chip, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner } from '@heroui/react';
+
 import Shield from 'lucide-react/icons/shield';
 import Trash2 from 'lucide-react/icons/trash-2';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import MinusCircle from 'lucide-react/icons/circle-minus';
 import Lock from 'lucide-react/icons/lock';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, useDisclosure } from '@/components/ui';
+import { GlassCard, useDisclosure, Button, Chip, Spinner, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@/components/ui';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

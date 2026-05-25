@@ -10,7 +10,7 @@
  */
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import { Input, Spinner, ButtonGroup, Button, Chip } from '@heroui/react';
+import { ButtonGroup } from '@heroui/react';
 import Search from 'lucide-react/icons/search';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Construction from 'lucide-react/icons/construction';
@@ -28,6 +28,7 @@ import {
   getFeatureModules,
   type ModuleDefinition,
 } from './moduleRegistry';
+import { Button, Chip, Spinner, Input } from '@/components/ui';
 
 type FilterType = 'all' | 'core' | 'feature';
 

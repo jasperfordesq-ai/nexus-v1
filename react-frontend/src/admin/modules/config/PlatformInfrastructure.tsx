@@ -1,4 +1,17 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Card, CardBody, CardHeader, Spinner, Button, Input, Select, SelectItem } from '@/components/ui';
+import { useState, useCallback, useEffect } from 'react';
+import { Switch, Checkbox } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
+import Globe from 'lucide-react/icons/globe';
+import MapPin from 'lucide-react/icons/map-pin';
+import KeyRound from 'lucide-react/icons/key-round';
+import Lock from 'lucide-react/icons/lock';
+import Eye from 'lucide-react/icons/eye';
+import EyeOff from 'lucide-react/icons/eye-off';
+import { useTranslation } from 'react-i18next';
+import { useToast, useTenant } from '@/contexts';
+import { adminConfig, adminSettings } from '../../api/adminApi';
+import type { TenantConfig } from '../../api/types';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -16,19 +29,6 @@ import { Select, SelectItem } from '@/components/ui';
  * Previously lived on /admin/tenant-features (now retired).
  */
 
-import { useState, useCallback, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Switch, Spinner, Button, Checkbox, Input } from '@heroui/react';
-import { Separator } from '@heroui-v3/react';
-import Globe from 'lucide-react/icons/globe';
-import MapPin from 'lucide-react/icons/map-pin';
-import KeyRound from 'lucide-react/icons/key-round';
-import Lock from 'lucide-react/icons/lock';
-import Eye from 'lucide-react/icons/eye';
-import EyeOff from 'lucide-react/icons/eye-off';
-import { useTranslation } from 'react-i18next';
-import { useToast, useTenant } from '@/contexts';
-import { adminConfig, adminSettings } from '../../api/adminApi';
-import type { TenantConfig } from '../../api/types';
 
 const PLATFORM_LANGUAGES = [
   { code: 'en', label: 'English', short: 'EN' },

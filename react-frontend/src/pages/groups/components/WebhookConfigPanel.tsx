@@ -9,26 +9,14 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import {
-  Button,
-  Chip,
-  Input,
-  Switch,
-  Checkbox,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Spinner,
-} from '@heroui/react';
+import { Switch, Checkbox } from '@heroui/react';
 import Webhook from 'lucide-react/icons/webhook';
 import Plus from 'lucide-react/icons/plus';
 import Trash2 from 'lucide-react/icons/trash-2';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { formatDateValue } from '@/lib/helpers';
 import { useTranslation } from 'react-i18next';
 

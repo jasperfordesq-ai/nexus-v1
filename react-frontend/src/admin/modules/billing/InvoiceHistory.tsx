@@ -8,9 +8,7 @@
  * Displays invoice list with view/download actions.
  */
 
-import { useEffect, useState, useCallback } from 'react';
-import { Spinner, Chip, Button } from '@heroui/react';
-import Receipt from 'lucide-react/icons/receipt';
+import { useEffect, useState, useCallback } from 'react';import Receipt from 'lucide-react/icons/receipt';
 import ExternalLink from 'lucide-react/icons/external-link';
 import Download from 'lucide-react/icons/download';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +16,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { billingApi, type Invoice } from '../../api/billingApi';
 import { PageHeader, DataTable, EmptyState, type Column } from '../../components';
+import { Button, Chip, Spinner } from '@/components/ui';
 
 function invoiceStatusColor(status: string): 'success' | 'warning' | 'danger' | 'default' {
   switch (status) {

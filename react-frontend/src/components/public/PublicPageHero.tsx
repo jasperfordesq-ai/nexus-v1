@@ -3,9 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import type { ReactNode } from 'react';
-import { Chip } from '@heroui/react';
-import Sparkles from 'lucide-react/icons/sparkles';
+import type { ReactNode } from 'react';import Sparkles from 'lucide-react/icons/sparkles';
+import { Chip } from '@/components/ui';
 
 interface PublicPageHeroStat {
   label: string;

@@ -1,3 +1,4 @@
+import { CardBody, Card, Button } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +11,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { Card, CardBody, Button } from '@heroui/react';
+
 import FileQuestion from 'lucide-react/icons/file-question';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { useTranslation } from 'react-i18next';

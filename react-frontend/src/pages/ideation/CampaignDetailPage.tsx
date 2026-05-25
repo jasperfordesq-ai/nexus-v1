@@ -12,8 +12,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import {
-  Button, Chip, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea } from '@heroui/react';
+
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Layers from 'lucide-react/icons/layers';
 import Edit3 from 'lucide-react/icons/pen-line';
@@ -29,7 +28,7 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Unlink from 'lucide-react/icons/unlink';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, useDisclosure } from '@/components/ui';
+import { GlassCard, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';

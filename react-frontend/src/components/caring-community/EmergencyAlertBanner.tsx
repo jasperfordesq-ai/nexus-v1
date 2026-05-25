@@ -15,15 +15,14 @@
  * Only rendered when hasFeature('caring_community') is true.
  */
 
-import { useEffect, useState } from 'react';
-import { Button } from '@heroui/react';
-import AlertTriangle from 'lucide-react/icons/alert-triangle';
+import { useEffect, useState } from 'react';import AlertTriangle from 'lucide-react/icons/alert-triangle';
 import Info from 'lucide-react/icons/info';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import api from '@/lib/api';
 import { useAuth, useTenant } from '@/contexts';
 import { logError } from '@/lib/logger';
+import { Button } from '@/components/ui';
 
 // ---------------------------------------------------------------------------
 // Types

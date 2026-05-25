@@ -9,21 +9,14 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  Button,
-  Avatar,
-  Spinner,
-} from '@heroui/react';
+
 import Heart from 'lucide-react/icons/heart';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { resolveAvatarUrl, formatRelativeTime } from '@/lib/helpers';
 import { UserHoverCard } from './UserHoverCard';
 import type { LikerUser, LikersResult } from '@/hooks/useSocialInteractions';
+import { Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, Avatar } from '@/components/ui';
 
 export interface LikersModalProps {
   isOpen: boolean;

@@ -13,8 +13,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea } from '@heroui/react';
+
 import Hash from 'lucide-react/icons/hash';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -22,7 +21,7 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import Sparkles from 'lucide-react/icons/sparkles';
 import Flag from 'lucide-react/icons/flag';
-import { GlassCard, useDisclosure } from '@/components/ui';
+import { GlassCard, useDisclosure, Button, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { EmptyState } from '@/components/feedback';
 import { FeedCard } from '@/components/feed/FeedCard';

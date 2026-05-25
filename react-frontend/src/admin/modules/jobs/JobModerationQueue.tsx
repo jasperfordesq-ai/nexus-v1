@@ -1,17 +1,6 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Admin Job Moderation Queue
- *
- * Displays jobs pending moderation review with approve/reject/flag actions,
- * moderation statistics, and spam detection score indicators.
- */
-
+import { Button, Chip, Card, CardBody, CardHeader, Textarea, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
-import { Button, Chip, Card, CardBody, CardHeader, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, Spinner, Avatar, Tooltip, Pagination } from '@heroui/react';
+import { Tooltip, Pagination } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import XCircle from 'lucide-react/icons/circle-x';
@@ -29,6 +18,17 @@ import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { PageHeader, StatCard, EmptyState } from '../../components';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Admin Job Moderation Queue
+ *
+ * Displays jobs pending moderation review with approve/reject/flag actions, * moderation statistics, and spam detection score indicators.
+ */
+
 
 interface PendingJob {
   id: number;

@@ -19,9 +19,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Button } from '@heroui/react';
-import ShieldCheck from 'lucide-react/icons/shield-check';
+import { motion } from 'framer-motion';import ShieldCheck from 'lucide-react/icons/shield-check';
 import ListChecks from 'lucide-react/icons/list-checks';
 import HeartHandshake from 'lucide-react/icons/heart-handshake';
 import AlertTriangle from 'lucide-react/icons/alert-triangle';
@@ -30,7 +28,7 @@ import UserCheck from 'lucide-react/icons/user-check';
 import MessageSquare from 'lucide-react/icons/message-square';
 import Mail from 'lucide-react/icons/mail';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button } from '@/components/ui';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';

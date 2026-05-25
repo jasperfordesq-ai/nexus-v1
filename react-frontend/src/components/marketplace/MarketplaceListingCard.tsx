@@ -1,3 +1,4 @@
+import { CardBody, Card, ImagePlaceholder, Button, Chip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,19 +7,17 @@
 /**
  * MarketplaceListingCard - Grid card for marketplace listing display
  *
- * Shows an image with overlaid price and condition badges, listing title,
- * location, seller info, and a toggleable save/heart button.
+ * Shows an image with overlaid price and condition badges, listing title, * location, seller info, and a toggleable save/heart button.
  */
 
 import { useState, useCallback } from 'react';
-import { Button, Card, CardBody, Chip } from '@heroui/react';
+
 import Heart from 'lucide-react/icons/heart';
 import MapPin from 'lucide-react/icons/map-pin';
 import Megaphone from 'lucide-react/icons/megaphone';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
-import { ImagePlaceholder } from '@/components/ui';
 import { PriceBadge } from './PriceBadge';
 import { ConditionBadge } from './ConditionBadge';
 import type { MarketplaceListingItem } from '@/types/marketplace';

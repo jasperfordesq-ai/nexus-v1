@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, Button, Chip, Input, Textarea } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,9 +9,7 @@ import { Select, SelectItem } from '@/components/ui';
  * Now with character count and draft persistence.
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { Button, Input, Textarea, Chip } from '@heroui/react';
-import ImagePlus from 'lucide-react/icons/image-plus';
+import { useState, useEffect, useCallback, useRef } from 'react';import ImagePlus from 'lucide-react/icons/image-plus';
 import MapPin from 'lucide-react/icons/map-pin';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';

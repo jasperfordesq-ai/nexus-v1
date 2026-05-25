@@ -7,13 +7,11 @@
  * SuggestedListingsWidget - Shows recommended listings in the sidebar
  */
 
-import { Link } from 'react-router-dom';
-import { Chip } from '@heroui/react';
-import Sparkles from 'lucide-react/icons/sparkles';
+import { Link } from 'react-router-dom';import Sparkles from 'lucide-react/icons/sparkles';
 import Heart from 'lucide-react/icons/heart';
 import HandHelping from 'lucide-react/icons/hand-helping';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Chip } from '@/components/ui';
 import { useTenant } from '@/contexts';
 
 export interface SuggestedListing {

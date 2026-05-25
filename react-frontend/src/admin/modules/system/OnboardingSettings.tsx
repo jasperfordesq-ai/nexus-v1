@@ -1,4 +1,25 @@
-import { Select, SelectItem, useDisclosure } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Spinner, Input, Textarea, Chip, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { useState, useEffect, useCallback } from 'react';
+import { Switch } from '@heroui/react';
+import Save from 'lucide-react/icons/save';
+import Sparkles from 'lucide-react/icons/sparkles';
+import UserCircle from 'lucide-react/icons/circle-user';
+import Heart from 'lucide-react/icons/heart';
+import HandHeart from 'lucide-react/icons/hand-heart';
+import Shield from 'lucide-react/icons/shield';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Eye from 'lucide-react/icons/eye';
+import ListChecks from 'lucide-react/icons/list-checks';
+import FileText from 'lucide-react/icons/file-text';
+import Globe from 'lucide-react/icons/globe';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { usePageTitle } from '@/hooks';
+import { useToast, useTenant } from '@/contexts';
+import { api } from '@/lib/api';
+import { logError } from '@/lib/logger';
+import { PageHeader } from '../../components';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -19,28 +40,6 @@ import { Select, SelectItem, useDisclosure } from '@/components/ui';
  * Route: /admin/onboarding-settings
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import {
-  Card, CardBody, CardHeader, Switch, Button, Spinner, Input, Textarea, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
-import Save from 'lucide-react/icons/save';
-import Sparkles from 'lucide-react/icons/sparkles';
-import UserCircle from 'lucide-react/icons/circle-user';
-import Heart from 'lucide-react/icons/heart';
-import HandHeart from 'lucide-react/icons/hand-heart';
-import Shield from 'lucide-react/icons/shield';
-import CheckCircle from 'lucide-react/icons/circle-check-big';
-import Eye from 'lucide-react/icons/eye';
-import ListChecks from 'lucide-react/icons/list-checks';
-import FileText from 'lucide-react/icons/file-text';
-import Globe from 'lucide-react/icons/globe';
-import AlertTriangle from 'lucide-react/icons/triangle-alert';
-import { useNavigate } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { usePageTitle } from '@/hooks';
-import { useToast, useTenant } from '@/contexts';
-import { api } from '@/lib/api';
-import { logError } from '@/lib/logger';
-import { PageHeader } from '../../components';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 

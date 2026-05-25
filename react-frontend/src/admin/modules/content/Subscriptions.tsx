@@ -9,15 +9,14 @@
  * Wired to adminPlans.getSubscriptions() API.
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { Spinner } from '@heroui/react';
-import CreditCard from 'lucide-react/icons/credit-card';
+import { useState, useEffect, useCallback } from 'react';import CreditCard from 'lucide-react/icons/credit-card';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminPlans } from '../../api/adminApi';
 import { PageHeader, DataTable, StatusBadge, EmptyState, type Column } from '../../components';
 
 import { useTranslation } from 'react-i18next';
+import { Spinner } from '@/components/ui';
 interface SubscriptionItem {
   id: number;
   tenant_name: string;

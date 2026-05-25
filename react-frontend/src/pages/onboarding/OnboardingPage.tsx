@@ -19,7 +19,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Button, Spinner, Chip, Avatar, Textarea } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import Sparkles from 'lucide-react/icons/sparkles';
 import ArrowRight from 'lucide-react/icons/arrow-right';
@@ -39,7 +39,7 @@ import Clock from 'lucide-react/icons/clock';
 import Users from 'lucide-react/icons/users';
 import Star from 'lucide-react/icons/star';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner, Textarea, Avatar } from '@/components/ui';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 import { useOnboardingConfig } from '@/hooks/useOnboardingConfig';

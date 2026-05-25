@@ -1,17 +1,6 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Cron Job Settings
- * Configure per-job and global cron settings
- * Parity: PHP CronJobController::settings()
- */
-
+import { Card, CardBody, CardHeader, Button, Input, Textarea, Spinner, Select, SelectItem } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Button, Input, Textarea, Switch, Spinner } from '@heroui/react';
+import { Switch } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Settings from 'lucide-react/icons/settings';
 import Save from 'lucide-react/icons/save';
@@ -24,6 +13,17 @@ import { Navigate } from 'react-router-dom';
 import { adminCron, adminSystem } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { CronJob, CronJobSettings, GlobalCronSettings } from '../../api/types';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Cron Job Settings
+ * Configure per-job and global cron settings
+ * Parity: PHP CronJobController::settings()
+ */
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Component

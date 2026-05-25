@@ -1,14 +1,4 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * GDPR Breach Detail
- * Detail page for viewing and managing a single data breach.
- * Route: /admin/enterprise/gdpr/breaches/:id
- */
-
+import { Card, CardBody, CardHeader, Chip, Button, Spinner, Textarea, Progress } from '@/components/ui';
 import {
   useEffect,
   useState,
@@ -16,14 +6,6 @@ import {
   useMemo } from 'react';
 import { useParams,
   useNavigate } from 'react-router-dom';
-import { Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Button,
-  Spinner,
-  Textarea,
-} from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
@@ -39,9 +21,18 @@ import { adminEnterprise } from '../../api/adminApi';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { PageHeader, StatusBadge } from '../../components';
 import type { GdprBreachDetail as GdprBreachDetailType } from '../../api/types';
-
 import { useTranslation } from 'react-i18next';
-import { Progress } from '@/components/ui';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * GDPR Breach Detail
+ * Detail page for viewing and managing a single data breach.
+ * Route: /admin/enterprise/gdpr/breaches/:id
+ */
+
 
 const severityColorMap: Record<string, 'default' | 'primary' | 'warning' | 'danger'> = {
   low: 'default',

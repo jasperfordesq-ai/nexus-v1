@@ -13,13 +13,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import {
-  Input,
-  Button,
-  Chip,
-  Avatar,
-  Spinner,
-} from '@heroui/react';
+
 import Search from 'lucide-react/icons/search';
 import MapPin from 'lucide-react/icons/map-pin';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -29,7 +23,7 @@ import Filter from 'lucide-react/icons/filter';
 import X from 'lucide-react/icons/x';
 import UserSearch from 'lucide-react/icons/user-search';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner, Input, Avatar } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';

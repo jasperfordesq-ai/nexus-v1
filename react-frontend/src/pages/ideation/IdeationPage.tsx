@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -23,8 +23,7 @@ import { Select, SelectItem } from '@/components/ui';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import {
-  Button, Chip, Input, Tabs, Tab, Spinner } from '@heroui/react';
+import { Tabs, Tab } from '@heroui/react';
 import Lightbulb from 'lucide-react/icons/lightbulb';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -40,7 +39,6 @@ import BarChart3 from 'lucide-react/icons/chart-column';
 import Search from 'lucide-react/icons/search';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';

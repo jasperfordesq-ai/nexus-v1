@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, Accordion, AccordionItem, Button, Input } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -7,21 +7,16 @@ import { Select, SelectItem } from '@/components/ui';
 /**
  * MarketplaceFacetedSearch - Filter sidebar for marketplace browse
  *
- * Provides category, price range, condition, seller type, delivery method,
- * sort, and time-posted filters. Collapsible on mobile via HeroUI Accordion.
+ * Provides category, price range, condition, seller type, delivery method, * sort, and time-posted filters. Collapsible on mobile via HeroUI Accordion.
  */
 
 import { useState, useCallback } from 'react';
-import {
-  Button, CheckboxGroup, Checkbox, Input, RadioGroup, Radio } from '@heroui/react';
+import { CheckboxGroup, Checkbox, RadioGroup, Radio } from '@heroui/react';
 import SlidersHorizontal from 'lucide-react/icons/sliders-horizontal';
 import { useTranslation } from 'react-i18next';
 import type { MarketplaceFilters,
   MarketplaceCategory } from '@/types/marketplace';
 
-import { Accordion,
-  AccordionItem,
-} from '@/components/ui';
 interface MarketplaceFacetedSearchProps {
   filters: MarketplaceFilters;
   onChange: (filters: MarketplaceFilters) => void;

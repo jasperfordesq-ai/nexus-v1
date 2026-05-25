@@ -1,16 +1,6 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * System Requirements
- * Checks PHP version, extensions, writable directories, services, and INI settings.
- */
-
+import { Card, CardBody, CardHeader, Button, Spinner, Chip, Input } from '@/components/ui';
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardBody, CardHeader, Button, Spinner, Chip, Input } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
@@ -27,6 +17,16 @@ import { useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { SystemRequirements as SystemRequirementsType } from '../../api/types';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * System Requirements
+ * Checks PHP version, extensions, writable directories, services, and INI settings.
+ */
+
 
 export function SystemRequirements() {
   const { t } = useTranslation('admin');

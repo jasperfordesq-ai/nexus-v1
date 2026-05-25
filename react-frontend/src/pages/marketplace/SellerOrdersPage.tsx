@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, GlassCard, Button, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -18,8 +18,7 @@ import { Select, SelectItem, useDisclosure } from '@/components/ui';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import {
-  Button, Spinner, Tab, Tabs, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input } from '@heroui/react';
+import { Tab, Tabs } from '@heroui/react';
 import Store from 'lucide-react/icons/store';
 import Package from 'lucide-react/icons/package';
 import Truck from 'lucide-react/icons/truck';
@@ -27,7 +26,6 @@ import Star from 'lucide-react/icons/star';
 import ExternalLink from 'lucide-react/icons/external-link';
 import Clock from 'lucide-react/icons/clock';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { OrderStatusBadge } from '@/components/marketplace';
 import type { MarketplaceOrderItem } from '@/types/marketplace';

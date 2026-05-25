@@ -1,3 +1,16 @@
+import { Card, CardBody, CardHeader, Input, Textarea, Button, Spinner, Chip } from '@/components/ui';
+import { useState, useCallback, useEffect } from 'react';
+import { Skeleton } from '@heroui/react';
+import Building from 'lucide-react/icons/building';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Save from 'lucide-react/icons/save';
+import Star from 'lucide-react/icons/star';
+import Tag from 'lucide-react/icons/tag';
+import { usePageTitle } from '@/hooks';
+import { useToast } from '@/contexts';
+import { adminFederation } from '../../api/adminApi';
+import { PageHeader } from '../../components';
+import { useTranslation } from 'react-i18next';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,19 +22,6 @@
  * Supports editing name, description, contact email, website, and topic/interest tags.
  */
 
-import { useState, useCallback, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Input, Textarea, Button, Spinner, Chip, Skeleton } from '@heroui/react';
-import Building from 'lucide-react/icons/building';
-import RefreshCw from 'lucide-react/icons/refresh-cw';
-import Save from 'lucide-react/icons/save';
-import Star from 'lucide-react/icons/star';
-import Tag from 'lucide-react/icons/tag';
-import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
-import { adminFederation } from '../../api/adminApi';
-import { PageHeader } from '../../components';
-
-import { useTranslation } from 'react-i18next';
 
 interface FedProfile {
   id: number;

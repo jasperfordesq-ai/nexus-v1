@@ -5,7 +5,7 @@
 
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Button, Skeleton } from '@heroui/react';
+import { Skeleton } from '@heroui/react';
 import AlertCircle from 'lucide-react/icons/alert-circle';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Calendar from 'lucide-react/icons/calendar';
@@ -16,7 +16,7 @@ import Sparkles from 'lucide-react/icons/sparkles';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import Users from 'lucide-react/icons/users';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { useApi } from '@/hooks/useApi';

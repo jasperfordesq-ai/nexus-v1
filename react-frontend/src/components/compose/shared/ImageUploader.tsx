@@ -7,11 +7,10 @@
  * ImageUploader — reusable image selection with preview, extracted from FeedPage.
  */
 
-import { useRef } from 'react';
-import { Button } from '@heroui/react';
-import ImagePlus from 'lucide-react/icons/image-plus';
+import { useRef } from 'react';import ImagePlus from 'lucide-react/icons/image-plus';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui';
 
 interface ImageUploaderProps {
   file: File | null;

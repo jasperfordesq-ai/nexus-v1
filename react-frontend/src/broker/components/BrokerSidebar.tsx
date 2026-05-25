@@ -13,7 +13,7 @@
 
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Button, Chip, Tooltip } from '@heroui/react';
+import { Tooltip } from '@heroui/react';
 import { useAuth, useTenant } from '@/contexts';
 import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
 import Users from 'lucide-react/icons/users';
@@ -31,6 +31,7 @@ import HelpCircle from 'lucide-react/icons/circle-help';
 import PanelLeftClose from 'lucide-react/icons/panel-left-close';
 import PanelLeft from 'lucide-react/icons/panel-left';
 import Settings from 'lucide-react/icons/settings';
+import { Button, Chip } from '@/components/ui';
 
 export interface BrokerBadgeCounts {
   pending_members: number;

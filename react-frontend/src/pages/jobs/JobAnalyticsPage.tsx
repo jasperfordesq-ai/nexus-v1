@@ -13,18 +13,9 @@
  * - Average time to apply, time to fill
  */
 
-import {
-  useState,
-  useEffect,
-  useCallback,
-  useRef } from 'react';
-import { useParams,
-  Link } from 'react-router-dom';
-import { Button,
-  Chip,
-  Spinner,
-  Tooltip,
-  } from '@heroui/react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { Tooltip } from '@heroui/react';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import Eye from 'lucide-react/icons/eye';
 import Users from 'lucide-react/icons/users';
@@ -38,9 +29,7 @@ import Share2 from 'lucide-react/icons/share-2';
 import Star from 'lucide-react/icons/star';
 import Sparkles from 'lucide-react/icons/sparkles';
 import { useTranslation } from 'react-i18next';
-import { GlassCard,
-  Progress,
-} from '@/components/ui';
+import { GlassCard, Progress, Button, Chip, Spinner } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTenant } from '@/contexts';
 import { api, API_BASE } from '@/lib/api';

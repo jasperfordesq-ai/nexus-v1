@@ -1,10 +1,10 @@
+import { Card, CardBody, Chip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 import type { ReactNode } from 'react';
-import { Card, CardBody, Chip } from '@heroui/react';
 
 interface PublicEmptyStateProps {
   icon: ReactNode;

@@ -11,9 +11,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Button } from '@heroui/react';
-import { Separator } from '@heroui-v3/react';
+import { motion } from 'framer-motion';import { Separator } from '@heroui-v3/react';
 import Scale from 'lucide-react/icons/scale';
 import Shield from 'lucide-react/icons/shield';
 import FileText from 'lucide-react/icons/file-text';
@@ -30,7 +28,7 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import ExternalLink from 'lucide-react/icons/external-link';
 import Building from 'lucide-react/icons/building';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';

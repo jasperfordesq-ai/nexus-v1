@@ -16,16 +16,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Button,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Chip,
-  Spinner,
-} from '@heroui/react';
+
 import FileText from 'lucide-react/icons/file-text';
 import Target from 'lucide-react/icons/target';
 import Sparkles from 'lucide-react/icons/sparkles';
@@ -33,7 +24,7 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import Layers from 'lucide-react/icons/layers';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

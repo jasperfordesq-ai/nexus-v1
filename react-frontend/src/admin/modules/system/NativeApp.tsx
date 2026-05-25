@@ -1,4 +1,14 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Select, SelectItem } from '@/components/ui';
+import { useEffect, useMemo, useState } from 'react';
+import { Switch } from '@heroui/react';
+import Download from 'lucide-react/icons/download';
+import Save from 'lucide-react/icons/save';
+import Smartphone from 'lucide-react/icons/smartphone';
+import { useTranslation } from 'react-i18next';
+import { useToast } from '@/contexts';
+import { usePageTitle } from '@/hooks';
+import { PageHeader } from '../../components';
+import { adminSettings } from '../../api/adminApi';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,17 +19,6 @@ import { Select, SelectItem } from '@/components/ui';
  * Configure mobile app (Capacitor) settings and tenant-branded build readiness.
  */
 
-import { useEffect, useMemo, useState } from 'react';
-import {
-  Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Switch } from '@heroui/react';
-import Download from 'lucide-react/icons/download';
-import Save from 'lucide-react/icons/save';
-import Smartphone from 'lucide-react/icons/smartphone';
-import { useTranslation } from 'react-i18next';
-import { useToast } from '@/contexts';
-import { usePageTitle } from '@/hooks';
-import { PageHeader } from '../../components';
-import { adminSettings } from '../../api/adminApi';
 
 type NativeAppForm = Record<string, string | boolean>;
 

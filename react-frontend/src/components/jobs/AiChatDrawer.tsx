@@ -3,12 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useRef, useEffect } from 'react';
-import { Button, Input, Spinner } from '@heroui/react';
-import Sparkles from 'lucide-react/icons/sparkles';
+import { useRef, useEffect } from 'react';import Sparkles from 'lucide-react/icons/sparkles';
 import X from 'lucide-react/icons/x';
 import Send from 'lucide-react/icons/send';
 import { useTranslation } from 'react-i18next';
+import { Button, Spinner, Input } from '@/components/ui';
 
 interface AiChatMessage {
   role: 'user' | 'assistant';

@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -14,8 +14,7 @@ import { Select, SelectItem } from '@/components/ui';
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import {
-  Input, Chip, Avatar, Button, Spinner } from '@heroui/react';
+
 import Search from 'lucide-react/icons/search';
 import Globe from 'lucide-react/icons/globe';
 import MapPin from 'lucide-react/icons/map-pin';
@@ -28,7 +27,6 @@ import Compass from 'lucide-react/icons/compass';
 import Car from 'lucide-react/icons/car';
 import Home from 'lucide-react/icons/house';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';

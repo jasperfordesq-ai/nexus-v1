@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, GlassCard, AlgorithmLabel, ListingSkeleton, ImagePlaceholder, Button, Input, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -17,7 +17,7 @@ const listingItemVariants = {
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Button, Input, Avatar } from '@heroui/react';
+
 import Search from 'lucide-react/icons/search';
 import Plus from 'lucide-react/icons/plus';
 import Filter from 'lucide-react/icons/filter';
@@ -40,7 +40,6 @@ import SlidersHorizontal from 'lucide-react/icons/sliders-horizontal';
 import X from 'lucide-react/icons/x';
 import Zap from 'lucide-react/icons/zap';
 import ArrowUpDown from 'lucide-react/icons/arrow-up-down';
-import { GlassCard, AlgorithmLabel, ListingSkeleton, ImagePlaceholder } from '@/components/ui';
 import { FeaturedBadge } from '@/components/listings/FeaturedBadge';
 import { EntityMapView } from '@/components/location';
 import { PageMeta } from '@/components/seo';

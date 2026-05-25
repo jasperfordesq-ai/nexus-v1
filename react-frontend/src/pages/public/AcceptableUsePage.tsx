@@ -12,9 +12,7 @@
  * exists, so we ship one rather than a "being prepared" placeholder.
  */
 
-import { motion } from 'framer-motion';
-import { Spinner } from '@heroui/react';
-import ShieldCheck from 'lucide-react/icons/shield-check';
+import { motion } from 'framer-motion';import ShieldCheck from 'lucide-react/icons/shield-check';
 import Ban from 'lucide-react/icons/ban';
 import UserX from 'lucide-react/icons/user-x';
 import Bot from 'lucide-react/icons/bot';
@@ -23,7 +21,7 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Lock from 'lucide-react/icons/lock';
 import Scale from 'lucide-react/icons/scale';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Spinner } from '@/components/ui';
 import { CustomLegalDocument } from '@/components/legal/CustomLegalDocument';
 import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';

@@ -1,16 +1,7 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * MobileFAB — floating action button for mobile quick post creation.
- */
-
-import { Button } from '@heroui/react';
 import PenSquare from 'lucide-react/icons/square-pen';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui';
 
 interface MobileFABProps {
   onPress: () => void;

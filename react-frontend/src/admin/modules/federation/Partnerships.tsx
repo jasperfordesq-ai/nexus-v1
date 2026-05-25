@@ -1,4 +1,3 @@
-import { Select, SelectItem, useDisclosure } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,46 +9,62 @@ import { Select, SelectItem, useDisclosure } from '@/components/ui';
  * Features: Counter-proposals, detail drawer, permissions matrix, audit timeline, * incoming requests tab, partnership statistics.
  */
 
-import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import {
-  Button, Tabs, Tab, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Textarea, Card, CardBody, CardHeader, Spinner } from '@heroui/react';
-import Handshake from 'lucide-react/icons/handshake';
-import RefreshCw from 'lucide-react/icons/refresh-cw';
-import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
-import CheckCircle from 'lucide-react/icons/circle-check-big';
-import XCircle from 'lucide-react/icons/circle-x';
-import Ban from 'lucide-react/icons/ban';
-import Eye from 'lucide-react/icons/eye';
-import MessageSquare from 'lucide-react/icons/message-square';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Tab, Tabs, Switch } from '@heroui/react';
 import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
-import ShieldCheck from 'lucide-react/icons/shield-check';
-import Clock from 'lucide-react/icons/clock';
+import Ban from 'lucide-react/icons/ban';
 import BarChart3 from 'lucide-react/icons/chart-column';
-import Users from 'lucide-react/icons/users';
-import Mail from 'lucide-react/icons/mail';
-import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import Calendar from 'lucide-react/icons/calendar';
-import UsersRound from 'lucide-react/icons/users-round';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Clock from 'lucide-react/icons/clock';
+import Eye from 'lucide-react/icons/eye';
+import Handshake from 'lucide-react/icons/handshake';
 import Inbox from 'lucide-react/icons/inbox';
-import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
-import { adminFederation } from '../../api/adminApi';
-import { DataTable,
-  PageHeader,
-  EmptyState,
-  StatusBadge,
-  ConfirmModal,
-  type Column } from '../../components';
-import { logError } from '@/lib/logger';
-
+import Mail from 'lucide-react/icons/mail';
+import MessageSquare from 'lucide-react/icons/message-square';
+import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import ShoppingBag from 'lucide-react/icons/shopping-bag';
+import Users from 'lucide-react/icons/users';
+import UsersRound from 'lucide-react/icons/users-round';
+import XCircle from 'lucide-react/icons/circle-x';
 import { useTranslation } from 'react-i18next';
 
-import { Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
+import { useToast } from '@/contexts';
+import { usePageTitle } from '@/hooks';
+import { logError } from '@/lib/logger';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Chip,
+  Dropdown,
   DropdownItem,
-  DropdownSection,
+  DropdownMenu,
+  DropdownTrigger,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Select,
+  SelectItem,
+  Spinner,
+  Textarea,
+  useDisclosure,
 } from '@/components/ui';
+import { adminFederation } from '../../api/adminApi';
+import {
+  ConfirmModal,
+  DataTable,
+  EmptyState,
+  PageHeader,
+  StatusBadge,
+  type Column,
+} from '../../components';
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────

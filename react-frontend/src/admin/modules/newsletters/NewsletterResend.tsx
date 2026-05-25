@@ -1,3 +1,4 @@
+import { Button, Input, Card, CardBody, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,10 +10,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import {
-  Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
-  Button, RadioGroup, Radio, Input, Card, CardBody,
-} from '@heroui/react';
+import { RadioGroup, Radio } from '@heroui/react';
 import Mail from 'lucide-react/icons/mail';
 import Users from 'lucide-react/icons/users';
 import AlertCircle from 'lucide-react/icons/circle-alert';
@@ -55,7 +53,6 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
 
     loadInfo();
   }, [isOpen, newsletterId, toast, t])
-
 
   const handleResend = async () => {
     if (!info) return;

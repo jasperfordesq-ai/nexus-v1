@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Chip, Card, CardBody, Spinner, Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,8 +12,7 @@ import { Select, SelectItem } from '@/components/ui';
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import {
-  Tabs, Tab, Chip, Card, CardBody, Spinner } from '@heroui/react';
+import { Tabs, Tab } from '@heroui/react';
 import CalendarClock from 'lucide-react/icons/calendar-clock';
 import Handshake from 'lucide-react/icons/handshake';
 import { useTranslation } from 'react-i18next';
@@ -144,7 +143,6 @@ export function JobPipelineOverview() {
     }
   }, [interviewsPage, interviewsStatus, t, toast]);
 
-
   // ── Fetch offers ────────────────────────────────────────────────────────
   const loadOffers = useCallback(async () => {
     setOffersLoading(true);
@@ -173,7 +171,6 @@ export function JobPipelineOverview() {
       setOffersLoading(false);
     }
   }, [offersPage, offersStatus, t, toast]);
-
 
   // ── Effects ─────────────────────────────────────────────────────────────
   useEffect(() => {

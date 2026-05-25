@@ -1,16 +1,5 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Email Settings
- * Configure email providers and delivery settings for the platform.
- */
-
+import { Card, CardBody, CardHeader, Input, Button, Spinner, Chip, Select, SelectItem } from '@/components/ui';
 import { useState, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Input, Button, Spinner, Chip } from '@heroui/react';
 import Mail from 'lucide-react/icons/mail';
 import Save from 'lucide-react/icons/save';
 import Send from 'lucide-react/icons/send';
@@ -24,6 +13,17 @@ import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
 import type { ApiResponse } from '@/lib/api';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Email Settings
+ * Configure email providers and delivery settings for the platform.
+ */
+
+
 
 interface EmailSettingsForm {
   provider: string;

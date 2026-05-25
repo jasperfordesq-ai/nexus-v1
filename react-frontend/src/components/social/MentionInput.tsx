@@ -13,12 +13,11 @@
  * Can be used as a drop-in replacement for HeroUI's Input or Textarea.
  */
 
-import { useState, useCallback, useRef, useEffect } from 'react';
-import { Textarea } from '@heroui/react';
-import { api } from '@/lib/api';
+import { useState, useCallback, useRef, useEffect } from 'react';import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { MentionAutocomplete } from './MentionAutocomplete';
 import type { MentionSuggestion } from './MentionAutocomplete';
+import { Textarea } from '@/components/ui';
 
 /* ─── Types ─────────────────────────────────────────────────── */
 

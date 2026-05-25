@@ -1,3 +1,4 @@
+import { Card, CardBody } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +11,7 @@
  * drills into the relevant filtered view — a chevron hint is shown on hover.
  */
 
-import { Card, CardBody } from '@heroui/react';
+
 import { Link } from 'react-router-dom';
 import { isValidElement } from 'react';
 import ChevronRight from 'lucide-react/icons/chevron-right';

@@ -9,17 +9,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  Input,
-  Avatar,
-  Spinner,
-} from '@heroui/react';
+
 import Search from 'lucide-react/icons/search';
 import Send from 'lucide-react/icons/send';
 import Check from 'lucide-react/icons/check';
@@ -28,6 +18,7 @@ import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { Button, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 
 interface ShareViaDMModalProps {
   isOpen: boolean;

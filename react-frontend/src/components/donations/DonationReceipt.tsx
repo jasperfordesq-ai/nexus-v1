@@ -1,3 +1,12 @@
+import { Button, Card, CardBody, CardHeader, Chip, Spinner } from '@/components/ui';
+import { useEffect, useState } from 'react';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Printer from 'lucide-react/icons/printer';
+import Receipt from 'lucide-react/icons/receipt';
+import { useTranslation } from 'react-i18next';
+import { api } from '@/lib/api';
+import { formatCurrency, formatDateValue } from '@/lib/helpers';
+import { logError } from '@/lib/logger';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,15 +19,6 @@
  * layout using HeroUI Card with @media print styles.
  */
 
-import { useEffect, useState } from 'react';
-import { Button, Card, CardBody, CardHeader, Chip, Spinner } from '@heroui/react';
-import AlertTriangle from 'lucide-react/icons/triangle-alert';
-import Printer from 'lucide-react/icons/printer';
-import Receipt from 'lucide-react/icons/receipt';
-import { useTranslation } from 'react-i18next';
-import { api } from '@/lib/api';
-import { formatCurrency, formatDateValue } from '@/lib/helpers';
-import { logError } from '@/lib/logger';
 
 /* ───────────────────────── Types ───────────────────────── */
 

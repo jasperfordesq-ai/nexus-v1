@@ -8,15 +8,14 @@
  * Monitor and manage 404 error occurrences across the platform.
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { Button, Spinner } from '@heroui/react';
-import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import { useState, useEffect, useCallback, useRef } from 'react';import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Trash2 from 'lucide-react/icons/trash-2';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader, EmptyState, DataTable, ConfirmModal, type Column } from '../../components';
 import { adminTools } from '../../api/adminApi';
+import { Button, Spinner } from '@/components/ui';
 
 interface Error404Entry {
   id: number;

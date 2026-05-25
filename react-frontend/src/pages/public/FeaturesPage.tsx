@@ -1,3 +1,18 @@
+import { Card, CardBody, CardHeader, Chip } from '@/components/ui';
+import { type ReactNode } from 'react';
+import { Separator } from '@heroui-v3/react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Sparkles from 'lucide-react/icons/sparkles';
+import Globe from 'lucide-react/icons/globe';
+import Shield from 'lucide-react/icons/shield';
+import Github from 'lucide-react/icons/github';
+import Bug from 'lucide-react/icons/bug';
+import ExternalLink from 'lucide-react/icons/external-link';
+import { PageMeta } from '@/components/seo';
+import { usePageTitle } from '@/hooks/usePageTitle';
+import { useTenant } from '@/contexts';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -17,21 +32,6 @@
  * still redirects here so existing bookmarks survive.
  */
 
-import { type ReactNode } from 'react';
-import { Card, CardBody, CardHeader, Chip } from '@heroui/react';
-import { Separator } from '@heroui-v3/react';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
-import CheckCircle from 'lucide-react/icons/circle-check-big';
-import Sparkles from 'lucide-react/icons/sparkles';
-import Globe from 'lucide-react/icons/globe';
-import Shield from 'lucide-react/icons/shield';
-import Github from 'lucide-react/icons/github';
-import Bug from 'lucide-react/icons/bug';
-import ExternalLink from 'lucide-react/icons/external-link';
-import { PageMeta } from '@/components/seo';
-import { usePageTitle } from '@/hooks/usePageTitle';
-import { useTenant } from '@/contexts';
 
 // ---------------------------------------------------------------------------
 // Maturity chip

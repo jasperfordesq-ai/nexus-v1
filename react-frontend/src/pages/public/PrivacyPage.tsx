@@ -11,9 +11,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Button, Chip, Spinner } from '@heroui/react';
-import { Separator } from '@heroui-v3/react';
+import { motion } from 'framer-motion';import { Separator } from '@heroui-v3/react';
 import Shield from 'lucide-react/icons/shield';
 import Database from 'lucide-react/icons/database';
 import PieChart from 'lucide-react/icons/chart-pie';
@@ -31,7 +29,7 @@ import MessageSquare from 'lucide-react/icons/message-square';
 import Send from 'lucide-react/icons/send';
 import CalendarDays from 'lucide-react/icons/calendar-days';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner } from '@/components/ui';
 import { CustomLegalDocument } from '@/components/legal/CustomLegalDocument';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { useTenant } from '@/contexts';

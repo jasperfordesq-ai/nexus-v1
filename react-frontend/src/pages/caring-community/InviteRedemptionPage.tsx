@@ -1,3 +1,4 @@
+import { CardBody, Card, Button, Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -5,7 +6,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Card, CardBody, Spinner } from '@heroui/react';
+
 import HeartHandshake from 'lucide-react/icons/heart-handshake';
 import AlertCircle from 'lucide-react/icons/alert-circle';
 import { useTranslation } from 'react-i18next';

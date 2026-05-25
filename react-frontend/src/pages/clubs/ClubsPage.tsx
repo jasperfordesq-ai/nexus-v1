@@ -14,7 +14,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Avatar, Button, Input } from '@heroui/react';
+
 import Users from 'lucide-react/icons/users';
 import Search from 'lucide-react/icons/search';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -22,7 +22,7 @@ import Calendar from 'lucide-react/icons/calendar';
 import Globe from 'lucide-react/icons/globe';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Input, Avatar } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';
 import { PageMeta } from '@/components/seo/PageMeta';

@@ -1,3 +1,16 @@
+import { Button, Card, CardBody, CardHeader, Chip, Spinner, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@/components/ui';
+import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+import Eye from 'lucide-react/icons/eye';
+import FileSearch from 'lucide-react/icons/file-search';
+import KeyRound from 'lucide-react/icons/key-round';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import { usePageTitle } from '@/hooks';
+import { useToast } from '@/contexts';
+import { adminFederation } from '../../api/adminApi';
+import { PageHeader } from '../../components';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,8 +19,7 @@
 /**
  * Federation Aggregates — admin self-service for cross-node aggregate sharing.
  *
- * Lets a tenant admin enable/disable the public /federation/aggregates feed,
- * rotate the HMAC signing secret, preview the JSON payload that would be
+ * Lets a tenant admin enable/disable the public /federation/aggregates feed, * rotate the HMAC signing secret, preview the JSON payload that would be
  * exposed, and inspect the audit trail of recent queries.
  *
  * Implements the consent surface described in
@@ -15,38 +27,6 @@
  *
  */
 
-import { useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Spinner,
-  Switch,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from '@heroui/react';
-import Eye from 'lucide-react/icons/eye';
-import FileSearch from 'lucide-react/icons/file-search';
-import KeyRound from 'lucide-react/icons/key-round';
-import RefreshCw from 'lucide-react/icons/refresh-cw';
-import ShieldCheck from 'lucide-react/icons/shield-check';
-
-import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
-import { adminFederation } from '../../api/adminApi';
-import { PageHeader } from '../../components';
 
 interface ConsentState {
   enabled: boolean;

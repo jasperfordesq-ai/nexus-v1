@@ -1,3 +1,4 @@
+import { Button, Card, CardBody, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,17 +10,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  Card,
-  CardBody,
-  Spinner,
-} from '@heroui/react';
+
 import Zap from 'lucide-react/icons/zap';
 import Star from 'lucide-react/icons/star';
 import ArrowUpCircle from 'lucide-react/icons/circle-arrow-up';

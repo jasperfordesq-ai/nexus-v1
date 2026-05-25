@@ -5,21 +5,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import {
-  Card,
-  Button,
-  Tabs,
-  Tab,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Chip,
-  Input,
-  Textarea,
-} from '@heroui/react';
+import { Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import MapPin from 'lucide-react/icons/map-pin';
 import TrendingUp from 'lucide-react/icons/trending-up';
@@ -34,6 +20,7 @@ import { adminGroups } from '@/admin/api/adminApi';
 import type { AdminGroup, GroupMember as GroupMemberType } from '@/admin/api/types';
 interface AdminGroupDetail extends AdminGroup {  stats?: { total_exchanges: number; total_hours: number; active_members: number; posts_count: number; events_count: number; activity_score: number };  latitude?: number;  longitude?: number;}
 import type { GroupMember } from '@/admin/api/types';
+import { Button, Chip, Input, Textarea, Card } from '@/components/ui';
 
 export default function GroupDetail() {
   const { t } = useTranslation('admin');

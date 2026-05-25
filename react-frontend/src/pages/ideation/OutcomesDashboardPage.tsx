@@ -12,13 +12,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import {
-  Button,
-  Chip,
-  Spinner,
-} from '@heroui/react';
-import ArrowLeft from 'lucide-react/icons/arrow-left';
+import { Link, useNavigate } from 'react-router-dom';import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Target from 'lucide-react/icons/target';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Clock from 'lucide-react/icons/clock';
@@ -27,7 +21,7 @@ import Award from 'lucide-react/icons/award';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';

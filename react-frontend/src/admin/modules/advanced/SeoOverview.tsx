@@ -1,23 +1,6 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * SEO Overview — Admin dashboard for search engine optimization.
- *
- * Sections:
- * 1. Tenant Meta (stored on tenants table: title, description, H1, hero intro)
- * 2. OG Image (default social sharing image for all pages)
- * 3. Meta Tags (title suffix, global description, keywords)
- * 4. SEO Features (sitemap, canonical URLs, Open Graph, Twitter Cards toggles)
- * 5. Verification & Robots (Google/Bing verification, custom robots.txt)
- * 6. Sitemap Stats (live stats from SitemapService, cache clear button)
- * 7. SEO Health Check (quick audit of common issues)
- */
-
+import { Card, CardBody, CardHeader, Input, Button, Spinner, Chip, Textarea } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
-import { Card, CardBody, CardHeader, Switch, Input, Button, Spinner, Chip, Textarea } from '@heroui/react';
+import { Switch } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Save from 'lucide-react/icons/save';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -36,6 +19,24 @@ import { useToast } from '@/contexts';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { PageHeader } from '../../components';
 import { adminSettings, adminTools } from '../../api/adminApi';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * SEO Overview — Admin dashboard for search engine optimization.
+ *
+ * Sections:
+ * 1. Tenant Meta (stored on tenants table: title, description, H1, hero intro)
+ * 2. OG Image (default social sharing image for all pages)
+ * 3. Meta Tags (title suffix, global description, keywords)
+ * 4. SEO Features (sitemap, canonical URLs, Open Graph, Twitter Cards toggles)
+ * 5. Verification & Robots (Google/Bing verification, custom robots.txt)
+ * 6. Sitemap Stats (live stats from SitemapService, cache clear button)
+ * 7. SEO Health Check (quick audit of common issues)
+ */
+
 // Keys that map to the backend's seo_* tenant_settings rows
 const SEO_KEYS = [
   'seo_title_suffix', 'seo_meta_description', 'seo_meta_keywords',

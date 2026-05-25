@@ -1,16 +1,6 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Algorithm Settings
- * Configure EdgeRank (feed), MatchRank (listings), CommunityRank (members),
- * and SmartMatch parameters. Shows algorithm health status.
- */
-
+import { Card, CardBody, CardHeader, Button, Spinner, Chip } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
-import { Card, CardBody, CardHeader, Slider, Button, Spinner, Switch, Chip } from '@heroui/react';
+import { Slider, Switch } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Settings from 'lucide-react/icons/settings';
 import Save from 'lucide-react/icons/save';
@@ -26,6 +16,16 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Algorithm Settings
+ * Configure EdgeRank (feed), MatchRank (listings), CommunityRank (members), * and SmartMatch parameters. Shows algorithm health status.
+ */
+
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

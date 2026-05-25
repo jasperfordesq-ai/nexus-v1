@@ -1,3 +1,14 @@
+import { Card, CardBody, CardHeader, Spinner } from '@/components/ui';
+import { useState, useEffect } from 'react';
+import Target from 'lucide-react/icons/target';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Clock from 'lucide-react/icons/clock';
+import AlertCircle from 'lucide-react/icons/circle-alert';
+import { useAdminPageMeta } from '../../AdminMetaContext';
+import { useToast } from '@/contexts';
+import { adminDeliverability } from '../../api/adminApi';
+import { PageHeader, StatCard } from '../../components';
+import { useTranslation } from 'react-i18next';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,17 +20,6 @@
  * Wired to adminDeliverability.getDashboard() API.
  */
 
-import { useState, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Spinner } from '@heroui/react';
-import Target from 'lucide-react/icons/target';
-import CheckCircle from 'lucide-react/icons/circle-check-big';
-import Clock from 'lucide-react/icons/clock';
-import AlertCircle from 'lucide-react/icons/circle-alert';
-import { useAdminPageMeta } from '../../AdminMetaContext';
-import { useToast } from '@/contexts';
-import { adminDeliverability } from '../../api/adminApi';
-import { PageHeader, StatCard } from '../../components';
-import { useTranslation } from 'react-i18next';
 
 interface DashboardData {
   total: number;

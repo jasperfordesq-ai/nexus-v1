@@ -4,8 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { Link } from 'react-router-dom';
-import {
-  Button, Chip, Avatar, Tooltip } from '@heroui/react';
+import { Tooltip } from '@heroui/react';
 import Briefcase from 'lucide-react/icons/briefcase';
 import MapPin from 'lucide-react/icons/map-pin';
 import Eye from 'lucide-react/icons/eye';
@@ -28,13 +27,7 @@ import Copy from 'lucide-react/icons/copy';
 import Send from 'lucide-react/icons/send';
 import Share2 from 'lucide-react/icons/share-2';
 import { useTranslation } from 'react-i18next';
-import { GlassCard,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-} from '@/components/ui';
+import { GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Chip, Avatar } from '@/components/ui';
 import { formatDateValue, resolveAvatarUrl } from '@/lib/helpers';
 import { MatchBadge } from './MatchBadge';
 import type { JobVacancy, MatchResult } from './JobDetailTypes';

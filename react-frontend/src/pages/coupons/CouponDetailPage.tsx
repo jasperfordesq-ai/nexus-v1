@@ -1,3 +1,4 @@
+import { CardBody, Card, Button, Chip, Spinner, Modal, ModalContent, ModalHeader, ModalBody } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,7 +10,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Card, CardBody, Button, Chip, Spinner, Modal, ModalContent, ModalHeader, ModalBody } from '@heroui/react';
+
 import Tag from 'lucide-react/icons/tag';
 import Copy from 'lucide-react/icons/copy';
 import QrCode from 'lucide-react/icons/qr-code';

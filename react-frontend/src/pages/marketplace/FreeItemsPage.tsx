@@ -11,13 +11,11 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { Button, Spinner } from '@heroui/react';
-import Gift from 'lucide-react/icons/gift';
+import { Link } from 'react-router-dom';import Gift from 'lucide-react/icons/gift';
 import Plus from 'lucide-react/icons/plus';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Spinner } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { MarketplaceListingGrid } from '@/components/marketplace';
 import type { MarketplaceListingItem } from '@/types/marketplace';

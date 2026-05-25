@@ -1,3 +1,4 @@
+import { Card, CardBody, Spinner, Modal, ModalContent, ModalHeader, ModalBody } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,15 +10,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  Card,
-  CardBody,
-  Spinner,
-} from '@heroui/react';
+
 import Eye from 'lucide-react/icons/eye';
 import Heart from 'lucide-react/icons/heart';
 import MessageCircle from 'lucide-react/icons/message-circle';

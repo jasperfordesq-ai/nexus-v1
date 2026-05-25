@@ -1,18 +1,6 @@
-import { Select, SelectItem, useDisclosure } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Member Notes
- * Admin CRM page for managing private notes about members.
- * Supports add, edit, pin, delete, category filtering, and user search.
- */
-
+import { Card, CardBody, CardHeader, Button, Input, Textarea, Chip, Spinner, Select, SelectItem, useDisclosure, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
-import {
-  Card, CardBody, CardHeader, Button, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Chip, Spinner, Pagination, Avatar } from '@heroui/react';
+import { Pagination } from '@heroui/react';
 import StickyNote from 'lucide-react/icons/sticky-note';
 import Plus from 'lucide-react/icons/plus';
 import Pin from 'lucide-react/icons/pin';
@@ -31,14 +19,18 @@ import { PageHeader,
   ConfirmModal,
   MemberSearchPicker,
   type MemberSearchMember } from '../../components';
-
 import { useTranslation } from 'react-i18next';
-import { Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-} from '@/components/ui';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Member Notes
+ * Admin CRM page for managing private notes about members.
+ * Supports add, edit, pin, delete, category filtering, and user search.
+ */
+
 interface Note {
   id: number;
   tenant_id: number;

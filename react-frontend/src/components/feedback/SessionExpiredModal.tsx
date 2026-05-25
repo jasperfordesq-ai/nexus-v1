@@ -11,18 +11,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-} from '@heroui/react';
+
 import LogIn from 'lucide-react/icons/log-in';
 import Clock from 'lucide-react/icons/clock';
 import { SESSION_EXPIRED_EVENT } from '@/lib/api';
 import { useTenant, useAuth } from '@/contexts';
+import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 
 export function SessionExpiredModal() {
   const { t } = useTranslation('errors');

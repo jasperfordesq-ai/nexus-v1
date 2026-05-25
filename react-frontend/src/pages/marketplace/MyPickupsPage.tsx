@@ -7,12 +7,10 @@
  * MyPickupsPage — AG45 click-and-collect: buyer's reservations with QR display.
  */
 
-import { useEffect, useState } from 'react';
-import { Spinner, Chip } from '@heroui/react';
-import ShoppingBag from 'lucide-react/icons/shopping-bag';
+import { useEffect, useState } from 'react';import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import QrCode from 'lucide-react/icons/qr-code';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Chip, Spinner } from '@/components/ui';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { useAuth } from '@/contexts';
 import { api } from '@/lib/api';

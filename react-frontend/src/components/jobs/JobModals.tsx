@@ -3,19 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  useRef } from 'react';
-import {
-  Button,
-  Chip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Textarea,
-  Spinner,
-} from '@heroui/react';
+import { useRef } from 'react';
+
 import Target from 'lucide-react/icons/target';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
@@ -25,7 +14,7 @@ import Sparkles from 'lucide-react/icons/sparkles';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import type { QualificationResult } from './JobDetailTypes';
-import { Progress } from '@/components/ui';
+import { Progress, Button, Chip, Spinner, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 
 interface ApplyModalProps {
   isOpen: boolean;

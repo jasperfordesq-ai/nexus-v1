@@ -15,7 +15,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Button, Chip, Spinner, Avatar, Tabs, Tab } from '@heroui/react';
+import { Tabs, Tab } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Star from 'lucide-react/icons/star';
@@ -27,7 +27,7 @@ import Shield from 'lucide-react/icons/shield';
 import Package from 'lucide-react/icons/package';
 import User from 'lucide-react/icons/user';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner, Avatar } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { MarketplaceListingGrid } from '@/components/marketplace';
 import { MarketplacePartnerBadge } from '@/components/marketplace/MarketplacePartnerBadge';

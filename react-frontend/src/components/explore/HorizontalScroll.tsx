@@ -3,11 +3,10 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useRef, useState, useCallback, useEffect, type ReactNode } from 'react';
-import { Button } from '@heroui/react';
-import ChevronLeft from 'lucide-react/icons/chevron-left';
+import { useRef, useState, useCallback, useEffect, type ReactNode } from 'react';import ChevronLeft from 'lucide-react/icons/chevron-left';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui';
 
 interface HorizontalScrollProps {
   children: ReactNode;

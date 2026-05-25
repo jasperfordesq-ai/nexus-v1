@@ -8,9 +8,7 @@
  * DataTable of recent error log entries.
  */
 
-import { useEffect, useState, useCallback } from 'react';
-import { Button, Chip } from '@heroui/react';
-import RefreshCw from 'lucide-react/icons/refresh-cw';
+import { useEffect, useState, useCallback } from 'react';import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
@@ -18,6 +16,7 @@ import { adminEnterprise } from '../../api/adminApi';
 import { PageHeader, DataTable } from '../../components';
 import type { Column } from '../../components';
 import type { ErrorLogEntry } from '../../api/types';
+import { Button, Chip } from '@/components/ui';
 
 export function ErrorLogs() {
   const { t } = useTranslation('admin');

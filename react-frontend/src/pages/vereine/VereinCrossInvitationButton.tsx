@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, Button, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -14,8 +14,7 @@ import { Select, SelectItem } from '@/components/ui';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Textarea } from '@heroui/react';
+
 import UserPlus from 'lucide-react/icons/user-plus';
 import { useAuth, useFeature, useToast } from '@/contexts';
 import { api } from '@/lib/api';

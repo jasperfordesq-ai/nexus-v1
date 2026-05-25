@@ -1,12 +1,7 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import CheckCircle from 'lucide-react/icons/check-circle';
 import Clock from 'lucide-react/icons/clock';
@@ -19,6 +14,11 @@ import XCircle from 'lucide-react/icons/x-circle';
 import { PageHeader } from '../../components';
 import { usePageTitle } from '@/hooks';
 import api from '@/lib/api';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 
 // ---------------------------------------------------------------------------
 // Types

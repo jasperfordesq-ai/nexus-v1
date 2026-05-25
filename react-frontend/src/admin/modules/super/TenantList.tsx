@@ -8,19 +8,10 @@
  * Full tenant management with search, filter, and CRUD actions.
  */
 
-import {
-  useState,
-  useCallback,
-  useEffect } from 'react';
-import { Link,
-  useNavigate } from 'react-router-dom';
+import { useState, useCallback, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Chip,
-  Tabs,
-  Tab,
-} from '@heroui/react';
+import { Tabs, Tab } from '@heroui/react';
 import Plus from 'lucide-react/icons/plus';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import Edit from 'lucide-react/icons/square-pen';
@@ -40,12 +31,7 @@ import { DataTable,
   type Column } from '../../components';
 import type { SuperAdminTenant } from '../../api/types';
 
-import { Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-} from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Chip } from '@/components/ui';
 export function TenantList() {
   const { t } = useTranslation('admin');
   usePageTitle(t('super.page_title'));

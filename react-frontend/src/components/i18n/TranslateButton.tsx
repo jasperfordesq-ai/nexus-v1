@@ -13,13 +13,12 @@
  * Renders nothing if `sourceLocale` is already the user's current i18n locale.
  */
 
-import { useCallback, useEffect, useState } from 'react';
-import { Button } from '@heroui/react';
-import Languages from 'lucide-react/icons/languages';
+import { useCallback, useEffect, useState } from 'react';import Languages from 'lucide-react/icons/languages';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
+import { Button } from '@/components/ui';
 
 interface TranslateButtonProps {
   contentType: string;

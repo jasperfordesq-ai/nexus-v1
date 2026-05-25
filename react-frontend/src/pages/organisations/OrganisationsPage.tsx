@@ -12,7 +12,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Input, Avatar } from '@heroui/react';
+
 import Building2 from 'lucide-react/icons/building-2';
 import Search from 'lucide-react/icons/search';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -25,7 +25,7 @@ import Star from 'lucide-react/icons/star';
 import Users from 'lucide-react/icons/users';
 import Plus from 'lucide-react/icons/plus';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Input, Avatar } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';

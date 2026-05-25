@@ -1,20 +1,8 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * MarketplaceEmptyState - Empty state placeholder for marketplace views
- *
- * Shows a muted icon, message, and optional call-to-action button
- * when no marketplace listings are available.
- */
-
-import { Button } from '@heroui/react';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
+import { Button } from '@/components/ui';
 
 interface MarketplaceEmptyStateProps {
   message?: string;

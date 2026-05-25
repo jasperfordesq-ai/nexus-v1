@@ -1,4 +1,14 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Card, CardBody, CardHeader, Input, Textarea, Button, Spinner, Select, SelectItem } from '@/components/ui';
+import { useEffect, useState } from 'react';
+import Target from 'lucide-react/icons/target';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Save from 'lucide-react/icons/save';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useAdminPageMeta } from '../../AdminMetaContext';
+import { useTenant, useToast } from '@/contexts';
+import { adminDeliverability } from '../../api/adminApi';
+import { PageHeader } from '../../components';
+import { useTranslation } from 'react-i18next';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,17 +20,7 @@ import { Select, SelectItem } from '@/components/ui';
  * Wired to adminDeliverability.get() + adminDeliverability.update() APIs.
  */
 
-import { useEffect, useState } from 'react';
-import { Card, CardBody, CardHeader, Input, Textarea, Button, Spinner } from '@heroui/react';
-import Target from 'lucide-react/icons/target';
-import ArrowLeft from 'lucide-react/icons/arrow-left';
-import Save from 'lucide-react/icons/save';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useAdminPageMeta } from '../../AdminMetaContext';
-import { useTenant, useToast } from '@/contexts';
-import { adminDeliverability } from '../../api/adminApi';
-import { PageHeader } from '../../components';
-import { useTranslation } from 'react-i18next';
+
 
 interface DeliverableFormData {
   title: string;

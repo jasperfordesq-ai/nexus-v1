@@ -1,3 +1,4 @@
+import { CardBody, Card, Button } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -7,8 +8,7 @@
  * PremiumGate — AG58
  *
  * Wraps content that requires a member premium feature unlock.
- * - If the tenant doesn't have the `member_premium` feature enabled at all,
- *   children render as-is (gating is a no-op for tenants not using premium).
+ * - If the tenant doesn't have the `member_premium` feature enabled at all, *   children render as-is (gating is a no-op for tenants not using premium).
  * - If the user is not authenticated or hasn't unlocked the requested feature
  *   key via their tier, an upgrade CTA is shown instead of children.
  *
@@ -17,7 +17,7 @@
 
 import { type ReactNode, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardBody, Button } from '@heroui/react';
+
 import Crown from 'lucide-react/icons/crown';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant } from '@/contexts';

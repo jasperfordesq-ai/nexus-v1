@@ -15,9 +15,10 @@
  */
 
 import { useState, useCallback } from 'react';
-import { Card, Button } from '@heroui/react';
+
 import Play from 'lucide-react/icons/play';
 import { useTranslation } from 'react-i18next';
+import { Button, Card } from '@/components/ui';
 
 /* ───────────────────────── Types ───────────────────────── */
 

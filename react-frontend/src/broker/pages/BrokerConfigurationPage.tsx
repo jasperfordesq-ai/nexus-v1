@@ -1,3 +1,4 @@
+import { Card, CardHeader, CardBody, Button, Input, Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +11,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Card, CardHeader, CardBody, Button, Input, Switch, Spinner } from '@heroui/react';
+import { Switch } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
@@ -109,7 +110,6 @@ export default function BrokerConfiguration() {
       setLoading(false);
     }
   }, [toast, t])
-
 
   useEffect(() => {
     loadConfig();

@@ -10,21 +10,13 @@
  * Stores preference in localStorage as 'nexus_language'.
  */
 
-import { useTranslation } from 'react-i18next';
-import {
-  Button } from '@heroui/react';
-import Globe from 'lucide-react/icons/globe';
+import { useTranslation } from 'react-i18next';import Globe from 'lucide-react/icons/globe';
 import { api,
   tokenManager } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { useTenantLanguages } from '@/contexts/TenantContext';
 
-import { Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-} from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button } from '@/components/ui';
 interface Language {
   code: string;
   label: string;

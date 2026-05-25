@@ -1,13 +1,7 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
+import { Card, CardBody, CardHeader, Button, Textarea, Select, SelectItem } from '@/components/ui';
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Card, CardBody, CardHeader, Button, Textarea, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import Plus from 'lucide-react/icons/plus';
 import Trash2 from 'lucide-react/icons/trash-2';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +11,11 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { useToast, useTenant } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
 import type { FederationWhitelistEntry, SuperAdminTenant } from '../../api/types';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 
 interface WhitelistEntry {
   id: number;

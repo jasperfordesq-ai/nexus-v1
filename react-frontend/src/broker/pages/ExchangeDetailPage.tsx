@@ -1,18 +1,7 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Exchange Detail
- * Full detail view for a single exchange request.
- * Parity: PHP BrokerControlsController::showExchange()
- */
-
+import { Card, CardBody, CardHeader, Button, Chip, Spinner } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Card, CardBody, CardHeader, Button, Chip, Spinner } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import User from 'lucide-react/icons/user';
@@ -24,6 +13,17 @@ import type { ExchangeDetail as ExchangeDetailType } from '@/admin/api/types';
 import { PageHeader } from '@/admin/components/PageHeader';
 import { useTenant } from '@/contexts';
 import { formatServerDateTime } from '@/lib/serverTime';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Exchange Detail
+ * Full detail view for a single exchange request.
+ * Parity: PHP BrokerControlsController::showExchange()
+ */
+
 
 const STATUS_COLORS: Record<string, 'warning' | 'success' | 'danger' | 'default' | 'primary'> = {
   pending_broker: 'warning',

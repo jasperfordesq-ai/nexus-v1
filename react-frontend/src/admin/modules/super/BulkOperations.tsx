@@ -1,13 +1,8 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
+import { Card, CardBody, CardHeader, Button, Chip, Select, SelectItem } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Card, CardBody, CardHeader, Button, Switch, Chip, Checkbox, RadioGroup, Radio } from '@heroui/react';
+import { Switch, Checkbox, RadioGroup, Radio } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Users from 'lucide-react/icons/users';
 import Building2 from 'lucide-react/icons/building-2';
@@ -19,6 +14,11 @@ import { useToast, useTenant } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
 import { PageHeader, ConfirmModal } from '../../components';
 import type { SuperAdminTenant, SuperAdminUser, BulkOperationResult } from '../../api/types';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 
 export function BulkOperations() {
   const { t } = useTranslation('admin');

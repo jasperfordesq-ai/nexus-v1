@@ -10,7 +10,7 @@
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button, Chip, Skeleton, Avatar, AvatarGroup } from '@heroui/react';
+import { Skeleton } from '@heroui/react';
 import Bell from 'lucide-react/icons/bell';
 import MessageSquare from 'lucide-react/icons/message-square';
 import ListTodo from 'lucide-react/icons/list-todo';
@@ -29,7 +29,7 @@ import Eye from 'lucide-react/icons/eye';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import ChevronUp from 'lucide-react/icons/chevron-up';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Avatar, AvatarGroup } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast, useTenant, useNotifications, useAuth } from '@/contexts';
 import { usePusherOptional } from '@/contexts/PusherContext';

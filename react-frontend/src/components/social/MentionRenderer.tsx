@@ -13,9 +13,10 @@
 
 import { Fragment, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Popover, PopoverTrigger, PopoverContent, Avatar } from '@heroui/react';
+import { Popover, PopoverTrigger, PopoverContent } from '@heroui/react';
 import { useTenant } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { Avatar } from '@/components/ui';
 
 /* ─── Types ─────────────────────────────────────────────────── */
 

@@ -1,3 +1,4 @@
+import { Card, CardBody, Chip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -8,7 +9,7 @@
  * thumbnail grid (first 4 item images), and public/private badge.
  */
 
-import { Card, CardBody, Chip } from '@heroui/react';
+
 import FolderHeart from 'lucide-react/icons/folder-heart';
 import Lock from 'lucide-react/icons/lock';
 import Globe from 'lucide-react/icons/globe';

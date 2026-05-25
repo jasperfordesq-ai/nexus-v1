@@ -1,3 +1,4 @@
+import { Card, CardBody, CardHeader, Accordion, AccordionItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,7 +16,7 @@
  * The standalone wrapper `BrokerHelpPage` owns the title for the /broker/help route.
  */
 
-import { Card, CardBody, CardHeader } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import { Trans, useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
@@ -30,7 +31,6 @@ import Scale from 'lucide-react/icons/scale';
 import Phone from 'lucide-react/icons/phone';
 import Database from 'lucide-react/icons/database';
 
-import { Accordion, AccordionItem } from '@/components/ui';
 const richComponents = {
   b: <strong />,
   i: <em />,

@@ -12,13 +12,7 @@
  */
 
 import { useCallback } from 'react';
-import {
-  Button,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-} from '@heroui/react';
+
 import Compass from 'lucide-react/icons/compass';
 import HandHeart from 'lucide-react/icons/hand-heart';
 import Heart from 'lucide-react/icons/heart';
@@ -27,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { Button, Modal, ModalContent, ModalHeader, ModalBody } from '@/components/ui';
 
 export type OnboardingChoice = 'recipient' | 'helper' | 'browse';
 

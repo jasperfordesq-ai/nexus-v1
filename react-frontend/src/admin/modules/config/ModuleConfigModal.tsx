@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Card, CardBody, Input, Button, Chip, Spinner, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,7 +15,7 @@ import { Select, SelectItem } from '@/components/ui';
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Card, CardBody, Switch, Input, Button, Chip, Spinner } from '@heroui/react';
+import { Switch } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ExternalLink from 'lucide-react/icons/external-link';
 import Save from 'lucide-react/icons/save';
@@ -124,7 +124,6 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     }
   }, [toast, t])
 
-
   const loadGroupConfig = useCallback(async () => {
     setLoading(true);
     try {
@@ -138,7 +137,6 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
       setLoading(false);
     }
   }, [toast, t])
-
 
   const loadListingConfig = useCallback(async () => {
     setLoading(true);
@@ -154,7 +152,6 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     }
   }, [toast, t])
 
-
   const loadVolunteeringConfig = useCallback(async () => {
     setLoading(true);
     try {
@@ -168,7 +165,6 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
       setLoading(false);
     }
   }, [toast, t])
-
 
   const loadJobConfig = useCallback(async () => {
     setLoading(true);
@@ -184,7 +180,6 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
     }
   }, [toast, t])
 
-
   const loadIdentityConfig = useCallback(async () => {
     setLoading(true);
     try {
@@ -198,7 +193,6 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
       setLoading(false);
     }
   }, [toast, t])
-
 
   useEffect(() => {
     if (!isOpen || !module) {

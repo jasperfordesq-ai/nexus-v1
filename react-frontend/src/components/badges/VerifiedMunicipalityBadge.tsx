@@ -10,9 +10,10 @@
  * impact reports have been verified (DNS-attested or admin-attested).
  */
 
-import { Chip, Tooltip } from '@heroui/react';
+import { Tooltip } from '@heroui/react';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import { useTranslation } from 'react-i18next';
+import { Chip } from '@/components/ui';
 
 interface Props {
   domain?: string | null;

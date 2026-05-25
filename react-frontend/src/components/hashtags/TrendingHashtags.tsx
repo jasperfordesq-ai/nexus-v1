@@ -11,11 +11,9 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Spinner } from '@heroui/react';
-import TrendingUp from 'lucide-react/icons/trending-up';
+import { Link } from 'react-router-dom';import TrendingUp from 'lucide-react/icons/trending-up';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Spinner } from '@/components/ui';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

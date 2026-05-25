@@ -1,4 +1,15 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Input, Textarea, Select, SelectItem } from '@/components/ui';
+import { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { Switch } from '@heroui/react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Save from 'lucide-react/icons/save';
+import Award from 'lucide-react/icons/award';
+import { usePageTitle } from '@/hooks';
+import { useToast, useTenant } from '@/contexts';
+import { adminGamification } from '../../api/adminApi';
+import { PageHeader } from '../../components';
+import { useTranslation } from 'react-i18next';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,19 +21,7 @@ import { Select, SelectItem } from '@/components/ui';
  * Parity: PHP Admin\CustomBadgeController@store
  */
 
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import {
-  Card, CardBody, CardHeader, Button, Input, Textarea, Switch } from '@heroui/react';
-import ArrowLeft from 'lucide-react/icons/arrow-left';
-import Save from 'lucide-react/icons/save';
-import Award from 'lucide-react/icons/award';
-import { usePageTitle } from '@/hooks';
-import { useToast, useTenant } from '@/contexts';
-import { adminGamification } from '../../api/adminApi';
-import { PageHeader } from '../../components';
 
-import { useTranslation } from 'react-i18next';
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────

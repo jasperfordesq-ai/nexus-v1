@@ -31,35 +31,16 @@ import { ListItemNode, ListNode } from '@lexical/list';
 import { AutoLinkNode, LinkNode } from '@lexical/link';
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import {
-  $getSelection,
-  $isRangeSelection,
-  $createParagraphNode,
-  $createTextNode,
-  FORMAT_TEXT_COMMAND,
-  UNDO_COMMAND,
-  REDO_COMMAND,
-  COMMAND_PRIORITY_NORMAL,
-  SELECTION_CHANGE_COMMAND,
-  BLUR_COMMAND,
-  type EditorState,
-  type LexicalEditor,
-  $getRoot,
-} from 'lexical';
+  $getSelection, $isRangeSelection, $createParagraphNode, $createTextNode, FORMAT_TEXT_COMMAND, UNDO_COMMAND, REDO_COMMAND, COMMAND_PRIORITY_NORMAL, SELECTION_CHANGE_COMMAND, BLUR_COMMAND, type EditorState, type LexicalEditor, $getRoot, } from 'lexical';
 import {
-  INSERT_ORDERED_LIST_COMMAND,
-  INSERT_UNORDERED_LIST_COMMAND,
-  REMOVE_LIST_COMMAND,
-} from '@lexical/list';
+  INSERT_ORDERED_LIST_COMMAND, INSERT_UNORDERED_LIST_COMMAND, REMOVE_LIST_COMMAND, } from '@lexical/list';
 import { $setBlocksType } from '@lexical/selection';
 import { $createHeadingNode, $createQuoteNode, $isHeadingNode } from '@lexical/rich-text';
 import { TOGGLE_LINK_COMMAND, $isLinkNode } from '@lexical/link';
 import {
-  $getNearestNodeOfType,
-  $findMatchingParent,
-  $insertNodeToNearestRoot,
-} from '@lexical/utils';
+  $getNearestNodeOfType, $findMatchingParent, $insertNodeToNearestRoot, } from '@lexical/utils';
 import { $isListNode, ListNode as ListNodeClass } from '@lexical/list';
-import { Button, Tooltip } from '@heroui/react';
+import { Tooltip } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Bold from 'lucide-react/icons/bold';
 import Italic from 'lucide-react/icons/italic';
@@ -86,6 +67,7 @@ import {
   $createLegalNoticeNode,
   $isLegalNoticeNode,
 } from './LegalNoticeNode';
+import { Button } from '@/components/ui';
 
 /* ───────────────────────── Theme ───────────────────────── */
 

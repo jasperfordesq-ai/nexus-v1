@@ -8,34 +8,20 @@
  * Developer portal for external partners integrating with the federation API.
  */
 
-import {
-  useState } from 'react';
-import { Tabs,
-  Tab,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-} from '@heroui/react';
+import { useState } from 'react';
+import { Tab, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tabs } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
-import BookOpen from 'lucide-react/icons/book-open';
-import Shield from 'lucide-react/icons/shield';
-import Code from 'lucide-react/icons/code';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
-import Webhook from 'lucide-react/icons/webhook';
+import BookOpen from 'lucide-react/icons/book-open';
+import Code from 'lucide-react/icons/code';
 import HelpCircle from 'lucide-react/icons/circle-help';
-import { usePageTitle } from '@/hooks';
-import { PageHeader } from '../../components';
+import Shield from 'lucide-react/icons/shield';
+import Webhook from 'lucide-react/icons/webhook';
 import { useTranslation } from 'react-i18next';
-import { Accordion,
-  AccordionItem,
-} from '@/components/ui';
+
+import { usePageTitle } from '@/hooks';
+import { Accordion, AccordionItem, Card, CardBody, CardHeader, Chip } from '@/components/ui';
+import { PageHeader } from '../../components';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Code block helper

@@ -4,10 +4,11 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Avatar, Button, Input, Spinner } from '@heroui/react';
+
 import Search from 'lucide-react/icons/search';
 import { adminUsers } from '../api/adminApi';
 import type { AdminUser } from '../api/types';
+import { Button, Spinner, Input, Avatar } from '@/components/ui';
 
 const SEARCH_DEBOUNCE_MS = 300;
 

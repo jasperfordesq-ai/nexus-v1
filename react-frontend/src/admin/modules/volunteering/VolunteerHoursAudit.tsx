@@ -1,18 +1,6 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Volunteer Hours Audit
- * Admin page for auditing volunteer hours, approving/declining pending entries,
- * and viewing payment trail.
- */
-
+import { Button, Chip, Input, Card, CardBody, CardHeader, Select, SelectItem } from '@/components/ui';
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import {
-  Button, Chip, Input, Card, CardBody, CardHeader, Tab, Tabs, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+import { Tab, Tabs, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import Clock from 'lucide-react/icons/clock';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Hourglass from 'lucide-react/icons/hourglass';
@@ -29,6 +17,16 @@ import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
 import { PageHeader, StatCard, DataTable, EmptyState, type Column } from '../../components';
 import { useTranslation } from 'react-i18next';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Volunteer Hours Audit
+ * Admin page for auditing volunteer hours, approving/declining pending entries, * and viewing payment trail.
+ */
+
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

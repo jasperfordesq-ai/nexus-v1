@@ -1,19 +1,8 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Archive Detail
- * Read-only compliance record for a reviewed broker message copy.
- * Shows decision info, the target message, and a frozen conversation snapshot.
- * No action buttons — this is a pure read-only view.
- */
-
+import { Card, CardBody, CardHeader, Button, Chip, Spinner } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Card, CardBody, CardHeader, Button, Chip, Spinner, ScrollShadow } from '@heroui/react';
+import { ScrollShadow } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Lock from 'lucide-react/icons/lock';
@@ -28,6 +17,18 @@ import { formatServerDateTime } from '@/lib/serverTime';
 import { adminBroker } from '@/admin/api/adminApi';
 import { PageHeader } from '@/admin/components';
 import type { BrokerArchiveDetail as BrokerArchiveDetailType } from '@/admin/api/types';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Archive Detail
+ * Read-only compliance record for a reviewed broker message copy.
+ * Shows decision info, the target message, and a frozen conversation snapshot.
+ * No action buttons — this is a pure read-only view.
+ */
+
 
 export function ArchiveDetail() {
   const { t } = useTranslation('broker');

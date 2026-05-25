@@ -1,3 +1,13 @@
+import { Card, CardBody, CardHeader, Input, Button, Spinner } from '@/components/ui';
+import { useState, useEffect } from 'react';
+import { Switch } from '@heroui/react';
+import Image from 'lucide-react/icons/image';
+import Save from 'lucide-react/icons/save';
+import { useTranslation } from 'react-i18next';
+import { usePageTitle } from '@/hooks';
+import { useToast } from '@/contexts';
+import { PageHeader } from '../../components';
+import { adminSettings } from '../../api/adminApi';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -8,15 +18,6 @@
  * Configure image upload limits, dimensions, and processing options.
  */
 
-import { useState, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Input, Switch, Button, Spinner } from '@heroui/react';
-import Image from 'lucide-react/icons/image';
-import Save from 'lucide-react/icons/save';
-import { useTranslation } from 'react-i18next';
-import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
-import { PageHeader } from '../../components';
-import { adminSettings } from '../../api/adminApi';
 
 export function ImageSettings() {
   const { t } = useTranslation('admin');

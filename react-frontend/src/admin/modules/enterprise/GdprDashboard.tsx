@@ -1,3 +1,4 @@
+import { CardBody, Card, Button, Chip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +11,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Card, CardBody, Chip, Button } from '@heroui/react';
+
 import FileWarning from 'lucide-react/icons/file-warning';
 import UserCheck from 'lucide-react/icons/user-check';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';

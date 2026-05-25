@@ -12,10 +12,11 @@
 
 import { forwardRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Avatar, Skeleton, Button } from '@heroui/react';
+import { Skeleton } from '@heroui/react';
 import UserCheck from 'lucide-react/icons/user-check';
 import { useTranslation } from 'react-i18next';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { Button, Avatar } from '@/components/ui';
 
 /* ─── Types ─────────────────────────────────────────────────── */
 

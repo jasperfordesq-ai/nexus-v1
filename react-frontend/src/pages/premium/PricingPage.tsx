@@ -1,19 +1,7 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
+import { Card, CardBody, CardHeader, Button, Chip, Spinner } from '@/components/ui';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Chip,
-  Switch,
-  Spinner,
-} from '@heroui/react';
+import { Switch } from '@heroui/react';
 import Crown from 'lucide-react/icons/crown';
 import CheckCircle2 from 'lucide-react/icons/check-circle-2';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +10,11 @@ import { PageMeta } from '@/components/seo';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import api from '@/lib/api';
 import { logError } from '@/lib/logger';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 
 interface PremiumTier {
   id: number;

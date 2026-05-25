@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Button, Chip, Input, Card, CardBody, Select, SelectItem, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,8 +11,7 @@ import { Select, SelectItem } from '@/components/ui';
  */
 
 import { useState, type CSSProperties, useCallback, useEffect } from 'react';
-import {
-  Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Tabs, Tab, Card, CardBody } from '@heroui/react';
+import { Tabs, Tab } from '@heroui/react';
 import Plus from 'lucide-react/icons/plus';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import Edit from 'lucide-react/icons/square-pen';
@@ -31,12 +30,6 @@ import { DataTable,
 import type { AdminCategory } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
-import { Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-} from '@/components/ui';
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
@@ -118,7 +111,6 @@ export function CategoriesAdmin() {
       setLoading(false);
     }
   }, [typeFilter, toast, t]);
-
 
   useEffect(() => {
     loadCategories();

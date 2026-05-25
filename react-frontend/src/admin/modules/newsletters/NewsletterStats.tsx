@@ -1,18 +1,7 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Newsletter Stats
- * Detailed per-campaign statistics page for a single newsletter.
- * Shows delivery funnel, engagement metrics, device breakdown,
- * A/B test results, timeline, top links, recent activity, and quick actions.
- */
-
+import { Card, CardBody, CardHeader, Button, Chip, Progress } from '@/components/ui';
 import { useState, useCallback, useEffect, useMemo, type CSSProperties } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Chip, Skeleton, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+import { Skeleton, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
@@ -39,9 +28,18 @@ import { useTenant, useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
 import { NewsletterResend } from './NewsletterResend';
-
 import { useTranslation } from 'react-i18next';
-import { Progress } from '@/components/ui';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Newsletter Stats
+ * Detailed per-campaign statistics page for a single newsletter.
+ * Shows delivery funnel, engagement metrics, device breakdown, * A/B test results, timeline, top links, recent activity, and quick actions.
+ */
+
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 interface NewsletterInfo {

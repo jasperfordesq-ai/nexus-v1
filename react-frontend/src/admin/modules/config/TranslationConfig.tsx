@@ -1,16 +1,6 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Translation Configuration (INT9 + INT10)
- * Per-tenant translation settings and glossary management.
- */
-
+import { Card, CardBody, CardHeader, Spinner, Button, Input, Select, SelectItem } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Switch, Spinner, Button, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+import { Switch, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Settings from 'lucide-react/icons/settings';
 import BookOpen from 'lucide-react/icons/book-open';
@@ -21,6 +11,16 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader } from '../../components';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Translation Configuration (INT9 + INT10)
+ * Per-tenant translation settings and glossary management.
+ */
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

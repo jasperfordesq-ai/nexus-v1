@@ -11,16 +11,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Button,
-  Input,
-  Textarea,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-} from '@heroui/react';
+
 import Plus from 'lucide-react/icons/plus';
 import Pencil from 'lucide-react/icons/pencil';
 import Trash2 from 'lucide-react/icons/trash-2';
@@ -31,6 +22,7 @@ import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader, DataTable, ConfirmModal, EmptyState, type Column } from '../../components';
 import { useTranslation } from 'react-i18next';
+import { Button, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

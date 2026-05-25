@@ -9,15 +9,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
-import {
-  Button,
-  Chip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-} from '@heroui/react';
+
 import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
 import Check from 'lucide-react/icons/check';
 import X from 'lucide-react/icons/x';
@@ -29,7 +21,7 @@ import Send from 'lucide-react/icons/send';
 import Inbox from 'lucide-react/icons/inbox';
 import Ban from 'lucide-react/icons/ban';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

@@ -1,12 +1,8 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
+import { Button, Card, CardBody, CardHeader, Chip, Spinner } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Button, Card, CardBody, CardHeader, Chip, RadioGroup, Radio, Spinner, Tooltip } from '@heroui/react';
+import { RadioGroup, Radio, Tooltip } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Newspaper from 'lucide-react/icons/newspaper';
 import Save from 'lucide-react/icons/save';
@@ -17,6 +13,11 @@ import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader } from '../../components';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 
 type Cadence = 'off' | 'daily' | 'monthly';
 

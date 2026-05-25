@@ -1,19 +1,7 @@
-import { Select, SelectItem, useDisclosure } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Cron Job Logs
- * View and filter cron job execution logs with detail modal
- * Parity: PHP CronJobController::logs()
- */
-
+import { Card, CardBody, CardHeader, Button, Chip, Spinner, Input, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Card, CardBody, CardHeader, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Chip, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Pagination } from '@heroui/react';
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination } from '@heroui/react';
 import FileText from 'lucide-react/icons/file-text';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
@@ -27,6 +15,17 @@ import { useToast } from '@/contexts';
 import { adminCron } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { CronLog } from '../../api/types';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Cron Job Logs
+ * View and filter cron job execution logs with detail modal
+ * Parity: PHP CronJobController::logs()
+ */
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Component

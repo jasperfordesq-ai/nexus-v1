@@ -1,4 +1,15 @@
-import { Select, SelectItem, useDisclosure } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Spinner, Textarea, Input, Select, SelectItem, useDisclosure, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@/components/ui';
+import { useCallback, useEffect, useState } from 'react';
+import { Checkbox, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
+import AlertTriangle from 'lucide-react/icons/alert-triangle';
+import Bell from 'lucide-react/icons/bell';
+import BellOff from 'lucide-react/icons/bell-off';
+import Info from 'lucide-react/icons/info';
+import Send from 'lucide-react/icons/send';
+import { useTranslation } from 'react-i18next';
+import { usePageTitle } from '@/hooks';
+import api from '@/lib/api';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,17 +26,6 @@ import { Select, SelectItem, useDisclosure } from '@/components/ui';
  *  - Per-active-alert deactivate button with confirmation
  */
 
-import { useCallback, useEffect, useState } from 'react';
-import { Button, Card, CardBody, CardHeader, Checkbox, Chip, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, Input } from '@heroui/react';
-import { Separator } from '@heroui-v3/react';
-import AlertTriangle from 'lucide-react/icons/alert-triangle';
-import Bell from 'lucide-react/icons/bell';
-import BellOff from 'lucide-react/icons/bell-off';
-import Info from 'lucide-react/icons/info';
-import Send from 'lucide-react/icons/send';
-import { useTranslation } from 'react-i18next';
-import { usePageTitle } from '@/hooks';
-import api from '@/lib/api';
 
 // ---------------------------------------------------------------------------
 // Types

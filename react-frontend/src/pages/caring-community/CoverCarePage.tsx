@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input, Textarea, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,14 +6,13 @@ import { Select, SelectItem } from '@/components/ui';
 
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Avatar, Button, Chip, Input, Spinner, Textarea } from '@heroui/react';
+
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CalendarClock from 'lucide-react/icons/calendar-clock';
 import CheckCircle from 'lucide-react/icons/check-circle';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import UserRoundCheck from 'lucide-react/icons/user-round-check';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';

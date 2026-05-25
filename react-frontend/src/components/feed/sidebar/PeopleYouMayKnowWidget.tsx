@@ -8,10 +8,10 @@
  */
 
 import { Link } from 'react-router-dom';
-import { Avatar, Button } from '@heroui/react';
+
 import UserPlus from 'lucide-react/icons/user-plus';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Avatar } from '@/components/ui';
 import { useTenant } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
 

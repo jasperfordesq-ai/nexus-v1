@@ -21,7 +21,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button, Chip, Avatar, Spinner } from '@heroui/react';
+
 import Globe from 'lucide-react/icons/globe';
 import Users from 'lucide-react/icons/users';
 import MessageSquare from 'lucide-react/icons/message-square';
@@ -45,7 +45,7 @@ import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
 import Clock from 'lucide-react/icons/clock';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner, Avatar } from '@/components/ui';
 import { Breadcrumbs, type BreadcrumbItem } from '@/components/navigation';
 import { PageMeta } from '@/components/seo';
 import { useTenant, useToast } from '@/contexts';

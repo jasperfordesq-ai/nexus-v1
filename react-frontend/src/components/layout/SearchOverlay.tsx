@@ -13,9 +13,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@heroui/react';
-import Search from 'lucide-react/icons/search';
+import { useNavigate } from 'react-router-dom';import Search from 'lucide-react/icons/search';
 import X from 'lucide-react/icons/x';
 import ListTodo from 'lucide-react/icons/list-todo';
 import Calendar from 'lucide-react/icons/calendar';
@@ -29,6 +27,7 @@ import ArrowRight from 'lucide-react/icons/arrow-right';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useTheme } from '@/contexts';
 import { api } from '@/lib/api';
+import { Button } from '@/components/ui';
 
 const RECENT_SEARCHES_KEY = 'nexus_recent_searches';
 

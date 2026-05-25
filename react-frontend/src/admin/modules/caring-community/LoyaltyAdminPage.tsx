@@ -1,23 +1,7 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * LoyaltyAdminPage — Admin console for the time-credit ↔ marketplace
- * loyalty bridge.
- *
- * - Aggregate redemption stats (count, hours, CHF discount)
- * - Recent redemption ledger (last 50)
- * - Per-seller loyalty configuration (pick a member, toggle accept,
- *   set CHF/hour and max discount %)
- *
- * Admin English only — no t() calls.
- */
-
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea } from '@heroui/react';
+import { Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Coins from 'lucide-react/icons/coins';
 import Info from 'lucide-react/icons/info';
@@ -32,6 +16,22 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { canManageCaring } from '@/caring/access';
 import { MemberSearchPicker, PageHeader, StatCard, type MemberSearchMember } from '../../components';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * LoyaltyAdminPage — Admin console for the time-credit ↔ marketplace
+ * loyalty bridge.
+ *
+ * - Aggregate redemption stats (count, hours, CHF discount)
+ * - Recent redemption ledger (last 50)
+ * - Per-seller loyalty configuration (pick a member, toggle accept, *   set CHF/hour and max discount %)
+ *
+ * Admin English only — no t() calls.
+ */
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

@@ -4,10 +4,10 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Avatar, Button, Spinner } from '@heroui/react';
+
 import Users from 'lucide-react/icons/users';
 import ChevronDown from 'lucide-react/icons/chevron-down';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Spinner, Avatar } from '@/components/ui';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

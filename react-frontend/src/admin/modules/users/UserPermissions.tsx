@@ -1,3 +1,15 @@
+import { Card, CardBody, CardHeader, Chip, Button, Spinner } from '@/components/ui';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Shield from 'lucide-react/icons/shield';
+import Info from 'lucide-react/icons/info';
+import { useTranslation } from 'react-i18next';
+import { usePageTitle } from '@/hooks';
+import { useTenant, useToast } from '@/contexts';
+import { adminUsers } from '../../api/adminApi';
+import { PageHeader } from '../../components';
+import type { AdminUserDetail } from '../../api/types';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,18 +21,6 @@
  * Full per-permission editor is coming soon.
  */
 
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Chip, Button, Spinner } from '@heroui/react';
-import ArrowLeft from 'lucide-react/icons/arrow-left';
-import Shield from 'lucide-react/icons/shield';
-import Info from 'lucide-react/icons/info';
-import { useTranslation } from 'react-i18next';
-import { usePageTitle } from '@/hooks';
-import { useTenant, useToast } from '@/contexts';
-import { adminUsers } from '../../api/adminApi';
-import { PageHeader } from '../../components';
-import type { AdminUserDetail } from '../../api/types';
 
 export function UserPermissions() {
   const { t } = useTranslation('admin');

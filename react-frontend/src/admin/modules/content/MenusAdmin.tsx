@@ -9,9 +9,7 @@
  * Wired to adminMenus API for full CRUD.
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { Button, Spinner, Chip } from '@heroui/react';
-import Menu from 'lucide-react/icons/menu';
+import { useState, useEffect, useCallback } from 'react';import Menu from 'lucide-react/icons/menu';
 import Plus from 'lucide-react/icons/plus';
 import Pencil from 'lucide-react/icons/pencil';
 import Trash2 from 'lucide-react/icons/trash-2';
@@ -22,6 +20,7 @@ import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
 import { adminMenus } from '../../api/adminApi';
 import { PageHeader, DataTable, EmptyState, ConfirmModal, type Column } from '../../components';
+import { Button, Chip, Spinner } from '@/components/ui';
 
 interface MenuItem {
   id: number;

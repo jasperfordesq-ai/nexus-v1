@@ -1,16 +1,6 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Plan Create/Edit Form
- * Super-admin form for creating or editing a subscription plan.
- * Includes Stripe sync status and one-click sync trigger.
- */
-
+import { Card, CardBody, CardHeader, Input, Textarea, Button, Spinner, Chip } from '@/components/ui';
 import { useState, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Input, Textarea, Switch, Button, Spinner, Chip } from '@heroui/react';
+import { Switch } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import CreditCard from 'lucide-react/icons/credit-card';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -24,6 +14,17 @@ import { useTenant, useToast } from '@/contexts';
 import { adminPlans, type PlanDetail } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import { useTranslation } from 'react-i18next';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Plan Create/Edit Form
+ * Super-admin form for creating or editing a subscription plan.
+ * Includes Stripe sync status and one-click sync trigger.
+ */
+
 
 interface PlanFormData {
   name: string;

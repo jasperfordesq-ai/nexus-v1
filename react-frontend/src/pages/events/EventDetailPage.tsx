@@ -1,3 +1,4 @@
+import { Button, Chip, Card, CardBody, Textarea, GlassCard, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, AvatarGroup } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,23 +12,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Button,
-  Avatar,
-  AvatarGroup,
-  Chip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Tabs,
-  Tab,
-  Card,
-  CardBody,
-  Skeleton,
-  Textarea,
-} from '@heroui/react';
+import { Tabs, Tab, Skeleton } from '@heroui/react';
 import Calendar from 'lucide-react/icons/calendar';
 import Clock from 'lucide-react/icons/clock';
 import MapPin from 'lucide-react/icons/map-pin';
@@ -52,7 +37,6 @@ import CalendarRange from 'lucide-react/icons/calendar-range';
 import Video from 'lucide-react/icons/video';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import { Helmet } from 'react-helmet-async';
-import { GlassCard } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { Breadcrumbs } from '@/components/navigation';
@@ -93,8 +77,6 @@ interface AttendeeWithCheckIn extends User {
   checked_in?: boolean;
   rsvp_status?: string;
 }
-
-
 
 export function EventDetailPage() {
   const { t } = useTranslation('events');

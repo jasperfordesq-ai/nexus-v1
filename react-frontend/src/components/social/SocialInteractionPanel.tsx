@@ -10,9 +10,7 @@
  * (post/listing/event/goal/poll/review/volunteer/challenge/resource/job/blog/discussion).
  */
 
-import { useCallback, useEffect, useState } from 'react';
-import { Button } from '@heroui/react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { useCallback, useEffect, useState } from 'react';import { AnimatePresence, motion } from 'framer-motion';
 import Heart from 'lucide-react/icons/heart';
 import MessageCircle from 'lucide-react/icons/message-circle';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +20,7 @@ import { cn } from '@/lib/helpers';
 import { CommentsSection } from './CommentsSection';
 import { LikersModal } from './LikersModal';
 import { ShareButton } from './ShareButton';
+import { Button } from '@/components/ui';
 
 export interface SocialInteractionPanelProps {
   targetType: string;

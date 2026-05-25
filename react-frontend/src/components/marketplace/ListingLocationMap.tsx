@@ -13,13 +13,11 @@
  * Falls back to a text-only display when Google Maps is not configured.
  */
 
-import { useMemo } from 'react';
-import { Button } from '@heroui/react';
-import MapPin from 'lucide-react/icons/map-pin';
+import { useMemo } from 'react';import MapPin from 'lucide-react/icons/map-pin';
 import Navigation from 'lucide-react/icons/navigation';
 import MapPinOff from 'lucide-react/icons/map-pin-off';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button } from '@/components/ui';
 import { LocationMap, type MapMarker } from '@/components/location';
 import { MAPS_ENABLED } from '@/lib/map-config';
 

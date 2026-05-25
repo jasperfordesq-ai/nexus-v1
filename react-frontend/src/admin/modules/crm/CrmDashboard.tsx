@@ -1,17 +1,6 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * CRM Dashboard
- * Main dashboard for the Member CRM module.
- * Displays key member metrics, quick actions, and recent activity summary.
- */
-
+import { Card, CardBody, CardHeader, Button, Chip, Spinner } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Chip, Spinner } from '@heroui/react';
 import Users from 'lucide-react/icons/users';
 import Activity from 'lucide-react/icons/activity';
 import UserPlus from 'lucide-react/icons/user-plus';
@@ -29,8 +18,18 @@ import { useTenant, useToast } from '@/contexts';
 import api from '@/lib/api';
 import { adminCrm } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
-
 import { useTranslation } from 'react-i18next';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * CRM Dashboard
+ * Main dashboard for the Member CRM module.
+ * Displays key member metrics, quick actions, and recent activity summary.
+ */
+
 interface CrmDashboardData {
   total_members: number;
   active_members: number;

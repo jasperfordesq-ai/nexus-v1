@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Button, Card, CardHeader, CardBody, Input, Chip, Spinner, Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,7 +11,7 @@ import { Select, SelectItem } from '@/components/ui';
 
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button, Card, CardHeader, CardBody, Input, Switch, Chip, Spinner, Tooltip } from '@heroui/react';
+import { Switch, Tooltip } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Save from 'lucide-react/icons/save';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -255,7 +255,6 @@ export function SegmentForm() {
     }
     setSaving(false);
   }, [name, description, isActive, matchType, rules, isEdit, id, navigate, tenantPath, t]);
-
 
   // ── Apply Suggestion ──
 

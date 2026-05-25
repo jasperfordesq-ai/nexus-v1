@@ -1,4 +1,4 @@
-import { useDisclosure } from '@/components/ui';
+import { useDisclosure, Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -14,8 +14,7 @@ import { useDisclosure } from '@/components/ui';
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import {
-  Skeleton, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input } from '@heroui/react';
+import { Skeleton } from '@heroui/react';
 import Plus from 'lucide-react/icons/plus';
 import X from 'lucide-react/icons/x';
 import Pencil from 'lucide-react/icons/pencil';

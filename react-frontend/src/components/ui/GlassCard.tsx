@@ -1,10 +1,11 @@
+import { Card } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 import { forwardRef, type ReactNode, type HTMLAttributes, type MouseEvent } from 'react';
-import { Card } from '@heroui/react';
+
 import { motion, type Variants } from 'framer-motion';
 
 /** Exclude HTML event props that conflict with Framer Motion's signatures */

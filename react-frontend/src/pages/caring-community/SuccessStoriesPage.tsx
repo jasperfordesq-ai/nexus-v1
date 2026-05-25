@@ -5,14 +5,14 @@
 
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardBody, Chip, Skeleton } from '@heroui/react';
+import { Skeleton } from '@heroui/react';
 import AlertCircle from 'lucide-react/icons/alert-circle';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import Award from 'lucide-react/icons/award';
 import Info from 'lucide-react/icons/info';
 import Sparkles from 'lucide-react/icons/sparkles';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Chip, CardBody, Card } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { useApi } from '@/hooks/useApi';

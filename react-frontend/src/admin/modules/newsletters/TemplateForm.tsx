@@ -1,4 +1,18 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Card, CardBody, CardHeader, Input, Textarea, Button, Chip, Spinner, Select, SelectItem } from '@/components/ui';
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Switch } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
+import ArrowLeft from 'lucide-react/icons/arrow-left';
+import Save from 'lucide-react/icons/save';
+import Copy from 'lucide-react/icons/copy';
+import Lightbulb from 'lucide-react/icons/lightbulb';
+import BarChart3 from 'lucide-react/icons/chart-column';
+import { useTranslation } from 'react-i18next';
+import { usePageTitle } from '@/hooks';
+import { useTenant, useToast } from '@/contexts';
+import { adminNewsletters } from '../../api/adminApi';
+import { PageHeader } from '../../components';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,20 +25,6 @@ import { Select, SelectItem } from '@/components/ui';
  * Parity: PHP Admin newsletter template form.
  */
 
-import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Input, Textarea, Button, Switch, Chip, Spinner } from '@heroui/react';
-import { Separator } from '@heroui-v3/react';
-import ArrowLeft from 'lucide-react/icons/arrow-left';
-import Save from 'lucide-react/icons/save';
-import Copy from 'lucide-react/icons/copy';
-import Lightbulb from 'lucide-react/icons/lightbulb';
-import BarChart3 from 'lucide-react/icons/chart-column';
-import { useTranslation } from 'react-i18next';
-import { usePageTitle } from '@/hooks';
-import { useTenant, useToast } from '@/contexts';
-import { adminNewsletters } from '../../api/adminApi';
-import { PageHeader } from '../../components';
 
 const RichTextEditor = lazy(() =>
   import('../../components/RichTextEditor').then((m) => ({ default: m.RichTextEditor })),

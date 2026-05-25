@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Input, Textarea, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,12 +6,11 @@ import { Select, SelectItem } from '@/components/ui';
 
 import { useState, useCallback, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Avatar, Button, Input, Textarea } from '@heroui/react';
+
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Heart from 'lucide-react/icons/heart';
 import Search from 'lucide-react/icons/search';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { useApi } from '@/hooks/useApi';

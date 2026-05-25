@@ -1,4 +1,4 @@
-import { useDisclosure } from '@/components/ui';
+import { Button, Chip, Spinner, Textarea, Card, CardBody, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -18,8 +18,7 @@ import { useDisclosure } from '@/components/ui';
 
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Button, Chip, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, Card, CardBody } from '@heroui/react';
+
 import Building from 'lucide-react/icons/building';
 import CheckCircle2 from 'lucide-react/icons/check-circle-2';
 import XCircle from 'lucide-react/icons/x-circle';

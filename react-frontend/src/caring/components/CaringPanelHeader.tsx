@@ -6,8 +6,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant } from '@/contexts';
-import {
-  Button, Avatar } from '@heroui/react';
+
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Bell from 'lucide-react/icons/bell';
 import LogOut from 'lucide-react/icons/log-out';
@@ -15,12 +14,7 @@ import Menu from 'lucide-react/icons/menu';
 import User from 'lucide-react/icons/user';
 import { resolveAvatarUrl } from '@/lib/helpers';
 
-import { Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-} from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Avatar } from '@/components/ui';
 interface CaringPanelHeaderProps {
   sidebarCollapsed: boolean;
   onSidebarToggle?: () => void;

@@ -10,18 +10,8 @@
  * Provides options: Online, Away, Do Not Disturb, and Custom status.
  */
 
-import {
-  useState,
-  useCallback } from 'react';
-import {
-  Input,
-  Button,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-} from '@heroui/react';
+import { useState, useCallback } from 'react';
+
 import Circle from 'lucide-react/icons/circle';
 import Moon from 'lucide-react/icons/moon';
 import MinusCircle from 'lucide-react/icons/circle-minus';
@@ -32,12 +22,7 @@ import { usePresenceOptional,
   type PresenceStatus } from '@/contexts/PresenceContext';
 import { useAuth } from '@/contexts/AuthContext';
 
-import { Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-} from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 interface StatusSelectorProps {
   /** Optional trigger element (defaults to a small status dot button) */
   children?: React.ReactNode;

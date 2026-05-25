@@ -9,15 +9,7 @@
  */
 
 import { useState } from 'react';
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  Textarea,
-} from '@heroui/react';
+
 import Send from 'lucide-react/icons/send';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
@@ -26,6 +18,7 @@ import { logError } from '@/lib/logger';
 import { QuotedPostEmbed, type QuotedPostData } from './QuotedPostEmbed';
 import type { FeedItem } from './types';
 import { getAuthor } from './types';
+import { Button, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 
 interface QuotePostModalProps {
   isOpen: boolean;

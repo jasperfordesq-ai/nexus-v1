@@ -16,9 +16,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Button } from '@heroui/react';
-import Handshake from 'lucide-react/icons/handshake';
+import { motion } from 'framer-motion';import Handshake from 'lucide-react/icons/handshake';
 import Clock from 'lucide-react/icons/clock';
 import Users from 'lucide-react/icons/users';
 import Heart from 'lucide-react/icons/heart';
@@ -30,7 +28,7 @@ import Gem from 'lucide-react/icons/gem';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Network from 'lucide-react/icons/network';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
 import { useTenant, useAuth } from '@/contexts';

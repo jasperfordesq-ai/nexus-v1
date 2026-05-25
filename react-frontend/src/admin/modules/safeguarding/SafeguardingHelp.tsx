@@ -15,34 +15,22 @@
  * system behaviour changes.
  */
 
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from '@heroui/react';
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
-import { useTranslation } from 'react-i18next';
 import BookOpen from 'lucide-react/icons/book-open';
-import Shield from 'lucide-react/icons/shield';
+import Clock from 'lucide-react/icons/clock';
+import Eye from 'lucide-react/icons/eye';
+import FileText from 'lucide-react/icons/file-text';
 import Flag from 'lucide-react/icons/flag';
-import Zap from 'lucide-react/icons/zap';
+import Scale from 'lucide-react/icons/scale';
+import Shield from 'lucide-react/icons/shield';
 import UserCheck from 'lucide-react/icons/user-check';
 import Users from 'lucide-react/icons/users';
-import Scale from 'lucide-react/icons/scale';
-import Clock from 'lucide-react/icons/clock';
-import FileText from 'lucide-react/icons/file-text';
-import Eye from 'lucide-react/icons/eye';
+import Zap from 'lucide-react/icons/zap';
+import { useTranslation } from 'react-i18next';
 
-import { Accordion,
-  AccordionItem,
-} from '@/components/ui';
+import { Accordion, AccordionItem, Card, CardBody, CardHeader, Chip } from '@/components/ui';
+
 export function SafeguardingHelp() {
   const { t } = useTranslation('admin');
   const triggerRows = [

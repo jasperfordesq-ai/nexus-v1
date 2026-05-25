@@ -8,9 +8,7 @@
  * Read-only DataTable of consent records.
  */
 
-import { useEffect, useState, useCallback } from 'react';
-import { Button, Chip } from '@heroui/react';
-import RefreshCw from 'lucide-react/icons/refresh-cw';
+import { useEffect, useState, useCallback } from 'react';import RefreshCw from 'lucide-react/icons/refresh-cw';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
 import { useToast } from '@/contexts';
@@ -20,6 +18,7 @@ import { PageHeader, DataTable } from '../../components';
 import type { Column } from '../../components';
 import type { GdprConsent } from '../../api/types';
 import { useTranslation } from 'react-i18next';
+import { Button, Chip } from '@/components/ui';
 
 export function GdprConsents() {
   const { t } = useTranslation('admin');

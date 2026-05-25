@@ -1,17 +1,7 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Matching Configuration Page
- * Admin form for configuring Smart Matching algorithm weights,
- * proximity bands, and algorithm toggles.
- */
-
+import { Card, CardBody, CardHeader, Input, Button, Spinner } from '@/components/ui';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Input, Button, Slider, Switch, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+import { Slider, Switch, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
@@ -22,8 +12,17 @@ import { useTenant, useToast } from '@/contexts';
 import { adminMatching } from '../../api/adminApi';
 import { PageHeader, ConfirmModal } from '../../components';
 import type { SmartMatchingConfig } from '../../api/types';
-
 import { useTranslation } from 'react-i18next';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Matching Configuration Page
+ * Admin form for configuring Smart Matching algorithm weights, * proximity bands, and algorithm toggles.
+ */
+
 /** Proximity band label mapping */
 const BAND_LABEL_KEYS = ['matching.band_walking', 'matching.band_local', 'matching.band_city', 'matching.band_regional', 'matching.band_max'];
 

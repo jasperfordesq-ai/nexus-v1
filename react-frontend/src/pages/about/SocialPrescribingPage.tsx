@@ -16,9 +16,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Button } from '@heroui/react';
-import HeartPulse from 'lucide-react/icons/heart-pulse';
+import { motion } from 'framer-motion';import HeartPulse from 'lucide-react/icons/heart-pulse';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import Users from 'lucide-react/icons/users';
@@ -32,7 +30,7 @@ import TrendingUp from 'lucide-react/icons/trending-up';
 import Stethoscope from 'lucide-react/icons/stethoscope';
 import Mail from 'lucide-react/icons/mail';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
 import { useTenant } from '@/contexts';

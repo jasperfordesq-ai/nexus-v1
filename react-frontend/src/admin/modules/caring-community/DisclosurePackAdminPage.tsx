@@ -1,10 +1,6 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Tab, Tabs, Textarea, Tooltip } from '@heroui/react';
+import { Tab, Tabs, Tooltip } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Download from 'lucide-react/icons/download';
 import FileText from 'lucide-react/icons/file-text';
@@ -17,6 +13,11 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { Abbr, PageHeader } from '../../components';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 
 interface DisclosurePack {
   controller: { name: string; address: string; contact_email: string; data_protection_officer: string };

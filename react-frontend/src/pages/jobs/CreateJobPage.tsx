@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -13,8 +13,7 @@ import { Select, SelectItem } from '@/components/ui';
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import {
-  Button, Input, Textarea, Switch, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tooltip, Avatar } from '@heroui/react';
+import { Switch, Tooltip } from '@heroui/react';
 import Briefcase from 'lucide-react/icons/briefcase';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Info from 'lucide-react/icons/info';
@@ -34,13 +33,6 @@ import MapPin from 'lucide-react/icons/map-pin';
 import Calendar from 'lucide-react/icons/calendar';
 import DollarSign from 'lucide-react/icons/dollar-sign';
 import { useTranslation } from 'react-i18next';
-import { GlassCard,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-} from '@/components/ui';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

@@ -1,24 +1,6 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * A3 - Hours Reports
- *
- * Reports on hours exchanged, grouped by category, member, or period.
- * - Hours by category pie/bar chart
- * - Hours by member table (given/received/balance)
- * - Monthly trend chart
- * - Summary stats cards (total hours, avg per member, etc.)
- *
- * API: GET /api/v2/admin/reports/hours?group_by=category|member|period|summary
- */
-
+import { Card, CardBody, CardHeader, Spinner, Button, Input, Chip, Select, SelectItem, Avatar } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
-import {
-  Card, CardBody, CardHeader, Spinner, Button, Input, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Avatar, Chip } from '@heroui/react';
+import { Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import {
   BarChart,
   Bar,
@@ -49,6 +31,23 @@ import { api, tokenManager } from '@/lib/api';
 import { CHART_COLORS, CHART_COLOR_MAP } from '@/lib/chartColors';
 import { StatCard, PageHeader } from '../../components';
 import { useTranslation } from 'react-i18next';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * A3 - Hours Reports
+ *
+ * Reports on hours exchanged, grouped by category, member, or period.
+ * - Hours by category pie/bar chart
+ * - Hours by member table (given/received/balance)
+ * - Monthly trend chart
+ * - Summary stats cards (total hours, avg per member, etc.)
+ *
+ * API: GET /api/v2/admin/reports/hours?group_by=category|member|period|summary
+ */
+
 
 // ---------------------------------------------------------------------------
 // Types

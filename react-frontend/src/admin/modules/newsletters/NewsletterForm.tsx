@@ -1,17 +1,6 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Newsletter Create/Edit Form
- * Full parity with PHP Admin\NewsletterController::create() / edit()
- * Includes: send, test send, recipient preview, A/B testing, recurring, geo/group targeting
- */
-
+import { Card, CardBody, CardHeader, Input, Button, Chip, Spinner, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
-import { Card, CardBody, CardHeader, Input, Button, Switch, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tooltip, Spinner } from '@heroui/react';
+import { Switch, Tooltip } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Save from 'lucide-react/icons/save';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -32,6 +21,17 @@ import { useTenant, useToast } from '@/contexts';
 import { logError } from '@/lib/logger';
 import { adminNewsletters } from '../../api/adminApi';
 import { PageHeader } from '../../components';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Newsletter Create/Edit Form
+ * Full parity with PHP Admin\NewsletterController::create() / edit()
+ * Includes: send, test send, recipient preview, A/B testing, recurring, geo/group targeting
+ */
+
 
 const RichTextEditor = lazy(() =>
   import('../../components/RichTextEditor').then((m) => ({ default: m.RichTextEditor })),

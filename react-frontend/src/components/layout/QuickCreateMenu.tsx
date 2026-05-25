@@ -11,12 +11,7 @@
 
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Modal,
-  ModalContent,
-  ModalBody,
-  Button,
-} from '@heroui/react';
+
 import ListTodo from 'lucide-react/icons/list-todo';
 import Calendar from 'lucide-react/icons/calendar';
 import Users from 'lucide-react/icons/users';
@@ -26,6 +21,7 @@ import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import type { TenantFeatures, TenantModules } from '@/types/api';
+import { Button, Modal, ModalContent, ModalBody } from '@/components/ui';
 
 interface QuickCreateMenuProps {
   isOpen: boolean;

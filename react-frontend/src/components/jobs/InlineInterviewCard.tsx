@@ -1,9 +1,3 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-import { Button, Chip } from '@heroui/react';
 import Calendar from 'lucide-react/icons/calendar';
 import Clock from 'lucide-react/icons/clock';
 import MapPin from 'lucide-react/icons/map-pin';
@@ -12,7 +6,7 @@ import XCircle from 'lucide-react/icons/circle-x';
 import Video from 'lucide-react/icons/video';
 import CalendarPlus from 'lucide-react/icons/calendar-plus';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip } from '@/components/ui';
 import { API_BASE } from '@/lib/api';
 import type { InlineInterview } from './JobDetailTypes';
 

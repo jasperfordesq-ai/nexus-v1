@@ -5,20 +5,13 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  Input,
-  Textarea,
-  Switch,
-} from '@heroui/react';
+import { Switch } from '@heroui/react';
 import { useToast } from '@/contexts/ToastContext';
 import { adminLegalDocs } from '@/admin/api/adminApi';
 import type { LegalDocumentVersion } from '@/admin/api/types';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import { LegalDocEditor } from '@/admin/components';
+import { Button, Input, Textarea, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 
 interface LegalDocVersionFormProps {
   documentId: number;

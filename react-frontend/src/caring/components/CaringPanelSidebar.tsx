@@ -6,7 +6,7 @@
 import { useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Button, Input, Tooltip } from '@heroui/react';
+import { Tooltip } from '@heroui/react';
 import { useAuth, useTenant } from '@/contexts';
 import { hasFullCaringAccess } from '../access';
 import Heart from 'lucide-react/icons/heart';
@@ -47,6 +47,7 @@ import Settings from 'lucide-react/icons/settings';
 import HelpCircle from 'lucide-react/icons/help-circle';
 import Search from 'lucide-react/icons/search';
 import X from 'lucide-react/icons/x';
+import { Button, Input } from '@/components/ui';
 
 interface CaringPanelSidebarProps {
   collapsed: boolean;

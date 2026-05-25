@@ -107,7 +107,6 @@ vi.mock('@/lib/api', () => ({
   tokenManager: { getTenantId: vi.fn() },
 }));
 
-
 // Stable references — CRITICAL: useAuth/useTenant/useToast must return the SAME object
 // reference on every call to prevent useEffect dependency loops.
 // SettingsPage's main useEffect has [user, ...loadFns] deps — if user changes reference

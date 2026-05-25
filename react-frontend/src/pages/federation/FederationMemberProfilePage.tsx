@@ -13,8 +13,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import {
-  Button, Avatar, Chip, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea, Tooltip } from '@heroui/react';
+import { Tooltip } from '@heroui/react';
 import Globe from 'lucide-react/icons/globe';
 import MapPin from 'lucide-react/icons/map-pin';
 import MessageSquare from 'lucide-react/icons/message-square';
@@ -29,7 +28,7 @@ import UserPlus from 'lucide-react/icons/user-plus';
 import Coins from 'lucide-react/icons/coins';
 import Star from 'lucide-react/icons/star';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, useDisclosure } from '@/components/ui';
+import { GlassCard, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { PageMeta } from '@/components/seo';
 import { FederatedTrustBadge, FederationReviewsPanel } from '@/components/federation';

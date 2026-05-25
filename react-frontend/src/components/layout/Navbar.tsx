@@ -10,20 +10,9 @@
  * Theme-aware styling for light and dark modes.
  */
 
-import {
-  useState,
-  useEffect,
-  useMemo,
-  useCallback,
-  useRef } from 'react';
-import { Link,
-  NavLink,
-  useNavigate,
-  useLocation } from 'react-router-dom';
-import {
-  Button,
-  Avatar,
-} from '@heroui/react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
+
 import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
 import ListTodo from 'lucide-react/icons/list-todo';
 import MessageSquare from 'lucide-react/icons/message-square';
@@ -96,12 +85,7 @@ import { useHeaderScroll } from '@/hooks/useHeaderScroll';
 import { CARING_COMMUNITY_ROUTE } from '@/pages/caring-community/config';
 import type { TenantFeatures } from '@/types/api';
 
-import { Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-} from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Avatar } from '@/components/ui';
 interface IdentityStatusResponse {
   has_id_verified_badge: boolean;
 }

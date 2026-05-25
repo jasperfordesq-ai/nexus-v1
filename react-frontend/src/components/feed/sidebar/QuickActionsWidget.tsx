@@ -7,15 +7,13 @@
  * QuickActionsWidget - Shows quick action buttons in the sidebar
  */
 
-import { Link } from 'react-router-dom';
-import { Button } from '@heroui/react';
-import Plus from 'lucide-react/icons/plus';
+import { Link } from 'react-router-dom';import Plus from 'lucide-react/icons/plus';
 import CalendarDays from 'lucide-react/icons/calendar-days';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import Target from 'lucide-react/icons/target';
 import UsersRound from 'lucide-react/icons/users-round';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button } from '@/components/ui';
 import { useAuth, useTenant } from '@/contexts';
 
 export function QuickActionsWidget() {

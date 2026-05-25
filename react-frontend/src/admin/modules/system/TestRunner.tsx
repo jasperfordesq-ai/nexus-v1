@@ -1,3 +1,13 @@
+import { Card, CardBody, CardHeader, Button, Chip } from '@/components/ui';
+import { useState } from 'react';
+import FlaskConical from 'lucide-react/icons/flask-conical';
+import Play from 'lucide-react/icons/play';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import { usePageTitle } from '@/hooks';
+import { useToast } from '@/contexts';
+import { PageHeader } from '../../components';
+import { adminTools } from '../../api/adminApi';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -8,16 +18,6 @@
  * Run API health checks and integration tests from the admin panel.
  */
 
-import { useState } from 'react';
-import { Card, CardBody, CardHeader, Button, Chip } from '@heroui/react';
-import FlaskConical from 'lucide-react/icons/flask-conical';
-import Play from 'lucide-react/icons/play';
-import CheckCircle from 'lucide-react/icons/circle-check-big';
-import XCircle from 'lucide-react/icons/circle-x';
-import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
-import { PageHeader } from '../../components';
-import { adminTools } from '../../api/adminApi';
 
 interface TestResult {
   name: string;

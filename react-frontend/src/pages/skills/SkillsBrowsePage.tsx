@@ -10,7 +10,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button, Input, Chip, Spinner, Avatar } from '@heroui/react';
+
 import Sparkles from 'lucide-react/icons/sparkles';
 import Search from 'lucide-react/icons/search';
 import ChevronRight from 'lucide-react/icons/chevron-right';
@@ -26,7 +26,7 @@ import Settings from 'lucide-react/icons/settings';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner, Input, Avatar } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';

@@ -1,26 +1,9 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Smart Matching Overview
- * Dashboard showing algorithm configuration summary, matching stats,
- * and quick actions for the Smart Matching admin module.
- */
-
+import { Card, CardBody, CardHeader, Button, Chip, Spinner, Progress } from '@/components/ui';
 import {
   useState,
   useCallback,
   useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Chip,
-  Spinner,
-} from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Settings from 'lucide-react/icons/settings';
 import BarChart3 from 'lucide-react/icons/chart-column';
@@ -37,9 +20,17 @@ import { useTenant, useToast } from '@/contexts';
 import { adminMatching } from '../../api/adminApi';
 import { StatCard, PageHeader, ConfirmModal } from '../../components';
 import type { SmartMatchingConfig, MatchingStatsResponse } from '../../api/types';
-
 import { useTranslation } from 'react-i18next';
-import { Progress } from '@/components/ui';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Smart Matching Overview
+ * Dashboard showing algorithm configuration summary, matching stats, * and quick actions for the Smart Matching admin module.
+ */
+
 /** Weight metadata for display */
 const WEIGHT_META: Array<{
   key: keyof Pick<SmartMatchingConfig,

@@ -1,17 +1,5 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * ConditionBadge - Item condition indicator chip
- *
- * Maps condition values to color-coded HeroUI Chips for
- * visual differentiation of marketplace item conditions.
- */
-
-import { Chip } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
+import { Chip } from '@/components/ui';
 
 interface ConditionBadgeProps {
   condition: string | null;

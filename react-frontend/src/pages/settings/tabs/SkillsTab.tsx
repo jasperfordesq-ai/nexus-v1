@@ -3,9 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect, useCallback } from 'react';
-import { Spinner } from '@heroui/react';
-import { GlassCard } from '@/components/ui';
+import { useState, useEffect, useCallback } from 'react';import { GlassCard, Spinner } from '@/components/ui';
 import { SkillSelector } from '@/components/skills/SkillSelector';
 import type { UserSkill } from '@/components/skills/SkillSelector';
 import { useTranslation } from 'react-i18next';

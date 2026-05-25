@@ -12,15 +12,14 @@
  * - Poster from thumbnail_url if available.
  */
 
-import { useRef, useState, useEffect, useCallback, type KeyboardEvent } from 'react';
-import { Button } from '@heroui/react';
-import Play from 'lucide-react/icons/play';
+import { useRef, useState, useEffect, useCallback, type KeyboardEvent } from 'react';import Play from 'lucide-react/icons/play';
 import Volume2 from 'lucide-react/icons/volume-2';
 import VolumeX from 'lucide-react/icons/volume-x';
 import VideoOff from 'lucide-react/icons/video-off';
 import { useTranslation } from 'react-i18next';
 import { resolveAssetUrl } from '@/lib/helpers';
 import type { PostMedia } from './types';
+import { Button } from '@/components/ui';
 
 interface VideoPlayerProps {
   media: PostMedia;

@@ -17,7 +17,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, Slider, Spinner, Chip } from '@heroui/react';
+import { Slider } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ClipboardCheck from 'lucide-react/icons/clipboard-check';
 import Smile from 'lucide-react/icons/smile';
@@ -29,7 +29,7 @@ import Star from 'lucide-react/icons/star';
 import Clock from 'lucide-react/icons/clock';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import MessageSquare from 'lucide-react/icons/message-square';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

@@ -1,31 +1,9 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
+import { Card, CardBody, CardHeader, Button, Spinner, Input, Progress, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import {
   useState,
   useEffect,
   useCallback } from 'react';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Spinner,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Input,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-} from '@heroui/react';
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import Users from 'lucide-react/icons/users';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import AlertCircle from 'lucide-react/icons/circle-alert';
@@ -37,7 +15,11 @@ import { useToast } from '@/contexts/ToastContext';
 import { adminLegalDocs } from '@/admin/api/adminApi';
 import type { ComplianceStats, UserAcceptance } from '@/admin/api/types';
 import { useAdminPageMeta } from '../../AdminMetaContext';
-import { Progress } from '@/components/ui';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 
 export default function LegalDocComplianceDashboard() {
   const { t } = useTranslation('admin');

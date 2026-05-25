@@ -1,19 +1,5 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * OrderStatusBadge — Renders a HeroUI Chip for marketplace order statuses.
- *
- * Maps each order status to a semantic color:
- *   pending_payment → warning, paid → primary, shipped → secondary,
- *   delivered → success, completed → success, disputed → danger,
- *   refunded → default, cancelled → default
- */
-
-import { Chip } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
+import { Chip } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

@@ -1,3 +1,4 @@
+import { Button, Chip, Card, CardBody, GlassCard, BottomSheet, ConfettiCelebration, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -13,14 +14,7 @@ import {
   Link } from 'react-router-dom';
 import { motion,
   AnimatePresence } from 'framer-motion';
-import { Button,
-  Avatar,
-  Chip,
-  Tooltip,
-  Skeleton,
-  Card,
-  CardBody,
-} from '@heroui/react';
+import { Tooltip, Skeleton } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Heart from 'lucide-react/icons/heart';
 import MessageCircle from 'lucide-react/icons/message-circle';
@@ -48,15 +42,6 @@ import Pencil from 'lucide-react/icons/pencil';
 import ThumbsDown from 'lucide-react/icons/thumbs-down';
 import Landmark from 'lucide-react/icons/landmark';
 import { useTranslation } from 'react-i18next';
-import { GlassCard,
-  BottomSheet,
-  ConfettiCelebration,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-} from '@/components/ui';
 import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -1513,7 +1498,7 @@ const FeedCard = React.memo(function FeedCard({
           </div>
         )}
 
-        {/* Divider before actions */}
+        {/* Separator before actions */}
         <Separator className="mb-1" />
 
         {/* Action Buttons — reactions + comment as primary; share + bookmark as ghost icon-only secondary actions */}

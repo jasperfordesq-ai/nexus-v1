@@ -1,4 +1,3 @@
-import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,8 +9,6 @@ import { Select, SelectItem } from '@/components/ui';
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import {
-  Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, Input, Card, CardBody, CardHeader } from '@heroui/react';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
@@ -27,6 +24,23 @@ import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
 import { DataTable, PageHeader, StatCard, EmptyState, type Column } from '../../components';
 import { useTranslation } from 'react-i18next';
+
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Chip,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Select,
+  SelectItem,
+  Textarea,
+} from '@/components/ui';
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 

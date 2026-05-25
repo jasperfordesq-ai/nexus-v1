@@ -1,4 +1,20 @@
-import { Select, SelectItem, useDisclosure } from '@/components/ui';
+import { Card, CardBody, CardHeader, Spinner, Button, Chip, Textarea, Input, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
+import { useState, useEffect, useCallback } from 'react';
+import { Pagination, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Switch } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
+import Shield from 'lucide-react/icons/shield';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import XCircle from 'lucide-react/icons/circle-x';
+import Clock from 'lucide-react/icons/clock';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Settings from 'lucide-react/icons/settings';
+import Filter from 'lucide-react/icons/filter';
+import { usePageTitle } from '@/hooks';
+import { useToast } from '@/contexts/ToastContext';
+import { api } from '@/lib/api';
+import { StatCard, PageHeader } from '../../components';
+import { useTranslation } from 'react-i18next';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -19,23 +35,7 @@ import { Select, SelectItem, useDisclosure } from '@/components/ui';
  *      PUT  /api/v2/admin/moderation/settings
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { Card, CardBody, CardHeader, Spinner, Button, Pagination, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Avatar, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, Switch, Input } from '@heroui/react';
-import { Separator } from '@heroui-v3/react';
-import Shield from 'lucide-react/icons/shield';
-import RefreshCw from 'lucide-react/icons/refresh-cw';
-import CheckCircle from 'lucide-react/icons/circle-check-big';
-import XCircle from 'lucide-react/icons/circle-x';
-import Clock from 'lucide-react/icons/clock';
-import AlertTriangle from 'lucide-react/icons/triangle-alert';
-import Settings from 'lucide-react/icons/settings';
-import Filter from 'lucide-react/icons/filter';
-import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts/ToastContext';
-import { api } from '@/lib/api';
-import { StatCard, PageHeader } from '../../components';
 
-import { useTranslation } from 'react-i18next';
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------

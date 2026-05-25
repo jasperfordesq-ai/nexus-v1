@@ -12,10 +12,7 @@
 
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import {
-  Input } from '@heroui/react';
-import Rocket from 'lucide-react/icons/rocket';
+import { motion } from 'framer-motion';import Rocket from 'lucide-react/icons/rocket';
 import Wallet from 'lucide-react/icons/wallet';
 import Handshake from 'lucide-react/icons/handshake';
 import Trophy from 'lucide-react/icons/trophy';
@@ -27,8 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
-import {
-  GlassCard, Accordion, AccordionItem } from '@/components/ui';
+import { GlassCard, Accordion, AccordionItem, Input } from '@/components/ui';
 
 interface FaqItem {
   question: string;

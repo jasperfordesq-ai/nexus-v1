@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure } from '@/components/ui';
+import { Button, Chip, Input, Textarea, Card, CardBody, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,8 +10,7 @@ import { Select, SelectItem, useDisclosure } from '@/components/ui';
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import {
-  Button, Chip, Input, Textarea, Switch, Tab, Tabs, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Card, CardBody, Checkbox, RadioGroup, Radio } from '@heroui/react';
+import { Switch, Tab, Tabs, Checkbox, RadioGroup, Radio } from '@heroui/react';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Plus from 'lucide-react/icons/plus';
 import Edit2 from 'lucide-react/icons/pen';
@@ -367,7 +366,6 @@ function CustomFieldsTab() {
     }
     setLoading(false);
   }, [toast, t]);
-
 
   useEffect(() => { loadData(); }, [loadData]);
 
@@ -1099,7 +1097,6 @@ function WebhooksTab() {
     }
     setLoading(false);
   }, [toast, t]);
-
 
   useEffect(() => { loadData(); }, [loadData]);
 

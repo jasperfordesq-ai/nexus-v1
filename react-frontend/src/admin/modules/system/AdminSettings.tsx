@@ -1,16 +1,6 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Admin Settings
- * Global platform configuration and settings management.
- */
-
+import { Card, CardBody, CardHeader, Input, Button, Textarea, Spinner, Chip, Select, SelectItem } from '@/components/ui';
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Card, CardBody, CardHeader, Input, Switch, Button, Textarea, Spinner, Chip, Tooltip } from '@heroui/react';
+import { Switch, Tooltip } from '@heroui/react';
 import Settings from 'lucide-react/icons/settings';
 import Save from 'lucide-react/icons/save';
 import ShieldCheck from 'lucide-react/icons/shield-check';
@@ -26,6 +16,16 @@ import { PageHeader } from '../../components';
 import { adminSettings } from '../../api/adminApi';
 import type { AdminSettingsResponse } from '../../api/types';
 import SystemConfig from '../enterprise/SystemConfig';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Admin Settings
+ * Global platform configuration and settings management.
+ */
+
 
 // Keys handled directly by the cards above — excluded from the embedded
 // SystemConfig editor below to avoid duplicate controls.

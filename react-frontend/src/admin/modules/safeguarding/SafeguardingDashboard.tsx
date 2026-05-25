@@ -1,20 +1,9 @@
-import { useDisclosure } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Safeguarding Dashboard (MS2)
- * Admin page for reviewing flagged messages, managing guardian assignments,
- * and monitoring safeguarding of vulnerable users (wards).
- */
-
+import { Card, CardBody, CardHeader, Button, Spinner, Chip, Textarea, Input, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
-import { Card, CardBody, CardHeader, Button, Spinner, Chip, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, Input, Avatar } from '@heroui/react';
+import { Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Shield from 'lucide-react/icons/shield';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
@@ -39,6 +28,16 @@ import { formatRelativeTime } from '@/lib/helpers';
 import { PageHeader } from '../../components';
 import { StatCard } from '../../components';
 import { SafeguardingHelp } from './SafeguardingHelp';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Safeguarding Dashboard (MS2)
+ * Admin page for reviewing flagged messages, managing guardian assignments, * and monitoring safeguarding of vulnerable users (wards).
+ */
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

@@ -1,3 +1,4 @@
+import { Card, CardBody, CardHeader, CardFooter, Button, Chip, Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +11,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardBody, CardHeader, CardFooter, Button, Chip, Spinner, ButtonGroup } from '@heroui/react';
+import { ButtonGroup } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Check from 'lucide-react/icons/check';
 import { useTranslation } from 'react-i18next';
@@ -54,7 +55,6 @@ export function PlanSelector() {
       setLoading(false);
     }
   }, [t, toast]);
-
 
   useEffect(() => {
     loadData();

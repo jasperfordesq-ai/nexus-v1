@@ -1,17 +1,6 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Menu Builder
- * Visual menu builder with drag-drop reordering, drag-to-nest, live preview,
- * icon picker, visibility rules editor, page/route pickers, and nested item support.
- */
-
+import { Card, CardBody, CardHeader, Input, Button, Spinner, Chip, Select, SelectItem, DynamicIcon } from '@/components/ui';
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Card, CardBody, CardHeader, Input, Button, Spinner, Switch, Chip } from '@heroui/react';
+import { Switch } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Menu from 'lucide-react/icons/menu';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -47,10 +36,19 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useTenant, useToast } from '@/contexts';
-import { DynamicIcon } from '@/components/ui';
 import { adminMenus, adminPages } from '../../api/adminApi';
 import { PageHeader, IconPicker, VisibilityRulesEditor, ConfirmModal } from '../../components';
 import type { MenuItemType, MenuLocation, VisibilityRules } from '@/types/menu';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Menu Builder
+ * Visual menu builder with drag-drop reordering, drag-to-nest, live preview, * icon picker, visibility rules editor, page/route pickers, and nested item support.
+ */
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────

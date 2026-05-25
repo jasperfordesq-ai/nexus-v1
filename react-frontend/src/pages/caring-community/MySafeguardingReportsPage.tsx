@@ -4,12 +4,10 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useState, type JSX } from 'react';
-import { Link, Navigate } from 'react-router-dom';
-import { Button, Chip, Spinner } from '@heroui/react';
-import ArrowLeft from 'lucide-react/icons/arrow-left';
+import { Link, Navigate } from 'react-router-dom';import ArrowLeft from 'lucide-react/icons/arrow-left';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';

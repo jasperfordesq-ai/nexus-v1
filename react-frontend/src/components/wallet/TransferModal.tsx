@@ -11,8 +11,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion } from 'framer-motion';
-import {
-  Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, Textarea, Avatar, Spinner } from '@heroui/react';
+
 import X from 'lucide-react/icons/x';
 import Send from 'lucide-react/icons/send';
 import Search from 'lucide-react/icons/search';
@@ -24,6 +23,7 @@ import { logError } from '@/lib/logger';
 import { useToast } from '@/contexts';
 import { CategorySelect } from './CategorySelect';
 import type { WalletUserSearchResult, Transaction } from '@/types/api';
+import { Button, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

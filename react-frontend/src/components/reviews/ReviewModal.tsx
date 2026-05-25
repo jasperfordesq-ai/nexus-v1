@@ -8,21 +8,13 @@
  */
 
 import { useState } from 'react';
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  Textarea,
-  Avatar,
-} from '@heroui/react';
+
 import Star from 'lucide-react/icons/star';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
+import { Button, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 
 interface ReviewModalProps {
   isOpen: boolean;

@@ -11,10 +11,8 @@
 import { Component, type ReactNode, type ErrorInfo } from 'react';
 import { motion } from 'framer-motion';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
-import RefreshCw from 'lucide-react/icons/refresh-cw';
-import { Button } from '@heroui/react';
-import i18n from 'i18next';
-import { GlassCard } from '@/components/ui';
+import RefreshCw from 'lucide-react/icons/refresh-cw';import i18n from 'i18next';
+import { GlassCard, Button } from '@/components/ui';
 import { logError } from '@/lib/logger';
 
 interface FeatureErrorBoundaryProps {

@@ -15,7 +15,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Button, Popover, PopoverTrigger, PopoverContent } from '@heroui/react';
+import { Popover, PopoverTrigger, PopoverContent } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Bell from 'lucide-react/icons/bell';
 import BellOff from 'lucide-react/icons/bell-off';
@@ -26,6 +26,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui';
 /* ───────────────────────── Types ───────────────────────── */
 
 interface GoalReminder {

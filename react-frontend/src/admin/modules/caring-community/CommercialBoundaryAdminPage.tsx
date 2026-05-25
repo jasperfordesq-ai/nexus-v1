@@ -1,12 +1,6 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
+import { Button, Card, CardBody, CardHeader, Chip, Spinner, Select, SelectItem, Accordion, AccordionItem } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  Button, Card, CardBody, CardHeader, Chip, Spinner, Tooltip } from '@heroui/react';
+import { Tooltip } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Building from 'lucide-react/icons/building';
 import Download from 'lucide-react/icons/download';
@@ -22,10 +16,11 @@ import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { Abbr,
   PageHeader } from '../../components';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
 
-import { Accordion,
-  AccordionItem,
-} from '@/components/ui';
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------

@@ -1,3 +1,17 @@
+import { Card, CardBody, CardHeader, Button, Chip, Code } from '@/components/ui';
+import { useState } from 'react';
+import { Tabs, Tab } from '@heroui/react';
+import Server from 'lucide-react/icons/server';
+import Copy from 'lucide-react/icons/copy';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import PlayCircle from 'lucide-react/icons/circle-play';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import Info from 'lucide-react/icons/info';
+import { useTranslation } from 'react-i18next';
+import { usePageTitle } from '@/hooks';
+import { useToast } from '@/contexts';
+import { PageHeader } from '../../components';
+import { adminSystem } from '../../api/adminApi';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,28 +26,6 @@
  * duplicate email sends. This page reflects the single-trigger model.
  */
 
-import { useState } from 'react';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Tabs,
-  Tab,
-  Chip,
-} from '@heroui/react';
-import Server from 'lucide-react/icons/server';
-import Copy from 'lucide-react/icons/copy';
-import CheckCircle from 'lucide-react/icons/circle-check-big';
-import PlayCircle from 'lucide-react/icons/circle-play';
-import AlertTriangle from 'lucide-react/icons/triangle-alert';
-import Info from 'lucide-react/icons/info';
-import { useTranslation } from 'react-i18next';
-import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
-import { Code } from '@/components/ui';
-import { PageHeader } from '../../components';
-import { adminSystem } from '../../api/adminApi';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Component

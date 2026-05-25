@@ -5,7 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Skeleton, Chip } from '@heroui/react';
+import { Skeleton } from '@heroui/react';
 import Users from 'lucide-react/icons/users';
 import Clock from 'lucide-react/icons/clock';
 import Award from 'lucide-react/icons/award';
@@ -17,7 +17,7 @@ import Handshake from 'lucide-react/icons/handshake';
 import Zap from 'lucide-react/icons/zap';
 import Heart from 'lucide-react/icons/heart';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Chip } from '@/components/ui';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 

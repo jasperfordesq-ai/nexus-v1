@@ -1,3 +1,4 @@
+import { Card, CardBody, Chip, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,7 +13,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Avatar, Card, CardBody, Chip, Skeleton } from '@heroui/react';
+import { Skeleton } from '@heroui/react';
 import Globe from 'lucide-react/icons/globe';
 import MessageSquare from 'lucide-react/icons/message-square';
 import Star from 'lucide-react/icons/star';

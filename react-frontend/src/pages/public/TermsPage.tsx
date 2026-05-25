@@ -12,9 +12,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Button, Chip, Spinner } from '@heroui/react';
-import { Separator } from '@heroui-v3/react';
+import { motion } from 'framer-motion';import { Separator } from '@heroui-v3/react';
 import FileText from 'lucide-react/icons/file-text';
 import Clock from 'lucide-react/icons/clock';
 import Users from 'lucide-react/icons/users';
@@ -33,7 +31,7 @@ import CalendarDays from 'lucide-react/icons/calendar-days';
 import Info from 'lucide-react/icons/info';
 import CircleSlash from 'lucide-react/icons/circle-slash';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner } from '@/components/ui';
 import { CustomLegalDocument } from '@/components/legal/CustomLegalDocument';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { useTenant } from '@/contexts';

@@ -3,17 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  Button,
-  Input,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Chip,
-  Spinner,
-} from '@heroui/react';
+
 import Lock from 'lucide-react/icons/lock';
 import Key from 'lucide-react/icons/key';
 import LogOut from 'lucide-react/icons/log-out';
@@ -27,7 +17,7 @@ import ShieldCheck from 'lucide-react/icons/shield-check';
 import ShieldOff from 'lucide-react/icons/shield-off';
 import Copy from 'lucide-react/icons/copy';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { BiometricSettings } from '@/components/security/BiometricSettings';
 import { useTranslation } from 'react-i18next';
 

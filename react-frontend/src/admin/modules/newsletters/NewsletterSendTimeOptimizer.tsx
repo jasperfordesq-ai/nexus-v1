@@ -1,4 +1,13 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Select, SelectItem } from '@/components/ui';
+import { useState, useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import Clock from 'lucide-react/icons/clock';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import { usePageTitle } from '@/hooks';
+import { adminNewsletters } from '../../api/adminApi';
+import { PageHeader } from '../../components';
+import type { SendTimeData } from '../../api/types';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,17 +18,7 @@ import { Select, SelectItem } from '@/components/ui';
  * Heatmap visualization of optimal send times based on engagement data
  */
 
-import { useState, useCallback, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import {
-  Button, Card, CardBody, CardHeader, Chip } from '@heroui/react';
-import Clock from 'lucide-react/icons/clock';
-import RefreshCw from 'lucide-react/icons/refresh-cw';
-import TrendingUp from 'lucide-react/icons/trending-up';
-import { usePageTitle } from '@/hooks';
-import { adminNewsletters } from '../../api/adminApi';
-import { PageHeader } from '../../components';
-import type { SendTimeData } from '../../api/types';
+
 
 export function NewsletterSendTimeOptimizer() {
   const { t } = useTranslation('admin');

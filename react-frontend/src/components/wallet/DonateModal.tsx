@@ -10,20 +10,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion } from 'framer-motion';
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  Input,
-  Textarea,
-  RadioGroup,
-  Radio,
-  Avatar,
-  Spinner,
-} from '@heroui/react';
+import { RadioGroup, Radio } from '@heroui/react';
 import Heart from 'lucide-react/icons/heart';
 import Users from 'lucide-react/icons/users';
 import User from 'lucide-react/icons/user';
@@ -34,6 +21,7 @@ import { resolveAvatarUrl } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
 import { useToast } from '@/contexts';
 import type { WalletUserSearchResult } from '@/types/api';
+import { Button, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 
 interface DonateModalProps {
   isOpen: boolean;

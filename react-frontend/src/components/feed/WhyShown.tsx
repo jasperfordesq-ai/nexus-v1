@@ -12,10 +12,11 @@
  * Only renders in "For You" (ranking) mode, not chronological.
  */
 
-import { Popover, PopoverTrigger, PopoverContent, Button } from '@heroui/react';
+import { Popover, PopoverTrigger, PopoverContent } from '@heroui/react';
 import Info from 'lucide-react/icons/info';
 import { useTranslation } from 'react-i18next';
 import type { FeedItem } from './types';
+import { Button } from '@/components/ui';
 
 interface WhyShownProps {
   item: FeedItem;

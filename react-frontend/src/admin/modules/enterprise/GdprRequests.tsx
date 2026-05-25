@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Chip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,10 +10,7 @@ import { Select, SelectItem } from '@/components/ui';
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import {
-  Button, Chip } from '@heroui/react';
-import RefreshCw from 'lucide-react/icons/refresh-cw';
+import { useNavigate } from 'react-router-dom';import RefreshCw from 'lucide-react/icons/refresh-cw';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import Plus from 'lucide-react/icons/plus';
 import { useTenant,
@@ -27,12 +24,6 @@ import type { Column } from '../../components';
 import type { GdprRequest } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
-import { Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-} from '@/components/ui';
 const STATUS_OPTION_KEYS = ['all', 'pending', 'processing', 'completed', 'rejected'] as const;
 
 function SlaChip({ createdAt, t }: { createdAt: string; t: (key: string, opts?: Record<string, unknown>) => string }) {

@@ -1,3 +1,4 @@
+import { CardBody, Card, Button, Chip, Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,19 +10,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Card,
-  CardBody,
-  Button,
-  Chip,
-  Spinner,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-} from '@heroui/react';
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import Plus from 'lucide-react/icons/plus';
 import Tag from 'lucide-react/icons/tag';
 import Pencil from 'lucide-react/icons/pencil';

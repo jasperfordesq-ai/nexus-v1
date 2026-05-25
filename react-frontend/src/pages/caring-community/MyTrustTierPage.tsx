@@ -3,13 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  useEffect } from 'react';
-import { Link,
-  useNavigate } from 'react-router-dom';
-import { Button,
-  Skeleton,
-  } from '@heroui/react';
+import { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Skeleton } from '@heroui/react';
 import AlertCircle from 'lucide-react/icons/alert-circle';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CheckCircle2 from 'lucide-react/icons/check-circle-2';
@@ -17,9 +13,7 @@ import Circle from 'lucide-react/icons/circle';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import { useTranslation } from 'react-i18next';
 import { TrustTierBadge } from '@/components/caring-community/TrustTierBadge';
-import { GlassCard,
-  Progress,
-} from '@/components/ui';
+import { GlassCard, Progress, Button } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { useApi } from '@/hooks/useApi';

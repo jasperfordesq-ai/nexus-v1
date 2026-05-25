@@ -1,25 +1,7 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
+import { Button, Card, CardBody, CardHeader, Chip, Input, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Switch,
-  Textarea,
-} from '@heroui/react';
+import { Switch } from '@heroui/react';
 import Bot from 'lucide-react/icons/bot';
 import Brain from 'lucide-react/icons/brain';
 import Edit3 from 'lucide-react/icons/edit-3';
@@ -30,6 +12,11 @@ import { api } from '@/lib/api';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { EmptyState } from '../../components/EmptyState';
 import { PageHeader } from '../../components/PageHeader';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 
 interface AgentDefinition {
   id: number;

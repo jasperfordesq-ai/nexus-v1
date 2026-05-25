@@ -10,7 +10,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Input, Tabs, Tab, Avatar, Skeleton } from '@heroui/react';
+import { Tabs, Tab, Skeleton } from '@heroui/react';
 import Search from 'lucide-react/icons/search';
 import ListTodo from 'lucide-react/icons/list-todo';
 import User from 'lucide-react/icons/user';
@@ -20,7 +20,7 @@ import Clock from 'lucide-react/icons/clock';
 import MapPin from 'lucide-react/icons/map-pin';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, AlgorithmLabel } from '@/components/ui';
+import { GlassCard, AlgorithmLabel, Button, Input, Avatar } from '@/components/ui';
 import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
 import { SavedSearches } from '@/components/search/SavedSearches';

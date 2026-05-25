@@ -1,18 +1,6 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Admin Job Bias Audit Dashboard
- *
- * Displays hiring bias metrics including funnel visualization,
- * rejection rates by stage, time-in-stage analysis, and source
- * effectiveness comparison.
- */
-
+import { Card, CardBody, CardHeader, Chip, Button, Spinner, Input } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
-import { Card, CardBody, CardHeader, Chip, Button, Spinner, Input, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import Clock from 'lucide-react/icons/clock';
@@ -28,6 +16,18 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader, StatCard } from '../../components';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Admin Job Bias Audit Dashboard
+ *
+ * Displays hiring bias metrics including funnel visualization, * rejection rates by stage, time-in-stage analysis, and source
+ * effectiveness comparison.
+ */
+
 
 interface BiasReport {
   period: { from: string; to: string };

@@ -11,12 +11,13 @@
  * This is a NEXUS differentiator: pay with a mix of cash and time credits.
  */
 
-import { Tooltip, Chip } from '@heroui/react';
+import { Tooltip } from '@heroui/react';
 import Clock from 'lucide-react/icons/clock';
 import HelpCircle from 'lucide-react/icons/circle-help';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { useTenant } from '@/contexts';
+import { Chip } from '@/components/ui';
 
 interface HybridPriceDisplayProps {
   /** Cash price amount */

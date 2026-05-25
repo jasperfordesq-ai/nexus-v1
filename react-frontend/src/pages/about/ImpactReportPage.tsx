@@ -13,7 +13,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import FileText from 'lucide-react/icons/file-text';
 import BookOpen from 'lucide-react/icons/book-open';
 import BarChart3 from 'lucide-react/icons/chart-column';
@@ -35,7 +35,7 @@ import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import Wallet from 'lucide-react/icons/wallet';
 import Mail from 'lucide-react/icons/mail';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
 import { useTenant } from '@/contexts';

@@ -1,22 +1,11 @@
+import { CardBody, Card, Progress, Chip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  useState,
-  useEffect,
-  useCallback } from 'react';
-import { Card,
-  CardBody,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Chip,
-} from '@heroui/react';
+import { useState, useEffect, useCallback } from 'react';
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import Users from 'lucide-react/icons/users';
 import Target from 'lucide-react/icons/target';
@@ -25,7 +14,6 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { useToast } from '@/contexts/ToastContext';
 import { adminGroups } from '@/admin/api/adminApi';
 import type { GroupRecommendation } from '@/admin/api/types';
-import { Progress } from '@/components/ui';
 
 export default function GroupRecommendations() {
   const { t } = useTranslation('admin');

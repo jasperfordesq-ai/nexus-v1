@@ -9,9 +9,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
-import { Button, Chip } from '@heroui/react';
-import Award from 'lucide-react/icons/award';
+import { motion } from 'framer-motion';import Award from 'lucide-react/icons/award';
 import Download from 'lucide-react/icons/download';
 import Plus from 'lucide-react/icons/plus';
 import ExternalLink from 'lucide-react/icons/external-link';
@@ -20,7 +18,7 @@ import Clock from 'lucide-react/icons/clock';
 import Building2 from 'lucide-react/icons/building-2';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import QrCode from 'lucide-react/icons/qr-code';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { api, API_BASE } from '@/lib/api';
 import { logError } from '@/lib/logger';

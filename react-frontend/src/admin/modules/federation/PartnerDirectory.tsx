@@ -1,18 +1,6 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Partner Directory
- * Browse discoverable communities in the federation network.
- * Supports search, region/category filters, partnership requests.
- */
-
+import { Button, Card, CardBody, CardFooter, Chip, Input, Textarea, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import {
-  Button, Card, CardBody, CardFooter, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, Skeleton } from '@heroui/react';
+import { Skeleton } from '@heroui/react';
 import Globe from 'lucide-react/icons/globe';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Search from 'lucide-react/icons/search';
@@ -31,8 +19,19 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader, EmptyState } from '../../components';
-
 import { useTranslation } from 'react-i18next';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Partner Directory
+ * Browse discoverable communities in the federation network.
+ * Supports search, region/category filters, partnership requests.
+ */
+
+
 interface CommunityTopic {
   name: string;
   slug: string;

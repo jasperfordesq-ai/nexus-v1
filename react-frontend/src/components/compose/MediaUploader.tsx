@@ -15,9 +15,7 @@
  * - Upload progress (visual feedback during compression)
  */
 
-import { useRef, useState, useCallback, type DragEvent } from 'react';
-import { Button, Input } from '@heroui/react';
-import ImagePlus from 'lucide-react/icons/image-plus';
+import { useRef, useState, useCallback, type DragEvent } from 'react';import ImagePlus from 'lucide-react/icons/image-plus';
 import X from 'lucide-react/icons/x';
 import GripVertical from 'lucide-react/icons/grip-vertical';
 import Type from 'lucide-react/icons/type';
@@ -35,6 +33,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { compressImage } from '@/lib/compress-image';
+import { Button, Input } from '@/components/ui';
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */

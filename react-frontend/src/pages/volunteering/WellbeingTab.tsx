@@ -12,8 +12,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
-import {
-  Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea } from '@heroui/react';
+
 import Heart from 'lucide-react/icons/heart';
 import Activity from 'lucide-react/icons/activity';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
@@ -25,7 +24,7 @@ import TrendingDown from 'lucide-react/icons/trending-down';
 import Coffee from 'lucide-react/icons/coffee';
 import Sun from 'lucide-react/icons/sun';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Progress, useDisclosure } from '@/components/ui';
+import { GlassCard, Progress, useDisclosure, Button, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

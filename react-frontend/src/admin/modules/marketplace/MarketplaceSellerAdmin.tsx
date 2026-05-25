@@ -9,13 +9,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import {
-  Tabs,
-  Tab,
-  Button,
-  Chip,
-  Tooltip,
-} from '@heroui/react';
+import { Tabs, Tab, Tooltip } from '@heroui/react';
 import Store from 'lucide-react/icons/store';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import UserX from 'lucide-react/icons/user-x';
@@ -28,6 +22,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader, DataTable, ConfirmModal, EmptyState, type Column } from '../../components';
+import { Button, Chip } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

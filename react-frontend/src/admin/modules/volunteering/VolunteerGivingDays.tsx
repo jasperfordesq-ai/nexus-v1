@@ -1,16 +1,6 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Volunteer Giving Days & Donations
- * Admin page to manage giving day campaigns and view donation summaries.
- */
-
+import { Button, Chip, Card, CardBody, CardHeader, Input, Textarea, Spinner, Progress, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import {
-  Button, Chip, Card, CardBody, CardHeader, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea, Spinner, Avatar, Tab, Tabs } from '@heroui/react';
+import { Tab, Tabs } from '@heroui/react';
 import Gift from 'lucide-react/icons/gift';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Plus from 'lucide-react/icons/plus';
@@ -30,7 +20,16 @@ import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
 import { DataTable, PageHeader, StatCard, EmptyState, type Column } from '../../components';
 import { useTranslation } from 'react-i18next';
-import { Progress, useDisclosure } from '@/components/ui';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Volunteer Giving Days & Donations
+ * Admin page to manage giving day campaigns and view donation summaries.
+ */
+
 
 interface GivingDay {
   id: number;

@@ -1,17 +1,6 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Admin Gamification Analytics
- * Data-focused view of gamification stats and badge distribution.
- * Parity: PHP Admin\GamificationController@analytics
- */
-
+import { Card, CardBody, CardHeader, Button, Spinner } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Spinner } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Award from 'lucide-react/icons/award';
 import Users from 'lucide-react/icons/users';
@@ -23,6 +12,17 @@ import { useToast, useTenant } from '@/contexts';
 import { adminGamification } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
 import type { GamificationStats, BadgeDefinition } from '../../api/types';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Admin Gamification Analytics
+ * Data-focused view of gamification stats and badge distribution.
+ * Parity: PHP Admin\GamificationController@analytics
+ */
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Component

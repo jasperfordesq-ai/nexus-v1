@@ -14,22 +14,10 @@
  * - attention strip for operational items that need review
  */
 
-import {
-  Fragment,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState } from 'react';
-import { Link,
-  useLocation } from 'react-router-dom';
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Input,
-  ScrollShadow,
-  Tooltip,
-} from '@heroui/react';
+import { ScrollShadow, Tooltip } from '@heroui/react';
 import { useAuth,
   useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -107,9 +95,7 @@ import X from 'lucide-react/icons/x';
 import BellRing from 'lucide-react/icons/bell-ring';
 import type { LucideIcon } from 'lucide-react';
 
-import { Accordion,
-  AccordionItem,
-} from '@/components/ui';
+import { Accordion, AccordionItem, Button, Input } from '@/components/ui';
 interface NavItem {
   label: string;
   href: string;

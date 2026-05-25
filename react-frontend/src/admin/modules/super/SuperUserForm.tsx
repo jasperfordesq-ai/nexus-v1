@@ -1,13 +1,8 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
+import { Card, CardBody, CardHeader, Button, Input, Select, SelectItem } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Input, Switch } from '@heroui/react';
+import { Switch } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Save from 'lucide-react/icons/save';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -18,6 +13,11 @@ import { useTenant, useToast } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { SuperAdminUserDetail, SuperAdminTenant } from '../../api/types';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 
 export function SuperUserForm() {
   const { id } = useParams();

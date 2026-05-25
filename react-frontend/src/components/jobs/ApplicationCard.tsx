@@ -5,7 +5,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Button, Chip, Avatar } from '@heroui/react';
+
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
 import ChevronRight from 'lucide-react/icons/chevron-right';
@@ -16,6 +16,7 @@ import { formatDateTime, formatDateValue, resolveAvatarUrl } from '@/lib/helpers
 import { api } from '@/lib/api';
 import type { Application, HistoryEntry } from './JobDetailTypes';
 import { STATUS_COLORS } from './JobDetailTypes';
+import { Button, Chip, Avatar } from '@/components/ui';
 
 interface ApplicationCardProps {
   application: Application;

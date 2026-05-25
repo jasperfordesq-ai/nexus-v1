@@ -1,11 +1,6 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Select, SelectItem } from '@/components/ui';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from '@heroui/react';
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Building2 from 'lucide-react/icons/building-2';
 import Clock from 'lucide-react/icons/clock';
@@ -21,6 +16,11 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api, tokenManager } from '@/lib/api';
 import { Abbr, PageHeader, StatCard } from '../../components';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 
 // ---------------------------------------------------------------------------
 // Types

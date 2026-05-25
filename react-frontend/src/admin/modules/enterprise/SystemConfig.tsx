@@ -1,19 +1,7 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * System Configuration
- * Grouped settings editor with descriptions, validation, and reset-to-defaults.
- * Replaces the legacy flat key-value editor.
- */
-
+import { Card, CardBody, CardHeader, Input, Button, Spinner, Textarea, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Card, CardBody, CardHeader, Input, Button, Spinner, Switch, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tooltip } from '@heroui/react';
+import { Switch, Tooltip } from '@heroui/react';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import { useTenant } from '@/contexts';
 import Save from 'lucide-react/icons/save';
@@ -29,6 +17,17 @@ import Info from 'lucide-react/icons/info';
 import { useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
 import { useTranslation } from 'react-i18next';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * System Configuration
+ * Grouped settings editor with descriptions, validation, and reset-to-defaults.
+ * Replaces the legacy flat key-value editor.
+ */
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Config schema types

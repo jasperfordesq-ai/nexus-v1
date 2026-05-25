@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Chip, Button, Spinner, Textarea, Card, CardBody, Select, SelectItem, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,7 +11,7 @@ import { Select, SelectItem } from '@/components/ui';
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Tabs, Tab, Chip, Button, Tooltip, Avatar, Spinner, Textarea, Card, CardBody } from '@heroui/react';
+import { Tabs, Tab, Tooltip } from '@heroui/react';
 import Briefcase from 'lucide-react/icons/briefcase';
 import Star from 'lucide-react/icons/star';
 import StarOff from 'lucide-react/icons/star-off';
@@ -150,7 +150,6 @@ export function JobsAdmin() {
     finally { setLoading(false); }
   }, [page, status, search, toast, t]);
 
-
   useEffect(() => { loadJobs(); }, [loadJobs]);
 
   const loadApplications = useCallback(async (job: Job) => {
@@ -175,7 +174,6 @@ export function JobsAdmin() {
       } else { toast.error((res as { error?: string }).error ?? t('jobs.failed_update_application')); }
     } catch { toast.error(t('jobs.unexpected_error')); }
   }, [toast, loadJobs, t]);
-
 
   const handleFeatureToggle = async (job: Job) => {
     try {

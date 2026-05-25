@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -22,8 +22,7 @@ import { Select, SelectItem, useDisclosure } from '@/components/ui';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import {
-  Button, Chip, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea, Avatar, Tooltip } from '@heroui/react';
+import { Tooltip } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import ArrowBigUp from 'lucide-react/icons/arrow-big-up';
 import Lightbulb from 'lucide-react/icons/lightbulb';
@@ -51,13 +50,6 @@ import Target from 'lucide-react/icons/target';
 import Layers from 'lucide-react/icons/layers';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
-import { GlassCard,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-} from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { SocialInteractionPanel } from '@/components/social';
 import { useAuth, useToast, useTenant } from '@/contexts';

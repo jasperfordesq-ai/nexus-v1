@@ -3,10 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useTranslation } from 'react-i18next';
-import {
-  Button } from '@heroui/react';
-import Users from 'lucide-react/icons/users';
+import { useTranslation } from 'react-i18next';import Users from 'lucide-react/icons/users';
 import MessageSquare from 'lucide-react/icons/message-square';
 import Calendar from 'lucide-react/icons/calendar';
 import FolderTree from 'lucide-react/icons/folder-tree';
@@ -21,12 +18,7 @@ import ChevronDown from 'lucide-react/icons/chevron-down';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import { useTenant } from '@/contexts';
 
-import { Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-} from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button } from '@/components/ui';
 interface GroupTabNavProps {
   activeTab: string;
   userIsAdmin: boolean;

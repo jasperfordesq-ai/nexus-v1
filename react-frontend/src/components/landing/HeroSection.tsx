@@ -4,13 +4,12 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Button } from '@heroui/react';
-import ArrowRight from 'lucide-react/icons/arrow-right';
+import { motion } from 'framer-motion';import ArrowRight from 'lucide-react/icons/arrow-right';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import { useTranslation } from 'react-i18next';
 import { useTenant, useAuth } from '@/contexts';
 import type { HeroContent } from '@/types';
+import { Button } from '@/components/ui';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },

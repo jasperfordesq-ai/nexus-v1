@@ -1,15 +1,10 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-import { Chip } from '@heroui/react';
 import Award from 'lucide-react/icons/award';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import Star from 'lucide-react/icons/star';
 import UserCheck from 'lucide-react/icons/user-check';
 import Users from 'lucide-react/icons/users';
 import { useTranslation } from 'react-i18next';
+import { Chip } from '@/components/ui';
 
 // ---------------------------------------------------------------------------
 // Types

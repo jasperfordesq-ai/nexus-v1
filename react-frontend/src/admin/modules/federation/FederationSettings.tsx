@@ -1,3 +1,16 @@
+import { Card, CardBody, CardHeader, Button, Input } from '@/components/ui';
+import { useState, useCallback, useEffect } from 'react';
+import { Switch, Skeleton } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
+import Network from 'lucide-react/icons/network';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Save from 'lucide-react/icons/save';
+import KeyRound from 'lucide-react/icons/key-round';
+import { useTranslation } from 'react-i18next';
+import { usePageTitle } from '@/hooks';
+import { useToast } from '@/contexts';
+import { adminFederation } from '../../api/adminApi';
+import { PageHeader } from '../../components';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,18 +22,6 @@
  * Includes functional switches with save/dirty state tracking.
  */
 
-import { useState, useCallback, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Switch, Button, Input, Skeleton } from '@heroui/react';
-import { Separator } from '@heroui-v3/react';
-import Network from 'lucide-react/icons/network';
-import RefreshCw from 'lucide-react/icons/refresh-cw';
-import Save from 'lucide-react/icons/save';
-import KeyRound from 'lucide-react/icons/key-round';
-import { useTranslation } from 'react-i18next';
-import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
-import { adminFederation } from '../../api/adminApi';
-import { PageHeader } from '../../components';
 
 interface FedSettings {
   federation_enabled: boolean;

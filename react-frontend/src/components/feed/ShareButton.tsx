@@ -17,10 +17,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import {
-  Button } from '@heroui/react';
-import Repeat2 from 'lucide-react/icons/repeat-2';
+import { Link } from 'react-router-dom';import Repeat2 from 'lucide-react/icons/repeat-2';
 import Quote from 'lucide-react/icons/quote';
 import Copy from 'lucide-react/icons/copy';
 import Share2 from 'lucide-react/icons/share-2';
@@ -36,12 +33,7 @@ import { QuotePostModal } from './QuotePostModal';
 import { ExternalShareModal } from './ExternalShareModal';
 import { ShareViaDMModal } from './ShareViaDMModal';
 
-import { Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-} from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button } from '@/components/ui';
 export interface ShareButtonProps {
   /**
    * Legacy: pass when `type` is omitted — resolves to type='post'. Prefer `type` + `id`.

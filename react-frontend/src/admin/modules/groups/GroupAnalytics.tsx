@@ -1,15 +1,5 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Admin Group Analytics
- * Aggregate stats for community groups: totals, averages, most active.
- */
-
+import { Card, CardBody, CardHeader, Spinner } from '@/components/ui';
 import { useState, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Spinner } from '@heroui/react';
 import Users from 'lucide-react/icons/users';
 import UserCheck from 'lucide-react/icons/user-check';
 import BarChart3 from 'lucide-react/icons/chart-column';
@@ -21,6 +11,16 @@ import { useToast } from '@/contexts';
 import { adminGroups } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
 import type { GroupAnalyticsData } from '../../api/types';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Admin Group Analytics
+ * Aggregate stats for community groups: totals, averages, most active.
+ */
+
 
 export function GroupAnalytics() {
   const { t } = useTranslation('admin');

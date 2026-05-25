@@ -1,16 +1,6 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Newsletter Analytics
- * Full analytics dashboard with summary stats, engagement metrics,
- * monthly performance chart, top performers table, and benchmark comparison.
- */
-
+import { Card, CardBody, CardHeader, Chip, Button } from '@/components/ui';
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import { Card, CardBody, CardHeader, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Button } from '@heroui/react';
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import Mail from 'lucide-react/icons/mail';
@@ -36,8 +26,17 @@ import {
 import { usePageTitle } from '@/hooks';
 import { adminNewsletters } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
-
 import { useTranslation } from 'react-i18next';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Newsletter Analytics
+ * Full analytics dashboard with summary stats, engagement metrics, * monthly performance chart, top performers table, and benchmark comparison.
+ */
+
 /* ────────────────────────────────────────────────────────────────────────── */
 /*  Types                                                                    */
 /* ────────────────────────────────────────────────────────────────────────── */

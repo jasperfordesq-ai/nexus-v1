@@ -1,12 +1,7 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
+import { Button, Card, CardBody, CardHeader, Input, Spinner, Select, SelectItem } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, CardBody, CardHeader, Input, Spinner, Tooltip } from '@heroui/react';
+import { Tooltip } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -17,6 +12,11 @@ import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { Abbr, PageHeader } from '../../components';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 
 interface FieldSchema {
   type: 'int' | 'int_nullable' | 'float' | 'enum' | 'url_nullable';

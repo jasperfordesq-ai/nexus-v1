@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Progress, Button, Chip, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,8 +10,7 @@ import { Select, SelectItem } from '@/components/ui';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Button, Chip, Tabs, Tab, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Checkbox, Spinner, Skeleton } from '@heroui/react';
+import { Tabs, Tab, Checkbox, Skeleton } from '@heroui/react';
 import Trophy from 'lucide-react/icons/trophy';
 import Medal from 'lucide-react/icons/medal';
 import Star from 'lucide-react/icons/star';
@@ -34,9 +33,6 @@ import Route from 'lucide-react/icons/route';
 import Calendar from 'lucide-react/icons/calendar';
 import { useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
-import { GlassCard,
-  Progress,
-} from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';

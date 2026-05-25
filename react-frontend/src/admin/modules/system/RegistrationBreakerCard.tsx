@@ -1,3 +1,12 @@
+import { Card, CardBody, CardHeader, Button, Chip, Spinner } from '@/components/ui';
+import { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import ShieldAlert from 'lucide-react/icons/shield-alert';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import PlayCircle from 'lucide-react/icons/play-circle';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import { api } from '@/lib/api';
+import { useToast } from '@/contexts';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -19,15 +28,6 @@
  * Additive: never touches existing components. Safe to ship.
  */
 
-import { useEffect, useState, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Card, CardBody, CardHeader, Button, Chip, Spinner } from '@heroui/react';
-import ShieldAlert from 'lucide-react/icons/shield-alert';
-import ShieldCheck from 'lucide-react/icons/shield-check';
-import PlayCircle from 'lucide-react/icons/play-circle';
-import RefreshCw from 'lucide-react/icons/refresh-cw';
-import { api } from '@/lib/api';
-import { useToast } from '@/contexts';
 
 interface BreakerStatus {
   tripped: boolean;

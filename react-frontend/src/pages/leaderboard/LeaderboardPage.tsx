@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -17,7 +17,7 @@ import { Select, SelectItem } from '@/components/ui';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, type Variants } from 'framer-motion';
-import { Button, Avatar, Chip, Skeleton, Tabs, Tab } from '@heroui/react';
+import { Skeleton, Tabs, Tab } from '@heroui/react';
 import Trophy from 'lucide-react/icons/trophy';
 import Medal from 'lucide-react/icons/medal';
 import Crown from 'lucide-react/icons/crown';
@@ -37,7 +37,6 @@ import Sparkles from 'lucide-react/icons/sparkles';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';

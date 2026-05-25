@@ -8,9 +8,7 @@
  * Manage API keys for federation integrations.
  */
 
-import { useState, useCallback, useEffect } from 'react';
-import { Button, Chip } from '@heroui/react';
-import Key from 'lucide-react/icons/key';
+import { useState, useCallback, useEffect } from 'react';import Key from 'lucide-react/icons/key';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Ban from 'lucide-react/icons/ban';
@@ -22,6 +20,7 @@ import { adminFederation } from '../../api/adminApi';
 import { DataTable, PageHeader, EmptyState, ConfirmModal, type Column } from '../../components';
 
 import { useTranslation } from 'react-i18next';
+import { Button, Chip } from '@/components/ui';
 interface ApiKey {
   id: number;
   name: string;

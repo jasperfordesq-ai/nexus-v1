@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -19,8 +19,7 @@ import { Select, SelectItem } from '@/components/ui';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import {
-  Button, Input, Chip, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
+
 import Search from 'lucide-react/icons/search';
 import Globe from 'lucide-react/icons/globe';
 import Hand from 'lucide-react/icons/hand';
@@ -32,7 +31,6 @@ import ListTodo from 'lucide-react/icons/list-todo';
 import MessageSquare from 'lucide-react/icons/message-square';
 import User from 'lucide-react/icons/user';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';

@@ -1,17 +1,6 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Page Builder
- * Create or edit a CMS page with real API integration.
- * Wired to adminPages.get/create/update.
- */
-
+import { Card, CardBody, CardHeader, Input, Button, Spinner, Select, SelectItem } from '@/components/ui';
 import { useState, useEffect, lazy, Suspense } from 'react';
-import { Card, CardBody, CardHeader, Input, Button, Spinner, Switch } from '@heroui/react';
+import { Switch } from '@heroui/react';
 import FileText from 'lucide-react/icons/file-text';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
@@ -23,6 +12,17 @@ import { useTenant, useToast, useAuth } from '@/contexts';
 import { adminPages } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import { useTranslation } from 'react-i18next';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Page Builder
+ * Create or edit a CMS page with real API integration.
+ * Wired to adminPages.get/create/update.
+ */
+
 
 const RichTextEditor = lazy(() =>
   import('../../components/RichTextEditor').then((m) => ({ default: m.RichTextEditor })),

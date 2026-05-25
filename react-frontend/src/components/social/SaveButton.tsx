@@ -13,7 +13,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Button, Popover, PopoverTrigger, PopoverContent, Input, Spinner } from '@heroui/react';
+import { Popover, PopoverTrigger, PopoverContent } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Bookmark from 'lucide-react/icons/bookmark';
 import BookmarkPlus from 'lucide-react/icons/bookmark-plus';
@@ -22,6 +22,7 @@ import Check from 'lucide-react/icons/check';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { Button, Spinner, Input } from '@/components/ui';
 
 interface CollectionLite {
   id: number;

@@ -1,31 +1,8 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Admin Marketplace Dashboard
- * Overview with key metrics, recent listings, and quick navigation to
- * the moderation queue and seller management sub-pages.
- */
-
+import { Card, CardBody, CardHeader, Button, Chip, Spinner } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Chip,
-  Spinner,
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableColumn,
-  TableCell,
-} from '@heroui/react';
+import { Table, TableHeader, TableBody, TableRow, TableColumn, TableCell } from '@heroui/react';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import Store from 'lucide-react/icons/store';
 import PackageCheck from 'lucide-react/icons/package-check';
@@ -39,6 +16,17 @@ import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { StatCard, PageHeader } from '../../components';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Admin Marketplace Dashboard
+ * Overview with key metrics, recent listings, and quick navigation to
+ * the moderation queue and seller management sub-pages.
+ */
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

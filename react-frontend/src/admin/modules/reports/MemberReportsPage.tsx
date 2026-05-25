@@ -1,26 +1,6 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * A2 - Member Activity Reports
- *
- * Report type tabs/selector with:
- * - Active members list with last login, transaction count
- * - Registration trends chart (daily/weekly/monthly)
- * - Retention cohort table
- * - Engagement metrics cards
- * - Top contributors leaderboard
- * - Least active members list
- *
- * API: GET /api/v2/admin/reports/members?type=active|registrations|retention|engagement|top_contributors|least_active
- */
-
+import { Card, CardBody, CardHeader, Spinner, Button, Chip, Select, SelectItem, Avatar } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
-import {
-  Card, CardBody, CardHeader, Spinner, Button, Tabs, Tab, Chip, Pagination, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Avatar } from '@heroui/react';
+import { Tabs, Tab, Pagination, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import {
   BarChart,
   Bar,
@@ -45,9 +25,28 @@ import { api, tokenManager } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { CHART_COLOR_MAP } from '@/lib/chartColors';
 import { StatCard, PageHeader } from '../../components';
-
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts/ToastContext';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * A2 - Member Activity Reports
+ *
+ * Report type tabs/selector with:
+ * - Active members list with last login, transaction count
+ * - Registration trends chart (daily/weekly/monthly)
+ * - Retention cohort table
+ * - Engagement metrics cards
+ * - Top contributors leaderboard
+ * - Least active members list
+ *
+ * API: GET /api/v2/admin/reports/members?type=active|registrations|retention|engagement|top_contributors|least_active
+ */
+
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------

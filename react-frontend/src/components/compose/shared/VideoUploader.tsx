@@ -7,12 +7,11 @@
  * VideoUploader — video file upload component for the compose modal.
  */
 
-import { useRef, useState } from 'react';
-import { Button } from '@heroui/react';
-import Video from 'lucide-react/icons/video';
+import { useRef, useState } from 'react';import Video from 'lucide-react/icons/video';
 import X from 'lucide-react/icons/x';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui';
 
 interface VideoUploaderProps {
   onVideoSelect: (file: File) => void;

@@ -18,9 +18,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Button, Chip, Spinner } from '@heroui/react';
-import { Separator } from '@heroui-v3/react';
+import { motion } from 'framer-motion';import { Separator } from '@heroui-v3/react';
 import BookOpen from 'lucide-react/icons/book-open';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import ThumbsUp from 'lucide-react/icons/thumbs-up';
@@ -42,7 +40,7 @@ import { lazy, Suspense } from 'react';
 const MarkdownRenderer = lazy(() =>
   import('@/components/content/MarkdownRenderer').then((m) => ({ default: m.MarkdownRenderer })),
 );
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner } from '@/components/ui';
 import { useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';

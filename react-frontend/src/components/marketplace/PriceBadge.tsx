@@ -1,17 +1,5 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * PriceBadge - Price display component for marketplace listings
- *
- * Renders contextual price badges based on price type: free, fixed,
- * negotiable, contact, or hybrid (currency + time credits).
- */
-
-import { Chip } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
+import { Chip } from '@/components/ui';
 
 interface PriceBadgeProps {
   price: number | null;

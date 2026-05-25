@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, GlassCard, Button, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,7 +6,7 @@ import { Select, SelectItem, useDisclosure } from '@/components/ui';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea } from '@heroui/react';
+
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import GraduationCap from 'lucide-react/icons/graduation-cap';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
@@ -15,7 +15,6 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import FileWarning from 'lucide-react/icons/file-warning';
 import Calendar from 'lucide-react/icons/calendar';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

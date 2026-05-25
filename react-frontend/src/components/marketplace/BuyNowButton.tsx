@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, Button, Input } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -16,9 +16,7 @@ import { Select, SelectItem, useDisclosure } from '@/components/ui';
  * telling the buyer to contact the seller to arrange payment.
  */
 
-import { useState, useCallback, useEffect } from 'react';
-import { Button, Input } from '@heroui/react';
-import CreditCard from 'lucide-react/icons/credit-card';
+import { useState, useCallback, useEffect } from 'react';import CreditCard from 'lucide-react/icons/credit-card';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';

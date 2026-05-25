@@ -1,3 +1,4 @@
+import { CardBody, Card, Progress, Button, Chip, Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -8,18 +9,10 @@
  * System health dashboard with metric cards and progress bars.
  */
 
-import {
-  useEffect,
-  useState,
-  useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Card,
-  CardBody,
-  Button,
-  Spinner,
-  Chip,
-} from '@heroui/react';
+
 import Server from 'lucide-react/icons/server';
 import Database from 'lucide-react/icons/database';
 import HardDrive from 'lucide-react/icons/hard-drive';
@@ -35,7 +28,6 @@ import { useTenant } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { SystemHealth } from '../../api/types';
-import { Progress } from '@/components/ui';
 
 /**
  * Parse a memory string like "24 MB" or "256M" to bytes.

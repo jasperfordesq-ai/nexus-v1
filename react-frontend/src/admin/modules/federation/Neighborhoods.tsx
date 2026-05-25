@@ -1,17 +1,6 @@
-import { Select, SelectItem, useDisclosure } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Federation Neighborhoods (FD2)
- * Admin page for managing neighborhood clusters of tenants.
- * Add/remove tenants from neighborhoods, view stats.
- */
-
+import { Card, CardBody, CardHeader, Button, Spinner, Input, Textarea, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
-import { Card, CardBody, CardHeader, Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea, Avatar } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import MapPin from 'lucide-react/icons/map-pin';
 import Plus from 'lucide-react/icons/plus';
@@ -29,8 +18,19 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { PageHeader, ConfirmModal } from '../../components';
 import { StatCard } from '../../components';
-
 import { useTranslation } from 'react-i18next';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Federation Neighborhoods (FD2)
+ * Admin page for managing neighborhood clusters of tenants.
+ * Add/remove tenants from neighborhoods, view stats.
+ */
+
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────

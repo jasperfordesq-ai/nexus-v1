@@ -1,19 +1,6 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * BusinessSellerBadge - Verified business seller indicator
- *
- * Displays a "Business" chip for business sellers, with an additional
- * verified checkmark when the business has been verified.
- * Returns null for private sellers.
- */
-
-import { Chip } from '@heroui/react';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import { useTranslation } from 'react-i18next';
+import { Chip } from '@/components/ui';
 
 interface BusinessSellerBadgeProps {
   sellerType: string;

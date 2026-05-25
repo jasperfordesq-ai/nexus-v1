@@ -10,13 +10,12 @@
  * price comparison, and submits via the marketplace offers API endpoint.
  */
 
-import { useState, useCallback } from 'react';
-import { Button, Input, Textarea } from '@heroui/react';
-import Send from 'lucide-react/icons/send';
+import { useState, useCallback } from 'react';import Send from 'lucide-react/icons/send';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { Button, Input, Textarea } from '@/components/ui';
 
 interface MakeOfferFormProps {
   listingId: number;

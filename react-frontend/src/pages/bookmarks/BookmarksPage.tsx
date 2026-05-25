@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure } from '@/components/ui';
+import { Button, Chip, Card, CardBody, Input, Spinner, Select, SelectItem, useDisclosure, GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,8 +11,7 @@ import { Select, SelectItem, useDisclosure } from '@/components/ui';
 
 import { Fragment, useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Button, Chip, Tabs, Tab, Card, CardBody, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Spinner } from '@heroui/react';
+import { Tabs, Tab } from '@heroui/react';
 import Bookmark from 'lucide-react/icons/bookmark';
 import BookmarkCheck from 'lucide-react/icons/bookmark-check';
 import FolderPlus from 'lucide-react/icons/folder-plus';
@@ -26,13 +25,6 @@ import MessageSquare from 'lucide-react/icons/message-square';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import Inbox from 'lucide-react/icons/inbox';
 import { useTranslation } from 'react-i18next';
-import { GlassCard,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-} from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks/usePageTitle';

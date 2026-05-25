@@ -17,9 +17,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Button } from '@heroui/react';
-import Handshake from 'lucide-react/icons/handshake';
+import { motion } from 'framer-motion';import Handshake from 'lucide-react/icons/handshake';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import ShieldCheck from 'lucide-react/icons/shield-check';
@@ -34,7 +32,7 @@ import Users from 'lucide-react/icons/users';
 import Target from 'lucide-react/icons/target';
 import Lightbulb from 'lucide-react/icons/lightbulb';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
 import { useTenant } from '@/contexts';

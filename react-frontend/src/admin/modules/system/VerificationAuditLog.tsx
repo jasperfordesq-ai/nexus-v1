@@ -1,4 +1,12 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Spinner, Chip, Select, SelectItem } from '@/components/ui';
+import { useState, useEffect, useCallback } from 'react';
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+import ScrollText from 'lucide-react/icons/scroll-text';
+import ChevronLeft from 'lucide-react/icons/chevron-left';
+import ChevronRight from 'lucide-react/icons/chevron-right';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import { useTranslation } from 'react-i18next';
+import { api } from '@/lib/api';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -8,15 +16,6 @@ import { Select, SelectItem } from '@/components/ui';
  * VerificationAuditLog — Admin component showing identity verification events.
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import {
-  Card, CardBody, CardHeader, Button, Spinner, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
-import ScrollText from 'lucide-react/icons/scroll-text';
-import ChevronLeft from 'lucide-react/icons/chevron-left';
-import ChevronRight from 'lucide-react/icons/chevron-right';
-import RefreshCw from 'lucide-react/icons/refresh-cw';
-import { useTranslation } from 'react-i18next';
-import { api } from '@/lib/api';
 
 interface AuditEvent {
   id: number;

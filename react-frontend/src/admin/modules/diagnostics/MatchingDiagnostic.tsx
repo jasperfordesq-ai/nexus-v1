@@ -1,3 +1,12 @@
+import { Card, CardBody, CardHeader, Input, Button, Spinner } from '@/components/ui';
+import { useState, useEffect } from 'react';
+import Stethoscope from 'lucide-react/icons/stethoscope';
+import Search from 'lucide-react/icons/search';
+import { useTranslation } from 'react-i18next';
+import { useAdminPageMeta } from '../../AdminMetaContext';
+import { useToast } from '@/contexts';
+import { adminDiagnostics } from '../../api/adminApi';
+import { PageHeader } from '../../components';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,15 +18,6 @@
  * Wired to adminDiagnostics API.
  */
 
-import { useState, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Input, Button, Spinner } from '@heroui/react';
-import Stethoscope from 'lucide-react/icons/stethoscope';
-import Search from 'lucide-react/icons/search';
-import { useTranslation } from 'react-i18next';
-import { useAdminPageMeta } from '../../AdminMetaContext';
-import { useToast } from '@/contexts';
-import { adminDiagnostics } from '../../api/adminApi';
-import { PageHeader } from '../../components';
 
 interface DiagResult {
   [key: string]: unknown;

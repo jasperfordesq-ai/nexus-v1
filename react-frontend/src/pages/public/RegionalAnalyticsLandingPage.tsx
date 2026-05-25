@@ -1,3 +1,4 @@
+import { Card, CardBody, Button, Chip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,7 +10,6 @@
  * routes interest into the existing /contact form.
  */
 
-import { Button, Card, CardBody, Chip } from '@heroui/react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import BarChart3 from 'lucide-react/icons/bar-chart-3';

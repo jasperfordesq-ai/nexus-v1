@@ -10,7 +10,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Chip, Avatar, Button } from '@heroui/react';
+
 import Activity from 'lucide-react/icons/activity';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { usePageTitle } from '@/hooks';
@@ -19,6 +19,7 @@ import { DataTable, PageHeader, type Column } from '../../components';
 import type { ActivityLogEntry } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
+import { Button, Chip, Avatar } from '@/components/ui';
 // ─────────────────────────────────────────────────────────────────────────────
 // Action colour mapping
 // ─────────────────────────────────────────────────────────────────────────────

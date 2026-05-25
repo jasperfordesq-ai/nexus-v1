@@ -8,20 +8,10 @@
  * Route: /jobs/employers/:userId
  */
 
-import {
-  useState,
-  useEffect,
-  useCallback,
-  useRef } from 'react';
-import { useParams,
-  Link } from 'react-router-dom';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button,
-  Chip,
-  Avatar,
-  Textarea,
-  Slider,
-  } from '@heroui/react';
+import { Slider } from '@heroui/react';
 import Briefcase from 'lucide-react/icons/briefcase';
 import MapPin from 'lucide-react/icons/map-pin';
 import Wifi from 'lucide-react/icons/wifi';
@@ -30,9 +20,7 @@ import ChevronRight from 'lucide-react/icons/chevron-right';
 import Star from 'lucide-react/icons/star';
 import MessageSquare from 'lucide-react/icons/message-square';
 import { useTranslation } from 'react-i18next';
-import { GlassCard,
-  Progress,
-} from '@/components/ui';
+import { GlassCard, Progress, Button, Chip, Textarea, Avatar } from '@/components/ui';
 import { LoadingScreen } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';
 import { useTenant, useAuth } from '@/contexts';

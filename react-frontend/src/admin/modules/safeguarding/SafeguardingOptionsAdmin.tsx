@@ -1,4 +1,21 @@
-import { Select, SelectItem, useDisclosure } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Spinner, Chip, Input, Textarea, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { useState, useEffect, useCallback } from 'react';
+import { Switch } from '@heroui/react';
+import Plus from 'lucide-react/icons/plus';
+import Edit3 from 'lucide-react/icons/pen-line';
+import Trash2 from 'lucide-react/icons/trash-2';
+import Shield from 'lucide-react/icons/shield';
+import CheckCircle from 'lucide-react/icons/circle-check-big';
+import Bell from 'lucide-react/icons/bell';
+import MessageSquare from 'lucide-react/icons/message-square';
+import Users from 'lucide-react/icons/users';
+import ShieldCheck from 'lucide-react/icons/shield-check';
+import { usePageTitle } from '@/hooks';
+import { useToast } from '@/contexts';
+import { api } from '@/lib/api';
+import { logError } from '@/lib/logger';
+import { PageHeader } from '../../components';
+import { useTranslation } from 'react-i18next';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,24 +32,6 @@ import { Select, SelectItem, useDisclosure } from '@/components/ui';
  * Route: /admin/safeguarding-options
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import {
-  Card, CardBody, CardHeader, Button, Spinner, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea, Switch } from '@heroui/react';
-import Plus from 'lucide-react/icons/plus';
-import Edit3 from 'lucide-react/icons/pen-line';
-import Trash2 from 'lucide-react/icons/trash-2';
-import Shield from 'lucide-react/icons/shield';
-import CheckCircle from 'lucide-react/icons/circle-check-big';
-import Bell from 'lucide-react/icons/bell';
-import MessageSquare from 'lucide-react/icons/message-square';
-import Users from 'lucide-react/icons/users';
-import ShieldCheck from 'lucide-react/icons/shield-check';
-import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
-import { api } from '@/lib/api';
-import { logError } from '@/lib/logger';
-import { PageHeader } from '../../components';
-import { useTranslation } from 'react-i18next';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 

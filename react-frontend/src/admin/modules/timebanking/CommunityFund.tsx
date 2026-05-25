@@ -1,26 +1,6 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Community Fund
- * Admin page for viewing the tenant community fund, depositing credits, and
- * granting fund credits to members.
- */
-
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Input,
-  Spinner,
-  Textarea,
-} from '@heroui/react';
 import ArrowDownToLine from 'lucide-react/icons/arrow-down-to-line';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import ArrowUpFromLine from 'lucide-react/icons/arrow-up-from-line';
@@ -36,6 +16,17 @@ import { adminTimebanking, adminUsers } from '../../api/adminApi';
 import type { AdminUser, CommunityFundBalance, CommunityFundTransaction } from '../../api/types';
 import { DataTable, PageHeader, StatCard, type Column } from '../../components';
 import { useTenant, useToast } from '@/contexts';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Community Fund
+ * Admin page for viewing the tenant community fund, depositing credits, and
+ * granting fund credits to members.
+ */
+
 
 const PAGE_SIZE = 20;
 

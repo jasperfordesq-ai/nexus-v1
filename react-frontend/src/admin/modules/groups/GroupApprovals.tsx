@@ -9,9 +9,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Button, Chip, Spinner } from '@heroui/react';
-import Check from 'lucide-react/icons/check';
+import { useTranslation } from 'react-i18next';import Check from 'lucide-react/icons/check';
 import X from 'lucide-react/icons/x';
 import UserPlus from 'lucide-react/icons/user-plus';
 import { usePageTitle } from '@/hooks';
@@ -19,6 +17,7 @@ import { useToast } from '@/contexts';
 import { adminGroups } from '../../api/adminApi';
 import { DataTable, PageHeader, ConfirmModal, EmptyState, type Column } from '../../components';
 import type { GroupApproval } from '../../api/types';
+import { Button, Chip, Spinner } from '@/components/ui';
 
 export function GroupApprovals() {
   const { t } = useTranslation('admin');

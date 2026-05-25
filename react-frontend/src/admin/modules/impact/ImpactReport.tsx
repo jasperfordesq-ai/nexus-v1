@@ -1,26 +1,7 @@
-import { Select, SelectItem, useDisclosure } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Impact Report - Admin Module
- *
- * Unified SROI + community health + skills/events + impact summary view.
- * Merges the former "Social Value" page into a single Impact Report.
- *
- * Data sources (loaded in parallel):
- *  - GET /api/v2/admin/impact-report        → SROI, health, timeline (primary)
- *  - GET /api/v2/admin/reports/social-value → skills, events, impact summary, currency
- *
- * Config is currently stored in two backends (tenant JSON + social_value_config
- * table). The config modal writes to both endpoints to keep them in sync.
- */
-
+import { Card, CardBody, CardHeader, Spinner, Button, Input, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardBody, CardHeader, Spinner, Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import {
   AreaChart,
@@ -47,14 +28,33 @@ import Sparkles from 'lucide-react/icons/sparkles';
 import Lightbulb from 'lucide-react/icons/lightbulb';
 import Calendar from 'lucide-react/icons/calendar';
 import Award from 'lucide-react/icons/award';
-
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api, tokenManager } from '@/lib/api';
 import { CHART_COLOR_MAP } from '@/lib/chartColors';
 import { StatCard, PageHeader } from '../../components';
-
 import i18n from '@/i18n';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Impact Report - Admin Module
+ *
+ * Unified SROI + community health + skills/events + impact summary view.
+ * Merges the former "Social Value" page into a single Impact Report.
+ *
+ * Data sources (loaded in parallel):
+ *  - GET /api/v2/admin/impact-report        → SROI, health, timeline (primary)
+ *  - GET /api/v2/admin/reports/social-value → skills, events, impact summary, currency
+ *
+ * Config is currently stored in two backends (tenant JSON + social_value_config
+ * table). The config modal writes to both endpoints to keep them in sync.
+ */
+
+
+
 
 // ---------------------------------------------------------------------------
 // Types

@@ -1,4 +1,22 @@
-import { useDisclosure } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, useDisclosure, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@/components/ui';
+import { useCallback, useEffect, useState } from 'react';
+import {
+  Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis, } from 'recharts';
+import { Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
+import Bell from 'lucide-react/icons/bell';
+import Info from 'lucide-react/icons/info';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Save from 'lucide-react/icons/save';
+import Send from 'lucide-react/icons/send';
+import FlaskConical from 'lucide-react/icons/flask-conical';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import { useTranslation } from 'react-i18next';
+import { usePageTitle } from '@/hooks';
+import { useToast } from '@/contexts';
+import { api } from '@/lib/api';
+import { logError } from '@/lib/logger';
+import { PageHeader, StatCard } from '../../components';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -18,24 +36,6 @@ import { useDisclosure } from '@/components/ui';
  * Admin UI text is translated through the admin namespace.
  */
 
-import { useCallback, useEffect, useState } from 'react';
-import {
-  Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis, } from 'recharts';
-import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
-import { Separator } from '@heroui-v3/react';
-import Bell from 'lucide-react/icons/bell';
-import Info from 'lucide-react/icons/info';
-import RefreshCw from 'lucide-react/icons/refresh-cw';
-import Save from 'lucide-react/icons/save';
-import Send from 'lucide-react/icons/send';
-import FlaskConical from 'lucide-react/icons/flask-conical';
-import TrendingUp from 'lucide-react/icons/trending-up';
-import { useTranslation } from 'react-i18next';
-import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
-import { api } from '@/lib/api';
-import { logError } from '@/lib/logger';
-import { PageHeader, StatCard } from '../../components';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

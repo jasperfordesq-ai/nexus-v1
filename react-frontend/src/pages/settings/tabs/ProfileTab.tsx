@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Input, Textarea, Avatar } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,8 +6,7 @@ import { Select, SelectItem } from '@/components/ui';
 
 import { useRef, useState } from 'react';
 import type React from 'react';
-import {
-  Button, Input, Textarea, Avatar } from '@heroui/react';
+
 import Save from 'lucide-react/icons/save';
 import Camera from 'lucide-react/icons/camera';
 import Phone from 'lucide-react/icons/phone';
@@ -15,7 +14,6 @@ import Building2 from 'lucide-react/icons/building-2';
 import Monitor from 'lucide-react/icons/monitor';
 import Lock from 'lucide-react/icons/lock';
 import ShieldCheck from 'lucide-react/icons/shield-check';
-import { GlassCard } from '@/components/ui';
 import { PlaceAutocompleteInput } from '@/components/location';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { isPhoneValid } from '@/lib/validation';

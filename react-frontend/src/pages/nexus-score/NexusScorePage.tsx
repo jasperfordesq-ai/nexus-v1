@@ -12,13 +12,7 @@ import {
   useEffect,
   useCallback,
   useRef } from 'react';
-import { motion } from 'framer-motion';
-import {
-  Chip,
-  Button,
-  Spinner,
-} from '@heroui/react';
-import Trophy from 'lucide-react/icons/trophy';
+import { motion } from 'framer-motion';import Trophy from 'lucide-react/icons/trophy';
 import Users from 'lucide-react/icons/users';
 import Star from 'lucide-react/icons/star';
 import Clock from 'lucide-react/icons/clock';
@@ -31,7 +25,7 @@ import Info from 'lucide-react/icons/info';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { Link } from 'react-router-dom';
-import { GlassCard, Progress } from '@/components/ui';
+import { GlassCard, Progress, Button, Chip, Spinner } from '@/components/ui';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 import { useAuth } from '@/contexts/AuthContext';

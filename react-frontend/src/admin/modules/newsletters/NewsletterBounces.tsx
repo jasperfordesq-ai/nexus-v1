@@ -1,18 +1,7 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Newsletter Bounces
- * Bounce tracking and suppression list management
- */
-
+import { Button, Card, CardBody, CardHeader, Chip, Input, Select, SelectItem } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Button, Card, CardBody, CardHeader, Tabs, Tab, Chip, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+import { Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Trash2 from 'lucide-react/icons/trash-2';
@@ -28,6 +17,16 @@ import { adminNewsletters } from '../../api/adminApi';
 import { CHART_COLOR_MAP } from '@/lib/chartColors';
 import { PageHeader, ConfirmModal } from '../../components';
 import type { NewsletterBounce, SuppressionListEntry, BounceTrendsData, BounceReasonSummary } from '../../api/types';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Newsletter Bounces
+ * Bounce tracking and suppression list management
+ */
+
 
 export function NewsletterBounces() {
   const { t } = useTranslation('admin');

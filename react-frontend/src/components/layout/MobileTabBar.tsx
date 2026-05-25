@@ -14,7 +14,7 @@ import React, { useState, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Badge, Button } from '@heroui/react';
+import { Badge } from '@heroui/react';
 import House from 'lucide-react/icons/house';
 import ListTodo from 'lucide-react/icons/list-todo';
 import Plus from 'lucide-react/icons/plus';
@@ -22,6 +22,7 @@ import MessageSquare from 'lucide-react/icons/message-square';
 import Menu from 'lucide-react/icons/menu';
 import { useAuth, useTenant, useNotifications } from '@/contexts';
 import { QuickCreateMenu } from './QuickCreateMenu';
+import { Button } from '@/components/ui';
 
 interface MobileTabBarProps {
   onMenuOpen?: () => void;

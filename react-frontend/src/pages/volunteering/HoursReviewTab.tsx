@@ -4,13 +4,13 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Avatar, Button, Chip, Spinner } from '@heroui/react';
+
 import Clock from 'lucide-react/icons/clock';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
 import Building2 from 'lucide-react/icons/building-2';
 import ChevronDown from 'lucide-react/icons/chevron-down';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner, Avatar } from '@/components/ui';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

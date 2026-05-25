@@ -1,18 +1,6 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Federation Analytics
- * KPI cards, daily API call line chart, top partners bar chart,
- * and recent error log table. Range selectable 7d / 30d / 90d.
- */
-
+import { Card, CardBody, CardHeader, Button, Chip, Select, SelectItem } from '@/components/ui';
 import { useState, useCallback, useEffect, useRef } from 'react';
-import {
-  Card, CardBody, CardHeader, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip } from '@heroui/react';
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import Handshake from 'lucide-react/icons/handshake';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import MessageSquare from 'lucide-react/icons/message-square';
@@ -39,6 +27,16 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts/ToastContext';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Federation Analytics
+ * KPI cards, daily API call line chart, top partners bar chart, * and recent error log table. Range selectable 7d / 30d / 90d.
+ */
+
 
 type Range = '7d' | '30d' | '90d';
 

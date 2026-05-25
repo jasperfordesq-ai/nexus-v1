@@ -3,12 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect, useState } from 'react';
-import { Button } from '@heroui/react';
-import { useTranslation } from 'react-i18next';
+import { useEffect, useState } from 'react';import { useTranslation } from 'react-i18next';
 import { GoogleIcon } from '@/components/icons/GoogleIcon';
 import { AppleIcon } from '@/components/icons/AppleIcon';
 import { FacebookIcon } from '@/components/icons/FacebookIcon';
+import { Button } from '@/components/ui';
 
 type Provider = 'google' | 'apple' | 'facebook';
 

@@ -9,9 +9,7 @@
  * Displays view counts, contact rate, save rate, and trends over time.
  */
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Spinner, Button } from '@heroui/react';
-import Eye from 'lucide-react/icons/eye';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';import Eye from 'lucide-react/icons/eye';
 import MessageCircle from 'lucide-react/icons/message-circle';
 import Heart from 'lucide-react/icons/heart';
 import TrendingUp from 'lucide-react/icons/trending-up';
@@ -19,7 +17,7 @@ import TrendingDown from 'lucide-react/icons/trending-down';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Spinner } from '@/components/ui';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { ListingAnalytics } from '@/types/api';

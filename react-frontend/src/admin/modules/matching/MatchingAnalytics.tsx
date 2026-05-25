@@ -1,25 +1,9 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Matching Analytics Page
- * Displays smart matching statistics, score distribution,
- * distance distribution, and approval metrics.
- */
-
+import { Card, CardBody, CardHeader, Button, Spinner, Progress } from '@/components/ui';
 import {
   useState,
   useCallback,
   useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Spinner,
-} from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import BarChart3 from 'lucide-react/icons/chart-column';
@@ -35,9 +19,17 @@ import { useTenant, useToast } from '@/contexts';
 import { adminMatching } from '../../api/adminApi';
 import { StatCard, PageHeader, EmptyState } from '../../components';
 import type { MatchingStatsResponse } from '../../api/types';
-
 import { useTranslation } from 'react-i18next';
-import { Progress } from '@/components/ui';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Matching Analytics Page
+ * Displays smart matching statistics, score distribution, * distance distribution, and approval metrics.
+ */
+
 /** Color map for score distribution bars */
 const SCORE_COLORS: Record<string, 'danger' | 'warning' | 'primary' | 'success'> = {
   '0-40': 'danger',

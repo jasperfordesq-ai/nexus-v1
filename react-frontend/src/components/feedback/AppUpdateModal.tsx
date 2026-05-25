@@ -10,10 +10,11 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from '@heroui/react';
+
 import Download from 'lucide-react/icons/download';
 import Sparkles from 'lucide-react/icons/sparkles';
 import type { AppUpdateInfo } from '@/hooks/useAppUpdate';
+import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 
 interface AppUpdateModalProps {
   updateInfo: AppUpdateInfo;

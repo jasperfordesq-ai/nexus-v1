@@ -4,18 +4,11 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useMemo } from 'react';
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  Input,
-  Button,
-} from '@heroui/react';
+
 import Search from 'lucide-react/icons/search';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
-import { ICON_MAP, ICON_NAMES, DynamicIcon } from '@/components/ui';
+import { ICON_MAP, ICON_NAMES, DynamicIcon, Button, Input, Modal, ModalContent, ModalHeader, ModalBody } from '@/components/ui';
 
 interface IconPickerProps {
   value: string | null;

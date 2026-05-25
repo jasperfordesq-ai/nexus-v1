@@ -9,12 +9,10 @@
  * Manual entry by default. Camera scanning is optional via html5-qrcode (not bundled).
  */
 
-import { useState } from 'react';
-import { Button, Input } from '@heroui/react';
-import QrCode from 'lucide-react/icons/qr-code';
+import { useState } from 'react';import QrCode from 'lucide-react/icons/qr-code';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Input } from '@/components/ui';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

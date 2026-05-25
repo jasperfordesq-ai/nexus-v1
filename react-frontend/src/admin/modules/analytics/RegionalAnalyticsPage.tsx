@@ -1,22 +1,7 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * AG59 — Regional Analytics Product
- * Sellable analytics dashboard for municipalities and SME partners.
- * Shows geographic density, demand/supply heatmaps, demographics,
- * engagement trends, volunteer breakdowns, and help-request analysis.
- *
- * User-facing admin copy is routed through translations.
- */
-
+import { Card, CardBody, CardHeader, Button, Chip, Spinner, Select, SelectItem } from '@/components/ui';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Card, CardBody, CardHeader, Button, Chip, Tabs, Tab, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+import { Tabs, Tab, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import Map from 'lucide-react/icons/map';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import Users from 'lucide-react/icons/users';
@@ -29,6 +14,19 @@ import { usePageTitle } from '@/hooks';
 import api from '@/lib/api';
 import { StatCard, PageHeader } from '../../components';
 import { useAdminPageMeta } from '../../AdminMetaContext';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * AG59 — Regional Analytics Product
+ * Sellable analytics dashboard for municipalities and SME partners.
+ * Shows geographic density, demand/supply heatmaps, demographics, * engagement trends, volunteer breakdowns, and help-request analysis.
+ *
+ * User-facing admin copy is routed through translations.
+ */
+
 
 type AdminT = ReturnType<typeof useTranslation<'admin'>>['t'];
 

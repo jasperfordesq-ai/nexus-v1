@@ -1,20 +1,8 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Admin User Edit
- * Edit user details, role, status, profile info, manage badges, password, consents.
- * Parity: PHP Admin\UserController::edit() — all legacy gaps closed
- */
-
+import { Card, CardBody, CardHeader, Input, Button, Textarea, Chip, Spinner, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import {
-  Card, CardBody, CardHeader, Input, Button, Textarea, Chip, Spinner, Avatar, Switch, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
+import { Switch } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
 import Trash2 from 'lucide-react/icons/trash-2';
@@ -35,6 +23,17 @@ import { api } from '@/lib/api';
 import { adminUsers, adminTimebanking, adminVetting, adminInsurance } from '../../api/adminApi';
 import { PageHeader, ConfirmModal } from '../../components';
 import type { AdminUserDetail, AdminBadge, UpdateUserPayload, UserConsent, VettingRecord, InsuranceCertificate } from '../../api/types';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Admin User Edit
+ * Edit user details, role, status, profile info, manage badges, password, consents.
+ * Parity: PHP Admin\UserController::edit() — all legacy gaps closed
+ */
+
 
 export function UserEdit() {
   const { t } = useTranslation('admin', { keyPrefix: 'user_edit' });

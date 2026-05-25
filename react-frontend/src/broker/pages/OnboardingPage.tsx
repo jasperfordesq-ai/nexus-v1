@@ -1,28 +1,10 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Broker Onboarding Page
- * Displays a simplified onboarding funnel visualization (no recharts) and
- * a table of pending members awaiting approval.
- */
-
+import { Card, CardBody, CardHeader, Chip, Button, Spinner, Progress, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection } from '@/components/ui';
 import {
   useEffect,
   useState,
   useCallback,
   useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Button,
-  Spinner,
-} from '@heroui/react';
 import ArrowDown from 'lucide-react/icons/arrow-down';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import { usePageTitle } from '@/hooks';
@@ -37,13 +19,17 @@ import { DataTable,
   PageHeader,
   ConfirmModal } from '@/admin/components';
 import type { Column } from '@/admin/components';
-import { Progress,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-} from '@/components/ui';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Broker Onboarding Page
+ * Displays a simplified onboarding funnel visualization (no recharts) and
+ * a table of pending members awaiting approval.
+ */
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

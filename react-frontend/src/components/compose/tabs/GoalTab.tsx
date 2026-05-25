@@ -9,7 +9,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { Button, Input, Textarea, Switch, DatePicker } from '@heroui/react';
+import { Switch, DatePicker } from '@heroui/react';
 import type { DateInputValue } from '@heroui/react';
 import { today, getLocalTimeZone } from '@internationalized/date';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +22,7 @@ import { CharacterCount } from '../shared/CharacterCount';
 import { EmojiPicker } from '../shared/EmojiPicker';
 import { useComposeSubmit } from '../ComposeSubmitContext';
 import type { TabSubmitProps } from '../types';
+import { Button, Input, Textarea } from '@/components/ui';
 
 const inputClasses = {
   input: 'bg-transparent text-[var(--text-primary)] text-base',

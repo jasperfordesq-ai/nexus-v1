@@ -1,16 +1,5 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Credit Commons Node Configuration
- * Admin UI for configuring this tenant's CC node identity,
- * parent node, exchange rate, and validation window.
- */
-
+import { Button, Card, CardBody, CardHeader, Input, Spinner, Chip } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
-import { Button, Card, CardBody, CardHeader, Input, Spinner, Chip } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Globe from 'lucide-react/icons/globe';
 import Save from 'lucide-react/icons/save';
@@ -23,6 +12,16 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { PageHeader } from '../../components';
 import { useTranslation } from 'react-i18next';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Credit Commons Node Configuration
+ * Admin UI for configuring this tenant's CC node identity, * parent node, exchange rate, and validation window.
+ */
+
 
 interface CcNodeConfig {
   node_slug: string;

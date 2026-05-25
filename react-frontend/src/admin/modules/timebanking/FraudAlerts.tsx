@@ -9,18 +9,9 @@
  * Parity: PHP Admin\TimebankingController::alerts()
  */
 
-import {
-  useState,
-  useCallback,
-  useEffect,
-  useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Chip,
-  Tabs,
-  Tab,
-  Button,
-} from '@heroui/react';
+import { Tabs, Tab } from '@heroui/react';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -34,12 +25,7 @@ import { DataTable,
 import type { FraudAlert } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
-import { Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-} from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Chip } from '@/components/ui';
 const SEVERITY_COLOR_MAP: Record<string, 'default' | 'primary' | 'warning' | 'danger'> = {
   low: 'default',
   medium: 'primary',

@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, GlassCard, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -16,8 +16,7 @@ import { Select, SelectItem, useDisclosure } from '@/components/ui';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import {
-  Button, Input, Switch, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
+import { Switch } from '@heroui/react';
 import Bell from 'lucide-react/icons/bell';
 import Plus from 'lucide-react/icons/plus';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -31,7 +30,6 @@ import Wifi from 'lucide-react/icons/wifi';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';

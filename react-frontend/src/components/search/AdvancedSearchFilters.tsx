@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Input } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,15 +15,12 @@ import { Select, SelectItem } from '@/components/ui';
  * - Content type selection
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { Button, Input, Chip } from '@heroui/react';
-import Filter from 'lucide-react/icons/filter';
+import { useState, useEffect, useCallback, useRef } from 'react';import Filter from 'lucide-react/icons/filter';
 import X from 'lucide-react/icons/x';
 import Calendar from 'lucide-react/icons/calendar';
 import Tag from 'lucide-react/icons/tag';
 import SlidersHorizontal from 'lucide-react/icons/sliders-horizontal';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { Category } from '@/types/api';

@@ -1,15 +1,9 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-import { Button } from '@heroui/react';
 import DollarSign from 'lucide-react/icons/dollar-sign';
 import Calendar from 'lucide-react/icons/calendar';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button } from '@/components/ui';
 import { formatDateValue } from '@/lib/helpers';
 import type { InlineOffer } from './JobDetailTypes';
 

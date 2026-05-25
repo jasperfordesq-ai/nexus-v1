@@ -19,17 +19,10 @@
 
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Textarea,
-} from '@heroui/react';
+
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import X from 'lucide-react/icons/x';
+import { Button, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 
 export interface BulkAction {
   key: string;

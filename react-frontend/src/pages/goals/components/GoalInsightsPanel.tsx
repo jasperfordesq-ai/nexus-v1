@@ -3,15 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  useCallback,
-  useEffect,
-  useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
-import { Button,
-  Chip,
-  Skeleton,
-} from '@heroui/react';
+import { Skeleton } from '@heroui/react';
 import Bell from 'lucide-react/icons/bell';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Flame from 'lucide-react/icons/flame';
@@ -24,7 +18,7 @@ import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
-import { Progress } from '@/components/ui';
+import { Progress, Button, Chip } from '@/components/ui';
 
 interface GoalMilestone {
   id: number;

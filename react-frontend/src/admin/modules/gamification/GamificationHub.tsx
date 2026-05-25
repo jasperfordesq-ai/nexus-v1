@@ -1,18 +1,7 @@
-import { Select, SelectItem, useDisclosure } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Admin Gamification Hub
- * Dashboard overview of badges, XP, campaigns, and quick links.
- * Parity: PHP Admin\GamificationController@index
- */
-
+import { Card, CardBody, CardHeader, Button, Spinner, Textarea, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea } from '@heroui/react';
+
 import Award from 'lucide-react/icons/award';
 import Users from 'lucide-react/icons/users';
 import Zap from 'lucide-react/icons/zap';
@@ -28,8 +17,19 @@ import { useToast, useTenant } from '@/contexts';
 import { adminGamification } from '../../api/adminApi';
 import { StatCard, PageHeader } from '../../components';
 import type { GamificationStats, BadgeConfigEntry } from '../../api/types';
-
 import { useTranslation } from 'react-i18next';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Admin Gamification Hub
+ * Dashboard overview of badges, XP, campaigns, and quick links.
+ * Parity: PHP Admin\GamificationController@index
+ */
+
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────

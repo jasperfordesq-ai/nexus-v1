@@ -23,12 +23,11 @@
  * (e.g. MapTiler Geocoding).
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Input, Button } from '@heroui/react';
-import MapPin from 'lucide-react/icons/map-pin';
+import { useState, useEffect, useRef, useCallback } from 'react';import MapPin from 'lucide-react/icons/map-pin';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import type { PlaceAutocompleteInputProps, PlaceResult, AddressComponents } from '@/types/google-places';
+import { Button, Input } from '@/components/ui';
 
 /**
  * Throttle: Nominatim usage policy says ≤1 request per second. Combined with

@@ -1,16 +1,13 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Input } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useCallback } from 'react';
-import { Button, Input } from '@heroui/react';
-import Zap from 'lucide-react/icons/zap';
+import { useState, useCallback } from 'react';import Zap from 'lucide-react/icons/zap';
 import ChevronUp from 'lucide-react/icons/chevron-up';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { PipelineRule } from './JobDetailTypes';

@@ -15,21 +15,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import {
-  Button,
-  Input,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Switch,
-  Spinner,
-  Tabs,
-  Tab,
-  Textarea,
-  Chip,
-} from '@heroui/react';
+import { Switch, Tabs, Tab } from '@heroui/react';
 import FolderHeart from 'lucide-react/icons/folder-heart';
 import Plus from 'lucide-react/icons/plus';
 import Search from 'lucide-react/icons/search';
@@ -38,7 +24,7 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import Package from 'lucide-react/icons/package';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { CollectionCard, SavedSearchCard } from '@/components/marketplace';
 import type {

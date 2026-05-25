@@ -1,3 +1,4 @@
+import { CardBody, Card, Chip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -13,7 +14,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { Card, CardBody, Chip } from '@heroui/react';
+
 import MapPin from 'lucide-react/icons/map-pin';
 import Tag from 'lucide-react/icons/tag';
 import Calendar from 'lucide-react/icons/calendar';

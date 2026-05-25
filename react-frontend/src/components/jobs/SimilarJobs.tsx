@@ -3,16 +3,14 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Link } from 'react-router-dom';
-import { Chip } from '@heroui/react';
-import Briefcase from 'lucide-react/icons/briefcase';
+import { Link } from 'react-router-dom';import Briefcase from 'lucide-react/icons/briefcase';
 import MapPin from 'lucide-react/icons/map-pin';
 import DollarSign from 'lucide-react/icons/dollar-sign';
 import Heart from 'lucide-react/icons/heart';
 import Timer from 'lucide-react/icons/timer';
 import Globe from 'lucide-react/icons/globe';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Chip } from '@/components/ui';
 import type { JobVacancy } from './JobDetailTypes';
 import { TYPE_CHIP_COLORS } from './JobDetailTypes';
 

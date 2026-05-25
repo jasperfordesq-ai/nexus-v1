@@ -17,18 +17,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import {
-  Button,
-  Avatar,
-  Chip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Input,
-  Textarea,
-} from '@heroui/react';
+
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import MessageSquare from 'lucide-react/icons/message-square';
@@ -43,7 +32,7 @@ import Ban from 'lucide-react/icons/ban';
 import UserCheck from 'lucide-react/icons/user-check';
 import Star from 'lucide-react/icons/star';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen, EmptyState } from '@/components/feedback';
 import { RatingModal } from '@/components/wallet';

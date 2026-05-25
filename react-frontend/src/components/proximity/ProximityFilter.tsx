@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, Button } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -7,9 +7,7 @@ import { Select, SelectItem } from '@/components/ui';
 // Proximity filter for Listings, Events, and Volunteering pages.
 // Coordinates come from the user's profile — no browser geolocation popup.
 
-import { useTranslation } from 'react-i18next';
-import { Button } from '@heroui/react';
-import MapPin from 'lucide-react/icons/map-pin';
+import { useTranslation } from 'react-i18next';import MapPin from 'lucide-react/icons/map-pin';
 import { useAuth, useToast } from '@/contexts';
 
 export interface ProximityFilterParams {

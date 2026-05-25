@@ -9,12 +9,11 @@
  * Provides autocomplete suggestions and popular tags for quick selection.
  */
 
-import { useState, useCallback, useRef, useEffect } from 'react';
-import { Button, Input, Chip } from '@heroui/react';
-import Tag from 'lucide-react/icons/tag';
+import { useState, useCallback, useRef, useEffect } from 'react';import Tag from 'lucide-react/icons/tag';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { Button, Chip, Input } from '@/components/ui';
 
 interface SkillTagsInputProps {
   tags: string[];

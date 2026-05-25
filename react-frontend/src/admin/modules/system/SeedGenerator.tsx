@@ -1,3 +1,14 @@
+import { Card, CardBody, CardHeader, Button, Input } from '@/components/ui';
+import { useState, useRef } from 'react';
+import { Checkbox } from '@heroui/react';
+import Database from 'lucide-react/icons/database';
+import Play from 'lucide-react/icons/play';
+import AlertTriangle from 'lucide-react/icons/triangle-alert';
+import { usePageTitle } from '@/hooks';
+import { useToast } from '@/contexts';
+import { PageHeader } from '../../components';
+import { adminTools } from '../../api/adminApi';
+import { useTranslation } from 'react-i18next';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -8,17 +19,6 @@
  * Generate sample/test data for development and testing environments.
  */
 
-import { useState, useRef } from 'react';
-import { Card, CardBody, CardHeader, Button, Checkbox, Input } from '@heroui/react';
-import Database from 'lucide-react/icons/database';
-import Play from 'lucide-react/icons/play';
-import AlertTriangle from 'lucide-react/icons/triangle-alert';
-import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
-import { PageHeader } from '../../components';
-import { adminTools } from '../../api/adminApi';
-
-import { useTranslation } from 'react-i18next';
 const SEED_OPTIONS = [
   { key: 'users', labelKey: 'seed_generator.option_users_label', descKey: 'seed_generator.option_users_desc', count: 50 },
   { key: 'listings', labelKey: 'seed_generator.option_listings_label', descKey: 'seed_generator.option_listings_desc', count: 100 },

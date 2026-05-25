@@ -1,19 +1,6 @@
-import { useDisclosure } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Member Tags
- * Admin CRM page for managing member tags.
- * Supports tag summary view, per-tag member drill-down, add/remove tags,
- * and autocomplete from existing tags.
- */
-
+import { Card, CardBody, CardHeader, Button, Input, Chip, Spinner, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import {
-  Card, CardBody, CardHeader, Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Chip, Spinner, Avatar } from '@heroui/react';
+
 import Tag from 'lucide-react/icons/tag';
 import Plus from 'lucide-react/icons/plus';
 import Trash2 from 'lucide-react/icons/trash-2';
@@ -26,6 +13,17 @@ import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant, useToast } from '@/contexts';
 import { adminCrm } from '../../api/adminApi';
 import { PageHeader, ConfirmModal, MemberSearchPicker, type MemberSearchMember } from '../../components';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Member Tags
+ * Admin CRM page for managing member tags.
+ * Supports tag summary view, per-tag member drill-down, add/remove tags, * and autocomplete from existing tags.
+ */
+
 
 interface MemberTag {
   id: number;

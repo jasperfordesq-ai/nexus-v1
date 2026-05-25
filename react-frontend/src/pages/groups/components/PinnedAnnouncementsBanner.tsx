@@ -9,12 +9,11 @@
  * Non-critical — silently fails if the API is unavailable.
  */
 
-import { useState, useEffect } from 'react';
-import { Chip } from '@heroui/react';
-import Megaphone from 'lucide-react/icons/megaphone';
+import { useState, useEffect } from 'react';import Megaphone from 'lucide-react/icons/megaphone';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { api } from '@/lib/api';
 import { useTranslation } from 'react-i18next';
+import { Chip } from '@/components/ui';
 
 interface PinnedAnnouncement {
   id: number;

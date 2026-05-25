@@ -1,3 +1,13 @@
+import { Card, CardBody, CardHeader, Button, Chip, Spinner } from '@/components/ui';
+import { useState, useEffect, useCallback } from 'react';
+import ClipboardCheck from 'lucide-react/icons/clipboard-check';
+import Play from 'lucide-react/icons/play';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import { useTranslation } from 'react-i18next';
+import { useToast } from '@/contexts';
+import { useAdminPageMeta } from '../../AdminMetaContext';
+import { PageHeader } from '../../components';
+import { adminTools } from '../../api/adminApi';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,16 +19,6 @@
  * Fetches real audit data from the API and supports triggering new audits.
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { Card, CardBody, CardHeader, Button, Chip, Spinner } from '@heroui/react';
-import ClipboardCheck from 'lucide-react/icons/clipboard-check';
-import Play from 'lucide-react/icons/play';
-import RefreshCw from 'lucide-react/icons/refresh-cw';
-import { useTranslation } from 'react-i18next';
-import { useToast } from '@/contexts';
-import { useAdminPageMeta } from '../../AdminMetaContext';
-import { PageHeader } from '../../components';
-import { adminTools } from '../../api/adminApi';
 
 interface AuditCheck {
   name: string;

@@ -1,23 +1,7 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * AG59 — Partner-facing Regional Analytics dashboard.
- *
- * Auth: ?token=<subscription_token> in the URL OR
- *       Authorization: Bearer <token>.
- *
- * All data is bucketed / anonymised server-side. Segments with N<10 are
- * suppressed and rendered as "—".
- */
-
+import { Button, Card, CardBody, CardHeader, Chip, Spinner, Select, SelectItem } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import {
-  Button, Card, CardBody, CardHeader, Chip, Spinner, Tab, Tabs } from '@heroui/react';
+import { Tab, Tabs } from '@heroui/react';
 import {
   Area,
   AreaChart,
@@ -43,6 +27,21 @@ import TrendingUp from 'lucide-react/icons/trending-up';
 import Users from 'lucide-react/icons/users';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * AG59 — Partner-facing Regional Analytics dashboard.
+ *
+ * Auth: ?token=<subscription_token> in the URL OR
+ *       Authorization: Bearer <token>.
+ *
+ * All data is bucketed / anonymised server-side. Segments with N<10 are
+ * suppressed and rendered as "—".
+ */
+
 
 // ─── Types ────────────────────────────────────────────────────────────────
 

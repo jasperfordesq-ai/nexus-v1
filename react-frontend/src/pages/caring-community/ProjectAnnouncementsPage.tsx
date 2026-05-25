@@ -9,13 +9,7 @@ import {
   useState } from 'react';
 import { Link,
   useParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Chip,
-  Spinner,
-} from '@heroui/react';
-import ArrowLeft from 'lucide-react/icons/arrow-left';
+import { useTranslation } from 'react-i18next';import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Bell from 'lucide-react/icons/bell';
 import BellOff from 'lucide-react/icons/bell-off';
 import CalendarDays from 'lucide-react/icons/calendar-days';
@@ -26,14 +20,7 @@ import Megaphone from 'lucide-react/icons/megaphone';
 import Milestone from 'lucide-react/icons/milestone';
 import Share2 from 'lucide-react/icons/share-2';
 import Users from 'lucide-react/icons/users';
-import { GlassCard,
-  Progress,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
-} from '@/components/ui';
+import { GlassCard, Progress, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Chip, Spinner } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';

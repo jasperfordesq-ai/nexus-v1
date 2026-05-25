@@ -5,20 +5,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import {
-  Avatar,
-  Button,
-  Chip,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Skeleton,
-  Textarea,
-  Tooltip,
-} from '@heroui/react';
+import { Skeleton, Tooltip } from '@heroui/react';
 import AlertCircle from 'lucide-react/icons/alert-circle';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CalendarClock from 'lucide-react/icons/calendar-clock';
@@ -30,7 +17,7 @@ import Play from 'lucide-react/icons/play';
 import StopCircle from 'lucide-react/icons/stop-circle';
 import Users from 'lucide-react/icons/users';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Input, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Avatar } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useTenant, useToast } from '@/contexts';
 import { useApi } from '@/hooks/useApi';

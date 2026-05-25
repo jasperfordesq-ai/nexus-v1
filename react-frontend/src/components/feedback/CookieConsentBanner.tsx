@@ -1,3 +1,4 @@
+import { CardBody, Card, Button, Chip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -16,7 +17,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Card, CardBody, Chip, Switch } from '@heroui/react';
+import { Switch } from '@heroui/react';
 import Cookie from 'lucide-react/icons/cookie';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import ChevronUp from 'lucide-react/icons/chevron-up';

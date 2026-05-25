@@ -13,12 +13,8 @@
 
 import { useCallback } from 'react';
 import { motion } from 'framer-motion';
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-} from '@heroui/react';
+import { Modal, ModalContent, ModalHeader, ModalBody } from '@/components/ui';
+
 
 export interface BottomSheetProps {
   isOpen: boolean;

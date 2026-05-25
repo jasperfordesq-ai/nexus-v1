@@ -13,12 +13,11 @@
  * API: GET /v2/users/{userId}/verein-membership-status?organization_id={orgId}
  */
 
-import { useEffect, useState } from 'react';
-import { Chip } from '@heroui/react';
-import CheckCircle2 from 'lucide-react/icons/circle-check';
+import { useEffect, useState } from 'react';import CheckCircle2 from 'lucide-react/icons/circle-check';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
+import { Chip } from '@/components/ui';
 
 interface MembershipStatusResponse {
   user_id: number;

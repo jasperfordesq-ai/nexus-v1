@@ -12,12 +12,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import {
-  Button,
-  Chip,
-  Input,
-  Avatar,
-} from '@heroui/react';
+
 import BookOpen from 'lucide-react/icons/book-open';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
@@ -27,7 +22,7 @@ import Eye from 'lucide-react/icons/eye';
 import Search from 'lucide-react/icons/search';
 import User from 'lucide-react/icons/user';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Input, Avatar } from '@/components/ui';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { PublicEmptyState } from '@/components/public/PublicEmptyState';
 import { PublicPageHero } from '@/components/public/PublicPageHero';

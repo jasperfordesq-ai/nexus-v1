@@ -1,14 +1,4 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * GDPR Request Detail
- * Detail page for viewing and managing a single GDPR request.
- * Route: /admin/enterprise/gdpr/requests/:id
- */
-
+import { Card, CardBody, CardHeader, Chip, Button, Spinner, Textarea, Input, Progress, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import {
   useEffect,
   useState,
@@ -16,20 +6,7 @@ import {
   useMemo } from 'react';
 import { useParams,
   useNavigate } from 'react-router-dom';
-import { Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Button,
-  Spinner,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Textarea,
-  Input,
-} from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import MessageSquarePlus from 'lucide-react/icons/message-square-plus';
@@ -46,7 +23,17 @@ import { useAdminPageMeta } from '../../AdminMetaContext';
 import { PageHeader, StatusBadge } from '../../components';
 import type { GdprRequestDetail as GdprRequestDetailType, GdprTimelineEntry } from '../../api/types';
 import { useTranslation } from 'react-i18next';
-import { Progress } from '@/components/ui';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * GDPR Request Detail
+ * Detail page for viewing and managing a single GDPR request.
+ * Route: /admin/enterprise/gdpr/requests/:id
+ */
+
 
 const typeColorMap: Record<string, 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'> = {
   access: 'primary',

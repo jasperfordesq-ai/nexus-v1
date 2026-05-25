@@ -1,4 +1,20 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Select, SelectItem, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@/components/ui';
+import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from '@heroui/react';
+import Copy from 'lucide-react/icons/copy';
+import Info from 'lucide-react/icons/info';
+import KeyRound from 'lucide-react/icons/key-round';
+import Plus from 'lucide-react/icons/plus';
+import Power from 'lucide-react/icons/power';
+import RefreshCw from 'lucide-react/icons/refresh-cw';
+import Server from 'lucide-react/icons/server';
+import Trash2 from 'lucide-react/icons/trash-2';
+import { usePageTitle } from '@/hooks';
+import { useToast } from '@/contexts';
+import { api } from '@/lib/api';
+import { logError } from '@/lib/logger';
+import { PageHeader } from '../../components';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -14,23 +30,6 @@ import { Select, SelectItem } from '@/components/ui';
  *
  */
 
-import { useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import {
-  Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, Tooltip } from '@heroui/react';
-import Copy from 'lucide-react/icons/copy';
-import Info from 'lucide-react/icons/info';
-import KeyRound from 'lucide-react/icons/key-round';
-import Plus from 'lucide-react/icons/plus';
-import Power from 'lucide-react/icons/power';
-import RefreshCw from 'lucide-react/icons/refresh-cw';
-import Server from 'lucide-react/icons/server';
-import Trash2 from 'lucide-react/icons/trash-2';
-import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
-import { api } from '@/lib/api';
-import { logError } from '@/lib/logger';
-import { PageHeader } from '../../components';
 
 type PeerStatus = 'pending' | 'active' | 'suspended';
 

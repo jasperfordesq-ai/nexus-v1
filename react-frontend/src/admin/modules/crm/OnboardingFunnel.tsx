@@ -1,27 +1,10 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Onboarding Funnel Visualization
- * Shows member progression from signup to active participation.
- * Data source: GET /api/v2/admin/crm/funnel
- */
-
+import { Button, Card, CardBody, CardHeader, Chip, Spinner, Progress } from '@/components/ui';
 import {
   useCallback,
   useEffect,
   useMemo,
   useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Spinner,
-} from '@heroui/react';
 import type { LucideIcon } from 'lucide-react';
 import Activity from 'lucide-react/icons/activity';
 import ArrowDown from 'lucide-react/icons/arrow-down';
@@ -48,7 +31,17 @@ import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant, useToast } from '@/contexts';
 import { adminCrm } from '../../api/adminApi';
 import { useTranslation } from 'react-i18next';
-import { Progress } from '@/components/ui';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Onboarding Funnel Visualization
+ * Shows member progression from signup to active participation.
+ * Data source: GET /api/v2/admin/crm/funnel
+ */
+
 
 interface FunnelStage {
   name: string;

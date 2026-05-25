@@ -13,12 +13,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import {
-  Button,
-  Avatar,
-  Chip,
-  Spinner,
-} from '@heroui/react';
+
 import Globe from 'lucide-react/icons/globe';
 import MapPin from 'lucide-react/icons/map-pin';
 import Users from 'lucide-react/icons/users';
@@ -33,7 +28,7 @@ import Calendar from 'lucide-react/icons/calendar';
 import UserCheck from 'lucide-react/icons/user-check';
 import Handshake from 'lucide-react/icons/handshake';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner, Avatar } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { PageMeta } from '@/components/seo';
 import { useAuth, useTenant } from '@/contexts';

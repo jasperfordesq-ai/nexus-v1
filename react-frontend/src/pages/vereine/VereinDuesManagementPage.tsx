@@ -1,4 +1,17 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+import Receipt from 'lucide-react/icons/receipt';
+import AlertCircle from 'lucide-react/icons/circle-alert';
+import Bell from 'lucide-react/icons/bell';
+import CheckCircle2 from 'lucide-react/icons/circle-check';
+import { PageMeta } from '@/components/seo/PageMeta';
+import { useToast } from '@/contexts';
+import { usePageTitle } from '@/hooks';
+import { api } from '@/lib/api';
+import { logError } from '@/lib/logger';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -18,20 +31,6 @@ import { Select, SelectItem } from '@/components/ui';
  *   (tenant admin OR scoped verein_admin role for THIS organization)
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import {
-  Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea } from '@heroui/react';
-import Receipt from 'lucide-react/icons/receipt';
-import AlertCircle from 'lucide-react/icons/circle-alert';
-import Bell from 'lucide-react/icons/bell';
-import CheckCircle2 from 'lucide-react/icons/circle-check';
-import { PageMeta } from '@/components/seo/PageMeta';
-import { useToast } from '@/contexts';
-import { usePageTitle } from '@/hooks';
-import { api } from '@/lib/api';
-import { logError } from '@/lib/logger';
 
 interface FeeConfig {
   id: number;

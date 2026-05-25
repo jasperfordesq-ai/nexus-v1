@@ -14,10 +14,11 @@
 
 import { useState, useRef, useCallback, useEffect, useId } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button, Tooltip } from '@heroui/react';
+import { Tooltip } from '@heroui/react';
 import Heart from 'lucide-react/icons/heart';
 import Clock from 'lucide-react/icons/clock';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui';
 
 /* ───────────────────────── Reaction Config ───────────────────────── */
 

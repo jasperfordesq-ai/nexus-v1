@@ -1,29 +1,11 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Federation Control Center
- * Super-admin hub for federation management: system status, feature toggles,
- * whitelist, partnerships, and quick links to sub-pages.
- */
-
+import { Card, CardBody, CardHeader, Button, Chip, Input, Spinner, Code, Snippet, Accordion, AccordionItem } from '@/components/ui';
 import {
   useState,
   useCallback,
   useEffect,
   useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Switch,
-  Chip,
-  Input,
-  Spinner,
-} from '@heroui/react';
+import { Switch } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Globe from 'lucide-react/icons/globe';
 import Shield from 'lucide-react/icons/shield';
@@ -42,16 +24,21 @@ import KeyRound from 'lucide-react/icons/key-round';
 import { usePageTitle } from '@/hooks';
 import { useToast,
   useTenant } from '@/contexts';
-import { Code,
-  Snippet,
-  Accordion,
-  AccordionItem,
-} from '@/components/ui';
 import { adminSuper } from '../../api/adminApi';
 import { PageHeader, ConfirmModal, StatCard } from '../../components';
 import type { FederationSystemControls as FederationSystemControlsType, FederationWhitelistEntry, FederationPartnership } from '../../api/types';
-
 import { useTranslation } from 'react-i18next';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Federation Control Center
+ * Super-admin hub for federation management: system status, feature toggles, * whitelist, partnerships, and quick links to sub-pages.
+ */
+
+
 export function FederationControls() {
   const { t } = useTranslation('admin');
   usePageTitle(t('super.federation_controls_title'));

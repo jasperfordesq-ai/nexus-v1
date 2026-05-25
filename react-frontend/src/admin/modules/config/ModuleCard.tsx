@@ -1,3 +1,4 @@
+import { Card, CardBody, Button, Chip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -8,7 +9,7 @@
  * Displays a single module in the configuration grid with toggle and configure actions.
  */
 
-import { Card, CardBody, Switch, Button, Chip } from '@heroui/react';
+import { Switch } from '@heroui/react';
 import Settings2 from 'lucide-react/icons/settings-2';
 import { useTranslation } from 'react-i18next';
 import type { ModuleDefinition } from './moduleRegistry';

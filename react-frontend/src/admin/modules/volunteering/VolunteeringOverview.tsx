@@ -1,16 +1,6 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Volunteering Overview
- * Admin dashboard for volunteering module with stats, trends chart,
- * quick actions, and real-time activity feed.
- */
-
+import { Card, CardBody, CardHeader, Button, Chip, Avatar } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Button, Chip, Avatar, ButtonGroup, Skeleton } from '@heroui/react';
+import { ButtonGroup, Skeleton } from '@heroui/react';
 import Heart from 'lucide-react/icons/heart';
 import Users from 'lucide-react/icons/users';
 import Clock from 'lucide-react/icons/clock';
@@ -28,9 +18,18 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
 import { PageHeader, StatCard } from '../../components';
-
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Volunteering Overview
+ * Admin dashboard for volunteering module with stats, trends chart, * quick actions, and real-time activity feed.
+ */
+
 
 interface VolStats {
   total_opportunities: number;

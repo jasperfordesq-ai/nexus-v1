@@ -1,3 +1,4 @@
+import { Card, CardBody, Button } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -8,7 +9,7 @@
  * Shown when a list or page has no data
  */
 
-import { Card, CardBody, Button } from '@heroui/react';
+
 import Inbox from 'lucide-react/icons/inbox';
 import type { LucideIcon } from 'lucide-react';
 

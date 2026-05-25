@@ -4,12 +4,11 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Button } from '@heroui/react';
-import X from 'lucide-react/icons/x';
+import { useTranslation } from 'react-i18next';import X from 'lucide-react/icons/x';
 import Download from 'lucide-react/icons/download';
 import { useInstallPrompt, shouldOfferInstall } from '@/lib/installPrompt';
 import { IosInstallModal } from './IosInstallModal';
+import { Button } from '@/components/ui';
 
 const DISMISS_KEY = 'nexus_install_banner_dismissed';
 const FIRST_SEEN_KEY = 'nexus_install_banner_first_seen';

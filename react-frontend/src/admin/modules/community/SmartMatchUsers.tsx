@@ -9,14 +9,13 @@
  * Wired to adminMatching.getApprovals() API (existing module).
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { Spinner, Chip } from '@heroui/react';
-import Users from 'lucide-react/icons/users';
+import { useState, useEffect, useCallback } from 'react';import Users from 'lucide-react/icons/users';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminMatching } from '../../api/adminApi';
 import { PageHeader, DataTable, StatusBadge, EmptyState, type Column } from '../../components';
 import type { MatchApproval } from '../../api/types';
+import { Chip, Spinner } from '@/components/ui';
 
 export function SmartMatchUsers() {
   usePageTitle("Community");

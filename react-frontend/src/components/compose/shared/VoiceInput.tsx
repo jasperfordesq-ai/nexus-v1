@@ -9,11 +9,10 @@
  * Returns null when the browser does not support the Web Speech API.
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Button } from '@heroui/react';
-import Mic from 'lucide-react/icons/mic';
+import { useCallback, useEffect, useRef, useState } from 'react';import Mic from 'lucide-react/icons/mic';
 import MicOff from 'lucide-react/icons/mic-off';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

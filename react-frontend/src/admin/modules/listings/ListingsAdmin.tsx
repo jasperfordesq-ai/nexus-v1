@@ -1,3 +1,4 @@
+import { Button, Chip, Card, CardBody, Input, Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,17 +12,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import {
-  Tabs,
-  Tab,
-  Button,
-  Chip,
-  Card,
-  CardBody,
-  Input,
-  Spinner,
-  Tooltip,
-} from '@heroui/react';
+import { Tabs, Tab, Tooltip } from '@heroui/react';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
 import Trash2 from 'lucide-react/icons/trash-2';
@@ -76,7 +67,6 @@ function FeaturedListingsPanel() {
       setFeaturedLoading(false);
     }
   }, [toast, t])
-
 
   useEffect(() => {
     loadFeatured();
@@ -359,7 +349,6 @@ export function ListingsAdmin() {
       setLoading(false);
     }
   }, [page, status, search, toast, t])
-
 
   useEffect(() => {
     loadItems();

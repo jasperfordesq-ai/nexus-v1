@@ -1,25 +1,9 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * ProviderHealthDashboard
- * Admin component showing health/status of all identity verification providers.
- */
-
+import { Card, CardBody, CardHeader, Chip, Spinner, Progress } from '@/components/ui';
 import {
   useState,
   useEffect,
   useCallback } from 'react';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Spinner,
-  Tooltip,
-} from '@heroui/react';
+import { Tooltip } from '@heroui/react';
 import Activity from 'lucide-react/icons/activity';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
@@ -31,7 +15,16 @@ import WifiOff from 'lucide-react/icons/wifi-off';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { Progress } from '@/components/ui';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * ProviderHealthDashboard
+ * Admin component showing health/status of all identity verification providers.
+ */
+
 
 interface ProviderHealthStats {
   total_sessions: number;

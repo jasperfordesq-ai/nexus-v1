@@ -1,26 +1,7 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
+import { Card, CardBody, CardHeader, Button, Spinner, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Spinner,
-  Chip,
-  Tooltip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  RadioGroup,
-  Radio,
-} from '@heroui/react';
+import { Tooltip, RadioGroup, Radio } from '@heroui/react';
 import Clock from 'lucide-react/icons/clock';
 import FileText from 'lucide-react/icons/file-text';
 import Eye from 'lucide-react/icons/eye';
@@ -42,6 +23,11 @@ import LegalDocVersionForm from './LegalDocVersionForm';
 import LegalDocVersionComparison from './LegalDocVersionComparison';
 import { sanitizeRichText } from '@/lib/sanitize';
 import { useAdminPageMeta } from '../../AdminMetaContext';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 
 export default function LegalDocVersionList() {
   const { t } = useTranslation('admin');

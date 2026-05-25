@@ -5,9 +5,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import type { ComponentType } from 'react';
-import { Button, Chip } from '@heroui/react';
-import ArrowRight from 'lucide-react/icons/arrow-right';
+import type { ComponentType } from 'react';import ArrowRight from 'lucide-react/icons/arrow-right';
 import Building2 from 'lucide-react/icons/building-2';
 import Calendar from 'lucide-react/icons/calendar';
 import FileText from 'lucide-react/icons/file-text';
@@ -32,7 +30,7 @@ import Target from 'lucide-react/icons/target';
 import Users from 'lucide-react/icons/users';
 import Wallet from 'lucide-react/icons/wallet';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import {
   OnboardingChoiceModal,

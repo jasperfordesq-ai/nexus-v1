@@ -14,14 +14,7 @@
 
 import { useState, useCallback, useEffect, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Avatar,
-  Tabs,
-  Tab,
-  Chip,
-  Skeleton,
-} from '@heroui/react';
+import { Tabs, Tab, Skeleton } from '@heroui/react';
 import Star from 'lucide-react/icons/star';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Trash2 from 'lucide-react/icons/trash-2';
@@ -33,6 +26,7 @@ import { resolveAvatarUrl } from '@/lib/helpers';
 import { PageMeta } from '@/components/seo';
 import { ReviewModal } from '@/components/reviews/ReviewModal';
 import { SocialInteractionPanel } from '@/components/social';
+import { Button, Chip, Avatar } from '@/components/ui';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

@@ -15,9 +15,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence, type PanInfo } from 'framer-motion';
-import { Button } from '@heroui/react';
-import X from 'lucide-react/icons/x';
+import { motion, AnimatePresence, type PanInfo } from 'framer-motion';import X from 'lucide-react/icons/x';
 import ChevronLeft from 'lucide-react/icons/chevron-left';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import Download from 'lucide-react/icons/download';
@@ -26,6 +24,7 @@ import { createPortal } from 'react-dom';
 import { FocusScope } from '@react-aria/focus';
 import { resolveAssetUrl } from '@/lib/helpers';
 import type { PostMedia } from './types';
+import { Button } from '@/components/ui';
 
 interface ImageLightboxProps {
   media: PostMedia[];

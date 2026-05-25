@@ -3,11 +3,12 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from '@heroui/react';
+
 import { useTranslation } from 'react-i18next';
 import Share from 'lucide-react/icons/share';
 import Plus from 'lucide-react/icons/plus';
 import Smartphone from 'lucide-react/icons/smartphone';
+import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 
 interface IosInstallModalProps {
   isOpen: boolean;

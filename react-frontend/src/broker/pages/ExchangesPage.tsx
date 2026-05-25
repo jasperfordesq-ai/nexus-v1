@@ -12,17 +12,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import {
-  Tabs,
-  Tab,
-  Button,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Textarea,
-} from '@heroui/react';
+import { Tabs, Tab } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
@@ -33,6 +23,7 @@ import { formatServerDate } from '@/lib/serverTime';
 import { adminBroker } from '@/admin/api/adminApi';
 import { DataTable, StatusBadge, PageHeader, type Column } from '@/admin/components';
 import type { ExchangeRequest } from '@/admin/api/types';
+import { Button, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 
 type ActionType = 'approve' | 'reject';
 

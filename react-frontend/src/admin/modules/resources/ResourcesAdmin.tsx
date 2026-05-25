@@ -11,7 +11,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Tabs, Tab, Chip, Button } from '@heroui/react';
+import { Tabs, Tab } from '@heroui/react';
 import BookOpen from 'lucide-react/icons/book-open';
 import Eye from 'lucide-react/icons/eye';
 import Trash2 from 'lucide-react/icons/trash-2';
@@ -25,6 +25,7 @@ import { api } from '@/lib/api';
 import { PageHeader, DataTable, ConfirmModal, EmptyState, type Column } from '../../components';
 
 import { useTranslation } from 'react-i18next';
+import { Button, Chip } from '@/components/ui';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────

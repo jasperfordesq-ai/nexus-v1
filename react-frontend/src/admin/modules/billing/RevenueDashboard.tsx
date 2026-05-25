@@ -1,3 +1,16 @@
+import { Card, CardBody, CardHeader, Chip, Spinner, Button } from '@/components/ui';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
+import TrendingUp from 'lucide-react/icons/trending-up';
+import Users from 'lucide-react/icons/users';
+import DollarSign from 'lucide-react/icons/dollar-sign';
+import Building2 from 'lucide-react/icons/building-2';
+import { useTranslation } from 'react-i18next';
+import { usePageTitle } from '@/hooks';
+import { useAuth, useTenant } from '@/contexts';
+import { api } from '@/lib/api';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -8,18 +21,6 @@
  * God-only page: platform-wide billing overview at /admin/super/billing/revenue
  */
 
-import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Chip, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button } from '@heroui/react';
-import { Separator } from '@heroui-v3/react';
-import TrendingUp from 'lucide-react/icons/trending-up';
-import Users from 'lucide-react/icons/users';
-import DollarSign from 'lucide-react/icons/dollar-sign';
-import Building2 from 'lucide-react/icons/building-2';
-import { useTranslation } from 'react-i18next';
-import { usePageTitle } from '@/hooks';
-import { useAuth, useTenant } from '@/contexts';
-import { api } from '@/lib/api';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

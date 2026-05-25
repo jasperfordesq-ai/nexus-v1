@@ -1,0 +1,191 @@
+// Copyright (c) 2024-2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { type ElementType, type HTMLAttributes, type ReactNode } from 'react';
+import {
+  Chip as HeroUIChip,
+  CloseButton,
+  type ChipProps as HeroUIChipProps,
+} from '@heroui-v3/react';
+
+type V2ChipColor =
+  | 'default'
+  | 'primary'
+  | 'secondary'
+  | 'success'
+  | 'warning'
+  | 'danger';
+
+type V2ChipVariant =
+  | 'solid'
+  | 'bordered'
+  | 'light'
+  | 'flat'
+  | 'faded'
+  | 'shadow'
+  | 'dot';
+
+type V3ChipColor = NonNullable<HeroUIChipProps['color']>;
+type V3ChipVariant = NonNullable<HeroUIChipProps['variant']>;
+
+export type ChipProps = Omit<
+  HeroUIChipProps,
+  'color' | 'variant' | 'children' | 'className'
+> &
+  Omit<HTMLAttributes<HTMLSpanElement>, 'color' | 'children'> & {
+    as?: ElementType;
+    children?: ReactNode;
+    color?: V2ChipColor | V3ChipColor;
+    variant?: V2ChipVariant | V3ChipVariant;
+    avatar?: ReactNode;
+    startContent?: ReactNode;
+    endContent?: ReactNode;
+    onClose?: () => void;
+    radius?: 'none' | 'sm' | 'md' | 'lg' | 'full';
+    isDisabled?: boolean;
+    className?: string;
+    classNames?: {
+      base?: string;
+      content?: string;
+      closeButton?: string;
+    };
+    href?: string;
+    to?: unknown;
+  };
+
+function mapColor(color?: ChipProps['color']): V3ChipColor {
+  switch (color) {
+    case 'primary':
+      return 'accent';
+    case 'secondary':
+      return 'default';
+    case 'success':
+    case 'warning':
+    case 'danger':
+    case 'accent':
+      return color;
+    default:
+      return 'default';
+  }
+}
+
+function mapVariant(variant?: ChipProps['variant']): V3ChipVariant {
+  switch (variant) {
+    case 'solid':
+    case 'shadow':
+      return 'primary';
+    case 'bordered':
+    case 'faded':
+      return 'secondary';
+    case 'light':
+      return 'soft';
+    case 'flat':
+    case 'dot':
+      return 'tertiary';
+    case 'primary':
+    case 'secondary':
+    case 'tertiary':
+    case 'soft':
+      return variant;
+    default:
+      return 'secondary';
+  }
+}
+
+function radiusClass(radius?: ChipProps['radius']): string | undefined {
+  switch (radius) {
+    case 'none':
+      return 'rounded-none';
+    case 'sm':
+      return 'rounded-sm';
+    case 'md':
+      return 'rounded-md';
+    case 'lg':
+      return 'rounded-lg';
+    case 'full':
+      return 'rounded-full';
+    default:
+      return undefined;
+  }
+}
+
+function combineClasses(...classes: Array<string | false | undefined>): string | undefined {
+  const className = classes.filter(Boolean).join(' ');
+
+  return className || undefined;
+}
+
+export function Chip({
+  as: Component,
+  avatar,
+  children,
+  className,
+  classNames,
+  color,
+  endContent,
+  isDisabled,
+  onClose,
+  radius,
+  startContent,
+  variant,
+  ...props
+}: ChipProps) {
+  const isDot = variant === 'dot';
+
+  const content = (
+    <>
+      {avatar}
+      {isDot && !startContent ? (
+        <span aria-hidden="true" className="inline-block size-1.5 rounded-full bg-current" />
+      ) : null}
+      {startContent}
+      <HeroUIChip.Label className={classNames?.content}>{children}</HeroUIChip.Label>
+      {endContent}
+      {onClose ? (
+        <CloseButton
+          aria-label="Close"
+          className={classNames?.closeButton}
+          onPress={onClose}
+        />
+      ) : null}
+    </>
+  );
+
+  const sharedProps = {
+    className: combineClasses(
+      classNames?.base,
+      radiusClass(radius),
+      isDisabled && 'opacity-50 pointer-events-none',
+      variant === 'shadow' && 'shadow-md',
+      className,
+    ),
+    color: mapColor(color),
+    variant: mapVariant(variant),
+    ...props,
+  } as HeroUIChipProps;
+
+  if (Component) {
+    return (
+      <HeroUIChip
+        {...sharedProps}
+        render={(renderProps) => (
+          <Component {...renderProps} {...props}>
+            {renderProps.children}
+          </Component>
+        )}
+      >
+        {content}
+      </HeroUIChip>
+    );
+  }
+
+  return (
+    <HeroUIChip
+      {...sharedProps}
+    >
+      {content}
+    </HeroUIChip>
+  );
+}

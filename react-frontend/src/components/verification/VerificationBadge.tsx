@@ -10,9 +10,7 @@
  * Always shows labels — never just icons. Green = ID Verified (trust signal).
  */
 
-import { useState, useEffect } from 'react';
-import { Chip } from '@heroui/react';
-import ShieldCheck from 'lucide-react/icons/shield-check';
+import { useState, useEffect } from 'react';import ShieldCheck from 'lucide-react/icons/shield-check';
 import ShieldOff from 'lucide-react/icons/shield-off';
 import Mail from 'lucide-react/icons/mail';
 import Phone from 'lucide-react/icons/phone';
@@ -22,6 +20,7 @@ import Shield from 'lucide-react/icons/shield';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { Chip } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

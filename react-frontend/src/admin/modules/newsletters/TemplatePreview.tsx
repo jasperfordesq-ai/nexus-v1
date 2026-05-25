@@ -9,18 +9,11 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  Spinner,
-} from '@heroui/react';
+
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { adminNewsletters } from '../../api/adminApi';
+import { Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 
 interface TemplatePreviewProps {
   templateId: number;

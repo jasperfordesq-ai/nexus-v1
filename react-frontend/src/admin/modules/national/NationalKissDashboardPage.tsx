@@ -1,27 +1,6 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * National KISS Foundation Dashboard
- *
- * Cross-cooperative super-admin dashboard. Designed for the national KISS
- * foundation administrator (think: what Martin Villiger himself would use).
- *
- * Backend endpoints (all require `national.kiss_dashboard.view` permission):
- *   GET /api/v2/admin/national/kiss/summary
- *   GET /api/v2/admin/national/kiss/comparative
- *   GET /api/v2/admin/national/kiss/trend
- *   GET /api/v2/admin/national/kiss/cooperatives
- *
- * Privacy: every member count surfaces as a bracket; no PII is ever shown.
- */
-
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Select, SelectItem } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import {
   Area,
   CartesianGrid,
@@ -46,6 +25,26 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader, StatCard, Abbr } from '../../components';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * National KISS Foundation Dashboard
+ *
+ * Cross-cooperative super-admin dashboard. Designed for the national KISS
+ * foundation administrator (think: what Martin Villiger himself would use).
+ *
+ * Backend endpoints (all require `national.kiss_dashboard.view` permission):
+ *   GET /api/v2/admin/national/kiss/summary
+ *   GET /api/v2/admin/national/kiss/comparative
+ *   GET /api/v2/admin/national/kiss/trend
+ *   GET /api/v2/admin/national/kiss/cooperatives
+ *
+ * Privacy: every member count surfaces as a bracket; no PII is ever shown.
+ */
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

@@ -14,7 +14,7 @@
  */
 
 import { useState, useCallback, useMemo } from 'react';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Spinner } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import CreditCard from 'lucide-react/icons/credit-card';
 import ShieldCheck from 'lucide-react/icons/shield-check';
@@ -33,6 +33,7 @@ import {
   useStripe,
   useElements,
 } from '@stripe/react-stripe-js';
+import { Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

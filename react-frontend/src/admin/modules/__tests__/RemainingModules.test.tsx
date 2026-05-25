@@ -389,7 +389,7 @@ describe('NexusScoreAnalytics', () => {
 
 // ─── LegalDocVersionForm ────────────────────────────────────────────────────
 
-import { Modal, ModalContent } from '@heroui/react';
+
 import LegalDocVersionForm from '../enterprise/LegalDocVersionForm';
 
 describe('LegalDocVersionForm', () => {
@@ -503,6 +503,7 @@ describe('VolunteeringOverview', () => {
 // ─── VolunteerOrganizations ─────────────────────────────────────────────────
 
 import { VolunteerOrganizations } from '../volunteering/VolunteerOrganizations';
+import { Modal, ModalContent } from '@/components/ui';
 
 describe('VolunteerOrganizations', () => {
   it('renders without crashing', () => {

@@ -10,11 +10,12 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Avatar, Button } from '@heroui/react';
+
 import Clock from 'lucide-react/icons/clock';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { resolveAvatarUrl, resolveAssetUrl, formatRelativeTime } from '@/lib/helpers';
+import { Button, Avatar } from '@/components/ui';
 
 export interface QuotedPostData {
   id: number;

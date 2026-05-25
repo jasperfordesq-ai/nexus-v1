@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,14 +10,12 @@ import { Select, SelectItem } from '@/components/ui';
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import {
-  Button, Chip, Input, Switch, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Spinner, Tooltip } from '@heroui/react';
+import { Switch, Tooltip } from '@heroui/react';
 import CalendarClock from 'lucide-react/icons/calendar-clock';
 import Plus from 'lucide-react/icons/plus';
 import X from 'lucide-react/icons/x';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
-import { GlassCard } from '@/components/ui';
 import { formatDateTime } from '@/lib/helpers';
 import { useTranslation } from 'react-i18next';
 

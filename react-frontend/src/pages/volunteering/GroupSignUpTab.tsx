@@ -10,8 +10,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import {
-  Button, Chip, Avatar, AvatarGroup, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
+
 import Users from 'lucide-react/icons/users';
 import UserPlus from 'lucide-react/icons/user-plus';
 import Calendar from 'lucide-react/icons/calendar';
@@ -24,7 +23,7 @@ import Crown from 'lucide-react/icons/crown';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Hourglass from 'lucide-react/icons/hourglass';
 import XCircle from 'lucide-react/icons/circle-x';
-import { GlassCard, useDisclosure } from '@/components/ui';
+import { GlassCard, useDisclosure, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, AvatarGroup } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

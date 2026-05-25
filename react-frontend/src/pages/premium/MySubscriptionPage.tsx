@@ -1,11 +1,6 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
+import { Card, CardBody, CardHeader, Button, Chip, Spinner } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Chip, Spinner } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Crown from 'lucide-react/icons/crown';
 import ExternalLink from 'lucide-react/icons/external-link';
@@ -14,6 +9,11 @@ import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 import { useTenant, useToast } from '@/contexts';
 import api from '@/lib/api';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
 
 interface MeResponse {
   subscription: {

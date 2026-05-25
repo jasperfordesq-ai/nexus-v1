@@ -1,14 +1,11 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Input, Textarea } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion } from 'framer-motion';
-import {
-  Button, Chip, Input, Textarea } from '@heroui/react';
-import Accessibility from 'lucide-react/icons/accessibility';
+import { motion } from 'framer-motion';import Accessibility from 'lucide-react/icons/accessibility';
 import Info from 'lucide-react/icons/info';
 import Plus from 'lucide-react/icons/plus';
 import Save from 'lucide-react/icons/save';
@@ -16,7 +13,6 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

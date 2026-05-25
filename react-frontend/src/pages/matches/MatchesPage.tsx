@@ -10,21 +10,10 @@
  * Each card shows source type, match score, title, reasons.
  */
 
-import {
-  useState,
-  useEffect,
-  useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { motion,
-  AnimatePresence } from 'framer-motion';
-import {
-  Button,
-  Spinner,
-  Chip,
-  Tabs,
-  Tab,
-  Avatar,
-  } from '@heroui/react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Tabs, Tab } from '@heroui/react';
 import Sparkles from 'lucide-react/icons/sparkles';
 import ListChecks from 'lucide-react/icons/list-checks';
 import Briefcase from 'lucide-react/icons/briefcase';
@@ -37,10 +26,7 @@ import ArrowRight from 'lucide-react/icons/arrow-right';
 import Filter from 'lucide-react/icons/filter';
 import Zap from 'lucide-react/icons/zap';
 import X from 'lucide-react/icons/x';
-import { GlassCard,
-  AlgorithmLabel,
-  Progress,
-} from '@/components/ui';
+import { GlassCard, AlgorithmLabel, Progress, Button, Chip, Spinner, Avatar } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';
 import { useAuth, useToast, useTenant } from '@/contexts';

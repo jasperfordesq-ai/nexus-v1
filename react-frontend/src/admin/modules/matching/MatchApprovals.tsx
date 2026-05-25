@@ -9,24 +9,9 @@
  * Replaces the AdminPlaceholder for /admin/match-approvals.
  */
 
-import {
-  useState,
-  useCallback,
-  useEffect } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Button,
-  Chip,
-  Tabs,
-  Tab,
-  Avatar,
-  Textarea,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-} from '@heroui/react';
+import { Tabs, Tab } from '@heroui/react';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
 import Clock from 'lucide-react/icons/clock';
@@ -47,7 +32,7 @@ import {
 import type { MatchApproval, MatchApprovalStats } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
-import { Progress } from '@/components/ui';
+import { Progress, Button, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 // Score color helper
 function scoreColor(score: number): 'danger' | 'warning' | 'success' {
   if (score < 50) return 'danger';

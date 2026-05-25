@@ -1,9 +1,3 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-import { Button, Chip } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import { Link } from 'react-router-dom';
 import X from 'lucide-react/icons/x';
@@ -11,6 +5,7 @@ import LightbulbIcon from 'lucide-react/icons/lightbulb';
 import TriangleAlertIcon from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
 import type { HelpArticle } from '../data/helpContent';
+import { Button, Chip } from '@/components/ui';
 
 interface AdminHelpDrawerProps {
   article: HelpArticle;

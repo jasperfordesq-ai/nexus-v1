@@ -1,3 +1,16 @@
+import { Button, Card, CardBody, CardHeader, Chip, Spinner } from '@/components/ui';
+import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import Receipt from 'lucide-react/icons/receipt';
+import CreditCard from 'lucide-react/icons/credit-card';
+import AlertCircle from 'lucide-react/icons/circle-alert';
+import CheckCircle2 from 'lucide-react/icons/circle-check';
+import { PageMeta } from '@/components/seo/PageMeta';
+import { useToast } from '@/contexts';
+import { usePageTitle } from '@/hooks';
+import { api } from '@/lib/api';
+import { logError } from '@/lib/logger';
+import { StripeCheckoutModal } from '@/components/marketplace/StripeCheckoutModal';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,19 +28,6 @@
  *   POST /api/v2/me/verein-dues/{id}/pay
  */
 
-import { useCallback, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Button, Card, CardBody, CardHeader, Chip, Spinner } from '@heroui/react';
-import Receipt from 'lucide-react/icons/receipt';
-import CreditCard from 'lucide-react/icons/credit-card';
-import AlertCircle from 'lucide-react/icons/circle-alert';
-import CheckCircle2 from 'lucide-react/icons/circle-check';
-import { PageMeta } from '@/components/seo/PageMeta';
-import { useToast } from '@/contexts';
-import { usePageTitle } from '@/hooks';
-import { api } from '@/lib/api';
-import { logError } from '@/lib/logger';
-import { StripeCheckoutModal } from '@/components/marketplace/StripeCheckoutModal';
 
 interface DuesRow {
   id: number;

@@ -1,3 +1,4 @@
+import { CardBody, Card, GlassCard, Chip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -5,7 +6,7 @@
 
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Card, CardBody, Chip, Skeleton } from '@heroui/react';
+import { Skeleton } from '@heroui/react';
 import AlertCircle from 'lucide-react/icons/alert-circle';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CheckCircle from 'lucide-react/icons/check-circle';
@@ -15,7 +16,6 @@ import Star from 'lucide-react/icons/star';
 import XCircle from 'lucide-react/icons/x-circle';
 import { useTranslation } from 'react-i18next';
 import { TrustTierBadge } from '@/components/caring-community/TrustTierBadge';
-import { GlassCard } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { useApi } from '@/hooks/useApi';

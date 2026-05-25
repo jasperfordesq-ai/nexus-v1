@@ -1,3 +1,12 @@
+import { Card, CardBody, CardHeader, Button, Spinner } from '@/components/ui';
+import { useState, useEffect, useCallback } from 'react';
+import Image from 'lucide-react/icons/image';
+import Play from 'lucide-react/icons/play';
+import { useTranslation } from 'react-i18next';
+import { usePageTitle } from '@/hooks';
+import { useToast } from '@/contexts';
+import { PageHeader } from '../../components';
+import { adminTools } from '../../api/adminApi';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -8,15 +17,6 @@
  * Bulk convert images to WebP format for performance optimization.
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { Card, CardBody, CardHeader, Button, Spinner } from '@heroui/react';
-import Image from 'lucide-react/icons/image';
-import Play from 'lucide-react/icons/play';
-import { useTranslation } from 'react-i18next';
-import { usePageTitle } from '@/hooks';
-import { useToast } from '@/contexts';
-import { PageHeader } from '../../components';
-import { adminTools } from '../../api/adminApi';
 
 interface WebpStats {
   total_images: number;

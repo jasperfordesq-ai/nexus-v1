@@ -1,17 +1,7 @@
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Community Analytics Dashboard
- * Visualizes community health metrics with Recharts charts.
- * Data source: GET /api/v2/admin/community-analytics
- */
-
+import { Card, CardBody, CardHeader, Spinner, Button } from '@/components/ui';
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardBody, CardHeader, Spinner, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import {
   BarChart,
   PieChart,
@@ -45,6 +35,17 @@ import { LocationMap } from '@/components/location';
 import { MAPS_ENABLED } from '@/lib/map-config';
 import { StatCard, PageHeader } from '../../components';
 import { useAdminPageMeta } from '../../AdminMetaContext';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Community Analytics Dashboard
+ * Visualizes community health metrics with Recharts charts.
+ * Data source: GET /api/v2/admin/community-analytics
+ */
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

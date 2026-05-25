@@ -5,25 +5,13 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import {
-  Button,
-  Chip,
-  Input,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Textarea,
-} from '@heroui/react';
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import CheckCircle from 'lucide-react/icons/circle-check';
 import Globe from 'lucide-react/icons/globe';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner, Input, Textarea } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import {
   FederationCommunityPicker,

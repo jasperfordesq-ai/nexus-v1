@@ -12,11 +12,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import {
-  Button,
-  Chip,
-  Avatar,
-} from '@heroui/react';
+
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Calendar from 'lucide-react/icons/calendar';
@@ -26,7 +22,7 @@ import ArrowLeft from 'lucide-react/icons/arrow-left';
 import MessageCircle from 'lucide-react/icons/message-circle';
 import { sanitizeRichText } from '@/lib/sanitize';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Button, Chip, Avatar } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { Helmet } from 'react-helmet-async';
 import { PageMeta } from '@/components/seo';

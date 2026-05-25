@@ -15,21 +15,13 @@
  */
 
 import { useState, useCallback } from 'react';
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  Textarea,
-  Checkbox,
-} from '@heroui/react';
+import { Checkbox } from '@heroui/react';
 import Star from 'lucide-react/icons/star';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { Button, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

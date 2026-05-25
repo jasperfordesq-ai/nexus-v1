@@ -261,15 +261,14 @@ function BootstrapError({ onRetry }: { onRetry: () => void }) {
  * Inline component to avoid circular dependency with lazy-loaded NotFoundPage.
  */
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { Button } from '@heroui/react';
-import { Helmet } from 'react-helmet-async';
+import { motion } from 'framer-motion';import { Helmet } from 'react-helmet-async';
 import Home from 'lucide-react/icons/house';
 import Search from 'lucide-react/icons/search';
 import Globe from 'lucide-react/icons/globe';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { usePageTitle } from '@/hooks/usePageTitle';
+import { Button } from '@/components/ui';
 
 function CommunityNotFound({ slug }: { slug: string }) {
   const { t } = useTranslation('errors');

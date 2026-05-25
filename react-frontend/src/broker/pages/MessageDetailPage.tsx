@@ -1,18 +1,7 @@
-import { Select, SelectItem } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
-// SPDX-License-Identifier: AGPL-3.0-or-later
-// Author: Jasper Ford
-// See NOTICE file for attribution and acknowledgements.
-
-/**
- * Message Detail
- * Broker message copy detail view with full conversation thread and moderation actions.
- * Parity: PHP BrokerControlsController::showMessage()
- */
-
+import { Card, CardBody, CardHeader, Button, Chip, Textarea, Spinner, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, ScrollShadow, Spinner } from '@heroui/react';
+import { ScrollShadow } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
@@ -30,6 +19,17 @@ import { formatServerDateTime } from '@/lib/serverTime';
 import { adminBroker } from '@/admin/api/adminApi';
 import { PageHeader } from '@/admin/components';
 import type { BrokerMessageDetail, ConversationMessage } from '@/admin/api/types';
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+/**
+ * Message Detail
+ * Broker message copy detail view with full conversation thread and moderation actions.
+ * Parity: PHP BrokerControlsController::showMessage()
+ */
+
 
 // ─── Copy reason chip colors ──────────────────────────────────────────────────
 
