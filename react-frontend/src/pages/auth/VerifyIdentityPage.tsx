@@ -224,8 +224,8 @@ export function VerifyIdentityPage() {
         {pageMeta}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
           <GlassCard className="p-8 text-center">
-            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-primary/10 flex items-center justify-center">
-              <Loader2 className="w-8 h-8 text-primary animate-spin" />
+            <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-accent/10 flex items-center justify-center">
+              <Loader2 className="w-8 h-8 text-accent animate-spin" />
             </div>
             <h1 className="text-2xl font-bold text-theme-primary mb-2">
               {t('verify_identity.loading_title')}
@@ -385,12 +385,12 @@ export function VerifyIdentityPage() {
             <motion.div
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
-              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4"
+              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-accent/10 mb-4"
             >
               {pageState === 'in_progress' ? (
                 <Spinner size="lg" color="secondary" />
               ) : (
-                <ShieldAlert className="w-8 h-8 text-primary" />
+                <ShieldAlert className="w-8 h-8 text-accent" />
               )}
             </motion.div>
             <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">
@@ -417,7 +417,7 @@ export function VerifyIdentityPage() {
 
           {pageState === 'start' && (
             <div className="space-y-4">
-              <div className="p-4 rounded-xl bg-primary/5 border border-primary/10">
+              <div className="p-4 rounded-xl bg-accent/5 border border-accent/10">
                 <h3 className="font-medium text-theme-primary text-sm mb-2">
                   {t('verify_identity.what_needed_title')}
                 </h3>

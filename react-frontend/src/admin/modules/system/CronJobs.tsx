@@ -340,8 +340,8 @@ export function CronJobs() {
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 mb-6">
           <Card shadow="sm">
             <CardBody className="flex flex-row items-center gap-3 p-4">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                <Clock size={20} className="text-primary" />
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10">
+                <Clock size={20} className="text-accent" />
               </div>
               <div>
                 <p className="text-xs text-default-500">{t('system.total_jobs')}</p>

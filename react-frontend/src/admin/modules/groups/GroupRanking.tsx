@@ -115,7 +115,7 @@ export default function GroupRanking() {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className="font-bold text-primary">{Number(group.ranking_score ?? 0).toFixed(0)}</span>
+                  <span className="font-bold text-accent">{Number(group.ranking_score ?? 0).toFixed(0)}</span>
                 </TableCell>
                 <TableCell>
                   <Switch

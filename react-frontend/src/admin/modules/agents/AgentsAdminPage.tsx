@@ -158,7 +158,7 @@ export default function AgentsAdminPage() {
           <Card key={def.id} className="border border-default-200">
             <CardHeader className="flex justify-between items-start gap-4">
               <div className="flex gap-3 items-start">
-                <Brain className="w-6 h-6 text-primary mt-1" />
+                <Brain className="w-6 h-6 text-accent mt-1" />
                 <div>
                   <h2 className="text-lg font-semibold">{def.name}</h2>
                   <p className="text-xs text-default-500 font-mono">{def.slug}</p>

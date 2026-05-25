@@ -1150,7 +1150,7 @@ export function RegisterPage() {
             <motion.div
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
-              className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/15 sm:h-16 sm:w-16"
+              className="mb-4 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-accent/15 sm:h-16 sm:w-16"
             >
               <User className="w-7 h-7 sm:w-8 sm:h-8 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
             </motion.div>

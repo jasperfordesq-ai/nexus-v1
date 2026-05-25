@@ -139,7 +139,7 @@ function CheckoutForm({
           <Separator />
           <div className="flex justify-between">
             <span className="font-semibold text-foreground">{t('checkout.total')}</span>
-            <span className="font-bold text-lg text-primary">{formatAmount(totalAmount, currency)}</span>
+            <span className="font-bold text-lg text-accent">{formatAmount(totalAmount, currency)}</span>
           </div>
         </div>
 
@@ -226,7 +226,7 @@ export function StripeCheckoutModal({
         {() => (
           <>
             <ModalHeader className="flex items-center gap-2">
-              <CreditCard className="w-5 h-5 text-primary" aria-hidden="true" />
+              <CreditCard className="w-5 h-5 text-accent" aria-hidden="true" />
               {t('checkout.title')}
             </ModalHeader>
 

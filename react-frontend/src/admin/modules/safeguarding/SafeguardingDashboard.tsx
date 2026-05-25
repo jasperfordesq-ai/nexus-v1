@@ -427,9 +427,9 @@ export function SafeguardingDashboard() {
 
       {/* Active filter banner — tells the admin what they drilled into */}
       {activeFilterLabel && (
-        <div className="flex items-center justify-between rounded-lg border border-primary/20 bg-primary/5 px-4 py-2">
+        <div className="flex items-center justify-between rounded-lg border border-accent/20 bg-accent/5 px-4 py-2">
           <div className="flex items-center gap-2 text-sm">
-            <Flag size={14} className="text-primary" />
+            <Flag size={14} className="text-accent" />
             <span className="text-default-600">
               {t('safeguarding.filter_showing')} <strong className="text-foreground">{activeFilterLabel}</strong>
             </span>
@@ -775,7 +775,7 @@ export function SafeguardingDashboard() {
 
                     {reviewTarget.ward_name && (
                       <div className="flex items-center gap-2 text-sm">
-                        <Shield size={14} className="text-primary" />
+                        <Shield size={14} className="text-accent" />
                         <span className="text-default-500">{t('safeguarding.ward')}:</span>
                         <span>{reviewTarget.ward_name}</span>
                         {reviewTarget.guardian_name && (

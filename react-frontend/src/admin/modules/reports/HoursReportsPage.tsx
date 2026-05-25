@@ -255,7 +255,7 @@ export function HoursReportsPage() {
         {/* Bar Chart */}
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <BarChart3 size={18} className="text-primary" />
+            <BarChart3 size={18} className="text-accent" />
             <h3 className="font-semibold">{t('reports.chart_hours_by_category')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
@@ -282,7 +282,7 @@ export function HoursReportsPage() {
         {/* Pie Chart */}
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <PieChartIcon size={18} className="text-secondary" />
+            <PieChartIcon size={18} className="text-accent" />
             <h3 className="font-semibold">{t('reports.chart_category_distribution')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
@@ -410,7 +410,7 @@ export function HoursReportsPage() {
     return (
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-          <TrendingUp size={18} className="text-primary" />
+          <TrendingUp size={18} className="text-accent" />
           <h3 className="font-semibold">{t('reports.chart_monthly_hours_trend')}</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">

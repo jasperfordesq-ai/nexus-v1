@@ -76,7 +76,7 @@ export default function NewsletterUnsubscribePage() {
 
         {state === 'loading' && (
           <>
-            <Loader2 className="mx-auto animate-spin text-primary mb-4" size={32} />
+            <Loader2 className="mx-auto animate-spin text-accent mb-4" size={32} />
             <h1 className="text-xl font-semibold text-foreground">{t('newsletter.processing')}</h1>
             <p className="mt-2 text-default-500 text-sm">{t('newsletter.removing_from_list')}</p>
           </>

@@ -215,7 +215,7 @@ export default function VereinFederationPanel({ organizationId }: Props) {
     <div className="space-y-6">
       <div>
         <h2 className="text-xl font-bold flex items-center gap-2">
-          <Network className="w-5 h-5 text-primary" />
+          <Network className="w-5 h-5 text-accent" />
           {t('verein_federation.panel_title')}
         </h2>
         <p className="text-sm text-default-500 mt-1">{t('verein_federation.panel_subtitle')}</p>

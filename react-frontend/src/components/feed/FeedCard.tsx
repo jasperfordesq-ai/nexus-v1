@@ -537,7 +537,7 @@ const FeedCard = React.memo(function FeedCard({
                   name={author.name}
                   src={resolveAvatarUrl(author.avatar)}
                   size="md"
-                  className="ring-2 ring-[var(--border-default)] group-hover:ring-primary/30 transition-all"
+                  className="ring-2 ring-[var(--border-default)] group-hover:ring-accent/30 transition-all"
                   isBordered
                 />
               </Link>
@@ -547,7 +547,7 @@ const FeedCard = React.memo(function FeedCard({
                 <UserHoverCard userId={author.id}>
                   <Link
                     to={tenantPath(`/profile/${author.id}`)}
-                    className="font-semibold text-theme-primary hover:text-primary transition-colors text-sm truncate"
+                    className="font-semibold text-theme-primary hover:text-accent transition-colors text-sm truncate"
                   >
                     {author.name}
                   </Link>
@@ -847,7 +847,7 @@ const FeedCard = React.memo(function FeedCard({
             detailPath ? (
               <Link
                 to={tenantPath(detailPath)}
-                className="text-sm font-semibold text-theme-primary hover:text-primary transition-colors mb-1.5 block"
+                className="text-sm font-semibold text-theme-primary hover:text-accent transition-colors mb-1.5 block"
                 onClick={recordClick}
               >
                 {item.title}
@@ -992,7 +992,7 @@ const FeedCard = React.memo(function FeedCard({
             )}
             {item.location && (
               <span className="flex items-center gap-1.5 text-theme-muted">
-                <MapPin className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
+                <MapPin className="w-3.5 h-3.5 text-accent" aria-hidden="true" />
                 <span className="truncate">{item.location}</span>
               </span>
             )}
@@ -1374,7 +1374,7 @@ const FeedCard = React.memo(function FeedCard({
                     <div className="text-[10px] font-semibold text-amber-700 dark:text-amber-400 uppercase tracking-wider leading-none">
                       {t('card.reviewed')}
                     </div>
-                    <div className="text-sm font-semibold text-theme-primary group-hover/receiver:text-primary transition-colors truncate">
+                    <div className="text-sm font-semibold text-theme-primary group-hover/receiver:text-accent transition-colors truncate">
                       {item.receiver.name}
                     </div>
                   </div>
@@ -1446,7 +1446,7 @@ const FeedCard = React.memo(function FeedCard({
           <div className="mb-3">
             <Link
               to={tenantPath(detailPath)}
-              className={`inline-flex items-center justify-center gap-2 py-2 px-5 rounded-xl text-sm font-medium transition-all bg-gradient-to-r ${config.softGradient || 'from-primary/10 to-primary/5'} text-theme-primary hover:opacity-80 border border-theme-default hover:border-primary/30`}
+              className={`inline-flex items-center justify-center gap-2 py-2 px-5 rounded-xl text-sm font-medium transition-all bg-gradient-to-r ${config.softGradient || 'from-accent/10 to-accent/5'} text-theme-primary hover:opacity-80 border border-theme-default hover:border-accent/30`}
               onClick={recordClick}
             >
               {config.icon}
@@ -1546,8 +1546,8 @@ const FeedCard = React.memo(function FeedCard({
                 <Button
                   size="sm"
                   variant="light"
-                  className={`transition-all ${showComments ? 'text-primary font-medium bg-primary/5' : 'text-theme-muted hover:text-primary hover:bg-primary/5'}`}
-                  startContent={<MessageCircle className={`w-[18px] h-[18px] ${showComments ? 'fill-primary/20' : ''}`} aria-hidden="true" />}
+                  className={`transition-all ${showComments ? 'text-accent font-medium bg-accent/5' : 'text-theme-muted hover:text-accent hover:bg-accent/5'}`}
+                  startContent={<MessageCircle className={`w-[18px] h-[18px] ${showComments ? 'fill-accent/20' : ''}`} aria-hidden="true" />}
                   onPress={toggleComments}
                 >
                   {t('card.comment_action')}

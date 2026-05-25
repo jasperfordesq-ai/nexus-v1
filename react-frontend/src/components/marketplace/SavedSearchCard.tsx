@@ -59,9 +59,9 @@ export function SavedSearchCard({ search, onToggle, onDelete, onRun }: SavedSear
             <Button
               variant="light"
               onPress={() => onRun?.(search)}
-              className="flex items-center gap-2 text-left hover:text-primary transition-colors h-auto p-0 min-w-0 justify-start"
+              className="flex items-center gap-2 text-left hover:text-accent transition-colors h-auto p-0 min-w-0 justify-start"
             >
-              <Search aria-hidden="true" className="w-4 h-4 text-primary shrink-0" />
+              <Search aria-hidden="true" className="w-4 h-4 text-accent shrink-0" />
               <span className="font-semibold text-foreground truncate">{search.name}</span>
             </Button>
 

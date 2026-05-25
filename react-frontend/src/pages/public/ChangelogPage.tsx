@@ -62,7 +62,7 @@ export function ChangelogPage() {
       {/* Header */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-3 flex-wrap">
-          <ScrollText className="w-7 h-7 text-primary shrink-0" aria-hidden="true" />
+          <ScrollText className="w-7 h-7 text-accent shrink-0" aria-hidden="true" />
           <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
             {t('changelog_page.heading')}
           </h1>
@@ -78,7 +78,7 @@ export function ChangelogPage() {
             href="https://github.com/jasperfordesq-ai/nexus-v1/blob/main/CHANGELOG.md"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-primary underline focus:outline-none focus:ring-2 focus:ring-primary rounded"
+            className="inline-flex items-center gap-1 text-accent underline focus:outline-none focus:ring-2 focus:ring-accent rounded"
           >
             {t('changelog_page.view_on_github')}
             <ExternalLink className="w-3 h-3" aria-hidden="true" />

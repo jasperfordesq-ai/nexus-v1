@@ -67,7 +67,7 @@ export function SellerCard({ seller }: SellerCardProps) {
       </div>
       <Link
         to={tenantPath(`/marketplace/seller/${seller.id}`)}
-        className="text-xs text-primary hover:underline shrink-0"
+        className="text-xs text-accent hover:underline shrink-0"
       >
         {t('seller.view_profile')}
       </Link>

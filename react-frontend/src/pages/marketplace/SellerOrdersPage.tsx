@@ -119,7 +119,7 @@ function SellerOrderCard({
             <div className="min-w-0">
               <Link
                 to={tenantPath(`/marketplace/${order.listing.id}`)}
-                className="font-semibold text-foreground hover:text-primary transition-colors line-clamp-1"
+                className="font-semibold text-foreground hover:text-accent transition-colors line-clamp-1"
               >
                 {order.listing.title}
               </Link>
@@ -164,7 +164,7 @@ function SellerOrderCard({
                   href={order.tracking_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-primary hover:underline inline-flex items-center gap-0.5"
+                  className="text-accent hover:underline inline-flex items-center gap-0.5"
                 >
                   {t('orders.track')}
                   <ExternalLink className="w-3 h-3" />
@@ -359,7 +359,7 @@ export function SellerOrdersPage() {
         {/* Header */}
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <Store className="w-7 h-7 text-primary" />
+            <Store className="w-7 h-7 text-accent" />
             {t('orders.seller.title')}
           </h1>
           <p className="text-default-500 text-sm mt-1">
@@ -427,7 +427,7 @@ export function SellerOrdersPage() {
       <Modal isOpen={shipModal.isOpen} onClose={shipModal.onClose} size="md" placement="center">
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <Truck className="w-5 h-5 text-primary" />
+            <Truck className="w-5 h-5 text-accent" />
             {t('orders.seller.ship_modal_title')}
           </ModalHeader>
           <ModalBody className="space-y-4">

@@ -113,7 +113,7 @@ function StepIndicator({ current, labels }: StepIndicatorProps) {
                   isComplete
                     ? 'bg-success border-success text-white'
                     : isActive
-                      ? 'bg-primary border-primary text-white'
+                      ? 'bg-accent border-accent text-white'
                       : 'bg-[var(--color-surface)] border-default-300 text-default-400',
                 ].join(' ')}
               >
@@ -122,7 +122,7 @@ function StepIndicator({ current, labels }: StepIndicatorProps) {
               <span
                 className={[
                   'mt-1 text-xs hidden sm:block max-w-[72px] text-center leading-tight',
-                  isActive ? 'text-primary font-medium' : 'text-default-400',
+                  isActive ? 'text-accent font-medium' : 'text-default-400',
                 ].join(' ')}
               >
                 {label}
@@ -470,7 +470,7 @@ export function MerchantOnboardingPage() {
 
       {/* Hero */}
       <div className="text-center mb-8">
-        <Building2 size={44} className="mx-auto mb-3 text-primary" />
+        <Building2 size={44} className="mx-auto mb-3 text-accent" />
         <h1 className="text-2xl sm:text-3xl font-bold text-[var(--color-text)]">
           {t('hero_title')}
         </h1>
@@ -491,7 +491,7 @@ export function MerchantOnboardingPage() {
         {step === 1 && (
           <div className="space-y-5">
             <h2 className="text-lg font-semibold text-[var(--color-text)] flex items-center gap-2">
-              <Building2 size={20} className="text-primary" />
+              <Building2 size={20} className="text-accent" />
               {t('steps.profile')}
             </h2>
 
@@ -546,7 +546,7 @@ export function MerchantOnboardingPage() {
         {step === 2 && (
           <div className="space-y-5">
             <h2 className="text-lg font-semibold text-[var(--color-text)] flex items-center gap-2">
-              <MapPin size={20} className="text-primary" />
+              <MapPin size={20} className="text-accent" />
               {t('steps.location')}
             </h2>
 
@@ -582,7 +582,7 @@ export function MerchantOnboardingPage() {
             {/* Opening hours grid */}
             <div>
               <p className="text-sm font-medium text-[var(--color-text)] mb-3 flex items-center gap-2">
-                <Clock size={16} className="text-primary" />
+                <Clock size={16} className="text-accent" />
                 {t('opening_hours')}
               </p>
               <div className="space-y-2">
@@ -646,7 +646,7 @@ export function MerchantOnboardingPage() {
         {step === 3 && (
           <div className="space-y-6">
             <h2 className="text-lg font-semibold text-[var(--color-text)] flex items-center gap-2">
-              <Camera size={20} className="text-primary" />
+              <Camera size={20} className="text-accent" />
               {t('steps.photo')}
             </h2>
 
@@ -656,7 +656,7 @@ export function MerchantOnboardingPage() {
                 <img
                   src={avatarPreview}
                   alt={t('steps.photo')}
-                  className="w-24 h-24 rounded-full object-cover border-2 border-primary"
+                  className="w-24 h-24 rounded-full object-cover border-2 border-accent"
                 />
               ) : (
                 <div className="w-24 h-24 rounded-full bg-default-100 flex items-center justify-center border-2 border-dashed border-default-300">

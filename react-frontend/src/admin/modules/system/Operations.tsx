@@ -124,7 +124,7 @@ export default function Operations() {
 
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <Timer size={18} className="text-secondary" />
+            <Timer size={18} className="text-accent" />
             <h3 className="font-semibold">Background jobs</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4 space-y-3">

@@ -182,7 +182,7 @@ export function MatchingAnalytics() {
             {/* Score Distribution */}
             <Card shadow="sm">
               <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-                <Zap size={18} className="text-primary" />
+                <Zap size={18} className="text-accent" />
                 <h3 className="font-semibold">{t('matching.score_distribution')}</h3>
               </CardHeader>
               <CardBody className="px-4 pb-4">
@@ -229,7 +229,7 @@ export function MatchingAnalytics() {
             {/* Distance Distribution */}
             <Card shadow="sm">
               <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-                <MapPin size={18} className="text-primary" />
+                <MapPin size={18} className="text-accent" />
                 <h3 className="font-semibold">{t('matching.distance_distribution')}</h3>
               </CardHeader>
               <CardBody className="px-4 pb-4">
@@ -278,7 +278,7 @@ export function MatchingAnalytics() {
             {/* Matching Activity */}
             <Card shadow="sm">
               <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-                <Users size={18} className="text-primary" />
+                <Users size={18} className="text-accent" />
                 <h3 className="font-semibold">{t('matching.matching_activity')}</h3>
               </CardHeader>
               <CardBody className="px-4 pb-4">
@@ -330,7 +330,7 @@ export function MatchingAnalytics() {
             {/* Approval Metrics */}
             <Card shadow="sm">
               <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-                <CheckCircle size={18} className="text-primary" />
+                <CheckCircle size={18} className="text-accent" />
                 <h3 className="font-semibold">{t('matching.approval_metrics')}</h3>
               </CardHeader>
               <CardBody className="px-4 pb-4">

@@ -206,7 +206,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
         {/* Languages */}
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <Globe size={18} className="text-primary" />
+            <Globe size={18} className="text-accent" />
             <h3 className="font-semibold">{t('tenant_features.language_localisation_heading')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4 space-y-4">
@@ -387,7 +387,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
         {/* API Keys */}
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <KeyRound size={18} className="text-primary" />
+            <KeyRound size={18} className="text-accent" />
             <h3 className="font-semibold">
               {t('tenant_features.api_keys_card_title')}
             </h3>

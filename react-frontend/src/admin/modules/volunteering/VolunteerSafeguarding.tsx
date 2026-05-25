@@ -438,7 +438,7 @@ export function VolunteerSafeguarding() {
                             : incident.status === 'escalated'
                               ? 'bg-danger'
                               : incident.status === 'investigating'
-                                ? 'bg-primary'
+                                ? 'bg-accent'
                                 : 'bg-warning'
                         }`}
                       />

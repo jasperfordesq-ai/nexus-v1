@@ -82,9 +82,9 @@ export function HybridPriceDisplay({
         <Tooltip
           content={t('hybrid_pricing.tooltip')}
         >
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
-            <Clock className={`${classes.icon} text-primary`} aria-hidden="true" />
-            <span className={`${classes.tc} font-bold text-primary`}>
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent/10 border border-accent/20">
+            <Clock className={`${classes.icon} text-accent`} aria-hidden="true" />
+            <span className={`${classes.tc} font-bold text-accent`}>
               {timeCreditPrice} TC
             </span>
           </div>
@@ -111,7 +111,7 @@ export function HybridPriceDisplay({
         <span className="text-xs text-theme-muted" aria-hidden="true">|</span>
         <Link
           to={tenantPath('/help')}
-          className="text-xs text-primary hover:underline"
+          className="text-xs text-accent hover:underline"
         >
           {t('hybrid_pricing.learn_more')}
         </Link>

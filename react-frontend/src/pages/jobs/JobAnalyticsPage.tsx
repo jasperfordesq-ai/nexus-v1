@@ -84,9 +84,9 @@ function isJobPredictionsData(value: unknown): value is JobPredictionsData {
 
 const STAGE_COLORS: Record<string, string> = {
   applied: 'bg-warning/20 text-warning',
-  screening: 'bg-primary/20 text-primary',
-  reviewed: 'bg-primary/20 text-primary',
-  interview: 'bg-secondary/20 text-secondary',
+  screening: 'bg-accent/20 text-accent',
+  reviewed: 'bg-accent/20 text-accent',
+  interview: 'bg-accent-soft text-accent',
   offer: 'bg-success/20 text-success',
   accepted: 'bg-success/20 text-success',
   rejected: 'bg-danger/20 text-danger',
@@ -393,7 +393,7 @@ export function JobAnalyticsPage() {
                 >
                   <span className="text-[10px] text-theme-subtle">{count}</span>
                   <Tooltip content={t('analytics.views_tooltip', { date: day.date, count })}>
-                    <div className={`w-full rounded-t bg-primary ${getBarHeightClass(count, maxViews)}`} />
+                    <div className={`w-full rounded-t bg-accent ${getBarHeightClass(count, maxViews)}`} />
                   </Tooltip>
                   <span className="text-[9px] text-theme-subtle rotate-[-45deg] origin-top-left whitespace-nowrap">
                     {new Date(day.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
@@ -424,7 +424,7 @@ export function JobAnalyticsPage() {
                     >
                       <span className="text-[10px] text-theme-subtle">{count}</span>
                       <Tooltip content={t('analytics.applications_tooltip', { week: week.week, count })}>
-                        <div className={`w-full rounded-t bg-secondary ${getBarHeightClass(count, maxWeeklyCount)}`} />
+                        <div className={`w-full rounded-t bg-default ${getBarHeightClass(count, maxWeeklyCount)}`} />
                       </Tooltip>
                       <span className="text-[9px] text-theme-subtle rotate-[-45deg] origin-top-left whitespace-nowrap">
                         {week.week}
@@ -462,7 +462,7 @@ export function JobAnalyticsPage() {
                       className="min-w-24"
                     />
                   </div>
-                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STAGE_COLORS[item.stage] ?? 'bg-primary/20 text-primary'}`}>
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STAGE_COLORS[item.stage] ?? 'bg-accent/20 text-accent'}`}>
                     {item.count}
                   </span>
                   <span className="text-xs text-theme-subtle w-12 text-right">{pct}%</span>
@@ -476,7 +476,7 @@ export function JobAnalyticsPage() {
       {/* AI Predictions */}
       <GlassCard className="p-6">
         <div className="flex items-center gap-2 mb-4">
-          <Sparkles size={20} className="text-secondary" />
+          <Sparkles size={20} className="text-accent" />
           <h2 className="text-lg font-semibold text-theme-primary">
             {t('analytics.predictions')}
           </h2>
@@ -553,15 +553,15 @@ export function JobAnalyticsPage() {
 
             {/* AI Insights */}
             {predictions.ai_insights && predictions.ai_insights.length > 0 && (
-              <div className="p-4 rounded-lg bg-secondary/5 border border-secondary/20">
+              <div className="p-4 rounded-lg bg-accent-soft border border-accent/20">
                 <div className="flex items-center gap-2 mb-3">
-                  <Sparkles size={16} className="text-secondary" />
-                  <p className="text-sm font-semibold text-secondary">{t('analytics.ai_insights')}</p>
+                  <Sparkles size={16} className="text-accent" />
+                  <p className="text-sm font-semibold text-accent">{t('analytics.ai_insights')}</p>
                 </div>
                 <ul className="space-y-2">
                   {predictions.ai_insights.map((insight, i) => (
                     <li key={i} className="text-sm text-foreground flex items-start gap-2">
-                      <span className="text-secondary mt-0.5">•</span>
+                      <span className="text-accent mt-0.5">•</span>
                       <span>{insight}</span>
                     </li>
                   ))}

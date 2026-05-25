@@ -142,7 +142,7 @@ export function ShippingSelector({ sellerId, onSelect, localPickup }: ShippingSe
   return (
     <div className="space-y-3">
       <h4 className="text-sm font-semibold text-foreground flex items-center gap-2">
-        <Truck className="w-4 h-4 text-primary" aria-hidden="true" />
+        <Truck className="w-4 h-4 text-accent" aria-hidden="true" />
         {t('shipping.select_title')}
       </h4>
 
@@ -156,7 +156,7 @@ export function ShippingSelector({ sellerId, onSelect, localPickup }: ShippingSe
           <Radio
             value={LOCAL_PICKUP_ID}
             classNames={{
-              base: 'max-w-full m-0 border border-default-200 rounded-lg p-3 data-[selected=true]:border-primary',
+              base: 'max-w-full m-0 border border-default-200 rounded-lg p-3 data-[selected=true]:border-accent',
             }}
           >
             <div className="flex items-center gap-3">
@@ -182,11 +182,11 @@ export function ShippingSelector({ sellerId, onSelect, localPickup }: ShippingSe
             key={option.id}
             value={String(option.id)}
             classNames={{
-              base: 'max-w-full m-0 border border-default-200 rounded-lg p-3 data-[selected=true]:border-primary',
+              base: 'max-w-full m-0 border border-default-200 rounded-lg p-3 data-[selected=true]:border-accent',
             }}
           >
             <div className="flex items-center gap-3">
-              <Package className="w-4 h-4 text-primary shrink-0" aria-hidden="true" />
+              <Package className="w-4 h-4 text-accent shrink-0" aria-hidden="true" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-foreground">

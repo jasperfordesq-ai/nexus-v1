@@ -277,7 +277,7 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
                   size="sm"
                   onPress={() => setActiveIndex(idx)}
                   className={`w-2 h-2 min-w-0 min-h-0 rounded-full p-0 ${
-                    idx === activeIndex ? 'bg-primary' : 'bg-white/50'
+                    idx === activeIndex ? 'bg-accent' : 'bg-white/50'
                   }`}
                   aria-label={t('listing.view_image', { number: idx + 1 })}
                 />
@@ -299,7 +299,7 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
               onPress={() => setActiveIndex(idx)}
               aria-label={t('listing.thumbnail_label', { n: idx + 1 })}
               className={`shrink-0 w-16 h-16 min-w-0 rounded-lg overflow-hidden border-2 transition-colors p-0 ${
-                idx === activeIndex ? 'border-primary' : 'border-transparent'
+                idx === activeIndex ? 'border-accent' : 'border-transparent'
               }`}
             >
               <img
@@ -537,7 +537,7 @@ export function MarketplaceListingPage() {
               <span className="text-default-300">/</span>
               <Link
                 to={tenantPath(`/marketplace/category/${listing.category?.slug}`)}
-                className="text-default-500 hover:text-primary transition-colors"
+                className="text-default-500 hover:text-accent transition-colors"
               >
                 {listing.category?.name}
               </Link>
@@ -683,7 +683,7 @@ export function MarketplaceListingPage() {
 
               {!isAuthenticated && (
                 <p className="text-xs text-default-400 text-center">
-                  <Link to={tenantPath('/login')} className="text-primary hover:underline">
+                  <Link to={tenantPath('/login')} className="text-accent hover:underline">
                     {t('listing.sign_in')}
                   </Link>
                   {' '}{t('listing.sign_in_to_contact')}
@@ -706,7 +706,7 @@ export function MarketplaceListingPage() {
                 <div className="min-w-0 flex-1">
                   <Link
                     to={tenantPath(`/marketplace/seller/${listing.user.id}`)}
-                    className="font-semibold text-foreground hover:text-primary transition-colors"
+                    className="font-semibold text-foreground hover:text-accent transition-colors"
                   >
                     {listing.user.name}
                   </Link>
@@ -819,10 +819,10 @@ export function MarketplaceListingPage() {
                       )}
                     </div>
                     <div className="p-2.5">
-                      <p className="text-sm font-medium line-clamp-1 text-foreground group-hover:text-primary transition-colors">
+                      <p className="text-sm font-medium line-clamp-1 text-foreground group-hover:text-accent transition-colors">
                         {item.title}
                       </p>
-                      <p className="text-sm font-semibold text-primary mt-0.5">
+                      <p className="text-sm font-semibold text-accent mt-0.5">
                         {formatPrice(item.price, item.price_type, item.price_currency, freeLabel)}
                       </p>
                     </div>

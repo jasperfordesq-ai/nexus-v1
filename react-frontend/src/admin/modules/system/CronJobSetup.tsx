@@ -323,7 +323,7 @@ export function CronJobSetup() {
       {/* Verification Checklist */}
       <Card shadow="sm" className="mt-6">
         <CardHeader className="flex items-center gap-2">
-          <Info size={18} className="text-primary" />
+          <Info size={18} className="text-accent" />
           <h3 className="text-lg font-semibold">{t('system.verification_checklist')}</h3>
         </CardHeader>
         <CardBody className="space-y-2">

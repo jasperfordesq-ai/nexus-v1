@@ -328,7 +328,7 @@ export function BillingControl() {
 
       <Card>
         <CardHeader className="flex items-center gap-2 pb-0">
-          <CreditCard size={18} className="text-primary" />
+          <CreditCard size={18} className="text-accent" />
           <span className="font-semibold text-sm">{t('billing.control_title')}</span>
         </CardHeader>
         <CardBody className="p-0">

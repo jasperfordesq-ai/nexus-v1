@@ -73,7 +73,7 @@ export function ApplyModal({
             <ModalBody>
               <div className="space-y-4">
                 {savedProfile && !usingSavedProfile && (
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/5 border border-primary/20 text-sm">
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-accent/5 border border-accent/20 text-sm">
                     <div className="flex-1 text-theme-primary">
                       {t('saved_profile.found')}
                       {savedProfile.cv_filename && (
@@ -129,7 +129,7 @@ export function ApplyModal({
                     </span>
                   </label>
                   <div
-                    className="border-2 border-dashed border-default-200 rounded-lg p-4 text-center cursor-pointer hover:border-primary transition-colors"
+                    className="border-2 border-dashed border-default-200 rounded-lg p-4 text-center cursor-pointer hover:border-accent transition-colors"
                     onClick={() => cvInputRef.current?.click()}
                     onDrop={onCvDrop}
                     onDragOver={(e) => e.preventDefault()}
@@ -189,8 +189,8 @@ export function ApplyModal({
                   </p>
                 )}
                 {cvParsed && cvParsed.skills && cvParsed.skills.length > 0 && (
-                  <div className="p-2 rounded-lg bg-secondary-50 border border-secondary-200 text-xs mt-1">
-                    <div className="font-medium text-secondary-700 mb-1 flex items-center gap-1">
+                  <div className="p-2 rounded-lg bg-surface-secondary border border-accent text-xs mt-1">
+                    <div className="font-medium text-accent mb-1 flex items-center gap-1">
                       <Sparkles size={12} aria-hidden="true" />
                       {t('cv.detected')}
                     </div>
@@ -253,7 +253,7 @@ export function QualificationModal({
           <>
             <ModalHeader>
               <div className="flex items-center gap-2">
-                <Target className="w-5 h-5 text-primary" aria-hidden="true" />
+                <Target className="w-5 h-5 text-accent" aria-hidden="true" />
                 {t('qualified.title')}
               </div>
             </ModalHeader>

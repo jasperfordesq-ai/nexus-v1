@@ -58,7 +58,7 @@ const sections: PlatformLegalSection[] = [
             href="https://project-nexus.ie"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary hover:underline"
+            className="text-accent hover:underline"
           >
             project-nexus.ie
           </a>
@@ -451,7 +451,7 @@ const sections: PlatformLegalSection[] = [
               href="https://project-nexus.ie"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:underline"
+              className="text-accent hover:underline"
             >
               project-nexus.ie
             </a>
@@ -478,7 +478,7 @@ const sections: PlatformLegalSection[] = [
               href="https://www.dataprotection.ie"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary hover:underline"
+              className="text-accent hover:underline"
             >
               www.dataprotection.ie
             </a>

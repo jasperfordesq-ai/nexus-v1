@@ -189,13 +189,20 @@ export function TableBody({
   ...props
 }: TableBodyProps) {
   const isLoading = isLoadingProp || loadingState === 'loading' || loadingState === 'loadingMore';
+  const resolvedRenderEmptyState =
+    renderEmptyState ??
+    (isLoading && loadingContent
+      ? () => loadingContent
+      : emptyContent
+        ? () => emptyContent
+        : undefined);
 
   return (
     <HeroUITable.Body
-      renderEmptyState={renderEmptyState ?? (emptyContent ? () => emptyContent : undefined)}
+      renderEmptyState={resolvedRenderEmptyState}
       {...(props as HeroUITableBodyProps)}
     >
-      {isLoading && loadingContent ? loadingContent : props.children}
+      {props.children}
     </HeroUITable.Body>
   );
 }

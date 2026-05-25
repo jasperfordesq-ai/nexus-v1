@@ -1748,7 +1748,7 @@ export function AchievementsPage() {
                       {filteredBadges.map((badge) => (
                         <motion.div key={badge.badge_key} variants={itemVariants}>
                           <GlassCard
-                            className={`flex h-full min-h-[180px] flex-col p-4 text-center transition-transform motion-safe:hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-primary/40 cursor-pointer ${
+                            className={`flex h-full min-h-[180px] flex-col p-4 text-center transition-transform motion-safe:hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-accent/40 cursor-pointer ${
                               !badge.earned_at && badge.earned === false ? 'opacity-40' : ''
                             }`}
                             role="button"

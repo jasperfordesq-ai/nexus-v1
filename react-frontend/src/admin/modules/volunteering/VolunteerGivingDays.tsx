@@ -387,7 +387,7 @@ export default function VolunteerGivingDays() {
         <Card className="border border-divider/70 shadow-sm shadow-black/[0.03]">
           <CardHeader className="pb-0">
             <div className="flex items-center gap-2">
-              <BarChart3 size={18} className="text-primary" />
+              <BarChart3 size={18} className="text-accent" />
               <h3 className="text-lg font-semibold">
                 {t('volunteering.campaign_analytics')}
               </h3>
@@ -463,10 +463,10 @@ export default function VolunteerGivingDays() {
           <ModalBody>
             {/* Stats summary */}
             <div className="grid grid-cols-3 gap-3">
-              <Card className="border border-primary/20 bg-primary-50/30 shadow-sm shadow-primary/10">
+              <Card className="border border-accent/20 bg-accent-soft shadow-sm shadow-accent/10">
                 <CardBody className="p-3 text-center">
                   <p className="text-xs text-default-500">{t('volunteering.total_donors')}</p>
-                  <p className="text-lg font-bold text-primary">{donorStats.total_donors}</p>
+                  <p className="text-lg font-bold text-accent">{donorStats.total_donors}</p>
                 </CardBody>
               </Card>
               <Card className="border border-success/20 bg-success-50/30 shadow-sm shadow-success/10">

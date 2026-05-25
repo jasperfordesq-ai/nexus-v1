@@ -378,8 +378,8 @@ export function PartnerDirectory() {
                         loading="lazy"
                       />
                     ) : (
-                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                        <Globe size={20} className="text-primary" />
+                      <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
+                        <Globe size={20} className="text-accent" />
                       </div>
                     )}
                     <div className="min-w-0 flex-1">
@@ -515,8 +515,8 @@ export function PartnerDirectory() {
                   {requestTarget.logo_url ? (
                     <img src={requestTarget.logo_url} alt={t('federation.partner_logo_alt', { name: requestTarget.name || t('federation.label_partner') })} className="w-10 h-10 rounded-lg object-cover" loading="lazy" />
                   ) : (
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <Globe size={18} className="text-primary" />
+                    <div className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center">
+                      <Globe size={18} className="text-accent" />
                     </div>
                   )}
                   <div>

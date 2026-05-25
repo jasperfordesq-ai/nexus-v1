@@ -152,7 +152,7 @@ export function PromotionSelector({
                     onPress={() => setSelectedType(product.type)}
                     className={`border-2 transition-colors ${
                       isSelected
-                        ? 'border-primary bg-primary/5'
+                        ? 'border-accent bg-accent/5'
                         : 'border-divider hover:border-default-300'
                     }`}
                   >
@@ -170,7 +170,7 @@ export function PromotionSelector({
                                   ? `${product.currency} ${Number(product.price).toFixed(2)}`
                                   : t('promotions.free_label')}
                               </span>
-                              {isSelected && <Check aria-hidden="true" className="w-5 h-5 text-primary" />}
+                              {isSelected && <Check aria-hidden="true" className="w-5 h-5 text-accent" />}
                             </div>
                           </div>
                           <p className="text-sm text-default-500 mt-1">{product.description}</p>

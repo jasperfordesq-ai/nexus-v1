@@ -201,7 +201,7 @@ export default function VereinMembersImportPage() {
       {/* Step 1: upload */}
       <Card className="border border-default-200 shadow-sm">
         <CardHeader className="flex items-center gap-2">
-          <Upload className="w-5 h-5 text-primary" />
+          <Upload className="w-5 h-5 text-accent" />
           <h2 className="text-base font-semibold">
             {t('verein_import.step1')}
           </h2>
@@ -249,7 +249,7 @@ export default function VereinMembersImportPage() {
       {preview && (
         <Card className="border border-default-200 shadow-sm">
           <CardHeader className="flex items-center gap-2 flex-wrap">
-            <FileText className="w-5 h-5 text-primary" />
+            <FileText className="w-5 h-5 text-accent" />
             <h2 className="text-base font-semibold">
               {t('verein_import.step2')}
             </h2>
@@ -267,9 +267,9 @@ export default function VereinMembersImportPage() {
                 <p className="text-xs uppercase text-success-700">{t('verein_import.summary.create')}</p>
                 <p className="text-2xl font-bold text-success">{preview.summary.ready_to_create}</p>
               </div>
-              <div className="rounded-lg border border-primary-200 bg-primary-50 p-3 text-center">
-                <p className="text-xs uppercase text-primary-700">{t('verein_import.summary.link')}</p>
-                <p className="text-2xl font-bold text-primary">{preview.summary.ready_to_link}</p>
+              <div className="rounded-lg border border-accent bg-accent-soft p-3 text-center">
+                <p className="text-xs uppercase text-accent">{t('verein_import.summary.link')}</p>
+                <p className="text-2xl font-bold text-accent">{preview.summary.ready_to_link}</p>
               </div>
               <div className="rounded-lg border border-warning-200 bg-warning-50 p-3 text-center">
                 <p className="text-xs uppercase text-warning-700">{t('verein_import.summary.duplicates')}</p>

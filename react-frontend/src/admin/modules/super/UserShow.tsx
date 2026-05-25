@@ -368,7 +368,7 @@ export function UserShow() {
                   <p className="text-xs text-default-400">{t('super.label_current_tenant')}</p>
                   <Link
                     to={tenantPath(`/admin/super/tenants/${user.tenant_id}`)}
-                    className="text-sm font-medium text-primary hover:underline"
+                    className="text-sm font-medium text-accent hover:underline"
                   >
                     {user.tenant_name || t('super.tenant_with_id', { id: user.tenant_id })}
                   </Link>
@@ -488,17 +488,17 @@ export function UserShow() {
               <div className="flex flex-col items-center gap-3 py-2">
                 <div className={`w-16 h-16 rounded-full flex items-center justify-center ${
                   privilege.level === 4 ? 'bg-gradient-to-br from-purple-500/20 to-pink-500/20' :
-                  privilege.level === 3 ? 'bg-secondary/10' :
-                  privilege.level === 2 ? 'bg-primary/10' :
+                  privilege.level === 3 ? 'bg-accent-soft' :
+                  privilege.level === 2 ? 'bg-accent/10' :
                   'bg-default/10'
                 }`}>
                   {privilege.level >= 3 ? (
                     <CrownIcon size={28} className={
-                      privilege.level === 4 ? 'text-purple-600' : 'text-secondary'
+                      privilege.level === 4 ? 'text-purple-600' : 'text-accent'
                     } />
                   ) : (
                     <Shield size={28} className={
-                      privilege.level === 2 ? 'text-primary' : 'text-default-400'
+                      privilege.level === 2 ? 'text-accent' : 'text-default-400'
                     } />
                   )}
                 </div>
@@ -513,8 +513,8 @@ export function UserShow() {
                       className={`h-2 flex-1 rounded-full ${
                         level <= privilege.level
                           ? privilege.level === 4 ? 'bg-gradient-to-r from-purple-500 to-pink-500'
-                            : privilege.level === 3 ? 'bg-secondary'
-                            : privilege.level === 2 ? 'bg-primary'
+                            : privilege.level === 3 ? 'bg-default'
+                            : privilege.level === 2 ? 'bg-accent'
                             : 'bg-default-300'
                           : 'bg-default-100'
                       }`}
@@ -668,7 +668,7 @@ export function UserShow() {
       <Modal isOpen={promoteModalOpen} onClose={() => { setPromoteModalOpen(false); setPromoteTargetTenant(''); }} size="md">
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <Crown size={20} className="text-secondary" />
+            <Crown size={20} className="text-accent" />
             {t('super.move_and_promote')}
           </ModalHeader>
           <ModalBody>

@@ -114,7 +114,7 @@ interface StatCardProps {
 
 function StatCard({ label, value, color = 'default', icon }: StatCardProps) {
   const colorClass: Record<string, string> = {
-    primary: 'text-primary',
+    primary: 'text-accent',
     success: 'text-success',
     warning: 'text-warning',
     danger: 'text-danger',
@@ -284,7 +284,7 @@ export function RevenueDashboard() {
                           <div className="flex items-center gap-2">
                             <div className="flex-1 h-2 bg-default-100 rounded-full overflow-hidden">
                               <div
-                                className="h-full bg-primary rounded-full"
+                                className="h-full bg-accent rounded-full"
                                 style={{ width: `${pct}%` }}
                               />
                             </div>

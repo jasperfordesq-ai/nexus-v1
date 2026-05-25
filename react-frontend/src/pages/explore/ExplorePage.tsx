@@ -620,8 +620,8 @@ export default function ExplorePage() {
             base: 'w-full sm:w-auto',
             tabList: 'w-full sm:w-auto gap-0 sm:gap-2 justify-center border-b border-[var(--border-default)]',
             tab: 'text-sm sm:text-base px-3 sm:px-5 h-10',
-            cursor: 'bg-primary',
-            tabContent: 'group-data-[selected=true]:text-primary',
+            cursor: 'bg-accent',
+            tabContent: 'group-data-[selected=true]:text-accent',
           }}
           aria-label={t('aria.content_tabs')}
         >

@@ -202,7 +202,7 @@ export function CivicDigestPage() {
       <Card>
         <CardBody className="gap-3 p-6">
           <div className="flex items-center gap-2">
-            <Bell className="h-5 w-5 text-primary" aria-hidden />
+            <Bell className="h-5 w-5 text-accent" aria-hidden />
             <h1 className="text-xl font-bold text-theme-primary">{t('intro_title')}</h1>
           </div>
           <p className="text-sm leading-relaxed text-theme-muted">{t('intro_body')}</p>
@@ -212,7 +212,7 @@ export function CivicDigestPage() {
       {/* Transparency global note */}
       <Card>
         <CardBody className="flex flex-row items-start gap-3 p-4">
-          <Info className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden />
+          <Info className="mt-0.5 h-5 w-5 shrink-0 text-accent" aria-hidden />
           <p className="text-xs leading-relaxed text-theme-muted">
             {t('transparency.global_note')}
           </p>
@@ -363,7 +363,7 @@ export function CivicDigestPage() {
       <Card>
         <CardBody className="gap-4 p-6">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" aria-hidden />
+            <Sparkles className="h-5 w-5 text-accent" aria-hidden />
             <h2 className="text-lg font-semibold text-theme-primary">{t('prefs_title')}</h2>
           </div>
 

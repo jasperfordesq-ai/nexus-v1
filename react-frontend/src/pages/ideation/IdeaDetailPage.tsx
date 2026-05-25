@@ -478,7 +478,7 @@ export function IdeaDetailPage() {
               isDisabled={!isAuthenticated || isVoting}
               className={`flex flex-col items-center gap-0.5 p-3 rounded-xl transition-colors h-auto min-w-0 ${
                 idea.has_voted
-                  ? 'bg-primary/10 text-primary'
+                  ? 'bg-accent/10 text-accent'
                   : 'hover:bg-[var(--color-surface-hover)] text-[var(--color-text-tertiary)]'
               }`}
               aria-label={idea.has_voted ? t('ideas.unvote') : t('ideas.vote')}

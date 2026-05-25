@@ -65,9 +65,9 @@ function mapColor(color?: SliderProps['color']): string | undefined {
     case 'success':
       return 'bg-success';
     case 'primary':
-      return 'bg-primary';
+      return 'bg-accent';
     case 'secondary':
-      return 'bg-secondary';
+      return 'bg-default';
     default:
       return undefined;
   }

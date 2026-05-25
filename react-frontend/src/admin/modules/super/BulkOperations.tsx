@@ -129,7 +129,7 @@ export function BulkOperations() {
   return (
     <div>
       <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-default-500 mb-1">
-        <Link to={tenantPath('/admin/super')} className="hover:text-primary">{t('super.breadcrumb_super_admin')}</Link>
+        <Link to={tenantPath('/admin/super')} className="hover:text-accent">{t('super.breadcrumb_super_admin')}</Link>
         <span>/</span>
         <span className="text-foreground">{t('super.bulk_operations_title')}</span>
       </nav>
@@ -144,7 +144,7 @@ export function BulkOperations() {
             </div>
             <p className="text-xs text-default-400">
               {t('super.bulk_move_users_desc')}{' '}
-              <Link to={tenantPath('/admin/super/users')} className="text-primary hover:underline">{t('super.manage_individual_users')}</Link>
+              <Link to={tenantPath('/admin/super/users')} className="text-accent hover:underline">{t('super.manage_individual_users')}</Link>
             </p>
           </CardHeader>
           <CardBody className="flex flex-col gap-4">
@@ -208,7 +208,7 @@ export function BulkOperations() {
             </div>
             <p className="text-xs text-default-400">
               {t('super.bulk_update_tenants_desc')}{' '}
-              <Link to={tenantPath('/admin/super/tenants')} className="text-primary hover:underline">{t('super.manage_individual_tenants')}</Link>
+              <Link to={tenantPath('/admin/super/tenants')} className="text-accent hover:underline">{t('super.manage_individual_tenants')}</Link>
             </p>
           </CardHeader>
           <CardBody className="flex flex-col gap-4">
@@ -284,13 +284,13 @@ export function BulkOperations() {
                     onClick={() => setBulkAction('enable_hub')}
                     className={`cursor-pointer border-2 rounded-lg p-3 transition-all ${
                       bulkAction === 'enable_hub'
-                        ? 'border-primary bg-primary/10'
-                        : 'border-default-200 hover:border-primary/50'
+                        ? 'border-accent bg-accent/10'
+                        : 'border-default-200 hover:border-accent/50'
                     }`}
                   >
                     <Radio value="enable_hub" classNames={{ wrapper: 'hidden' }}>
                       <div className="flex flex-col gap-1">
-                        <p className="text-sm font-semibold text-primary">{t('super.enable_hub')}</p>
+                        <p className="text-sm font-semibold text-accent">{t('super.enable_hub')}</p>
                         <p className="text-xs text-default-500">{t('super.enable_hub_desc')}</p>
                       </div>
                     </Radio>

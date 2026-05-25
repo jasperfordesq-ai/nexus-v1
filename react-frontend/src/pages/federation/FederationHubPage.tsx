@@ -383,7 +383,7 @@ function QuickLinksSection() {
                       <Icon className="w-5 h-5 text-white" aria-hidden="true" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-semibold text-foreground text-sm leading-tight mb-1 group-hover:text-primary transition-colors">
+                      <h3 className="font-semibold text-foreground text-sm leading-tight mb-1 group-hover:text-accent transition-colors">
                         {t(`hub.quick_link_${index}_title`)}
                       </h3>
                       <p className="text-xs text-default-500 line-clamp-2">{t(`hub.quick_link_${index}_description`)}</p>
@@ -432,7 +432,7 @@ function PartnerCommunitiesSection({ partners }: { partners: FederationPartner[]
         {partners.length > 4 && (
           <Link
             to={tenantPath("/federation/partners")}
-            className="text-sm text-primary hover:text-primary-600 flex items-center gap-1 transition-colors"
+            className="text-sm text-accent hover:text-accent flex items-center gap-1 transition-colors"
           >
             {t('hub.view_all', { count: partners.length })}
             <ChevronRight className="w-4 h-4" aria-hidden="true" />
@@ -797,7 +797,7 @@ export default function FederationHubPage() {
         className="mt-4 mb-8"
       >
         <div className="flex items-center gap-3 mb-1">
-          <Network className="w-7 h-7 text-primary" aria-hidden="true" />
+          <Network className="w-7 h-7 text-accent" aria-hidden="true" />
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">{t('hub.title')}</h1>
         </div>
         <p className="text-default-500 ml-10">

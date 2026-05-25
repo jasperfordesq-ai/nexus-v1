@@ -131,7 +131,7 @@ export function TimebankingDashboard() {
                       </span>
                       <Link
                         to={tenantPath(`/admin/users/${earner.user_id}/edit`)}
-                        className="text-sm font-medium hover:text-primary transition-colors"
+                        className="text-sm font-medium hover:text-accent transition-colors"
                       >
                         {earner.user_name}
                       </Link>
@@ -174,7 +174,7 @@ export function TimebankingDashboard() {
                       </span>
                       <Link
                         to={tenantPath(`/admin/users/${spender.user_id}/edit`)}
-                        className="text-sm font-medium hover:text-primary transition-colors"
+                        className="text-sm font-medium hover:text-accent transition-colors"
                       >
                         {spender.user_name}
                       </Link>

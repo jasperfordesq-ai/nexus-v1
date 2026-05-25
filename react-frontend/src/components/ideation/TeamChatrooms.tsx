@@ -365,7 +365,7 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
               variant="light"
               className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 justify-start h-auto ${
                 activeChatroomId === room.id
-                  ? 'bg-primary/10 text-primary font-medium'
+                  ? 'bg-accent/10 text-accent font-medium'
                   : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)]'
               }`}
             >

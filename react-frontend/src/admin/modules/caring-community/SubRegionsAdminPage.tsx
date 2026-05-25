@@ -277,7 +277,7 @@ export default function SubRegionsAdminPage() {
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-xl font-semibold flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-primary" aria-hidden="true" />
+            <MapPin className="h-5 w-5 text-accent" aria-hidden="true" />
             {t('sub_regions.meta.title')}
           </h1>
           <p className="text-sm text-default-500 mt-0.5">
@@ -294,12 +294,12 @@ export default function SubRegionsAdminPage() {
       </div>
 
       {/* Intro card */}
-      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('sub_regions.about.title')}</p>
+              <p className="font-semibold text-accent dark:text-accent">{t('sub_regions.about.title')}</p>
               <p className="text-default-600">
                 {t('sub_regions.about.body')}
               </p>

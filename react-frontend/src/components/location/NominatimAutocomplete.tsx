@@ -293,7 +293,7 @@ export function NominatimAutocomplete(props: NominatimAutocompleteProps) {
                 aria-selected={index === activeIndex}
                 className={`flex flex-col gap-0.5 px-3 py-2.5 cursor-pointer transition-colors
                   ${index === activeIndex
-                    ? 'bg-primary-50 dark:bg-primary-900/30'
+                    ? 'bg-accent-soft dark:bg-accent-soft'
                     : 'hover:bg-default-100 dark:hover:bg-default-50/10'
                   }
                   ${index < suggestions.length - 1 ? 'border-b border-glass-border/50' : ''}

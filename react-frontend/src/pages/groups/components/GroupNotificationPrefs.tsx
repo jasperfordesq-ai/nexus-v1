@@ -88,7 +88,7 @@ export function GroupNotificationPrefs({ groupId, isOpen, onClose }: GroupNotifi
     <Modal isOpen={isOpen} onClose={onClose} size="md">
       <ModalContent>
         <ModalHeader className="flex items-center gap-2">
-          <Bell size={20} className="text-primary" aria-hidden="true" />
+          <Bell size={20} className="text-accent" aria-hidden="true" />
           {t('notifications.prefs_title')}
         </ModalHeader>
 

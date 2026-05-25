@@ -242,10 +242,10 @@ export function NewsletterSendTimeOptimizer() {
 
         {/* Insights */}
         {data?.insights && (
-          <Card className="bg-primary-50 dark:bg-primary-50/10">
+          <Card className="bg-accent-soft dark:bg-accent-soft">
             <CardBody className="flex-row items-center gap-3">
-              <TrendingUp size={20} className="text-primary" />
-              <p className="text-sm text-primary-700 dark:text-primary-300">
+              <TrendingUp size={20} className="text-accent" />
+              <p className="text-sm text-accent dark:text-accent">
                 {data.insights}
               </p>
             </CardBody>

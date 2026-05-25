@@ -451,7 +451,7 @@ export function LoginPage() {
                     {showResolvedTenant && (
                       <div className="p-3 rounded-xl bg-theme-elevated border border-theme-default">
                         <div className="flex items-center gap-3">
-                          <Building2 className="w-5 h-5 text-primary flex-shrink-0" />
+                          <Building2 className="w-5 h-5 text-accent flex-shrink-0" />
                           <div>
                             <p className="text-theme-primary font-medium">{tenant.name}</p>
                             {tenant.tagline && (
@@ -501,7 +501,7 @@ export function LoginPage() {
                     {showTenantCard && (
                       <div className="p-3 rounded-xl bg-theme-elevated border border-theme-default">
                         <div className="flex items-center gap-3">
-                          <Building2 className="w-5 h-5 text-primary" />
+                          <Building2 className="w-5 h-5 text-accent" />
                           <div>
                             <p className="text-theme-primary font-medium">{tenants[0]?.name}</p>
                             {tenants[0]?.tagline && (

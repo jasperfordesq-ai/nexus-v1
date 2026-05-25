@@ -114,7 +114,7 @@ function OrderCard({
             <div className="min-w-0">
               <Link
                 to={tenantPath(`/marketplace/${order.listing.id}`)}
-                className="font-semibold text-foreground hover:text-primary transition-colors line-clamp-1"
+                className="font-semibold text-foreground hover:text-accent transition-colors line-clamp-1"
               >
                 {order.listing.title}
               </Link>
@@ -157,7 +157,7 @@ function OrderCard({
                   href={order.tracking_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-primary hover:underline inline-flex items-center gap-0.5"
+                  className="text-accent hover:underline inline-flex items-center gap-0.5"
                 >
                   {t('orders.track')}
                   <ExternalLink className="w-3 h-3" />
@@ -349,7 +349,7 @@ export function BuyerOrdersPage() {
         {/* Header */}
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <ShoppingBag className="w-7 h-7 text-primary" />
+            <ShoppingBag className="w-7 h-7 text-accent" />
             {t('orders.buyer.title')}
           </h1>
           <p className="text-default-500 text-sm mt-1">

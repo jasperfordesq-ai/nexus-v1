@@ -902,7 +902,7 @@ export function CreateJobPage() {
             {skillsArray.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-2">
                 {skillsArray.map((skill, idx) => (
-                  <Chip key={idx} size="sm" variant="flat" color="primary" className="bg-primary/10 text-primary">
+                  <Chip key={idx} size="sm" variant="flat" color="primary" className="bg-accent/10 text-accent">
                     {skill}
                   </Chip>
                 ))}
@@ -1083,8 +1083,8 @@ export function CreateJobPage() {
 
           {/* Feature 2: Salary Benchmark widget */}
           {benchmark && (
-            <div className="flex items-center gap-3 bg-primary/5 rounded-lg p-3">
-              <TrendingUp className="w-4 h-4 text-primary shrink-0" aria-hidden="true" />
+            <div className="flex items-center gap-3 bg-accent/5 rounded-lg p-3">
+              <TrendingUp className="w-4 h-4 text-accent shrink-0" aria-hidden="true" />
               <p className="text-xs text-theme-primary flex-1">
                 {t('benchmark.market_rate', {
                   role: benchmark.role_keyword,
@@ -1532,7 +1532,7 @@ export function CreateJobPage() {
                 <h3 className="text-sm font-semibold text-theme-primary">{t('detail.skills_required')}</h3>
                 <div className="flex flex-wrap gap-1.5">
                   {skillsArray.map((skill, idx) => (
-                    <Chip key={idx} size="sm" variant="flat" color="primary" className="bg-primary/10 text-primary">
+                    <Chip key={idx} size="sm" variant="flat" color="primary" className="bg-accent/10 text-accent">
                       {skill}
                     </Chip>
                   ))}

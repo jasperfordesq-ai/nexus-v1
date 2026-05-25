@@ -81,7 +81,7 @@ export function Snippet({
       {!hideCopyButton && copyText && (
         <button
           type="button"
-          className="shrink-0 rounded p-1 text-default-500 transition-colors hover:bg-default-200 hover:text-default-700 focus:outline-none focus:ring-2 focus:ring-primary"
+          className="shrink-0 rounded p-1 text-default-500 transition-colors hover:bg-default-200 hover:text-default-700 focus:outline-none focus:ring-2 focus:ring-accent"
           onClick={handleCopy}
           aria-label={t('common:copy_code')}
         >

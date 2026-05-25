@@ -421,7 +421,7 @@ export function Subscribers() {
       {/* Sync Platform Members card */}
       <Card shadow="sm">
         <CardBody className="flex flex-row items-center gap-4 p-4">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
             <Users size={20} />
           </div>
           <div className="min-w-0 flex-1">

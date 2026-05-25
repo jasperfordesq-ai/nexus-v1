@@ -344,7 +344,7 @@ export default function KiAgentAdminPage() {
     <div className="space-y-6 p-6">
       {/* Page header */}
       <div className="flex items-center gap-3">
-        <Brain size={28} className="text-primary" />
+        <Brain size={28} className="text-accent" />
         <div>
           <h1 className="text-2xl font-bold">{t('ai.ki_agents.meta.title')}</h1>
           <p className="text-sm text-default-500">
@@ -368,11 +368,11 @@ export default function KiAgentAdminPage() {
         )}
       </div>
 
-      <div className="rounded-xl border-l-4 border-l-primary bg-primary-50 px-4 py-3 dark:bg-primary-900/20">
+      <div className="rounded-xl border-l-4 border-l-accent bg-accent-soft px-4 py-3 dark:bg-accent-soft">
         <div className="flex gap-3">
-          <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
           <div className="space-y-1 text-sm">
-            <p className="font-semibold text-primary-800 dark:text-primary-200">{t('ai.ki_agents.about.title')}</p>
+            <p className="font-semibold text-accent dark:text-accent">{t('ai.ki_agents.about.title')}</p>
             <p className="text-default-600">
               {t('ai.ki_agents.about.body')}
             </p>
@@ -679,7 +679,7 @@ export default function KiAgentAdminPage() {
           <div className="mt-4 space-y-4">
             {/* Trigger run */}
             <div className="flex items-center gap-3 rounded-xl border border-default-200 p-4 flex-wrap">
-              <Bot size={20} className="text-primary" />
+              <Bot size={20} className="text-accent" />
               <p className="font-semibold text-sm">{t('ai.ki_agents.runs.trigger_title')}</p>
               <Select
                 size="sm"

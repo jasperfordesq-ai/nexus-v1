@@ -449,7 +449,7 @@ export function FeaturesPage() {
       {/* Hero */}
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-3 flex-wrap">
-          <Sparkles className="w-7 h-7 text-primary shrink-0" aria-hidden="true" />
+          <Sparkles className="w-7 h-7 text-accent shrink-0" aria-hidden="true" />
           <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
             {t('features_page.heading')}
           </h1>
@@ -498,14 +498,14 @@ export function FeaturesPage() {
       {/* Feature groups */}
       {GROUPS.map((group, index) => {
         const icons = [
-          <Sparkles className="w-5 h-5 text-primary" aria-hidden="true" />,
-          <Globe className="w-5 h-5 text-primary" aria-hidden="true" />,
+          <Sparkles className="w-5 h-5 text-accent" aria-hidden="true" />,
+          <Globe className="w-5 h-5 text-accent" aria-hidden="true" />,
           <CheckCircle className="w-5 h-5 text-success" aria-hidden="true" />,
           <CheckCircle className="w-5 h-5 text-success" aria-hidden="true" />,
           <Shield className="w-5 h-5 text-warning" aria-hidden="true" />,
-          <Sparkles className="w-5 h-5 text-secondary" aria-hidden="true" />,
-          <Sparkles className="w-5 h-5 text-secondary" aria-hidden="true" />,
-          <Shield className="w-5 h-5 text-primary" aria-hidden="true" />,
+          <Sparkles className="w-5 h-5 text-accent" aria-hidden="true" />,
+          <Sparkles className="w-5 h-5 text-accent" aria-hidden="true" />,
+          <Shield className="w-5 h-5 text-accent" aria-hidden="true" />,
         ];
         return <FeatureSection key={group.key} group={group} icon={icons[index]} />;
       })}
@@ -533,9 +533,9 @@ export function FeaturesPage() {
       </Card>
 
       {/* Open source + how to help */}
-      <Card className="border border-primary-200 dark:border-primary-800">
+      <Card className="border border-accent dark:border-accent">
         <CardHeader className="flex gap-2 items-center">
-          <Github className="w-5 h-5 text-primary" aria-hidden="true" />
+          <Github className="w-5 h-5 text-accent" aria-hidden="true" />
           <h2 className="text-lg font-semibold">
             {t('features_page.open_source_title')}
           </h2>
@@ -550,7 +550,7 @@ export function FeaturesPage() {
               href="https://github.com/jasperfordesq-ai/nexus-v1"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-primary underline font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded"
+              className="inline-flex items-center gap-1.5 text-accent underline font-medium focus:outline-none focus:ring-2 focus:ring-accent rounded"
             >
               <Github className="w-3.5 h-3.5" aria-hidden="true" />
               {t('features_page.link_repo')}
@@ -558,7 +558,7 @@ export function FeaturesPage() {
             </a>
             <Link
               to={tenantPath('/changelog')}
-              className="inline-flex items-center gap-1.5 text-primary underline font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded"
+              className="inline-flex items-center gap-1.5 text-accent underline font-medium focus:outline-none focus:ring-2 focus:ring-accent rounded"
             >
               {t('features_page.link_changelog')}
             </Link>
@@ -566,7 +566,7 @@ export function FeaturesPage() {
               href="https://project-nexus.canny.io/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-primary underline font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded"
+              className="inline-flex items-center gap-1.5 text-accent underline font-medium focus:outline-none focus:ring-2 focus:ring-accent rounded"
             >
               <Bug className="w-3.5 h-3.5" aria-hidden="true" />
               {t('features_page.link_report_bug')}
@@ -574,7 +574,7 @@ export function FeaturesPage() {
             </a>
             <Link
               to={tenantPath('/about')}
-              className="inline-flex items-center gap-1.5 text-primary underline font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded"
+              className="inline-flex items-center gap-1.5 text-accent underline font-medium focus:outline-none focus:ring-2 focus:ring-accent rounded"
             >
               {t('features_page.link_about')}
             </Link>
@@ -596,7 +596,7 @@ export function FeaturesPage() {
             {t('features_page.security_body_before')}
             <a
               href="mailto:jasper@hour-timebank.ie"
-              className="text-primary underline font-medium focus:outline-none focus:ring-2 focus:ring-primary rounded"
+              className="text-accent underline font-medium focus:outline-none focus:ring-2 focus:ring-accent rounded"
             >
               {t('features_page.security_email')}
             </a>

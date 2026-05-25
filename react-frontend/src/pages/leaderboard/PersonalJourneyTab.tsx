@@ -185,7 +185,7 @@ export default function PersonalJourneyTab() {
                     {month.xp_earned || ''}
                   </span>
                   <div
-                    className="w-full rounded-t bg-gradient-to-t from-primary-500 to-primary-300 min-h-1"
+                    className="w-full rounded-t bg-gradient-to-t from-accent-soft0 to-accent min-h-1"
                     style={{ height: `${height}%` }}
                     title={t('journey.monthly_activity_bar_title', {
                       month: month.month,
@@ -244,7 +244,7 @@ export default function PersonalJourneyTab() {
                 key={`${milestone.type}-${i}`}
                 className="flex items-center gap-3 p-2"
               >
-                <div className="w-2 h-2 rounded-full bg-primary-500" />
+                <div className="w-2 h-2 rounded-full bg-accent-soft0" />
                 <div className="flex-1">
                   <p className="text-sm">{milestone.label}</p>
                   {milestone.date && (

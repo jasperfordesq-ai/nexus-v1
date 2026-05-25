@@ -401,12 +401,12 @@ export default function MunicipalImpactReportsPage() {
         <strong>{t('municipal_reports.export_note.csv_label')}</strong>{t('municipal_reports.export_note.csv_text')}
       </p>
 
-      <Card className="mb-4 border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+      <Card className="mb-4 border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('municipal_reports.about.title')}</p>
+              <p className="font-semibold text-accent dark:text-accent">{t('municipal_reports.about.title')}</p>
               <p className="text-default-600">
                 {t('municipal_reports.about.body_1_before_kiss')} <Abbr term={t('municipal_reports.about.kiss_abbr')}>{t('municipal_reports.about.kiss_abbr')}</Abbr>
                 {t('municipal_reports.about.body_1_after_kiss')} <Abbr term={t('municipal_reports.about.chf_abbr')}>{t('municipal_reports.about.chf_abbr')}</Abbr>
@@ -535,7 +535,7 @@ export default function MunicipalImpactReportsPage() {
       <Card className="mb-6" shadow="sm">
         <CardHeader className="flex flex-col items-start gap-3 md:flex-row md:items-center">
           <div className="flex items-start gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent">
               <Layers size={20} />
             </div>
             <div>
@@ -622,7 +622,7 @@ export default function MunicipalImpactReportsPage() {
           return (
             <Card key={report.key} shadow="sm">
               <CardHeader className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
                   <Icon size={20} />
                 </div>
                 <div>
@@ -860,7 +860,7 @@ function NarrativeShell({
   const { t } = useTranslation('admin');
 
   return (
-    <Card shadow="sm" className={isActive ? 'border-2 border-primary/40' : 'opacity-70'}>
+    <Card shadow="sm" className={isActive ? 'border-2 border-accent/40' : 'opacity-70'}>
       <CardHeader className="flex flex-col items-start gap-1">
         <div className="flex items-center gap-2">
           <h2 className="text-base font-semibold">{title}</h2>

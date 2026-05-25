@@ -127,7 +127,7 @@ export function SellerPickupSlotsPage() {
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <Calendar className="w-7 h-7 text-primary" />
+            <Calendar className="w-7 h-7 text-accent" />
             {t('marketplace.pickup.slots_title')}
           </h1>
           <p className="text-default-500 text-sm mt-1">

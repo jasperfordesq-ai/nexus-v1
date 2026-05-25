@@ -300,11 +300,11 @@ export function MarketplaceCollectionsPage() {
                   <div className="p-3">
                     <Link
                       to={tenantPath(`/marketplace/${item.listing.id}`)}
-                      className="font-medium text-foreground text-sm hover:text-primary transition-colors line-clamp-2"
+                      className="font-medium text-foreground text-sm hover:text-accent transition-colors line-clamp-2"
                     >
                       {item.listing.title}
                     </Link>
-                    <p className="text-sm font-semibold text-primary mt-1">
+                    <p className="text-sm font-semibold text-accent mt-1">
                       {item.listing.price_type === 'free'
                         ? t('common.free')
                         : item.listing.price != null
@@ -348,7 +348,7 @@ export function MarketplaceCollectionsPage() {
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
             <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-              <FolderHeart className="w-7 h-7 text-primary" />
+              <FolderHeart className="w-7 h-7 text-accent" />
               {t('collections.page_title')}
             </h1>
             <p className="text-default-500 text-sm mt-1">

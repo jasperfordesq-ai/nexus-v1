@@ -392,7 +392,7 @@ export default function EmergencyAlertAdminPage() {
                 <SelectItem key={opt.key} id={opt.key} textValue={severityLabel(opt.key)}>
                   <div className="flex items-center gap-2">
                     {opt.key === 'info' ? (
-                      <Info size={14} className="text-primary" />
+                      <Info size={14} className="text-accent" />
                     ) : (
                       <AlertTriangle
                         size={14}

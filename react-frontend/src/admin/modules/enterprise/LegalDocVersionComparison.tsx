@@ -114,8 +114,8 @@ export default function LegalDocVersionComparison({
             </div>
 
             {/* Changes Count */}
-            <div className="flex items-center gap-2 p-3 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
-              <AlertCircle size={18} className="text-primary" />
+            <div className="flex items-center gap-2 p-3 bg-accent-soft dark:bg-accent-soft rounded-lg">
+              <AlertCircle size={18} className="text-accent" />
               <span className="text-sm">
                 {comparison.changes_count > 0
                   ? t('enterprise.comparison.changes_detected')

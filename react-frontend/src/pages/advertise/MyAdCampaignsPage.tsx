@@ -201,7 +201,7 @@ export function MyAdCampaignsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Megaphone size={28} className="text-primary" aria-hidden="true" />
+          <Megaphone size={28} className="text-accent" aria-hidden="true" />
           <div>
             <h1 className="text-2xl font-bold text-theme-primary">{t('advertise.page_title')}</h1>
             <p className="text-sm text-theme-subtle">{t('advertise.page_subtitle')}</p>

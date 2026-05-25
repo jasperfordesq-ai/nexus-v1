@@ -147,7 +147,7 @@ export default function CouponDetailPage() {
       <Card>
         <CardBody className="p-6">
           <div className="flex items-start justify-between mb-4">
-            <Tag className="w-10 h-10 text-primary" />
+            <Tag className="w-10 h-10 text-accent" />
             <Chip color="success" variant="flat" size="lg">
               {formatDiscount()}
             </Chip>

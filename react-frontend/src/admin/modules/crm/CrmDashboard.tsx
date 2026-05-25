@@ -43,9 +43,9 @@ interface CrmDashboardData {
 }
 
 const QUICK_ACTIONS = [
-  { labelKey: 'crm.qa_member_notes', path: '/admin/crm/notes', icon: StickyNote, color: 'text-primary bg-primary/10' },
+  { labelKey: 'crm.qa_member_notes', path: '/admin/crm/notes', icon: StickyNote, color: 'text-accent bg-accent/10' },
   { labelKey: 'crm.qa_crm_tasks', path: '/admin/crm/tasks', icon: ClipboardList, color: 'text-warning bg-warning/10' },
-  { labelKey: 'crm.qa_member_tags', path: '/admin/crm/tags', icon: Tag, color: 'text-secondary bg-secondary/10' },
+  { labelKey: 'crm.qa_member_tags', path: '/admin/crm/tags', icon: Tag, color: 'text-accent bg-accent-soft' },
   { labelKey: 'crm.qa_activity_timeline', path: '/admin/crm/timeline', icon: Activity, color: 'text-danger bg-danger/10' },
   { labelKey: 'crm.qa_onboarding_funnel', path: '/admin/crm/funnel', icon: TrendingUp, color: 'text-success bg-success/10' },
   { labelKey: 'crm.qa_all_members', path: '/admin/users', icon: Users, color: 'text-default bg-default/10' },
@@ -260,7 +260,7 @@ export function CrmDashboard() {
 
             <div className="flex items-center justify-between rounded-lg bg-default-50 p-3">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg text-secondary bg-secondary/10">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg text-accent bg-accent-soft">
                   <UserPlus size={20} />
                 </div>
                 <div>
@@ -290,7 +290,7 @@ export function CrmDashboard() {
 
             <div className="flex items-center justify-between rounded-lg bg-default-50 p-3">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg text-primary bg-primary/10">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg text-accent bg-accent/10">
                   <TrendingUp size={20} />
                 </div>
                 <div>

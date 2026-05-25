@@ -126,7 +126,7 @@ export function MarketplaceImageGallery({ images }: MarketplaceImageGalleryProps
               onPress={() => handleThumbnailClick(index)}
               className={`shrink-0 w-16 h-16 min-w-0 rounded-md overflow-hidden border-2 transition-colors p-0 ${
                 index === activeIndex
-                  ? 'border-primary'
+                  ? 'border-accent'
                   : 'border-transparent hover:border-default-300'
               }`}
               aria-label={t('gallery.select_image', { number: index + 1 })}

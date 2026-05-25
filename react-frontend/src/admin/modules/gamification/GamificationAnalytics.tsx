@@ -137,7 +137,7 @@ export function GamificationAnalytics() {
                     </span>
                     <div className="flex-1 h-6 rounded-lg bg-default-100 overflow-hidden">
                       <div
-                        className="h-full rounded-lg bg-primary transition-all duration-500"
+                        className="h-full rounded-lg bg-accent transition-all duration-500"
                         style={{ width: `${Math.max(2, (badge.count / maxDistCount) * 100)}%` }}
                       />
                     </div>
@@ -179,7 +179,7 @@ export function GamificationAnalytics() {
                     className="flex items-center justify-between gap-2 rounded-lg bg-default-50 px-3 py-2"
                   >
                     <div className="flex items-center gap-2 min-w-0">
-                      <Award size={16} className={badge.type === 'custom' ? 'text-success' : 'text-primary'} />
+                      <Award size={16} className={badge.type === 'custom' ? 'text-success' : 'text-accent'} />
                       <span className="text-sm font-medium text-foreground truncate">{badge.name}</span>
                       {badge.type === 'custom' && (
                         <span className="text-[10px] uppercase tracking-wider text-success bg-success/10 px-1.5 py-0.5 rounded font-semibold">

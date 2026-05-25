@@ -228,12 +228,12 @@ export default function MunicipalVerificationAdminPage() {
       />
 
       {/* Intro card */}
-      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('municipal_verification.about.title')}</p>
+              <p className="font-semibold text-accent dark:text-accent">{t('municipal_verification.about.title')}</p>
               <p className="text-default-600">
                 {t('municipal_verification.about.body')}
               </p>
@@ -285,7 +285,7 @@ export default function MunicipalVerificationAdminPage() {
       {/* New verification request */}
       <Card>
         <CardHeader className="flex items-center gap-2">
-          <Globe className="w-5 h-5 text-primary" />
+          <Globe className="w-5 h-5 text-accent" />
           <h2 className="text-base font-semibold">{t('municipal_verification.request.title')}</h2>
         </CardHeader>
         <Separator />

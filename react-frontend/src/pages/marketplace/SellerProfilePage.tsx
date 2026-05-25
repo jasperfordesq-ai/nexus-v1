@@ -78,7 +78,7 @@ function StatCard({
 }) {
   return (
     <div className="text-center space-y-1">
-      <Icon className="w-5 h-5 text-primary mx-auto" />
+      <Icon className="w-5 h-5 text-accent mx-auto" />
       <p className="text-lg font-bold text-foreground">{value}</p>
       <p className="text-xs text-default-400">{label}</p>
     </div>

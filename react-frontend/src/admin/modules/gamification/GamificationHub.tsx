@@ -205,7 +205,7 @@ export function GamificationHub() {
                     </span>
                     <div className="flex-1 h-6 rounded-lg bg-default-100 overflow-hidden">
                       <div
-                        className="h-full rounded-lg bg-primary transition-all duration-500"
+                        className="h-full rounded-lg bg-accent transition-all duration-500"
                         style={{ width: `${Math.max(2, (badge.count / maxDistCount) * 100)}%` }}
                       />
                     </div>
@@ -233,7 +233,7 @@ export function GamificationHub() {
             <Link to={tenantPath("/admin/gamification/campaigns")} className="block">
               <Card shadow="none" className="bg-default-50 hover:bg-default-100 transition-colors cursor-pointer">
                 <CardBody className="flex flex-row items-center gap-3 p-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
                     <Megaphone size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -263,7 +263,7 @@ export function GamificationHub() {
             <Link to={tenantPath("/admin/gamification/badge-config")} className="block">
               <Card shadow="none" className="bg-default-50 hover:bg-default-100 transition-colors cursor-pointer">
                 <CardBody className="flex flex-row items-center gap-3 p-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent">
                     <Settings2 size={20} />
                   </div>
                   <div className="flex-1 min-w-0">

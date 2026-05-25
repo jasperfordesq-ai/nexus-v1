@@ -101,8 +101,8 @@ export function JobMetadataSidebar({
 
       {/* Salary benchmark (owners only) */}
       {isOwner && benchmark && (
-        <div className="flex items-start gap-2 bg-primary/5 rounded-lg p-2.5">
-          <TrendingUp className="w-4 h-4 text-primary shrink-0 mt-0.5" aria-hidden="true" />
+        <div className="flex items-start gap-2 bg-accent/5 rounded-lg p-2.5">
+          <TrendingUp className="w-4 h-4 text-accent shrink-0 mt-0.5" aria-hidden="true" />
           <p className="text-xs text-theme-primary">
             {t('benchmark.market_rate', {
               role: benchmark.role_keyword,
@@ -125,7 +125,7 @@ export function JobMetadataSidebar({
           {vacancy.contact_email && (
             <div className="flex items-center gap-3">
               <Mail className="w-4 h-4 text-theme-subtle flex-shrink-0" aria-hidden="true" />
-              <a href={`mailto:${vacancy.contact_email}`} className="text-sm text-primary hover:underline">
+              <a href={`mailto:${vacancy.contact_email}`} className="text-sm text-accent hover:underline">
                 {vacancy.contact_email}
               </a>
             </div>
@@ -134,7 +134,7 @@ export function JobMetadataSidebar({
           {vacancy.contact_phone && (
             <div className="flex items-center gap-3">
               <Phone className="w-4 h-4 text-theme-subtle flex-shrink-0" aria-hidden="true" />
-              <a href={`tel:${vacancy.contact_phone}`} className="text-sm text-primary hover:underline">
+              <a href={`tel:${vacancy.contact_phone}`} className="text-sm text-accent hover:underline">
                 {vacancy.contact_phone}
               </a>
             </div>

@@ -39,7 +39,7 @@ export function AppUpdateModal({ updateInfo, onDismiss }: AppUpdateModalProps) {
     >
       <ModalContent data-nosnippet>
         <ModalHeader className="flex items-center gap-2">
-          <Sparkles size={20} className="text-primary" />
+          <Sparkles size={20} className="text-accent" />
           {t('update_available')}
         </ModalHeader>
         <ModalBody>

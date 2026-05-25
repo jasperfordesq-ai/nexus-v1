@@ -108,7 +108,7 @@ export default function FederationWhitelist() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
       </div>
     );
   }
@@ -188,7 +188,7 @@ export default function FederationWhitelist() {
                   <TableCell>
                     <Link
                       to={tenantPath(`/admin/super/federation/tenant/${entry.tenant_id}/features`)}
-                      className="text-primary hover:underline"
+                      className="text-accent hover:underline"
                     >
                       {entry.tenant_name}
                     </Link>

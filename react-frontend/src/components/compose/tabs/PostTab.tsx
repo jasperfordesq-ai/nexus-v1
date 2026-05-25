@@ -317,7 +317,7 @@ export function PostTab({ onSuccess, onClose, isOpen, groupId, templateData, onC
 
       {/* Schedule indicator */}
       {isScheduled && scheduleDate && (
-        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 text-sm">
+        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent-soft dark:bg-accent-soft text-accent dark:text-accent text-sm">
           <Calendar className="w-4 h-4 flex-shrink-0" />
           <span>{t('compose.schedule_set', { date: toScheduleIso(scheduleDate, scheduleTime) })}</span>
           <Button
@@ -325,7 +325,7 @@ export function PostTab({ onSuccess, onClose, isOpen, groupId, templateData, onC
             variant="light"
             size="sm"
             onPress={() => { setScheduleDate(null); setScheduleTime(null); }}
-            className="ml-auto p-0.5 min-w-0 min-h-0 h-auto hover:bg-primary-100 dark:hover:bg-primary-800/30"
+            className="ml-auto p-0.5 min-w-0 min-h-0 h-auto hover:bg-accent-soft dark:hover:bg-accent"
             aria-label={t('compose.schedule_clear')}
           >
             <X className="w-3.5 h-3.5" />
@@ -346,7 +346,7 @@ export function PostTab({ onSuccess, onClose, isOpen, groupId, templateData, onC
                 size="sm"
                 isIconOnly
                 aria-label={t('compose.schedule_label')}
-                className={isScheduled ? 'text-primary' : 'text-[var(--text-muted)]'}
+                className={isScheduled ? 'text-accent' : 'text-[var(--text-muted)]'}
               >
                 <Calendar className="w-5 h-5" />
               </Button>

@@ -102,7 +102,7 @@ export function NexusScoreAnalytics() {
                 {stats.badge_distribution.map(({ badge_name, count }) => (
                   <div key={badge_name} className="flex items-center justify-between py-1 border-b border-default-100 last:border-0">
                     <span className="text-sm">{badge_name}</span>
-                    <span className="text-sm font-medium text-primary">{count}</span>
+                    <span className="text-sm font-medium text-accent">{count}</span>
                   </div>
                 ))}
               </div>
@@ -130,7 +130,7 @@ export function NexusScoreAnalytics() {
               ].map(({ factor, weight }) => (
                 <div key={factor} className="flex items-center justify-between py-1 border-b border-default-100 last:border-0">
                   <span className="text-sm">{factor}</span>
-                  <span className="text-sm font-medium text-primary">{weight}</span>
+                  <span className="text-sm font-medium text-accent">{weight}</span>
                 </div>
               ))}
             </div>

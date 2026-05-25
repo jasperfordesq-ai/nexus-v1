@@ -193,12 +193,12 @@ export default function DisclosurePackAdminPage() {
         }
       />
 
-      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">
+              <p className="font-semibold text-accent dark:text-accent">
                 {t('disclosure_pack.about.title')}
               </p>
               <p className="text-default-600">
@@ -272,7 +272,7 @@ export default function DisclosurePackAdminPage() {
                 <CardBody className="pt-0 space-y-1">
                   {Object.entries(draft.data_categories).map(([cat, fields]) => (
                     <p key={cat} className="text-sm">
-                      <span className="font-mono text-xs text-primary">{cat}</span>:{' '}
+                      <span className="font-mono text-xs text-accent">{cat}</span>:{' '}
                       <span className="text-default-600">{(fields as string[]).join(', ')}</span>
                     </p>
                   ))}
@@ -284,7 +284,7 @@ export default function DisclosurePackAdminPage() {
                 <CardBody className="pt-0 space-y-1">
                   {Object.entries(draft.lawful_basis).map(([cat, basis]) => (
                     <p key={cat} className="text-sm">
-                      <span className="font-mono text-xs text-primary">{cat}</span>:{' '}
+                      <span className="font-mono text-xs text-accent">{cat}</span>:{' '}
                       <span className="text-default-600">{basis as string}</span>
                     </p>
                   ))}
@@ -297,7 +297,7 @@ export default function DisclosurePackAdminPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {Object.entries(draft.retention_defaults).map(([k, v]) => (
                       <p key={k} className="text-sm">
-                        <span className="font-mono text-xs text-primary">{k}</span>:{' '}
+                        <span className="font-mono text-xs text-accent">{k}</span>:{' '}
                         <span className="text-default-600">{v as string}</span>
                       </p>
                     ))}
@@ -312,7 +312,7 @@ export default function DisclosurePackAdminPage() {
               <CardBody className="grid grid-cols-1 sm:grid-cols-2 gap-2 py-4">
                 {Object.entries(draft.data_subject_rights).map(([k, v]) => (
                   <p key={k} className="text-sm">
-                    <span className="font-mono text-xs text-primary">{k}</span>:{' '}
+                    <span className="font-mono text-xs text-accent">{k}</span>:{' '}
                     {typeof v === 'boolean' ? (
                       <Chip size="sm" color={v ? 'success' : 'default'} variant="flat">
                         {v ? t('disclosure_pack.status.enabled_lower') : t('disclosure_pack.status.disabled_lower')}

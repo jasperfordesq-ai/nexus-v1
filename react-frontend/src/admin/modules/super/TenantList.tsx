@@ -192,7 +192,7 @@ export function TenantList() {
         <div>
           <Link
             to={tenantPath(`/admin/super/tenants/${tenant.id}`)}
-            className="font-medium text-foreground hover:text-primary"
+            className="font-medium text-foreground hover:text-accent"
           >
             {tenant.name}
           </Link>
@@ -262,7 +262,7 @@ export function TenantList() {
   return (
     <div>
       <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-default-500 mb-1">
-        <Link to={tenantPath('/admin/super')} className="hover:text-primary">{t('super.breadcrumb_super_admin')}</Link>
+        <Link to={tenantPath('/admin/super')} className="hover:text-accent">{t('super.breadcrumb_super_admin')}</Link>
         <span>/</span>
         <span className="text-foreground">{t('super.breadcrumb_tenants')}</span>
       </nav>

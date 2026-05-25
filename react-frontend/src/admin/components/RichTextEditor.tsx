@@ -93,8 +93,8 @@ const editorTheme = {
       listitem: 'list-none',
     },
   },
-  link: 'text-primary underline cursor-pointer hover:text-primary-600',
-  quote: 'border-l-4 border-primary pl-4 italic text-default-500 my-4',
+  link: 'text-accent underline cursor-pointer hover:text-accent',
+  quote: 'border-l-4 border-accent pl-4 italic text-default-500 my-4',
   code: 'bg-default-100 dark:bg-default-50 px-1.5 py-0.5 rounded text-sm font-mono',
 };
 
@@ -529,7 +529,7 @@ export function RichTextEditor({
         className={`
           rounded-lg border-2 transition-colors
           border-default-200 dark:border-default-100
-          focus-within:border-primary
+          focus-within:border-accent
           ${isDisabled ? 'opacity-50 pointer-events-none' : ''}
         `}
       >
@@ -539,7 +539,7 @@ export function RichTextEditor({
             <RichTextPlugin
               contentEditable={
                 <ContentEditable
-                  className="min-h-[400px] px-4 py-3 outline-none focus-visible:ring-2 focus-visible:ring-primary/50 text-foreground"
+                  className="min-h-[400px] px-4 py-3 outline-none focus-visible:ring-2 focus-visible:ring-accent/50 text-foreground"
                   aria-label={label || undefined}
                 />
               }

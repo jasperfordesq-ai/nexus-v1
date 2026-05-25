@@ -64,8 +64,8 @@ export function SafeguardingHelp() {
     <section className="mt-10">
       <Card shadow="sm" className="border border-default-200">
         <CardHeader className="flex items-center gap-3 pb-2">
-          <div className="p-2 rounded-lg bg-primary/10">
-            <BookOpen className="w-5 h-5 text-primary" />
+          <div className="p-2 rounded-lg bg-accent/10">
+            <BookOpen className="w-5 h-5 text-accent" />
           </div>
           <div>
             <h2 className="text-lg font-semibold text-foreground">
@@ -85,7 +85,7 @@ export function SafeguardingHelp() {
               aria-label={t('safeguarding.help.about.aria')}
               title={
                 <div className="flex items-center gap-2">
-                  <Shield className="w-4 h-4 text-primary" />
+                  <Shield className="w-4 h-4 text-accent" />
                   <span className="font-medium">{t('safeguarding.help.about.title')}</span>
                 </div>
               }
@@ -120,7 +120,7 @@ export function SafeguardingHelp() {
                 <p>
                   {t('safeguarding.help.flagging.intro')}
                 </p>
-                <div className="p-3 rounded-lg bg-primary/5 border border-primary/20">
+                <div className="p-3 rounded-lg bg-accent/5 border border-accent/20">
                   <p className="font-medium text-foreground mb-1">
                     <Chip size="sm" color="primary" variant="flat" className="mr-2">
                       {t('safeguarding.help.flagging.most_common')}
@@ -228,7 +228,7 @@ export function SafeguardingHelp() {
               aria-label={t('safeguarding.help.assignments.aria')}
               title={
                 <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-secondary" />
+                  <Users className="w-4 h-4 text-accent" />
                   <span className="font-medium">{t('safeguarding.help.assignments.title')}</span>
                 </div>
               }
@@ -263,7 +263,7 @@ export function SafeguardingHelp() {
               aria-label={t('safeguarding.help.preferences.aria')}
               title={
                 <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-primary" />
+                  <FileText className="w-4 h-4 text-accent" />
                   <span className="font-medium">{t('safeguarding.help.preferences.title')}</span>
                 </div>
               }

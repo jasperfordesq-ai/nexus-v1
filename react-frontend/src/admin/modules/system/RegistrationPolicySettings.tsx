@@ -318,7 +318,7 @@ export function RegistrationPolicySettings() {
           <CardHeader className="pb-0">
             <div>
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <ShieldCheck size={20} className="text-primary" /> {t('system.reg.registration_method')}
+                <ShieldCheck size={20} className="text-accent" /> {t('system.reg.registration_method')}
               </h3>
               <p className="text-sm text-default-500 mt-1">
                 {t('system.reg.registration_method_desc')}
@@ -358,7 +358,7 @@ export function RegistrationPolicySettings() {
             )}
 
             {policy.registration_mode === 'waitlist' && (
-              <div className="flex items-center gap-2 p-3 rounded-lg bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400">
+              <div className="flex items-center gap-2 p-3 rounded-lg bg-accent-soft text-accent dark:bg-accent-soft dark:text-accent">
                 <Users size={16} className="shrink-0" />
                 <span className="text-sm">{t('system.reg.waitlist_info')}</span>
               </div>
@@ -379,7 +379,7 @@ export function RegistrationPolicySettings() {
             <CardHeader className="pb-0">
               <div>
                 <h3 className="text-lg font-semibold flex items-center gap-2">
-                  <UserCheck size={20} className="text-secondary" /> {t('system.reg.verification_settings')}
+                  <UserCheck size={20} className="text-accent" /> {t('system.reg.verification_settings')}
                 </h3>
                 <p className="text-sm text-default-500 mt-1">
                   {t('system.reg.verification_settings_desc')}
@@ -476,7 +476,7 @@ export function RegistrationPolicySettings() {
           <CardHeader className="pb-0">
             <div>
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Mail size={20} className="text-primary" /> {t('system.reg.email_verification')}
+                <Mail size={20} className="text-accent" /> {t('system.reg.email_verification')}
               </h3>
             </div>
           </CardHeader>
@@ -839,10 +839,10 @@ export function RegistrationPolicySettings() {
         </Modal>
 
         {/* ── Section 6: How Registration Modes Work ── */}
-        <Card shadow="sm" className="bg-primary-50/50 dark:bg-primary-900/10 border border-primary-200 dark:border-primary-800">
+        <Card shadow="sm" className="bg-accent-soft dark:bg-accent-soft border border-accent dark:border-accent">
           <CardBody>
             <div className="flex gap-3">
-              <Info size={20} className="text-primary shrink-0 mt-0.5" />
+              <Info size={20} className="text-accent shrink-0 mt-0.5" />
               <div className="text-sm space-y-2">
                 <p className="font-semibold text-base">{t('system.reg.understanding_modes')}</p>
                 <div className="space-y-2 text-default-700 dark:text-default-300">
@@ -851,11 +851,11 @@ export function RegistrationPolicySettings() {
                     <p>{t('system.reg.info_open')}</p>
                   </div>
                   <div className="flex items-start gap-2">
-                    <UserCheck size={14} className="shrink-0 mt-1 text-primary" />
+                    <UserCheck size={14} className="shrink-0 mt-1 text-accent" />
                     <p>{t('system.reg.info_open_approval')}</p>
                   </div>
                   <div className="flex items-start gap-2">
-                    <ShieldCheck size={14} className="shrink-0 mt-1 text-secondary" />
+                    <ShieldCheck size={14} className="shrink-0 mt-1 text-accent" />
                     <p>{t('system.reg.info_verified')}</p>
                   </div>
                   <div className="flex items-start gap-2">

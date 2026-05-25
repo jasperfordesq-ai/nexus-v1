@@ -64,7 +64,7 @@ export function SellerPickupScanPage() {
       <div className="max-w-xl mx-auto px-4 py-6 space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-          <QrCode className="w-7 h-7 text-primary" />
+          <QrCode className="w-7 h-7 text-accent" />
           {t('marketplace.pickup.scan_title')}
         </h1>
         <p className="text-default-500 text-sm mt-1">

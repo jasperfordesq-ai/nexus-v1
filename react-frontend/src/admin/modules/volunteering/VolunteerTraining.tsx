@@ -435,9 +435,9 @@ export function VolunteerTraining() {
 
       {/* Bulk verify bar */}
       {selectedIds.size > 0 && (
-        <div className="flex items-center gap-3 rounded-2xl border border-primary/20 bg-primary-50 p-3 shadow-sm shadow-primary/10">
-          <ListChecks size={18} className="text-primary" />
-          <span className="text-sm font-medium text-primary-700">
+        <div className="flex items-center gap-3 rounded-2xl border border-accent/20 bg-accent-soft p-3 shadow-sm shadow-accent/10">
+          <ListChecks size={18} className="text-accent" />
+          <span className="text-sm font-medium text-accent">
             {t('volunteering.bulk_selected', { count: selectedIds.size })}
           </span>
           <Button

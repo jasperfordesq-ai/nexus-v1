@@ -191,8 +191,8 @@ export function SocialInteractionPanel({
           variant="light"
           size={compact ? 'sm' : 'md'}
           className={cn(
-            'flex-1 min-w-[7rem] text-theme-muted hover:bg-primary/10 hover:text-primary',
-            showComments && 'bg-primary/10 text-primary',
+            'flex-1 min-w-[7rem] text-theme-muted hover:bg-accent/10 hover:text-accent',
+            showComments && 'bg-accent/10 text-accent',
           )}
           startContent={<MessageCircle className="h-4 w-4" aria-hidden="true" />}
           aria-expanded={showComments}

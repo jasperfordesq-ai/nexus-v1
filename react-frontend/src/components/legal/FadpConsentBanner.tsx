@@ -68,7 +68,7 @@ export function FadpConsentBanner() {
       <div className="max-w-3xl mx-auto pointer-events-auto">
         <Card
           shadow="lg"
-          className="border border-primary-200 bg-[var(--color-surface)]"
+          className="border border-accent bg-[var(--color-surface)]"
         >
           <CardBody className="py-4 px-5">
             <div className="flex items-start gap-4">

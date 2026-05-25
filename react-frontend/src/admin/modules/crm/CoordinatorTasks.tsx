@@ -507,7 +507,7 @@ export default function CoordinatorTasks() {
                         {task.user_name && (
                           <Link
                             to={tenantPath(`/admin/users/${task.user_id}/edit`)}
-                            className="flex items-center gap-2 text-xs text-default-500 hover:text-primary transition-colors"
+                            className="flex items-center gap-2 text-xs text-default-500 hover:text-accent transition-colors"
                           >
                             <Avatar
                               src={task.user_avatar || undefined}

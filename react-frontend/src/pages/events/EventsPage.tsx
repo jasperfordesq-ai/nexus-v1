@@ -474,7 +474,7 @@ export function EventsPage() {
                       </div>
                       <div className="h-1.5 rounded-full bg-theme-elevated overflow-hidden">
                         <motion.div
-                          className="h-full rounded-full bg-primary"
+                          className="h-full rounded-full bg-accent"
                           initial={{ width: '0%' }}
                           animate={{ width: `${Math.round((events.length / totalCount) * 100)}%` }}
                           transition={{ duration: 0.6, ease: 'easeOut' }}
@@ -523,7 +523,7 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
   return (
     <Link to={tenantPath(`/events/${event.id}`)} aria-label={t('card.open_aria', { title: event.title, date: eventDateLabel })}>
       <article>
-        <GlassCard className={`overflow-hidden hover:border-primary/40 hover:shadow-lg transition ${isPast || isCancelled ? 'opacity-65' : ''}`}>
+        <GlassCard className={`overflow-hidden hover:border-accent/40 hover:shadow-lg transition ${isPast || isCancelled ? 'opacity-65' : ''}`}>
           {coverImage && (
             <img
               src={coverImage}
@@ -602,7 +602,7 @@ const EventCard = memo(function EventCard({ event }: EventCardProps) {
                   </span>
                 )}
                 {event.distance_km !== undefined && (
-                  <span className="flex items-center gap-1.5 text-primary font-medium">
+                  <span className="flex items-center gap-1.5 text-accent font-medium">
                     <MapPin className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
                     {event.distance_km < 1
                       ? `${Math.round(event.distance_km * 1000)} m`

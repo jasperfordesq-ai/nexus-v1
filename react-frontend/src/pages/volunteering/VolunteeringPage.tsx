@@ -687,7 +687,7 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
               </span>
             )}
             {opportunity.distance_km !== undefined && (
-              <span className="flex items-center gap-1 text-primary font-medium">
+              <span className="flex items-center gap-1 text-accent font-medium">
                 <MapPin className="w-3 h-3" aria-hidden="true" />
                 {opportunity.distance_km < 1
                   ? `${Math.round(opportunity.distance_km * 1000)} m`

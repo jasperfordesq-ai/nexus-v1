@@ -49,18 +49,18 @@ const QUICK_LINKS = [
 
 // Tailwind JIT needs full class names at build time — dynamic `bg-${color}/10` won't work
 const quickLinkBgClass: Record<string, string> = {
-  primary: 'bg-primary/10',
+  primary: 'bg-accent/10',
   danger: 'bg-danger/10',
   warning: 'bg-warning/10',
-  secondary: 'bg-secondary/10',
+  secondary: 'bg-accent-soft',
   success: 'bg-success/10',
   default: 'bg-default/10',
 };
 const quickLinkTextClass: Record<string, string> = {
-  primary: 'text-primary',
+  primary: 'text-accent',
   danger: 'text-danger',
   warning: 'text-warning',
-  secondary: 'text-secondary',
+  secondary: 'text-accent',
   success: 'text-success',
   default: 'text-default-500',
 };

@@ -118,7 +118,7 @@ export function SuperUserList() {
         <div className="flex items-center gap-3">
           <Avatar name={user.name} size="sm" />
           <div>
-            <Link to={tenantPath(`/admin/super/users/${user.id}`)} className="font-medium text-foreground hover:text-primary">
+            <Link to={tenantPath(`/admin/super/users/${user.id}`)} className="font-medium text-foreground hover:text-accent">
               {user.name}
             </Link>
             <p className="text-xs text-default-400">{user.email}</p>
@@ -129,7 +129,7 @@ export function SuperUserList() {
     {
       key: 'tenant', label: t('super.col_tenant'), sortable: true,
       render: (user) => (
-        <Link to={tenantPath(`/admin/super/tenants/${user.tenant_id}`)} className="hover:text-primary">
+        <Link to={tenantPath(`/admin/super/tenants/${user.tenant_id}`)} className="hover:text-accent">
           <Chip size="sm" variant="flat">{user.tenant_name || t('super.tenant_with_id', { id: user.tenant_id })}</Chip>
         </Link>
       ),
@@ -194,7 +194,7 @@ export function SuperUserList() {
               : <DropdownItem key="revoke-sa" id="revoke-sa" startContent={<UserX size={14} />} className="text-warning">{t('super.action_revoke_tenant_sa')}</DropdownItem>
             }
             {!user.is_super_admin
-              ? <DropdownItem key="grant-global" id="grant-global" startContent={<Shield size={14} />} className="text-secondary">{t('super.action_grant_global_sa')}</DropdownItem>
+              ? <DropdownItem key="grant-global" id="grant-global" startContent={<Shield size={14} />} className="text-accent">{t('super.action_grant_global_sa')}</DropdownItem>
               : <DropdownItem key="revoke-global" id="revoke-global" startContent={<Shield size={14} />} className="text-danger">{t('super.action_revoke_global_sa')}</DropdownItem>
             }
           </DropdownMenu>
@@ -213,7 +213,7 @@ export function SuperUserList() {
   return (
     <div>
       <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-default-500 mb-1">
-        <Link to={tenantPath('/admin/super')} className="hover:text-primary">{t('super.breadcrumb_super_admin')}</Link>
+        <Link to={tenantPath('/admin/super')} className="hover:text-accent">{t('super.breadcrumb_super_admin')}</Link>
         <span>/</span>
         <span className="text-foreground">{t('super.breadcrumb_users')}</span>
       </nav>

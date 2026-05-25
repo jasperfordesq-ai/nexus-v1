@@ -197,7 +197,7 @@ function AppKanbanCard({ application, onDragStart, onDownloadCv, onScheduleInter
             {appliedDate.toLocaleDateString()}
           </span>
           {application.match_percentage != null && (
-            <span className="flex items-center gap-1 text-primary font-medium">
+            <span className="flex items-center gap-1 text-accent font-medium">
               <Percent size={11} aria-hidden="true" />
               {application.match_percentage}% {t('match.title')}
             </span>
@@ -327,7 +327,7 @@ function KanbanColumn({ column, applications, onDragStart, onDrop, onDownloadCv,
         onDrop={handleDrop}
         className={`min-h-48 rounded-xl p-2 space-y-2 transition-colors ${
           isDragOver
-            ? 'bg-primary/10 border-2 border-primary/40 border-dashed'
+            ? 'bg-accent/10 border-2 border-accent/40 border-dashed'
             : 'bg-theme-elevated/50 border-2 border-transparent'
         }`}
       >
@@ -816,8 +816,8 @@ export function JobKanbanPage() {
 
       {/* Bulk action bar */}
       {selectedAppIds.size > 0 && (
-        <div className="sticky top-0 z-20 flex flex-col gap-3 p-3 mb-4 bg-primary/10 border border-primary/30 rounded-xl backdrop-blur-sm sm:flex-row sm:items-center">
-          <span className="text-sm font-medium text-primary">{t('bulk.selected_count', { count: selectedAppIds.size })}</span>
+        <div className="sticky top-0 z-20 flex flex-col gap-3 p-3 mb-4 bg-accent/10 border border-accent/30 rounded-xl backdrop-blur-sm sm:flex-row sm:items-center">
+          <span className="text-sm font-medium text-accent">{t('bulk.selected_count', { count: selectedAppIds.size })}</span>
           <Select
             size="sm"
             placeholder={t('bulk.select_action')}
@@ -890,7 +890,7 @@ export function JobKanbanPage() {
               {auditEvents.map((event, i) => (
                 <div key={i} className="relative">
                   <div className={`absolute -left-[25px] w-3 h-3 rounded-full border-2 border-background ${
-                    event.type === 'status_change' ? 'bg-primary' : event.type === 'interview' ? 'bg-secondary' : 'bg-warning'
+                    event.type === 'status_change' ? 'bg-accent' : event.type === 'interview' ? 'bg-default' : 'bg-warning'
                   }`} />
                   <div className="bg-default-50 rounded-lg p-3">
                     <div className="flex items-center justify-between gap-2">

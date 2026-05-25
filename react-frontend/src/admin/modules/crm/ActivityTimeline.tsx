@@ -65,13 +65,13 @@ const ACTIVITY_COLOR_MAP: Record<string, 'default' | 'primary' | 'success' | 'wa
 };
 
 const ACTIVITY_DOT_COLOR_MAP: Record<string, string> = {
-  login: 'bg-primary',
+  login: 'bg-accent',
   signup: 'bg-success',
   listing_created: 'bg-warning',
   exchange_completed: 'bg-success',
-  note_added: 'bg-secondary',
+  note_added: 'bg-default',
   task_created: 'bg-default-400',
-  profile_updated: 'bg-primary',
+  profile_updated: 'bg-accent',
   group_joined: 'bg-warning',
 };
 
@@ -327,7 +327,7 @@ export function ActivityTimeline() {
                             <div className="flex flex-wrap items-center gap-2">
                               <Link
                                 to={tenantPath(`/admin/users/${entry.user_id}/edit`)}
-                                className="font-semibold text-foreground hover:text-primary transition-colors"
+                                className="font-semibold text-foreground hover:text-accent transition-colors"
                               >
                                 {entry.user_name}
                               </Link>

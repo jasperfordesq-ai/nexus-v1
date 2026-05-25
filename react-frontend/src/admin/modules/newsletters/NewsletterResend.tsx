@@ -128,7 +128,7 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
                         </div>
                         <div>
                           <p className="text-sm text-default-500">{t('newsletter_resend.clicked')}</p>
-                          <p className="text-2xl font-bold text-primary">{info.total_clicked.toLocaleString()}</p>
+                          <p className="text-2xl font-bold text-accent">{info.total_clicked.toLocaleString()}</p>
                         </div>
                       </div>
                     </CardBody>
@@ -167,7 +167,7 @@ export function NewsletterResend({ isOpen, onClose, newsletterId, onSuccess }: N
 
                   <Card className="bg-default-100">
                     <CardBody className="flex-row items-center gap-3">
-                      <Users size={20} className="text-primary" />
+                      <Users size={20} className="text-accent" />
                       <div className="flex-1">
                         <p className="text-sm font-medium">{t('newsletter_resend.preview_recipient_count')}</p>
                         <p className="text-xs text-default-500">

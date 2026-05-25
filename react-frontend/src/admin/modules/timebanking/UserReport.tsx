@@ -156,7 +156,7 @@ export function UserReport() {
             <div className="min-w-0">
               <Link
                 to={tenantPath(`/admin/users/${user.id}/edit`)}
-                className="text-sm font-medium hover:text-primary transition-colors block truncate"
+                className="text-sm font-medium hover:text-accent transition-colors block truncate"
               >
                 {user.name}
               </Link>

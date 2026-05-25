@@ -49,7 +49,7 @@ export function MarketplaceListingCard({ listing, onSave, onUnsave }: Marketplac
 
   return (
     <Card
-      className="group relative overflow-hidden bg-default-50 border border-default-200 transition-shadow duration-200 hover:shadow-lg focus-within:ring-2 focus-within:ring-primary/45"
+      className="group relative overflow-hidden bg-default-50 border border-default-200 transition-shadow duration-200 hover:shadow-lg focus-within:ring-2 focus-within:ring-accent/45"
     >
       <Link
         to={tenantPath(`/marketplace/${listing.id}`)}

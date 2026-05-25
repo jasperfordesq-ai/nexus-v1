@@ -114,7 +114,7 @@ export function MyTrustTierPage() {
         {/* Page header */}
         <GlassCard className="p-6 sm:p-8">
           <div className="flex items-start gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/15">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent/15">
               <ShieldCheck
                 className="h-6 w-6 text-[var(--color-primary)]"
                 aria-hidden="true"

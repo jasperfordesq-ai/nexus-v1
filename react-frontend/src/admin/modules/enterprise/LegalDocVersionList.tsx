@@ -217,7 +217,7 @@ export default function LegalDocVersionList() {
           </Card>
         ) : (
           versions.map((version, index) => (
-            <Card key={version.id} className="border-l-4 border-l-primary">
+            <Card key={version.id} className="border-l-4 border-l-accent">
               <CardHeader className="flex justify-between items-start">
                 <div className="flex gap-4">
                   <div className="flex-1">

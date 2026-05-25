@@ -88,7 +88,7 @@ export default function CouponsPage() {
             <Card key={c.id} className="hover:shadow-lg transition-shadow">
               <CardBody className="p-5">
                 <div className="flex items-start justify-between mb-3">
-                  <Tag className="w-6 h-6 text-primary" />
+                  <Tag className="w-6 h-6 text-accent" />
                   <Chip size="sm" color="success" variant="flat">
                     {formatDiscount(c)}
                   </Chip>

@@ -107,11 +107,11 @@ export function AiReplySuggestion({
 
   // Generated: show the editable reply
   return (
-    <Card className="border border-secondary/20 bg-secondary/5">
+    <Card className="border border-accent/20 bg-accent-soft">
       <CardBody className="gap-3 p-3">
         <div className="flex items-center gap-2">
-          <Sparkles aria-hidden="true" className="w-4 h-4 text-secondary" />
-          <span className="text-xs font-medium text-secondary">
+          <Sparkles aria-hidden="true" className="w-4 h-4 text-accent" />
+          <span className="text-xs font-medium text-accent">
             {t('ai_reply.suggested_reply')}
           </span>
         </div>

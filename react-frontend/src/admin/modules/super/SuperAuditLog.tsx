@@ -133,7 +133,7 @@ export default function SuperAuditLog() {
         return (
           <div>
             {targetLink ? (
-              <Link to={targetLink} className="font-medium text-foreground hover:text-primary">
+              <Link to={targetLink} className="font-medium text-foreground hover:text-accent">
                 {entry.target_label}
               </Link>
             ) : (
@@ -147,7 +147,7 @@ export default function SuperAuditLog() {
     {
       key: 'actor_name', label: t('super.col_actor'),
       render: (entry) => entry.actor_id ? (
-        <Link to={tenantPath(`/admin/super/users/${entry.actor_id}`)} className="hover:text-primary">
+        <Link to={tenantPath(`/admin/super/users/${entry.actor_id}`)} className="hover:text-accent">
           {entry.actor_name || t('super.user_with_id', { id: entry.actor_id })}
         </Link>
       ) : (
@@ -171,7 +171,7 @@ export default function SuperAuditLog() {
   return (
     <div>
       <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-default-500 mb-1">
-        <Link to={tenantPath('/admin/super')} className="hover:text-primary">{t('super.breadcrumb_super_admin')}</Link>
+        <Link to={tenantPath('/admin/super')} className="hover:text-accent">{t('super.breadcrumb_super_admin')}</Link>
         <span>/</span>
         <span className="text-foreground">{t('super.audit_log')}</span>
       </nav>

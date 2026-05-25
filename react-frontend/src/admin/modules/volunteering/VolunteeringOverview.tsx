@@ -360,8 +360,8 @@ export function VolunteeringOverview() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {quickActions.map((action) => {
           const colorClasses: Record<string, { bg: string; text: string }> = {
-            primary: { bg: 'bg-primary/10', text: 'text-primary' },
-            secondary: { bg: 'bg-secondary/10', text: 'text-secondary' },
+            primary: { bg: 'bg-accent/10', text: 'text-accent' },
+            secondary: { bg: 'bg-accent-soft', text: 'text-accent' },
             success: { bg: 'bg-success/10', text: 'text-success' },
             warning: { bg: 'bg-warning/10', text: 'text-warning' },
             danger: { bg: 'bg-danger/10', text: 'text-danger' },

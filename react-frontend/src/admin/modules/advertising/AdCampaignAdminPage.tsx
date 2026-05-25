@@ -576,14 +576,14 @@ export function AdCampaignAdminPage() {
           {() => (
             <>
               <ModalHeader className="flex items-center gap-2">
-                <TrendingUp size={20} className="text-primary" />
+                <TrendingUp size={20} className="text-accent" />
                 {detailCampaign?.name ?? t('advertising.shared.campaign_details')}
               </ModalHeader>
 
               <ModalBody>
                 {detailLoading ? (
                   <div className="flex justify-center py-10">
-                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-accent border-t-transparent" />
                   </div>
                 ) : detailCampaign ? (
                   <div className="space-y-6">
@@ -664,13 +664,13 @@ export function AdCampaignAdminPage() {
                               <p className="font-semibold text-foreground">{creative.headline}</p>
                               <p className="text-sm text-default-600 mt-0.5">{creative.body}</p>
                               {creative.cta_text && (
-                                <span className="mt-1 inline-block rounded bg-primary/10 px-2 py-0.5 text-xs text-primary">
+                                <span className="mt-1 inline-block rounded bg-accent/10 px-2 py-0.5 text-xs text-accent">
                                   {creative.cta_text}
                                 </span>
                               )}
                               {creative.destination_url && (
                                 <p className="mt-1 text-xs text-default-400 truncate">
-                                  <a href={creative.destination_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                                  <a href={creative.destination_url} target="_blank" rel="noopener noreferrer" className="text-accent hover:underline">
                                     {creative.destination_url}
                                   </a>
                                 </p>
@@ -765,7 +765,7 @@ export function AdCampaignAdminPage() {
           {() => (
             <>
               <ModalHeader className="flex items-center gap-2">
-                <Plus size={20} className="text-primary" />
+                <Plus size={20} className="text-accent" />
                 {t('advertising.ad.create_title')}
               </ModalHeader>
               <ModalBody className="space-y-4">

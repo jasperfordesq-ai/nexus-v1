@@ -116,7 +116,7 @@ function ProviderCard({ provider, t }: ProviderCardProps) {
           <div className="flex min-w-0 items-center gap-2">
             {provider.is_verified && (
               <BadgeCheck
-                className="h-4 w-4 shrink-0 text-primary"
+                className="h-4 w-4 shrink-0 text-accent"
                 aria-label={t('providers.verified_badge')}
               />
             )}
@@ -146,7 +146,7 @@ function ProviderCard({ provider, t }: ProviderCardProps) {
             <a
               href={`tel:${provider.contact_phone}`}
               aria-label={t('providers.call_aria', { phone: provider.contact_phone })}
-              className="flex items-center gap-1.5 text-theme-muted hover:text-primary transition-colors"
+              className="flex items-center gap-1.5 text-theme-muted hover:text-accent transition-colors"
             >
               <Phone className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
               <span className="break-all">{provider.contact_phone}</span>
@@ -156,7 +156,7 @@ function ProviderCard({ provider, t }: ProviderCardProps) {
             <a
               href={`mailto:${provider.contact_email}`}
               aria-label={t('providers.email_aria', { email: provider.contact_email })}
-              className="flex items-center gap-1.5 text-theme-muted hover:text-primary transition-colors"
+              className="flex items-center gap-1.5 text-theme-muted hover:text-accent transition-colors"
             >
               <Mail className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
               <span className="max-w-[180px] truncate break-all">{provider.contact_email}</span>
@@ -168,7 +168,7 @@ function ProviderCard({ provider, t }: ProviderCardProps) {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={t('providers.website_aria', { url: provider.website_url })}
-              className="flex items-center gap-1.5 text-theme-muted hover:text-primary transition-colors"
+              className="flex items-center gap-1.5 text-theme-muted hover:text-accent transition-colors"
             >
               <Globe className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
               <span>{t('providers.website')}</span>
@@ -178,7 +178,7 @@ function ProviderCard({ provider, t }: ProviderCardProps) {
 
         {/* Verified badge strip */}
         {provider.is_verified && (
-          <div className="flex items-center gap-1.5 text-xs text-primary font-medium pt-0.5">
+          <div className="flex items-center gap-1.5 text-xs text-accent font-medium pt-0.5">
             <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" />
             {t('providers.verified_badge')}
           </div>
@@ -253,7 +253,7 @@ export default function CareProviderDirectoryPage() {
         {/* Page header */}
         <div className="space-y-1">
           <h1 className="flex flex-wrap items-center gap-2 text-2xl font-bold text-theme-primary">
-            <Heart className="h-6 w-6 text-primary" aria-hidden="true" />
+            <Heart className="h-6 w-6 text-accent" aria-hidden="true" />
             {t('providers.title')}
           </h1>
           <p className="text-theme-muted">{t('providers.subtitle')}</p>

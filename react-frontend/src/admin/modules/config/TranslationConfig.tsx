@@ -249,7 +249,7 @@ export function TranslationConfig() {
         {/* General Settings */}
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <Settings size={18} className="text-primary" />
+            <Settings size={18} className="text-accent" />
             <h3 className="font-semibold">{t('config.translation_general_settings')}</h3>
           </CardHeader>
           <CardBody className="divide-y divide-divider px-4">
@@ -384,7 +384,7 @@ export function TranslationConfig() {
         {glossaryEnabled && (
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-              <BookOpen size={18} className="text-secondary" />
+              <BookOpen size={18} className="text-accent" />
               <h3 className="font-semibold">{t('config.translation_glossary_management')}</h3>
               <span className="text-sm text-default-400">{t('config.translation_glossary_management_desc')}</span>
             </CardHeader>

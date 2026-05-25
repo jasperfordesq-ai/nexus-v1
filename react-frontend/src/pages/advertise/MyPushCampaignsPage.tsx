@@ -212,7 +212,7 @@ export function MyPushCampaignsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <BellRing size={28} className="text-primary" aria-hidden="true" />
+          <BellRing size={28} className="text-accent" aria-hidden="true" />
           <div>
             <h1 className="text-2xl font-bold text-theme-primary">{t('push_campaign.page_title')}</h1>
             <p className="text-sm text-theme-subtle">{t('push_campaign.page_subtitle')}</p>
@@ -378,7 +378,7 @@ export function MyPushCampaignsPage() {
                   </Button>
                 </div>
                 {audienceEstimate !== null && (
-                  <p className="text-sm font-medium text-primary">
+                  <p className="text-sm font-medium text-accent">
                     {t('push_campaign.estimate_result', { count: audienceEstimate })}
                   </p>
                 )}

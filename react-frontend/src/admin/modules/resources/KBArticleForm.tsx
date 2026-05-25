@@ -523,8 +523,8 @@ export function KBArticleForm() {
                 className={`
                   flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed p-10 cursor-pointer transition-colors
                   ${isDragging
-                    ? 'border-primary bg-primary/5'
-                    : 'border-default-300 hover:border-primary hover:bg-default-50'
+                    ? 'border-accent bg-accent/5'
+                    : 'border-default-300 hover:border-accent hover:bg-default-50'
                   }
                 `}
               >
@@ -550,7 +550,7 @@ export function KBArticleForm() {
             {/* Pending file indicator */}
             {pendingFile && (
               <div className="flex items-center gap-3 rounded-lg border border-default-200 px-4 py-3">
-                <FileText size={18} className="text-primary flex-shrink-0" />
+                <FileText size={18} className="text-accent flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground truncate">{pendingFile.name}</p>
                   <p className="text-xs text-default-400">{formatFileSize(pendingFile.size)}</p>
@@ -703,7 +703,7 @@ export function KBArticleForm() {
 
                   {attachments.map((att) => (
                     <div key={att.id} className="flex items-center gap-3 rounded-lg border border-default-200 px-4 py-2.5">
-                      <FileText size={16} className="text-primary flex-shrink-0" />
+                      <FileText size={16} className="text-accent flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-foreground truncate">{att.file_name}</p>
                         <p className="text-xs text-default-400">

@@ -722,7 +722,7 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
 
   const renderBadge = (item: NavItem) => {
     if (!item.badge) return null;
-    const tone = item.attention === 'danger' ? 'bg-danger text-danger-foreground' : 'bg-primary text-primary-foreground';
+    const tone = item.attention === 'danger' ? 'bg-danger text-danger-foreground' : 'bg-accent text-accent-foreground';
     return <span className={`ml-auto rounded-full px-2 py-0.5 text-xs font-semibold ${tone}`}>{item.badge}</span>;
   };
 
@@ -740,11 +740,11 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
         aria-current={active ? 'page' : undefined}
         className={`group relative flex min-h-9 items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors ${
           active
-            ? 'bg-primary/10 text-primary font-semibold shadow-sm'
+            ? 'bg-accent/10 text-accent font-semibold shadow-sm'
             : 'text-default-500 hover:bg-default-100 hover:text-foreground'
         } ${compact ? 'justify-center px-2' : ''}`}
       >
-        {active && !compact && <span className="absolute left-0 top-2 h-5 w-0.5 rounded-r bg-primary" />}
+        {active && !compact && <span className="absolute left-0 top-2 h-5 w-0.5 rounded-r bg-accent" />}
         <ItemIcon size={16} className="shrink-0" />
         {!compact && <span className="min-w-0 flex-1 truncate">{item.label}</span>}
         {!compact && renderBadge(item)}
@@ -763,7 +763,7 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
           to={tenantPath(href)}
           aria-current={active ? 'page' : undefined}
           className={`flex items-center justify-center rounded-lg px-2 py-2 transition-colors ${
-            active ? 'bg-primary/10 text-primary' : 'text-default-500 hover:bg-default-100 hover:text-foreground'
+            active ? 'bg-accent/10 text-accent' : 'text-default-500 hover:bg-default-100 hover:text-foreground'
           }`}
         >
           <Icon size={18} />
@@ -809,7 +809,7 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
           itemClasses={{
             base: 'py-0',
             trigger: `rounded-lg px-3 py-2 text-sm transition-colors ${
-              active ? 'bg-primary/10 text-primary font-semibold' : 'text-default-600 hover:bg-default-100 hover:text-foreground'
+              active ? 'bg-accent/10 text-accent font-semibold' : 'text-default-600 hover:bg-default-100 hover:text-foreground'
             }`,
             title: 'text-sm font-medium',
             content: 'pb-1 pt-0',
@@ -929,7 +929,7 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
                       }}
                       className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-colors ${
                         isActive(item.href)
-                          ? 'bg-primary/10 text-primary font-semibold'
+                          ? 'bg-accent/10 text-accent font-semibold'
                           : 'text-default-500 hover:bg-default-100 hover:text-foreground'
                       }`}
                     >
@@ -979,7 +979,7 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
                       to={tenantPath(page.href)}
                       className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-colors ${
                         isActive(page.href)
-                          ? 'bg-primary/10 text-primary font-semibold'
+                          ? 'bg-accent/10 text-accent font-semibold'
                           : 'text-default-500 hover:bg-default-100 hover:text-foreground'
                       }`}
                     >
@@ -1017,7 +1017,7 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
           <Link
             to={tenantPath('/admin/help')}
             className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-default-100 ${
-              location.pathname.includes('/admin/help') ? 'bg-primary/10 text-primary' : 'text-default-600'
+              location.pathname.includes('/admin/help') ? 'bg-accent/10 text-accent' : 'text-default-600'
             } ${collapsed ? 'justify-center' : ''}`}
             title={t('help_centre')}
           >

@@ -136,7 +136,7 @@ export function GroupTabNav({
               <DropdownItem
                 key={tab.key} id={tab.key}
                 startContent={<Icon className="w-4 h-4" />}
-                className={activeTab === tab.key ? 'bg-primary/10 text-primary' : ''}
+                className={activeTab === tab.key ? 'bg-accent/10 text-accent' : ''}
               >
                 {showSection ? t('detail.tab_section_label', { section: tab.section, label: tab.label }) : tab.label}
               </DropdownItem>

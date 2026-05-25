@@ -306,8 +306,8 @@ export function GdprDashboard() {
         {links.map((link) => (
           <Card key={link.href} shadow="sm" isPressable as={Link} to={link.href}>
             <CardBody className="flex flex-row items-center gap-4 p-4">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                <link.icon size={20} className="text-primary" />
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10">
+                <link.icon size={20} className="text-accent" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-foreground">{link.label}</p>

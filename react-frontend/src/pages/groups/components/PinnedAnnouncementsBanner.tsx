@@ -63,9 +63,9 @@ export function PinnedAnnouncementsBanner({ groupId, isMember = true }: PinnedAn
       {pinned.map((announcement) => (
         <div
           key={announcement.id}
-          className="flex items-start gap-3 p-3 rounded-lg bg-primary/5 border border-primary/20"
+          className="flex items-start gap-3 p-3 rounded-lg bg-accent/5 border border-accent/20"
         >
-          <Megaphone className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+          <Megaphone className="w-4 h-4 text-accent flex-shrink-0 mt-0.5" />
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-theme-primary">{announcement.title}</p>
             <SafeHtml content={announcement.content} className="text-xs text-theme-subtle mt-0.5 line-clamp-2" as="p" />

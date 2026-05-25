@@ -84,15 +84,15 @@ const EVENT_TYPE_I18N_KEYS: Record<string, string> = {
 };
 
 const EVENT_TYPE_STYLES: Record<string, Omit<EventTypeConfig, 'label'>> = {
-  cross_tenant_message: { icon: Mail, color: 'primary', bgClass: 'bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400' },
-  api_message_sent: { icon: Mail, color: 'primary', bgClass: 'bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400' },
+  cross_tenant_message: { icon: Mail, color: 'primary', bgClass: 'bg-accent-soft text-accent dark:bg-accent-soft dark:text-accent' },
+  api_message_sent: { icon: Mail, color: 'primary', bgClass: 'bg-accent-soft text-accent dark:bg-accent-soft dark:text-accent' },
   cross_tenant_transaction: { icon: CreditCard, color: 'success', bgClass: 'bg-success-100 text-success-600 dark:bg-success-900/30 dark:text-success-400' },
   api_transaction_initiated: { icon: CreditCard, color: 'success', bgClass: 'bg-success-100 text-success-600 dark:bg-success-900/30 dark:text-success-400' },
-  connection_request: { icon: UserPlus, color: 'secondary', bgClass: 'bg-secondary-100 text-secondary-600 dark:bg-secondary-900/30 dark:text-secondary-400' },
+  connection_request: { icon: UserPlus, color: 'secondary', bgClass: 'bg-surface-secondary text-accent dark:bg-surface-secondary dark:text-accent' },
   listing_federated: { icon: Package, color: 'warning', bgClass: 'bg-warning-100 text-warning-600 dark:bg-warning-900/30 dark:text-warning-400' },
   listing_unfederated: { icon: Package, color: 'warning', bgClass: 'bg-warning-100 text-warning-600 dark:bg-warning-900/30 dark:text-warning-400' },
   listing_viewed: { icon: Package, color: 'warning', bgClass: 'bg-warning-100 text-warning-600 dark:bg-warning-900/30 dark:text-warning-400' },
-  partnership_requested: { icon: Handshake, color: 'primary', bgClass: 'bg-primary-100 text-primary-600 dark:bg-primary-900/30 dark:text-primary-400' },
+  partnership_requested: { icon: Handshake, color: 'primary', bgClass: 'bg-accent-soft text-accent dark:bg-accent-soft dark:text-accent' },
   partnership_approved: { icon: Handshake, color: 'success', bgClass: 'bg-success-100 text-success-600 dark:bg-success-900/30 dark:text-success-400' },
   partnership_rejected: { icon: Handshake, color: 'danger', bgClass: 'bg-danger-100 text-danger-600 dark:bg-danger-900/30 dark:text-danger-400' },
   partnership_status_changed: { icon: Handshake, color: 'warning', bgClass: 'bg-warning-100 text-warning-600 dark:bg-warning-900/30 dark:text-warning-400' },

@@ -217,8 +217,8 @@ export function MatchDebugPanel() {
       {/* User search card */}
       <Card>
         <CardHeader className="flex gap-3 items-center">
-          <div className="p-2 rounded-xl bg-primary/10">
-            <Target className="w-5 h-5 text-primary" />
+          <div className="p-2 rounded-xl bg-accent/10">
+            <Target className="w-5 h-5 text-accent" />
           </div>
           <div>
             <p className="text-sm font-semibold text-foreground">{t('select_a_user')}</p>
@@ -278,15 +278,15 @@ export function MatchDebugPanel() {
           {selectedUser && (
             <div className="mt-4 flex items-center gap-2">
               <span className="text-sm text-default-500">{t('inspecting')}</span>
-              <div className="flex items-center gap-2 bg-primary/10 rounded-full px-3 py-1">
+              <div className="flex items-center gap-2 bg-accent/10 rounded-full px-3 py-1">
                 <Avatar
                   src={resolveAvatarUrl(selectedUser.avatar_url)}
                   name={selectedUser.name}
                   size="sm"
                   className="w-5 h-5"
                 />
-                <span className="text-sm font-medium text-primary">{selectedUser.name}</span>
-                <span className="text-xs text-primary/70">#{selectedUser.id}</span>
+                <span className="text-sm font-medium text-accent">{selectedUser.name}</span>
+                <span className="text-xs text-accent/70">#{selectedUser.id}</span>
               </div>
               {total > 0 && (
                 <Chip size="sm" variant="flat" color="primary">
@@ -354,7 +354,7 @@ export function MatchDebugPanel() {
               <CardHeader className="flex items-start justify-between gap-4 pb-2">
                 <div className="flex items-start gap-3 flex-1 min-w-0">
                   {/* Rank badge */}
-                  <div className="shrink-0 w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary">
+                  <div className="shrink-0 w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center text-xs font-bold text-accent">
                     {index + 1}
                   </div>
 

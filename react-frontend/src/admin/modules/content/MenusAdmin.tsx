@@ -118,7 +118,7 @@ export function MenusAdmin() {
           type="button"
           variant="light"
           onPress={() => navigate(tenantPath(`/admin/menus/builder/${item.id}`))}
-          className="text-left font-medium text-primary hover:underline min-w-0 h-auto p-0 justify-start"
+          className="text-left font-medium text-accent hover:underline min-w-0 h-auto p-0 justify-start"
         >
           {item.name}
         </Button>
@@ -205,8 +205,8 @@ export function MenusAdmin() {
       />
 
       {/* How it works notice */}
-      <div className="flex items-start gap-3 p-4 mb-4 rounded-lg bg-primary-50/50 dark:bg-primary-900/10 border border-primary-200 dark:border-primary-800">
-        <Info size={16} className="text-primary-500 shrink-0 mt-0.5" />
+      <div className="flex items-start gap-3 p-4 mb-4 rounded-lg bg-accent-soft dark:bg-accent-soft border border-accent dark:border-accent">
+        <Info size={16} className="text-accent0 shrink-0 mt-0.5" />
         <div className="text-sm">
           <p className="font-medium text-theme-primary">{t('content.menus_how_it_works_title')}</p>
           <p className="mt-0.5 text-theme-muted">{t('content.menus_how_it_works_desc')}</p>

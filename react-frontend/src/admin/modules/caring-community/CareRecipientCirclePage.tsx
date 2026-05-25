@@ -145,12 +145,12 @@ export default function CareRecipientCirclePage() {
       />
 
       {/* Intro card */}
-      <Card className="border border-primary/30 bg-primary-50/70 shadow-sm shadow-primary/10 dark:bg-primary-900/20" shadow="none">
+      <Card className="border border-accent/30 bg-accent-soft shadow-sm shadow-accent/10 dark:bg-accent-soft" shadow="none">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('admin.recipient_circle.about.title')}</p>
+              <p className="font-semibold text-accent dark:text-accent">{t('admin.recipient_circle.about.title')}</p>
               <p className="text-default-600">{t('admin.recipient_circle.about.body')}</p>
               <div className="space-y-0.5 pt-1 text-default-500">
                 <p><strong>{t('admin.recipient_circle.about.trust_tiers_label')}</strong> {t('admin.recipient_circle.about.trust_tiers_body')}</p>

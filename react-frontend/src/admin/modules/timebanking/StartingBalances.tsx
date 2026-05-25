@@ -112,7 +112,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
   return (
     <Card shadow="sm">
       <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-        <Plus size={18} className="text-primary" />
+        <Plus size={18} className="text-accent" />
         <h3 className="font-semibold">{t('timebanking.grant_starting_credits')}</h3>
       </CardHeader>
       <CardBody className="px-4 pb-4 space-y-4">
@@ -169,8 +169,8 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
         ) : (
           <div className="flex items-center justify-between border border-divider rounded-lg p-3">
             <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-                <Users size={16} className="text-primary" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent/10">
+                <Users size={16} className="text-accent" />
               </div>
               <div>
                 <p className="text-sm font-medium text-foreground">
@@ -338,7 +338,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
   return (
     <div>
       <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-        <History size={16} className="text-secondary" />
+        <History size={16} className="text-accent" />
         {t('timebanking.grant_history')}
       </h3>
       <DataTable

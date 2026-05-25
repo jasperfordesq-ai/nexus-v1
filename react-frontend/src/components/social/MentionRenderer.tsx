@@ -75,7 +75,7 @@ function MentionLink({
   const linkContent = (
     <Link
       to={profilePath || '#'}
-      className="text-primary font-semibold hover:underline cursor-pointer"
+      className="text-accent font-semibold hover:underline cursor-pointer"
       onClick={(e) => {
         e.stopPropagation();
         if (!profilePath) e.preventDefault();

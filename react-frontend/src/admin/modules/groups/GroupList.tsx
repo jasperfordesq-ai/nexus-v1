@@ -34,7 +34,7 @@ import { DataTable,
 import type { AdminGroup } from '../../api/types';
 
 import { resolveAssetUrl } from '@/lib/helpers';
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab, Checkbox } from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab } from '@/components/ui';
 const statusColors: Record<string, 'success' | 'warning' | 'danger' | 'default'> = {
   active: 'success',
   pending: 'warning',
@@ -193,34 +193,6 @@ export function GroupList() {
   };
 
   const columns: Column<AdminGroup>[] = [
-    {
-      key: 'select',
-      label: (
-        <Checkbox
-          isSelected={selectedIds.size === items.length && items.length > 0}
-          onValueChange={(checked) => {
-            if (checked) {
-              setSelectedIds(new Set(items.map(i => i.id)));
-            } else {
-              setSelectedIds(new Set());
-            }
-          }}
-          aria-label={t('groups.select_all')}
-        />
-      ),
-      render: (item) => (
-        <Checkbox
-          isSelected={selectedIds.has(item.id)}
-          onValueChange={(checked) => {
-            const next = new Set(selectedIds);
-            if (checked) next.add(item.id);
-            else next.delete(item.id);
-            setSelectedIds(next);
-          }}
-          aria-label={t('groups.select_item')}
-        />
-      ),
-    },
     {
       key: 'name',
       label: t('groups.col_group'),
@@ -399,7 +371,7 @@ export function GroupList() {
       </div>
 
       {selectedIds.size > 0 && (
-        <div className="flex items-center gap-3 p-3 mb-4 bg-primary/10 rounded-lg">
+        <div className="flex items-center gap-3 p-3 mb-4 bg-accent/10 rounded-lg">
           <span className="text-sm font-medium">{t('groups.selected_count', { count: selectedIds.size })}</span>
           <Button size="sm" variant="flat" onPress={handleBulkArchive}>{t('groups.archive')}</Button>
           <Button size="sm" variant="flat" color="danger" onPress={handleBulkDelete}>{t('groups.delete')}</Button>
@@ -418,6 +390,9 @@ export function GroupList() {
         page={page}
         pageSize={20}
         onPageChange={setPage}
+        selectable
+        selectedKeys={new Set(Array.from(selectedIds, String))}
+        onSelectionChange={(keys) => setSelectedIds(new Set(Array.from(keys, Number)))}
       />
 
       {confirmDelete && (

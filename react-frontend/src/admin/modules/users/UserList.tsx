@@ -348,7 +348,7 @@ export function UserList() {
           <div>
             <Link
               to={tenantPath(`/admin/users/${user.id}/edit`)}
-              className="font-medium text-foreground hover:text-primary"
+              className="font-medium text-foreground hover:text-accent"
             >
               {user.name}
             </Link>
@@ -565,7 +565,7 @@ export function UserList() {
                     type="file"
                     accept=".csv"
                     onChange={(e) => setImportFile(e.target.files?.[0] || null)}
-                    className="block w-full text-sm text-default-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100"
+                    className="block w-full text-sm text-default-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-accent-soft file:text-accent hover:file:bg-accent-soft"
                   />
                 </div>
 

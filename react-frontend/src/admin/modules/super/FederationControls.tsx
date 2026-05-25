@@ -188,9 +188,9 @@ export function FederationControls() {
 
   const activePartnerships = partnerships.filter(p => p.status === 'active').length;
   const colorClasses: Record<string, { bg: string; text: string }> = {
-    primary: { bg: 'bg-primary/10', text: 'text-primary' },
+    primary: { bg: 'bg-accent/10', text: 'text-accent' },
     success: { bg: 'bg-success/10', text: 'text-success' },
-    secondary: { bg: 'bg-secondary/10', text: 'text-secondary' },
+    secondary: { bg: 'bg-accent-soft', text: 'text-accent' },
     warning: { bg: 'bg-warning/10', text: 'text-warning' },
     danger: { bg: 'bg-danger/10', text: 'text-danger' },
   };
@@ -220,7 +220,7 @@ export function FederationControls() {
     <div className="space-y-6">
       {/* Breadcrumb */}
       <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-default-500">
-        <Link to={tenantPath('/admin/super')} className="hover:text-primary">{t('super.breadcrumb_super_admin')}</Link>
+        <Link to={tenantPath('/admin/super')} className="hover:text-accent">{t('super.breadcrumb_super_admin')}</Link>
         <span>/</span>
         <span className="text-foreground font-medium">{t('super.breadcrumb_federation_controls')}</span>
       </nav>
@@ -464,7 +464,7 @@ export function FederationControls() {
         {/* System Status */}
         <Card>
           <CardHeader className="flex gap-2 items-center pb-0">
-            <Globe size={20} className="text-primary" />
+            <Globe size={20} className="text-accent" />
             <h3 className="font-semibold text-lg">{t('super.system_status')}</h3>
           </CardHeader>
           <CardBody className="flex flex-col gap-4">
@@ -521,7 +521,7 @@ export function FederationControls() {
         {/* Feature Toggles */}
         <Card>
           <CardHeader className="flex gap-2 items-center pb-0">
-            <Shield size={20} className="text-secondary" />
+            <Shield size={20} className="text-accent" />
             <h3 className="font-semibold text-lg">{t('super.cross_tenant_features')}</h3>
           </CardHeader>
           <CardBody className="flex flex-col gap-3">
@@ -578,7 +578,7 @@ export function FederationControls() {
               {whitelist.map((entry) => (
                 <div key={entry.tenant_id} className="flex items-center justify-between py-2 border-b border-default-100 last:border-b-0">
                   <span>
-                    <Link to={tenantPath(`/admin/super/tenants/${entry.tenant_id}`)} className="hover:text-primary font-medium text-sm">
+                    <Link to={tenantPath(`/admin/super/tenants/${entry.tenant_id}`)} className="hover:text-accent font-medium text-sm">
                       {entry.tenant_name}
                     </Link>
                     {' '}<span className="text-xs text-default-400">{t('super.tenant_id_compact', { id: entry.tenant_id })}</span>
@@ -597,7 +597,7 @@ export function FederationControls() {
         <Card>
           <CardHeader className="flex justify-between items-center pb-0">
             <div className="flex gap-2 items-center">
-              <Handshake size={20} className="text-secondary" />
+              <Handshake size={20} className="text-accent" />
               <h3 className="font-semibold text-lg">{t('super.partnerships')}</h3>
               <Chip size="sm" variant="flat">{partnerships.length}</Chip>
             </div>

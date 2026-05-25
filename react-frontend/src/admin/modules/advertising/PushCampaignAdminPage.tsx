@@ -201,7 +201,7 @@ function MiniBarChart({
     <div className="space-y-1">
       <div className="flex gap-4 text-xs text-default-400 mb-2">
         <span className="flex items-center gap-1">
-          <span className="inline-block w-3 h-3 rounded-sm bg-primary" />
+          <span className="inline-block w-3 h-3 rounded-sm bg-accent" />
           {t('advertising.push.metrics.sends')}
         </span>
         <span className="flex items-center gap-1">
@@ -218,7 +218,7 @@ function MiniBarChart({
               <div key={d.date} className="flex flex-col items-center gap-0.5 flex-1 min-w-[28px]">
                 <div className="w-full flex gap-0.5 items-end" style={{ height: 48 }}>
                   <div
-                    className="flex-1 bg-primary rounded-t opacity-80"
+                    className="flex-1 bg-accent rounded-t opacity-80"
                     style={{ height: `${sendPct}%` }}
                     title={t('advertising.push.chart_sends_title', { count: d.sends })}
                   />
@@ -470,7 +470,7 @@ export default function PushCampaignAdminPage() {
       <Card>
         <CardHeader className="flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-2">
-            <Bell size={20} className="text-primary" />
+            <Bell size={20} className="text-accent" />
             <h2 className="text-lg font-semibold">{t('advertising.push.header.title')}</h2>
           </div>
           <Button
@@ -695,7 +695,7 @@ export default function PushCampaignAdminPage() {
                         href={detailCampaign.cta_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-primary text-xs break-all"
+                        className="text-accent text-xs break-all"
                       >
                         {detailCampaign.cta_url}
                       </a>
@@ -827,7 +827,7 @@ export default function PushCampaignAdminPage() {
       <Modal isOpen={createDisc.isOpen} onClose={createDisc.onClose} size="2xl">
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <Megaphone size={18} className="text-primary" />
+            <Megaphone size={18} className="text-accent" />
             {t('advertising.push.create_title')}
           </ModalHeader>
           <ModalBody>

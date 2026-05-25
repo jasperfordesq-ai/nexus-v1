@@ -365,7 +365,7 @@ export function JobsPage() {
           variant="underlined"
           classNames={{
             tab: 'text-theme-muted data-[selected=true]:text-theme-primary',
-            cursor: 'bg-primary',
+            cursor: 'bg-accent',
           }}
         >
           {jobConfig['jobs.tab_browse'] !== false && (
@@ -942,7 +942,7 @@ const MyPostingCard = memo(function MyPostingCard({ vacancy }: MyPostingCardProp
               <Eye className="w-4 h-4" aria-hidden="true" />
               {t('views', { count: vacancy.views_count })}
             </span>
-            <span className={`flex items-center gap-1 ${vacancy.applications_count > 0 ? 'text-primary font-medium' : ''}`}>
+            <span className={`flex items-center gap-1 ${vacancy.applications_count > 0 ? 'text-accent font-medium' : ''}`}>
               <FileText className="w-4 h-4" aria-hidden="true" />
               {t('applications', { count: vacancy.applications_count })}
             </span>

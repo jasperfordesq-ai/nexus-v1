@@ -73,7 +73,7 @@ function ExpandableDetails({ details }: { details: Record<string, unknown> | str
       <Button
         variant="light"
         size="sm"
-        className="flex items-center gap-1 text-xs text-primary hover:text-primary-600 transition-colors h-auto min-w-0 p-0"
+        className="flex items-center gap-1 text-xs text-accent hover:text-accent transition-colors h-auto min-w-0 p-0"
         onPress={() => setExpanded((prev) => !prev)}
       >
         {expanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
@@ -139,7 +139,7 @@ export function GroupAuditLog({ groupId }: GroupAuditLogProps) {
     <GlassCard className="p-5 space-y-5">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-2">
-          <ScrollText size={18} className="text-primary" />
+          <ScrollText size={18} className="text-accent" />
           <h3 className="text-base font-semibold text-foreground">
             {t('groups.audit_log_title')}
           </h3>

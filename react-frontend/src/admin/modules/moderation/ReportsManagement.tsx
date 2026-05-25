@@ -301,8 +301,8 @@ export default function ReportsManagement() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <Card shadow="sm" className="border border-default-200">
             <CardBody className="flex flex-row items-center gap-3 p-4">
-              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-primary-100 dark:bg-primary-900/30">
-                <Flag className="w-6 h-6 text-primary" />
+              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-accent-soft dark:bg-accent-soft">
+                <Flag className="w-6 h-6 text-accent" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.total ?? ((stats.reports_pending ?? 0) + (stats.reports_resolved ?? 0) + (stats.reports_dismissed ?? 0))}</p>

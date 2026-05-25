@@ -144,7 +144,7 @@ export function CustomPage() {
         >
           <GlassCard className="p-6 sm:p-8">
             <div className="flex items-center gap-3 mb-6">
-              <FileText className="w-6 h-6 text-primary" />
+              <FileText className="w-6 h-6 text-accent" />
               <h1 className="text-2xl sm:text-3xl font-bold text-theme-primary">
                 {page.title}
               </h1>
@@ -154,13 +154,13 @@ export function CustomPage() {
               <div
                 className="
                   prose prose-neutral dark:prose-invert max-w-none
-                  [&_a]:text-primary [&_a]:underline
+                  [&_a]:text-accent [&_a]:underline
                   [&_img]:rounded-xl [&_img]:max-w-full
                   [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:mt-8 [&_h2]:mb-4
                   [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:mt-6 [&_h3]:mb-3
                   [&_ul]:list-disc [&_ul]:pl-6
                   [&_ol]:list-decimal [&_ol]:pl-6
-                  [&_blockquote]:border-l-4 [&_blockquote]:border-primary [&_blockquote]:pl-4 [&_blockquote]:italic
+                  [&_blockquote]:border-l-4 [&_blockquote]:border-accent [&_blockquote]:pl-4 [&_blockquote]:italic
                   [&_code]:bg-theme-elevated [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-sm
                   [&_pre]:bg-theme-elevated [&_pre]:p-4 [&_pre]:rounded-xl [&_pre]:overflow-x-auto
                 "

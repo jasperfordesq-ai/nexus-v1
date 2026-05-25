@@ -756,7 +756,7 @@ export function InsuranceCertificates() {
       >
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <Plus size={20} className="text-primary" />
+            <Plus size={20} className="text-accent" />
             {t('insurance.modal_create_title')}
           </ModalHeader>
           <ModalBody className="gap-4">
@@ -914,7 +914,7 @@ export function InsuranceCertificates() {
         >
           <ModalContent>
             <ModalHeader className="flex items-center gap-2">
-              <Pencil size={20} className="text-primary" />
+              <Pencil size={20} className="text-accent" />
               {t('insurance.modal_edit_title')}
             </ModalHeader>
             <ModalBody className="gap-4">
@@ -1066,7 +1066,7 @@ export function InsuranceCertificates() {
         >
           <ModalContent>
             <ModalHeader className="flex items-center gap-2">
-              <FileCheck size={20} className="text-primary" />
+              <FileCheck size={20} className="text-accent" />
               {t('insurance.modal_view_title')}
             </ModalHeader>
             <ModalBody>
@@ -1138,7 +1138,7 @@ export function InsuranceCertificates() {
                     href={resolveAssetUrl(viewItem.certificate_file_path)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-sm text-primary hover:underline bg-primary-50 dark:bg-primary-50/10 px-3 py-2 rounded-lg"
+                    className="inline-flex items-center gap-2 text-sm text-accent hover:underline bg-accent-soft dark:bg-accent-soft px-3 py-2 rounded-lg"
                   >
                     <FileText size={16} />
                     {t('insurance.view_certificate_file')}

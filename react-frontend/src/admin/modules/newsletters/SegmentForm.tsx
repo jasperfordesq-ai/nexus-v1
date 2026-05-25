@@ -528,7 +528,7 @@ export function SegmentForm() {
 
             {previewCount !== null && (
               <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-default-100">
-                <Users size={18} className="text-primary" />
+                <Users size={18} className="text-accent" />
                 <span className="text-lg font-semibold text-foreground">
                   {previewCount.toLocaleString()}
                 </span>
@@ -565,7 +565,7 @@ export function SegmentForm() {
                     key={idx}
                     onPress={() => applySuggestion(suggestion)}
                     variant="bordered"
-                    className="text-left p-4 rounded-lg border-default-200 hover:border-primary hover:bg-primary-50/50 h-auto justify-start"
+                    className="text-left p-4 rounded-lg border-default-200 hover:border-accent hover:bg-accent-soft h-auto justify-start"
                   >
                     <div className="flex items-start gap-2 text-left w-full">
                       <Lightbulb size={16} className="text-warning mt-0.5 flex-shrink-0" />

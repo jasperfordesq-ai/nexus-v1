@@ -171,7 +171,7 @@ export function CronJobSettingsPage() {
         {/* Per-Job Settings */}
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2">
-            <Settings size={18} className="text-primary" />
+            <Settings size={18} className="text-accent" />
             <span className="text-lg font-semibold">{t('system.section_per_job_settings')}</span>
           </CardHeader>
           <CardBody className="space-y-4">
@@ -330,7 +330,7 @@ export function CronJobSettingsPage() {
         {/* Global Settings */}
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2">
-            <Settings size={18} className="text-secondary" />
+            <Settings size={18} className="text-accent" />
             <span className="text-lg font-semibold">{t('system.section_global_settings')}</span>
           </CardHeader>
           <CardBody className="space-y-4">

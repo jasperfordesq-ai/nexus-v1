@@ -45,7 +45,7 @@ export function PageHeader({ title, description, subtitle, icon, actions }: Page
           <div className="min-w-0 flex-1">
             <div className="flex min-w-0 items-center gap-3">
               {icon && (
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
                   {icon}
                 </span>
               )}
@@ -56,7 +56,7 @@ export function PageHeader({ title, description, subtitle, icon, actions }: Page
                   size="sm"
                   variant="light"
                   onClick={() => setHelpOpen(true)}
-                  className="ml-1 shrink-0 text-default-400 hover:text-primary"
+                  className="ml-1 shrink-0 text-default-400 hover:text-accent"
                   aria-label={t('shared.open_page_help')}
                   title={t('shared.help')}
                 >

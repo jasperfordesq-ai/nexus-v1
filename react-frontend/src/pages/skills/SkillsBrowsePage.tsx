@@ -91,8 +91,8 @@ function ProficiencyBadge({ level }: { level: string }) {
 function StatCard({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: number | string }) {
   return (
     <GlassCard className="p-4 text-center">
-      <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-        <Icon className="w-5 h-5 text-primary" aria-hidden="true" />
+      <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10">
+        <Icon className="w-5 h-5 text-accent" aria-hidden="true" />
       </div>
       <p className="text-2xl font-bold text-theme-primary">{value}</p>
       <p className="text-xs text-theme-subtle mt-0.5">{label}</p>
@@ -256,8 +256,8 @@ export function SkillsBrowsePage() {
       <GlassCard className="p-5 sm:p-6">
         <div className="relative">
           <h1 className="text-2xl font-bold text-theme-primary flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-              <GraduationCap className="w-5 h-5 text-primary" aria-hidden="true" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10">
+              <GraduationCap className="w-5 h-5 text-accent" aria-hidden="true" />
             </div>
             {t('skills.browse_title')}
           </h1>
@@ -292,7 +292,7 @@ export function SkillsBrowsePage() {
           {isAuthenticated && (
             <Link
               to={tenantPath('/settings?tab=skills')}
-              className="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary/10 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/20"
+              className="mt-4 inline-flex items-center gap-2 rounded-lg bg-accent/10 px-4 py-2 text-sm font-medium text-accent transition-colors hover:bg-accent/20"
             >
               <Settings className="w-4 h-4" aria-hidden="true" />
               {t('skills.add_your_skills')}
@@ -415,7 +415,7 @@ export function SkillsBrowsePage() {
                         aria-expanded={isExpanded}
                       >
                         <div className="flex items-center gap-3">
-                          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
                             {category.icon || <FolderTree className="h-5 w-5" aria-hidden="true" />}
                           </div>
                           <div className="text-left">
@@ -439,7 +439,7 @@ export function SkillsBrowsePage() {
                         </div>
                         <div className="flex items-center gap-2 shrink-0">
                           {isExpanded ? (
-                            <ChevronDown className="w-5 h-5 text-primary transition-transform" aria-hidden="true" />
+                            <ChevronDown className="w-5 h-5 text-accent transition-transform" aria-hidden="true" />
                           ) : (
                             <ChevronRight className="w-5 h-5 text-theme-subtle transition-transform" aria-hidden="true" />
                           )}
@@ -507,8 +507,8 @@ export function SkillsBrowsePage() {
                                           onPress={() => selectSkill(category.id, skill.skill_name)}
                                           className={`text-left p-3 rounded-xl border transition-all justify-start h-auto ${
                                             isSelected
-                                              ? 'border-primary/40 bg-primary/10 shadow-sm shadow-primary/10'
-                                              : 'bg-theme-elevated border-theme-default hover:border-primary/30 hover:bg-theme-hover'
+                                              ? 'border-accent/40 bg-accent/10 shadow-sm shadow-accent/10'
+                                              : 'bg-theme-elevated border-theme-default hover:border-accent/30 hover:bg-theme-hover'
                                           }`}
                                         >
                                           <div className="flex items-center justify-between">
@@ -518,7 +518,7 @@ export function SkillsBrowsePage() {
                                             <Chip
                                               size="sm"
                                               variant="flat"
-                                              className="bg-primary/10 text-primary"
+                                              className="bg-accent/10 text-accent"
                                             >
                                               <Users className="w-3 h-3 mr-1 inline" aria-hidden="true" />
                                               {skill.user_count}
@@ -564,7 +564,7 @@ export function SkillsBrowsePage() {
                                     <div className="mt-4 pt-4 border-t border-theme-default">
                                       <div className="flex items-center justify-between mb-3">
                                         <h4 className="text-sm font-semibold text-theme-primary flex items-center gap-2">
-                                          <Users className="w-4 h-4 text-primary" aria-hidden="true" />
+                                          <Users className="w-4 h-4 text-accent" aria-hidden="true" />
                                           {t('skills.members_with', {
                                             skill: selectedSkill.skillName,
                                           })}
@@ -594,7 +594,7 @@ export function SkillsBrowsePage() {
                                             <Link
                                               key={member.id}
                                               to={tenantPath(`/profile/${member.id}`)}
-                                              className="flex items-center gap-3 p-3 rounded-xl bg-theme-elevated border border-theme-default hover:border-primary/30 hover:bg-theme-hover transition-all"
+                                              className="flex items-center gap-3 p-3 rounded-xl bg-theme-elevated border border-theme-default hover:border-accent/30 hover:bg-theme-hover transition-all"
                                             >
                                               <Avatar
                                                 src={resolveAvatarUrl(member.avatar)}

@@ -698,7 +698,7 @@ export function NewsletterStats() {
                         href={link.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="break-all text-sm text-primary hover:underline"
+                        className="break-all text-sm text-accent hover:underline"
                       >
                         {link.url.length > 80 ? link.url.substring(0, 80) + '...' : link.url}
                       </a>
@@ -946,7 +946,7 @@ function AbVariantCard({
         <p className="text-sm italic text-default-600">&quot;{subject}&quot;</p>
         <div className="grid grid-cols-3 gap-3 text-center">
           <div>
-            <p className="text-2xl font-bold text-primary">{openRate}%</p>
+            <p className="text-2xl font-bold text-accent">{openRate}%</p>
             <p className="text-xs text-default-500">{tLocal('newsletters.label_open_rate')}</p>
           </div>
           <div>

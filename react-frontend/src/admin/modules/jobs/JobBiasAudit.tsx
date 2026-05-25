@@ -55,8 +55,8 @@ interface BiasReport {
 const FUNNEL_STAGES = ['applied', 'screening', 'interview', 'offer', 'accepted'] as const;
 
 const FUNNEL_COLORS: Record<string, string> = {
-  applied: 'bg-primary',
-  screening: 'bg-secondary',
+  applied: 'bg-accent',
+  screening: 'bg-default',
   interview: 'bg-warning',
   offer: 'bg-success',
   accepted: 'bg-success',
@@ -233,7 +233,7 @@ function JobBiasAudit() {
           {/* Hiring Funnel */}
           <Card>
             <CardHeader className="flex items-center gap-2">
-              <BarChart3 className="w-5 h-5 text-primary" />
+              <BarChart3 className="w-5 h-5 text-accent" />
               <h3 className="text-lg font-semibold">
                 {t('jobs.bias_hiring_funnel')}
               </h3>
@@ -250,7 +250,7 @@ function JobBiasAudit() {
                     </span>
                     <div className="flex-1 h-8 bg-default-100 rounded-lg overflow-hidden relative">
                       <div
-                        className={`h-full ${FUNNEL_COLORS[stage] ?? 'bg-primary'} rounded-lg transition-all duration-500`}
+                        className={`h-full ${FUNNEL_COLORS[stage] ?? 'bg-accent'} rounded-lg transition-all duration-500`}
                         style={{ width: `${Math.max(pct, 1)}%` }}
                       />
                       <span className="absolute inset-0 flex items-center px-3 text-sm font-medium">
@@ -362,14 +362,14 @@ function JobBiasAudit() {
                 {/* Direct */}
                 <div className="p-4 rounded-lg bg-default-50 border border-default-200 space-y-3">
                   <div className="flex items-center gap-2">
-                    <Briefcase className="w-5 h-5 text-primary" />
+                    <Briefcase className="w-5 h-5 text-accent" />
                     <span className="text-base font-semibold">
                       {t('jobs.bias_source_direct')}
                     </span>
                   </div>
                   <div className="grid grid-cols-3 gap-2 text-center">
                     <div>
-                      <p className="text-2xl font-bold text-primary">
+                      <p className="text-2xl font-bold text-accent">
                         {report.source_effectiveness.direct.applications}
                       </p>
                       <p className="text-xs text-default-500">
@@ -398,14 +398,14 @@ function JobBiasAudit() {
                 {/* Referral */}
                 <div className="p-4 rounded-lg bg-default-50 border border-default-200 space-y-3">
                   <div className="flex items-center gap-2">
-                    <Users className="w-5 h-5 text-secondary" />
+                    <Users className="w-5 h-5 text-accent" />
                     <span className="text-base font-semibold">
                       {t('jobs.bias_source_referral')}
                     </span>
                   </div>
                   <div className="grid grid-cols-3 gap-2 text-center">
                     <div>
-                      <p className="text-2xl font-bold text-primary">
+                      <p className="text-2xl font-bold text-accent">
                         {report.source_effectiveness.referral.applications}
                       </p>
                       <p className="text-xs text-default-500">

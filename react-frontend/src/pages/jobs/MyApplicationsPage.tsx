@@ -132,10 +132,10 @@ const ITEMS_PER_PAGE = 20;
 const TIMELINE_DOT_COLORS: Record<string, string> = {
   applied: 'bg-default-400',
   pending: 'bg-default-400',
-  screening: 'bg-primary',
-  reviewed: 'bg-primary',
+  screening: 'bg-accent',
+  reviewed: 'bg-accent',
   interview: 'bg-warning',
-  offer: 'bg-secondary',
+  offer: 'bg-default',
   accepted: 'bg-success',
   rejected: 'bg-danger',
   withdrawn: 'bg-default-300',
@@ -225,7 +225,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
           <div className='flex-1 min-w-0'>
             <Link
               to={tenantPath(`/jobs/${vacancy.id}`)}
-              className='text-base font-semibold text-theme-primary hover:text-primary transition-colors line-clamp-2'>
+              className='text-base font-semibold text-theme-primary hover:text-accent transition-colors line-clamp-2'>
               {vacancy.title}
             </Link>
           </div>
@@ -307,16 +307,16 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
 
         {/* Reviewer notes */}
         {application.reviewer_notes && (
-          <blockquote className='border-l-2 border-primary/40 pl-3 mb-3 text-sm text-theme-muted italic'>
+          <blockquote className='border-l-2 border-accent/40 pl-3 mb-3 text-sm text-theme-muted italic'>
             {application.reviewer_notes}
           </blockquote>
         )}
 
         {/* Interview section — inline details */}
         {application.interview && (
-          <div className='mt-3 p-3 rounded-lg bg-secondary-50 dark:bg-secondary-900/20 border border-secondary-200 dark:border-secondary-800'>
+          <div className='mt-3 p-3 rounded-lg bg-surface-secondary dark:bg-surface-secondary border border-accent dark:border-accent'>
             <div className='flex flex-wrap items-center justify-between gap-2'>
-              <div className='flex items-center gap-2 text-sm font-medium text-secondary-700 dark:text-secondary-300'>
+              <div className='flex items-center gap-2 text-sm font-medium text-accent dark:text-accent'>
                 <Video size={14} aria-hidden="true" />
                 {t('interview_inline', {
                   date: new Date(application.interview.scheduled_at).toLocaleString(undefined, {
@@ -342,7 +342,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
               </Chip>
             </div>
             {application.interview.duration_mins && (
-              <div className='text-xs text-secondary-600 dark:text-secondary-400 mt-1'>
+              <div className='text-xs text-accent dark:text-accent mt-1'>
                 {t('interview.duration')}: {application.interview.duration_mins} {t('interview.minutes')}
               </div>
             )}
@@ -378,7 +378,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
                 </Button>
               )}
               {application.interview.interview_type !== 'video' && application.interview.location_notes && (
-                <span className='text-xs text-secondary-600 dark:text-secondary-400'>
+                <span className='text-xs text-accent dark:text-accent'>
                   {application.interview.location_notes}
                 </span>
               )}

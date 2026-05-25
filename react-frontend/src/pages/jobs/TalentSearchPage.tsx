@@ -384,7 +384,7 @@ export function TalentSearchPage() {
               transition={{ delay: index * 0.03 }}
             >
               <Link to={tenantPath(`/profile/${candidate.id}`)}>
-                <GlassCard className="p-5 hover:border-primary/30 transition-colors cursor-pointer h-full">
+                <GlassCard className="p-5 hover:border-accent/30 transition-colors cursor-pointer h-full">
                   <div className="flex items-start gap-3">
                     <Avatar
                       name={candidate.name}
@@ -411,7 +411,7 @@ export function TalentSearchPage() {
                           size="sm"
                           variant="flat"
                           color="primary"
-                          className="bg-primary/10 text-primary"
+                          className="bg-accent/10 text-accent"
                         >
                           {skill}
                         </Chip>

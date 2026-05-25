@@ -112,7 +112,7 @@ export function LoyaltyHistoryPage() {
 
       <Link
         to={tenantPath('/caring-community')}
-        className="inline-flex items-center gap-1 text-sm text-default-500 hover:text-primary mb-4"
+        className="inline-flex items-center gap-1 text-sm text-default-500 hover:text-accent mb-4"
       >
         <ArrowLeft className="w-4 h-4" />
         {t('loyalty.history.back')}
@@ -171,7 +171,7 @@ export function LoyaltyHistoryPage() {
                     {row.marketplace_listing_id && row.listing_title ? (
                       <Link
                         to={tenantPath(`/marketplace/${row.marketplace_listing_id}`)}
-                        className="text-primary hover:underline"
+                        className="text-accent hover:underline"
                       >
                         {row.listing_title}
                       </Link>

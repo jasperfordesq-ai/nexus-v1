@@ -546,9 +546,9 @@ function CustomFieldsTab() {
       </div>
 
       {orderChanged && (
-        <Card className="border border-primary/30 bg-primary-50/40 shadow-sm shadow-primary/10">
+        <Card className="border border-accent/30 bg-accent-soft shadow-sm shadow-accent/10">
           <CardBody className="p-3 flex items-center justify-between">
-            <p className="text-sm text-primary-700">
+            <p className="text-sm text-accent">
               {t('volunteering.order_changed_note')}
             </p>
             <Button

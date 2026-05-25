@@ -310,7 +310,7 @@ export function RequestHelpPage() {
           </div>
 
           {caredForId !== null && (
-            <p className="mb-6 rounded-lg bg-secondary/10 px-4 py-3 text-sm text-secondary-700 dark:text-secondary-300">
+            <p className="mb-6 rounded-lg bg-accent-soft px-4 py-3 text-sm text-accent dark:text-accent">
               {t('request_help.on_behalf_notice')}
             </p>
           )}

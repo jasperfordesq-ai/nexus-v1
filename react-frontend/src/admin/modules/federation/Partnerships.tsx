@@ -606,7 +606,7 @@ export function Partnerships() {
 
       {/* Bulk action bar */}
       {selectedPendingItems.length > 0 && (
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-primary-50 dark:bg-primary-950 border border-primary-200 dark:border-primary-800">
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-accent-soft dark:bg-accent-soft border border-accent dark:border-accent">
           <span className="text-sm font-medium">
             {t('federation.bulk_selected')}
           </span>
@@ -940,7 +940,7 @@ export function Partnerships() {
                             <div className="space-y-3">
                               {auditLog.map((entry) => (
                                 <div key={entry.id} className="flex items-start gap-3 border-b border-default-100 pb-3 last:border-0">
-                                  <div className="mt-1 h-2 w-2 rounded-full bg-primary shrink-0" />
+                                  <div className="mt-1 h-2 w-2 rounded-full bg-accent shrink-0" />
                                   <div className="flex-1 min-w-0">
                                     <p className="text-sm font-medium">
                                       {entry.action.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
@@ -991,7 +991,7 @@ export function Partnerships() {
                           ) : stats ? (
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                               <div className="text-center p-4 rounded-lg bg-default-50">
-                                <Mail size={24} className="mx-auto mb-2 text-primary" />
+                                <Mail size={24} className="mx-auto mb-2 text-accent" />
                                 <p className="text-2xl font-bold">{stats.messages_exchanged}</p>
                                 <p className="text-xs text-default-400">{t('federation.stat_messages')}</p>
                               </div>
@@ -1001,7 +1001,7 @@ export function Partnerships() {
                                 <p className="text-xs text-default-400">{t('federation.stat_transactions')}</p>
                               </div>
                               <div className="text-center p-4 rounded-lg bg-default-50">
-                                <Users size={24} className="mx-auto mb-2 text-secondary" />
+                                <Users size={24} className="mx-auto mb-2 text-accent" />
                                 <p className="text-2xl font-bold">{stats.connections_made}</p>
                                 <p className="text-xs text-default-400">{t('federation.stat_connections')}</p>
                               </div>

@@ -144,7 +144,7 @@ export default function AiModuleDocsAdminPage() {
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center gap-3">
-        <BookOpen size={28} className="text-primary" />
+        <BookOpen size={28} className="text-accent" />
         <div>
           <h1 className="text-2xl font-bold">{t('ai.module_docs.meta.title')}</h1>
           <p className="text-sm text-default-500">
@@ -166,9 +166,9 @@ export default function AiModuleDocsAdminPage() {
         </div>
       </div>
 
-      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft">
         <CardBody className="flex flex-row gap-3 p-4">
-          <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+          <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
           <div className="space-y-1 text-sm text-default-600">
             <p>
               {t('ai.module_docs.about.body')}

@@ -58,7 +58,7 @@ function OverviewTab() {
     <div className="space-y-6">
       <Card>
         <CardHeader className="flex items-center gap-2">
-          <HelpCircle size={20} className="text-primary" />
+          <HelpCircle size={20} className="text-accent" />
           <div>
             <h3 className="text-lg font-semibold">{t('federation.api_doc_overview_title')}</h3>
             <p className="text-sm text-default-500">{t('federation.api_doc_overview_subtitle')}</p>
@@ -208,7 +208,7 @@ function OverviewTab() {
 
           <div>
             <h4 className="font-semibold text-base mb-1">{t('federation.api_doc_summary_title')}</h4>
-            <blockquote className="border-l-4 border-primary pl-4 italic text-default-700">
+            <blockquote className="border-l-4 border-accent pl-4 italic text-default-700">
               {t('federation.api_doc_summary_body')}
             </blockquote>
           </div>
@@ -240,7 +240,7 @@ function AuthenticationTab() {
       {/* API Key Auth */}
       <Card>
         <CardHeader className="flex items-center gap-2">
-          <Shield size={20} className="text-primary" />
+          <Shield size={20} className="text-accent" />
           <div>
             <h3 className="text-lg font-semibold">{t('federation.api_doc_api_key_auth')}</h3>
             <p className="text-sm text-default-500">{t('federation.api_doc_api_key_desc')}</p>
@@ -1126,7 +1126,7 @@ function WebhooksTab() {
     <div className="space-y-6">
       <Card>
         <CardHeader className="flex items-center gap-2">
-          <Webhook size={20} className="text-primary" />
+          <Webhook size={20} className="text-accent" />
           <div>
             <h3 className="text-lg font-semibold">{t('federation.api_doc_webhook_events')}</h3>
             <p className="text-sm text-default-500">{t('federation.api_doc_webhook_events_desc')}</p>
@@ -1135,7 +1135,7 @@ function WebhooksTab() {
         <CardBody className="space-y-3">
           <p className="text-sm text-default-600">
             {t('federation.api_doc_webhook_delivery_intro')}{' '}
-            <a href="../webhooks" className="text-primary underline">{t('federation.api_docs_webhooks')}</a>
+            <a href="../webhooks" className="text-accent underline">{t('federation.api_docs_webhooks')}</a>
             {' '}{t('federation.api_doc_webhook_delivery_suffix')}
           </p>
           <Table aria-label={t('federation.api_doc_webhook_events_aria')} removeWrapper>

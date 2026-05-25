@@ -111,7 +111,7 @@ export default function MemberSpotlightTab() {
             transition={{ delay: i * 0.1 }}
           >
             <Link to={tenantPath(`/members/${member.id}`)}>
-              <GlassCard className="p-6 hover:ring-1 hover:ring-primary-500/30 transition-all cursor-pointer">
+              <GlassCard className="p-6 hover:ring-1 hover:ring-accent0/30 transition-all cursor-pointer">
                 <div className="flex items-center gap-3 mb-3">
                   <Avatar
                     src={resolveAvatarUrl(member.avatar_url)}
@@ -133,7 +133,7 @@ export default function MemberSpotlightTab() {
                 </div>
 
                 <div className="flex items-center gap-2 text-sm">
-                  <span className="text-primary-500 font-medium">{member.recent_activity}</span>
+                  <span className="text-accent0 font-medium">{member.recent_activity}</span>
                   {member.xp > 0 && (
                     <span className="text-default-400 text-xs">{member.xp.toLocaleString()} XP</span>
                   )}

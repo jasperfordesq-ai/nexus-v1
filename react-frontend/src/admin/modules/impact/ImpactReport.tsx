@@ -538,7 +538,7 @@ export function ImpactReport() {
 
       <div className="mb-2">
         <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-          <Sparkles size={20} className="text-primary" />
+          <Sparkles size={20} className="text-accent" />
           {t('impact.section_sroi')}
         </h2>
         <p className="text-sm text-default-500 mt-0.5">
@@ -580,8 +580,8 @@ export function ImpactReport() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-8">
         <Card shadow="sm">
           <CardBody className="flex flex-row items-center gap-4 p-4">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-              <ArrowLeftRight size={20} className="text-primary" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10">
+              <ArrowLeftRight size={20} className="text-accent" />
             </div>
             <div>
               <p className="text-sm text-default-500">{t('impact.chart_transactions_name')}</p>
@@ -694,11 +694,11 @@ export function ImpactReport() {
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                   <div className="p-4 rounded-lg bg-default-50">
                     <p className="text-xs text-default-500 mb-1">{t('impact.label_skills_offered')}</p>
-                    <p className="text-2xl font-bold text-primary">{extras.skills.skills_offered ?? 0}</p>
+                    <p className="text-2xl font-bold text-accent">{extras.skills.skills_offered ?? 0}</p>
                   </div>
                   <div className="p-4 rounded-lg bg-default-50">
                     <p className="text-xs text-default-500 mb-1">{t('impact.label_skills_requested')}</p>
-                    <p className="text-2xl font-bold text-secondary">{extras.skills.skills_requested ?? 0}</p>
+                    <p className="text-2xl font-bold text-accent">{extras.skills.skills_requested ?? 0}</p>
                   </div>
                   <div className="p-4 rounded-lg bg-default-50">
                     <p className="text-xs text-default-500 mb-1">{t('impact.label_unique_skills')}</p>
@@ -821,7 +821,7 @@ export function ImpactReport() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 mb-8">
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <Clock size={18} className="text-primary" />
+            <Clock size={18} className="text-accent" />
             <h3 className="font-semibold">{t('impact.chart_hours_exchanged_title')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">

@@ -228,7 +228,7 @@ export function MessageReview() {
       render: (item) => (
         <Link
           to={tenantPath(`/broker/messages/${item.id}`)}
-          className="font-medium text-primary hover:underline"
+          className="font-medium text-accent hover:underline"
         >
           {item.sender_name}
         </Link>
@@ -464,7 +464,7 @@ export function MessageReview() {
       >
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <MessageSquare size={18} className="text-primary shrink-0" />
+            <MessageSquare size={18} className="text-accent shrink-0" />
             <span>{t('messages.quick_view_title')}</span>
           </ModalHeader>
 

@@ -82,7 +82,7 @@ export function RoleList() {
       sortable: true,
       render: (role) => (
         <div className="flex items-center gap-2">
-          <Shield size={16} className="text-primary" />
+          <Shield size={16} className="text-accent" />
           <span className="font-medium">{role.name}</span>
         </div>
       ),

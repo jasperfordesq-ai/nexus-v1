@@ -411,7 +411,7 @@ export function MessageDetail() {
       {isArchived && archive && (
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2">
-            <Archive className="w-4 h-4 text-secondary" />
+            <Archive className="w-4 h-4 text-accent" />
             <span className="font-semibold">{t('messages.detail_archive_record')}</span>
           </CardHeader>
           <Separator />
@@ -575,7 +575,7 @@ export function MessageDetail() {
       >
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <Archive className="w-5 h-5 text-primary" />
+            <Archive className="w-5 h-5 text-accent" />
             {t('messages.detail_approve_archive')}
           </ModalHeader>
           <ModalBody>

@@ -41,7 +41,7 @@ const statusIcon = (status: string) => {
   switch (status) {
     case 'pass': return <CheckCircle size={16} className="text-success" />;
     case 'fail': return <XCircle size={16} className="text-danger" />;
-    case 'running': return <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />;
+    case 'running': return <div className="h-4 w-4 animate-spin rounded-full border-2 border-accent border-t-transparent" />;
     default: return <div className="h-4 w-4 rounded-full bg-default-200" />;
   }
 };

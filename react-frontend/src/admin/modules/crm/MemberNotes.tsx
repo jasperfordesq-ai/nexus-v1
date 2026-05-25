@@ -380,7 +380,7 @@ export function MemberNotes() {
                   <div className="min-w-0">
                     <Link
                       to={tenantPath(`/admin/users/${note.user_id}/edit`)}
-                      className="font-semibold text-foreground hover:text-primary transition-colors"
+                      className="font-semibold text-foreground hover:text-accent transition-colors"
                     >
                       {note.user_name}
                     </Link>

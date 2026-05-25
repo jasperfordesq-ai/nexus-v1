@@ -360,7 +360,7 @@ export function JobAlertsPage() {
             <>
               <ModalHeader>
                 <div className="flex items-center gap-2">
-                  <Bell className="w-5 h-5 text-primary" aria-hidden="true" />
+                  <Bell className="w-5 h-5 text-accent" aria-hidden="true" />
                   {t('alerts.create')}
                 </div>
               </ModalHeader>

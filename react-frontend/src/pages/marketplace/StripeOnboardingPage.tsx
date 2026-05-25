@@ -147,8 +147,8 @@ export function StripeOnboardingPage() {
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-2">
-            <CreditCard className="w-8 h-8 text-primary" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-accent/10 mb-2">
+            <CreditCard className="w-8 h-8 text-accent" />
           </div>
           <h1 className="text-2xl font-bold text-foreground">
             {t('onboarding.title')}
@@ -248,8 +248,8 @@ export function StripeOnboardingPage() {
               </h2>
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
-                  <div className="shrink-0 w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Building2 className="w-4 h-4 text-primary" />
+                  <div className="shrink-0 w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
+                    <Building2 className="w-4 h-4 text-accent" />
                   </div>
                   <div>
                     <p className="text-sm font-medium text-foreground">
@@ -261,8 +261,8 @@ export function StripeOnboardingPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="shrink-0 w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Shield className="w-4 h-4 text-primary" />
+                  <div className="shrink-0 w-8 h-8 rounded-lg bg-accent/10 flex items-center justify-center">
+                    <Shield className="w-4 h-4 text-accent" />
                   </div>
                   <div>
                     <p className="text-sm font-medium text-foreground">

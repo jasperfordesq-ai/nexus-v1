@@ -61,9 +61,9 @@ export function AdminDashboard() {
 
   /** Quick action items matching the legacy PHP dashboard sidebar */
   const QUICK_ACTIONS = [
-    { label: t('quick_actions.manage_users'), path: '/admin/users', icon: UserPlus, color: 'text-primary bg-primary/10' },
+    { label: t('quick_actions.manage_users'), path: '/admin/users', icon: UserPlus, color: 'text-accent bg-accent/10' },
     { label: t('quick_actions.view_listings'), path: '/admin/listings', icon: ListChecks, color: 'text-success bg-success/10' },
-    { label: t('quick_actions.send_newsletter'), path: '/admin/newsletters', icon: Send, color: 'text-secondary bg-secondary/10' },
+    { label: t('quick_actions.send_newsletter'), path: '/admin/newsletters', icon: Send, color: 'text-accent bg-accent-soft' },
     { label: t('quick_actions.new_blog_post'), path: '/admin/blog/create', icon: PenSquare, color: 'text-danger bg-danger/10' },
     { label: t('quick_actions.gamification'), path: '/admin/gamification', icon: Trophy, color: 'text-warning bg-warning/10' },
     { label: t('quick_actions.settings'), path: '/admin/settings', icon: Settings, color: 'text-default-600 bg-default/20' },
@@ -256,10 +256,10 @@ export function AdminDashboard() {
           )}
 
           {stats?.pending_listings !== undefined && stats.pending_listings > 0 && (
-            <Card shadow="sm" className="border border-primary/20 bg-surface shadow-sm shadow-primary/10">
+            <Card shadow="sm" className="border border-accent/20 bg-surface shadow-sm shadow-accent/10">
               <CardBody className="flex flex-row items-center gap-4 p-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                  <ListChecks size={20} className="text-primary" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10">
+                  <ListChecks size={20} className="text-accent" />
                 </div>
                 <div className="flex-1">
                   <p className="text-sm text-default-500">{t('alerts.pending_listings')}</p>
@@ -286,7 +286,7 @@ export function AdminDashboard() {
         {/* Quick Actions (matches legacy sidebar) */}
         <Card shadow="sm" className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <Rocket size={18} className="text-primary" />
+            <Rocket size={18} className="text-accent" />
             <h3 className="font-semibold">{t('quick_actions.card_title')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
@@ -310,7 +310,7 @@ export function AdminDashboard() {
             <div className="mt-3 pt-3 border-t border-divider">
               <Link
                 to={tenantPath('/admin/enterprise')}
-                className="flex items-center justify-between rounded-xl px-2 py-2 text-sm text-primary transition-colors hover:bg-primary/10"
+                className="flex items-center justify-between rounded-xl px-2 py-2 text-sm text-accent transition-colors hover:bg-accent/10"
               >
                 <span className="flex items-center gap-1.5">
                   <Chip size="sm" color="secondary" variant="flat">{t('quick_actions.enterprise')}</Chip>
@@ -325,7 +325,7 @@ export function AdminDashboard() {
         {/* Monthly Trends */}
         <Card shadow="sm" className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <TrendingUp size={18} className="text-primary" />
+            <TrendingUp size={18} className="text-accent" />
             <h3 className="font-semibold">{t('trends.card_title')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
@@ -341,7 +341,7 @@ export function AdminDashboard() {
                     <div className="flex items-center gap-4">
                       <span className="text-sm font-medium">{trend.hours} {t('trends.hours_suffix')}</span>
                       <div
-                        className="h-2 rounded-full bg-primary"
+                        className="h-2 rounded-full bg-accent"
                         style={{ width: `${Math.min(100, (trend.hours / Math.max(...trends.map((x) => x.hours || 1))) * 100)}px` }}
                       />
                     </div>
@@ -360,7 +360,7 @@ export function AdminDashboard() {
         <Card shadow="sm" className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
           <CardHeader className="flex items-center justify-between px-4 pt-4 pb-0">
             <div className="flex items-center gap-2">
-              <Activity size={18} className="text-primary" />
+              <Activity size={18} className="text-accent" />
               <h3 className="font-semibold">{t('activity.card_title')}</h3>
             </div>
             <Button
@@ -381,7 +381,7 @@ export function AdminDashboard() {
               <div className="space-y-3">
                 {activity.map((entry) => (
                   <div key={entry.id} className="flex items-start gap-3 border-b border-divider pb-3 last:border-0 last:pb-0">
-                    <div className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-primary" />
+                    <div className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-accent" />
                     <div className="min-w-0 flex-1">
                       <p className="text-sm">
                         <span className="font-medium">{entry.user_name}</span>{' '}

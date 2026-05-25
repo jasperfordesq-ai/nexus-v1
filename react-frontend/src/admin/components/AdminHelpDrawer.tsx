@@ -77,7 +77,7 @@ export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerPro
                 <ol className="space-y-3">
                   {article.steps.map((step, idx) => (
                     <li key={idx} className="flex gap-3">
-                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent/10 text-xs font-bold text-accent">
                         {idx + 1}
                       </span>
                       <div className="min-w-0">

@@ -71,7 +71,7 @@ export function MyPickupsPage() {
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
       <div className="min-w-0">
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-          <ShoppingBag className="w-7 h-7 text-primary" />
+          <ShoppingBag className="w-7 h-7 text-accent" />
           {t('pickup.my_pickups_title')}
         </h1>
         <p className="text-default-500 text-sm mt-1">
@@ -107,7 +107,7 @@ export function MyPickupsPage() {
 
               {r.status === 'reserved' && (
                 <div className="flex items-center gap-3 p-3 rounded-md bg-default-100">
-                  <QrCode className="w-10 h-10 text-primary shrink-0" />
+                  <QrCode className="w-10 h-10 text-accent shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-default-500">
                       {t('pickup.show_this_code')}

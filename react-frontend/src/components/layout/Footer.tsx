@@ -238,14 +238,14 @@ export function Footer({ children, copyright }: FooterProps) {
               <span aria-hidden="true">&middot;</span>
               <Link
                 to={RELEASE_STATUS.readMorePath}
-                className="underline font-medium hover:text-theme-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded whitespace-nowrap"
+                className="underline font-medium hover:text-theme-primary transition-colors focus:outline-none focus:ring-2 focus:ring-accent rounded whitespace-nowrap"
               >
                 {t('release_status.features_link')}
               </Link>
               <span aria-hidden="true">&middot;</span>
               <Link
                 to={tenantPath('/changelog')}
-                className="underline font-medium hover:text-theme-primary transition-colors focus:outline-none focus:ring-2 focus:ring-primary rounded whitespace-nowrap"
+                className="underline font-medium hover:text-theme-primary transition-colors focus:outline-none focus:ring-2 focus:ring-accent rounded whitespace-nowrap"
               >
                 {t('release_status.changelog_link')}
               </Link>
@@ -262,7 +262,7 @@ export function Footer({ children, copyright }: FooterProps) {
                   </span>
                   {partnerLogoUrl ? (
                     partnerLinkUrl ? (
-                      <a href={partnerLinkUrl} target="_blank" rel="noopener noreferrer" className="transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg">
+                      <a href={partnerLinkUrl} target="_blank" rel="noopener noreferrer" className="transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-accent rounded-lg">
                         <img src={partnerLogoUrl} alt={branding.name} className="max-h-20 w-auto max-w-[22rem] object-contain" />
                       </a>
                     ) : (
@@ -296,7 +296,7 @@ export function Footer({ children, copyright }: FooterProps) {
                     rel="noopener noreferrer"
                     title={pbLabel || t('footer.powered_by')}
                     aria-label={pbLabel || t('footer.powered_by')}
-                    className="transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
+                    className="transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-accent rounded-lg"
                   >
                     <img
                       src={pbImage}

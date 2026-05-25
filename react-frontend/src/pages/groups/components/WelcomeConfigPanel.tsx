@@ -92,7 +92,7 @@ export function WelcomeConfigPanel({ groupId, isAdmin }: WelcomeConfigPanelProps
     <GlassCard className="p-5 space-y-5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <HandHeart size={18} className="text-primary" aria-hidden="true" />
+          <HandHeart size={18} className="text-accent" aria-hidden="true" />
           <h3 className="text-base font-semibold text-foreground">
             {t('welcome.title')}
           </h3>

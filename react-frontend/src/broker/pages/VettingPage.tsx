@@ -827,8 +827,8 @@ export function VettingRecords() {
 
       {/* Bulk Action Bar */}
       {selectedIds.size > 0 && (
-        <div className="mb-4 flex items-center gap-3 p-3 rounded-lg bg-primary-50 border border-primary-200">
-          <span className="text-sm font-medium text-primary">
+        <div className="mb-4 flex items-center gap-3 p-3 rounded-lg bg-accent-soft border border-accent">
+          <span className="text-sm font-medium text-accent">
             {t('vetting.records_selected', { count: selectedIds.size })}
           </span>
           <div className="flex gap-2">
@@ -908,7 +908,7 @@ export function VettingRecords() {
       >
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <Plus size={20} className="text-primary" />
+            <Plus size={20} className="text-accent" />
             {t('vetting.modal_add_title')}
           </ModalHeader>
           <ModalBody className="gap-4">
@@ -1069,7 +1069,7 @@ export function VettingRecords() {
         >
           <ModalContent>
             <ModalHeader className="flex items-center gap-2">
-              <Pencil size={20} className="text-primary" />
+              <Pencil size={20} className="text-accent" />
               {t('vetting.modal_edit_title')}
             </ModalHeader>
             <ModalBody className="gap-4">
@@ -1226,7 +1226,7 @@ export function VettingRecords() {
         >
           <ModalContent>
             <ModalHeader className="flex items-center gap-2">
-              <FileText size={20} className="text-primary" />
+              <FileText size={20} className="text-accent" />
               {t('vetting.modal_view_title')}
             </ModalHeader>
             <ModalBody>
@@ -1342,7 +1342,7 @@ export function VettingRecords() {
                       href={viewItem.document_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-primary hover:underline flex items-center gap-1"
+                      className="text-sm text-accent hover:underline flex items-center gap-1"
                     >
                       <FileText size={14} />
                       {t('vetting.view_document')}

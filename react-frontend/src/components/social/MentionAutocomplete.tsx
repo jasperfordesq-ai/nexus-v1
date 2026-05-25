@@ -124,7 +124,7 @@ export const MentionAutocomplete = forwardRef<HTMLDivElement, MentionAutocomplet
                   aria-selected={idx === selectedIndex}
                   className={`w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors h-auto justify-start rounded-none ${
                     idx === selectedIndex
-                      ? 'bg-primary-50 dark:bg-primary-900/20 text-[var(--color-primary)]'
+                      ? 'bg-accent-soft dark:bg-accent-soft text-[var(--color-primary)]'
                       : 'text-[var(--text-primary)] hover:bg-[var(--surface-hover)]'
                   }`}
                   onMouseDown={(e) => {

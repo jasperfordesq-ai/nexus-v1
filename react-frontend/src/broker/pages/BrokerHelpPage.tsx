@@ -44,8 +44,8 @@ export function BrokerControlsHelp() {
     <section className="mt-10">
       <Card shadow="sm" className="border border-default-200">
         <CardHeader className="flex items-center gap-3 pb-2">
-          <div className="p-2 rounded-lg bg-primary/10">
-            <BookOpen className="w-5 h-5 text-primary" />
+          <div className="p-2 rounded-lg bg-accent/10">
+            <BookOpen className="w-5 h-5 text-accent" />
           </div>
           <div>
             <h2 className="text-lg font-semibold text-foreground">
@@ -65,7 +65,7 @@ export function BrokerControlsHelp() {
               aria-label={t('help.overview.aria')}
               title={
                 <div className="flex items-center gap-2">
-                  <Workflow className="w-4 h-4 text-primary" />
+                  <Workflow className="w-4 h-4 text-accent" />
                   <span className="font-medium">{t('help.overview.title')}</span>
                 </div>
               }
@@ -90,7 +90,7 @@ export function BrokerControlsHelp() {
               aria-label={t('help.workflow.aria')}
               title={
                 <div className="flex items-center gap-2">
-                  <Workflow className="w-4 h-4 text-secondary" />
+                  <Workflow className="w-4 h-4 text-accent" />
                   <span className="font-medium">{t('help.workflow.title')}</span>
                 </div>
               }
@@ -144,7 +144,7 @@ export function BrokerControlsHelp() {
               aria-label={t('help.monitoring.aria')}
               title={
                 <div className="flex items-center gap-2">
-                  <Eye className="w-4 h-4 text-secondary" />
+                  <Eye className="w-4 h-4 text-accent" />
                   <span className="font-medium">{t('help.monitoring.title')}</span>
                 </div>
               }
@@ -272,7 +272,7 @@ export function BrokerControlsHelp() {
               aria-label={t('help.contacts.aria')}
               title={
                 <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-primary" />
+                  <Phone className="w-4 h-4 text-accent" />
                   <span className="font-medium">{t('help.contacts.title')}</span>
                 </div>
               }

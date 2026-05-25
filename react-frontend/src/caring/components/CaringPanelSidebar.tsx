@@ -211,14 +211,14 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
           aria-current={active ? 'page' : undefined}
           className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
             active
-              ? 'bg-primary/10 text-primary'
+              ? 'bg-accent/10 text-accent'
               : 'text-default-600 hover:bg-default-100 hover:text-foreground'
           } ${collapsed ? 'justify-center px-2' : ''}`}
         >
           <Icon
             aria-hidden="true"
             size={18}
-            className={`shrink-0 ${active ? 'text-primary' : 'text-default-400'}`}
+            className={`shrink-0 ${active ? 'text-accent' : 'text-default-400'}`}
           />
           {!collapsed && <span className="flex-1 truncate">{label}</span>}
         </Link>
@@ -244,7 +244,7 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
       <div className="flex h-16 items-center justify-between border-b border-divider px-3">
         {!collapsed && (
           <Link to={tenantPath('/caring')} className="flex min-w-0 items-center gap-2">
-            <Heart aria-hidden="true" size={20} className="text-primary shrink-0" />
+            <Heart aria-hidden="true" size={20} className="text-accent shrink-0" />
             <span className="truncate text-sm font-semibold text-foreground leading-tight">
               {t('panel.sidebar.brand')}
             </span>
@@ -323,7 +323,7 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
               to={tenantPath('/admin/help')}
               aria-label={t('panel.sidebar.help_centre')}
               className={`flex items-center justify-center rounded-lg px-2 py-2 transition-colors hover:bg-default-100 ${
-                location.pathname.includes('/admin/help') ? 'text-primary' : 'text-default-400 hover:text-foreground'
+                location.pathname.includes('/admin/help') ? 'text-accent' : 'text-default-400 hover:text-foreground'
               }`}
             >
               <HelpCircle aria-hidden="true" size={18} />
@@ -333,7 +333,7 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
           <Link
             to={tenantPath('/admin/help')}
             className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-default-100 ${
-              location.pathname.includes('/admin/help') ? 'text-primary font-medium' : 'text-default-400 hover:text-foreground'
+              location.pathname.includes('/admin/help') ? 'text-accent font-medium' : 'text-default-400 hover:text-foreground'
             }`}
           >
             <HelpCircle aria-hidden="true" size={18} />

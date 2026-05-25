@@ -73,7 +73,7 @@ export default function AiTraceMetricsAdminPage() {
   return (
     <div className="space-y-6 p-6">
       <div className="flex items-center gap-3">
-        <BarChart3 size={28} className="text-primary" />
+        <BarChart3 size={28} className="text-accent" />
         <div>
           <h1 className="text-2xl font-bold">{t('ai.trace_metrics.meta.title')}</h1>
           <p className="text-sm text-default-500">
@@ -174,7 +174,7 @@ interface StatProps {
 }
 
 function Stat({ icon: Icon, label, value, loading, color = 'default' }: StatProps) {
-  const tint = color === 'success' ? 'text-success' : color === 'danger' ? 'text-danger' : 'text-primary';
+  const tint = color === 'success' ? 'text-success' : color === 'danger' ? 'text-danger' : 'text-accent';
   return (
     <Card>
       <CardBody className="p-3 gap-1">

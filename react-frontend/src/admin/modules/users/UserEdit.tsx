@@ -694,7 +694,7 @@ export function UserEdit() {
         <Card>
           <CardHeader className="px-6 pt-5 pb-0">
             <div className="flex items-center gap-2">
-              <KeyRound size={18} className="text-primary" />
+              <KeyRound size={18} className="text-accent" />
               <h3 className="text-lg font-semibold text-foreground">{t('sections.account_actions')}</h3>
             </div>
           </CardHeader>
@@ -736,7 +736,7 @@ export function UserEdit() {
           <CardHeader className="px-6 pt-5 pb-0">
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center gap-2">
-                <Coins size={18} className="text-primary" />
+                <Coins size={18} className="text-accent" />
                 <h3 className="text-lg font-semibold text-foreground">{t('sections.time_credits')}</h3>
               </div>
               <Button size="sm" variant="flat" color="primary" onPress={() => setBalanceModalOpen(true)}>
@@ -869,7 +869,7 @@ export function UserEdit() {
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <ShieldCheck size={16} className="text-primary" />
+                      <ShieldCheck size={16} className="text-accent" />
                       <p className="font-medium text-foreground">{t('sections.vetting_status')}</p>
                     </div>
                     <div className="flex items-center gap-2">
@@ -938,7 +938,7 @@ export function UserEdit() {
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <FileCheck size={16} className="text-primary" />
+                      <FileCheck size={16} className="text-accent" />
                       <p className="font-medium text-foreground">{t('sections.insurance_certificates')}</p>
                     </div>
                     <div className="flex items-center gap-2">
@@ -1028,7 +1028,7 @@ export function UserEdit() {
         size="sm">
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <Coins size={20} className="text-primary" />
+            <Coins size={20} className="text-accent" />
             {t('modals.adjust_balance.title')}
           </ModalHeader>
           <ModalBody className="gap-4">
@@ -1061,7 +1061,7 @@ export function UserEdit() {
         size="sm">
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <KeyRound size={20} className="text-primary" />
+            <KeyRound size={20} className="text-accent" />
             {t('modals.set_password.title')}
           </ModalHeader>
           <ModalBody className="gap-4">

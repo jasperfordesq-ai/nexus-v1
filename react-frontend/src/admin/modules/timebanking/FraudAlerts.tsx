@@ -116,7 +116,7 @@ export function FraudAlerts() {
         render: (alert) => (
           <Link
             to={tenantPath(`/admin/users/${alert.user_id}/edit`)}
-            className="text-sm font-medium hover:text-primary transition-colors"
+            className="text-sm font-medium hover:text-accent transition-colors"
           >
             {alert.user_name}
           </Link>

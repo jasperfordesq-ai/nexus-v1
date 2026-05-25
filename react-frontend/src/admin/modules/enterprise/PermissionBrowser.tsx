@@ -58,8 +58,8 @@ export function PermissionBrowser() {
             <Card key={category} shadow="sm">
               <CardBody className="p-4">
                 <div className="flex items-center gap-2 mb-3">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
-                    <Key size={16} className="text-primary" />
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent/10">
+                    <Key size={16} className="text-accent" />
                   </div>
                   <h3 className="text-base font-semibold capitalize">{category}</h3>
                   <Chip size="sm" variant="flat" color="default">

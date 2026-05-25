@@ -368,7 +368,7 @@ export function UserMonitoring() {
       >
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <UserPlus size={20} className="text-primary" />
+            <UserPlus size={20} className="text-accent" />
             {t('monitoring.modal_title')}
           </ModalHeader>
           <ModalBody>
@@ -427,7 +427,7 @@ export function UserMonitoring() {
                         aria-selected={index === highlightedIndex}
                         className={`flex cursor-pointer items-center gap-3 px-3 py-2.5 transition-colors ${
                           index === highlightedIndex
-                            ? 'bg-primary/10'
+                            ? 'bg-accent/10'
                             : 'hover:bg-default-100'
                         }`}
                         onMouseEnter={() => setHighlightedIndex(index)}

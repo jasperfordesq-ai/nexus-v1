@@ -43,8 +43,8 @@ export default function ModuleCard({ module, enabled, onToggle, onConfigure, tog
           <div
             className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
               module.type === 'core'
-                ? 'bg-secondary/10 text-secondary'
-                : 'bg-primary/10 text-primary'
+                ? 'bg-accent-soft text-accent'
+                : 'bg-accent/10 text-accent'
             }`}
           >
             <Icon size={20} />

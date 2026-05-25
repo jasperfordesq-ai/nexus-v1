@@ -433,7 +433,7 @@ export function CreateMarketplaceListingPage() {
         {/* Section 1: Photos */}
         <GlassCard className="p-6 space-y-4">
           <h2 className="text-lg font-semibold text-foreground flex flex-wrap items-center gap-2">
-            <Camera className="w-5 h-5 text-primary" />
+            <Camera className="w-5 h-5 text-accent" />
             {t('create.photos')}
             <span className="text-sm font-normal text-default-400">
               {t('create.photos_count', { current: images.length, max: MAX_IMAGES })}
@@ -449,7 +449,7 @@ export function CreateMarketplaceListingPage() {
             onClick={() => fileInputRef.current?.click()}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInputRef.current?.click(); } }}
             className="border-2 border-dashed border-default-300 rounded-xl p-8 text-center cursor-pointer
-              hover:border-primary hover:bg-primary/5 transition-colors"
+              hover:border-accent hover:bg-accent/5 transition-colors"
           >
             <Upload className="w-10 h-10 text-default-300 mx-auto mb-3" />
             <p className="text-sm text-default-500">
@@ -503,7 +503,7 @@ export function CreateMarketplaceListingPage() {
                 <Button
                   variant="flat"
                   onPress={() => fileInputRef.current?.click()}
-                  className="aspect-square rounded-lg border-2 border-dashed border-default-300 flex flex-col items-center justify-center hover:border-primary hover:bg-primary/5 transition-colors h-auto min-w-0"
+                  className="aspect-square rounded-lg border-2 border-dashed border-default-300 flex flex-col items-center justify-center hover:border-accent hover:bg-accent/5 transition-colors h-auto min-w-0"
                 >
                   <Plus className="w-5 h-5 text-default-400" />
                   <span className="text-xs text-default-400 mt-1">{t('create.add')}</span>
@@ -516,7 +516,7 @@ export function CreateMarketplaceListingPage() {
         {/* Section 1b: Video */}
         <GlassCard className="p-6 space-y-4">
           <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-            <Video className="w-5 h-5 text-primary" />
+            <Video className="w-5 h-5 text-accent" />
             {t('create.video')}
             <span className="text-sm font-normal text-default-400">
               {t('create.video_optional')}
@@ -548,7 +548,7 @@ export function CreateMarketplaceListingPage() {
               onClick={() => videoInputRef.current?.click()}
               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); videoInputRef.current?.click(); } }}
               className="border-2 border-dashed border-default-300 rounded-xl p-6 text-center cursor-pointer
-                hover:border-primary hover:bg-primary/5 transition-colors"
+                hover:border-accent hover:bg-accent/5 transition-colors"
             >
               <Video className="w-8 h-8 text-default-300 mx-auto mb-2" />
               <p className="text-sm text-default-500">
@@ -572,7 +572,7 @@ export function CreateMarketplaceListingPage() {
         {/* Section 2: Details */}
         <GlassCard className="p-6 space-y-4">
           <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-            <FileText className="w-5 h-5 text-primary" />
+            <FileText className="w-5 h-5 text-accent" />
             {t('create.details')}
           </h2>
 
@@ -707,7 +707,7 @@ export function CreateMarketplaceListingPage() {
         {/* Section 3: Pricing */}
         <GlassCard className="p-6 space-y-4">
           <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-            <DollarSign className="w-5 h-5 text-primary" />
+            <DollarSign className="w-5 h-5 text-accent" />
             {t('create.pricing')}
           </h2>
 
@@ -769,7 +769,7 @@ export function CreateMarketplaceListingPage() {
         {/* Section 4: Delivery */}
         <GlassCard className="p-6 space-y-4">
           <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-            <Truck className="w-5 h-5 text-primary" />
+            <Truck className="w-5 h-5 text-accent" />
             {t('create.location_delivery')}
           </h2>
 

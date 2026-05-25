@@ -247,7 +247,7 @@ function BootstrapError({ onRetry }: { onRetry: () => void }) {
         </p>
         <button
           onClick={onRetry}
-          className="px-6 py-2 rounded-lg bg-primary text-white font-medium text-sm hover:opacity-90 transition-opacity"
+          className="px-6 py-2 rounded-lg bg-accent text-white font-medium text-sm hover:opacity-90 transition-opacity"
         >
           {t('actions.retry')}
         </button>

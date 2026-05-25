@@ -32,7 +32,7 @@ export function ManualInstallModal({ isOpen, onClose, browser }: ManualInstallMo
     <Modal isOpen={isOpen} onClose={onClose} placement="center" size="md" backdrop="blur">
       <ModalContent>
         <ModalHeader className="flex items-center gap-2">
-          <Download className="w-5 h-5 text-primary" aria-hidden="true" />
+          <Download className="w-5 h-5 text-accent" aria-hidden="true" />
           {title}
         </ModalHeader>
         <ModalBody>
@@ -40,7 +40,7 @@ export function ManualInstallModal({ isOpen, onClose, browser }: ManualInstallMo
           <ol className="space-y-3 mt-2">
             {steps.map((step, i) => (
               <li key={i} className="flex items-start gap-3">
-                <span className="shrink-0 w-6 h-6 rounded-full bg-primary/15 text-primary text-xs font-semibold inline-flex items-center justify-center">
+                <span className="shrink-0 w-6 h-6 rounded-full bg-accent/15 text-accent text-xs font-semibold inline-flex items-center justify-center">
                   {i + 1}
                 </span>
                 <span className="text-sm flex flex-wrap items-center gap-1">

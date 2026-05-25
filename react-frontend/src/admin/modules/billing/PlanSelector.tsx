@@ -160,7 +160,7 @@ export function PlanSelector() {
               return (
                 <Card
                   key={plan.id}
-                  className={`relative ${isCurrent ? 'border-2 border-primary' : ''} ${isDowngradeBlocked ? 'opacity-60' : ''}`}
+                  className={`relative ${isCurrent ? 'border-2 border-accent' : ''} ${isDowngradeBlocked ? 'opacity-60' : ''}`}
                 >
                   {isCurrent && (
                     <Chip

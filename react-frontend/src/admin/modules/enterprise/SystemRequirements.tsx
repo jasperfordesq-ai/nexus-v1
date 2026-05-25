@@ -140,7 +140,7 @@ export function SystemRequirements() {
           {/* PHP Version */}
           <Card shadow="sm">
             <CardHeader className="flex items-center gap-2 px-6 pt-5 pb-0">
-              <Code size={18} className="text-primary" />
+              <Code size={18} className="text-accent" />
               <h3 className="text-base font-semibold">{t('enterprise.php_version')}</h3>
             </CardHeader>
             <CardBody className="px-6 pb-5">
@@ -162,7 +162,7 @@ export function SystemRequirements() {
           <Card shadow="sm">
             <CardHeader className="flex items-center justify-between px-6 pt-5 pb-0">
               <div className="flex items-center gap-2">
-                <Puzzle size={18} className="text-secondary" />
+                <Puzzle size={18} className="text-accent" />
                 <h3 className="text-base font-semibold">{t('enterprise.php_extensions')}</h3>
                 <Chip size="sm" variant="flat" color="default">
                   {t('enterprise.extensions_summary', { loaded: loadedCount, total: data.extensions.length, required: requiredCount })}

@@ -954,7 +954,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
                 </span>
               )}
               {listing.distance_km !== undefined && (
-                <span className="flex items-center gap-1 text-primary font-medium">
+                <span className="flex items-center gap-1 text-accent font-medium">
                   <MapPin className="w-3 h-3" aria-hidden="true" />
                   {formatDistance(listing.distance_km)}
                 </span>
@@ -1115,7 +1115,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
               </span>
             )}
             {listing.distance_km !== undefined && (
-              <span className="flex items-center gap-1 shrink-0 text-primary font-medium">
+              <span className="flex items-center gap-1 shrink-0 text-accent font-medium">
                 <MapPin className="w-3 h-3" aria-hidden="true" />
                 {formatDistance(listing.distance_km)}
               </span>

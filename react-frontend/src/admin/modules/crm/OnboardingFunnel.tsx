@@ -415,7 +415,7 @@ export default function OnboardingFunnel() {
       icon: Filter,
       title: t('crm.guide_stage_width_title'),
       body: t('crm.guide_stage_width_body'),
-      accentClassName: 'bg-primary/10 text-primary',
+      accentClassName: 'bg-accent/10 text-accent',
     },
     {
       icon: ArrowDownRight,
@@ -456,7 +456,7 @@ export default function OnboardingFunnel() {
               : ''
           }`
         : t('crm.no_registration_data'),
-      accentClassName: 'bg-secondary/10 text-secondary',
+      accentClassName: 'bg-accent-soft text-accent',
     },
     {
       eyebrow: t('crm.snapshot_priority_title'),
@@ -481,7 +481,7 @@ export default function OnboardingFunnel() {
           aria-hidden="true"
         />
         <div
-          className="pointer-events-none absolute right-[-10%] top-[-18%] h-56 w-56 rounded-full bg-primary/10 blur-3xl"
+          className="pointer-events-none absolute right-[-10%] top-[-18%] h-56 w-56 rounded-full bg-accent/10 blur-3xl"
           aria-hidden="true"
         />
 
@@ -489,7 +489,7 @@ export default function OnboardingFunnel() {
           <div className="max-w-3xl space-y-5">
             <Chip
               variant="flat"
-              className="border border-primary/15 bg-primary/10 px-3 text-primary"
+              className="border border-accent/15 bg-accent/10 px-3 text-accent"
             >
               {t('crm.crm_label')}
             </Chip>
@@ -561,7 +561,7 @@ export default function OnboardingFunnel() {
           label={t('crm.entry_stage')}
           value={entryStage?.count.toLocaleString() ?? '0'}
           caption={entryStage?.name ?? t('crm.no_stages_available')}
-          accentClassName="bg-primary/10 text-primary"
+          accentClassName="bg-accent/10 text-accent"
         />
         <MetricCard
           icon={Target}
@@ -592,7 +592,7 @@ export default function OnboardingFunnel() {
                 : formatMonthLabel(latestMonth.month)
               : t('crm.no_registration_data')
           }
-          accentClassName="bg-secondary/10 text-secondary"
+          accentClassName="bg-accent-soft text-accent"
         />
       </div>
 
@@ -624,7 +624,7 @@ export default function OnboardingFunnel() {
         <Card className="overflow-hidden border border-default-200/70 bg-surface/90 shadow-lg">
           <CardHeader className="flex flex-col items-start gap-3 px-6 pb-0 pt-6">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/10 text-accent">
                 <Filter size={20} />
               </div>
               <div>
@@ -637,7 +637,7 @@ export default function OnboardingFunnel() {
           <CardBody className="gap-5 px-6 pb-6 pt-6">
             {stageInsights.length > 0 ? (
               <>
-                <div className="rounded-[28px] border border-primary/10 bg-primary/5 p-4 sm:p-5">
+                <div className="rounded-[28px] border border-accent/10 bg-accent/5 p-4 sm:p-5">
                   <p className="text-sm leading-7 text-default-600 dark:text-default-400">
                     {t('crm.member_funnel_help')}
                   </p>
@@ -726,7 +726,7 @@ export default function OnboardingFunnel() {
                 </div>
 
                 {entryStage && finalStage && (
-                  <div className="flex flex-wrap items-center justify-between gap-4 rounded-[28px] border border-primary/10 bg-primary/5 px-5 py-4">
+                  <div className="flex flex-wrap items-center justify-between gap-4 rounded-[28px] border border-accent/10 bg-accent/5 px-5 py-4">
                     <div className="space-y-1">
                       <p className="text-sm font-medium text-default-500">{t('crm.overall_conversion')}</p>
                       <div className="flex items-center gap-2 text-sm text-default-600 dark:text-default-400">
@@ -823,7 +823,7 @@ export default function OnboardingFunnel() {
           <Card className="border border-default-200/70 bg-surface/90 shadow-sm">
             <CardHeader className="flex flex-col items-start gap-3 px-6 pb-0 pt-6">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-accent/10 text-accent">
                   <Activity size={18} />
                 </div>
                 <div>
@@ -895,7 +895,7 @@ export default function OnboardingFunnel() {
         <Card className="border border-default-200/70 bg-surface/90 shadow-lg">
           <CardHeader className="flex flex-col items-start gap-3 px-6 pb-0 pt-6">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-secondary/10 text-secondary">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent-soft text-accent">
                 <CalendarDays size={20} />
               </div>
               <div>

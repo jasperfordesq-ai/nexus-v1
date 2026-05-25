@@ -321,7 +321,7 @@ export function MemberReportsPage() {
     return (
       <Card shadow="sm">
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-          <UserCheck size={18} className="text-primary" />
+          <UserCheck size={18} className="text-accent" />
           <h3 className="font-semibold">{t('reports.retention_cohorts')}</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">
@@ -487,7 +487,7 @@ export function MemberReportsPage() {
                   </TableCell>
                   <TableCell className="text-right text-success font-medium">{c.hours_given?.toFixed(1)}</TableCell>
                   <TableCell className="text-right text-warning font-medium">{c.hours_received?.toFixed(1)}</TableCell>
-                  <TableCell className="text-right text-primary">{c.transaction_count}</TableCell>
+                  <TableCell className="text-right text-accent">{c.transaction_count}</TableCell>
                   <TableCell className="text-right text-default-600">{c.listings_count}</TableCell>
                 </TableRow>
               ))}

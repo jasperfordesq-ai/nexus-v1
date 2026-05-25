@@ -98,8 +98,8 @@ export default function PerformanceDashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <Activity className="w-5 h-5 text-primary" />
+            <div className="p-2 bg-accent/10 rounded-lg">
+              <Activity className="w-5 h-5 text-accent" />
             </div>
             <div>
               <div className="text-sm text-default-500">{t('performance.label_total_requests')}</div>
@@ -134,8 +134,8 @@ export default function PerformanceDashboard() {
 
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-secondary/10 rounded-lg">
-              <MemoryStick className="w-5 h-5 text-secondary" />
+            <div className="p-2 bg-accent-soft rounded-lg">
+              <MemoryStick className="w-5 h-5 text-accent" />
             </div>
             <div>
               <div className="text-sm text-default-500">{t('performance.label_memory_spikes')}</div>
@@ -211,7 +211,7 @@ export default function PerformanceDashboard() {
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
-                  <Database className="w-4 h-4 text-primary" />
+                  <Database className="w-4 h-4 text-accent" />
                   <span className="text-sm text-default-500">{formatTimestamp(query.timestamp)}</span>
                 </div>
                 <code className="text-sm bg-default-100 dark:bg-default-50 p-2 rounded block overflow-x-auto">
@@ -253,7 +253,7 @@ export default function PerformanceDashboard() {
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
-                  <MemoryStick className="w-4 h-4 text-secondary" />
+                  <MemoryStick className="w-4 h-4 text-accent" />
                   <code className="text-sm truncate">{spike.endpoint}</code>
                 </div>
                 <div className="flex items-center gap-4 text-sm text-default-500">
@@ -294,7 +294,7 @@ export default function PerformanceDashboard() {
               <div className="w-32 text-sm text-default-500">{hour}</div>
               <div className="flex-1 bg-default-100 dark:bg-default-50 rounded-full h-8 overflow-hidden">
                 <div
-                  className="bg-primary h-full flex items-center justify-end px-3 transition-all"
+                  className="bg-accent h-full flex items-center justify-end px-3 transition-all"
                   style={{ width: `${percentage}%` }}
                 >
                   {percentage > 20 && (
@@ -325,7 +325,7 @@ export default function PerformanceDashboard() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Zap className="w-7 h-7 text-primary" />
+            <Zap className="w-7 h-7 text-accent" />
             {t('performance.page_title')}
           </h1>
           <p className="text-default-500 mt-1">

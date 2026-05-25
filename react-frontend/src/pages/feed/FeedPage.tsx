@@ -851,7 +851,7 @@ export function FeedPage() {
       {(pullDistance > 0 || isRefreshing) && (
         <div className="flex h-12 items-center justify-center overflow-hidden sm:hidden">
           <RefreshCw
-            className={`w-5 h-5 text-primary transition-opacity ${isRefreshing || pullDistance > 48 ? 'animate-spin opacity-100' : 'opacity-60'}`}
+            className={`w-5 h-5 text-accent transition-opacity ${isRefreshing || pullDistance > 48 ? 'animate-spin opacity-100' : 'opacity-60'}`}
             aria-hidden="true"
           />
         </div>
@@ -862,7 +862,7 @@ export function FeedPage() {
         <div className="flex flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
           <div className="min-w-0">
             <div className="flex items-start gap-3">
-              <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary ring-1 ring-primary/15">
+              <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent ring-1 ring-accent/15">
                 <Newspaper className="w-5 h-5" aria-hidden="true" />
               </span>
               <div className="min-w-0">
@@ -873,14 +873,14 @@ export function FeedPage() {
           </div>
           <div className="flex flex-wrap items-center gap-2 sm:justify-end">
             {!isLoading && items.length > 0 && (
-              <Chip size="sm" variant="flat" className="bg-primary/10 text-primary">
+              <Chip size="sm" variant="flat" className="bg-accent/10 text-accent">
                 {t('items_loaded', { count: items.length })}
               </Chip>
             )}
             <AlgorithmLabel area="feed" />
             {isAuthenticated && (
               <Button
-                className="hidden bg-primary text-white shadow-sm sm:flex"
+                className="hidden bg-accent text-white shadow-sm sm:flex"
                 startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
                 onPress={() => openCompose('post')}
               >
@@ -905,7 +905,7 @@ export function FeedPage() {
               isIconOnly
               size="sm"
               variant="light"
-              className="self-end text-theme-muted hover:text-primary sm:self-auto"
+              className="self-end text-theme-muted hover:text-accent sm:self-auto"
               onPress={clearFeedControls}
               aria-label={t('filter.clear')}
             >
@@ -925,8 +925,8 @@ export function FeedPage() {
                 aria-pressed={filter === opt.key}
                 className={`min-w-0 px-3 ${
                   filter === opt.key
-                    ? 'bg-primary text-white shadow-sm'
-                    : 'bg-theme-elevated text-theme-muted hover:text-primary hover:bg-primary/5 border border-theme-default transition-colors'
+                    ? 'bg-accent text-white shadow-sm'
+                    : 'bg-theme-elevated text-theme-muted hover:text-accent hover:bg-accent/5 border border-theme-default transition-colors'
                 }`}
                 onPress={() => handleFilterChange(opt.key)}
               >
@@ -941,8 +941,8 @@ export function FeedPage() {
                   radius="full"
                   className={`min-w-0 px-3 sm:hidden ${
                     activeOverflowFilter
-                      ? 'bg-primary text-white shadow-sm'
-                      : 'bg-theme-elevated text-theme-muted hover:text-primary hover:bg-primary/5 border border-theme-default transition-colors'
+                      ? 'bg-accent text-white shadow-sm'
+                      : 'bg-theme-elevated text-theme-muted hover:text-accent hover:bg-accent/5 border border-theme-default transition-colors'
                   }`}
                   startContent={<ListFilter className="h-4 w-4 shrink-0" aria-hidden="true" />}
                 >
@@ -971,8 +971,8 @@ export function FeedPage() {
                 aria-pressed={filter === opt.key}
                 className={`hidden shrink-0 sm:inline-flex ${
                   filter === opt.key
-                    ? 'bg-primary text-white shadow-sm'
-                    : 'bg-theme-elevated text-theme-muted hover:text-primary hover:bg-primary/5 border border-theme-default transition-colors'
+                    ? 'bg-accent text-white shadow-sm'
+                    : 'bg-theme-elevated text-theme-muted hover:text-accent hover:bg-accent/5 border border-theme-default transition-colors'
                 }`}
                 onPress={() => handleFilterChange(opt.key)}
               >
@@ -993,7 +993,7 @@ export function FeedPage() {
 
       {/* Quick Post Box */}
       {isAuthenticated && (
-        <GlassCard className="p-3.5 transition-colors hover:border-primary/20 sm:p-4">
+        <GlassCard className="p-3.5 transition-colors hover:border-accent/20 sm:p-4">
           <div
             className="flex cursor-pointer flex-col gap-3 sm:flex-row sm:items-center"
             role="button"
@@ -1010,7 +1010,7 @@ export function FeedPage() {
                 isBordered
                 className="shrink-0 ring-2 ring-[var(--border-default)]"
               />
-              <div className="min-h-11 flex-1 rounded-full border border-theme-default bg-theme-elevated px-4 py-2.5 text-sm text-theme-subtle transition-colors hover:border-primary/30">
+              <div className="min-h-11 flex-1 rounded-full border border-theme-default bg-theme-elevated px-4 py-2.5 text-sm text-theme-subtle transition-colors hover:border-accent/30">
                 <span className="line-clamp-1">{t('whats_on_your_mind')}</span>
               </div>
             </div>
@@ -1088,7 +1088,7 @@ export function FeedPage() {
           <p className="mx-auto mb-2 max-w-sm text-sm leading-6 text-theme-muted">{error}</p>
           <p className="mx-auto mb-6 max-w-sm text-xs leading-5 text-theme-subtle">{t('error_hint')}</p>
           <Button
-            className="bg-primary text-white shadow-lg shadow-primary/20"
+            className="bg-accent text-white shadow-lg shadow-accent/20"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadFeed()}
           >
@@ -1130,7 +1130,7 @@ export function FeedPage() {
               )}
               {isAuthenticated && (
                 <Button
-                  className="bg-primary text-white shadow-lg shadow-primary/20"
+                  className="bg-accent text-white shadow-lg shadow-accent/20"
                   startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
                   onPress={() => openCompose('post')}
                 >
@@ -1222,7 +1222,7 @@ export function FeedPage() {
                 <div className="pt-6 pb-2 text-center">
                   <Button
                     variant="bordered"
-                    className="border-theme-default text-theme-muted hover:border-primary hover:text-primary transition-colors"
+                    className="border-theme-default text-theme-muted hover:border-accent hover:text-accent transition-colors"
                     onPress={() => loadFeed(true)}
                     startContent={<TrendingUp className="w-4 h-4" aria-hidden="true" />}
                   >

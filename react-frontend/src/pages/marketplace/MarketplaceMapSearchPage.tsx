@@ -411,10 +411,10 @@ export function MarketplaceMapSearchPage() {
                           </div>
                           {/* Details */}
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold line-clamp-1 text-foreground group-hover:text-primary transition-colors">
+                            <p className="text-sm font-semibold line-clamp-1 text-foreground group-hover:text-accent transition-colors">
                               {listing.title}
                             </p>
-                            <p className="text-sm font-bold text-primary mt-0.5">
+                            <p className="text-sm font-bold text-accent mt-0.5">
                               {listing.price_type === 'free' || listing.price === null || listing.price === 0
                                 ? t('price.free')
                                 : new Intl.NumberFormat(undefined, {

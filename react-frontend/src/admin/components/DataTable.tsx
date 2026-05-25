@@ -13,7 +13,7 @@ import { useState, useMemo, useCallback, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import Search from 'lucide-react/icons/search';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
-import { Button, Chip, Spinner, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, type Selection, type SortDescriptor } from '@/components/ui';
+import { Button, Checkbox, Chip, Spinner, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, type Selection, type SortDescriptor } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -23,6 +23,7 @@ export interface Column<T> {
   key: string;
   label: ReactNode;
   sortable?: boolean;
+  isRowHeader?: boolean;
   render?: (item: T) => ReactNode;
   width?: number;
 }
@@ -200,10 +201,16 @@ export function DataTable<T extends Record<string, any>>({
       }}
     >
       <TableHeader>
-        {columns.map((col) => (
+        {selectable ? (
+          <TableColumn className="w-10 pr-0">
+            <Checkbox aria-label={t('shared.select_all_rows')} slot="selection" />
+          </TableColumn>
+        ) : null}
+        {columns.map((col, index) => (
           <TableColumn
             key={col.key}
             allowsSorting={col.sortable}
+            isRowHeader={col.isRowHeader ?? index === 0}
             width={col.width}
             scope="col"
           >
@@ -224,7 +231,16 @@ export function DataTable<T extends Record<string, any>>({
         }
       >
         {sortedData.map((item) => (
-          <TableRow key={String(item[keyField])}>
+          <TableRow key={String(item[keyField])} id={String(item[keyField])}>
+            {selectable ? (
+              <TableCell className="w-10 pr-0">
+                <Checkbox
+                  aria-label={t('shared.select_row', { id: String(item[keyField]) })}
+                  slot="selection"
+                  variant="secondary"
+                />
+              </TableCell>
+            ) : null}
             {columns.map((col) => (
               <TableCell key={col.key}>
                 {col.render

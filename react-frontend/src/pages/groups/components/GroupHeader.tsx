@@ -241,7 +241,7 @@ export function GroupHeader({
               key={tag.id}
               size="sm"
               variant="flat"
-              className="bg-primary/10 text-primary"
+              className="bg-accent/10 text-accent"
             >
               {tag.name}
             </Chip>

@@ -140,9 +140,9 @@ export function SuperUserForm() {
   return (
     <div>
       <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-default-500 mb-1">
-        <Link to={tenantPath('/admin/super')} className="hover:text-primary">{t('super.page_title')}</Link>
+        <Link to={tenantPath('/admin/super')} className="hover:text-accent">{t('super.page_title')}</Link>
         <span>/</span>
-        <Link to={tenantPath('/admin/super/users')} className="hover:text-primary">{t('super.users')}</Link>
+        <Link to={tenantPath('/admin/super/users')} className="hover:text-accent">{t('super.users')}</Link>
         <span>/</span>
         <span className="text-foreground">{isEditing ? t('super.breadcrumb_edit') : t('super.breadcrumb_create')}</span>
       </nav>
@@ -290,7 +290,7 @@ export function SuperUserForm() {
             {/* Move and Promote to Regional SA */}
             <Card>
               <CardHeader className="font-semibold text-lg flex items-center gap-2">
-                <Crown size={18} className="text-secondary" />
+                <Crown size={18} className="text-accent" />
                 {t('super.move_and_promote_to_hub')}
               </CardHeader>
               <Separator />
@@ -348,7 +348,7 @@ export function SuperUserForm() {
                   </div>
                   <div>
                     <p className="text-xs text-default-400">{t('super.label_tenant')}</p>
-                    <Link to={tenantPath(`/admin/super/tenants/${user.tenant_id}`)} className="text-sm text-primary hover:underline">
+                    <Link to={tenantPath(`/admin/super/tenants/${user.tenant_id}`)} className="text-sm text-accent hover:underline">
                       {user.tenant_name || t('super.tenant_with_id', { id: user.tenant_id })}
                     </Link>
                   </div>
@@ -387,7 +387,7 @@ export function SuperUserForm() {
                 </div>
                 <p className="text-xs text-default-400 mt-2">
                   {t('super.manage_sa_from')}{' '}
-                  <Link to={tenantPath(`/admin/super/users/${id}`)} className="text-primary hover:underline">
+                  <Link to={tenantPath(`/admin/super/users/${id}`)} className="text-accent hover:underline">
                     {t('super.user_detail_page')}
                   </Link>
                 </p>

@@ -37,11 +37,11 @@ interface StatCardProps {
 }
 
 const colorMap = {
-  primary: 'text-primary bg-primary/10',
+  primary: 'text-accent bg-accent/10',
   success: 'text-success bg-success/10',
   warning: 'text-warning bg-warning/10',
   danger: 'text-danger bg-danger/10',
-  secondary: 'text-secondary bg-secondary/10',
+  secondary: 'text-accent bg-accent-soft',
   default: 'text-default-600 bg-default/20',
 };
 

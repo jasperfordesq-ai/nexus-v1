@@ -28,10 +28,10 @@ export function InlineInterviewCard({
   if (pendingInterview.status !== 'proposed') return null;
 
   return (
-    <GlassCard className="p-5 border-l-4 border-l-secondary bg-secondary/5">
+    <GlassCard className="p-5 border-l-4 border-l-accent bg-accent-soft">
       <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-lg bg-secondary/20 flex items-center justify-center flex-shrink-0">
-          <Calendar className="w-5 h-5 text-secondary" aria-hidden="true" />
+        <div className="w-10 h-10 rounded-lg bg-accent-soft flex items-center justify-center flex-shrink-0">
+          <Calendar className="w-5 h-5 text-accent" aria-hidden="true" />
         </div>
         <div className="flex-1 space-y-3">
           <div>
@@ -90,7 +90,7 @@ export function InlineInterviewCard({
                     href={pendingInterview.location_notes}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-primary hover:underline"
+                    className="text-accent hover:underline"
                   >
                     {pendingInterview.location_notes}
                   </a>

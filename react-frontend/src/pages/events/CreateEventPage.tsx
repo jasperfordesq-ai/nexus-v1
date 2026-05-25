@@ -586,8 +586,8 @@ export function CreateEventPage() {
         </h2>
 
         {groupId && !isEditing && (
-          <div className="flex items-center gap-3 p-3 mb-4 rounded-lg bg-primary/5 border border-primary/20">
-            <Users className="w-5 h-5 text-primary flex-shrink-0" />
+          <div className="flex items-center gap-3 p-3 mb-4 rounded-lg bg-accent/5 border border-accent/20">
+            <Users className="w-5 h-5 text-accent flex-shrink-0" />
             <p className="text-sm text-theme-primary">
               {t('form.group_event_notice')}
             </p>

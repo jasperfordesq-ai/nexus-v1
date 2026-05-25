@@ -386,7 +386,7 @@ export function NewsletterActivity() {
                     </TableCell>
                     <TableCell>
                       {event.url ? (
-                        <a href={event.url} target="_blank" rel="noopener noreferrer" className="break-all text-sm text-primary hover:underline">
+                        <a href={event.url} target="_blank" rel="noopener noreferrer" className="break-all text-sm text-accent hover:underline">
                           {event.url.length > 60 ? event.url.substring(0, 60) + '...' : event.url}
                         </a>
                       ) : <span className="text-sm text-default-400">--</span>}

@@ -503,7 +503,7 @@ const GroupCard = memo(function GroupCard({ group, featured }: GroupCardProps) {
             {group.tags && group.tags.length > 0 && (
               <div className="flex flex-wrap gap-1 mb-3">
                 {group.tags.slice(0, MAX_VISIBLE_TAGS).map((tag: { id: number; name: string }) => (
-                  <span key={tag.id} className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-primary/10 text-primary">
+                  <span key={tag.id} className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-accent/10 text-accent">
                     {tag.name}
                   </span>
                 ))}

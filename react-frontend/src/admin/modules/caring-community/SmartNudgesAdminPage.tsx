@@ -268,12 +268,12 @@ export default function SmartNudgesAdminPage() {
       />
 
       {/* About card */}
-      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('smart_nudges.about.title')}</p>
+              <p className="font-semibold text-accent dark:text-accent">{t('smart_nudges.about.title')}</p>
               <p className="text-default-600">
                 {t('smart_nudges.about.body')}
               </p>
@@ -303,7 +303,7 @@ export default function SmartNudgesAdminPage() {
       {/* Chart */}
       <Card>
         <CardHeader className="flex items-center gap-2">
-          <TrendingUp className="w-5 h-5 text-primary" />
+          <TrendingUp className="w-5 h-5 text-accent" />
           <h2 className="text-base font-semibold">{t('smart_nudges.chart.title')}</h2>
         </CardHeader>
         <Separator />
@@ -403,7 +403,7 @@ export default function SmartNudgesAdminPage() {
       {dryResult && (
         <Card>
           <CardHeader className="flex items-center gap-2">
-            <FlaskConical className="w-5 h-5 text-secondary" />
+            <FlaskConical className="w-5 h-5 text-accent" />
             <h2 className="text-base font-semibold">{t('smart_nudges.dry_run.title')}</h2>
             <Chip size="sm" variant="flat" className="ml-auto">
               {t('smart_nudges.dry_run.candidates', { count: dryResult.candidates?.length ?? 0 })}

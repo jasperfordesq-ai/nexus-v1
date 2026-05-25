@@ -418,9 +418,9 @@ export function CreateChallengePage() {
         <div className="space-y-5">
           {/* Challenge Framing Guidance */}
           {!isEdit && (
-            <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-3">
+            <div className="rounded-xl border border-accent/20 bg-accent/5 p-4 space-y-3">
               <div className="flex items-start gap-2">
-                <HelpCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                <HelpCircle className="w-5 h-5 text-accent shrink-0 mt-0.5" />
                 <div>
                   <h3 className="text-sm font-semibold text-[var(--color-text)] mb-1">
                     {t('guidance.title')}
@@ -467,7 +467,7 @@ export function CreateChallengePage() {
               </div>
 
               <details className="group">
-                <summary className="text-xs font-medium text-primary cursor-pointer hover:underline">
+                <summary className="text-xs font-medium text-accent cursor-pointer hover:underline">
                   {t('guidance.examples_toggle')}
                 </summary>
                 <div className="mt-2 space-y-2 text-xs text-[var(--color-text-secondary)]">
@@ -685,7 +685,7 @@ export function CreateChallengePage() {
                     key={tmpl.id}
                     className={`p-4 cursor-pointer transition-all ${
                       selectedTemplateId === tmpl.id
-                        ? 'ring-2 ring-primary bg-primary/5'
+                        ? 'ring-2 ring-accent bg-accent/5'
                         : 'hover:bg-[var(--color-surface-hover)]'
                     }`}
                     onClick={() => setSelectedTemplateId(tmpl.id)}

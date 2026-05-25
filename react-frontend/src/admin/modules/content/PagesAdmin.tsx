@@ -99,7 +99,7 @@ export function PagesAdmin() {
           type="button"
           variant="light"
           onPress={() => navigate(tenantPath(`/admin/pages/builder/${item.id}`))}
-          className="text-left font-medium text-primary hover:underline min-w-0 h-auto p-0 justify-start"
+          className="text-left font-medium text-accent hover:underline min-w-0 h-auto p-0 justify-start"
         >
           {item.title}
         </Button>

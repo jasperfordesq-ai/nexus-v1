@@ -42,7 +42,7 @@ export function LocationMapCard({
     <GlassCard animated className={`p-0 overflow-hidden ${className}`}>
       {/* Header */}
       <div className="flex items-center gap-2 px-4 pt-4 pb-2">
-        <MapPin className="w-4 h-4 text-primary" />
+        <MapPin className="w-4 h-4 text-accent" />
         <h3 className="text-sm font-semibold text-theme-primary">{title}</h3>
       </div>
 

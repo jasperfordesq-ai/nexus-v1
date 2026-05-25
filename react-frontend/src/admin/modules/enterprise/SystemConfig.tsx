@@ -748,7 +748,7 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
         {configSchema.map((group) => (
           <Card key={group.key} shadow="sm">
             <CardHeader className="flex items-center gap-3 pb-1">
-              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
+              <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-accent/10 text-accent">
                 {group.icon}
               </div>
               <div className="flex-1 min-w-0">
@@ -769,7 +769,7 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
             exist on the platform. */}
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-3 pb-1">
-            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 text-primary">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-accent/10 text-accent">
               <Settings2 size={18} />
             </div>
             <div className="flex-1 min-w-0">

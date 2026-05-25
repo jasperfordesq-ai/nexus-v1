@@ -47,9 +47,9 @@ function mapColor(color?: TooltipProps['color']): string | undefined {
     case 'warning':
       return 'bg-warning text-warning-foreground';
     case 'primary':
-      return 'bg-primary text-primary-foreground';
+      return 'bg-accent text-accent-foreground';
     case 'secondary':
-      return 'bg-secondary text-secondary-foreground';
+      return 'bg-default text-foreground';
     default:
       return undefined;
   }

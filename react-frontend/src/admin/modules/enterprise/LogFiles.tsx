@@ -40,7 +40,7 @@ function getFileIconColor(name: string): string {
   const lower = name.toLowerCase();
   if (lower.includes('error') || lower.includes('fatal')) return 'text-danger';
   if (lower.includes('cron') || lower.includes('schedule')) return 'text-warning';
-  return 'text-primary';
+  return 'text-accent';
 }
 
 function matchesFilter(name: string, filter: FilterType): boolean {
@@ -124,7 +124,7 @@ export function LogFiles() {
       <div className="flex gap-4 mb-6">
         <Card shadow="sm" className="flex-1">
           <CardBody className="flex flex-row items-center gap-3 p-4">
-            <Files size={20} className="text-primary" />
+            <Files size={20} className="text-accent" />
             <div>
               <p className="text-xs text-default-500">{t('log_files_labels.total_files')}</p>
               <p className="text-lg font-bold text-foreground">{files.length}</p>

@@ -97,7 +97,7 @@ function seoGradeColor(g: 'A' | 'B' | 'C' | 'D' | 'F'): 'success' | 'primary' | 
 
 const SEO_GRADE_TEXT_CLASSES: Record<ReturnType<typeof seoGradeColor>, string> = {
   success: 'text-success',
-  primary: 'text-primary',
+  primary: 'text-accent',
   warning: 'text-warning',
   danger: 'text-danger',
   default: 'text-default-500',
@@ -365,7 +365,7 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
         <KpiCard label={t('kpi.status')} value={healthBadge} hint={summary.cache_path} />
         <KpiCard
           label={t('kpi.metrics')}
-          value={<a href="/api/v2/admin/prerender/metrics" target="_blank" rel="noopener noreferrer" className="text-primary text-sm hover:underline">/metrics</a>}
+          value={<a href="/api/v2/admin/prerender/metrics" target="_blank" rel="noopener noreferrer" className="text-accent text-sm hover:underline">/metrics</a>}
           hint={t('hints.prometheus')}
         />
       </div>
@@ -566,7 +566,7 @@ function FreshnessControls({
 
           <div className="space-y-2">
             <p className="font-medium flex items-center gap-2">
-              <Search size={16} className="text-primary" />{t('drift.title')}
+              <Search size={16} className="text-accent" />{t('drift.title')}
             </p>
             <p className="text-sm text-default-500">
               {t('drift.description')}
@@ -771,7 +771,7 @@ function KpiCard({
 }) {
   const toneClass = tone === 'warning' ? 'text-warning'
     : tone === 'danger' ? 'text-danger'
-    : tone === 'primary' ? 'text-primary'
+    : tone === 'primary' ? 'text-accent'
     : '';
   return (
     <Card shadow="sm" className="p-2">
@@ -990,7 +990,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
               <>
                 {' '}
                 <span aria-hidden="true">&middot;</span>{' '}
-                <span className="text-primary">{t('selected', { count: selected.size })}</span>
+                <span className="text-accent">{t('selected', { count: selected.size })}</span>
               </>
             )}
           </span>

@@ -299,7 +299,7 @@ export function MatchesPage() {
                       {/* Content */}
                       <Link to={tenantPath(detailPath)} className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-theme-primary truncate group-hover:text-primary transition-colors">
+                          <h3 className="font-semibold text-theme-primary truncate group-hover:text-accent transition-colors">
                             {match.title}
                           </h3>
                           <Chip size="sm" variant="flat" className={config.color}>
@@ -361,7 +361,7 @@ export function MatchesPage() {
                       {/* Actions */}
                       <div className="flex flex-col items-center gap-2 flex-shrink-0">
                         <Link to={tenantPath(detailPath)} aria-label={t('view_details')}>
-                          <ArrowRight className="w-5 h-5 text-theme-subtle group-hover:text-primary transition-colors mt-2" />
+                          <ArrowRight className="w-5 h-5 text-theme-subtle group-hover:text-accent transition-colors mt-2" />
                         </Link>
                         {match.source_type === 'listing' && (
                           <Button

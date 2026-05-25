@@ -74,7 +74,7 @@ export function BulkActionToolbar({
 
   return (
     <>
-      <div className="flex items-center justify-between gap-3 rounded-lg border border-primary/40 bg-primary/10 px-4 py-2 mb-3">
+      <div className="flex items-center justify-between gap-3 rounded-lg border border-accent/40 bg-accent/10 px-4 py-2 mb-3">
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium">
             {t('bulk.selected_count', { count: selectedCount })}

@@ -252,11 +252,11 @@ export function JobsAdmin() {
                   <Button key={job.id} onPress={() => handleSelectJob(job)}
                     variant="light"
                     className={['text-left rounded-lg px-3 py-2.5 w-full justify-start h-auto',
-                      isSelected ? 'bg-primary-50 border border-primary-200 dark:bg-primary-950 dark:border-primary-800' : 'border border-transparent',
+                      isSelected ? 'bg-accent-soft border border-accent dark:bg-accent-soft dark:border-accent' : 'border border-transparent',
                     ].join(' ')} aria-pressed={isSelected}>
                     <div className="text-left w-full">
                       <p className={['text-sm font-medium leading-snug truncate',
-                        isSelected ? 'text-primary-700 dark:text-primary-300' : 'text-foreground'].join(' ')}>{job.title}</p>
+                        isSelected ? 'text-accent dark:text-accent' : 'text-foreground'].join(' ')}>{job.title}</p>
                       <div className='flex items-center gap-1.5 mt-1'>
                         <Users size={11} className='text-default-400 shrink-0' />
                         <span className='text-xs text-default-500'>{t(job.applications_count === 1 ? 'jobs.application_count_one' : 'jobs.application_count_other', { count: job.applications_count })}</span>

@@ -246,19 +246,19 @@ export function GdprRequestCreate() {
                       flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all
                       cursor-pointer text-center h-auto min-w-0
                       ${isSelected
-                        ? 'border-primary bg-primary-50 shadow-sm'
+                        ? 'border-accent bg-accent-soft shadow-sm'
                         : 'border-default-200 bg-default-50 hover:border-default-300'
                       }
                     `}
                   >
                     <div className={`
                       flex h-10 w-10 items-center justify-center rounded-lg
-                      ${isSelected ? 'bg-primary/20 text-primary' : 'bg-default-200 text-default-600'}
+                      ${isSelected ? 'bg-accent/20 text-accent' : 'bg-default-200 text-default-600'}
                     `}>
                       <Icon size={20} />
                     </div>
                     <div>
-                      <p className={`font-semibold text-sm ${isSelected ? 'text-primary' : 'text-foreground'}`}>
+                      <p className={`font-semibold text-sm ${isSelected ? 'text-accent' : 'text-foreground'}`}>
                         {t(type.labelKey)}
                       </p>
                       <p className="text-xs text-default-500 mt-0.5">{t(type.descriptionKey)}</p>

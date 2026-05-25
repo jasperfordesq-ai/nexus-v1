@@ -251,12 +251,12 @@ export default function CommercialBoundaryAdminPage() {
         }
       />
 
-      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('commercial_boundary.about.title')}</p>
+              <p className="font-semibold text-accent dark:text-accent">{t('commercial_boundary.about.title')}</p>
               <p className="text-default-600">
                 {t('commercial_boundary.about.body_prefix')}{' '}
                 <Abbr term="KISS" />/<Abbr term="AGORIS" /> {t('commercial_boundary.about.body_suffix')}
@@ -282,7 +282,7 @@ export default function CommercialBoundaryAdminPage() {
         <Card>
           <CardHeader className="pb-2">
             <div className="flex items-center gap-2">
-              <ShieldCheck size={16} className="text-primary" />
+              <ShieldCheck size={16} className="text-accent" />
               <span className="font-semibold text-sm">{t('commercial_boundary.sections.classifications')}</span>
             </div>
           </CardHeader>

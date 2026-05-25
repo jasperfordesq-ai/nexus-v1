@@ -1042,7 +1042,7 @@ export function ListingDetailPage() {
                 key={tag}
                 size="sm"
                 variant="flat"
-                className="max-w-full bg-primary/10 text-primary"
+                className="max-w-full bg-accent/10 text-accent"
               >
                 <span className="truncate">{tag}</span>
               </Chip>

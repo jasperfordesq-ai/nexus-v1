@@ -171,7 +171,7 @@ export function BillingPage() {
       {!loading && subscription && (
         <Card className="mb-6">
           <CardHeader className="flex gap-3">
-            <Users className="w-5 h-5 text-primary" />
+            <Users className="w-5 h-5 text-accent" />
             <h3 className="text-lg font-semibold">
               {t('billing.your_plan_usage')}
             </h3>
@@ -261,7 +261,7 @@ export function BillingPage() {
           {/* Current Plan Card */}
           <Card className="lg:col-span-2">
             <CardHeader className="flex gap-3">
-              <CreditCard className="w-5 h-5 text-primary" />
+              <CreditCard className="w-5 h-5 text-accent" />
               <h3 className="text-lg font-semibold">{t('billing.current_plan')}</h3>
             </CardHeader>
             <Separator />

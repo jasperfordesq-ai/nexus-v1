@@ -502,7 +502,7 @@ export const ComposeEditor = forwardRef<ComposeEditorHandle, ComposeEditorProps>
             <RichTextPlugin
               contentEditable={
                 <ContentEditable
-                  className="min-h-[120px] max-h-[300px] overflow-y-auto px-3 py-2 outline-none focus-visible:ring-2 focus-visible:ring-primary/50 text-sm text-[var(--text-primary)]"
+                  className="min-h-[120px] max-h-[300px] overflow-y-auto px-3 py-2 outline-none focus-visible:ring-2 focus-visible:ring-accent/50 text-sm text-[var(--text-primary)]"
                   aria-label={t('aria.post_content_editor')}
                 />
               }

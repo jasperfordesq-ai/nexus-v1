@@ -597,7 +597,7 @@ export default function SafeguardingPage() {
       <Modal isOpen={!!reviewTarget} onClose={() => setReviewTarget(null)} size="md">
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <Eye size={20} className="text-primary" />
+            <Eye size={20} className="text-accent" />
             {t('safeguarding.mark_reviewed')}
           </ModalHeader>
           <ModalBody>

@@ -553,7 +553,7 @@ export function MarketplaceSearchPage() {
           <aside className="hidden lg:block w-64 shrink-0">
             <GlassCard className="p-5 sticky top-24">
               <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                <SlidersHorizontal className="w-4 h-4 text-primary" />
+                <SlidersHorizontal className="w-4 h-4 text-accent" />
                 {t('search.filters_title')}
               </h3>
               {filterContent}

@@ -110,10 +110,10 @@ export default function InviteRedemptionPage() {
     return (
       <>
         <PageMeta title={t('invite.valid.title')} description={t('invite.valid.body', { community: tenantName })} noIndex />
-        <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-primary/5 to-background p-4">
+        <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-accent/5 to-background p-4">
           <Card className="w-full max-w-md" shadow="md">
             <CardBody className="flex flex-col items-center gap-7 p-8 text-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-accent/10 text-accent">
                 <HeartHandshake size={32} aria-hidden="true" />
               </div>
               <div className="min-w-0">

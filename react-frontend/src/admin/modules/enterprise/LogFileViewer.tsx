@@ -45,7 +45,7 @@ function levelColorClass(level: string | null): string {
     case 'WARNING':
       return 'text-warning';
     case 'INFO':
-      return 'text-primary';
+      return 'text-accent';
     case 'DEBUG':
       return 'text-default-400';
     default:

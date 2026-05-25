@@ -96,7 +96,7 @@ export function LegalAcceptanceGate({
                   to={linkPath}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1 text-xs text-primary underline shrink-0 focus:outline-none focus:ring-2 focus:ring-primary rounded"
+                  className="flex items-center gap-1 text-xs text-accent underline shrink-0 focus:outline-none focus:ring-2 focus:ring-accent rounded"
                 >
                   {t('gate.read')}
                   <ExternalLink className="w-3 h-3" aria-hidden="true" />

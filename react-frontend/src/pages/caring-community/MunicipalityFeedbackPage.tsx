@@ -135,8 +135,8 @@ export default function MunicipalityFeedbackPage() {
       <Card>
         <CardBody className="space-y-2">
           <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/15">
-              <Inbox size={20} className="text-primary" />
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/15">
+              <Inbox size={20} className="text-accent" />
             </span>
             <h1 className="text-xl font-bold sm:text-2xl">{t('intro_title')}</h1>
           </div>

@@ -89,7 +89,7 @@ export function FederationCommunityPicker({ isOpen, onClose, onSelect }: Props) 
     <Modal isOpen={isOpen} onClose={onClose} size="lg" scrollBehavior="inside">
       <ModalContent>
         <ModalHeader className="flex items-center gap-2">
-          <Globe className="h-5 w-5 text-primary" aria-hidden="true" />
+          <Globe className="h-5 w-5 text-accent" aria-hidden="true" />
           <span>{t('federation_picker.title')}</span>
         </ModalHeader>
         <ModalBody className="gap-4">
@@ -124,7 +124,7 @@ export function FederationCommunityPicker({ isOpen, onClose, onSelect }: Props) 
                     onPress={() => setSelectedSlug(peer.slug)}
                     className={`border ${
                       selectedSlug === peer.slug
-                        ? 'border-primary bg-primary/5'
+                        ? 'border-accent bg-accent/5'
                         : 'border-default-200'
                     }`}
                   >

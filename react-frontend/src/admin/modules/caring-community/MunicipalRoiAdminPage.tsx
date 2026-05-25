@@ -251,12 +251,12 @@ export default function MunicipalRoiAdminPage() {
       />
 
       {/* Intro card */}
-      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
-            <Info size={16} className="mt-0.5 shrink-0 text-primary" aria-hidden="true" />
+            <Info size={16} className="mt-0.5 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('municipal_roi_page.about.title')}</p>
+              <p className="font-semibold text-accent dark:text-accent">{t('municipal_roi_page.about.title')}</p>
               <p className="text-default-600">
                 {t('municipal_roi_page.about.body_prefix')} <Abbr term="ROI" /> {t('municipal_roi_page.about.body_middle')}{' '}
                 <Abbr term="KISS" />/{t('municipal_roi_page.about.body_suffix')}
@@ -478,7 +478,7 @@ export default function MunicipalRoiAdminPage() {
                   <>{t('municipal_roi_page.municipalities.point_export')}</>,
                 ] as React.ReactNode[]).map((point, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm text-default-700">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
                     {point}
                   </li>
                 ))}

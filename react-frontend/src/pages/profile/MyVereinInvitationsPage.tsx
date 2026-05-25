@@ -152,7 +152,7 @@ export default function MyVereinInvitationsPage() {
       <PageMeta title={t('verein_federation.my_invitations_title')} noIndex />
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-2">
-          <UserPlus className="w-6 h-6 text-primary" />
+          <UserPlus className="w-6 h-6 text-accent" />
           {t('verein_federation.my_invitations_title')}
         </h1>
         <p className="text-sm text-default-500 mt-1">

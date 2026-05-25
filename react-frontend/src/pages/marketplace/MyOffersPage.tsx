@@ -260,7 +260,7 @@ export function MyOffersPage() {
         {/* Header */}
         <div className="min-w-0">
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <HandCoins className="w-7 h-7 text-primary" />
+            <HandCoins className="w-7 h-7 text-accent" />
             {t('my_offers.title')}
           </h1>
           <p className="text-default-500 text-sm mt-1">
@@ -351,7 +351,7 @@ export function MyOffersPage() {
       <Modal isOpen={isCounterOpen} onClose={onCounterClose} size="md">
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <RotateCcw className="w-5 h-5 text-secondary" />
+            <RotateCcw className="w-5 h-5 text-accent" />
             {t('my_offers.counter_modal_title')}
           </ModalHeader>
           <ModalBody>

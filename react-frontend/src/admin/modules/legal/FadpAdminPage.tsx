@@ -628,8 +628,8 @@ export function FadpAdminPage() {
             <Card shadow="sm">
               <CardBody className="space-y-4 p-6">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-100">
-                    <Globe size={22} className="text-primary-600" />
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent-soft">
+                    <Globe size={22} className="text-accent" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-[var(--color-text)]">{t('fadp.residency.title')}</h3>
@@ -661,7 +661,7 @@ export function FadpAdminPage() {
                     <span className="font-medium">{t('fadp.residency.dpa_contact')}:</span>{' '}
                     <a
                       href={`mailto:${retention.dpa_contact_email}`}
-                      className="text-primary hover:underline"
+                      className="text-accent hover:underline"
                     >
                       {retention.dpa_contact_email}
                     </a>

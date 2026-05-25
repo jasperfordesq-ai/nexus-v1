@@ -1406,7 +1406,7 @@ export function ConversationPage() {
 
             <Link
               to={tenantPath(`/profile/${other_user.id}`)}
-              className="flex min-w-0 flex-1 items-center gap-3 rounded-xl outline-none transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-background)]"
+              className="flex min-w-0 flex-1 items-center gap-3 rounded-xl outline-none transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-background)]"
             >
               <h1 className="sr-only">{t('conversation_with', { name: other_user.name })}</h1>
               <div className="relative shrink-0">
@@ -1452,7 +1452,7 @@ export function ConversationPage() {
               isIconOnly
               variant="flat"
               size="sm"
-              className={`bg-theme-elevated text-theme-muted ${showSearch ? 'ring-1 ring-primary/40 text-primary' : ''}`}
+              className={`bg-theme-elevated text-theme-muted ${showSearch ? 'ring-1 ring-accent/40 text-accent' : ''}`}
               aria-label={t('aria_search_messages')}
               aria-expanded={showSearch}
               onPress={() => setShowSearch(!showSearch)}
@@ -1657,14 +1657,14 @@ export function ConversationPage() {
       {listing && (
         <GlassCard className="shrink-0 p-4">
           <div className="flex items-start gap-3">
-            <FileText className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+            <FileText className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" aria-hidden="true" />
             <div className="flex-1 min-w-0">
               <p className="text-sm text-theme-muted mb-1">
                 {t('regarding_context', { type: listing.type === 'offer' ? t('context_offer') : t('context_request') })}
               </p>
               <Link
                 to={tenantPath(`/listings/${listing.id}`)}
-                className="font-medium text-theme-heading hover:text-primary transition-colors"
+                className="font-medium text-theme-heading hover:text-accent transition-colors"
               >
                 {listing.title}
               </Link>
@@ -1728,7 +1728,7 @@ export function ConversationPage() {
                   name={other_user.name}
                   className="h-20 w-20 ring-4 ring-theme-default"
                 />
-                <span className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border border-theme-default bg-theme-card text-primary shadow-sm">
+                <span className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border border-theme-default bg-theme-card text-accent shadow-sm">
                   <MessageCircle className="h-4 w-4" aria-hidden="true" />
                 </span>
               </div>

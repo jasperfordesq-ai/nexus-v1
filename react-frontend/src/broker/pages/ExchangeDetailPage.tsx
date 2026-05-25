@@ -241,7 +241,7 @@ export default function ExchangeDetail() {
             <div className="space-y-3">
               {history.map((entry) => (
                 <div key={entry.id} className="flex gap-3 items-start">
-                  <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0" />
+                  <div className="w-2 h-2 rounded-full bg-accent mt-2 flex-shrink-0" />
                   <div>
                     <p className="text-sm font-medium">{entry.action}</p>
                     {entry.actor_name && (

@@ -217,7 +217,7 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
               {challenge.is_completed ? (
                 <Trophy className="w-4 h-4 text-warning flex-shrink-0" aria-hidden="true" />
               ) : (
-                <Target className="w-4 h-4 text-primary flex-shrink-0" aria-hidden="true" />
+                <Target className="w-4 h-4 text-accent flex-shrink-0" aria-hidden="true" />
               )}
               <h3 className="font-semibold text-theme-primary truncate">
                 {challenge.title}
@@ -410,7 +410,7 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
           {(onModalClose) => (
             <>
               <ModalHeader className="text-theme-primary flex items-center gap-2">
-                <Target className="w-5 h-5 text-primary" aria-hidden="true" />
+                <Target className="w-5 h-5 text-accent" aria-hidden="true" />
                 {t('challenges.create_modal_title')}
               </ModalHeader>
               <ModalBody className="gap-4">

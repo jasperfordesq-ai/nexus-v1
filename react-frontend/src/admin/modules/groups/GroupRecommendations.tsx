@@ -55,8 +55,8 @@ export default function GroupRecommendations() {
         <Card shadow="sm">
           <CardBody className="p-6">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-primary" />
+            <div className="w-12 h-12 rounded-lg bg-accent/10 flex items-center justify-center">
+              <TrendingUp className="w-6 h-6 text-accent" />
             </div>
             <div>
               <div className="text-sm text-default-500">{t('groups.total_recommendations')}</div>

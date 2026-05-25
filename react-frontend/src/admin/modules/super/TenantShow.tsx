@@ -319,7 +319,7 @@ export function TenantShow() {
               ) : (
                 <Link
                   to={tenantPath(`/admin/super/tenants/${crumb.id}`)}
-                  className="text-primary hover:underline"
+                  className="text-accent hover:underline"
                 >
                   {crumb.name}
                 </Link>
@@ -336,7 +336,7 @@ export function TenantShow() {
           <Card shadow="sm">
             <CardHeader className="pb-0">
               <div className="flex items-center gap-2">
-                <Building2 size={18} className="text-primary" />
+                <Building2 size={18} className="text-accent" />
                 <h3 className="text-lg font-semibold">{t('super.section_tenant_information')}</h3>
               </div>
             </CardHeader>
@@ -351,7 +351,7 @@ export function TenantShow() {
                     tenant.parent_id ? (
                       <Link
                         to={tenantPath(`/admin/super/tenants/${tenant.parent_id}`)}
-                        className="text-primary hover:underline"
+                        className="text-accent hover:underline"
                       >
                         {tenant.parent_name || `Tenant #${tenant.parent_id}`}
                       </Link>
@@ -396,7 +396,7 @@ export function TenantShow() {
             <Card shadow="sm">
               <CardHeader className="pb-0">
                 <div className="flex items-center gap-2">
-                  <Users size={18} className="text-primary" />
+                  <Users size={18} className="text-accent" />
                   <h3 className="text-lg font-semibold">{t('super.section_contact_information')}</h3>
                 </div>
               </CardHeader>
@@ -414,7 +414,7 @@ export function TenantShow() {
           <Card shadow="sm">
             <CardHeader className="pb-0">
               <div className="flex items-center gap-2">
-                <Search size={18} className="text-primary" />
+                <Search size={18} className="text-accent" />
                 <h3 className="text-lg font-semibold">{t('super.section_seo_settings')}</h3>
               </div>
             </CardHeader>
@@ -435,7 +435,7 @@ export function TenantShow() {
           <Card shadow="sm">
             <CardHeader className="pb-0">
               <div className="flex items-center gap-2">
-                <MapPin size={18} className="text-primary" />
+                <MapPin size={18} className="text-accent" />
                 <h3 className="text-lg font-semibold">{t('super.section_location')}</h3>
               </div>
             </CardHeader>
@@ -454,7 +454,7 @@ export function TenantShow() {
           <Card shadow="sm">
             <CardHeader className="pb-0">
               <div className="flex items-center gap-2">
-                <Globe size={18} className="text-primary" />
+                <Globe size={18} className="text-accent" />
                 <h3 className="text-lg font-semibold">{t('super.section_social_media')}</h3>
               </div>
             </CardHeader>
@@ -474,7 +474,7 @@ export function TenantShow() {
                           href={social.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-sm text-primary hover:underline truncate"
+                          className="flex items-center gap-1 text-sm text-accent hover:underline truncate"
                         >
                           {social.url}
                           <ExternalLink size={12} className="shrink-0" />
@@ -493,7 +493,7 @@ export function TenantShow() {
           <Card shadow="sm">
             <CardHeader className="pb-0">
               <div className="flex items-center gap-2">
-                <Languages size={18} className="text-primary" />
+                <Languages size={18} className="text-accent" />
                 <h3 className="text-lg font-semibold">{t('super.section_languages')}</h3>
               </div>
             </CardHeader>
@@ -530,7 +530,7 @@ export function TenantShow() {
           <Card shadow="sm">
             <CardHeader className="pb-0">
               <div className="flex items-center gap-2">
-                <Network size={18} className="text-primary" />
+                <Network size={18} className="text-accent" />
                 <h3 className="text-lg font-semibold">{t('super.section_features_modules')}</h3>
               </div>
             </CardHeader>
@@ -613,7 +613,7 @@ export function TenantShow() {
           <Card shadow="sm">
             <CardHeader className="pb-0">
               <div className="flex items-center gap-2">
-                <Building2 size={18} className="text-primary" />
+                <Building2 size={18} className="text-accent" />
                 <h3 className="text-lg font-semibold">
                   {t('super.section_children')}
                   {tenant.children.length > 0 && (
@@ -664,7 +664,7 @@ export function TenantShow() {
             <CardHeader className="pb-0">
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center gap-2">
-                  <Users size={18} className="text-primary" />
+                  <Users size={18} className="text-accent" />
                   <h3 className="text-lg font-semibold">
                     {t('super.section_admins')}
                     {tenant.admins.length > 0 && (
@@ -830,7 +830,7 @@ export function TenantShow() {
           <Card shadow="sm">
             <CardHeader className="pb-0">
               <div className="flex items-center gap-2">
-                <Network size={18} className="text-primary" />
+                <Network size={18} className="text-accent" />
                 <h3 className="text-lg font-semibold">{t('super.section_hub_settings')}</h3>
               </div>
             </CardHeader>

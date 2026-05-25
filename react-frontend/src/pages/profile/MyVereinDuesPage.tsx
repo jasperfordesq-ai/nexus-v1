@@ -133,7 +133,7 @@ export function MyVereinDuesPage() {
       <PageMeta title={t('verein_dues.my_page_title')} noIndex />
       <div className="container max-w-4xl mx-auto p-4 md:p-6 space-y-6">
       <div className="flex items-center gap-3">
-        <Receipt className="w-7 h-7 text-primary" />
+        <Receipt className="w-7 h-7 text-accent" />
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">
             {t('verein_dues.my_page_heading')}

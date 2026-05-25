@@ -173,9 +173,9 @@ export default function Partnerships() {
 
   const getFeatureIcon = (feature: string) => {
     switch (feature) {
-      case 'profiles': return <Users className="w-4 h-4 text-primary" />;
+      case 'profiles': return <Users className="w-4 h-4 text-accent" />;
       case 'messaging': return <MessageSquare className="w-4 h-4 text-success" />;
-      case 'transactions': return <DollarSign className="w-4 h-4 text-secondary" />;
+      case 'transactions': return <DollarSign className="w-4 h-4 text-accent" />;
       case 'listings': return <FileText className="w-4 h-4 text-warning" />;
       case 'events': return <Calendar className="w-4 h-4 text-pink-500" />;
       case 'groups': return <UsersRound className="w-4 h-4 text-cyan-500" />;
@@ -190,7 +190,7 @@ export default function Partnerships() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
       </div>
     );
   }

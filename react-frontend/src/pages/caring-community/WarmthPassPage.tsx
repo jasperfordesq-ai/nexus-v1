@@ -169,7 +169,7 @@ export function WarmthPassPage() {
           <>
             {/* The credential card */}
             <div
-              className="rounded-2xl bg-gradient-to-br from-warning-100 to-primary-100 p-1 shadow-lg dark:from-warning-900/40 dark:to-primary-900/40"
+              className="rounded-2xl bg-gradient-to-br from-warning-100 to-accent-soft p-1 shadow-lg dark:from-warning-900/40 dark:to-accent-soft"
             >
               <div className="rounded-xl bg-white/80 p-6 backdrop-blur-sm dark:bg-black/30 sm:p-8">
                 {/* Card header row: tenant name + pass label */}
@@ -210,7 +210,7 @@ export function WarmthPassPage() {
                 {/* Stats row */}
                 <div className="mt-6 grid grid-cols-3 gap-4">
                   <div className="flex flex-col items-center gap-1 rounded-lg bg-white/60 p-3 dark:bg-white/10">
-                    <Clock className="h-5 w-5 text-primary" aria-hidden="true" />
+                    <Clock className="h-5 w-5 text-accent" aria-hidden="true" />
                     <p className="text-xl font-bold text-theme-primary">{data.hours_logged}</p>
                     <p className="text-center text-xs text-theme-muted">
                       {t('warmth_pass.hours_logged')}
@@ -291,7 +291,7 @@ export function WarmthPassPage() {
             <Card>
               <CardBody className="gap-3 p-5">
                 <div className="flex items-center gap-2">
-                  <ShieldCheck className="h-5 w-5 text-primary" aria-hidden="true" />
+                  <ShieldCheck className="h-5 w-5 text-accent" aria-hidden="true" />
                   <p className="font-semibold text-sm">{t('warmth_pass.what_is_this')}</p>
                 </div>
                 <p className="text-sm text-theme-muted leading-relaxed">

@@ -295,11 +295,11 @@ export function MemberTags() {
               key={ts.tag}
               isPressable
               onPress={() => openTagMembers(ts.tag)}
-              className="hover:border-primary transition-colors"
+              className="hover:border-accent transition-colors"
             >
               <CardHeader className="flex items-center justify-between pb-1">
                 <div className="flex items-center gap-2 min-w-0">
-                  <Tag size={16} className="text-primary shrink-0" />
+                  <Tag size={16} className="text-accent shrink-0" />
                   <span className="font-semibold text-foreground truncate">{ts.tag}</span>
                 </div>
                 <Button
@@ -346,7 +346,7 @@ export function MemberTags() {
       </div>
 
       <div className="flex items-center gap-3 mb-6">
-        <Tag size={20} className="text-primary" />
+        <Tag size={20} className="text-accent" />
         <h2 className="text-xl font-semibold">
           {t('crm.members_tagged')} &ldquo;{activeTag}&rdquo;
         </h2>
@@ -381,7 +381,7 @@ export function MemberTags() {
                   <div className="min-w-0">
                     <Link
                       to={tenantPath(`/admin/users/${mt.user_id}/edit`)}
-                      className="font-semibold text-foreground hover:text-primary transition-colors truncate block"
+                      className="font-semibold text-foreground hover:text-accent transition-colors truncate block"
                     >
                       {mt.user_name || t('crm.user_with_id', { id: mt.user_id })}
                     </Link>

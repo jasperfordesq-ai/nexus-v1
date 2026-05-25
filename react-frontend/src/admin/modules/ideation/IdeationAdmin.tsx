@@ -147,7 +147,7 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
           key="voting" id="voting"
           startContent={<Vote size={14} />}
           color="primary"
-          className={challenge.status !== 'voting' ? 'text-primary' : 'hidden'}
+          className={challenge.status !== 'voting' ? 'text-accent' : 'hidden'}
         >
           {t('ideation.mark_as_voting')}
         </DropdownItem>

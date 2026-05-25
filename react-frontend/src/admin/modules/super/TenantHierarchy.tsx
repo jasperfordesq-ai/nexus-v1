@@ -70,7 +70,7 @@ function TreeNode({ node, depth, onNavigate, expandedIds, onToggle, t }: TreeNod
           tabIndex={0}
           onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigate(node.id); } }}
         >
-          <Building2 size={18} className="text-primary shrink-0" />
+          <Building2 size={18} className="text-accent shrink-0" />
           <div className="min-w-0 flex-1">
             <span className="font-medium text-foreground">{node.name}</span>
             <span className="text-xs text-default-400 ml-2">({node.slug})</span>
@@ -187,9 +187,9 @@ export function TenantHierarchy() {
   return (
     <div>
       <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-default-500 mb-1">
-        <Link to={tenantPath('/admin/super')} className="hover:text-primary">{t('super.super_dashboard_title')}</Link>
+        <Link to={tenantPath('/admin/super')} className="hover:text-accent">{t('super.super_dashboard_title')}</Link>
         <span>/</span>
-        <Link to={tenantPath('/admin/super/tenants')} className="hover:text-primary">{t('super.tenants')}</Link>
+        <Link to={tenantPath('/admin/super/tenants')} className="hover:text-accent">{t('super.tenants')}</Link>
         <span>/</span>
         <span className="text-foreground">{t('super.hierarchy')}</span>
       </nav>

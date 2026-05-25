@@ -482,7 +482,7 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
                       href={detail.evidence_url}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-sm text-primary underline"
+                      className="text-sm text-accent underline"
                     >
                       {detail.evidence_url}
                     </a>

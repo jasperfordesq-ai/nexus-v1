@@ -154,12 +154,12 @@ export function CommunityDeliveryCard({
 
   return (
     <>
-      <Card className="border border-primary/20 bg-primary/5 shadow-sm">
+      <Card className="border border-accent/20 bg-accent/5 shadow-sm">
         <CardBody className="gap-4">
           {/* Header */}
           <div className="flex items-start gap-3">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Truck className="w-5 h-5 text-primary" />
+            <div className="p-2 rounded-lg bg-accent/10">
+              <Truck className="w-5 h-5 text-accent" />
             </div>
             <div className="flex-1">
               <h4 className="text-sm font-semibold text-theme-primary">
@@ -180,15 +180,15 @@ export function CommunityDeliveryCard({
           {informational && (
             <div className="space-y-2 text-xs text-theme-muted">
               <div className="flex items-center gap-2">
-                <Users className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                <Users className="w-3.5 h-3.5 text-accent flex-shrink-0" />
                 <span>{t('community_delivery.step1')}</span>
               </div>
               <div className="flex items-center gap-2">
-                <Clock className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                <Clock className="w-3.5 h-3.5 text-accent flex-shrink-0" />
                 <span>{t('community_delivery.step2')}</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                <CheckCircle className="w-3.5 h-3.5 text-accent flex-shrink-0" />
                 <span>{t('community_delivery.step3')}</span>
               </div>
             </div>
@@ -222,7 +222,7 @@ export function CommunityDeliveryCard({
                       </Chip>
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <Clock className="w-3 h-3 text-primary" />
+                      <Clock className="w-3 h-3 text-accent" />
                       <span className="text-xs text-theme-muted">
                         {t('community_delivery.time_credits_value', { count: offer.time_credits })}
                         {offer.estimated_minutes && ` - ${t('community_delivery.estimated_minutes', { count: offer.estimated_minutes })}`}

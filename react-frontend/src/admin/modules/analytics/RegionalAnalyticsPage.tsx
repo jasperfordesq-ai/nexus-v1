@@ -147,7 +147,7 @@ function TabPanel({ loading, error, t, children }: { loading: boolean; error: st
 }
 
 /** Horizontal percentage bar row */
-function PercentBar({ label, value, total, color = 'bg-primary' }: { label: string; value: number; total: number; color?: string }) {
+function PercentBar({ label, value, total, color = 'bg-accent' }: { label: string; value: number; total: number; color?: string }) {
   const width = total > 0 ? Math.round((value / total) * 100) : 0;
   return (
     <div className="flex items-center gap-3 py-1.5">
@@ -194,7 +194,7 @@ function HeatmapTab({ data, t }: { data: HeatmapCell[]; t: AdminT }) {
                 <TableCell className="font-semibold">{cell.count}</TableCell>
                 <TableCell>
                   <div className="h-3 w-32 rounded-full bg-default-100">
-                    <div className="h-full rounded-full bg-primary" style={{ width: `${barWidth}%` }} />
+                    <div className="h-full rounded-full bg-accent" style={{ width: `${barWidth}%` }} />
                   </div>
                 </TableCell>
               </TableRow>
@@ -229,7 +229,7 @@ function DemographicsTab({ data, t }: { data: DemographicsData; t: AdminT }) {
                 label={t(AGE_GROUP_LABEL_KEYS[key] ?? key)}
                 value={count}
                 total={totalAge}
-                color="bg-primary"
+                color="bg-accent"
               />
             );
           })}
@@ -249,7 +249,7 @@ function DemographicsTab({ data, t }: { data: DemographicsData; t: AdminT }) {
               label={l.language.toUpperCase()}
               value={l.count}
               total={totalLang}
-              color="bg-secondary"
+              color="bg-default"
             />
           ))}
           <p className="mt-3 text-xs text-default-400">{t('analytics.regional.demographics.total_active_members', { total: totalLang.toLocaleString() })}</p>
@@ -345,7 +345,7 @@ function EngagementTab({ data, t }: { data: EngagementRow[]; t: AdminT }) {
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <div className="h-3 w-20 rounded-full bg-default-100">
-                      <div className="h-full rounded-full bg-primary" style={{ width: `${barWidth}%` }} />
+                      <div className="h-full rounded-full bg-accent" style={{ width: `${barWidth}%` }} />
                     </div>
                     <span className="font-semibold">{row.active_members.toLocaleString()}</span>
                   </div>
@@ -374,7 +374,7 @@ function VolunteerTab({ data, t }: { data: VolunteerData; t: AdminT }) {
         <Card shadow="sm">
           <CardBody className="p-4">
             <p className="text-xs text-default-500">{t('analytics.regional.volunteer.total_hours')}</p>
-            <p className="text-2xl font-bold text-primary">{data.total_hours.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-accent">{data.total_hours.toLocaleString()}</p>
           </CardBody>
         </Card>
         <Card shadow="sm">
@@ -386,7 +386,7 @@ function VolunteerTab({ data, t }: { data: VolunteerData; t: AdminT }) {
         <Card shadow="sm">
           <CardBody className="p-4">
             <p className="text-xs text-default-500">{t('analytics.regional.volunteer.reciprocity_ratio')}</p>
-            <p className="text-2xl font-bold text-secondary">
+            <p className="text-2xl font-bold text-accent">
               {(data.reciprocity_ratio * 100).toFixed(1)}%
             </p>
             <p className="text-xs text-default-400">{t('analytics.regional.volunteer.reciprocity_description')}</p>

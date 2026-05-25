@@ -83,7 +83,7 @@ export function ListingLocationMap({
     <GlassCard className={`p-0 overflow-hidden ${className}`}>
       {/* Header */}
       <div className="flex items-center gap-2 px-4 pt-4 pb-2">
-        <MapPin className="w-4 h-4 text-primary" aria-hidden="true" />
+        <MapPin className="w-4 h-4 text-accent" aria-hidden="true" />
         <h3 className="text-sm font-semibold text-foreground">
           {t('listing.location_title')}
         </h3>

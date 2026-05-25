@@ -154,7 +154,7 @@ export function JobDescriptionCard({
                   key={idx}
                   variant="flat"
                   color={isMatched ? 'success' : isMissing ? 'danger' : 'primary'}
-                  className={isMatched ? 'bg-success/10 text-success' : isMissing ? 'bg-danger/10 text-danger' : 'bg-primary/10 text-primary'}
+                  className={isMatched ? 'bg-success/10 text-success' : isMissing ? 'bg-danger/10 text-danger' : 'bg-accent/10 text-accent'}
                   startContent={isMatched ? <Check className="w-3 h-3" /> : isMissing ? <X className="w-3 h-3" /> : undefined}
                 >
                   {skill}

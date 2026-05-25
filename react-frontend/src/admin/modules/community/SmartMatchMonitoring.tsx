@@ -139,7 +139,7 @@ export function SmartMatchMonitoring() {
                 {Object.entries(data.score_distribution).map(([range, count]) => (
                   <div key={range} className="flex items-center justify-between py-1 border-b border-default-100 last:border-0">
                     <span className="text-sm">{range}</span>
-                    <span className="text-sm font-medium text-primary">{count}</span>
+                    <span className="text-sm font-medium text-accent">{count}</span>
                   </div>
                 ))}
               </div>

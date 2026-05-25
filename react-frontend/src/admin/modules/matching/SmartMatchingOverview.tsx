@@ -165,7 +165,7 @@ export function SmartMatchingOverview() {
         <Card shadow="sm">
           <CardHeader className="flex items-center justify-between px-4 pt-4 pb-0">
             <div className="flex items-center gap-2">
-              <Zap size={18} className="text-primary" />
+              <Zap size={18} className="text-accent" />
               <h3 className="font-semibold">{t('matching.algorithm_weights')}</h3>
             </div>
             {config && (
@@ -232,7 +232,7 @@ export function SmartMatchingOverview() {
         {/* Quick Actions */}
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <Settings size={18} className="text-primary" />
+            <Settings size={18} className="text-accent" />
             <h3 className="font-semibold">{t('matching.quick_actions')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
@@ -293,7 +293,7 @@ export function SmartMatchingOverview() {
         {/* Matching Activity Summary */}
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <Users size={18} className="text-primary" />
+            <Users size={18} className="text-accent" />
             <h3 className="font-semibold">{t('matching.matching_activity')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
@@ -351,7 +351,7 @@ export function SmartMatchingOverview() {
         {/* Approval Summary */}
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <ShieldCheck size={18} className="text-primary" />
+            <ShieldCheck size={18} className="text-accent" />
             <h3 className="font-semibold">{t('matching.approval_summary')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">

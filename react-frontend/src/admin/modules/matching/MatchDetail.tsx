@@ -181,7 +181,7 @@ export function MatchDetail() {
       {/* Match Score Card */}
       <Card shadow="sm" className="mb-6">
         <CardHeader className="flex items-center gap-3 pb-0">
-          <Shield size={20} className="text-primary" />
+          <Shield size={20} className="text-accent" />
           <h3 className="text-lg font-semibold">{t('matching.match_information')}</h3>
           <div className="ml-auto">
             <StatusBadge status={item.status} />
@@ -265,7 +265,7 @@ export function MatchDetail() {
         {/* User 1 */}
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-3 pb-0">
-            <User size={18} className="text-primary" />
+            <User size={18} className="text-accent" />
             <h3 className="font-semibold">{t('matching.matched_user')}</h3>
           </CardHeader>
           <CardBody>
@@ -341,7 +341,7 @@ export function MatchDetail() {
       {item.listing_title && (
         <Card shadow="sm" className="mb-6">
           <CardHeader className="flex items-center gap-3 pb-0">
-            <FileText size={18} className="text-secondary" />
+            <FileText size={18} className="text-accent" />
             <h3 className="font-semibold">{t('matching.associated_listing')}</h3>
           </CardHeader>
           <CardBody>

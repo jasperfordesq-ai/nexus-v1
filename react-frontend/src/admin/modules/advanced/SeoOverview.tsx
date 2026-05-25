@@ -566,7 +566,7 @@ export function SeoOverview() {
                     href={sitemapStats.sitemap_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-primary flex items-center gap-1 hover:underline"
+                    className="text-sm text-accent flex items-center gap-1 hover:underline"
                   >
                     {sitemapStats.sitemap_url}
                     <ExternalLink size={12} />

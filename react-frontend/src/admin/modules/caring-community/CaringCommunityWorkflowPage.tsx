@@ -563,7 +563,7 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: Pred
       <CardHeader className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold flex items-center gap-2">
-            <BrainCircuit size={18} className="text-primary" />
+            <BrainCircuit size={18} className="text-accent" />
             {t('caring_workflow.predictive.title')}
           </h2>
           <p className="mt-1 text-sm text-default-500">
@@ -1956,7 +1956,7 @@ export default function CaringCommunityWorkflowPage() {
             <CardHeader className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <h2 className="text-lg font-semibold flex items-center gap-2">
-                  <Sparkles size={18} className="text-primary" />
+                  <Sparkles size={18} className="text-accent" />
                   {t('caring_workflow.tandem.title')}
                 </h2>
                 <p className="mt-1 text-sm text-default-500">
@@ -2026,7 +2026,7 @@ export default function CaringCommunityWorkflowPage() {
                               <div className="text-xs text-default-500">{t('caring_workflow.relationships.supporter')}</div>
                             </div>
                           </div>
-                          <HeartHandshake size={20} className="text-primary" />
+                          <HeartHandshake size={20} className="text-accent" />
                           <div className="flex items-center gap-2">
                             <div className="h-9 w-9 overflow-hidden rounded-full bg-default-100 flex items-center justify-center text-xs font-semibold">
                               {suggestion.recipient.avatar_url ? (
@@ -2362,7 +2362,7 @@ export default function CaringCommunityWorkflowPage() {
                 const status = roleStatusByKey.get(role.key);
                 return (
                   <div key={role.key} className="flex items-start gap-3 rounded-lg border border-default-200 p-3">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
                       <Icon size={18} />
                     </div>
                     <div className="min-w-0 flex-1">
@@ -2776,7 +2776,7 @@ export default function CaringCommunityWorkflowPage() {
             return (
               <div key={stage.key} className="rounded-lg border border-default-200 p-3">
                 <div className="mb-3 flex items-center justify-between">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft text-accent">
                     <Icon size={18} />
                   </div>
                   <Chip size="sm" variant="flat">{index + 1}</Chip>

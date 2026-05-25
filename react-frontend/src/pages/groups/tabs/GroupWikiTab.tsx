@@ -344,7 +344,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                       variant="light"
                       className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 h-auto min-w-0 justify-start ${
                         selectedPage?.id === page.id
-                          ? 'bg-primary/10 text-primary font-medium'
+                          ? 'bg-accent/10 text-accent font-medium'
                           : 'text-theme-secondary hover:bg-theme-hover'
                       }`}
                       style={{ paddingLeft: `${page.depth * 16 + 12}px` }}
@@ -390,7 +390,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                       {idx < breadcrumbs.length - 1 ? (
                         <Button
                           variant="light"
-                          className="hover:text-primary transition-colors underline-offset-2 hover:underline h-auto min-w-0 p-0"
+                          className="hover:text-accent transition-colors underline-offset-2 hover:underline h-auto min-w-0 p-0"
                           onPress={() => loadPage(crumb.slug)}
                         >
                           {crumb.title}
@@ -531,8 +531,8 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                           key={rev.id}
                           className="flex items-start gap-3 p-3 rounded-lg bg-theme-elevated/50"
                         >
-                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                            <Edit className="w-4 h-4 text-primary" aria-hidden="true" />
+                          <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
+                            <Edit className="w-4 h-4 text-accent" aria-hidden="true" />
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 text-sm">

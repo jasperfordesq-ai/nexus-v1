@@ -128,7 +128,7 @@ export default function MunicipalityCalendarPage() {
             <Link
               key={ev.id}
               to={tenantPath(`/events/${ev.id}`)}
-              className="block bg-primary-50 hover:bg-primary-100 dark:bg-primary-900/30 rounded px-1 py-0.5 truncate"
+              className="block bg-accent-soft hover:bg-accent-soft dark:bg-accent-soft rounded px-1 py-0.5 truncate"
             >
               <span className="font-medium">{ev.organization_name}</span>: {ev.title}
             </Link>
@@ -153,7 +153,7 @@ export default function MunicipalityCalendarPage() {
 
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Calendar className="w-6 h-6 text-primary" />
+          <Calendar className="w-6 h-6 text-accent" />
           {t('verein_federation.calendar.title')}
         </h1>
         {code ? (

@@ -43,7 +43,7 @@ export function PasswordStrength({ state }: PasswordStrengthProps) {
         ? 'bg-danger'
         : tone === 'warn'
           ? 'bg-warning'
-          : 'bg-primary';
+          : 'bg-accent';
 
   const Icon =
     tone === 'success' ? CheckCircle : tone === 'error' ? AlertCircle : state.isChecking ? Loader2 : Info;

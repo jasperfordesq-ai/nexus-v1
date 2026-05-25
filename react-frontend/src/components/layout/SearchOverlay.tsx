@@ -250,9 +250,9 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
   // ─── Type badges ───────────────────────────────────────────────────────
   const typeLabels: Record<string, { label: string; color: string }> = {
     listing: { label: t('search.type_listing'), color: 'bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-300' },
-    user: { label: t('search.type_member'), color: 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300' },
+    user: { label: t('search.type_member'), color: 'bg-accent-soft text-accent dark:bg-accent-soft dark:text-accent' },
     event: { label: t('search.type_event'), color: 'bg-warning-100 text-warning-700 dark:bg-warning-900/30 dark:text-warning-300' },
-    group: { label: t('search.type_group'), color: 'bg-secondary-100 text-secondary-700 dark:bg-secondary-900/30 dark:text-secondary-300' },
+    group: { label: t('search.type_group'), color: 'bg-surface-secondary text-accent dark:bg-surface-secondary dark:text-accent' },
   };
 
   // ─── Don't render if not open ──────────────────────────────────────────
@@ -288,7 +288,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
               placeholder={t('search.placeholder')}
               aria-label={t('search.placeholder')}
               autoFocus
-              className="min-w-0 flex-1 bg-transparent text-foreground placeholder:text-default-400 text-base outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+              className="min-w-0 flex-1 bg-transparent text-foreground placeholder:text-default-400 text-base outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
             />
             {query && (
               <Button
@@ -333,7 +333,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                           onFocus={() => setSelectedIndex(i)}
                           className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-start h-auto justify-start min-w-0 ${
                             i === selectedIndex
-                              ? 'bg-primary-50 dark:bg-primary-500/10'
+                              ? 'bg-accent-soft dark:bg-accent-soft0/10'
                               : 'hover:bg-default-100'
                           }`}
                         >
@@ -362,7 +362,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                         onMouseEnter={() => setSelectedIndex(i)}
                         className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-start h-auto min-w-0 ${
                           i === selectedIndex
-                            ? 'bg-primary-50 dark:bg-primary-500/10'
+                            ? 'bg-accent-soft dark:bg-accent-soft0/10'
                             : 'hover:bg-default-100'
                         }`}
                       >
@@ -375,7 +375,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                 <Button
                   variant="light"
                   onPress={goToSearch}
-                  className="w-full flex items-center justify-center gap-2 mt-3 pt-3 border-t border-divider text-primary hover:underline text-sm h-auto rounded-none"
+                  className="w-full flex items-center justify-center gap-2 mt-3 pt-3 border-t border-divider text-accent hover:underline text-sm h-auto rounded-none"
                 >
                   <Search className="w-4 h-4" />
                   {t('search.view_all')}
@@ -385,7 +385,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
             ) : isLoading ? (
               /* Loading */
               <div className="flex items-center gap-2 py-4">
-                <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
                 <span className="text-sm text-default-500">{t('search.searching')}</span>
               </div>
             ) : query.trim().length >= 2 ? (
@@ -395,7 +395,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                 <Button
                   variant="light"
                   onPress={goToSearch}
-                  className="inline-flex items-center gap-2 text-primary hover:underline text-sm h-auto"
+                  className="inline-flex items-center gap-2 text-accent hover:underline text-sm h-auto"
                 >
                   <Search className="w-4 h-4" />
                   {t('search.search_for')} "{query.trim()}"

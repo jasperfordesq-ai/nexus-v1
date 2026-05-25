@@ -168,7 +168,7 @@ function AnalyticsView({ analytics, t }: { analytics: Analytics; t: TFunction<'c
                 aria-label={`${b.option}: ${b.percentage}%`}
                 value={b.percentage}
                 className="min-w-0"
-                classNames={{ indicator: 'bg-primary' }}
+                classNames={{ indicator: 'bg-accent' }}
               />
               <span className="text-xs text-default-500 sm:text-right">
                 {b.percentage}% ({b.count})
@@ -381,12 +381,12 @@ export default function MunicipalSurveyAdminPage() {
         )}
       />
       {/* Intro card */}
-      <Card className="border border-primary/30 bg-primary-50/70 shadow-sm shadow-primary/10 dark:bg-primary-900/20" shadow="none">
+      <Card className="border border-accent/30 bg-accent-soft shadow-sm shadow-accent/10 dark:bg-accent-soft" shadow="none">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('admin.surveys.about.title')}</p>
+              <p className="font-semibold text-accent dark:text-accent">{t('admin.surveys.about.title')}</p>
               <p className="text-default-600">{t('admin.surveys.about.body')}</p>
               <div className="space-y-0.5 pt-1 text-default-500">
                 <p><strong>{t('admin.surveys.status.draft')}:</strong> {t('admin.surveys.about.draft')}</p>
@@ -402,7 +402,7 @@ export default function MunicipalSurveyAdminPage() {
       <Card shadow="none" className="border border-divider/70 shadow-sm shadow-black/[0.03]">
         <CardHeader className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <ClipboardList size={20} className="text-primary" aria-hidden="true" />
+            <ClipboardList size={20} className="text-accent" aria-hidden="true" />
             <div>
               <h2 className="text-lg font-semibold">{t('admin.surveys.list.title')}</h2>
               <p className="text-sm text-default-500">{t('admin.surveys.list.subtitle')}</p>
@@ -548,7 +548,7 @@ export default function MunicipalSurveyAdminPage() {
       >
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <ClipboardList size={18} className="text-primary" />
+            <ClipboardList size={18} className="text-accent" />
             {t('admin.surveys.create_modal.title', { step: createStep })}
           </ModalHeader>
           <ModalBody>
@@ -739,7 +739,7 @@ export default function MunicipalSurveyAdminPage() {
       >
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <BarChart3 size={18} className="text-primary" />
+            <BarChart3 size={18} className="text-accent" />
             {t('admin.surveys.analytics.modal_title', { title: analyticsTitle })}
           </ModalHeader>
           <ModalBody>

@@ -123,8 +123,8 @@ export default function RegionalAnalyticsLandingPage() {
             return (
               <Card key={feature.title} shadow="sm">
                 <CardBody className="flex flex-row gap-4 p-5">
-                  <div className="rounded-lg bg-primary-100 dark:bg-primary-900/30 p-3 h-fit">
-                    <Icon size={22} className="text-primary-600 dark:text-primary-400" aria-hidden="true" />
+                  <div className="rounded-lg bg-accent-soft dark:bg-accent-soft p-3 h-fit">
+                    <Icon size={22} className="text-accent dark:text-accent" aria-hidden="true" />
                   </div>
                   <div>
                     <h3 className="font-semibold mb-1">{feature.title}</h3>
@@ -145,7 +145,7 @@ export default function RegionalAnalyticsLandingPage() {
           {tiers.map((tier) => {
             const tierLabel = t(`regional_analytics.tiers.${tier.key}.label`);
             return (
-              <Card key={tier.key} shadow={tier.key === 'pro' ? 'lg' : 'sm'} className={tier.key === 'pro' ? 'border-2 border-primary-500' : ''}>
+              <Card key={tier.key} shadow={tier.key === 'pro' ? 'lg' : 'sm'} className={tier.key === 'pro' ? 'border-2 border-accent0' : ''}>
                 <CardBody className="p-6">
                   <Chip size="sm" variant="flat" color={tier.key === 'pro' ? 'primary' : 'default'} className="mb-3">
                     {tierLabel}
@@ -155,7 +155,7 @@ export default function RegionalAnalyticsLandingPage() {
                   <ul className="space-y-2 mb-5">
                     {tier.features.map((feature) => (
                       <li key={feature} className="text-sm flex items-start gap-2">
-                        <span className="text-primary-500" aria-hidden="true">-</span>
+                        <span className="text-accent0" aria-hidden="true">-</span>
                         <span>{feature}</span>
                       </li>
                     ))}

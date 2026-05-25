@@ -212,7 +212,7 @@ function CommunityFundGrantForm({ fundBalance, onComplete }: { fundBalance: numb
   return (
     <Card shadow="sm">
       <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-        <ArrowUpFromLine size={18} className="text-primary" aria-hidden="true" />
+        <ArrowUpFromLine size={18} className="text-accent" aria-hidden="true" />
         <h3 className="font-semibold">{t('timebanking.community_fund_grant_title')}</h3>
       </CardHeader>
       <CardBody className="space-y-4 px-4 pb-4">
@@ -271,8 +271,8 @@ function CommunityFundGrantForm({ fundBalance, onComplete }: { fundBalance: numb
         ) : (
           <div className="flex items-center justify-between rounded-lg border border-divider p-3">
             <div className="flex min-w-0 items-center gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10">
-                <Users size={16} className="text-primary" aria-hidden="true" />
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent/10">
+                <Users size={16} className="text-accent" aria-hidden="true" />
               </div>
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium text-foreground">{selectedUser.name}</p>

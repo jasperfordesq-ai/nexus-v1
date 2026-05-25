@@ -81,7 +81,7 @@ export function ReviewArchive() {
       render: (item) => (
         <Link
           to={tenantPath(`/broker/archives/${item.id}`)}
-          className="font-medium text-primary hover:underline"
+          className="font-medium text-accent hover:underline"
         >
           {item.sender_name}
         </Link>

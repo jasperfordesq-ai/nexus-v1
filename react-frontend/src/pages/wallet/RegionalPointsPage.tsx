@@ -260,7 +260,7 @@ export default function RegionalPointsPage() {
       {cfg.member_transfers_enabled && (
         <Card className="border border-default-200 bg-surface/80 shadow-sm">
           <CardHeader className="flex items-center gap-2">
-            <Send className="w-5 h-5 text-primary" />
+            <Send className="w-5 h-5 text-accent" />
             <h2 className="text-base font-semibold">
               {t('regional_points.transfer.title')}
             </h2>

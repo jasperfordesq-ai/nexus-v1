@@ -239,7 +239,7 @@ export function NewsletterAnalytics() {
       {totals && hasData && (
         <Card shadow="sm" className="mt-6">
           <CardHeader className="flex items-center gap-3 px-6 pb-0 pt-5">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-secondary/10 text-secondary">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
               <BarChart3 size={20} />
             </div>
             <div>
@@ -254,12 +254,12 @@ export function NewsletterAnalytics() {
               <EngagementStat
                 label={t('newsletters.label_unique_opens')}
                 value={totals.unique_opens}
-                color="text-primary"
+                color="text-accent"
               />
               <EngagementStat
                 label={t('newsletters.label_total_opens')}
                 value={totals.total_opens}
-                color="text-primary"
+                color="text-accent"
               />
               <EngagementStat
                 label={t('newsletters.label_unique_clicks')}
@@ -288,7 +288,7 @@ export function NewsletterAnalytics() {
       {chartData.length > 0 && (
         <Card shadow="sm" className="mt-6">
           <CardHeader className="flex items-center gap-3 px-6 pb-0 pt-5">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
               <TrendingUp size={20} />
             </div>
             <div>

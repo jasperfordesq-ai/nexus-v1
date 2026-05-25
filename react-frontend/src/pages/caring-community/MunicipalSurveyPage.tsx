@@ -451,7 +451,7 @@ export default function MunicipalSurveyPage() {
       />
       <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col gap-6">
         <div className="flex items-center gap-3">
-          <ClipboardList size={24} className="text-primary" />
+          <ClipboardList size={24} className="text-accent" />
           <h1 className="text-2xl font-bold">{t('meta.title')}</h1>
         </div>
         <p className="text-default-600 text-sm">{t('meta.description')}</p>

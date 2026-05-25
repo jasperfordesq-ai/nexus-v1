@@ -330,7 +330,7 @@ export function EmployerBrandPage() {
                     <div className="flex-1 min-w-0">
                       <Link
                         to={tenantPath(`/jobs/${job.id}`)}
-                        className="font-semibold text-theme-primary hover:text-primary transition-colors line-clamp-2"
+                        className="font-semibold text-theme-primary hover:text-accent transition-colors line-clamp-2"
                       >
                         {job.title}
                       </Link>

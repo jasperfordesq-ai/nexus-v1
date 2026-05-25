@@ -59,7 +59,7 @@ export function AiChatDrawer({
         <div className="fixed bottom-0 right-0 z-50 w-full max-w-md h-[500px] bg-background border-l border-t border-divider rounded-tl-2xl shadow-2xl flex flex-col">
           <div className="flex items-center justify-between p-4 border-b border-divider">
             <div className="flex items-center gap-2">
-              <Sparkles size={18} className="text-secondary" aria-hidden="true" />
+              <Sparkles size={18} className="text-accent" aria-hidden="true" />
               <span className="font-semibold text-sm">{t('ai_chat.title')}</span>
             </div>
             <Button
@@ -75,13 +75,13 @@ export function AiChatDrawer({
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {messages.length === 0 && (
               <div className="text-center text-default-400 text-sm py-8">
-                <Sparkles size={24} className="mx-auto mb-2 text-secondary" aria-hidden="true" />
+                <Sparkles size={24} className="mx-auto mb-2 text-accent" aria-hidden="true" />
                 <p>{t('ai_chat.hint')}</p>
               </div>
             )}
             {messages.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-default-100 text-foreground'}`}>
+                <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm ${msg.role === 'user' ? 'bg-accent text-accent-foreground' : 'bg-default-100 text-foreground'}`}>
                   {msg.content}
                 </div>
               </div>

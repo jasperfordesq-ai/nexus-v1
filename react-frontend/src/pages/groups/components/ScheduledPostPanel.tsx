@@ -156,7 +156,7 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
     <GlassCard className="space-y-5 p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <CalendarClock size={18} className="text-primary" />
+          <CalendarClock size={18} className="text-accent" />
           <h3 className="text-base font-semibold text-foreground">
             {t('scheduled.title')}
           </h3>
@@ -232,7 +232,7 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} size="lg">
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <CalendarClock size={20} className="text-primary" />
+            <CalendarClock size={20} className="text-accent" />
             {t('scheduled.add_title')}
           </ModalHeader>
 

@@ -153,7 +153,7 @@ export default function AdminHelpCenterPage() {
                   className="transition-shadow hover:shadow-md"
                 >
                   <CardHeader className="flex items-start gap-2 pb-1">
-                    <BookOpen size={16} className="mt-0.5 shrink-0 text-primary" />
+                    <BookOpen size={16} className="mt-0.5 shrink-0 text-accent" />
                     <span className="text-sm font-semibold text-foreground leading-snug">
                       {article.title}
                     </span>

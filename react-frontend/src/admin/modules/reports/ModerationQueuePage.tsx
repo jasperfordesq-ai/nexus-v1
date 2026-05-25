@@ -400,7 +400,7 @@ export function ModerationQueuePage() {
       {stats?.by_type && Object.keys(stats.by_type).length > 0 && (
         <Card shadow="sm" className="mb-6">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <Filter size={18} className="text-primary" />
+            <Filter size={18} className="text-accent" />
             <h3 className="font-semibold">{t('reports.by_content_type')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">

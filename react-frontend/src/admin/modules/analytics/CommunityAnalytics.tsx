@@ -249,7 +249,7 @@ export function CommunityAnalytics() {
       {/* Exchange Trends (12 months) */}
       <Card shadow="sm" className="mb-6">
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-          <BarChart3 size={18} className="text-primary" />
+          <BarChart3 size={18} className="text-accent" />
           <h3 className="font-semibold">{t('analytics.exchange_trends_title')}</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">
@@ -410,7 +410,7 @@ export function CommunityAnalytics() {
         {/* Category Demand */}
         <Card shadow="sm">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <PieChartIcon size={18} className="text-secondary" />
+            <PieChartIcon size={18} className="text-accent" />
             <h3 className="font-semibold">{t('analytics.category_demand_title')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
@@ -536,7 +536,7 @@ export function CommunityAnalytics() {
       {MAPS_ENABLED && (
         <Card shadow="sm" className="mt-6">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <Globe size={18} className="text-primary" />
+            <Globe size={18} className="text-accent" />
             <h3 className="font-semibold">{t('analytics.geographic_distribution_title')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
@@ -606,7 +606,7 @@ export function CommunityAnalytics() {
                           </span>
                           <div className="w-24 h-1.5 rounded-full bg-default-100 overflow-hidden">
                             <div
-                              className="h-full rounded-full bg-primary"
+                              className="h-full rounded-full bg-accent"
                               style={{ width: `${Math.min(area.percentage, 100)}%` }}
                             />
                           </div>

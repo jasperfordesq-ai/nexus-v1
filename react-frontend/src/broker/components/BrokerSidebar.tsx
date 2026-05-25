@@ -145,11 +145,11 @@ export function BrokerSidebar({ collapsed, onToggle, badges }: BrokerSidebarProp
           to={tenantPath(item.path)}
           className={`relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
             active
-              ? 'bg-primary/10 text-primary'
+              ? 'bg-accent/10 text-accent'
               : 'text-default-600 hover:bg-default-100 hover:text-foreground'
           } ${collapsed ? 'justify-center px-2' : ''}`}
         >
-          <Icon size={20} className={active ? 'text-primary' : 'text-default-400'} />
+          <Icon size={20} className={active ? 'text-accent' : 'text-default-400'} />
           {!collapsed && (
             <>
               <span className="flex-1 truncate">{item.label}</span>
@@ -186,7 +186,7 @@ export function BrokerSidebar({ collapsed, onToggle, badges }: BrokerSidebarProp
       <div className="flex h-16 items-center justify-between border-b border-divider px-3">
         {!collapsed && (
           <Link to={tenantPath('/broker')} className="flex items-center gap-2">
-            <ShieldCheck size={22} className="text-primary" />
+            <ShieldCheck size={22} className="text-accent" />
             <span className="text-base font-semibold text-foreground">
               {t('sidebar.title')}
             </span>

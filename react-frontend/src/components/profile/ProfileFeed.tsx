@@ -367,7 +367,7 @@ export function ProfileFeed({ userId, isOwnProfile = false }: ProfileFeedProps) 
       {(pullDistance > 0 || isRefreshing) && (
         <div className="flex h-12 items-center justify-center overflow-hidden sm:hidden">
           <RefreshCw
-            className={`w-5 h-5 text-primary transition-opacity ${isRefreshing || pullDistance > 48 ? 'animate-spin opacity-100' : 'opacity-60'}`}
+            className={`w-5 h-5 text-accent transition-opacity ${isRefreshing || pullDistance > 48 ? 'animate-spin opacity-100' : 'opacity-60'}`}
             aria-hidden="true"
           />
         </div>

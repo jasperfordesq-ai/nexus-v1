@@ -203,8 +203,8 @@ export function HourTransferPage() {
 
         <GlassCard className="p-6 sm:p-8">
           <div className="mb-7 flex items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/15">
-              <ArrowRightLeft className="h-6 w-6 text-primary" aria-hidden="true" />
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent/15">
+              <ArrowRightLeft className="h-6 w-6 text-accent" aria-hidden="true" />
             </div>
             <div>
               <h1 className="text-2xl font-bold leading-tight text-theme-primary">

@@ -107,12 +107,12 @@ export function WarmthPassAdminPage() {
       />
 
       {/* About card */}
-      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">
+              <p className="font-semibold text-accent dark:text-accent">
                 {t('admin.warmth_pass.about.title')}
               </p>
               <p className="text-default-600">
@@ -255,7 +255,7 @@ export function WarmthPassAdminPage() {
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
               <div className="rounded-lg border border-divider p-4">
                 <div className="flex items-center gap-2 mb-1">
-                  <Clock className="h-4 w-4 text-primary" aria-hidden="true" />
+                  <Clock className="h-4 w-4 text-accent" aria-hidden="true" />
                   <p className="text-xs text-default-500">{t('admin.warmth_pass.fields.hours_logged')}</p>
                 </div>
                 <p className="text-2xl font-bold">{result.hours_logged}</p>

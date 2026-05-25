@@ -383,7 +383,7 @@ export default function ProjectAnnouncementsPage() {
 
           <section className="flex flex-col gap-4">
             <div className="flex items-center gap-2">
-              <Milestone className="h-5 w-5 text-primary" aria-hidden="true" />
+              <Milestone className="h-5 w-5 text-accent" aria-hidden="true" />
               <h2 className="text-xl font-semibold text-theme-primary">{t('updates_title')}</h2>
             </div>
 
@@ -438,8 +438,8 @@ export default function ProjectAnnouncementsPage() {
       <PageMeta title={t('meta.title')} description={t('meta.description')} />
       <div className="mx-auto flex max-w-5xl flex-col gap-6 px-4 py-8">
         <div className="flex items-start gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-            <Megaphone className="h-5 w-5 text-primary" aria-hidden="true" />
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-accent/10">
+            <Megaphone className="h-5 w-5 text-accent" aria-hidden="true" />
           </div>
           <div>
             <h1 className="text-3xl font-bold text-theme-primary">{t('meta.title')}</h1>

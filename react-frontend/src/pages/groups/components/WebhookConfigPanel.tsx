@@ -159,7 +159,7 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
     <GlassCard className="p-5 space-y-5">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
-          <Webhook size={18} className="text-primary" />
+          <Webhook size={18} className="text-accent" />
           <h3 className="text-base font-semibold text-foreground">
             {t('webhooks.title')}
           </h3>
@@ -254,7 +254,7 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
       <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} size="lg">
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <Webhook size={20} className="text-primary" />
+            <Webhook size={20} className="text-accent" />
             {t('webhooks.add_title')}
           </ModalHeader>
 

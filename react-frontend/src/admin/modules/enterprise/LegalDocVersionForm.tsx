@@ -123,8 +123,8 @@ export default function LegalDocVersionForm({
       <ModalBody>
         <div className="space-y-4">
           {/* Info banner */}
-          <div className="flex items-start gap-3 p-3 bg-primary-50 dark:bg-primary-900/20 rounded-lg">
-            <AlertCircle size={20} className="text-primary shrink-0 mt-0.5" />
+          <div className="flex items-start gap-3 p-3 bg-accent-soft dark:bg-accent-soft rounded-lg">
+            <AlertCircle size={20} className="text-accent shrink-0 mt-0.5" />
             <div className="text-sm">
               <p className="font-medium mb-1">{t('enterprise.version_form.version_management')}</p>
               <p className="text-[var(--color-text-secondary)]">

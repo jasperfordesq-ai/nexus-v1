@@ -93,7 +93,7 @@ export function LegalDocList() {
       sortable: true,
       render: (doc) => (
         <div className="flex items-center gap-2">
-          <FileText size={16} className="text-primary" />
+          <FileText size={16} className="text-accent" />
           <span className="font-medium">{doc.title}</span>
         </div>
       ),

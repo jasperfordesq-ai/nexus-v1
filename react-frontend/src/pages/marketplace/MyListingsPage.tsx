@@ -284,7 +284,7 @@ export function MyListingsPage() {
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
             <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-              <ShoppingBag className="w-7 h-7 text-primary" />
+              <ShoppingBag className="w-7 h-7 text-accent" />
               {t('my_listings.title')}
             </h1>
             <p className="text-default-500 text-sm mt-1">
@@ -303,7 +303,7 @@ export function MyListingsPage() {
 
         {/* AG48 — Onboarding nudge */}
         {!onboardingDone && !onboardingDismissed && (
-          <GlassCard className="flex flex-col gap-4 border-l-4 border-primary p-4 sm:flex-row sm:items-center sm:justify-between">
+          <GlassCard className="flex flex-col gap-4 border-l-4 border-accent p-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
               <p className="font-semibold text-foreground">
                 {t('onboarding.nudge_title')}
@@ -343,7 +343,7 @@ export function MyListingsPage() {
         {!isLoadingStats && stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <GlassCard className="p-4 text-center">
-              <Package className="w-5 h-5 text-primary mx-auto mb-1" />
+              <Package className="w-5 h-5 text-accent mx-auto mb-1" />
               <p className="text-2xl font-bold text-foreground">{stats.active_listings}</p>
               <p className="text-xs text-default-500">{t('my_listings.stat_active')}</p>
             </GlassCard>
@@ -353,7 +353,7 @@ export function MyListingsPage() {
               <p className="text-xs text-default-500">{t('my_listings.stat_sold')}</p>
             </GlassCard>
             <GlassCard className="p-4 text-center">
-              <Eye className="w-5 h-5 text-secondary mx-auto mb-1" />
+              <Eye className="w-5 h-5 text-accent mx-auto mb-1" />
               <p className="text-2xl font-bold text-foreground">{stats.total_views}</p>
               <p className="text-xs text-default-500">{t('my_listings.stat_views')}</p>
             </GlassCard>
@@ -441,13 +441,13 @@ export function MyListingsPage() {
                   {/* Info */}
                   <div className="p-3">
                     <Link to={tenantPath(`/marketplace/${listing.id}`)}>
-                      <p className="text-sm font-semibold text-foreground truncate hover:text-primary transition-colors">
+                      <p className="text-sm font-semibold text-foreground truncate hover:text-accent transition-colors">
                         {listing.title}
                       </p>
                     </Link>
 
                     {listing.price != null && listing.price > 0 ? (
-                      <p className="text-sm font-bold text-primary mt-1">
+                      <p className="text-sm font-bold text-accent mt-1">
                         {formatCurrency(listing.price, listing.price_currency)}
                       </p>
                     ) : (

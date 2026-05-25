@@ -151,8 +151,8 @@ export default function LegalDocComplianceDashboard() {
         <Card>
           <CardBody>
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
-                <Users size={24} className="text-primary" />
+              <div className="p-3 bg-accent-soft dark:bg-accent-soft rounded-lg">
+                <Users size={24} className="text-accent" />
               </div>
               <div>
                 <p className="text-sm text-[var(--color-text-secondary)]">{t('enterprise.label_total_users')}</p>
@@ -197,8 +197,8 @@ export default function LegalDocComplianceDashboard() {
         <Card>
           <CardBody>
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-primary-100 dark:bg-primary-900/30 rounded-lg">
-                <TrendingUp size={24} className="text-primary" />
+              <div className="p-3 bg-accent-soft dark:bg-accent-soft rounded-lg">
+                <TrendingUp size={24} className="text-accent" />
               </div>
               <div>
                 <p className="text-sm text-[var(--color-text-secondary)]">{t('enterprise.overall_compliance')}</p>

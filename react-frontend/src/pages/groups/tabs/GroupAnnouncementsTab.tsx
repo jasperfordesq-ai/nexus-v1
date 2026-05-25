@@ -199,7 +199,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
                 key={announcement.id}
                 className={`p-4 rounded-lg border transition-colors ${
                   announcement.is_pinned
-                    ? 'border-primary/30 bg-primary/5'
+                    ? 'border-accent/30 bg-accent/5'
                     : 'border-theme-default bg-theme-elevated'
                 }`}
               >
@@ -207,7 +207,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       {announcement.is_pinned && (
-                        <Pin className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                        <Pin className="w-3.5 h-3.5 text-accent flex-shrink-0" />
                       )}
                       <h3 className="font-semibold text-theme-primary truncate">
                         {announcement.title}
@@ -274,7 +274,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
           {(onModalClose) => (
             <>
               <ModalHeader className="text-theme-primary flex items-center gap-2">
-                <Megaphone className="w-5 h-5 text-primary" />
+                <Megaphone className="w-5 h-5 text-accent" />
                 {t('announcements.new')}
               </ModalHeader>
               <ModalBody className="gap-4">

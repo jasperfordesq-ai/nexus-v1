@@ -1160,7 +1160,7 @@ export function ChallengeDetailPage() {
                       isDisabled={!isAuthenticated || votingIds.has(idea.id)}
                       className={`p-1.5 rounded-lg transition-colors min-w-0 w-auto h-auto ${
                         idea.has_voted
-                          ? 'bg-primary/10 text-primary'
+                          ? 'bg-accent/10 text-accent'
                           : 'hover:bg-[var(--color-surface-hover)] text-[var(--color-text-tertiary)]'
                       }`}
                       aria-label={idea.has_voted ? t('ideas.unvote') : t('ideas.vote')}
@@ -1170,7 +1170,7 @@ export function ChallengeDetailPage() {
                       />
                     </Button>
                     <span className={`text-sm font-semibold ${
-                      idea.has_voted ? 'text-primary' : 'text-[var(--color-text-secondary)]'
+                      idea.has_voted ? 'text-accent' : 'text-[var(--color-text-secondary)]'
                     }`}>
                       {idea.votes_count}
                     </span>
@@ -1183,7 +1183,7 @@ export function ChallengeDetailPage() {
                       className="block"
                     >
                       <div className="flex items-start gap-2 mb-1">
-                        <h3 className="text-base font-semibold text-[var(--color-text)] hover:text-primary transition-colors">
+                        <h3 className="text-base font-semibold text-[var(--color-text)] hover:text-accent transition-colors">
                           {idea.title}
                         </h3>
                         {idea.status !== 'submitted' && (
@@ -1332,7 +1332,7 @@ export function ChallengeDetailPage() {
                       aria-label={draft.title || t('ideas.untitled_draft')}
                       className={`flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors ${
                         editingDraftId === draft.id
-                          ? 'bg-primary/10 border border-primary/30'
+                          ? 'bg-accent/10 border border-accent/30'
                           : 'hover:bg-[var(--color-surface)] border border-transparent'
                       }`}
                       onClick={() => {

@@ -694,7 +694,7 @@ function StatCard({ icon, label, value, color, href, isLoading }: StatCardProps)
   };
   return (
     <Link to={tenantPath(href)} aria-label={`${label}: ${isLoading ? t('common.loading') : value}`} className="block focus-visible:outline-none">
-      <GlassCard hoverable className="min-h-[124px] p-4 focus-within:ring-2 focus-within:ring-primary/40">
+      <GlassCard hoverable className="min-h-[124px] p-4 focus-within:ring-2 focus-within:ring-accent/40">
         <div className={`mb-3 inline-flex rounded-xl p-2.5 ${colorClasses[color]}`}>{icon}</div>
         <div className="text-xs font-medium uppercase tracking-wide text-theme-muted sm:text-sm sm:normal-case sm:tracking-normal">{label}</div>
         {isLoading ? (<Skeleton className="mt-2 rounded-lg"><div className="h-8 w-16 rounded-lg bg-default-300" /></Skeleton>) : (<div className="mt-1 truncate text-2xl font-bold text-theme-primary">{value}</div>)}

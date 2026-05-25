@@ -226,7 +226,7 @@ export function SystemMonitoring() {
                 <CardBody className="p-4">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <Cpu size={18} className="text-primary" />
+                      <Cpu size={18} className="text-accent" />
                       <span className="text-sm font-semibold text-foreground">
                         {t('enterprise.vm_memory')}
                       </span>
@@ -272,7 +272,7 @@ export function SystemMonitoring() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <Card shadow="sm" isPressable as={Link} to={tenantPath('/admin/enterprise/monitoring/log-files')}>
               <CardBody className="flex flex-row items-center gap-3 p-4">
-                <FileText size={20} className="text-primary" />
+                <FileText size={20} className="text-accent" />
                 <div>
                   <p className="text-sm font-semibold text-foreground">{t('enterprise.log_files')}</p>
                   <p className="text-xs text-default-500">{t('enterprise.log_files_desc')}</p>

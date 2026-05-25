@@ -266,7 +266,7 @@ export function Neighborhoods() {
               <CardHeader className="flex justify-between items-start">
                 <div>
                   <h3 className="text-lg font-semibold flex items-center gap-2">
-                    <Globe size={18} className="text-primary" />
+                    <Globe size={18} className="text-accent" />
                     {neighborhood.name}
                   </h3>
                   {neighborhood.description && (

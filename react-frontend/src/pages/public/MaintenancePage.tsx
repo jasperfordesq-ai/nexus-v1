@@ -28,7 +28,7 @@ export function MaintenancePage() {
   const adminPath = tenantPath('/admin');
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-primary-500 to-secondary-600 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-linear-to-br from-accent-soft0 to-default flex items-center justify-center p-4">
       <PageMeta title={t('page_meta.maintenance.title')} noIndex />
       {/* Tell prerender services (Prerender.io, Google) this is temporary.
           503 = "come back later, don't cache or de-index this page." */}
@@ -39,7 +39,7 @@ export function MaintenancePage() {
       <Card className="max-w-lg w-full">
         <CardBody className="text-center py-12 px-6 gap-6">
           <div className="flex justify-center">
-            <div className="w-20 h-20 bg-linear-to-br from-primary-500 to-secondary-600 rounded-full flex items-center justify-center">
+            <div className="w-20 h-20 bg-linear-to-br from-accent-soft0 to-default rounded-full flex items-center justify-center">
               <Wrench size={40} className="text-white" />
             </div>
           </div>
@@ -58,9 +58,9 @@ export function MaintenancePage() {
             </p>
           </div>
 
-          <div className="rounded-lg bg-primary-50 dark:bg-primary-950/30 border border-primary-200 dark:border-primary-800 px-4 py-3 text-left">
+          <div className="rounded-lg bg-accent-soft dark:bg-accent-soft border border-accent dark:border-accent px-4 py-3 text-left">
             <div className="flex gap-3 items-start">
-              <Info size={18} className="text-primary-500 mt-0.5 shrink-0" />
+              <Info size={18} className="text-accent0 mt-0.5 shrink-0" />
               <p className="text-sm text-default-600">
                 {t('maintenance.deploy_notice')}
               </p>

@@ -347,7 +347,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                 <Button
                   variant="flat"
                   fullWidth
-                  className="flex h-auto min-h-[48px] min-w-0 items-center justify-start gap-3 rounded-xl border border-primary/30 bg-primary/10 px-4 py-3.5 text-primary hover:bg-primary/20"
+                  className="flex h-auto min-h-[48px] min-w-0 items-center justify-start gap-3 rounded-xl border border-accent/30 bg-accent/10 px-4 py-3.5 text-accent hover:bg-accent/20"
                   onPress={() => { onClose(); setTimeout(onClick, DRAWER_CLOSE_MS); }}
                 >
                   <Download className="w-5 h-5 shrink-0" aria-hidden="true" />

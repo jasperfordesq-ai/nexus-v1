@@ -448,7 +448,7 @@ export function MarketplaceCategoryPage() {
         <nav aria-label={t('breadcrumb')} className="flex items-center gap-2 text-sm flex-wrap">
           <Link
             to={tenantPath('/marketplace')}
-            className="text-default-500 hover:text-primary transition-colors"
+            className="text-default-500 hover:text-accent transition-colors"
           >
             {t('category.marketplace')}
           </Link>
@@ -459,11 +459,11 @@ export function MarketplaceCategoryPage() {
         {/* Category header */}
         <GlassCard className="p-6">
           <div className="flex items-start gap-4">
-            <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+            <div className="w-14 h-14 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
               {category.icon ? (
                 <span className="text-2xl">{category.icon}</span>
               ) : (
-                <Tag className="w-7 h-7 text-primary" />
+                <Tag className="w-7 h-7 text-accent" />
               )}
             </div>
             <div className="flex-1 min-w-0">
@@ -542,7 +542,7 @@ export function MarketplaceCategoryPage() {
           <aside className="hidden lg:block w-64 shrink-0">
             <GlassCard className="p-5 sticky top-24">
               <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                <SlidersHorizontal className="w-4 h-4 text-primary" />
+                <SlidersHorizontal className="w-4 h-4 text-accent" />
                 {t('category.filters_title')}
               </h3>
               {filterContent}

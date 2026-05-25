@@ -136,6 +136,15 @@ describe('DataTable', () => {
     expect(screen.getByText('Nothing here')).toBeTruthy();
   });
 
+  it('renders the loading state without placing spinner markup directly in the table body collection', () => {
+    const { container } = render(
+      <W><DataTable columns={columns} data={[]} isLoading /></W>
+    );
+
+    expect(container.querySelector('table')).toBeTruthy();
+    expect(container.querySelector('tbody > svg')).toBeNull();
+  });
+
   it('renders search input when searchable', () => {
     render(
       <W><DataTable columns={columns} data={sampleData} searchable={true} /></W>
@@ -209,6 +218,42 @@ describe('DataTable', () => {
     render(<W><DataTable columns={columns} data={sampleData} /></W>);
     const table = screen.getByRole('grid');
     expect(table).toBeTruthy();
+  });
+
+  it('renders selectable rows without missing HeroUI selection slots', () => {
+    const onSelectionChange = vi.fn();
+    const { container } = render(
+      <W>
+        <DataTable
+          columns={columns}
+          data={sampleData}
+          selectable
+          onSelectionChange={onSelectionChange}
+        />
+      </W>
+    );
+
+    expect(container.querySelector('table')).toBeTruthy();
+    expect(screen.getAllByRole('checkbox')).toHaveLength(sampleData.length + 1);
+  });
+
+  it('reports selected row keys from selectable checkboxes', () => {
+    const onSelectionChange = vi.fn();
+    render(
+      <W>
+        <DataTable
+          columns={columns}
+          data={sampleData}
+          selectable
+          onSelectionChange={onSelectionChange}
+        />
+      </W>
+    );
+
+    fireEvent.click(screen.getByLabelText('Select row 1'));
+
+    expect(onSelectionChange).toHaveBeenCalledTimes(1);
+    expect(Array.from(onSelectionChange.mock.calls[0][0])).toEqual(['1']);
   });
 });
 

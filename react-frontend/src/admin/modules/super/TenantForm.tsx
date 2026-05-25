@@ -309,9 +309,9 @@ export function TenantForm() {
   return (
     <div>
       <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-default-500 mb-1">
-        <Link to={tenantPath('/admin/super')} className="hover:text-primary">{t('tenant_form.breadcrumb_super_admin')}</Link>
+        <Link to={tenantPath('/admin/super')} className="hover:text-accent">{t('tenant_form.breadcrumb_super_admin')}</Link>
         <span>/</span>
-        <Link to={tenantPath('/admin/super/tenants')} className="hover:text-primary">{t('tenant_form.breadcrumb_tenants')}</Link>
+        <Link to={tenantPath('/admin/super/tenants')} className="hover:text-accent">{t('tenant_form.breadcrumb_tenants')}</Link>
         <span>/</span>
         <span className="text-foreground">{isEdit ? t('tenant_form.breadcrumb_edit') : t('tenant_form.breadcrumb_create')}</span>
       </nav>
@@ -460,7 +460,7 @@ export function TenantForm() {
                 <p className="text-xs font-medium uppercase text-default-400 mb-2 flex items-center gap-1">
                   <Eye size={12} /> {t('tenant_form.google_search_preview')}
                 </p>
-                <p className="text-lg text-blue-700 dark:text-primary truncate">
+                <p className="text-lg text-blue-700 dark:text-accent truncate">
                   {form.meta_title || form.name || t('tenant_form.page_title_fallback')}
                 </p>
                 <p className="text-sm text-green-700 dark:text-success truncate">

@@ -84,7 +84,7 @@ function ShippingForm({ form, onChange, onSubmit, onCancel, isSubmitting, submit
   const { t } = useTranslation('marketplace');
 
   return (
-    <GlassCard className="space-y-4 border border-primary/20 bg-primary/5 p-4 shadow-sm">
+    <GlassCard className="space-y-4 border border-accent/20 bg-accent/5 p-4 shadow-sm">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <Input
           label={t('shipping.courier_name')}
@@ -337,7 +337,7 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
-          <Truck className="w-5 h-5 text-primary" />
+          <Truck className="w-5 h-5 text-accent" />
           {t('shipping.title')}
         </h3>
         {!showAddForm && editingId === null && (

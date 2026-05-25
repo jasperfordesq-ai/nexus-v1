@@ -579,10 +579,10 @@ export function NewsletterForm() {
         {/* ── Sidebar ── */}
         <div className="space-y-6">
           {/* Recipient Preview */}
-          <Card shadow="sm" className="border-2 border-primary-100">
+          <Card shadow="sm" className="border-2 border-accent">
             <CardBody className="gap-3">
               <div className="flex items-center gap-2">
-                <Users size={18} className="text-primary" />
+                <Users size={18} className="text-accent" />
                 <span className="text-sm font-semibold">{t('newsletter_form.estimated_recipients')}</span>
               </div>
               <div className="text-center">
@@ -590,7 +590,7 @@ export function NewsletterForm() {
                   <span className="text-sm text-default-400">{t('newsletter_form.calculating')}</span>
                 ) : recipientCount !== null ? (
                   <div>
-                    <p className="text-3xl font-bold text-primary">{recipientCount.toLocaleString()}</p>
+                    <p className="text-3xl font-bold text-accent">{recipientCount.toLocaleString()}</p>
                     <p className="text-xs text-default-500">
                       {targetAudience === 'segment' ? t('newsletter_form.matching_segment_rules') : targetAudience.replace(/_/g, ' ')}
                     </p>
@@ -917,7 +917,7 @@ export function NewsletterForm() {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-default-500">{t('newsletter_form.label_recipients')}</span>
-                    <span className="font-medium text-primary">{recipientCount?.toLocaleString() || '--'}</span>
+                    <span className="font-medium text-accent">{recipientCount?.toLocaleString() || '--'}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-default-500">{t('newsletter_form.section_target_audience')}</span>

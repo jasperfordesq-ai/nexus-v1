@@ -517,7 +517,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                 {resolvedTheme === 'dark' ? (
                   <Sun className="w-3.5 h-3.5 text-amber-400" aria-hidden="true" />
                 ) : (
-                  <Moon className="w-3.5 h-3.5 text-primary" aria-hidden="true" />
+                  <Moon className="w-3.5 h-3.5 text-accent" aria-hidden="true" />
                 )}
               </Button>
               <span className="text-[var(--border-default)] text-xs select-none shrink-0">|</span>
@@ -802,7 +802,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                           name={`${user?.first_name} ${user?.last_name}`}
                           src={resolveAvatarUrl(user?.avatar_url || user?.avatar)}
                           size="sm"
-                          className="cursor-pointer ring-2 ring-transparent hover:ring-primary/50 transition-all w-8 h-8 sm:w-9 sm:h-9"
+                          className="cursor-pointer ring-2 ring-transparent hover:ring-accent/50 transition-all w-8 h-8 sm:w-9 sm:h-9"
                           showFallback
                         />
                         {user?.id && <PresenceIndicator userId={user.id} size="lg" showOffline />}
@@ -871,7 +871,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                             resolvedTheme === 'dark' ? (
                               <Sun className="w-4 h-4 text-amber-400" aria-hidden="true" />
                             ) : (
-                              <Moon className="w-4 h-4 text-primary" aria-hidden="true" />
+                              <Moon className="w-4 h-4 text-accent" aria-hidden="true" />
                             )
                           }
                         >
@@ -883,7 +883,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                             description={installState.isIosSafari
                               ? t('install.cta_ios_sub')
                               : t('install.cta_sub')}
-                            startContent={<Download className="w-4 h-4 text-primary" aria-hidden="true" />}
+                            startContent={<Download className="w-4 h-4 text-accent" aria-hidden="true" />}
                           >
                             {t('install.cta')}
                           </DropdownItem>
@@ -918,7 +918,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                       {resolvedTheme === 'dark' ? (
                         <Sun className="w-4 h-4 text-amber-400" aria-hidden="true" />
                       ) : (
-                        <Moon className="w-4 h-4 text-primary" aria-hidden="true" />
+                        <Moon className="w-4 h-4 text-accent" aria-hidden="true" />
                       )}
                     </Button>
                     <LanguageSwitcher />

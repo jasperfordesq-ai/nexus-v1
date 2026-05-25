@@ -118,7 +118,7 @@ export function MessageContextCard({ contextType, contextId }: MessageContextCar
 
   return (
     <Link to={tenantPath(detailPath)}>
-      <div className="flex items-center gap-3 p-3 rounded-lg bg-theme-elevated border border-primary/20 mb-3 hover:bg-theme-hover transition-colors group">
+      <div className="flex items-center gap-3 p-3 rounded-lg bg-theme-elevated border border-accent/20 mb-3 hover:bg-theme-hover transition-colors group">
         <div className="flex-shrink-0">
           {context.image_url ? (
             <img
@@ -142,12 +142,12 @@ export function MessageContextCard({ contextType, contextId }: MessageContextCar
               {t(config.labelKey)}
             </Chip>
           </div>
-          <p className="font-medium text-sm text-theme-primary truncate group-hover:text-primary transition-colors">
+          <p className="font-medium text-sm text-theme-primary truncate group-hover:text-accent transition-colors">
             {context.title}
           </p>
         </div>
 
-        <ExternalLink className="w-4 h-4 text-theme-subtle group-hover:text-primary transition-colors flex-shrink-0" />
+        <ExternalLink className="w-4 h-4 text-theme-subtle group-hover:text-accent transition-colors flex-shrink-0" />
       </div>
     </Link>
   );

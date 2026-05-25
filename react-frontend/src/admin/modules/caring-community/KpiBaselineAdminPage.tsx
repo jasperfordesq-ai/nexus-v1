@@ -85,9 +85,9 @@ function ComparisonPanel({ result, onClose, t }: { result: ComparisonResult; onC
     <Card className="mt-4 border border-[var(--color-border)]">
       <CardHeader className="flex items-center justify-between gap-3 pb-2">
         <div className="flex items-center gap-2">
-          <BarChart2 size={18} className="text-primary" />
+          <BarChart2 size={18} className="text-accent" />
           <span className="font-semibold text-sm">
-            {t('kpi_baselines.comparison.comparing')} <span className="text-primary">{baseline.label}</span>
+            {t('kpi_baselines.comparison.comparing')} <span className="text-accent">{baseline.label}</span>
             <span className="text-[var(--color-text-muted)] ml-2 font-normal">
               {t('kpi_baselines.comparison.captured', { date: fmtDate(baseline.captured_at) })}
             </span>
@@ -295,12 +295,12 @@ export default function KpiBaselineAdminPage() {
         }
       />
 
-      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('kpi_baselines.about.title')}</p>
+              <p className="font-semibold text-accent dark:text-accent">{t('kpi_baselines.about.title')}</p>
               <p className="text-default-600">
                 <Abbr term="KPI" /> {t('kpi_baselines.about.body_prefix')} <Abbr term="KPI" /> {t('kpi_baselines.about.body_suffix')}
               </p>
@@ -349,7 +349,7 @@ export default function KpiBaselineAdminPage() {
               </TableHeader>
               <TableBody>
                 {baselines.map((b) => (
-                  <TableRow key={b.id} className={selectedBaselineId === b.id ? 'bg-primary/5' : ''}>
+                  <TableRow key={b.id} className={selectedBaselineId === b.id ? 'bg-accent/5' : ''}>
                     <TableCell>
                       <div className="font-medium text-sm">{b.label}</div>
                       {b.notes && (
@@ -408,7 +408,7 @@ export default function KpiBaselineAdminPage() {
           {(onClose) => (
             <>
               <ModalHeader className="flex items-center gap-2">
-                <Database size={18} className="text-primary" />
+                <Database size={18} className="text-accent" />
                 {t('kpi_baselines.modal.title_prefix')} <Abbr term="KPI" /> {t('kpi_baselines.modal.title_suffix')}
               </ModalHeader>
               <ModalBody className="gap-4">

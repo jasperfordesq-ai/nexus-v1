@@ -290,12 +290,12 @@ export default function ResearchPartnershipsAdminPage() {
       />
 
       {/* Intro card */}
-      <Card className="border-l-4 border-l-primary bg-primary-50 dark:bg-primary-900/20" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
-            <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+            <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
-              <p className="font-semibold text-primary-800 dark:text-primary-200">{t('research_partnerships.about.title')}</p>
+              <p className="font-semibold text-accent dark:text-accent">{t('research_partnerships.about.title')}</p>
               <p className="text-default-600">
                 {t('research_partnerships.about.body')}
               </p>
@@ -316,7 +316,7 @@ export default function ResearchPartnershipsAdminPage() {
 
       <Card>
         <CardHeader className="flex items-center gap-2">
-          <FlaskConical size={18} className="text-primary" />
+          <FlaskConical size={18} className="text-accent" />
           <span className="font-semibold">{t('research_partnerships.partners.title')}</span>
         </CardHeader>
         <CardBody className="p-0">
@@ -347,7 +347,7 @@ export default function ResearchPartnershipsAdminPage() {
                     <TableCell>{partner.agreement_reference || '-'}</TableCell>
                     <TableCell>
                       {partner.methodology_url ? (
-                        <a className="text-primary text-sm" href={partner.methodology_url} target="_blank" rel="noreferrer">
+                        <a className="text-accent text-sm" href={partner.methodology_url} target="_blank" rel="noreferrer">
                           {t('research_partnerships.actions.view')}
                         </a>
                       ) : '-'}
@@ -363,7 +363,7 @@ export default function ResearchPartnershipsAdminPage() {
 
       <Card>
         <CardHeader className="flex items-center gap-2">
-          <FileText size={18} className="text-primary" />
+          <FileText size={18} className="text-accent" />
           <span className="font-semibold">{t('research_partnerships.templates.title')}</span>
           <span className="text-xs text-default-500 font-normal ml-2">
             {t('research_partnerships.templates.subtitle')}
@@ -416,7 +416,7 @@ export default function ResearchPartnershipsAdminPage() {
 
       <Card>
         <CardHeader className="flex items-center gap-2">
-          <FileCheck2 size={18} className="text-primary" />
+          <FileCheck2 size={18} className="text-accent" />
           <span className="font-semibold">{t('research_partnerships.exports.title')}</span>
         </CardHeader>
         <CardBody className="p-0">

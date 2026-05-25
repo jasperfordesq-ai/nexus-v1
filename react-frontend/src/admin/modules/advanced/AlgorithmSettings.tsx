@@ -266,7 +266,7 @@ export function AlgorithmSettings() {
           <Card key={areaData.area} shadow="sm">
             <CardHeader className="flex flex-col items-start justify-between gap-4 sm:flex-row">
               <div className="flex items-center gap-3">
-                <Cpu size={20} className="text-primary shrink-0" />
+                <Cpu size={20} className="text-accent shrink-0" />
                 <div>
                   <h3 className="text-base font-semibold">{t(areaData.labelKey)}</h3>
                   <p className="text-sm text-foreground-500">{t(areaData.descriptionKey)}</p>
@@ -351,7 +351,7 @@ export function AlgorithmSettings() {
         <Card shadow="sm">
           <CardHeader className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Activity size={20} className="text-primary" />
+              <Activity size={20} className="text-accent" />
               <div>
                 <h3 className="text-base font-semibold">{t('algorithm_health_title')}</h3>
                 <p className="text-sm text-foreground-500">
