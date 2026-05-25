@@ -1,0 +1,10 @@
+{
+  "hrs": "hrs",
+  "title": "Wallet",
+  "status": {
+    "pending": "Ar feitheamh",
+    "cancelled": "Cealaithe",
+    "disputed": "Faoi dhíospóid",
+    "failed": "Teipthe"
+  }
+}

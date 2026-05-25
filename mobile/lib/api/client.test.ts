@@ -1,0 +1,501 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+// Mock dependencies — must be declared before imports
+jest.mock('@/lib/storage', () => ({
+  storage: {
+    get: jest.fn(),
+    set: jest.fn(),
+    remove: jest.fn(),
+  },
+}));
+jest.mock('@/lib/constants', () => ({
+  API_BASE_URL: 'https://test.api',
+  STORAGE_KEYS: {
+    AUTH_TOKEN: 'nexus_auth_token',
+    REFRESH_TOKEN: 'nexus_refresh_token',
+    TENANT_SLUG: 'nexus_tenant_slug',
+    USER_DATA: 'nexus_user_data',
+  },
+  TIMEOUTS: {
+    API_GET: 10_000,
+    API_MUTATION: 15_000,
+    API_UPLOAD: 60_000,
+    API_REQUEST: 15_000,
+  },
+}));
+
+import { ApiResponseError, api, registerUnauthorizedCallback, attemptTokenRefresh } from './client';
+import { storage } from '@/lib/storage';
+
+const mockStorage = storage as jest.Mocked<typeof storage>;
+
+// ---- helpers ----
+
+/** Build a minimal Response-like object that fetch returns */
+function mockResponse(
+  body: unknown,
+  init: { status?: number; headers?: Record<string, string> } = {},
+): Response {
+  const status = init.status ?? 200;
+  const ok = status >= 200 && status < 300;
+  const headersMap = new Map(Object.entries(init.headers ?? { 'content-type': 'application/json' }));
+  return {
+    ok,
+    status,
+    headers: { get: (k: string) => headersMap.get(k.toLowerCase()) ?? null } as unknown as Headers,
+    json: jest.fn().mockResolvedValue(body),
+    text: jest.fn().mockResolvedValue(typeof body === 'string' ? body : JSON.stringify(body)),
+  } as unknown as Response;
+}
+
+// ---- setup / teardown ----
+
+let fetchMock: jest.Mock;
+
+beforeEach(() => {
+  jest.useFakeTimers();
+  fetchMock = jest.fn();
+  global.fetch = fetchMock;
+
+  // Default storage: authenticated user with tenant
+  mockStorage.get.mockImplementation(async (key: string) => {
+    if (key === 'nexus_auth_token') return 'test-token';
+    if (key === 'nexus_tenant_slug') return 'hour-timebank';
+    if (key === 'nexus_refresh_token') return 'test-refresh-token';
+    return null;
+  });
+  mockStorage.set.mockResolvedValue(undefined);
+  mockStorage.remove.mockResolvedValue(undefined);
+});
+
+afterEach(() => {
+  jest.useRealTimers();
+  jest.restoreAllMocks();
+  // Reset the module-level _refreshPromise by advancing past the grace timer
+  // (attemptTokenRefresh caches for 2s)
+  jest.clearAllTimers();
+});
+
+// ---- Tests ----
+
+describe('ApiResponseError', () => {
+  it('constructs with status, message, and errors', () => {
+    const errors = { email: ['is required', 'must be valid'] };
+    const err = new ApiResponseError(422, 'Validation failed', errors);
+
+    expect(err).toBeInstanceOf(Error);
+    expect(err.name).toBe('ApiResponseError');
+    expect(err.status).toBe(422);
+    expect(err.message).toBe('Validation failed');
+    expect(err.errors).toEqual(errors);
+  });
+
+  it('constructs without errors parameter', () => {
+    const err = new ApiResponseError(500, 'Internal error');
+
+    expect(err.status).toBe(500);
+    expect(err.message).toBe('Internal error');
+    expect(err.errors).toBeUndefined();
+  });
+});
+
+describe('api.get', () => {
+  it('makes GET request with correct URL, auth header, and tenant header', async () => {
+    fetchMock.mockResolvedValueOnce(mockResponse({ data: [1, 2, 3] }));
+
+    const result = await api.get<{ data: number[] }>('/api/v2/users');
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [url, options] = fetchMock.mock.calls[0];
+    expect(url).toBe('https://test.api/api/v2/users');
+    expect(options.method).toBe('GET');
+    expect(options.headers).toMatchObject({
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer test-token',
+      'X-Tenant-Slug': 'hour-timebank',
+    });
+    expect(result).toEqual({ data: [1, 2, 3] });
+  });
+
+  it('appends query params to the URL', async () => {
+    fetchMock.mockResolvedValueOnce(mockResponse({ results: [] }));
+
+    await api.get('/api/v2/search', { q: 'hello', page: '2' });
+
+    const [url] = fetchMock.mock.calls[0];
+    expect(url).toContain('q=hello');
+    expect(url).toContain('page=2');
+  });
+
+  it('omits Authorization header when no token is stored', async () => {
+    mockStorage.get.mockImplementation(async (key: string) => {
+      if (key === 'nexus_tenant_slug') return 'hour-timebank';
+      return null;
+    });
+    fetchMock.mockResolvedValueOnce(mockResponse({ ok: true }));
+
+    await api.get('/api/v2/public');
+
+    const [, options] = fetchMock.mock.calls[0];
+    expect(options.headers.Authorization).toBeUndefined();
+  });
+
+  it('omits X-Tenant-Slug header when no tenant is stored', async () => {
+    mockStorage.get.mockImplementation(async (key: string) => {
+      if (key === 'nexus_auth_token') return 'test-token';
+      return null;
+    });
+    fetchMock.mockResolvedValueOnce(mockResponse({ ok: true }));
+
+    await api.get('/api/v2/tenants');
+
+    const [, options] = fetchMock.mock.calls[0];
+    expect(options.headers['X-Tenant-Slug']).toBeUndefined();
+  });
+});
+
+describe('api.post', () => {
+  it('makes POST request with JSON body', async () => {
+    const payload = { name: 'Test', email: 'test@example.com' };
+    fetchMock.mockResolvedValueOnce(mockResponse({ id: 1 }));
+
+    const result = await api.post<{ id: number }>('/api/v2/users', payload);
+
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [url, options] = fetchMock.mock.calls[0];
+    expect(url).toBe('https://test.api/api/v2/users');
+    expect(options.method).toBe('POST');
+    expect(options.body).toBe(JSON.stringify(payload));
+    expect(options.headers['Content-Type']).toBe('application/json');
+    expect(result).toEqual({ id: 1 });
+  });
+});
+
+describe('api.upload', () => {
+  it('sends FormData without Content-Type header', async () => {
+    const formData = new FormData();
+    formData.append('file', 'fake-file-data');
+    fetchMock.mockResolvedValueOnce(mockResponse({ url: '/uploads/file.jpg' }));
+
+    const result = await api.upload<{ url: string }>('/api/v2/upload', formData);
+
+    const [, options] = fetchMock.mock.calls[0];
+    expect(options.method).toBe('POST');
+    // Content-Type must NOT be set for FormData — React Native sets the multipart boundary
+    expect(options.headers['Content-Type']).toBeUndefined();
+    expect(options.headers.Accept).toBe('application/json');
+    expect(options.body).toBe(formData);
+    expect(result).toEqual({ url: '/uploads/file.jpg' });
+  });
+});
+
+describe('api.put', () => {
+  it('makes PUT request', async () => {
+    fetchMock.mockResolvedValueOnce(mockResponse({ updated: true }));
+
+    await api.put('/api/v2/users/1', { name: 'Updated' });
+
+    const [, options] = fetchMock.mock.calls[0];
+    expect(options.method).toBe('PUT');
+  });
+});
+
+describe('api.patch', () => {
+  it('makes PATCH request', async () => {
+    fetchMock.mockResolvedValueOnce(mockResponse({ patched: true }));
+
+    await api.patch('/api/v2/users/1', { name: 'Patched' });
+
+    const [, options] = fetchMock.mock.calls[0];
+    expect(options.method).toBe('PATCH');
+  });
+});
+
+describe('api.delete', () => {
+  it('makes DELETE request without body', async () => {
+    fetchMock.mockResolvedValueOnce(mockResponse(null, { status: 204, headers: {} }));
+
+    await api.delete('/api/v2/users/1');
+
+    const [, options] = fetchMock.mock.calls[0];
+    expect(options.method).toBe('DELETE');
+    expect(options.body).toBeUndefined();
+  });
+});
+
+describe('204 No Content response', () => {
+  it('returns null without attempting to parse JSON', async () => {
+    const res = mockResponse(null, { status: 204, headers: { 'content-type': 'application/json' } });
+    fetchMock.mockResolvedValueOnce(res);
+
+    const result = await api.delete('/api/v2/items/1');
+
+    expect(result).toBeNull();
+    // json() should NOT have been called for 204
+    expect(res.json).not.toHaveBeenCalled();
+  });
+});
+
+describe('error responses', () => {
+  it('throws ApiResponseError with server message and validation errors', async () => {
+    const errorBody = {
+      message: 'Validation failed',
+      errors: { email: ['The email field is required.'] },
+    };
+    fetchMock.mockResolvedValueOnce(mockResponse(errorBody, { status: 422 }));
+
+    await expect(api.post('/api/v2/users', {})).rejects.toThrow(ApiResponseError);
+
+    try {
+      await api.post('/api/v2/users', {});
+    } catch (err) {
+      // The first call already threw; this block won't run.
+      // Use the assertion above instead.
+    }
+
+    // Re-test with a fresh fetch call for detailed assertions
+    fetchMock.mockResolvedValueOnce(mockResponse(errorBody, { status: 422 }));
+    try {
+      await api.post('/api/v2/users', {});
+      fail('Expected to throw');
+    } catch (err) {
+      expect(err).toBeInstanceOf(ApiResponseError);
+      const apiErr = err as ApiResponseError;
+      expect(apiErr.status).toBe(422);
+      expect(apiErr.message).toBe('Validation failed');
+      expect(apiErr.errors).toEqual({ email: ['The email field is required.'] });
+    }
+  });
+
+  it('uses default message when server provides none', async () => {
+    fetchMock.mockResolvedValueOnce(mockResponse({}, { status: 500 }));
+
+    await expect(api.get('/api/v2/fail')).rejects.toThrow('Request failed with status 500');
+  });
+});
+
+describe('token refresh on 401', () => {
+  it('refreshes token and retries original request on 401', async () => {
+    // First call: 401
+    fetchMock.mockResolvedValueOnce(mockResponse({}, { status: 401 }));
+    // Refresh call: success
+    fetchMock.mockResolvedValueOnce(
+      mockResponse({ access_token: 'new-token', refresh_token: 'new-refresh' }),
+    );
+    // Retry call: success
+    fetchMock.mockResolvedValueOnce(mockResponse({ data: 'refreshed' }));
+
+    const result = await api.get<{ data: string }>('/api/v2/me');
+
+    // 3 fetch calls: original, refresh, retry
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+
+    // Refresh call went to the right endpoint
+    const [refreshUrl, refreshOptions] = fetchMock.mock.calls[1];
+    expect(refreshUrl).toBe('https://test.api/api/auth/refresh-token');
+    expect(refreshOptions.method).toBe('POST');
+    expect(JSON.parse(refreshOptions.body)).toEqual({ refresh_token: 'test-refresh-token' });
+
+    // Retry used the new token
+    const [, retryOptions] = fetchMock.mock.calls[2];
+    expect(retryOptions.headers.Authorization).toBe('Bearer new-token');
+
+    // New tokens were saved
+    expect(mockStorage.set).toHaveBeenCalledWith('nexus_auth_token', 'new-token');
+    expect(mockStorage.set).toHaveBeenCalledWith('nexus_refresh_token', 'new-refresh');
+
+    expect(result).toEqual({ data: 'refreshed' });
+
+    // Advance past the 2s grace timer so the next test starts clean
+    jest.advanceTimersByTime(3000);
+  });
+
+  it('calls unauthorized callback and throws when refresh fails', async () => {
+    const unauthorizedCb = jest.fn();
+    registerUnauthorizedCallback(unauthorizedCb);
+
+    // First call: 401
+    fetchMock.mockResolvedValueOnce(mockResponse({}, { status: 401 }));
+    // Refresh call: fails (e.g. refresh token expired)
+    fetchMock.mockResolvedValueOnce(mockResponse({}, { status: 401 }));
+
+    await expect(api.get('/api/v2/me')).rejects.toThrow('Your session has expired');
+
+    // Credentials were cleared
+    expect(mockStorage.remove).toHaveBeenCalledWith('nexus_auth_token');
+    expect(mockStorage.remove).toHaveBeenCalledWith('nexus_refresh_token');
+    expect(mockStorage.remove).toHaveBeenCalledWith('nexus_user_data');
+
+    // Callback was invoked
+    expect(unauthorizedCb).toHaveBeenCalledTimes(1);
+
+    // Clean up
+    registerUnauthorizedCallback(jest.fn());
+    jest.advanceTimersByTime(3000);
+  });
+
+  it('calls unauthorized callback when no refresh token is stored', async () => {
+    const unauthorizedCb = jest.fn();
+    registerUnauthorizedCallback(unauthorizedCb);
+
+    // No refresh token in storage
+    mockStorage.get.mockImplementation(async (key: string) => {
+      if (key === 'nexus_auth_token') return 'test-token';
+      if (key === 'nexus_tenant_slug') return 'hour-timebank';
+      return null; // no refresh token
+    });
+
+    // First call: 401
+    fetchMock.mockResolvedValueOnce(mockResponse({}, { status: 401 }));
+
+    await expect(api.get('/api/v2/me')).rejects.toThrow('Your session has expired');
+    expect(unauthorizedCb).toHaveBeenCalled();
+
+    registerUnauthorizedCallback(jest.fn());
+    jest.advanceTimersByTime(3000);
+  });
+});
+
+describe('concurrent token refresh', () => {
+  it('collapses multiple 401 refresh attempts into a single refresh request', async () => {
+    // Both calls return 401
+    fetchMock.mockResolvedValueOnce(mockResponse({}, { status: 401 }));
+    fetchMock.mockResolvedValueOnce(mockResponse({}, { status: 401 }));
+    // Single refresh call
+    fetchMock.mockResolvedValueOnce(
+      mockResponse({ access_token: 'shared-new-token' }),
+    );
+    // Both retries succeed
+    fetchMock.mockResolvedValueOnce(mockResponse({ id: 1 }));
+    fetchMock.mockResolvedValueOnce(mockResponse({ id: 2 }));
+
+    const [r1, r2] = await Promise.all([
+      api.get<{ id: number }>('/api/v2/users/1'),
+      api.get<{ id: number }>('/api/v2/users/2'),
+    ]);
+
+    // Count refresh calls (POST to /api/auth/refresh-token)
+    const refreshCalls = fetchMock.mock.calls.filter(
+      ([url, opts]: [string, RequestInit]) =>
+        url.includes('/api/auth/refresh-token') && opts.method === 'POST',
+    );
+    expect(refreshCalls).toHaveLength(1);
+
+    expect(r1).toEqual({ id: 1 });
+    expect(r2).toEqual({ id: 2 });
+
+    jest.advanceTimersByTime(3000);
+  });
+});
+
+describe('network error', () => {
+  it('throws ApiResponseError with status 0 on fetch failure', async () => {
+    fetchMock.mockRejectedValueOnce(new TypeError('Network request failed'));
+
+    try {
+      await api.get('/api/v2/me');
+      fail('Expected to throw');
+    } catch (err) {
+      expect(err).toBeInstanceOf(ApiResponseError);
+      const apiErr = err as ApiResponseError;
+      expect(apiErr.status).toBe(0);
+      expect(apiErr.message).toBe('Network error. Please check your connection.');
+    }
+  });
+});
+
+describe('timeout', () => {
+  it('throws ApiResponseError with timeout message when request is aborted', async () => {
+    const abortError = new Error('The operation was aborted');
+    abortError.name = 'AbortError';
+    fetchMock.mockRejectedValueOnce(abortError);
+
+    try {
+      await api.get('/api/v2/slow');
+      fail('Expected to throw');
+    } catch (err) {
+      expect(err).toBeInstanceOf(ApiResponseError);
+      const apiErr = err as ApiResponseError;
+      expect(apiErr.status).toBe(0);
+      expect(apiErr.message).toBe('Request timed out. Please check your connection.');
+    }
+  });
+});
+
+describe('attemptTokenRefresh', () => {
+  it('returns new token on successful refresh', async () => {
+    fetchMock.mockResolvedValueOnce(
+      mockResponse({ access_token: 'refreshed-token', refresh_token: 'new-refresh' }),
+    );
+
+    const token = await attemptTokenRefresh();
+
+    expect(token).toBe('refreshed-token');
+    expect(mockStorage.set).toHaveBeenCalledWith('nexus_auth_token', 'refreshed-token');
+    expect(mockStorage.set).toHaveBeenCalledWith('nexus_refresh_token', 'new-refresh');
+
+    jest.advanceTimersByTime(3000);
+  });
+
+  it('returns null when no refresh token is stored', async () => {
+    mockStorage.get.mockImplementation(async (key: string) => {
+      if (key === 'nexus_tenant_slug') return 'hour-timebank';
+      return null;
+    });
+
+    const token = await attemptTokenRefresh();
+
+    expect(token).toBeNull();
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    jest.advanceTimersByTime(3000);
+  });
+
+  it('returns null when refresh endpoint returns non-OK', async () => {
+    fetchMock.mockResolvedValueOnce(mockResponse({}, { status: 401 }));
+
+    const token = await attemptTokenRefresh();
+
+    expect(token).toBeNull();
+
+    jest.advanceTimersByTime(3000);
+  });
+
+  it('accepts token field as fallback for access_token', async () => {
+    fetchMock.mockResolvedValueOnce(
+      mockResponse({ token: 'fallback-token' }),
+    );
+
+    const token = await attemptTokenRefresh();
+
+    expect(token).toBe('fallback-token');
+    expect(mockStorage.set).toHaveBeenCalledWith('nexus_auth_token', 'fallback-token');
+
+    jest.advanceTimersByTime(3000);
+  });
+});
+
+describe('registerUnauthorizedCallback', () => {
+  it('registers a callback that is invoked on unrecoverable 401', async () => {
+    const cb = jest.fn();
+    registerUnauthorizedCallback(cb);
+
+    // No refresh token available
+    mockStorage.get.mockImplementation(async (key: string) => {
+      if (key === 'nexus_auth_token') return 'expired';
+      if (key === 'nexus_tenant_slug') return 'hour-timebank';
+      return null;
+    });
+
+    fetchMock.mockResolvedValueOnce(mockResponse({}, { status: 401 }));
+
+    await expect(api.get('/api/v2/me')).rejects.toThrow(ApiResponseError);
+    expect(cb).toHaveBeenCalledTimes(1);
+
+    jest.advanceTimersByTime(3000);
+  });
+});

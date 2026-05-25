@@ -1,0 +1,15 @@
+{
+  "title": "Búsqueda",
+  "placeholder": "Buscar personas, anuncios, eventos…",
+  "empty": "No se encontraron resultados.",
+  "startTyping": "Empieza a escribir para buscar…",
+  "types": {
+    "user": "Personas",
+    "listing": "Anuncios",
+    "event": "Eventos",
+    "group": "Grupos",
+    "blog_post": "Blog"
+  },
+  "filterAll": "Todos",
+  "error": "La búsqueda falló. Inténtalo de nuevo."
+}

@@ -1,0 +1,15 @@
+{
+  "title": "Suche",
+  "placeholder": "Personen, Angebote, Veranstaltungen suchen…",
+  "empty": "Keine Ergebnisse gefunden.",
+  "startTyping": "Tippe, um zu suchen…",
+  "types": {
+    "user": "Personen",
+    "listing": "Angebote",
+    "event": "Veranstaltungen",
+    "group": "Gruppen",
+    "blog_post": "Blog"
+  },
+  "filterAll": "Alle",
+  "error": "Suche fehlgeschlagen. Bitte versuche es erneut."
+}

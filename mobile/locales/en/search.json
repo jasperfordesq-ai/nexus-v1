@@ -1,0 +1,15 @@
+{
+  "title": "Search",
+  "placeholder": "Search people, listings, events…",
+  "empty": "No results found.",
+  "startTyping": "Start typing to search…",
+  "types": {
+    "user": "People",
+    "listing": "Listings",
+    "event": "Events",
+    "group": "Groups",
+    "blog_post": "Blog"
+  },
+  "filterAll": "All",
+  "error": "Search failed. Please try again."
+}

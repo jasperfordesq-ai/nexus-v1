@@ -1,0 +1,15 @@
+{
+  "title": "Recherche",
+  "placeholder": "Rechercher des personnes, annonces, événements…",
+  "empty": "Aucun résultat trouvé.",
+  "startTyping": "Commence à taper pour rechercher…",
+  "types": {
+    "user": "Personnes",
+    "listing": "Annonces",
+    "event": "Événements",
+    "group": "Groupes",
+    "blog_post": "Blog"
+  },
+  "filterAll": "Tous",
+  "error": "La recherche a échoué. Veuillez réessayer."
+}

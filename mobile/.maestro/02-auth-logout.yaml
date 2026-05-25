@@ -1,0 +1,67 @@
+# Copyright © 2024–2026 Jasper Ford
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Flow 02 — Authentication: Logout
+#
+# Verifies that a logged-in user can navigate to the Profile tab, find the
+# "Sign out" option, confirm the sign-out alert, and land back on the login
+# screen. This flow intentionally does NOT use clearState so that it exercises
+# the full sign-out path from an active session.
+#
+# NOTE: This flow assumes the user is already signed in. When running the
+# full suite, flow 01 (auth-login) must run first. When running this flow
+# in isolation, ensure the app has valid session state (do not use clearState).
+#
+# Run:
+#   maestro test --env TEST_EMAIL=user@example.com --env TEST_PASSWORD=secret \
+#     .maestro/02-auth-logout.yaml
+
+appId: ie.hour.nexus
+---
+# ── 1. Launch the app without clearing state (session persists from flow 01)
+- launchApp
+
+# ── 2. Wait for the main screen to be ready
+- wait:
+    for:
+      element:
+        text: "Feed"
+      timeout: 10000
+
+# ── 3. Tap the Profile tab in the bottom tab bar
+- tapOn: "Profile"
+
+# ── 4. Wait for the profile screen to load
+- wait:
+    for:
+      element:
+        text: "View wallet"
+      timeout: 5000
+
+# ── 5. Scroll down to reach the "Sign out" button (it sits below the Explore section)
+- scrollUntilVisible:
+    element:
+      text: "Sign out"
+    direction: DOWN
+
+# ── 6. Tap "Sign out"
+- tapOn: "Sign out"
+
+# ── 7. Confirm the sign-out alert dialog ("Are you sure you want to sign out?")
+- wait:
+    for:
+      element:
+        text: "Are you sure you want to sign out?"
+      timeout: 3000
+- tapOn: "Yes"
+
+# ── 8. Assert we are back on the login screen
+- wait:
+    for:
+      element:
+        text: "Sign in"
+      timeout: 8000
+- assertVisible: "Sign in"
+
+# ── 9. Screenshot to confirm the final state
+- takeScreenshot: logout-success

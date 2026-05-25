@@ -1,0 +1,25 @@
+{
+  "title": "Réalisations",
+  "xp": "{{xp}} XP",
+  "level": "Niveau {{level}}",
+  "rank": "Rang #{{rank}}",
+  "unranked": "Non classé",
+  "streak": "Série de {{days}} jours",
+  "nextLevel": "{{xp}} XP pour le prochain niveau",
+  "badges": {
+    "title": "Insignes",
+    "earned": "Obtenus",
+    "locked": "Verrouillés",
+    "empty": "Aucun insigne pour le moment."
+  },
+  "leaderboard": {
+    "title": "Classement",
+    "weekly": "Cette semaine",
+    "monthly": "Ce mois-ci",
+    "allTime": "Depuis toujours",
+    "you": "Toi",
+    "empty": "Aucun classement pour le moment.",
+    "badgesCount": "{{count}} insigne",
+    "badgesCount_other": "{{count}} insignes"
+  }
+}

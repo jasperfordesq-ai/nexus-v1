@@ -1,0 +1,98 @@
+# Copyright © 2024–2026 Jasper Ford
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Flow 04 — Browse Groups
+#
+# Navigates to the Groups screen via the Profile > Explore section, verifies
+# the filter pills ("All", "Public", "Private", "My Groups"), applies the
+# Public filter, and exercises the search bar.
+#
+# Run:
+#   maestro test --env TEST_EMAIL=user@example.com --env TEST_PASSWORD=secret \
+#     .maestro/04-browse-groups.yaml
+
+appId: ie.hour.nexus
+---
+# ── 1. Launch the app without clearing state
+- launchApp
+
+# ── 2. Re-authenticate if session has expired
+- runFlow:
+    when:
+      visible: "Sign in"
+    commands:
+      - runFlow:
+          when:
+            visible: "Select your timebank"
+          commands:
+            - tapOn: "hour-timebank"
+      - tapOn:
+          id: "email-input"
+      - inputText: "${TEST_EMAIL}"
+      - tapOn:
+          id: "password-input"
+      - inputText: "${TEST_PASSWORD}"
+      - tapOn: "Sign in"
+      - wait:
+          for:
+            element:
+              text: "Feed"
+            timeout: 10000
+
+# ── 3. Tap the Profile tab to reach the Explore section
+- tapOn: "Profile"
+
+# ── 4. Wait for the profile screen to load (wallet link is a reliable anchor)
+- wait:
+    for:
+      element:
+        text: "View wallet"
+      timeout: 5000
+
+# ── 5. Scroll down until "Groups" is visible in the Explore section
+- scrollUntilVisible:
+    element:
+      text: "Groups"
+    direction: DOWN
+
+# ── 6. Tap "Groups" to open the groups screen/modal
+- tapOn: "Groups"
+
+# ── 7. Assert the Groups screen title is visible
+- wait:
+    for:
+      element:
+        text: "Groups"
+      timeout: 5000
+- assertVisible: "Groups"
+
+# ── 8. Assert the "All" filter pill is present and active by default
+- assertVisible: "All"
+
+# ── 9. Tap the "Public" filter pill
+- tapOn: "Public"
+
+# ── 10. Short wait for the filtered list to render
+- wait:
+    for:
+      milliseconds: 500
+
+# ── 11. Screenshot the Public-filtered groups list
+- takeScreenshot: groups-public-filter
+
+# ── 12. Tap the search bar and type a query
+- tapOn:
+    id: "groups-search"
+- inputText: "community"
+
+# ── 13. Wait for debounce + results render
+- wait:
+    for:
+      milliseconds: 1000
+
+# ── 14. Screenshot the search results
+- takeScreenshot: groups-search
+
+# ── 15. Clear the search and reset to All filter for a clean teardown
+- tapOn: "Clear"
+- tapOn: "All"

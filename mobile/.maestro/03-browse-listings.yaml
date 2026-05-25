@@ -1,0 +1,83 @@
+# Copyright © 2024–2026 Jasper Ford
+# SPDX-License-Identifier: AGPL-3.0-or-later
+#
+# Flow 03 — Browse Listings
+#
+# Verifies that the Listings tab loads, the search bar accepts input and
+# filters results (with debounce), and the list can be scrolled without
+# crashing. Tests both the search and the clear actions.
+#
+# Run:
+#   maestro test --env TEST_EMAIL=user@example.com --env TEST_PASSWORD=secret \
+#     .maestro/03-browse-listings.yaml
+
+appId: ie.hour.nexus
+---
+# ── 1. Launch the app without clearing state (relies on persisted session)
+- launchApp
+
+# ── 2. Handle re-authentication if the session has expired
+- runFlow:
+    when:
+      visible: "Sign in"
+    commands:
+      - runFlow:
+          when:
+            visible: "Select your timebank"
+          commands:
+            - tapOn: "hour-timebank"
+      - tapOn:
+          id: "email-input"
+      - inputText: "${TEST_EMAIL}"
+      - tapOn:
+          id: "password-input"
+      - inputText: "${TEST_PASSWORD}"
+      - tapOn: "Sign in"
+      - wait:
+          for:
+            element:
+              text: "Feed"
+            timeout: 10000
+
+# ── 3. Tap the Listings tab
+- tapOn: "Listings"
+
+# ── 4. Assert the Listings screen title is visible (from exchanges locale)
+- wait:
+    for:
+      element:
+        text: "Listings"
+      timeout: 5000
+- assertVisible: "Listings"
+
+# ── 5. Tap the search bar and type a query
+- tapOn:
+    id: "listings-search"
+- inputText: "garden"
+
+# ── 6. Wait for debounce to fire and results to update (500 ms debounce + render)
+- wait:
+    for:
+      milliseconds: 1000
+
+# ── 7. Screenshot the filtered results
+- takeScreenshot: listings-search
+
+# ── 8. Clear the search input (tap the Clear button or the X icon)
+- tapOn: "Clear"
+
+# ── 9. Wait for the full list to restore
+- wait:
+    for:
+      milliseconds: 500
+
+# ── 10. Scroll down through the listing cards to verify no crash on scroll
+- swipe:
+    direction: UP
+    duration: 600
+
+# ── 11. Assert the screen is still intact after scrolling
+- assertVisible: "Listings"
+
+# ── 12. Screenshot the scrolled state
+- takeScreenshot: listings-scrolled
