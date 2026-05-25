@@ -6,7 +6,8 @@
     "listings": "Annonces",
     "events": "Événements",
     "messages": "Messages",
-    "profile": "Profil"
+    "profile": "Profil",
+    "more": "Plus"
   },
   "buttons": {
     "save": "Enregistrer",

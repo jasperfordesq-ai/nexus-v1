@@ -43,5 +43,10 @@
   "organisations": "Organisations",
   "blog": "Blog",
   "skills": "Skills & Endorsements",
-  "federation": "Federation"
+  "federation": "Federation",
+  "myProfile": "My Profile",
+  "mySpace": "My Space",
+  "discover": "Discover",
+  "account": "Account",
+  "actions": "Actions"
 }

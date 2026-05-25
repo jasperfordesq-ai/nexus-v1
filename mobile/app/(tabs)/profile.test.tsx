@@ -4,16 +4,14 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
+import { render } from '@testing-library/react-native';
 
 // --- Mocks ---
 
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }),
-  useSegments: () => ['(tabs)'],
   router: { push: jest.fn(), replace: jest.fn(), back: jest.fn() },
   useLocalSearchParams: () => ({}),
-  useNavigation: () => ({ setOptions: jest.fn() }),
 }));
 
 jest.mock('react-i18next', () => ({
@@ -21,7 +19,6 @@ jest.mock('react-i18next', () => ({
     t: (key: string) => {
       const map: Record<string, string> = {
         'timeBalance': 'Time balance',
-        'about': 'About',
         'viewWallet': 'View wallet',
         'editProfile': 'Edit profile',
         'browseMembers': 'Browse Members',
@@ -29,23 +26,18 @@ jest.mock('react-i18next', () => ({
         'signOut': 'Sign out',
         'signOutConfirmTitle': 'Sign out',
         'signOutConfirmMessage': 'Are you sure you want to sign out?',
-        'changePhoto': 'Change profile photo',
-        'permissionNeeded': 'Permission needed',
-        'permissionMessage': 'Please allow access to your photo library to change your avatar.',
-        'uploadFailed': 'Upload failed',
-        'uploadFailedMessage': 'Could not update your avatar. Please try again.',
         'hrs': 'hrs',
-        'explore': 'Explore',
         'groups': 'Groups',
-        'search': 'Search',
         'aiChat': 'AI Assistant',
         'achievements': 'Achievements',
         'myGoals': 'My Goals',
         'volunteering': 'Volunteering',
         'organisations': 'Organisations',
-        'blog': 'Blog',
-        'skills': 'Skills & Endorsements',
         'federation': 'Federation',
+        'myProfile': 'My Profile',
+        'mySpace': 'My Space',
+        'discover': 'Discover',
+        'account': 'Account',
         'common:buttons.cancel': 'Cancel',
         'common:attribution': 'Project NEXUS is open-source software licensed under AGPL-3.0-or-later.',
       };
@@ -56,7 +48,6 @@ jest.mock('react-i18next', () => ({
 }));
 
 const mockLogout = jest.fn();
-const mockRefreshUser = jest.fn();
 const mockUseAuth = jest.fn();
 
 jest.mock('@/lib/hooks/useAuth', () => ({
@@ -70,11 +61,10 @@ const defaultAuthState = {
     name: 'Alice Smith',
     avatar_url: null,
     balance: 4.5,
-    bio: 'I love community gardening.',
   },
   displayName: 'Alice Smith',
   logout: mockLogout,
-  refreshUser: mockRefreshUser,
+  refreshUser: jest.fn(),
 };
 
 jest.mock('@/lib/hooks/useTenant', () => ({
@@ -90,9 +80,6 @@ jest.mock('@/lib/hooks/useTheme', () => ({
     textSecondary: '#666666',
     textMuted: '#999999',
     border: '#dddddd',
-    borderSubtle: '#eeeeee',
-    error: '#e53e3e',
-    errorBg: '#fff5f5',
   }),
 }));
 
@@ -103,26 +90,8 @@ jest.mock('expo-haptics', () => ({
   NotificationFeedbackType: { Success: 'success', Warning: 'warning', Error: 'error' },
 }));
 
-jest.mock('expo-image-picker', () => ({
-  launchImageLibraryAsync: jest.fn().mockResolvedValue({ canceled: true, assets: null }),
-  requestMediaLibraryPermissionsAsync: jest.fn().mockResolvedValue({ status: 'granted' }),
-  MediaTypeOptions: { Images: 'Images' },
-}));
-
 jest.mock('@expo/vector-icons', () => ({
   Ionicons: 'View',
-}));
-
-jest.mock('@/lib/api/profile', () => ({
-  updateAvatar: jest.fn(),
-}));
-
-jest.mock('@/lib/api/client', () => ({
-  api: { get: jest.fn() },
-}));
-
-jest.mock('@/lib/constants', () => ({
-  API_V2: '/api/v2',
 }));
 
 jest.mock('@/components/ui/Avatar', () => () => null);
@@ -133,49 +102,57 @@ jest.mock('@/components/ui/Skeleton', () => ({
 
 // --- Tests ---
 
-import ProfileScreen from './profile';
+import MoreScreen from './profile';
 
-describe('ProfileScreen', () => {
+describe('MoreScreen (More tab)', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseAuth.mockReturnValue(defaultAuthState);
   });
 
   it('renders the user display name and email', () => {
-    const { getByText } = render(<ProfileScreen />);
+    const { getByText } = render(<MoreScreen />);
     expect(getByText('Alice Smith')).toBeTruthy();
     expect(getByText('alice@example.com')).toBeTruthy();
   });
 
-  it('renders the time balance card when balance is present', () => {
-    const { getByText } = render(<ProfileScreen />);
-    expect(getByText('Time balance')).toBeTruthy();
-    expect(getByText('4.5 hrs')).toBeTruthy();
+  it('renders the time balance chip when balance is present', () => {
+    const { getByText } = render(<MoreScreen />);
+    // Chip text: "{balance} hrs · Time balance"
+    expect(getByText('4.5 hrs · Time balance')).toBeTruthy();
   });
 
-  it('renders the bio when provided', () => {
-    const { getByText } = render(<ProfileScreen />);
-    expect(getByText('I love community gardening.')).toBeTruthy();
-  });
-
-  it('renders action buttons: View wallet, Edit profile, Browse Members, Settings', () => {
-    const { getByText } = render(<ProfileScreen />);
-    expect(getByText('View wallet')).toBeTruthy();
+  it('renders Edit Profile and View Wallet action buttons', () => {
+    const { getByText } = render(<MoreScreen />);
     expect(getByText('Edit profile')).toBeTruthy();
+    expect(getByText('View wallet')).toBeTruthy();
+  });
+
+  it('renders My Space section with profile navigation items', () => {
+    const { getByText } = render(<MoreScreen />);
+    expect(getByText('My Space')).toBeTruthy();
+    expect(getByText('My Profile')).toBeTruthy();
+    expect(getByText('Achievements')).toBeTruthy();
+    expect(getByText('My Goals')).toBeTruthy();
+    expect(getByText('Groups')).toBeTruthy();
+  });
+
+  it('renders Discover section with community navigation items', () => {
+    const { getByText } = render(<MoreScreen />);
+    expect(getByText('Discover')).toBeTruthy();
     expect(getByText('Browse Members')).toBeTruthy();
+    expect(getByText('Volunteering')).toBeTruthy();
+    expect(getByText('AI Assistant')).toBeTruthy();
+  });
+
+  it('renders Settings in the Account section', () => {
+    const { getByText } = render(<MoreScreen />);
+    expect(getByText('Account')).toBeTruthy();
     expect(getByText('Settings')).toBeTruthy();
   });
 
-  it('renders the Explore section with explore items', () => {
-    const { getByText } = render(<ProfileScreen />);
-    expect(getByText('Explore')).toBeTruthy();
-    expect(getByText('Groups')).toBeTruthy();
-    expect(getByText('AI Assistant')).toBeTruthy();
-    expect(getByText('Achievements')).toBeTruthy();
-  });
-
   it('renders the Sign out button', () => {
-    const { getByText } = render(<ProfileScreen />);
+    const { getByText } = render(<MoreScreen />);
     expect(getByText('Sign out')).toBeTruthy();
   });
 
@@ -187,14 +164,13 @@ describe('ProfileScreen', () => {
       refreshUser: jest.fn(),
     });
 
-    // With no user, the screen renders the skeleton — none of the profile content should appear
-    const { queryByText } = render(<ProfileScreen />);
+    const { queryByText } = render(<MoreScreen />);
     expect(queryByText('Alice Smith')).toBeNull();
     expect(queryByText('alice@example.com')).toBeNull();
   });
 
   it('renders the AGPL attribution footer', () => {
-    const { getByText } = render(<ProfileScreen />);
+    const { getByText } = render(<MoreScreen />);
     expect(getByText(/AGPL-3\.0-or-later/)).toBeTruthy();
   });
 });

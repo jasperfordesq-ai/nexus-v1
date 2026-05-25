@@ -12,20 +12,22 @@ import * as Sentry from '@sentry/react-native';
  */
 export function navigateToLink(link: string | null): void {
   if (!link) return;
-  const match = link.match(/^\/([^/]+)(?:\/(\d+))?/);
+  const match = link.match(/^\/([^/]+)(?:\/([^/]+))?/);
   if (!match) return;
   const [, section, id] = match;
-  if (id && isNaN(Number(id))) return;
   switch (section) {
     case 'exchanges':
     case 'listings':
       if (id) router.push({ pathname: '/(modals)/exchange-detail', params: { id } });
+      else router.replace('/(tabs)/exchanges');
       break;
     case 'events':
       if (id) router.push({ pathname: '/(modals)/event-detail', params: { id } });
+      else router.replace('/(tabs)/events');
       break;
     case 'members':
       if (id) router.push({ pathname: '/(modals)/member-profile', params: { id } });
+      else router.push('/(modals)/members');
       break;
     case 'messages':
       if (id) router.push({ pathname: '/(modals)/thread', params: { id } });
@@ -34,9 +36,11 @@ export function navigateToLink(link: string | null): void {
     case 'blog':
     case 'blog-post':
       if (id) router.push({ pathname: '/(modals)/blog-post', params: { id } });
+      else router.push('/(modals)/blog');
       break;
     case 'groups':
       if (id) router.push({ pathname: '/(modals)/group-detail', params: { id } });
+      else router.push('/(modals)/groups');
       break;
     case 'jobs':
       if (id) router.push({ pathname: '/(modals)/job-detail', params: { id } });
@@ -81,6 +85,9 @@ export function navigateToLink(link: string | null): void {
       break;
     case 'chat':
       router.push('/(modals)/chat');
+      break;
+    case 'search':
+      router.push('/(modals)/search');
       break;
     default:
       Sentry.captureMessage(`[DeepLink] Unhandled link: ${link}`, 'warning');

@@ -7,6 +7,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { Avatar as HeroAvatar } from 'heroui-native';
 import type { AvatarSize } from 'heroui-native';
+import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 
 interface AvatarProps {
   uri: string | null | undefined;
@@ -32,12 +33,13 @@ function getInitials(name: string | null | undefined): string {
 export default function Avatar({ uri, name, size = 40, showOnline = false }: AvatarProps) {
   const sizeToken = sizeToToken(size);
   const initials = getInitials(name);
+  const resolvedUri = resolveImageUrl(uri);
 
   return (
     <View style={{ position: 'relative', alignSelf: 'flex-start' }}>
       <HeroAvatar size={sizeToken} accessibilityLabel={name ?? undefined}>
-        {uri ? (
-          <HeroAvatar.Image source={{ uri }} />
+        {resolvedUri ? (
+          <HeroAvatar.Image source={{ uri: resolvedUri }} />
         ) : null}
         <HeroAvatar.Fallback>{initials}</HeroAvatar.Fallback>
       </HeroAvatar>

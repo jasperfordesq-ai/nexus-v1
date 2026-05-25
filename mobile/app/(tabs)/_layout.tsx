@@ -11,7 +11,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme } from '@/lib/hooks/useTheme';
 import { useRealtimeContext } from '@/lib/context/RealtimeContext';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
@@ -61,13 +60,12 @@ const TABS_CONFIG: TabConfig[] = [
   { name: 'exchanges', i18nKey: 'common:tabs.listings',   icon: 'storefront-outline', iconFocused: 'storefront' },
   { name: 'events',    i18nKey: 'common:tabs.events',     icon: 'calendar-outline', iconFocused: 'calendar' },
   { name: 'messages',  i18nKey: 'common:tabs.messages',   icon: 'chatbubble-outline', iconFocused: 'chatbubble' },
-  { name: 'profile',   i18nKey: 'common:tabs.profile',    icon: 'person-outline',  iconFocused: 'person' },
+  { name: 'profile',   i18nKey: 'common:tabs.more',       icon: 'menu-outline',    iconFocused: 'menu' },
 ];
 
 export default function TabsLayout() {
   const { t } = useTranslation();
   const primary = usePrimaryColor();
-  const theme = useTheme();
   const { unreadMessages, resetUnread } = useRealtimeContext();
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
@@ -87,10 +85,10 @@ export default function TabsLayout() {
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: primary,
-        tabBarInactiveTintColor: theme.textMuted,
+        tabBarInactiveTintColor: '#9ca3af',
         tabBarStyle: {
-          backgroundColor: theme.surface,
-          borderTopColor: theme.border,
+          backgroundColor: '#ffffff',
+          borderTopColor: '#e5e7eb',
           borderTopWidth: 1,
           paddingBottom: (insets.bottom || 0) + 4,
           paddingTop: 4,

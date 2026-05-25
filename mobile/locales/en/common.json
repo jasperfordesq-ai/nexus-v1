@@ -6,7 +6,8 @@
     "listings": "Listings",
     "events": "Events",
     "messages": "Messages",
-    "profile": "Profile"
+    "profile": "Profile",
+    "more": "More"
   },
   "buttons": {
     "save": "Save",
