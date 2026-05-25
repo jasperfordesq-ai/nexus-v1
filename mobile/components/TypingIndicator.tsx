@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useRef } from 'react';
-import { Animated, StyleSheet } from 'react-native';
+import { Animated } from 'react-native';
 
 import { useTheme } from '@/lib/hooks/useTheme';
 
@@ -18,6 +18,7 @@ const BOUNCE_HEIGHT = -6;
 const STAGGER_DELAY = 150;
 
 export default function TypingIndicator({ visible }: TypingIndicatorProps) {
+  // theme kept only to pass textMuted to Animated.View backgroundColor (cannot use className on animated color)
   const theme = useTheme();
   const containerOpacity = useRef(new Animated.Value(0)).current;
   const dot1 = useRef(new Animated.Value(0)).current;
@@ -87,42 +88,34 @@ export default function TypingIndicator({ visible }: TypingIndicatorProps) {
   return (
     <Animated.View
       style={[
-        styles.container,
-        { backgroundColor: theme.surface, opacity: containerOpacity },
+        {
+          flexDirection: 'row',
+          alignItems: 'center',
+          alignSelf: 'flex-start',
+          borderRadius: 12,
+          paddingHorizontal: 12,
+          paddingVertical: 8,
+          marginLeft: 12,
+          marginBottom: 4,
+          backgroundColor: theme.surface,
+          opacity: containerOpacity,
+        },
       ]}
       pointerEvents="none"
     >
       {[dot1, dot2, dot3].map((dot, i) => (
         <Animated.View
           key={i}
-          style={[
-            styles.dot,
-            {
-              backgroundColor: theme.textMuted,
-              marginLeft: i > 0 ? DOT_GAP : 0,
-              transform: [{ translateY: dot }],
-            },
-          ]}
+          style={{
+            width: DOT_SIZE,
+            height: DOT_SIZE,
+            borderRadius: DOT_SIZE / 2,
+            backgroundColor: theme.textMuted,
+            marginLeft: i > 0 ? DOT_GAP : 0,
+            transform: [{ translateY: dot }],
+          }}
         />
       ))}
     </Animated.View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginLeft: 12,
-    marginBottom: 4,
-  },
-  dot: {
-    width: DOT_SIZE,
-    height: DOT_SIZE,
-    borderRadius: DOT_SIZE / 2,
-  },
-});

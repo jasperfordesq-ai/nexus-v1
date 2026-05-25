@@ -8,7 +8,6 @@ import {
   Dimensions,
   FlatList,
   Pressable,
-  StyleSheet,
   Text,
   View,
   type ViewToken,
@@ -99,19 +98,20 @@ export default function ImageCarousel({ images, height = 250, onImagePress }: Im
       />
 
       {/* Image count badge */}
-      <View style={styles.countBadge}>
-        <Text style={styles.countBadgeText}>
+      <View className="absolute top-2 right-2 bg-black/60 rounded-[10px] px-2 py-0.5">
+        <Text className="text-white text-[12px] font-semibold">
           {activeIndex + 1}/{images.length}
         </Text>
       </View>
 
       {/* Page indicator dots */}
       {images.length > 1 ? (
-        <View style={styles.dotsContainer}>
+        <View className="absolute bottom-2 left-0 right-0 flex-row justify-center items-center gap-1.5">
           {images.map((_, index) => (
             <View
               key={index}
-              style={[styles.dot, index === activeIndex ? styles.dotActive : styles.dotInactive]}
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ backgroundColor: index === activeIndex ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.5)' }}
             />
           ))}
         </View>
@@ -119,33 +119,3 @@ export default function ImageCarousel({ images, height = 250, onImagePress }: Im
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  countBadge: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    borderRadius: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-  },
-  countBadgeText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  dotsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'absolute',
-    bottom: 8,
-    left: 0,
-    right: 0,
-    gap: 6,
-  },
-  dot: { width: 6, height: 6, borderRadius: 3 },
-  dotActive: { backgroundColor: 'rgba(255,255,255,1)' },
-  dotInactive: { backgroundColor: 'rgba(255,255,255,0.5)' },
-});

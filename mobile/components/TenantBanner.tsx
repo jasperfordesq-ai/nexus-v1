@@ -3,14 +3,10 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useMemo } from 'react';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image } from 'react-native';
 
 import { useTenant, usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
-import { TYPOGRAPHY } from '@/lib/styles/typography';
-import { SPACING } from '@/lib/styles/spacing';
 
 /**
  * Displays the current tenant's name and logo in a compact header banner.
@@ -19,58 +15,37 @@ import { SPACING } from '@/lib/styles/spacing';
 export default function TenantBanner() {
   const { tenant } = useTenant();
   const primary = usePrimaryColor();
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   if (!tenant) return null;
 
   return (
-    <View style={[styles.banner, { borderBottomColor: withAlpha(primary, 0.13) }]}>
+    <View
+      className="flex-row items-center px-4 py-2.5 gap-3 border-b bg-surface"
+      style={{ borderBottomColor: withAlpha(primary, 0.13) }}
+    >
       {tenant.branding.logo_url ? (
         <Image
           source={{ uri: tenant.branding.logo_url }}
-          style={styles.logo}
+          style={{ width: 36, height: 36 }}
           resizeMode="contain"
           accessibilityLabel={`${tenant.name} logo`}
         />
       ) : (
-        <View style={[styles.logoPlaceholder, { backgroundColor: primary }]}>
-          <Text style={styles.logoInitial}>
+        <View
+          className="w-9 h-9 rounded-lg justify-center items-center"
+          style={{ backgroundColor: primary }}
+        >
+          <Text className="text-lg font-bold text-white">
             {tenant.name.charAt(0).toUpperCase()}
           </Text>
         </View>
       )}
       <View>
-        <Text style={styles.tenantName}>{tenant.name}</Text>
+        <Text className="text-base font-bold text-foreground">{tenant.name}</Text>
         {tenant.tagline && (
-          <Text style={styles.tagline}>{tenant.tagline}</Text>
+          <Text className="text-xs text-muted-foreground">{tenant.tagline}</Text>
         )}
       </View>
     </View>
   );
-}
-
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    banner: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingHorizontal: SPACING.md,
-      paddingVertical: SPACING.sm + 2,
-      gap: SPACING.sm + 4,
-      borderBottomWidth: 1,
-      backgroundColor: theme.surface,
-    },
-    logo: { width: 36, height: 36 },
-    logoPlaceholder: {
-      width: 36,
-      height: 36,
-      borderRadius: SPACING.sm,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    logoInitial: { ...TYPOGRAPHY.h3, color: '#fff' },
-    tenantName: { ...TYPOGRAPHY.body, fontWeight: '700', color: theme.text },
-    tagline: { ...TYPOGRAPHY.caption, color: theme.textSecondary },
-  });
 }

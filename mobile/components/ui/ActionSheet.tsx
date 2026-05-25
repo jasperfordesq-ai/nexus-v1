@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 
@@ -39,10 +39,7 @@ export default function ActionSheet({ visible, onClose, title, actions }: Action
         {actions.map((action, index) => (
           <Pressable
             key={index}
-            style={[
-              styles.actionRow,
-              index < actions.length - 1 ? styles.actionBorder : undefined,
-            ]}
+            className={`flex-row items-center py-4${index < actions.length - 1 ? ' border-b border-black/10' : ''}`}
             onPress={() => handleAction(action)}
             accessibilityLabel={action.label}
             accessibilityRole="button"
@@ -66,14 +63,3 @@ export default function ActionSheet({ visible, onClose, title, actions }: Action
   );
 }
 
-const styles = StyleSheet.create({
-  actionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 16,
-  },
-  actionBorder: {
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: 'rgba(0,0,0,0.1)',
-  },
-});

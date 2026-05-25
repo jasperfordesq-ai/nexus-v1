@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { Appearance, Text, TouchableOpacity, View } from 'react-native';
+import { Appearance, Pressable, Text, View } from 'react-native';
 import { router } from 'expo-router';
 
 interface Props {
@@ -73,7 +73,7 @@ export default class ModalErrorBoundary extends React.Component<Props, State> {
           >
             Something went wrong
           </Text>
-          <TouchableOpacity
+          <Pressable
             style={{
               paddingVertical: 10,
               paddingHorizontal: 24,
@@ -85,7 +85,7 @@ export default class ModalErrorBoundary extends React.Component<Props, State> {
             accessibilityLabel="Go Back"
           >
             <Text style={{ fontSize: 14, fontWeight: '600', color: colors.buttonText }}>Go Back</Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       );
     }

@@ -4,8 +4,9 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Spinner } from 'heroui-native';
 // TODO: Migrate from expo-av to expo-audio when SDK 55+ is adopted.
 // expo-av is deprecated but expo-audio's API differs significantly (useAudioPlayer hook-based).
 // The deprecation warning is suppressed via LogBox in _layout.tsx.
@@ -97,6 +98,7 @@ export default function VoiceMessageBubble({
     }
   }, [audioUrl, isPlaying, onPlaybackStatusUpdate]);
 
+  // theme kept only for border color in waveform (dynamic unfilled bar color depends on isOwn + theme.border)
   const theme = useTheme();
 
   const iconColor = isOwn ? 'rgba(255,255,255,0.95)' : primaryColor; // contrast on primary
@@ -110,15 +112,16 @@ export default function VoiceMessageBubble({
     : totalMs > 0 ? formatDuration(totalMs) : '0:00';
 
   return (
-    <View style={styles.row}>
-      <TouchableOpacity
+    <View className="flex-row items-center gap-1.5 min-w-[180px]">
+      <Pressable
         onPress={handlePlayPause}
         disabled={isLoading}
-        style={[styles.playButton, { borderColor: iconColor }]}
+        style={{ borderColor: iconColor }}
+        className="w-8 h-8 rounded-full border-[1.5px] items-center justify-center"
         accessibilityLabel={isPlaying ? t('voice.pause') : t('voice.play')}
       >
         {isLoading ? (
-          <ActivityIndicator size="small" color={iconColor} />
+          <Spinner size="sm" color={iconColor} />
         ) : (
           <Ionicons
             name={isPlaying ? 'pause' : 'play'}
@@ -126,9 +129,9 @@ export default function VoiceMessageBubble({
             color={iconColor}
           />
         )}
-      </TouchableOpacity>
+      </Pressable>
 
-      <View style={styles.waveContainer}>
+      <View className="flex-1 flex-row items-center gap-0.5">
         {/* Simple waveform bar visualization */}
         {Array.from({ length: 20 }).map((_, i) => {
           const barHeight = 6 + ((i % 5) * 3) + (i % 3 === 0 ? 4 : 0);
@@ -136,61 +139,25 @@ export default function VoiceMessageBubble({
           return (
             <View
               key={i}
-              style={[
-                styles.waveBar,
-                {
-                  height: barHeight,
-                  backgroundColor: filled
-                    ? (isOwn ? 'rgba(255,255,255,0.95)' : primaryColor) // contrast on primary
-                    : unfilledBarColor,
-                },
-              ]}
+              style={{
+                flex: 1,
+                height: barHeight,
+                borderRadius: 2,
+                backgroundColor: filled
+                  ? (isOwn ? 'rgba(255,255,255,0.95)' : primaryColor) // contrast on primary
+                  : unfilledBarColor,
+              }}
             />
           );
         })}
       </View>
 
-      <Text style={[styles.duration, { color: timeColor }]}>{displayTime}</Text>
-      <Text style={[styles.label, { color: hasError ? theme.error : labelColor }]}>
+      <Text style={{ fontSize: 11, color: timeColor, minWidth: 30, textAlign: 'right', fontVariant: ['tabular-nums'] }}>
+        {displayTime}
+      </Text>
+      <Text style={{ fontSize: 11, opacity: 0.7, color: hasError ? theme.error : labelColor }}>
         {hasError ? t('voice.failed') : t('voice.label')}
       </Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    minWidth: 180,
-  },
-  playButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    borderWidth: 1.5,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  waveContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-  },
-  waveBar: {
-    flex: 1,
-    borderRadius: 2,
-  },
-  duration: {
-    fontSize: 11,
-    fontVariant: ['tabular-nums'],
-    minWidth: 30,
-    textAlign: 'right',
-  },
-  label: {
-    fontSize: 11,
-    opacity: 0.7,
-  },
-});

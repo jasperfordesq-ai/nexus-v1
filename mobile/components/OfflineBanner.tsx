@@ -3,41 +3,23 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNetworkStatus } from '@/lib/hooks/useNetworkStatus';
-import { useTheme } from '@/lib/hooks/useTheme';
-import { TYPOGRAPHY } from '@/lib/styles/typography';
-import { SPACING } from '@/lib/styles/spacing';
 
 /**
  * Renders a sticky warning banner when the device has no connectivity.
- * Respects light/dark theme.
+ * Respects light/dark theme via NativeWind tokens.
  */
 export default function OfflineBanner() {
   const { t } = useTranslation('common');
   const { isOnline } = useNetworkStatus();
-  const theme = useTheme();
 
   if (isOnline) return null;
 
   return (
-    <View style={[styles.banner, { backgroundColor: theme.warning + '18', borderBottomColor: theme.warning }]}>
-      <Text style={[styles.text, { color: theme.warning }]}>{t('offline')}</Text>
+    <View className="border-b border-warning/30 bg-warning/10 px-4 py-2 items-center z-[100]">
+      <Text className="text-sm font-semibold text-warning">{t('offline')}</Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  banner: {
-    borderBottomWidth: 1,
-    paddingVertical: SPACING.sm,
-    paddingHorizontal: SPACING.md,
-    alignItems: 'center',
-    zIndex: 100,
-  },
-  text: {
-    ...TYPOGRAPHY.bodySmall,
-    fontWeight: '600',
-  },
-});

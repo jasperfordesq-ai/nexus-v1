@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React, { useCallback } from 'react';
-import { Pressable, View, StyleSheet } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
@@ -44,49 +44,26 @@ export default function FAB({ icon = 'add', onPress, color, position = 'bottom-r
     onPress();
   }, [onPress]);
 
-  const positionStyle = position === 'bottom-center' ? styles.bottomCenter : styles.bottomRight;
+  const wrapperClass = position === 'bottom-center'
+    ? 'absolute z-10 bottom-4 left-0 right-0 items-center'
+    : 'absolute z-10 bottom-4 right-4';
 
   return (
-    <View style={[styles.wrapper, positionStyle]} pointerEvents="box-none">
+    <View className={wrapperClass} pointerEvents="box-none">
       <AnimatedPressable
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         onPress={handlePress}
         accessibilityRole="button"
         accessibilityLabel="Action button"
-        style={[styles.fab, { backgroundColor: bgColor }, animatedStyle]}
+        className="w-14 h-14 rounded-full items-center justify-center"
+        style={[
+          { backgroundColor: bgColor, elevation: 6, shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.27, shadowRadius: 4.65 },
+          animatedStyle,
+        ]}
       >
         <Ionicons name={icon} size={28} color="#fff" />
       </AnimatedPressable>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  wrapper: {
-    position: 'absolute',
-    zIndex: 10,
-  },
-  bottomRight: {
-    right: 16,
-    bottom: 16,
-  },
-  bottomCenter: {
-    bottom: 16,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-  },
-  fab: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 6,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.27,
-    shadowRadius: 4.65,
-  },
-});

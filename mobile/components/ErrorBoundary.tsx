@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import * as Sentry from '@sentry/react-native';
 
 interface Props {
@@ -44,7 +44,7 @@ function ErrorFallback({ onReset }: { onReset: () => void }) {
       >
         Something went wrong
       </Text>
-      <TouchableOpacity
+      <Pressable
         style={{
           paddingVertical: 10,
           paddingHorizontal: 24,
@@ -56,7 +56,7 @@ function ErrorFallback({ onReset }: { onReset: () => void }) {
         accessibilityLabel="Retry"
       >
         <Text style={{ fontSize: 14, fontWeight: '600', color: '#fff' }}>Retry</Text>
-      </TouchableOpacity>
+      </Pressable>
     </View>
   );
 }
@@ -81,6 +81,8 @@ export default class ErrorBoundary extends React.Component<Props, State> {
     Sentry.captureException(error, {
       extra: { componentStack: info.componentStack },
     });
+
+    console.error('ErrorBoundary caught:', error, info.componentStack);
 
     if (__DEV__) {
       console.error('ErrorBoundary caught:', error, info.componentStack);

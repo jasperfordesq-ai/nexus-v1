@@ -3,8 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useMemo, useRef, useCallback } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Animated, Share } from 'react-native';
+import { useState, useRef, useCallback } from 'react';
+import { View, Text, Pressable, Animated, Share } from 'react-native';
 import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
@@ -14,9 +14,7 @@ import { useTranslation } from 'react-i18next';
 
 import { toggleLike, toggleBookmark, type FeedItem as FeedItemType, type PollData } from '@/lib/api/feed';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
-import { TYPOGRAPHY } from '@/lib/styles/typography';
-import { SPACING, RADIUS } from '@/lib/styles/spacing';
+import { useTheme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
 import Card from '@/components/ui/Card';
 import ImageCarousel from '@/components/ui/ImageCarousel';
@@ -31,8 +29,8 @@ interface FeedItemProps {
 export default function FeedItem({ item }: FeedItemProps) {
   const { t } = useTranslation('home');
   const primary = usePrimaryColor();
+  // theme kept only for Ionicons color= props (cannot accept className)
   const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   // Optimistic like state — initialise from server if available
   const [liked, setLiked] = useState(item.is_liked ?? false);
@@ -186,43 +184,43 @@ export default function FeedItem({ item }: FeedItemProps) {
 
   return (
     <View
-      style={styles.wrapper}
+      className="mx-4 my-1.5"
       accessible={true}
       accessibilityLabel={cardLabel}
       accessibilityRole="summary"
     >
-      <Card style={styles.card}>
-        <TouchableOpacity activeOpacity={1} onPress={handleDoubleTap}>
+      <Card className="gap-2">
+        <Pressable onPress={handleDoubleTap}>
           {/* Author row */}
-          <View style={styles.actor}>
+          <View className="flex-row items-center gap-2.5">
             <Avatar uri={item.author_avatar ?? null} name={item.author_name || null} size={36} />
-            <View style={styles.actorInfo}>
-              <Text style={styles.actorName} numberOfLines={1}>{item.author_name ?? ''}</Text>
-              <Text style={styles.time}>{item.created_at ? formatRelativeTime(item.created_at) : ''}</Text>
+            <View className="flex-1">
+              <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>{item.author_name ?? ''}</Text>
+              <Text className="text-xs text-muted-foreground">{item.created_at ? formatRelativeTime(item.created_at) : ''}</Text>
             </View>
             {/* Type badge */}
-            <View style={styles.typeBadge}>
-              <Text style={styles.typeBadgeText}>{t(`feedTypes.${item.type}`, { defaultValue: item.type })}</Text>
+            <View className="bg-border/50 rounded px-2 py-[3px] mr-1">
+              <Text className="text-[11px] font-semibold text-muted-foreground">{t(`feedTypes.${item.type}`, { defaultValue: item.type })}</Text>
             </View>
             {/* More button */}
-            <TouchableOpacity
+            <Pressable
               onPress={() => setActionSheetVisible(true)}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               accessibilityLabel={t('moreOptions', { defaultValue: 'More options' })}
               accessibilityRole="button"
-              style={styles.moreBtn}
+              className="p-1"
             >
               <Ionicons name="ellipsis-horizontal" size={20} color={theme.textMuted} />
-            </TouchableOpacity>
+            </Pressable>
           </View>
 
           {/* Content */}
-          {item.title ? <Text style={styles.title}>{item.title}</Text> : null}
+          {item.title ? <Text className="text-base font-semibold text-foreground">{item.title}</Text> : null}
           {item.content && (
             <>
-              <Text style={styles.body} numberOfLines={3}>{item.content}</Text>
+              <Text className="text-sm text-muted-foreground leading-5" numberOfLines={3}>{item.content}</Text>
               {item.content.length > 150 && (
-                <Text style={styles.readMore}>{t('readMore')}</Text>
+                <Text className="text-sm text-muted-foreground font-medium">{t('readMore')}</Text>
               )}
             </>
           )}
@@ -237,14 +235,13 @@ export default function FeedItem({ item }: FeedItemProps) {
             />
           ) : item.image_url ? (
             /* Single image */
-            <TouchableOpacity
-              activeOpacity={0.9}
+            <Pressable
               onPress={() => router.push({ pathname: '/(modals)/image-viewer', params: { uri: item.image_url ?? '', title: item.title ?? '' } })}
               accessibilityLabel={t('feedTypes.post')}
               accessibilityRole="imagebutton"
             >
-              <Image source={{ uri: item.image_url }} style={styles.feedImage} contentFit="cover" />
-            </TouchableOpacity>
+              <Image source={{ uri: item.image_url }} style={{ width: '100%', height: 200, borderRadius: 12 }} contentFit="cover" />
+            </Pressable>
           ) : null}
 
           {/* Poll */}
@@ -258,33 +255,36 @@ export default function FeedItem({ item }: FeedItemProps) {
 
           {/* Location */}
           {item.location && (
-            <View style={styles.locationRow}>
+            <View className="flex-row items-center gap-[3px]">
               <Ionicons name="location-outline" size={13} color={theme.textMuted} />
-              <Text style={styles.locationText}>{item.location}</Text>
+              <Text className="text-xs text-muted-foreground">{item.location}</Text>
             </View>
           )}
 
           {/* Heart overlay for double-tap */}
           <Animated.View
             pointerEvents="none"
-            style={[
-              styles.heartOverlay,
-              {
-                opacity: overlayOpacity,
-                transform: [{ scale: overlayScale }],
-              },
-            ]}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              justifyContent: 'center',
+              alignItems: 'center',
+              opacity: overlayOpacity,
+              transform: [{ scale: overlayScale }],
+            }}
           >
             <Ionicons name="heart" size={80} color={primary} />
           </Animated.View>
-        </TouchableOpacity>
+        </Pressable>
 
         {/* Actions row */}
-        <View style={styles.actions}>
-          <TouchableOpacity
-            style={styles.actionBtn}
+        <View className="flex-row gap-4 pt-1 border-t border-border/50">
+          <Pressable
+            className="flex-row items-center gap-1.5"
             onPress={handleLikePress}
-            activeOpacity={0.7}
             accessibilityLabel={liked ? t('unlikePost') : t('likePost')}
             accessibilityRole="button"
           >
@@ -296,16 +296,16 @@ export default function FeedItem({ item }: FeedItemProps) {
               />
             </Animated.View>
             {likesCount > 0 && (
-              <Text style={[styles.actionCount, liked && { color: primary }]}>
+              <Text className="text-sm" style={{ color: liked ? primary : theme.textMuted }}>
                 {likesCount}
               </Text>
             )}
-          </TouchableOpacity>
+          </Pressable>
 
           {(item.comments_count ?? 0) > 0 && (
-            <View style={styles.actionBtn}>
+            <View className="flex-row items-center gap-1.5">
               <Ionicons name="chatbubble-outline" size={17} color={theme.textMuted} />
-              <Text style={styles.actionCount}>{item.comments_count}</Text>
+              <Text className="text-sm text-muted-foreground">{item.comments_count}</Text>
             </View>
           )}
         </View>
@@ -322,36 +322,4 @@ export default function FeedItem({ item }: FeedItemProps) {
       />
     </View>
   );
-}
-
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    wrapper: { marginHorizontal: SPACING.md, marginVertical: SPACING.sm - 2 },
-    card: { gap: SPACING.sm },
-    actor: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm + 2 },
-    actorInfo: { flex: 1 },
-    actorName: { ...TYPOGRAPHY.label, fontWeight: '600', color: theme.text },
-    time: { ...TYPOGRAPHY.caption, color: theme.textMuted },
-    typeBadge: { backgroundColor: theme.borderSubtle, borderRadius: RADIUS.sm, paddingHorizontal: SPACING.sm, paddingVertical: 3, marginRight: SPACING.xs },
-    moreBtn: { padding: SPACING.xs },
-    typeBadgeText: { fontSize: 11, fontWeight: '600', color: theme.textSecondary },
-    title: { ...TYPOGRAPHY.body, fontWeight: '600', color: theme.text },
-    body: { ...TYPOGRAPHY.label, color: theme.textSecondary, lineHeight: 20 },
-    readMore: { ...TYPOGRAPHY.bodySmall, color: theme.textMuted, fontWeight: '500' },
-    feedImage: { width: '100%', height: 200, borderRadius: RADIUS.md },
-    locationRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
-    locationText: { ...TYPOGRAPHY.caption, color: theme.textMuted },
-    actions: { flexDirection: 'row', gap: SPACING.md, paddingTop: SPACING.xs, borderTopWidth: 1, borderTopColor: theme.borderSubtle },
-    actionBtn: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-    actionCount: { ...TYPOGRAPHY.bodySmall, color: theme.textMuted },
-    heartOverlay: {
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-  });
 }
