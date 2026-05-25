@@ -98,6 +98,27 @@ function combineClasses(...classes: Array<string | false | undefined>): string |
   return className || undefined;
 }
 
+function decoratedInputClass(className?: string): string | undefined {
+  return combineClasses(
+    'min-w-0 flex-1 border-0 bg-transparent px-0 py-0 shadow-none outline-none',
+    'focus-visible:border-transparent focus-visible:ring-0',
+    className,
+  );
+}
+
+function decoratedWrapperClass(
+  className: string | undefined,
+  size: InputProps['size'],
+  radius: InputProps['radius'],
+): string | undefined {
+  return combineClasses(
+    'flex w-full items-center gap-2 px-3 py-2',
+    sizeClass(size),
+    radiusClass(radius),
+    className,
+  );
+}
+
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({
   className,
   classNames,
@@ -147,7 +168,9 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({
   const inputElement = (
     <HeroUIInput
       className={combineClasses(
-        classNames?.input,
+        startContent || trailingContent
+          ? decoratedInputClass(classNames?.input)
+          : classNames?.input,
         !startContent && !endContent && classNames?.inputWrapper,
         sizeClass(size),
         !startContent && !endContent && radiusClass(radius),
@@ -165,11 +188,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({
 
   const input = startContent || trailingContent ? (
     <div
-      className={combineClasses(
-        'flex items-center gap-2',
+      className={decoratedWrapperClass(
         classNames?.inputWrapper,
-        sizeClass(size),
-        radiusClass(radius),
+        size,
+        radius,
       )}
     >
       {startContent ? <span className="shrink-0">{startContent}</span> : null}
@@ -185,18 +207,19 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({
       return (
         <div
           className={combineClasses(
-            'flex items-center gap-2',
+            decoratedWrapperClass(
+              classNames?.inputWrapper,
+              size,
+              radius,
+            ),
             classNames?.base,
-            classNames?.inputWrapper,
-            sizeClass(size),
-            radiusClass(radius),
             className,
           )}
           style={fieldStyle}
         >
           {startContent ? <span className="shrink-0">{startContent}</span> : null}
           <HeroUIInput
-            className={classNames?.input}
+            className={decoratedInputClass(classNames?.input)}
             disabled={isDisabled}
             fullWidth={fullWidth}
             readOnly={isReadOnly}

@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { forwardRef, type ElementType, type ReactNode } from 'react';
+import { forwardRef, type ElementType, type MouseEvent, type ReactNode } from 'react';
 import type { ButtonHTMLAttributes } from 'react';
 import {
   Button as HeroUIButton,
@@ -118,10 +118,14 @@ function radiusClass(radius?: ButtonProps['radius']): string | undefined {
   }
 }
 
-function combineClasses(...classes: Array<string | undefined>): string | undefined {
+function combineClasses(...classes: Array<string | false | undefined>): string | undefined {
   const className = classes.filter(Boolean).join(' ');
 
   return className || undefined;
+}
+
+function buttonSizeClass(size?: ButtonProps['size']): string {
+  return size === 'sm' || size === 'lg' ? `button--${size}` : 'button--md';
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -135,18 +139,27 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       disableAnimation: _disableAnimation,
       disableRipple: _disableRipple,
       endContent,
+      fullWidth,
+      isDisabled,
+      isIconOnly,
       isLoading,
       isPending,
+      onPress,
       radius,
+      size,
       spinner,
       spinnerPlacement = 'start',
       startContent,
+      type,
       variant,
+      disabled,
       ...props
     },
     ref,
   ) => {
     const pending = isPending ?? isLoading ?? false;
+    const disabledState = isDisabled ?? disabled ?? false;
+    const mappedVariant = mapVariant(color, variant);
     const pendingIndicator = spinner ?? <HeroUISpinner color="current" size="sm" />;
     const content = typeof children === 'function'
       ? children
@@ -162,24 +175,63 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const sharedProps = {
       className: combineClasses(classNames?.base, radiusClass(radius), className),
+      fullWidth,
+      isDisabled: disabledState,
+      isIconOnly,
       isPending: pending,
-      variant: mapVariant(color, variant),
+      size,
+      type,
+      variant: mappedVariant,
+      onPress,
       ...props,
     } as HeroUIButtonProps;
 
     if (Component) {
+      const directChildren = typeof content === 'function'
+        ? content({
+            isDisabled: disabledState,
+            isPending: pending,
+          } as never)
+        : content;
+      const directClassName = combineClasses(
+        'button',
+        buttonSizeClass(size),
+        `button--${mappedVariant}`,
+        fullWidth && 'w-full',
+        isIconOnly && 'button--icon-only',
+        classNames?.base,
+        radiusClass(radius),
+        className,
+      );
+      const handleClick = (event: MouseEvent<HTMLElement>) => {
+        if (disabledState || pending) {
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
+
+        props.onClick?.(event as MouseEvent<HTMLButtonElement>);
+        onPress?.(event as never);
+      };
+      const directProps = {
+        ...props,
+        'aria-disabled': disabledState || undefined,
+        'data-disabled': disabledState || undefined,
+        'data-pending': pending || undefined,
+        className: directClassName,
+        onClick: handleClick,
+        ref,
+      };
+
       return (
-        <HeroUIButton
-          ref={ref}
-          {...sharedProps}
-          render={(renderProps) => (
-            <Component {...renderProps} {...props}>
-              {renderProps.children}
-            </Component>
-          )}
+        <Component
+          {...directProps}
+          {...(Component === 'button'
+            ? { disabled: disabledState, type: type ?? 'button' }
+            : null)}
         >
-          {content}
-        </HeroUIButton>
+          {directChildren}
+        </Component>
       );
     }
 
