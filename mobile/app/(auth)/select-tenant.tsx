@@ -3,46 +3,32 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useMemo, useCallback } from 'react';
+import { useCallback } from 'react';
 import {
   View,
   Text,
   FlatList,
-  TouchableOpacity,
-  Image,
-  ActivityIndicator,
-  StyleSheet,
+  Pressable,
   SafeAreaView,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-
 import { useTranslation } from 'react-i18next';
+import { Separator } from 'heroui-native';
 
 import { listTenants, type TenantListItem } from '@/lib/api/tenant';
 import { useApi } from '@/lib/hooks/useApi';
 import { useTenant, usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import Button from '@/components/ui/Button';
 
-/** White text used on primary-colored backgrounds for guaranteed contrast */
-const PRIMARY_CONTRAST_TEXT = '#FFFFFF'; // contrast text on primary
-
-/**
- * Tenant picker — shown before login when the user needs to select
- * which timebank community they belong to.
- *
- * Route: /(auth)/select-tenant
- * Navigated to from: login screen "Not your timebank?" link
- */
 export default function SelectTenantScreen() {
   const { t } = useTranslation('auth');
   const { setTenantSlug, tenantSlug } = useTenant();
   const primary = usePrimaryColor();
   const { data, isLoading, error, refresh } = useApi(() => listTenants());
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme, primary), [theme, primary]);
-  const Separator = useCallback(() => <View style={styles.separator} />, [styles]);
 
   const tenants = data?.data ?? [];
 
@@ -52,98 +38,76 @@ export default function SelectTenantScreen() {
     router.back();
   }
 
+  const ItemSeparator = useCallback(() => <Separator />, []);
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>{t('selectTenant.title')}</Text>
-        <Text style={styles.subtitle}>{t('selectTenant.subtitle')}</Text>
+    <SafeAreaView className="flex-1 bg-background">
+      <View className="px-6 pt-6 pb-2">
+        <Text className="text-[22px] font-bold text-foreground">{t('selectTenant.title')}</Text>
+        <Text className="text-sm text-muted-foreground mt-1">{t('selectTenant.subtitle')}</Text>
       </View>
 
-      {isLoading && (
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" color={primary} />
-        </View>
-      )}
+      {isLoading ? (
+        <LoadingSpinner />
+      ) : null}
 
-      {error && (
-        <View style={styles.centered}>
-          <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity onPress={() => void refresh()} style={{ marginTop: 12, paddingHorizontal: 20, paddingVertical: 10 }}>
-            <Text style={{ color: primary, fontWeight: '600', fontSize: 15 }}>{t('common:buttons.retry')}</Text>
-          </TouchableOpacity>
+      {error ? (
+        <View className="flex-1 items-center justify-center p-8">
+          <Text className="text-danger text-sm mb-3">{error}</Text>
+          <Button onPress={() => void refresh()} variant="ghost">
+            {t('common:buttons.retry')}
+          </Button>
         </View>
-      )}
+      ) : null}
 
-      <FlatList<TenantListItem>
-        data={tenants}
-        keyExtractor={(item) => String(item.id)}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={[
-              styles.tenantRow,
-              item.slug === tenantSlug && styles.tenantRowActive,
-            ]}
-            onPress={() => void handleSelect(item)}
-            activeOpacity={0.7}
-            accessibilityRole="button"
-            accessibilityLabel={item.name}
-            accessibilityState={{ selected: item.slug === tenantSlug }}
-          >
-            {item.logo_url ? (
-              <Image source={{ uri: item.logo_url }} style={styles.logo} resizeMode="contain" />
-            ) : (
-              <View style={styles.logoPlaceholder}>
-                <Text style={styles.logoInitial}>{item.name.charAt(0).toUpperCase()}</Text>
-              </View>
-            )}
-            <Text style={styles.tenantName}>{item.name}</Text>
-            {item.slug === tenantSlug && (
-              <Ionicons name="checkmark" size={18} color={primary} />
-            )}
-          </TouchableOpacity>
-        )}
-        ItemSeparatorComponent={Separator}
-        ListEmptyComponent={
-          !isLoading && !error ? (
-            <View style={styles.centered}>
-              <Text style={styles.emptyText}>{t('selectTenant.empty')}</Text>
+      {!isLoading && !error ? (
+        <FlatList<TenantListItem>
+          data={tenants}
+          keyExtractor={(item) => String(item.id)}
+          ItemSeparatorComponent={ItemSeparator}
+          contentContainerStyle={{ paddingHorizontal: 16 }}
+          renderItem={({ item }) => {
+            const isActive = item.slug === tenantSlug;
+            return (
+              <Pressable
+                className={`flex-row items-center py-3.5 gap-3${isActive ? ' bg-accent/10 rounded-xl px-2' : ''}`}
+                onPress={() => void handleSelect(item)}
+                accessibilityRole="button"
+                accessibilityLabel={item.name}
+                accessibilityState={{ selected: isActive }}
+              >
+                {item.logo_url ? (
+                  <Image
+                    source={{ uri: item.logo_url }}
+                    style={{ width: 40, height: 40, borderRadius: 8 }}
+                    contentFit="contain"
+                  />
+                ) : (
+                  <View
+                    className="w-10 h-10 rounded-lg items-center justify-center"
+                    style={{ backgroundColor: primary }}
+                  >
+                    <Text className="text-white font-bold text-lg">
+                      {item.name.charAt(0).toUpperCase()}
+                    </Text>
+                  </View>
+                )}
+                <Text className="flex-1 text-base font-medium text-foreground">{item.name}</Text>
+                {isActive ? (
+                  <Ionicons name="checkmark" size={18} color={primary} />
+                ) : null}
+              </Pressable>
+            );
+          }}
+          ListEmptyComponent={
+            <View className="items-center justify-center p-8">
+              <Text className="text-muted-foreground text-[15px] text-center">
+                {t('selectTenant.empty')}
+              </Text>
             </View>
-          ) : null
-        }
-        contentContainerStyle={styles.list}
-      />
+          }
+        />
+      ) : null}
     </SafeAreaView>
   );
-}
-
-function makeStyles(theme: Theme, primary: string) {
-  return StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.surface },
-    header: { padding: 24, paddingBottom: 8 },
-    title: { fontSize: 22, fontWeight: '700', color: theme.text },
-    subtitle: { fontSize: 14, color: theme.textSecondary, marginTop: 4 },
-    centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
-    errorText: { color: theme.error, fontSize: 14 },
-    emptyText: { color: theme.textSecondary, fontSize: 15, textAlign: 'center' },
-    list: { paddingHorizontal: 16 },
-    tenantRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingVertical: 14,
-      gap: 12,
-    },
-    tenantRowActive: { backgroundColor: theme.infoBg, borderRadius: 10, paddingHorizontal: 8 },
-    logo: { width: 40, height: 40, borderRadius: 8 },
-    logoPlaceholder: {
-      width: 40,
-      height: 40,
-      borderRadius: 8,
-      backgroundColor: primary,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    logoInitial: { color: PRIMARY_CONTRAST_TEXT, fontWeight: '700', fontSize: 18 }, // contrast text on primary
-    tenantName: { flex: 1, fontSize: 16, fontWeight: '500', color: theme.text },
-    separator: { height: 1, backgroundColor: theme.borderSubtle },
-  });
 }
