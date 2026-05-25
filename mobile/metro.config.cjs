@@ -2,21 +2,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
+//
+// DEPRECATED — this file is superseded by metro.config.js which adds
+// withUniwindConfig (NativeWind CSS transformer) and the heroui-native
+// ESM transformIgnorePatterns allowlist.
+//
+// Metro resolves metro.config.js before metro.config.cjs, so this file
+// is never loaded in normal operation. It is kept only for tooling that
+// explicitly requires a .cjs extension; in that case it delegates to the
+// canonical config.
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const { getDefaultConfig } = require('expo/metro-config');
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const exclusionList = require('metro-config/src/defaults/exclusionList');
-
-const config = getDefaultConfig(__dirname);
-
-// Exclude test files and jest setup from the Metro bundle.
-// Without this, Metro picks up *.test.ts(x) files which import
-// @testing-library/react-native — a test-only package that cannot be bundled.
-config.resolver.blockList = exclusionList([
-  /.*\.test\.[jt]sx?$/,
-  /.*\.spec\.[jt]sx?$/,
-  /jest-setup\.[jt]s$/,
-]);
-
-module.exports = config;
+module.exports = require('./metro.config.js');

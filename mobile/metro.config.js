@@ -17,6 +17,37 @@ config.resolver.blockList = [
   /.*[/\\]jest-setup\.[jt]s$/,
 ];
 
+// Enable package.json "exports" field resolution. Required for heroui-native
+// which uses conditional exports to serve the correct ESM/CJS entry point.
+config.resolver.unstable_enablePackageExports = true;
+
+// heroui-native ships as ESM source (JSX/TSX inside node_modules) and must be
+// transformed by Babel — same allowlist as jest.config.js transformIgnorePatterns.
+// tailwind-variants and react-native-worklets are also ESM-only packages.
+config.transformer.transformIgnorePatterns = [
+  'node_modules/(?!(' +
+    'react-native|' +
+    '@react-native(-community)?|' +
+    'expo|' +
+    '@expo|' +
+    '@expo-google-fonts|' +
+    'react-navigation|' +
+    '@react-navigation|' +
+    '@unimodules|' +
+    'sentry-expo|' +
+    '@sentry/react-native|' +
+    'react-native-svg|' +
+    'react-native-reanimated|' +
+    'react-native-worklets|' +
+    'react-native-gesture-handler|' +
+    '@gorhom|' +
+    'heroui-native|' +
+    'tailwind-variants|' +
+    'nativewind|' +
+    'uniwind' +
+  '))',
+];
+
 module.exports = withUniwindConfig(config, {
   cssEntryFile: './global.css',
   dtsFile: './uniwind-types.d.ts',

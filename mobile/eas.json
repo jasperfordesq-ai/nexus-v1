@@ -8,7 +8,14 @@
       "developmentClient": true,
       "distribution": "internal",
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "gradleCommand": ":app:assembleDebug"
+      },
+      "ios": {
+        "simulator": true
+      },
+      "cache": {
+        "key": "nexus-dev-v1"
       },
       "env": {
         "EXPO_PUBLIC_API_URL": "http://10.0.2.2:8090",
@@ -17,8 +24,15 @@
     },
     "preview": {
       "distribution": "internal",
+      "channel": "preview",
       "android": {
         "buildType": "apk"
+      },
+      "ios": {
+        "resourceClass": "m-medium"
+      },
+      "cache": {
+        "key": "nexus-preview-v1"
       },
       "env": {
         "EXPO_PUBLIC_API_URL": "https://api.project-nexus.ie",
@@ -27,8 +41,15 @@
     },
     "production": {
       "autoIncrement": true,
+      "channel": "production",
       "android": {
         "buildType": "app-bundle"
+      },
+      "ios": {
+        "resourceClass": "m-medium"
+      },
+      "cache": {
+        "key": "nexus-prod-v1"
       },
       "env": {
         "EXPO_PUBLIC_API_URL": "https://api.project-nexus.ie",
@@ -41,6 +62,9 @@
       "android": {
         "serviceAccountKeyPath": "./google-play-key.json",
         "track": "internal"
+      },
+      "ios": {
+        "ascAppId": "APPLE_APP_STORE_CONNECT_APP_ID"
       }
     }
   }

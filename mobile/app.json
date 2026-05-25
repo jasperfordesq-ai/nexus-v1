@@ -79,6 +79,14 @@
         }
       ]
     ],
+    "updates": {
+      "enabled": true,
+      "fallbackToCacheTimeout": 0,
+      "runtimeVersion": {
+        "policy": "appVersion"
+      },
+      "url": "https://u.expo.dev/EXPO_PROJECT_ID"
+    },
     "experiments": {
       "typedRoutes": true
     }
