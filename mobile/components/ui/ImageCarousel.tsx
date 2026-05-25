@@ -3,17 +3,17 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import {
   Dimensions,
   FlatList,
-  Image,
+  Pressable,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
   type ViewToken,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
 
 interface CarouselImage {
@@ -28,15 +28,11 @@ interface ImageCarouselProps {
 }
 
 const screenWidth = Dimensions.get('window').width;
-const HORIZONTAL_MARGIN = 16; // matches FeedItem wrapper marginHorizontal
-const CARD_PADDING = 16; // matches Card padding
+const HORIZONTAL_MARGIN = 16;
+const CARD_PADDING = 16;
 const IMAGE_WIDTH = screenWidth - HORIZONTAL_MARGIN * 2 - CARD_PADDING * 2;
 
-export default function ImageCarousel({
-  images,
-  height = 250,
-  onImagePress,
-}: ImageCarouselProps) {
+export default function ImageCarousel({ images, height = 250, onImagePress }: ImageCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const onViewableItemsChanged = useRef(
@@ -65,8 +61,7 @@ export default function ImageCarousel({
 
   const renderItem = useCallback(
     ({ item, index }: { item: CarouselImage; index: number }) => (
-      <TouchableOpacity
-        activeOpacity={0.9}
+      <Pressable
         onPress={() => handleImagePress(index)}
         accessibilityLabel={item.alt ?? `Image ${index + 1} of ${images.length}`}
         accessibilityRole="imagebutton"
@@ -74,20 +69,17 @@ export default function ImageCarousel({
         <Image
           source={{ uri: item.uri }}
           style={{ width: IMAGE_WIDTH, height, borderRadius: 10 }}
-          resizeMode="cover"
+          contentFit="cover"
         />
-      </TouchableOpacity>
+      </Pressable>
     ),
     [handleImagePress, height, images.length],
   );
 
-  const keyExtractor = useCallback(
-    (_: CarouselImage, index: number) => `carousel-${index}`,
-    [],
-  );
+  const keyExtractor = useCallback((_: CarouselImage, index: number) => `carousel-${index}`, []);
 
   return (
-    <View style={styles.container}>
+    <View>
       <FlatList
         data={images}
         renderItem={renderItem}
@@ -114,27 +106,21 @@ export default function ImageCarousel({
       </View>
 
       {/* Page indicator dots */}
-      {images.length > 1 && (
+      {images.length > 1 ? (
         <View style={styles.dotsContainer}>
           {images.map((_, index) => (
             <View
               key={index}
-              style={[
-                styles.dot,
-                index === activeIndex ? styles.dotActive : styles.dotInactive,
-              ]}
+              style={[styles.dot, index === activeIndex ? styles.dotActive : styles.dotInactive]}
             />
           ))}
         </View>
-      )}
+      ) : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    position: 'relative',
-  },
   countBadge: {
     position: 'absolute',
     top: 8,
@@ -159,15 +145,7 @@ const styles = StyleSheet.create({
     right: 0,
     gap: 6,
   },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-  },
-  dotActive: {
-    backgroundColor: 'rgba(255, 255, 255, 1)',
-  },
-  dotInactive: {
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
-  },
+  dot: { width: 6, height: 6, borderRadius: 3 },
+  dotActive: { backgroundColor: 'rgba(255,255,255,1)' },
+  dotInactive: { backgroundColor: 'rgba(255,255,255,0.5)' },
 });

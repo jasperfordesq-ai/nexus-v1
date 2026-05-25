@@ -3,18 +3,10 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect, useRef } from 'react';
-import {
-  Animated,
-  Pressable,
-  StyleSheet,
-  Text,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import React from 'react';
+import { View, Text } from 'react-native';
+import { Checkbox as HeroCheckbox } from 'heroui-native';
 import * as Haptics from 'expo-haptics';
-
-import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme } from '@/lib/hooks/useTheme';
 
 interface CheckboxProps {
   checked: boolean;
@@ -23,89 +15,24 @@ interface CheckboxProps {
   disabled?: boolean;
 }
 
-export default function Checkbox({
-  checked,
-  onPress,
-  label,
-  disabled = false,
-}: CheckboxProps) {
-  const theme = useTheme();
-  const primary = usePrimaryColor();
-  const scaleAnim = useRef(new Animated.Value(1)).current;
-
-  useEffect(() => {
-    Animated.spring(scaleAnim, {
-      toValue: 1,
-      friction: 4,
-      tension: 200,
-      useNativeDriver: true,
-    }).start();
-  }, [checked, scaleAnim]);
-
-  function handlePress() {
-    if (disabled) return;
-    void Haptics.selectionAsync();
-
-    // Trigger scale-down then spring back
-    scaleAnim.setValue(0.8);
-    Animated.spring(scaleAnim, {
-      toValue: 1,
-      friction: 4,
-      tension: 200,
-      useNativeDriver: true,
-    }).start();
-
-    onPress();
-  }
+export default function Checkbox({ checked, onPress, label, disabled = false }: CheckboxProps) {
+  const handleChange = (isSelected: boolean) => {
+    if (isSelected !== checked) {
+      Haptics.selectionAsync().catch(() => {});
+      onPress();
+    }
+  };
 
   return (
-    <Pressable
-      onPress={handlePress}
-      disabled={disabled}
-      style={[styles.container, disabled && styles.disabled]}
-      accessibilityRole="checkbox"
-      accessibilityState={{ checked, disabled }}
-    >
-      <Animated.View
-        style={[
-          styles.box,
-          {
-            borderColor: checked ? primary : theme.border,
-            backgroundColor: checked ? primary : 'transparent',
-            transform: [{ scale: scaleAnim }],
-          },
-        ]}
-      >
-        {checked && (
-          <Ionicons name="checkmark" size={14} color="#fff" />
-        )}
-      </Animated.View>
+    <View className="flex-row items-center gap-2.5">
+      <HeroCheckbox
+        isSelected={checked}
+        onSelectedChange={handleChange}
+        isDisabled={disabled}
+      />
       {label ? (
-        <Text style={[styles.label, { color: theme.text }]}>{label}</Text>
+        <Text className="text-base text-foreground font-normal flex-1">{label}</Text>
       ) : null}
-    </Pressable>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  box: {
-    width: 22,
-    height: 22,
-    borderRadius: 6,
-    borderWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  label: {
-    fontSize: 15,
-    fontWeight: '400',
-  },
-  disabled: {
-    opacity: 0.5,
-  },
-});

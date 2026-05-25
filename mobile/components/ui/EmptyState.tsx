@@ -4,9 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/lib/hooks/useTheme';
 import Button from './Button';
 
 interface EmptyStateProps {
@@ -17,56 +16,19 @@ interface EmptyStateProps {
   onAction?: () => void;
 }
 
-export default function EmptyState({
-  icon,
-  title,
-  subtitle,
-  actionLabel,
-  onAction,
-}: EmptyStateProps) {
-  const theme = useTheme();
-
+export default function EmptyState({ icon, title, subtitle, actionLabel, onAction }: EmptyStateProps) {
   return (
-    <View style={styles.container}>
-      <Ionicons name={icon} size={48} color={theme.textMuted} style={styles.icon} />
-      <Text style={[styles.title, { color: theme.text }]}>{title}</Text>
-      {subtitle && (
-        <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
-          {subtitle}
-        </Text>
-      )}
-      {actionLabel && onAction && (
-        <View style={styles.action}>
+    <View className="items-center justify-center px-8 py-12">
+      <Ionicons name={icon} size={48} className="mb-4 text-muted-foreground" />
+      <Text className="text-lg font-semibold text-foreground text-center mb-2">{title}</Text>
+      {subtitle ? (
+        <Text className="text-sm text-muted-foreground text-center leading-5 mb-1">{subtitle}</Text>
+      ) : null}
+      {actionLabel && onAction ? (
+        <View className="mt-5">
           <Button onPress={onAction}>{actionLabel}</Button>
         </View>
-      )}
+      ) : null}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 32,
-    paddingVertical: 48,
-  },
-  icon: {
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '600',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 14,
-    textAlign: 'center',
-    lineHeight: 20,
-    marginBottom: 4,
-  },
-  action: {
-    marginTop: 20,
-  },
-});

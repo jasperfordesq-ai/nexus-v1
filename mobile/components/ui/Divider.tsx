@@ -4,8 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { View } from 'react-native';
-import { useTheme } from '@/lib/hooks/useTheme';
+import { Separator } from 'heroui-native';
 
 interface DividerProps {
   spacing?: number;
@@ -13,15 +12,12 @@ interface DividerProps {
 }
 
 export default function Divider({ spacing = 16, color }: DividerProps) {
-  const theme = useTheme();
-
   return (
-    <View
-      style={{
-        height: 1,
-        backgroundColor: color ?? theme.border,
-        marginVertical: spacing,
-      }}
+    <Separator
+      style={[
+        { marginVertical: spacing },
+        color ? { backgroundColor: color } : undefined,
+      ]}
     />
   );
 }

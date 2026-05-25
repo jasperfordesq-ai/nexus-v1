@@ -3,15 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useRef, useCallback } from 'react';
-import {
-  Animated,
-  StyleSheet,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native';
+import React, { useCallback } from 'react';
+import { Pressable, View, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
 
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 
@@ -24,60 +20,44 @@ interface FABProps {
   position?: 'bottom-right' | 'bottom-center';
 }
 
-export default function FAB({
-  icon = 'add',
-  onPress,
-  color,
-  position = 'bottom-right',
-}: FABProps) {
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+export default function FAB({ icon = 'add', onPress, color, position = 'bottom-right' }: FABProps) {
   const primary = usePrimaryColor();
   const bgColor = color ?? primary;
-  const scale = useRef(new Animated.Value(1)).current;
+  const scale = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
 
   const handlePressIn = useCallback(() => {
-    Animated.spring(scale, {
-      toValue: 0.9,
-      useNativeDriver: true,
-    }).start();
+    scale.value = withSpring(0.9, { stiffness: 300, damping: 20 });
   }, [scale]);
 
   const handlePressOut = useCallback(() => {
-    Animated.spring(scale, {
-      toValue: 1,
-      friction: 3,
-      tension: 40,
-      useNativeDriver: true,
-    }).start();
+    scale.value = withSpring(1, { stiffness: 200, damping: 15 });
   }, [scale]);
 
   const handlePress = useCallback(() => {
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
     onPress();
   }, [onPress]);
 
-  const positionStyle =
-    position === 'bottom-center'
-      ? styles.bottomCenter
-      : styles.bottomRight;
+  const positionStyle = position === 'bottom-center' ? styles.bottomCenter : styles.bottomRight;
 
   return (
     <View style={[styles.wrapper, positionStyle]} pointerEvents="box-none">
-      <TouchableWithoutFeedback
+      <AnimatedPressable
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         onPress={handlePress}
         accessibilityRole="button"
         accessibilityLabel="Action button"
+        style={[styles.fab, { backgroundColor: bgColor }, animatedStyle]}
       >
-        <Animated.View
-          style={[
-            styles.fab,
-            { backgroundColor: bgColor, transform: [{ scale }] },
-          ]}
-        >
-          <Ionicons name={icon} size={28} color="#fff" />
-        </Animated.View>
-      </TouchableWithoutFeedback>
+        <Ionicons name={icon} size={28} color="#fff" />
+      </AnimatedPressable>
     </View>
   );
 }

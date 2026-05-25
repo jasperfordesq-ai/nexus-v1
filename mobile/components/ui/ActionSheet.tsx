@@ -3,12 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import React, { useMemo } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React from 'react';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import BottomSheet from '@/components/ui/BottomSheet';
 
 interface Action {
@@ -25,92 +24,56 @@ interface ActionSheetProps {
   actions: Action[];
 }
 
-export default function ActionSheet({
-  visible,
-  onClose,
-  title,
-  actions,
-}: ActionSheetProps) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-
-  // Calculate snap height: header (~50) + actions (56 each) + padding
-  const snapHeight = Math.min(
-    (title ? 50 : 18) + actions.length * 56 + 24,
-    400,
-  );
+export default function ActionSheet({ visible, onClose, title, actions }: ActionSheetProps) {
+  const snapHeight = Math.min((title ? 50 : 18) + actions.length * 56 + 24, 400);
 
   const handleAction = (action: Action) => {
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
     onClose();
-    // Small delay so the sheet closes before the action fires
     setTimeout(() => action.onPress(), 200);
   };
 
   return (
-    <BottomSheet
-      visible={visible}
-      onClose={onClose}
-      snapPoints={[snapHeight]}
-      title={title}
-    >
-      <View style={styles.list}>
+    <BottomSheet visible={visible} onClose={onClose} snapPoints={[snapHeight]} title={title}>
+      <View className="pt-1">
         {actions.map((action, index) => (
-          <TouchableOpacity
+          <Pressable
             key={index}
             style={[
               styles.actionRow,
-              index < actions.length - 1 && styles.actionBorder,
+              index < actions.length - 1 ? styles.actionBorder : undefined,
             ]}
-            activeOpacity={0.6}
             onPress={() => handleAction(action)}
             accessibilityLabel={action.label}
             accessibilityRole="button"
           >
-            {action.icon && (
+            {action.icon ? (
               <Ionicons
                 name={action.icon as keyof typeof Ionicons.glyphMap}
                 size={22}
-                color={action.destructive ? theme.error : theme.text}
-                style={styles.actionIcon}
+                className={action.destructive ? 'text-danger mr-3.5' : 'text-foreground mr-3.5'}
               />
-            )}
+            ) : null}
             <Text
-              style={[
-                styles.actionLabel,
-                action.destructive && { color: theme.error },
-              ]}
+              className={`text-base font-medium${action.destructive ? ' text-danger' : ' text-foreground'}`}
             >
               {action.label}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         ))}
       </View>
     </BottomSheet>
   );
 }
 
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    list: {
-      paddingTop: 4,
-    },
-    actionRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingVertical: 16,
-    },
-    actionBorder: {
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: theme.borderSubtle,
-    },
-    actionIcon: {
-      marginRight: 14,
-    },
-    actionLabel: {
-      fontSize: 16,
-      color: theme.text,
-      fontWeight: '500',
-    },
-  });
-}
+const styles = StyleSheet.create({
+  actionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+  },
+  actionBorder: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: 'rgba(0,0,0,0.1)',
+  },
+});

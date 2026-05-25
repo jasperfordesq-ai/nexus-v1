@@ -3,19 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import React, { useMemo, useRef, useCallback } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  Animated,
-  type NativeSyntheticEvent,
-  type TargetedEvent,
-  type TextInputProps,
-  StyleSheet,
-} from 'react-native';
-import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import React from 'react';
+import { View, Text, type TextInputProps } from 'react-native';
+import { Input as HeroInput } from 'heroui-native';
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -30,128 +20,34 @@ export default function Input({
   leftIcon,
   rightIcon,
   style,
-  onFocus: onFocusProp,
-  onBlur: onBlurProp,
+  editable,
   ...rest
 }: InputProps) {
-  const primary = usePrimaryColor();
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-
-  const focusAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(1)).current;
-
-  const handleFocus = useCallback(
-    (e: NativeSyntheticEvent<TargetedEvent>) => {
-      Animated.parallel([
-        Animated.timing(focusAnim, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: false,
-        }),
-        Animated.timing(scaleAnim, {
-          toValue: 1.01,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-      ]).start();
-      onFocusProp?.(e);
-    },
-    [focusAnim, scaleAnim, onFocusProp],
-  );
-
-  const handleBlur = useCallback(
-    (e: NativeSyntheticEvent<TargetedEvent>) => {
-      Animated.parallel([
-        Animated.timing(focusAnim, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: false,
-        }),
-        Animated.timing(scaleAnim, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-      ]).start();
-      onBlurProp?.(e);
-    },
-    [focusAnim, scaleAnim, onBlurProp],
-  );
-
-  const animatedBorderColor = focusAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [error ? theme.error : theme.border, error ? theme.error : primary],
-  });
+  const isDisabled = editable === false;
 
   return (
-    <View style={styles.wrapper}>
-      {label && <Text style={styles.label}>{label}</Text>}
-      <Animated.View
-        style={[
-          styles.inputContainer,
-          {
-            borderColor: animatedBorderColor,
-            transform: [{ scale: scaleAnim }],
-          },
-        ]}
-      >
-        {leftIcon && <View style={styles.leftIcon}>{leftIcon}</View>}
-        <TextInput
-          style={[
-            styles.input,
-            leftIcon ? styles.inputWithLeftIcon : undefined,
-            rightIcon ? styles.inputWithRightIcon : undefined,
-            style,
-          ]}
-          placeholderTextColor={theme.textMuted}
+    <View className="mb-3">
+      {label ? (
+        <Text className="text-sm font-semibold text-foreground mb-1.5">{label}</Text>
+      ) : null}
+      <View className="flex-row items-center">
+        {leftIcon ? (
+          <View className="pl-3 absolute left-0 z-10">{leftIcon}</View>
+        ) : null}
+        <HeroInput
+          isInvalid={!!error}
+          isDisabled={isDisabled}
+          style={[leftIcon ? { paddingLeft: 40 } : undefined, rightIcon ? { paddingRight: 40 } : undefined, style]}
+          className="flex-1"
           {...rest}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
         />
-        {rightIcon && <View style={styles.rightIcon}>{rightIcon}</View>}
-      </Animated.View>
-      {error && <Text style={styles.errorText}>{error}</Text>}
+        {rightIcon ? (
+          <View className="pr-3 absolute right-0 z-10">{rightIcon}</View>
+        ) : null}
+      </View>
+      {error ? (
+        <Text className="text-xs text-danger mt-1">{error}</Text>
+      ) : null}
     </View>
   );
-}
-
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    wrapper: { marginBottom: 12 },
-    label: {
-      fontSize: 14,
-      fontWeight: '600',
-      color: theme.text,
-      marginBottom: 6,
-    },
-    inputContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      borderWidth: 1,
-      borderColor: theme.border,
-      borderRadius: 10,
-      backgroundColor: theme.surface,
-    },
-    input: {
-      flex: 1,
-      paddingHorizontal: 14,
-      paddingVertical: 12,
-      fontSize: 16,
-      color: theme.text,
-    },
-    inputWithLeftIcon: {
-      paddingLeft: 0,
-    },
-    inputWithRightIcon: {
-      paddingRight: 0,
-    },
-    leftIcon: {
-      paddingLeft: 12,
-    },
-    rightIcon: {
-      paddingRight: 12,
-    },
-    errorText: { fontSize: 12, color: theme.error, marginTop: 4 },
-  });
 }

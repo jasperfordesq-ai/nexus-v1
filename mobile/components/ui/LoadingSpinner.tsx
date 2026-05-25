@@ -3,36 +3,31 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
-import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme } from '@/lib/hooks/useTheme';
+import React from 'react';
+import { View } from 'react-native';
+import { Spinner } from 'heroui-native';
+import type { SpinnerSize } from 'heroui-native';
 
 interface LoadingSpinnerProps {
   size?: 'small' | 'large';
   fullScreen?: boolean;
 }
 
-export default function LoadingSpinner({ size = 'large', fullScreen = false }: LoadingSpinnerProps) {
-  const primary = usePrimaryColor();
-  const theme = useTheme();
+const SIZE_MAP: Record<'small' | 'large', SpinnerSize> = {
+  small: 'sm',
+  large: 'lg',
+};
 
+export default function LoadingSpinner({ size = 'large', fullScreen = false }: LoadingSpinnerProps) {
   return (
-    <View style={[styles.container, fullScreen && [styles.fullScreen, { backgroundColor: theme.bg + 'CC' }]]}>
-      <ActivityIndicator size={size} color={primary} />
+    <View
+      className={
+        fullScreen
+          ? 'absolute inset-0 z-10 items-center justify-center bg-background/80'
+          : 'flex-1 items-center justify-center p-10'
+      }
+    >
+      <Spinner size={SIZE_MAP[size]} />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 40,
-  },
-  fullScreen: {
-    position: 'absolute',
-    inset: 0,
-    zIndex: 10,
-  },
-});

@@ -3,9 +3,10 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { View, Text, StyleSheet } from 'react-native';
-import { Image } from 'expo-image';
-import { usePrimaryColor } from '@/lib/hooks/useTenant';
+import React from 'react';
+import { View } from 'react-native';
+import { Avatar as HeroAvatar } from 'heroui-native';
+import type { AvatarSize } from 'heroui-native';
 
 interface AvatarProps {
   uri: string | null | undefined;
@@ -14,48 +15,10 @@ interface AvatarProps {
   showOnline?: boolean;
 }
 
-export default function Avatar({ uri, name, size = 40, showOnline = false }: AvatarProps) {
-  const primary = usePrimaryColor();
-  const initials = getInitials(name);
-
-  const sizeStyle = { width: size, height: size, borderRadius: size / 2 };
-
-  const onlineDot = showOnline ? (
-    <View
-      style={[
-        styles.onlineDot,
-        {
-          right: 0,
-          bottom: 0,
-        },
-      ]}
-    />
-  ) : null;
-
-  if (uri) {
-    return (
-      <View style={sizeStyle}>
-        <Image
-          source={{ uri }}
-          style={[styles.image, sizeStyle]}
-          contentFit="cover"
-          accessibilityLabel={`${name} avatar`}
-        />
-        {onlineDot}
-      </View>
-    );
-  }
-
-  return (
-    <View
-      style={[styles.fallback, sizeStyle, { backgroundColor: primary }]}
-      accessibilityLabel={name ?? undefined}
-      accessibilityRole="image"
-    >
-      <Text style={[styles.initials, { fontSize: size * 0.36 }]}>{initials}</Text>
-      {onlineDot}
-    </View>
-  );
+function sizeToToken(px: number): AvatarSize {
+  if (px <= 30) return 'sm';
+  if (px <= 50) return 'md';
+  return 'lg';
 }
 
 function getInitials(name: string | null | undefined): string {
@@ -66,17 +29,33 @@ function getInitials(name: string | null | undefined): string {
   return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
 }
 
-const styles = StyleSheet.create({
-  image: {},
-  fallback: { justifyContent: 'center', alignItems: 'center' },
-  initials: { color: '#fff', fontWeight: '700' },
-  onlineDot: {
-    position: 'absolute',
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: '#22c55e',
-    borderWidth: 2,
-    borderColor: '#fff',
-  },
-});
+export default function Avatar({ uri, name, size = 40, showOnline = false }: AvatarProps) {
+  const sizeToken = sizeToToken(size);
+  const initials = getInitials(name);
+
+  return (
+    <View style={{ position: 'relative', alignSelf: 'flex-start' }}>
+      <HeroAvatar size={sizeToken} accessibilityLabel={name ?? undefined}>
+        {uri ? (
+          <HeroAvatar.Image source={{ uri }} />
+        ) : null}
+        <HeroAvatar.Fallback>{initials}</HeroAvatar.Fallback>
+      </HeroAvatar>
+      {showOnline ? (
+        <View
+          style={{
+            position: 'absolute',
+            right: 0,
+            bottom: 0,
+            width: 10,
+            height: 10,
+            borderRadius: 5,
+            backgroundColor: '#22c55e',
+            borderWidth: 2,
+            borderColor: '#fff',
+          }}
+        />
+      ) : null}
+    </View>
+  );
+}

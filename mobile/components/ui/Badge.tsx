@@ -4,11 +4,17 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { Chip } from 'heroui-native';
+import type { ChipSize } from 'heroui-native';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 
 type BadgeSize = 'sm' | 'md';
 type BadgeVariant = 'solid' | 'outline';
+
+const SIZE_MAP: Record<BadgeSize, ChipSize> = {
+  sm: 'sm',
+  md: 'md',
+};
 
 interface BadgeProps {
   label: string;
@@ -17,60 +23,38 @@ interface BadgeProps {
   variant?: BadgeVariant;
 }
 
-const SIZE_CONFIG: Record<BadgeSize, { height: number; fontSize: number; paddingHorizontal: number }> = {
-  sm: { height: 20, fontSize: 10, paddingHorizontal: 6 },
-  md: { height: 26, fontSize: 12, paddingHorizontal: 10 },
-};
-
-export default function Badge({
-  label,
-  color,
-  size = 'md',
-  variant = 'solid',
-}: BadgeProps) {
+export default function Badge({ label, color, size = 'md', variant = 'solid' }: BadgeProps) {
   const primary = usePrimaryColor();
+  // When a custom color is provided we can't pass it directly to HeroUI's color prop
+  // (it only accepts named tokens). Fall back to inline style for custom tenant colors.
+  const useCustomColor = !!color;
   const resolvedColor = color ?? primary;
-  const config = SIZE_CONFIG[size];
+
+  const chipVariant = variant === 'solid' ? 'primary' : 'tertiary';
+
+  if (useCustomColor) {
+    return (
+      <Chip
+        variant={chipVariant}
+        size={SIZE_MAP[size]}
+        style={
+          variant === 'solid'
+            ? { backgroundColor: resolvedColor }
+            : { borderWidth: 1, borderColor: resolvedColor, backgroundColor: 'transparent' }
+        }
+      >
+        <Chip.Label
+          style={variant === 'solid' ? { color: '#fff' } : { color: resolvedColor }}
+        >
+          {label}
+        </Chip.Label>
+      </Chip>
+    );
+  }
 
   return (
-    <View
-      style={[
-        styles.base,
-        {
-          height: config.height,
-          paddingHorizontal: config.paddingHorizontal,
-        },
-        variant === 'solid' && { backgroundColor: resolvedColor },
-        variant === 'outline' && {
-          borderWidth: 1,
-          borderColor: resolvedColor,
-          backgroundColor: 'transparent',
-        },
-      ]}
-    >
-      <Text
-        style={[
-          styles.text,
-          { fontSize: config.fontSize },
-          variant === 'solid' && { color: '#FFFFFF' },
-          variant === 'outline' && { color: resolvedColor },
-        ]}
-        numberOfLines={1}
-      >
-        {label}
-      </Text>
-    </View>
+    <Chip variant={chipVariant} size={SIZE_MAP[size]}>
+      <Chip.Label>{label}</Chip.Label>
+    </Chip>
   );
 }
-
-const styles = StyleSheet.create({
-  base: {
-    borderRadius: 999,
-    alignItems: 'center',
-    justifyContent: 'center',
-    alignSelf: 'flex-start',
-  },
-  text: {
-    fontWeight: '600',
-  },
-});

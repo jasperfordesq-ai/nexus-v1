@@ -3,23 +3,27 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useMemo, useRef, useCallback } from 'react';
-import {
-  View,
-  TouchableOpacity,
-  Animated,
-  type ViewProps,
-  StyleSheet,
-} from 'react-native';
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import React from 'react';
+import { Pressable, type StyleProp, type ViewStyle } from 'react-native';
+import { Card as HeroCard } from 'heroui-native';
+import * as Haptics from 'expo-haptics';
 
 type CardVariant = 'elevated' | 'outlined' | 'flat';
 
-interface CardProps extends ViewProps {
+// Surface variants accepted by HeroUI Card.Root (extends Surface)
+const VARIANT_MAP: Record<CardVariant, 'default' | 'secondary' | 'transparent'> = {
+  elevated: 'default',
+  outlined: 'secondary',
+  flat: 'transparent',
+};
+
+interface CardProps {
   children: React.ReactNode;
   variant?: CardVariant;
   pressable?: boolean;
   onPress?: () => void;
+  style?: StyleProp<ViewStyle>;
+  className?: string;
 }
 
 export default function Card({
@@ -28,81 +32,34 @@ export default function Card({
   pressable = false,
   onPress,
   style,
-  ...rest
+  className,
 }: CardProps) {
-  const theme = useTheme();
-  const dynamicStyles = useMemo(() => makeStyles(theme), [theme]);
-  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const heroVariant = VARIANT_MAP[variant];
 
-  const handlePressIn = useCallback(() => {
-    Animated.spring(scaleAnim, {
-      toValue: 0.98,
-      useNativeDriver: true,
-      speed: 50,
-      bounciness: 4,
-    }).start();
-  }, [scaleAnim]);
-
-  const handlePressOut = useCallback(() => {
-    Animated.spring(scaleAnim, {
-      toValue: 1,
-      useNativeDriver: true,
-      speed: 50,
-      bounciness: 4,
-    }).start();
-  }, [scaleAnim]);
-
-  const variantStyle =
-    variant === 'elevated'
-      ? dynamicStyles.elevated
-      : variant === 'outlined'
-        ? dynamicStyles.outlined
-        : dynamicStyles.flat;
-
-  const cardStyle = [dynamicStyles.base, variantStyle, style];
+  const handlePress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    onPress?.();
+  };
 
   if (pressable) {
     return (
-      <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={onPress}
-          onPressIn={handlePressIn}
-          onPressOut={handlePressOut}
-        >
-          <View style={cardStyle} {...rest}>
-            {children}
-          </View>
-        </TouchableOpacity>
-      </Animated.View>
+      <Pressable onPress={handlePress} accessibilityRole="button">
+        {({ pressed }) => (
+          <HeroCard
+            variant={heroVariant}
+            style={[{ opacity: pressed ? 0.85 : 1 }, style]}
+            className={className}
+          >
+            <HeroCard.Body>{children}</HeroCard.Body>
+          </HeroCard>
+        )}
+      </Pressable>
     );
   }
 
   return (
-    <View style={cardStyle} {...rest}>
-      {children}
-    </View>
+    <HeroCard variant={heroVariant} style={style} className={className}>
+      <HeroCard.Body>{children}</HeroCard.Body>
+    </HeroCard>
   );
-}
-
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    base: {
-      backgroundColor: theme.surface,
-      borderRadius: 14,
-      padding: 16,
-    },
-    elevated: {
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.06,
-      shadowRadius: 4,
-      elevation: 2,
-    },
-    outlined: {
-      borderWidth: 1,
-      borderColor: theme.border,
-    },
-    flat: {},
-  });
 }
