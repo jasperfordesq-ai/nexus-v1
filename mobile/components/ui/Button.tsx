@@ -24,6 +24,7 @@ interface ButtonProps {
   disabled?: boolean;
   onPress?: () => void;
   style?: StyleProp<ViewStyle>;
+  className?: string;
   accessibilityLabel?: string;
   testID?: string;
 }
@@ -46,6 +47,7 @@ export default function Button({
   disabled = false,
   onPress,
   style,
+  className,
   accessibilityLabel,
   testID,
 }: ButtonProps) {
@@ -67,6 +69,7 @@ export default function Button({
       isDisabled={disabled || isLoading}
       onPress={handlePress}
       style={wrapperStyle}
+      className={className}
       accessibilityLabel={accessibilityLabel}
       testID={testID}
     >
@@ -75,7 +78,7 @@ export default function Button({
           <ActivityIndicator color={variant === 'solid' ? '#fff' : color ?? '#818cf8'} />
         </View>
       ) : typeof children === 'string' ? (
-        <HeroButton.LabelContent>{children}</HeroButton.LabelContent>
+        <HeroButton.Label>{children}</HeroButton.Label>
       ) : (
         children
       )}

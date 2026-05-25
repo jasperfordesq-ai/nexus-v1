@@ -5,6 +5,7 @@
  */
 
 @import 'tailwindcss';
+@import 'uniwind';
 @import 'heroui-native/styles';
 
 @source './node_modules/heroui-native/lib';
@@ -35,6 +36,7 @@
       --accent: oklch(0.55 0.20 280);
       --accent-foreground: oklch(1 0 0);
       --accent-hover: oklch(0.49 0.20 280);
+      --border-strong: oklch(0 0 0 / 18%);
     }
   }
 }

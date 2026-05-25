@@ -83,10 +83,6 @@ export default class ErrorBoundary extends React.Component<Props, State> {
     });
 
     console.error('ErrorBoundary caught:', error, info.componentStack);
-
-    if (__DEV__) {
-      console.error('ErrorBoundary caught:', error, info.componentStack);
-    }
   }
 
   handleReset = (): void => {

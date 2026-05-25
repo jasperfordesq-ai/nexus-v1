@@ -10,5 +10,4 @@ module.exports = {
     './components/**/*.{js,jsx,ts,tsx}',
     './node_modules/heroui-native/lib/**/*.{js,jsx,ts,tsx}',
   ],
-  presets: [require('nativewind/preset')],
 };

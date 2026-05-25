@@ -6,7 +6,7 @@
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const { getDefaultConfig } = require('expo/metro-config');
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const { withNativeWind } = require('nativewind/metro');
+const { withUniwindConfig } = require('uniwind/metro');
 
 const config = getDefaultConfig(__dirname);
 
@@ -17,4 +17,7 @@ config.resolver.blockList = [
   /.*[/\\]jest-setup\.[jt]s$/,
 ];
 
-module.exports = withNativeWind(config, { input: './global.css' });
+module.exports = withUniwindConfig(config, {
+  cssEntryFile: './global.css',
+  dtsFile: './uniwind-types.d.ts',
+});

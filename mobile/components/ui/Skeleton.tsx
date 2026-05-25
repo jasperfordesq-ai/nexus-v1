@@ -27,7 +27,7 @@ export function SkeletonBox({
 }: SkeletonBoxProps): React.JSX.Element {
   return (
     <Skeleton
-      animation="shimmer"
+      variant="shimmer"
       style={[{ width: width as ViewStyle['width'], height, borderRadius }, style]}
     />
   );
@@ -44,16 +44,16 @@ export function FeedItemSkeleton(): React.JSX.Element {
       style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4, elevation: 2 }}
     >
       <View className="flex-row items-center gap-2.5">
-        <Skeleton animation="shimmer" style={{ width: 36, height: 36, borderRadius: 18 }} />
+        <Skeleton variant="shimmer" style={{ width: 36, height: 36, borderRadius: 18 }} />
         <View className="flex-1 gap-1.5">
-          <Skeleton animation="shimmer" style={{ width: 120, height: 12, borderRadius: 6 }} />
-          <Skeleton animation="shimmer" style={{ width: 72, height: 10, borderRadius: 6 }} />
+          <Skeleton variant="shimmer" style={{ width: 120, height: 12, borderRadius: 6 }} />
+          <Skeleton variant="shimmer" style={{ width: 72, height: 10, borderRadius: 6 }} />
         </View>
       </View>
-      <Skeleton animation="shimmer" style={{ width: '100%', height: 16, borderRadius: 6 }} />
-      <Skeleton animation="shimmer" style={{ width: '100%', height: 14, borderRadius: 6 }} />
-      <Skeleton animation="shimmer" style={{ width: '100%', height: 14, borderRadius: 6 }} />
-      <Skeleton animation="shimmer" style={{ width: '60%', height: 10, borderRadius: 6 }} />
+      <Skeleton variant="shimmer" style={{ width: '100%', height: 16, borderRadius: 6 }} />
+      <Skeleton variant="shimmer" style={{ width: '100%', height: 14, borderRadius: 6 }} />
+      <Skeleton variant="shimmer" style={{ width: '100%', height: 14, borderRadius: 6 }} />
+      <Skeleton variant="shimmer" style={{ width: '60%', height: 10, borderRadius: 6 }} />
     </View>
   );
 }
@@ -65,10 +65,10 @@ export function FeedItemSkeleton(): React.JSX.Element {
 export function ConversationSkeleton(): React.JSX.Element {
   return (
     <View className="flex-row items-center bg-surface px-4 py-3 gap-3">
-      <Skeleton animation="shimmer" style={{ width: 48, height: 48, borderRadius: 24 }} />
+      <Skeleton variant="shimmer" style={{ width: 48, height: 48, borderRadius: 24 }} />
       <View className="flex-1 gap-2">
-        <Skeleton animation="shimmer" style={{ width: 120, height: 13, borderRadius: 6 }} />
-        <Skeleton animation="shimmer" style={{ width: '60%', height: 11, borderRadius: 6 }} />
+        <Skeleton variant="shimmer" style={{ width: 120, height: 13, borderRadius: 6 }} />
+        <Skeleton variant="shimmer" style={{ width: '60%', height: 11, borderRadius: 6 }} />
       </View>
     </View>
   );
@@ -84,11 +84,11 @@ export function EventCardSkeleton(): React.JSX.Element {
       className="flex-row items-start bg-surface gap-3 p-4 rounded-2xl"
       style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4, elevation: 2 }}
     >
-      <Skeleton animation="shimmer" style={{ width: 48, height: 52, borderRadius: 8 }} />
+      <Skeleton variant="shimmer" style={{ width: 48, height: 52, borderRadius: 8 }} />
       <View className="flex-1 gap-2">
-        <Skeleton animation="shimmer" style={{ width: '80%', height: 16, borderRadius: 6 }} />
-        <Skeleton animation="shimmer" style={{ width: '60%', height: 12, borderRadius: 6 }} />
-        <Skeleton animation="shimmer" style={{ width: '45%', height: 12, borderRadius: 6 }} />
+        <Skeleton variant="shimmer" style={{ width: '80%', height: 16, borderRadius: 6 }} />
+        <Skeleton variant="shimmer" style={{ width: '60%', height: 12, borderRadius: 6 }} />
+        <Skeleton variant="shimmer" style={{ width: '45%', height: 12, borderRadius: 6 }} />
       </View>
     </View>
   );
@@ -104,11 +104,11 @@ export function ExchangeCardSkeleton(): React.JSX.Element {
       className="bg-surface rounded-2xl mx-4 my-1.5 p-4 gap-2"
       style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4, elevation: 2 }}
     >
-      <Skeleton animation="shimmer" style={{ width: '75%', height: 16, borderRadius: 6 }} />
-      <Skeleton animation="shimmer" style={{ width: '100%', height: 12, borderRadius: 6 }} />
+      <Skeleton variant="shimmer" style={{ width: '75%', height: 16, borderRadius: 6 }} />
+      <Skeleton variant="shimmer" style={{ width: '100%', height: 12, borderRadius: 6 }} />
       <View className="flex-row gap-4">
-        <Skeleton animation="shimmer" style={{ width: 60, height: 12, borderRadius: 6 }} />
-        <Skeleton animation="shimmer" style={{ width: 40, height: 12, borderRadius: 6 }} />
+        <Skeleton variant="shimmer" style={{ width: 60, height: 12, borderRadius: 6 }} />
+        <Skeleton variant="shimmer" style={{ width: 40, height: 12, borderRadius: 6 }} />
       </View>
     </View>
   );
@@ -122,15 +122,15 @@ export function ProfileSkeleton(): React.JSX.Element {
   return (
     <View className="px-5 pt-6">
       <View className="items-center">
-        <Skeleton animation="shimmer" style={{ width: 88, height: 88, borderRadius: 44 }} />
-        <Skeleton animation="shimmer" style={{ width: 120, height: 16, borderRadius: 8, marginTop: 12 }} />
-        <Skeleton animation="shimmer" style={{ width: 80, height: 12, borderRadius: 6, marginTop: 6 }} />
+        <Skeleton variant="shimmer" style={{ width: 88, height: 88, borderRadius: 44 }} />
+        <Skeleton variant="shimmer" style={{ width: 120, height: 16, borderRadius: 8, marginTop: 12 }} />
+        <Skeleton variant="shimmer" style={{ width: 80, height: 12, borderRadius: 6, marginTop: 6 }} />
       </View>
-      <Skeleton animation="shimmer" style={{ width: '100%', height: 90, borderRadius: 14, marginTop: 24 }} />
+      <Skeleton variant="shimmer" style={{ width: '100%', height: 90, borderRadius: 14, marginTop: 24 }} />
       <View className="gap-3 mt-5">
-        <Skeleton animation="shimmer" style={{ width: '100%', height: 46, borderRadius: 10 }} />
-        <Skeleton animation="shimmer" style={{ width: '100%', height: 46, borderRadius: 10 }} />
-        <Skeleton animation="shimmer" style={{ width: '100%', height: 46, borderRadius: 10 }} />
+        <Skeleton variant="shimmer" style={{ width: '100%', height: 46, borderRadius: 10 }} />
+        <Skeleton variant="shimmer" style={{ width: '100%', height: 46, borderRadius: 10 }} />
+        <Skeleton variant="shimmer" style={{ width: '100%', height: 46, borderRadius: 10 }} />
       </View>
     </View>
   );
