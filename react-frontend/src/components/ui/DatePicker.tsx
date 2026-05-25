@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import type { ComponentProps, ReactNode } from 'react';
+import type { DateValue } from '@internationalized/date';
 import {
   Calendar,
   DateField,
@@ -18,6 +19,8 @@ type HeroUIDatePickerPopoverProps = ComponentProps<typeof HeroUIDatePicker.Popov
 type HeroUIDatePickerTriggerProps = ComponentProps<typeof HeroUIDatePicker.Trigger>;
 type HeroUICalendarProps = ComponentProps<typeof Calendar>;
 type HeroUIDateFieldGroupProps = ComponentProps<typeof DateField.Group>;
+
+export type DateInputValue = DateValue;
 
 interface DatePickerClassNames {
   base?: string;

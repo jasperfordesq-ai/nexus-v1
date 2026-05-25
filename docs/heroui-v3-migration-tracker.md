@@ -45,6 +45,7 @@ This is the living tracker for migrating `react-frontend` from HeroUI v2 to Hero
 | 2026-05-25 | `/docs/react/migration/alert`, `/docs/react/components/alert` | `Alert` migration to v3 compound `Alert.*` API via app-local compatibility wrapper |
 | 2026-05-25 | `/docs/react/migration/link`, `/docs/react/components/link` | `Link` migration to v3 link API and `Link.Icon` anchor icon pattern via app-local compatibility wrapper |
 | 2026-05-25 | `/docs/react/migration/drawer`, `/docs/react/components/drawer`, HeroUI MCP Drawer source | `Drawer` migration from v2 modal-style API to v3 `Drawer.Backdrop` / `Drawer.Content` / `Drawer.Dialog` composition |
+| 2026-05-25 | `/docs/react/migration/dateinput` | `DateInputValue` type migration to the v3 `DateValue` type shape |
 
 ## Current Baseline
 
@@ -71,7 +72,7 @@ Captured with import-specific scan of `react-frontend/src`.
 | `Divider` | 0 remaining from 126 baseline | Renamed to `Separator`; mostly mechanical | Complete |
 | `Progress` | 0 remaining from 51 baseline | Structural migration to `ProgressBar` compound components via app-local wrapper | Complete |
 | `CircularProgress` | 0 | No work currently detected | Complete |
-| `DateInput` / `DateInputValue` | 0 | No work currently detected | Complete |
+| `DateInput` / `DateInputValue` | 0 remaining from 7-file current baseline | `DateInputValue` exported from the app-local `DatePicker` wrapper as the v3 `DateValue` type | Complete |
 | `TimeInput` | 0 remaining from 3 baseline | Structural migration to `TimeField` via app-local wrapper | Complete |
 | `SelectItem` | 0 remaining from 197 baseline | Structural migration to `Select` + `ListBox.Item` via app-local wrapper | Complete |
 | `SelectSection` | 0 | No work currently detected | Complete |
@@ -145,7 +146,8 @@ Captured with import-specific scan of `react-frontend/src`.
 | 30 | `Badge` family | `/docs/react/migration/badge`, `/docs/react/components/badge` | `npx tsc --noEmit`, `npm run build` | Complete with verification note | Added app-local v3-backed compatibility wrapper; no remaining v2 `Badge` imports. Targeted wrapper type-check and lint passed. |
 | 31 | Small leftovers: `Alert`, `Link`, and table types | `/docs/react/migration/alert`, `/docs/react/components/alert`, `/docs/react/migration/link`, `/docs/react/components/link` | Targeted `npx tsc`, targeted `npx eslint`, import scan | Complete with verification note | Added app-local v3-backed compatibility wrappers and moved `Selection` / `SortDescriptor` type imports to the app-local `Table` wrapper. |
 | 32 | `Drawer` family | `/docs/react/migration/drawer`, `/docs/react/components/drawer`, HeroUI MCP Drawer source | Targeted `npx eslint`, import scan, `npx tsc --noEmit` | Complete with verification note | Added app-local v3-backed compatibility wrapper; no remaining v2 `Drawer*` imports. Full TypeScript timed out after 5 minutes without diagnostics. |
-| 33 | Remove provider, v2 plugin, v2 deps, and aliases | `/docs/react/migration`, `/docs/react/migration/styling` | `npx tsc --noEmit`, `npm run build`, `npm test`, smoke E2E | Blocked | Blocked until all v2 imports are gone |
+| 33 | `DateInputValue` type cleanup | `/docs/react/migration/dateinput` | Targeted `npx eslint`, import scan | Complete | Exported `DateInputValue` from the app-local `DatePicker` wrapper; no remaining v2 `DateInputValue` imports. |
+| 34 | Remove provider, v2 plugin, v2 deps, and aliases | `/docs/react/migration`, `/docs/react/migration/styling` | `npx tsc --noEmit`, `npm run build`, `npm test`, smoke E2E | Blocked | Blocked until all v2 imports and mocks are gone |
 
 ## Per-Phase Log
 
@@ -186,6 +188,7 @@ Add one entry per migration slice.
 | 2026-05-25 | 30 | `react-frontend/src/components/ui/Badge.tsx`, `react-frontend/src/components/ui/index.ts`, plus 3 Badge call-site import rewrites under `react-frontend/src` | `/docs/react/migration/badge`, `/docs/react/components/badge` | Import scan for v2 `Badge`; mechanical import rewrite; targeted `npx tsc` on `Badge.tsx`; targeted `npx eslint` on `Badge.tsx`; `git diff --check` | `Badge` imports from `@heroui/react` reduced to 0. Targeted wrapper type-check and lint passed. Remaining source references to `@heroui/react`: 88. | Continue with `Drawer`, `Alert`, `Link`, type leftovers, and provider cleanup after all v2 imports are gone |
 | 2026-05-25 | 31 | `react-frontend/src/components/ui/Alert.tsx`, `react-frontend/src/components/ui/Link.tsx`, `react-frontend/src/components/ui/Table.tsx`, `react-frontend/src/components/ui/index.ts`, `react-frontend/src/admin/modules/advanced/EmailDeliverability.tsx`, `react-frontend/src/components/layout/SourceRepositoryLink.tsx`, `react-frontend/src/admin/components/DataTable.tsx` | `/docs/react/migration/alert`, `/docs/react/components/alert`, `/docs/react/migration/link`, `/docs/react/components/link` | Import scan for v2 `Alert`, `Link`, `Selection`, and `SortDescriptor`; targeted `npx tsc` on `Alert.tsx`, `Link.tsx`, and `Table.tsx`; targeted `npx eslint` on `Alert.tsx`, `Link.tsx`, and `Table.tsx`; `git diff --check` | `Alert`, `Link`, `Selection`, and `SortDescriptor` imports from `@heroui/react` reduced to 0. Targeted wrapper type-check and lint passed. Remaining source references to `@heroui/react`: 85. | Continue with `Drawer`, then provider/plugin/dependency cleanup after all v2 imports are gone |
 | 2026-05-25 | 32 | `react-frontend/src/components/ui/Drawer.tsx`, `react-frontend/src/components/ui/index.ts`, `react-frontend/src/components/layout/MobileDrawer.tsx`, `react-frontend/src/components/layout/NotificationFlyout.tsx` | `/docs/react/migration/drawer`, `/docs/react/components/drawer`, HeroUI MCP Drawer source | Import scan for v2 `Drawer`, `DrawerContent`, `DrawerHeader`, `DrawerBody`, and `DrawerFooter`; targeted `npx eslint` on `Drawer.tsx`, `MobileDrawer.tsx`, and `NotificationFlyout.tsx`; full `npx tsc --noEmit`; direct wrapper `npx tsc` check; `npm run build`; `git diff --check` | `Drawer*` imports from `@heroui/react` reduced to 0. Targeted lint passed. Full TypeScript and build both timed out after 5 minutes without diagnostics. Direct wrapper type-check reached only `@/*` path-alias resolution noise after wrapper type issues were resolved. Remaining source references to `@heroui/react`: 83. | Continue with remaining `DateInputValue` type imports, then provider/plugin/dependency cleanup |
+| 2026-05-25 | 33 | `react-frontend/src/components/ui/DatePicker.tsx`, `react-frontend/src/components/ui/index.ts`, plus 7 `DateInputValue` call-site import rewrites under `react-frontend/src` | `/docs/react/migration/dateinput` | Import scan for v2 `DateInputValue`; targeted `npx eslint` on `DatePicker.tsx` and the 7 touched call sites; `git diff --check` | `DateInputValue` imports from `@heroui/react` reduced to 0. Targeted lint passed. Remaining source references to `@heroui/react`: 76. | Continue with provider/mocks/plugin/dependency cleanup |
 
 ## Recount Commands
 

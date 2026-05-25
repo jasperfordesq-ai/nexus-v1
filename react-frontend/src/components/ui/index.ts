@@ -21,7 +21,7 @@ export { Code, type CodeProps } from './Code';
 export { Snippet, type SnippetProps } from './Snippet';
 export { Progress, type ProgressProps } from './Progress';
 export { TimeInput, type TimeInputProps, type TimeInputValue } from './TimeInput';
-export { DatePicker, type DatePickerProps } from './DatePicker';
+export { DatePicker, type DatePickerProps, type DateInputValue } from './DatePicker';
 export { Button, type ButtonProps } from './Button';
 export { ButtonGroup, type ButtonGroupProps } from './ButtonGroup';
 export { Badge, type BadgeProps } from './Badge';

@@ -9,8 +9,8 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
+import type { DateInputValue } from '@/components/ui';
 import { DatePicker } from '@/components/ui';
-import type { DateInputValue } from '@heroui/react';
 import { today, getLocalTimeZone } from '@internationalized/date';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';

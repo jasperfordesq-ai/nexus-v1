@@ -9,11 +9,11 @@ import { Select, SelectItem, TimeInput, type TimeInputValue, GlassCard, Button, 
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import type { DateInputValue } from '@/components/ui';
 import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { DatePicker } from '@/components/ui';
-import type { DateInputValue } from '@heroui/react';
 import { parseDate, parseTime, today, getLocalTimeZone } from '@internationalized/date';
 import Save from 'lucide-react/icons/save';
 import Calendar from 'lucide-react/icons/calendar';
