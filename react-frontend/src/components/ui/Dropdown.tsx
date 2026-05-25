@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import {
+  cloneElement,
   createContext,
   Fragment,
   isValidElement,
@@ -62,8 +63,18 @@ export function Dropdown({ children, placement, shouldBlockScroll, ...props }: D
 
 export interface DropdownTriggerProps extends HeroDropdownTriggerProps {}
 
-export function DropdownTrigger({ children, ...props }: DropdownTriggerProps) {
-  return <HeroDropdown.Trigger {...props}>{children}</HeroDropdown.Trigger>;
+export function DropdownTrigger({ children, className, ...props }: DropdownTriggerProps) {
+  if (isValidElement<{ className?: string }>(children)) {
+    const childClassName = typeof children.props.className === 'string' ? children.props.className : undefined;
+    const triggerClassName = typeof className === 'string' ? className : undefined;
+
+    return cloneElement(children, {
+      ...(props as Record<string, unknown>),
+      className: cn(childClassName, triggerClassName),
+    } as { className?: string });
+  }
+
+  return <HeroDropdown.Trigger {...props} className={className}>{children}</HeroDropdown.Trigger>;
 }
 
 interface LegacyDropdownClassNames {
