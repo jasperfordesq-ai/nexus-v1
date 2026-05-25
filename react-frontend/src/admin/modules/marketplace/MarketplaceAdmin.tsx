@@ -1,8 +1,8 @@
-import { Card, CardBody, CardHeader, Button, Chip, Spinner } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Chip, Spinner, Table, TableHeader, TableBody, TableRow, TableColumn, TableCell } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Table, TableHeader, TableBody, TableRow, TableColumn, TableCell } from '@heroui/react';
+
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import Store from 'lucide-react/icons/store';
 import PackageCheck from 'lucide-react/icons/package-check';

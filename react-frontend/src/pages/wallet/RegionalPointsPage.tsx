@@ -1,7 +1,7 @@
-import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import Coins from 'lucide-react/icons/coins';
 import RefreshCw from 'lucide-react/icons/refresh-cw';

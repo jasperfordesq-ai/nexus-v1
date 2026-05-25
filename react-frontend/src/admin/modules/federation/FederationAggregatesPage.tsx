@@ -1,7 +1,7 @@
-import { Button, Card, CardBody, CardHeader, Chip, Spinner, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Spinner, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+
 import Eye from 'lucide-react/icons/eye';
 import FileSearch from 'lucide-react/icons/file-search';
 import KeyRound from 'lucide-react/icons/key-round';

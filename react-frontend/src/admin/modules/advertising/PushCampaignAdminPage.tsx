@@ -1,7 +1,7 @@
-import { Button, Card, CardBody, CardHeader, Chip, ChipProps, Input, Spinner, Textarea, Select, SelectItem, useDisclosure, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tab, Tabs } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, ChipProps, Input, Spinner, Textarea, Select, SelectItem, useDisclosure, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tab, Tabs, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import BarChart3 from 'lucide-react/icons/bar-chart-3';
 import Bell from 'lucide-react/icons/bell';

@@ -29,6 +29,20 @@ export { Switch, type SwitchProps } from './Switch';
 export { Tabs, Tab, type TabsProps, type TabProps } from './Tabs';
 export { Tooltip, type TooltipProps } from './Tooltip';
 export {
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  type TableProps,
+  type TableHeaderProps,
+  type TableColumnProps,
+  type TableBodyProps,
+  type TableRowProps,
+  type TableCellProps,
+} from './Table';
+export {
   Card,
   CardHeader,
   CardBody,

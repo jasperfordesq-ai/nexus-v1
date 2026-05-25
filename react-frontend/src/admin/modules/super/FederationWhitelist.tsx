@@ -1,7 +1,7 @@
-import { Card, CardBody, CardHeader, Button, Textarea, Select, SelectItem } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Textarea, Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+
 import Plus from 'lucide-react/icons/plus';
 import Trash2 from 'lucide-react/icons/trash-2';
 import { useTranslation } from 'react-i18next';

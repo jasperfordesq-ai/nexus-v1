@@ -6,12 +6,12 @@
 import { useCallback, useEffect, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { RadioGroup, Radio, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+import { RadioGroup, Radio } from '@heroui/react';
 import Download from 'lucide-react/icons/download';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import History from 'lucide-react/icons/history';
 import AlertTriangle from 'lucide-react/icons/alert-triangle';
-import { GlassCard, Button, Chip } from '@/components/ui';
+import { GlassCard, Button, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';

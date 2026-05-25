@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Input } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Input, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -19,7 +19,7 @@ import { Select, SelectItem, GlassCard, Button, Chip, Input } from '@/components
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import RefreshCw from 'lucide-react/icons/refresh-cw';

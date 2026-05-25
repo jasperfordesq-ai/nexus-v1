@@ -1,6 +1,6 @@
-import { Button, Spinner, Card, CardBody, CardHeader, Chip, GlassCard, Avatar } from '@/components/ui';
+import { Button, Spinner, Card, CardBody, CardHeader, Chip, GlassCard, Avatar, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+
 import TrendingUp from 'lucide-react/icons/trending-up';
 import Users from 'lucide-react/icons/users';
 import BarChart3 from 'lucide-react/icons/chart-column';

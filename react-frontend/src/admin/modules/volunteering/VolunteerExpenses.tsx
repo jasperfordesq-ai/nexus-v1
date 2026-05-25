@@ -9,7 +9,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+
 import Building2 from 'lucide-react/icons/building-2';
 import CalendarRange from 'lucide-react/icons/calendar-range';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
@@ -27,24 +27,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
-import {
-  Accordion,
-  AccordionItem,
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Select,
-  SelectItem,
-  Textarea,
-} from '@/components/ui';
+import { Accordion, AccordionItem, Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Textarea, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { adminVolunteering } from '../../api/adminApi';
 import { DataTable, EmptyState, PageHeader, StatCard, type Column } from '../../components';
 

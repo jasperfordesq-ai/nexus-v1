@@ -1,6 +1,6 @@
-import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Select, SelectItem, Tooltip } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Select, SelectItem, Tooltip, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import Building2 from 'lucide-react/icons/building-2';
 import Clock from 'lucide-react/icons/clock';

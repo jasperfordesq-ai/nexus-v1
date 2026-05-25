@@ -13,10 +13,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Coins from 'lucide-react/icons/coins';
-import { GlassCard, Chip, Skeleton } from '@/components/ui';
+import { GlassCard, Chip, Skeleton, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';

@@ -1,4 +1,4 @@
-import { CardBody, Card, Button, Chip, Spinner, Input } from '@/components/ui';
+import { CardBody, Card, Button, Chip, Spinner, Input, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,7 +15,7 @@ import { CardBody, Card, Button, Chip, Spinner, Input } from '@/components/ui';
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';

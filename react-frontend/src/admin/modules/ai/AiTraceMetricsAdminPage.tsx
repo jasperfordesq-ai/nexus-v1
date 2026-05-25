@@ -1,4 +1,4 @@
-import { CardBody, Card, Select, SelectItem, Chip, Spinner } from '@/components/ui';
+import { CardBody, Card, Select, SelectItem, Chip, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,7 +6,7 @@ import { CardBody, Card, Select, SelectItem, Chip, Spinner } from '@/components/
 
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+
 import BarChart3 from 'lucide-react/icons/bar-chart-3';
 import Clock from 'lucide-react/icons/clock';
 import DollarSign from 'lucide-react/icons/dollar-sign';

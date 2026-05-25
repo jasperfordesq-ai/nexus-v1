@@ -1,11 +1,11 @@
-import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Select, SelectItem, Tooltip } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Select, SelectItem, Tooltip, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, Pagination, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+import { Alert, Pagination } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Activity from 'lucide-react/icons/activity';
 import AlertTriangle from 'lucide-react/icons/alert-triangle';

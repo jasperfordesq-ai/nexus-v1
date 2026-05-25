@@ -1,9 +1,9 @@
-import { Card, CardBody, CardHeader, Button, Spinner, Input, Progress, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Spinner, Input, Progress, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import {
   useState,
   useEffect,
   useCallback } from 'react';
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+
 import Users from 'lucide-react/icons/users';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import AlertCircle from 'lucide-react/icons/circle-alert';

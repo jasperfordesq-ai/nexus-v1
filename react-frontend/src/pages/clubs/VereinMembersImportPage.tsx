@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -21,7 +21,7 @@ import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea } fr
 import { ChangeEvent, useCallback, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import Upload from 'lucide-react/icons/upload';
 import FileText from 'lucide-react/icons/file-text';

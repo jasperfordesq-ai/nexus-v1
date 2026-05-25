@@ -1,0 +1,183 @@
+// Copyright (C) 2024-2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { type ComponentPropsWithoutRef, type ReactNode } from 'react';
+import { Table as HeroUITable } from '@heroui-v3/react';
+
+type HeroUITableProps = ComponentPropsWithoutRef<typeof HeroUITable>;
+type HeroUITableContentProps = ComponentPropsWithoutRef<typeof HeroUITable.Content>;
+type HeroUITableHeaderProps = ComponentPropsWithoutRef<typeof HeroUITable.Header>;
+type HeroUITableColumnProps = ComponentPropsWithoutRef<typeof HeroUITable.Column>;
+type HeroUITableBodyProps = ComponentPropsWithoutRef<typeof HeroUITable.Body>;
+type HeroUITablerowProps = ComponentPropsWithoutRef<typeof HeroUITable.Row>;
+type HeroUITableCellProps = ComponentPropsWithoutRef<typeof HeroUITable.Cell>;
+
+export type TableProps = Omit<HeroUITableProps, 'children' | 'className' | 'variant'> & {
+  'aria-label'?: string;
+  bottomContent?: ReactNode;
+  bottomContentPlacement?: 'inside' | 'outside';
+  children?: ReactNode;
+  className?: string;
+  classNames?: {
+    base?: string;
+    wrapper?: string;
+    table?: string;
+    thead?: string;
+    tbody?: string;
+    tr?: string;
+    th?: string;
+    td?: string;
+  };
+  color?: string;
+  defaultSelectedKeys?: HeroUITableContentProps['defaultSelectedKeys'];
+  disabledBehavior?: HeroUITableContentProps['disabledBehavior'];
+  disabledKeys?: HeroUITableContentProps['disabledKeys'];
+  disallowEmptySelection?: HeroUITableContentProps['disallowEmptySelection'];
+  fullWidth?: boolean;
+  hideHeader?: boolean;
+  isCompact?: boolean;
+  isHeaderSticky?: boolean;
+  isKeyboardNavigationDisabled?: boolean;
+  isStriped?: boolean;
+  layout?: string;
+  onCellAction?: unknown;
+  onRowAction?: HeroUITableContentProps['onRowAction'];
+  onSelectionChange?: HeroUITableContentProps['onSelectionChange'];
+  onSortChange?: HeroUITableContentProps['onSortChange'];
+  radius?: string;
+  removeWrapper?: boolean;
+  selectedKeys?: HeroUITableContentProps['selectedKeys'];
+  selectionBehavior?: HeroUITableContentProps['selectionBehavior'];
+  selectionMode?: HeroUITableContentProps['selectionMode'];
+  shadow?: string;
+  sortDescriptor?: HeroUITableContentProps['sortDescriptor'];
+  topContent?: ReactNode;
+  topContentPlacement?: 'inside' | 'outside';
+  variant?: 'default' | 'primary' | 'secondary' | 'flat' | string;
+};
+
+export type TableHeaderProps = HeroUITableHeaderProps;
+export type TableColumnProps = HeroUITableColumnProps;
+export type TableBodyProps = Omit<HeroUITableBodyProps, 'renderEmptyState'> & {
+  emptyContent?: ReactNode;
+  loadingContent?: ReactNode;
+  loadingState?: 'idle' | 'loading' | 'loadingMore' | 'sorting' | 'error' | 'filtering';
+  renderEmptyState?: HeroUITableBodyProps['renderEmptyState'];
+};
+export type TableRowProps = HeroUITablerowProps;
+export type TableCellProps = HeroUITableCellProps;
+
+function combineClasses(...classes: Array<string | false | undefined>): string | undefined {
+  const className = classes.filter(Boolean).join(' ');
+
+  return className || undefined;
+}
+
+function mapVariant(variant?: TableProps['variant']): HeroUITableProps['variant'] {
+  return variant === 'flat' || variant === 'secondary' ? 'secondary' : 'primary';
+}
+
+export function Table({
+  'aria-label': ariaLabel,
+  bottomContent,
+  bottomContentPlacement: _bottomContentPlacement,
+  children,
+  className,
+  classNames,
+  color: _color,
+  defaultSelectedKeys,
+  disabledBehavior,
+  disabledKeys,
+  disallowEmptySelection,
+  fullWidth: _fullWidth,
+  hideHeader: _hideHeader,
+  isCompact: _isCompact,
+  isHeaderSticky: _isHeaderSticky,
+  isKeyboardNavigationDisabled: _isKeyboardNavigationDisabled,
+  isStriped: _isStriped,
+  layout: _layout,
+  onCellAction: _onCellAction,
+  onRowAction,
+  onSelectionChange,
+  onSortChange,
+  radius: _radius,
+  removeWrapper: _removeWrapper,
+  selectedKeys,
+  selectionBehavior,
+  selectionMode,
+  shadow: _shadow,
+  sortDescriptor,
+  topContent,
+  topContentPlacement: _topContentPlacement,
+  variant,
+  ...props
+}: TableProps) {
+  return (
+    <HeroUITable
+      className={combineClasses(classNames?.base, className)}
+      variant={mapVariant(variant)}
+      {...props}
+    >
+      {topContent}
+      <HeroUITable.ScrollContainer className={classNames?.wrapper}>
+        <HeroUITable.Content
+          aria-label={ariaLabel}
+          className={classNames?.table}
+          defaultSelectedKeys={defaultSelectedKeys}
+          disabledBehavior={disabledBehavior}
+          disabledKeys={disabledKeys}
+          disallowEmptySelection={disallowEmptySelection}
+          onRowAction={onRowAction}
+          onSelectionChange={onSelectionChange}
+          onSortChange={onSortChange}
+          selectedKeys={selectedKeys}
+          selectionBehavior={selectionBehavior}
+          selectionMode={selectionMode}
+          sortDescriptor={sortDescriptor}
+        >
+          {children}
+        </HeroUITable.Content>
+      </HeroUITable.ScrollContainer>
+      {bottomContent ? (
+        <HeroUITable.Footer>{bottomContent}</HeroUITable.Footer>
+      ) : null}
+    </HeroUITable>
+  );
+}
+
+export function TableHeader({ className, ...props }: TableHeaderProps) {
+  return <HeroUITable.Header className={className} {...props} />;
+}
+
+export function TableColumn({ className, ...props }: TableColumnProps) {
+  return <HeroUITable.Column className={className} {...props} />;
+}
+
+export function TableBody({
+  emptyContent,
+  loadingContent,
+  loadingState,
+  renderEmptyState,
+  ...props
+}: TableBodyProps) {
+  const isLoading = loadingState === 'loading' || loadingState === 'loadingMore';
+
+  return (
+    <HeroUITable.Body
+      renderEmptyState={renderEmptyState ?? (emptyContent ? () => emptyContent : undefined)}
+      {...props}
+    >
+      {isLoading && loadingContent ? loadingContent : props.children}
+    </HeroUITable.Body>
+  );
+}
+
+export function TableRow({ className, ...props }: TableRowProps) {
+  return <HeroUITable.Row className={className} {...props} />;
+}
+
+export function TableCell({ className, ...props }: TableCellProps) {
+  return <HeroUITable.Cell className={className} {...props} />;
+}

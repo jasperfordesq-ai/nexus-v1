@@ -1,6 +1,6 @@
-import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Select, SelectItem, useDisclosure, Progress, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Select, SelectItem, useDisclosure, Progress, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import CheckCircle from 'lucide-react/icons/check-circle';
 import Flag from 'lucide-react/icons/flag';

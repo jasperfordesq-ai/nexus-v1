@@ -1,4 +1,4 @@
-import { CardBody, Card, Button, Chip, Spinner, Input, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch } from '@/components/ui';
+import { CardBody, Card, Button, Chip, Spinner, Input, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,7 +6,7 @@ import { CardBody, Card, Button, Chip, Spinner, Input, Textarea, Modal, ModalBod
 
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+
 import BookOpen from 'lucide-react/icons/book-open';
 import Info from 'lucide-react/icons/info';
 import Plus from 'lucide-react/icons/plus';

@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Spinner } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Table, TableHeader, TableBody, TableRow, TableColumn, TableCell } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +10,7 @@ import { Select, SelectItem, GlassCard, Button, Chip, Spinner } from '@/componen
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Table, TableHeader, TableBody, TableRow, TableColumn, TableCell } from '@heroui/react';
+
 import ScrollText from 'lucide-react/icons/scroll-text';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import ChevronUp from 'lucide-react/icons/chevron-up';

@@ -9,7 +9,7 @@
  */
 
 import { useState } from 'react';
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import BookOpen from 'lucide-react/icons/book-open';
@@ -20,7 +20,7 @@ import Webhook from 'lucide-react/icons/webhook';
 import { useTranslation } from 'react-i18next';
 
 import { usePageTitle } from '@/hooks';
-import { Accordion, AccordionItem, Card, CardBody, CardHeader, Chip, Tab, Tabs } from '@/components/ui';
+import { Accordion, AccordionItem, Card, CardBody, CardHeader, Chip, Tab, Tabs, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { PageHeader } from '../../components';
 
 // ─────────────────────────────────────────────────────────────────────────────

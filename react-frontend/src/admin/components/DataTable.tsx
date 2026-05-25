@@ -11,10 +11,10 @@
 
 import { useState, useMemo, useCallback, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination, type Selection, type SortDescriptor } from '@heroui/react';
+import { Pagination, type Selection, type SortDescriptor } from '@heroui/react';
 import Search from 'lucide-react/icons/search';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
-import { Button, Chip, Spinner, Input } from '@/components/ui';
+import { Button, Chip, Spinner, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

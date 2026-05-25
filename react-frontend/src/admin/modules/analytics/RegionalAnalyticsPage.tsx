@@ -1,7 +1,7 @@
-import { Card, CardBody, CardHeader, Button, Chip, Spinner, Select, SelectItem, Tabs, Tab } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Chip, Spinner, Select, SelectItem, Tabs, Tab, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+
 import Map from 'lucide-react/icons/map';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import Users from 'lucide-react/icons/users';

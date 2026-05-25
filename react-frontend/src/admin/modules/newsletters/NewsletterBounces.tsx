@@ -1,7 +1,7 @@
-import { Button, Card, CardBody, CardHeader, Chip, Input, Select, SelectItem, Tabs, Tab } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Select, SelectItem, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Trash2 from 'lucide-react/icons/trash-2';

@@ -15,7 +15,7 @@
  * system behaviour changes.
  */
 
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import BookOpen from 'lucide-react/icons/book-open';
 import Clock from 'lucide-react/icons/clock';
@@ -29,7 +29,7 @@ import Users from 'lucide-react/icons/users';
 import Zap from 'lucide-react/icons/zap';
 import { useTranslation } from 'react-i18next';
 
-import { Accordion, AccordionItem, Card, CardBody, CardHeader, Chip } from '@/components/ui';
+import { Accordion, AccordionItem, Card, CardBody, CardHeader, Chip, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 
 export function SafeguardingHelp() {
   const { t } = useTranslation('admin');

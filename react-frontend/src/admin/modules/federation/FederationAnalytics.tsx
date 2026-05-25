@@ -1,6 +1,6 @@
-import { Card, CardBody, CardHeader, Button, Chip, Select, SelectItem } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Chip, Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+
 import Handshake from 'lucide-react/icons/handshake';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import MessageSquare from 'lucide-react/icons/message-square';

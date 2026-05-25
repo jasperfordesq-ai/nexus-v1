@@ -1,6 +1,6 @@
-import { Card, CardBody, CardHeader, Chip, Button } from '@/components/ui';
+import { Card, CardBody, CardHeader, Chip, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import Mail from 'lucide-react/icons/mail';

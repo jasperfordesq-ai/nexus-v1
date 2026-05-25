@@ -1,7 +1,7 @@
-import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import AlertTriangle from 'lucide-react/icons/alert-triangle';
 import Clock from 'lucide-react/icons/clock';

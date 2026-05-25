@@ -1,7 +1,7 @@
-import { Card, CardBody, CardHeader, Spinner, Button } from '@/components/ui';
+import { Card, CardBody, CardHeader, Spinner, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+
 import {
   BarChart,
   PieChart,

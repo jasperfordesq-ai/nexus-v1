@@ -1,9 +1,9 @@
-import { Card, CardBody, CardHeader, Button, Spinner, Chip, Textarea, Input, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Spinner, Chip, Textarea, Input, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import Shield from 'lucide-react/icons/shield';
 import ShieldAlert from 'lucide-react/icons/shield-alert';

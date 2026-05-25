@@ -1,6 +1,6 @@
-import { Card, CardBody, CardHeader, Spinner, Button, Chip, Textarea, Input, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch } from '@/components/ui';
+import { Card, CardBody, CardHeader, Spinner, Button, Chip, Textarea, Input, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
-import { Pagination, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+import { Pagination } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Shield from 'lucide-react/icons/shield';
 import RefreshCw from 'lucide-react/icons/refresh-cw';

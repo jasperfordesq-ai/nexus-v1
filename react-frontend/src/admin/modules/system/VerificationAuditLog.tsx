@@ -1,6 +1,6 @@
-import { Card, CardBody, CardHeader, Button, Spinner, Chip, Select, SelectItem } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Spinner, Chip, Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+
 import ScrollText from 'lucide-react/icons/scroll-text';
 import ChevronLeft from 'lucide-react/icons/chevron-left';
 import ChevronRight from 'lucide-react/icons/chevron-right';

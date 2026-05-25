@@ -1,11 +1,11 @@
-import { CardBody, Card, Progress, Button, Switch } from '@/components/ui';
+import { CardBody, Card, Progress, Button, Switch, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useEffect, useCallback } from 'react';
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Star from 'lucide-react/icons/star';
 import { useTranslation } from 'react-i18next';

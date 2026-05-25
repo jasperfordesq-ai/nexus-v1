@@ -1,4 +1,4 @@
-import { CardBody, Card, Button, Chip, Spinner } from '@/components/ui';
+import { CardBody, Card, Button, Chip, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +10,7 @@ import { CardBody, Card, Button, Chip, Spinner } from '@/components/ui';
 
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+
 import Pause from 'lucide-react/icons/pause';
 import Trash2 from 'lucide-react/icons/trash-2';
 import { usePageTitle } from '@/hooks';
