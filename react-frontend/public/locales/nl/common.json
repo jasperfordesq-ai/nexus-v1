@@ -68,7 +68,8 @@
     "premium": "Premie",
     "verify_identity": "Verifieer uw identiteit",
     "accessibility_alpha": "Toegankelijkheid (alfa)",
-    "features": "Functies"
+    "features": "Functies",
+    "accessibility_alpha_tooltip": "Enhanced accessible version — WCAG 2.2 AA compliant. Opens in a new tab."
   },
   "landing_links": {
     "title": "Verken deze gemeenschap",

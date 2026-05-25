@@ -68,7 +68,8 @@
     "premium": "Premia",
     "verify_identity": "Zweryfikuj swoją tożsamość",
     "accessibility_alpha": "Dostępność (alfa)",
-    "features": "Funkcje"
+    "features": "Funkcje",
+    "accessibility_alpha_tooltip": "Enhanced accessible version — WCAG 2.2 AA compliant. Opens in a new tab."
   },
   "landing_links": {
     "title": "Poznaj tę społeczność",

@@ -68,7 +68,8 @@
     "premium": "Préimh",
     "verify_identity": "Fíoraigh d'aitheantas",
     "accessibility_alpha": "Inrochtaineacht (alfa)",
-    "features": "Gnéithe"
+    "features": "Gnéithe",
+    "accessibility_alpha_tooltip": "Enhanced accessible version — WCAG 2.2 AA compliant. Opens in a new tab."
   },
   "landing_links": {
     "title": "Déan iniúchadh ar an bpobal seo",

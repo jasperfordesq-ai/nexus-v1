@@ -68,7 +68,8 @@
     "premium": "Prêmio",
     "verify_identity": "Verifique a sua identidade",
     "accessibility_alpha": "Acessibilidade (alfa)",
-    "features": "Funcionalidades"
+    "features": "Funcionalidades",
+    "accessibility_alpha_tooltip": "Enhanced accessible version — WCAG 2.2 AA compliant. Opens in a new tab."
   },
   "landing_links": {
     "title": "Explore esta comunidade",

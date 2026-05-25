@@ -68,7 +68,8 @@
     "premium": "プレミアム",
     "verify_identity": "本人確認をする",
     "accessibility_alpha": "アクセシビリティ（アルファ）",
-    "features": "機能"
+    "features": "機能",
+    "accessibility_alpha_tooltip": "Enhanced accessible version — WCAG 2.2 AA compliant. Opens in a new tab."
   },
   "landing_links": {
     "title": "このコミュニティを探索",

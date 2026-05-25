@@ -68,7 +68,8 @@
     "premium": "المميز",
     "verify_identity": "تحقّق من هويتك",
     "accessibility_alpha": "إمكانية الوصول (ألفا)",
-    "features": "الميزات"
+    "features": "الميزات",
+    "accessibility_alpha_tooltip": "Enhanced accessible version — WCAG 2.2 AA compliant. Opens in a new tab."
   },
   "landing_links": {
     "title": "استكشف هذا المجتمع",

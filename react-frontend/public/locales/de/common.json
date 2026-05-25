@@ -68,7 +68,8 @@
     "premium": "Prämie",
     "verify_identity": "Identität verifizieren",
     "accessibility_alpha": "Barrierefreiheit (Alpha)",
-    "features": "Funktionen"
+    "features": "Funktionen",
+    "accessibility_alpha_tooltip": "Enhanced accessible version — WCAG 2.2 AA compliant. Opens in a new tab."
   },
   "landing_links": {
     "title": "Diese Gemeinschaft erkunden",

@@ -67,7 +67,8 @@
     "marketplace": "Marketplace",
     "premium": "Premium",
     "verify_identity": "Verify Your Identity",
-    "accessibility_alpha": "Accessibility (alpha)",
+    "accessibility_alpha": "WCAG 2.2 AA",
+    "accessibility_alpha_tooltip": "Enhanced accessible version — WCAG 2.2 AA compliant. Opens in a new tab.",
     "features": "Features"
   },
   "landing_links": {
@@ -129,7 +130,7 @@
     "messages": "Your messages",
     "marketplace": "Buy & sell in your community",
     "premium": "Premium membership tiers",
-    "accessibility_alpha": "Open the accessibility-first alpha frontend",
+    "accessibility_alpha": "Open the WCAG 2.2 AA accessible version",
     "features": "Everything Project NEXUS does, with honest maturity labels"
   },
   "user_menu": {
@@ -227,7 +228,7 @@
     "switch_to_light": "Switch to light mode",
     "switch_to_dark": "Switch to dark mode",
     "skip_to_content": "Skip to main content",
-    "accessibility_alpha_new_tab": "Open Accessibility (alpha) in a new tab",
+    "accessibility_alpha_new_tab": "Open WCAG 2.2 AA accessible version in a new tab",
     "menu_opened": "Navigation menu opened",
     "close": "Close",
     "scroll_to_top": "Scroll to top",
