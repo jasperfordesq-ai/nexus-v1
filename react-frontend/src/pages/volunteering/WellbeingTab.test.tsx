@@ -40,24 +40,34 @@ const stableT = (
   fallbackOrOptions?: string | Record<string, unknown>,
   opts?: Record<string, unknown>,
 ) => {
+  const translations: Record<string, string> = {
+    hours_abbrev: "{{hours}}h",
+    "wellbeing.burnout_warning": "Burnout Warning",
+    "wellbeing.heading": "Volunteer Wellbeing",
+    "wellbeing.hide_tips": "Hide Self-Care Tips",
+    "wellbeing.log_feeling": "Log How I'm Feeling",
+    "wellbeing.needs_attention_title": "Your Wellbeing Needs Attention",
+    "wellbeing.risk_high": "High Risk",
+    "wellbeing.risk_low": "Low Risk",
+    "wellbeing.risk_moderate": "Moderate Risk",
+    "wellbeing.score_aria": "Wellbeing score: {{score}} out of 100",
+    "wellbeing.score_out_of_100": "{{score}}/100 - {{label}}",
+    "wellbeing.tip_breaks": "Take regular breaks between volunteer shifts",
+    "wellbeing.view_tips": "View Self-Care Tips",
+  };
+
   if (typeof fallbackOrOptions === "string") {
     return interpolate(fallbackOrOptions, opts);
   }
 
   if (fallbackOrOptions && typeof fallbackOrOptions === "object") {
-    const translations: Record<string, string> = {
-      hours_abbrev: "{{hours}}h",
-      "wellbeing.score_aria": "Wellbeing score: {{score}} out of 100",
-      "wellbeing.score_out_of_100": "{{score}}/100 - {{label}}",
-    };
-
     return interpolate(
       translations[key] ?? String(fallbackOrOptions.fallbackValue ?? key),
       fallbackOrOptions,
     );
   }
 
-  return key;
+  return translations[key] ?? key;
 };
 
 vi.mock("react-i18next", () => ({

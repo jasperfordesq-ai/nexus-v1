@@ -176,7 +176,7 @@ describe('CampaignsPage', () => {
 
     render(<CampaignsPage />);
     await waitFor(() => {
-      expect(screen.getByText('Ideation Not Available')).toBeInTheDocument();
+      expect(screen.getByText('campaigns.feature_not_available')).toBeInTheDocument();
     });
   });
 

@@ -13,7 +13,33 @@ import { framerMotionMock } from '@/test/mocks';
 
 vi.mock('framer-motion', () => framerMotionMock);
 
-const stableT = (_key: string, fallback: string, _opts?: object) => fallback ?? _key;
+const donationTranslations: Record<string, string> = {
+  'donations.heading': 'Donations',
+  'donations.refresh': 'Refresh',
+  'donations.donate': 'Donate',
+  'donations.donate_with_card': 'Donate with card',
+  'donations.load_error': 'Unable to load donations data.',
+  'donations.try_again': 'Try Again',
+  'donations.empty_title': 'No giving days or donations',
+  'donations.empty_description': 'No giving activity is available right now.',
+  'donations.make_donation': 'Make a donation',
+  'donations.active_giving_days': 'Active Giving Days',
+  'donations.stats.total_raised': 'Total Raised',
+  'donations.stats.total_donors': 'Total Donors',
+  'donations.stats.active_campaigns': 'Active Campaigns',
+  'donations.day_status.active': 'Active',
+  'donations.day_status.ended': 'Ended',
+  'donations.progress_aria': '{{percent}}% funded',
+  'donations.donors_count': '{{count}} donors',
+  'donations.my_donations': 'My Donations',
+  'donations.status.completed': 'Completed',
+  'donations.payment_methods.card': 'Card',
+};
+const stableT = (key: string, fallbackOrOpts?: string | Record<string, unknown>, opts?: Record<string, unknown>) => {
+  const fallback = typeof fallbackOrOpts === 'string' ? fallbackOrOpts : donationTranslations[key] ?? key;
+  const vars = typeof fallbackOrOpts === 'object' ? fallbackOrOpts : opts;
+  return fallback.replace(/\{\{(\w+)\}\}/g, (_, k) => String(vars?.[k] ?? ''));
+};
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: stableT,

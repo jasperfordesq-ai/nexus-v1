@@ -164,6 +164,7 @@ describe('API Client', () => {
       vi.mocked(fetch).mockResolvedValueOnce({
         ok: true,
         status: 200,
+        headers: new Headers(),
         json: () => Promise.resolve({ data: { id: 1 } }),
       } as Response);
 
@@ -192,6 +193,7 @@ describe('API Client', () => {
       vi.mocked(fetch).mockResolvedValueOnce({
         ok: true,
         status: 200,
+        headers: new Headers(),
         json: () => Promise.resolve({ data: { id: 1, name: 'Test' } }),
       } as Response);
 
@@ -205,6 +207,7 @@ describe('API Client', () => {
       vi.mocked(fetch).mockResolvedValueOnce({
         ok: true,
         status: 200,
+        headers: new Headers(),
         json: () => Promise.resolve({ success: false, error: 'Validation failed', code: 'VALIDATION_ERROR' }),
       } as Response);
 
@@ -219,6 +222,7 @@ describe('API Client', () => {
       vi.mocked(fetch).mockResolvedValue({
         ok: true,
         status: 200,
+        headers: new Headers(),
         json: () => Promise.resolve({ data: { id: 1 } }),
       } as Response);
 
@@ -239,6 +243,7 @@ describe('API Client', () => {
       vi.mocked(fetch).mockResolvedValue({
         ok: true,
         status: 200,
+        headers: new Headers(),
         json: () => Promise.resolve({ data: {} }),
       } as Response);
 
@@ -254,6 +259,7 @@ describe('API Client', () => {
       vi.mocked(fetch).mockResolvedValue({
         ok: true,
         status: 200,
+        headers: new Headers(),
         json: () => Promise.resolve({ data: { id: 1 } }),
       } as Response);
 
@@ -274,6 +280,7 @@ describe('API Client', () => {
       vi.mocked(fetch).mockResolvedValueOnce({
         ok: true,
         status: 201,
+        headers: new Headers(),
         json: () => Promise.resolve({ data: { id: 1 } }),
       } as Response);
 
@@ -302,6 +309,7 @@ describe('API Client', () => {
       vi.mocked(fetch).mockResolvedValueOnce({
         ok: true,
         status: 200,
+        headers: new Headers(),
         json: () => Promise.resolve({ success: false, error: 'Upload rejected', code: 'UPLOAD_REJECTED' }),
       } as Response);
 
@@ -318,6 +326,7 @@ describe('API Client', () => {
       vi.mocked(fetch).mockResolvedValueOnce({
         ok: true,
         status: 200,
+        headers: new Headers(),
         json: () => Promise.resolve({ data: { id: 1 } }),
       } as Response);
 
@@ -338,6 +347,7 @@ describe('API Client', () => {
       vi.mocked(fetch).mockResolvedValueOnce({
         ok: true,
         status: 200,
+        headers: new Headers(),
         json: () => Promise.resolve({ success: true }),
       } as Response);
 
@@ -357,6 +367,7 @@ describe('API Client', () => {
       vi.mocked(fetch).mockResolvedValueOnce({
         ok: false,
         status: 400,
+        headers: new Headers(),
         json: () => Promise.resolve({ error: 'Bad request', code: 'BAD_REQUEST' }),
       } as Response);
 
@@ -371,6 +382,7 @@ describe('API Client', () => {
       vi.mocked(fetch).mockResolvedValueOnce({
         ok: false,
         status: 500,
+        headers: new Headers(),
         json: () => Promise.resolve({ error: 'Server error' }),
       } as Response);
 
@@ -413,12 +425,14 @@ describe('API Client', () => {
         .mockResolvedValueOnce({
           ok: false,
           status: 401,
+        headers: new Headers(),
           json: () => Promise.resolve({ error: 'Unauthorized' }),
         } as Response)
         // Refresh token call succeeds
         .mockResolvedValueOnce({
           ok: true,
           status: 200,
+        headers: new Headers(),
           json: () =>
             Promise.resolve({
               success: true,
@@ -430,6 +444,7 @@ describe('API Client', () => {
         .mockResolvedValueOnce({
           ok: true,
           status: 200,
+        headers: new Headers(),
           json: () => Promise.resolve({ data: { id: 1 } }),
         } as Response);
 
@@ -451,12 +466,14 @@ describe('API Client', () => {
         .mockResolvedValueOnce({
           ok: false,
           status: 401,
+        headers: new Headers(),
           json: () => Promise.resolve({ error: 'Unauthorized' }),
         } as Response)
         // Refresh fails
         .mockResolvedValueOnce({
           ok: false,
           status: 401,
+        headers: new Headers(),
           json: () => Promise.resolve({ error: 'Refresh token expired' }),
         } as Response);
 
@@ -471,6 +488,7 @@ describe('API Client', () => {
       vi.mocked(fetch).mockResolvedValueOnce({
         ok: false,
         status: 401,
+        headers: new Headers(),
         json: () => Promise.resolve({ error: 'Unauthorized' }),
       } as Response);
 
@@ -486,6 +504,7 @@ describe('API Client', () => {
       vi.mocked(fetch).mockResolvedValueOnce({
         ok: true,
         status: 200,
+        headers: new Headers(),
         json: () => Promise.resolve({ data: [] }),
       } as Response);
 

@@ -41,6 +41,12 @@ vi.mock('@/lib/api', () => ({
 }));
 
 const mockHasFeature = vi.fn(() => true);
+const mockTenantContext = {
+  tenant: { id: 2, name: 'Test Tenant', slug: 'test' },
+  tenantPath: (p: string) => `/test${p}`,
+  hasFeature: mockHasFeature,
+  hasModule: vi.fn(() => true),
+};
 const mockUseAuth = vi.fn(() => ({
   user: { id: 1, first_name: 'Test', name: 'Test User' },
   isAuthenticated: true,
@@ -48,12 +54,7 @@ const mockUseAuth = vi.fn(() => ({
 
 vi.mock('@/contexts', () => ({
   useAuth: (...args: unknown[]) => mockUseAuth(...args),
-  useTenant: vi.fn(() => ({
-    tenant: { id: 2, name: 'Test Tenant', slug: 'test' },
-    tenantPath: (p: string) => `/test$${p}`,
-    hasFeature: mockHasFeature,
-    hasModule: vi.fn(() => true),
-  })),
+  useTenant: vi.fn(() => mockTenantContext),
   useToast: vi.fn(() => ({
     success: vi.fn(),
     error: vi.fn(),
@@ -233,6 +234,9 @@ describe('CreateJobPage', () => {
       mockUseParams.mockReturnValue({ id: '5' });
       // Handle multiple API calls: templates load + vacancy load
       vi.mocked(api.get).mockImplementation((url: string) => {
+        if (url.includes('/v2/jobs/salary-benchmark')) {
+          return Promise.resolve({ success: false, data: null, meta: {} });
+        }
         if (url.includes('/v2/jobs/5')) {
           return Promise.resolve({ success: true, data: mockVacancy, meta: {} });
         }

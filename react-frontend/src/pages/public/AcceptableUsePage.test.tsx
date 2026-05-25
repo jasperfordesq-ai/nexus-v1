@@ -123,7 +123,7 @@ describe('AcceptableUsePage', () => {
     render(<AcceptableUsePage />);
     expect(screen.getByText(/No illegal activity/i)).toBeInTheDocument();
     expect(screen.getByText(/No fraud or impersonation/i)).toBeInTheDocument();
-    expect(screen.getByText(/Enforcement/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Enforcement/i).length).toBeGreaterThan(0);
   });
 
   it('includes the version label on the default fallback', () => {

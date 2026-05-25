@@ -13,6 +13,7 @@ const mockRegisterBiometric = vi.fn();
 const mockGetWebAuthnCredentials = vi.fn();
 const mockRemoveWebAuthnCredential = vi.fn();
 const mockRemoveAllWebAuthnCredentials = vi.fn();
+const mockRenameWebAuthnCredential = vi.fn();
 const mockDetectPlatform = vi.fn();
 
 vi.mock('@/lib/webauthn', () => ({
@@ -21,6 +22,7 @@ vi.mock('@/lib/webauthn', () => ({
   getWebAuthnCredentials: (...args: unknown[]) => mockGetWebAuthnCredentials(...args),
   removeWebAuthnCredential: (...args: unknown[]) => mockRemoveWebAuthnCredential(...args),
   removeAllWebAuthnCredentials: (...args: unknown[]) => mockRemoveAllWebAuthnCredentials(...args),
+  renameWebAuthnCredential: (...args: unknown[]) => mockRenameWebAuthnCredential(...args),
   detectPlatform: (...args: unknown[]) => mockDetectPlatform(...args),
 }));
 
@@ -43,9 +45,51 @@ vi.mock('@/contexts', () => ({
 }));
 
 // Mock i18next
+const settingsTranslations: Record<string, string> = {
+  'biometric.platform_windows_title': 'Setting up on Windows',
+  'biometric.platform_windows_step1': 'Click "This PC" to create a passkey stored on this computer. You\'ll confirm with your Windows Hello PIN, fingerprint, or face.',
+  'biometric.platform_windows_step2': 'Requirement: You must have Windows Hello set up first. Go to Windows Settings > Accounts > Sign-in options > PIN to set it up.',
+  'biometric.platform_windows_step3': 'Or click "Phone, tablet, or security key" to scan a QR code with your phone instead.',
+  'biometric.platform_windows_step4': 'To set up passkeys on your phone too, open this page on your phone and tap "This device".',
+  biometric_all_removed: 'Removed {{count}} passkey(s).',
+  biometric_checking: 'Checking passkey support...',
+  biometric_enabled: '{{count}} passkey(s) registered',
+  biometric_last_used: 'Last used',
+  biometric_not_enabled: 'Sign in faster with fingerprint, face, or PIN.',
+  biometric_not_supported: 'Passkeys are not supported in this browser.',
+  biometric_registered: 'Passkey registered successfully.',
+  biometric_registered_on: 'Registered',
+  biometric_remove: 'Remove passkey',
+  biometric_remove_all: 'Remove All Passkeys',
+  biometric_removed: 'Passkey removed.',
+  biometric_title: 'Passkey Login',
+  cancel: 'Cancel',
+  passkey_add_another: 'Add another passkey',
+  passkey_create: 'Create a passkey',
+  passkey_device_tip: 'Register a passkey on each device you use. To add your phone, open this page on your phone.',
+  passkey_multi_device_note: 'You can register passkeys on multiple devices. Each device needs its own passkey unless your passkey provider syncs them (e.g., iCloud Keychain syncs across Apple devices, Google Password Manager syncs across Android and Chrome).',
+  passkey_registration_failed: 'Registration failed',
+  passkey_remove_all_confirm: 'Remove All',
+  passkey_remove_all_failed: 'Failed to remove credentials',
+  passkey_remove_all_title: 'Remove All Passkeys',
+  passkey_remove_all_warning: 'Are you sure you want to remove all passkeys? You\'ll need to set them up again on each device.',
+  passkey_remove_failed: 'Failed to remove credential',
+  passkey_rename: 'Rename passkey',
+  passkey_rename_failed: 'Failed to rename passkey',
+  passkey_rename_input: 'New passkey name',
+  passkey_renamed: 'Passkey renamed.',
+  passkey_setup_guide: 'Setup guide',
+  passkey_setup_subtitle: 'Setup for this device',
+  passkey_setup_tooltip: 'Show passkey setup guide',
+  passkey_show_instructions: 'Show passkey setup instructions',
+};
+
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, opts?: { fallbackValue?: string }) => opts?.fallbackValue || key,
+    t: (key: string, opts?: { fallbackValue?: string; count?: number }) => {
+      const template = settingsTranslations[key] ?? opts?.fallbackValue ?? key;
+      return template.replace('{{count}}', String(opts?.count ?? ''));
+    },
   }),
 }));
 
@@ -141,7 +185,7 @@ describe('BiometricSettings', () => {
 
     await user.click(screen.getByText('Create a passkey'));
     await waitFor(() => {
-      expect(mockToast.success).toHaveBeenCalledWith('Passkey registered successfully!');
+      expect(mockToast.success).toHaveBeenCalledWith('Passkey registered successfully.');
     });
   });
 
@@ -186,7 +230,7 @@ describe('BiometricSettings', () => {
 
     render(<BiometricSettings />);
     await waitFor(() => {
-      expect(screen.getByText(/does not support passkeys/i)).toBeDefined();
+      expect(screen.getByText(/passkeys are not supported/i)).toBeDefined();
     });
   });
 

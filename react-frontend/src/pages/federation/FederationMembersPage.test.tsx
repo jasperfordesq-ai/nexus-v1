@@ -202,6 +202,7 @@ describe('FederationMembersPage', () => {
     await waitFor(() => {
       expect(api.get).toHaveBeenCalledWith(
         expect.stringContaining('/v2/federation/members'),
+        expect.anything(),
       );
     });
     expect(api.get).toHaveBeenCalledWith(

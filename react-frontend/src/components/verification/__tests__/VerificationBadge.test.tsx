@@ -71,29 +71,29 @@ describe('VerificationBadgeIcon', () => {
 
   it('renders a role="img" element with aria-label', () => {
     render(<VerificationBadgeIcon badge={emailBadge} />);
-    expect(screen.getByRole('img', { name: 'Email Verified' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /email verified/i })).toBeInTheDocument();
   });
 
   it('renders for phone_verified type', () => {
     render(<VerificationBadgeIcon badge={phoneBadge} />);
-    expect(screen.getByRole('img', { name: 'Phone Verified' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /phone verified/i })).toBeInTheDocument();
   });
 
   it('applies sm size class by default', () => {
     render(<VerificationBadgeIcon badge={emailBadge} />);
-    const div = screen.getByRole('img', { name: 'Email Verified' });
+    const div = screen.getByRole('img', { name: /email verified/i });
     expect(div.className).toContain('w-6 h-6');
   });
 
   it('applies md size class when size="md"', () => {
     render(<VerificationBadgeIcon badge={emailBadge} size="md" />);
-    const div = screen.getByRole('img', { name: 'Email Verified' });
+    const div = screen.getByRole('img', { name: /email verified/i });
     expect(div.className).toContain('w-8 h-8');
   });
 
   it('applies lg size class when size="lg"', () => {
     render(<VerificationBadgeIcon badge={emailBadge} size="lg" />);
-    const div = screen.getByRole('img', { name: 'Email Verified' });
+    const div = screen.getByRole('img', { name: /email verified/i });
     expect(div.className).toContain('w-10 h-10');
   });
 
@@ -118,23 +118,21 @@ describe('VerificationBadgeRow', () => {
     vi.clearAllMocks();
   });
 
-  it('renders nothing when no badges and no userId', () => {
+  it('renders not ID verified fallback when no badges and no userId', () => {
     render(<VerificationBadgeRow badges={[]} />);
-    expect(screen.queryByLabelText('Verification badges')).not.toBeInTheDocument();
+    expect(screen.getByText('Not ID Verified')).toBeInTheDocument();
   });
 
   it('renders badges when passed via prop', () => {
     render(<VerificationBadgeRow badges={[emailBadge, phoneBadge]} />);
-    expect(screen.getByRole('img', { name: 'Email Verified' })).toBeInTheDocument();
-    expect(screen.getByRole('img', { name: 'Phone Verified' })).toBeInTheDocument();
+    expect(screen.getByText('Email Verified')).toBeInTheDocument();
+    expect(screen.getByText('Phone Verified')).toBeInTheDocument();
   });
 
-  it('renders only verified badges when badges prop is provided', () => {
-    // Component renders all passed badges without filtering when using the badges prop directly.
-    // Pass only verified badges to control what is rendered.
+  it('renders the not ID verified fallback when no ID badge is present', () => {
     render(<VerificationBadgeRow badges={[emailBadge]} />);
-    expect(screen.queryByRole('img', { name: 'ID Verified' })).not.toBeInTheDocument();
-    expect(screen.getByRole('img', { name: 'Email Verified' })).toBeInTheDocument();
+    expect(screen.getByText('Email Verified')).toBeInTheDocument();
+    expect(screen.getByText('Not ID Verified')).toBeInTheDocument();
   });
 
   it('fetches badges by userId when no badges prop provided', async () => {
@@ -157,17 +155,17 @@ describe('VerificationBadgeRow', () => {
 
     render(<VerificationBadgeRow userId={5} />);
     await waitFor(() => {
-      expect(screen.getByRole('img', { name: 'Email Verified' })).toBeInTheDocument();
-      expect(screen.getByRole('img', { name: 'Phone Verified' })).toBeInTheDocument();
+      expect(screen.getByText('Email Verified')).toBeInTheDocument();
+      expect(screen.getByText('Phone Verified')).toBeInTheDocument();
     });
   });
 
-  it('renders nothing when API returns empty array', async () => {
+  it('renders not ID verified fallback when API returns empty array', async () => {
     vi.mocked(api.get).mockResolvedValueOnce({ success: true, data: [] });
 
     render(<VerificationBadgeRow userId={5} />);
     await waitFor(() => {
-      expect(screen.queryByLabelText('Verification badges')).not.toBeInTheDocument();
+      expect(screen.getByText('Not ID Verified')).toBeInTheDocument();
     });
   });
 
@@ -192,7 +190,7 @@ describe('VerificationBadgeSummary', () => {
     expect(screen.queryByText('Verification')).not.toBeInTheDocument();
   });
 
-  it('renders "Verification" heading after successful load with verified badges', async () => {
+  it('renders verification heading after successful load with verified badges', async () => {
     vi.mocked(api.get).mockResolvedValueOnce({
       success: true,
       data: [emailBadge, phoneBadge],
@@ -200,7 +198,7 @@ describe('VerificationBadgeSummary', () => {
 
     render(<VerificationBadgeSummary userId={1} />);
     await waitFor(() => {
-      expect(screen.getByText('Verification')).toBeInTheDocument();
+      expect(screen.getByText('Verification Status')).toBeInTheDocument();
     });
   });
 
@@ -224,7 +222,7 @@ describe('VerificationBadgeSummary', () => {
 
     render(<VerificationBadgeSummary userId={1} />);
     await waitFor(() => {
-      expect(screen.queryByText('Verification')).not.toBeInTheDocument();
+      expect(screen.queryByText('Verification Status')).not.toBeInTheDocument();
     });
   });
 
@@ -233,7 +231,7 @@ describe('VerificationBadgeSummary', () => {
 
     render(<VerificationBadgeSummary userId={1} />);
     await waitFor(() => {
-      expect(screen.queryByText('Verification')).not.toBeInTheDocument();
+      expect(screen.queryByText('Verification Status')).not.toBeInTheDocument();
     });
   });
 });

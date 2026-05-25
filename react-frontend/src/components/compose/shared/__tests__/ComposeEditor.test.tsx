@@ -57,7 +57,7 @@ describe('ComposeEditor', () => {
 
   it('renders link button', () => {
     render(<ComposeEditor value="" onChange={vi.fn()} />);
-    expect(screen.getByLabelText('Insert Link')).toBeInTheDocument();
+    expect(screen.getByLabelText('Insert link')).toBeInTheDocument();
   });
 
   it('renders placeholder text', () => {

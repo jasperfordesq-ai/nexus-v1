@@ -14,12 +14,21 @@ import { framerMotionMock } from '@/test/mocks';
 vi.mock('framer-motion', () => framerMotionMock);
 
 // Stable t function reference to avoid useCallback/useEffect re-trigger loops
+const credentialTranslations: Record<string, string> = {
+  'credentials.heading': 'Credential Verification',
+  'credentials.load_failed': 'Failed to load credentials.',
+  'credentials.no_credentials_title': 'No credentials uploaded',
+  'credentials.re_upload': 'Re-upload',
+  'credentials.try_again': 'Try Again',
+  'credentials.upload_new': 'Upload New Credential',
+};
+
 const stableT = (key: string, fallbackOrOptions?: string | { fallbackValue?: string }, _opts?: object) => {
   if (typeof fallbackOrOptions === 'string') {
     return fallbackOrOptions;
   }
 
-  return fallbackOrOptions?.fallbackValue ?? key;
+  return credentialTranslations[key] ?? fallbackOrOptions?.fallbackValue ?? key;
 };
 vi.mock('react-i18next', () => ({
   initReactI18next: {

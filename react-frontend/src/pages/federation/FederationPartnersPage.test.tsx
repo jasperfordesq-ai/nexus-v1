@@ -20,9 +20,16 @@ vi.mock('framer-motion', () => ({
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, opts?: Record<string, unknown>) =>
-      (opts?.fallbackValue as string | undefined) ?? key,
+    t: (key: string, opts?: Record<string, unknown>) => {
+      const translations: Record<string, string> = {
+        'partners.level_discovery': 'Discovery',
+        'partners.level_social': 'Social',
+      };
+      return translations[key] ?? (opts?.fallbackValue as string | undefined) ?? key;
+    },
+    i18n: { language: 'en', changeLanguage: vi.fn() },
   }),
+  initReactI18next: { type: '3rdParty', init: vi.fn() },
 }));
 
 vi.mock('react-router-dom', async () => {
@@ -158,6 +165,7 @@ describe('FederationPartnersPage', () => {
     await waitFor(() => {
       expect(api.get).toHaveBeenCalledWith(
         expect.stringContaining('/v2/federation/partners'),
+        expect.objectContaining({ signal: expect.any(AbortSignal) }),
       );
     });
   });

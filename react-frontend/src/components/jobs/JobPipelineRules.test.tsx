@@ -67,7 +67,7 @@ describe('JobPipelineRules', () => {
 
     render(<JobPipelineRules jobId="42" />);
 
-    await userEvent.click(screen.getByRole('button', { name: /pipeline.title/i }));
+    await userEvent.click(screen.getByRole('button', { name: /pipeline\.rules_title/i }));
 
     await waitFor(() => {
       expect(api.get).toHaveBeenCalledWith('/v2/jobs/42/pipeline-rules');

@@ -95,7 +95,7 @@ describe('AdminSidebar', () => {
     expect(screen.getByText('Users')).toBeInTheDocument();
     expect(screen.getByText('Listings')).toBeInTheDocument();
     expect(screen.getByText('Content')).toBeInTheDocument();
-    expect(screen.getByText('System')).toBeInTheDocument();
+    expect(screen.getByText('Platform Operations')).toBeInTheDocument();
   });
 
   it('hides labels when collapsed', () => {

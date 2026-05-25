@@ -16,7 +16,14 @@ import type { PostMedia } from '../types';
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, fallbackOrOpts?: string | Record<string, unknown>, opts?: Record<string, unknown>) => {
-      const fallback = typeof fallbackOrOpts === 'string' ? fallbackOrOpts : key;
+      const translations: Record<string, string> = {
+        'carousel.aria_label': 'Image carousel',
+        'carousel.role_description': 'carousel',
+        'carousel.previous': 'Previous image',
+        'carousel.next': 'Next image',
+        'carousel.go_to_image': 'Go to image {{number}}',
+      };
+      const fallback = typeof fallbackOrOpts === 'string' ? fallbackOrOpts : translations[key] ?? key;
       const vars = typeof fallbackOrOpts === 'object' ? fallbackOrOpts : opts;
       if (!vars) return fallback;
       return fallback.replace(/\{\{(\w+)\}\}/g, (_, k) => String(vars[k] ?? `{{${k}}}`));

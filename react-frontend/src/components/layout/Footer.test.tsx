@@ -80,7 +80,7 @@ describe('Footer', () => {
     it('renders default copyright text with tenant branding name', () => {
       render(<Footer />);
       const year = new Date().getFullYear();
-      expect(screen.getByText(`\u00A9 ${year} Test Community. All rights reserved.`)).toBeInTheDocument();
+      expect(screen.getByText(`Test Community \u2014 AGPL-3.0 \u2014 Copyright \u00A9 2024\u2013${year} Jasper Ford`)).toBeInTheDocument();
     });
 
     it('renders custom footer_text when set in tenant config', () => {

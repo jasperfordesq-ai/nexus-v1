@@ -187,10 +187,10 @@ describe('MobileTabBar', () => {
       expect(screen.queryByLabelText('Messages')).not.toBeInTheDocument();
     });
 
-    it('hides Home tab when dashboard module is disabled', () => {
+    it('hides Home tab when feed module is disabled', () => {
       setupDefaultMocks({
         tenant: {
-          hasModule: vi.fn((mod: string) => mod !== 'dashboard'),
+          hasModule: vi.fn((mod: string) => mod !== 'feed'),
         },
       });
       render(<MobileTabBar />);
@@ -210,8 +210,8 @@ describe('MobileTabBar', () => {
   });
 
   describe('Active state', () => {
-    it('marks Home tab as active on dashboard route', () => {
-      mockPathname = '/dashboard';
+    it('marks Home tab as active on feed route', () => {
+      mockPathname = '/feed';
       render(<MobileTabBar />);
       const homeButton = screen.getByLabelText('Home');
       expect(homeButton).toHaveAttribute('aria-current', 'page');

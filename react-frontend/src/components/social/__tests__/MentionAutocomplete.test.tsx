@@ -16,12 +16,18 @@ import { HeroUIProvider } from '@heroui/react';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, fallback?: string, opts?: Record<string, unknown>) => {
-      if (fallback && opts) {
-        // Simple interpolation for "{{count}}" pattern
-        return fallback.replace(/\{\{(\w+)\}\}/g, (_, k) => String(opts[k] ?? ''));
+    t: (key: string, fallbackOrOpts?: string | Record<string, unknown>, opts?: Record<string, unknown>) => {
+      const translations: Record<string, string> = {
+        'mention.suggestions_aria': 'Mention suggestions, {{count}} results',
+        'mention.connected': 'Connected',
+        'mention.no_users': 'No users found',
+      };
+      const fallback = translations[key] ?? (typeof fallbackOrOpts === 'string' ? fallbackOrOpts : key);
+      const vars = typeof fallbackOrOpts === 'object' ? fallbackOrOpts : opts;
+      if (vars) {
+        return fallback.replace(/\{\{(\w+)\}\}/g, (_, k) => String(vars[k] ?? ''));
       }
-      return fallback ?? key;
+      return fallback;
     },
     i18n: { language: 'en', changeLanguage: vi.fn() },
   }),

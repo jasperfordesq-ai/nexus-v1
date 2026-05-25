@@ -65,7 +65,7 @@ describe('SuperAdminRoute', () => {
     });
 
     renderWithRouter();
-    expect(screen.getByText('Checking permissions...')).toBeInTheDocument();
+    expect(screen.getByText('Checking Permissions')).toBeInTheDocument();
   });
 
   it('redirects non-super-admin to admin dashboard', () => {

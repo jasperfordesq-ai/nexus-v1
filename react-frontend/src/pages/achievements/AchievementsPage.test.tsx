@@ -226,14 +226,15 @@ describe('AchievementsPage', () => {
     });
   });
 
-  it('shows tab navigation with Badges, Challenges, Collections, XP Shop', async () => {
+  it('shows tab navigation with Badges, Challenges, Journeys, Engagement, XP Shop', async () => {
     render(<AchievementsPage />);
     await waitFor(() => {
       // "Badges" appears in profile card ("3 Badges") and tab, use getAllByText
       expect(screen.getAllByText('Badges').length).toBeGreaterThanOrEqual(1);
     });
     expect(screen.getByText('Challenges')).toBeInTheDocument();
-    expect(screen.getByText('Collections')).toBeInTheDocument();
+    expect(screen.getByText('Journeys')).toBeInTheDocument();
+    expect(screen.getByText('Engagement')).toBeInTheDocument();
     expect(screen.getByText('XP Shop')).toBeInTheDocument();
   });
 

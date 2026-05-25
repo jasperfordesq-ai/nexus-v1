@@ -110,7 +110,7 @@ describe('StatusSelector', () => {
       </W>,
     );
 
-    expect(screen.getByLabelText('status.set_status')).toBeInTheDocument();
+    expect(screen.getByLabelText('status.set_status_current')).toBeInTheDocument();
   });
 
   it('renders children as custom trigger when provided', () => {
@@ -148,7 +148,7 @@ describe('StatusSelector', () => {
       </W>,
     );
 
-    await user.click(screen.getByLabelText('status.set_status'));
+    await user.click(screen.getByLabelText('status.set_status_current'));
 
     // The dropdown menu should appear with status options
     expect(screen.getAllByText('status.online').length).toBeGreaterThanOrEqual(1);
@@ -165,7 +165,7 @@ describe('StatusSelector', () => {
       </W>,
     );
 
-    await user.click(screen.getByLabelText('status.set_status'));
+    await user.click(screen.getByLabelText('status.set_status_current'));
 
     expect(screen.getByText('status.set_custom')).toBeInTheDocument();
   });
@@ -186,7 +186,7 @@ describe('StatusSelector', () => {
       </W>,
     );
 
-    await user.click(screen.getByLabelText('status.set_status'));
+    await user.click(screen.getByLabelText('status.set_status_current'));
 
     // Should show the custom status instead of "Set custom status..."
     expect(screen.getByText('\uD83D\uDCC5 In a meeting')).toBeInTheDocument();
@@ -208,7 +208,7 @@ describe('StatusSelector', () => {
       </W>,
     );
 
-    await user.click(screen.getByLabelText('status.set_status'));
+    await user.click(screen.getByLabelText('status.set_status_current'));
 
     expect(screen.getByText('status.clear_custom')).toBeInTheDocument();
   });
@@ -222,7 +222,7 @@ describe('StatusSelector', () => {
       </W>,
     );
 
-    await user.click(screen.getByLabelText('status.set_status'));
+    await user.click(screen.getByLabelText('status.set_status_current'));
     await user.click(screen.getByText('status.away'));
 
     expect(mockSetStatus).toHaveBeenCalledWith('away');
@@ -244,7 +244,7 @@ describe('StatusSelector', () => {
       </W>,
     );
 
-    await user.click(screen.getByLabelText('status.set_status'));
+    await user.click(screen.getByLabelText('status.set_status_current'));
 
     // The DND option should have the highlight class
     const dndOption = screen.getAllByText('status.dnd')
@@ -264,7 +264,7 @@ describe('StatusSelector', () => {
       </W>,
     );
 
-    await user.click(screen.getByLabelText('status.set_status'));
+    await user.click(screen.getByLabelText('status.set_status_current'));
     await user.click(screen.getByText('status.set_custom'));
 
     // Modal should appear with title
@@ -280,7 +280,7 @@ describe('StatusSelector', () => {
       </W>,
     );
 
-    await user.click(screen.getByLabelText('status.set_status'));
+    await user.click(screen.getByLabelText('status.set_status_current'));
     await user.click(screen.getByText('status.set_custom'));
 
     // The modal should contain input fields for Emoji and Status
@@ -302,7 +302,7 @@ describe('StatusSelector', () => {
       </W>,
     );
 
-    await user.click(screen.getByLabelText('status.set_status'));
+    await user.click(screen.getByLabelText('status.set_status_current'));
     await user.click(screen.getByText('status.set_custom'));
 
     expect(screen.getByText('cancel')).toBeInTheDocument();
@@ -318,7 +318,7 @@ describe('StatusSelector', () => {
       </W>,
     );
 
-    await user.click(screen.getByLabelText('status.set_status'));
+    await user.click(screen.getByLabelText('status.set_status_current'));
     await user.click(screen.getByText('status.set_custom'));
 
     const dialog = screen.getByRole('dialog');
@@ -336,6 +336,6 @@ describe('StatusSelector', () => {
 
     // When presence is null and no children, the component renders <>{children}</> which is empty
     // The "Set status" button should NOT be present
-    expect(screen.queryByLabelText('status.set_status')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('status.set_status_current')).not.toBeInTheDocument();
   });
 });

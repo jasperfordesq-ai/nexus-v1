@@ -34,7 +34,19 @@ vi.mock("framer-motion", () => ({
 
 vi.mock("react-i18next", () => ({
   useTranslation: () => ({
-    t: (_key: string, fallback: string, _opts?: object) => fallback ?? _key,
+    t: (key: string, fallbackOrOptions?: string | Record<string, unknown>, _opts?: object) => {
+      const translations: Record<string, string> = {
+        "swaps.accept": "Accept",
+        "swaps.all": "All",
+        "swaps.heading": "Shift Swaps",
+        "swaps.no_swaps_title": "No swap requests",
+        "swaps.received": "Received",
+        "swaps.reject": "Reject",
+        "swaps.sent": "Sent",
+      };
+      if (typeof fallbackOrOptions === "string") return fallbackOrOptions;
+      return translations[key] ?? key;
+    },
   }),
 }));
 

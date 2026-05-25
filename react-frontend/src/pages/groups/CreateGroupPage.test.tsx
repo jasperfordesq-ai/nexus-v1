@@ -113,6 +113,7 @@ import { CreateGroupPage } from './CreateGroupPage';
 describe('CreateGroupPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    api.get.mockResolvedValue({ success: true, data: [] });
     api.post.mockResolvedValue({ success: true, data: { id: 10 } });
     api.put.mockResolvedValue({ success: true });
   });
@@ -135,7 +136,7 @@ describe('CreateGroupPage', () => {
   it('renders private group toggle switch', () => {
     render(<CreateGroupPage />);
     // The switch displays "Public Group" by default (is_private starts false)
-    expect(screen.getByText('Public Group')).toBeInTheDocument();
+    expect(screen.getAllByText('Public Group').length).toBeGreaterThan(0);
   });
 
   it('renders submit button', () => {
@@ -154,7 +155,7 @@ describe('CreateGroupPage', () => {
     render(<CreateGroupPage />);
 
     const submitButton = screen.getByText('Create Group');
-    fireEvent.click(submitButton);
+    fireEvent.submit(submitButton.closest('form') as HTMLFormElement);
 
     await waitFor(() => {
       expect(screen.getByText('Group name is required')).toBeInTheDocument();

@@ -19,6 +19,9 @@ vi.mock('react-i18next', () => ({
       if (key === 'files.download_aria' && typeof fallbackOrOptions === 'object') {
         return `Download ${fallbackOrOptions.name}`;
       }
+      if (key === 'files.actions_aria') {
+        return 'File actions';
+      }
       return typeof fallbackOrOptions === 'string' ? fallbackOrOptions : key;
     },
   }),

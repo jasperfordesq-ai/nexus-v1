@@ -79,7 +79,7 @@ describe('EventsPage', () => {
 
   it('shows the page description', () => {
     render(<EventsPage />);
-    expect(screen.getByText('Discover community events, workshops, and meetups near you.')).toBeInTheDocument();
+    expect(screen.getByText(/Find local workshops, gatherings, and community events near you/i)).toBeInTheDocument();
   });
 
   it('shows search input', () => {

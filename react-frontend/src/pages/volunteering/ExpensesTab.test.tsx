@@ -13,7 +13,18 @@ import { framerMotionMock } from '@/test/mocks';
 
 vi.mock('framer-motion', () => framerMotionMock);
 
-const stableT = (_key: string, fallback: string, _opts?: object) => fallback ?? _key;
+const translations: Record<string, string> = {
+  'expenses.heading': 'My Expenses',
+  'expenses.submit': 'Submit Expense',
+  'expenses.stats.total_claimed': 'Total Claimed',
+  'expenses.stats.approved': 'Approved',
+  'expenses.stats.paid': 'Paid',
+  'expenses.load_error': 'Unable to load expenses. Please try again.',
+  'expenses.try_again': 'Try Again',
+  'expenses.empty_title': 'No expenses yet',
+};
+const stableT = (key: string, fallback?: string | object) =>
+  translations[key] ?? (typeof fallback === 'string' ? fallback : key);
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: stableT,

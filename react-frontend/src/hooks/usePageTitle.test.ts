@@ -8,7 +8,7 @@
  */
 
 import { describe, it, expect, afterEach } from 'vitest';
-import { renderHook } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
 import { usePageTitle } from './usePageTitle';
 
 describe('usePageTitle', () => {
@@ -18,33 +18,33 @@ describe('usePageTitle', () => {
     document.title = originalTitle;
   });
 
-  it('sets document title', () => {
+  it('sets document title', async () => {
     renderHook(() => usePageTitle('Dashboard'));
-    expect(document.title).toBe('Dashboard');
+    await waitFor(() => expect(document.title).toBe('Dashboard'));
   });
 
-  it('restores previous title on unmount', () => {
+  it('restores previous title on unmount', async () => {
     document.title = 'Original Title';
     const { unmount } = renderHook(() => usePageTitle('New Title'));
-    expect(document.title).toBe('New Title');
+    await waitFor(() => expect(document.title).toBe('New Title'));
 
     unmount();
     expect(document.title).toBe('Original Title');
   });
 
-  it('updates title when title prop changes', () => {
+  it('updates title when title prop changes', async () => {
     const { rerender } = renderHook(
       ({ title }) => usePageTitle(title),
       { initialProps: { title: 'Page A' } }
     );
-    expect(document.title).toBe('Page A');
+    await waitFor(() => expect(document.title).toBe('Page A'));
 
     rerender({ title: 'Page B' });
-    expect(document.title).toBe('Page B');
+    await waitFor(() => expect(document.title).toBe('Page B'));
   });
 
-  it('handles empty string title', () => {
+  it('handles empty string title', async () => {
     renderHook(() => usePageTitle(''));
-    expect(document.title).toBe('');
+    await waitFor(() => expect(document.title).toBe(''));
   });
 });

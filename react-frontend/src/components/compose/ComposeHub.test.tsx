@@ -126,8 +126,7 @@ describe('ComposeHub', () => {
 
   it('renders without crashing when open', () => {
     render(<ComposeHub {...defaultProps} />);
-    // Default tab is 'listing', so header shows "Create Listing" (also in submit button)
-    expect(screen.getAllByText(/Create Listing/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/Create Post/).length).toBeGreaterThanOrEqual(1);
   });
 
   it('shows all 5 tab labels when all features enabled', () => {
@@ -168,9 +167,9 @@ describe('ComposeHub', () => {
     expect(screen.queryAllByText('Goal').length).toBe(0);
   });
 
-  it('defaults to Listing tab header', () => {
+  it('defaults to Post tab header', () => {
     render(<ComposeHub {...defaultProps} />);
-    expect(screen.getAllByText(/Create Listing/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/Create Post/).length).toBeGreaterThanOrEqual(1);
   });
 
   it('opens to specified defaultTab', () => {
@@ -183,8 +182,7 @@ describe('ComposeHub', () => {
     const user = userEvent.setup();
     render(<ComposeHub {...defaultProps} />);
 
-    // Default is Listing tab
-    expect(screen.getAllByText(/Create Listing/).length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText(/Create Post/).length).toBeGreaterThanOrEqual(1);
 
     // Click the Post tab
     const postTabs = screen.getAllByText('Post');

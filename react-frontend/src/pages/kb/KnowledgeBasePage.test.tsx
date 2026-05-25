@@ -117,32 +117,35 @@ const mockArticle = {
   id: 1,
   title: 'How to Create a Listing',
   slug: 'how-to-create-listing',
-  excerpt: 'Step-by-step guide to creating listings.',
-  category: 'Getting Started',
-  parent_id: null,
+  content_type: 'markdown',
+  category_id: 1,
+  category_name: 'Getting Started',
+  parent_article_id: null,
   is_published: true,
-  view_count: 50,
-  helpful_count: 10,
-  not_helpful_count: 1,
+  views_count: 50,
+  helpful_yes: 10,
+  helpful_no: 1,
   created_at: '2026-01-01T10:00:00Z',
   updated_at: '2026-03-10T10:00:00Z',
-  children_count: 2,
+  author: null,
+  content_preview: 'Step-by-step guide to creating listings.',
 };
 
 const mockArticle2 = {
   id: 2,
   title: 'Understanding Time Credits',
   slug: 'understanding-time-credits',
-  excerpt: null,
-  category: 'Wallet',
-  parent_id: null,
+  content_type: 'markdown',
+  category_id: 2,
+  category_name: 'Wallet',
+  parent_article_id: null,
   is_published: true,
-  view_count: 0,
-  helpful_count: 5,
-  not_helpful_count: 0,
+  views_count: 0,
+  helpful_yes: 5,
+  helpful_no: 0,
   created_at: '2026-02-01T10:00:00Z',
   updated_at: '2026-03-08T10:00:00Z',
-  children_count: 0,
+  author: null,
 };
 
 describe('KnowledgeBasePage', () => {
@@ -190,8 +193,8 @@ describe('KnowledgeBasePage', () => {
       expect(screen.getByText('How to Create a Listing')).toBeInTheDocument();
     });
     expect(screen.getByText('Understanding Time Credits')).toBeInTheDocument();
-    expect(screen.getByText('Getting Started')).toBeInTheDocument();
-    expect(screen.getByText('Wallet')).toBeInTheDocument();
+    expect(screen.getAllByText('Getting Started').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Wallet').length).toBeGreaterThan(0);
   });
 
   it('displays article excerpts when present', async () => {

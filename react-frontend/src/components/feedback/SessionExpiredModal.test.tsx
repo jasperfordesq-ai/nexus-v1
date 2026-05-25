@@ -60,7 +60,7 @@ describe('SessionExpiredModal', () => {
 
   it('does not show modal content by default', () => {
     render(<SessionExpiredModal />);
-    expect(screen.queryByText('Session Expired')).not.toBeInTheDocument();
+    expect(screen.queryByText('Session expired')).not.toBeInTheDocument();
   });
 
   it('shows modal when session expired event fires', () => {
@@ -68,7 +68,7 @@ describe('SessionExpiredModal', () => {
     act(() => {
       window.dispatchEvent(new CustomEvent('nexus:session_expired'));
     });
-    expect(screen.getByText('Session Expired')).toBeInTheDocument();
+    expect(screen.getByText('Session expired')).toBeInTheDocument();
     expect(screen.getByText(/session has expired/i)).toBeInTheDocument();
   });
 

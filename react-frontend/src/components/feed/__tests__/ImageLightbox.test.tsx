@@ -16,7 +16,16 @@ import type { PostMedia } from '../types';
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, fallbackOrOpts?: string | Record<string, unknown>, opts?: Record<string, unknown>) => {
-      const fallback = typeof fallbackOrOpts === 'string' ? fallbackOrOpts : key;
+      const translations: Record<string, string> = {
+        'lightbox.aria_label': 'Image viewer',
+        'lightbox.close': 'Close image viewer',
+        'lightbox.counter': '{{current}} of {{total}}',
+        'lightbox.download': 'Download image',
+        'carousel.previous': 'Previous image',
+        'carousel.next': 'Next image',
+        'carousel.go_to_image': 'Go to image {{number}}',
+      };
+      const fallback = translations[key] ?? (typeof fallbackOrOpts === 'string' ? fallbackOrOpts : key);
       const vars = typeof fallbackOrOpts === 'object' ? fallbackOrOpts : opts;
       if (!vars) return fallback;
       return fallback.replace(/\{\{(\w+)\}\}/g, (_, k) => String(vars[k] ?? `{{${k}}}`));
@@ -200,7 +209,7 @@ describe('ImageLightbox', () => {
     render(<ImageLightbox media={media} initialIndex={3} onClose={onClose} />);
 
     expect(screen.getByText('4 of 5')).toBeInTheDocument();
-    const img = screen.getByRole('img');
+    const img = document.querySelector('img');
     expect(img).toHaveAttribute('src', '/uploads/img4.jpg');
   });
 

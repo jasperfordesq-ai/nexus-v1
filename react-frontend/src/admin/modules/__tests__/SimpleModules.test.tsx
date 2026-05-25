@@ -128,6 +128,12 @@ vi.mock('../../components', () => ({
   DataTable: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   ConfirmModal: () => null,
   EmptyState: () => null,
+  StatCard: ({ label, value }: { label?: React.ReactNode; value?: React.ReactNode }) => (
+    <div>
+      <span>{label}</span>
+      <span>{value}</span>
+    </div>
+  ),
   StatusBadge: () => null,
   Column: undefined,
 }));

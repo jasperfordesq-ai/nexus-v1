@@ -32,13 +32,13 @@ describe('OfflineIndicator', () => {
     // navigator.onLine defaults to true in jsdom
     Object.defineProperty(navigator, 'onLine', { value: true, writable: true });
     render(<OfflineIndicator />);
-    expect(screen.queryByText(/you are offline/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/you appear to be offline/i)).not.toBeInTheDocument();
   });
 
   it('shows banner when offline', () => {
     Object.defineProperty(navigator, 'onLine', { value: false, writable: true });
     render(<OfflineIndicator />);
-    expect(screen.getByText(/you are offline/i)).toBeInTheDocument();
+    expect(screen.getByText(/you appear to be offline/i)).toBeInTheDocument();
     // Restore
     Object.defineProperty(navigator, 'onLine', { value: true, writable: true });
   });

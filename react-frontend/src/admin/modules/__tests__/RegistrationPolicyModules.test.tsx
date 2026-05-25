@@ -23,6 +23,7 @@ import { HeroUIProvider } from '@heroui/react';
 
 const mockGet = vi.fn();
 const mockPut = vi.fn();
+const mockToast = { success: vi.fn(), error: vi.fn(), info: vi.fn(), showToast: vi.fn() };
 
 vi.mock('@/lib/api', () => ({
   api: {
@@ -48,7 +49,7 @@ vi.mock('@/contexts', () => ({
     hasModule: vi.fn(() => true),
     tenantPath: (p: string) => `/test${p}`,
   })),
-  useToast: vi.fn(() => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), showToast: vi.fn() })),
+  useToast: vi.fn(() => mockToast),
   useNotifications: vi.fn(() => ({ counts: { messages: 0, notifications: 0 } })),
 
   useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),

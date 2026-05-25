@@ -6,16 +6,18 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@/test/test-utils';
 import { FeatureGate } from './FeatureGate';
-import { useTenant } from '@/contexts';
+import { useTenant } from '@/contexts/TenantContext';
 
-vi.mock('@/contexts', () => ({
+vi.mock('@/contexts/TenantContext', () => ({
   useTenant: vi.fn(() => ({
     hasFeature: vi.fn(() => true),
     hasModule: vi.fn(() => true),
     isLoading: false,
     tenantPath: vi.fn((p: string) => `/test${p}`),
   })),
+}));
 
+vi.mock('@/contexts', () => ({
   useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
   useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
   usePusher: () => ({ channel: null, isConnected: false }),

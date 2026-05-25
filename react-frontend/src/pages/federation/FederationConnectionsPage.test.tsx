@@ -22,7 +22,9 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, opts?: Record<string, unknown>) =>
       (opts?.fallbackValue as string | undefined) ?? key,
+    i18n: { language: 'en', changeLanguage: vi.fn() },
   }),
+  initReactI18next: { type: '3rdParty', init: vi.fn() },
 }));
 
 vi.mock('react-router-dom', async () => {
@@ -156,6 +158,7 @@ describe('FederationConnectionsPage', () => {
     await waitFor(() => {
       expect(api.get).toHaveBeenCalledWith(
         expect.stringContaining('/v2/federation/connections?status=accepted'),
+        expect.objectContaining({ signal: expect.any(AbortSignal) }),
       );
     });
   });

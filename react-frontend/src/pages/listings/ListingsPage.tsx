@@ -53,6 +53,7 @@ import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
+import { MAPS_ENABLED } from '@/lib/map-config';
 import { resolveAvatarUrl, resolveAssetUrl } from '@/lib/helpers';
 import { ProximityFilter, type ProximityFilterParams } from '@/components/proximity/ProximityFilter';
 import type { Listing, Category } from '@/types/api';
@@ -559,13 +560,25 @@ export function ListingsPage() {
               <Button
                 isIconOnly
                 variant="light"
-                className={`min-h-[44px] min-w-[44px] rounded-none rounded-r-xl transition-colors ${viewMode === 'list' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300' : 'text-theme-muted'}`}
+                className={`min-h-[44px] min-w-[44px] rounded-none ${!MAPS_ENABLED ? 'rounded-r-xl' : ''} transition-colors ${viewMode === 'list' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300' : 'text-theme-muted'}`}
                 aria-label={t('aria_list_view')}
                 aria-pressed={viewMode === 'list'}
                 onPress={() => setViewMode('list')}
               >
                 <List className="w-4 h-4" aria-hidden="true" />
               </Button>
+              {MAPS_ENABLED && (
+                <Button
+                  isIconOnly
+                  variant="light"
+                  className={`min-h-[44px] min-w-[44px] rounded-none rounded-r-xl transition-colors ${viewMode === 'map' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300' : 'text-theme-muted'}`}
+                  aria-label={t('aria_map_view')}
+                  aria-pressed={viewMode === 'map'}
+                  onPress={() => setViewMode('map')}
+                >
+                  <MapIcon className="w-4 h-4" aria-hidden="true" />
+                </Button>
+              )}
             </div>
           </div>
         </form>

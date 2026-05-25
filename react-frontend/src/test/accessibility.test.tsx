@@ -48,7 +48,17 @@ vi.mock('framer-motion', () => ({
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, fallback?: string) => fallback ?? key,
+    t: (key: string, fallbackOrOpts?: string | Record<string, unknown>, opts?: Record<string, unknown>) => {
+      const translations: Record<string, string> = {
+        level_plain: 'Level {{level}}',
+        level_named: 'Level {{level}}: {{name}}',
+        xp_progress: '{{current}} / {{required}} XP',
+        level_progress_aria: 'Level {{level}} progress: {{percentage}}%',
+      };
+      const fallback = typeof fallbackOrOpts === 'string' ? fallbackOrOpts : translations[key] ?? key;
+      const vars = typeof fallbackOrOpts === 'object' ? fallbackOrOpts : opts;
+      return fallback.replace(/\{\{(\w+)\}\}/g, (_, k) => String(vars?.[k] ?? ''));
+    },
     i18n: { language: 'en', changeLanguage: () => Promise.resolve() },
   }),
   Trans: ({ children }: { children: unknown }) => children,

@@ -16,7 +16,25 @@ import { HeroUIProvider } from '@heroui/react';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, fallback?: string) => fallback ?? key,
+    t: (key: string, fallbackOrOpts?: string | Record<string, unknown>, opts?: Record<string, unknown>) => {
+      const translations: Record<string, string> = {
+        'review_modal.title': 'Write a Review',
+        'review_modal.subtitle': 'Share your experience with {{name}}',
+        'review_modal.transaction_review': 'Transaction Review',
+        'review_modal.general_review': 'General Review',
+        'review_modal.rating_label': 'Rating',
+        'review_modal.rating_required': '*',
+        'review_modal.rate_star': 'Rate {{star}} out of 5 stars',
+        'review_modal.comment_label': 'Comment',
+        'review_modal.comment_placeholder': 'Tell us about your experience',
+        'review_modal.characters_count': '{{count}}/{{max}} characters',
+        'review_modal.cancel': 'Cancel',
+        'review_modal.submit': 'Submit Review',
+      };
+      const fallback = typeof fallbackOrOpts === 'string' ? fallbackOrOpts : translations[key] ?? key;
+      const vars = typeof fallbackOrOpts === 'object' ? fallbackOrOpts : opts;
+      return fallback.replace(/\{\{(\w+)\}\}/g, (_, k) => String(vars?.[k] ?? ''));
+    },
     i18n: { language: 'en', changeLanguage: vi.fn() },
   }),
   initReactI18next: { type: '3rdParty', init: () => {} },

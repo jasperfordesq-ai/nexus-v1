@@ -67,7 +67,7 @@ describe('AdminRoute', () => {
     });
 
     renderWithRouter();
-    expect(screen.getByText('Checking permissions...')).toBeInTheDocument();
+    expect(screen.getByText('Checking Permissions')).toBeInTheDocument();
   });
 
   it('redirects to login when not authenticated', () => {

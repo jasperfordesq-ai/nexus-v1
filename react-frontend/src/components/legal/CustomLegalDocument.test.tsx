@@ -86,7 +86,7 @@ describe('CustomLegalDocument', () => {
 
   it('renders the version number chip', () => {
     render(<CustomLegalDocument document={makeDoc({ version_number: '2.1' })} />);
-    expect(screen.getByText('v2.1')).toBeInTheDocument();
+    expect(screen.getByText('Version 2.1')).toBeInTheDocument();
   });
 
   it('renders summary of changes when present', () => {

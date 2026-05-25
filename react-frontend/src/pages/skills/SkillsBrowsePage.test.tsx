@@ -128,7 +128,7 @@ describe('SkillsBrowsePage', () => {
   it('renders explainer text', () => {
     mockApiGet.mockResolvedValue({ success: true, data: [] });
     render(<SkillsBrowsePage />);
-    expect(screen.getByText(/Every member of your community/i)).toBeInTheDocument();
+    expect(screen.getByText(/Browse skills shared by members in your community/i)).toBeInTheDocument();
   });
 
   it('renders categories when API returns data', async () => {

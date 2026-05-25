@@ -20,8 +20,13 @@ vi.mock('framer-motion', () => ({
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, opts?: Record<string, unknown>) =>
-      (opts?.fallbackValue as string | undefined) ?? key,
+    t: (key: string, opts?: Record<string, unknown>) => {
+      const translations: Record<string, string> = {
+        'idea_detail.actions': 'Idea actions',
+      };
+
+      return translations[key] ?? (opts?.fallbackValue as string | undefined) ?? key;
+    },
   }),
 }));
 

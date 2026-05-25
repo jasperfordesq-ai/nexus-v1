@@ -10,6 +10,7 @@ import type { MessageBubbleProps } from './MessageBubble';
 import type { Message } from '@/types/api';
 
 vi.mock('react-i18next', () => ({
+  initReactI18next: { type: '3rdParty', init: vi.fn() },
   useTranslation: () => ({
     t: (key: string) => key,
     i18n: { changeLanguage: vi.fn() },
@@ -30,6 +31,13 @@ vi.mock('framer-motion', () => ({
 
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: (url: string | null) => url ?? '',
+}));
+
+vi.mock('@/contexts/TenantContext', () => ({
+  useTenant: () => ({
+    tenantPath: (path: string) => `/test${path}`,
+    hasFeature: vi.fn(() => false),
+  }),
 }));
 
 vi.mock('./VoiceMessagePlayer', () => ({

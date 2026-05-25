@@ -34,39 +34,39 @@ describe('Password Validation', () => {
 
     it('returns error for password under minimum length', () => {
       const errors = validatePassword('Short1!');
-      expect(errors).toContain(`At least ${PASSWORD_MIN_LENGTH} characters`);
+      expect(errors).toContain('auth.password_requirements.length');
     });
 
-    it('returns error for missing uppercase', () => {
+    it('does not require uppercase characters', () => {
       const errors = validatePassword('lowercase123!');
-      expect(errors).toContain('At least one uppercase letter');
+      expect(errors).toHaveLength(0);
     });
 
-    it('returns error for missing lowercase', () => {
+    it('does not require lowercase characters', () => {
       const errors = validatePassword('UPPERCASE123!');
-      expect(errors).toContain('At least one lowercase letter');
+      expect(errors).toHaveLength(0);
     });
 
-    it('returns error for missing number', () => {
+    it('does not require numbers', () => {
       const errors = validatePassword('SecurePassword!');
-      expect(errors).toContain('At least one number');
+      expect(errors).toHaveLength(0);
     });
 
-    it('returns error for missing special character', () => {
+    it('does not require special characters', () => {
       const errors = validatePassword('SecurePassword123');
-      expect(errors).toContain('At least one special character');
+      expect(errors).toHaveLength(0);
     });
 
     it('accepts underscore as special character', () => {
       const errors = validatePassword('SecurePass123_abc');
-      expect(errors).not.toContain('At least one special character');
+      expect(errors).toHaveLength(0);
     });
 
     it('accepts various special characters', () => {
       const specialChars = ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '+', '='];
       specialChars.forEach((char) => {
         const errors = validatePassword(`SecurePass123${char}`);
-        expect(errors).not.toContain('At least one special character');
+        expect(errors).toHaveLength(0);
       });
     });
   });
@@ -80,8 +80,8 @@ describe('Password Validation', () => {
       expect(isPasswordValid('weak')).toBe(false);
     });
 
-    it('returns false for password missing one requirement', () => {
-      expect(isPasswordValid('securepass123!')).toBe(false); // no uppercase
+    it('returns true for passwords that only meet the length requirement', () => {
+      expect(isPasswordValid('securepass123!')).toBe(true);
     });
   });
 
@@ -90,8 +90,8 @@ describe('Password Validation', () => {
       expect(getPasswordStrength('')).toBe(0);
     });
 
-    it('returns 100 for password meeting all requirements', () => {
-      expect(getPasswordStrength('SecurePass123!')).toBe(100);
+    it('returns a good score for passwords above the minimum length', () => {
+      expect(getPasswordStrength('SecurePass123!')).toBe(78);
     });
 
     it('returns partial score for partially valid password', () => {
@@ -107,13 +107,12 @@ describe('Password Validation', () => {
       expect(getPasswordStrengthLevel('abc')).toBe('weak');
     });
 
-    it('returns strong for passwords meeting all requirements', () => {
-      expect(getPasswordStrengthLevel('SecurePass123!')).toBe('strong');
+    it('returns good for passwords above the minimum length', () => {
+      expect(getPasswordStrengthLevel('SecurePass123!')).toBe('good');
     });
 
-    it('returns appropriate level based on requirements met', () => {
-      // Meeting ~2/5 requirements = 40% = fair
-      expect(getPasswordStrengthLevel('password')).toBe('weak'); // only lowercase
+    it('returns appropriate level based on password length', () => {
+      expect(getPasswordStrengthLevel('password')).toBe('fair');
     });
   });
 

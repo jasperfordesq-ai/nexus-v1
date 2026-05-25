@@ -46,7 +46,33 @@ vi.mock('@/contexts', () => ({
   useToast: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() }),
 }));
 
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: (...args: unknown[]) => mockUseAuth(...args),
+}));
+
+vi.mock('@/contexts/TenantContext', () => ({
+  useTenant: (...args: unknown[]) => mockUseTenant(...args),
+}));
+
+vi.mock('@/hooks/useLegalGate', () => ({
+  useLegalGate: () => ({
+    hasPending: false,
+    pendingDocs: [],
+    acceptAll: vi.fn(),
+    isAccepting: false,
+    isLoading: false,
+  }),
+}));
+
+vi.mock('@/components/legal/LegalAcceptanceGate', () => ({
+  LegalAcceptanceGate: () => <div data-testid="legal-acceptance-gate" />,
+}));
+
 vi.mock('@/components/feedback', () => ({
+  LoadingScreen: ({ message }: { message?: string }) => <div data-testid="loading">{message}</div>,
+}));
+
+vi.mock('@/components/feedback/LoadingScreen', () => ({
   LoadingScreen: ({ message }: { message?: string }) => <div data-testid="loading">{message}</div>,
 }));
 

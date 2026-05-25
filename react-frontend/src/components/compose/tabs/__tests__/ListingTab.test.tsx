@@ -150,7 +150,7 @@ describe('ListingTab', () => {
 
   it('renders location input', () => {
     render(<ListingTab {...defaultProps} />);
-    expect(screen.getByTestId('place-input')).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /location/i })).toBeInTheDocument();
   });
 
   it('renders estimated hours input', () => {

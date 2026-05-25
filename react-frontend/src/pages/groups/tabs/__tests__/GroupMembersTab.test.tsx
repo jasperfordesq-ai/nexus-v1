@@ -68,6 +68,7 @@ vi.mock('@/components/feedback', () => ({
 
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: vi.fn((url) => url || '/default-avatar.png'),
+  formatDateValue: vi.fn((value) => String(value)),
 }));
 
 import { GroupMembersTab } from '../GroupMembersTab';

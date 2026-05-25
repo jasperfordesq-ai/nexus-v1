@@ -157,7 +157,7 @@ describe('OutcomesDashboardPage', () => {
     await waitFor(() => {
       expect(screen.getByText('challenges.load_error')).toBeInTheDocument();
     });
-    expect(screen.getByText('Retry')).toBeInTheDocument();
+    expect(screen.getByText('actions.retry')).toBeInTheDocument();
   });
 
   it('retry button refetches data after error', async () => {
@@ -166,9 +166,9 @@ describe('OutcomesDashboardPage', () => {
       .mockResolvedValueOnce({ success: true, data: mockDashboard });
     render(<OutcomesDashboardPage />);
     await waitFor(() => {
-      expect(screen.getByText('Retry')).toBeInTheDocument();
+      expect(screen.getByText('actions.retry')).toBeInTheDocument();
     });
-    fireEvent.click(screen.getByText('Retry'));
+    fireEvent.click(screen.getByText('actions.retry'));
     await waitFor(() => {
       expect(screen.getByText('Reduce Carbon Footprint')).toBeInTheDocument();
     });

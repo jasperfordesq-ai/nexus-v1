@@ -18,7 +18,15 @@ const mockChangeLanguage = vi.fn();
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, fallback?: string) => fallback ?? key,
+    t: (key: string, fallbackOrOpts?: string | Record<string, unknown>, opts?: Record<string, unknown>) => {
+      const translations: Record<string, string> = {
+        'aria.current_language': 'Language: {{language}}',
+        'aria.select_language': 'Select language',
+      };
+      const fallback = typeof fallbackOrOpts === 'string' ? fallbackOrOpts : translations[key] ?? key;
+      const vars = typeof fallbackOrOpts === 'object' ? fallbackOrOpts : opts;
+      return fallback.replace(/\{\{(\w+)\}\}/g, (_, k) => String(vars?.[k] ?? ''));
+    },
     i18n: { language: 'en', changeLanguage: mockChangeLanguage },
   }),
   initReactI18next: { type: '3rdParty', init: () => {} },

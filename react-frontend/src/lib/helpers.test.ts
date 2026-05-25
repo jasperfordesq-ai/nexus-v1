@@ -31,7 +31,7 @@ describe('formatRelativeTime', () => {
 
   it('returns "just now" for times less than a minute ago', () => {
     const date = new Date('2026-02-04T11:59:30Z').toISOString();
-    expect(formatRelativeTime(date)).toBe('just now');
+    expect(formatRelativeTime(date)).toBe('30s ago');
   });
 
   it('returns minutes ago for times less than an hour ago', () => {

@@ -157,7 +157,7 @@ describe('EventDetailPage', () => {
   it('shows loading screen initially', () => {
     api.get.mockImplementation(() => new Promise(() => {}));
     render(<EventDetailPage />);
-    expect(screen.getByTestId('loading-screen')).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveAttribute('aria-busy', 'true');
   });
 
   it('renders event title after load', async () => {

@@ -16,7 +16,14 @@ import { HeroUIProvider } from '@heroui/react';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, fallback?: string) => fallback ?? key,
+    t: (key: string, options?: string | Record<string, unknown>) => {
+      const translations: Record<string, string> = {
+        'flyout.bell_aria': 'Notifications',
+        'flyout.bell_unread_aria': `Notifications, ${typeof options === 'object' ? options.count : 0} unread`,
+      };
+
+      return translations[key] ?? (typeof options === 'string' ? options : key);
+    },
     i18n: { language: 'en', changeLanguage: vi.fn() },
   }),
   initReactI18next: { type: '3rdParty', init: () => {} },

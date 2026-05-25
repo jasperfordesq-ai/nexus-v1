@@ -183,8 +183,8 @@ describe('JobAnalyticsPage', () => {
     await waitFor(() => {
       expect(screen.getByText('analytics.applications_by_stage')).toBeInTheDocument();
     });
-    expect(screen.getByText('applied')).toBeInTheDocument();
-    expect(screen.getByText('interview')).toBeInTheDocument();
+    expect(screen.getByText('application_status.applied')).toBeInTheDocument();
+    expect(screen.getByText('application_status.interview')).toBeInTheDocument();
   });
 
   it('shows avg_time_to_apply metric when available', async () => {

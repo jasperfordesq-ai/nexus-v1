@@ -13,7 +13,22 @@ import { framerMotionMock } from '@/test/mocks';
 
 vi.mock('framer-motion', () => framerMotionMock);
 
-const stableT = (_key: string, fallback: string, _opts?: object) => fallback ?? _key;
+const safeguardingTranslations: Record<string, string> = {
+  'safeguarding.add_training': 'Add Training',
+  'safeguarding.heading': 'Safeguarding',
+  'safeguarding.incident_reports': 'Incident Reports',
+  'safeguarding.load_error': 'Unable to load safeguarding data.',
+  'safeguarding.no_incidents_title': 'No incidents reported',
+  'safeguarding.no_training_title': 'No training records',
+  'safeguarding.report_incident': 'Report Incident',
+  'safeguarding.training_records': 'Training Records',
+  'safeguarding.try_again': 'Try Again',
+};
+
+const stableT = (key: string, fallbackOrOptions?: string | Record<string, unknown>, _opts?: object) => {
+  if (typeof fallbackOrOptions === 'string') return fallbackOrOptions;
+  return safeguardingTranslations[key] ?? key;
+};
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: stableT,

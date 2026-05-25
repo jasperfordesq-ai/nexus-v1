@@ -16,7 +16,13 @@ import { HeroUIProvider } from '@heroui/react';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, fallback?: string) => fallback ?? key,
+    t: (key: string, opts?: string | Record<string, unknown>) => {
+      if (key === 'video.default_title') return 'Video';
+      if (key === 'video.play_label') return `Play video: ${(opts as Record<string, unknown>)?.title ?? 'Video'}`;
+      if (key === 'video.thumbnail_alt') return `Thumbnail for ${(opts as Record<string, unknown>)?.title ?? 'Video'}`;
+      if (typeof opts === 'string') return opts;
+      return key;
+    },
     i18n: { language: 'en', changeLanguage: vi.fn() },
   }),
   initReactI18next: { type: '3rdParty', init: () => {} },

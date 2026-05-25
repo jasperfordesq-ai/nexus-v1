@@ -325,6 +325,7 @@ export function NotificationsPage() {
               <Button
                 variant="flat"
                 size="sm"
+                aria-label={t('settings_aria')}
                 className="w-full bg-theme-elevated text-theme-primary"
                 startContent={<Settings className="w-4 h-4" aria-hidden="true" />}
               >

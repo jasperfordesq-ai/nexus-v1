@@ -54,7 +54,20 @@ vi.mock('@/contexts', () => ({
 // Mock i18next
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, fallback: string) => fallback,
+    t: (key: string, fallback?: string) => {
+      const translations: Record<string, string> = {
+        'cookie_consent.banner_label': 'Cookie consent',
+        'cookie_consent.title': 'We use cookies',
+        'cookie_consent.description': 'We use cookies to improve your experience.',
+        'cookie_consent.learn_more': 'Learn more',
+        'cookie_consent.manage': 'Manage preferences',
+        'cookie_consent.hide_details': 'Hide details',
+        'cookie_consent.save': 'Save preferences',
+        'cookie_consent.essential_only': 'Essential only',
+        'cookie_consent.accept_all': 'Accept all',
+      };
+      return fallback ?? translations[key] ?? key;
+    },
     i18n: { language: 'en' },
   }),
 }));

@@ -10,7 +10,13 @@ import { FederatedTrustBadge } from './FederatedTrustBadge';
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, opts?: Record<string, unknown>) => {
-      const fallback = (opts?.fallbackValue as string | undefined) ?? key;
+      const translations: Record<string, string> = {
+        'reputation.aria_label': 'Federated reputation {{score}} from {{count}} reviews',
+        'reputation.chip_label': '{{score}} ({{count}})',
+        'reputation.tooltip_federated': 'Aggregated from {{count}} federation reviews',
+        'reputation.tooltip_local': 'Based on {{count}} local reviews',
+      };
+      const fallback = (opts?.fallbackValue as string | undefined) ?? translations[key] ?? key;
       if (!opts) return fallback;
       // Simple interpolation for tests
       return fallback.replace(/\{\{(\w+)\}\}/g, (_, k: string) =>
