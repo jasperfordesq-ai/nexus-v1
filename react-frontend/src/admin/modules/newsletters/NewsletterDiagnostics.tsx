@@ -8,11 +8,18 @@
  * Email health dashboard - queue status, bounce rate, configuration checks
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import {
+  useState,
+  useCallback,
+  useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  Button, Card, CardBody, CardHeader, Chip, Progress,
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Chip,
 } from '@heroui/react';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import AlertCircle from 'lucide-react/icons/circle-alert';
@@ -28,6 +35,7 @@ import { useTenant } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 import type { NewsletterDiagnostics as DiagnosticsData } from '../../api/types';
+import { Progress } from '@/components/ui';
 
 export function NewsletterDiagnostics() {
   const { t } = useTranslation('admin');

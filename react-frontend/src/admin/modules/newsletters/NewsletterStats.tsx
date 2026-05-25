@@ -10,9 +10,27 @@
  * A/B test results, timeline, top links, recent activity, and quick actions.
  */
 
-import { useState, useCallback, useEffect, useMemo, type CSSProperties } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Chip, Progress, Skeleton, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+import {
+  useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  type CSSProperties } from 'react';
+import { useParams,
+  useNavigate } from 'react-router-dom';
+import { Card,
+  CardBody,
+  CardHeader,
+  Button,
+  Chip,
+  Skeleton,
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+} from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
@@ -41,6 +59,7 @@ import { PageHeader, StatCard } from '../../components';
 import { NewsletterResend } from './NewsletterResend';
 
 import { useTranslation } from 'react-i18next';
+import { Progress } from '@/components/ui';
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 interface NewsletterInfo {

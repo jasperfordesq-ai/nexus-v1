@@ -10,7 +10,10 @@
  *      DELETE /api/v2/admin/goals/{id}
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import {
+  useState,
+  useEffect,
+  useCallback } from 'react';
 import {
   Card,
   CardBody,
@@ -18,7 +21,6 @@ import {
   Button,
   Chip,
   Input,
-  Progress,
   Pagination,
   Table,
   TableHeader,
@@ -37,6 +39,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader, ConfirmModal } from '../../components';
+import { Progress } from '@/components/ui';
 
 // ---------------------------------------------------------------------------
 // Types

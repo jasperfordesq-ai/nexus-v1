@@ -11,7 +11,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Switch, Chip, Input, Spinner, Code, Snippet, Accordion, AccordionItem } from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Switch, Chip, Input, Spinner, Accordion, AccordionItem } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Globe from 'lucide-react/icons/globe';
 import Shield from 'lucide-react/icons/shield';
@@ -29,6 +29,7 @@ import Handshake from 'lucide-react/icons/handshake';
 import KeyRound from 'lucide-react/icons/key-round';
 import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
+import { Code, Snippet } from '@/components/ui';
 import { adminSuper } from '../../api/adminApi';
 import { PageHeader, ConfirmModal, StatCard } from '../../components';
 import type { FederationSystemControls as FederationSystemControlsType, FederationWhitelistEntry, FederationPartnership } from '../../api/types';

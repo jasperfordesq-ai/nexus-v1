@@ -8,7 +8,11 @@
  * Admin page to manage giving day campaigns and view donation summaries.
  */
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import {
+  useState,
+  useCallback,
+  useEffect,
+  useMemo } from 'react';
 import {
   Button,
   Chip,
@@ -22,7 +26,6 @@ import {
   ModalFooter,
   Input,
   Textarea,
-  Progress,
   Spinner,
   Avatar,
   Tab,
@@ -57,6 +60,7 @@ import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
 import { DataTable, PageHeader, StatCard, EmptyState, type Column } from '../../components';
 import { useTranslation } from 'react-i18next';
+import { Progress } from '@/components/ui';
 
 interface GivingDay {
   id: number;

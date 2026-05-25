@@ -9,9 +9,19 @@
  * Data source: GET /api/v2/admin/crm/funnel
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Card, CardBody, CardHeader, Chip, Progress, Spinner } from '@heroui/react';
+import { Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Chip,
+  Spinner,
+} from '@heroui/react';
 import type { LucideIcon } from 'lucide-react';
 import Activity from 'lucide-react/icons/activity';
 import ArrowDown from 'lucide-react/icons/arrow-down';
@@ -38,6 +48,7 @@ import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant, useToast } from '@/contexts';
 import { adminCrm } from '../../api/adminApi';
 import { useTranslation } from 'react-i18next';
+import { Progress } from '@/components/ui';
 
 interface FunnelStage {
   name: string;

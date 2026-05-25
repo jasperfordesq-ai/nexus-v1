@@ -7,11 +7,15 @@
  * Achievements Page - Badge showcase, challenges, collections, XP shop, daily rewards
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef } from 'react';
+import { motion,
+  AnimatePresence } from 'framer-motion';
 import {
   Button,
-  Progress,
   Chip,
   Select,
   SelectItem,
@@ -25,7 +29,7 @@ import {
   Checkbox,
   Spinner,
   Skeleton,
-} from '@heroui/react';
+  } from '@heroui/react';
 import Trophy from 'lucide-react/icons/trophy';
 import Medal from 'lucide-react/icons/medal';
 import Star from 'lucide-react/icons/star';
@@ -48,7 +52,9 @@ import Route from 'lucide-react/icons/route';
 import Calendar from 'lucide-react/icons/calendar';
 import { useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
-import { GlassCard } from '@/components/ui';
+import { GlassCard,
+  Progress,
+} from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';

@@ -3,8 +3,34 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useState } from 'react';
-import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Progress, Select, SelectItem, Spinner, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, useDisclosure } from '@heroui/react';
+import {
+  useCallback,
+  useEffect,
+  useState } from 'react';
+import { Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Chip,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Select,
+  SelectItem,
+  Spinner,
+  Switch,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+  Textarea,
+  useDisclosure,
+} from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import CheckCircle from 'lucide-react/icons/check-circle';
 import Flag from 'lucide-react/icons/flag';
@@ -20,6 +46,7 @@ import { usePageTitle } from '@/hooks';
 import api from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { EmptyState, PageHeader } from '../../components';
+import { Progress } from '@/components/ui';
 
 type ProjectStatus = 'draft' | 'active' | 'paused' | 'completed' | 'cancelled';
 

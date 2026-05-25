@@ -5,15 +5,15 @@
 
 /**
  * Create/Edit Event Page with image upload, category selection,
- * and HeroUI DatePicker + TimeInput components.
+ * and HeroUI DatePicker + app-local TimeInput components.
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Button, Input, Textarea, Select, SelectItem, DatePicker, TimeInput, Switch, CheckboxGroup, Checkbox, Chip } from '@heroui/react';
-import type { DateInputValue, TimeInputValue } from '@heroui/react';
+import { Button, Input, Textarea, Select, SelectItem, DatePicker, Switch, CheckboxGroup, Checkbox, Chip } from '@heroui/react';
+import type { DateInputValue } from '@heroui/react';
 import { parseDate, parseTime, today, getLocalTimeZone } from '@internationalized/date';
 import Save from 'lucide-react/icons/save';
 import Calendar from 'lucide-react/icons/calendar';
@@ -28,6 +28,7 @@ import Tag from 'lucide-react/icons/tag';
 import Repeat from 'lucide-react/icons/repeat';
 import Video from 'lucide-react/icons/video';
 import BarChart3 from 'lucide-react/icons/chart-column';
+import { TimeInput, type TimeInputValue } from '@/components/ui';
 import { GlassCard } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { LoadingScreen } from '@/components/feedback';

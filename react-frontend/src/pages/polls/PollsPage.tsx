@@ -15,10 +15,33 @@
  * - Delete confirmation modal (owner / admin)
  */
 
-import { useState, useEffect, useCallback, useRef, memo } from 'react';
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  memo } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Button, Input, Textarea, Progress, Chip, Avatar, Tabs, Tab, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, DatePicker, Switch, Select, SelectItem, useDisclosure } from '@heroui/react';
+import { motion,
+  AnimatePresence } from 'framer-motion';
+import { Button,
+  Input,
+  Textarea,
+  Chip,
+  Avatar,
+  Tabs,
+  Tab,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  DatePicker,
+  Switch,
+  Select,
+  SelectItem,
+  useDisclosure,
+  } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import type { DateInputValue } from '@heroui/react';
 import BarChart3 from 'lucide-react/icons/chart-column';
@@ -40,7 +63,9 @@ import Tag from 'lucide-react/icons/tag';
 import ListOrdered from 'lucide-react/icons/list-ordered';
 import Filter from 'lucide-react/icons/filter';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard,
+  Progress,
+} from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { SocialInteractionPanel } from '@/components/social';
 import { useAuth, useToast, useTenant } from '@/contexts';

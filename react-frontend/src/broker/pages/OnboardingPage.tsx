@@ -9,13 +9,16 @@
  * a table of pending members awaiting approval.
  */
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import {
+  useEffect,
+  useState,
+  useCallback,
+  useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Card,
   CardBody,
   CardHeader,
-  Progress,
   Chip,
   Dropdown,
   DropdownTrigger,
@@ -33,6 +36,7 @@ import { adminCrm, adminUsers } from '@/admin/api/adminApi';
 import type { AdminUser, CrmFunnelStage } from '@/admin/api/types';
 import { DataTable, PageHeader, ConfirmModal } from '@/admin/components';
 import type { Column } from '@/admin/components';
+import { Progress } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

@@ -3,8 +3,28 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Progress, Select, SelectItem, Spinner, Textarea, Tooltip } from '@heroui/react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState } from 'react';
+import { Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Chip,
+  Input,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Select,
+  SelectItem,
+  Spinner,
+  Textarea,
+  Tooltip,
+} from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import CheckCircle2 from 'lucide-react/icons/check-circle-2';
 import Info from 'lucide-react/icons/info';
@@ -17,6 +37,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { Abbr, PageHeader } from '../../components';
+import { Progress } from '@/components/ui';
 
 type ItemStatus = 'pending' | 'in_progress' | 'decided' | 'blocked';
 type ItemType = 'enum' | 'text' | 'url' | 'choice';

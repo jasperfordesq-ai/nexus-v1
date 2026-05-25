@@ -15,19 +15,23 @@
  * Route: /federation/onboarding
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion,
+  AnimatePresence } from 'framer-motion';
 import {
   Button,
   Switch,
   Select,
   SelectItem,
   Input,
-  Progress,
   Spinner,
   Chip,
-} from '@heroui/react';
+  } from '@heroui/react';
 import Globe from 'lucide-react/icons/globe';
 import Users from 'lucide-react/icons/users';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
@@ -47,7 +51,9 @@ import Sparkles from 'lucide-react/icons/sparkles';
 import HandHeart from 'lucide-react/icons/hand-heart';
 import Network from 'lucide-react/icons/network';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard,
+  Progress,
+} from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';
 import { useAuth, useToast, useTenant } from '@/contexts';

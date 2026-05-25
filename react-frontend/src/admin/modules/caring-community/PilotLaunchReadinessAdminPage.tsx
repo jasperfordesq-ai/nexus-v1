@@ -3,9 +3,24 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Card, CardBody, CardHeader, Chip, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Progress, Spinner, Tooltip } from '@heroui/react';
+import { Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Chip,
+  Modal,
+  ModalBody,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  Spinner,
+  Tooltip,
+} from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
@@ -20,6 +35,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader } from '../../components';
+import { Progress } from '@/components/ui';
 
 type SectionStatus = 'ready' | 'needs_review' | 'not_started' | 'blocked';
 

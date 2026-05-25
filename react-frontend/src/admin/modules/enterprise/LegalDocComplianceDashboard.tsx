@@ -3,7 +3,10 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect, useCallback } from 'react';
+import {
+  useState,
+  useEffect,
+  useCallback } from 'react';
 import {
   Card,
   CardBody,
@@ -16,7 +19,6 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  Progress,
   Input,
   Modal,
   ModalContent,
@@ -35,6 +37,7 @@ import { useToast } from '@/contexts/ToastContext';
 import { adminLegalDocs } from '@/admin/api/adminApi';
 import type { ComplianceStats, UserAcceptance } from '@/admin/api/types';
 import { useAdminPageMeta } from '../../AdminMetaContext';
+import { Progress } from '@/components/ui';
 
 export default function LegalDocComplianceDashboard() {
   const { t } = useTranslation('admin');

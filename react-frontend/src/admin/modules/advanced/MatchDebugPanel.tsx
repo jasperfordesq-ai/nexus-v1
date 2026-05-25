@@ -10,12 +10,14 @@
  * proximity, freshness, reciprocity, quality).
  */
 
-import { useState, useCallback, useRef } from 'react';
+import {
+  useState,
+  useCallback,
+  useRef } from 'react';
 import {
   Card,
   CardBody,
   CardHeader,
-  Progress,
   Chip,
   Avatar,
   Input,
@@ -35,6 +37,7 @@ import { PageHeader } from '../../components';
 import { adminUsers } from '../../api/adminApi';
 
 import { useTranslation } from 'react-i18next';
+import { Progress } from '@/components/ui';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────

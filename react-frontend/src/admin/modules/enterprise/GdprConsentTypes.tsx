@@ -9,11 +9,26 @@
  * Route: /admin/enterprise/gdpr/consent-types
  */
 
-import { useEffect, useState, useCallback } from 'react';
 import {
-  Card, CardBody, Button, Chip, Progress, Spinner,
-  Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
-  Input, Textarea, Select, SelectItem, Switch,
+  useEffect,
+  useState,
+  useCallback } from 'react';
+import {
+  Card,
+  CardBody,
+  Button,
+  Chip,
+  Spinner,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Input,
+  Textarea,
+  Select,
+  SelectItem,
+  Switch,
 } from '@heroui/react';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Plus from 'lucide-react/icons/plus';
@@ -30,6 +45,7 @@ import { PageHeader, DataTable, ConfirmModal } from '../../components';
 import type { Column } from '../../components';
 import type { ConsentType, ConsentTypeUser } from '../../api/types';
 import { useTranslation } from 'react-i18next';
+import { Progress } from '@/components/ui';
 
 const CATEGORY_OPTIONS = ['essential', 'functional', 'analytics', 'marketing', 'communications', 'other'] as const;
 

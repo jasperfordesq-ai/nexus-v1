@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Accordion, AccordionItem, Button, Card, CardBody, CardHeader, Chip, Snippet, Spinner, Tooltip } from '@heroui/react';
+import { Accordion, AccordionItem, Button, Card, CardBody, CardHeader, Chip, Spinner, Tooltip } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ClipboardList from 'lucide-react/icons/clipboard-list';
 import ExternalLink from 'lucide-react/icons/external-link';
@@ -19,6 +19,7 @@ import Webhook from 'lucide-react/icons/webhook';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
+import { Snippet } from '@/components/ui';
 import { api } from '@/lib/api';
 import { PageHeader } from '../../components';
 

@@ -9,9 +9,27 @@
  * Route: /admin/enterprise/gdpr/requests/:id
  */
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Chip, Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, Input, Progress } from '@heroui/react';
+import {
+  useEffect,
+  useState,
+  useCallback,
+  useMemo } from 'react';
+import { useParams,
+  useNavigate } from 'react-router-dom';
+import { Card,
+  CardBody,
+  CardHeader,
+  Chip,
+  Button,
+  Spinner,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Textarea,
+  Input,
+} from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import MessageSquarePlus from 'lucide-react/icons/message-square-plus';
@@ -28,6 +46,7 @@ import { useAdminPageMeta } from '../../AdminMetaContext';
 import { PageHeader, StatusBadge } from '../../components';
 import type { GdprRequestDetail as GdprRequestDetailType, GdprTimelineEntry } from '../../api/types';
 import { useTranslation } from 'react-i18next';
+import { Progress } from '@/components/ui';
 
 const typeColorMap: Record<string, 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'> = {
   access: 'primary',

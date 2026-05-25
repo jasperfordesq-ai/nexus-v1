@@ -7,15 +7,18 @@
  * RecommendedShiftsTab - Skills-based shift recommendations (V4)
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Button,
   Chip,
-  Progress,
-} from '@heroui/react';
+  } from '@heroui/react';
 import Sparkles from 'lucide-react/icons/sparkles';
 import MapPin from 'lucide-react/icons/map-pin';
 import Calendar from 'lucide-react/icons/calendar';
@@ -26,7 +29,9 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Target from 'lucide-react/icons/target';
 import Zap from 'lucide-react/icons/zap';
 import ExternalLink from 'lucide-react/icons/external-link';
-import { GlassCard } from '@/components/ui';
+import { GlassCard,
+  Progress,
+} from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';

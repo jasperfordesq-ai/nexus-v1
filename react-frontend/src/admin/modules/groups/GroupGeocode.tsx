@@ -10,12 +10,13 @@
  * redirecting to the Groups list.
  */
 
-import { Card, CardBody, CardHeader, Code } from '@heroui/react';
+import { Card, CardBody, CardHeader } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import MapPin from 'lucide-react/icons/map-pin';
 import Info from 'lucide-react/icons/info';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
+import { Code } from '@/components/ui';
 import { PageHeader } from '../../components';
 
 export function GroupGeocode() {

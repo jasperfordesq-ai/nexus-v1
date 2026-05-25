@@ -9,9 +9,21 @@
  * Route: /admin/enterprise/gdpr/breaches/:id
  */
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Chip, Button, Spinner, Textarea, Progress } from '@heroui/react';
+import {
+  useEffect,
+  useState,
+  useCallback,
+  useMemo } from 'react';
+import { useParams,
+  useNavigate } from 'react-router-dom';
+import { Card,
+  CardBody,
+  CardHeader,
+  Chip,
+  Button,
+  Spinner,
+  Textarea,
+} from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
@@ -29,6 +41,7 @@ import { PageHeader, StatusBadge } from '../../components';
 import type { GdprBreachDetail as GdprBreachDetailType } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
+import { Progress } from '@/components/ui';
 
 const severityColorMap: Record<string, 'default' | 'primary' | 'warning' | 'danger'> = {
   low: 'default',

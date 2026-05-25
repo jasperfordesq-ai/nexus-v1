@@ -8,13 +8,15 @@
  * Full-JSON export, JSON import (with dry-run), and stale log purge.
  */
 
-import { useState, useCallback, useRef } from 'react';
+import {
+  useState,
+  useCallback,
+  useRef } from 'react';
 import {
   Card,
   CardBody,
   CardHeader,
   Button,
-  Progress,
   Input,
   Switch,
   Modal,
@@ -35,6 +37,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader } from '../../components';
+import { Progress } from '@/components/ui';
 
 interface ImportSummary {
   dry_run: boolean;

@@ -9,8 +9,8 @@
  */
 
 import { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
-import { Button, Avatar, Spinner, DatePicker, TimeInput, Popover, PopoverTrigger, PopoverContent } from '@heroui/react';
-import type { DateInputValue, TimeInputValue } from '@heroui/react';
+import { Button, Avatar, Spinner, DatePicker, Popover, PopoverTrigger, PopoverContent } from '@heroui/react';
+import type { DateInputValue } from '@heroui/react';
 import { today, getLocalTimeZone } from '@internationalized/date';
 import Calendar from 'lucide-react/icons/calendar';
 import X from 'lucide-react/icons/x';
@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { useDraftPersistence } from '@/hooks';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { TimeInput, type TimeInputValue } from '@/components/ui';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';

@@ -10,7 +10,11 @@
  * settlement view, transaction history, agreement detail modal.
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef } from 'react';
 import {
   Card,
   CardBody,
@@ -34,7 +38,6 @@ import {
   SelectItem,
   Tabs,
   Tab,
-  Progress,
   useDisclosure,
 } from '@heroui/react';
 import Handshake from 'lucide-react/icons/handshake';
@@ -62,6 +65,7 @@ import { formatRelativeTime } from '@/lib/helpers';
 import { PageHeader, StatCard, ConfirmModal } from '../../components';
 
 import { useTranslation } from 'react-i18next';
+import { Progress } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

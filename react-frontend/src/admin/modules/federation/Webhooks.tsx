@@ -35,7 +35,6 @@ import {
   DropdownMenu,
   DropdownItem,
   Tooltip,
-  Snippet,
 } from '@heroui/react';
 import Webhook from 'lucide-react/icons/webhook';
 import Plus from 'lucide-react/icons/plus';
@@ -52,6 +51,7 @@ import ChevronDown from 'lucide-react/icons/chevron-down';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
+import { Snippet } from '@/components/ui';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';

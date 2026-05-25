@@ -8,9 +8,17 @@
  * Admin component showing health/status of all identity verification providers.
  */
 
-import { useState, useEffect, useCallback } from 'react';
 import {
-  Card, CardBody, CardHeader, Chip, Progress, Spinner, Tooltip,
+  useState,
+  useEffect,
+  useCallback } from 'react';
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  Chip,
+  Spinner,
+  Tooltip,
 } from '@heroui/react';
 import Activity from 'lucide-react/icons/activity';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
@@ -23,6 +31,7 @@ import WifiOff from 'lucide-react/icons/wifi-off';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
+import { Progress } from '@/components/ui';
 
 interface ProviderHealthStats {
   total_sessions: number;

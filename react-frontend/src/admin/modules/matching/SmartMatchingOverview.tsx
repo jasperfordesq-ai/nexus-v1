@@ -9,9 +9,18 @@
  * and quick actions for the Smart Matching admin module.
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import {
+  useState,
+  useCallback,
+  useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Progress, Chip, Spinner } from '@heroui/react';
+import { Card,
+  CardBody,
+  CardHeader,
+  Button,
+  Chip,
+  Spinner,
+} from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Settings from 'lucide-react/icons/settings';
 import BarChart3 from 'lucide-react/icons/chart-column';
@@ -30,6 +39,7 @@ import { StatCard, PageHeader, ConfirmModal } from '../../components';
 import type { SmartMatchingConfig, MatchingStatsResponse } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
+import { Progress } from '@/components/ui';
 /** Weight metadata for display */
 const WEIGHT_META: Array<{
   key: keyof Pick<SmartMatchingConfig,

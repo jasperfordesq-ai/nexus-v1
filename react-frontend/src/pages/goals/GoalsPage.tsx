@@ -15,13 +15,16 @@
  * - Discover tab for community goals
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Button,
   Input,
-  Progress,
   Chip,
   Modal,
   ModalContent,
@@ -39,7 +42,7 @@ import {
   DropdownItem,
   useDisclosure,
   Skeleton,
-} from '@heroui/react';
+  } from '@heroui/react';
 import Target from 'lucide-react/icons/target';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -63,7 +66,10 @@ import ClipboardCheck from 'lucide-react/icons/clipboard-check';
 import FileText from 'lucide-react/icons/file-text';
 import History from 'lucide-react/icons/history';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, ConfettiCelebration } from '@/components/ui';
+import { GlassCard,
+  ConfettiCelebration,
+  Progress,
+} from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';

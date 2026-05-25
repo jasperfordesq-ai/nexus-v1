@@ -11,16 +11,20 @@
  * modal renders on /goals, but as a standalone route.
  */
 
-import { useEffect, useState, useCallback } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import {
+  useEffect,
+  useState,
+  useCallback } from 'react';
+import { useParams,
+  Link,
+  useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
   Avatar,
   Chip,
-  Progress,
   Skeleton,
-} from '@heroui/react';
+  } from '@heroui/react';
 import Target from 'lucide-react/icons/target';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Calendar from 'lucide-react/icons/calendar';
@@ -32,7 +36,9 @@ import Lock from 'lucide-react/icons/lock';
 import History from 'lucide-react/icons/history';
 import Sparkles from 'lucide-react/icons/sparkles';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
-import { GlassCard } from '@/components/ui';
+import { GlassCard,
+  Progress,
+} from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
 import { SocialInteractionPanel } from '@/components/social';

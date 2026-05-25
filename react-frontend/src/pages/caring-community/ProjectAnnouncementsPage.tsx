@@ -3,8 +3,12 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import {
+  useCallback,
+  useEffect,
+  useState } from 'react';
+import { Link,
+  useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -13,9 +17,8 @@ import {
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
-  Progress,
   Spinner,
-} from '@heroui/react';
+  } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Bell from 'lucide-react/icons/bell';
 import BellOff from 'lucide-react/icons/bell-off';
@@ -27,7 +30,9 @@ import Megaphone from 'lucide-react/icons/megaphone';
 import Milestone from 'lucide-react/icons/milestone';
 import Share2 from 'lucide-react/icons/share-2';
 import Users from 'lucide-react/icons/users';
-import { GlassCard } from '@/components/ui';
+import { GlassCard,
+  Progress,
+} from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';

@@ -20,7 +20,6 @@ import {
   Button,
   Tabs,
   Tab,
-  Code,
   Chip,
 } from '@heroui/react';
 import Server from 'lucide-react/icons/server';
@@ -32,6 +31,7 @@ import Info from 'lucide-react/icons/info';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
+import { Code } from '@/components/ui';
 import { PageHeader } from '../../components';
 import { adminSystem } from '../../api/adminApi';
 

@@ -7,9 +7,17 @@
  * NexusScore Page — personal reputation score breakdown with 6-category detail
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Progress, Chip, Button, Spinner } from '@heroui/react';
+import {
+  Chip,
+  Button,
+  Spinner,
+} from '@heroui/react';
 import Trophy from 'lucide-react/icons/trophy';
 import Users from 'lucide-react/icons/users';
 import Star from 'lucide-react/icons/star';
@@ -23,7 +31,7 @@ import Info from 'lucide-react/icons/info';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { Link } from 'react-router-dom';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Progress } from '@/components/ui';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 import { useAuth } from '@/contexts/AuthContext';

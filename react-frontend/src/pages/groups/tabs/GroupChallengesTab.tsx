@@ -9,11 +9,14 @@
  * and admin challenge creation.
  */
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo } from 'react';
 import {
   Button,
   Spinner,
-  Progress,
   Modal,
   ModalContent,
   ModalHeader,
@@ -25,7 +28,7 @@ import {
   SelectItem,
   Chip,
   useDisclosure,
-} from '@heroui/react';
+  } from '@heroui/react';
 import Trophy from 'lucide-react/icons/trophy';
 import Target from 'lucide-react/icons/target';
 import Clock from 'lucide-react/icons/clock';
@@ -35,7 +38,9 @@ import Flame from 'lucide-react/icons/flame';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard,
+  Progress,
+} from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';

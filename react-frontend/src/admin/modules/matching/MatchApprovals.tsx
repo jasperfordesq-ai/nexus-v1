@@ -9,7 +9,10 @@
  * Replaces the AdminPlaceholder for /admin/match-approvals.
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import {
+  useState,
+  useCallback,
+  useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Button,
@@ -17,7 +20,6 @@ import {
   Tabs,
   Tab,
   Avatar,
-  Progress,
   Textarea,
   Modal,
   ModalContent,
@@ -45,6 +47,7 @@ import {
 import type { MatchApproval, MatchApprovalStats } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
+import { Progress } from '@/components/ui';
 // Score color helper
 function scoreColor(score: number): 'danger' | 'warning' | 'success' {
   if (score < 50) return 'danger';

@@ -16,13 +16,15 @@
  * API: GET /api/v2/goals/{id}/history
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import {
+  useState,
+  useEffect,
+  useCallback } from 'react';
 import { motion } from 'framer-motion';
 import {
   Button,
   Spinner,
   Chip,
-  Progress,
 } from '@heroui/react';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import ClipboardCheck from 'lucide-react/icons/clipboard-check';
@@ -42,6 +44,7 @@ import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
+import { Progress } from '@/components/ui';
 
 /* ───────────────────────── Types ───────────────────────── */
 

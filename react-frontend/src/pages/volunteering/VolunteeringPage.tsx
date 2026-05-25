@@ -8,8 +8,11 @@
  */
 
 import React, { useState, useEffect, useCallback, useRef, Suspense } from 'react';
-import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import {
+  ErrorBoundary } from '@/components/feedback/ErrorBoundary';
+import { Link,
+  useNavigate,
+  useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   Button,
@@ -23,11 +26,10 @@ import {
   Textarea,
   useDisclosure,
   Avatar,
-  Progress,
   Select,
   SelectItem,
   Spinner,
-} from '@heroui/react';
+  } from '@heroui/react';
 import Heart from 'lucide-react/icons/heart';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -61,7 +63,9 @@ import Lightbulb from 'lucide-react/icons/lightbulb';
 import HandHeart from 'lucide-react/icons/hand-heart';
 import Accessibility from 'lucide-react/icons/accessibility';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard,
+  Progress,
+} from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useTenant, useToast } from '@/contexts';

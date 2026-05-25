@@ -20,7 +20,7 @@
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Tabs, Tab, Chip, Spinner, Input, Switch, Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Tooltip, Code, Checkbox } from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Tabs, Tab, Chip, Spinner, Input, Switch, Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Tooltip, Checkbox } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Play from 'lucide-react/icons/play';
@@ -41,6 +41,7 @@ import Zap from 'lucide-react/icons/zap';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast, useAuth, usePusherOptional } from '@/contexts';
+import { Code } from '@/components/ui';
 import { PageHeader } from '../../../components';
 import {
   adminPrerender,

@@ -3,8 +3,21 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect, useCallback } from 'react';
-import { Card, CardBody, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Switch, Progress } from '@heroui/react';
+import {
+  useState,
+  useEffect,
+  useCallback } from 'react';
+import { Card,
+  CardBody,
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  Button,
+  Switch,
+} from '@heroui/react';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Star from 'lucide-react/icons/star';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +25,7 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { useToast } from '@/contexts/ToastContext';
 import { adminGroups } from '@/admin/api/adminApi';
 import type { FeaturedGroup } from '@/admin/api/types';
+import { Progress } from '@/components/ui';
 
 export default function GroupRanking() {
   const { t } = useTranslation('admin');

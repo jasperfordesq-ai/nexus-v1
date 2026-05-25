@@ -3,7 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useRef } from 'react';
+import {
+  useRef } from 'react';
 import {
   Button,
   Chip,
@@ -13,7 +14,6 @@ import {
   ModalBody,
   ModalFooter,
   Textarea,
-  Progress,
   Spinner,
 } from '@heroui/react';
 import Target from 'lucide-react/icons/target';
@@ -25,6 +25,7 @@ import Sparkles from 'lucide-react/icons/sparkles';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import type { QualificationResult } from './JobDetailTypes';
+import { Progress } from '@/components/ui';
 
 interface ApplyModalProps {
   isOpen: boolean;

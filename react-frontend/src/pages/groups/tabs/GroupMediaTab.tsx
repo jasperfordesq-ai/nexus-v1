@@ -17,7 +17,6 @@ import {
   ModalBody,
   Chip,
   useDisclosure,
-  Image,
 } from '@heroui/react';
 import Camera from 'lucide-react/icons/camera';
 import Film from 'lucide-react/icons/film';
@@ -317,11 +316,10 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
                 {item.type === 'video' ? (
                   <div className="w-full h-full bg-default-100 flex items-center justify-center">
                     {item.thumbnail_url ? (
-                      <Image
+                      <img
                         src={item.thumbnail_url}
                         alt={item.caption || t('media.video_thumbnail')}
                         className="w-full h-full object-cover"
-                        removeWrapper
                       />
                     ) : (
                       <Film className="w-12 h-12 text-default-400" aria-hidden="true" />
@@ -333,11 +331,10 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
                     </div>
                   </div>
                 ) : (
-                  <Image
+                  <img
                     src={item.thumbnail_url || item.url}
                     alt={item.caption || t('media.photo_alt')}
                     className="w-full h-full object-cover"
-                    removeWrapper
                   />
                 )}
 
@@ -453,11 +450,10 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
                       aria-label={currentItem.caption || t('media.video_player')}
                     />
                   ) : (
-                    <Image
+                    <img
                       src={currentItem.url}
                       alt={currentItem.caption || t('media.fullsize_alt')}
                       className="max-h-[80vh] max-w-full object-contain rounded-lg"
-                      removeWrapper
                     />
                   )}
                 </div>

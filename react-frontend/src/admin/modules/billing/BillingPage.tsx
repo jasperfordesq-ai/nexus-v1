@@ -8,9 +8,27 @@
  * Main billing dashboard showing current subscription, quick actions.
  */
 
-import { useEffect, useState, useCallback } from 'react';
-import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Chip, Spinner, Progress, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, useDisclosure } from '@heroui/react';
+import {
+  useEffect,
+  useState,
+  useCallback } from 'react';
+import { Link,
+  useSearchParams,
+  useNavigate } from 'react-router-dom';
+import { Card,
+  CardBody,
+  CardHeader,
+  Button,
+  Chip,
+  Spinner,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Textarea,
+  useDisclosure,
+} from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import CreditCard from 'lucide-react/icons/credit-card';
 import ArrowRight from 'lucide-react/icons/arrow-right';
@@ -22,6 +40,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast, useTenant } from '@/contexts';
 import { billingApi, type SubscriptionDetails } from '../../api/billingApi';
 import { PageHeader } from '../../components';
+import { Progress } from '@/components/ui';
 
 function statusColor(status: string): 'success' | 'warning' | 'danger' | 'default' {
   switch (status) {

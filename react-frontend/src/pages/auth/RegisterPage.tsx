@@ -15,11 +15,24 @@
  * Desktop shows all fields, mobile shows one step at a time
  */
 
-import { useState, useEffect, useRef, useCallback, type FormEvent } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Input, Checkbox, Select, SelectItem, Progress } from '@heroui/react';
+import {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  type FormEvent } from 'react';
+import { Link,
+  useNavigate,
+  useSearchParams } from 'react-router-dom';
+import { Button,
+  Input,
+  Checkbox,
+  Select,
+  SelectItem,
+  } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion,
+  AnimatePresence } from 'framer-motion';
 import User from 'lucide-react/icons/user';
 import Mail from 'lucide-react/icons/mail';
 import Lock from 'lucide-react/icons/lock';
@@ -38,11 +51,15 @@ import ShieldCheck from 'lucide-react/icons/shield-check';
 import Ticket from 'lucide-react/icons/ticket';
 import Clock from 'lucide-react/icons/clock';
 import Users from 'lucide-react/icons/users';
-import { useTranslation, Trans } from 'react-i18next';
-import { useAuth, useTenant } from '@/contexts';
+import { useTranslation,
+  Trans } from 'react-i18next';
+import { useAuth,
+  useTenant } from '@/contexts';
 import type { RegisterResult } from '@/contexts/AuthContext';
 import { usePageTitle } from '@/hooks';
-import { GlassCard } from '@/components/ui';
+import { GlassCard,
+  Progress,
+} from '@/components/ui';
 import { OAuthButtons } from '@/components/auth/OAuthButtons';
 import { PageMeta } from '@/components/seo';
 import { PlaceAutocompleteInput } from '@/components/location';

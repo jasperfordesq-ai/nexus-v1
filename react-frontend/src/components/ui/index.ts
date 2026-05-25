@@ -15,6 +15,10 @@ export { AlgorithmLabel, useAlgorithmInfo } from './AlgorithmLabel';
 export { ImagePlaceholder } from './ImagePlaceholder';
 export { DynamicIcon, ICON_MAP, ICON_NAMES } from './DynamicIcon';
 export { ConfettiCelebration } from './ConfettiCelebration';
+export { Code, type CodeProps } from './Code';
+export { Snippet, type SnippetProps } from './Snippet';
+export { Progress, type ProgressProps } from './Progress';
+export { TimeInput, type TimeInputProps, type TimeInputValue } from './TimeInput';
 
 // Skeleton Components
 export {

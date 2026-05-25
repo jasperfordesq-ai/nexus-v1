@@ -9,9 +9,17 @@
  * distance distribution, and approval metrics.
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import {
+  useState,
+  useCallback,
+  useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Progress, Spinner } from '@heroui/react';
+import { Card,
+  CardBody,
+  CardHeader,
+  Button,
+  Spinner,
+} from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import BarChart3 from 'lucide-react/icons/chart-column';
@@ -29,6 +37,7 @@ import { StatCard, PageHeader, EmptyState } from '../../components';
 import type { MatchingStatsResponse } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
+import { Progress } from '@/components/ui';
 /** Color map for score distribution bars */
 const SCORE_COLORS: Record<string, 'danger' | 'warning' | 'primary' | 'success'> = {
   '0-40': 'danger',

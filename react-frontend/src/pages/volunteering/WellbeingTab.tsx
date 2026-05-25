@@ -10,11 +10,14 @@
  * suggested rest days, and a mood check-in form.
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
   Button,
-  Progress,
   Chip,
   Modal,
   ModalContent,
@@ -23,7 +26,7 @@ import {
   ModalFooter,
   Textarea,
   useDisclosure,
-} from '@heroui/react';
+  } from '@heroui/react';
 import Heart from 'lucide-react/icons/heart';
 import Activity from 'lucide-react/icons/activity';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
@@ -35,7 +38,9 @@ import TrendingDown from 'lucide-react/icons/trending-down';
 import Coffee from 'lucide-react/icons/coffee';
 import Sun from 'lucide-react/icons/sun';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard,
+  Progress,
+} from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';

@@ -9,13 +9,14 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { Button, Input, Textarea, DatePicker, TimeInput } from '@heroui/react';
-import type { DateInputValue, TimeInputValue } from '@heroui/react';
+import { Button, Input, Textarea, DatePicker } from '@heroui/react';
+import type { DateInputValue } from '@heroui/react';
 import { today, getLocalTimeZone } from '@internationalized/date';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { useDraftPersistence } from '@/hooks';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
+import { TimeInput, type TimeInputValue } from '@/components/ui';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { PlaceAutocompleteInput } from '@/components/location';

@@ -17,7 +17,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import { Button, Card, CardBody, CardHeader, Chip, Code, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Tabs, Tab, Textarea, useDisclosure } from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Tabs, Tab, Textarea, useDisclosure } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Info from 'lucide-react/icons/info';
 import ShieldCheck from 'lucide-react/icons/shield-check';
@@ -28,6 +28,7 @@ import Stamp from 'lucide-react/icons/stamp';
 import Trash2 from 'lucide-react/icons/trash-2';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
+import { Code } from '@/components/ui';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
