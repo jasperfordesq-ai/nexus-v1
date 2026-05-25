@@ -9,7 +9,8 @@
  */
 
 import { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
-import { DatePicker, Popover, PopoverTrigger, PopoverContent } from '@heroui/react';
+import { DatePicker } from '@heroui/react';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui';
 import type { DateInputValue } from '@heroui/react';
 import { today, getLocalTimeZone } from '@internationalized/date';
 import Calendar from 'lucide-react/icons/calendar';

@@ -9,7 +9,7 @@
  */
 
 import { useMemo, useRef, useState } from 'react';
-import { Popover, PopoverContent, PopoverTrigger } from '@heroui/react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
 import Search from 'lucide-react/icons/search';
 import Smile from 'lucide-react/icons/smile';
 import { useTranslation } from 'react-i18next';

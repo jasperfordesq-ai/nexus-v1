@@ -9,7 +9,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Popover, PopoverContent, PopoverTrigger } from '@heroui/react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
 import Film from 'lucide-react/icons/film';
 import Search from 'lucide-react/icons/search';
 import { useTranslation } from 'react-i18next';

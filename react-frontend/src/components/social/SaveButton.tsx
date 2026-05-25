@@ -13,7 +13,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Popover, PopoverTrigger, PopoverContent } from '@heroui/react';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui';
 import { Separator } from '@heroui-v3/react';
 import Bookmark from 'lucide-react/icons/bookmark';
 import BookmarkPlus from 'lucide-react/icons/bookmark-plus';

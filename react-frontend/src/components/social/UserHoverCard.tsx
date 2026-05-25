@@ -13,7 +13,7 @@
 
 import { useState, useCallback, useRef, useEffect, memo } from 'react';
 import { Link } from 'react-router-dom';
-import { Popover, PopoverTrigger, PopoverContent } from '@heroui/react';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui';
 import UserPlus from 'lucide-react/icons/user-plus';
 import UserCheck from 'lucide-react/icons/user-check';
 import Check from 'lucide-react/icons/check';

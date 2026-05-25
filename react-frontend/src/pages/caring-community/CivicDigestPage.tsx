@@ -6,7 +6,7 @@ import { CardBody, Card, Select, SelectItem, Button, Chip, Skeleton } from '@/co
 
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Popover, PopoverContent, PopoverTrigger } from '@heroui/react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui';
 import { useTranslation } from 'react-i18next';
 import type { LucideIcon } from 'lucide-react';
 import AlertTriangle from 'lucide-react/icons/alert-triangle';
