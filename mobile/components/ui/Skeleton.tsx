@@ -7,7 +7,6 @@ import React from 'react';
 import { View, type StyleProp, type ViewStyle } from 'react-native';
 import { Skeleton } from 'heroui-native';
 
-import { SPACING, RADIUS } from '@/lib/styles/spacing';
 
 // ---------------------------------------------------------------------------
 // SkeletonBox — base primitive
@@ -23,7 +22,7 @@ interface SkeletonBoxProps {
 export function SkeletonBox({
   width = '100%',
   height = 14,
-  borderRadius = RADIUS.sm,
+  borderRadius = 6,
   style,
 }: SkeletonBoxProps): React.JSX.Element {
   return (
@@ -85,7 +84,7 @@ export function EventCardSkeleton(): React.JSX.Element {
       className="flex-row items-start bg-surface gap-3 p-4 rounded-2xl"
       style={{ shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4, elevation: 2 }}
     >
-      <Skeleton animation="shimmer" style={{ width: 48, height: 52, borderRadius: SPACING.sm }} />
+      <Skeleton animation="shimmer" style={{ width: 48, height: 52, borderRadius: 8 }} />
       <View className="flex-1 gap-2">
         <Skeleton animation="shimmer" style={{ width: '80%', height: 16, borderRadius: 6 }} />
         <Skeleton animation="shimmer" style={{ width: '60%', height: 12, borderRadius: 6 }} />
