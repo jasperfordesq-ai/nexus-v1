@@ -1,8 +1,8 @@
-import { Button, Card, CardBody, CardHeader, Chip, Spinner, Tooltip } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Spinner, Tooltip, RadioGroup, Radio } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { RadioGroup, Radio } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import Newspaper from 'lucide-react/icons/newspaper';
 import Save from 'lucide-react/icons/save';

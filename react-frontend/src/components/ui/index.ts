@@ -24,6 +24,7 @@ export { Chip, type ChipProps } from './Chip';
 export { Spinner, type SpinnerProps } from './Spinner';
 export { Skeleton, type SkeletonProps } from './Skeleton';
 export { Checkbox, CheckboxGroup, type CheckboxProps, type CheckboxGroupProps } from './Checkbox';
+export { Radio, RadioGroup, type RadioProps, type RadioGroupProps } from './Radio';
 export { Input, type InputProps } from './Input';
 export { Textarea, type TextareaProps } from './Textarea';
 export { Switch, type SwitchProps } from './Switch';

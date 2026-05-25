@@ -1,7 +1,7 @@
-import { Card, CardBody, CardHeader, Button, Spinner, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tooltip } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Spinner, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tooltip, RadioGroup, Radio } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { RadioGroup, Radio } from '@heroui/react';
+
 import Clock from 'lucide-react/icons/clock';
 import FileText from 'lucide-react/icons/file-text';
 import Eye from 'lucide-react/icons/eye';

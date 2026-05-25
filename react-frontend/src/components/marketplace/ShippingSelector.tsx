@@ -12,7 +12,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { RadioGroup, Radio } from '@heroui/react';
+
 import Truck from 'lucide-react/icons/truck';
 import MapPin from 'lucide-react/icons/map-pin';
 import Package from 'lucide-react/icons/package';
@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { MarketplaceShippingOption } from '@/types/marketplace';
-import { Chip, Spinner } from '@/components/ui';
+import { Chip, Spinner, RadioGroup, Radio } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

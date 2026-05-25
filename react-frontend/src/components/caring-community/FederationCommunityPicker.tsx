@@ -1,11 +1,11 @@
-import { CardBody, Card, Button, Spinner, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@/components/ui';
+import { CardBody, Card, Button, Spinner, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, RadioGroup } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { RadioGroup } from '@heroui/react';
+
 import Search from 'lucide-react/icons/search';
 import Globe from 'lucide-react/icons/globe';
 import { useTranslation } from 'react-i18next';
