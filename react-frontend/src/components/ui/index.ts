@@ -25,6 +25,7 @@ export { Spinner, type SpinnerProps } from './Spinner';
 export { Input, type InputProps } from './Input';
 export { Textarea, type TextareaProps } from './Textarea';
 export { Switch, type SwitchProps } from './Switch';
+export { Tabs, Tab, type TabsProps, type TabProps } from './Tabs';
 export {
   Card,
   CardHeader,

@@ -1,4 +1,4 @@
-import { Button, Chip, Input, Textarea, Card, CardBody, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@/components/ui';
+import { Button, Chip, Input, Textarea, Card, CardBody, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Tab, Tabs } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +10,7 @@ import { Button, Chip, Input, Textarea, Card, CardBody, Select, SelectItem, useD
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Tab, Tabs, Checkbox, RadioGroup, Radio } from '@heroui/react';
+import { Checkbox, RadioGroup, Radio } from '@heroui/react';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Plus from 'lucide-react/icons/plus';
 import Edit2 from 'lucide-react/icons/pen';

@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useEffect, useCallback } from 'react';
-import { Tabs, Tab } from '@heroui/react';
+
 import Activity from 'lucide-react/icons/activity';
 import Database from 'lucide-react/icons/database';
 import Zap from 'lucide-react/icons/zap';
@@ -14,7 +14,7 @@ import MemoryStick from 'lucide-react/icons/memory-stick';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { usePageTitle } from '@/hooks/usePageTitle';
-import { Button, Chip, Spinner, Card } from '@/components/ui';
+import { Button, Chip, Spinner, Card, Tabs, Tab } from '@/components/ui';
 
 interface PerformanceSummary {
   slowest_requests: Array<{

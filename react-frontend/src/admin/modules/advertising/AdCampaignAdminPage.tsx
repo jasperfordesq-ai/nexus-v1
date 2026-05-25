@@ -1,4 +1,4 @@
-import { Select, SelectItem, Button, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Select, SelectItem, Button, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -20,7 +20,7 @@ import { Select, SelectItem, Button, Chip, Input, Textarea, Modal, ModalContent,
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tabs, Tab } from '@heroui/react';
+
 import Megaphone from 'lucide-react/icons/megaphone';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import Eye from 'lucide-react/icons/eye';

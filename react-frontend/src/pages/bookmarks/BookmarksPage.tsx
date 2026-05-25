@@ -1,4 +1,4 @@
-import { Button, Chip, Card, CardBody, Input, Spinner, Select, SelectItem, useDisclosure, GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Button, Chip, Card, CardBody, Input, Spinner, Select, SelectItem, useDisclosure, GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,7 +11,7 @@ import { Button, Chip, Card, CardBody, Input, Spinner, Select, SelectItem, useDi
 
 import { Fragment, useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Tabs, Tab } from '@heroui/react';
+
 import Bookmark from 'lucide-react/icons/bookmark';
 import BookmarkCheck from 'lucide-react/icons/bookmark-check';
 import FolderPlus from 'lucide-react/icons/folder-plus';

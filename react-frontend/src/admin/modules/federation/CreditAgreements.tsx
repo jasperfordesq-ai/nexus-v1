@@ -1,6 +1,6 @@
-import { Card, CardBody, CardHeader, Button, Spinner, Chip, Input, Select, SelectItem, useDisclosure, Progress, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Spinner, Chip, Input, Select, SelectItem, useDisclosure, Progress, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab } from '@/components/ui';
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tabs, Tab } from '@heroui/react';
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import Handshake from 'lucide-react/icons/handshake';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';

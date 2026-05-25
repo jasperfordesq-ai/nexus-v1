@@ -1,4 +1,4 @@
-import { Button, Chip, Card, CardBody, Textarea, GlassCard, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, AvatarGroup } from '@/components/ui';
+import { Button, Chip, Card, CardBody, Textarea, GlassCard, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, AvatarGroup, Tabs, Tab } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,7 +12,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Tabs, Tab, Skeleton } from '@heroui/react';
+import { Skeleton } from '@heroui/react';
 import Calendar from 'lucide-react/icons/calendar';
 import Clock from 'lucide-react/icons/clock';
 import MapPin from 'lucide-react/icons/map-pin';

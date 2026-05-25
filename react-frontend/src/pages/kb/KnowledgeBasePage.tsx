@@ -16,7 +16,7 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Tabs, Tab } from '@heroui/react';
+
 import BookOpen from 'lucide-react/icons/book-open';
 import Search from 'lucide-react/icons/search';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -27,7 +27,7 @@ import Clock from 'lucide-react/icons/clock';
 import Eye from 'lucide-react/icons/eye';
 import Folder from 'lucide-react/icons/folder';
 import File from 'lucide-react/icons/file';
-import { GlassCard, Button, Chip, Spinner, Input } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner, Input, Tabs, Tab } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';

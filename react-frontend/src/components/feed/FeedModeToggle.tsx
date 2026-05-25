@@ -7,8 +7,9 @@
  * FeedModeToggle — toggle between "For You" (EdgeRank) and "Recent" (chronological) feed modes.
  */
 
-import { Tabs, Tab } from '@heroui/react';
+
 import Sparkles from 'lucide-react/icons/sparkles';
+import { Tabs, Tab } from '@/components/ui';
 import Clock from 'lucide-react/icons/clock';
 import { useTranslation } from 'react-i18next';
 import type { Key } from 'react';

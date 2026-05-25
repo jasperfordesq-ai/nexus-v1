@@ -1,7 +1,7 @@
-import { Button, Card, CardBody, CardHeader, Chip, Spinner, Select, SelectItem } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Spinner, Select, SelectItem, Tab, Tabs } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Tab, Tabs } from '@heroui/react';
+
 import {
   Area,
   AreaChart,

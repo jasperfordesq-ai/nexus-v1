@@ -1,4 +1,4 @@
-import { useDisclosure, Button, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { useDisclosure, Button, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tab, Tabs } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -18,7 +18,7 @@ import { useDisclosure, Button, Spinner, Input, Textarea, Modal, ModalContent, M
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Tab, Tabs } from '@heroui/react';
+
 import Send from 'lucide-react/icons/send';
 import Inbox from 'lucide-react/icons/inbox';
 import HandCoins from 'lucide-react/icons/hand-coins';

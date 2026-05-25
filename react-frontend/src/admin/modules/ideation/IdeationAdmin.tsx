@@ -9,7 +9,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Tabs, Tab } from '@heroui/react';
+
 import Lightbulb from 'lucide-react/icons/lightbulb';
 import Eye from 'lucide-react/icons/eye';
 import Trash2 from 'lucide-react/icons/trash-2';
@@ -30,7 +30,7 @@ import { DataTable,
   ConfirmModal,
   type Column } from '../../components';
 
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Chip } from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Chip, Tabs, Tab } from '@/components/ui';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────

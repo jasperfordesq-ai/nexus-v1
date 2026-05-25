@@ -1,6 +1,6 @@
-import { Card, CardBody, CardHeader, Button, Chip } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Chip, Tabs, Tab } from '@/components/ui';
 import { useEffect, useState, useCallback } from 'react';
-import { Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import Users from 'lucide-react/icons/users';
 import MessageSquare from 'lucide-react/icons/message-square';

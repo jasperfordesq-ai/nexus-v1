@@ -10,7 +10,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Tab, Tabs } from '@heroui/react';
+
 import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
 import Ban from 'lucide-react/icons/ban';
 import BarChart3 from 'lucide-react/icons/chart-column';
@@ -34,7 +34,7 @@ import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { logError } from '@/lib/logger';
-import { Button, Card, CardBody, CardHeader, Chip, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Spinner, Textarea, useDisclosure, Switch } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Dropdown, DropdownItem, DropdownMenu, DropdownTrigger, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Spinner, Textarea, useDisclosure, Switch, Tab, Tabs } from '@/components/ui';
 import { adminFederation } from '../../api/adminApi';
 import {
   ConfirmModal,

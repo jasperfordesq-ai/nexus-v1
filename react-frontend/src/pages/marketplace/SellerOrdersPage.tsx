@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure, GlassCard, Button, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, GlassCard, Button, Spinner, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tab, Tabs } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -18,7 +18,7 @@ import { Select, SelectItem, useDisclosure, GlassCard, Button, Spinner, Input, M
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Tab, Tabs } from '@heroui/react';
+
 import Store from 'lucide-react/icons/store';
 import Package from 'lucide-react/icons/package';
 import Truck from 'lucide-react/icons/truck';

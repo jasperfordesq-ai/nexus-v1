@@ -18,7 +18,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Tab, Tabs } from '@heroui/react';
+
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import Package from 'lucide-react/icons/package';
 import Truck from 'lucide-react/icons/truck';
@@ -26,7 +26,7 @@ import Star from 'lucide-react/icons/star';
 import ExternalLink from 'lucide-react/icons/external-link';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, useDisclosure, Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
+import { GlassCard, useDisclosure, Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tab, Tabs } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { OrderStatusBadge, RatingModal } from '@/components/marketplace';
 import type { MarketplaceOrderItem } from '@/types/marketplace';

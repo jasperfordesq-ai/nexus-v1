@@ -13,7 +13,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Tabs, Tab } from '@heroui/react';
+
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Search from 'lucide-react/icons/search';
 import Flag from 'lucide-react/icons/flag';
@@ -23,7 +23,7 @@ import { formatServerDate } from '@/lib/serverTime';
 import { adminBroker } from '@/admin/api/adminApi';
 import { DataTable, PageHeader, type Column } from '@/admin/components';
 import type { BrokerArchive } from '@/admin/api/types';
-import { Button, Chip, Input } from '@/components/ui';
+import { Button, Chip, Input, Tabs, Tab } from '@/components/ui';
 
 export function ReviewArchive() {
   const { t } = useTranslation('broker');

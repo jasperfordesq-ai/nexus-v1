@@ -1,6 +1,6 @@
-import { Button, Chip, Card, CardBody, CardHeader, Input, Textarea, Spinner, Progress, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
+import { Button, Chip, Card, CardBody, CardHeader, Input, Textarea, Spinner, Progress, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tab, Tabs } from '@/components/ui';
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import { Tab, Tabs } from '@heroui/react';
+
 import Gift from 'lucide-react/icons/gift';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Plus from 'lucide-react/icons/plus';

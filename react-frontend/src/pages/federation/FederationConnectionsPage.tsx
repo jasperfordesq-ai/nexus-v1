@@ -11,7 +11,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Tab, Tabs } from '@heroui/react';
+
 import UserPlus from 'lucide-react/icons/user-plus';
 import UserCheck from 'lucide-react/icons/user-check';
 import Clock from 'lucide-react/icons/clock';
@@ -23,7 +23,7 @@ import Check from 'lucide-react/icons/check';
 import X from 'lucide-react/icons/x';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Spinner, Avatar } from '@/components/ui';
+import { GlassCard, Button, Chip, Spinner, Avatar, Tab, Tabs } from '@/components/ui';
 import { Breadcrumbs } from '@/components/navigation';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';

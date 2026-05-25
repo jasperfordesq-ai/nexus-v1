@@ -1,6 +1,6 @@
-import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Code, useDisclosure, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Textarea, Code, useDisclosure, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tabs, Tab } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
-import { Tabs, Tab } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import Info from 'lucide-react/icons/info';
 import ShieldCheck from 'lucide-react/icons/shield-check';

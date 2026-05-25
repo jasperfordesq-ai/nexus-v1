@@ -10,7 +10,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Tabs, Tab } from '@heroui/react';
+
 import Calendar from 'lucide-react/icons/calendar';
 import Eye from 'lucide-react/icons/eye';
 import Trash2 from 'lucide-react/icons/trash-2';
@@ -21,7 +21,7 @@ import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader, DataTable, ConfirmModal, EmptyState, type Column } from '../../components';
-import { Button, Chip } from '@/components/ui';
+import { Button, Chip, Tabs, Tab } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

@@ -1,4 +1,4 @@
-import { Button, Chip, Input, Card, CardBody, Select, SelectItem, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Button, Chip, Input, Card, CardBody, Select, SelectItem, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,7 +11,7 @@ import { Button, Chip, Input, Card, CardBody, Select, SelectItem, Dropdown, Drop
  */
 
 import { useState, type CSSProperties, useCallback, useEffect } from 'react';
-import { Tabs, Tab } from '@heroui/react';
+
 import Plus from 'lucide-react/icons/plus';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import Edit from 'lucide-react/icons/square-pen';

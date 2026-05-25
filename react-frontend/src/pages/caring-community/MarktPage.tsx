@@ -13,14 +13,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Skeleton, Tab, Tabs } from '@heroui/react';
+import { Skeleton } from '@heroui/react';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import Clock from 'lucide-react/icons/clock';
 import Tag from 'lucide-react/icons/tag';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Store from 'lucide-react/icons/store';
-import { GlassCard, Button, Avatar } from '@/components/ui';
+import { GlassCard, Button, Avatar, Tab, Tabs } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
 import { useAuth, useTenant } from '@/contexts';

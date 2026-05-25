@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,7 +15,7 @@ import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input, Textarea, 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Checkbox, Tooltip, Tabs, Tab } from '@heroui/react';
+import { Checkbox, Tooltip } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Briefcase from 'lucide-react/icons/briefcase';
 import Download from 'lucide-react/icons/download';

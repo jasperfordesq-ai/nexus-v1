@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input, Tabs, Tab } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -23,7 +23,7 @@ import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input } from '@/c
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Tabs, Tab } from '@heroui/react';
+
 import Lightbulb from 'lucide-react/icons/lightbulb';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';

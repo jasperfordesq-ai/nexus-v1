@@ -1,6 +1,6 @@
-import { Card, CardBody, CardHeader, Button, Chip, Code } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Chip, Code, Tabs, Tab } from '@/components/ui';
 import { useState } from 'react';
-import { Tabs, Tab } from '@heroui/react';
+
 import Server from 'lucide-react/icons/server';
 import Copy from 'lucide-react/icons/copy';
 import CheckCircle from 'lucide-react/icons/circle-check-big';

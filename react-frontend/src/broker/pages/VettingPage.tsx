@@ -1,4 +1,4 @@
-import { Select, SelectItem, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
+import { Select, SelectItem, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -13,7 +13,7 @@ import { Select, SelectItem, Button, Chip, Spinner, Input, Textarea, Modal, Moda
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Tabs, Tab, Checkbox } from '@heroui/react';
+import { Checkbox } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import ShieldAlert from 'lucide-react/icons/shield-alert';

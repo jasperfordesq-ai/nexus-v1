@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Tabs, Tab, Skeleton } from '@heroui/react';
+import { Skeleton } from '@heroui/react';
 import Briefcase from 'lucide-react/icons/briefcase';
 import MapPin from 'lucide-react/icons/map-pin';
 import Wifi from 'lucide-react/icons/wifi';
@@ -22,7 +22,7 @@ import Video from 'lucide-react/icons/video';
 import Download from 'lucide-react/icons/download';
 import FileDown from 'lucide-react/icons/file-down';
 import ExternalLink from 'lucide-react/icons/external-link';
-import { GlassCard, useDisclosure, Button, Chip, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { GlassCard, useDisclosure, Button, Chip, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab } from '@/components/ui';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';

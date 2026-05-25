@@ -19,7 +19,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Tabs, Tab } from '@heroui/react';
+
 import Plus from 'lucide-react/icons/plus';
 import Users from 'lucide-react/icons/users';
 import Clock from 'lucide-react/icons/clock';
@@ -28,7 +28,7 @@ import Calendar from 'lucide-react/icons/calendar';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Avatar } from '@/components/ui';
+import { GlassCard, Button, Chip, Avatar, Tabs, Tab } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
 import { usePageTitle } from '@/hooks';

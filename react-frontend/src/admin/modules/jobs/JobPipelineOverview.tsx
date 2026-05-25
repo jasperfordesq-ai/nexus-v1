@@ -1,4 +1,4 @@
-import { Chip, Card, CardBody, Spinner, Select, SelectItem } from '@/components/ui';
+import { Chip, Card, CardBody, Spinner, Select, SelectItem, Tabs, Tab } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,7 +12,7 @@ import { Chip, Card, CardBody, Spinner, Select, SelectItem } from '@/components/
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Tabs, Tab } from '@heroui/react';
+
 import CalendarClock from 'lucide-react/icons/calendar-clock';
 import Handshake from 'lucide-react/icons/handshake';
 import { useTranslation } from 'react-i18next';

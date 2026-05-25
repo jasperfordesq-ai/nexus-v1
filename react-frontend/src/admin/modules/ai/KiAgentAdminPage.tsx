@@ -1,4 +1,4 @@
-import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch } from '@/components/ui';
+import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Switch, Tab, Tabs } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,7 +6,7 @@ import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Input, Modal
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Slider, Tab, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tabs } from '@heroui/react';
+import { Slider, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import Bot from 'lucide-react/icons/bot';
 import Brain from 'lucide-react/icons/brain';
 import Info from 'lucide-react/icons/info';

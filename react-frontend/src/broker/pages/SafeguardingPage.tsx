@@ -12,7 +12,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { Tabs, Tab } from '@heroui/react';
+
 
 import Shield from 'lucide-react/icons/shield';
 import Flag from 'lucide-react/icons/flag';
@@ -27,7 +27,7 @@ import { api } from '@/lib/api';
 import { formatServerDate } from '@/lib/serverTime';
 import { PageHeader, DataTable, StatCard, EmptyState } from '@/admin/components';
 import type { Column } from '@/admin/components';
-import { Button, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Button, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

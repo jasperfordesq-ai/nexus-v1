@@ -1,6 +1,6 @@
-import { Button, Chip, Input, Card, CardBody, CardHeader, Select, SelectItem } from '@/components/ui';
+import { Button, Chip, Input, Card, CardBody, CardHeader, Select, SelectItem, Tab, Tabs } from '@/components/ui';
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import { Tab, Tabs, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import Clock from 'lucide-react/icons/clock';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Hourglass from 'lucide-react/icons/hourglass';

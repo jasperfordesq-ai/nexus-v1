@@ -1,7 +1,7 @@
-import { Button, Card, CardBody, CardHeader, Chip, Spinner } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Spinner, Tab, Tabs } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tab, Tabs, Tooltip } from '@heroui/react';
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import AlarmClock from 'lucide-react/icons/alarm-clock';
 import CheckCircle2 from 'lucide-react/icons/circle-check';

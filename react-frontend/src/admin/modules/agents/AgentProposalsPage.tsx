@@ -1,7 +1,7 @@
-import { Button, Card, CardBody, CardHeader, Chip, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Textarea, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tab, Tabs } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tab, Tabs } from '@heroui/react';
+
 import Bot from 'lucide-react/icons/bot';
 import CheckCircle2 from 'lucide-react/icons/check-circle-2';
 import XCircle from 'lucide-react/icons/x-circle';

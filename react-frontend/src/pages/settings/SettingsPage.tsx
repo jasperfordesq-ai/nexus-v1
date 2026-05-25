@@ -20,7 +20,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { Key } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Tabs, Tab } from '@heroui/react';
+
 import User from 'lucide-react/icons/user';
 import Bell from 'lucide-react/icons/bell';
 import Shield from 'lucide-react/icons/shield';
@@ -32,7 +32,7 @@ import Users from 'lucide-react/icons/users';
 import Info from 'lucide-react/icons/info';
 import Languages from 'lucide-react/icons/languages';
 import { sanitizeRichText } from '@/lib/sanitize';
-import { GlassCard, useDisclosure, Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { GlassCard, useDisclosure, Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab } from '@/components/ui';
 import { AvailabilityGrid } from '@/components/availability/AvailabilityGrid';
 import { AppearanceSettings } from '@/components/settings/AppearanceSettings';
 import { useAuth, useToast, useTenant } from '@/contexts';

@@ -1,7 +1,7 @@
-import { Button, Card, CardBody, CardHeader, Chip, Spinner } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Spinner, Tab, Tabs } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tab, Tabs } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import UserPlus from 'lucide-react/icons/user-plus';
 import { PageMeta } from '@/components/seo';

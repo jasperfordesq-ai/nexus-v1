@@ -1,4 +1,4 @@
-import { CardBody, Card } from '@/components/ui';
+import { CardBody, Card, Tabs, Tab } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,7 +12,7 @@ import { CardBody, Card } from '@/components/ui';
  */
 
 import { useTranslation } from 'react-i18next';
-import { Tabs, Tab } from '@heroui/react';
+
 import Webhook from 'lucide-react/icons/webhook';
 import { PageMeta } from '@/components/seo';
 

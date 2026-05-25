@@ -12,7 +12,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Tabs, Tab } from '@heroui/react';
+
 import FileText from 'lucide-react/icons/file-text';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -34,7 +34,7 @@ import {
   } from '../../components';
 import { TemplatePreview } from './TemplatePreview';
 
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Chip } from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Chip, Tabs, Tab } from '@/components/ui';
 interface Template {
   id: number;
   name: string;
