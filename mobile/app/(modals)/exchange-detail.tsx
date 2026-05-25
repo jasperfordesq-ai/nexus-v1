@@ -3,15 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
   ScrollView,
-  TouchableOpacity,
-  StyleSheet,
+  Pressable,
   RefreshControl,
-  ActivityIndicator,
   Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -19,13 +17,12 @@ import { useLocalSearchParams, router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import * as Haptics from 'expo-haptics';
+import { Spinner } from 'heroui-native';
 
-import { TYPOGRAPHY } from '@/lib/styles/typography';
-import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import { getExchange, type Exchange } from '@/lib/api/exchanges';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { useTheme } from '@/lib/hooks/useTheme';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { APP_URL } from '@/lib/constants';
 import Avatar from '@/components/ui/Avatar';
@@ -46,7 +43,6 @@ function ExchangeDetailModalInner() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
   const { user: currentUser } = useAuth();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -91,11 +87,11 @@ function ExchangeDetailModalInner() {
 
   if (isNaN(exchangeId) || exchangeId <= 0) {
     return (
-      <SafeAreaView style={styles.centered}>
-        <Text style={styles.errorText}>{t('detail.invalidId')}</Text>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text style={[styles.backLink, { color: primary }]}>{t('detail.goBack')}</Text>
-        </TouchableOpacity>
+      <SafeAreaView className="flex-1 justify-center items-center p-6">
+        <Text className="text-xs text-danger mb-4">{t('detail.invalidId')}</Text>
+        <Pressable onPress={() => router.back()}>
+          <Text className="text-sm font-semibold" style={{ color: primary }}>{t('detail.goBack')}</Text>
+        </Pressable>
       </SafeAreaView>
     );
   }
@@ -107,11 +103,11 @@ function ExchangeDetailModalInner() {
 
   if (error || !exchange) {
     return (
-      <SafeAreaView style={styles.centered}>
-        <Text style={styles.errorText}>{error ?? t('detail.notFound')}</Text>
-        <TouchableOpacity onPress={() => router.back()}>
-          <Text style={[styles.backLink, { color: primary }]}>{t('detail.goBack')}</Text>
-        </TouchableOpacity>
+      <SafeAreaView className="flex-1 justify-center items-center p-6">
+        <Text className="text-xs text-danger mb-4">{error ?? t('detail.notFound')}</Text>
+        <Pressable onPress={() => router.back()}>
+          <Text className="text-sm font-semibold" style={{ color: primary }}>{t('detail.goBack')}</Text>
+        </Pressable>
       </SafeAreaView>
     );
   }
@@ -132,9 +128,9 @@ function ExchangeDetailModalInner() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-surface" edges={['bottom']}>
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={{ padding: 20 }}
         refreshControl={
           <RefreshControl
             refreshing={isRefreshing}
@@ -145,59 +141,59 @@ function ExchangeDetailModalInner() {
         }
       >
         {/* Top row: type badge + share */}
-        <View style={styles.topRow}>
-          <View style={[styles.typeBadge, exchange.type === 'offer' ? styles.offerBadge : styles.requestBadge]}>
-            <Text style={styles.typeBadgeText}>
+        <View className="flex-row items-center justify-between mb-3">
+          <View
+            className={exchange.type === 'offer' ? 'bg-success/10 self-start rounded px-2.5 py-1' : 'bg-info/10 self-start rounded px-2.5 py-1'}
+          >
+            <Text className="text-xs font-semibold text-muted-foreground">
               {exchange.type === 'offer' ? t('offering') : t('requesting')}
             </Text>
           </View>
-          <TouchableOpacity
+          <Pressable
             onPress={() => void handleShare()}
             accessibilityLabel={t('detail.share')}
             accessibilityRole="button"
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <Ionicons name="share-outline" size={22} color={theme.textSecondary} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
 
-        <Text style={styles.title}>{exchange.title ?? ''}</Text>
-        <Text style={styles.description}>{exchange.description ?? ''}</Text>
+        <Text className="text-xl font-bold text-foreground mb-3">{exchange.title ?? ''}</Text>
+        <Text className="text-sm text-muted-foreground mb-5">{exchange.description ?? ''}</Text>
 
         {/* Time estimate */}
         {(exchange.hours_estimate ?? 0) > 0 && (
-          <View style={[styles.creditsCard, { borderColor: primary }]}>
-            <Text style={styles.creditsLabel}>{t('detail.timeEstimate')}</Text>
-            <Text style={[styles.creditsValue, { color: primary }]}>
+          <View style={{ borderWidth: 2, borderRadius: 12, padding: 16, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20, borderColor: primary }}>
+            <Text className="text-xs text-muted-foreground">{t('detail.timeEstimate')}</Text>
+            <Text style={{ fontSize: 24, fontWeight: '700', color: primary }}>
               {t('detail.hours', { count: exchange.hours_estimate ?? 0 })}
             </Text>
           </View>
         )}
 
         {/* Posted by */}
-        <TouchableOpacity
-          style={styles.postedBy}
+        <Pressable
+          className="flex-row items-center mb-6"
           onPress={() => {
             if (exchangeUser.id > 0) {
               router.push({ pathname: '/(modals)/member-profile', params: { id: String(exchangeUser.id) } });
             }
           }}
-          activeOpacity={0.7}
           accessibilityRole="button"
           accessibilityLabel={exchangeUser.name}
         >
           <Avatar uri={exchangeUser.avatar_url} name={exchangeUser.name} size={40} />
-          <View style={styles.postedByText}>
-            <Text style={styles.postedByLabel}>{t('detail.postedBy')}</Text>
-            <Text style={styles.postedByName}>{exchangeUser.name}</Text>
+          <View style={{ marginLeft: 12 }}>
+            <Text className="text-xs text-muted-foreground">{t('detail.postedBy')}</Text>
+            <Text className="text-sm font-semibold text-foreground">{exchangeUser.name}</Text>
           </View>
-        </TouchableOpacity>
+        </Pressable>
 
         {/* Action -- hidden if you are the poster */}
         {currentUser?.id !== exchangeUser.id && exchangeUser.id > 0 && (
-          <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: primary, opacity: isSubmitting ? 0.7 : 1 }]}
-            activeOpacity={0.8}
+          <Pressable
+            style={[{ borderRadius: 12, paddingVertical: 14, alignItems: 'center', backgroundColor: primary }, isSubmitting && { opacity: 0.7 }]}
             disabled={isSubmitting}
             accessibilityLabel={
               exchange.type === 'offer' ? t('detail.requestService') : t('detail.offerHelp')
@@ -206,49 +202,15 @@ function ExchangeDetailModalInner() {
             onPress={() => handleAction(exchangeUser.id, exchangeUser.name)}
           >
             {isSubmitting ? (
-              <ActivityIndicator color="#fff" size="small" />
+              <Spinner size="sm" />
             ) : (
-              <Text style={styles.actionButtonText}>
+              <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>
                 {exchange.type === 'offer' ? t('detail.requestService') : t('detail.offerHelp')}
               </Text>
             )}
-          </TouchableOpacity>
+          </Pressable>
         )}
       </ScrollView>
     </SafeAreaView>
   );
-}
-
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.surface },
-    content: { padding: SPACING.lg },
-    centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: SPACING.lg },
-    topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
-    typeBadge: { alignSelf: 'flex-start', borderRadius: RADIUS.sm, paddingHorizontal: 10, paddingVertical: 4 },
-    offerBadge: { backgroundColor: theme.successBg },
-    requestBadge: { backgroundColor: theme.infoBg },
-    typeBadgeText: { ...TYPOGRAPHY.caption, fontWeight: '600', color: theme.textSecondary },
-    title: { ...TYPOGRAPHY.h2, color: theme.text, marginBottom: 12 },
-    description: { ...TYPOGRAPHY.body, color: theme.textSecondary, marginBottom: SPACING.lg },
-    creditsCard: {
-      borderWidth: 2,
-      borderRadius: 12,
-      padding: SPACING.md,
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: SPACING.lg,
-    },
-    creditsLabel: { ...TYPOGRAPHY.label, color: theme.textSecondary },
-    creditsValue: { fontSize: 24, fontWeight: '700' },
-    postedBy: { flexDirection: 'row', alignItems: 'center', marginBottom: SPACING.xl },
-    postedByText: { marginLeft: 12 },
-    postedByLabel: { ...TYPOGRAPHY.caption, color: theme.textMuted },
-    postedByName: { ...TYPOGRAPHY.body, fontWeight: '600', color: theme.text },
-    actionButton: { borderRadius: 12, paddingVertical: RADIUS.lg, alignItems: 'center' },
-    actionButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' }, // contrast on primary
-    errorText: { ...TYPOGRAPHY.label, color: theme.error, marginBottom: SPACING.md },
-    backLink: { ...TYPOGRAPHY.body, fontWeight: '600' },
-  });
 }

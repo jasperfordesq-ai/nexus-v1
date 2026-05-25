@@ -3,13 +3,12 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  StyleSheet,
   Text,
   View,
 } from 'react-native';
@@ -21,9 +20,6 @@ import { useTranslation } from 'react-i18next';
 
 import { updatePassword } from '@/lib/api/profile';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
-import { TYPOGRAPHY } from '@/lib/styles/typography';
-import { SPACING } from '@/lib/styles/spacing';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import OfflineBanner from '@/components/OfflineBanner';
@@ -32,8 +28,6 @@ export default function ChangePasswordScreen() {
   const { t } = useTranslation('settings');
   const navigation = useNavigation();
   const primary = usePrimaryColor();
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   useEffect(() => {
     navigation.setOptions({ title: t('password.title') });
@@ -90,22 +84,22 @@ export default function ChangePasswordScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-background">
       <KeyboardAvoidingView
-        style={styles.flex}
+        className="flex-1"
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
       >
         <ScrollView
-          contentContainerStyle={styles.content}
+          contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
           keyboardShouldPersistTaps="handled"
         >
           <OfflineBanner />
-          <Text style={styles.hint}>
+          <Text className="text-sm text-muted-foreground mb-5 leading-5">
             {t('password.hint')}
           </Text>
 
-          <View style={styles.form}>
+          <View className="mb-5">
             <Input
               label={t('password.currentLabel')}
               placeholder={t('password.currentPlaceholder')}
@@ -116,7 +110,7 @@ export default function ChangePasswordScreen() {
               onChangeText={(v) => { setCurrentPassword(v); setFieldErrors((e) => ({ ...e, currentPassword: undefined })); }}
             />
             {fieldErrors.currentPassword ? (
-              <Text style={styles.fieldError}>{fieldErrors.currentPassword}</Text>
+              <Text className="text-danger text-[12px] mt-1 mb-1">{fieldErrors.currentPassword}</Text>
             ) : null}
             <Input
               label={t('password.newLabel')}
@@ -128,7 +122,7 @@ export default function ChangePasswordScreen() {
               onChangeText={(v) => { setNewPassword(v); setFieldErrors((e) => ({ ...e, newPassword: undefined })); }}
             />
             {fieldErrors.newPassword ? (
-              <Text style={styles.fieldError}>{fieldErrors.newPassword}</Text>
+              <Text className="text-danger text-[12px] mt-1 mb-1">{fieldErrors.newPassword}</Text>
             ) : null}
             <Input
               label={t('password.confirmLabel')}
@@ -140,7 +134,7 @@ export default function ChangePasswordScreen() {
               onChangeText={(v) => { setConfirmPassword(v); setFieldErrors((e) => ({ ...e, confirmPassword: undefined })); }}
             />
             {fieldErrors.confirmPassword ? (
-              <Text style={styles.fieldError}>{fieldErrors.confirmPassword}</Text>
+              <Text className="text-danger text-[12px] mt-1 mb-1">{fieldErrors.confirmPassword}</Text>
             ) : null}
           </View>
 
@@ -149,7 +143,7 @@ export default function ChangePasswordScreen() {
             isLoading={isLoading}
             disabled={isLoading}
             color={primary}
-            style={styles.saveButton}
+            style={{ marginTop: 4 }}
           >
             {t('password.save')}
           </Button>
@@ -157,21 +151,4 @@ export default function ChangePasswordScreen() {
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
-}
-
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.bg },
-    flex: { flex: 1 },
-    content: { padding: SPACING.lg, paddingBottom: SPACING.xxl },
-    hint: {
-      ...TYPOGRAPHY.label,
-      color: theme.textSecondary,
-      marginBottom: SPACING.lg,
-      lineHeight: 20,
-    },
-    form: { marginBottom: SPACING.lg },
-    saveButton: { marginTop: SPACING.sm },
-    fieldError: { color: theme.error, ...TYPOGRAPHY.caption, marginTop: SPACING.xs, marginBottom: SPACING.xs },
-  });
 }

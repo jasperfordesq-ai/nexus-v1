@@ -3,12 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
   ScrollView,
-  StyleSheet,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -19,14 +18,11 @@ import * as Haptics from 'expo-haptics';
 
 import { useTranslation } from 'react-i18next';
 
-import { TYPOGRAPHY } from '@/lib/styles/typography';
-import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import { updateProfile, type UpdateProfilePayload } from '@/lib/api/profile';
 import { type User } from '@/lib/api/auth';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { storage } from '@/lib/storage';
 import { STORAGE_KEYS } from '@/lib/constants';
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import OfflineBanner from '@/components/OfflineBanner';
@@ -43,8 +39,6 @@ export default function EditProfileScreen() {
   const { t } = useTranslation('profile');
   const navigation = useNavigation();
   const { user, refreshUser } = useAuth();
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   useEffect(() => {
     navigation.setOptions({ title: t('edit.title') });
@@ -139,15 +133,18 @@ export default function EditProfileScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-background">
       <KeyboardAvoidingView
-        style={{ flex: 1 }}
+        className="flex-1"
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+        <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
           <OfflineBanner />
-          <View style={styles.fieldGroup}>
-            <Text style={styles.label}>{t('edit.firstName')}</Text>
+
+          <View className="mb-[18px]">
+            <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
+              {t('edit.firstName')}
+            </Text>
             <Input
               value={firstName}
               onChangeText={(v) => {
@@ -161,8 +158,10 @@ export default function EditProfileScreen() {
             />
           </View>
 
-          <View style={styles.fieldGroup}>
-            <Text style={styles.label}>{t('edit.lastName')}</Text>
+          <View className="mb-[18px]">
+            <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
+              {t('edit.lastName')}
+            </Text>
             <Input
               value={lastName}
               onChangeText={setLastName}
@@ -172,21 +171,25 @@ export default function EditProfileScreen() {
             />
           </View>
 
-          <View style={styles.fieldGroup}>
-            <Text style={styles.label}>{t('edit.aboutYou')}</Text>
+          <View className="mb-[18px]">
+            <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
+              {t('edit.aboutYou')}
+            </Text>
             <Input
               value={bio}
               onChangeText={setBio}
               placeholder={t('edit.aboutPlaceholder')}
               multiline
               numberOfLines={4}
-              style={styles.bioInput}
+              style={{ height: 100, textAlignVertical: 'top' }}
               maxLength={500}
             />
           </View>
 
-          <View style={styles.fieldGroup}>
-            <Text style={styles.label}>{t('edit.location')}</Text>
+          <View className="mb-[18px]">
+            <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
+              {t('edit.location')}
+            </Text>
             <Input
               value={location}
               onChangeText={setLocation}
@@ -195,8 +198,10 @@ export default function EditProfileScreen() {
             />
           </View>
 
-          <View style={styles.fieldGroup}>
-            <Text style={styles.label}>{t('edit.phoneOptional')}</Text>
+          <View className="mb-[18px]">
+            <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
+              {t('edit.phoneOptional')}
+            </Text>
             <Input
               value={phone}
               onChangeText={(v) => {
@@ -213,7 +218,7 @@ export default function EditProfileScreen() {
             onPress={() => void handleSave()}
             disabled={saving}
             isLoading={saving}
-            style={styles.saveBtn}
+            className="mt-2 rounded-lg"
             accessibilityLabel={t('edit.saveChanges')}
           >
             {t('edit.saveChanges')}
@@ -222,22 +227,4 @@ export default function EditProfileScreen() {
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
-}
-
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.bg },
-    content: { padding: 20, paddingBottom: SPACING.xxl },
-    fieldGroup: { marginBottom: 18 },
-    label: {
-      ...TYPOGRAPHY.bodySmall,
-      fontWeight: '600',
-      color: theme.textSecondary,
-      textTransform: 'uppercase',
-      letterSpacing: 0.5,
-      marginBottom: RADIUS.sm,
-    },
-    bioInput: { height: 100, textAlignVertical: 'top' },
-    saveBtn: { marginTop: SPACING.sm, borderRadius: RADIUS.md },
-  });
 }

@@ -3,15 +3,14 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   FlatList,
   View,
   Text,
   TextInput,
-  TouchableOpacity,
+  Pressable,
   RefreshControl,
-  StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useNavigation } from 'expo-router';
@@ -26,10 +25,8 @@ import {
 } from '@/lib/api/organisations';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
-import { TYPOGRAPHY } from '@/lib/styles/typography';
-import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -42,59 +39,66 @@ import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 function OrganisationCard({
   item,
   primary,
-  theme,
-  styles,
+  textMuted,
+  textSecondary,
   t,
   onPress,
 }: {
   item: Organisation;
   primary: string;
-  theme: Theme;
-  styles: ReturnType<typeof makeStyles>;
+  textMuted: string;
+  textSecondary: string;
   t: (key: string, opts?: Record<string, unknown>) => string;
   onPress: () => void;
 }) {
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.75}>
-      <View style={styles.cardHeader}>
+    <Pressable
+      className="bg-surface rounded-xl p-4 mb-[14px] border border-border/50 gap-[10px]"
+      onPress={onPress}
+    >
+      {/* Card header */}
+      <View className="flex-row items-center gap-[14px]">
         <Avatar uri={item.logo} name={item.name} size={46} />
-        <View style={styles.cardHeaderContent}>
-          <View style={styles.nameRow}>
-            <Text style={styles.cardName} numberOfLines={1}>{item.name}</Text>
+        <View className="flex-1 gap-1">
+          <View className="flex-row items-center gap-[6px] flex-wrap">
+            <Text className="text-sm font-semibold text-foreground flex-shrink" numberOfLines={1}>{item.name}</Text>
             {item.verified ? (
-              <View style={[styles.verifiedBadge, { backgroundColor: withAlpha(primary, 0.10) }]}>
+              <View
+                className="flex-row items-center gap-[3px] rounded px-[6px] py-[2px]"
+                style={{ backgroundColor: withAlpha(primary, 0.10) }}
+              >
                 <Ionicons name="checkmark-circle" size={12} color={primary} />
-                <Text style={[styles.verifiedText, { color: primary }]}>{t('verified')}</Text>
+                <Text className="text-[11px] font-semibold" style={{ color: primary }}>{t('verified')}</Text>
               </View>
             ) : null}
           </View>
           {item.location ? (
-            <View style={styles.locationRow}>
-              <Ionicons name="location-outline" size={13} color={theme.textMuted} />
-              <Text style={styles.locationText} numberOfLines={1}>{item.location}</Text>
+            <View className="flex-row items-center gap-1">
+              <Ionicons name="location-outline" size={13} color={textMuted} />
+              <Text className="text-xs text-muted-foreground flex-1" numberOfLines={1}>{item.location}</Text>
             </View>
           ) : null}
         </View>
-        <Ionicons name="chevron-forward" size={18} color={theme.textMuted} />
+        <Ionicons name="chevron-forward" size={18} color={textMuted} />
       </View>
 
       {/* Counts */}
-      <View style={styles.countsRow}>
-        <View style={styles.countItem}>
-          <Ionicons name="people-outline" size={13} color={theme.textSecondary} />
-          <Text style={styles.countText}>
+      <View className="flex-row items-center gap-2">
+        <View className="flex-row items-center gap-1">
+          <Ionicons name="people-outline" size={13} color={textSecondary} />
+          <Text className="text-xs text-muted-foreground">
             {t('members', { count: item.members_count })}
           </Text>
         </View>
-        <View style={styles.countDot} />
-        <View style={styles.countItem}>
-          <Ionicons name="list-outline" size={13} color={theme.textSecondary} />
-          <Text style={styles.countText}>
+        <View className="w-[3px] h-[3px] rounded-full bg-muted-foreground" />
+        <View className="flex-row items-center gap-1">
+          <Ionicons name="list-outline" size={13} color={textSecondary} />
+          <Text className="text-xs text-muted-foreground">
             {t('listings', { count: item.listings_count })}
           </Text>
         </View>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 
@@ -107,7 +111,6 @@ export default function OrganisationsScreen() {
   const navigation = useNavigation();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   useEffect(() => {
     navigation.setOptions({ title: t('title') });
@@ -160,8 +163,8 @@ export default function OrganisationsScreen() {
       <OrganisationCard
         item={item}
         primary={primary}
-        theme={theme}
-        styles={styles}
+        textMuted={theme.textMuted}
+        textSecondary={theme.textSecondary}
         t={t}
         onPress={() => {
           void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -172,17 +175,17 @@ export default function OrganisationsScreen() {
         }}
       />
     ),
-    [primary, theme, styles, t],
+    [primary, theme.textMuted, theme.textSecondary, t],
   );
 
   return (
     <ModalErrorBoundary>
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
       {/* Search bar */}
-      <View style={styles.searchBar}>
-        <Ionicons name="search-outline" size={18} color={theme.textMuted} style={styles.searchIcon} />
+      <View className="flex-row items-center mx-4 my-[12px] px-[12px] h-[42px] bg-surface rounded-lg gap-2">
+        <Ionicons name="search-outline" size={18} color={theme.textMuted} style={{ flexShrink: 0 }} />
         <TextInput
-          style={styles.searchInput}
+          className="flex-1 text-sm text-foreground py-0"
           placeholder={t('searchPlaceholder')}
           placeholderTextColor={theme.textMuted}
           value={search}
@@ -194,9 +197,9 @@ export default function OrganisationsScreen() {
           accessibilityLabel={t('searchPlaceholder')}
         />
         {search.length > 0 && (
-          <TouchableOpacity onPress={handleClear} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} accessibilityLabel={t('common:actions.clear', 'Clear search')} accessibilityRole="button">
+          <Pressable onPress={handleClear} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} accessibilityLabel={t('common:actions.clear', 'Clear search')} accessibilityRole="button">
             <Ionicons name="close-circle" size={18} color={theme.textMuted} />
-          </TouchableOpacity>
+          </Pressable>
         )}
       </View>
 
@@ -217,11 +220,11 @@ export default function OrganisationsScreen() {
           isLoading ? (
             <LoadingSpinner />
           ) : error ? (
-            <View style={styles.centered}>
-              <Text style={styles.errorText}>{error}</Text>
-              <TouchableOpacity onPress={refresh} style={styles.retryButton}>
-                <Text style={[styles.retryText, { color: primary }]}>{t('common:actions.retry', 'Retry')}</Text>
-              </TouchableOpacity>
+            <View className="flex-1 justify-center items-center p-10">
+              <Text className="text-sm font-medium text-danger text-center">{error}</Text>
+              <Pressable onPress={refresh} className="mt-[14px]">
+                <Text className="font-semibold" style={{ color: primary }}>{t('common:actions.retry', 'Retry')}</Text>
+              </Pressable>
             </View>
           ) : (
             <EmptyState
@@ -232,120 +235,14 @@ export default function OrganisationsScreen() {
         }
         ListFooterComponent={
           isLoadingMore ? (
-            <View style={styles.footerLoader}>
+            <View className="py-4">
               <LoadingSpinner />
             </View>
           ) : null
         }
-        contentContainerStyle={styles.list}
+        contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: 32 }}
       />
     </SafeAreaView>
     </ModalErrorBoundary>
   );
-}
-
-// ---------------------------------------------------------------------------
-// Styles
-// ---------------------------------------------------------------------------
-
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.bg },
-    searchBar: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginHorizontal: SPACING.md,
-      marginVertical: SPACING.sm + 4,
-      paddingHorizontal: SPACING.sm + 4,
-      height: 42,
-      backgroundColor: theme.surface,
-      borderRadius: RADIUS.md,
-      gap: SPACING.sm,
-    },
-    searchIcon: { flexShrink: 0 },
-    searchInput: {
-      flex: 1,
-      ...TYPOGRAPHY.body,
-      color: theme.text,
-      paddingVertical: 0,
-    },
-    list: { flexGrow: 1, paddingHorizontal: SPACING.md, paddingBottom: SPACING.xl },
-    card: {
-      backgroundColor: theme.surface,
-      borderRadius: RADIUS.lg,
-      padding: RADIUS.lg,
-      marginBottom: SPACING.sm + 4,
-      borderWidth: 1,
-      borderColor: theme.borderSubtle,
-      gap: SPACING.sm + 2,
-    },
-    cardHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: SPACING.sm + 4,
-    },
-    cardHeaderContent: {
-      flex: 1,
-      gap: SPACING.xs,
-    },
-    nameRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: SPACING.sm - 2,
-      flexWrap: 'wrap',
-    },
-    cardName: {
-      ...TYPOGRAPHY.body,
-      fontWeight: '600',
-      color: theme.text,
-      flexShrink: 1,
-    },
-    verifiedBadge: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 3,
-      borderRadius: RADIUS.sm,
-      paddingHorizontal: SPACING.sm - 2,
-      paddingVertical: SPACING.xxs,
-    },
-    verifiedText: {
-      fontSize: 11,
-      fontWeight: '600',
-    },
-    locationRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: SPACING.xs,
-    },
-    locationText: {
-      ...TYPOGRAPHY.bodySmall,
-      color: theme.textMuted,
-      flex: 1,
-    },
-    countsRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: SPACING.sm,
-    },
-    countItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: SPACING.xs,
-    },
-    countText: {
-      ...TYPOGRAPHY.caption,
-      color: theme.textSecondary,
-    },
-    countDot: {
-      width: 3,
-      height: 3,
-      borderRadius: 1.5,
-      backgroundColor: theme.textMuted,
-    },
-    centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 },
-    errorText: { color: theme.error, ...TYPOGRAPHY.label, textAlign: 'center' },
-    retryButton: { marginTop: SPACING.sm + 4 },
-    retryText: { ...TYPOGRAPHY.button },
-    footerLoader: { paddingVertical: SPACING.md },
-  });
 }

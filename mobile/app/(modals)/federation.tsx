@@ -3,13 +3,11 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect } from 'react';
 import {
-  ActivityIndicator,
   FlatList,
-  StyleSheet,
   Text,
-  TouchableOpacity,
+  Pressable,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -17,6 +15,7 @@ import { router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
+import { Spinner } from 'heroui-native';
 
 import {
   getFederationPartners,
@@ -26,9 +25,7 @@ import {
 import { useApi } from '@/lib/hooks/useApi';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
-import { TYPOGRAPHY } from '@/lib/styles/typography';
-import { SPACING, RADIUS } from '@/lib/styles/spacing';
+import { useTheme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -39,7 +36,6 @@ export default function FederationScreen() {
   const navigation = useNavigation();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   useEffect(() => {
     navigation.setOptions({ title: t('title') });
@@ -82,8 +78,8 @@ export default function FederationScreen() {
         year: 'numeric',
       });
       return (
-        <TouchableOpacity
-          style={styles.partnerCard}
+        <Pressable
+          className="flex-row items-center bg-surface rounded-xl p-4 mb-2.5 border border-border/50 gap-3.5"
           onPress={() => {
             void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             router.push({
@@ -91,65 +87,64 @@ export default function FederationScreen() {
               params: { id: String(item.id) },
             });
           }}
-          activeOpacity={0.75}
           accessibilityRole="button"
           accessibilityLabel={item.name}
         >
           <Avatar uri={item.logo} name={item.name} size={48} />
-          <View style={styles.partnerInfo}>
-            <Text style={styles.partnerName} numberOfLines={1}>
+          <View className="flex-1 gap-0.5">
+            <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
               {item.name}
             </Text>
             {item.location ? (
-              <View style={styles.metaRow}>
+              <View className="flex-row items-center gap-1">
                 <Ionicons name="location-outline" size={13} color={theme.textSecondary} />
-                <Text style={styles.metaText} numberOfLines={1}>
+                <Text className="text-xs text-muted-foreground flex-1" numberOfLines={1}>
                   {item.location}
                 </Text>
               </View>
             ) : null}
-            <View style={styles.metaRow}>
+            <View className="flex-row items-center gap-1">
               <Ionicons name="people-outline" size={13} color={theme.textSecondary} />
-              <Text style={styles.metaText}>
+              <Text className="text-xs text-muted-foreground">
                 {(item.member_count ?? 0).toLocaleString()}
               </Text>
             </View>
-            <Text style={styles.connectedSince}>
+            <Text style={{ fontSize: 11, color: theme.textMuted, marginTop: 2 }}>
               {t('connectedSince', { date: connectedDate })}
             </Text>
           </View>
           <Ionicons name="chevron-forward" size={18} color={theme.textMuted} />
-        </TouchableOpacity>
+        </Pressable>
       );
     },
-    [styles, t, theme.textSecondary, theme.textMuted],
+    [t, theme.textSecondary, theme.textMuted],
   );
 
-  const listHeader = useMemo(() => {
+  const listHeader = (() => {
     if (statsLoading) {
       return (
-        <View style={styles.statsCard}>
-          <ActivityIndicator color={primary} />
+        <View className="flex-row items-center bg-surface rounded-xl p-4 mb-4 border border-border/50 justify-center">
+          <Spinner size="sm" />
         </View>
       );
     }
     if (!stats) return null;
     return (
-      <View style={styles.statsCard}>
+      <View className="flex-row items-center bg-surface rounded-xl p-4 mb-4 border border-border/50">
         <StatColumn
           value={stats.partner_count ?? 0}
           label={t('stats.partners', { count: stats.partner_count ?? 0 })}
           primary={primary}
           theme={theme}
         />
-        <View style={styles.statDivider} />
+        <View style={{ width: 1, height: 40, backgroundColor: theme.border, marginHorizontal: 8 }} />
         <StatColumn
           value={stats.federated_members ?? 0}
           label={t('stats.members', { count: stats.federated_members ?? 0 })}
           primary={primary}
           theme={theme}
         />
-        <View style={styles.statDivider} />
+        <View style={{ width: 1, height: 40, backgroundColor: theme.border, marginHorizontal: 8 }} />
         <StatColumn
           value={stats.cross_community_exchanges ?? 0}
           label={t('stats.exchanges', { count: stats.cross_community_exchanges ?? 0 })}
@@ -158,11 +153,11 @@ export default function FederationScreen() {
         />
       </View>
     );
-  }, [stats, statsLoading, primary, t, theme, styles]);
+  })();
 
   if (partnersLoading) {
     return (
-      <SafeAreaView style={styles.center} edges={['bottom']}>
+      <SafeAreaView className="flex-1 items-center justify-center" edges={['bottom']}>
         <LoadingSpinner />
       </SafeAreaView>
     );
@@ -170,16 +165,18 @@ export default function FederationScreen() {
 
   return (
     <ModalErrorBoundary>
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
       <FlatList
         data={partners}
         keyExtractor={(item) => String(item.id)}
         renderItem={renderPartner}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={{ padding: 16, paddingBottom: 48 }}
         ListHeaderComponent={
           <>
             {listHeader}
-            <Text style={styles.sectionTitle}>{t('partners')}</Text>
+            <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">
+              {t('partners')}
+            </Text>
           </>
         }
         ListEmptyComponent={
@@ -190,7 +187,9 @@ export default function FederationScreen() {
         }
         ListFooterComponent={
           isLoadingMore ? (
-            <ActivityIndicator color={primary} style={{ marginVertical: 16 }} />
+            <View style={{ marginVertical: 16, alignItems: 'center' }}>
+              <Spinner size="sm" />
+            </View>
           ) : null
         }
         onEndReached={hasMore ? loadMore : undefined}
@@ -212,11 +211,11 @@ function StatColumn({
   value: number;
   label: string;
   primary: string;
-  theme: Theme;
+  theme: ReturnType<typeof useTheme>;
 }) {
   return (
-    <View style={{ flex: 1, alignItems: 'center', gap: SPACING.xs }}>
-      <Text style={{ ...TYPOGRAPHY.h2, color: primary }}>
+    <View style={{ flex: 1, alignItems: 'center', gap: 4 }}>
+      <Text style={{ fontSize: 20, fontWeight: '700', color: primary }}>
         {value.toLocaleString()}
       </Text>
       <Text
@@ -227,72 +226,4 @@ function StatColumn({
       </Text>
     </View>
   );
-}
-
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.bg },
-    center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    listContent: { padding: SPACING.md, paddingBottom: SPACING.xxl },
-    statsCard: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: theme.surface,
-      borderRadius: SPACING.md,
-      padding: SPACING.md,
-      marginBottom: SPACING.xl - 12,
-      borderWidth: 1,
-      borderColor: theme.borderSubtle,
-    },
-    statDivider: {
-      width: 1,
-      height: 40,
-      backgroundColor: theme.border,
-      marginHorizontal: SPACING.sm,
-    },
-    sectionTitle: {
-      ...TYPOGRAPHY.caption,
-      fontWeight: '700',
-      color: theme.textSecondary,
-      textTransform: 'uppercase',
-      letterSpacing: 0.6,
-      marginBottom: SPACING.sm + 4,
-    },
-    partnerCard: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: theme.surface,
-      borderRadius: RADIUS.lg,
-      padding: RADIUS.lg,
-      marginBottom: SPACING.sm + 2,
-      borderWidth: 1,
-      borderColor: theme.borderSubtle,
-      gap: SPACING.sm + 4,
-    },
-    partnerInfo: {
-      flex: 1,
-      gap: 3,
-    },
-    partnerName: {
-      ...TYPOGRAPHY.body,
-      fontWeight: '600',
-      color: theme.text,
-    },
-    metaRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: SPACING.xs,
-    },
-    metaText: {
-      ...TYPOGRAPHY.caption,
-      color: theme.textSecondary,
-      flex: 1,
-    },
-    connectedSince: {
-      fontSize: 11,
-      color: theme.textMuted,
-      marginTop: SPACING.xxs,
-    },
-    // emptyText removed — now handled by EmptyState component
-  });
 }

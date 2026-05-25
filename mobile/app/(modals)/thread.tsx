@@ -9,11 +9,9 @@ import {
   Text,
   FlatList,
   TextInput,
-  TouchableOpacity,
+  Pressable,
   KeyboardAvoidingView,
   Platform,
-  StyleSheet,
-  ActivityIndicator,
   RefreshControl,
   Keyboard,
   Alert,
@@ -22,13 +20,14 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { Spinner } from 'heroui-native';
 
 import { useTranslation } from 'react-i18next';
 import { getThread, getOrCreateThread, sendMessage, displayName, type Message } from '@/lib/api/messages';
 import { useApi } from '@/lib/hooks/useApi';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { useTheme } from '@/lib/hooks/useTheme';
 import { useRealtimeContext } from '@/lib/context/RealtimeContext';
 import Avatar from '@/components/ui/Avatar';
 import VoiceMessageBubble from '@/components/VoiceMessageBubble';
@@ -59,7 +58,6 @@ function ThreadScreenInner() {
   const primary = usePrimaryColor();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
   const navigation = useNavigation();
 
   // Prefer recipientId (new conversation mode) over id (existing conversation mode)
@@ -183,8 +181,8 @@ function ThreadScreenInner() {
 
   if (!isValidId) {
     return (
-      <SafeAreaView style={styles.centered}>
-        <Text style={styles.errorText}>{t('thread.invalidConversation')}</Text>
+      <SafeAreaView className="flex-1 justify-center items-center p-8">
+        <Text className="text-sm text-danger text-center">{t('thread.invalidConversation')}</Text>
       </SafeAreaView>
     );
   }
@@ -193,17 +191,16 @@ function ThreadScreenInner() {
     const isOwn = item.is_own;
     const senderName = displayName(item.sender);
     return (
-      <View style={[styles.bubbleRow, isOwn ? styles.bubbleRowOwn : styles.bubbleRowOther]}>
+      <View className={`flex-row my-0.5 items-end gap-1.5 ${isOwn ? 'justify-end' : 'justify-start'}`}>
         {!isOwn && (
           <Avatar uri={item.sender?.avatar_url ?? null} name={senderName} size={28} />
         )}
         <View
-          style={[
-            styles.bubble,
-            isOwn
-              ? [styles.bubbleOwn, { backgroundColor: primary }]
-              : styles.bubbleOther,
-          ]}
+          className="max-w-[72%] rounded-[18px] px-3.5 pt-2 pb-1.5"
+          style={isOwn
+            ? { backgroundColor: primary, borderBottomRightRadius: 4 }
+            : { backgroundColor: theme.bg, borderBottomLeftRadius: 4 }
+          }
         >
           {item.is_voice && item.audio_url ? (
             <VoiceMessageBubble
@@ -214,22 +211,28 @@ function ThreadScreenInner() {
               textColorSecondary={theme.textSecondary}
             />
           ) : item.is_voice ? (
-            <View style={styles.voiceRow}>
+            <View className="flex-row items-center gap-1.5">
               <Ionicons
                 name="mic"
                 size={16}
                 color={isOwn ? 'rgba(255,255,255,0.9)' : theme.textSecondary} // contrast on primary
               />
-              <Text style={[styles.voiceLabel, isOwn ? styles.bubbleTextOwn : styles.bubbleTextOther]}>
+              <Text className={`text-[14px] italic ${isOwn ? 'text-white' : 'text-foreground'}`}>
                 {t('thread.voiceMessage')}
               </Text>
             </View>
           ) : (
-            <Text style={[styles.bubbleText, isOwn ? styles.bubbleTextOwn : styles.bubbleTextOther]}>
+            <Text className={`text-[15px] leading-5 ${isOwn ? 'text-white' : 'text-foreground'}`}>
               {item.body}
             </Text>
           )}
-          <Text style={[styles.bubbleTime, isOwn ? styles.bubbleTimeOwn : styles.bubbleTimeOther]}>
+          <Text
+            className="text-[10px] mt-0.5"
+            style={isOwn
+              ? { color: 'rgba(255,255,255,0.75)', textAlign: 'right' } // contrast on primary
+              : { color: theme.textMuted, textAlign: 'right' }
+            }
+          >
             {formatTime(item.created_at)}
           </Text>
         </View>
@@ -239,7 +242,7 @@ function ThreadScreenInner() {
 
   if (isLoading && !data) {
     return (
-      <SafeAreaView style={styles.centered}>
+      <SafeAreaView className="flex-1 justify-center items-center p-8">
         <LoadingSpinner />
       </SafeAreaView>
     );
@@ -247,20 +250,20 @@ function ThreadScreenInner() {
 
   if (error && !data) {
     return (
-      <SafeAreaView style={styles.centered}>
-        <Text style={styles.errorText}>{t('thread.loadError')}</Text>
-        <TouchableOpacity onPress={() => void refresh()} style={styles.retryBtn}>
-          <Text style={{ color: primary, fontWeight: '600', fontSize: 15 }}>{t('common:buttons.retry')}</Text>
-        </TouchableOpacity>
+      <SafeAreaView className="flex-1 justify-center items-center p-8">
+        <Text className="text-sm text-danger text-center mb-3">{t('thread.loadError')}</Text>
+        <Pressable onPress={() => void refresh()} className="px-5 py-2.5">
+          <Text style={{ color: primary }} className="font-semibold text-[15px]">{t('common:buttons.retry')}</Text>
+        </Pressable>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-surface">
       <OfflineBanner />
       <KeyboardAvoidingView
-        style={styles.flex}
+        className="flex-1"
         behavior="padding"
         keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 30}
       >
@@ -270,7 +273,7 @@ function ThreadScreenInner() {
           keyExtractor={(item) => String(item.id)}
           renderItem={renderMessage}
           inverted
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 12 }}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
@@ -284,9 +287,13 @@ function ThreadScreenInner() {
         {/* Typing indicator — wire up via Pusher later */}
         <TypingIndicator visible={false} />
 
-        <View style={[styles.inputRow, { paddingBottom: Math.max(10, insets.bottom) }]}>
+        <View
+          className="flex-row items-end px-3 py-2.5 border-t border-border/50 bg-surface gap-2"
+          style={{ paddingBottom: Math.max(10, insets.bottom) }}
+        >
           <TextInput
-            style={styles.input}
+            className="flex-1 min-h-[40px] max-h-[120px] border border-border rounded-[20px] px-4 pt-2.5 pb-2.5 text-[15px]"
+            style={{ color: theme.text, backgroundColor: theme.surface }}
             value={inputText}
             onChangeText={setInputText}
             placeholder={t('thread.inputPlaceholder')}
@@ -295,20 +302,20 @@ function ThreadScreenInner() {
             maxLength={1000}
             returnKeyType="default"
           />
-          <TouchableOpacity
-            style={[styles.sendButton, { backgroundColor: primary }]}
+          <Pressable
+            className="h-10 px-4 rounded-[20px] justify-center items-center"
+            style={{ backgroundColor: primary }}
             onPress={handleSend}
             disabled={isSending || !inputText.trim()}
-            activeOpacity={0.8}
             accessibilityLabel={t('messages:send')}
             accessibilityRole="button"
           >
             {isSending ? (
-              <ActivityIndicator color="#fff" size="small" />
+              <Spinner size="sm" />
             ) : (
-              <Text style={styles.sendButtonText}>{t('thread.send')}</Text>
+              <Text className="text-white font-semibold text-[14px]">{t('thread.send')}</Text>
             )}
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -318,83 +325,4 @@ function ThreadScreenInner() {
 function formatTime(iso: string): string {
   const date = new Date(iso);
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
-
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    flex: { flex: 1 },
-    container: { flex: 1, backgroundColor: theme.surface },
-    centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 32 },
-    errorText: { color: theme.error, fontSize: 14, textAlign: 'center', marginBottom: 12 },
-    retryBtn: { paddingHorizontal: 20, paddingVertical: 10 },
-
-    listContent: { paddingHorizontal: 12, paddingVertical: 12 },
-
-    bubbleRow: {
-      flexDirection: 'row',
-      marginVertical: 3,
-      alignItems: 'flex-end',
-      gap: 6,
-    },
-    bubbleRowOwn: { justifyContent: 'flex-end' },
-    bubbleRowOther: { justifyContent: 'flex-start' },
-
-    bubble: {
-      maxWidth: '72%',
-      borderRadius: 18,
-      paddingHorizontal: 14,
-      paddingTop: 8,
-      paddingBottom: 6,
-    },
-    bubbleOwn: {
-      borderBottomRightRadius: 4,
-    },
-    bubbleOther: {
-      backgroundColor: theme.bg,
-      borderBottomLeftRadius: 4,
-    },
-
-    voiceRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-    voiceLabel: { fontSize: 14, fontStyle: 'italic' },
-    bubbleText: { fontSize: 15, lineHeight: 20 },
-    bubbleTextOwn: { color: '#fff' }, // contrast on primary
-    bubbleTextOther: { color: theme.text },
-
-    bubbleTime: { fontSize: 10, marginTop: 2 },
-    bubbleTimeOwn: { color: 'rgba(255,255,255,0.75)', textAlign: 'right' }, // contrast on primary
-    bubbleTimeOther: { color: theme.textMuted, textAlign: 'right' },
-
-    inputRow: {
-      flexDirection: 'row',
-      alignItems: 'flex-end',
-      paddingHorizontal: 12,
-      paddingVertical: 10,
-      borderTopWidth: 1,
-      borderTopColor: theme.borderSubtle,
-      backgroundColor: theme.surface,
-      gap: 8,
-    },
-    input: {
-      flex: 1,
-      minHeight: 40,
-      maxHeight: 120,
-      borderWidth: 1,
-      borderColor: theme.border,
-      borderRadius: 20,
-      paddingHorizontal: 16,
-      paddingTop: 10,
-      paddingBottom: 10,
-      fontSize: 15,
-      color: theme.text,
-      backgroundColor: theme.surface,
-    },
-    sendButton: {
-      height: 40,
-      paddingHorizontal: 18,
-      borderRadius: 20,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    sendButtonText: { color: '#fff', fontWeight: '600', fontSize: 14 }, // contrast on primary
-  });
 }

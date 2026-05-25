@@ -3,17 +3,15 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
   ScrollView,
-  StyleSheet,
-  TouchableOpacity,
+  Pressable,
   Alert,
   Linking,
   RefreshControl,
-  ActivityIndicator,
   Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -21,13 +19,12 @@ import { useLocalSearchParams, router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
+import { Spinner } from 'heroui-native';
 
-import { TYPOGRAPHY } from '@/lib/styles/typography';
-import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import { getEvent, rsvpEvent, removeRsvp } from '@/lib/api/events';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { useTheme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
@@ -48,7 +45,6 @@ function EventDetailScreenInner() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   useEffect(() => {
     navigation.setOptions({ title: t('detail.title') });
@@ -67,11 +63,11 @@ function EventDetailScreenInner() {
 
   if (isNaN(eventId) || eventId <= 0) {
     return (
-      <SafeAreaView style={styles.center} edges={['bottom']}>
-        <Text style={styles.errorText}>{t('detail.invalidId')}</Text>
-        <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
+      <SafeAreaView className="flex-1 items-center justify-center" edges={['bottom']}>
+        <Text className="text-sm text-muted-foreground">{t('detail.invalidId')}</Text>
+        <Pressable onPress={() => router.back()} className="mt-3">
           <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>{t('detail.goBack')}</Text>
-        </TouchableOpacity>
+        </Pressable>
       </SafeAreaView>
     );
   }
@@ -139,7 +135,7 @@ function EventDetailScreenInner() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.center} edges={['bottom']}>
+      <SafeAreaView className="flex-1 items-center justify-center" edges={['bottom']}>
         <LoadingSpinner />
       </SafeAreaView>
     );
@@ -147,11 +143,11 @@ function EventDetailScreenInner() {
 
   if (!event) {
     return (
-      <SafeAreaView style={styles.center} edges={['bottom']}>
-        <Text style={styles.errorText}>{t('detail.notFound')}</Text>
-        <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
+      <SafeAreaView className="flex-1 items-center justify-center" edges={['bottom']}>
+        <Text className="text-sm text-muted-foreground">{t('detail.notFound')}</Text>
+        <Pressable onPress={() => router.back()} className="mt-3">
           <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>{t('detail.goBack')}</Text>
-        </TouchableOpacity>
+        </Pressable>
       </SafeAreaView>
     );
   }
@@ -166,36 +162,35 @@ function EventDetailScreenInner() {
     : '—';
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={{ padding: 20, paddingBottom: 48 }}
         refreshControl={
           <RefreshControl refreshing={isLoading} onRefresh={() => void refresh()} tintColor={primary} colors={[primary]} />
         }
       >
         {/* Title + share */}
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10 }}>
-          <Text style={[styles.title, { flex: 1 }]}>{event.title}</Text>
-          <TouchableOpacity
+          <Text className="text-xl font-bold text-foreground mb-2.5" style={{ flex: 1 }}>{event.title}</Text>
+          <Pressable
             onPress={() => void handleShare()}
             style={{ padding: 4 }}
-            activeOpacity={0.7}
             accessibilityLabel={t('detail.share')}
             accessibilityRole="button"
           >
             <Ionicons name="share-outline" size={22} color={primary} />
-          </TouchableOpacity>
+          </Pressable>
         </View>
         {event.category && (
-          <View style={[styles.categoryPill, { backgroundColor: (event.category.color ?? primary) + '20' }]}>
-            <Text style={[styles.categoryText, { color: event.category.color ?? primary }]}>
+          <View style={{ alignSelf: 'flex-start', borderRadius: 6, paddingHorizontal: 10, paddingVertical: 4, marginBottom: 16, backgroundColor: (event.category.color ?? primary) + '20' }}>
+            <Text style={{ fontSize: 11, fontWeight: '600', color: event.category.color ?? primary }}>
               {event.category.name}
             </Text>
           </View>
         )}
 
         {/* Date + time */}
-        <View style={styles.metaCard}>
+        <View className="bg-surface rounded-xl p-4 gap-2.5 border border-border/50 mb-4">
           <MetaRow icon="calendar-outline" text={dateStr} theme={theme} />
           <MetaRow icon="time-outline" text={timeStr} theme={theme} />
           {event.is_online ? (
@@ -212,26 +207,25 @@ function EventDetailScreenInner() {
         </View>
 
         {/* Attendees */}
-        <View style={styles.attendeesRow}>
+        <View className="flex-row items-center gap-1.5 mb-4">
           <Ionicons name="people-outline" size={16} color={theme.textSecondary} />
-          <Text style={styles.attendeesText}>
+          <Text className="text-xs text-muted-foreground flex-1">
             {t('attendees', { going: counts.going, interested: counts.interested })}
           </Text>
           {event.is_full && (
-            <View style={styles.fullBadge}>
-              <Text style={styles.fullBadgeText}>{t('full')}</Text>
+            <View className="bg-danger/10 rounded px-2 py-0.5">
+              <Text className="text-xs font-semibold text-danger">{t('full')}</Text>
             </View>
           )}
         </View>
 
         {/* RSVP buttons */}
-        <View style={styles.rsvpRow}>
+        <View className="flex-row gap-3 mb-6">
           <RsvpButton
             label={t('going')}
             icon="checkmark-circle"
             selected={currentRsvp === 'going'}
             primary={primary}
-            theme={theme}
             loading={updating}
             disabled={updating || (event.is_full && currentRsvp !== 'going')}
             onPress={() => void handleRsvp('going')}
@@ -241,7 +235,6 @@ function EventDetailScreenInner() {
             icon="star"
             selected={currentRsvp === 'interested'}
             primary={primary}
-            theme={theme}
             loading={updating}
             disabled={updating}
             onPress={() => void handleRsvp('interested')}
@@ -250,19 +243,19 @@ function EventDetailScreenInner() {
 
         {/* Description */}
         {event.description ? (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('detail.about')}</Text>
-            <Text style={styles.description}>{event.description}</Text>
+          <View className="mb-6">
+            <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2.5">{t('detail.about')}</Text>
+            <Text className="text-sm text-foreground">{event.description}</Text>
           </View>
         ) : null}
 
         {/* Organizer */}
         {event.organizer ? (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('detail.organizer')}</Text>
-            <View style={styles.organizerRow}>
+          <View className="mb-6">
+            <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2.5">{t('detail.organizer')}</Text>
+            <View className="flex-row items-center gap-3">
               <Avatar uri={event.organizer.avatar ?? undefined} name={event.organizer.name ?? '?'} size={36} />
-              <Text style={styles.organizerName}>{event.organizer.name ?? t('common:unknown')}</Text>
+              <Text className="text-sm font-semibold text-foreground">{event.organizer.name ?? t('common:unknown')}</Text>
             </View>
           </View>
         ) : null}
@@ -282,29 +275,25 @@ function MetaRow({
   text: string;
   onPress?: () => void;
   tint?: string;
-  theme: Theme;
+  theme: ReturnType<typeof useTheme>;
 }) {
   return (
-    <TouchableOpacity
-      style={metaRowStyle}
+    <Pressable
+      style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}
       onPress={onPress}
       disabled={!onPress}
-      activeOpacity={onPress ? 0.7 : 1}
     >
       <Ionicons name={icon} size={16} color={tint ?? theme.textSecondary} />
-      <Text style={[{ ...TYPOGRAPHY.label, color: theme.text, flex: 1 }, tint ? { color: tint } : null]}>{text}</Text>
-    </TouchableOpacity>
+      <Text style={{ fontSize: 13, color: tint ?? theme.text, flex: 1 }}>{text}</Text>
+    </Pressable>
   );
 }
-
-const metaRowStyle = { flexDirection: 'row' as const, alignItems: 'center' as const, gap: 10 };
 
 function RsvpButton({
   label,
   icon,
   selected,
   primary,
-  theme,
   loading,
   disabled,
   onPress,
@@ -313,86 +302,41 @@ function RsvpButton({
   icon: React.ComponentProps<typeof Ionicons>['name'];
   selected: boolean;
   primary: string;
-  theme: Theme;
   loading: boolean;
   disabled: boolean;
   onPress: () => void;
 }) {
-  const iconColor = selected ? '#fff' : theme.textSecondary; // contrast on primary
+  const iconColor = selected ? '#fff' : '#8E8E93'; // contrast on primary
   return (
-    <TouchableOpacity
+    <Pressable
       style={[
-        rsvpBtnBase(theme),
-        selected ? { backgroundColor: primary, borderColor: primary } : { borderColor: theme.border },
-        disabled && rsvpBtnDisabled,
+        {
+          flex: 1,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 6,
+          borderWidth: 1,
+          borderRadius: 10,
+          paddingVertical: 12,
+        },
+        selected
+          ? { backgroundColor: primary, borderColor: primary }
+          : { borderColor: '#C6C6C8' },
+        disabled && { opacity: 0.4 },
       ]}
       onPress={onPress}
       disabled={disabled}
-      activeOpacity={0.8}
       accessibilityLabel={label}
       accessibilityRole="button"
       accessibilityState={{ busy: loading, selected }}
     >
       {loading ? (
-        <ActivityIndicator size="small" color={iconColor} />
+        <Spinner size="sm" />
       ) : (
         <Ionicons name={icon} size={16} color={iconColor} />
       )}
-      <Text style={[{ ...TYPOGRAPHY.label, fontWeight: '600' as const, color: theme.textSecondary }, selected && { color: '#fff' }]}>{label}</Text>{/* contrast on primary */}
-    </TouchableOpacity>
+      <Text style={{ fontSize: 13, fontWeight: '600', color: selected ? '#fff' : '#8E8E93' }}>{label}</Text>
+    </Pressable>
   );
-}
-
-const rsvpBtnDisabled = { opacity: 0.4 };
-
-function rsvpBtnBase(theme: Theme) {
-  return {
-    flex: 1,
-    flexDirection: 'row' as const,
-    alignItems: 'center' as const,
-    justifyContent: 'center' as const,
-    gap: 6,
-    borderWidth: 1,
-    borderRadius: RADIUS.md,
-    paddingVertical: 12,
-    backgroundColor: theme.surface,
-  };
-}
-
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.bg },
-    center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    content: { padding: 20, paddingBottom: 48 },
-    title: { ...TYPOGRAPHY.h2, color: theme.text, marginBottom: 10 },
-    categoryPill: { alignSelf: 'flex-start', borderRadius: SPACING.sm, paddingHorizontal: 10, paddingVertical: 4, marginBottom: SPACING.md },
-    categoryText: { ...TYPOGRAPHY.caption, fontWeight: '600' },
-    metaCard: {
-      backgroundColor: theme.surface,
-      borderRadius: RADIUS.lg,
-      padding: RADIUS.lg,
-      gap: 10,
-      borderWidth: 1,
-      borderColor: theme.borderSubtle,
-      marginBottom: SPACING.md,
-    },
-    attendeesRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: SPACING.md },
-    attendeesText: { ...TYPOGRAPHY.label, color: theme.textSecondary, flex: 1 },
-    fullBadge: { backgroundColor: theme.errorBg, borderRadius: RADIUS.sm, paddingHorizontal: SPACING.sm, paddingVertical: 2 },
-    fullBadgeText: { fontSize: 11, fontWeight: '600', color: theme.error },
-    rsvpRow: { flexDirection: 'row', gap: 12, marginBottom: SPACING.lg },
-    section: { marginBottom: SPACING.lg },
-    sectionTitle: {
-      ...TYPOGRAPHY.caption,
-      fontWeight: '700',
-      color: theme.textSecondary,
-      textTransform: 'uppercase',
-      letterSpacing: 0.6,
-      marginBottom: 10,
-    },
-    description: { ...TYPOGRAPHY.body, color: theme.text },
-    organizerRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-    organizerName: { ...TYPOGRAPHY.body, fontWeight: '600', color: theme.text },
-    errorText: { ...TYPOGRAPHY.body, color: theme.textMuted },
-  });
 }

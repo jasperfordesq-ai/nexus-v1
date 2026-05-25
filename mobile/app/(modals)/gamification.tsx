@@ -3,14 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   View,
   Text,
   FlatList,
   RefreshControl,
-  StyleSheet,
-  TouchableOpacity,
+  Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from 'expo-router';
@@ -18,8 +17,6 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 
-import { TYPOGRAPHY } from '@/lib/styles/typography';
-import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import {
   getGamificationProfile,
   getBadges,
@@ -30,7 +27,7 @@ import {
 } from '@/lib/api/gamification';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -45,19 +42,18 @@ function XpBar({
   xp,
   nextLevelXp,
   primary,
-  theme,
-  styles,
 }: {
   xp: number;
   nextLevelXp: number;
   primary: string;
-  theme: Theme;
-  styles: ReturnType<typeof makeStyles>;
 }) {
   const percentage = nextLevelXp > 0 ? Math.min(100, Math.round((xp / nextLevelXp) * 100)) : 0;
   return (
-    <View style={styles.xpBarTrack}>
-      <View style={[styles.xpBarFill, { width: `${percentage}%` as `${number}%`, backgroundColor: primary }]} />
+    <View className="h-2 rounded-full bg-border/50 overflow-hidden">
+      <View
+        className="h-2 rounded-full"
+        style={{ width: `${percentage}%`, backgroundColor: primary }}
+      />
     </View>
   );
 }
@@ -66,37 +62,35 @@ function ProfileSection({
   profile,
   primary,
   theme,
-  styles,
   t,
 }: {
   profile: GamificationProfile;
   primary: string;
-  theme: Theme;
-  styles: ReturnType<typeof makeStyles>;
+  theme: ReturnType<typeof useTheme>;
   t: (key: string, opts?: Record<string, unknown>) => string;
 }) {
   const toNextLevel = Math.max(0, profile.next_level_xp - profile.xp);
   return (
-    <View style={[styles.profileCard, { borderColor: primary }]}>
-      <View style={styles.profileTopRow}>
-        <View style={[styles.levelBadge, { backgroundColor: primary }]}>
-          <Text style={styles.levelBadgeText}>{t('gamification:level', { level: profile.level })}</Text>
+    <View className="border-2 rounded-xl p-[18px] bg-surface mt-5 mb-5" style={{ borderColor: primary }}>
+      <View className="flex-row items-center gap-2.5 flex-wrap mb-3">
+        <View className="rounded-lg px-2.5 py-1" style={{ backgroundColor: primary }}>
+          <Text className="text-xs font-bold text-white">{t('gamification:level', { level: profile.level })}</Text>
         </View>
         {profile.rank !== null ? (
-          <Text style={[styles.rankText, { color: primary }]}>{t('gamification:rank', { rank: profile.rank })}</Text>
+          <Text className="text-xs font-semibold" style={{ color: primary }}>{t('gamification:rank', { rank: profile.rank })}</Text>
         ) : (
-          <Text style={styles.unrankedText}>{t('gamification:unranked')}</Text>
+          <Text className="text-xs text-muted-foreground">{t('gamification:unranked')}</Text>
         )}
         {profile.streak_days > 0 && (
-          <View style={styles.streakRow}>
+          <View className="flex-row items-center gap-1 ml-auto">
             <Ionicons name="flame-outline" size={14} color={theme.textSecondary} />
-            <Text style={styles.streakText}>{t('gamification:streak', { days: profile.streak_days })}</Text>
+            <Text className="text-xs text-muted-foreground">{t('gamification:streak', { days: profile.streak_days })}</Text>
           </View>
         )}
       </View>
-      <Text style={[styles.xpValue, { color: primary }]}>{t('gamification:xp', { xp: profile.xp })}</Text>
-      <XpBar xp={profile.xp} nextLevelXp={profile.next_level_xp} primary={primary} theme={theme} styles={styles} />
-      <Text style={styles.nextLevelText}>{t('gamification:nextLevel', { xp: toNextLevel })}</Text>
+      <Text className="text-[32px] font-bold mb-2.5" style={{ color: primary }}>{t('gamification:xp', { xp: profile.xp })}</Text>
+      <XpBar xp={profile.xp} nextLevelXp={profile.next_level_xp} primary={primary} />
+      <Text className="text-xs text-muted-foreground mt-1.5">{t('gamification:nextLevel', { xp: toNextLevel })}</Text>
     </View>
   );
 }
@@ -105,13 +99,11 @@ function BadgeCard({
   badge,
   primary,
   theme,
-  styles,
   t,
 }: {
   badge: Badge;
   primary: string;
-  theme: Theme;
-  styles: ReturnType<typeof makeStyles>;
+  theme: ReturnType<typeof useTheme>;
   t: (key: string) => string;
 }) {
   const earnedDate = badge.earned_at
@@ -119,21 +111,31 @@ function BadgeCard({
     : null;
 
   return (
-    <View style={[styles.badgeCard, { borderColor: badge.is_earned ? primary : theme.borderSubtle }]}>
-      <View style={[styles.badgeIconWrap, { backgroundColor: badge.is_earned ? withAlpha(primary, 0.13) : theme.surface }]}>
+    <View
+      className="border rounded-xl px-4 py-3 bg-surface mb-2 items-center"
+      style={{ borderColor: badge.is_earned ? primary : theme.borderSubtle }}
+    >
+      <View
+        className="w-14 h-14 rounded-full items-center justify-center mb-2"
+        style={{ backgroundColor: badge.is_earned ? withAlpha(primary, 0.13) : theme.surface }}
+      >
         <Ionicons
           name={(badge.icon as React.ComponentProps<typeof Ionicons>['name']) ?? 'ribbon-outline'}
           size={28}
           color={badge.is_earned ? primary : theme.textMuted}
         />
       </View>
-      <Text style={[styles.badgeName, { color: badge.is_earned ? theme.text : theme.textMuted }]} numberOfLines={2}>
+      <Text
+        className="text-xs font-semibold text-center mb-1"
+        style={{ color: badge.is_earned ? theme.text : theme.textMuted }}
+        numberOfLines={2}
+      >
         {badge.name}
       </Text>
       {badge.is_earned && earnedDate ? (
-        <Text style={styles.badgeEarnedDate}>{t('gamification:badges.earned')}: {earnedDate}</Text>
+        <Text className="text-[11px] text-muted-foreground text-center">{t('gamification:badges.earned')}: {earnedDate}</Text>
       ) : (
-        <Text style={styles.badgeLockedText}>{t('gamification:badges.locked')}</Text>
+        <Text className="text-[11px] text-muted-foreground text-center">{t('gamification:badges.locked')}</Text>
       )}
     </View>
   );
@@ -144,32 +146,39 @@ function LeaderboardRow({
   isCurrentUser,
   primary,
   theme,
-  styles,
   t,
 }: {
   entry: LeaderboardEntry;
   isCurrentUser: boolean;
   primary: string;
-  theme: Theme;
-  styles: ReturnType<typeof makeStyles>;
+  theme: ReturnType<typeof useTheme>;
   t: (key: string, opts?: Record<string, unknown>) => string;
 }) {
   return (
-    <View style={[styles.lbRow, isCurrentUser && { backgroundColor: withAlpha(primary, 0.08), borderRadius: 10 }]}>
-      <Text style={[styles.lbRank, { color: isCurrentUser ? primary : theme.textSecondary }]}>
+    <View
+      className="flex-row items-center gap-2.5 py-2.5 px-1.5 mb-1 rounded-[10px]"
+      style={isCurrentUser ? { backgroundColor: withAlpha(primary, 0.08) } : undefined}
+    >
+      <Text
+        className="text-xs font-bold min-w-[28px] text-center"
+        style={{ color: isCurrentUser ? primary : theme.textSecondary }}
+      >
         #{entry.rank}
       </Text>
       <Avatar uri={entry.user.avatar} name={entry.user.name} size={36} />
-      <View style={styles.lbBody}>
-        <Text style={styles.lbName} numberOfLines={1}>
+      <View className="flex-1 ml-1">
+        <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
           {entry.user.name}
           {isCurrentUser ? ` (${t('gamification:leaderboard.you')})` : ''}
         </Text>
-        <Text style={styles.lbMeta}>
+        <Text className="text-xs text-muted-foreground mt-0.5">
           {t('gamification:level', { level: entry.level })} · {t('gamification:leaderboard.badgesCount', { count: entry.badges_count })}
         </Text>
       </View>
-      <Text style={[styles.lbXp, { color: isCurrentUser ? primary : theme.text }]}>
+      <Text
+        className="text-xs font-bold"
+        style={{ color: isCurrentUser ? primary : theme.text }}
+      >
         {t('gamification:xp', { xp: entry.xp })}
       </Text>
     </View>
@@ -183,7 +192,6 @@ export default function GamificationScreen() {
   const navigation = useNavigation();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   const [activeTab, setActiveTab] = useState<Tab>('badges');
   const [period, setPeriod] = useState<LeaderboardPeriod>('monthly');
@@ -235,7 +243,7 @@ export default function GamificationScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView className="flex-1 items-center justify-center bg-background">
         <LoadingSpinner />
       </SafeAreaView>
     );
@@ -243,7 +251,7 @@ export default function GamificationScreen() {
 
   return (
     <ModalErrorBoundary>
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-background">
       <FlatList<LeaderboardEntry | Badge | 'header' | 'tabs' | 'period-selector' | 'empty'>
         refreshControl={
           <RefreshControl
@@ -264,59 +272,62 @@ export default function GamificationScreen() {
           return `badge-${(item as Badge).id}`;
         }}
         numColumns={1}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 40 }}
         renderItem={({ item }) => {
           if (item === 'header') {
             return profile ? (
-              <ProfileSection profile={profile} primary={primary} theme={theme} styles={styles} t={t} />
+              <ProfileSection profile={profile} primary={primary} theme={theme} t={t} />
             ) : null;
           }
 
           if (item === 'tabs') {
             return (
-              <View style={styles.tabRow}>
-                <TouchableOpacity
-                  style={[styles.tabPill, activeTab === 'badges' && { backgroundColor: primary }]}
+              <View className="flex-row gap-2.5 mb-4">
+                <Pressable
+                  className={`flex-1 items-center py-2.5 rounded-full border border-border ${activeTab === 'badges' ? '' : 'bg-surface'}`}
+                  style={activeTab === 'badges' ? { backgroundColor: primary } : undefined}
                   onPress={() => { void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setActiveTab('badges'); }}
-                  activeOpacity={0.8}
                   accessibilityRole="tab"
                   accessibilityState={{ selected: activeTab === 'badges' }}
                 >
-                  <Text style={[styles.tabPillText, activeTab === 'badges' && { color: '#fff' }]}>{/* contrast on primary */}
+                  <Text className={`text-xs font-semibold ${activeTab === 'badges' ? 'text-white' : 'text-muted-foreground'}`}>
                     {t('gamification:badges.title')}
                   </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.tabPill, activeTab === 'leaderboard' && { backgroundColor: primary }]}
+                </Pressable>
+                <Pressable
+                  className={`flex-1 items-center py-2.5 rounded-full border border-border ${activeTab === 'leaderboard' ? '' : 'bg-surface'}`}
+                  style={activeTab === 'leaderboard' ? { backgroundColor: primary } : undefined}
                   onPress={() => { void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setActiveTab('leaderboard'); }}
-                  activeOpacity={0.8}
                   accessibilityRole="tab"
                   accessibilityState={{ selected: activeTab === 'leaderboard' }}
                 >
-                  <Text style={[styles.tabPillText, activeTab === 'leaderboard' && { color: '#fff' }]}>{/* contrast on primary */}
+                  <Text className={`text-xs font-semibold ${activeTab === 'leaderboard' ? 'text-white' : 'text-muted-foreground'}`}>
                     {t('gamification:leaderboard.title')}
                   </Text>
-                </TouchableOpacity>
+                </Pressable>
               </View>
             );
           }
 
           if (item === 'period-selector') {
             return (
-              <View style={styles.periodRow}>
+              <View className="flex-row gap-2 mb-3.5">
                 {periods.map((p) => (
-                  <TouchableOpacity
+                  <Pressable
                     key={p.key}
-                    style={[styles.periodPill, period === p.key && { backgroundColor: withAlpha(primary, 0.15), borderColor: primary }]}
+                    className="flex-1 items-center py-1.5 rounded-lg border border-border bg-surface"
+                    style={period === p.key ? { backgroundColor: withAlpha(primary, 0.15), borderColor: primary } : undefined}
                     onPress={() => { void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setPeriod(p.key); }}
-                    activeOpacity={0.8}
                     accessibilityRole="button"
                     accessibilityState={{ selected: period === p.key }}
                   >
-                    <Text style={[styles.periodPillText, period === p.key && { color: primary }]}>
+                    <Text
+                      className="text-xs font-semibold text-muted-foreground"
+                      style={period === p.key ? { color: primary } : undefined}
+                    >
                       {p.label}
                     </Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 ))}
               </View>
             );
@@ -324,8 +335,8 @@ export default function GamificationScreen() {
 
           if (item === 'empty') {
             return (
-              <View style={styles.emptyWrap}>
-                <Text style={styles.emptyText}>
+              <View className="pt-10 items-center">
+                <Text className="text-xs text-muted-foreground">
                   {activeTab === 'badges' ? t('gamification:badges.empty') : t('gamification:leaderboard.empty')}
                 </Text>
               </View>
@@ -340,7 +351,6 @@ export default function GamificationScreen() {
                 isCurrentUser={userRank !== null && entry.rank === userRank}
                 primary={primary}
                 theme={theme}
-                styles={styles}
                 t={t}
               />
             );
@@ -348,152 +358,16 @@ export default function GamificationScreen() {
 
           const badge = item as Badge;
           return (
-            <BadgeCard badge={badge} primary={primary} theme={theme} styles={styles} t={t} />
+            <BadgeCard badge={badge} primary={primary} theme={theme} t={t} />
           );
         }}
       />
       {lbLoading && activeTab === 'leaderboard' && (
-        <View style={styles.lbLoadingOverlay}>
+        <View className="absolute bottom-6 self-center">
           <LoadingSpinner />
         </View>
       )}
     </SafeAreaView>
     </ModalErrorBoundary>
   );
-}
-
-// ─── Styles ───────────────────────────────────────────────────────────────────
-
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.bg },
-    center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    listContent: { paddingHorizontal: SPACING.md, paddingBottom: 40 },
-
-    // Profile card
-    profileCard: {
-      borderWidth: 2,
-      borderRadius: SPACING.md,
-      padding: 18,
-      backgroundColor: theme.surface,
-      marginTop: 20,
-      marginBottom: 20,
-    },
-    profileTopRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 10,
-      flexWrap: 'wrap',
-      marginBottom: 12,
-    },
-    levelBadge: {
-      borderRadius: SPACING.sm,
-      paddingHorizontal: 10,
-      paddingVertical: 4,
-    },
-    levelBadgeText: { ...TYPOGRAPHY.bodySmall, fontWeight: '700', color: '#fff' }, // contrast on primary
-    rankText: { ...TYPOGRAPHY.bodySmall, fontWeight: '600' },
-    unrankedText: { ...TYPOGRAPHY.bodySmall, color: theme.textMuted },
-    streakRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginLeft: 'auto' },
-    streakText: { ...TYPOGRAPHY.bodySmall, color: theme.textSecondary },
-    xpValue: { fontSize: 32, fontWeight: '700', marginBottom: 10 },
-    xpBarTrack: {
-      height: 8,
-      borderRadius: 4,
-      backgroundColor: theme.borderSubtle,
-      overflow: 'hidden',
-      marginBottom: 6,
-    },
-    xpBarFill: { height: 8, borderRadius: 4 },
-    nextLevelText: { ...TYPOGRAPHY.caption, color: theme.textMuted, marginTop: 2 },
-
-    // Tabs
-    tabRow: {
-      flexDirection: 'row',
-      gap: 10,
-      marginBottom: 16,
-    },
-    tabPill: {
-      flex: 1,
-      alignItems: 'center',
-      paddingVertical: 10,
-      borderRadius: 20,
-      backgroundColor: theme.surface,
-      borderWidth: 1,
-      borderColor: theme.border,
-    },
-    tabPillText: {
-      ...TYPOGRAPHY.label,
-      fontWeight: '600',
-      color: theme.textSecondary,
-    },
-
-    // Period selector
-    periodRow: {
-      flexDirection: 'row',
-      gap: 8,
-      marginBottom: 14,
-    },
-    periodPill: {
-      flex: 1,
-      alignItems: 'center',
-      paddingVertical: 7,
-      borderRadius: RADIUS.md,
-      borderWidth: 1,
-      borderColor: theme.border,
-      backgroundColor: theme.surface,
-    },
-    periodPillText: {
-      ...TYPOGRAPHY.caption,
-      fontWeight: '600',
-      color: theme.textSecondary,
-    },
-
-    // Badge card
-    badgeCard: {
-      borderWidth: 1,
-      borderRadius: RADIUS.lg,
-      padding: RADIUS.lg,
-      backgroundColor: theme.surface,
-      marginBottom: RADIUS.md,
-      alignItems: 'center',
-    },
-    badgeIconWrap: {
-      width: 56,
-      height: 56,
-      borderRadius: 28,
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginBottom: 8,
-    },
-    badgeName: { ...TYPOGRAPHY.label, fontWeight: '600', textAlign: 'center', marginBottom: 4 },
-    badgeEarnedDate: { fontSize: 11, color: theme.textMuted, textAlign: 'center' },
-    badgeLockedText: { fontSize: 11, color: theme.textMuted, textAlign: 'center' },
-
-    // Leaderboard row
-    lbRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 10,
-      paddingVertical: 10,
-      paddingHorizontal: 6,
-      marginBottom: 4,
-    },
-    lbRank: { ...TYPOGRAPHY.label, fontWeight: '700', minWidth: SPACING.xl, textAlign: 'center' },
-    lbBody: { flex: 1, marginLeft: 4 },
-    lbName: { ...TYPOGRAPHY.body, fontWeight: '600', color: theme.text },
-    lbMeta: { ...TYPOGRAPHY.caption, color: theme.textMuted, marginTop: 2 },
-    lbXp: { ...TYPOGRAPHY.label, fontWeight: '700' },
-
-    // Loading overlay for leaderboard period switch
-    lbLoadingOverlay: {
-      position: 'absolute',
-      bottom: 24,
-      alignSelf: 'center',
-    },
-
-    // Empty
-    emptyWrap: { paddingTop: 40, alignItems: 'center' },
-    emptyText: { ...TYPOGRAPHY.label, color: theme.textMuted },
-  });
 }

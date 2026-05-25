@@ -3,14 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
   ScrollView,
   RefreshControl,
-  StyleSheet,
-  TouchableOpacity,
+  Pressable,
   Alert,
   Share,
 } from 'react-native';
@@ -23,9 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { getOpportunity, expressInterest } from '@/lib/api/volunteering';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
-import { TYPOGRAPHY } from '@/lib/styles/typography';
-import { SPACING, RADIUS } from '@/lib/styles/spacing';
+import { useTheme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
@@ -38,7 +35,6 @@ export default function VolunteeringDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   useEffect(() => {
     navigation.setOptions({ title: t('detail.title') });
@@ -70,11 +66,11 @@ export default function VolunteeringDetailScreen() {
 
   if (isNaN(opportunityId) || opportunityId <= 0) {
     return (
-      <SafeAreaView style={styles.center} edges={['bottom']}>
-        <Text style={styles.errorText}>{t('detail.invalidId')}</Text>
-        <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
-          <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>{t('detail.goBack')}</Text>
-        </TouchableOpacity>
+      <SafeAreaView className="flex-1 items-center justify-center" edges={['bottom']}>
+        <Text className="text-sm text-muted-foreground">{t('detail.invalidId')}</Text>
+        <Pressable onPress={() => router.back()} className="mt-3">
+          <Text style={{ color: primary }} className="text-[15px] font-semibold">{t('detail.goBack')}</Text>
+        </Pressable>
       </SafeAreaView>
     );
   }
@@ -97,7 +93,7 @@ export default function VolunteeringDetailScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.center} edges={['bottom']}>
+      <SafeAreaView className="flex-1 items-center justify-center" edges={['bottom']}>
         <LoadingSpinner />
       </SafeAreaView>
     );
@@ -105,11 +101,11 @@ export default function VolunteeringDetailScreen() {
 
   if (!opportunity) {
     return (
-      <SafeAreaView style={styles.center} edges={['bottom']}>
-        <Text style={styles.errorText}>{t('detail.notFound')}</Text>
-        <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
-          <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>{t('detail.goBack')}</Text>
-        </TouchableOpacity>
+      <SafeAreaView className="flex-1 items-center justify-center" edges={['bottom']}>
+        <Text className="text-sm text-muted-foreground">{t('detail.notFound')}</Text>
+        <Pressable onPress={() => router.back()} className="mt-3">
+          <Text style={{ color: primary }} className="text-[15px] font-semibold">{t('detail.goBack')}</Text>
+        </Pressable>
       </SafeAreaView>
     );
   }
@@ -133,27 +129,26 @@ export default function VolunteeringDetailScreen() {
 
   return (
     <ModalErrorBoundary>
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
         refreshControl={
           <RefreshControl refreshing={isLoading} onRefresh={refresh} tintColor={primary} colors={[primary]} />
         }
       >
         {/* Title + share + status */}
-        <View style={styles.titleRow}>
-          <Text style={styles.title}>{opportunity.title}</Text>
-          <TouchableOpacity
+        <View className="flex-row items-start gap-2.5 mb-4">
+          <Text className="flex-1 text-xl font-bold text-foreground">{opportunity.title}</Text>
+          <Pressable
             onPress={() => void handleShare()}
-            style={{ padding: 4 }}
-            activeOpacity={0.7}
+            className="p-1"
             accessibilityLabel={t('detail.share')}
             accessibilityRole="button"
           >
             <Ionicons name="share-outline" size={22} color={primary} />
-          </TouchableOpacity>
-          <View style={[styles.statusBadge, { backgroundColor: statusColor + '22' }]}>
-            <Text style={[styles.statusText, { color: statusColor }]}>
+          </Pressable>
+          <View style={{ backgroundColor: statusColor + '22' }} className="rounded px-2 py-0.5 self-start">
+            <Text style={{ color: statusColor }} className="text-[11px] font-semibold">
               {t(`status.${opportunity.status}`)}
             </Text>
           </View>
@@ -161,21 +156,23 @@ export default function VolunteeringDetailScreen() {
 
         {/* Organisation */}
         {opportunity.organisation ? (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('detail.organisation')}</Text>
-            <View style={styles.orgRow}>
+          <View className="mb-5">
+            <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
+              {t('detail.organisation')}
+            </Text>
+            <View className="flex-row items-center gap-4">
               <Avatar
                 uri={opportunity.organisation.avatar}
                 name={opportunity.organisation.name}
                 size={36}
               />
-              <Text style={styles.orgName}>{opportunity.organisation.name}</Text>
+              <Text className="text-sm font-semibold text-foreground">{opportunity.organisation.name}</Text>
             </View>
           </View>
         ) : null}
 
         {/* Meta card */}
-        <View style={styles.metaCard}>
+        <View className="bg-surface rounded-2xl p-4 gap-2.5 border border-border/50 mb-5">
           {opportunity.is_remote ? (
             <MetaRow icon="wifi-outline" text={t('remote')} theme={theme} tint={primary} />
           ) : opportunity.location ? (
@@ -209,12 +206,14 @@ export default function VolunteeringDetailScreen() {
 
         {/* Skills */}
         {(opportunity.skills_needed ?? []).length > 0 ? (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('skills')}</Text>
-            <View style={styles.skillsRow}>
+          <View className="mb-5">
+            <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
+              {t('skills')}
+            </Text>
+            <View className="flex-row flex-wrap gap-2">
               {(opportunity.skills_needed ?? []).map((skill) => (
-                <View key={skill} style={[styles.skillPill, { backgroundColor: theme.surface, borderColor: theme.border }]}>
-                  <Text style={styles.skillText}>{skill}</Text>
+                <View key={skill} className="rounded-lg px-2.5 py-1 border border-border bg-surface">
+                  <Text className="text-xs text-foreground">{skill}</Text>
                 </View>
               ))}
             </View>
@@ -223,22 +222,23 @@ export default function VolunteeringDetailScreen() {
 
         {/* Description */}
         {opportunity.description ? (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('detail.about')}</Text>
-            <Text style={styles.description}>{opportunity.description}</Text>
+          <View className="mb-5">
+            <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
+              {t('detail.about')}
+            </Text>
+            <Text className="text-sm text-foreground">{opportunity.description}</Text>
           </View>
         ) : null}
 
         {/* Express Interest button */}
-        <TouchableOpacity
-          style={[
-            styles.interestButton,
-            { backgroundColor: interestSent ? theme.success : primary },
-            (interestLoading || interestSent) && styles.interestButtonDisabled,
-          ]}
+        <Pressable
+          className="flex-row items-center justify-center gap-2 rounded-xl py-4 mt-2"
+          style={{
+            backgroundColor: interestSent ? theme.success : primary,
+            opacity: interestLoading || interestSent ? 0.75 : 1,
+          }}
           onPress={() => void handleExpressInterest()}
           disabled={interestLoading || interestSent}
-          activeOpacity={0.8}
           accessibilityRole="button"
           accessibilityLabel={interestSent ? t('interestSent') : t('expressInterest')}
         >
@@ -247,10 +247,10 @@ export default function VolunteeringDetailScreen() {
           ) : (
             <Ionicons name="hand-left-outline" size={18} color="#fff" />
           )}
-          <Text style={styles.interestButtonText}>
+          <Text className="text-base font-bold text-white">
             {interestSent ? t('interestSent') : t('expressInterest')}
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
     </ModalErrorBoundary>
@@ -269,82 +269,13 @@ function MetaRow({
 }: {
   icon: React.ComponentProps<typeof Ionicons>['name'];
   text: string;
-  theme: Theme;
+  theme: ReturnType<typeof useTheme>;
   tint?: string;
 }) {
   return (
-    <View style={metaRowStyle}>
+    <View className="flex-row items-center gap-2.5">
       <Ionicons name={icon} size={16} color={tint ?? theme.textSecondary} />
-      <Text style={{ fontSize: 14, color: tint ?? theme.text, flex: 1 }}>{text}</Text>
+      <Text style={{ color: tint ?? theme.text }} className="flex-1 text-sm">{text}</Text>
     </View>
   );
-}
-
-const metaRowStyle = { flexDirection: 'row' as const, alignItems: 'center' as const, gap: 10 };
-
-// ---------------------------------------------------------------------------
-// Styles
-// ---------------------------------------------------------------------------
-
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.bg },
-    center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    content: { padding: SPACING.xl - 12, paddingBottom: SPACING.xxl },
-    titleRow: {
-      flexDirection: 'row',
-      alignItems: 'flex-start',
-      gap: SPACING.sm + 2,
-      marginBottom: SPACING.md,
-    },
-    title: { flex: 1, ...TYPOGRAPHY.h2, color: theme.text },
-    statusBadge: {
-      borderRadius: RADIUS.sm,
-      paddingHorizontal: SPACING.sm,
-      paddingVertical: SPACING.xs,
-      alignSelf: 'flex-start',
-    },
-    statusText: { fontSize: 11, fontWeight: '600' },
-    metaCard: {
-      backgroundColor: theme.surface,
-      borderRadius: RADIUS.lg,
-      padding: RADIUS.lg,
-      gap: SPACING.sm + 2,
-      borderWidth: 1,
-      borderColor: theme.borderSubtle,
-      marginBottom: SPACING.xl - 12,
-    },
-    section: { marginBottom: SPACING.xl - 12 },
-    sectionTitle: {
-      ...TYPOGRAPHY.caption,
-      fontWeight: '700',
-      color: theme.textSecondary,
-      textTransform: 'uppercase',
-      letterSpacing: 0.6,
-      marginBottom: SPACING.sm + 2,
-    },
-    orgRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm + 4 },
-    orgName: { ...TYPOGRAPHY.body, fontWeight: '600', color: theme.text },
-    skillsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
-    skillPill: {
-      borderRadius: SPACING.sm,
-      paddingHorizontal: SPACING.sm + 2,
-      paddingVertical: 5,
-      borderWidth: 1,
-    },
-    skillText: { ...TYPOGRAPHY.bodySmall, color: theme.text },
-    description: { ...TYPOGRAPHY.body, color: theme.text },
-    interestButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: SPACING.sm,
-      borderRadius: SPACING.sm + 4,
-      paddingVertical: RADIUS.lg,
-      marginTop: SPACING.sm,
-    },
-    interestButtonDisabled: { opacity: 0.75 },
-    interestButtonText: { fontSize: 16, fontWeight: '700', color: '#fff' }, // contrast on primary
-    errorText: { ...TYPOGRAPHY.body, color: theme.textMuted },
-  });
 }

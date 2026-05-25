@@ -3,15 +3,14 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   FlatList,
   View,
   Text,
   TextInput,
-  TouchableOpacity,
+  Pressable,
   RefreshControl,
-  StyleSheet,
   ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -20,8 +19,6 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 
-import { TYPOGRAPHY } from '@/lib/styles/typography';
-import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import {
   getJobs,
   getMyApplications,
@@ -36,7 +33,7 @@ import {
 } from '@/lib/api/jobs';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -57,14 +54,12 @@ function JobCard({
   item,
   primary,
   theme,
-  styles,
   t,
   onPress,
 }: {
   item: JobVacancy;
   primary: string;
-  theme: Theme;
-  styles: ReturnType<typeof makeStyles>;
+  theme: ReturnType<typeof useTheme>;
   t: (key: string, opts?: Record<string, unknown>) => string;
   onPress: () => void;
 }) {
@@ -106,65 +101,72 @@ function JobCard({
   const visibleSkills = (item.skills_required ?? []).slice(0, 3);
 
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.75} accessibilityRole="button" accessibilityLabel={item.title}>
+    <Pressable
+      className="bg-surface rounded-2xl p-4 mb-3 border border-border/50 gap-2"
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={item.title}
+    >
       {/* Featured badge */}
       {item.is_featured ? (
-        <View style={styles.featuredBadge}>
-          <Text style={styles.featuredText}>{t('card.featured')}</Text>
+        <View className="self-start rounded bg-warning/20 px-2 py-0.5">
+          <Text className="text-[11px] font-bold text-warning uppercase tracking-[0.4px]">
+            {t('card.featured')}
+          </Text>
         </View>
       ) : null}
 
       {/* Title row */}
-      <View style={styles.cardTitleRow}>
-        <Text style={styles.cardTitle} numberOfLines={2}>
+      <View className="flex-row items-start gap-2">
+        <Text className="flex-1 text-sm font-semibold text-foreground" numberOfLines={2}>
           {item.title}
         </Text>
-        <View style={[styles.typeBadge, { backgroundColor: typeColor + '22' }]}>
-          <Text style={[styles.typeBadgeText, { color: typeColor }]}>
+        <View style={{ backgroundColor: typeColor + '22' }} className="rounded px-2 py-0.5 self-start">
+          <Text style={{ color: typeColor }} className="text-[11px] font-semibold">
             {t(`filters.type.${item.type}`)}
           </Text>
         </View>
       </View>
 
       {/* Organisation / creator */}
-      <Text style={styles.cardOrg} numberOfLines={1}>
+      <Text className="text-xs text-muted-foreground" numberOfLines={1}>
         {displayName}
       </Text>
 
       {/* Meta row */}
-      <View style={styles.cardMeta}>
+      <View className="flex-row flex-wrap gap-2 items-center">
         {item.is_remote ? (
-          <View style={[styles.remoteBadge, { backgroundColor: withAlpha(primary, 0.10) }]}>
-            <Text style={[styles.remoteBadgeText, { color: primary }]}>
+          <View style={{ backgroundColor: withAlpha(primary, 0.10) }} className="rounded px-2 py-0.5">
+            <Text style={{ color: primary }} className="text-[11px] font-semibold">
               {t('card.remote')}
             </Text>
           </View>
         ) : item.location ? (
-          <View style={styles.metaItem}>
+          <View className="flex-row items-center gap-1">
             <Ionicons name="location-outline" size={13} color={theme.textMuted} />
-            <Text style={styles.metaText} numberOfLines={1}>
+            <Text className="text-[11px] text-muted-foreground" numberOfLines={1}>
               {item.location}
             </Text>
           </View>
         ) : null}
 
         {salaryStr ? (
-          <View style={styles.metaItem}>
+          <View className="flex-row items-center gap-1">
             <Ionicons name="cash-outline" size={13} color={theme.textMuted} />
-            <Text style={styles.metaText}>{salaryStr}</Text>
+            <Text className="text-[11px] text-muted-foreground">{salaryStr}</Text>
           </View>
         ) : null}
 
         {deadlineStr ? (
-          <View style={styles.metaItem}>
+          <View className="flex-row items-center gap-1">
             <Ionicons name="calendar-outline" size={13} color={theme.textMuted} />
-            <Text style={styles.metaText}>{deadlineStr}</Text>
+            <Text className="text-[11px] text-muted-foreground">{deadlineStr}</Text>
           </View>
         ) : null}
 
-        <View style={styles.metaItem}>
+        <View className="flex-row items-center gap-1">
           <Ionicons name="people-outline" size={13} color={theme.textMuted} />
-          <Text style={styles.metaText}>
+          <Text className="text-[11px] text-muted-foreground">
             {t('card.applications', { count: item.applications_count })}
           </Text>
         </View>
@@ -172,20 +174,20 @@ function JobCard({
 
       {/* Skills */}
       {visibleSkills.length > 0 ? (
-        <View style={styles.skillsRow}>
+        <View className="flex-row flex-wrap gap-1.5">
           {visibleSkills.map((skill) => (
-            <View key={skill} style={[styles.skillPill, { backgroundColor: theme.bg }]}>
-              <Text style={styles.skillText}>{skill}</Text>
+            <View key={skill} className="rounded px-2 py-0.5 border border-border bg-background">
+              <Text className="text-[11px] text-muted-foreground">{skill}</Text>
             </View>
           ))}
           {(item.skills_required ?? []).length > 3 ? (
-            <View style={[styles.skillPill, { backgroundColor: theme.bg }]}>
-              <Text style={styles.skillText}>+{item.skills_required.length - 3}</Text>
+            <View className="rounded px-2 py-0.5 border border-border bg-background">
+              <Text className="text-[11px] text-muted-foreground">+{item.skills_required.length - 3}</Text>
             </View>
           ) : null}
         </View>
       ) : null}
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 
@@ -196,7 +198,6 @@ function JobCard({
 function ApplicationCard({
   item,
   theme,
-  styles,
   t,
   primary,
   onInterviewAccepted,
@@ -205,8 +206,7 @@ function ApplicationCard({
   onOfferRejected,
 }: {
   item: JobApplication;
-  theme: Theme;
-  styles: ReturnType<typeof makeStyles>;
+  theme: ReturnType<typeof useTheme>;
   t: (key: string, opts?: Record<string, unknown>) => string;
   primary: string;
   onInterviewAccepted: (interviewId: number) => void;
@@ -243,36 +243,37 @@ function ApplicationCard({
   const offer = item.offer ?? null;
 
   return (
-    <View style={styles.appCard}>
-      <View style={styles.cardTitleRow}>
-        <Text style={styles.cardTitle} numberOfLines={2}>
+    <View className="bg-surface rounded-2xl p-4 mb-3 border border-border/50 gap-2">
+      <View className="flex-row items-start gap-2">
+        <Text className="flex-1 text-sm font-semibold text-foreground" numberOfLines={2}>
           {jobTitle}
         </Text>
-        <View style={[styles.typeBadge, { backgroundColor: color + '22' }]}>
-          <Text style={[styles.typeBadgeText, { color }]}>
+        <View style={{ backgroundColor: color + '22' }} className="rounded px-2 py-0.5 self-start">
+          <Text style={{ color }} className="text-[11px] font-semibold">
             {t(`applications.status.${item.status}`)}
           </Text>
         </View>
       </View>
       {orgName ? (
-        <Text style={styles.cardOrg} numberOfLines={1}>
+        <Text className="text-xs text-muted-foreground" numberOfLines={1}>
           {orgName}
         </Text>
       ) : null}
-      <View style={styles.metaItem}>
+      <View className="flex-row items-center gap-1">
         <Ionicons name="calendar-outline" size={13} color={theme.textMuted} />
-        <Text style={styles.metaText}>{appliedStr}</Text>
+        <Text className="text-[11px] text-muted-foreground">{appliedStr}</Text>
       </View>
 
       {/* Interview actions */}
       {interview?.status === 'proposed' ? (
-        <View style={{ marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: theme.border }}>
-          <Text style={{ fontSize: 12, fontWeight: '500', color: theme.textSecondary, marginBottom: 6 }}>
+        <View className="mt-2.5 pt-2.5 border-t border-border">
+          <Text className="text-xs font-medium text-muted-foreground mb-1.5">
             {t('applications.interview_proposed')}
           </Text>
-          <View style={{ flexDirection: 'row', gap: 8 }}>
-            <TouchableOpacity
-              style={{ paddingHorizontal: 12, paddingVertical: 7, borderRadius: 8, backgroundColor: primary }}
+          <View className="flex-row gap-2">
+            <Pressable
+              className="px-3 py-1.5 rounded-lg"
+              style={{ backgroundColor: primary }}
               disabled={actionLoading}
               onPress={async () => {
                 setActionLoading(true);
@@ -280,16 +281,15 @@ function ApplicationCard({
                 setActionLoading(false);
                 if (ok) onInterviewAccepted(interview.id);
               }}
-              activeOpacity={0.8}
               accessibilityRole="button"
               accessibilityLabel={t('applications.accept_interview')}
             >
-              <Text style={{ fontSize: 13, fontWeight: '600', color: '#fff' }}>{/* contrast on primary */}
+              <Text className="text-[13px] font-semibold text-white">{/* contrast on primary */}
                 {t('applications.accept_interview')}
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{ paddingHorizontal: 12, paddingVertical: 7, borderRadius: 8, backgroundColor: theme.surface, borderWidth: 1, borderColor: theme.border }}
+            </Pressable>
+            <Pressable
+              className="px-3 py-1.5 rounded-lg bg-surface border border-border"
               disabled={actionLoading}
               onPress={async () => {
                 setActionLoading(true);
@@ -297,20 +297,19 @@ function ApplicationCard({
                 setActionLoading(false);
                 if (ok) onInterviewDeclined(interview.id);
               }}
-              activeOpacity={0.8}
               accessibilityRole="button"
               accessibilityLabel={t('applications.decline_interview')}
             >
-              <Text style={{ fontSize: 13, fontWeight: '600', color: theme.error }}>
+              <Text className="text-[13px] font-semibold text-danger">
                 {t('applications.decline_interview')}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
       ) : interview?.status === 'accepted' ? (
-        <View style={{ marginTop: 8 }}>
-          <View style={[styles.typeBadge, { backgroundColor: theme.success + '22', alignSelf: 'flex-start' }]}>
-            <Text style={[styles.typeBadgeText, { color: theme.success }]}>
+        <View className="mt-2">
+          <View style={{ backgroundColor: theme.success + '22' }} className="rounded px-2 py-0.5 self-start">
+            <Text style={{ color: theme.success }} className="text-[11px] font-semibold">
               {t('applications.interview_confirmed')}
             </Text>
           </View>
@@ -319,13 +318,14 @@ function ApplicationCard({
 
       {/* Offer actions */}
       {offer?.status === 'pending' ? (
-        <View style={{ marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: theme.border }}>
-          <Text style={{ fontSize: 12, fontWeight: '500', color: theme.textSecondary, marginBottom: 6 }}>
+        <View className="mt-2.5 pt-2.5 border-t border-border">
+          <Text className="text-xs font-medium text-muted-foreground mb-1.5">
             {t('applications.offer_received')}
           </Text>
-          <View style={{ flexDirection: 'row', gap: 8 }}>
-            <TouchableOpacity
-              style={{ paddingHorizontal: 12, paddingVertical: 7, borderRadius: 8, backgroundColor: theme.success }}
+          <View className="flex-row gap-2">
+            <Pressable
+              className="px-3 py-1.5 rounded-lg"
+              style={{ backgroundColor: theme.success }}
               disabled={actionLoading}
               onPress={async () => {
                 setActionLoading(true);
@@ -333,16 +333,15 @@ function ApplicationCard({
                 setActionLoading(false);
                 if (ok) onOfferAccepted(offer.id);
               }}
-              activeOpacity={0.8}
               accessibilityRole="button"
               accessibilityLabel={t('applications.accept_offer')}
             >
-              <Text style={{ fontSize: 13, fontWeight: '600', color: '#fff' }}>{/* contrast on primary */}
+              <Text className="text-[13px] font-semibold text-white">{/* contrast on primary */}
                 {t('applications.accept_offer')}
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{ paddingHorizontal: 12, paddingVertical: 7, borderRadius: 8, backgroundColor: theme.surface, borderWidth: 1, borderColor: theme.border }}
+            </Pressable>
+            <Pressable
+              className="px-3 py-1.5 rounded-lg bg-surface border border-border"
               disabled={actionLoading}
               onPress={async () => {
                 setActionLoading(true);
@@ -350,20 +349,19 @@ function ApplicationCard({
                 setActionLoading(false);
                 if (ok) onOfferRejected(offer.id);
               }}
-              activeOpacity={0.8}
               accessibilityRole="button"
               accessibilityLabel={t('applications.decline_offer')}
             >
-              <Text style={{ fontSize: 13, fontWeight: '600', color: theme.error }}>
+              <Text className="text-[13px] font-semibold text-danger">
                 {t('applications.decline_offer')}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
       ) : offer?.status === 'accepted' ? (
-        <View style={{ marginTop: 8 }}>
-          <View style={[styles.typeBadge, { backgroundColor: theme.success + '22', alignSelf: 'flex-start' }]}>
-            <Text style={[styles.typeBadgeText, { color: theme.success }]}>
+        <View className="mt-2">
+          <View style={{ backgroundColor: theme.success + '22' }} className="rounded px-2 py-0.5 self-start">
+            <Text style={{ color: theme.success }} className="text-[11px] font-semibold">
               {t('applications.offer_accepted')}
             </Text>
           </View>
@@ -382,7 +380,6 @@ export default function JobsScreen() {
   const navigation = useNavigation();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   useEffect(() => {
     navigation.setOptions({ title: t('title') });
@@ -482,7 +479,6 @@ export default function JobsScreen() {
         item={item}
         primary={primary}
         theme={theme}
-        styles={styles}
         t={t}
         onPress={() => {
           void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -493,7 +489,7 @@ export default function JobsScreen() {
         }}
       />
     ),
-    [primary, theme, styles, t],
+    [primary, theme, t],
   );
 
   // Update an application's interview status locally (avoid full refresh)
@@ -523,7 +519,6 @@ export default function JobsScreen() {
       <ApplicationCard
         item={item}
         theme={theme}
-        styles={styles}
         t={t}
         primary={primary}
         onInterviewAccepted={handleInterviewAccepted}
@@ -532,53 +527,54 @@ export default function JobsScreen() {
         onOfferRejected={handleOfferRejected}
       />
     ),
-    [theme, styles, t, primary, handleInterviewAccepted, handleInterviewDeclined, handleOfferAccepted, handleOfferRejected],
+    [theme, t, primary, handleInterviewAccepted, handleInterviewDeclined, handleOfferAccepted, handleOfferRejected],
   );
 
   return (
     <ModalErrorBoundary>
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
       {/* Tab bar */}
-      <View style={styles.tabBar}>
-        <TouchableOpacity
-          style={[styles.tab, activeTab === 'browse' && { borderBottomColor: primary, borderBottomWidth: 2 }]}
+      <View className="flex-row border-b border-border/50 bg-surface">
+        <Pressable
+          className="flex-1 py-3 items-center border-b-2"
+          style={{ borderBottomColor: activeTab === 'browse' ? primary : 'transparent' }}
           onPress={() => setActiveTab('browse')}
           accessibilityRole="tab"
           accessibilityState={{ selected: activeTab === 'browse' }}
           accessibilityLabel={t('tabs.browse')}
         >
-          <Text style={[styles.tabText, activeTab === 'browse' && { color: primary }]}>
+          <Text
+            className="text-sm font-semibold"
+            style={{ color: activeTab === 'browse' ? primary : theme.textSecondary }}
+          >
             {t('tabs.browse')}
           </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.tab,
-            activeTab === 'myApplications' && { borderBottomColor: primary, borderBottomWidth: 2 },
-          ]}
+        </Pressable>
+        <Pressable
+          className="flex-1 py-3 items-center border-b-2"
+          style={{ borderBottomColor: activeTab === 'myApplications' ? primary : 'transparent' }}
           onPress={() => setActiveTab('myApplications')}
           accessibilityRole="tab"
           accessibilityState={{ selected: activeTab === 'myApplications' }}
           accessibilityLabel={t('tabs.myApplications')}
         >
-          <Text style={[styles.tabText, activeTab === 'myApplications' && { color: primary }]}>
+          <Text
+            className="text-sm font-semibold"
+            style={{ color: activeTab === 'myApplications' ? primary : theme.textSecondary }}
+          >
             {t('tabs.myApplications')}
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
 
       {activeTab === 'browse' ? (
         <>
           {/* Search bar */}
-          <View style={styles.searchBar}>
-            <Ionicons
-              name="search-outline"
-              size={18}
-              color={theme.textMuted}
-              style={styles.searchIcon}
-            />
+          <View className="flex-row items-center mx-4 my-3 px-3 h-[42px] bg-surface rounded-xl gap-2">
+            <Ionicons name="search-outline" size={18} color={theme.textMuted} />
             <TextInput
-              style={styles.searchInput}
+              className="flex-1 text-sm text-foreground py-0"
+              style={{ color: theme.text }}
               placeholder={t('search.placeholder')}
               placeholderTextColor={theme.textMuted}
               value={search}
@@ -590,14 +586,14 @@ export default function JobsScreen() {
               accessibilityLabel={t('search.placeholder')}
             />
             {search.length > 0 && (
-              <TouchableOpacity
+              <Pressable
                 onPress={handleClear}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 accessibilityLabel={t('common:actions.clear', 'Clear search')}
                 accessibilityRole="button"
               >
                 <Ionicons name="close-circle" size={18} color={theme.textMuted} />
-              </TouchableOpacity>
+              </Pressable>
             )}
           </View>
 
@@ -605,46 +601,40 @@ export default function JobsScreen() {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={styles.filtersScroll}
-            contentContainerStyle={styles.filtersContent}
+            contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 8, gap: 8, flexDirection: 'row', alignItems: 'center' }}
           >
             {JOB_TYPES.map((type) => (
-              <TouchableOpacity
+              <Pressable
                 key={type || 'all-type'}
-                style={[
-                  styles.filterChip,
-                  typeFilter === type && { backgroundColor: primary, borderColor: primary },
-                ]}
+                className="px-3 py-1 rounded-full border"
+                style={{
+                  backgroundColor: typeFilter === type ? primary : theme.surface,
+                  borderColor: typeFilter === type ? primary : theme.border,
+                }}
                 onPress={() => setTypeFilter(type)}
               >
                 <Text
-                  style={[
-                    styles.filterChipText,
-                    typeFilter === type && { color: '#fff' }, // contrast on primary
-                  ]}
+                  className="text-xs font-semibold"
+                  style={{ color: typeFilter === type ? '#fff' : theme.textSecondary }} // contrast on primary
                 >
                   {t(type ? `filters.type.${type}` : 'filters.type.all')}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             ))}
-            <View style={styles.filterDivider} />
+            <View className="w-px h-5 bg-border mx-1" />
             {COMMITMENT_TYPES.map((commitment) => (
-              <TouchableOpacity
+              <Pressable
                 key={commitment || 'all-commitment'}
-                style={[
-                  styles.filterChip,
-                  commitmentFilter === commitment && {
-                    backgroundColor: primary,
-                    borderColor: primary,
-                  },
-                ]}
+                className="px-3 py-1 rounded-full border"
+                style={{
+                  backgroundColor: commitmentFilter === commitment ? primary : theme.surface,
+                  borderColor: commitmentFilter === commitment ? primary : theme.border,
+                }}
                 onPress={() => setCommitmentFilter(commitment)}
               >
                 <Text
-                  style={[
-                    styles.filterChipText,
-                    commitmentFilter === commitment && { color: '#fff' }, // contrast on primary
-                  ]}
+                  className="text-xs font-semibold"
+                  style={{ color: commitmentFilter === commitment ? '#fff' : theme.textSecondary }} // contrast on primary
                 >
                   {t(
                     commitment
@@ -652,7 +642,7 @@ export default function JobsScreen() {
                       : 'filters.commitment.all',
                   )}
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             ))}
           </ScrollView>
 
@@ -673,11 +663,11 @@ export default function JobsScreen() {
               jobsLoading ? (
                 <LoadingSpinner />
               ) : jobsError ? (
-                <View style={styles.centered}>
-                  <Text style={styles.errorText}>{jobsError}</Text>
-                  <TouchableOpacity onPress={refreshJobs} style={styles.retryButton}>
-                    <Text style={[styles.retryText, { color: primary }]}>{t('retry', 'Retry')}</Text>
-                  </TouchableOpacity>
+                <View className="flex-1 justify-center items-center p-10">
+                  <Text className="text-sm text-danger text-center">{jobsError}</Text>
+                  <Pressable onPress={refreshJobs} className="mt-3">
+                    <Text style={{ color: primary }} className="text-sm font-semibold">{t('retry', 'Retry')}</Text>
+                  </Pressable>
                 </View>
               ) : (
                 <EmptyState
@@ -689,12 +679,12 @@ export default function JobsScreen() {
             }
             ListFooterComponent={
               jobsLoadingMore ? (
-                <View style={styles.footerLoader}>
+                <View className="py-4">
                   <LoadingSpinner />
                 </View>
               ) : null
             }
-            contentContainerStyle={styles.list}
+            contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: 32, paddingTop: 4 }}
           />
         </>
       ) : (
@@ -715,11 +705,11 @@ export default function JobsScreen() {
             appsLoading ? (
               <LoadingSpinner />
             ) : appsError ? (
-              <View style={styles.centered}>
-                <Text style={styles.errorText}>{appsError}</Text>
-                <TouchableOpacity onPress={refreshApps} style={styles.retryButton}>
-                  <Text style={[styles.retryText, { color: primary }]}>{t('retry', 'Retry')}</Text>
-                </TouchableOpacity>
+              <View className="flex-1 justify-center items-center p-10">
+                <Text className="text-sm text-danger text-center">{appsError}</Text>
+                <Pressable onPress={refreshApps} className="mt-3">
+                  <Text style={{ color: primary }} className="text-sm font-semibold">{t('retry', 'Retry')}</Text>
+                </Pressable>
               </View>
             ) : (
               <EmptyState
@@ -731,191 +721,15 @@ export default function JobsScreen() {
           }
           ListFooterComponent={
             appsLoadingMore ? (
-              <View style={styles.footerLoader}>
+              <View className="py-4">
                 <LoadingSpinner />
               </View>
             ) : null
           }
-          contentContainerStyle={styles.list}
+          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: 32, paddingTop: 4 }}
         />
       )}
     </SafeAreaView>
     </ModalErrorBoundary>
   );
-}
-
-// ---------------------------------------------------------------------------
-// Styles
-// ---------------------------------------------------------------------------
-
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.bg },
-    tabBar: {
-      flexDirection: 'row',
-      borderBottomWidth: 1,
-      borderBottomColor: theme.borderSubtle,
-      backgroundColor: theme.surface,
-    },
-    tab: {
-      flex: 1,
-      paddingVertical: 12,
-      alignItems: 'center',
-      borderBottomWidth: 2,
-      borderBottomColor: 'transparent',
-    },
-    tabText: {
-      ...TYPOGRAPHY.label,
-      fontWeight: '600',
-      color: theme.textSecondary,
-    },
-    searchBar: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginHorizontal: SPACING.md,
-      marginVertical: 12,
-      paddingHorizontal: 12,
-      height: 42,
-      backgroundColor: theme.surface,
-      borderRadius: RADIUS.md,
-      gap: SPACING.sm,
-    },
-    searchIcon: { flexShrink: 0 },
-    searchInput: {
-      flex: 1,
-      fontSize: TYPOGRAPHY.body.fontSize,
-      color: theme.text,
-      paddingVertical: 0,
-    },
-    filtersScroll: { flexShrink: 0 },
-    filtersContent: {
-      paddingHorizontal: SPACING.md,
-      paddingBottom: RADIUS.md,
-      gap: SPACING.sm,
-      flexDirection: 'row',
-      alignItems: 'center',
-    },
-    filterChip: {
-      paddingHorizontal: 12,
-      paddingVertical: RADIUS.sm,
-      borderRadius: RADIUS.xl,
-      borderWidth: 1,
-      borderColor: theme.border,
-      backgroundColor: theme.surface,
-    },
-    filterChipText: {
-      ...TYPOGRAPHY.caption,
-      fontWeight: '600',
-      color: theme.textSecondary,
-    },
-    filterDivider: {
-      width: 1,
-      height: 20,
-      backgroundColor: theme.border,
-      marginHorizontal: 4,
-    },
-    list: { flexGrow: 1, paddingHorizontal: SPACING.md, paddingBottom: SPACING.xl, paddingTop: 4 },
-    card: {
-      backgroundColor: theme.surface,
-      borderRadius: RADIUS.lg,
-      padding: RADIUS.lg,
-      marginBottom: 12,
-      borderWidth: 1,
-      borderColor: theme.borderSubtle,
-      gap: SPACING.sm,
-    },
-    appCard: {
-      backgroundColor: theme.surface,
-      borderRadius: RADIUS.lg,
-      padding: RADIUS.lg,
-      marginBottom: 12,
-      borderWidth: 1,
-      borderColor: theme.borderSubtle,
-      gap: SPACING.sm,
-    },
-    featuredBadge: {
-      alignSelf: 'flex-start',
-      backgroundColor: theme.warning + '33',
-      borderRadius: RADIUS.sm,
-      paddingHorizontal: SPACING.sm,
-      paddingVertical: 3,
-    },
-    featuredText: {
-      fontSize: 11,
-      fontWeight: '700',
-      color: theme.warning,
-      textTransform: 'uppercase',
-      letterSpacing: 0.4,
-    },
-    cardTitleRow: {
-      flexDirection: 'row',
-      alignItems: 'flex-start',
-      gap: 8,
-    },
-    cardTitle: {
-      flex: 1,
-      ...TYPOGRAPHY.body,
-      fontWeight: '600',
-      color: theme.text,
-    },
-    typeBadge: {
-      borderRadius: RADIUS.sm,
-      paddingHorizontal: SPACING.sm,
-      paddingVertical: 3,
-      alignSelf: 'flex-start',
-    },
-    typeBadgeText: {
-      fontSize: 11,
-      fontWeight: '600',
-    },
-    cardOrg: {
-      ...TYPOGRAPHY.bodySmall,
-      color: theme.textSecondary,
-    },
-    cardMeta: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: 8,
-      alignItems: 'center',
-    },
-    remoteBadge: {
-      borderRadius: RADIUS.sm,
-      paddingHorizontal: SPACING.sm,
-      paddingVertical: 3,
-    },
-    remoteBadgeText: {
-      fontSize: 11,
-      fontWeight: '600',
-    },
-    metaItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 4,
-    },
-    metaText: {
-      ...TYPOGRAPHY.caption,
-      color: theme.textMuted,
-    },
-    skillsRow: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: 6,
-    },
-    skillPill: {
-      borderRadius: RADIUS.sm,
-      paddingHorizontal: SPACING.sm,
-      paddingVertical: 3,
-      borderWidth: 1,
-      borderColor: theme.border,
-    },
-    skillText: {
-      fontSize: 11,
-      color: theme.textSecondary,
-    },
-    centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 },
-    errorText: { ...TYPOGRAPHY.label, color: theme.error, textAlign: 'center' },
-    retryButton: { marginTop: 12 },
-    retryText: { ...TYPOGRAPHY.body, fontWeight: '600' },
-    footerLoader: { paddingVertical: SPACING.md },
-  });
 }

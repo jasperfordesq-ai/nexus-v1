@@ -3,15 +3,14 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   FlatList,
   View,
   Text,
   TextInput,
-  TouchableOpacity,
+  Pressable,
   RefreshControl,
-  StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useNavigation } from 'expo-router';
@@ -26,10 +25,8 @@ import {
 } from '@/lib/api/volunteering';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
-import { TYPOGRAPHY } from '@/lib/styles/typography';
-import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
@@ -42,14 +39,12 @@ function OpportunityCard({
   item,
   primary,
   theme,
-  styles,
   t,
   onPress,
 }: {
   item: VolunteerOpportunity;
   primary: string;
-  theme: Theme;
-  styles: ReturnType<typeof makeStyles>;
+  theme: ReturnType<typeof useTheme>;
   t: (key: string, opts?: Record<string, unknown>) => string;
   onPress: () => void;
 }) {
@@ -67,12 +62,17 @@ function OpportunityCard({
   const visibleSkills = (item.skills_needed ?? []).slice(0, 3);
 
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.75} accessibilityRole="button" accessibilityLabel={item.title}>
+    <Pressable
+      className="bg-surface rounded-2xl p-4 mb-3 border border-border/50 gap-2"
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={item.title}
+    >
       {/* Title row */}
-      <View style={styles.cardTitleRow}>
-        <Text style={styles.cardTitle} numberOfLines={2}>{item.title}</Text>
-        <View style={[styles.statusBadge, { backgroundColor: statusColor + '22' }]}>
-          <Text style={[styles.statusText, { color: statusColor }]}>
+      <View className="flex-row items-start gap-2">
+        <Text className="flex-1 text-sm font-semibold text-foreground" numberOfLines={2}>{item.title}</Text>
+        <View style={{ backgroundColor: statusColor + '22' }} className="rounded px-2 py-0.5 self-start">
+          <Text style={{ color: statusColor }} className="text-[11px] font-semibold">
             {t(`status.${item.status}`)}
           </Text>
         </View>
@@ -80,53 +80,53 @@ function OpportunityCard({
 
       {/* Organisation */}
       {item.organisation ? (
-        <Text style={styles.cardOrg} numberOfLines={1}>{item.organisation.name}</Text>
+        <Text className="text-xs text-muted-foreground" numberOfLines={1}>{item.organisation.name}</Text>
       ) : null}
 
       {/* Meta row: location / remote, hours */}
-      <View style={styles.cardMeta}>
+      <View className="flex-row flex-wrap gap-2 items-center">
         {item.is_remote ? (
-          <View style={[styles.remoteBadge, { backgroundColor: withAlpha(primary, 0.10) }]}>
-            <Text style={[styles.remoteBadgeText, { color: primary }]}>{t('remote')}</Text>
+          <View style={{ backgroundColor: withAlpha(primary, 0.10) }} className="rounded px-2 py-0.5">
+            <Text style={{ color: primary }} className="text-[11px] font-semibold">{t('remote')}</Text>
           </View>
         ) : item.location ? (
-          <View style={styles.metaItem}>
+          <View className="flex-row items-center gap-1">
             <Ionicons name="location-outline" size={13} color={theme.textMuted} />
-            <Text style={styles.metaText} numberOfLines={1}>{item.location}</Text>
+            <Text className="text-[11px] text-muted-foreground" numberOfLines={1}>{item.location}</Text>
           </View>
         ) : null}
 
         {item.hours_per_week !== null ? (
-          <View style={styles.metaItem}>
+          <View className="flex-row items-center gap-1">
             <Ionicons name="time-outline" size={13} color={theme.textMuted} />
-            <Text style={styles.metaText}>{t('hoursPerWeek', { hours: item.hours_per_week })}</Text>
+            <Text className="text-[11px] text-muted-foreground">{t('hoursPerWeek', { hours: item.hours_per_week })}</Text>
           </View>
         ) : null}
 
         {deadlineStr ? (
-          <View style={styles.metaItem}>
+          <View className="flex-row items-center gap-1">
             <Ionicons name="calendar-outline" size={13} color={theme.textMuted} />
-            <Text style={styles.metaText}>{deadlineStr}</Text>
+            <Text className="text-[11px] text-muted-foreground">{deadlineStr}</Text>
           </View>
         ) : null}
       </View>
 
       {/* Skills */}
       {visibleSkills.length > 0 ? (
-        <View style={styles.skillsRow}>
+        <View className="flex-row flex-wrap gap-1.5">
           {visibleSkills.map((skill) => (
-            <View key={skill} style={[styles.skillPill, { backgroundColor: theme.bg }]}>
-              <Text style={styles.skillText}>{skill}</Text>
+            <View key={skill} className="rounded px-2 py-0.5 border border-border bg-background">
+              <Text className="text-[11px] text-muted-foreground">{skill}</Text>
             </View>
           ))}
           {(item.skills_needed ?? []).length > 3 ? (
-            <View style={[styles.skillPill, { backgroundColor: theme.bg }]}>
-              <Text style={styles.skillText}>+{item.skills_needed.length - 3}</Text>
+            <View className="rounded px-2 py-0.5 border border-border bg-background">
+              <Text className="text-[11px] text-muted-foreground">+{item.skills_needed.length - 3}</Text>
             </View>
           ) : null}
         </View>
       ) : null}
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 
@@ -139,7 +139,6 @@ export default function VolunteeringScreen() {
   const navigation = useNavigation();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   useEffect(() => {
     navigation.setOptions({ title: t('title') });
@@ -193,7 +192,6 @@ export default function VolunteeringScreen() {
         item={item}
         primary={primary}
         theme={theme}
-        styles={styles}
         t={t}
         onPress={() => {
           void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -204,17 +202,18 @@ export default function VolunteeringScreen() {
         }}
       />
     ),
-    [primary, theme, styles, t],
+    [primary, theme, t],
   );
 
   return (
     <ModalErrorBoundary>
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
       {/* Search bar */}
-      <View style={styles.searchBar}>
-        <Ionicons name="search-outline" size={18} color={theme.textMuted} style={styles.searchIcon} />
+      <View className="flex-row items-center mx-4 my-3 px-3 h-[42px] bg-surface rounded-xl gap-2">
+        <Ionicons name="search-outline" size={18} color={theme.textMuted} />
         <TextInput
-          style={styles.searchInput}
+          className="flex-1 text-sm py-0"
+          style={{ color: theme.text }}
           placeholder={t('searchPlaceholder')}
           placeholderTextColor={theme.textMuted}
           value={search}
@@ -226,9 +225,14 @@ export default function VolunteeringScreen() {
           accessibilityLabel={t('searchPlaceholder')}
         />
         {search.length > 0 && (
-          <TouchableOpacity onPress={handleClear} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} accessibilityLabel={t('common:actions.clear', 'Clear search')} accessibilityRole="button">
+          <Pressable
+            onPress={handleClear}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            accessibilityLabel={t('common:actions.clear', 'Clear search')}
+            accessibilityRole="button"
+          >
             <Ionicons name="close-circle" size={18} color={theme.textMuted} />
-          </TouchableOpacity>
+          </Pressable>
         )}
       </View>
 
@@ -249,11 +253,11 @@ export default function VolunteeringScreen() {
           isLoading ? (
             <LoadingSpinner />
           ) : error ? (
-            <View style={styles.centered}>
-              <Text style={styles.errorText}>{error}</Text>
-              <TouchableOpacity onPress={refresh} style={styles.retryButton}>
-                <Text style={[styles.retryText, { color: primary }]}>{t('common:actions.retry', 'Retry')}</Text>
-              </TouchableOpacity>
+            <View className="flex-1 justify-center items-center p-10">
+              <Text className="text-sm text-danger text-center">{error}</Text>
+              <Pressable onPress={refresh} className="mt-3">
+                <Text style={{ color: primary }} className="text-sm font-semibold">{t('common:actions.retry', 'Retry')}</Text>
+              </Pressable>
             </View>
           ) : (
             <EmptyState
@@ -264,122 +268,14 @@ export default function VolunteeringScreen() {
         }
         ListFooterComponent={
           isLoadingMore ? (
-            <View style={styles.footerLoader}>
+            <View className="py-4">
               <LoadingSpinner />
             </View>
           ) : null
         }
-        contentContainerStyle={styles.list}
+        contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: 32 }}
       />
     </SafeAreaView>
     </ModalErrorBoundary>
   );
-}
-
-// ---------------------------------------------------------------------------
-// Styles
-// ---------------------------------------------------------------------------
-
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.bg },
-    searchBar: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginHorizontal: SPACING.md,
-      marginVertical: SPACING.sm + 4,
-      paddingHorizontal: SPACING.sm + 4,
-      height: 42,
-      backgroundColor: theme.surface,
-      borderRadius: RADIUS.md,
-      gap: SPACING.sm,
-    },
-    searchIcon: { flexShrink: 0 },
-    searchInput: {
-      flex: 1,
-      ...TYPOGRAPHY.body,
-      color: theme.text,
-      paddingVertical: 0,
-    },
-    list: { flexGrow: 1, paddingHorizontal: SPACING.md, paddingBottom: SPACING.xl },
-    card: {
-      backgroundColor: theme.surface,
-      borderRadius: RADIUS.lg,
-      padding: RADIUS.lg,
-      marginBottom: SPACING.sm + 4,
-      borderWidth: 1,
-      borderColor: theme.borderSubtle,
-      gap: SPACING.sm,
-    },
-    cardTitleRow: {
-      flexDirection: 'row',
-      alignItems: 'flex-start',
-      gap: SPACING.sm,
-    },
-    cardTitle: {
-      flex: 1,
-      ...TYPOGRAPHY.body,
-      fontWeight: '600',
-      color: theme.text,
-    },
-    statusBadge: {
-      borderRadius: RADIUS.sm,
-      paddingHorizontal: SPACING.sm,
-      paddingVertical: 3,
-      alignSelf: 'flex-start',
-    },
-    statusText: {
-      fontSize: 11,
-      fontWeight: '600',
-    },
-    cardOrg: {
-      ...TYPOGRAPHY.bodySmall,
-      color: theme.textSecondary,
-    },
-    cardMeta: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: SPACING.sm,
-      alignItems: 'center',
-    },
-    remoteBadge: {
-      borderRadius: RADIUS.sm,
-      paddingHorizontal: SPACING.sm,
-      paddingVertical: 3,
-    },
-    remoteBadgeText: {
-      fontSize: 11,
-      fontWeight: '600',
-    },
-    metaItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: SPACING.xs,
-    },
-    metaText: {
-      ...TYPOGRAPHY.caption,
-      color: theme.textMuted,
-    },
-    skillsRow: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: SPACING.sm - 2,
-    },
-    skillPill: {
-      borderRadius: RADIUS.sm,
-      paddingHorizontal: SPACING.sm,
-      paddingVertical: 3,
-      borderWidth: 1,
-      borderColor: theme.border,
-    },
-    skillText: {
-      fontSize: 11,
-      color: theme.textSecondary,
-    },
-    centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 },
-    errorText: { color: theme.error, ...TYPOGRAPHY.label, textAlign: 'center' },
-    retryButton: { marginTop: SPACING.sm + 4 },
-    retryText: { ...TYPOGRAPHY.button },
-    footerLoader: { paddingVertical: SPACING.md },
-  });
 }

@@ -3,26 +3,23 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigation } from 'expo-router';
 import {
   View,
   Text,
   FlatList,
   RefreshControl,
-  StyleSheet,
-  ActivityIndicator,
-  TouchableOpacity,
+  Pressable,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
+import { Spinner } from 'heroui-native';
 
-import { TYPOGRAPHY } from '@/lib/styles/typography';
-import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { useTheme } from '@/lib/hooks/useTheme';
 import { getWalletBalance, getWalletTransactions, type TransactionItem } from '@/lib/api/wallet';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
@@ -48,25 +45,22 @@ function TransactionRow({
   item,
   primary,
   theme,
-  styles,
   t,
 }: {
   item: TransactionItem;
   primary: string;
-  theme: Theme;
-  styles: ReturnType<typeof makeStyles>;
+  theme: ReturnType<typeof useTheme>;
   t: (key: string, opts?: Record<string, unknown>) => string;
 }) {
   const isCredit = item.type === 'credit';
-  const sign = isCredit ? '+' : '\u2212';
+  const sign = isCredit ? '+' : '−';
   const amountColor = isCredit ? theme.success : theme.error;
   const otherName = item.other_user?.name ?? t('system');
   const otherAvatar = item.other_user?.avatar_url ?? null;
 
   return (
-    <TouchableOpacity
-      style={styles.row}
-      activeOpacity={0.8}
+    <Pressable
+      className="flex-row items-start py-4 px-1 bg-surface rounded-xl"
       onPress={() => void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
       accessibilityRole="button"
       accessibilityLabel={`${otherName}, ${sign}${(item.amount ?? 0).toFixed(1)} ${t('hrs')}`}
@@ -77,31 +71,31 @@ function TransactionRow({
         size={44}
       />
 
-      <View style={styles.rowBody}>
-        <Text style={styles.rowName} numberOfLines={1}>
+      <View className="flex-1 ml-3 mr-2">
+        <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
           {otherName}
         </Text>
         {item.description ? (
-          <Text style={styles.rowDesc} numberOfLines={2}>
+          <Text className="text-xs text-muted-foreground mt-0.5" numberOfLines={2}>
             {item.description}
           </Text>
         ) : null}
-        <Text style={styles.rowDate}>{formatDate(item.created_at)}</Text>
+        <Text className="text-[11px] text-muted-foreground mt-1">{formatDate(item.created_at)}</Text>
       </View>
 
-      <View style={styles.rowRight}>
-        <Text style={[styles.rowAmount, { color: amountColor }]}>
+      <View className="items-end justify-center min-w-[72px]">
+        <Text style={{ color: amountColor }} className="text-base font-bold">
           {sign}{(item.amount ?? 0).toFixed(1)} {t('hrs')}
         </Text>
         {item.status !== 'completed' && (
-          <View style={[styles.statusBadge, { borderColor: primary }]}>
-            <Text style={[styles.statusText, { color: primary }]}>
+          <View style={{ borderColor: primary }} className="border rounded px-1 py-0.5 mt-1">
+            <Text style={{ color: primary }} className="text-[11px] font-semibold capitalize">
               {t(`status.${item.status}`, { defaultValue: item.status })}
             </Text>
           </View>
         )}
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 
@@ -120,12 +114,12 @@ function WalletModalInner() {
   const navigation = useNavigation();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   useEffect(() => {
     navigation.setOptions({ title: t('title') });
   }, [navigation, t]);
-  const Separator = useCallback(() => <View style={styles.separator} />, [styles]);
+
+  const Separator = useCallback(() => <View className="h-2" />, []);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const {
@@ -159,24 +153,27 @@ function WalletModalInner() {
   }, [refreshBalance, refreshTx]);
 
   const ListHeader = (
-    <View style={[styles.balanceCard, { borderColor: primary }]}>
+    <View
+      className="border-2 rounded-2xl py-7 px-6 items-center bg-surface mt-5 mb-5"
+      style={{ borderColor: primary }}
+    >
       {balanceLoading && balance === null ? (
-        <ActivityIndicator color={primary} />
+        <Spinner size="sm" />
       ) : (
         <>
-          <Text style={[styles.balanceValue, { color: primary }]}>
-            {balance !== null ? (Number(balance) || 0).toFixed(1) : '\u2014'}
+          <Text style={{ color: primary }} className="text-5xl font-bold leading-[56px]">
+            {balance !== null ? (Number(balance) || 0).toFixed(1) : '—'}
           </Text>
-          <Text style={styles.balanceLabel}>{t('timeCredits')}</Text>
+          <Text className="text-sm text-muted-foreground mt-1">{t('timeCredits')}</Text>
         </>
       )}
     </View>
   );
 
   const ListEmpty = txLoading ? null : (
-    <View style={styles.emptyWrap}>
+    <View className="pt-16 items-center">
       {txError ? (
-        <Text style={styles.errorText}>{txError}</Text>
+        <Text className="text-sm text-danger text-center">{txError}</Text>
       ) : (
         <EmptyState
           icon="wallet-outline"
@@ -187,17 +184,17 @@ function WalletModalInner() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-background">
       <FlatList<TransactionItem>
         data={transactions}
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => (
-          <TransactionRow item={item} primary={primary} theme={theme} styles={styles} t={t} />
+          <TransactionRow item={item} primary={primary} theme={theme} t={t} />
         )}
         ListHeaderComponent={ListHeader}
         ListEmptyComponent={ListEmpty}
         ItemSeparatorComponent={Separator}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32 }}
         refreshControl={
           <RefreshControl
             refreshing={isRefreshing || isLoading}
@@ -209,48 +206,4 @@ function WalletModalInner() {
       />
     </SafeAreaView>
   );
-}
-
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.bg },
-    listContent: { paddingHorizontal: SPACING.md, paddingBottom: SPACING.xl },
-    balanceCard: {
-      borderWidth: 2,
-      borderRadius: SPACING.md,
-      paddingVertical: 28,
-      paddingHorizontal: SPACING.lg,
-      alignItems: 'center',
-      backgroundColor: theme.surface,
-      marginTop: 20,
-      marginBottom: SPACING.lg,
-    },
-    balanceValue: { fontSize: 48, fontWeight: '700', lineHeight: 56 },
-    balanceLabel: { ...TYPOGRAPHY.label, color: theme.textSecondary, marginTop: 4 },
-    row: {
-      flexDirection: 'row',
-      alignItems: 'flex-start',
-      paddingVertical: RADIUS.lg,
-      paddingHorizontal: 4,
-      backgroundColor: theme.surface,
-      borderRadius: 12,
-    },
-    rowBody: { flex: 1, marginLeft: 12, marginRight: SPACING.sm },
-    rowName: { ...TYPOGRAPHY.body, fontWeight: '600', color: theme.text },
-    rowDesc: { ...TYPOGRAPHY.bodySmall, color: theme.textSecondary, marginTop: 2 },
-    rowDate: { ...TYPOGRAPHY.caption, color: theme.textMuted, marginTop: 4 },
-    rowRight: { alignItems: 'flex-end', justifyContent: 'center', minWidth: 72 },
-    rowAmount: { fontSize: 16, fontWeight: '700' },
-    statusBadge: {
-      borderWidth: 1,
-      borderRadius: 4,
-      paddingHorizontal: RADIUS.sm,
-      paddingVertical: 2,
-      marginTop: 4,
-    },
-    statusText: { ...TYPOGRAPHY.badge, fontWeight: '600', textTransform: 'capitalize' },
-    separator: { height: SPACING.sm },
-    emptyWrap: { paddingTop: SPACING.xxl, alignItems: 'center' },
-    errorText: { ...TYPOGRAPHY.label, color: theme.error, textAlign: 'center' },
-  });
 }

@@ -3,16 +3,14 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
   ScrollView,
-  StyleSheet,
-  TouchableOpacity,
+  Pressable,
   Alert,
   RefreshControl,
-  ActivityIndicator,
   Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -20,13 +18,12 @@ import { useLocalSearchParams, router, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
+import { Spinner } from 'heroui-native';
 
-import { TYPOGRAPHY } from '@/lib/styles/typography';
-import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import { getGroup, joinGroup, leaveGroup } from '@/lib/api/groups';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -48,7 +45,6 @@ function GroupDetailScreenInner() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   useEffect(() => {
     navigation.setOptions({ title: t('detail.title') });
@@ -105,20 +101,20 @@ function GroupDetailScreenInner() {
 
   if (isNaN(groupId) || groupId <= 0) {
     return (
-      <SafeAreaView style={styles.center} edges={['bottom']}>
-        <Text style={styles.errorText}>{t('detail.invalidId')}</Text>
-        <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
+      <SafeAreaView className="flex-1 items-center justify-center" edges={['bottom']}>
+        <Text className="text-sm text-muted-foreground">{t('detail.invalidId')}</Text>
+        <Pressable onPress={() => router.back()} style={{ marginTop: 12 }}>
           <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>
             {t('detail.goBack')}
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </SafeAreaView>
     );
   }
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.center} edges={['bottom']}>
+      <SafeAreaView className="flex-1 items-center justify-center" edges={['bottom']}>
         <LoadingSpinner />
       </SafeAreaView>
     );
@@ -126,13 +122,13 @@ function GroupDetailScreenInner() {
 
   if (!group) {
     return (
-      <SafeAreaView style={styles.center} edges={['bottom']}>
-        <Text style={styles.errorText}>{t('detail.notFound')}</Text>
-        <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
+      <SafeAreaView className="flex-1 items-center justify-center" edges={['bottom']}>
+        <Text className="text-sm text-muted-foreground">{t('detail.notFound')}</Text>
+        <Pressable onPress={() => router.back()} style={{ marginTop: 12 }}>
           <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>
             {t('detail.goBack')}
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </SafeAreaView>
     );
   }
@@ -193,9 +189,9 @@ function GroupDetailScreenInner() {
   const displayDescription = group.long_description ?? group.description;
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={{ padding: 20, paddingBottom: 48 }}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -206,100 +202,102 @@ function GroupDetailScreenInner() {
         }
       >
         {/* Title row */}
-        <View style={styles.titleRow}>
-          <Text style={styles.title}>{group.name}</Text>
-          <TouchableOpacity
+        <View className="flex-row items-start gap-[10px] mb-2 flex-wrap">
+          <Text className="flex-1 text-xl font-bold text-foreground">{group.name}</Text>
+          <Pressable
             onPress={() => void handleShare()}
             style={{ padding: 4 }}
-            activeOpacity={0.7}
             accessibilityLabel={t('detail.share')}
             accessibilityRole="button"
           >
             <Ionicons name="share-outline" size={22} color={primary} />
-          </TouchableOpacity>
+          </Pressable>
           {group.is_featured && (
-            <View style={[styles.badge, { backgroundColor: withAlpha(primary, 0.13) }]}>
-              <Text style={[styles.badgeText, { color: primary }]}>{t('featured')}</Text>
+            <View
+              className="self-start rounded-lg px-[10px] py-1 mt-0.5"
+              style={{ backgroundColor: withAlpha(primary, 0.13) }}
+            >
+              <Text className="text-xs font-semibold" style={{ color: primary }}>{t('featured')}</Text>
             </View>
           )}
         </View>
 
         {/* Visibility badge */}
-        <View style={styles.visibilityRow}>
+        <View className="flex-row items-center gap-[5px] mb-4">
           <Ionicons
             name={group.visibility === 'private' ? 'lock-closed-outline' : 'globe-outline'}
             size={14}
             color={theme.textSecondary}
           />
-          <Text style={styles.visibilityText}>
+          <Text className="text-xs text-muted-foreground">
             {group.visibility === 'private' ? t('private') : t('public')}
           </Text>
         </View>
 
         {/* Stats row */}
-        <View style={styles.statsRow}>
-          <View style={styles.statItem}>
+        <View className="flex-row items-center bg-surface rounded-xl p-4 border border-border/50 mb-4">
+          <View className="flex-1 flex-row items-center gap-[6px] justify-center">
             <Ionicons name="people-outline" size={15} color={theme.textSecondary} />
-            <Text style={styles.statText}>
+            <Text className="text-sm font-medium text-muted-foreground">
               {t('members', { count: currentMemberCount })}
             </Text>
           </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
+          <View className="w-px h-5 bg-border" />
+          <View className="flex-1 flex-row items-center gap-[6px] justify-center">
             <Ionicons name="document-text-outline" size={15} color={theme.textSecondary} />
-            <Text style={styles.statText}>
+            <Text className="text-sm font-medium text-muted-foreground">
               {t('posts', { count: group.posts_count ?? 0 })}
             </Text>
           </View>
         </View>
 
         {/* Join / Leave button */}
-        <TouchableOpacity
+        <Pressable
+          className="rounded-xl py-[13px] items-center justify-center mb-6 min-h-[46px]"
           style={[
-            styles.memberBtn,
             currentIsMember
               ? { backgroundColor: theme.surface, borderColor: theme.border, borderWidth: 1 }
               : { backgroundColor: primary },
-            isUpdating && styles.memberBtnDisabled,
+            isUpdating ? { opacity: 0.5 } : undefined,
           ]}
           onPress={currentIsMember ? () => void handleLeave() : () => void handleJoin()}
           disabled={isUpdating}
-          activeOpacity={0.8}
           accessibilityRole="button"
           accessibilityLabel={currentIsMember ? t('leave') : t('join')}
         >
           {isUpdating ? (
-            <ActivityIndicator
-              color={currentIsMember ? theme.text : '#fff'} // contrast on primary
-              size="small"
-            />
+            <Spinner size="sm" />
           ) : (
             <Text
-              style={[
-                styles.memberBtnText,
-                { color: currentIsMember ? theme.text : '#fff' }, // contrast on primary
-              ]}
+              className="text-sm font-bold"
+              style={{ color: currentIsMember ? theme.text : '#fff' }}
             >
               {currentIsMember ? t('leave') : t('join')}
             </Text>
           )}
-        </TouchableOpacity>
+        </Pressable>
 
         {/* Description */}
         {displayDescription ? (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('detail.about')}</Text>
-            <Text style={styles.description}>{displayDescription}</Text>
+          <View className="mb-6">
+            <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-[10px]">
+              {t('detail.about')}
+            </Text>
+            <Text className="text-sm text-foreground">{displayDescription}</Text>
           </View>
         ) : null}
 
         {/* Tags */}
         {group.tags && group.tags.length > 0 ? (
-          <View style={styles.section}>
-            <View style={styles.tagsRow}>
+          <View className="mb-6">
+            <View className="flex-row flex-wrap gap-2">
               {group.tags.map((tag) => (
-                <View key={tag} style={[styles.tagPill, { backgroundColor: theme.surface, borderColor: theme.border }]}>
-                  <Text style={[styles.tagText, { color: theme.textSecondary }]}>{tag}</Text>
+                <View
+                  key={tag}
+                  className="rounded-full border px-3 py-[5px]"
+                  style={{ backgroundColor: theme.surface, borderColor: theme.border }}
+                >
+                  <Text className="text-xs font-medium text-muted-foreground">{tag}</Text>
                 </View>
               ))}
             </View>
@@ -308,90 +306,19 @@ function GroupDetailScreenInner() {
 
         {/* Admin */}
         {group.admin ? (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('detail.members')}</Text>
-            <View style={styles.adminRow}>
+          <View className="mb-6">
+            <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-[10px]">
+              {t('detail.members')}
+            </Text>
+            <View className="flex-row items-center gap-3">
               <Avatar uri={group.admin.avatar_url ?? undefined} name={group.admin.name ?? '?'} size={36} />
-              <Text style={styles.adminName}>{group.admin.name ?? t('common:unknown')}</Text>
+              <Text className="text-sm font-semibold text-foreground">
+                {group.admin.name ?? t('common:unknown')}
+              </Text>
             </View>
           </View>
         ) : null}
       </ScrollView>
     </SafeAreaView>
   );
-}
-
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.bg },
-    center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    content: { padding: 20, paddingBottom: 48 },
-    titleRow: {
-      flexDirection: 'row',
-      alignItems: 'flex-start',
-      gap: 10,
-      marginBottom: 8,
-      flexWrap: 'wrap',
-    },
-    title: { flex: 1, ...TYPOGRAPHY.h2, color: theme.text },
-    badge: {
-      alignSelf: 'flex-start',
-      borderRadius: SPACING.sm,
-      paddingHorizontal: 10,
-      paddingVertical: 4,
-      marginTop: 2,
-    },
-    badgeText: { ...TYPOGRAPHY.caption, fontWeight: '600' },
-    visibilityRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 5,
-      marginBottom: SPACING.md,
-    },
-    visibilityText: { ...TYPOGRAPHY.bodySmall, color: theme.textSecondary },
-    statsRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: theme.surface,
-      borderRadius: RADIUS.lg,
-      padding: RADIUS.lg,
-      borderWidth: 1,
-      borderColor: theme.borderSubtle,
-      marginBottom: SPACING.md,
-    },
-    statItem: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 6, justifyContent: 'center' },
-    statText: { ...TYPOGRAPHY.label, color: theme.textSecondary },
-    statDivider: { width: 1, height: 20, backgroundColor: theme.border },
-    memberBtn: {
-      borderRadius: 12,
-      paddingVertical: 13,
-      alignItems: 'center',
-      justifyContent: 'center',
-      marginBottom: 24,
-      minHeight: 46,
-    },
-    memberBtnDisabled: { opacity: 0.5 },
-    memberBtnText: { ...TYPOGRAPHY.body, fontWeight: '700' },
-    section: { marginBottom: SPACING.lg },
-    sectionTitle: {
-      ...TYPOGRAPHY.caption,
-      fontWeight: '700',
-      color: theme.textSecondary,
-      textTransform: 'uppercase',
-      letterSpacing: 0.6,
-      marginBottom: 10,
-    },
-    description: { ...TYPOGRAPHY.body, color: theme.text },
-    tagsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
-    tagPill: {
-      borderRadius: RADIUS.xl,
-      borderWidth: 1,
-      paddingHorizontal: 12,
-      paddingVertical: 5,
-    },
-    tagText: { ...TYPOGRAPHY.bodySmall, fontWeight: '500' },
-    adminRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-    adminName: { ...TYPOGRAPHY.body, fontWeight: '600', color: theme.text },
-    errorText: { ...TYPOGRAPHY.body, color: theme.textMuted },
-  });
 }

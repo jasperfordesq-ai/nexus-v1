@@ -3,27 +3,26 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
   TextInput,
-  TouchableOpacity,
-  ActivityIndicator,
+  Pressable,
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useNavigation } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
+import { Spinner } from 'heroui-native';
 
 import { createExchange, type ExchangeType } from '@/lib/api/exchanges';
 import { ApiResponseError, api } from '@/lib/api/client';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import { useApi } from '@/lib/hooks/useApi';
 import { API_V2 } from '@/lib/constants';
@@ -49,7 +48,6 @@ export default function NewExchangeModal() {
   const navigation = useNavigation();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   useEffect(() => {
     navigation.setOptions({ title: t('newExchange') });
@@ -112,43 +110,45 @@ export default function NewExchangeModal() {
 
   return (
     <ModalErrorBoundary>
-    <SafeAreaView style={styles.flex} edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-surface" edges={['bottom']}>
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={{ padding: 24 }} keyboardShouldPersistTaps="handled">
         <OfflineBanner />
         {/* Type toggle */}
-        <Text style={styles.label}>{t('type')}</Text>
-        <View style={styles.toggle}>
+        <Text className="text-sm font-semibold text-foreground mb-1.5 mt-4">{t('type')}</Text>
+        <View className="flex-row gap-2">
           {(['offer', 'request'] as ExchangeType[]).map((tp) => (
-            <TouchableOpacity
+            <Pressable
               key={tp}
               style={[
-                styles.toggleOption,
+                { flex: 1, borderWidth: 1, borderColor: theme.border, borderRadius: 8, paddingVertical: 10, alignItems: 'center' },
                 type === tp && { backgroundColor: primary, borderColor: primary },
               ]}
               onPress={() => setType(tp)}
               accessibilityLabel={t('typeLabel', { type: t(tp) })}
               accessibilityRole="button"
             >
-              <Text style={[styles.toggleText, type === tp && styles.toggleTextActive]}>
+              <Text style={[{ fontSize: 14, fontWeight: '600', color: theme.textSecondary }, type === tp && { color: '#fff' }]}>
                 {t(tp)}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           ))}
         </View>
 
         {error && (
-          <View style={styles.errorBanner}>
-            <Text style={styles.errorBannerText}>{error}</Text>
+          <View className="bg-danger/10 rounded-lg p-3 mt-3">
+            <Text className="text-danger text-sm">{error}</Text>
           </View>
         )}
 
-        <Text style={styles.label}>{t('titleLabel')}</Text>
+        <Text className="text-sm font-semibold text-foreground mb-1.5 mt-4">{t('titleLabel')}</Text>
         <TextInput
-          style={[styles.input, !!fieldErrors.title && styles.inputError]}
+          style={[
+            { borderWidth: 1, borderColor: fieldErrors.title ? theme.error : theme.border, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12, fontSize: 16, color: theme.text, backgroundColor: theme.surface },
+          ]}
           value={title}
           onChangeText={(v) => {
             setTitle(v);
@@ -162,13 +162,13 @@ export default function NewExchangeModal() {
           blurOnSubmit={false}
         />
         {fieldErrors.title && (
-          <Text style={styles.fieldError}>{fieldErrors.title}</Text>
+          <Text className="text-xs text-danger mt-1">{fieldErrors.title}</Text>
         )}
 
-        <Text style={styles.label}>{t('description')}</Text>
+        <Text className="text-sm font-semibold text-foreground mb-1.5 mt-4">{t('description')}</Text>
         <TextInput
           ref={descriptionRef}
-          style={[styles.input, styles.textarea]}
+          style={{ borderWidth: 1, borderColor: theme.border, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12, fontSize: 16, color: theme.text, backgroundColor: theme.surface, height: 100 }}
           value={description}
           onChangeText={setDescription}
           placeholder={t('descriptionPlaceholder')}
@@ -182,10 +182,12 @@ export default function NewExchangeModal() {
           onSubmitEditing={() => creditsRef.current?.focus()}
         />
 
-        <Text style={styles.label}>{t('timeCredits')}</Text>
+        <Text className="text-sm font-semibold text-foreground mb-1.5 mt-4">{t('timeCredits')}</Text>
         <TextInput
           ref={creditsRef}
-          style={[styles.input, !!fieldErrors.timeCredits && styles.inputError]}
+          style={[
+            { borderWidth: 1, borderColor: fieldErrors.timeCredits ? theme.error : theme.border, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12, fontSize: 16, color: theme.text, backgroundColor: theme.surface },
+          ]}
           value={timeCredits}
           onChangeText={(v) => {
             setTimeCredits(v);
@@ -197,104 +199,55 @@ export default function NewExchangeModal() {
           returnKeyType="done"
         />
         {fieldErrors.timeCredits && (
-          <Text style={styles.fieldError}>{fieldErrors.timeCredits}</Text>
+          <Text className="text-xs text-danger mt-1">{fieldErrors.timeCredits}</Text>
         )}
 
         {/* Category picker */}
         {categories.length > 0 && (
           <>
-            <Text style={styles.label}>{t('category')}</Text>
-            <View style={styles.categoryGrid}>
+            <Text className="text-sm font-semibold text-foreground mb-1.5 mt-4">{t('category')}</Text>
+            <View className="flex-row flex-wrap gap-2">
               {categories.map((cat) => {
                 const selected = categoryId === cat.id || (categoryId === null && categories[0]?.id === cat.id);
                 return (
-                  <TouchableOpacity
+                  <Pressable
                     key={cat.id}
                     style={[
-                      styles.categoryChip,
+                      { borderWidth: 1, borderColor: theme.border, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 7, backgroundColor: theme.surface },
                       selected && { backgroundColor: withAlpha(primary, 0.09), borderColor: primary },
                     ]}
                     onPress={() => setCategoryId(cat.id)}
-                    activeOpacity={0.7}
                     accessibilityLabel={t('categoryLabel', { name: cat.name })}
                     accessibilityRole="button"
                   >
-                    <Text style={[styles.categoryChipText, selected && { color: primary, fontWeight: '600' }]}>
+                    <Text style={[{ fontSize: 13, color: theme.textMuted }, selected && { color: primary, fontWeight: '600' }]}>
                       {cat.name}
                     </Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 );
               })}
             </View>
           </>
         )}
 
-        <TouchableOpacity
-          style={[styles.button, { backgroundColor: primary }, submitting && styles.buttonDisabled]}
+        <Pressable
+          style={[{ borderRadius: 10, paddingVertical: 14, alignItems: 'center', marginTop: 32, backgroundColor: primary }, submitting && { opacity: 0.6 }]}
           onPress={() => void handleSubmit()}
           disabled={submitting}
-          activeOpacity={0.8}
           accessibilityLabel={type === 'offer' ? t('postOffer') : t('postRequest')}
           accessibilityRole="button"
         >
           {submitting ? (
-            <ActivityIndicator color="#fff" />
+            <Spinner size="sm" />
           ) : (
-            <Text style={styles.buttonText}>
+            <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>
               {type === 'offer' ? t('postOffer') : t('postRequest')}
             </Text>
           )}
-        </TouchableOpacity>
+        </Pressable>
       </ScrollView>
     </KeyboardAvoidingView>
     </SafeAreaView>
     </ModalErrorBoundary>
   );
-}
-
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    flex: { flex: 1, backgroundColor: theme.surface },
-    container: { padding: 24 },
-    label: { fontSize: 14, fontWeight: '600', color: theme.text, marginBottom: 6, marginTop: 16 },
-    toggle: { flexDirection: 'row', gap: 8 },
-    toggleOption: {
-      flex: 1,
-      borderWidth: 1,
-      borderColor: theme.border,
-      borderRadius: 8,
-      paddingVertical: 10,
-      alignItems: 'center',
-    },
-    toggleText: { fontSize: 14, fontWeight: '600', color: theme.textSecondary },
-    toggleTextActive: { color: '#fff' }, // contrast on primary
-    input: {
-      borderWidth: 1,
-      borderColor: theme.border,
-      borderRadius: 10,
-      paddingHorizontal: 14,
-      paddingVertical: 12,
-      fontSize: 16,
-      color: theme.text,
-      backgroundColor: theme.surface,
-    },
-    inputError: { borderColor: theme.error },
-    textarea: { height: 100 },
-    fieldError: { fontSize: 12, color: theme.error, marginTop: 4 },
-    categoryGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-    categoryChip: {
-      borderWidth: 1,
-      borderColor: theme.border,
-      borderRadius: 20,
-      paddingHorizontal: 14,
-      paddingVertical: 7,
-      backgroundColor: theme.surface,
-    },
-    categoryChipText: { fontSize: 13, color: theme.textMuted },
-    errorBanner: { backgroundColor: theme.errorBg, borderRadius: 8, padding: 12, marginTop: 12 },
-    errorBannerText: { color: theme.error, fontSize: 14 },
-    button: { borderRadius: 10, paddingVertical: 14, alignItems: 'center', marginTop: 32 },
-    buttonDisabled: { opacity: 0.6 },
-    buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' }, // contrast on primary
-  });
 }

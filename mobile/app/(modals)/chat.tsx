@@ -3,29 +3,25 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
   FlatList,
-  StyleSheet,
-  TouchableOpacity,
   TextInput,
   KeyboardAvoidingView,
   Platform,
-  ActivityIndicator,
+  Pressable,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-
-import { TYPOGRAPHY } from '@/lib/styles/typography';
-import { SPACING, RADIUS } from '@/lib/styles/spacing';
+import { Spinner } from 'heroui-native';
 
 import { sendChatMessage, type ChatMessage } from '@/lib/api/chat';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { useTheme } from '@/lib/hooks/useTheme';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 // Internal message type extends ChatMessage to support the transient "thinking" state
@@ -38,36 +34,32 @@ const THINKING_ID = '__thinking__';
 function MessageBubble({
   message,
   primary,
-  theme,
-  styles,
   t,
 }: {
   message: DisplayMessage;
   primary: string;
-  theme: Theme;
-  styles: ReturnType<typeof makeStyles>;
   t: (key: string) => string;
 }) {
   const isUser = message.role === 'user';
   const isThinking = message.role === 'thinking';
 
   return (
-    <View style={[styles.bubbleRow, isUser ? styles.bubbleRowRight : styles.bubbleRowLeft]}>
+    <View className={`mb-2.5 max-w-[80%] ${isUser ? 'self-end' : 'self-start'}`}>
       <View
-        style={[
-          styles.bubble,
+        className={`rounded-2xl px-4 py-2 ${
           isUser
-            ? [styles.bubbleUser, { backgroundColor: primary }]
-            : styles.bubbleAssistant,
-        ]}
+            ? 'rounded-br-[4px]'
+            : 'bg-surface border border-border/50 rounded-bl-[4px]'
+        }`}
+        style={isUser ? { backgroundColor: primary } : undefined}
       >
         {isThinking ? (
-          <View style={styles.thinkingWrap}>
-            <ActivityIndicator size="small" color={theme.textSecondary} />
-            <Text style={[styles.bubbleText, { color: theme.textSecondary }]}>{t('chat:thinking')}</Text>
+          <View className="flex-row items-center gap-2">
+            <Spinner size="sm" />
+            <Text className="text-sm text-muted-foreground">{t('chat:thinking')}</Text>
           </View>
         ) : (
-          <Text style={[styles.bubbleText, isUser ? { color: '#fff' } : { color: theme.text }]}>{/* contrast on primary */}
+          <Text className={`text-sm ${isUser ? 'text-white' : 'text-foreground'}`}>
             {message.content}
           </Text>
         )}
@@ -92,7 +84,6 @@ function ChatScreenInner() {
   const primary = usePrimaryColor();
   const theme = useTheme();
   const insets = useSafeAreaInsets();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   const [messages, setMessages] = useState<DisplayMessage[]>([]);
   const [inputText, setInputText] = useState('');
@@ -198,142 +189,77 @@ function ChatScreenInner() {
       <MessageBubble
         message={item}
         primary={primary}
-        theme={theme}
-        styles={styles}
         t={t}
       />
     ),
-    [primary, theme, styles, t],
+    [primary, t],
   );
 
   return (
-      <SafeAreaView style={styles.container}>
-        <KeyboardAvoidingView
-          style={styles.flex}
-          behavior="padding"
-          keyboardVerticalOffset={Platform.OS === 'ios' ? 88 : 30}
-        >
-          {/* Message list — inverted so newest messages appear at bottom */}
-          {messages.length === 0 ? (
-            <View style={styles.emptyWrap}>
-              <Ionicons name="chatbubble-ellipses-outline" size={40} color={theme.textMuted} />
-              <Text style={styles.emptyText}>{t('chat:empty')}</Text>
-            </View>
-          ) : (
-            <FlatList<DisplayMessage>
-              ref={listRef}
-              data={messages}
-              keyExtractor={(item) => item.id}
-              renderItem={renderItem}
-              inverted
-              contentContainerStyle={styles.listContent}
-              onContentSizeChange={scrollToBottom}
-            />
-          )}
-
-          {/* Input area */}
-          <View style={[styles.inputArea, { borderTopColor: theme.border }]}>
-            <TextInput
-              style={[styles.textInput, { borderColor: theme.border, color: theme.text, backgroundColor: theme.surface }]}
-              placeholder={t('chat:placeholder')}
-              placeholderTextColor={theme.textMuted}
-              value={inputText}
-              onChangeText={setInputText}
-              multiline
-              maxLength={2000}
-              returnKeyType="default"
-              accessibilityLabel={t('chat:placeholder')}
-            />
-            <TouchableOpacity
-              style={[styles.sendBtn, { backgroundColor: primary, opacity: !inputText.trim() || sending ? 0.5 : 1 }]}
-              onPress={() => void handleSend()}
-              disabled={!inputText.trim() || sending}
-              activeOpacity={0.8}
-              accessibilityLabel={t('chat:send')}
-              accessibilityRole="button"
-            >
-              {sending ? (
-                <ActivityIndicator size="small" color="#fff" />
-              ) : (
-                <Ionicons name="send" size={18} color="#fff" />
-              )}
-            </TouchableOpacity>
+    <SafeAreaView className="flex-1 bg-background">
+      <KeyboardAvoidingView
+        className="flex-1"
+        behavior="padding"
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 88 : 30}
+      >
+        {/* Message list — inverted so newest messages appear at bottom */}
+        {messages.length === 0 ? (
+          <View className="flex-1 items-center justify-center gap-3">
+            <Ionicons name="chatbubble-ellipses-outline" size={40} color={theme.textMuted} />
+            <Text className="text-xs text-muted-foreground text-center px-6">{t('chat:empty')}</Text>
           </View>
+        ) : (
+          <FlatList<DisplayMessage>
+            ref={listRef}
+            data={messages}
+            keyExtractor={(item) => item.id}
+            renderItem={renderItem}
+            inverted
+            contentContainerStyle={{ paddingHorizontal: 12, paddingVertical: 16 }}
+            onContentSizeChange={scrollToBottom}
+          />
+        )}
 
-          {/* Disclaimer */}
-          <Text style={[styles.disclaimer, { paddingBottom: Math.max(SPACING.sm, insets.bottom) }]}>{t('chat:disclaimer')}</Text>
-        </KeyboardAvoidingView>
-      </SafeAreaView>
+        {/* Input area */}
+        <View
+          className="flex-row items-end gap-2.5 px-3 py-2.5 border-t border-border"
+        >
+          <TextInput
+            className="flex-1 border border-border rounded-2xl px-4 py-2 text-sm bg-surface text-foreground"
+            style={{ maxHeight: 120, minHeight: 40, color: theme.text, backgroundColor: theme.surface, borderColor: theme.border }}
+            placeholder={t('chat:placeholder')}
+            placeholderTextColor={theme.textMuted}
+            value={inputText}
+            onChangeText={setInputText}
+            multiline
+            maxLength={2000}
+            returnKeyType="default"
+            accessibilityLabel={t('chat:placeholder')}
+          />
+          <Pressable
+            className="w-10 h-10 rounded-full items-center justify-center"
+            style={{ backgroundColor: primary, opacity: !inputText.trim() || sending ? 0.5 : 1 }}
+            onPress={() => void handleSend()}
+            disabled={!inputText.trim() || sending}
+            accessibilityLabel={t('chat:send')}
+            accessibilityRole="button"
+          >
+            {sending ? (
+              <Spinner size="sm" />
+            ) : (
+              <Ionicons name="send" size={18} color="#fff" />
+            )}
+          </Pressable>
+        </View>
+
+        {/* Disclaimer */}
+        <Text
+          className="text-[11px] text-muted-foreground text-center px-4 pb-2"
+          style={{ paddingBottom: Math.max(8, insets.bottom) }}
+        >
+          {t('chat:disclaimer')}
+        </Text>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
-}
-
-// ─── Styles ───────────────────────────────────────────────────────────────────
-
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.bg },
-    flex: { flex: 1 },
-    listContent: { paddingHorizontal: 12, paddingVertical: SPACING.md },
-
-    // Empty state
-    emptyWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
-    emptyText: { ...TYPOGRAPHY.label, color: theme.textMuted, textAlign: 'center', paddingHorizontal: SPACING.xl },
-
-    // Message bubbles
-    bubbleRow: { marginBottom: 10, maxWidth: '80%' },
-    bubbleRowRight: { alignSelf: 'flex-end' },
-    bubbleRowLeft: { alignSelf: 'flex-start' },
-    bubble: {
-      borderRadius: SPACING.md,
-      paddingHorizontal: RADIUS.lg,
-      paddingVertical: RADIUS.md,
-    },
-    bubbleUser: {
-      borderBottomRightRadius: 4,
-    },
-    bubbleAssistant: {
-      backgroundColor: theme.surface,
-      borderWidth: 1,
-      borderColor: theme.borderSubtle,
-      borderBottomLeftRadius: 4,
-    },
-    bubbleText: { ...TYPOGRAPHY.body },
-    thinkingWrap: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-
-    // Input area
-    inputArea: {
-      flexDirection: 'row',
-      alignItems: 'flex-end',
-      gap: 10,
-      paddingHorizontal: 12,
-      paddingVertical: 10,
-      borderTopWidth: 1,
-    },
-    textInput: {
-      flex: 1,
-      borderWidth: 1,
-      borderRadius: RADIUS.xl,
-      paddingHorizontal: RADIUS.lg,
-      paddingVertical: 9,
-      fontSize: TYPOGRAPHY.body.fontSize,
-      maxHeight: 120,
-      minHeight: 40,
-    },
-    sendBtn: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-
-    // Disclaimer
-    disclaimer: {
-      fontSize: 11,
-      color: theme.textMuted,
-      textAlign: 'center',
-      paddingHorizontal: SPACING.md,
-      paddingBottom: SPACING.sm,
-    },
-  });
 }

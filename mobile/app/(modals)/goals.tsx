@@ -3,16 +3,14 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   View,
   Text,
   FlatList,
-  StyleSheet,
-  TouchableOpacity,
+  Pressable,
   TextInput,
   Alert,
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   RefreshControl,
@@ -22,9 +20,8 @@ import { useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
+import { Spinner } from 'heroui-native';
 
-import { TYPOGRAPHY } from '@/lib/styles/typography';
-import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import {
   getGoals,
   createGoal,
@@ -33,7 +30,7 @@ import {
 } from '@/lib/api/goals';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { useTheme } from '@/lib/hooks/useTheme';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
@@ -44,15 +41,13 @@ function GoalCard({
   goal,
   primary,
   theme,
-  styles,
   t,
   onComplete,
   onAbandon,
 }: {
   goal: Goal;
   primary: string;
-  theme: Theme;
-  styles: ReturnType<typeof makeStyles>;
+  theme: ReturnType<typeof useTheme>;
   t: (key: string, opts?: Record<string, unknown>) => string;
   onComplete: (id: number) => void;
   onAbandon: (id: number) => void;
@@ -85,33 +80,34 @@ function GoalCard({
 
   return (
     <View
-      style={styles.goalCard}
+      className="bg-surface rounded-xl px-4 py-3 border border-border/50"
       accessible={true}
       accessibilityLabel={goal.title}
     >
-      <View style={styles.goalCardHeader}>
-        <Text style={styles.goalTitle} numberOfLines={2}>{goal.title}</Text>
-        <View style={[styles.statusBadge, { backgroundColor: statusColor + '20', borderColor: statusColor }]}>
-          <Text style={[styles.statusText, { color: statusColor }]}>
+      <View className="flex-row items-start justify-between gap-2 mb-2">
+        <Text className="flex-1 text-sm font-semibold text-foreground" numberOfLines={2}>{goal.title}</Text>
+        <View
+          className="border rounded px-2 py-0.5"
+          style={{ backgroundColor: statusColor + '20', borderColor: statusColor }}
+        >
+          <Text className="text-[11px] font-semibold" style={{ color: statusColor }}>
             {t(`goals:status.${goal.status}`)}
           </Text>
         </View>
       </View>
 
       {/* Progress */}
-      <View style={styles.progressRow}>
-        <View style={styles.progressTrack}>
+      <View className="mb-2">
+        <View className="h-1.5 rounded-full bg-border/50 overflow-hidden mb-1">
           <View
-            style={[
-              styles.progressFill,
-              {
-                width: `${progressPercent}%` as `${number}%`,
-                backgroundColor: goal.status === 'completed' ? theme.success : primary,
-              },
-            ]}
+            className="h-1.5 rounded-full"
+            style={{
+              width: `${progressPercent}%`,
+              backgroundColor: goal.status === 'completed' ? theme.success : primary,
+            }}
           />
         </View>
-        <Text style={styles.progressLabel}>
+        <Text className="text-xs text-muted-foreground">
           {goal.target_hours
             ? t('goals:progress', { current: goal.progress_hours, target: goal.target_hours })
             : t('goals:noTarget', { current: goal.progress_hours })}
@@ -120,33 +116,33 @@ function GoalCard({
 
       {/* Due date */}
       {dueDateStr && (
-        <View style={styles.dueDateRow}>
+        <View className="flex-row items-center gap-1 mb-2">
           <Ionicons name="calendar-outline" size={13} color={theme.textMuted} />
-          <Text style={styles.dueDateText}>{t('goals:due', { date: dueDateStr })}</Text>
+          <Text className="text-xs text-muted-foreground">{t('goals:due', { date: dueDateStr })}</Text>
         </View>
       )}
 
       {/* Actions for active goals only */}
       {goal.status === 'active' && (
-        <View style={styles.actionRow}>
-          <TouchableOpacity
-            style={[styles.actionBtn, { borderColor: theme.success }]}
+        <View className="flex-row gap-2 mt-1">
+          <Pressable
+            className="flex-1 flex-row items-center justify-center gap-1 border rounded-lg py-1.5"
+            style={{ borderColor: theme.success }}
             onPress={() => { void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); onComplete(goal.id); }}
-            activeOpacity={0.8}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             <Ionicons name="checkmark-outline" size={14} color={theme.success} />
-            <Text style={[styles.actionBtnText, { color: theme.success }]}>{t('goals:complete')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.actionBtn, { borderColor: theme.textMuted }]}
+            <Text className="text-xs font-semibold" style={{ color: theme.success }}>{t('goals:complete')}</Text>
+          </Pressable>
+          <Pressable
+            className="flex-1 flex-row items-center justify-center gap-1 border rounded-lg py-1.5"
+            style={{ borderColor: theme.textMuted }}
             onPress={handleAbandon}
-            activeOpacity={0.8}
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             <Ionicons name="close-outline" size={14} color={theme.textMuted} />
-            <Text style={[styles.actionBtnText, { color: theme.textMuted }]}>{t('goals:abandon')}</Text>
-          </TouchableOpacity>
+            <Text className="text-xs font-semibold" style={{ color: theme.textMuted }}>{t('goals:abandon')}</Text>
+          </Pressable>
         </View>
       )}
     </View>
@@ -158,14 +154,12 @@ function GoalCard({
 function CreateGoalForm({
   primary,
   theme,
-  styles,
   t,
   onCreated,
   onCancel,
 }: {
   primary: string;
-  theme: Theme;
-  styles: ReturnType<typeof makeStyles>;
+  theme: ReturnType<typeof useTheme>;
   t: (key: string) => string;
   onCreated: (goal: Goal) => void;
   onCancel: () => void;
@@ -193,12 +187,13 @@ function CreateGoalForm({
   }
 
   return (
-    <View style={styles.formCard}>
-      <Text style={styles.formTitle}>{t('goals:create.title')}</Text>
+    <View className="bg-surface rounded-xl p-4 mb-4 border border-border">
+      <Text className="text-base font-bold text-foreground mb-3">{t('goals:create.title')}</Text>
 
-      <Text style={styles.formLabel}>{t('goals:create.titleLabel')}</Text>
+      <Text className="text-xs font-semibold text-muted-foreground mb-1">{t('goals:create.titleLabel')}</Text>
       <TextInput
-        style={[styles.formInput, { borderColor: theme.border, color: theme.text }]}
+        className="border rounded-lg px-3 py-2 text-sm bg-background mb-3"
+        style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg }}
         placeholder={t('goals:create.titlePlaceholder')}
         placeholderTextColor={theme.textMuted}
         value={title}
@@ -207,9 +202,10 @@ function CreateGoalForm({
         autoFocus
       />
 
-      <Text style={styles.formLabel}>{t('goals:create.targetHoursLabel')}</Text>
+      <Text className="text-xs font-semibold text-muted-foreground mb-1">{t('goals:create.targetHoursLabel')}</Text>
       <TextInput
-        style={[styles.formInput, { borderColor: theme.border, color: theme.text }]}
+        className="border rounded-lg px-3 py-2 text-sm bg-background mb-3"
+        style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg }}
         placeholder="e.g. 10"
         placeholderTextColor={theme.textMuted}
         value={targetHours}
@@ -218,24 +214,27 @@ function CreateGoalForm({
         returnKeyType="done"
       />
 
-      <View style={styles.formActions}>
-        <TouchableOpacity style={styles.cancelBtn} onPress={onCancel} activeOpacity={0.8}>
-          <Text style={[styles.cancelBtnText, { color: theme.textSecondary }]}>
+      <View className="flex-row gap-2 mt-1">
+        <Pressable
+          className="flex-1 items-center py-3 rounded-lg border border-border"
+          onPress={onCancel}
+        >
+          <Text className="text-xs font-semibold text-muted-foreground">
             {t('common:cancel')}
           </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.submitBtn, { backgroundColor: primary, opacity: submitting || !title.trim() ? 0.6 : 1 }]}
+        </Pressable>
+        <Pressable
+          className="flex-[2] items-center justify-center py-3 rounded-lg"
+          style={{ backgroundColor: primary, opacity: submitting || !title.trim() ? 0.6 : 1 }}
           onPress={() => void handleSubmit()}
           disabled={submitting || !title.trim()}
-          activeOpacity={0.8}
         >
           {submitting ? (
-            <ActivityIndicator size="small" color="#fff" />
+            <Spinner size="sm" />
           ) : (
-            <Text style={styles.submitBtnText}>{t('goals:create.submit')}</Text>
+            <Text className="text-xs font-bold text-white">{t('goals:create.submit')}</Text>
           )}
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );
@@ -248,7 +247,6 @@ export default function GoalsScreen() {
   const navigation = useNavigation();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   const [showForm, setShowForm] = useState(false);
   const [goals, setGoals] = useState<Goal[]>([]);
@@ -259,13 +257,13 @@ export default function GoalsScreen() {
     navigation.setOptions({
       title: t('goals:title'),
       headerRight: () => (
-        <TouchableOpacity
+        <Pressable
           onPress={() => setShowForm((v) => !v)}
           style={{ marginRight: 16 }}
           accessibilityLabel={t('goals:addGoal')}
         >
           <Ionicons name={showForm ? 'close-outline' : 'add-outline'} size={24} color={primary} />
-        </TouchableOpacity>
+        </Pressable>
       ),
     });
   }, [navigation, t, primary, showForm]);
@@ -301,7 +299,7 @@ export default function GoalsScreen() {
 
   if (isLoading && !initialized) {
     return (
-      <SafeAreaView style={styles.center}>
+      <SafeAreaView className="flex-1 items-center justify-center bg-background">
         <LoadingSpinner />
       </SafeAreaView>
     );
@@ -309,15 +307,15 @@ export default function GoalsScreen() {
 
   return (
     <ModalErrorBoundary>
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-background">
       <KeyboardAvoidingView
-        style={styles.flex}
+        className="flex-1"
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <FlatList<Goal>
           data={goals}
           keyExtractor={(item) => String(item.id)}
-          contentContainerStyle={styles.listContent}
+          contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -330,7 +328,6 @@ export default function GoalsScreen() {
               <CreateGoalForm
                 primary={primary}
                 theme={theme}
-                styles={styles}
                 t={t}
                 onCreated={handleGoalCreated}
                 onCancel={() => setShowForm(false)}
@@ -339,9 +336,9 @@ export default function GoalsScreen() {
           }
           ListEmptyComponent={
             !isLoading && !showForm ? (
-              <View style={styles.emptyWrap}>
+              <View className="pt-10 items-center">
                 {error ? (
-                  <Text style={styles.errorText}>{error}</Text>
+                  <Text className="text-xs text-danger text-center">{error}</Text>
                 ) : (
                   <EmptyState
                     icon="flag-outline"
@@ -359,7 +356,6 @@ export default function GoalsScreen() {
               goal={item}
               primary={primary}
               theme={theme}
-              styles={styles}
               t={t}
               onComplete={(id) => void handleUpdateStatus(id, 'completed')}
               onAbandon={(id) => void handleUpdateStatus(id, 'abandoned')}
@@ -371,112 +367,4 @@ export default function GoalsScreen() {
     </SafeAreaView>
     </ModalErrorBoundary>
   );
-}
-
-// ─── Styles ───────────────────────────────────────────────────────────────────
-
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.bg },
-    flex: { flex: 1 },
-    center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    listContent: { padding: SPACING.md, paddingBottom: 40 },
-
-    // Goal card
-    goalCard: {
-      backgroundColor: theme.surface,
-      borderRadius: RADIUS.lg,
-      padding: RADIUS.lg,
-      borderWidth: 1,
-      borderColor: theme.borderSubtle,
-    },
-    goalCardHeader: {
-      flexDirection: 'row',
-      alignItems: 'flex-start',
-      justifyContent: 'space-between',
-      gap: SPACING.sm,
-      marginBottom: RADIUS.md,
-    },
-    goalTitle: { flex: 1, ...TYPOGRAPHY.body, fontWeight: '600', color: theme.text },
-    statusBadge: {
-      borderWidth: 1,
-      borderRadius: RADIUS.sm,
-      paddingHorizontal: SPACING.sm,
-      paddingVertical: 3,
-    },
-    statusText: { fontSize: 11, fontWeight: '600' },
-
-    // Progress
-    progressRow: { marginBottom: SPACING.sm },
-    progressTrack: {
-      height: 6,
-      borderRadius: 3,
-      backgroundColor: theme.borderSubtle,
-      overflow: 'hidden',
-      marginBottom: 4,
-    },
-    progressFill: { height: 6, borderRadius: 3 },
-    progressLabel: { ...TYPOGRAPHY.caption, color: theme.textSecondary },
-
-    // Due date
-    dueDateRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: SPACING.sm },
-    dueDateText: { ...TYPOGRAPHY.caption, color: theme.textMuted },
-
-    // Actions
-    actionRow: { flexDirection: 'row', gap: RADIUS.md, marginTop: 4 },
-    actionBtn: {
-      flex: 1,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 5,
-      borderWidth: 1,
-      borderRadius: SPACING.sm,
-      paddingVertical: 7,
-    },
-    actionBtnText: { ...TYPOGRAPHY.bodySmall, fontWeight: '600' },
-
-    // Create form
-    formCard: {
-      backgroundColor: theme.surface,
-      borderRadius: RADIUS.lg,
-      padding: SPACING.md,
-      marginBottom: SPACING.md,
-      borderWidth: 1,
-      borderColor: theme.border,
-    },
-    formTitle: { fontSize: 16, fontWeight: '700', color: theme.text, marginBottom: RADIUS.lg },
-    formLabel: { ...TYPOGRAPHY.caption, fontWeight: '600', color: theme.textSecondary, marginBottom: 5 },
-    formInput: {
-      borderWidth: 1,
-      borderRadius: RADIUS.md,
-      paddingHorizontal: 12,
-      paddingVertical: RADIUS.md,
-      fontSize: TYPOGRAPHY.body.fontSize,
-      backgroundColor: theme.bg,
-      marginBottom: 12,
-    },
-    formActions: { flexDirection: 'row', gap: RADIUS.md, marginTop: 4 },
-    cancelBtn: {
-      flex: 1,
-      alignItems: 'center',
-      paddingVertical: 11,
-      borderRadius: RADIUS.md,
-      borderWidth: 1,
-      borderColor: theme.border,
-    },
-    cancelBtnText: { ...TYPOGRAPHY.label, fontWeight: '600' },
-    submitBtn: {
-      flex: 2,
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingVertical: 11,
-      borderRadius: RADIUS.md,
-    },
-    submitBtnText: { ...TYPOGRAPHY.label, fontWeight: '700', color: '#fff' }, // contrast on primary
-
-    // Empty / error
-    emptyWrap: { paddingTop: SPACING.xxl, alignItems: 'center' },
-    errorText: { ...TYPOGRAPHY.label, color: theme.error, textAlign: 'center' },
-  });
 }

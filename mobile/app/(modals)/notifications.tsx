@@ -3,14 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   FlatList,
   View,
   Text,
-  TouchableOpacity,
+  Pressable,
   RefreshControl,
-  StyleSheet,
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -18,8 +17,6 @@ import * as Haptics from 'expo-haptics';
 import { useNavigation } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { TYPOGRAPHY } from '@/lib/styles/typography';
-import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import {
   getNotifications,
   markAllRead,
@@ -41,13 +38,15 @@ export default function NotificationsScreen() {
   const { t } = useTranslation('notifications');
   const navigation = useNavigation();
   const primary = usePrimaryColor();
+  // Keep useTheme for categoryDot backgroundColor (categoryColor uses theme tokens)
+  // and categoryDot borderColor (theme.surface) — these can't be className'd.
   const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   useEffect(() => {
     navigation.setOptions({ title: t('title') });
   }, [navigation, t]);
-  const Separator = useCallback(() => <View style={styles.separator} />, [styles]);
+
+  const Separator = useCallback(() => <View className="h-px bg-border/50" />, []);
   const [markingAll, setMarkingAll] = useState(false);
 
   const { data, isLoading, error, refresh } = useApi(() => getNotifications());
@@ -85,32 +84,37 @@ export default function NotificationsScreen() {
       : item.message;
 
     return (
-      <TouchableOpacity
-        style={[styles.row, !item.is_read && styles.rowUnread]}
+      <Pressable
+        className={`flex-row items-start px-4 py-3 gap-3${!item.is_read ? ' bg-background' : ''}`}
         onPress={() => {
           void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           void markRead(item.id).then(() => refresh()).catch(console.warn);
           navigateToLink(item.link ?? null);
         }}
-        activeOpacity={0.7}
         accessibilityLabel={item.is_read ? label : t('unreadItem', { label })}
         accessibilityRole="button"
         accessibilityHint={t('itemHint')}
       >
-        <View style={styles.avatarWrap}>
+        <View className="relative">
           <Avatar
             uri={item.actor?.avatar_url ?? null}
             name={item.actor?.name ?? '?'}
             size={42}
           />
-          <View style={[styles.categoryDot, { backgroundColor: categoryColor(item.category, theme.textMuted, theme) }]} />
+          <View
+            className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-[1.5px]"
+            style={{
+              backgroundColor: categoryColor(item.category, theme.textMuted, theme),
+              borderColor: theme.surface,
+            }}
+          />
         </View>
 
-        <View style={styles.content}>
-          {item.title && <Text style={styles.title} numberOfLines={1}>{item.title}</Text>}
-          <Text style={styles.message} numberOfLines={2}>{item.message}</Text>
-          <View style={styles.metaRow}>
-            <Text style={styles.time}>
+        <View className="flex-1">
+          {item.title && <Text className="text-sm font-bold text-foreground mb-0.5" numberOfLines={1}>{item.title}</Text>}
+          <Text className="text-sm text-muted-foreground leading-5" numberOfLines={2}>{item.message}</Text>
+          <View className="flex-row items-center gap-2 mt-1">
+            <Text className="text-[12px] text-muted-foreground">
               {(Date.now() - new Date(item.created_at).getTime()) < 60_000
                 ? t('justNow')
                 : formatRelativeTime(item.created_at)}
@@ -126,36 +130,44 @@ export default function NotificationsScreen() {
           </View>
         </View>
 
-        {!item.is_read && <View style={[styles.unreadDot, { backgroundColor: primary }]} />}
-      </TouchableOpacity>
+        {!item.is_read && (
+          <View
+            className="w-2 h-2 rounded-full mt-1.5 shrink-0"
+            style={{ backgroundColor: primary }}
+          />
+        )}
+      </Pressable>
     );
   }
 
   return (
     <ModalErrorBoundary>
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-surface" edges={['bottom']}>
       {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerLeft}>
-          <Text style={styles.heading}>{t('title')}</Text>
+      <View className="flex-row items-center justify-between px-4 pt-4 pb-2">
+        <View className="flex-row items-center gap-2">
+          <Text className="text-xl font-bold text-foreground">{t('title')}</Text>
           {unreadCount > 0 && (
-            <View style={[styles.badge, { backgroundColor: primary }]}>
-              <Text style={styles.badgeText}>{unreadCount}</Text>
+            <View
+              className="min-w-5 h-5 rounded-md justify-center items-center px-1.5"
+              style={{ backgroundColor: primary }}
+            >
+              <Text className="text-white text-[11px] font-bold">{unreadCount}</Text>
             </View>
           )}
         </View>
         {unreadCount > 0 && (
-          <TouchableOpacity
+          <Pressable
             onPress={() => void handleMarkAll()}
             disabled={markingAll}
             accessibilityLabel={t('markAllRead')}
             accessibilityRole="button"
             accessibilityState={{ busy: markingAll, disabled: markingAll }}
           >
-            <Text style={[styles.markAll, { color: primary }]}>
+            <Text className="text-sm font-semibold" style={{ color: primary }}>
               {markingAll ? t('marking') : t('markAllRead')}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         )}
       </View>
 
@@ -171,11 +183,11 @@ export default function NotificationsScreen() {
           isLoading ? (
             <LoadingSpinner />
           ) : error ? (
-            <View style={styles.centered}>
-              <Text style={styles.errorText}>{error}</Text>
-              <TouchableOpacity onPress={() => void refresh()} style={styles.retryBtn}>
-                <Text style={{ color: primary, fontWeight: '600', fontSize: 15 }}>{t('common:buttons.retry')}</Text>
-              </TouchableOpacity>
+            <View className="flex-1 justify-center items-center p-10">
+              <Text className="text-sm text-danger text-center mb-3">{error}</Text>
+              <Pressable onPress={() => void refresh()} className="px-5 py-2">
+                <Text className="font-semibold text-[15px]" style={{ color: primary }}>{t('common:buttons.retry')}</Text>
+              </Pressable>
             </View>
           ) : (
             <EmptyState
@@ -185,7 +197,7 @@ export default function NotificationsScreen() {
             />
           )
         }
-        contentContainerStyle={styles.list}
+        contentContainerStyle={{ flexGrow: 1 }}
       />
     </SafeAreaView>
     </ModalErrorBoundary>
@@ -220,67 +232,4 @@ function categoryColor(category: string | undefined | null, fallback: string, th
     case 'mention':     return '#6366F1';
     default:            return fallback;
   }
-}
-
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.surface },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: SPACING.md,
-      paddingTop: SPACING.md,
-      paddingBottom: SPACING.sm,
-    },
-    headerLeft: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
-    heading: { ...TYPOGRAPHY.h2, color: theme.text },
-    badge: {
-      minWidth: 20,
-      height: 20,
-      borderRadius: RADIUS.md,
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingHorizontal: 5,
-    },
-    badgeText: { color: '#fff', fontSize: 11, fontWeight: '700' }, // contrast on primary
-    markAll: { ...TYPOGRAPHY.label, fontWeight: '600' },
-    list: { flexGrow: 1 },
-    row: {
-      flexDirection: 'row',
-      alignItems: 'flex-start',
-      paddingHorizontal: SPACING.md,
-      paddingVertical: 12,
-      gap: 12,
-    },
-    rowUnread: { backgroundColor: theme.bg },
-    avatarWrap: { position: 'relative' },
-    categoryDot: {
-      position: 'absolute',
-      bottom: 0,
-      right: 0,
-      width: 10,
-      height: 10,
-      borderRadius: 5,
-      borderWidth: 1.5,
-      borderColor: theme.surface,
-    },
-    content: { flex: 1 },
-    title: { ...TYPOGRAPHY.label, fontWeight: '700', color: theme.text, marginBottom: 2 },
-    message: { ...TYPOGRAPHY.label, color: theme.textSecondary, lineHeight: 20 },
-    metaRow: { flexDirection: 'row' as const, alignItems: 'center' as const, gap: SPACING.sm, marginTop: 4 },
-    time: { ...TYPOGRAPHY.caption, color: theme.textMuted },
-    unreadDot: {
-      width: 8,
-      height: 8,
-      borderRadius: 4,
-      marginTop: 6,
-      flexShrink: 0,
-    },
-    separator: { height: 1, backgroundColor: theme.borderSubtle },
-    centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 },
-    errorText: { ...TYPOGRAPHY.label, color: theme.error, textAlign: 'center', marginBottom: 12 },
-    retryBtn: { paddingHorizontal: 20, paddingVertical: RADIUS.md },
-    // emptyTitle and emptySubText removed — now handled by EmptyState component
-  });
 }

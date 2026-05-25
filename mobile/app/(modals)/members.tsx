@@ -3,15 +3,14 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   FlatList,
   View,
   Text,
   TextInput,
-  TouchableOpacity,
+  Pressable,
   RefreshControl,
-  StyleSheet,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useNavigation } from 'expo-router';
@@ -23,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { getMembers, type Member, type MemberListResponse } from '@/lib/api/members';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { useTheme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { SkeletonBox } from '@/components/ui/Skeleton';
@@ -34,12 +33,11 @@ export default function MembersScreen() {
   const navigation = useNavigation();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   useEffect(() => {
     navigation.setOptions({ title: t('title') });
   }, [navigation, t]);
-  const Separator = useCallback(() => <View style={styles.separator} />, [styles]);
+
   const [search, setSearch] = useState('');
   const [committedSearch, setCommittedSearch] = useState('');
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -89,8 +87,8 @@ export default function MembersScreen() {
 
   function renderItem({ item }: { item: Member }) {
     return (
-      <TouchableOpacity
-        style={styles.row}
+      <Pressable
+        className="flex-row items-center px-4 py-3 gap-3"
         onPress={() => {
           void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           router.push({
@@ -98,30 +96,29 @@ export default function MembersScreen() {
             params: { id: String(item.id), name: item.name },
           });
         }}
-        activeOpacity={0.7}
         accessibilityRole="button"
         accessibilityLabel={t('memberCard.accessibilityLabel', { name: item.name })}
       >
         <Avatar uri={item.avatar_url} name={item.name} size={46} />
-        <View style={styles.rowContent}>
-          <Text style={styles.memberName} numberOfLines={1}>{item.name}</Text>
+        <View className="flex-1">
+          <Text className="text-[15px] font-semibold text-foreground" numberOfLines={1}>{item.name}</Text>
           {item.tagline ? (
-            <Text style={styles.tagline} numberOfLines={1}>{item.tagline}</Text>
+            <Text className="text-[13px] text-muted-foreground mt-0.5" numberOfLines={1}>{item.tagline}</Text>
           ) : null}
         </View>
         <Ionicons name="chevron-forward" size={18} color={theme.textMuted} />
-      </TouchableOpacity>
+      </Pressable>
     );
   }
 
   return (
     <ModalErrorBoundary>
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-surface">
       {/* Search bar */}
-      <View style={styles.searchBar}>
-        <Ionicons name="search-outline" size={18} color={theme.textMuted} style={styles.searchIcon} />
+      <View className="flex-row items-center mx-4 my-3 px-3 h-[42px] bg-background rounded-[10px] gap-2">
+        <Ionicons name="search-outline" size={18} color={theme.textMuted} style={{ flexShrink: 0 }} />
         <TextInput
-          style={styles.searchInput}
+          className="flex-1 text-[15px] text-foreground py-0"
           placeholder={t('search.placeholder')}
           placeholderTextColor={theme.textMuted}
           value={search}
@@ -133,9 +130,9 @@ export default function MembersScreen() {
           accessibilityLabel={t('search.placeholder')}
         />
         {search.length > 0 && (
-          <TouchableOpacity onPress={handleClear} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} accessibilityLabel={t('common:actions.clear', 'Clear search')} accessibilityRole="button">
+          <Pressable onPress={handleClear} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }} accessibilityLabel={t('common:actions.clear', 'Clear search')} accessibilityRole="button">
             <Ionicons name="close-circle" size={18} color={theme.textMuted} />
-          </TouchableOpacity>
+          </Pressable>
         )}
       </View>
 
@@ -143,7 +140,7 @@ export default function MembersScreen() {
         data={items}
         keyExtractor={(item) => String(item.id)}
         renderItem={renderItem}
-        ItemSeparatorComponent={Separator}
+        ItemSeparatorComponent={() => <View className="h-px bg-background ml-[74px]" />}
         onEndReached={hasMore ? loadMore : undefined}
         onEndReachedThreshold={0.3}
         refreshControl={
@@ -157,13 +154,13 @@ export default function MembersScreen() {
           isLoading ? (
             <MemberListSkeleton />
           ) : error ? (
-            <View style={styles.centered}>
-              <Text style={styles.errorText}>{error}</Text>
+            <View className="flex-1 justify-center items-center p-10">
+              <Text className="text-[14px] text-danger text-center">{error}</Text>
             </View>
           ) : (
-            <View style={styles.centered}>
+            <View className="flex-1 justify-center items-center p-10">
               <Ionicons name="people-outline" size={40} color={theme.textMuted} />
-              <Text style={styles.emptyText}>
+              <Text className="text-[15px] text-muted-foreground text-center mt-3">
                 {committedSearch
                   ? t('empty.noResults', { query: committedSearch })
                   : t('empty.title')}
@@ -173,12 +170,12 @@ export default function MembersScreen() {
         }
         ListFooterComponent={
           isLoadingMore ? (
-            <View style={styles.footerLoader}>
+            <View className="py-4">
               <LoadingSpinner />
             </View>
           ) : null
         }
-        contentContainerStyle={styles.list}
+        contentContainerStyle={{ flexGrow: 1 }}
       />
     </SafeAreaView>
     </ModalErrorBoundary>
@@ -191,7 +188,7 @@ export default function MembersScreen() {
 
 function MemberRowSkeleton(): React.JSX.Element {
   return (
-    <View style={skeletonRowStyle}>
+    <View className="flex-row items-center px-4 py-3 gap-3">
       <SkeletonBox width={46} height={46} borderRadius={23} />
       <View style={{ flex: 1, gap: 8 }}>
         <SkeletonBox width="55%" height={13} />
@@ -201,14 +198,6 @@ function MemberRowSkeleton(): React.JSX.Element {
   );
 }
 
-const skeletonRowStyle = {
-  flexDirection: 'row' as const,
-  alignItems: 'center' as const,
-  paddingHorizontal: 16,
-  paddingVertical: 12,
-  gap: 12,
-};
-
 function MemberListSkeleton(): React.JSX.Element {
   return (
     <>
@@ -217,48 +206,4 @@ function MemberListSkeleton(): React.JSX.Element {
       ))}
     </>
   );
-}
-
-// ---------------------------------------------------------------------------
-// Styles
-// ---------------------------------------------------------------------------
-
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.surface },
-    searchBar: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginHorizontal: 16,
-      marginVertical: 12,
-      paddingHorizontal: 12,
-      height: 42,
-      backgroundColor: theme.bg,
-      borderRadius: 10,
-      gap: 8,
-    },
-    searchIcon: { flexShrink: 0 },
-    searchInput: {
-      flex: 1,
-      fontSize: 15,
-      color: theme.text,
-      paddingVertical: 0,
-    },
-    list: { flexGrow: 1 },
-    row: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingHorizontal: 16,
-      paddingVertical: 12,
-      gap: 12,
-    },
-    rowContent: { flex: 1 },
-    memberName: { fontSize: 15, fontWeight: '600', color: theme.text },
-    tagline: { fontSize: 13, color: theme.textSecondary, marginTop: 2 },
-    separator: { height: 1, backgroundColor: theme.bg, marginLeft: 74 },
-    centered: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 },
-    errorText: { color: theme.error, fontSize: 14, textAlign: 'center' },
-    emptyText: { color: theme.textSecondary, fontSize: 15, textAlign: 'center', marginTop: 12 },
-    footerLoader: { paddingVertical: 16 },
-  });
 }

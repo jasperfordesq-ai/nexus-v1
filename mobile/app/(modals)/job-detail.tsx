@@ -3,13 +3,12 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
   ScrollView,
-  StyleSheet,
-  TouchableOpacity,
+  Pressable,
   Alert,
   Modal,
   TextInput,
@@ -23,13 +22,11 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useTranslation } from 'react-i18next';
 
-import { TYPOGRAPHY } from '@/lib/styles/typography';
-import { SPACING, RADIUS } from '@/lib/styles/spacing';
 import { getJobDetail, applyToJob, saveJob, unsaveJob, getSavedProfile } from '@/lib/api/jobs';
 import type { JobVacancy } from '@/lib/api/jobs';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -43,7 +40,6 @@ export default function JobDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
 
   useEffect(() => {
     navigation.setOptions({ title: t('title') });
@@ -91,20 +87,20 @@ export default function JobDetailScreen() {
 
   if (safeId === 0) {
     return (
-      <SafeAreaView style={styles.center} edges={['bottom']}>
-        <Text style={styles.errorText}>{t('detail.invalidId', 'Invalid job ID.')}</Text>
-        <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
-          <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>
+      <SafeAreaView className="flex-1 items-center justify-center" edges={['bottom']}>
+        <Text className="text-sm text-muted-foreground">{t('detail.invalidId', 'Invalid job ID.')}</Text>
+        <Pressable onPress={() => router.back()} className="mt-3">
+          <Text style={{ color: primary }} className="text-[15px] font-semibold">
             {t('detail.goBack', 'Go Back')}
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </SafeAreaView>
     );
   }
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.center} edges={['bottom']}>
+      <SafeAreaView className="flex-1 items-center justify-center" edges={['bottom']}>
         <LoadingSpinner />
       </SafeAreaView>
     );
@@ -112,13 +108,13 @@ export default function JobDetailScreen() {
 
   if (!job) {
     return (
-      <SafeAreaView style={styles.center} edges={['bottom']}>
-        <Text style={styles.errorText}>{t('detail.notFound', 'Job not found.')}</Text>
-        <TouchableOpacity onPress={() => router.back()} style={{ marginTop: 12 }}>
-          <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>
+      <SafeAreaView className="flex-1 items-center justify-center" edges={['bottom']}>
+        <Text className="text-sm text-muted-foreground">{t('detail.notFound', 'Job not found.')}</Text>
+        <Pressable onPress={() => router.back()} className="mt-3">
+          <Text style={{ color: primary }} className="text-[15px] font-semibold">
             {t('detail.goBack', 'Go Back')}
           </Text>
-        </TouchableOpacity>
+        </Pressable>
       </SafeAreaView>
     );
   }
@@ -230,14 +226,14 @@ export default function JobDetailScreen() {
 
   return (
     <ModalErrorBoundary>
-    <SafeAreaView style={styles.container} edges={['bottom']}>
-      <ScrollView contentContainerStyle={styles.content}>
+    <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
+      <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 48 }}>
         {/* Title */}
-        <View style={styles.titleRow}>
-          <Text style={styles.title}>{job.title}</Text>
+        <View className="flex-row items-start gap-2.5 mb-4">
+          <Text className="flex-1 text-xl font-bold text-foreground">{job.title}</Text>
           {matchPct !== null ? (
-            <View style={[styles.matchBadge, { backgroundColor: matchColor + '22', borderColor: matchColor }]}>
-              <Text style={[styles.matchText, { color: matchColor }]}>
+            <View style={{ backgroundColor: matchColor + '22', borderColor: matchColor }} className="rounded-lg px-2 py-1 self-start border">
+              <Text style={{ color: matchColor }} className="text-xs font-bold">
                 {t('detail.matchPercentage', { percentage: matchPct })}
               </Text>
             </View>
@@ -245,20 +241,20 @@ export default function JobDetailScreen() {
         </View>
 
         {/* Organisation / creator */}
-        <View style={styles.section}>
-          <View style={styles.orgRow}>
+        <View className="mb-5">
+          <View className="flex-row items-center gap-3">
             <Avatar
               uri={job.organization?.logo_url ?? job.creator.avatar_url}
               name={job.organization?.name ?? job.creator.name}
               size={36}
             />
             <View>
-              <Text style={styles.orgName}>
+              <Text className="text-sm font-semibold text-foreground">
                 {job.organization?.name ?? job.creator.name}
               </Text>
               {isClosed ? (
-                <View style={[styles.statusBadge, { backgroundColor: theme.errorBg }]}>
-                  <Text style={[styles.statusText, { color: theme.error }]}>
+                <View className="rounded bg-danger/10 px-2 py-0.5 self-start mt-1">
+                  <Text className="text-[11px] font-semibold text-danger">
                     {t('detail.closedBadge')}
                   </Text>
                 </View>
@@ -268,13 +264,13 @@ export default function JobDetailScreen() {
         </View>
 
         {/* Meta card */}
-        <View style={styles.metaCard}>
+        <View className="bg-surface rounded-2xl p-4 gap-2.5 border border-border/50 mb-5">
           {/* Type chip */}
           <MetaRow
             icon="briefcase-outline"
             text={t(`filters.type.${job.type}`)}
-            theme={theme}
             tint={typeColor[job.type]}
+            theme={theme}
           />
 
           {/* Commitment */}
@@ -323,15 +319,17 @@ export default function JobDetailScreen() {
 
         {/* Skills */}
         {(job.skills_required ?? []).length > 0 ? (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('detail.skills')}</Text>
-            <View style={styles.skillsRow}>
+          <View className="mb-5">
+            <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
+              {t('detail.skills')}
+            </Text>
+            <View className="flex-row flex-wrap gap-2">
               {(job.skills_required ?? []).map((skill) => (
                 <View
                   key={skill}
-                  style={[styles.skillPill, { backgroundColor: theme.surface, borderColor: theme.border }]}
+                  className="rounded-lg px-2.5 py-1 border border-border bg-surface"
                 >
-                  <Text style={styles.skillText}>{skill}</Text>
+                  <Text className="text-xs text-foreground">{skill}</Text>
                 </View>
               ))}
             </View>
@@ -340,28 +338,29 @@ export default function JobDetailScreen() {
 
         {/* Description */}
         {job.description ? (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('detail.description')}</Text>
-            <Text style={styles.description}>{job.description}</Text>
+          <View className="mb-5">
+            <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
+              {t('detail.description')}
+            </Text>
+            <Text className="text-sm text-foreground">{job.description}</Text>
           </View>
         ) : null}
 
         {/* Footer action buttons */}
-        <View style={styles.actions}>
-          <TouchableOpacity
-            style={[styles.saveButton, { borderColor: theme.border }]}
+        <View className="flex-row gap-3 mt-2">
+          <Pressable
+            className="flex-1 flex-row items-center justify-center gap-2 rounded-xl py-3.5 border border-border"
             onPress={() => void handleShare()}
-            activeOpacity={0.8}
             accessibilityRole="button"
             accessibilityLabel={t('detail.share', 'Share')}
           >
             <Ionicons name="share-outline" size={18} color={theme.textSecondary} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.saveButton, { borderColor: primary }]}
+          </Pressable>
+          <Pressable
+            className="flex-1 flex-row items-center justify-center gap-2 rounded-xl py-3.5 border"
+            style={{ borderColor: primary }}
             onPress={() => void handleToggleSave()}
             disabled={saveLoading}
-            activeOpacity={0.8}
             accessibilityRole="button"
             accessibilityLabel={isSaved ? t('detail.saved') : t('detail.save')}
           >
@@ -370,21 +369,18 @@ export default function JobDetailScreen() {
               size={18}
               color={primary}
             />
-            <Text style={[styles.saveButtonText, { color: primary }]}>
+            <Text style={{ color: primary }} className="text-sm font-semibold">
               {isSaved ? t('detail.saved') : t('detail.save')}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
 
-          <TouchableOpacity
-            style={[
-              styles.applyButton,
-              { backgroundColor: hasApplied || isClosed ? theme.textMuted : primary },
-            ]}
+          <Pressable
+            className="flex-[2] flex-row items-center justify-center gap-2 rounded-xl py-3.5"
+            style={{ backgroundColor: hasApplied || isClosed ? theme.textMuted : primary }}
             onPress={() => {
               if (!hasApplied && !isClosed) setApplyModalVisible(true);
             }}
             disabled={hasApplied || isClosed}
-            activeOpacity={0.8}
             accessibilityRole="button"
             accessibilityLabel={hasApplied ? t('detail.applied') : t('detail.apply')}
           >
@@ -393,10 +389,10 @@ export default function JobDetailScreen() {
               size={18}
               color="#fff" // contrast on primary
             />
-            <Text style={styles.applyButtonText}>
+            <Text className="text-base font-bold text-white">
               {hasApplied ? t('detail.applied') : t('detail.apply')}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         </View>
       </ScrollView>
 
@@ -411,37 +407,38 @@ export default function JobDetailScreen() {
           style={{ flex: 1, backgroundColor: theme.bg }}
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
-          <SafeAreaView style={{ flex: 1 }}>
-            <View style={styles.modalHeader}>
-              <TouchableOpacity onPress={handleCloseModal} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+          <SafeAreaView className="flex-1">
+            <View className="flex-row items-center justify-between px-5 py-3 border-b border-border/50">
+              <Pressable onPress={handleCloseModal} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
                 <Ionicons name="close" size={24} color={theme.text} />
-              </TouchableOpacity>
-              <Text style={styles.modalTitle}>
+              </Pressable>
+              <Text className="text-base font-bold text-foreground flex-1 text-center mx-2">
                 {t('apply.title', { jobTitle: job.title })}
               </Text>
               <View style={{ width: 24 }} />
             </View>
 
             {applySuccess ? (
-              <View style={styles.successContainer}>
+              <View className="flex-1 items-center justify-center p-10">
                 <Ionicons name="checkmark-circle" size={64} color={theme.success} />
-                <Text style={styles.successTitle}>{t('apply.success')}</Text>
-                <Text style={styles.successMessage}>{t('apply.successMessage')}</Text>
-                <TouchableOpacity
-                  style={[styles.applyButton, { backgroundColor: primary, marginTop: 24 }]}
+                <Text className="text-xl font-bold text-foreground mt-5">{t('apply.success')}</Text>
+                <Text className="text-sm text-muted-foreground text-center mt-2">{t('apply.successMessage')}</Text>
+                <Pressable
+                  className="flex-row items-center justify-center gap-2 rounded-xl py-3.5 mt-6 w-full"
+                  style={{ backgroundColor: primary }}
                   onPress={handleCloseModal}
                 >
-                  <Text style={styles.applyButtonText}>{t('detail.goBack', 'Go Back')}</Text>
-                </TouchableOpacity>
+                  <Text className="text-base font-bold text-white">{t('detail.goBack', 'Go Back')}</Text>
+                </Pressable>
               </View>
             ) : (
               <ScrollView
-                contentContainerStyle={styles.modalContent}
+                contentContainerStyle={{ padding: 20, paddingBottom: 48 }}
                 keyboardShouldPersistTaps="handled"
               >
                 {/* Saved profile one-click apply */}
                 {savedProfile?.cover_text ? (
-                  <TouchableOpacity
+                  <Pressable
                     style={{
                       flexDirection: 'row',
                       alignItems: 'center',
@@ -454,18 +451,20 @@ export default function JobDetailScreen() {
                       marginBottom: 12,
                     }}
                     onPress={() => setCoverMessage(savedProfile.cover_text ?? '')}
-                    activeOpacity={0.8}
                   >
                     <Ionicons name="flash-outline" size={14} color={primary} />
                     <Text style={{ fontSize: 13, fontWeight: '600', color: primary }}>
                       {t('saved_profile.use', 'Use Saved Cover Letter')}
                     </Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 ) : null}
 
-                <Text style={styles.sectionTitle}>{t('apply.messageLabel')}</Text>
+                <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
+                  {t('apply.messageLabel')}
+                </Text>
                 <TextInput
-                  style={[styles.textarea, { color: theme.text, borderColor: theme.border, backgroundColor: theme.surface }]}
+                  style={{ color: theme.text, borderColor: theme.border, backgroundColor: theme.surface }}
+                  className="border rounded-xl p-3 text-sm min-h-[140px] mt-2"
                   placeholder={t('apply.messagePlaceholder')}
                   placeholderTextColor={theme.textMuted}
                   value={coverMessage}
@@ -476,27 +475,23 @@ export default function JobDetailScreen() {
                   autoFocus
                 />
 
-                <TouchableOpacity
-                  style={[
-                    styles.applyButton,
-                    {
-                      backgroundColor:
-                        coverMessage.trim().length === 0 || applyLoading
-                          ? theme.textMuted
-                          : primary,
-                      marginTop: 20,
-                    },
-                  ]}
+                <Pressable
+                  className="flex-row items-center justify-center gap-2 rounded-xl py-3.5 mt-5"
+                  style={{
+                    backgroundColor:
+                      coverMessage.trim().length === 0 || applyLoading
+                        ? theme.textMuted
+                        : primary,
+                  }}
                   onPress={() => void handleSubmitApplication()}
                   disabled={coverMessage.trim().length === 0 || applyLoading}
-                  activeOpacity={0.8}
                 >
                   {applyLoading ? (
                     <LoadingSpinner />
                   ) : (
-                    <Text style={styles.applyButtonText}>{t('apply.submit')}</Text>
+                    <Text className="text-base font-bold text-white">{t('apply.submit')}</Text>
                   )}
-                </TouchableOpacity>
+                </Pressable>
               </ScrollView>
             )}
           </SafeAreaView>
@@ -519,157 +514,13 @@ function MetaRow({
 }: {
   icon: React.ComponentProps<typeof Ionicons>['name'];
   text: string;
-  theme: Theme;
+  theme: ReturnType<typeof useTheme>;
   tint?: string;
 }) {
   return (
-    <View style={metaRowStyle}>
+    <View className="flex-row items-center gap-2.5">
       <Ionicons name={icon} size={16} color={tint ?? theme.textSecondary} />
-      <Text style={{ ...TYPOGRAPHY.label, color: tint ?? theme.text, flex: 1 }}>{text}</Text>
+      <Text style={{ color: tint ?? theme.text }} className="flex-1 text-sm">{text}</Text>
     </View>
   );
-}
-
-const metaRowStyle = {
-  flexDirection: 'row' as const,
-  alignItems: 'center' as const,
-  gap: 10,
-};
-
-// ---------------------------------------------------------------------------
-// Styles
-// ---------------------------------------------------------------------------
-
-function makeStyles(theme: Theme) {
-  return StyleSheet.create({
-    container: { flex: 1, backgroundColor: theme.bg },
-    center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    content: { padding: 20, paddingBottom: 48 },
-    titleRow: {
-      flexDirection: 'row',
-      alignItems: 'flex-start',
-      gap: 10,
-      marginBottom: 16,
-    },
-    title: { flex: 1, ...TYPOGRAPHY.h2, color: theme.text },
-    matchBadge: {
-      borderRadius: 8,
-      paddingHorizontal: 8,
-      paddingVertical: 5,
-      alignSelf: 'flex-start',
-      borderWidth: 1,
-    },
-    matchText: { ...TYPOGRAPHY.caption, fontWeight: '700' },
-    section: { marginBottom: 20 },
-    sectionTitle: {
-      ...TYPOGRAPHY.caption,
-      fontWeight: '700',
-      color: theme.textSecondary,
-      textTransform: 'uppercase',
-      letterSpacing: 0.6,
-      marginBottom: RADIUS.md,
-    },
-    orgRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-    orgName: { ...TYPOGRAPHY.body, fontWeight: '600', color: theme.text },
-    statusBadge: {
-      borderRadius: RADIUS.sm,
-      paddingHorizontal: SPACING.sm,
-      paddingVertical: 3,
-      alignSelf: 'flex-start',
-      marginTop: 4,
-    },
-    statusText: { fontSize: 11, fontWeight: '600' },
-    metaCard: {
-      backgroundColor: theme.surface,
-      borderRadius: RADIUS.lg,
-      padding: RADIUS.lg,
-      gap: RADIUS.md,
-      borderWidth: 1,
-      borderColor: theme.borderSubtle,
-      marginBottom: 20,
-    },
-    skillsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
-    skillPill: {
-      borderRadius: 8,
-      paddingHorizontal: 10,
-      paddingVertical: 5,
-      borderWidth: 1,
-    },
-    skillText: { ...TYPOGRAPHY.bodySmall, color: theme.text },
-    description: { ...TYPOGRAPHY.body, color: theme.text },
-    actions: {
-      flexDirection: 'row',
-      gap: 12,
-      marginTop: 8,
-    },
-    saveButton: {
-      flex: 1,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 8,
-      borderRadius: 12,
-      paddingVertical: 14,
-      borderWidth: 1.5,
-    },
-    saveButtonText: { ...TYPOGRAPHY.body, fontWeight: '600' },
-    applyButton: {
-      flex: 2,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: 8,
-      borderRadius: 12,
-      paddingVertical: 14,
-    },
-    applyButtonText: { fontSize: 16, fontWeight: '700', color: '#fff' }, // contrast on primary
-    errorText: { ...TYPOGRAPHY.body, color: theme.textMuted },
-    // Modal
-    modalHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: 20,
-      paddingVertical: SPACING.md,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.borderSubtle,
-    },
-    modalTitle: {
-      fontSize: 16,
-      fontWeight: '700',
-      color: theme.text,
-      flex: 1,
-      textAlign: 'center',
-      marginHorizontal: 8,
-    },
-    modalContent: {
-      padding: 20,
-      paddingBottom: 48,
-    },
-    textarea: {
-      borderWidth: 1,
-      borderRadius: 12,
-      padding: 12,
-      fontSize: TYPOGRAPHY.body.fontSize,
-      minHeight: 140,
-      marginTop: 8,
-    },
-    successContainer: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: 40,
-    },
-    successTitle: {
-      ...TYPOGRAPHY.h2,
-      color: theme.text,
-      marginTop: 20,
-    },
-    successMessage: {
-      ...TYPOGRAPHY.body,
-      color: theme.textSecondary,
-      textAlign: 'center',
-      marginTop: SPACING.sm,
-    },
-  });
 }
