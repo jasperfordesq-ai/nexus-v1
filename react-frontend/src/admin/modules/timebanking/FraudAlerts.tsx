@@ -25,7 +25,7 @@ import { DataTable,
 import type { FraudAlert } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Chip, Tabs, Tab } from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Tabs, Tab } from '@/components/ui';
 const SEVERITY_COLOR_MAP: Record<string, 'default' | 'primary' | 'warning' | 'danger'> = {
   low: 'default',
   medium: 'primary',

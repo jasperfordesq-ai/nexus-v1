@@ -26,7 +26,7 @@ import ChevronDown from 'lucide-react/icons/chevron-down';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
-import { Snippet, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tooltip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Checkbox, CheckboxGroup } from '@/components/ui';
+import { Snippet, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tooltip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Checkbox, CheckboxGroup } from '@/components/ui';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';

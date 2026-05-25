@@ -14,7 +14,7 @@ import Menu from 'lucide-react/icons/menu';
 import User from 'lucide-react/icons/user';
 import { resolveAvatarUrl } from '@/lib/helpers';
 
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Avatar } from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Avatar } from '@/components/ui';
 interface CaringPanelHeaderProps {
   sidebarCollapsed: boolean;
   onSidebarToggle?: () => void;

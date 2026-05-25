@@ -34,7 +34,7 @@ import {
   } from '../../components';
 import { TemplatePreview } from './TemplatePreview';
 
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Chip, Tabs, Tab } from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Tabs, Tab } from '@/components/ui';
 interface Template {
   id: number;
   name: string;

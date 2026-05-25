@@ -197,7 +197,7 @@ export function MemberSearchPicker({
           {label}
           {isRequired ? <span className="text-danger"> *</span> : null}
         </p>
-        <div className="flex items-center justify-between gap-3 rounded-large border border-default-200 bg-default-50 px-3 py-2">
+        <div className="flex items-center justify-between gap-3 rounded-[14px] border border-default-200 bg-default-50 px-3 py-2">
           <div className="flex min-w-0 items-center gap-3">
             <Avatar
               src={resolvedSelectedMember.avatar_url || undefined}
@@ -240,7 +240,7 @@ export function MemberSearchPicker({
       />
 
       {showDropdown && results.length > 0 && (
-        <div className="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-large border border-default-200 bg-content1 shadow-lg">
+        <div className="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-[14px] border border-default-200 bg-overlay shadow-lg">
           {results.map((member) => (
             <Button
               key={member.id}

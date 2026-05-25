@@ -1,4 +1,4 @@
-import { Button, Chip, Card, CardBody, Input, Spinner, Select, SelectItem, useDisclosure, GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab } from '@/components/ui';
+import { Button, Chip, Card, CardBody, Input, Spinner, Select, SelectItem, useDisclosure, GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford

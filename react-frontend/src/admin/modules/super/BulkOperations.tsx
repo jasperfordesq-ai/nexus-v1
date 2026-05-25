@@ -177,7 +177,7 @@ export function BulkOperations() {
                 <SelectItem key={String(t.id)} id={String(t.id)}>{t.name}</SelectItem>)}
             </Select>
 
-            <div className="bg-secondary-50 border border-secondary-200 text-secondary-700 rounded-medium p-3">
+            <div className="bg-default border border-accent text-accent rounded-[12px] p-3">
               <Switch
                 isSelected={grantSA}
                 onValueChange={setGrantSA}

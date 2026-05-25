@@ -18,7 +18,7 @@ import ChevronDown from 'lucide-react/icons/chevron-down';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import { useTenant } from '@/contexts';
 
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button } from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from '@/components/ui';
 interface GroupTabNavProps {
   activeTab: string;
   userIsAdmin: boolean;

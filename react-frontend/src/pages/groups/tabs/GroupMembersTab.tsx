@@ -15,7 +15,7 @@ import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import Shield from 'lucide-react/icons/shield';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import UserX from 'lucide-react/icons/user-x';
-import { GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Chip, Spinner, Avatar } from '@/components/ui';
+import { GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Spinner, Avatar } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';

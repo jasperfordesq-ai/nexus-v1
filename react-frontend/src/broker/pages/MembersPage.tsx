@@ -37,7 +37,7 @@ import { parseServerTimestamp,
   formatServerDate,
   formatServerDateTime } from '@/lib/serverTime';
 
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab, Tooltip } from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab, Tooltip } from '@/components/ui';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types & Constants
 // ─────────────────────────────────────────────────────────────────────────────

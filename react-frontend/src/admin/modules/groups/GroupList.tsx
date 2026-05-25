@@ -34,7 +34,7 @@ import { DataTable,
 import type { AdminGroup } from '../../api/types';
 
 import { resolveAssetUrl } from '@/lib/helpers';
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab, Checkbox } from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab, Checkbox } from '@/components/ui';
 const statusColors: Record<string, 'success' | 'warning' | 'danger' | 'default'> = {
   active: 'success',
   pending: 'warning',

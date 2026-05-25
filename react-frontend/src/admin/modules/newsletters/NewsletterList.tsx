@@ -32,7 +32,7 @@ import { DataTable,
   type Column } from '../../components';
 import { NewsletterResend } from './NewsletterResend';
 
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Chip } from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip } from '@/components/ui';
 interface NewsletterItem {
   id: number;
   name: string;

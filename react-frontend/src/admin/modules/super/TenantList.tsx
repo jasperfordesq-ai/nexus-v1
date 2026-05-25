@@ -31,7 +31,7 @@ import { DataTable,
   type Column } from '../../components';
 import type { SuperAdminTenant } from '../../api/types';
 
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Chip, Tabs, Tab } from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Tabs, Tab } from '@/components/ui';
 export function TenantList() {
   const { t } = useTranslation('admin');
   usePageTitle(t('super.page_title'));

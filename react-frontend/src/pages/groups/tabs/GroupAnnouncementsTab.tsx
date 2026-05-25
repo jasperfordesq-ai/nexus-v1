@@ -18,7 +18,7 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';

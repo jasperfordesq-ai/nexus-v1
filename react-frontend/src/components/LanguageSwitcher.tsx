@@ -16,7 +16,7 @@ import { api,
 import { logError } from '@/lib/logger';
 import { useTenantLanguages } from '@/contexts/TenantContext';
 
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button } from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from '@/components/ui';
 interface Language {
   code: string;
   label: string;

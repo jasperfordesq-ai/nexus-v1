@@ -1,4 +1,4 @@
-import { Card, CardBody, CardHeader, Button, Input, Textarea, Chip, Spinner, Select, SelectItem, useDisclosure, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Pagination } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Input, Textarea, Chip, Spinner, Select, SelectItem, useDisclosure, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Pagination } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
 
 import StickyNote from 'lucide-react/icons/sticky-note';

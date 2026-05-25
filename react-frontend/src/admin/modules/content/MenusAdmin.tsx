@@ -215,7 +215,7 @@ export function MenusAdmin() {
 
       {/* Info notice when no custom menus exist */}
       {data.length === 0 && (
-        <div className="flex items-start gap-3 p-4 mb-4 rounded-medium bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300">
+        <div className="flex items-start gap-3 p-4 mb-4 rounded-[12px] bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300">
           <Info size={16} className="shrink-0 mt-0.5" />
           <p className="text-sm">{t('content.menus_using_defaults_desc')}</p>
         </div>

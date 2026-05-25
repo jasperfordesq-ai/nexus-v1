@@ -572,7 +572,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                       href={accessibleFrontendUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center rounded-small text-theme-muted hover:text-theme-primary hover:bg-default/40 h-11 min-h-[44px] min-w-0 px-3 gap-2 text-sm outline-solid outline-transparent focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2"
+                      className="inline-flex items-center justify-center rounded-[8px] text-theme-muted hover:text-theme-primary hover:bg-default/40 h-11 min-h-[44px] min-w-0 px-3 gap-2 text-sm outline-solid outline-transparent focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2"
                       aria-label={t('accessibility.accessibility_alpha_new_tab')}
                       onClick={onClose}
                     >

@@ -885,7 +885,7 @@ export function CreateEventPage() {
                       ))}
                     </CheckboxGroup>
                     {errors.recurrenceDays && (
-                      <p className="text-tiny text-danger mt-1">{errors.recurrenceDays}</p>
+                      <p className="text-xs text-danger mt-1">{errors.recurrenceDays}</p>
                     )}
                   </div>
                 )}

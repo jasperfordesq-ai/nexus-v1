@@ -20,7 +20,7 @@ import Megaphone from 'lucide-react/icons/megaphone';
 import Milestone from 'lucide-react/icons/milestone';
 import Share2 from 'lucide-react/icons/share-2';
 import Users from 'lucide-react/icons/users';
-import { GlassCard, Progress, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Chip, Spinner } from '@/components/ui';
+import { GlassCard, Progress, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Spinner } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useAuth, useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';

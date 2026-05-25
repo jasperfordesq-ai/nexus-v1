@@ -11,7 +11,7 @@
 
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';import ChevronDown from 'lucide-react/icons/chevron-down';
 import { useTranslation } from 'react-i18next';
-import { DynamicIcon, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button } from '@/components/ui';
+import { DynamicIcon, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from '@/components/ui';
 import { useTenant, useAuth } from '@/contexts';
 import type { ApiMenu, ApiMenuItem } from '@/types/menu';
 

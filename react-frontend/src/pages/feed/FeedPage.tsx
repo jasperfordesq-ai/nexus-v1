@@ -29,7 +29,7 @@ import ArrowUp from 'lucide-react/icons/arrow-up';
 import CircleX from 'lucide-react/icons/circle-x';
 import ListFilter from 'lucide-react/icons/list-filter';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, AlgorithmLabel, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, useDisclosure, Button, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
+import { GlassCard, AlgorithmLabel, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, useDisclosure, Button, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { ComposeHub } from '@/components/compose';
 import type { ComposeTab } from '@/components/compose';

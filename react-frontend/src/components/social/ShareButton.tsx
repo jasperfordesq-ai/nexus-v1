@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { logError } from '@/lib/logger';
 
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button } from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button } from '@/components/ui';
 export interface ShareButtonProps {
   shareToFeed: (content?: string) => Promise<boolean>;
   title?: string;
