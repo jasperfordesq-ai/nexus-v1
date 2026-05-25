@@ -10,7 +10,6 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Drawer, DrawerContent, DrawerHeader, DrawerBody } from '@heroui/react';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui';
 import Bell from 'lucide-react/icons/bell';
 import MessageSquare from 'lucide-react/icons/message-square';
@@ -32,7 +31,7 @@ import { formatRelativeTime, resolveAvatarUrl } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
 import { getNotificationDisplayText } from '@/lib/notificationText';
 import type { Notification } from '@/types/api';
-import { Button, Avatar, AvatarGroup, Skeleton } from '@/components/ui';
+import { Button, Avatar, AvatarGroup, Skeleton, Drawer, DrawerContent, DrawerHeader, DrawerBody } from '@/components/ui';
 
 const TYPE_ICONS: Record<string, typeof Bell> = {
   message: MessageSquare,

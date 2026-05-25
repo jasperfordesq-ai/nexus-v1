@@ -82,6 +82,16 @@ export {
   type ModalSectionProps,
 } from './Modal';
 export {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerBody,
+  DrawerFooter,
+  type DrawerProps,
+  type DrawerContentProps,
+  type DrawerSectionProps,
+} from './Drawer';
+export {
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
