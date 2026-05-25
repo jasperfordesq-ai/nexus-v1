@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,7 +13,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Input, Select, SelectItem, Button } from '@heroui/react';
+import { Input, Button } from '@heroui/react';
 import Download from 'lucide-react/icons/download';
 import X from 'lucide-react/icons/x';
 import { usePageTitle } from '@/hooks';
@@ -204,14 +205,14 @@ export default function SuperAuditLog() {
             resetAndFilter();
           }}
         >
-          <SelectItem key="user_created">{t('super.event_user_created')}</SelectItem>
-          <SelectItem key="user_moved">{t('super.event_user_moved')}</SelectItem>
-          <SelectItem key="tenant_created">{t('super.event_tenant_created')}</SelectItem>
-          <SelectItem key="tenant_updated">{t('super.event_tenant_updated')}</SelectItem>
-          <SelectItem key="bulk_users_moved">{t('super.event_bulk_users_moved')}</SelectItem>
-          <SelectItem key="bulk_tenants_updated">{t('super.event_bulk_tenants_updated')}</SelectItem>
-          <SelectItem key="federation_lockdown">{t('super.event_federation_lockdown')}</SelectItem>
-          <SelectItem key="federation_updated">{t('super.event_federation_updated')}</SelectItem>
+          <SelectItem key="user_created" id="user_created">{t('super.event_user_created')}</SelectItem>
+          <SelectItem key="user_moved" id="user_moved">{t('super.event_user_moved')}</SelectItem>
+          <SelectItem key="tenant_created" id="tenant_created">{t('super.event_tenant_created')}</SelectItem>
+          <SelectItem key="tenant_updated" id="tenant_updated">{t('super.event_tenant_updated')}</SelectItem>
+          <SelectItem key="bulk_users_moved" id="bulk_users_moved">{t('super.event_bulk_users_moved')}</SelectItem>
+          <SelectItem key="bulk_tenants_updated" id="bulk_tenants_updated">{t('super.event_bulk_tenants_updated')}</SelectItem>
+          <SelectItem key="federation_lockdown" id="federation_lockdown">{t('super.event_federation_lockdown')}</SelectItem>
+          <SelectItem key="federation_updated" id="federation_updated">{t('super.event_federation_updated')}</SelectItem>
         </Select>
 
         <Select
@@ -224,10 +225,10 @@ export default function SuperAuditLog() {
             resetAndFilter();
           }}
         >
-          <SelectItem key="user">{t('super.target_type_user')}</SelectItem>
-          <SelectItem key="tenant">{t('super.target_type_tenant')}</SelectItem>
-          <SelectItem key="bulk">{t('super.target_type_bulk')}</SelectItem>
-          <SelectItem key="federation">{t('super.target_type_federation')}</SelectItem>
+          <SelectItem key="user" id="user">{t('super.target_type_user')}</SelectItem>
+          <SelectItem key="tenant" id="tenant">{t('super.target_type_tenant')}</SelectItem>
+          <SelectItem key="bulk" id="bulk">{t('super.target_type_bulk')}</SelectItem>
+          <SelectItem key="federation" id="federation">{t('super.target_type_federation')}</SelectItem>
         </Select>
 
         <Input

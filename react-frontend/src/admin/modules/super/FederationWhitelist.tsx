@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,20 +7,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Select,
-  SelectItem,
-  Textarea,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-} from '@heroui/react';
+  Card, CardBody, CardHeader, Button, Textarea, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import Plus from 'lucide-react/icons/plus';
 import Trash2 from 'lucide-react/icons/trash-2';
 import { useTranslation } from 'react-i18next';
@@ -153,7 +141,7 @@ export default function FederationWhitelist() {
             variant="bordered"
           >
             {availableTenants.map(tenant => (
-              <SelectItem key={tenant.id.toString()}>
+              <SelectItem key={tenant.id.toString()} id={tenant.id.toString()}>
                 {tenant.name} ({tenant.domain})
               </SelectItem>
             ))}

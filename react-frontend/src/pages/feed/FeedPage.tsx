@@ -14,8 +14,11 @@
  */
 
 import React, { useState, useEffect, useCallback, useMemo, useRef, Component, type ReactNode, type ErrorInfo, type KeyboardEvent } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import {
+  useNavigate,
+  useSearchParams } from 'react-router-dom';
+import { motion,
+  AnimatePresence } from 'framer-motion';
 import {
   Button,
   Avatar,
@@ -26,10 +29,6 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
   useDisclosure,
 } from '@heroui/react';
 import Newspaper from 'lucide-react/icons/newspaper';
@@ -44,7 +43,14 @@ import ArrowUp from 'lucide-react/icons/arrow-up';
 import CircleX from 'lucide-react/icons/circle-x';
 import ListFilter from 'lucide-react/icons/list-filter';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, AlgorithmLabel } from '@/components/ui';
+import { GlassCard,
+  AlgorithmLabel,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { ComposeHub } from '@/components/compose';
 import type { ComposeTab } from '@/components/compose';
@@ -971,7 +977,7 @@ export function FeedPage() {
                 onAction={(key) => handleFilterChange(key as FeedFilter)}
               >
                 {mobileOverflowFilterOptions.map((opt) => (
-                  <DropdownItem key={opt.key}>
+                  <DropdownItem key={opt.key} id={opt.key}>
                     {opt.label}
                   </DropdownItem>
                 ))}

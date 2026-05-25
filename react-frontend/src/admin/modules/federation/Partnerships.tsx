@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,11 +13,7 @@
 
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import {
-  Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,
-  Tabs, Tab, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
-  Select, SelectItem, Switch, Textarea, Card, CardBody, CardHeader,
-  Spinner, useDisclosure,
-} from '@heroui/react';
+  Button, Tabs, Tab, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Textarea, Card, CardBody, CardHeader, Spinner, useDisclosure } from '@heroui/react';
 import Handshake from 'lucide-react/icons/handshake';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
@@ -38,11 +35,22 @@ import Inbox from 'lucide-react/icons/inbox';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';
-import { DataTable, PageHeader, EmptyState, StatusBadge, ConfirmModal, type Column } from '../../components';
+import { DataTable,
+  PageHeader,
+  EmptyState,
+  StatusBadge,
+  ConfirmModal,
+  type Column } from '../../components';
 import { logError } from '@/lib/logger';
 
 import { useTranslation } from 'react-i18next';
 
+import { Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
@@ -509,27 +517,27 @@ export function Partnerships() {
             >
               {(action) => {
                 if (action.key === 'approve') return (
-                  <DropdownItem key="approve" startContent={<CheckCircle size={14} />} className="text-success">
+                  <DropdownItem key="approve" id="approve" startContent={<CheckCircle size={14} />} className="text-success">
                     {t('federation.label_approve')}
                   </DropdownItem>
                 );
                 if (action.key === 'reject') return (
-                  <DropdownItem key="reject" startContent={<XCircle size={14} />} className="text-danger" color="danger">
+                  <DropdownItem key="reject" id="reject" startContent={<XCircle size={14} />} className="text-danger" color="danger">
                     {t('federation.reject')}
                   </DropdownItem>
                 );
                 if (action.key === 'counter') return (
-                  <DropdownItem key="counter" startContent={<MessageSquare size={14} />} className="text-warning">
+                  <DropdownItem key="counter" id="counter" startContent={<MessageSquare size={14} />} className="text-warning">
                     {t('federation.counter_propose')}
                   </DropdownItem>
                 );
                 if (action.key === 'terminate') return (
-                  <DropdownItem key="terminate" startContent={<Ban size={14} />} className="text-danger" color="danger">
+                  <DropdownItem key="terminate" id="terminate" startContent={<Ban size={14} />} className="text-danger" color="danger">
                     {t('federation.terminate')}
                   </DropdownItem>
                 );
                 return (
-                  <DropdownItem key="reactivate" startContent={<CheckCircle size={14} />} className="text-success">
+                  <DropdownItem key="reactivate" id="reactivate" startContent={<CheckCircle size={14} />} className="text-success">
                     {t('federation.reactivate')}
                   </DropdownItem>
                 );
@@ -721,7 +729,7 @@ export function Partnerships() {
                   }}
                 >
                   {[1, 2, 3, 4].map((level) => (
-                    <SelectItem key={String(level)} textValue={t(LEVEL_LABEL_KEYS[level] || 'federation.level_discovery')}>
+                    <SelectItem key={String(level)} id={String(level)} textValue={t(LEVEL_LABEL_KEYS[level] || 'federation.level_discovery')}>
                       <div>
                         <p className="font-medium">{t(LEVEL_LABEL_KEYS[level] || 'federation.level_discovery')}</p>
                         <p className="text-xs text-default-400">{t(LEVEL_DESCRIPTION_KEYS[level] || 'federation.level_desc_discovery')}</p>

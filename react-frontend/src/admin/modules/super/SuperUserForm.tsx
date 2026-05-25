@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,7 +7,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Input, Select, SelectItem, Switch } from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Input, Switch } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Save from 'lucide-react/icons/save';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -163,7 +164,7 @@ export function SuperUserForm() {
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <Select label={t('super.label_tenant')} isRequired selectedKeys={form.tenant_id ? [form.tenant_id] : []}
                 onSelectionChange={(keys) => update('tenant_id', Array.from(keys)[0])}>
-                {tenants.map((t) => <SelectItem key={String(t.id)}>{t.name}</SelectItem>)}
+                {tenants.map((t) => <SelectItem key={String(t.id)} id={String(t.id)}>{t.name}</SelectItem>)}
               </Select>
               <div className="grid grid-cols-2 gap-4">
                 <Input label={t('super.label_first_name')} isRequired value={form.first_name}
@@ -177,9 +178,9 @@ export function SuperUserForm() {
                 onValueChange={(v) => update('password', v)} />
               <Select label={t('super.label_role')} selectedKeys={[form.role]}
                 onSelectionChange={(keys) => update('role', Array.from(keys)[0])}>
-                <SelectItem key="member">{t('super.role_member')}</SelectItem>
-                <SelectItem key="admin">{t('super.role_admin')}</SelectItem>
-                <SelectItem key="tenant_admin">{t('super.role_tenant_admin')}</SelectItem>
+                <SelectItem key="member" id="member">{t('super.role_member')}</SelectItem>
+                <SelectItem key="admin" id="admin">{t('super.role_admin')}</SelectItem>
+                <SelectItem key="tenant_admin" id="tenant_admin">{t('super.role_tenant_admin')}</SelectItem>
               </Select>
               <div className="grid grid-cols-2 gap-4">
                 <Input label={t('super.label_location')} value={form.location} onValueChange={(v) => update('location', v)} />
@@ -230,9 +231,9 @@ export function SuperUserForm() {
                     onValueChange={(v) => update('email', v)} />
                   <Select label={t('super.label_role')} selectedKeys={[form.role]}
                     onSelectionChange={(keys) => update('role', Array.from(keys)[0])}>
-                    <SelectItem key="member">{t('super.role_member')}</SelectItem>
-                    <SelectItem key="admin">{t('super.role_admin')}</SelectItem>
-                    <SelectItem key="tenant_admin">{t('super.role_tenant_admin')}</SelectItem>
+                    <SelectItem key="member" id="member">{t('super.role_member')}</SelectItem>
+                    <SelectItem key="admin" id="admin">{t('super.role_admin')}</SelectItem>
+                    <SelectItem key="tenant_admin" id="tenant_admin">{t('super.role_tenant_admin')}</SelectItem>
                   </Select>
                   <div className="grid grid-cols-2 gap-4">
                     <Input label={t('super.label_location')} value={form.location} onValueChange={(v) => update('location', v)} />
@@ -271,7 +272,7 @@ export function SuperUserForm() {
                 >
                   {tenants
                     .filter(t => t.id !== user.tenant_id)
-                    .map(t => <SelectItem key={String(t.id)}>{t.name}</SelectItem>)}
+                    .map(t => <SelectItem key={String(t.id)} id={String(t.id)}>{t.name}</SelectItem>)}
                 </Select>
                 <Button
                   color="default"
@@ -314,7 +315,7 @@ export function SuperUserForm() {
                 >
                   {hubTenants
                     .filter(t => t.id !== user.tenant_id)
-                    .map(t => <SelectItem key={String(t.id)}>{t.name}</SelectItem>)}
+                    .map(t => <SelectItem key={String(t.id)} id={String(t.id)}>{t.name}</SelectItem>)}
                 </Select>
                 {hubTenants.filter(t => t.id !== user.tenant_id).length === 0 && (
                   <p className="text-xs text-default-400">{t('super.no_hub_tenants_found')}</p>

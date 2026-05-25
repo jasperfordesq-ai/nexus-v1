@@ -9,9 +9,18 @@
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Button, Avatar, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Tooltip, Skeleton, Card, CardBody } from '@heroui/react';
+import {
+  Link } from 'react-router-dom';
+import { motion,
+  AnimatePresence } from 'framer-motion';
+import { Button,
+  Avatar,
+  Chip,
+  Tooltip,
+  Skeleton,
+  Card,
+  CardBody,
+} from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Heart from 'lucide-react/icons/heart';
 import MessageCircle from 'lucide-react/icons/message-circle';
@@ -39,7 +48,15 @@ import Pencil from 'lucide-react/icons/pencil';
 import ThumbsDown from 'lucide-react/icons/thumbs-down';
 import Landmark from 'lucide-react/icons/landmark';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, BottomSheet, ConfettiCelebration } from '@/components/ui';
+import { GlassCard,
+  BottomSheet,
+  ConfettiCelebration,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 import { useTenant, useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -640,7 +657,7 @@ const FeedCard = React.memo(function FeedCard({
                       <>
                         {canViewAnalytics && (
                           <DropdownItem
-                            key="analytics"
+                            key="analytics" id="analytics"
                             startContent={<BarChart3 className="w-4 h-4" aria-hidden="true" />}
                             onPress={() => setShowAnalytics(true)}
                           >
@@ -649,7 +666,7 @@ const FeedCard = React.memo(function FeedCard({
                         )}
                         {onEditPost && item.type === 'post' && (
                           <DropdownItem
-                            key="edit"
+                            key="edit" id="edit"
                             startContent={<Pencil className="w-4 h-4" aria-hidden="true" />}
                             onPress={() => onEditPost(item)}
                           >
@@ -658,7 +675,7 @@ const FeedCard = React.memo(function FeedCard({
                         )}
                         {item.type === 'post' && (
                           <DropdownItem
-                            key="delete"
+                            key="delete" id="delete"
                             startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
                             className="text-danger"
                             color="danger"
@@ -672,7 +689,7 @@ const FeedCard = React.memo(function FeedCard({
                       <>
                         {!item.is_official && (
                           <DropdownItem
-                            key="hide"
+                            key="hide" id="hide"
                             startContent={<EyeOff className="w-4 h-4" aria-hidden="true" />}
                             onPress={() => onHidePost(item)}
                           >
@@ -681,7 +698,7 @@ const FeedCard = React.memo(function FeedCard({
                         )}
                         {onNotInterested && (
                           <DropdownItem
-                            key="not-interested"
+                            key="not-interested" id="not-interested"
                             startContent={<ThumbsDown className="w-4 h-4" aria-hidden="true" />}
                             onPress={() => onNotInterested(item)}
                           >
@@ -690,7 +707,7 @@ const FeedCard = React.memo(function FeedCard({
                         )}
                         {onMuteUser && (
                           <DropdownItem
-                            key="mute"
+                            key="mute" id="mute"
                             startContent={<VolumeX className="w-4 h-4" aria-hidden="true" />}
                             onPress={() => onMuteUser(item)}
                           >
@@ -699,7 +716,7 @@ const FeedCard = React.memo(function FeedCard({
                         )}
                         {onReportPost && (
                           <DropdownItem
-                            key="report"
+                            key="report" id="report"
                             startContent={<Flag className="w-4 h-4" aria-hidden="true" />}
                             className="text-danger"
                             color="danger"
@@ -710,7 +727,7 @@ const FeedCard = React.memo(function FeedCard({
                         )}
                         {isAdmin && onAdminDeletePost && (
                           <DropdownItem
-                            key="admin-delete"
+                            key="admin-delete" id="admin-delete"
                             startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
                             className="text-danger"
                             color="danger"

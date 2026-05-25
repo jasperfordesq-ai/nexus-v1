@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -19,13 +20,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Button,
-  Input,
-  Select,
-  SelectItem,
-  Chip,
-  Avatar,
-} from '@heroui/react';
+  Button, Input, Chip, Avatar } from '@heroui/react';
 import Search from 'lucide-react/icons/search';
 import Globe from 'lucide-react/icons/globe';
 import Calendar from 'lucide-react/icons/calendar';
@@ -258,7 +253,7 @@ export function FederationEventsPage() {
               { id: '', name: t('events.all_communities') },
               ...partners.map((p) => ({ id: String(p.id), name: p.name })),
             ].map((item) => (
-              <SelectItem key={item.id}>{item.name}</SelectItem>
+              <SelectItem key={item.id} id={item.id}>{item.name}</SelectItem>
             ))}
           </Select>
 

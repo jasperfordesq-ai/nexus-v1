@@ -10,9 +10,19 @@
  * Admin/Help/Theme/Language consolidated into a utility row at the bottom.
  */
 
-import { useEffect, useRef, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { Button, Avatar, Drawer, DrawerContent, DrawerHeader, DrawerBody, Accordion, AccordionItem } from '@heroui/react';
+import {
+  useEffect,
+  useRef,
+  useState } from 'react';
+import { useNavigate,
+  useLocation } from 'react-router-dom';
+import { Button,
+  Avatar,
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerBody,
+} from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import X from 'lucide-react/icons/x';
 import Home from 'lucide-react/icons/house';
@@ -65,14 +75,22 @@ import { TenantLogo } from '@/components/branding';
 import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
 import { SourceRepositoryLink } from './SourceRepositoryLink';
 import { useTranslation } from 'react-i18next';
-import { useAuth, useTenant, useNotifications, useCookieConsent, useTheme } from '@/contexts';
+import { useAuth,
+  useTenant,
+  useNotifications,
+  useCookieConsent,
+  useTheme } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { buildAccessibleFrontendUrl } from '@/lib/accessible-frontend';
-import type { TenantFeatures, TenantModules } from '@/types/api';
+import type { TenantFeatures,
+  TenantModules } from '@/types/api';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useMenuContext } from '@/contexts';
 import { MobileMenuItems } from '@/components/navigation';
 
+import { Accordion,
+  AccordionItem,
+} from '@/components/ui';
 interface IdentityStatusResponse {
   has_id_verified_badge: boolean;
 }
@@ -461,7 +479,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               }}
             >
               {/* Main Navigation */}
-              <AccordionItem key="main" title={t('sections.main')} aria-label={t('aria.main_navigation')}>
+              <AccordionItem key="main" id="main" title={t('sections.main')} aria-label={t('aria.main_navigation')}>
                 <div className="space-y-1">
                   {mainNavItems.map(renderNavLink)}
                 </div>
@@ -469,7 +487,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
 
               {/* Timebanking */}
               {visibleTimebanking.length > 0 ? (
-                <AccordionItem key="timebanking" title={t('nav.timebanking')} aria-label={t('aria.timebanking_navigation')}>
+                <AccordionItem key="timebanking" id="timebanking" title={t('nav.timebanking')} aria-label={t('aria.timebanking_navigation')}>
                   <div className="space-y-1">
                     {timebankingNavItems.map(renderNavLink)}
                   </div>
@@ -478,7 +496,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
 
               {/* Community */}
               {visibleCommunity.length > 0 ? (
-                <AccordionItem key="community" title={t('sections.community')} aria-label={t('aria.community_navigation')}>
+                <AccordionItem key="community" id="community" title={t('sections.community')} aria-label={t('aria.community_navigation')}>
                   <div className="space-y-1">
                     {communityNavItems.map(renderNavLink)}
                   </div>
@@ -487,7 +505,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
 
               {/* Engage */}
               {visibleEngage.length > 0 ? (
-                <AccordionItem key="engage" title={t('sections.engage')} aria-label={t('aria.engage_navigation')}>
+                <AccordionItem key="engage" id="engage" title={t('sections.engage')} aria-label={t('aria.engage_navigation')}>
                   <div className="space-y-1">
                     {engageNavItems.map(renderNavLink)}
                   </div>
@@ -496,7 +514,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
 
               {/* Explore / Activity */}
               {visibleExplore.length > 0 ? (
-                <AccordionItem key="explore" title={t('sections.explore')} aria-label={t('aria.explore_navigation')}>
+                <AccordionItem key="explore" id="explore" title={t('sections.explore')} aria-label={t('aria.explore_navigation')}>
                   <div className="space-y-1">
                     {exploreNavItems.map(renderNavLink)}
                   </div>
@@ -506,7 +524,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               {/* Partner Communities (federation) */}
               {visibleFederation.length > 0 && isAuthenticated ? (
                 <AccordionItem
-                  key="federation"
+                  key="federation" id="federation"
                   title={t('sections.partner_communities')}
                   aria-label={t('aria.partner_communities_navigation')}
                 >
@@ -517,7 +535,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               ) : null}
 
               {/* About */}
-              <AccordionItem key="about" title={t('sections.about')} aria-label={t('aria.about_navigation')}>
+              <AccordionItem key="about" id="about" title={t('sections.about')} aria-label={t('aria.about_navigation')}>
                 <div className="space-y-1">
                   {aboutNavItems.map(renderNavLink)}
                   {tenant?.slug === 'hour-timebank' && hourTimebankAboutItems.map(renderNavLink)}
@@ -530,7 +548,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               </AccordionItem>
 
               {/* Legal */}
-              <AccordionItem key="legal" title={t('sections.legal')} aria-label={t('aria.legal_navigation')}>
+              <AccordionItem key="legal" id="legal" title={t('sections.legal')} aria-label={t('aria.legal_navigation')}>
                 <div className="space-y-1">
                   {legalNavItems.map(renderNavLink)}
                   <Button

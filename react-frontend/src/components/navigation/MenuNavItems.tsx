@@ -11,15 +11,16 @@
 
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
+  Button } from '@heroui/react';
+import ChevronDown from 'lucide-react/icons/chevron-down';
+import { useTranslation } from 'react-i18next';
+import { DynamicIcon,
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
-  Button,
-} from '@heroui/react';
-import ChevronDown from 'lucide-react/icons/chevron-down';
-import { useTranslation } from 'react-i18next';
-import { DynamicIcon } from '@/components/ui';
+  DropdownSection,
+} from '@/components/ui';
 import { useTenant, useAuth } from '@/contexts';
 import type { ApiMenu, ApiMenuItem } from '@/types/menu';
 
@@ -152,7 +153,7 @@ export function DesktopMenuItems({ menus }: DesktopMenuItemsProps) {
                   const childHref = resolveItemUrl(child, tenantPath);
                   return (
                     <DropdownItem
-                      key={childHref}
+                      key={childHref} id={childHref}
                       startContent={<DynamicIcon name={child.icon} className="w-4 h-4" />}
                       className={location.pathname.startsWith(childHref) ? 'bg-theme-active' : ''}
                     >

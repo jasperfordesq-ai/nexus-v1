@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,7 +12,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, Select, SelectItem, ScrollShadow, Spinner } from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, ScrollShadow, Spinner } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
@@ -540,10 +541,10 @@ export function MessageDetail() {
               }}
               variant="bordered"
             >
-              <SelectItem key="info">{t('messages.severity_info')}</SelectItem>
-              <SelectItem key="warning">{t('messages.severity_warning')}</SelectItem>
-              <SelectItem key="concern">{t('messages.severity_concern')}</SelectItem>
-              <SelectItem key="urgent">{t('messages.severity_urgent')}</SelectItem>
+              <SelectItem key="info" id="info">{t('messages.severity_info')}</SelectItem>
+              <SelectItem key="warning" id="warning">{t('messages.severity_warning')}</SelectItem>
+              <SelectItem key="concern" id="concern">{t('messages.severity_concern')}</SelectItem>
+              <SelectItem key="urgent" id="urgent">{t('messages.severity_urgent')}</SelectItem>
             </Select>
           </ModalBody>
           <ModalFooter>

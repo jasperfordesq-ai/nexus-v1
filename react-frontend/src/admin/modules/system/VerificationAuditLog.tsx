@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,9 +10,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import {
-  Card, CardBody, CardHeader, Select, SelectItem, Button, Spinner, Chip,
-  Table, TableHeader, TableColumn, TableBody, TableRow, TableCell,
-} from '@heroui/react';
+  Card, CardBody, CardHeader, Button, Spinner, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import ScrollText from 'lucide-react/icons/scroll-text';
 import ChevronLeft from 'lucide-react/icons/chevron-left';
 import ChevronRight from 'lucide-react/icons/chevron-right';
@@ -113,7 +112,7 @@ export function VerificationAuditLog() {
             }}
           >
             {EVENT_TYPES.map((type) => (
-              <SelectItem key={type} textValue={t(`verification.event_type_${type}`)}>
+              <SelectItem key={type} id={type} textValue={t(`verification.event_type_${type}`)}>
                 {t(`verification.event_type_${type}`)}
               </SelectItem>
             ))}

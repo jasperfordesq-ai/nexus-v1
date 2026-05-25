@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -18,25 +19,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  Button,
-  Chip,
-  Spinner,
-  Input,
-  Textarea,
-  Avatar,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Select,
-  SelectItem,
-  useDisclosure,
-} from '@heroui/react';
+  Button, Chip, Spinner, Input, Textarea, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import ArrowBigUp from 'lucide-react/icons/arrow-big-up';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
@@ -50,7 +33,13 @@ import Send from 'lucide-react/icons/send';
 import Users from 'lucide-react/icons/users';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
-import { GlassCard } from '@/components/ui';
+import { GlassCard,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast, useTenant } from '@/contexts';
@@ -520,7 +509,7 @@ export function IdeaDetailPage() {
                 <DropdownMenu aria-label={t('idea_detail.actions')} items={dropdownItems}>
                   {(item) => (
                     <DropdownItem
-                      key={item.key}
+                      key={item.key} id={item.key}
                       className={item.className}
                       color={item.color}
                       startContent={item.startContent}
@@ -712,8 +701,8 @@ export function IdeaDetailPage() {
               }}
               variant="bordered"
             >
-              <SelectItem key="public">{t('convert_to_group.visibility_public')}</SelectItem>
-              <SelectItem key="private">{t('convert_to_group.visibility_private')}</SelectItem>
+              <SelectItem key="public" id="public">{t('convert_to_group.visibility_public')}</SelectItem>
+              <SelectItem key="private" id="private">{t('convert_to_group.visibility_private')}</SelectItem>
             </Select>
           </ModalBody>
           <ModalFooter>

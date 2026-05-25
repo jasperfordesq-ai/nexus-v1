@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +11,7 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Card, CardBody, CardHeader, Input, Button, Spinner, Select, SelectItem, Switch, Chip } from '@heroui/react';
+import { Card, CardBody, CardHeader, Input, Button, Spinner, Switch, Chip } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Menu from 'lucide-react/icons/menu';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -826,7 +827,7 @@ export function MenuBuilder() {
               }}
             >
               {LOCATION_OPTIONS.map((opt) => (
-                <SelectItem key={opt.key}>{opt.label}</SelectItem>
+                <SelectItem key={opt.key} id={opt.key}>{opt.label}</SelectItem>
               ))}
             </Select>
             <div className="flex items-end gap-4">
@@ -982,7 +983,7 @@ export function MenuBuilder() {
                     }}
                   >
                     {TYPE_OPTIONS.map((opt) => (
-                      <SelectItem key={opt.key} textValue={opt.label}>
+                      <SelectItem key={opt.key} id={opt.key} textValue={opt.label}>
                         <div>
                           <p className="text-sm font-medium">{opt.label}</p>
                           <p className="text-xs text-default-400">{opt.description}</p>
@@ -1024,7 +1025,7 @@ export function MenuBuilder() {
                       }}
                     >
                       {pages.map((page) => (
-                        <SelectItem key={String(page.id)} textValue={page.title}>
+                        <SelectItem key={String(page.id)} id={String(page.id)} textValue={page.title}>
                           <div>
                             <p className="text-sm font-medium">{page.title}</p>
                             <p className="text-xs text-default-400">/page/{page.slug}</p>
@@ -1054,7 +1055,7 @@ export function MenuBuilder() {
                       }}
                     >
                       {APP_ROUTES.map((route) => (
-                        <SelectItem key={route.value} textValue={route.label}>
+                        <SelectItem key={route.value} id={route.value} textValue={route.label}>
                           <div className="flex items-center justify-between gap-2">
                             <span className="text-sm font-medium">{route.label}</span>
                             <span className="text-xs text-default-400 font-mono">{route.value}</span>
@@ -1084,8 +1085,8 @@ export function MenuBuilder() {
                         if (sel) setEditForm((f) => ({ ...f, target: sel }));
                       }}
                     >
-                      <SelectItem key="_self">{t('menu_builder.same_window')}</SelectItem>
-                      <SelectItem key="_blank">{t('menu_builder.new_tab')}</SelectItem>
+                      <SelectItem key="_self" id="_self">{t('menu_builder.same_window')}</SelectItem>
+                      <SelectItem key="_blank" id="_blank">{t('menu_builder.new_tab')}</SelectItem>
                     </Select>
                   )}
 
@@ -1105,7 +1106,7 @@ export function MenuBuilder() {
                         { key: '', label: t('menu_builder.no_parent') },
                         ...parentOptions,
                       ].map((opt) => (
-                        <SelectItem key={opt.key}>{opt.label}</SelectItem>
+                        <SelectItem key={opt.key} id={opt.key}>{opt.label}</SelectItem>
                       ))}
                     </Select>
                   )}

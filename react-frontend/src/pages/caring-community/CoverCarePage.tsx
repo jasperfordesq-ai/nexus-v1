@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -5,7 +6,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Avatar, Button, Chip, Input, Select, SelectItem, Spinner, Textarea } from '@heroui/react';
+import { Avatar, Button, Chip, Input, Spinner, Textarea } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CalendarClock from 'lucide-react/icons/calendar-clock';
 import CheckCircle from 'lucide-react/icons/check-circle';
@@ -225,7 +226,7 @@ export default function CoverCarePage() {
               variant="bordered"
             >
               {links.map((link) => (
-                <SelectItem key={String(link.cared_for_id)}>{link.cared_for_name}</SelectItem>
+                <SelectItem key={String(link.cared_for_id)} id={String(link.cared_for_id)}>{link.cared_for_name}</SelectItem>
               ))}
             </Select>
             <Input
@@ -265,7 +266,7 @@ export default function CoverCarePage() {
                 variant="bordered"
               >
                 {[0, 1, 2, 3, 4, 5].map((tier) => (
-                  <SelectItem key={String(tier)}>{t('cover.trust_tier', { tier })}</SelectItem>
+                  <SelectItem key={String(tier)} id={String(tier)}>{t('cover.trust_tier', { tier })}</SelectItem>
                 ))}
               </Select>
               <Select
@@ -275,7 +276,7 @@ export default function CoverCarePage() {
                 variant="bordered"
               >
                 {['planned', 'soon', 'urgent'].map((item) => (
-                  <SelectItem key={item}>{t(`cover.urgency.${item}`)}</SelectItem>
+                  <SelectItem key={item} id={item}>{t(`cover.urgency.${item}`)}</SelectItem>
                 ))}
               </Select>
             </div>

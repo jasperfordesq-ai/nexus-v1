@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,23 +12,7 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
-  Button,
-  Chip,
-  Select,
-  SelectItem,
-  Input,
-  Card,
-  CardBody,
-  CardHeader,
-  Tab,
-  Tabs,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from '@heroui/react';
+  Button, Chip, Input, Card, CardBody, CardHeader, Tab, Tabs, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import Clock from 'lucide-react/icons/clock';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Hourglass from 'lucide-react/icons/hourglass';
@@ -365,10 +350,10 @@ export function VolunteerHoursAudit() {
             setStatusFilter(val || 'all');
           }}
         >
-          <SelectItem key="all">{t('volunteering.tab_all')}</SelectItem>
-          <SelectItem key="pending">{t('volunteering.tab_pending')}</SelectItem>
-          <SelectItem key="approved">{t('volunteering.tab_approved')}</SelectItem>
-          <SelectItem key="declined">{t('volunteering.declined')}</SelectItem>
+          <SelectItem key="all" id="all">{t('volunteering.tab_all')}</SelectItem>
+          <SelectItem key="pending" id="pending">{t('volunteering.tab_pending')}</SelectItem>
+          <SelectItem key="approved" id="approved">{t('volunteering.tab_approved')}</SelectItem>
+          <SelectItem key="declined" id="declined">{t('volunteering.declined')}</SelectItem>
         </Select>
         <Input
           type="date"

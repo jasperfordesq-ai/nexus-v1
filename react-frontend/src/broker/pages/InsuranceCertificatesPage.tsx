@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -13,22 +14,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
-  Tabs,
-  Tab,
-  Button,
-  Chip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Input,
-  Select,
-  SelectItem,
-  Textarea,
-  Avatar,
-  Spinner,
-} from '@heroui/react';
+  Tabs, Tab, Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea, Avatar, Spinner } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
@@ -848,7 +834,7 @@ export function InsuranceCertificates() {
               isRequired
             >
               {INSURANCE_TYPE_KEYS.map((key) => (
-                <SelectItem key={key}>{t(INSURANCE_TYPE_LABEL_KEYS[key])}</SelectItem>
+                <SelectItem key={key} id={key}>{t(INSURANCE_TYPE_LABEL_KEYS[key])}</SelectItem>
               ))}
             </Select>
             <Input
@@ -955,7 +941,7 @@ export function InsuranceCertificates() {
                 isRequired
               >
                 {INSURANCE_TYPE_KEYS.map((key) => (
-                  <SelectItem key={key}>{t(INSURANCE_TYPE_LABEL_KEYS[key])}</SelectItem>
+                  <SelectItem key={key} id={key}>{t(INSURANCE_TYPE_LABEL_KEYS[key])}</SelectItem>
                 ))}
               </Select>
               <Input

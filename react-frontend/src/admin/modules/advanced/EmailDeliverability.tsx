@@ -1,10 +1,11 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, Button, Card, CardBody, CardHeader, Chip, Input, Pagination, Select, SelectItem, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from '@heroui/react';
+import { Alert, Button, Card, CardBody, CardHeader, Chip, Input, Pagination, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Activity from 'lucide-react/icons/activity';
 import AlertTriangle from 'lucide-react/icons/alert-triangle';
@@ -382,10 +383,10 @@ export default function EmailDeliverability() {
               if (v) setSummaryDays(Number(v));
             }}
           >
-            <SelectItem key="1">{t('email_deliverability.windows.1')}</SelectItem>
-            <SelectItem key="7">{t('email_deliverability.windows.7')}</SelectItem>
-            <SelectItem key="30">{t('email_deliverability.windows.30')}</SelectItem>
-            <SelectItem key="90">{t('email_deliverability.windows.90')}</SelectItem>
+            <SelectItem key="1" id="1">{t('email_deliverability.windows.1')}</SelectItem>
+            <SelectItem key="7" id="7">{t('email_deliverability.windows.7')}</SelectItem>
+            <SelectItem key="30" id="30">{t('email_deliverability.windows.30')}</SelectItem>
+            <SelectItem key="90" id="90">{t('email_deliverability.windows.90')}</SelectItem>
           </Select>
           <Tooltip content={t('email_deliverability.actions.refresh')}>
             <Button size="sm" variant="flat" onPress={loadSummary} isIconOnly aria-label={t('email_deliverability.actions.refresh')}>
@@ -602,7 +603,7 @@ export default function EmailDeliverability() {
                 onSelectionChange={(keys) => setLogStatus((Array.from(keys)[0] as string) ?? '')}
               >
                 {LOG_STATUSES.map((status) => (
-                  <SelectItem key={status}>{status ? t(`email_deliverability.status.${status}`) : t('email_deliverability.filters.all')}</SelectItem>
+                  <SelectItem key={status} id={status}>{status ? t(`email_deliverability.status.${status}`) : t('email_deliverability.filters.all')}</SelectItem>
                 ))}
               </Select>
               <Input size="sm" type="date" label={t('email_deliverability.filters.since')} value={logSince} onValueChange={setLogSince} />
@@ -665,7 +666,7 @@ export default function EmailDeliverability() {
                   }
                 }}
               >
-                {PAGE_SIZE_OPTIONS.map((size) => <SelectItem key={String(size)}>{String(size)}</SelectItem>)}
+                {PAGE_SIZE_OPTIONS.map((size) => <SelectItem key={String(size)} id={String(size)}>{String(size)}</SelectItem>)}
               </Select>
               <Pagination total={logPages} page={logPage} onChange={setLogPage} showControls />
             </div>
@@ -695,7 +696,7 @@ export default function EmailDeliverability() {
                 onSelectionChange={(keys) => setSuppReason((Array.from(keys)[0] as string) ?? '')}
               >
                 {SUPPRESSION_REASONS.map((reason) => (
-                  <SelectItem key={reason}>{reason ? t(`email_deliverability.suppressions.reasons.${reason}`) : t('email_deliverability.filters.all')}</SelectItem>
+                  <SelectItem key={reason} id={reason}>{reason ? t(`email_deliverability.suppressions.reasons.${reason}`) : t('email_deliverability.filters.all')}</SelectItem>
                 ))}
               </Select>
               <Button size="sm" color="primary" onPress={runSuppressionSearch}>{t('email_deliverability.actions.search')}</Button>
@@ -763,7 +764,7 @@ export default function EmailDeliverability() {
                   }
                 }}
               >
-                {PAGE_SIZE_OPTIONS.map((size) => <SelectItem key={String(size)}>{String(size)}</SelectItem>)}
+                {PAGE_SIZE_OPTIONS.map((size) => <SelectItem key={String(size)} id={String(size)}>{String(size)}</SelectItem>)}
               </Select>
               <Pagination total={suppPages} page={suppPage} onChange={setSuppPage} showControls />
             </div>

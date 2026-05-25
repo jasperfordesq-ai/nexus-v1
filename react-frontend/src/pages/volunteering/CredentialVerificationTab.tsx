@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -13,18 +14,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Button,
-  Input,
-  Chip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Select,
-  SelectItem,
-  useDisclosure,
-} from '@heroui/react';
+  Button, Input, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@heroui/react';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import Upload from 'lucide-react/icons/upload';
 import FileText from 'lucide-react/icons/file-text';
@@ -487,7 +477,7 @@ export function CredentialVerificationTab() {
               startContent={<ShieldCheck className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
             >
               {CREDENTIAL_TYPE_KEYS.map((key) => (
-                <SelectItem key={key}>{t(`credentials.type_${key}`, key)}</SelectItem>
+                <SelectItem key={key} id={key}>{t(`credentials.type_${key}`, key)}</SelectItem>
               ))}
             </Select>
 

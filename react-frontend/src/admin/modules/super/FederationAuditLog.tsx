@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +11,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Select, SelectItem, Input, Button, Chip } from '@heroui/react';
+import { Input, Button, Chip } from '@heroui/react';
 import Download from 'lucide-react/icons/download';
 import X from 'lucide-react/icons/x';
 import Activity from 'lucide-react/icons/activity';
@@ -336,7 +337,7 @@ export function FederationAuditLog() {
           }}
         >
           {CATEGORIES.filter((c) => c.key !== '').map((c) => (
-            <SelectItem key={c.key}>{t(c.labelKey)}</SelectItem>
+            <SelectItem key={c.key} id={c.key}>{t(c.labelKey)}</SelectItem>
           ))}
         </Select>
 
@@ -351,7 +352,7 @@ export function FederationAuditLog() {
           }}
         >
           {LEVELS.filter((l) => l.key !== '').map((l) => (
-            <SelectItem key={l.key}>{t(l.labelKey)}</SelectItem>
+            <SelectItem key={l.key} id={l.key}>{t(l.labelKey)}</SelectItem>
           ))}
         </Select>
 

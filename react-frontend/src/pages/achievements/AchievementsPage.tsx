@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -7,29 +8,10 @@
  * Achievements Page - Badge showcase, challenges, collections, XP shop, daily rewards
  */
 
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  useState,
-  useEffect,
-  useCallback,
-  useRef } from 'react';
-import { motion,
-  AnimatePresence } from 'framer-motion';
-import {
-  Button,
-  Chip,
-  Select,
-  SelectItem,
-  Tabs,
-  Tab,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Checkbox,
-  Spinner,
-  Skeleton,
-  } from '@heroui/react';
+  Button, Chip, Tabs, Tab, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Checkbox, Spinner, Skeleton } from '@heroui/react';
 import Trophy from 'lucide-react/icons/trophy';
 import Medal from 'lucide-react/icons/medal';
 import Star from 'lucide-react/icons/star';
@@ -1737,7 +1719,7 @@ export function AchievementsPage() {
                               })),
                             ]}
                           >
-                            {(item) => <SelectItem key={item.key}>{item.label}</SelectItem>}
+                            {(item) => <SelectItem key={item.key} id={item.key}>{item.label}</SelectItem>}
                           </Select>
                         </>
                       )}

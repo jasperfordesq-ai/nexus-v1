@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -5,7 +6,7 @@
 
 import { useMemo, useState, type JSX } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { Button, Input, Select, SelectItem, Textarea } from '@heroui/react';
+import { Button, Input, Textarea } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CheckCircle from 'lucide-react/icons/circle-check';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
@@ -196,7 +197,7 @@ export default function SafeguardingReportPage(): JSX.Element {
               isRequired
             >
               {categories.map((c) => (
-                <SelectItem key={c}>
+                <SelectItem key={c} id={c}>
                   {t(`safeguarding_reports.submit.form.categories.${c}`)}
                 </SelectItem>
               ))}
@@ -210,7 +211,7 @@ export default function SafeguardingReportPage(): JSX.Element {
               isRequired
             >
               {severities.map((s) => (
-                <SelectItem key={s}>
+                <SelectItem key={s} id={s}>
                   {t(`safeguarding_reports.submit.form.severities.${s}`)}
                 </SelectItem>
               ))}

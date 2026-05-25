@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,25 +12,7 @@
 
 import { useState, type CSSProperties, useCallback, useEffect } from 'react';
 import {
-  Button,
-  Chip,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Input,
-  Select,
-  SelectItem,
-  Tabs,
-  Tab,
-  Card,
-  CardBody,
-} from '@heroui/react';
+  Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Tabs, Tab, Card, CardBody } from '@heroui/react';
 import Plus from 'lucide-react/icons/plus';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import Edit from 'lucide-react/icons/square-pen';
@@ -40,10 +23,20 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useAdminPageMeta } from '../../AdminMetaContext';
 import { useToast } from '@/contexts';
 import { adminCategories } from '../../api/adminApi';
-import { DataTable, PageHeader, ConfirmModal, EmptyState, type Column } from '../../components';
+import { DataTable,
+  PageHeader,
+  ConfirmModal,
+  EmptyState,
+  type Column } from '../../components';
 import type { AdminCategory } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
+import { Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
@@ -244,10 +237,10 @@ export function CategoriesAdmin() {
           </Button>
         </DropdownTrigger>
         <DropdownMenu aria-label={t('categories.label_category_actions')} onAction={handleMenuAction}>
-          <DropdownItem key="edit" startContent={<Edit size={14} />}>
+          <DropdownItem key="edit" id="edit" startContent={<Edit size={14} />}>
             {t('common.edit')}
           </DropdownItem>
-          <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
+          <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
             {t('common.delete')}
           </DropdownItem>
         </DropdownMenu>
@@ -406,7 +399,7 @@ export function CategoriesAdmin() {
               variant="bordered"
             >
               {CATEGORY_TYPES.map((t) => (
-                <SelectItem key={t.key}>{t.label}</SelectItem>
+                <SelectItem key={t.key} id={t.key}>{t.label}</SelectItem>
               ))}
             </Select>
 
@@ -431,7 +424,7 @@ export function CategoriesAdmin() {
               }}
             >
               {COLOR_OPTIONS.map((color) => (
-                <SelectItem key={color} textValue={color}>
+                <SelectItem key={color} id={color} textValue={color}>
                   <div className="flex items-center gap-2">
                     <div
                       className="h-3 w-3 rounded-full"

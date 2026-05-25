@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -8,28 +9,11 @@
  */
 
 import React, { useState, useEffect, useCallback, useRef, Suspense } from 'react';
-import {
-  ErrorBoundary } from '@/components/feedback/ErrorBoundary';
-import { Link,
-  useNavigate,
-  useSearchParams } from 'react-router-dom';
+import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Button,
-  Input,
-  Chip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Textarea,
-  useDisclosure,
-  Avatar,
-  Select,
-  SelectItem,
-  Spinner,
-  } from '@heroui/react';
+  Button, Input, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, useDisclosure, Avatar, Spinner } from '@heroui/react';
 import Heart from 'lucide-react/icons/heart';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -1340,7 +1324,7 @@ function HoursTab() {
               startContent={<Building2 className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
             >
               {organisations.map((org) => (
-                <SelectItem key={String(org.id)}>{org.name}</SelectItem>
+                <SelectItem key={String(org.id)} id={String(org.id)}>{org.name}</SelectItem>
               ))}
             </Select>
             <Input

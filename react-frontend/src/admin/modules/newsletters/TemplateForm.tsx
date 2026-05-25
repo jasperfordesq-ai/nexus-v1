@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,7 +13,7 @@
 
 import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Input, Textarea, Button, Select, SelectItem, Switch, Chip, Spinner } from '@heroui/react';
+import { Card, CardBody, CardHeader, Input, Textarea, Button, Switch, Chip, Spinner } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
@@ -304,7 +305,7 @@ export function TemplateForm() {
                     isDisabled={submitting}
                   >
                     {CATEGORIES.map((cat) => (
-                      <SelectItem key={cat.key}>{cat.label}</SelectItem>
+                      <SelectItem key={cat.key} id={cat.key}>{cat.label}</SelectItem>
                     ))}
                   </Select>
                   <div className="flex items-center gap-3 pt-2">

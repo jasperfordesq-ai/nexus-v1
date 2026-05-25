@@ -268,3 +268,5 @@ DPO_Confidentiality_Agreement_*.docx
 # ─── Blue-green deploy local artefacts ───────────────────────────────────────
 .bluegreen-status
 .bluegreen-latest-log
+# heroui-agents-md
+.heroui-docs/

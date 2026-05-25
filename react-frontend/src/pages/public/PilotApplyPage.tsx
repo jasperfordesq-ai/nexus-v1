@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -13,14 +14,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Button,
-  Input,
-  Select,
-  SelectItem,
-  Textarea,
-  CheckboxGroup,
-  Checkbox,
-} from '@heroui/react';
+  Button, Input, Textarea, CheckboxGroup, Checkbox } from '@heroui/react';
 import Building from 'lucide-react/icons/building';
 import Globe from 'lucide-react/icons/globe';
 import CheckCircle2 from 'lucide-react/icons/check-circle-2';
@@ -293,7 +287,7 @@ export function PilotApplyPage() {
                 value: 'text-theme-primary',
               }}
             >
-              {COUNTRIES.map(c => <SelectItem key={c}>{c}</SelectItem>)}
+              {COUNTRIES.map(c => <SelectItem key={c} id={c}>{c}</SelectItem>)}
             </Select>
             <Input
               label={t('provisioning.fields.region_or_canton')}
@@ -353,7 +347,7 @@ export function PilotApplyPage() {
             }}
           >
             {CATEGORIES.map(c => (
-              <SelectItem key={c}>{t(`provisioning.categories.${c}`)}</SelectItem>
+              <SelectItem key={c} id={c}>{t(`provisioning.categories.${c}`)}</SelectItem>
             ))}
           </Select>
 
@@ -381,7 +375,7 @@ export function PilotApplyPage() {
               value: 'text-theme-primary',
             }}
           >
-            {form.languages.map(l => <SelectItem key={l}>{l.toUpperCase()}</SelectItem>)}
+            {form.languages.map(l => <SelectItem key={l} id={l}>{l.toUpperCase()}</SelectItem>)}
           </Select>
 
           {/* Bucket */}
@@ -395,7 +389,7 @@ export function PilotApplyPage() {
               value: 'text-theme-primary',
             }}
           >
-            {BUCKETS.map(b => <SelectItem key={b}>{t(`provisioning.buckets.${b}`)}</SelectItem>)}
+            {BUCKETS.map(b => <SelectItem key={b} id={b}>{t(`provisioning.buckets.${b}`)}</SelectItem>)}
           </Select>
 
           {/* Intended use */}

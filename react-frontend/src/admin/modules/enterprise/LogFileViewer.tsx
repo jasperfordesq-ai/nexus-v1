@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,19 +12,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  Card,
-  CardBody,
-  Button,
-  Spinner,
-  Select,
-  SelectItem,
-  Switch,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-} from '@heroui/react';
+  Card, CardBody, Button, Spinner, Switch, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Download from 'lucide-react/icons/download';
@@ -191,7 +180,7 @@ export function LogFileViewer() {
             className="w-36"
           >
             {LINE_OPTION_KEYS.map((key) => (
-              <SelectItem key={key}>{t(`enterprise.log_lines_${key}`)}</SelectItem>
+              <SelectItem key={key} id={key}>{t(`enterprise.log_lines_${key}`)}</SelectItem>
             ))}
           </Select>
 
@@ -207,7 +196,7 @@ export function LogFileViewer() {
             className="w-40"
           >
             {LEVEL_OPTION_KEYS.map((key) => (
-              <SelectItem key={key}>{t(`enterprise.log_level_${key.toLowerCase()}`)}</SelectItem>
+              <SelectItem key={key} id={key}>{t(`enterprise.log_level_${key.toLowerCase()}`)}</SelectItem>
             ))}
           </Select>
 

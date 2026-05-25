@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,15 +12,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  Card,
-  CardBody,
-  Input,
-  Textarea,
-  Button,
-  Select,
-  SelectItem,
-  Spinner,
-} from '@heroui/react';
+  Card, CardBody, Input, Textarea, Button, Spinner } from '@heroui/react';
 import Save from 'lucide-react/icons/save';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { useTranslation } from 'react-i18next';
@@ -179,7 +172,7 @@ export function LegalDocForm() {
                 variant="bordered"
               >
                 {DOC_TYPES.map((dt) => (
-                  <SelectItem key={dt.value}>{dt.label}</SelectItem>
+                  <SelectItem key={dt.value} id={dt.value}>{dt.label}</SelectItem>
                 ))}
               </Select>
               <Input
@@ -199,7 +192,7 @@ export function LegalDocForm() {
                 variant="bordered"
               >
                 {STATUS_OPTIONS.map((s) => (
-                  <SelectItem key={s.value}>{s.label}</SelectItem>
+                  <SelectItem key={s.value} id={s.value}>{s.label}</SelectItem>
                 ))}
               </Select>
             </div>

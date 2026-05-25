@@ -1,10 +1,12 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Accordion, AccordionItem, Button, Card, CardBody, CardHeader, Chip, Select, SelectItem, Spinner, Tooltip } from '@heroui/react';
+import {
+  Button, Card, CardBody, CardHeader, Chip, Spinner, Tooltip } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Building from 'lucide-react/icons/building';
 import Download from 'lucide-react/icons/download';
@@ -18,8 +20,12 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { Abbr, PageHeader } from '../../components';
+import { Abbr,
+  PageHeader } from '../../components';
 
+import { Accordion,
+  AccordionItem,
+} from '@/components/ui';
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -315,7 +321,7 @@ export default function CommercialBoundaryAdminPage() {
         >
           {groupedCapabilities.map((group) => (
             <AccordionItem
-              key={group.category.key}
+              key={group.category.key} id={group.category.key}
               aria-label={group.category.label}
               title={
                 <div className="flex items-center gap-3">
@@ -419,7 +425,7 @@ function CapabilityRow({ capability, saving, onChange, onReset, t }: CapabilityR
             aria-label={t('commercial_boundary.fields.classification_aria', { label: capability.label })}
           >
             {CLASSIFICATION_OPTIONS.map((opt) => (
-              <SelectItem key={opt}>
+              <SelectItem key={opt} id={opt}>
                 {t(`commercial_boundary.classification.${opt}`)}
               </SelectItem>
             ))}

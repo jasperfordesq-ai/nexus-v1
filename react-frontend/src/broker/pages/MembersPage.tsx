@@ -9,16 +9,16 @@
  * status, notes drawer, and contextual actions for brokers.
  */
 
-import { useEffect, useState, useCallback, useMemo } from 'react';
+import {
+  useEffect,
+  useState,
+  useCallback,
+  useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Tabs,
   Tab,
   Chip,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
   Button,
   Avatar,
   Modal,
@@ -41,14 +41,26 @@ import RotateCcw from 'lucide-react/icons/rotate-ccw';
 import ExternalLink from 'lucide-react/icons/external-link';
 import Send from 'lucide-react/icons/send';
 import { usePageTitle } from '@/hooks';
-import { useToast, useTenant } from '@/contexts';
-import { adminUsers, adminCrm } from '@/admin/api/adminApi';
+import { useToast,
+  useTenant } from '@/contexts';
+import { adminUsers,
+  adminCrm } from '@/admin/api/adminApi';
 import type { AdminUser } from '@/admin/api/types';
-import { DataTable, PageHeader, ConfirmModal } from '@/admin/components';
+import { DataTable,
+  PageHeader,
+  ConfirmModal } from '@/admin/components';
 import type { Column } from '@/admin/components';
 import { resolveAvatarUrl } from '@/lib/helpers';
-import { parseServerTimestamp, formatServerDate, formatServerDateTime } from '@/lib/serverTime';
+import { parseServerTimestamp,
+  formatServerDate,
+  formatServerDateTime } from '@/lib/serverTime';
 
+import { Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types & Constants
 // ─────────────────────────────────────────────────────────────────────────────
@@ -410,28 +422,28 @@ export default function MembersPage() {
               </DropdownTrigger>
               <DropdownMenu aria-label={t('members.col_actions')}>
                 <DropdownItem
-                  key="view"
+                  key="view" id="view"
                   startContent={<ExternalLink size={14} />}
                   onPress={() => window.open(tenantPath(`/profile/${user.id}`), '_blank')}
                 >
                   {t('members.view_profile')}
                 </DropdownItem>
                 <DropdownItem
-                  key="message"
+                  key="message" id="message"
                   startContent={<Send size={14} />}
                   onPress={() => window.open(tenantPath(`/messages?to=${user.id}`), '_blank')}
                 >
                   {t('members.send_message')}
                 </DropdownItem>
                 <DropdownItem
-                  key="notes"
+                  key="notes" id="notes"
                   startContent={<StickyNote size={14} />}
                   onPress={() => openNotes(user)}
                 >
                   {t('members.notes')}
                 </DropdownItem>
                 <DropdownItem
-                  key="vetting"
+                  key="vetting" id="vetting"
                   startContent={<ShieldCheck size={14} />}
                   onPress={() => window.open(tenantPath(`/broker/vetting?user_id=${user.id}`), '_self')}
                 >
@@ -443,7 +455,7 @@ export default function MembersPage() {
                     appropriate state transition. */}
                 {user.status !== 'banned' ? (
                   <DropdownItem
-                    key="status-action"
+                    key="status-action" id="status-action"
                     startContent={
                       user.status === 'pending' ? <UserCheck size={14} /> :
                       user.status === 'active' ? <UserX size={14} /> :

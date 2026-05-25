@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,29 +11,7 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
-  Button,
-  Chip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Input,
-  Textarea,
-  Select,
-  SelectItem,
-  Card,
-  CardBody,
-  CardHeader,
-  Accordion,
-  AccordionItem,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from '@heroui/react';
+  Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea, Card, CardBody, CardHeader, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import DollarSign from 'lucide-react/icons/dollar-sign';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Download from 'lucide-react/icons/download';
@@ -49,9 +28,16 @@ import ExternalLink from 'lucide-react/icons/external-link';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { adminVolunteering } from '../../api/adminApi';
-import { DataTable, PageHeader, StatCard, EmptyState, type Column } from '../../components';
+import { DataTable,
+  PageHeader,
+  StatCard,
+  EmptyState,
+  type Column } from '../../components';
 import { useTranslation } from 'react-i18next';
 
+import { Accordion,
+  AccordionItem,
+} from '@/components/ui';
 // ── Types ──────────────────────────────────────────────────────────────────────
 
 interface Expense {
@@ -583,7 +569,7 @@ export function VolunteerExpenses() {
             <Accordion variant="splitted">
               {policies.map((policy) => (
                 <AccordionItem
-                  key={policy.type}
+                  key={policy.type} id={policy.type}
                   title={
                     <span className="font-medium">
                       {t(`volunteering.expense_type_${policy.type}`)}
@@ -676,9 +662,9 @@ export function VolunteerExpenses() {
                     setReviewAction(val as 'approved' | 'rejected' | 'paid');
                   }}
                 >
-                  <SelectItem key="approved">{t('volunteering.approve')}</SelectItem>
-                  <SelectItem key="rejected">{t('volunteering.reject')}</SelectItem>
-                  <SelectItem key="paid">{t('volunteering.mark_as_paid')}</SelectItem>
+                  <SelectItem key="approved" id="approved">{t('volunteering.approve')}</SelectItem>
+                  <SelectItem key="rejected" id="rejected">{t('volunteering.reject')}</SelectItem>
+                  <SelectItem key="paid" id="paid">{t('volunteering.mark_as_paid')}</SelectItem>
                 </Select>
 
                 <Textarea
@@ -793,8 +779,8 @@ export function VolunteerExpenses() {
                   setPolicyForm({ ...policyForm, requires_approval: val === 'yes' });
                 }}
               >
-                <SelectItem key="yes">{t('volunteering.yes')}</SelectItem>
-                <SelectItem key="no">{t('volunteering.no')}</SelectItem>
+                <SelectItem key="yes" id="yes">{t('volunteering.yes')}</SelectItem>
+                <SelectItem key="no" id="no">{t('volunteering.no')}</SelectItem>
               </Select>
             </div>
           </ModalBody>

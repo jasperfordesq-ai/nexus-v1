@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,7 +10,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Button, Input, Textarea, Select, SelectItem, Chip } from '@heroui/react';
+import { Button, Input, Textarea, Chip } from '@heroui/react';
 import ImagePlus from 'lucide-react/icons/image-plus';
 import MapPin from 'lucide-react/icons/map-pin';
 import X from 'lucide-react/icons/x';
@@ -334,7 +335,7 @@ export function ListingTab({ onSuccess, onClose, templateData }: TabSubmitProps)
             }}
           >
             {categories.map((c) => (
-              <SelectItem key={String(c.id)} textValue={c.name}>
+              <SelectItem key={String(c.id)} id={String(c.id)} textValue={c.name}>
                 {c.name}
               </SelectItem>
             ))}

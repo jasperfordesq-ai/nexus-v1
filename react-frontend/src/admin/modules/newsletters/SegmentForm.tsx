@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +11,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button, Card, CardHeader, CardBody, Input, Select, SelectItem, Switch, Chip, Spinner, Tooltip } from '@heroui/react';
+import { Button, Card, CardHeader, CardBody, Input, Switch, Chip, Spinner, Tooltip } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Save from 'lucide-react/icons/save';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -294,8 +295,8 @@ export function SegmentForm() {
           }}
           className="min-w-[120px]"
         >
-          <SelectItem key="1">{t('segment_form.value_yes')}</SelectItem>
-          <SelectItem key="0">{t('segment_form.value_no')}</SelectItem>
+          <SelectItem key="1" id="1">{t('segment_form.value_yes')}</SelectItem>
+          <SelectItem key="0" id="0">{t('segment_form.value_no')}</SelectItem>
         </Select>
       );
     }
@@ -313,7 +314,7 @@ export function SegmentForm() {
           className="min-w-[160px]"
         >
           {fieldConfig.options.map(opt => (
-            <SelectItem key={opt}>{t(`segment_form.option_${opt}`, opt.charAt(0).toUpperCase() + opt.slice(1))}</SelectItem>
+            <SelectItem key={opt} id={opt}>{t(`segment_form.option_${opt}`, opt.charAt(0).toUpperCase() + opt.slice(1))}</SelectItem>
           ))}
         </Select>
       );
@@ -425,8 +426,8 @@ export function SegmentForm() {
             }}
             className="max-w-[200px]"
           >
-            <SelectItem key="all">{t('segment_form.match_all_and')}</SelectItem>
-            <SelectItem key="any">{t('segment_form.match_any_or')}</SelectItem>
+            <SelectItem key="all" id="all">{t('segment_form.match_all_and')}</SelectItem>
+            <SelectItem key="any" id="any">{t('segment_form.match_any_or')}</SelectItem>
           </Select>
         </CardHeader>
         <CardBody className="space-y-3">
@@ -457,7 +458,7 @@ export function SegmentForm() {
                 className="min-w-[180px] flex-1"
               >
                 {RULE_FIELDS.map(f => (
-                  <SelectItem key={f.key}>{t(`segment_form.field_${f.key}`, f.label)}</SelectItem>
+                  <SelectItem key={f.key} id={f.key}>{t(`segment_form.field_${f.key}`, f.label)}</SelectItem>
                 ))}
               </Select>
 
@@ -473,7 +474,7 @@ export function SegmentForm() {
                   className="min-w-[150px]"
                 >
                   {(getFieldConfig(rule.field)?.operators || []).map(op => (
-                    <SelectItem key={op}>{t(`segment_form.operator_${op}`, OPERATOR_LABELS[op] || op)}</SelectItem>
+                    <SelectItem key={op} id={op}>{t(`segment_form.operator_${op}`, OPERATOR_LABELS[op] || op)}</SelectItem>
                   ))}
                 </Select>
               )}

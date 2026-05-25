@@ -15,7 +15,7 @@
  * The standalone wrapper `BrokerHelpPage` owns the title for the /broker/help route.
  */
 
-import { Card, CardBody, CardHeader, Accordion, AccordionItem } from '@heroui/react';
+import { Card, CardBody, CardHeader } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import { Trans, useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
@@ -30,6 +30,7 @@ import Scale from 'lucide-react/icons/scale';
 import Phone from 'lucide-react/icons/phone';
 import Database from 'lucide-react/icons/database';
 
+import { Accordion, AccordionItem } from '@/components/ui';
 const richComponents = {
   b: <strong />,
   i: <em />,
@@ -60,7 +61,7 @@ export function BrokerControlsHelp() {
           <Accordion variant="splitted" selectionMode="multiple">
             {/* Overview */}
             <AccordionItem
-              key="overview"
+              key="overview" id="overview"
               aria-label={t('help.overview.aria')}
               title={
                 <div className="flex items-center gap-2">
@@ -85,7 +86,7 @@ export function BrokerControlsHelp() {
 
             {/* Workflow */}
             <AccordionItem
-              key="workflow"
+              key="workflow" id="workflow"
               aria-label={t('help.workflow.aria')}
               title={
                 <div className="flex items-center gap-2">
@@ -109,7 +110,7 @@ export function BrokerControlsHelp() {
 
             {/* Messages */}
             <AccordionItem
-              key="messages"
+              key="messages" id="messages"
               aria-label={t('help.messages.aria')}
               title={
                 <div className="flex items-center gap-2">
@@ -139,7 +140,7 @@ export function BrokerControlsHelp() {
 
             {/* Monitoring */}
             <AccordionItem
-              key="monitoring"
+              key="monitoring" id="monitoring"
               aria-label={t('help.monitoring.aria')}
               title={
                 <div className="flex items-center gap-2">
@@ -161,7 +162,7 @@ export function BrokerControlsHelp() {
 
             {/* Vetting */}
             <AccordionItem
-              key="vetting"
+              key="vetting" id="vetting"
               aria-label={t('help.vetting.aria')}
               title={
                 <div className="flex items-center gap-2">
@@ -194,7 +195,7 @@ export function BrokerControlsHelp() {
 
             {/* Alerts */}
             <AccordionItem
-              key="alerts"
+              key="alerts" id="alerts"
               aria-label={t('help.alerts.aria')}
               title={
                 <div className="flex items-center gap-2">
@@ -220,7 +221,7 @@ export function BrokerControlsHelp() {
 
             {/* Legal */}
             <AccordionItem
-              key="legal"
+              key="legal" id="legal"
               aria-label={t('help.legal.aria')}
               title={
                 <div className="flex items-center gap-2">
@@ -244,7 +245,7 @@ export function BrokerControlsHelp() {
 
             {/* Data */}
             <AccordionItem
-              key="data"
+              key="data" id="data"
               aria-label={t('help.data.aria')}
               title={
                 <div className="flex items-center gap-2">
@@ -267,7 +268,7 @@ export function BrokerControlsHelp() {
 
             {/* Contacts */}
             <AccordionItem
-              key="contacts"
+              key="contacts" id="contacts"
               aria-label={t('help.contacts.aria')}
               title={
                 <div className="flex items-center gap-2">
@@ -288,7 +289,7 @@ export function BrokerControlsHelp() {
 
             {/* Troubleshooting */}
             <AccordionItem
-              key="troubleshooting"
+              key="troubleshooting" id="troubleshooting"
               aria-label={t('help.troubleshooting.aria')}
               title={
                 <div className="flex items-center gap-2">

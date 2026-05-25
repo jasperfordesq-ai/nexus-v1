@@ -1,10 +1,11 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState, type ChangeEvent, type JSX } from 'react';
-import { Button, Card, CardBody, CardHeader, Chip, Input, Select, SelectItem, Spinner, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea } from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -1607,7 +1608,7 @@ export default function CaringCommunityWorkflowPage() {
                       }}
                       items={coordinatorOptions}
                     >
-                      {(item) => <SelectItem key={item.id}>{item.label}</SelectItem>}
+                      {(item) => <SelectItem key={item.id} id={item.id}>{item.label}</SelectItem>}
                     </Select>
                     <Button
                       size="sm"
@@ -1701,7 +1702,7 @@ export default function CaringCommunityWorkflowPage() {
                     onSelectionChange={(keys) => setRelationshipFrequency((Array.from(keys)[0]?.toString() as SupportRelationship['frequency']) || 'weekly')}
                     items={frequencyOptions}
                   >
-                    {(item) => <SelectItem key={item.id}>{item.label}</SelectItem>}
+                    {(item) => <SelectItem key={item.id} id={item.id}>{item.label}</SelectItem>}
                   </Select>
                   <Input type="number" min={0.25} step={0.25} label={t('caring_workflow.relationships.expected_hours_per_visit')} value={relationshipExpectedHours} onValueChange={setRelationshipExpectedHours} />
                   <Input type="date" label={t('caring_workflow.relationships.start_date')} value={relationshipStartDate} onValueChange={setRelationshipStartDate} />
@@ -2151,7 +2152,7 @@ export default function CaringCommunityWorkflowPage() {
                   onSelectionChange={(keys) => updatePolicyField('municipal_report_default_period', Array.from(keys)[0]?.toString() ?? 'last_90_days')}
                 >
                   {reportPeriods.map((period) => (
-                    <SelectItem key={period}>{t(`caring_workflow.policy.periods.${period}`)}</SelectItem>
+                    <SelectItem key={period} id={period}>{t(`caring_workflow.policy.periods.${period}`)}</SelectItem>
                   ))}
                 </Select>
                 <div className="grid grid-cols-1 gap-3">

@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -5,7 +6,7 @@
 
 import { useState, useCallback, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Avatar, Button, Input, Select, SelectItem, Textarea } from '@heroui/react';
+import { Avatar, Button, Input, Textarea } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Heart from 'lucide-react/icons/heart';
 import Search from 'lucide-react/icons/search';
@@ -221,7 +222,7 @@ export function LinkCareReceiverPage() {
               isDisabled={isSubmitting}
             >
               {relationshipOptions.map((opt) => (
-                <SelectItem key={opt.key}>{opt.label}</SelectItem>
+                <SelectItem key={opt.key} id={opt.key}>{opt.label}</SelectItem>
               ))}
             </Select>
 

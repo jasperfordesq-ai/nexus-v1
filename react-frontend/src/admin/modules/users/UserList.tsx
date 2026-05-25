@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,23 +13,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import {
-  Button,
-  Avatar,
-  Chip,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  Tabs,
-  Tab,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Select,
-  SelectItem,
-} from '@heroui/react';
+  Button, Avatar, Chip, Tabs, Tab, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
 import Plus from 'lucide-react/icons/plus';
 import Upload from 'lucide-react/icons/upload';
 import Download from 'lucide-react/icons/download';
@@ -47,13 +32,28 @@ import AlertCircle from 'lucide-react/icons/circle-alert';
 import Trash2 from 'lucide-react/icons/trash-2';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts';
-import { useTenant, useToast } from '@/contexts';
+import { useTenant,
+  useToast } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { useAdminPageMeta } from '../../AdminMetaContext';
-import { adminUsers, type BulkActionResult } from '../../api/adminApi';
-import { DataTable, StatusBadge, PageHeader, ConfirmModal, BulkActionToolbar, type BulkAction, type Column } from '../../components';
-import type { AdminUser, UserListParams } from '../../api/types';
+import { adminUsers,
+  type BulkActionResult } from '../../api/adminApi';
+import { DataTable,
+  StatusBadge,
+  PageHeader,
+  ConfirmModal,
+  BulkActionToolbar,
+  type BulkAction,
+  type Column } from '../../components';
+import type { AdminUser,
+  UserListParams } from '../../api/types';
 
+import { Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 export function UserList() {
   const { t } = useTranslation('admin');
   useAdminPageMeta({ title: t('users.title') });
@@ -326,7 +326,7 @@ export function UserList() {
         <DropdownMenu aria-label={t('users.actions_menu')} onAction={handleMenuAction}>
           {items.map((item) => (
             <DropdownItem
-              key={item.key}
+              key={item.key} id={item.key}
               startContent={item.icon}
               className={item.className}
               color={item.color}
@@ -586,9 +586,9 @@ export function UserList() {
                   size="sm"
                   variant="bordered"
                 >
-                  <SelectItem key="member">{t('users.import_role_member')}</SelectItem>
-                  <SelectItem key="broker">{t('users.import_role_broker')}</SelectItem>
-                  <SelectItem key="coordinator">{t('users.import_role_coordinator')}</SelectItem>
+                  <SelectItem key="member" id="member">{t('users.import_role_member')}</SelectItem>
+                  <SelectItem key="broker" id="broker">{t('users.import_role_broker')}</SelectItem>
+                  <SelectItem key="coordinator" id="coordinator">{t('users.import_role_coordinator')}</SelectItem>
                 </Select>
               </div>
             ) : (

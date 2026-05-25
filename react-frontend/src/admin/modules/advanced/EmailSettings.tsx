@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,7 +10,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Input, Button, Select, SelectItem, Spinner, Chip } from '@heroui/react';
+import { Card, CardBody, CardHeader, Input, Button, Spinner, Chip } from '@heroui/react';
 import Mail from 'lucide-react/icons/mail';
 import Save from 'lucide-react/icons/save';
 import Send from 'lucide-react/icons/send';
@@ -257,7 +258,7 @@ export function EmailSettings() {
               variant="bordered"
             >
               {PROVIDERS.map(p => (
-                <SelectItem key={p.key}>{t(p.labelKey)}</SelectItem>
+                <SelectItem key={p.key} id={p.key}>{t(p.labelKey)}</SelectItem>
               ))}
             </Select>
           </CardBody>
@@ -419,9 +420,9 @@ export function EmailSettings() {
                 }}
                 variant="bordered"
               >
-                <SelectItem key="tls">{t('encryption_tls')}</SelectItem>
-                <SelectItem key="ssl">{t('encryption_ssl')}</SelectItem>
-                <SelectItem key="none">{t('encryption_none')}</SelectItem>
+                <SelectItem key="tls" id="tls">{t('encryption_tls')}</SelectItem>
+                <SelectItem key="ssl" id="ssl">{t('encryption_ssl')}</SelectItem>
+                <SelectItem key="none" id="none">{t('encryption_none')}</SelectItem>
               </Select>
               <Input
                 label={t('label_from_email')}

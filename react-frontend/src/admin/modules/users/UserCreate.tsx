@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -13,14 +14,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  Card,
-  CardBody,
-  Input,
-  Button,
-  Select,
-  SelectItem,
-  Switch,
-} from '@heroui/react';
+  Card, CardBody, Input, Button, Switch } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
 import { usePageTitle } from '@/hooks';
@@ -192,12 +186,12 @@ export function UserCreate() {
                 errorMessage={errors.role}
                 isDisabled={submitting}
               >
-                <SelectItem key="member">{t('users.role_member')}</SelectItem>
-                <SelectItem key="broker">{t('users.role_broker')}</SelectItem>
-                <SelectItem key="moderator">{t('users.role_moderator')}</SelectItem>
-                <SelectItem key="newsletter_admin">{t('users.role_newsletter_admin')}</SelectItem>
-                <SelectItem key="tenant_admin">{t('users.role_tenant_admin')}</SelectItem>
-                <SelectItem key="admin">{t('users.role_admin')}</SelectItem>
+                <SelectItem key="member" id="member">{t('users.role_member')}</SelectItem>
+                <SelectItem key="broker" id="broker">{t('users.role_broker')}</SelectItem>
+                <SelectItem key="moderator" id="moderator">{t('users.role_moderator')}</SelectItem>
+                <SelectItem key="newsletter_admin" id="newsletter_admin">{t('users.role_newsletter_admin')}</SelectItem>
+                <SelectItem key="tenant_admin" id="tenant_admin">{t('users.role_tenant_admin')}</SelectItem>
+                <SelectItem key="admin" id="admin">{t('users.role_admin')}</SelectItem>
               </Select>
 
               <Select
@@ -207,8 +201,8 @@ export function UserCreate() {
                 onSelectionChange={(keys) => setStatus(Array.from(keys)[0] as string)}
                 isDisabled={submitting}
               >
-                <SelectItem key="active">{t('users.active')}</SelectItem>
-                <SelectItem key="pending">{t('users.pending')}</SelectItem>
+                <SelectItem key="active" id="active">{t('users.active')}</SelectItem>
+                <SelectItem key="pending" id="pending">{t('users.pending')}</SelectItem>
               </Select>
             </div>
 

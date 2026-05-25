@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,19 +12,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import {
-  Card,
-  CardBody,
-  Button,
-  Input,
-  Textarea,
-  Switch,
-  Tabs,
-  Tab,
-  Select,
-  SelectItem,
-  Spinner,
-  Checkbox,
-} from '@heroui/react';
+  Card, CardBody, Button, Input, Textarea, Switch, Tabs, Tab, Spinner, Checkbox } from '@heroui/react';
 import Building2 from 'lucide-react/icons/building-2';
 import Save from 'lucide-react/icons/save';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -407,7 +396,7 @@ export function TenantForm() {
                 {parentTenants
                   .filter((t) => String(t.id) !== id)
                   .map((t) => (
-                    <SelectItem key={String(t.id)}>{t.name}</SelectItem>
+                    <SelectItem key={String(t.id)} id={String(t.id)}>{t.name}</SelectItem>
                   ))}
               </Select>
               <div className="flex items-center gap-8">
@@ -531,10 +520,10 @@ export function TenantForm() {
                 className="max-w-xs"
                 description={t('tenant_form.robots_description')}
               >
-                <SelectItem key="index, follow">{t('tenant_form.robots_index_follow')}</SelectItem>
-                <SelectItem key="noindex, follow">{t('tenant_form.robots.noindex_follow')}</SelectItem>
-                <SelectItem key="index, nofollow">{t('tenant_form.robots.index_nofollow')}</SelectItem>
-                <SelectItem key="noindex, nofollow">{t('tenant_form.robots.noindex_nofollow')}</SelectItem>
+                <SelectItem key="index, follow" id="index, follow">{t('tenant_form.robots_index_follow')}</SelectItem>
+                <SelectItem key="noindex, follow" id="noindex, follow">{t('tenant_form.robots.noindex_follow')}</SelectItem>
+                <SelectItem key="index, nofollow" id="index, nofollow">{t('tenant_form.robots.index_nofollow')}</SelectItem>
+                <SelectItem key="noindex, nofollow" id="noindex, nofollow">{t('tenant_form.robots.noindex_nofollow')}</SelectItem>
               </Select>
               <Select
                 label={t('tenant_form.organisation_type_label')}
@@ -547,11 +536,11 @@ export function TenantForm() {
                 className="max-w-xs"
                 description={t('tenant_form.organisation_type_description')}
               >
-                <SelectItem key="NonprofitOrganization">{t('tenant_form.schema_nonprofit')}</SelectItem>
-                <SelectItem key="LocalBusiness">{t('tenant_form.schema_local_business')}</SelectItem>
-                <SelectItem key="CommunityOrganization">{t('tenant_form.schema_community')}</SelectItem>
-                <SelectItem key="VolunteerOrganization">{t('tenant_form.schema_volunteer')}</SelectItem>
-                <SelectItem key="GovernmentOrganization">{t('tenant_form.schema_government')}</SelectItem>
+                <SelectItem key="NonprofitOrganization" id="NonprofitOrganization">{t('tenant_form.schema_nonprofit')}</SelectItem>
+                <SelectItem key="LocalBusiness" id="LocalBusiness">{t('tenant_form.schema_local_business')}</SelectItem>
+                <SelectItem key="CommunityOrganization" id="CommunityOrganization">{t('tenant_form.schema_community')}</SelectItem>
+                <SelectItem key="VolunteerOrganization" id="VolunteerOrganization">{t('tenant_form.schema_volunteer')}</SelectItem>
+                <SelectItem key="GovernmentOrganization" id="GovernmentOrganization">{t('tenant_form.schema_government')}</SelectItem>
               </Select>
             </CardBody>
           </Card>
@@ -577,7 +566,7 @@ export function TenantForm() {
                 className="max-w-xs"
               >
                 {COUNTRY_CODES.map((code) => (
-                  <SelectItem key={code}>{t(`tenant_form.countries.${code}`)} ({code})</SelectItem>
+                  <SelectItem key={code} id={code}>{t(`tenant_form.countries.${code}`)} ({code})</SelectItem>
                 ))}
               </Select>
               <Select
@@ -591,7 +580,7 @@ export function TenantForm() {
                 className="max-w-xs"
               >
                 {SERVICE_AREAS.map((key) => (
-                  <SelectItem key={key}>{t(`tenant_form.service_areas.${key}`)}</SelectItem>
+                  <SelectItem key={key} id={key}>{t(`tenant_form.service_areas.${key}`)}</SelectItem>
                 ))}
               </Select>
               <div className="grid grid-cols-2 gap-4">
@@ -665,7 +654,7 @@ export function TenantForm() {
                 {PLATFORM_LANGUAGES.filter((l) =>
                   form.supported_languages.includes(l.code)
                 ).map((lang) => (
-                  <SelectItem key={lang.code}>
+                  <SelectItem key={lang.code} id={lang.code}>
                     {lang.label} ({lang.short})
                   </SelectItem>
                 ))}

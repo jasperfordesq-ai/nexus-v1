@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +11,7 @@
  */
 
 import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
-import { Card, CardBody, CardHeader, Input, Button, Select, SelectItem, Switch, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tooltip, Spinner } from '@heroui/react';
+import { Card, CardBody, CardHeader, Input, Button, Switch, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tooltip, Spinner } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Save from 'lucide-react/icons/save';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -510,9 +511,9 @@ export function NewsletterForm() {
                       size="sm"
                       isDisabled={isSent}
                     >
-                      <SelectItem key="opens">{t('newsletter_form.metric_open_rate')}</SelectItem>
-                      <SelectItem key="clicks">{t('newsletter_form.metric_click_rate')}</SelectItem>
-                      <SelectItem key="conversions">{t('newsletter_form.metric_conversion_rate')}</SelectItem>
+                      <SelectItem key="opens" id="opens">{t('newsletter_form.metric_open_rate')}</SelectItem>
+                      <SelectItem key="clicks" id="clicks">{t('newsletter_form.metric_click_rate')}</SelectItem>
+                      <SelectItem key="conversions" id="conversions">{t('newsletter_form.metric_conversion_rate')}</SelectItem>
                     </Select>
                   </div>
                   <div className="flex items-center justify-between p-2 rounded-lg bg-default-50">
@@ -616,8 +617,8 @@ export function NewsletterForm() {
                 size="sm"
                 isDisabled={isSent}
               >
-                <SelectItem key="draft">{t('newsletter_form.status_draft')}</SelectItem>
-                <SelectItem key="scheduled">{t('newsletter_form.status_scheduled')}</SelectItem>
+                <SelectItem key="draft" id="draft">{t('newsletter_form.status_draft')}</SelectItem>
+                <SelectItem key="scheduled" id="scheduled">{t('newsletter_form.status_scheduled')}</SelectItem>
               </Select>
 
               {status === 'scheduled' && (
@@ -658,9 +659,9 @@ export function NewsletterForm() {
                     size="sm"
                     isDisabled={isSent}
                   >
-                    <SelectItem key="daily">{t('newsletter_form.frequency_daily')}</SelectItem>
-                    <SelectItem key="weekly">{t('newsletter_form.frequency_weekly')}</SelectItem>
-                    <SelectItem key="monthly">{t('newsletter_form.frequency_monthly')}</SelectItem>
+                    <SelectItem key="daily" id="daily">{t('newsletter_form.frequency_daily')}</SelectItem>
+                    <SelectItem key="weekly" id="weekly">{t('newsletter_form.frequency_weekly')}</SelectItem>
+                    <SelectItem key="monthly" id="monthly">{t('newsletter_form.frequency_monthly')}</SelectItem>
                   </Select>
 
                   {recurringFrequency === 'weekly' && (
@@ -673,7 +674,7 @@ export function NewsletterForm() {
                       isDisabled={isSent}
                     >
                       {dayNames.map((name, i) => (
-                        <SelectItem key={String(i + 1)}>{name}</SelectItem>
+                        <SelectItem key={String(i + 1)} id={String(i + 1)}>{name}</SelectItem>
                       ))}
                     </Select>
                   )}
@@ -688,7 +689,7 @@ export function NewsletterForm() {
                       isDisabled={isSent}
                     >
                       {Array.from({ length: 28 }, (_, i) => (
-                        <SelectItem key={String(i + 1)}>{String(i + 1)}</SelectItem>
+                        <SelectItem key={String(i + 1)} id={String(i + 1)}>{String(i + 1)}</SelectItem>
                       ))}
                     </Select>
                   )}
@@ -735,10 +736,10 @@ export function NewsletterForm() {
                 size="sm"
                 isDisabled={isSent}
               >
-                <SelectItem key="all_members">{t('newsletter_form.audience_all_members')}</SelectItem>
-                <SelectItem key="subscribers_only">{t('newsletter_form.audience_subscribers_only')}</SelectItem>
-                <SelectItem key="both">{t('newsletter_form.audience_members_subscribers')}</SelectItem>
-                <SelectItem key="segment">{t('newsletter_form.audience_specific_segment')}</SelectItem>
+                <SelectItem key="all_members" id="all_members">{t('newsletter_form.audience_all_members')}</SelectItem>
+                <SelectItem key="subscribers_only" id="subscribers_only">{t('newsletter_form.audience_subscribers_only')}</SelectItem>
+                <SelectItem key="both" id="both">{t('newsletter_form.audience_members_subscribers')}</SelectItem>
+                <SelectItem key="segment" id="segment">{t('newsletter_form.audience_specific_segment')}</SelectItem>
               </Select>
 
               {targetAudience === 'segment' && segments.length > 0 && (
@@ -751,7 +752,7 @@ export function NewsletterForm() {
                   isDisabled={isSent}
                 >
                   {segments.map((s) => (
-                    <SelectItem key={String(s.id)} textValue={s.name}>
+                    <SelectItem key={String(s.id)} id={String(s.id)} textValue={s.name}>
                       <div className="flex justify-between items-center">
                         <span>{s.name}</span>
                         {s.member_count !== undefined && (
@@ -811,7 +812,7 @@ export function NewsletterForm() {
                     placeholder={t('newsletters.placeholder_select_groups')}
                   >
                     {groups.map((g) => (
-                      <SelectItem key={String(g.id)}>{g.name}</SelectItem>
+                      <SelectItem key={String(g.id)} id={String(g.id)}>{g.name}</SelectItem>
                     ))}
                   </Select>
                   {targetGroups.length > 0 && (
@@ -842,7 +843,7 @@ export function NewsletterForm() {
                   isDisabled={isSent}
                 >
                   {templates.map((t) => (
-                    <SelectItem key={String(t.id)}>{t.name}</SelectItem>
+                    <SelectItem key={String(t.id)} id={String(t.id)}>{t.name}</SelectItem>
                   ))}
                 </Select>
               </CardBody>

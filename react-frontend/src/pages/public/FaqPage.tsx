@@ -13,7 +13,8 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Accordion, AccordionItem, Input } from '@heroui/react';
+import {
+  Input } from '@heroui/react';
 import Rocket from 'lucide-react/icons/rocket';
 import Wallet from 'lucide-react/icons/wallet';
 import Handshake from 'lucide-react/icons/handshake';
@@ -26,7 +27,8 @@ import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo/PageMeta';
-import { GlassCard } from '@/components/ui';
+import {
+  GlassCard, Accordion, AccordionItem } from '@/components/ui';
 
 interface FaqItem {
   question: string;
@@ -450,7 +452,7 @@ export function FaqPage() {
                   >
                     {cat.items.map((item, idx) => (
                       <AccordionItem
-                        key={`${cat.title}-${idx}`}
+                        key={`${cat.title}-${idx}`} id={`${cat.title}-${idx}`}
                         aria-label={item.question}
                         title={item.question}
                       >

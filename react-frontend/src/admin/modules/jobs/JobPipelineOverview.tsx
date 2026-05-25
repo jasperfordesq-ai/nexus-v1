@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,15 +13,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
-  Tabs,
-  Tab,
-  Chip,
-  Card,
-  CardBody,
-  Spinner,
-  Select,
-  SelectItem,
-} from '@heroui/react';
+  Tabs, Tab, Chip, Card, CardBody, Spinner } from '@heroui/react';
 import CalendarClock from 'lucide-react/icons/calendar-clock';
 import Handshake from 'lucide-react/icons/handshake';
 import { useTranslation } from 'react-i18next';
@@ -391,7 +384,7 @@ export function JobPipelineOverview() {
                   className="max-w-xs"
                 >
                   {INTERVIEW_STATUSES.map((s) => (
-                    <SelectItem key={s}>
+                    <SelectItem key={s} id={s}>
                       {s === 'all' ? t('jobs.pipeline_all') : t(getStatusKey(s))}
                     </SelectItem>
                   ))}
@@ -455,7 +448,7 @@ export function JobPipelineOverview() {
                   className="max-w-xs"
                 >
                   {OFFER_STATUSES.map((s) => (
-                    <SelectItem key={s}>
+                    <SelectItem key={s} id={s}>
                       {s === 'all' ? t('jobs.pipeline_all') : t(getStatusKey(s))}
                     </SelectItem>
                   ))}

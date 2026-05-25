@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -5,7 +6,7 @@
 
 import { useCallback, useEffect, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, CardBody, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, useDisclosure } from '@heroui/react';
+import { Button, Card, CardBody, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, useDisclosure } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Info from 'lucide-react/icons/info';
 import PlugZap from 'lucide-react/icons/plug-zap';
@@ -531,7 +532,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
                   }
                 >
                   {CATEGORIES.map((c) => (
-                    <SelectItem key={c}>{t(`external_integrations.categories.${c}`)}</SelectItem>
+                    <SelectItem key={c} id={c}>{t(`external_integrations.categories.${c}`)}</SelectItem>
                   ))}
                 </Select>
 
@@ -547,7 +548,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
                   }
                 >
                   {STATUSES.map((s) => (
-                    <SelectItem key={s}>{t(`external_integrations.statuses.${s}`)}</SelectItem>
+                    <SelectItem key={s} id={s}>{t(`external_integrations.statuses.${s}`)}</SelectItem>
                   ))}
                 </Select>
               </div>
@@ -591,7 +592,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
                   }
                 >
                   {DSA_STATUSES.map((d) => (
-                    <SelectItem key={d}>{t(`external_integrations.dsa_statuses.${d}`)}</SelectItem>
+                    <SelectItem key={d} id={d}>{t(`external_integrations.dsa_statuses.${d}`)}</SelectItem>
                   ))}
                 </Select>
 

@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,7 +12,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Button, Input, Textarea, Select, SelectItem, Radio, RadioGroup, Chip } from '@heroui/react';
+import { Button, Input, Textarea, Radio, RadioGroup, Chip } from '@heroui/react';
 import Save from 'lucide-react/icons/save';
 import Clock from 'lucide-react/icons/clock';
 import Tag from 'lucide-react/icons/tag';
@@ -542,16 +543,16 @@ export function CreateListingPage() {
                   label: 'text-theme-muted',
                 }}
               >
-                <SelectItem key="beginner_friendly">
+                <SelectItem key="beginner_friendly" id="beginner_friendly">
                   {t('form.experience_beginner')}
                 </SelectItem>
-                <SelectItem key="some_experience">
+                <SelectItem key="some_experience" id="some_experience">
                   {t('form.experience_some')}
                 </SelectItem>
-                <SelectItem key="experienced">
+                <SelectItem key="experienced" id="experienced">
                   {t('form.experience_experienced')}
                 </SelectItem>
-                <SelectItem key="professional">
+                <SelectItem key="professional" id="professional">
                   {t('form.experience_professional')}
                 </SelectItem>
               </Select>
@@ -568,16 +569,16 @@ export function CreateListingPage() {
                   label: 'text-theme-muted',
                 }}
               >
-                <SelectItem key="provided">
+                <SelectItem key="provided" id="provided">
                   {t('form.equipment_provided_option')}
                 </SelectItem>
-                <SelectItem key="partial">
+                <SelectItem key="partial" id="partial">
                   {t('form.equipment_partial')}
                 </SelectItem>
-                <SelectItem key="bring_own">
+                <SelectItem key="bring_own" id="bring_own">
                   {t('form.equipment_bring_own')}
                 </SelectItem>
-                <SelectItem key="not_applicable">
+                <SelectItem key="not_applicable" id="not_applicable">
                   {t('form.equipment_na')}
                 </SelectItem>
               </Select>
@@ -717,7 +718,7 @@ export function CreateListingPage() {
               }}
             >
               {categories.map((cat) => (
-                <SelectItem key={cat.id.toString()}>{cat.name}</SelectItem>
+                <SelectItem key={cat.id.toString()} id={cat.id.toString()}>{cat.name}</SelectItem>
               ))}
             </Select>
           </div>

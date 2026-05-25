@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +11,7 @@
 import { useState, useEffect, useCallback, useRef, memo, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Input, Select, SelectItem, Chip, Skeleton } from '@heroui/react';
+import { Button, Input, Chip, Skeleton } from '@heroui/react';
 import Search from 'lucide-react/icons/search';
 import Calendar from 'lucide-react/icons/calendar';
 import MapPin from 'lucide-react/icons/map-pin';
@@ -311,9 +312,9 @@ export function EventsPage() {
             }}
             startContent={<Filter className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
           >
-            <SelectItem key="upcoming">{t('filter_upcoming')}</SelectItem>
-            <SelectItem key="past">{t('filter_past')}</SelectItem>
-            <SelectItem key="all">{t('filter_all')}</SelectItem>
+            <SelectItem key="upcoming" id="upcoming">{t('filter_upcoming')}</SelectItem>
+            <SelectItem key="past" id="past">{t('filter_past')}</SelectItem>
+            <SelectItem key="all" id="all">{t('filter_all')}</SelectItem>
           </Select>
 
           <ProximityFilter value={proximityParams} onFilter={setProximityParams} />

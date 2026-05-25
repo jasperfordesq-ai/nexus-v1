@@ -12,17 +12,19 @@
 
 import { useTranslation } from 'react-i18next';
 import {
-  Button,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-} from '@heroui/react';
+  Button } from '@heroui/react';
 import Globe from 'lucide-react/icons/globe';
-import { api, tokenManager } from '@/lib/api';
+import { api,
+  tokenManager } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { useTenantLanguages } from '@/contexts/TenantContext';
 
+import { Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 interface Language {
   code: string;
   label: string;
@@ -107,7 +109,7 @@ export function LanguageSwitcher({ compact = true }: LanguageSwitcherProps) {
       >
         {supportedLanguages.map((lang) => (
           <DropdownItem
-            key={lang.code}
+            key={lang.code} id={lang.code}
             className={lang.code === currentLang.code ? 'bg-theme-active' : ''}
           >
             <span className="font-medium text-xs text-theme-subtle me-2">{lang.short}</span>

@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,7 +12,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Chip, Avatar, Spinner, Input, Select, SelectItem, Switch, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Chip, Avatar, Spinner, Input, Switch, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Building2 from 'lucide-react/icons/building-2';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -729,9 +730,9 @@ export function TenantShow() {
                       if (val) setAdminForm({ ...adminForm, role: val });
                     }}
                   >
-                    <SelectItem key="admin">{t('super.role_admin')}</SelectItem>
-                    <SelectItem key="tenant_admin">{t('super.role_tenant_admin')}</SelectItem>
-                    <SelectItem key="member">{t('super.role_member')}</SelectItem>
+                    <SelectItem key="admin" id="admin">{t('super.role_admin')}</SelectItem>
+                    <SelectItem key="tenant_admin" id="tenant_admin">{t('super.role_tenant_admin')}</SelectItem>
+                    <SelectItem key="member" id="member">{t('super.role_member')}</SelectItem>
                   </Select>
                   <Button
                     size="sm"
@@ -930,7 +931,7 @@ export function TenantShow() {
               {hubTenants
                 .filter((t) => t.id !== tenant.id && t.id !== tenant.parent_id)
                 .map((t) => (
-                  <SelectItem key={String(t.id)}>{t.name}</SelectItem>
+                  <SelectItem key={String(t.id)} id={String(t.id)}>{t.name}</SelectItem>
                 ))}
             </Select>
           </ModalBody>

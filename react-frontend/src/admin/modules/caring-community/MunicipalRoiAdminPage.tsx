@@ -1,10 +1,11 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Card, CardBody, CardHeader, Chip, Input, Select, SelectItem, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Building2 from 'lucide-react/icons/building-2';
 import Clock from 'lucide-react/icons/clock';
@@ -306,9 +307,9 @@ export default function MunicipalRoiAdminPage() {
               variant="bordered"
             >
               <>
-                <SelectItem key="">{t('municipal_roi_page.filters.all_sub_regions')}</SelectItem>
+                <SelectItem key="" id="">{t('municipal_roi_page.filters.all_sub_regions')}</SelectItem>
                 {subRegions.map((sr) => (
-                  <SelectItem key={String(sr.id)}>{sr.name}</SelectItem>
+                  <SelectItem key={String(sr.id)} id={String(sr.id)}>{sr.name}</SelectItem>
                 ))}
               </>
             </Select>

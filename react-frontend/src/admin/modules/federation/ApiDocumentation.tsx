@@ -8,8 +8,21 @@
  * Developer portal for external partners integrating with the federation API.
  */
 
-import { useState } from 'react';
-import { Tabs, Tab, Card, CardBody, CardHeader, Chip, Accordion, AccordionItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+import {
+  useState } from 'react';
+import { Tabs,
+  Tab,
+  Card,
+  CardBody,
+  CardHeader,
+  Chip,
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+} from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import BookOpen from 'lucide-react/icons/book-open';
 import Shield from 'lucide-react/icons/shield';
@@ -20,6 +33,9 @@ import HelpCircle from 'lucide-react/icons/circle-help';
 import { usePageTitle } from '@/hooks';
 import { PageHeader } from '../../components';
 import { useTranslation } from 'react-i18next';
+import { Accordion,
+  AccordionItem,
+} from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Code block helper
@@ -763,7 +779,7 @@ function EndpointsTab() {
     <Accordion variant="bordered" selectionMode="multiple">
       {ENDPOINTS.map((ep, idx) => (
         <AccordionItem
-          key={idx}
+          key={idx} id={idx}
           aria-label={`${ep.method} ${ep.path}`}
           title={
             <div className="flex items-center gap-3">

@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,13 +16,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Button,
-  Switch,
-  Select,
-  SelectItem,
-  Input,
-  Spinner,
-} from '@heroui/react';
+  Button, Switch, Input, Spinner } from '@heroui/react';
 import Settings from 'lucide-react/icons/settings';
 import Eye from 'lucide-react/icons/eye';
 import MessageSquare from 'lucide-react/icons/message-square';
@@ -473,9 +468,9 @@ export function FederationSettingsPage() {
               }}
               classNames={selectClassNames}
             >
-              <SelectItem key="local_only">{t('settings.reach_local_only')}</SelectItem>
-              <SelectItem key="remote_ok">{t('settings.reach_remote_ok')}</SelectItem>
-              <SelectItem key="travel_ok">{t('settings.reach_travel_ok')}</SelectItem>
+              <SelectItem key="local_only" id="local_only">{t('settings.reach_local_only')}</SelectItem>
+              <SelectItem key="remote_ok" id="remote_ok">{t('settings.reach_remote_ok')}</SelectItem>
+              <SelectItem key="travel_ok" id="travel_ok">{t('settings.reach_travel_ok')}</SelectItem>
             </Select>
 
             {settings.service_reach === 'travel_ok' && (

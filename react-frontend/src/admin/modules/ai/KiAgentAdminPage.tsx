@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,30 +7,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Button,
-  Card,
-  CardBody,
-  Chip,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Select,
-  SelectItem,
-  Slider,
-  Switch,
-  Tab,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Tabs,
-  Spinner,
-} from '@heroui/react';
+  Button, Card, CardBody, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Slider, Switch, Tab, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tabs, Spinner } from '@heroui/react';
 import Bot from 'lucide-react/icons/bot';
 import Brain from 'lucide-react/icons/brain';
 import Info from 'lucide-react/icons/info';
@@ -719,7 +697,7 @@ export default function KiAgentAdminPage() {
                 labelPlacement="outside-left"
               >
                 {AGENT_TYPES.map((t) => (
-                  <SelectItem key={t}>
+                  <SelectItem key={t} id={t}>
                     {agentTypeText(t)}
                   </SelectItem>
                 ))}

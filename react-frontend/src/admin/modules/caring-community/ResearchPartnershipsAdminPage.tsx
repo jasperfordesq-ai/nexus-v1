@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,29 +7,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Select,
-  SelectItem,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Textarea,
-  Tooltip,
-} from '@heroui/react';
+  Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, Tooltip } from '@heroui/react';
 import Database from 'lucide-react/icons/database';
 import FileCheck2 from 'lucide-react/icons/file-check-2';
 import FileText from 'lucide-react/icons/file-text';
@@ -527,7 +506,7 @@ export default function ResearchPartnershipsAdminPage() {
                     onChange={(event) => setStatus(event.target.value as PartnerStatus)}
                   >
                     {['draft', 'active', 'paused', 'ended'].map((item) => (
-                      <SelectItem key={item}>{t(`research_partnerships.statuses.${item}`)}</SelectItem>
+                      <SelectItem key={item} id={item}>{t(`research_partnerships.statuses.${item}`)}</SelectItem>
                     ))}
                   </Select>
                   <Textarea
@@ -624,7 +603,7 @@ export default function ResearchPartnershipsAdminPage() {
                   onChange={(event) => setSelectedPartnerId(Number(event.target.value) || null)}
                 >
                   {activePartners.map((partner) => (
-                    <SelectItem key={String(partner.id)}>{partner.name}</SelectItem>
+                    <SelectItem key={String(partner.id)} id={String(partner.id)}>{partner.name}</SelectItem>
                   ))}
                 </Select>
                 <div className="grid grid-cols-2 gap-3">

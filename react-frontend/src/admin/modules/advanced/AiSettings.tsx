@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -18,7 +19,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Card, CardBody, CardHeader, Input, Switch, Button, Select, SelectItem, Spinner, Chip } from '@heroui/react';
+import { Card, CardBody, CardHeader, Input, Switch, Button, Spinner, Chip } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Bot from 'lucide-react/icons/bot';
 import Save from 'lucide-react/icons/save';
@@ -318,7 +319,7 @@ export function AiSettings() {
               description={t('desc_select_ai_provider')}
             >
               {PROVIDERS.map(p => (
-                <SelectItem key={p.key}>{t(p.labelKey)}</SelectItem>
+                <SelectItem key={p.key} id={p.key}>{t(p.labelKey)}</SelectItem>
               ))}
             </Select>
           </CardBody>
@@ -386,7 +387,7 @@ export function AiSettings() {
                     description={t('desc_select_model')}
                   >
                     {MODEL_SUGGESTIONS[provider.key].map(m => (
-                      <SelectItem key={m}>{m}</SelectItem>
+                      <SelectItem key={m} id={m}>{m}</SelectItem>
                     ))}
                   </Select>
 

@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -21,13 +22,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
-  Button,
-  Input,
-  Select,
-  SelectItem,
-  Chip,
-  Spinner,
-} from '@heroui/react';
+  Button, Input, Chip, Spinner } from '@heroui/react';
 import Search from 'lucide-react/icons/search';
 import MapIcon from 'lucide-react/icons/map';
 import List from 'lucide-react/icons/list';
@@ -289,7 +284,7 @@ export function MarketplaceMapSearchPage() {
             aria-label={t('map.radius_label')}
           >
             {RADIUS_OPTIONS.map((opt) => (
-              <SelectItem key={opt.value}>{t('map.radius_option', { km: opt.value })}</SelectItem>
+              <SelectItem key={opt.value} id={opt.value}>{t('map.radius_option', { km: opt.value })}</SelectItem>
             ))}
           </Select>
 
@@ -305,7 +300,7 @@ export function MarketplaceMapSearchPage() {
             aria-label={t('search.category_label')}
           >
             {categories.map((cat) => (
-              <SelectItem key={String(cat.id)}>
+              <SelectItem key={String(cat.id)} id={String(cat.id)}>
                 {cat.name} ({cat.listing_count})
               </SelectItem>
             ))}

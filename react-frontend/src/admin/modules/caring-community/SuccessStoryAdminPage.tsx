@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -5,7 +6,7 @@
 
 import { useCallback, useEffect, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, CardBody, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Spinner, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, Tooltip, useDisclosure } from '@heroui/react';
+import { Button, Card, CardBody, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, Tooltip, useDisclosure } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Award from 'lucide-react/icons/award';
 import Info from 'lucide-react/icons/info';
@@ -542,7 +543,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                   }
                 >
                   {METRIC_SOURCES.map((s) => (
-                    <SelectItem key={s}>{t(`success_stories_admin.metric_sources.${s}`)}</SelectItem>
+                    <SelectItem key={s} id={s}>{t(`success_stories_admin.metric_sources.${s}`)}</SelectItem>
                   ))}
                 </Select>
 
@@ -590,7 +591,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                   }
                 >
                   {AUDIENCE_OPTIONS.map((a) => (
-                    <SelectItem key={a}>{t(`success_stories_admin.audience.${a}`)}</SelectItem>
+                    <SelectItem key={a} id={a}>{t(`success_stories_admin.audience.${a}`)}</SelectItem>
                   ))}
                 </Select>
 

@@ -15,7 +15,18 @@
  * system behaviour changes.
  */
 
-import { Card, CardBody, CardHeader, Accordion, AccordionItem, Chip, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  Chip,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+} from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import { useTranslation } from 'react-i18next';
 import BookOpen from 'lucide-react/icons/book-open';
@@ -29,6 +40,9 @@ import Clock from 'lucide-react/icons/clock';
 import FileText from 'lucide-react/icons/file-text';
 import Eye from 'lucide-react/icons/eye';
 
+import { Accordion,
+  AccordionItem,
+} from '@/components/ui';
 export function SafeguardingHelp() {
   const { t } = useTranslation('admin');
   const triggerRows = [
@@ -79,7 +93,7 @@ export function SafeguardingHelp() {
           <Accordion variant="splitted" selectionMode="multiple">
             {/* ─────────────────────────────────────────────────────────────── */}
             <AccordionItem
-              key="about"
+              key="about" id="about"
               aria-label={t('safeguarding.help.about.aria')}
               title={
                 <div className="flex items-center gap-2">
@@ -105,7 +119,7 @@ export function SafeguardingHelp() {
 
             {/* ─────────────────────────────────────────────────────────────── */}
             <AccordionItem
-              key="flagging"
+              key="flagging" id="flagging"
               aria-label={t('safeguarding.help.flagging.aria')}
               title={
                 <div className="flex items-center gap-2">
@@ -149,7 +163,7 @@ export function SafeguardingHelp() {
 
             {/* ─────────────────────────────────────────────────────────────── */}
             <AccordionItem
-              key="triggers"
+              key="triggers" id="triggers"
               aria-label={t('safeguarding.help.triggers.aria')}
               title={
                 <div className="flex items-center gap-2">
@@ -186,7 +200,7 @@ export function SafeguardingHelp() {
 
             {/* ─────────────────────────────────────────────────────────────── */}
             <AccordionItem
-              key="vetting-gate"
+              key="vetting-gate" id="vetting-gate"
               aria-label={t('safeguarding.help.vetting.aria')}
               title={
                 <div className="flex items-center gap-2">
@@ -222,7 +236,7 @@ export function SafeguardingHelp() {
 
             {/* ─────────────────────────────────────────────────────────────── */}
             <AccordionItem
-              key="assignments"
+              key="assignments" id="assignments"
               aria-label={t('safeguarding.help.assignments.aria')}
               title={
                 <div className="flex items-center gap-2">
@@ -257,7 +271,7 @@ export function SafeguardingHelp() {
 
             {/* ─────────────────────────────────────────────────────────────── */}
             <AccordionItem
-              key="member-preferences"
+              key="member-preferences" id="member-preferences"
               aria-label={t('safeguarding.help.preferences.aria')}
               title={
                 <div className="flex items-center gap-2">
@@ -285,7 +299,7 @@ export function SafeguardingHelp() {
 
             {/* ─────────────────────────────────────────────────────────────── */}
             <AccordionItem
-              key="autonomy"
+              key="autonomy" id="autonomy"
               aria-label={t('safeguarding.help.autonomy.aria')}
               title={
                 <div className="flex items-center gap-2">
@@ -319,7 +333,7 @@ export function SafeguardingHelp() {
 
             {/* ─────────────────────────────────────────────────────────────── */}
             <AccordionItem
-              key="annual-review"
+              key="annual-review" id="annual-review"
               aria-label={t('safeguarding.help.annual_review.aria')}
               title={
                 <div className="flex items-center gap-2">
@@ -349,7 +363,7 @@ export function SafeguardingHelp() {
 
             {/* ─────────────────────────────────────────────────────────────── */}
             <AccordionItem
-              key="audit"
+              key="audit" id="audit"
               aria-label={t('safeguarding.help.audit.aria')}
               title={
                 <div className="flex items-center gap-2">

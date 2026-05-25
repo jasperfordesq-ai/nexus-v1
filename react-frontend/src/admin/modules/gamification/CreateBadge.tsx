@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,16 +13,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
-  Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Input,
-  Textarea,
-  Select,
-  SelectItem,
-  Switch,
-} from '@heroui/react';
+  Card, CardBody, CardHeader, Button, Input, Textarea, Switch } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
 import Award from 'lucide-react/icons/award';
@@ -197,7 +189,7 @@ export function CreateBadge() {
               variant="bordered"
             >
               {ICON_OPTIONS.map((opt) => (
-                <SelectItem key={opt.key}>{t(opt.labelKey)}</SelectItem>
+                <SelectItem key={opt.key} id={opt.key}>{t(opt.labelKey)}</SelectItem>
               ))}
             </Select>
 
@@ -211,7 +203,7 @@ export function CreateBadge() {
               variant="bordered"
             >
               {CATEGORY_OPTIONS.map((opt) => (
-                <SelectItem key={opt.key}>{t(opt.labelKey)}</SelectItem>
+                <SelectItem key={opt.key} id={opt.key}>{t(opt.labelKey)}</SelectItem>
               ))}
             </Select>
           </div>

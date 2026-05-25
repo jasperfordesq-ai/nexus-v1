@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,34 +16,8 @@
  *  - Export CSV download
  */
 
-import {
-  useCallback,
-  useEffect,
-  useState } from 'react';
-import { Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Select,
-  SelectItem,
-  Spinner,
-  Switch,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Textarea,
-  useDisclosure,
-} from '@heroui/react';
+import { useCallback, useEffect, useState } from 'react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, useDisclosure } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import BarChart3 from 'lucide-react/icons/bar-chart-3';
 import CheckCircle from 'lucide-react/icons/check-circle';
@@ -449,7 +424,7 @@ export default function MunicipalSurveyAdminPage() {
               variant="bordered"
             >
               {STATUS_FILTERS.map((f) => (
-                <SelectItem key={f} textValue={f === '' ? t('admin.surveys.filters.all_statuses') : t(`admin.surveys.status.${f}`)}>
+                <SelectItem key={f} id={f} textValue={f === '' ? t('admin.surveys.filters.all_statuses') : t(`admin.surveys.status.${f}`)}>
                   {f === '' ? t('admin.surveys.filters.all_statuses') : t(`admin.surveys.status.${f}`)}
                 </SelectItem>
               ))}
@@ -671,7 +646,7 @@ export default function MunicipalSurveyAdminPage() {
                         variant="bordered"
                       >
                         {QUESTION_TYPES.map((qt) => (
-                          <SelectItem key={qt} textValue={t(`admin.surveys.question_types.${qt}`)}>
+                          <SelectItem key={qt} id={qt} textValue={t(`admin.surveys.question_types.${qt}`)}>
                             {t(`admin.surveys.question_types.${qt}`)}
                           </SelectItem>
                         ))}

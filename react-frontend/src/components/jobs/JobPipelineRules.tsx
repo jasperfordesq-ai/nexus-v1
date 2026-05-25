@@ -1,10 +1,11 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useCallback } from 'react';
-import { Button, Select, SelectItem, Input } from '@heroui/react';
+import { Button, Input } from '@heroui/react';
 import Zap from 'lucide-react/icons/zap';
 import ChevronUp from 'lucide-react/icons/chevron-up';
 import ChevronDown from 'lucide-react/icons/chevron-down';
@@ -121,7 +122,7 @@ export function JobPipelineRules({ jobId }: JobPipelineRulesProps) {
                 }
               >
                 {TRIGGER_STAGES.map((stage) => (
-                  <SelectItem key={stage}>{stageLabel(stage)}</SelectItem>
+                  <SelectItem key={stage} id={stage}>{stageLabel(stage)}</SelectItem>
                 ))}
               </Select>
               <Input
@@ -141,9 +142,9 @@ export function JobPipelineRules({ jobId }: JobPipelineRulesProps) {
                   setNewRule((r) => ({ ...r, action: Array.from(keys)[0] as string }))
                 }
               >
-                <SelectItem key="move_stage">{t('pipeline.action_move_stage')}</SelectItem>
-                <SelectItem key="reject">{t('pipeline.action_auto_reject')}</SelectItem>
-                <SelectItem key="notify_reviewer">{t('pipeline.action_notify_me')}</SelectItem>
+                <SelectItem key="move_stage" id="move_stage">{t('pipeline.action_move_stage')}</SelectItem>
+                <SelectItem key="reject" id="reject">{t('pipeline.action_auto_reject')}</SelectItem>
+                <SelectItem key="notify_reviewer" id="notify_reviewer">{t('pipeline.action_notify_me')}</SelectItem>
               </Select>
               {newRule.action === 'move_stage' && (
                 <Select
@@ -155,7 +156,7 @@ export function JobPipelineRules({ jobId }: JobPipelineRulesProps) {
                   }
                 >
                   {TARGET_STAGES.map((stage) => (
-                    <SelectItem key={stage}>{stageLabel(stage)}</SelectItem>
+                    <SelectItem key={stage} id={stage}>{stageLabel(stage)}</SelectItem>
                   ))}
                 </Select>
               )}

@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +11,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Button, Input, Textarea, Switch, Select, SelectItem, Spinner } from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Input, Textarea, Switch, Spinner } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Settings from 'lucide-react/icons/settings';
 import Save from 'lucide-react/icons/save';
@@ -188,7 +189,7 @@ export function CronJobSettingsPage() {
                   onChange={(e) => setSelectedJobId(e.target.value)}
                 >
                   {jobs.map((job) => (
-                    <SelectItem key={job.slug}>
+                    <SelectItem key={job.slug} id={job.slug}>
                       {job.name}
                     </SelectItem>
                   ))}

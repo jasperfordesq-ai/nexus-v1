@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -17,25 +18,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import {
-  Card,
-  CardBody,
-  CardHeader,
-  Spinner,
-  Button,
-  Input,
-  Select,
-  SelectItem,
-  Tabs,
-  Tab,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Avatar,
-  Chip,
-} from '@heroui/react';
+  Card, CardBody, CardHeader, Spinner, Button, Input, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Avatar, Chip } from '@heroui/react';
 import {
   BarChart,
   Bar,
@@ -370,7 +353,7 @@ export function HoursReportsPage() {
             label={t('reports.label_sort_by')}
           >
             {SORT_OPTIONS.map((opt) => (
-              <SelectItem key={opt.key}>
+              <SelectItem key={opt.key} id={opt.key}>
                 {opt.key === 'total' ? t('reports.sort_total_hours') : opt.key === 'given' ? t('reports.sort_hours_given') : t('reports.sort_hours_received')}
               </SelectItem>
             ))}

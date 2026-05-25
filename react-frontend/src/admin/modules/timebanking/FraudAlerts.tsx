@@ -9,28 +9,37 @@
  * Parity: PHP Admin\TimebankingController::alerts()
  */
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import {
+  useState,
+  useCallback,
+  useEffect,
+  useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Chip,
   Tabs,
   Tab,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
   Button,
 } from '@heroui/react';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { useAdminPageMeta } from '../../AdminMetaContext';
-import { useTenant, useToast } from '@/contexts';
+import { useTenant,
+  useToast } from '@/contexts';
 import { adminTimebanking } from '../../api/adminApi';
-import { DataTable, PageHeader, type Column } from '../../components';
+import { DataTable,
+  PageHeader,
+  type Column } from '../../components';
 import type { FraudAlert } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
+import { Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 const SEVERITY_COLOR_MAP: Record<string, 'default' | 'primary' | 'warning' | 'danger'> = {
   low: 'default',
   medium: 'primary',
@@ -192,13 +201,13 @@ export function FraudAlerts() {
               onAction={(key) => handleStatusChange(alert.id, String(key))}
               disabledKeys={[alert.status]}
             >
-              <DropdownItem key="reviewing" description={t('timebanking.desc_mark_as_under_investigation')}>
+              <DropdownItem key="reviewing" id="reviewing" description={t('timebanking.desc_mark_as_under_investigation')}>
                 {t('timebanking.action_investigate')}
               </DropdownItem>
-              <DropdownItem key="resolved" description={t('timebanking.desc_mark_as_resolved')} className="text-success">
+              <DropdownItem key="resolved" id="resolved" description={t('timebanking.desc_mark_as_resolved')} className="text-success">
                 {t('timebanking.action_resolve')}
               </DropdownItem>
-              <DropdownItem key="dismissed" description={t('timebanking.desc_dismiss_this_alert')} className="text-default-400">
+              <DropdownItem key="dismissed" id="dismissed" description={t('timebanking.desc_dismiss_this_alert')} className="text-default-400">
                 {t('timebanking.action_dismiss')}
               </DropdownItem>
             </DropdownMenu>

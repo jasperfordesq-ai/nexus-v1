@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -13,18 +14,7 @@
 
 import { useState } from 'react';
 import {
-  Button,
-  Input,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Select,
-  SelectItem,
-  Switch,
-  Textarea,
-} from '@heroui/react';
+  Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Textarea } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Banknote from 'lucide-react/icons/banknote';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
@@ -210,7 +200,7 @@ export function DonationCheckout({
                     }}
                   >
                     {CURRENCIES.map((c) => (
-                      <SelectItem key={c.key}>{t(c.labelKey)}</SelectItem>
+                      <SelectItem key={c.key} id={c.key}>{t(c.labelKey)}</SelectItem>
                     ))}
                   </Select>
 

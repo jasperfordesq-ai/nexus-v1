@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,7 +16,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Button, Input, Select, SelectItem, Chip } from '@heroui/react';
+import { Button, Input, Chip } from '@heroui/react';
 import Filter from 'lucide-react/icons/filter';
 import X from 'lucide-react/icons/x';
 import Calendar from 'lucide-react/icons/calendar';
@@ -175,11 +176,11 @@ export function AdvancedSearchFilters({
                 value: 'text-theme-primary',
               }}
             >
-              <SelectItem key="all">{t('filter_all_types')}</SelectItem>
-              <SelectItem key="listings">{t('filter_listings')}</SelectItem>
-              <SelectItem key="users">{t('filter_members')}</SelectItem>
-              <SelectItem key="events">{t('filter_events')}</SelectItem>
-              <SelectItem key="groups">{t('filter_groups')}</SelectItem>
+              <SelectItem key="all" id="all">{t('filter_all_types')}</SelectItem>
+              <SelectItem key="listings" id="listings">{t('filter_listings')}</SelectItem>
+              <SelectItem key="users" id="users">{t('filter_members')}</SelectItem>
+              <SelectItem key="events" id="events">{t('filter_events')}</SelectItem>
+              <SelectItem key="groups" id="groups">{t('filter_groups')}</SelectItem>
             </Select>
 
             {/* Category */}
@@ -194,7 +195,7 @@ export function AdvancedSearchFilters({
               }}
               items={[{ id: 0, name: t('filter_all_categories'), slug: '' }, ...categories]}
             >
-              {(cat) => <SelectItem key={cat.id || ''}>{cat.name}</SelectItem>}
+              {(cat) => <SelectItem key={cat.id || ''} id={cat.id || ''}>{cat.name}</SelectItem>}
             </Select>
 
             {/* Sort */}
@@ -208,9 +209,9 @@ export function AdvancedSearchFilters({
                 value: 'text-theme-primary',
               }}
             >
-              <SelectItem key="relevance">{t('filter_relevance')}</SelectItem>
-              <SelectItem key="newest">{t('filter_newest')}</SelectItem>
-              <SelectItem key="oldest">{t('filter_oldest')}</SelectItem>
+              <SelectItem key="relevance" id="relevance">{t('filter_relevance')}</SelectItem>
+              <SelectItem key="newest" id="newest">{t('filter_newest')}</SelectItem>
+              <SelectItem key="oldest" id="oldest">{t('filter_oldest')}</SelectItem>
             </Select>
 
             {/* Date from */}

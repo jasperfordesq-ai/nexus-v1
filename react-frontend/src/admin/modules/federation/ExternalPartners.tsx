@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,31 +12,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import {
-  Button,
-  Chip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Input,
-  Select,
-  SelectItem,
-  Switch,
-  Spinner,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Textarea,
-  useDisclosure,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-} from '@heroui/react';
+  Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Switch, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Textarea, useDisclosure } from '@heroui/react';
 import Globe from 'lucide-react/icons/globe';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -51,10 +28,17 @@ import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
-import { PageHeader, ConfirmModal } from '../../components';
+import { PageHeader,
+  ConfirmModal } from '../../components';
 
 import { useTranslation } from 'react-i18next';
 
+import { Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
@@ -497,16 +481,16 @@ export function ExternalPartners() {
                       else if (key === 'delete') setDeleteTarget(partner);
                     }}
                   >
-                    <DropdownItem key="edit" startContent={<Pencil size={14} />}>
+                    <DropdownItem key="edit" id="edit" startContent={<Pencil size={14} />}>
                       {t('federation.edit')}
                     </DropdownItem>
-                    <DropdownItem key="health" startContent={healthCheckLoading === partner.id ? <Spinner size="sm" /> : <HeartPulse size={14} />}>
+                    <DropdownItem key="health" id="health" startContent={healthCheckLoading === partner.id ? <Spinner size="sm" /> : <HeartPulse size={14} />}>
                       {t('federation.health_check')}
                     </DropdownItem>
-                    <DropdownItem key="logs" startContent={<ScrollText size={14} />}>
+                    <DropdownItem key="logs" id="logs" startContent={<ScrollText size={14} />}>
                       {t('federation.view_logs')}
                     </DropdownItem>
-                    <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
+                    <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
                       {t('federation.delete')}
                     </DropdownItem>
                   </DropdownMenu>
@@ -574,7 +558,7 @@ export function ExternalPartners() {
                   }}
                 >
                   {PROTOCOL_TYPES.map((p) => (
-                    <SelectItem key={p.key}>{t(p.i18nKey)}</SelectItem>
+                    <SelectItem key={p.key} id={p.key}>{t(p.i18nKey)}</SelectItem>
                   ))}
                 </Select>
 
@@ -597,7 +581,7 @@ export function ExternalPartners() {
                     }}
                   >
                     {PARTNER_STATUSES.map((s) => (
-                      <SelectItem key={s.key}>{t(s.i18nKey)}</SelectItem>
+                      <SelectItem key={s.key} id={s.key}>{t(s.i18nKey)}</SelectItem>
                     ))}
                   </Select>
                 )}
@@ -612,7 +596,7 @@ export function ExternalPartners() {
                   }}
                 >
                   {AUTH_METHODS.map((m) => (
-                    <SelectItem key={m.key}>{t(m.i18nKey)}</SelectItem>
+                    <SelectItem key={m.key} id={m.key}>{t(m.i18nKey)}</SelectItem>
                   ))}
                 </Select>
 

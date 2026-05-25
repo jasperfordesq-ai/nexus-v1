@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,23 +13,7 @@
 import { useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Card,
-  CardBody,
-  CardHeader,
-  Input,
-  Button,
-  Spinner,
-  Switch,
-  Select,
-  SelectItem,
-  Textarea,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Tooltip,
-} from '@heroui/react';
+  Card, CardBody, CardHeader, Input, Button, Spinner, Switch, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tooltip } from '@heroui/react';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import { useTenant } from '@/contexts';
 import Save from 'lucide-react/icons/save';
@@ -615,7 +600,7 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
               errorMessage={error}
             >
               {(def.key === 'locale' ? localeOptions : (def.options ?? [])).map((opt) => (
-                <SelectItem key={opt.value}>{opt.label}</SelectItem>
+                <SelectItem key={opt.value} id={opt.value}>{opt.label}</SelectItem>
               ))}
             </Select>
             <p className="text-xs text-default-400 mt-1">{def.description}</p>

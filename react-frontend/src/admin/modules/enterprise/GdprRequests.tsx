@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,26 +12,27 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Button,
-  Chip,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  Select,
-  SelectItem,
-} from '@heroui/react';
+  Button, Chip } from '@heroui/react';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import Plus from 'lucide-react/icons/plus';
-import { useTenant, useToast } from '@/contexts';
+import { useTenant,
+  useToast } from '@/contexts';
 import { adminEnterprise } from '../../api/adminApi';
 import { useAdminPageMeta } from '../../AdminMetaContext';
-import { PageHeader, DataTable, StatusBadge } from '../../components';
+import { PageHeader,
+  DataTable,
+  StatusBadge } from '../../components';
 import type { Column } from '../../components';
 import type { GdprRequest } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
+import { Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 const STATUS_OPTION_KEYS = ['all', 'pending', 'processing', 'completed', 'rejected'] as const;
 
 function SlaChip({ createdAt, t }: { createdAt: string; t: (key: string, opts?: Record<string, unknown>) => string }) {
@@ -159,16 +161,16 @@ export function GdprRequests() {
             </Button>
           </DropdownTrigger>
           <DropdownMenu aria-label={t('enterprise.gdpr_request_actions')}>
-            <DropdownItem key="view" onPress={() => navigate(tenantPath(`/admin/enterprise/gdpr/requests/${r.id}`))}>
+            <DropdownItem key="view" id="view" onPress={() => navigate(tenantPath(`/admin/enterprise/gdpr/requests/${r.id}`))}>
               {t('enterprise.gdpr_view_details')}
             </DropdownItem>
-            <DropdownItem key="processing" onPress={() => handleStatusUpdate(r.id, 'processing')}>
+            <DropdownItem key="processing" id="processing" onPress={() => handleStatusUpdate(r.id, 'processing')}>
               {t('enterprise.gdpr_mark_processing')}
             </DropdownItem>
-            <DropdownItem key="completed" onPress={() => handleStatusUpdate(r.id, 'completed')}>
+            <DropdownItem key="completed" id="completed" onPress={() => handleStatusUpdate(r.id, 'completed')}>
               {t('enterprise.gdpr_mark_completed')}
             </DropdownItem>
-            <DropdownItem key="rejected" className="text-danger" color="danger" onPress={() => handleStatusUpdate(r.id, 'rejected')}>
+            <DropdownItem key="rejected" id="rejected" className="text-danger" color="danger" onPress={() => handleStatusUpdate(r.id, 'rejected')}>
               {t('enterprise.gdpr_reject')}
             </DropdownItem>
           </DropdownMenu>
@@ -219,7 +221,7 @@ export function GdprRequests() {
           variant="bordered"
         >
           {STATUS_OPTION_KEYS.map((key) => (
-            <SelectItem key={key}>{t(`enterprise.status_${key}`)}</SelectItem>
+            <SelectItem key={key} id={key}>{t(`enterprise.status_${key}`)}</SelectItem>
           ))}
         </Select>
       </div>

@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -5,7 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Chip, Avatar, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Select, SelectItem } from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Chip, Avatar, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Edit from 'lucide-react/icons/square-pen';
@@ -601,7 +602,7 @@ export function UserShow() {
             >
               {tenants
                 .filter(t => t.id !== user.tenant_id)
-                .map(t => <SelectItem key={String(t.id)}>{t.name}</SelectItem>)}
+                .map(t => <SelectItem key={String(t.id)} id={String(t.id)}>{t.name}</SelectItem>)}
             </Select>
           </ModalBody>
           <ModalFooter>
@@ -687,7 +688,7 @@ export function UserShow() {
             >
               {hubTenants
                 .filter(t => t.id !== user.tenant_id)
-                .map(t => <SelectItem key={String(t.id)}>{t.name}</SelectItem>)}
+                .map(t => <SelectItem key={String(t.id)} id={String(t.id)}>{t.name}</SelectItem>)}
             </Select>
             {hubTenants.filter(t => t.id !== user.tenant_id).length === 0 && (
               <p className="text-xs text-default-400 mt-1">{t('super.no_hub_tenants_found')}</p>

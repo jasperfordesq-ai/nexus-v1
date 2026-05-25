@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -16,24 +17,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import {
-  Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Spinner,
-  Chip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Input,
-  Textarea,
-  Switch,
-  Select,
-  SelectItem,
-  useDisclosure,
-} from '@heroui/react';
+  Card, CardBody, CardHeader, Button, Spinner, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea, Switch, useDisclosure } from '@heroui/react';
 import Plus from 'lucide-react/icons/plus';
 import Edit3 from 'lucide-react/icons/pen-line';
 import Trash2 from 'lucide-react/icons/trash-2';
@@ -413,9 +397,9 @@ export function SafeguardingOptionsAdmin() {
               }}
               variant="bordered"
             >
-              <SelectItem key="checkbox">{t('safeguarding.type_checkbox')}</SelectItem>
-              <SelectItem key="info">{t('safeguarding.type_info')}</SelectItem>
-              <SelectItem key="select">{t('safeguarding.type_select')}</SelectItem>
+              <SelectItem key="checkbox" id="checkbox">{t('safeguarding.type_checkbox')}</SelectItem>
+              <SelectItem key="info" id="info">{t('safeguarding.type_info')}</SelectItem>
+              <SelectItem key="select" id="select">{t('safeguarding.type_select')}</SelectItem>
             </Select>
             <Switch
               isSelected={form.is_required}
@@ -467,14 +451,14 @@ export function SafeguardingOptionsAdmin() {
                   className="mt-3"
                   description={t('safeguarding.desc_required_vetting_type')}
                 >
-                  <SelectItem key="garda_vetting">{t('safeguarding.vetting_garda')}</SelectItem>
-                  <SelectItem key="dbs_basic">{t('safeguarding.vetting_dbs_basic')}</SelectItem>
-                  <SelectItem key="dbs_standard">{t('safeguarding.vetting_dbs_standard')}</SelectItem>
-                  <SelectItem key="dbs_enhanced">{t('safeguarding.vetting_dbs_enhanced')}</SelectItem>
-                  <SelectItem key="pvg_scotland">{t('safeguarding.vetting_pvg_scotland')}</SelectItem>
-                  <SelectItem key="access_ni">{t('safeguarding.vetting_access_ni')}</SelectItem>
-                  <SelectItem key="international">{t('safeguarding.vetting_international')}</SelectItem>
-                  <SelectItem key="other">{t('safeguarding.vetting_other')}</SelectItem>
+                  <SelectItem key="garda_vetting" id="garda_vetting">{t('safeguarding.vetting_garda')}</SelectItem>
+                  <SelectItem key="dbs_basic" id="dbs_basic">{t('safeguarding.vetting_dbs_basic')}</SelectItem>
+                  <SelectItem key="dbs_standard" id="dbs_standard">{t('safeguarding.vetting_dbs_standard')}</SelectItem>
+                  <SelectItem key="dbs_enhanced" id="dbs_enhanced">{t('safeguarding.vetting_dbs_enhanced')}</SelectItem>
+                  <SelectItem key="pvg_scotland" id="pvg_scotland">{t('safeguarding.vetting_pvg_scotland')}</SelectItem>
+                  <SelectItem key="access_ni" id="access_ni">{t('safeguarding.vetting_access_ni')}</SelectItem>
+                  <SelectItem key="international" id="international">{t('safeguarding.vetting_international')}</SelectItem>
+                  <SelectItem key="other" id="other">{t('safeguarding.vetting_other')}</SelectItem>
                 </Select>
               )}
             </div>

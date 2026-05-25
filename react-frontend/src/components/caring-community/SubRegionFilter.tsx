@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -14,7 +15,6 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Select, SelectItem } from '@heroui/react';
 import MapPin from 'lucide-react/icons/map-pin';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -162,9 +162,9 @@ export function SubRegionFilter({
         placeholder={t('sub_region.all_areas')}
       >
         <>
-          <SelectItem key="__all__">{t('sub_region.all_areas')}</SelectItem>
+          <SelectItem key="__all__" id="__all__">{t('sub_region.all_areas')}</SelectItem>
           {(grouped ?? []).map((r) => (
-            <SelectItem key={String(r.id)} textValue={r.name}>
+            <SelectItem key={String(r.id)} id={String(r.id)} textValue={r.name}>
               <span className="flex items-center gap-2">
                 <span className="font-medium">{r.name}</span>
                 <span className="text-xs text-default-400">

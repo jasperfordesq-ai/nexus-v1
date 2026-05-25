@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,36 +11,9 @@
  * settlement view, transaction history, agreement detail modal.
  */
 
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
-  useState,
-  useEffect,
-  useCallback,
-  useRef } from 'react';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Spinner,
-  Chip,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Input,
-  Select,
-  SelectItem,
-  Tabs,
-  Tab,
-  useDisclosure,
-} from '@heroui/react';
+  Card, CardBody, CardHeader, Button, Spinner, Chip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Tabs, Tab, useDisclosure } from '@heroui/react';
 import Handshake from 'lucide-react/icons/handshake';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -623,7 +597,7 @@ export function CreditAgreements() {
                   }}
                 >
                   {partners.map((p) => (
-                    <SelectItem key={String(p.id)}>{p.name}</SelectItem>
+                    <SelectItem key={String(p.id)} id={String(p.id)}>{p.name}</SelectItem>
                   ))}
                 </Select>
 

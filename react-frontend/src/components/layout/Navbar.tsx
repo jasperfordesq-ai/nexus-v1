@@ -10,16 +10,19 @@
  * Theme-aware styling for light and dark modes.
  */
 
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom';
+import {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  useRef } from 'react';
+import { Link,
+  NavLink,
+  useNavigate,
+  useLocation } from 'react-router-dom';
 import {
   Button,
   Avatar,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
 } from '@heroui/react';
 import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
 import ListTodo from 'lucide-react/icons/list-todo';
@@ -70,9 +73,15 @@ import Crown from 'lucide-react/icons/crown';
 import Accessibility from 'lucide-react/icons/accessibility';
 import ExternalLink from 'lucide-react/icons/external-link';
 import Download from 'lucide-react/icons/download';
-import { useInstallPrompt, shouldOfferInstall, requestInstall } from '@/lib/installPrompt';
+import { useInstallPrompt,
+  shouldOfferInstall,
+  requestInstall } from '@/lib/installPrompt';
 import { useTranslation } from 'react-i18next';
-import { useAuth, useTenant, useNotifications, useTheme, useMenuContext } from '@/contexts';
+import { useAuth,
+  useTenant,
+  useNotifications,
+  useTheme,
+  useMenuContext } from '@/contexts';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { buildAccessibleFrontendUrl } from '@/lib/accessible-frontend';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
@@ -81,11 +90,18 @@ import { SearchOverlay } from '@/components/layout/SearchOverlay';
 import { MegaMenu } from '@/components/layout/MegaMenu';
 import { NotificationFlyout } from '@/components/layout/NotificationFlyout';
 import { TenantLogo } from '@/components/branding';
-import { PresenceIndicator, StatusSelector } from '@/components/social';
+import { PresenceIndicator,
+  StatusSelector } from '@/components/social';
 import { useHeaderScroll } from '@/hooks/useHeaderScroll';
 import { CARING_COMMUNITY_ROUTE } from '@/pages/caring-community/config';
 import type { TenantFeatures } from '@/types/api';
 
+import { Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 interface IdentityStatusResponse {
   has_id_verified_badge: boolean;
 }
@@ -632,7 +648,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   >
                     {timebankingItems.map((item) => (
                       <DropdownItem
-                        key={item.href}
+                        key={item.href} id={item.href}
                         description={item.desc}
                         startContent={<item.icon className="w-4 h-4" aria-hidden="true" />}
                         className={location.pathname.startsWith(item.href) ? 'bg-theme-active' : ''}
@@ -698,7 +714,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                   >
                     {visibleCommunityItems.map((item) => (
                       <DropdownItem
-                        key={item.href}
+                        key={item.href} id={item.href}
                         description={item.desc}
                         startContent={<item.icon className="w-4 h-4" aria-hidden="true" />}
                         className={location.pathname.startsWith(item.href) ? 'bg-theme-active' : ''}
@@ -762,14 +778,14 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                       }}
                     >
                       <DropdownItem
-                        key={tenantPath('/listings/create')}
+                        key={tenantPath('/listings/create')} id={tenantPath('/listings/create')}
                         startContent={<ListTodo className="w-4 h-4" aria-hidden="true" />}
                       >
                         {t('create.new_listing')}
                       </DropdownItem>
                       {hasFeature('events') ? (
                         <DropdownItem
-                          key={tenantPath('/events/create')}
+                          key={tenantPath('/events/create')} id={tenantPath('/events/create')}
                           startContent={<Calendar className="w-4 h-4" aria-hidden="true" />}
                         >
                           {t('create.new_event')}
@@ -822,7 +838,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                     >
                       <DropdownSection showDivider>
                         <DropdownItem
-                          key="profile-header"
+                          key="profile-header" id="profile-header"
                           className="h-14 gap-2 cursor-default"
                           textValue={t('user_menu.my_profile')}
                           isReadOnly
@@ -836,14 +852,14 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
 
                       <DropdownSection showDivider>
                         <DropdownItem
-                          key={tenantPath('/profile')}
+                          key={tenantPath('/profile')} id={tenantPath('/profile')}
                           startContent={<UserCircle className="w-4 h-4" aria-hidden="true" />}
                         >
                           {t('user_menu.my_profile')}
                         </DropdownItem>
                         {hasModule('wallet') ? (
                           <DropdownItem
-                            key={tenantPath('/wallet')}
+                            key={tenantPath('/wallet')} id={tenantPath('/wallet')}
                             startContent={<Wallet className="w-4 h-4" aria-hidden="true" />}
                             endContent={
                               <span className="text-xs text-theme-subtle">
@@ -855,7 +871,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                           </DropdownItem>
                         ) : null}
                         <DropdownItem
-                          key={tenantPath('/settings')}
+                          key={tenantPath('/settings')} id={tenantPath('/settings')}
                           startContent={<Settings className="w-4 h-4" aria-hidden="true" />}
                         >
                           {t('user_menu.settings')}
@@ -864,7 +880,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
 
                       <DropdownSection showDivider>
                         <DropdownItem
-                          key="theme"
+                          key="theme" id="theme"
                           startContent={
                             resolvedTheme === 'dark' ? (
                               <Sun className="w-4 h-4 text-amber-400" aria-hidden="true" />
@@ -877,7 +893,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                         </DropdownItem>
                         {canShowInstall ? (
                           <DropdownItem
-                            key="install"
+                            key="install" id="install"
                             description={installState.isIosSafari
                               ? t('install.cta_ios_sub')
                               : t('install.cta_sub')}
@@ -890,7 +906,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
 
                       <DropdownSection>
                         <DropdownItem
-                          key="logout"
+                          key="logout" id="logout"
                           color="danger"
                           startContent={<LogOut className="w-4 h-4" aria-hidden="true" />}
                           className="text-[var(--color-error)]"

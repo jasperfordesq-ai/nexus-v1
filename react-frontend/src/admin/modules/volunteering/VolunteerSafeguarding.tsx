@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,21 +11,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import {
-  Button,
-  Chip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Select,
-  SelectItem,
-  Textarea,
-  Input,
-  Card,
-  CardBody,
-  CardHeader,
-} from '@heroui/react';
+  Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, Input, Card, CardBody, CardHeader } from '@heroui/react';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
@@ -534,11 +521,11 @@ export function VolunteerSafeguarding() {
                   selectedKeys={[updateStatus]}
                   onSelectionChange={(keys) => setUpdateStatus(Array.from(keys)[0] as string)}
                 >
-                  <SelectItem key="open">{t('volunteering.status_open')}</SelectItem>
-                  <SelectItem key="investigating">{t('volunteering.status_investigating')}</SelectItem>
-                  <SelectItem key="resolved">{t('volunteering.status_resolved')}</SelectItem>
-                  <SelectItem key="escalated">{t('volunteering.status_escalated')}</SelectItem>
-                  <SelectItem key="closed">{t('volunteering.status_closed')}</SelectItem>
+                  <SelectItem key="open" id="open">{t('volunteering.status_open')}</SelectItem>
+                  <SelectItem key="investigating" id="investigating">{t('volunteering.status_investigating')}</SelectItem>
+                  <SelectItem key="resolved" id="resolved">{t('volunteering.status_resolved')}</SelectItem>
+                  <SelectItem key="escalated" id="escalated">{t('volunteering.status_escalated')}</SelectItem>
+                  <SelectItem key="closed" id="closed">{t('volunteering.status_closed')}</SelectItem>
                 </Select>
 
                 <Textarea

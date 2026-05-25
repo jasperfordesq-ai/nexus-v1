@@ -1,27 +1,11 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 import React, { useState, useEffect } from 'react';
-import {
-  Button,
-  Input,
-  Select,
-  SelectItem,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Chip,
-  Avatar,
-  Pagination,
-  Spinner,
-  Card,
-  CardBody,
-} from '@heroui/react';
+import { Button, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Avatar, Pagination, Spinner, Card, CardBody } from '@heroui/react';
 import Search from 'lucide-react/icons/search';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
@@ -381,7 +365,7 @@ export default function ReportsManagement() {
             className="w-full lg:w-48"
           >
             {CONTENT_TYPES.map((type) => (
-              <SelectItem key={type.value}>
+              <SelectItem key={type.value} id={type.value}>
                 {type.label}
               </SelectItem>
             ))}
@@ -393,7 +377,7 @@ export default function ReportsManagement() {
             className="w-full lg:w-48"
           >
             {STATUS_FILTERS.map((status) => (
-              <SelectItem key={status.value}>
+              <SelectItem key={status.value} id={status.value}>
                 {status.label}
               </SelectItem>
             ))}
@@ -406,9 +390,9 @@ export default function ReportsManagement() {
               className="w-full lg:w-56"
             >
               {[
-                <SelectItem key="all">{t('moderation.filter_all_tenants')}</SelectItem>,
+                <SelectItem key="all" id="all">{t('moderation.filter_all_tenants')}</SelectItem>,
                 ...tenants.map((tenant) => (
-                  <SelectItem key={tenant.id.toString()}>
+                  <SelectItem key={tenant.id.toString()} id={tenant.id.toString()}>
                     {tenant.name}
                   </SelectItem>
                 )),

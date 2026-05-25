@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,18 +11,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import {
-  Button,
-  Chip,
-  Select,
-  SelectItem,
-  Spinner,
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableColumn,
-  TableCell,
-} from '@heroui/react';
+  Button, Chip, Spinner, Table, TableHeader, TableBody, TableRow, TableColumn, TableCell } from '@heroui/react';
 import ScrollText from 'lucide-react/icons/scroll-text';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import ChevronUp from 'lucide-react/icons/chevron-up';
@@ -172,7 +162,7 @@ export function GroupAuditLog({ groupId }: GroupAuditLogProps) {
             ...uniqueActions.map((action) => ({ key: action, label: action })),
           ]}
         >
-          {(item) => <SelectItem key={item.key}>{item.label}</SelectItem>}
+          {(item) => <SelectItem key={item.key} id={item.key}>{item.label}</SelectItem>}
         </Select>
       </div>
 

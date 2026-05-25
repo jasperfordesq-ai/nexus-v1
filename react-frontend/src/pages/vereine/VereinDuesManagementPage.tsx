@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -21,29 +22,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Input,
-  Select,
-  SelectItem,
-  Spinner,
-  Switch,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Textarea,
-} from '@heroui/react';
+  Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea } from '@heroui/react';
 import Receipt from 'lucide-react/icons/receipt';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import Bell from 'lucide-react/icons/bell';
@@ -321,19 +300,19 @@ export function VereinDuesManagementPage() {
             selectedKeys={[currency]}
             onChange={(e) => setCurrency(e.target.value || 'CHF')}
           >
-            <SelectItem key="CHF">CHF</SelectItem>
-            <SelectItem key="EUR">EUR</SelectItem>
-            <SelectItem key="USD">USD</SelectItem>
-            <SelectItem key="GBP">GBP</SelectItem>
+            <SelectItem key="CHF" id="CHF">CHF</SelectItem>
+            <SelectItem key="EUR" id="EUR">EUR</SelectItem>
+            <SelectItem key="USD" id="USD">USD</SelectItem>
+            <SelectItem key="GBP" id="GBP">GBP</SelectItem>
           </Select>
           <Select
             label={t('verein_dues.admin_billing_cycle')}
             selectedKeys={[billingCycle]}
             onChange={(e) => setBillingCycle(e.target.value || 'annual')}
           >
-            <SelectItem key="annual">{t('verein_dues.cycle.annual')}</SelectItem>
-            <SelectItem key="biennial">{t('verein_dues.cycle.biennial')}</SelectItem>
-            <SelectItem key="monthly">{t('verein_dues.cycle.monthly')}</SelectItem>
+            <SelectItem key="annual" id="annual">{t('verein_dues.cycle.annual')}</SelectItem>
+            <SelectItem key="biennial" id="biennial">{t('verein_dues.cycle.biennial')}</SelectItem>
+            <SelectItem key="monthly" id="monthly">{t('verein_dues.cycle.monthly')}</SelectItem>
           </Select>
           <Input
             label={t('verein_dues.admin_grace_period')}
@@ -398,11 +377,11 @@ export function VereinDuesManagementPage() {
               size="sm"
               className="w-full"
             >
-              <SelectItem key="all">{t('verein_dues.status_all')}</SelectItem>
-              <SelectItem key="pending">{t('verein_dues.status.pending')}</SelectItem>
-              <SelectItem key="paid">{t('verein_dues.status.paid')}</SelectItem>
-              <SelectItem key="overdue">{t('verein_dues.status.overdue')}</SelectItem>
-              <SelectItem key="waived">{t('verein_dues.status.waived')}</SelectItem>
+              <SelectItem key="all" id="all">{t('verein_dues.status_all')}</SelectItem>
+              <SelectItem key="pending" id="pending">{t('verein_dues.status.pending')}</SelectItem>
+              <SelectItem key="paid" id="paid">{t('verein_dues.status.paid')}</SelectItem>
+              <SelectItem key="overdue" id="overdue">{t('verein_dues.status.overdue')}</SelectItem>
+              <SelectItem key="waived" id="waived">{t('verein_dues.status.waived')}</SelectItem>
             </Select>
             <Input
               label={t('verein_dues.admin_search')}

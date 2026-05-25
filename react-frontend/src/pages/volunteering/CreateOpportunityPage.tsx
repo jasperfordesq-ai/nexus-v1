@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -14,7 +15,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Button, Input, Textarea, Select, SelectItem, DatePicker } from '@heroui/react';
+import { Button, Input, Textarea, DatePicker } from '@heroui/react';
 import type { DateInputValue } from '@heroui/react';
 import { today, getLocalTimeZone } from '@internationalized/date';
 import Save from 'lucide-react/icons/save';
@@ -254,7 +255,7 @@ export default function CreateOpportunityPage() {
               }}
             >
               {approvedOrgs.map((org) => (
-                <SelectItem key={org.id.toString()}>
+                <SelectItem key={org.id.toString()} id={org.id.toString()}>
                   {org.name}
                 </SelectItem>
               ))}

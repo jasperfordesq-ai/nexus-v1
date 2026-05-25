@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -22,26 +23,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
-  Button,
-  Chip,
-  Spinner,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Input,
-  Textarea,
-  Select,
-  SelectItem,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  Avatar,
-  Tooltip,
-  useDisclosure,
-} from '@heroui/react';
+  Button, Chip, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea, Avatar, Tooltip, useDisclosure } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import ArrowBigUp from 'lucide-react/icons/arrow-big-up';
 import Lightbulb from 'lucide-react/icons/lightbulb';
@@ -69,7 +51,13 @@ import Target from 'lucide-react/icons/target';
 import Layers from 'lucide-react/icons/layers';
 import { useTranslation } from 'react-i18next';
 import { Helmet } from 'react-helmet-async';
-import { GlassCard } from '@/components/ui';
+import { GlassCard,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { SocialInteractionPanel } from '@/components/social';
 import { useAuth, useToast, useTenant } from '@/contexts';
@@ -927,7 +915,7 @@ export function ChallengeDetailPage() {
                 <DropdownMenu aria-label={t('admin.change_status')} items={adminMenuItems}>
                   {(item) => (
                     <DropdownItem
-                      key={item.key}
+                      key={item.key} id={item.key}
                       className={item.className}
                       color={item.color}
                       startContent={item.startContent}
@@ -1431,10 +1419,10 @@ export function ChallengeDetailPage() {
                   }}
                   variant="bordered"
                 >
-                  <SelectItem key="image">{t('media.type_image')}</SelectItem>
-                  <SelectItem key="video">{t('media.type_video')}</SelectItem>
-                  <SelectItem key="document">{t('media.type_document')}</SelectItem>
-                  <SelectItem key="link">{t('media.type_link')}</SelectItem>
+                  <SelectItem key="image" id="image">{t('media.type_image')}</SelectItem>
+                  <SelectItem key="video" id="video">{t('media.type_video')}</SelectItem>
+                  <SelectItem key="document" id="document">{t('media.type_document')}</SelectItem>
+                  <SelectItem key="link" id="link">{t('media.type_link')}</SelectItem>
                 </Select>
                 <Input
                   size="sm"
@@ -1524,7 +1512,7 @@ export function ChallengeDetailPage() {
                 variant="bordered"
               >
                 {ideas.map((idea) => (
-                  <SelectItem key={String(idea.id)}>
+                  <SelectItem key={String(idea.id)} id={String(idea.id)}>
                     {idea.title}
                   </SelectItem>
                 ))}
@@ -1545,10 +1533,10 @@ export function ChallengeDetailPage() {
               }}
               variant="bordered"
             >
-              <SelectItem key="not_started">{t('outcomes.status_not_started')}</SelectItem>
-              <SelectItem key="in_progress">{t('outcomes.status_in_progress')}</SelectItem>
-              <SelectItem key="implemented">{t('outcomes.status_implemented')}</SelectItem>
-              <SelectItem key="abandoned">{t('outcomes.status_abandoned')}</SelectItem>
+              <SelectItem key="not_started" id="not_started">{t('outcomes.status_not_started')}</SelectItem>
+              <SelectItem key="in_progress" id="in_progress">{t('outcomes.status_in_progress')}</SelectItem>
+              <SelectItem key="implemented" id="implemented">{t('outcomes.status_implemented')}</SelectItem>
+              <SelectItem key="abandoned" id="abandoned">{t('outcomes.status_abandoned')}</SelectItem>
             </Select>
 
             <Textarea
@@ -1596,7 +1584,7 @@ export function ChallengeDetailPage() {
                 variant="bordered"
               >
                 {campaigns.map((c) => (
-                  <SelectItem key={String(c.id)}>
+                  <SelectItem key={String(c.id)} id={String(c.id)}>
                     {c.title}
                   </SelectItem>
                 ))}

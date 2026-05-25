@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,27 +11,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import {
-  Button,
-  Chip,
-  Input,
-  Textarea,
-  Select,
-  SelectItem,
-  Switch,
-  Tab,
-  Tabs,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-  Card,
-  CardBody,
-  Checkbox,
-  RadioGroup,
-  Radio,
-} from '@heroui/react';
+  Button, Chip, Input, Textarea, Switch, Tab, Tabs, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Card, CardBody, Checkbox, RadioGroup, Radio } from '@heroui/react';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Plus from 'lucide-react/icons/plus';
 import Edit2 from 'lucide-react/icons/pen';
@@ -257,7 +238,7 @@ function FieldPreviewModal({
               t('volunteering.preview_option_two'),
               t('volunteering.preview_option_three'),
             ]).map((opt) => (
-              <SelectItem key={opt}>{opt}</SelectItem>
+              <SelectItem key={opt} id={opt}>{opt}</SelectItem>
             ))}
           </Select>
         );
@@ -637,7 +618,7 @@ function CustomFieldsTab() {
                 variant="bordered"
               >
                 {fieldTypeOptions.map((ft) => (
-                  <SelectItem key={ft}>{t(`volunteering.field_type_${ft}`)}</SelectItem>
+                  <SelectItem key={ft} id={ft}>{t(`volunteering.field_type_${ft}`)}</SelectItem>
                 ))}
               </Select>
               <Select
@@ -650,7 +631,7 @@ function CustomFieldsTab() {
                 variant="bordered"
               >
                 {appliesToOptions.map((at) => (
-                  <SelectItem key={at}>{t(`volunteering.applies_to_${at}`)}</SelectItem>
+                  <SelectItem key={at} id={at}>{t(`volunteering.applies_to_${at}`)}</SelectItem>
                 ))}
               </Select>
               <Switch
@@ -978,12 +959,12 @@ function RemindersTab() {
               loadDeliveryLogs(val, deliveryFilterChannel);
             }}
           >
-            <SelectItem key="">{t('volunteering.tab_all')}</SelectItem>
-            <SelectItem key="pre_shift">{t('volunteering.reminder_pre_shift')}</SelectItem>
-            <SelectItem key="post_shift_feedback">{t('volunteering.reminder_post_shift_feedback')}</SelectItem>
-            <SelectItem key="lapsed_volunteer">{t('volunteering.reminder_lapsed_volunteer')}</SelectItem>
-            <SelectItem key="credential_expiry">{t('volunteering.reminder_credential_expiry')}</SelectItem>
-            <SelectItem key="training_expiry">{t('volunteering.reminder_training_expiry')}</SelectItem>
+            <SelectItem key="" id="">{t('volunteering.tab_all')}</SelectItem>
+            <SelectItem key="pre_shift" id="pre_shift">{t('volunteering.reminder_pre_shift')}</SelectItem>
+            <SelectItem key="post_shift_feedback" id="post_shift_feedback">{t('volunteering.reminder_post_shift_feedback')}</SelectItem>
+            <SelectItem key="lapsed_volunteer" id="lapsed_volunteer">{t('volunteering.reminder_lapsed_volunteer')}</SelectItem>
+            <SelectItem key="credential_expiry" id="credential_expiry">{t('volunteering.reminder_credential_expiry')}</SelectItem>
+            <SelectItem key="training_expiry" id="training_expiry">{t('volunteering.reminder_training_expiry')}</SelectItem>
           </Select>
           <Select
             label={t('volunteering.filter_channel')}
@@ -997,10 +978,10 @@ function RemindersTab() {
               loadDeliveryLogs(deliveryFilterType, val);
             }}
           >
-            <SelectItem key="">{t('volunteering.tab_all')}</SelectItem>
-            <SelectItem key="email">{t('volunteering.channel_email')}</SelectItem>
-            <SelectItem key="push">{t('volunteering.channel_push')}</SelectItem>
-            <SelectItem key="sms">{t('volunteering.channel_sms')}</SelectItem>
+            <SelectItem key="" id="">{t('volunteering.tab_all')}</SelectItem>
+            <SelectItem key="email" id="email">{t('volunteering.channel_email')}</SelectItem>
+            <SelectItem key="push" id="push">{t('volunteering.channel_push')}</SelectItem>
+            <SelectItem key="sms" id="sms">{t('volunteering.channel_sms')}</SelectItem>
           </Select>
         </div>
 

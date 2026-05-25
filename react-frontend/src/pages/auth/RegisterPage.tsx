@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,21 +16,9 @@
  * Desktop shows all fields, mobile shows one step at a time
  */
 
-import {
-  useState,
-  useEffect,
-  useRef,
-  useCallback,
-  type FormEvent } from 'react';
-import { Link,
-  useNavigate,
-  useSearchParams } from 'react-router-dom';
-import { Button,
-  Input,
-  Checkbox,
-  Select,
-  SelectItem,
-  } from '@heroui/react';
+import { useState, useEffect, useRef, useCallback, type FormEvent } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Button, Input, Checkbox } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import { motion,
   AnimatePresence } from 'framer-motion';
@@ -468,7 +457,7 @@ export function RegisterPage() {
               >
                 {tenants.map((t) => (
                   <SelectItem
-                    key={String(t.id)}
+                    key={String(t.id)} id={String(t.id)}
                     textValue={t.name}
                     classNames={{
                       base: 'text-gray-900 dark:text-white data-[hover=true]:bg-gray-100 dark:data-[hover=true]:bg-white/10',
@@ -545,7 +534,7 @@ export function RegisterPage() {
               }}
             >
               <SelectItem
-                key="individual"
+                key="individual" id="individual"
                 textValue={t('register.type_individual')}
                 classNames={{
                   base: 'text-gray-900 dark:text-white data-[hover=true]:bg-gray-100 dark:data-[hover=true]:bg-white/10',
@@ -554,7 +543,7 @@ export function RegisterPage() {
                 {t('register.type_individual')}
               </SelectItem>
               <SelectItem
-                key="organisation"
+                key="organisation" id="organisation"
                 textValue={t('register.type_organisation')}
                 classNames={{
                   base: 'text-gray-900 dark:text-white data-[hover=true]:bg-gray-100 dark:data-[hover=true]:bg-white/10',

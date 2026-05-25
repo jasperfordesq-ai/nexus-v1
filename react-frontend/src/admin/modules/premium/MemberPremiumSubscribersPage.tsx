@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,21 +11,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Card,
-  CardBody,
-  Button,
-  Chip,
-  Spinner,
-  Pagination,
-  Select,
-  SelectItem,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-} from '@heroui/react';
+  Card, CardBody, Button, Chip, Spinner, Pagination, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import Users from 'lucide-react/icons/users';
 import { useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -108,7 +95,7 @@ export function MemberPremiumSubscribersPage() {
             }}
           >
             {STATUS_OPTIONS.map((s) => (
-              <SelectItem key={s} textValue={s ? t(`member_premium_admin.subscribers_page.status.${s}`) : t('member_premium_admin.subscribers_page.all')}>
+              <SelectItem key={s} id={s} textValue={s ? t(`member_premium_admin.subscribers_page.status.${s}`) : t('member_premium_admin.subscribers_page.all')}>
                 {s ? t(`member_premium_admin.subscribers_page.status.${s}`) : t('member_premium_admin.subscribers_page.all')}
               </SelectItem>
             ))}

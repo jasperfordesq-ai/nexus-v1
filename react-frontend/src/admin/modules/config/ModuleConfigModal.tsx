@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -14,7 +15,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Card, CardBody, Switch, Input, Select, SelectItem, Button, Chip, Spinner } from '@heroui/react';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Card, CardBody, Switch, Input, Button, Chip, Spinner } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ExternalLink from 'lucide-react/icons/external-link';
 import Save from 'lucide-react/icons/save';
@@ -637,7 +638,7 @@ function ConfigOptionRow({ option, value, onChange, disabled }: ConfigOptionRowP
             aria-label={label}
           >
             {option.choices.map(c => (
-              <SelectItem key={c.value}>{getChoiceLabel(t, option, c.value, c.label)}</SelectItem>
+              <SelectItem key={c.value} id={c.value}>{getChoiceLabel(t, option, c.value, c.label)}</SelectItem>
             ))}
           </Select>
         )}

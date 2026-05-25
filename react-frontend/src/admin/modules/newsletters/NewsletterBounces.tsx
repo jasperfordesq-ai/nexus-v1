@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,9 +12,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Button, Card, CardBody, CardHeader, Tabs, Tab, Chip, Input,
-  Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell,
-} from '@heroui/react';
+  Button, Card, CardBody, CardHeader, Tabs, Tab, Chip, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Trash2 from 'lucide-react/icons/trash-2';
@@ -333,10 +332,10 @@ export function NewsletterBounces() {
                 onSelectionChange={(keys) => setTypeFilter(Array.from(keys)[0] as string)}
                 className="w-40"
               >
-                <SelectItem key="all">{t('newsletter_bounces.bounce_type_all')}</SelectItem>
-                <SelectItem key="hard">{t('newsletter_bounces.bounce_type_hard')}</SelectItem>
-                <SelectItem key="soft">{t('newsletter_bounces.bounce_type_soft')}</SelectItem>
-                <SelectItem key="complaint">{t('newsletter_bounces.bounce_type_complaint')}</SelectItem>
+                <SelectItem key="all" id="all">{t('newsletter_bounces.bounce_type_all')}</SelectItem>
+                <SelectItem key="hard" id="hard">{t('newsletter_bounces.bounce_type_hard')}</SelectItem>
+                <SelectItem key="soft" id="soft">{t('newsletter_bounces.bounce_type_soft')}</SelectItem>
+                <SelectItem key="complaint" id="complaint">{t('newsletter_bounces.bounce_type_complaint')}</SelectItem>
               </Select>
             )}
           </div>

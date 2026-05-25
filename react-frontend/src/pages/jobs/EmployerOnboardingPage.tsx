@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,22 +11,11 @@
  * Progress is persisted in localStorage so it survives page reloads.
  */
 
+import { useState, useEffect, useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  useState,
-  useEffect,
-  useCallback } from 'react';
-import { Link,
-  useNavigate } from 'react-router-dom';
-import { motion,
-  AnimatePresence } from 'framer-motion';
-import {
-  Button,
-  Input,
-  Textarea,
-  Select,
-  SelectItem,
-  Switch,
-  } from '@heroui/react';
+  Button, Input, Textarea, Switch } from '@heroui/react';
 import Briefcase from 'lucide-react/icons/briefcase';
 import Building2 from 'lucide-react/icons/building-2';
 import Rocket from 'lucide-react/icons/rocket';
@@ -385,10 +375,10 @@ function StepOrganization({ state, user, onChange, onNext, onBack }: StepOrgProp
               value: 'text-theme-primary',
             }}
           >
-            <SelectItem key="1-10">{t('onboarding.org_size_1_10')}</SelectItem>
-            <SelectItem key="11-50">{t('onboarding.org_size_11_50')}</SelectItem>
-            <SelectItem key="51-200">{t('onboarding.org_size_51_200')}</SelectItem>
-            <SelectItem key="201+">{t('onboarding.org_size_201_plus')}</SelectItem>
+            <SelectItem key="1-10" id="1-10">{t('onboarding.org_size_1_10')}</SelectItem>
+            <SelectItem key="11-50" id="11-50">{t('onboarding.org_size_11_50')}</SelectItem>
+            <SelectItem key="51-200" id="51-200">{t('onboarding.org_size_51_200')}</SelectItem>
+            <SelectItem key="201+" id="201+">{t('onboarding.org_size_201_plus')}</SelectItem>
           </Select>
           <Input
             label={t('onboarding.org_website')}
@@ -506,7 +496,7 @@ function StepPostJob({ state, errors, isSubmitting, onChange, onSubmit, onBack }
             }}
           >
             {JOB_TYPES.map((type) => (
-              <SelectItem key={type}>{t(`type.${type}`)}</SelectItem>
+              <SelectItem key={type} id={type}>{t(`type.${type}`)}</SelectItem>
             ))}
           </Select>
 
@@ -523,7 +513,7 @@ function StepPostJob({ state, errors, isSubmitting, onChange, onSubmit, onBack }
             }}
           >
             {COMMITMENT_TYPES.map((c) => (
-              <SelectItem key={c}>{t(`commitment.${c}`)}</SelectItem>
+              <SelectItem key={c} id={c}>{t(`commitment.${c}`)}</SelectItem>
             ))}
           </Select>
         </div>

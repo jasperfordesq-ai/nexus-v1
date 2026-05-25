@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -19,18 +20,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Button,
-  Input,
-  Select,
-  SelectItem,
-  Chip,
-  Avatar,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-} from '@heroui/react';
+  Button, Input, Chip, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
 import Search from 'lucide-react/icons/search';
 import Globe from 'lucide-react/icons/globe';
 import Hand from 'lucide-react/icons/hand';
@@ -279,7 +269,7 @@ export function FederationListingsPage() {
               { id: '', name: t('listings.all_communities') },
               ...partners.map((p) => ({ id: String(p.id), name: p.name })),
             ].map((item) => (
-              <SelectItem key={item.id}>{item.name}</SelectItem>
+              <SelectItem key={item.id} id={item.id}>{item.name}</SelectItem>
             ))}
           </Select>
         </div>

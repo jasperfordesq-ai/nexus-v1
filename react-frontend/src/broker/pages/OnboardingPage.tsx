@@ -20,23 +20,30 @@ import {
   CardBody,
   CardHeader,
   Chip,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
   Button,
   Spinner,
 } from '@heroui/react';
 import ArrowDown from 'lucide-react/icons/arrow-down';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import { usePageTitle } from '@/hooks';
-import { useToast, useTenant } from '@/contexts';
+import { useToast,
+  useTenant } from '@/contexts';
 import { formatServerDate } from '@/lib/serverTime';
-import { adminCrm, adminUsers } from '@/admin/api/adminApi';
-import type { AdminUser, CrmFunnelStage } from '@/admin/api/types';
-import { DataTable, PageHeader, ConfirmModal } from '@/admin/components';
+import { adminCrm,
+  adminUsers } from '@/admin/api/adminApi';
+import type { AdminUser,
+  CrmFunnelStage } from '@/admin/api/types';
+import { DataTable,
+  PageHeader,
+  ConfirmModal } from '@/admin/components';
 import type { Column } from '@/admin/components';
-import { Progress } from '@/components/ui';
+import { Progress,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -200,13 +207,13 @@ export default function OnboardingPage() {
             </DropdownTrigger>
             <DropdownMenu aria-label={t('members.col_actions')}>
               <DropdownItem
-                key="approve"
+                key="approve" id="approve"
                 onPress={() => setApproveUser(user)}
               >
                 {t('members.approve')}
               </DropdownItem>
               <DropdownItem
-                key="view"
+                key="view" id="view"
                 onPress={() =>
                   window.open(tenantPath(`/profile/${user.id}`), '_blank')
                 }

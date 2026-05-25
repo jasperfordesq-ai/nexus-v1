@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -8,7 +9,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { Select, SelectItem, Skeleton } from '@heroui/react';
+import { Skeleton } from '@heroui/react';
 import Users from 'lucide-react/icons/users';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
@@ -89,7 +90,7 @@ export function GroupSelector({ value, onChange }: GroupSelectorProps) {
       }}
     >
       {groups.map((g) => (
-        <SelectItem key={String(g.id)} textValue={g.name}>
+        <SelectItem key={String(g.id)} id={String(g.id)} textValue={g.name}>
           <div className="flex items-center gap-2">
             <span className="text-sm">{g.name}</span>
             {g.member_count != null && (

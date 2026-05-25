@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,20 +12,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import {
-  Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Select,
-  SelectItem,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Chip,
-} from '@heroui/react';
+  Card, CardBody, CardHeader, Button, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip } from '@heroui/react';
 import Handshake from 'lucide-react/icons/handshake';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import MessageSquare from 'lucide-react/icons/message-square';
@@ -135,9 +123,9 @@ export function FederationAnalytics() {
               }}
               className="w-36"
             >
-              <SelectItem key="7d">{t('federation.analytics.range_7d')}</SelectItem>
-              <SelectItem key="30d">{t('federation.analytics.range_30d')}</SelectItem>
-              <SelectItem key="90d">{t('federation.analytics.range_90d')}</SelectItem>
+              <SelectItem key="7d" id="7d">{t('federation.analytics.range_7d')}</SelectItem>
+              <SelectItem key="30d" id="30d">{t('federation.analytics.range_30d')}</SelectItem>
+              <SelectItem key="90d" id="90d">{t('federation.analytics.range_90d')}</SelectItem>
             </Select>
             <Button
               variant="flat"

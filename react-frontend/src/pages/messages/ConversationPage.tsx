@@ -13,11 +13,32 @@
  * - Typing indicators (when Pusher is available)
  */
 
-import { useState, useEffect, useRef, useCallback, type ChangeEvent, type FormEvent } from 'react';
+import {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  type ChangeEvent,
+  type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams, Link, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
+import { useParams,
+  Link,
+  useNavigate,
+  useSearchParams,
+  Navigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
-import { Button, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Input, Tooltip, Skeleton, Chip } from '@heroui/react';
+import { Button,
+  Avatar,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Input,
+  Tooltip,
+  Skeleton,
+  Chip,
+} from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Info from 'lucide-react/icons/info';
 import Loader2 from 'lucide-react/icons/loader-circle';
@@ -29,8 +50,15 @@ import FileText from 'lucide-react/icons/file-text';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import Languages from 'lucide-react/icons/languages';
 import MessageCircle from 'lucide-react/icons/message-circle';
-import { useToast, useNotifications } from '@/contexts';
-import { GlassCard } from '@/components/ui';
+import { useToast,
+  useNotifications } from '@/contexts';
+import { GlassCard,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 import { LoadingScreen } from '@/components/feedback';
 import { useAuth, usePusherOptional, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -1507,7 +1535,7 @@ export function ConversationPage() {
               </DropdownTrigger>
               <DropdownMenu aria-label={t('aria_conversation_actions')}>
                 <DropdownItem
-                  key="delete_self"
+                  key="delete_self" id="delete_self"
                   startContent={<Trash2 className="w-4 h-4" />}
                   className="text-danger"
                   color="danger"
@@ -1516,7 +1544,7 @@ export function ConversationPage() {
                   {t('delete_conversation_for_me')}
                 </DropdownItem>
                 <DropdownItem
-                  key="delete_everyone"
+                  key="delete_everyone" id="delete_everyone"
                   startContent={<Trash2 className="w-4 h-4" />}
                   className="text-danger"
                   color="danger"

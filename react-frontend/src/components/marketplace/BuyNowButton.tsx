@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -17,7 +18,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Button, Input, useDisclosure, Select, SelectItem } from '@heroui/react';
+import { Button, Input, useDisclosure } from '@heroui/react';
 import CreditCard from 'lucide-react/icons/credit-card';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant, useToast } from '@/contexts';
@@ -226,7 +227,7 @@ export function BuyNowButton({
             }}
           >
             {pickupSlots.map((s) => (
-              <SelectItem key={String(s.id)} textValue={formatSlotLabel(s)}>
+              <SelectItem key={String(s.id)} id={String(s.id)} textValue={formatSlotLabel(s)}>
                 {formatSlotLabel(s)} ({s.remaining} {t('pickup.left')})
               </SelectItem>
             ))}

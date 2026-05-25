@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,17 +11,13 @@
 import { useState, useEffect, useCallback, memo, useRef, useMemo } from 'react';
 
 const listingContainerVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
-};
+  hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.05 } }, };
 const listingItemVariants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.25 } },
-};
+  hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.25 } }, };
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Button, Input, Select, SelectItem, Avatar } from '@heroui/react';
+import { Button, Input, Avatar } from '@heroui/react';
 import Search from 'lucide-react/icons/search';
 import Plus from 'lucide-react/icons/plus';
 import Filter from 'lucide-react/icons/filter';
@@ -481,9 +478,9 @@ export function ListingsPage() {
               }}
               startContent={<Filter className="w-4 h-4 text-theme-subtle" />}
             >
-              <SelectItem key="all">{t('filter_all_types')}</SelectItem>
-              <SelectItem key="offer">{t('filters.offers')}</SelectItem>
-              <SelectItem key="request">{t('filters.requests')}</SelectItem>
+              <SelectItem key="all" id="all">{t('filter_all_types')}</SelectItem>
+              <SelectItem key="offer" id="offer">{t('filters.offers')}</SelectItem>
+              <SelectItem key="request" id="request">{t('filters.requests')}</SelectItem>
             </Select>
 
             <Select
@@ -504,7 +501,7 @@ export function ListingsPage() {
               startContent={<Tag className="w-4 h-4 text-theme-subtle" />}
               items={categoryItems}
             >
-              {(cat) => <SelectItem key={cat.slug}>{cat.name}</SelectItem>}
+              {(cat) => <SelectItem key={cat.slug} id={cat.slug}>{cat.name}</SelectItem>}
             </Select>
 
             {/* Sort order */}
@@ -523,8 +520,8 @@ export function ListingsPage() {
               }}
               startContent={<ArrowUpDown className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
             >
-              <SelectItem key="recommended">{t('sort_recommended')}</SelectItem>
-              <SelectItem key="newest">{t('sort_newest')}</SelectItem>
+              <SelectItem key="recommended" id="recommended">{t('sort_recommended')}</SelectItem>
+              <SelectItem key="newest" id="newest">{t('sort_newest')}</SelectItem>
             </Select>
 
             {/* Filters toggle */}
@@ -602,11 +599,11 @@ export function ListingsPage() {
               }}
               startContent={<Clock className="w-4 h-4 text-theme-subtle" />}
             >
-              <SelectItem key="any">{t('filter_any_duration')}</SelectItem>
-              <SelectItem key="quick">{t('filter_quick')}</SelectItem>
-              <SelectItem key="short">{t('filter_short')}</SelectItem>
-              <SelectItem key="half_day">{t('filter_half_day')}</SelectItem>
-              <SelectItem key="full_day">{t('filter_full_day')}</SelectItem>
+              <SelectItem key="any" id="any">{t('filter_any_duration')}</SelectItem>
+              <SelectItem key="quick" id="quick">{t('filter_quick')}</SelectItem>
+              <SelectItem key="short" id="short">{t('filter_short')}</SelectItem>
+              <SelectItem key="half_day" id="half_day">{t('filter_half_day')}</SelectItem>
+              <SelectItem key="full_day" id="full_day">{t('filter_full_day')}</SelectItem>
             </Select>
 
             <Select
@@ -625,9 +622,9 @@ export function ListingsPage() {
               }}
               startContent={<MapIcon className="w-4 h-4 text-theme-subtle" />}
             >
-              <SelectItem key="any">{t('filter_any_mode')}</SelectItem>
-              <SelectItem key="remote">{t('filter_remote')}</SelectItem>
-              <SelectItem key="in_person">{t('filter_in_person')}</SelectItem>
+              <SelectItem key="any" id="any">{t('filter_any_mode')}</SelectItem>
+              <SelectItem key="remote" id="remote">{t('filter_remote')}</SelectItem>
+              <SelectItem key="in_person" id="in_person">{t('filter_in_person')}</SelectItem>
             </Select>
 
             <Select
@@ -646,10 +643,10 @@ export function ListingsPage() {
               }}
               startContent={<Calendar className="w-4 h-4 text-theme-subtle" />}
             >
-              <SelectItem key="any">{t('filter_any_time')}</SelectItem>
-              <SelectItem key="1">{t('filter_today')}</SelectItem>
-              <SelectItem key="7">{t('filter_this_week')}</SelectItem>
-              <SelectItem key="30">{t('filter_this_month')}</SelectItem>
+              <SelectItem key="any" id="any">{t('filter_any_time')}</SelectItem>
+              <SelectItem key="1" id="1">{t('filter_today')}</SelectItem>
+              <SelectItem key="7" id="7">{t('filter_this_week')}</SelectItem>
+              <SelectItem key="30" id="30">{t('filter_this_month')}</SelectItem>
             </Select>
 
             <ProximityFilter key={proximityKey} value={proximityParams} onFilter={setProximityParams} />

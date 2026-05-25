@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +11,7 @@
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Input, Select, SelectItem, Avatar, Button, Chip, Tooltip } from '@heroui/react';
+import { Input, Avatar, Button, Chip, Tooltip } from '@heroui/react';
 import Search from 'lucide-react/icons/search';
 import Users from 'lucide-react/icons/users';
 import MapPin from 'lucide-react/icons/map-pin';
@@ -432,12 +433,12 @@ export function MembersPage() {
               startContent={<Filter className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
             >
               {membersAlgorithm?.key === 'communityrank' ? (
-                <SelectItem key="communityrank">{t('members.sort_communityrank')}</SelectItem>
+                <SelectItem key="communityrank" id="communityrank">{t('members.sort_communityrank')}</SelectItem>
               ) : null}
-              <SelectItem key="name">{t('members.sort_name')}</SelectItem>
-              <SelectItem key="joined">{t('members.sort_newest')}</SelectItem>
-              <SelectItem key="rating">{t('members.sort_rated')}</SelectItem>
-              <SelectItem key="hours_given">{t('members.sort_active')}</SelectItem>
+              <SelectItem key="name" id="name">{t('members.sort_name')}</SelectItem>
+              <SelectItem key="joined" id="joined">{t('members.sort_newest')}</SelectItem>
+              <SelectItem key="rating" id="rating">{t('members.sort_rated')}</SelectItem>
+              <SelectItem key="hours_given" id="hours_given">{t('members.sort_active')}</SelectItem>
             </Select>
 
             <Button
@@ -469,11 +470,11 @@ export function MembersPage() {
                   value: 'text-theme-primary',
                 }}
               >
-                <SelectItem key="5">{t('radius_5')}</SelectItem>
-                <SelectItem key="10">{t('radius_10')}</SelectItem>
-                <SelectItem key="25">{t('radius_25')}</SelectItem>
-                <SelectItem key="50">{t('radius_50')}</SelectItem>
-                <SelectItem key="100">{t('radius_100')}</SelectItem>
+                <SelectItem key="5" id="5">{t('radius_5')}</SelectItem>
+                <SelectItem key="10" id="10">{t('radius_10')}</SelectItem>
+                <SelectItem key="25" id="25">{t('radius_25')}</SelectItem>
+                <SelectItem key="50" id="50">{t('radius_50')}</SelectItem>
+                <SelectItem key="100" id="100">{t('radius_100')}</SelectItem>
               </Select>
             )}
 

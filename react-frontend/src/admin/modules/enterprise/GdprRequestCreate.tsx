@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,8 +13,7 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Card, CardBody, Input, Textarea, Select, SelectItem, Button, Chip, Spinner,
-} from '@heroui/react';
+  Card, CardBody, Input, Textarea, Button, Chip, Spinner } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
 import Eye from 'lucide-react/icons/eye';
@@ -282,7 +282,7 @@ export function GdprRequestCreate() {
             className="max-w-xs"
           >
             {PRIORITY_KEYS.map((key) => (
-              <SelectItem key={key} className="capitalize">
+              <SelectItem key={key} id={key} className="capitalize">
                 {t(`enterprise.priority_${key}`)}
               </SelectItem>
             ))}

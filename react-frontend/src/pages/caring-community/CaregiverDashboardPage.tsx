@@ -5,7 +5,8 @@
 
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Accordion, AccordionItem, Avatar, Button, Chip, Skeleton } from '@heroui/react';
+import {
+  Avatar, Button, Chip, Skeleton } from '@heroui/react';
 import AlertTriangle from 'lucide-react/icons/alert-triangle';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CalendarClock from 'lucide-react/icons/calendar-clock';
@@ -14,7 +15,10 @@ import HeartHandshake from 'lucide-react/icons/heart-handshake';
 import Plus from 'lucide-react/icons/plus';
 import UserRoundCheck from 'lucide-react/icons/user-round-check';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard,
+  Accordion,
+  AccordionItem,
+} from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { useApi } from '@/hooks/useApi';
@@ -245,7 +249,7 @@ function LinkCard({ link, t, tenantPath }: LinkCardProps) {
         <div className="flex flex-wrap gap-2">
           <Accordion className="w-full sm:w-auto" variant="light">
             <AccordionItem
-              key="schedule"
+              key="schedule" id="schedule"
               aria-label={t('caregiver.view_schedule')}
               title={
                 <span className="text-sm font-medium text-[var(--color-primary)]">

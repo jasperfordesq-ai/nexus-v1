@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -5,7 +6,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, CardBody, CardHeader, Input, Select, SelectItem, Spinner, Tooltip } from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Input, Spinner, Tooltip } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -128,7 +129,7 @@ export default function OperatingPolicyAdminPage() {
           }}
         >
           {(schema.choices ?? []).map((opt) => (
-            <SelectItem key={opt}>
+            <SelectItem key={opt} id={opt}>
               {choiceLabel(opt)}
             </SelectItem>
           ))}

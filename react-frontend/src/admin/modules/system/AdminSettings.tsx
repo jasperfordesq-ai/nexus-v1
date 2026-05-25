@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,7 +10,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Card, CardBody, CardHeader, Input, Switch, Button, Textarea, Spinner, Select, SelectItem, Chip, Tooltip } from '@heroui/react';
+import { Card, CardBody, CardHeader, Input, Switch, Button, Textarea, Spinner, Chip, Tooltip } from '@heroui/react';
 import Settings from 'lucide-react/icons/settings';
 import Save from 'lucide-react/icons/save';
 import ShieldCheck from 'lucide-react/icons/shield-check';
@@ -322,7 +323,7 @@ export function AdminSettings() {
               }}
             >
               {CURRENCY_OPTIONS.map(opt => (
-                <SelectItem key={opt.code}>{t(opt.labelKey)}</SelectItem>
+                <SelectItem key={opt.code} id={opt.code}>{t(opt.labelKey)}</SelectItem>
               ))}
             </Select>
           </CardBody>

@@ -8,7 +8,10 @@
  * Announcements with pinning, creation for admins.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import {
+  useState,
+  useEffect,
+  useCallback } from 'react';
 import {
   Button,
   Spinner,
@@ -20,10 +23,6 @@ import {
   ModalFooter,
   Input,
   Textarea,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
   useDisclosure,
 } from '@heroui/react';
 import Megaphone from 'lucide-react/icons/megaphone';
@@ -34,7 +33,13 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import { EmptyState } from '@/components/feedback';
 import { useToast } from '@/contexts';
@@ -251,14 +256,14 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
                       </DropdownTrigger>
                       <DropdownMenu aria-label={t('announcements.dropdown_aria')}>
                         <DropdownItem
-                          key="pin"
+                          key="pin" id="pin"
                           startContent={announcement.is_pinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
                           onPress={() => handleTogglePin(announcement)}
                         >
                           {announcement.is_pinned ? t('announcements.unpin') : t('announcements.pin')}
                         </DropdownItem>
                         <DropdownItem
-                          key="delete"
+                          key="delete" id="delete"
                           startContent={<Trash2 className="w-4 h-4" />}
                           className="text-danger"
                           color="danger"

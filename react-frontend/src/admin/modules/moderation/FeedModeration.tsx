@@ -1,25 +1,11 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 import React, { useState, useEffect } from 'react';
-import {
-  Button,
-  Input,
-  Select,
-  SelectItem,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Chip,
-  Avatar,
-  Pagination,
-  Spinner,
-} from '@heroui/react';
+import { Button, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Avatar, Pagination, Spinner } from '@heroui/react';
 import Search from 'lucide-react/icons/search';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import EyeOff from 'lucide-react/icons/eye-off';
@@ -305,7 +291,7 @@ export default function FeedModeration() {
           className="w-full sm:w-48"
         >
           {POST_TYPES.map((type) => (
-            <SelectItem key={type.value}>
+            <SelectItem key={type.value} id={type.value}>
               {type.label}
             </SelectItem>
           ))}
@@ -318,9 +304,9 @@ export default function FeedModeration() {
             className="w-full sm:w-56"
           >
             {[
-              <SelectItem key="all">{t('moderation.filter_all_tenants')}</SelectItem>,
+              <SelectItem key="all" id="all">{t('moderation.filter_all_tenants')}</SelectItem>,
               ...tenants.map((t) => (
-                <SelectItem key={t.id.toString()}>
+                <SelectItem key={t.id.toString()} id={t.id.toString()}>
                   {t.name}
                 </SelectItem>
               )),

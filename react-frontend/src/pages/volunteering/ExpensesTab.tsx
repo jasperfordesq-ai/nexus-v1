@@ -1,4 +1,5 @@
-﻿// Copyright © 2024–2026 Jasper Ford
+import { Select, SelectItem } from '@/components/ui';
+// Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -10,19 +11,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Button,
-  Chip,
-  Input,
-  Select,
-  SelectItem,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-  Textarea,
-} from '@heroui/react';
+  Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Textarea } from '@heroui/react';
 import Receipt from 'lucide-react/icons/receipt';
 import Plus from 'lucide-react/icons/plus';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
@@ -346,7 +335,7 @@ export function ExpensesTab() {
                     isRequired
                   >
                     {organisations.map((org) => (
-                      <SelectItem key={org.id.toString()}>{org.name}</SelectItem>
+                      <SelectItem key={org.id.toString()} id={org.id.toString()}>{org.name}</SelectItem>
                     ))}
                   </Select>
                 )}
@@ -360,7 +349,7 @@ export function ExpensesTab() {
                   variant="bordered"
                 >
                   {EXPENSE_TYPE_OPTIONS.map((opt) => (
-                    <SelectItem key={opt.key} startContent={opt.icon}>
+                    <SelectItem key={opt.key} id={opt.key} startContent={opt.icon}>
                       {t(`expenses.types.${opt.key}`)}
                     </SelectItem>
                   ))}

@@ -1,14 +1,10 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  Button,
-  Switch,
-  Select,
-  SelectItem,
-} from '@heroui/react';
+import { Button, Switch } from '@heroui/react';
 import Save from 'lucide-react/icons/save';
 import Eye from 'lucide-react/icons/eye';
 import Search from 'lucide-react/icons/search';
@@ -175,9 +171,9 @@ export function PrivacyTab({
               }}
               classNames={selectClassNames}
             >
-              <SelectItem key="public">{t('visibility_options.public')}</SelectItem>
-              <SelectItem key="members">{t('visibility_options.members')}</SelectItem>
-              <SelectItem key="connections">{t('visibility_options.connections')}</SelectItem>
+              <SelectItem key="public" id="public">{t('visibility_options.public')}</SelectItem>
+              <SelectItem key="members" id="members">{t('visibility_options.members')}</SelectItem>
+              <SelectItem key="connections" id="connections">{t('visibility_options.connections')}</SelectItem>
             </Select>
           </div>
 
@@ -458,12 +454,12 @@ export function PrivacyTab({
                   size="sm"
                   className="max-w-xs"
                 >
-                  <SelectItem key="public_liability">{t('insurance.public_liability')}</SelectItem>
-                  <SelectItem key="professional_indemnity">{t('insurance.professional_indemnity')}</SelectItem>
-                  <SelectItem key="employers_liability">{t('insurance.employers_liability')}</SelectItem>
-                  <SelectItem key="product_liability">{t('insurance.product_liability')}</SelectItem>
-                  <SelectItem key="personal_accident">{t('insurance.personal_accident')}</SelectItem>
-                  <SelectItem key="other">{t('insurance.other')}</SelectItem>
+                  <SelectItem key="public_liability" id="public_liability">{t('insurance.public_liability')}</SelectItem>
+                  <SelectItem key="professional_indemnity" id="professional_indemnity">{t('insurance.professional_indemnity')}</SelectItem>
+                  <SelectItem key="employers_liability" id="employers_liability">{t('insurance.employers_liability')}</SelectItem>
+                  <SelectItem key="product_liability" id="product_liability">{t('insurance.product_liability')}</SelectItem>
+                  <SelectItem key="personal_accident" id="personal_accident">{t('insurance.personal_accident')}</SelectItem>
+                  <SelectItem key="other" id="other">{t('insurance.other')}</SelectItem>
                 </Select>
                 <label className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-theme-elevated hover:bg-theme-hover cursor-pointer transition-colors border border-default-200">
                   <Upload className="w-4 h-4 text-theme-primary" />

@@ -1,10 +1,11 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useState } from 'react';
-import { Button, Card, CardBody, Chip, Input, Select, SelectItem, Spinner, Switch, Textarea } from '@heroui/react';
+import { Button, Card, CardBody, Chip, Input, Spinner, Switch, Textarea } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Inbox from 'lucide-react/icons/inbox';
 import MessageSquare from 'lucide-react/icons/message-square';
@@ -156,10 +157,10 @@ export default function MunicipalityFeedbackPage() {
             size="sm"
             isRequired
           >
-            <SelectItem key="question">{t('category_question')}</SelectItem>
-            <SelectItem key="idea">{t('category_idea')}</SelectItem>
-            <SelectItem key="issue_report">{t('category_issue_report')}</SelectItem>
-            <SelectItem key="sentiment">{t('category_sentiment')}</SelectItem>
+            <SelectItem key="question" id="question">{t('category_question')}</SelectItem>
+            <SelectItem key="idea" id="idea">{t('category_idea')}</SelectItem>
+            <SelectItem key="issue_report" id="issue_report">{t('category_issue_report')}</SelectItem>
+            <SelectItem key="sentiment" id="sentiment">{t('category_sentiment')}</SelectItem>
           </Select>
 
           <Input
@@ -190,10 +191,10 @@ export default function MunicipalityFeedbackPage() {
             variant="bordered"
             size="sm"
           >
-            <SelectItem key="positive">{t('sentiment_positive')}</SelectItem>
-            <SelectItem key="neutral">{t('sentiment_neutral')}</SelectItem>
-            <SelectItem key="negative">{t('sentiment_negative')}</SelectItem>
-            <SelectItem key="concerned">{t('sentiment_concerned')}</SelectItem>
+            <SelectItem key="positive" id="positive">{t('sentiment_positive')}</SelectItem>
+            <SelectItem key="neutral" id="neutral">{t('sentiment_neutral')}</SelectItem>
+            <SelectItem key="negative" id="negative">{t('sentiment_negative')}</SelectItem>
+            <SelectItem key="concerned" id="concerned">{t('sentiment_concerned')}</SelectItem>
           </Select>
 
           <Separator />

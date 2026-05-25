@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -16,12 +17,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
-  Button,
-  Checkbox,
-  Select,
-  SelectItem,
-  Spinner,
-} from '@heroui/react';
+  Button, Checkbox, Spinner } from '@heroui/react';
 import Shield from 'lucide-react/icons/shield';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -536,7 +532,7 @@ export function SafeguardingStep({ onNext, onBack, onSkip, isRequired, introText
                         onClick={(e) => e.stopPropagation()}
                       >
                         {selectOpts.map((so) => (
-                          <SelectItem key={so.value}>{so.label}</SelectItem>
+                          <SelectItem key={so.value} id={so.value}>{so.label}</SelectItem>
                         ))}
                       </Select>
                     ) : null;

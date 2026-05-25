@@ -9,12 +9,24 @@
  * Parity: PHP Admin groups management
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import {
+  useState,
+  useCallback,
+  useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Tabs, Tab, Button, Chip, Avatar, Checkbox,
-  Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,
-  Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input,
+  Tabs,
+  Tab,
+  Button,
+  Chip,
+  Avatar,
+  Checkbox,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Input,
 } from '@heroui/react';
 import Trash2 from 'lucide-react/icons/trash-2';
 import Users from 'lucide-react/icons/users';
@@ -27,13 +39,23 @@ import PowerOff from 'lucide-react/icons/power-off';
 import Pencil from 'lucide-react/icons/pencil';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
-import { useTenant, useToast } from '@/contexts';
+import { useTenant,
+  useToast } from '@/contexts';
 import { adminGroups } from '../../api/adminApi';
 import { api } from '@/lib/api';
-import { DataTable, PageHeader, ConfirmModal, type Column } from '../../components';
+import { DataTable,
+  PageHeader,
+  ConfirmModal,
+  type Column } from '../../components';
 import type { AdminGroup } from '../../api/types';
 
 import { resolveAssetUrl } from '@/lib/helpers';
+import { Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 const statusColors: Record<string, 'success' | 'warning' | 'danger' | 'default'> = {
   active: 'success',
   pending: 'warning',
@@ -323,32 +345,32 @@ export function GroupList() {
               else if (key === 'delete') setConfirmDelete(item);
             }}
           >
-            <DropdownItem key="view" startContent={<Eye size={14} />}>
+            <DropdownItem key="view" id="view" startContent={<Eye size={14} />}>
               {t('groups.view_group')}
             </DropdownItem>
-            <DropdownItem key="edit" startContent={<Pencil size={14} />}>
+            <DropdownItem key="edit" id="edit" startContent={<Pencil size={14} />}>
               {t('groups.edit_group')}
             </DropdownItem>
             <DropdownItem
-              key="toggle-status"
+              key="toggle-status" id="toggle-status"
               startContent={item.status === 'active' ? <PowerOff size={14} /> : <Power size={14} />}
               className={item.status === 'active' ? 'text-warning' : 'text-success'}
             >
               {item.status === 'active' ? t('groups.deactivate') : t('groups.activate')}
             </DropdownItem>
             <DropdownItem
-              key="archive"
+              key="archive" id="archive"
               startContent={<EyeOff size={14} />}
             >
               {item.status === 'archived' ? t('groups.unarchive') : t('groups.archive')}
             </DropdownItem>
-            <DropdownItem key="clone" startContent={<Users size={14} />}>
+            <DropdownItem key="clone" id="clone" startContent={<Users size={14} />}>
               {t('groups.clone_group')}
             </DropdownItem>
-            <DropdownItem key="audit" startContent={<Eye size={14} />}>
+            <DropdownItem key="audit" id="audit" startContent={<Eye size={14} />}>
               {t('groups.audit_log_title')}
             </DropdownItem>
-            <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
+            <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
               {t('groups.delete')}
             </DropdownItem>
           </DropdownMenu>

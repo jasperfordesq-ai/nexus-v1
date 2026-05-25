@@ -7,13 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant } from '@/contexts';
 import {
-  Button,
-  Avatar,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-} from '@heroui/react';
+  Button, Avatar } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Bell from 'lucide-react/icons/bell';
 import LogOut from 'lucide-react/icons/log-out';
@@ -21,6 +15,12 @@ import Menu from 'lucide-react/icons/menu';
 import User from 'lucide-react/icons/user';
 import { resolveAvatarUrl } from '@/lib/helpers';
 
+import { Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 interface CaringPanelHeaderProps {
   sidebarCollapsed: boolean;
   onSidebarToggle?: () => void;
@@ -106,11 +106,11 @@ export function CaringPanelHeader({ sidebarCollapsed, onSidebarToggle }: CaringP
               if (key === 'logout') logout();
             }}
           >
-            <DropdownItem key="profile" startContent={<User size={16} />}>
+            <DropdownItem key="profile" id="profile" startContent={<User size={16} />}>
               {t('panel.header.my_profile')}
             </DropdownItem>
             <DropdownItem
-              key="logout"
+              key="logout" id="logout"
               startContent={<LogOut size={16} />}
               className="text-danger"
               color="danger"

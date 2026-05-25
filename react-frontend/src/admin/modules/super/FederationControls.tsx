@@ -9,9 +9,21 @@
  * whitelist, partnerships, and quick links to sub-pages.
  */
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import {
+  useState,
+  useCallback,
+  useEffect,
+  useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Switch, Chip, Input, Spinner, Accordion, AccordionItem } from '@heroui/react';
+import { Card,
+  CardBody,
+  CardHeader,
+  Button,
+  Switch,
+  Chip,
+  Input,
+  Spinner,
+} from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Globe from 'lucide-react/icons/globe';
 import Shield from 'lucide-react/icons/shield';
@@ -28,8 +40,13 @@ import Users from 'lucide-react/icons/users';
 import Handshake from 'lucide-react/icons/handshake';
 import KeyRound from 'lucide-react/icons/key-round';
 import { usePageTitle } from '@/hooks';
-import { useToast, useTenant } from '@/contexts';
-import { Code, Snippet } from '@/components/ui';
+import { useToast,
+  useTenant } from '@/contexts';
+import { Code,
+  Snippet,
+  Accordion,
+  AccordionItem,
+} from '@/components/ui';
 import { adminSuper } from '../../api/adminApi';
 import { PageHeader, ConfirmModal, StatCard } from '../../components';
 import type { FederationSystemControls as FederationSystemControlsType, FederationWhitelistEntry, FederationPartnership } from '../../api/types';
@@ -299,7 +316,7 @@ export function FederationControls() {
 
           <Accordion variant="light" isCompact>
             <AccordionItem
-              key="what"
+              key="what" id="what"
               aria-label={t('super.jwt_accordion_what')}
               title={<span className="font-medium">{t('super.jwt_accordion_what')}</span>}
             >
@@ -320,7 +337,7 @@ export function FederationControls() {
             </AccordionItem>
 
             <AccordionItem
-              key="setup"
+              key="setup" id="setup"
               aria-label={t('super.jwt_accordion_setup')}
               title={<span className="font-medium">{t('super.jwt_accordion_setup')}</span>}
             >
@@ -358,7 +375,7 @@ export function FederationControls() {
             </AccordionItem>
 
             <AccordionItem
-              key="rotate"
+              key="rotate" id="rotate"
               aria-label={t('super.jwt_accordion_rotate')}
               title={<span className="font-medium">{t('super.jwt_accordion_rotate')}</span>}
             >
@@ -383,7 +400,7 @@ export function FederationControls() {
             </AccordionItem>
 
             <AccordionItem
-              key="troubleshoot"
+              key="troubleshoot" id="troubleshoot"
               aria-label={t('super.jwt_accordion_troubleshoot')}
               title={<span className="font-medium">{t('super.jwt_accordion_troubleshoot')}</span>}
             >

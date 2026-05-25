@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,26 +16,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Button,
-  Card,
-  CardBody,
-  Chip,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Select,
-  SelectItem,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from '@heroui/react';
+  Button, Card, CardBody, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import BarChart3 from 'lucide-react/icons/bar-chart-3';
 import Download from 'lucide-react/icons/download';
 import Eye from 'lucide-react/icons/eye';
@@ -440,8 +422,8 @@ function CreateSubscriptionModal({
                 if (v) setPartnerType(v);
               }}
             >
-              <SelectItem key="municipality">{t('regional_analytics_admin.partner_types.municipality')}</SelectItem>
-              <SelectItem key="sme_partner">{t('regional_analytics_admin.partner_types.sme_partner')}</SelectItem>
+              <SelectItem key="municipality" id="municipality">{t('regional_analytics_admin.partner_types.municipality')}</SelectItem>
+              <SelectItem key="sme_partner" id="sme_partner">{t('regional_analytics_admin.partner_types.sme_partner')}</SelectItem>
             </Select>
             <Input
               label={t('regional_analytics_admin.create_modal.contact_email')}
@@ -464,9 +446,9 @@ function CreateSubscriptionModal({
                 if (v) setPlanTier(v);
               }}
             >
-              <SelectItem key="basic">{t('regional_analytics_admin.plan_tiers.basic')}</SelectItem>
-              <SelectItem key="pro">{t('regional_analytics_admin.plan_tiers.pro')}</SelectItem>
-              <SelectItem key="enterprise">{t('regional_analytics_admin.plan_tiers.enterprise')}</SelectItem>
+              <SelectItem key="basic" id="basic">{t('regional_analytics_admin.plan_tiers.basic')}</SelectItem>
+              <SelectItem key="pro" id="pro">{t('regional_analytics_admin.plan_tiers.pro')}</SelectItem>
+              <SelectItem key="enterprise" id="enterprise">{t('regional_analytics_admin.plan_tiers.enterprise')}</SelectItem>
             </Select>
             <div className="flex gap-3">
               <Input

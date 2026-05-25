@@ -8,16 +8,15 @@
  * List, search, filter, change status, and delete ideation challenges.
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import {
+  useState,
+  useCallback,
+  useEffect } from 'react';
 import {
   Chip,
   Button,
   Tabs,
   Tab,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
 } from '@heroui/react';
 import Lightbulb from 'lucide-react/icons/lightbulb';
 import Eye from 'lucide-react/icons/eye';
@@ -34,8 +33,17 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { DataTable, PageHeader, ConfirmModal, type Column } from '../../components';
+import { DataTable,
+  PageHeader,
+  ConfirmModal,
+  type Column } from '../../components';
 
+import { Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
@@ -130,18 +138,18 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
         </Button>
       </DropdownTrigger>
       <DropdownMenu aria-label={t('ideation.label_challenge_actions')} onAction={handleAction}>
-        <DropdownItem key="view" startContent={<Eye size={14} />}>
+        <DropdownItem key="view" id="view" startContent={<Eye size={14} />}>
           {t('ideation.view_details')}
         </DropdownItem>
         <DropdownItem
-          key="draft"
+          key="draft" id="draft"
           startContent={<FileEdit size={14} />}
           className={challenge.status !== 'draft' ? '' : 'hidden'}
         >
           {t('ideation.mark_as_draft')}
         </DropdownItem>
         <DropdownItem
-          key="open"
+          key="open" id="open"
           startContent={<CheckCircle size={14} />}
           color="success"
           className={challenge.status !== 'open' ? 'text-success' : 'hidden'}
@@ -149,7 +157,7 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
           {t('ideation.mark_as_open')}
         </DropdownItem>
         <DropdownItem
-          key="voting"
+          key="voting" id="voting"
           startContent={<Vote size={14} />}
           color="primary"
           className={challenge.status !== 'voting' ? 'text-primary' : 'hidden'}
@@ -157,7 +165,7 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
           {t('ideation.mark_as_voting')}
         </DropdownItem>
         <DropdownItem
-          key="evaluating"
+          key="evaluating" id="evaluating"
           startContent={<ClipboardCheck size={14} />}
           color="warning"
           className={challenge.status !== 'evaluating' ? 'text-warning' : 'hidden'}
@@ -165,21 +173,21 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
           {t('ideation.mark_as_evaluating')}
         </DropdownItem>
         <DropdownItem
-          key="closed"
+          key="closed" id="closed"
           startContent={<XCircle size={14} />}
           className={challenge.status !== 'closed' ? '' : 'hidden'}
         >
           {t('ideation.mark_as_closed')}
         </DropdownItem>
         <DropdownItem
-          key="archived"
+          key="archived" id="archived"
           startContent={<Archive size={14} />}
           className={challenge.status !== 'archived' ? '' : 'hidden'}
         >
           {t('ideation.mark_as_archived')}
         </DropdownItem>
         <DropdownItem
-          key="delete"
+          key="delete" id="delete"
           startContent={<Trash2 size={14} />}
           className="text-danger"
           color="danger"

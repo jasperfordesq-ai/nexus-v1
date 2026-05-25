@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -19,7 +20,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Card, CardBody, CardHeader, Spinner, Button, Select, SelectItem, Pagination, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Avatar, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Textarea, Switch, Input } from '@heroui/react';
+import { Card, CardBody, CardHeader, Spinner, Button, Pagination, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Avatar, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Textarea, Switch, Input } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Shield from 'lucide-react/icons/shield';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -441,7 +442,7 @@ export function ModerationQueuePage() {
           aria-label={t('reports.label_status_filter')}
         >
           {STATUS_OPTION_KEYS.map((opt) => (
-            <SelectItem key={opt.key}>{t(opt.i18nKey)}</SelectItem>
+            <SelectItem key={opt.key} id={opt.key}>{t(opt.i18nKey)}</SelectItem>
           ))}
         </Select>
         <Select
@@ -455,7 +456,7 @@ export function ModerationQueuePage() {
           aria-label={t('reports.label_content_type_filter')}
         >
           {CONTENT_TYPE_OPTION_KEYS.map((opt) => (
-            <SelectItem key={opt.key}>{t(opt.i18nKey)}</SelectItem>
+            <SelectItem key={opt.key} id={opt.key}>{t(opt.i18nKey)}</SelectItem>
           ))}
         </Select>
         <Input type="search" name="admin-search" autoComplete="off"

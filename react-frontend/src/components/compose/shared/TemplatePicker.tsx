@@ -8,18 +8,18 @@
  * template content. Templates are hardcoded per tab and use i18n for labels.
  */
 
-import {
-  Button,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-} from '@heroui/react';
+import { Button } from '@heroui/react';
 import FileText from 'lucide-react/icons/file-text';
 import { useTranslation } from 'react-i18next';
 
 import type { ComposeTab } from '../types';
 
+import { Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
@@ -169,7 +169,7 @@ export function TemplatePicker({ tab, onSelect }: TemplatePickerProps) {
         onAction={handleAction}
       >
         {templates.map((tpl) => (
-          <DropdownItem key={tpl.key}>
+          <DropdownItem key={tpl.key} id={tpl.key}>
             {t(tpl.labelKey, tpl.key)}
           </DropdownItem>
         ))}

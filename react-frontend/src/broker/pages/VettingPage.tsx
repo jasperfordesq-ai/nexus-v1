@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -13,23 +14,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
-  Tabs,
-  Tab,
-  Button,
-  Chip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Input,
-  Select,
-  SelectItem,
-  Textarea,
-  Checkbox,
-  Avatar,
-  Spinner,
-} from '@heroui/react';
+  Tabs, Tab, Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea, Checkbox, Avatar, Spinner } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
@@ -1001,7 +986,7 @@ export function VettingRecords() {
               isRequired
             >
               {Object.keys(VETTING_TYPE_KEYS).map((key) => (
-                <SelectItem key={key}>{getTypeLabel(key)}</SelectItem>
+                <SelectItem key={key} id={key}>{getTypeLabel(key)}</SelectItem>
               ))}
             </Select>
             <Input
@@ -1111,7 +1096,7 @@ export function VettingRecords() {
                 isRequired
               >
                 {Object.keys(VETTING_TYPE_KEYS).map((key) => (
-                  <SelectItem key={key}>{getTypeLabel(key)}</SelectItem>
+                  <SelectItem key={key} id={key}>{getTypeLabel(key)}</SelectItem>
                 ))}
               </Select>
               <Input

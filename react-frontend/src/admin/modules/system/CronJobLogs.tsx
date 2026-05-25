@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,29 +13,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Card,
-  CardBody,
-  CardHeader,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Button,
-  Chip,
-  Spinner,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-  Select,
-  SelectItem,
-  Input,
-  Pagination,
-} from '@heroui/react';
+  Card, CardBody, CardHeader, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button, Chip, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Input, Pagination } from '@heroui/react';
 import FileText from 'lucide-react/icons/file-text';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
@@ -236,10 +215,10 @@ export function CronJobLogs() {
               setPage(1);
             }}
           >
-            <SelectItem key="success">
+            <SelectItem key="success" id="success">
               {t('system.status_success')}
             </SelectItem>
-            <SelectItem key="failed">
+            <SelectItem key="failed" id="failed">
               {t('system.status_failed')}
             </SelectItem>
           </Select>

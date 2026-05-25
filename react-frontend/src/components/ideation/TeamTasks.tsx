@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,21 +16,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import {
-  Button,
-  Input,
-  Textarea,
-  Select,
-  SelectItem,
-  Chip,
-  Spinner,
-  Avatar,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-} from '@heroui/react';
+  Button, Input, Textarea, Chip, Spinner, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@heroui/react';
 import Plus from 'lucide-react/icons/plus';
 import CheckSquare from 'lucide-react/icons/square-check-big';
 import Clock from 'lucide-react/icons/clock';
@@ -443,9 +430,9 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
                 }}
                 variant="bordered"
               >
-                <SelectItem key="todo">{t('tasks.status_todo')}</SelectItem>
-                <SelectItem key="in_progress">{t('tasks.status_in_progress')}</SelectItem>
-                <SelectItem key="done">{t('tasks.status_done')}</SelectItem>
+                <SelectItem key="todo" id="todo">{t('tasks.status_todo')}</SelectItem>
+                <SelectItem key="in_progress" id="in_progress">{t('tasks.status_in_progress')}</SelectItem>
+                <SelectItem key="done" id="done">{t('tasks.status_done')}</SelectItem>
               </Select>
               <Select
                 label={t('tasks.priority_label')}
@@ -456,10 +443,10 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
                 }}
                 variant="bordered"
               >
-                <SelectItem key="low">{t('tasks.priority_low')}</SelectItem>
-                <SelectItem key="medium">{t('tasks.priority_medium')}</SelectItem>
-                <SelectItem key="high">{t('tasks.priority_high')}</SelectItem>
-                <SelectItem key="urgent">{t('tasks.priority_urgent')}</SelectItem>
+                <SelectItem key="low" id="low">{t('tasks.priority_low')}</SelectItem>
+                <SelectItem key="medium" id="medium">{t('tasks.priority_medium')}</SelectItem>
+                <SelectItem key="high" id="high">{t('tasks.priority_high')}</SelectItem>
+                <SelectItem key="urgent" id="urgent">{t('tasks.priority_urgent')}</SelectItem>
               </Select>
             </div>
             <div className="grid grid-cols-2 gap-3">
@@ -476,7 +463,7 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
                   variant="bordered"
                 >
                   {members.map((m) => (
-                    <SelectItem key={String(m.id)}>{m.name}</SelectItem>
+                    <SelectItem key={String(m.id)} id={String(m.id)}>{m.name}</SelectItem>
                   ))}
                 </Select>
               )}

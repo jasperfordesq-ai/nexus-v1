@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -16,19 +17,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Button,
-  Input,
-  Select,
-  SelectItem,
-  Switch,
-  Chip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-} from '@heroui/react';
+  Button, Input, Switch, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@heroui/react';
 import Bell from 'lucide-react/icons/bell';
 import Plus from 'lucide-react/icons/plus';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -414,7 +403,7 @@ export function JobAlertsPage() {
                       }}
                     >
                       {JOB_TYPES.map((type) => (
-                        <SelectItem key={type}>{t(`type.${type}`)}</SelectItem>
+                        <SelectItem key={type} id={type}>{t(`type.${type}`)}</SelectItem>
                       ))}
                     </Select>
 
@@ -429,7 +418,7 @@ export function JobAlertsPage() {
                       }}
                     >
                       {COMMITMENT_TYPES.map((type) => (
-                        <SelectItem key={type}>{t(`commitment.${type}`)}</SelectItem>
+                        <SelectItem key={type} id={type}>{t(`commitment.${type}`)}</SelectItem>
                       ))}
                     </Select>
                   </div>

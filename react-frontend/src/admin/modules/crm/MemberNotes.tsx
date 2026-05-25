@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,11 +12,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import {
-  Card, CardBody, CardHeader, Button, Input, Textarea, Select, SelectItem,
-  Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure,
-  Chip, Spinner, Pagination, Avatar, Dropdown, DropdownTrigger, DropdownMenu,
-  DropdownItem,
-} from '@heroui/react';
+  Card, CardBody, CardHeader, Button, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Chip, Spinner, Pagination, Avatar } from '@heroui/react';
 import StickyNote from 'lucide-react/icons/sticky-note';
 import Plus from 'lucide-react/icons/plus';
 import Pin from 'lucide-react/icons/pin';
@@ -24,13 +21,24 @@ import Edit3 from 'lucide-react/icons/pen-line';
 import Filter from 'lucide-react/icons/filter';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import Search from 'lucide-react/icons/search';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams,
+  Link } from 'react-router-dom';
 import { useAdminPageMeta } from '../../AdminMetaContext';
-import { useTenant, useToast } from '@/contexts';
+import { useTenant,
+  useToast } from '@/contexts';
 import { adminCrm } from '../../api/adminApi';
-import { PageHeader, ConfirmModal, MemberSearchPicker, type MemberSearchMember } from '../../components';
+import { PageHeader,
+  ConfirmModal,
+  MemberSearchPicker,
+  type MemberSearchMember } from '../../components';
 
 import { useTranslation } from 'react-i18next';
+import { Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 interface Note {
   id: number;
   tenant_id: number;
@@ -311,7 +319,7 @@ export function MemberNotes() {
           }}
         >
           {CATEGORIES.map(cat => (
-            <SelectItem key={cat.key}>{t(cat.labelKey)}</SelectItem>
+            <SelectItem key={cat.key} id={cat.key}>{t(cat.labelKey)}</SelectItem>
           ))}
         </Select>
 
@@ -413,14 +421,14 @@ export function MemberNotes() {
                       else if (key === 'delete') setDeleteTarget(note);
                     }}
                   >
-                    <DropdownItem key="edit" startContent={<Edit3 size={14} />}>
+                    <DropdownItem key="edit" id="edit" startContent={<Edit3 size={14} />}>
                       {t('crm.note_action_edit')}
                     </DropdownItem>
-                    <DropdownItem key="pin" startContent={<Pin size={14} />}>
+                    <DropdownItem key="pin" id="pin" startContent={<Pin size={14} />}>
                       {note.is_pinned === 1 ? t('crm.note_action_unpin') : t('crm.note_action_pin')}
                     </DropdownItem>
                     <DropdownItem
-                      key="delete"
+                      key="delete" id="delete"
                       startContent={<Trash2 size={14} />}
                       className="text-danger"
                       color="danger"
@@ -500,7 +508,7 @@ export function MemberNotes() {
               }}
             >
               {CATEGORIES.map(cat => (
-                <SelectItem key={cat.key}>{t(cat.labelKey)}</SelectItem>
+                <SelectItem key={cat.key} id={cat.key}>{t(cat.labelKey)}</SelectItem>
               ))}
             </Select>
             <div className="flex items-center gap-2">

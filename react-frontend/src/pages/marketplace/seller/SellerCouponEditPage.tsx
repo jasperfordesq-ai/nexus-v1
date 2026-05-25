@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,15 +11,7 @@
 import { useEffect, useState, FormEvent } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import {
-  Card,
-  CardBody,
-  Input,
-  Textarea,
-  Button,
-  Select,
-  SelectItem,
-  Spinner,
-} from '@heroui/react';
+  Card, CardBody, Input, Textarea, Button, Spinner } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
@@ -200,9 +193,9 @@ export default function SellerCouponEditPage() {
                   setForm((f) => ({ ...f, discount_type: e.target.value as DiscountType }))
                 }
               >
-                <SelectItem key="percent">% {t('coupon.type_percent')}</SelectItem>
-                <SelectItem key="fixed">{t('coupon.type_fixed')}</SelectItem>
-                <SelectItem key="bogo">{t('coupon.type_bogo')}</SelectItem>
+                <SelectItem key="percent" id="percent">% {t('coupon.type_percent')}</SelectItem>
+                <SelectItem key="fixed" id="fixed">{t('coupon.type_fixed')}</SelectItem>
+                <SelectItem key="bogo" id="bogo">{t('coupon.type_bogo')}</SelectItem>
               </Select>
               <Input
                 type="number"
@@ -252,10 +245,10 @@ export default function SellerCouponEditPage() {
                 selectedKeys={[form.status]}
                 onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as Status }))}
               >
-                <SelectItem key="draft">{t('coupon.seller.status_draft')}</SelectItem>
-                <SelectItem key="active">{t('coupon.seller.status_active')}</SelectItem>
-                <SelectItem key="paused">{t('coupon.seller.status_paused')}</SelectItem>
-                <SelectItem key="expired">{t('coupon.seller.status_expired')}</SelectItem>
+                <SelectItem key="draft" id="draft">{t('coupon.seller.status_draft')}</SelectItem>
+                <SelectItem key="active" id="active">{t('coupon.seller.status_active')}</SelectItem>
+                <SelectItem key="paused" id="paused">{t('coupon.seller.status_paused')}</SelectItem>
+                <SelectItem key="expired" id="expired">{t('coupon.seller.status_expired')}</SelectItem>
               </Select>
               <Select
                 label={t('coupon.seller.applies_to')}
@@ -264,9 +257,9 @@ export default function SellerCouponEditPage() {
                   setForm((f) => ({ ...f, applies_to: e.target.value as AppliesTo }))
                 }
               >
-                <SelectItem key="all_listings">{t('coupon.seller.all_listings')}</SelectItem>
-                <SelectItem key="listing_ids">{t('coupon.seller.specific_listings')}</SelectItem>
-                <SelectItem key="category_ids">{t('coupon.seller.specific_categories')}</SelectItem>
+                <SelectItem key="all_listings" id="all_listings">{t('coupon.seller.all_listings')}</SelectItem>
+                <SelectItem key="listing_ids" id="listing_ids">{t('coupon.seller.specific_listings')}</SelectItem>
+                <SelectItem key="category_ids" id="category_ids">{t('coupon.seller.specific_categories')}</SelectItem>
               </Select>
             </div>
             <Input

@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,17 +11,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Input,
-  Select,
-  SelectItem,
-  Spinner,
-  Switch,
-} from '@heroui/react';
+  Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Switch } from '@heroui/react';
 import Download from 'lucide-react/icons/download';
 import Save from 'lucide-react/icons/save';
 import Smartphone from 'lucide-react/icons/smartphone';
@@ -181,12 +172,12 @@ export function NativeApp() {
             <Input label={t('system.native_app.package_name')} variant="bordered" value={fieldValue(formData, 'native_app_package_name')} onValueChange={(v) => updateField('native_app_package_name', v)} />
             <Input label={t('system.native_app.app_version')} variant="bordered" value={fieldValue(formData, 'native_app_version')} onValueChange={(v) => updateField('native_app_version', v)} />
             <Select label={t('system.native_app.store_mode')} selectedKeys={[fieldValue(formData, 'native_app_store_mode')]} onChange={(event) => updateField('native_app_store_mode', event.target.value)}>
-              <SelectItem key="shared">{t('system.native_app.shared_app')}</SelectItem>
-              <SelectItem key="tenant_branded">{t('system.native_app.tenant_branded_app')}</SelectItem>
+              <SelectItem key="shared" id="shared">{t('system.native_app.shared_app')}</SelectItem>
+              <SelectItem key="tenant_branded" id="tenant_branded">{t('system.native_app.tenant_branded_app')}</SelectItem>
             </Select>
             <Select label={t('system.native_app.build_profile')} selectedKeys={[fieldValue(formData, 'native_app_build_profile')]} onChange={(event) => updateField('native_app_build_profile', event.target.value)}>
-              <SelectItem key="preview">{t('system.native_app.preview')}</SelectItem>
-              <SelectItem key="production">{t('system.native_app.production')}</SelectItem>
+              <SelectItem key="preview" id="preview">{t('system.native_app.preview')}</SelectItem>
+              <SelectItem key="production" id="production">{t('system.native_app.production')}</SelectItem>
             </Select>
           </CardBody>
         </Card>
@@ -242,15 +233,15 @@ export function NativeApp() {
             <Input label={t('system.native_app.theme_color')} type="color" variant="bordered" value={fieldValue(formData, 'native_app_theme_color')} onValueChange={(v) => updateField('native_app_theme_color', v)} />
             <Input label={t('system.native_app.background_color')} type="color" variant="bordered" value={fieldValue(formData, 'native_app_background_color')} onValueChange={(v) => updateField('native_app_background_color', v)} />
             <Select label={t('system.native_app.display')} selectedKeys={[fieldValue(formData, 'native_app_display')]} onChange={(event) => updateField('native_app_display', event.target.value)}>
-              <SelectItem key="standalone">{t('system.native_app.standalone')}</SelectItem>
-              <SelectItem key="fullscreen">{t('system.native_app.fullscreen')}</SelectItem>
-              <SelectItem key="minimal-ui">{t('system.native_app.minimal_ui')}</SelectItem>
-              <SelectItem key="browser">{t('system.native_app.browser')}</SelectItem>
+              <SelectItem key="standalone" id="standalone">{t('system.native_app.standalone')}</SelectItem>
+              <SelectItem key="fullscreen" id="fullscreen">{t('system.native_app.fullscreen')}</SelectItem>
+              <SelectItem key="minimal-ui" id="minimal-ui">{t('system.native_app.minimal_ui')}</SelectItem>
+              <SelectItem key="browser" id="browser">{t('system.native_app.browser')}</SelectItem>
             </Select>
             <Select label={t('system.native_app.orientation')} selectedKeys={[fieldValue(formData, 'native_app_orientation')]} onChange={(event) => updateField('native_app_orientation', event.target.value)}>
-              <SelectItem key="portrait">{t('system.native_app.portrait')}</SelectItem>
-              <SelectItem key="landscape">{t('system.native_app.landscape')}</SelectItem>
-              <SelectItem key="any">{t('system.native_app.any')}</SelectItem>
+              <SelectItem key="portrait" id="portrait">{t('system.native_app.portrait')}</SelectItem>
+              <SelectItem key="landscape" id="landscape">{t('system.native_app.landscape')}</SelectItem>
+              <SelectItem key="any" id="any">{t('system.native_app.any')}</SelectItem>
             </Select>
           </CardBody>
         </Card>

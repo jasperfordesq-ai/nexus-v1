@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -5,7 +6,7 @@
 
 import { useCallback, useEffect, useMemo, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, useDisclosure } from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, useDisclosure } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -326,8 +327,8 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
               onChange={(e) => setStatusFilter(e.target.value)}
             >
               {[
-                <SelectItem key="">{t('admin.common.all')}</SelectItem>,
-                ...ALL_STATUSES.map((s) => <SelectItem key={s}>{statusLabel(s)}</SelectItem>),
+                <SelectItem key="" id="">{t('admin.common.all')}</SelectItem>,
+                ...ALL_STATUSES.map((s) => <SelectItem key={s} id={s}>{statusLabel(s)}</SelectItem>),
               ]}
             </Select>
             <Select
@@ -339,8 +340,8 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
               onChange={(e) => setSeverityFilter(e.target.value)}
             >
               {[
-                <SelectItem key="">{t('admin.common.all')}</SelectItem>,
-                ...ALL_SEVERITIES.map((s) => <SelectItem key={s}>{severityLabel(s)}</SelectItem>),
+                <SelectItem key="" id="">{t('admin.common.all')}</SelectItem>,
+                ...ALL_SEVERITIES.map((s) => <SelectItem key={s} id={s}>{severityLabel(s)}</SelectItem>),
               ]}
             </Select>
           </div>
@@ -538,7 +539,7 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
                       className="w-44"
                     >
                       {ALL_STATUSES.map((s) => (
-                        <SelectItem key={s}>{statusLabel(s)}</SelectItem>
+                        <SelectItem key={s} id={s}>{statusLabel(s)}</SelectItem>
                       ))}
                     </Select>
                     <Input

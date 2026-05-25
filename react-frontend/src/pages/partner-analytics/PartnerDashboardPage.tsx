@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -16,17 +17,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Select,
-  SelectItem,
-  Spinner,
-  Tab,
-  Tabs,
-} from '@heroui/react';
+  Button, Card, CardBody, CardHeader, Chip, Spinner, Tab, Tabs } from '@heroui/react';
 import {
   Area,
   AreaChart,
@@ -260,9 +251,9 @@ export default function PartnerDashboardPage() {
           }}
           className="w-full sm:max-w-[220px]"
         >
-          <SelectItem key="last_30d">{t('partner_analytics.period_30d')}</SelectItem>
-          <SelectItem key="last_90d">{t('partner_analytics.period_90d')}</SelectItem>
-          <SelectItem key="last_year">{t('partner_analytics.period_year')}</SelectItem>
+          <SelectItem key="last_30d" id="last_30d">{t('partner_analytics.period_30d')}</SelectItem>
+          <SelectItem key="last_90d" id="last_90d">{t('partner_analytics.period_90d')}</SelectItem>
+          <SelectItem key="last_year" id="last_year">{t('partner_analytics.period_year')}</SelectItem>
         </Select>
       </div>
 

@@ -9,12 +9,7 @@
 
 import { useState } from 'react';
 import {
-  Button,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-} from '@heroui/react';
+  Button } from '@heroui/react';
 import Share2 from 'lucide-react/icons/share-2';
 import Link2 from 'lucide-react/icons/link-2';
 import Repeat2 from 'lucide-react/icons/repeat-2';
@@ -22,6 +17,12 @@ import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { logError } from '@/lib/logger';
 
+import { Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 export interface ShareButtonProps {
   shareToFeed: (content?: string) => Promise<boolean>;
   title?: string;
@@ -107,7 +108,7 @@ export function ShareButton({
       <DropdownMenu aria-label={t('share_options')}>
         {isAuthenticated ? (
           <DropdownItem
-            key="feed"
+            key="feed" id="feed"
             startContent={<Repeat2 className="w-4 h-4" aria-hidden="true" />}
             onPress={handleShareToFeed}
             isDisabled={!canShareToFeed}
@@ -116,7 +117,7 @@ export function ShareButton({
           </DropdownItem>
         ) : (
           <DropdownItem
-            key="feed-disabled"
+            key="feed-disabled" id="feed-disabled"
             startContent={<Repeat2 className="w-4 h-4" aria-hidden="true" />}
             isDisabled
           >
@@ -124,7 +125,7 @@ export function ShareButton({
           </DropdownItem>
         )}
         <DropdownItem
-          key="link"
+          key="link" id="link"
           startContent={<Link2 className="w-4 h-4" aria-hidden="true" />}
           onPress={handleNativeShare}
         >

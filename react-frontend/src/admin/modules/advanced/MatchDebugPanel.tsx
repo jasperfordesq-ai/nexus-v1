@@ -10,20 +10,9 @@
  * proximity, freshness, reciprocity, quality).
  */
 
+import { useState, useCallback, useRef } from 'react';
 import {
-  useState,
-  useCallback,
-  useRef } from 'react';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Avatar,
-  Input,
-  Spinner,
-  Button,
-} from '@heroui/react';
+  Card, CardBody, CardHeader, Chip, Avatar, Input, Spinner, Button } from '@heroui/react';
 import Target from 'lucide-react/icons/target';
 import Search from 'lucide-react/icons/search';
 import User from 'lucide-react/icons/user';

@@ -19,19 +19,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Button,
-  Input,
-  Textarea,
-  Avatar,
-  Chip,
-  Spinner,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Tooltip,
-} from '@heroui/react';
+  Button, Input, Textarea, Avatar, Chip, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tooltip } from '@heroui/react';
 import MessageSquare from 'lucide-react/icons/message-square';
 import Send from 'lucide-react/icons/send';
 import Mail from 'lucide-react/icons/mail';

@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,9 +12,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import {
-  Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
-  Input, Textarea, Select, SelectItem,
-} from '@heroui/react';
+  Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea } from '@heroui/react';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Plus from 'lucide-react/icons/plus';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
@@ -203,7 +202,7 @@ export function GdprBreaches() {
                 variant="bordered"
               >
                 {SEVERITY_KEYS.map((key) => (
-                  <SelectItem key={key}>{t(`common.${key}`)}</SelectItem>
+                  <SelectItem key={key} id={key}>{t(`common.${key}`)}</SelectItem>
                 ))}
               </Select>
               <Input

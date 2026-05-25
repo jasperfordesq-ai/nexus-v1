@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -20,20 +21,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Button,
-  Chip,
-  Input,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Select,
-  SelectItem,
-  Tabs,
-  Tab,
-  Textarea,
-} from '@heroui/react';
+  Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab, Textarea } from '@heroui/react';
 import Megaphone from 'lucide-react/icons/megaphone';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import Eye from 'lucide-react/icons/eye';
@@ -800,10 +788,10 @@ export function AdCampaignAdminPage() {
                   }}
                   variant="bordered"
                 >
-                  <SelectItem key="sme">{t('advertising.advertiser.sme_local')}</SelectItem>
-                  <SelectItem key="verein">{t('advertising.advertiser.verein')}</SelectItem>
-                  <SelectItem key="gemeinde">{t('advertising.advertiser.gemeinde')}</SelectItem>
-                  <SelectItem key="private">{t('advertising.advertiser.private')}</SelectItem>
+                  <SelectItem key="sme" id="sme">{t('advertising.advertiser.sme_local')}</SelectItem>
+                  <SelectItem key="verein" id="verein">{t('advertising.advertiser.verein')}</SelectItem>
+                  <SelectItem key="gemeinde" id="gemeinde">{t('advertising.advertiser.gemeinde')}</SelectItem>
+                  <SelectItem key="private" id="private">{t('advertising.advertiser.private')}</SelectItem>
                 </Select>
 
                 <Select
@@ -815,10 +803,10 @@ export function AdCampaignAdminPage() {
                   }}
                   variant="bordered"
                 >
-                  <SelectItem key="feed">{t('advertising.ad.placement.feed')}</SelectItem>
-                  <SelectItem key="discovery">{t('advertising.ad.placement.discovery')}</SelectItem>
-                  <SelectItem key="markt">{t('advertising.ad.placement.market')}</SelectItem>
-                  <SelectItem key="all">{t('advertising.ad.placement.all')}</SelectItem>
+                  <SelectItem key="feed" id="feed">{t('advertising.ad.placement.feed')}</SelectItem>
+                  <SelectItem key="discovery" id="discovery">{t('advertising.ad.placement.discovery')}</SelectItem>
+                  <SelectItem key="markt" id="markt">{t('advertising.ad.placement.market')}</SelectItem>
+                  <SelectItem key="all" id="all">{t('advertising.ad.placement.all')}</SelectItem>
                 </Select>
 
                 <Input

@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,7 +12,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Button, Switch, Select, SelectItem } from '@heroui/react';
+import { Button, Switch } from '@heroui/react';
 import Languages from 'lucide-react/icons/languages';
 import Sparkles from 'lucide-react/icons/sparkles';
 import Save from 'lucide-react/icons/save';
@@ -164,7 +165,7 @@ export function TranslationTab() {
             }}
           >
             {SUPPORTED_LOCALES.map((loc) => (
-              <SelectItem key={loc}>{loc.toUpperCase()}</SelectItem>
+              <SelectItem key={loc} id={loc}>{loc.toUpperCase()}</SelectItem>
             ))}
           </Select>
         </div>

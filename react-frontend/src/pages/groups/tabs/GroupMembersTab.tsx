@@ -10,21 +10,19 @@
 
 import { Link } from 'react-router-dom';
 import {
-  Button,
-  Avatar,
-  Chip,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  Spinner,
-} from '@heroui/react';
+  Button, Avatar, Chip, Spinner } from '@heroui/react';
 import Users from 'lucide-react/icons/users';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import Shield from 'lucide-react/icons/shield';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import UserX from 'lucide-react/icons/user-x';
-import { GlassCard } from '@/components/ui';
+import { GlassCard,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
@@ -127,7 +125,7 @@ export function GroupMembersTab({
                     <DropdownMenu aria-label={t('detail.member_actions_aria')}>
                       {memberIsAdmin ? (
                         <DropdownItem
-                          key="demote"
+                          key="demote" id="demote"
                           startContent={<Users className="w-4 h-4" aria-hidden="true" />}
                           onPress={() => onUpdateMemberRole(member.id, 'member')}
                         >
@@ -135,7 +133,7 @@ export function GroupMembersTab({
                         </DropdownItem>
                       ) : (
                         <DropdownItem
-                          key="promote"
+                          key="promote" id="promote"
                           startContent={<Shield className="w-4 h-4" aria-hidden="true" />}
                           onPress={() => onUpdateMemberRole(member.id, 'admin')}
                         >
@@ -143,7 +141,7 @@ export function GroupMembersTab({
                         </DropdownItem>
                       )}
                       <DropdownItem
-                        key="remove"
+                        key="remove" id="remove"
                         className="text-danger"
                         color="danger"
                         startContent={<UserX className="w-4 h-4" aria-hidden="true" />}

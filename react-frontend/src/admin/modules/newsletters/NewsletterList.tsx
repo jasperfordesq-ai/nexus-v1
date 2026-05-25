@@ -11,8 +11,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import {
-  Button, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Chip,
-} from '@heroui/react';
+  Button, Chip } from '@heroui/react';
 import Mail from 'lucide-react/icons/mail';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -26,11 +25,22 @@ import Activity from 'lucide-react/icons/activity';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
-import { useTenant, useToast } from '@/contexts';
+import { useTenant,
+  useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
-import { DataTable, PageHeader, StatusBadge, ConfirmModal, type Column } from '../../components';
+import { DataTable,
+  PageHeader,
+  StatusBadge,
+  ConfirmModal,
+  type Column } from '../../components';
 import { NewsletterResend } from './NewsletterResend';
 
+import { Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 interface NewsletterItem {
   id: number;
   name: string;
@@ -192,37 +202,37 @@ export function NewsletterList() {
             else if (key === 'resend') setResendTarget(item.id);
             else if (key === 'delete') setDeleteTarget(item);
           }}>
-            <DropdownItem key="edit" startContent={<Edit size={14} />}>{t('newsletters.edit')}</DropdownItem>
+            <DropdownItem key="edit" id="edit" startContent={<Edit size={14} />}>{t('newsletters.edit')}</DropdownItem>
             <DropdownItem
-              key="send"
+              key="send" id="send"
               startContent={<Send size={14} />}
               className={item.status === 'draft' || item.status === 'scheduled' ? '' : 'hidden'}
             >
               {t('newsletters.send_now')}
             </DropdownItem>
             <DropdownItem
-              key="stats"
+              key="stats" id="stats"
               startContent={<BarChart3 size={14} />}
               className={item.status === 'sent' || item.status === 'sending' ? '' : 'hidden'}
             >
               {t('newsletters.stats')}
             </DropdownItem>
             <DropdownItem
-              key="activity"
+              key="activity" id="activity"
               startContent={<Activity size={14} />}
               className={item.status === 'sent' ? '' : 'hidden'}
             >
               {t('newsletters.activity_log')}
             </DropdownItem>
-            <DropdownItem key="duplicate" startContent={<Copy size={14} />}>{t('newsletters.duplicate')}</DropdownItem>
+            <DropdownItem key="duplicate" id="duplicate" startContent={<Copy size={14} />}>{t('newsletters.duplicate')}</DropdownItem>
             <DropdownItem
-              key="resend"
+              key="resend" id="resend"
               startContent={<Send size={14} />}
               className={item.status === 'sent' ? '' : 'hidden'}
             >
               {t('newsletters.resend_to_non_openers')}
             </DropdownItem>
-            <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">{t('newsletters.delete')}</DropdownItem>
+            <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">{t('newsletters.delete')}</DropdownItem>
           </DropdownMenu>
         </Dropdown>
       ),

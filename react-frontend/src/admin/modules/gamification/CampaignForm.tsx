@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -13,16 +14,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
-  Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Input,
-  Textarea,
-  Select,
-  SelectItem,
-  Spinner,
-} from '@heroui/react';
+  Card, CardBody, CardHeader, Button, Input, Textarea, Spinner } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
 import { usePageTitle } from '@/hooks';
@@ -278,7 +270,7 @@ export function CampaignForm() {
               variant="bordered"
             >
               {STATUS_OPTIONS.map((opt) => (
-                <SelectItem key={opt.key}>{t(opt.labelKey)}</SelectItem>
+                <SelectItem key={opt.key} id={opt.key}>{t(opt.labelKey)}</SelectItem>
               ))}
             </Select>
 
@@ -292,7 +284,7 @@ export function CampaignForm() {
               variant="bordered"
             >
               {TYPE_OPTIONS.map((opt) => (
-                <SelectItem key={opt.key}>{t(opt.labelKey)}</SelectItem>
+                <SelectItem key={opt.key} id={opt.key}>{t(opt.labelKey)}</SelectItem>
               ))}
             </Select>
           </div>
@@ -309,7 +301,7 @@ export function CampaignForm() {
             placeholder={t('gamification.select_badge')}
           >
             {badges.map((badge) => (
-              <SelectItem key={badge.key} textValue={badge.name}>
+              <SelectItem key={badge.key} id={badge.key} textValue={badge.name}>
                 <div className="flex items-center gap-2">
                   <span>{badge.name}</span>
                   <span className="text-xs text-default-400">({badge.type})</span>
@@ -340,7 +332,7 @@ export function CampaignForm() {
             variant="bordered"
           >
             {AUDIENCE_OPTIONS.map((opt) => (
-              <SelectItem key={opt.key}>{t(opt.labelKey)}</SelectItem>
+              <SelectItem key={opt.key} id={opt.key}>{t(opt.labelKey)}</SelectItem>
             ))}
           </Select>
 
@@ -355,9 +347,9 @@ export function CampaignForm() {
               variant="bordered"
               placeholder={t('gamification.select_frequency')}
             >
-              <SelectItem key="daily">{t('gamification.schedule_daily')}</SelectItem>
-              <SelectItem key="weekly">{t('gamification.schedule_weekly')}</SelectItem>
-              <SelectItem key="monthly">{t('gamification.schedule_monthly')}</SelectItem>
+              <SelectItem key="daily" id="daily">{t('gamification.schedule_daily')}</SelectItem>
+              <SelectItem key="weekly" id="weekly">{t('gamification.schedule_weekly')}</SelectItem>
+              <SelectItem key="monthly" id="monthly">{t('gamification.schedule_monthly')}</SelectItem>
             </Select>
           )}
 

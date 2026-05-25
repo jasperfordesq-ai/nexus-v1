@@ -10,13 +10,10 @@
  * Provides options: Online, Away, Do Not Disturb, and Custom status.
  */
 
-import { useState, useCallback } from 'react';
 import {
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  DropdownSection,
+  useState,
+  useCallback } from 'react';
+import {
   Input,
   Button,
   Modal,
@@ -31,9 +28,16 @@ import MinusCircle from 'lucide-react/icons/circle-minus';
 import MessageSquare from 'lucide-react/icons/message-square';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
-import { usePresenceOptional, type PresenceStatus } from '@/contexts/PresenceContext';
+import { usePresenceOptional,
+  type PresenceStatus } from '@/contexts/PresenceContext';
 import { useAuth } from '@/contexts/AuthContext';
 
+import { Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 interface StatusSelectorProps {
   /** Optional trigger element (defaults to a small status dot button) */
   children?: React.ReactNode;
@@ -163,7 +167,7 @@ export function StatusSelector({ children }: StatusSelectorProps) {
           <DropdownSection title={t('status.section_status')} showDivider>
             {STATUS_OPTIONS.map((option) => (
               <DropdownItem
-                key={option.key}
+                key={option.key} id={option.key}
                 startContent={option.icon}
                 description={t(option.descriptionKey)}
                 className={currentStatus?.status === option.key ? 'bg-theme-hover' : ''}
@@ -174,7 +178,7 @@ export function StatusSelector({ children }: StatusSelectorProps) {
           </DropdownSection>
           <DropdownSection title={t('status.section_custom')}>
             <DropdownItem
-              key="custom"
+              key="custom" id="custom"
               startContent={<MessageSquare className="w-3 h-3 text-theme-subtle" />}
               description={t('status.set_custom_desc')}
             >
@@ -184,7 +188,7 @@ export function StatusSelector({ children }: StatusSelectorProps) {
             </DropdownItem>
             {currentStatus?.custom_status ? (
               <DropdownItem
-                key="clear-custom"
+                key="clear-custom" id="clear-custom"
                 startContent={<X className="w-3 h-3 text-theme-subtle" />}
                 className="text-danger"
               >
@@ -193,7 +197,7 @@ export function StatusSelector({ children }: StatusSelectorProps) {
             ) : (
               // HeroUI DropdownSection requires at least the items declared;
               // render a hidden placeholder when there's nothing to clear
-              <DropdownItem key="noop-clear" className="hidden">
+              <DropdownItem key="noop-clear" id="noop-clear" className="hidden">
                 {' '}
               </DropdownItem>
             )}

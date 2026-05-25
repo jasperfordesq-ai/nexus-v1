@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,13 +7,7 @@
 import { useRef, useState } from 'react';
 import type React from 'react';
 import {
-  Button,
-  Input,
-  Textarea,
-  Avatar,
-  Select,
-  SelectItem,
-} from '@heroui/react';
+  Button, Input, Textarea, Avatar } from '@heroui/react';
 import Save from 'lucide-react/icons/save';
 import Camera from 'lucide-react/icons/camera';
 import Phone from 'lucide-react/icons/phone';
@@ -223,8 +218,8 @@ export function ProfileTab({
             }}
             classNames={selectClassNames}
           >
-            <SelectItem key="individual">{t('profile.type_individual')}</SelectItem>
-            <SelectItem key="organisation">{t('profile.type_organisation')}</SelectItem>
+            <SelectItem key="individual" id="individual">{t('profile.type_individual')}</SelectItem>
+            <SelectItem key="organisation" id="organisation">{t('profile.type_organisation')}</SelectItem>
           </Select>
 
           {/* Organisation Name (conditional) */}

@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -13,7 +14,7 @@ import { useState, type FormEvent } from 'react';
 import { useTurnstile } from '@/hooks/useTurnstile';
 import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
-import { Button, Input, Textarea, Select, SelectItem } from '@heroui/react';
+import { Button, Input, Textarea } from '@heroui/react';
 import Mail from 'lucide-react/icons/mail';
 import MessageSquare from 'lucide-react/icons/message-square';
 import Loader2 from 'lucide-react/icons/loader-circle';
@@ -197,11 +198,11 @@ export function ContactPage() {
                   value: 'text-theme-primary',
                 }}
               >
-                <SelectItem key="general">{t('contact.form.subjects.general')}</SelectItem>
-                <SelectItem key="account">{t('contact.form.subjects.account')}</SelectItem>
-                <SelectItem key="technical">{t('contact.form.subjects.technical')}</SelectItem>
-                <SelectItem key="feedback">{t('contact.form.subjects.feedback')}</SelectItem>
-                <SelectItem key="other">{t('contact.form.subjects.other')}</SelectItem>
+                <SelectItem key="general" id="general">{t('contact.form.subjects.general')}</SelectItem>
+                <SelectItem key="account" id="account">{t('contact.form.subjects.account')}</SelectItem>
+                <SelectItem key="technical" id="technical">{t('contact.form.subjects.technical')}</SelectItem>
+                <SelectItem key="feedback" id="feedback">{t('contact.form.subjects.feedback')}</SelectItem>
+                <SelectItem key="other" id="other">{t('contact.form.subjects.other')}</SelectItem>
               </Select>
 
               <Textarea

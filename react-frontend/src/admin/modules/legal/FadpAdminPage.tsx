@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,31 +7,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Chip,
-  Input,
-  Select,
-  SelectItem,
-  Spinner,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Tabs,
-  Tab,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Switch,
-  Textarea,
-} from '@heroui/react';
+  Card, CardBody, CardHeader, Button, Chip, Input, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Tabs, Tab, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Textarea } from '@heroui/react';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Plus from 'lucide-react/icons/plus';
 import Trash2 from 'lucide-react/icons/trash-2';
@@ -556,7 +533,7 @@ export function FadpAdminPage() {
                       variant="bordered"
                     >
                       {dataResidencyOptions.map(option => (
-                        <SelectItem key={option}>{t(`fadp.data_residency.${option}`)}</SelectItem>
+                        <SelectItem key={option} id={option}>{t(`fadp.data_residency.${option}`)}</SelectItem>
                       ))}
                     </Select>
                     <Input
@@ -802,7 +779,7 @@ export function FadpAdminPage() {
                   variant="bordered"
                 >
                   {legalBasisOptions.map(option => (
-                    <SelectItem key={option}>{t(`fadp.legal_basis.${option}`)}</SelectItem>
+                    <SelectItem key={option} id={option}>{t(`fadp.legal_basis.${option}`)}</SelectItem>
                   ))}
                 </Select>
                 <div className="flex items-center justify-between gap-4 rounded-lg border border-default-200 p-3">

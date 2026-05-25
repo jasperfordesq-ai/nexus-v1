@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +11,7 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Card, CardBody, CardHeader, Input, Textarea, Select, SelectItem, Button, Spinner } from '@heroui/react';
+import { Card, CardBody, CardHeader, Input, Textarea, Button, Spinner } from '@heroui/react';
 import Target from 'lucide-react/icons/target';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
@@ -164,10 +165,10 @@ export function EditDeliverable() {
               if (selected) handleChange('priority', selected);
             }}
           >
-            <SelectItem key="low">{t('deliverability.priority_low')}</SelectItem>
-            <SelectItem key="medium">{t('deliverability.priority_medium')}</SelectItem>
-            <SelectItem key="high">{t('deliverability.priority_high')}</SelectItem>
-            <SelectItem key="critical">{t('deliverability.priority_critical')}</SelectItem>
+            <SelectItem key="low" id="low">{t('deliverability.priority_low')}</SelectItem>
+            <SelectItem key="medium" id="medium">{t('deliverability.priority_medium')}</SelectItem>
+            <SelectItem key="high" id="high">{t('deliverability.priority_high')}</SelectItem>
+            <SelectItem key="critical" id="critical">{t('deliverability.priority_critical')}</SelectItem>
           </Select>
           <Select
             label={t('deliverability.status_label')}
@@ -178,10 +179,10 @@ export function EditDeliverable() {
               if (selected) handleChange('status', selected);
             }}
           >
-            <SelectItem key="planned">{t('deliverability.status_planned')}</SelectItem>
-            <SelectItem key="in_progress">{t('deliverability.status_in_progress')}</SelectItem>
-            <SelectItem key="review">{t('deliverability.status_review')}</SelectItem>
-            <SelectItem key="completed">{t('deliverability.status_completed')}</SelectItem>
+            <SelectItem key="planned" id="planned">{t('deliverability.status_planned')}</SelectItem>
+            <SelectItem key="in_progress" id="in_progress">{t('deliverability.status_in_progress')}</SelectItem>
+            <SelectItem key="review" id="review">{t('deliverability.status_review')}</SelectItem>
+            <SelectItem key="completed" id="completed">{t('deliverability.status_completed')}</SelectItem>
           </Select>
           <Input
             label={t('deliverability.due_date_label')}

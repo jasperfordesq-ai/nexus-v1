@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -22,15 +23,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Button,
-  Input,
-  Select,
-  SelectItem,
-  CheckboxGroup,
-  Checkbox,
-  Switch,
-  Textarea,
-} from '@heroui/react';
+  Button, Input, CheckboxGroup, Checkbox, Switch, Textarea } from '@heroui/react';
 import MapPin from 'lucide-react/icons/map-pin';
 import CheckCircle from 'lucide-react/icons/check-circle';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -413,11 +406,11 @@ export function PilotInquiryPage() {
                   value: 'text-theme-primary',
                 }}
               >
-                <SelectItem key="0">{t('timeline_options.asap')}</SelectItem>
-                <SelectItem key="6">{t('timeline_options.6m')}</SelectItem>
-                <SelectItem key="12">{t('timeline_options.1y')}</SelectItem>
-                <SelectItem key="24">{t('timeline_options.2y')}</SelectItem>
-                <SelectItem key="99">{t('timeline_options.explore')}</SelectItem>
+                <SelectItem key="0" id="0">{t('timeline_options.asap')}</SelectItem>
+                <SelectItem key="6" id="6">{t('timeline_options.6m')}</SelectItem>
+                <SelectItem key="12" id="12">{t('timeline_options.1y')}</SelectItem>
+                <SelectItem key="24" id="24">{t('timeline_options.2y')}</SelectItem>
+                <SelectItem key="99" id="99">{t('timeline_options.explore')}</SelectItem>
               </Select>
 
               <Select
@@ -433,11 +426,11 @@ export function PilotInquiryPage() {
                   value: 'text-theme-primary',
                 }}
               >
-                <SelectItem key="under_5k">{t('budget_options.under_5k')}</SelectItem>
-                <SelectItem key="5k_10k">{t('budget_options.5k_10k')}</SelectItem>
-                <SelectItem key="10k_25k">{t('budget_options.10k_25k')}</SelectItem>
-                <SelectItem key="25k_plus">{t('budget_options.25k_plus')}</SelectItem>
-                <SelectItem key="unknown">{t('budget_options.unknown')}</SelectItem>
+                <SelectItem key="under_5k" id="under_5k">{t('budget_options.under_5k')}</SelectItem>
+                <SelectItem key="5k_10k" id="5k_10k">{t('budget_options.5k_10k')}</SelectItem>
+                <SelectItem key="10k_25k" id="10k_25k">{t('budget_options.10k_25k')}</SelectItem>
+                <SelectItem key="25k_plus" id="25k_plus">{t('budget_options.25k_plus')}</SelectItem>
+                <SelectItem key="unknown" id="unknown">{t('budget_options.unknown')}</SelectItem>
               </Select>
             </motion.div>
           )}

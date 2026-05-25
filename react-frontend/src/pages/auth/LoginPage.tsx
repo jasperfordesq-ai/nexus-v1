@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,7 +16,7 @@
 
 import { useState, useEffect, useRef, useCallback, type FormEvent } from 'react';
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { Button, Input, Checkbox, Select, SelectItem } from '@heroui/react';
+import { Button, Input, Checkbox } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Mail from 'lucide-react/icons/mail';
@@ -480,7 +481,7 @@ export function LoginPage() {
                       >
                         {tenants.map((t) => (
                           <SelectItem
-                            key={String(t.id)}
+                            key={String(t.id)} id={String(t.id)}
                             textValue={t.name}
                             classNames={{
                               base: 'text-gray-900 dark:text-white data-[hover=true]:bg-gray-100 dark:data-[hover=true]:bg-white/10',

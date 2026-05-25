@@ -3,8 +3,20 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Accordion, AccordionItem, Button, Card, CardBody, CardHeader, Chip, Spinner, Tooltip } from '@heroui/react';
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState } from 'react';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  Chip,
+  Spinner,
+  Tooltip,
+} from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ClipboardList from 'lucide-react/icons/clipboard-list';
 import ExternalLink from 'lucide-react/icons/external-link';
@@ -19,7 +31,10 @@ import Webhook from 'lucide-react/icons/webhook';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
-import { Snippet } from '@/components/ui';
+import { Snippet,
+  Accordion,
+  AccordionItem,
+} from '@/components/ui';
 import { api } from '@/lib/api';
 import { PageHeader } from '../../components';
 
@@ -149,7 +164,7 @@ export default function IntegrationShowcaseAdminPage() {
             const Icon = ICON_MAP[section.icon] ?? Plug;
             return (
               <AccordionItem
-                key={section.id}
+                key={section.id} id={section.id}
                 aria-label={section.title}
                 title={
                   <span className="flex items-center gap-2 font-semibold">

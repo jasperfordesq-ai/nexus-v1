@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -13,27 +14,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Button,
-  Card,
-  CardBody,
-  Chip,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Select,
-  SelectItem,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Textarea,
-} from '@heroui/react';
+  Button, Card, CardBody, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea } from '@heroui/react';
 import Info from 'lucide-react/icons/info';
 import Plus from 'lucide-react/icons/plus';
 import Pencil from 'lucide-react/icons/pencil';
@@ -352,7 +333,7 @@ export default function SubRegionsAdminPage() {
           size="sm"
         >
           {TYPE_FILTER_OPTIONS.map((value) => (
-            <SelectItem key={value}>{t(`sub_regions.type_options.${value}`)}</SelectItem>
+            <SelectItem key={value} id={value}>{t(`sub_regions.type_options.${value}`)}</SelectItem>
           ))}
         </Select>
       </div>
@@ -483,7 +464,7 @@ export default function SubRegionsAdminPage() {
                   errorMessage={formErrors.type}
                 >
                   {REGION_TYPES.map((value) => (
-                    <SelectItem key={value}>{t(`sub_regions.type_options.${value}`)}</SelectItem>
+                    <SelectItem key={value} id={value}>{t(`sub_regions.type_options.${value}`)}</SelectItem>
                   ))}
                 </Select>
                 <Textarea
@@ -526,8 +507,8 @@ export default function SubRegionsAdminPage() {
                     if (val) setForm((f) => ({ ...f, status: val }));
                   }}
                 >
-                  <SelectItem key="active">{t('sub_regions.status.active')}</SelectItem>
-                  <SelectItem key="inactive">{t('sub_regions.status.inactive')}</SelectItem>
+                  <SelectItem key="active" id="active">{t('sub_regions.status.active')}</SelectItem>
+                  <SelectItem key="inactive" id="inactive">{t('sub_regions.status.inactive')}</SelectItem>
                 </Select>
               </ModalBody>
               <ModalFooter>

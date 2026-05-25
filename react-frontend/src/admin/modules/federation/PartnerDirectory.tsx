@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,22 +12,7 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  Chip,
-  Input,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Select,
-  SelectItem,
-  Textarea,
-  Skeleton,
-} from '@heroui/react';
+  Button, Card, CardBody, CardFooter, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, Skeleton } from '@heroui/react';
 import Globe from 'lucide-react/icons/globe';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Search from 'lucide-react/icons/search';
@@ -256,7 +242,7 @@ export function PartnerDirectory() {
                 }}
               >
                 {regions.map((r) => (
-                  <SelectItem key={r}>{r}</SelectItem>
+                  <SelectItem key={r} id={r}>{r}</SelectItem>
                 ))}
               </Select>
             )}
@@ -273,7 +259,7 @@ export function PartnerDirectory() {
                 }}
               >
                 {categories.map((c) => (
-                  <SelectItem key={c}>{c}</SelectItem>
+                  <SelectItem key={c} id={c}>{c}</SelectItem>
                 ))}
               </Select>
             )}
@@ -291,7 +277,7 @@ export function PartnerDirectory() {
                 startContent={<Tag size={14} className="text-default-400" />}
               >
                 {topics.map((tp) => (
-                  <SelectItem key={tp.slug} textValue={tp.name}>
+                  <SelectItem key={tp.slug} id={tp.slug} textValue={tp.name}>
                     {tp.name} ({tp.tenant_count})
                   </SelectItem>
                 ))}

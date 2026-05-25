@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -18,14 +19,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Button,
-  Input,
-  Select,
-  SelectItem,
-  Checkbox,
-  CheckboxGroup,
-  Chip,
-} from '@heroui/react';
+  Button, Input, Checkbox, CheckboxGroup, Chip } from '@heroui/react';
 import Search from 'lucide-react/icons/search';
 import SlidersHorizontal from 'lucide-react/icons/sliders-horizontal';
 import RotateCcw from 'lucide-react/icons/rotate-ccw';
@@ -304,7 +298,7 @@ export function MarketplaceSearchPage() {
           size="sm"
         >
           {categories.map((cat) => (
-            <SelectItem key={String(cat.id)}>
+            <SelectItem key={String(cat.id)} id={String(cat.id)}>
               {cat.name} ({cat.listing_count})
             </SelectItem>
           ))}
@@ -363,8 +357,8 @@ export function MarketplaceSearchPage() {
           }}
           size="sm"
         >
-          <SelectItem key="private">{t('search.private')}</SelectItem>
-          <SelectItem key="business">{t('search.business')}</SelectItem>
+          <SelectItem key="private" id="private">{t('search.private')}</SelectItem>
+          <SelectItem key="business" id="business">{t('search.business')}</SelectItem>
         </Select>
       </div>
 
@@ -380,9 +374,9 @@ export function MarketplaceSearchPage() {
           }}
           size="sm"
         >
-          <SelectItem key="pickup">{t('search.delivery_pickup')}</SelectItem>
-          <SelectItem key="shipping">{t('search.delivery_shipping')}</SelectItem>
-          <SelectItem key="both">{t('search.delivery_both')}</SelectItem>
+          <SelectItem key="pickup" id="pickup">{t('search.delivery_pickup')}</SelectItem>
+          <SelectItem key="shipping" id="shipping">{t('search.delivery_shipping')}</SelectItem>
+          <SelectItem key="both" id="both">{t('search.delivery_both')}</SelectItem>
         </Select>
       </div>
 
@@ -399,7 +393,7 @@ export function MarketplaceSearchPage() {
           size="sm"
         >
           {POSTED_WITHIN_OPTIONS.filter((o) => o.value).map((opt) => (
-            <SelectItem key={opt.value}>{getPostedWithinLabel(opt.value)}</SelectItem>
+            <SelectItem key={opt.value} id={opt.value}>{getPostedWithinLabel(opt.value)}</SelectItem>
           ))}
         </Select>
       </div>
@@ -468,7 +462,7 @@ export function MarketplaceSearchPage() {
               aria-label={t('common.sort_by')}
             >
               {SORT_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value}>{t(`sort.${opt.value}`)}</SelectItem>
+                <SelectItem key={opt.value} id={opt.value}>{t(`sort.${opt.value}`)}</SelectItem>
               ))}
             </Select>
 
@@ -604,7 +598,7 @@ export function MarketplaceSearchPage() {
                     aria-label={t('common.sort_by')}
                   >
                     {SORT_OPTIONS.map((opt) => (
-                      <SelectItem key={opt.value}>{t(`sort.${opt.value}`)}</SelectItem>
+                      <SelectItem key={opt.value} id={opt.value}>{t(`sort.${opt.value}`)}</SelectItem>
                     ))}
                   </Select>
                 </div>

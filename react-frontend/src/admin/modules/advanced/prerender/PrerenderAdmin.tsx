@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -20,7 +21,7 @@
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Tabs, Tab, Chip, Spinner, Input, Switch, Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Tooltip, Checkbox } from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Tabs, Tab, Chip, Spinner, Input, Switch, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Tooltip, Checkbox } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Play from 'lucide-react/icons/play';
@@ -946,10 +947,10 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
             onSelectionChange={(s) => setStalenessFilter(Array.from(s)[0] as string)}
             className="max-w-[180px]"
           >
-            <SelectItem key="all">{t('filters.all')}</SelectItem>
-            <SelectItem key="fresh">{t('filters.fresh')}</SelectItem>
-            <SelectItem key="warn">{t('filters.aging')}</SelectItem>
-            <SelectItem key="stale">{t('filters.stale')}</SelectItem>
+            <SelectItem key="all" id="all">{t('filters.all')}</SelectItem>
+            <SelectItem key="fresh" id="fresh">{t('filters.fresh')}</SelectItem>
+            <SelectItem key="warn" id="warn">{t('filters.aging')}</SelectItem>
+            <SelectItem key="stale" id="stale">{t('filters.stale')}</SelectItem>
           </Select>
           <Select
             label={t('filters.issue')}
@@ -958,9 +959,9 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
             onSelectionChange={(s) => setIssueFilter(Array.from(s)[0] as string)}
             className="max-w-[180px]"
           >
-            <SelectItem key="all">{t('filters.all')}</SelectItem>
-            <SelectItem key="content_stale">{t('filters.content_drifted')}</SelectItem>
-            <SelectItem key="asset_invalid">{t('filters.asset_broken')}</SelectItem>
+            <SelectItem key="all" id="all">{t('filters.all')}</SelectItem>
+            <SelectItem key="content_stale" id="content_stale">{t('filters.content_drifted')}</SelectItem>
+            <SelectItem key="asset_invalid" id="asset_invalid">{t('filters.asset_broken')}</SelectItem>
           </Select>
           <Select
             label={t('filters.status')}
@@ -969,9 +970,9 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
             onSelectionChange={(s) => setStatusFilter(Array.from(s)[0] as string)}
             className="max-w-[150px]"
           >
-            <SelectItem key="all">{t('filters.all')}</SelectItem>
-            <SelectItem key="200">{t('filters.status_200')}</SelectItem>
-            <SelectItem key="non-200">{t('filters.status_non_200')}</SelectItem>
+            <SelectItem key="all" id="all">{t('filters.all')}</SelectItem>
+            <SelectItem key="200" id="200">{t('filters.status_200')}</SelectItem>
+            <SelectItem key="non-200" id="non-200">{t('filters.status_non_200')}</SelectItem>
           </Select>
           <Input
             label={t('filters.tenant_slug')}
@@ -1517,9 +1518,9 @@ function AnalyticsTab() {
           onSelectionChange={(s) => setWindowDays(Array.from(s)[0] as string)}
           className="max-w-[150px]"
         >
-          <SelectItem key="1">{t('windows.1')}</SelectItem>
-          <SelectItem key="7">{t('windows.7')}</SelectItem>
-          <SelectItem key="30">{t('windows.30')}</SelectItem>
+          <SelectItem key="1" id="1">{t('windows.1')}</SelectItem>
+          <SelectItem key="7" id="7">{t('windows.7')}</SelectItem>
+          <SelectItem key="30" id="30">{t('windows.30')}</SelectItem>
         </Select>
         <Button variant="flat" onPress={load} startContent={<RefreshCw size={14} />} className="self-end">{t('actions.reload')}</Button>
         <span className="text-sm text-default-500 ml-auto self-end">
@@ -1701,13 +1702,13 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
             onSelectionChange={(s) => setStatus(Array.from(s)[0] as string)}
             className="max-w-[180px]"
           >
-            <SelectItem key="all">{t('filters.all')}</SelectItem>
-            <SelectItem key="queued">{t('filters.queued')}</SelectItem>
-            <SelectItem key="running">{t('filters.running')}</SelectItem>
-            <SelectItem key="succeeded">{t('filters.succeeded')}</SelectItem>
-            <SelectItem key="partial">{t('filters.partial')}</SelectItem>
-            <SelectItem key="failed">{t('filters.failed')}</SelectItem>
-            <SelectItem key="cancelled">{t('filters.cancelled')}</SelectItem>
+            <SelectItem key="all" id="all">{t('filters.all')}</SelectItem>
+            <SelectItem key="queued" id="queued">{t('filters.queued')}</SelectItem>
+            <SelectItem key="running" id="running">{t('filters.running')}</SelectItem>
+            <SelectItem key="succeeded" id="succeeded">{t('filters.succeeded')}</SelectItem>
+            <SelectItem key="partial" id="partial">{t('filters.partial')}</SelectItem>
+            <SelectItem key="failed" id="failed">{t('filters.failed')}</SelectItem>
+            <SelectItem key="cancelled" id="cancelled">{t('filters.cancelled')}</SelectItem>
           </Select>
           <Button variant="flat" startContent={<RefreshCw size={14} />} onPress={load}>
             {t('actions.reload')}
@@ -1899,10 +1900,10 @@ function EventsTab() {
             onSelectionChange={(s) => setLimit(parseInt(Array.from(s)[0] as string, 10))}
             className="max-w-[140px]"
           >
-            <SelectItem key="50">50</SelectItem>
-            <SelectItem key="200">200</SelectItem>
-            <SelectItem key="500">500</SelectItem>
-            <SelectItem key="2000">2000</SelectItem>
+            <SelectItem key="50" id="50">50</SelectItem>
+            <SelectItem key="200" id="200">200</SelectItem>
+            <SelectItem key="500" id="500">500</SelectItem>
+            <SelectItem key="2000" id="2000">2000</SelectItem>
           </Select>
           <Button variant="flat" startContent={<RefreshCw size={14} />} onPress={load}>
             {t('actions.reload')}
@@ -2183,16 +2184,16 @@ function AuditTab() {
           selectedKeys={filter ? [filter] : []}
           onChange={(e) => setFilter(e.target.value || '')}
         >
-          <SelectItem key="">{t('filters.all')}</SelectItem>
-          <SelectItem key="enqueue">{t('actions.enqueue')}</SelectItem>
-          <SelectItem key="cancel">{t('actions.cancel')}</SelectItem>
-          <SelectItem key="purge">{t('actions.purge')}</SelectItem>
-          <SelectItem key="purge_unexpected">{t('actions.purge_unexpected')}</SelectItem>
-          <SelectItem key="invalidate">{t('actions.invalidate')}</SelectItem>
-          <SelectItem key="auto_recache">{t('actions.auto_recache')}</SelectItem>
-          <SelectItem key="detect_drift">{t('actions.detect_drift')}</SelectItem>
-          <SelectItem key="reset_breaker">{t('actions.reset_breaker')}</SelectItem>
-          <SelectItem key="reset_queue">{t('actions.reset_queue')}</SelectItem>
+          <SelectItem key="" id="">{t('filters.all')}</SelectItem>
+          <SelectItem key="enqueue" id="enqueue">{t('actions.enqueue')}</SelectItem>
+          <SelectItem key="cancel" id="cancel">{t('actions.cancel')}</SelectItem>
+          <SelectItem key="purge" id="purge">{t('actions.purge')}</SelectItem>
+          <SelectItem key="purge_unexpected" id="purge_unexpected">{t('actions.purge_unexpected')}</SelectItem>
+          <SelectItem key="invalidate" id="invalidate">{t('actions.invalidate')}</SelectItem>
+          <SelectItem key="auto_recache" id="auto_recache">{t('actions.auto_recache')}</SelectItem>
+          <SelectItem key="detect_drift" id="detect_drift">{t('actions.detect_drift')}</SelectItem>
+          <SelectItem key="reset_breaker" id="reset_breaker">{t('actions.reset_breaker')}</SelectItem>
+          <SelectItem key="reset_queue" id="reset_queue">{t('actions.reset_queue')}</SelectItem>
         </Select>
         <Button size="sm" variant="flat" onPress={load} isDisabled={loading} startContent={<RefreshCw size={14} />}>
           {t('buttons.refresh')}

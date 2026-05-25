@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -14,14 +15,7 @@ import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Input,
-  Select,
-  SelectItem,
-  Chip,
-  Avatar,
-  Button,
-  Spinner,
-} from '@heroui/react';
+  Input, Chip, Avatar, Button, Spinner } from '@heroui/react';
 import Search from 'lucide-react/icons/search';
 import Globe from 'lucide-react/icons/globe';
 import MapPin from 'lucide-react/icons/map-pin';
@@ -339,7 +333,7 @@ export function FederationMembersPage() {
               startContent={<Globe className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
             >
               {partners.map((partner) => (
-                <SelectItem key={String(partner.id)}>
+                <SelectItem key={String(partner.id)} id={String(partner.id)}>
                   {partner.is_external ? `${partner.name} (${t('external')})` : partner.name}
                 </SelectItem>
               ))}

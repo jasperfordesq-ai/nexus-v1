@@ -9,16 +9,15 @@
  * Parity: PHP Admin newsletter template management.
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import {
+  useState,
+  useCallback,
+  useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
   Chip,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
   Tabs,
   Tab,
 } from '@heroui/react';
@@ -31,7 +30,8 @@ import Copy from 'lucide-react/icons/copy';
 import Eye from 'lucide-react/icons/eye';
 import Trash2 from 'lucide-react/icons/trash-2';
 import { usePageTitle } from '@/hooks';
-import { useTenant, useToast } from '@/contexts';
+import { useTenant,
+  useToast } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
 import {
   DataTable,
@@ -39,9 +39,15 @@ import {
   EmptyState,
   ConfirmModal,
   type Column,
-} from '../../components';
+  } from '../../components';
 import { TemplatePreview } from './TemplatePreview';
 
+import { Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 interface Template {
   id: number;
   name: string;
@@ -174,17 +180,17 @@ export function Templates() {
             }
           }}
         >
-          <DropdownItem key="edit" startContent={<Pencil size={14} />}>
+          <DropdownItem key="edit" id="edit" startContent={<Pencil size={14} />}>
             {t('newsletters.edit')}
           </DropdownItem>
-          <DropdownItem key="duplicate" startContent={<Copy size={14} />}>
+          <DropdownItem key="duplicate" id="duplicate" startContent={<Copy size={14} />}>
             {t('newsletters.duplicate')}
           </DropdownItem>
-          <DropdownItem key="preview" startContent={<Eye size={14} />}>
+          <DropdownItem key="preview" id="preview" startContent={<Eye size={14} />}>
             {t('newsletters.preview')}
           </DropdownItem>
           <DropdownItem
-            key="delete"
+            key="delete" id="delete"
             startContent={<Trash2 size={14} />}
             className="text-danger"
             color="danger"

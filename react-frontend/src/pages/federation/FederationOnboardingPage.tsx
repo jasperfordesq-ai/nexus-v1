@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,23 +16,11 @@
  * Route: /federation/onboarding
  */
 
-import {
-  useState,
-  useEffect,
-  useCallback,
-  useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion,
-  AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Button,
-  Switch,
-  Select,
-  SelectItem,
-  Input,
-  Spinner,
-  Chip,
-  } from '@heroui/react';
+  Button, Switch, Input, Spinner, Chip } from '@heroui/react';
 import Globe from 'lucide-react/icons/globe';
 import Users from 'lucide-react/icons/users';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
@@ -491,9 +480,9 @@ export function FederationOnboardingPage() {
                     }}
                     classNames={selectClassNames}
                   >
-                    <SelectItem key="local_only">{t('onboarding.reach_local_only')}</SelectItem>
-                    <SelectItem key="remote_ok">{t('onboarding.reach_remote_ok')}</SelectItem>
-                    <SelectItem key="travel_ok">{t('onboarding.reach_travel_ok')}</SelectItem>
+                    <SelectItem key="local_only" id="local_only">{t('onboarding.reach_local_only')}</SelectItem>
+                    <SelectItem key="remote_ok" id="remote_ok">{t('onboarding.reach_remote_ok')}</SelectItem>
+                    <SelectItem key="travel_ok" id="travel_ok">{t('onboarding.reach_travel_ok')}</SelectItem>
                   </Select>
 
                   {settings.service_reach === 'travel_ok' && (

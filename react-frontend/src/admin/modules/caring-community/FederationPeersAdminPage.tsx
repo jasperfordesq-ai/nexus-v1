@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -16,29 +17,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Select,
-  SelectItem,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Textarea,
-  Tooltip,
-} from '@heroui/react';
+  Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, Tooltip } from '@heroui/react';
 import Copy from 'lucide-react/icons/copy';
 import Info from 'lucide-react/icons/info';
 import KeyRound from 'lucide-react/icons/key-round';
@@ -335,7 +314,7 @@ export default function FederationPeersAdminPage() {
                           }}
                         >
                           {(['pending', 'active', 'suspended'] as PeerStatus[]).map((s) => (
-                            <SelectItem key={s}>{t(`federation_peers_admin.status.${s}`)}</SelectItem>
+                            <SelectItem key={s} id={s}>{t(`federation_peers_admin.status.${s}`)}</SelectItem>
                           ))}
                         </Select>
                         <Tooltip content={t('federation_peers_admin.actions.rotate_secret')}>

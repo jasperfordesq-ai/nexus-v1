@@ -1,30 +1,11 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState } from 'react';
-import { Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Select,
-  SelectItem,
-  Spinner,
-  Textarea,
-  Tooltip,
-} from '@heroui/react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Textarea, Tooltip } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import CheckCircle2 from 'lucide-react/icons/check-circle-2';
 import Info from 'lucide-react/icons/info';
@@ -217,7 +198,7 @@ export default function IsolatedNodeAdminPage() {
           }}
         >
           {(editingItem.choices ?? []).map((opt) => (
-            <SelectItem key={opt}>{opt}</SelectItem>
+            <SelectItem key={opt} id={opt}>{opt}</SelectItem>
           ))}
         </Select>
       );
@@ -463,7 +444,7 @@ export default function IsolatedNodeAdminPage() {
                   }}
                 >
                   {STATUS_OPTIONS.map((opt) => (
-                    <SelectItem key={opt}>{t(`isolated_node.status.${opt}`)}</SelectItem>
+                    <SelectItem key={opt} id={opt}>{t(`isolated_node.status.${opt}`)}</SelectItem>
                   ))}
                 </Select>
                 <Textarea

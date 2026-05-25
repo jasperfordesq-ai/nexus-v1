@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -5,7 +6,7 @@
 
 import { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { Button, Select, SelectItem, Textarea, Input } from '@heroui/react';
+import { Button, Textarea, Input } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CheckCircle from 'lucide-react/icons/circle-check';
 import Heart from 'lucide-react/icons/heart';
@@ -167,7 +168,7 @@ export function OfferFavourPage() {
               classNames={{ label: 'text-base font-medium' }}
             >
               {CATEGORIES.map((cat) => (
-                <SelectItem key={cat}>
+                <SelectItem key={cat} id={cat}>
                   {t(`offer_favour.form.categories.${cat}`)}
                 </SelectItem>
               ))}

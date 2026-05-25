@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,23 +16,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Select,
-  SelectItem,
-  Chip,
-  Tabs,
-  Tab,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from '@heroui/react';
+  Card, CardBody, CardHeader, Button, Chip, Tabs, Tab, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import Map from 'lucide-react/icons/map';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import Users from 'lucide-react/icons/users';
@@ -683,10 +668,10 @@ export default function RegionalAnalyticsPage() {
           size="sm"
           variant="bordered"
         >
-          <SelectItem key="last_30d">{t('analytics.regional.periods.last_30d')}</SelectItem>
-          <SelectItem key="last_90d">{t('analytics.regional.periods.last_90d')}</SelectItem>
-          <SelectItem key="last_12m">{t('analytics.regional.periods.last_12m')}</SelectItem>
-          <SelectItem key="all_time">{t('analytics.regional.periods.all_time')}</SelectItem>
+          <SelectItem key="last_30d" id="last_30d">{t('analytics.regional.periods.last_30d')}</SelectItem>
+          <SelectItem key="last_90d" id="last_90d">{t('analytics.regional.periods.last_90d')}</SelectItem>
+          <SelectItem key="last_12m" id="last_12m">{t('analytics.regional.periods.last_12m')}</SelectItem>
+          <SelectItem key="all_time" id="all_time">{t('analytics.regional.periods.all_time')}</SelectItem>
         </Select>
 
         <Button

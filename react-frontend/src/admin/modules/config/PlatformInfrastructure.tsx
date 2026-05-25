@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -16,7 +17,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Switch, Spinner, Button, Select, SelectItem, Checkbox, Input } from '@heroui/react';
+import { Card, CardBody, CardHeader, Switch, Spinner, Button, Checkbox, Input } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Globe from 'lucide-react/icons/globe';
 import MapPin from 'lucide-react/icons/map-pin';
@@ -225,7 +226,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                 size="sm"
               >
                 {PLATFORM_LANGUAGES.filter((l) => langSupported.includes(l.code)).map((lang) => (
-                  <SelectItem key={lang.code}>{lang.label} ({lang.short})</SelectItem>
+                  <SelectItem key={lang.code} id={lang.code}>{lang.label} ({lang.short})</SelectItem>
                 ))}
               </Select>
             </div>
@@ -342,8 +343,8 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                 size="sm"
                 isDisabled={true}
               >
-                <SelectItem key="google">{t('tenant_features.provider_google')}</SelectItem>
-                <SelectItem key="openstreetmap">{t('tenant_features.provider_osm')}</SelectItem>
+                <SelectItem key="google" id="google">{t('tenant_features.provider_google')}</SelectItem>
+                <SelectItem key="openstreetmap" id="openstreetmap">{t('tenant_features.provider_osm')}</SelectItem>
               </Select>
             </div>
 
@@ -364,8 +365,8 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                 className="max-w-xs"
                 size="sm"
               >
-                <SelectItem key="google">{t('tenant_features.provider_google_places')}</SelectItem>
-                <SelectItem key="nominatim">{t('tenant_features.provider_nominatim')}</SelectItem>
+                <SelectItem key="google" id="google">{t('tenant_features.provider_google_places')}</SelectItem>
+                <SelectItem key="nominatim" id="nominatim">{t('tenant_features.provider_nominatim')}</SelectItem>
               </Select>
             </div>
 

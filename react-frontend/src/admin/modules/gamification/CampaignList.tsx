@@ -12,12 +12,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  Button,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-} from '@heroui/react';
+  Button } from '@heroui/react';
 import Plus from 'lucide-react/icons/plus';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import Edit from 'lucide-react/icons/square-pen';
@@ -28,11 +23,23 @@ import Pause from 'lucide-react/icons/pause';
 import RotateCcw from 'lucide-react/icons/rotate-ccw';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
-import { useToast, useTenant } from '@/contexts';
+import { useToast,
+  useTenant } from '@/contexts';
 import { adminGamification } from '../../api/adminApi';
-import { DataTable, PageHeader, ConfirmModal, StatusBadge, EmptyState, type Column } from '../../components';
+import { DataTable,
+  PageHeader,
+  ConfirmModal,
+  StatusBadge,
+  EmptyState,
+  type Column } from '../../components';
 import type { Campaign } from '../../api/types';
 
+import { Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -121,11 +128,11 @@ export function CampaignList() {
           </Button>
         </DropdownTrigger>
         <DropdownMenu aria-label={t('gamification.label_campaign_actions')} onAction={handleAction}>
-          <DropdownItem key="edit" startContent={<Edit size={14} />}>
+          <DropdownItem key="edit" id="edit" startContent={<Edit size={14} />}>
             {t('gamification.edit')}
           </DropdownItem>
           <DropdownItem
-            key="activate"
+            key="activate" id="activate"
             startContent={<Play size={14} />}
             color="success"
             className={campaign.status === 'draft' ? 'text-success' : 'hidden'}
@@ -133,7 +140,7 @@ export function CampaignList() {
             {t('gamification.activate')}
           </DropdownItem>
           <DropdownItem
-            key="pause"
+            key="pause" id="pause"
             startContent={<Pause size={14} />}
             color="warning"
             className={campaign.status === 'active' ? 'text-warning' : 'hidden'}
@@ -141,14 +148,14 @@ export function CampaignList() {
             {t('gamification.pause')}
           </DropdownItem>
           <DropdownItem
-            key="resume"
+            key="resume" id="resume"
             startContent={<RotateCcw size={14} />}
             color="success"
             className={campaign.status === 'paused' ? 'text-success' : 'hidden'}
           >
             {t('gamification.resume')}
           </DropdownItem>
-          <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
+          <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
             {t('gamification.delete')}
           </DropdownItem>
         </DropdownMenu>

@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,21 +13,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Button,
-  Chip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Input,
-  Textarea,
-  Switch,
-  Select,
-  SelectItem,
-  Avatar,
-  Spinner,
-} from '@heroui/react';
+  Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea, Switch, Avatar, Spinner } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Eye from 'lucide-react/icons/eye';
 import MessageCircleOff from 'lucide-react/icons/message-circle-off';
@@ -500,11 +487,11 @@ export function UserMonitoring() {
                 setExpiresDays(val ?? '');
               }}
             >
-              <SelectItem key="7">{t('monitoring.duration_7_days')}</SelectItem>
-              <SelectItem key="14">{t('monitoring.duration_14_days')}</SelectItem>
-              <SelectItem key="30">{t('monitoring.duration_30_days')}</SelectItem>
-              <SelectItem key="60">{t('monitoring.duration_60_days')}</SelectItem>
-              <SelectItem key="90">{t('monitoring.duration_90_days')}</SelectItem>
+              <SelectItem key="7" id="7">{t('monitoring.duration_7_days')}</SelectItem>
+              <SelectItem key="14" id="14">{t('monitoring.duration_14_days')}</SelectItem>
+              <SelectItem key="30" id="30">{t('monitoring.duration_30_days')}</SelectItem>
+              <SelectItem key="60" id="60">{t('monitoring.duration_60_days')}</SelectItem>
+              <SelectItem key="90" id="90">{t('monitoring.duration_90_days')}</SelectItem>
             </Select>
           </ModalBody>
           <ModalFooter>

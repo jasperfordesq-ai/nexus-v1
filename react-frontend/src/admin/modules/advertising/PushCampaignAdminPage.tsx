@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -22,7 +23,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, CardBody, CardHeader, Chip, ChipProps, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Spinner, Tab, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tabs, Textarea, useDisclosure } from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, ChipProps, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Tab, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tabs, Textarea, useDisclosure } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import BarChart3 from 'lucide-react/icons/bar-chart-3';
 import Bell from 'lucide-react/icons/bell';
@@ -851,10 +852,10 @@ export default function PushCampaignAdminPage() {
                 }}
                 variant="bordered"
               >
-                <SelectItem key="sme">{t('advertising.advertiser.sme')}</SelectItem>
-                <SelectItem key="verein">{t('advertising.advertiser.verein')}</SelectItem>
-                <SelectItem key="gemeinde">{t('advertising.advertiser.gemeinde')}</SelectItem>
-                <SelectItem key="private">{t('advertising.advertiser.private')}</SelectItem>
+                <SelectItem key="sme" id="sme">{t('advertising.advertiser.sme')}</SelectItem>
+                <SelectItem key="verein" id="verein">{t('advertising.advertiser.verein')}</SelectItem>
+                <SelectItem key="gemeinde" id="gemeinde">{t('advertising.advertiser.gemeinde')}</SelectItem>
+                <SelectItem key="private" id="private">{t('advertising.advertiser.private')}</SelectItem>
               </Select>
               <Input
                 label={t('advertising.push.fields.notification_title')}

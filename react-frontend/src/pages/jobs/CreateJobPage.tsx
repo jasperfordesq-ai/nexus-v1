@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -13,25 +14,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
-  Button,
-  Input,
-  Textarea,
-  Select,
-  SelectItem,
-  Switch,
-  Chip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Tooltip,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  Avatar,
-} from '@heroui/react';
+  Button, Input, Textarea, Switch, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tooltip, Avatar } from '@heroui/react';
 import Briefcase from 'lucide-react/icons/briefcase';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Info from 'lucide-react/icons/info';
@@ -51,7 +34,13 @@ import MapPin from 'lucide-react/icons/map-pin';
 import Calendar from 'lucide-react/icons/calendar';
 import DollarSign from 'lucide-react/icons/dollar-sign';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -719,13 +708,13 @@ export function CreateJobPage() {
                 }}
               >
                 {templates.length === 0 ? (
-                  <DropdownItem key="empty" isReadOnly className="text-theme-subtle italic">
+                  <DropdownItem key="empty" id="empty" isReadOnly className="text-theme-subtle italic">
                     {t('templates.empty')}
                   </DropdownItem>
                 ) : (
                   templates.map((tpl) => (
                     <DropdownItem
-                      key={String(tpl.id)}
+                      key={String(tpl.id)} id={String(tpl.id)}
                       endContent={
                         <Button
                           isIconOnly
@@ -847,7 +836,7 @@ export function CreateJobPage() {
               }}
             >
               {JOB_TYPES.map((type) => (
-                <SelectItem key={type}>{t(`type.${type}`)}</SelectItem>
+                <SelectItem key={type} id={type}>{t(`type.${type}`)}</SelectItem>
               ))}
             </Select>
 
@@ -861,7 +850,7 @@ export function CreateJobPage() {
               }}
             >
               {COMMITMENT_TYPES.map((type) => (
-                <SelectItem key={type}>{t(`commitment.${type}`)}</SelectItem>
+                <SelectItem key={type} id={type}>{t(`commitment.${type}`)}</SelectItem>
               ))}
             </Select>
           </div>
@@ -1082,9 +1071,9 @@ export function CreateJobPage() {
                     value: 'text-theme-primary',
                   }}
                 >
-                  <SelectItem key="hourly">{t('salary.hourly')}</SelectItem>
-                  <SelectItem key="annual">{t('salary.annual')}</SelectItem>
-                  <SelectItem key="time_credits">{t('salary.time_credits')}</SelectItem>
+                  <SelectItem key="hourly" id="hourly">{t('salary.hourly')}</SelectItem>
+                  <SelectItem key="annual" id="annual">{t('salary.annual')}</SelectItem>
+                  <SelectItem key="time_credits" id="time_credits">{t('salary.time_credits')}</SelectItem>
                 </Select>
                 <Input
                   label={t('form.salary_currency_label')}
@@ -1204,7 +1193,7 @@ export function CreateJobPage() {
                   }}
                 >
                   {COMPANY_SIZE_OPTIONS.map((s) => (
-                    <SelectItem key={s}>{s}</SelectItem>
+                    <SelectItem key={s} id={s}>{s}</SelectItem>
                   ))}
                 </Select>
 
@@ -1622,9 +1611,9 @@ export function CreateJobPage() {
                 value: 'text-theme-primary',
               }}
             >
-              <SelectItem key="reviewer">{t('team.role_reviewer')}</SelectItem>
-              <SelectItem key="interviewer">{t('team.role_interviewer')}</SelectItem>
-              <SelectItem key="hiring_manager">{t('team.role_hiring_manager')}</SelectItem>
+              <SelectItem key="reviewer" id="reviewer">{t('team.role_reviewer')}</SelectItem>
+              <SelectItem key="interviewer" id="interviewer">{t('team.role_interviewer')}</SelectItem>
+              <SelectItem key="hiring_manager" id="hiring_manager">{t('team.role_hiring_manager')}</SelectItem>
             </Select>
 
             {/* Search results */}

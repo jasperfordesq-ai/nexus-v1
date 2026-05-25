@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,7 +12,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardBody, CardHeader, Input, Switch, Button, Textarea, Spinner, Select, SelectItem } from '@heroui/react';
+import { Card, CardBody, CardHeader, Input, Switch, Button, Textarea, Spinner } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ChevronUp from 'lucide-react/icons/chevron-up';
 import ChevronDown from 'lucide-react/icons/chevron-down';
@@ -158,7 +159,7 @@ function IconSelect({
       size="sm"
     >
       {ICON_OPTIONS.map((icon) => (
-        <SelectItem key={icon}>{icon}</SelectItem>
+        <SelectItem key={icon} id={icon}>{icon}</SelectItem>
       ))}
     </Select>
   );

@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -19,25 +20,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import {
-  Card,
-  CardBody,
-  CardHeader,
-  Spinner,
-  Button,
-  Tabs,
-  Tab,
-  Chip,
-  Select,
-  SelectItem,
-  Pagination,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Avatar,
-} from '@heroui/react';
+  Card, CardBody, CardHeader, Spinner, Button, Tabs, Tab, Chip, Pagination, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Avatar } from '@heroui/react';
 import {
   BarChart,
   Bar,
@@ -304,7 +287,7 @@ export function MemberReportsPage() {
               aria-label={t('reports.label_group_by')}
             >
               {GROUP_BY_OPTIONS.map((opt) => (
-                <SelectItem key={opt.key}>{opt.label}</SelectItem>
+                <SelectItem key={opt.key} id={opt.key}>{opt.label}</SelectItem>
               ))}
             </Select>
           </div>
@@ -594,7 +577,7 @@ export function MemberReportsPage() {
               aria-label={t('reports.label_period')}
             >
               {PERIOD_OPTIONS.map((opt) => (
-                <SelectItem key={opt.key}>{opt.label}</SelectItem>
+                <SelectItem key={opt.key} id={opt.key}>{opt.label}</SelectItem>
               ))}
             </Select>
             <Button

@@ -15,7 +15,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Accordion, AccordionItem, Button, Input, Spinner } from '@heroui/react';
+import {
+  Button, Input, Spinner } from '@heroui/react';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import HelpCircle from 'lucide-react/icons/circle-help';
 import Search from 'lucide-react/icons/search';
@@ -24,7 +25,11 @@ import BookOpen from 'lucide-react/icons/book-open';
 import Wallet from 'lucide-react/icons/wallet';
 import Calendar from 'lucide-react/icons/calendar';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import {
+  GlassCard,
+  Accordion,
+  AccordionItem,
+} from '@/components/ui';
 import { PublicPageHero } from '@/components/public/PublicPageHero';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { useTenant, useFeature, useModule } from '@/contexts';
@@ -216,7 +221,7 @@ export function HelpCenterPage() {
           >
             {filteredGroups.map((group, catIdx) => (
               <AccordionItem
-                key={String(catIdx)}
+                key={String(catIdx)} id={String(catIdx)}
                 aria-label={group.category}
                 title={group.category}
                 subtitle={t('help.articles_count', { count: group.faqs.length })}
@@ -239,7 +244,7 @@ export function HelpCenterPage() {
                 >
                   {group.faqs.map((faq) => (
                     <AccordionItem
-                      key={String(faq.id)}
+                      key={String(faq.id)} id={String(faq.id)}
                       aria-label={faq.question}
                       title={faq.question}
                     >

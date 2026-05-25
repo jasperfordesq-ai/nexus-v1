@@ -1,14 +1,10 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  Button,
-  Switch,
-  Select,
-  SelectItem,
-} from '@heroui/react';
+import { Button, Switch } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import Save from 'lucide-react/icons/save';
 import Mail from 'lucide-react/icons/mail';
@@ -299,10 +295,10 @@ export function NotificationsTab({
                     value: 'text-theme-primary',
                   }}
                 >
-                  <SelectItem key="off">{t('activity_digest.off')}</SelectItem>
-                  <SelectItem key="instant">{t('activity_digest.instant')}</SelectItem>
-                  <SelectItem key="daily">{t('activity_digest.daily')}</SelectItem>
-                  <SelectItem key="monthly">{t('activity_digest.monthly')}</SelectItem>
+                  <SelectItem key="off" id="off">{t('activity_digest.off')}</SelectItem>
+                  <SelectItem key="instant" id="instant">{t('activity_digest.instant')}</SelectItem>
+                  <SelectItem key="daily" id="daily">{t('activity_digest.daily')}</SelectItem>
+                  <SelectItem key="monthly" id="monthly">{t('activity_digest.monthly')}</SelectItem>
                 </Select>
               </div>
             </div>
@@ -372,10 +368,10 @@ export function NotificationsTab({
                     value: 'text-theme-primary',
                   }}
                 >
-                  <SelectItem key="daily">{t('match_digest.daily')}</SelectItem>
-                  <SelectItem key="monthly">{t('match_digest.monthly')}</SelectItem>
-                  <SelectItem key="fortnightly">{t('match_digest.fortnightly')}</SelectItem>
-                  <SelectItem key="never">{t('match_digest.never')}</SelectItem>
+                  <SelectItem key="daily" id="daily">{t('match_digest.daily')}</SelectItem>
+                  <SelectItem key="monthly" id="monthly">{t('match_digest.monthly')}</SelectItem>
+                  <SelectItem key="fortnightly" id="fortnightly">{t('match_digest.fortnightly')}</SelectItem>
+                  <SelectItem key="never" id="never">{t('match_digest.never')}</SelectItem>
                 </Select>
               </div>
             </div>

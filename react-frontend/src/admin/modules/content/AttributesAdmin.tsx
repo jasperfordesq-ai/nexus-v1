@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,22 +12,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import {
-  Button,
-  Chip,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Input,
-  Select,
-  SelectItem,
-  Switch,
-} from '@heroui/react';
+  Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Switch } from '@heroui/react';
 import Tags from 'lucide-react/icons/tags';
 import Plus from 'lucide-react/icons/plus';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
@@ -35,11 +21,23 @@ import Trash2 from 'lucide-react/icons/trash-2';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
-import { adminAttributes, adminCategories } from '../../api/adminApi';
-import { DataTable, PageHeader, ConfirmModal, EmptyState, type Column } from '../../components';
-import type { AdminAttribute, AdminCategory } from '../../api/types';
+import { adminAttributes,
+  adminCategories } from '../../api/adminApi';
+import { DataTable,
+  PageHeader,
+  ConfirmModal,
+  EmptyState,
+  type Column } from '../../components';
+import type { AdminAttribute,
+  AdminCategory } from '../../api/types';
 
 import { useTranslation } from 'react-i18next';
+import { Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 // ─────────────────────────────────────────────────────────────────────────────
 // Constants
 // ─────────────────────────────────────────────────────────────────────────────
@@ -228,10 +226,10 @@ export function AttributesAdmin() {
           </Button>
         </DropdownTrigger>
         <DropdownMenu aria-label={t('content.label_attribute_actions')} onAction={handleMenuAction}>
-          <DropdownItem key="edit" startContent={<Edit size={14} />}>
+          <DropdownItem key="edit" id="edit" startContent={<Edit size={14} />}>
             {t('content.label_edit_item')}
           </DropdownItem>
-          <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
+          <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
             {t('content.label_delete_item')}
           </DropdownItem>
         </DropdownMenu>
@@ -345,7 +343,7 @@ export function AttributesAdmin() {
               variant="bordered"
             >
               {ATTRIBUTE_TYPES.map((attrType) => (
-                <SelectItem key={attrType.key}>{t(`content.attr_type_${attrType.key}`)}</SelectItem>
+                <SelectItem key={attrType.key} id={attrType.key}>{t(`content.attr_type_${attrType.key}`)}</SelectItem>
               ))}
             </Select>
 
@@ -359,7 +357,7 @@ export function AttributesAdmin() {
               variant="bordered"
             >
               {categories.map((cat) => (
-                <SelectItem key={String(cat.id)}>{cat.name}</SelectItem>
+                <SelectItem key={String(cat.id)} id={String(cat.id)}>{cat.name}</SelectItem>
               ))}
             </Select>
 

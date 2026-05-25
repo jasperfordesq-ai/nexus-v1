@@ -1,10 +1,11 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, Tooltip } from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, Tooltip } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Download from 'lucide-react/icons/download';
 import Filter from 'lucide-react/icons/filter';
@@ -268,8 +269,8 @@ export default function LeadNurtureAdminPage() {
                 setSegmentFilter(typeof v === 'string' ? v : '');
               }}
             >
-              <SelectItem key="">{t('lead_nurture.filters.all_segments')}</SelectItem>
-              <>{SEGMENTS.map((s) => <SelectItem key={s}>{segmentLabel(s)}</SelectItem>)}</>
+              <SelectItem key="" id="">{t('lead_nurture.filters.all_segments')}</SelectItem>
+              <>{SEGMENTS.map((s) => <SelectItem key={s} id={s}>{segmentLabel(s)}</SelectItem>)}</>
             </Select>
             <Select
               size="sm"
@@ -281,8 +282,8 @@ export default function LeadNurtureAdminPage() {
                 setStageFilter(typeof v === 'string' ? v : '');
               }}
             >
-              <SelectItem key="">{t('lead_nurture.filters.all_stages')}</SelectItem>
-              <>{STAGES.map((s) => <SelectItem key={s}>{stageLabel(s)}</SelectItem>)}</>
+              <SelectItem key="" id="">{t('lead_nurture.filters.all_stages')}</SelectItem>
+              <>{STAGES.map((s) => <SelectItem key={s} id={s}>{stageLabel(s)}</SelectItem>)}</>
             </Select>
           </div>
         </CardBody>
@@ -386,7 +387,7 @@ export default function LeadNurtureAdminPage() {
                   }}
                 >
                   {STAGES.map((s) => (
-                    <SelectItem key={s}>{stageLabel(s)}</SelectItem>
+                    <SelectItem key={s} id={s}>{stageLabel(s)}</SelectItem>
                   ))}
                 </Select>
                 <Input

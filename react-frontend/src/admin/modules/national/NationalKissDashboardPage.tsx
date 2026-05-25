@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -20,22 +21,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Input,
-  Select,
-  SelectItem,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from '@heroui/react';
+  Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import {
   Area,
   CartesianGrid,
@@ -321,10 +307,10 @@ export function NationalKissDashboardPage() {
             className="md:max-w-xs"
             aria-label={t('national_kiss_dashboard.filters.period_aria')}
           >
-            <SelectItem key="this_month">{t('national_kiss_dashboard.periods.this_month')}</SelectItem>
-            <SelectItem key="last_quarter">{t('national_kiss_dashboard.periods.last_quarter')}</SelectItem>
-            <SelectItem key="last_year">{t('national_kiss_dashboard.periods.last_year')}</SelectItem>
-            <SelectItem key="custom">{t('national_kiss_dashboard.periods.custom')}</SelectItem>
+            <SelectItem key="this_month" id="this_month">{t('national_kiss_dashboard.periods.this_month')}</SelectItem>
+            <SelectItem key="last_quarter" id="last_quarter">{t('national_kiss_dashboard.periods.last_quarter')}</SelectItem>
+            <SelectItem key="last_year" id="last_year">{t('national_kiss_dashboard.periods.last_year')}</SelectItem>
+            <SelectItem key="custom" id="custom">{t('national_kiss_dashboard.periods.custom')}</SelectItem>
           </Select>
           <Input
             type="date"

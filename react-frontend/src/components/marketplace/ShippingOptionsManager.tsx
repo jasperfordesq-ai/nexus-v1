@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -13,14 +14,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import {
-  Button,
-  Input,
-  Select,
-  SelectItem,
-  Switch,
-  Spinner,
-  Chip,
-} from '@heroui/react';
+  Button, Input, Switch, Spinner, Chip } from '@heroui/react';
 import Plus from 'lucide-react/icons/plus';
 import Pencil from 'lucide-react/icons/pencil';
 import Trash2 from 'lucide-react/icons/trash-2';
@@ -129,7 +123,7 @@ function ShippingForm({ form, onChange, onSubmit, onCancel, isSubmitting, submit
             className="w-28"
           >
             {CURRENCY_OPTIONS.map((opt) => (
-              <SelectItem key={opt.value}>{opt.label}</SelectItem>
+              <SelectItem key={opt.value} id={opt.value}>{opt.label}</SelectItem>
             ))}
           </Select>
         </div>

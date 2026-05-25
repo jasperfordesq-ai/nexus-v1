@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -7,7 +8,7 @@
 // Coordinates come from the user's profile — no browser geolocation popup.
 
 import { useTranslation } from 'react-i18next';
-import { Button, Select, SelectItem } from '@heroui/react';
+import { Button } from '@heroui/react';
 import MapPin from 'lucide-react/icons/map-pin';
 import { useAuth, useToast } from '@/contexts';
 
@@ -82,7 +83,7 @@ export function ProximityFilter({ value, onFilter, className }: Props) {
           }}
         >
           {RADIUS_OPTIONS.map((km) => (
-            <SelectItem key={String(km)}>{t(`radius_${km}`)}</SelectItem>
+            <SelectItem key={String(km)} id={String(km)}>{t(`radius_${km}`)}</SelectItem>
           ))}
         </Select>
       )}

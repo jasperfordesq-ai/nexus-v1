@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -19,20 +20,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
-  Button,
-  Input,
-  Textarea,
-  Select,
-  SelectItem,
-  Spinner,
-  Chip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-} from '@heroui/react';
+  Button, Input, Textarea, Spinner, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import FileText from 'lucide-react/icons/file-text';
 import Eye from 'lucide-react/icons/eye';
@@ -539,7 +527,7 @@ export function CreateChallengePage() {
               variant="bordered"
             >
               {categories.map((cat) => (
-                <SelectItem key={cat.name}>
+                <SelectItem key={cat.name} id={cat.name}>
                   {cat.name}
                 </SelectItem>
               ))}
@@ -643,8 +631,8 @@ export function CreateChallengePage() {
               }}
               variant="bordered"
             >
-              <SelectItem key="draft">{t('status.draft')}</SelectItem>
-              <SelectItem key="open">{t('status.open')}</SelectItem>
+              <SelectItem key="draft" id="draft">{t('status.draft')}</SelectItem>
+              <SelectItem key="open" id="open">{t('status.open')}</SelectItem>
             </Select>
           )}
 

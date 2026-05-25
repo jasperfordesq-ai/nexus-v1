@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,7 +13,7 @@
 
 import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Card, CardBody, Input, Button, Select, SelectItem, Switch, Textarea, Spinner } from '@heroui/react';
+import { Card, CardBody, Input, Button, Switch, Textarea, Spinner } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 const RichTextEditor = lazy(() =>
   import('../../components/RichTextEditor').then((m) => ({ default: m.RichTextEditor })),
@@ -304,8 +305,8 @@ export function BlogPostForm() {
                 }}
                 isDisabled={submitting}
               >
-                <SelectItem key="draft">{t('content.draft')}</SelectItem>
-                <SelectItem key="published">{t('content.published')}</SelectItem>
+                <SelectItem key="draft" id="draft">{t('content.draft')}</SelectItem>
+                <SelectItem key="published" id="published">{t('content.published')}</SelectItem>
               </Select>
 
               {/* Category */}
@@ -320,7 +321,7 @@ export function BlogPostForm() {
                 isDisabled={submitting}
               >
                 {categories.map((cat) => (
-                  <SelectItem key={String(cat.id)}>
+                  <SelectItem key={String(cat.id)} id={String(cat.id)}>
                     {cat.name}
                   </SelectItem>
                 ))}

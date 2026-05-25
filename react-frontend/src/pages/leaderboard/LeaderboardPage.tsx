@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -16,7 +17,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, type Variants } from 'framer-motion';
-import { Button, Avatar, Select, SelectItem, Chip, Skeleton, Tabs, Tab } from '@heroui/react';
+import { Button, Avatar, Chip, Skeleton, Tabs, Tab } from '@heroui/react';
 import Trophy from 'lucide-react/icons/trophy';
 import Medal from 'lucide-react/icons/medal';
 import Crown from 'lucide-react/icons/crown';
@@ -715,10 +716,10 @@ function CompetitiveLeaderboard(props: CompetitiveLeaderboardProps) {
             }}
             startContent={typeIcons[type]}
           >
-            <SelectItem key="xp">{t('leaderboard.type.xp')}</SelectItem>
-            <SelectItem key="volunteer_hours">{t('leaderboard.type.volunteer_hours')}</SelectItem>
-            <SelectItem key="credits_earned">{t('leaderboard.type.credits_earned')}</SelectItem>
-            <SelectItem key="nexus_score">{t('leaderboard.type.nexus_score')}</SelectItem>
+            <SelectItem key="xp" id="xp">{t('leaderboard.type.xp')}</SelectItem>
+            <SelectItem key="volunteer_hours" id="volunteer_hours">{t('leaderboard.type.volunteer_hours')}</SelectItem>
+            <SelectItem key="credits_earned" id="credits_earned">{t('leaderboard.type.credits_earned')}</SelectItem>
+            <SelectItem key="nexus_score" id="nexus_score">{t('leaderboard.type.nexus_score')}</SelectItem>
           </Select>
 
           {/* Period Selector */}
@@ -735,10 +736,10 @@ function CompetitiveLeaderboard(props: CompetitiveLeaderboardProps) {
             }}
             startContent={<TrendingUp className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
           >
-            <SelectItem key="all">{t('leaderboard.period.all')}</SelectItem>
-            <SelectItem key="season">{t('leaderboard.period.season')}</SelectItem>
-            <SelectItem key="month">{t('leaderboard.period.month')}</SelectItem>
-            <SelectItem key="week">{t('leaderboard.period.week')}</SelectItem>
+            <SelectItem key="all" id="all">{t('leaderboard.period.all')}</SelectItem>
+            <SelectItem key="season" id="season">{t('leaderboard.period.season')}</SelectItem>
+            <SelectItem key="month" id="month">{t('leaderboard.period.month')}</SelectItem>
+            <SelectItem key="week" id="week">{t('leaderboard.period.week')}</SelectItem>
           </Select>
         </div>
 

@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,13 +7,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Button,
-  Chip,
-  Input,
-  Select,
-  SelectItem,
-  Textarea,
-} from '@heroui/react';
+  Button, Chip, Input, Textarea } from '@heroui/react';
 import Accessibility from 'lucide-react/icons/accessibility';
 import Info from 'lucide-react/icons/info';
 import Plus from 'lucide-react/icons/plus';
@@ -258,7 +253,7 @@ export function AccessibilityTab() {
                   classNames={{ trigger: 'bg-theme-elevated border-theme-default' }}
                 >
                   {NEED_TYPES.map((type) => (
-                    <SelectItem key={type}>{t(`accessibility.types.${type}`)}</SelectItem>
+                    <SelectItem key={type} id={type}>{t(`accessibility.types.${type}`)}</SelectItem>
                   ))}
                 </Select>
 

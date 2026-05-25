@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,27 +12,7 @@
 import { Fragment, useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Button,
-  Chip,
-  Select,
-  SelectItem,
-  Tabs,
-  Tab,
-  Card,
-  CardBody,
-  Input,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Spinner,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  useDisclosure,
-} from '@heroui/react';
+  Button, Chip, Tabs, Tab, Card, CardBody, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Spinner, useDisclosure } from '@heroui/react';
 import Bookmark from 'lucide-react/icons/bookmark';
 import BookmarkCheck from 'lucide-react/icons/bookmark-check';
 import FolderPlus from 'lucide-react/icons/folder-plus';
@@ -45,7 +26,13 @@ import MessageSquare from 'lucide-react/icons/message-square';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import Inbox from 'lucide-react/icons/inbox';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useTenant, useToast } from '@/contexts';
 import { usePageTitle } from '@/hooks/usePageTitle';
@@ -301,9 +288,9 @@ export default function BookmarksPage() {
             size="sm"
           >
             <Fragment>
-              <SelectItem key="all">{t('bookmarks.all_items')}</SelectItem>
+              <SelectItem key="all" id="all">{t('bookmarks.all_items')}</SelectItem>
               {collections.map((coll) => (
-                <SelectItem key={String(coll.id)}>
+                <SelectItem key={String(coll.id)} id={String(coll.id)}>
                   {coll.name} {coll.bookmarks_count != null && `(${coll.bookmarks_count})`}
                 </SelectItem>
               ))}
@@ -325,7 +312,7 @@ export default function BookmarksPage() {
                 </DropdownTrigger>
                 <DropdownMenu>
                   <DropdownItem
-                    key="edit"
+                    key="edit" id="edit"
                     startContent={<Pencil className="w-3.5 h-3.5" />}
                     onPress={() => {
                       setEditingColl(coll);
@@ -337,7 +324,7 @@ export default function BookmarksPage() {
                     {t('bookmarks.edit_collection')}
                   </DropdownItem>
                   <DropdownItem
-                    key="delete"
+                    key="delete" id="delete"
                     startContent={<Trash2 className="w-3.5 h-3.5" />}
                     className="text-danger"
                     color="danger"

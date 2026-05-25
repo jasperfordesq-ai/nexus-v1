@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,25 +16,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import {
-  Button,
-  Chip,
-  Input,
-  Select,
-  SelectItem,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from '@heroui/react';
+  Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import Megaphone from 'lucide-react/icons/megaphone';
 import Plus from 'lucide-react/icons/plus';
@@ -324,8 +307,8 @@ export function MyAdCampaignsPage() {
                 }}
                 variant="bordered"
               >
-                <SelectItem key="feed">{t('advertise.type_feed')}</SelectItem>
-                <SelectItem key="discovery">{t('advertise.type_discovery')}</SelectItem>
+                <SelectItem key="feed" id="feed">{t('advertise.type_feed')}</SelectItem>
+                <SelectItem key="discovery" id="discovery">{t('advertise.type_discovery')}</SelectItem>
               </Select>
 
               <div className="grid grid-cols-2 gap-3">

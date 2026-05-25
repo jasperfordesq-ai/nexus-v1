@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,19 +12,7 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
-  Button,
-  Chip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Input,
-  Textarea,
-  Select,
-  SelectItem,
-  useDisclosure,
-} from '@heroui/react';
+  Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea, useDisclosure } from '@heroui/react';
 import Building2 from 'lucide-react/icons/building-2';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Wallet from 'lucide-react/icons/wallet';
@@ -537,10 +526,10 @@ export function VolunteerOrganizations() {
           setStatusFilter(val || 'all');
         }}
       >
-        <SelectItem key="all">{t('volunteering.tab_all')}</SelectItem>
-        <SelectItem key="active">{t('volunteering.status_active')}</SelectItem>
-        <SelectItem key="suspended">{t('volunteering.status_suspended')}</SelectItem>
-        <SelectItem key="pending">{t('volunteering.tab_pending')}</SelectItem>
+        <SelectItem key="all" id="all">{t('volunteering.tab_all')}</SelectItem>
+        <SelectItem key="active" id="active">{t('volunteering.status_active')}</SelectItem>
+        <SelectItem key="suspended" id="suspended">{t('volunteering.status_suspended')}</SelectItem>
+        <SelectItem key="pending" id="pending">{t('volunteering.tab_pending')}</SelectItem>
       </Select>
     </div>
   ), [searchQuery, statusFilter, t]);
@@ -854,8 +843,8 @@ export function VolunteerOrganizations() {
                   }}
                   variant="bordered"
                 >
-                  <SelectItem key="organisation">{t('volunteering.org_type_organisation')}</SelectItem>
-                  <SelectItem key="club">{t('volunteering.org_type_club')}</SelectItem>
+                  <SelectItem key="organisation" id="organisation">{t('volunteering.org_type_organisation')}</SelectItem>
+                  <SelectItem key="club" id="club">{t('volunteering.org_type_club')}</SelectItem>
                 </Select>
                 {createForm.org_type === 'club' && (
                   <Input

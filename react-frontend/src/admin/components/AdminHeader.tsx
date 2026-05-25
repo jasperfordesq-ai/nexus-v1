@@ -11,7 +11,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useTenant } from '@/contexts';
-import { Button, Avatar, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@heroui/react';
+import { Button, Avatar } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Bell from 'lucide-react/icons/bell';
 import LogOut from 'lucide-react/icons/log-out';
@@ -19,6 +19,12 @@ import Menu from 'lucide-react/icons/menu';
 import User from 'lucide-react/icons/user';
 import { resolveAvatarUrl } from '@/lib/helpers';
 
+import { Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 interface AdminHeaderProps {
   sidebarCollapsed: boolean;
   onSidebarToggle?: () => void;
@@ -103,13 +109,13 @@ export function AdminHeader({ sidebarCollapsed, onSidebarToggle }: AdminHeaderPr
             }}
           >
             <DropdownItem
-              key="profile"
+              key="profile" id="profile"
               startContent={<User size={16} />}
             >
               {t('my_profile')}
             </DropdownItem>
             <DropdownItem
-              key="logout"
+              key="logout" id="logout"
               startContent={<LogOut size={16} />}
               className="text-danger"
               color="danger"

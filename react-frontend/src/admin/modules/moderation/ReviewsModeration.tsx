@@ -1,25 +1,11 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 import React, { useState, useEffect } from 'react';
-import {
-  Button,
-  Input,
-  Select,
-  SelectItem,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Chip,
-  Avatar,
-  Pagination,
-  Spinner,
-} from '@heroui/react';
+import { Button, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Avatar, Pagination, Spinner } from '@heroui/react';
 import Search from 'lucide-react/icons/search';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Flag from 'lucide-react/icons/flag';
@@ -333,7 +319,7 @@ export default function ReviewsModeration() {
           className="w-full sm:w-48"
         >
           {RATING_FILTERS.map((filter) => (
-            <SelectItem key={filter.value}>
+            <SelectItem key={filter.value} id={filter.value}>
               {filter.label}
             </SelectItem>
           ))}
@@ -346,9 +332,9 @@ export default function ReviewsModeration() {
             className="w-full sm:w-56"
           >
             {[
-              <SelectItem key="all">{t('moderation.filter_all_tenants')}</SelectItem>,
+              <SelectItem key="all" id="all">{t('moderation.filter_all_tenants')}</SelectItem>,
               ...tenants.map((t) => (
-                <SelectItem key={t.id.toString()}>
+                <SelectItem key={t.id.toString()} id={t.id.toString()}>
                   {t.name}
                 </SelectItem>
               )),

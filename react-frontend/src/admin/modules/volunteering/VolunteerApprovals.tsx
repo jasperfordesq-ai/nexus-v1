@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +11,7 @@
  */
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import { Button, Avatar, Input, Tabs, Tab, Checkbox, Select, SelectItem } from '@heroui/react';
+import { Button, Avatar, Input, Tabs, Tab, Checkbox } from '@heroui/react';
 import ClipboardCheck from 'lucide-react/icons/clipboard-check';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
@@ -340,7 +341,7 @@ export function VolunteerApprovals() {
               }}
               items={[{ key: 'all', label: t('volunteering.tab_all') }, ...opportunityOptions.map(title => ({ key: title, label: title }))]}
             >
-              {(item) => <SelectItem key={item.key}>{item.label}</SelectItem>}
+              {(item) => <SelectItem key={item.key} id={item.key}>{item.label}</SelectItem>}
             </Select>
           )}
         </div>

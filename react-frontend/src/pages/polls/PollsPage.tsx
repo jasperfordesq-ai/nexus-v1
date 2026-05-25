@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,33 +16,10 @@
  * - Delete confirmation modal (owner / admin)
  */
 
-import {
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-  memo } from 'react';
+import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link } from 'react-router-dom';
-import { motion,
-  AnimatePresence } from 'framer-motion';
-import { Button,
-  Input,
-  Textarea,
-  Chip,
-  Avatar,
-  Tabs,
-  Tab,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  DatePicker,
-  Switch,
-  Select,
-  SelectItem,
-  useDisclosure,
-  } from '@heroui/react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Button, Input, Textarea, Chip, Avatar, Tabs, Tab, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, DatePicker, Switch, useDisclosure } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import type { DateInputValue } from '@heroui/react';
 import BarChart3 from 'lucide-react/icons/chart-column';
@@ -949,8 +927,8 @@ export function PollsPage() {
                     value: 'text-[var(--text-primary)]',
                   }}
                 >
-                  <SelectItem key="standard">{t('poll_type_standard')}</SelectItem>
-                  <SelectItem key="ranked">{t('poll_type_ranked')}</SelectItem>
+                  <SelectItem key="standard" id="standard">{t('poll_type_standard')}</SelectItem>
+                  <SelectItem key="ranked" id="ranked">{t('poll_type_ranked')}</SelectItem>
                 </Select>
 
                 {/* Category (P2) */}

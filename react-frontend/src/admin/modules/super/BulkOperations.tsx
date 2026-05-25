@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,7 +7,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Card, CardBody, CardHeader, Button, Select, SelectItem, Switch, Chip, Checkbox, RadioGroup, Radio } from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Switch, Chip, Checkbox, RadioGroup, Radio } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Users from 'lucide-react/icons/users';
 import Building2 from 'lucide-react/icons/building-2';
@@ -154,7 +155,7 @@ export function BulkOperations() {
                 setSelectedUserIds(new Set());
                 if (val) loadUsersForTenant(val);
               }}>
-              {tenants.map(t => <SelectItem key={String(t.id)}>{t.name}</SelectItem>)}
+              {tenants.map(t => <SelectItem key={String(t.id)} id={String(t.id)}>{t.name}</SelectItem>)}
             </Select>
 
             {users.length > 0 && (
@@ -173,7 +174,7 @@ export function BulkOperations() {
             <Select label={t('super.label_target_tenant')} selectedKeys={targetTenant ? [targetTenant] : []}
               onSelectionChange={(keys) => setTargetTenant(String(Array.from(keys)[0] || ''))}>
               {tenants.filter(t => String(t.id) !== sourceTenant).map(t =>
-                <SelectItem key={String(t.id)}>{t.name}</SelectItem>)}
+                <SelectItem key={String(t.id)} id={String(t.id)}>{t.name}</SelectItem>)}
             </Select>
 
             <div className="bg-secondary-50 border border-secondary-200 text-secondary-700 rounded-medium p-3">

@@ -13,12 +13,8 @@ import { useTranslation } from 'react-i18next';
 import {
   Button,
   Chip,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
   Spinner,
-  } from '@heroui/react';
+} from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Bell from 'lucide-react/icons/bell';
 import BellOff from 'lucide-react/icons/bell-off';
@@ -32,6 +28,11 @@ import Share2 from 'lucide-react/icons/share-2';
 import Users from 'lucide-react/icons/users';
 import { GlassCard,
   Progress,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
 } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useAuth, useTenant, useToast } from '@/contexts';
@@ -330,14 +331,14 @@ export default function ProjectAnnouncementsPage() {
                     </DropdownTrigger>
                     <DropdownMenu aria-label={t('share.title')}>
                       <DropdownItem
-                        key="native"
+                        key="native" id="native"
                         startContent={<Share2 className="h-4 w-4" aria-hidden="true" />}
                         onPress={() => void shareProject()}
                       >
                         {t('share.native')}
                       </DropdownItem>
                       <DropdownItem
-                        key="copy"
+                        key="copy" id="copy"
                         startContent={<Link2 className="h-4 w-4" aria-hidden="true" />}
                         onPress={() => void copyProjectLink()}
                       >

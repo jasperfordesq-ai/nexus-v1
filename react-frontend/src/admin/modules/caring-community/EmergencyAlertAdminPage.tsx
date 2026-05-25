@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,7 +16,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import { Button, Card, CardBody, CardHeader, Checkbox, Chip, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, Input, useDisclosure } from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Checkbox, Chip, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, Input, useDisclosure } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import AlertTriangle from 'lucide-react/icons/alert-triangle';
 import Bell from 'lucide-react/icons/bell';
@@ -388,7 +389,7 @@ export default function EmergencyAlertAdminPage() {
               variant="bordered"
             >
               {SEVERITY_OPTIONS.map((opt) => (
-                <SelectItem key={opt.key} textValue={severityLabel(opt.key)}>
+                <SelectItem key={opt.key} id={opt.key} textValue={severityLabel(opt.key)}>
                   <div className="flex items-center gap-2">
                     {opt.key === 'info' ? (
                       <Info size={14} className="text-primary" />

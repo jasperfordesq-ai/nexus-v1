@@ -8,16 +8,16 @@
  * Full tenant management with search, filter, and CRUD actions.
  */
 
-import { useState, useCallback, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import {
+  useState,
+  useCallback,
+  useEffect } from 'react';
+import { Link,
+  useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
   Chip,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
   Tabs,
   Tab,
 } from '@heroui/react';
@@ -31,11 +31,21 @@ import ToggleLeft from 'lucide-react/icons/toggle-left';
 import ToggleRight from 'lucide-react/icons/toggle-right';
 import Network from 'lucide-react/icons/network';
 import { usePageTitle } from '@/hooks';
-import { useTenant, useToast } from '@/contexts';
+import { useTenant,
+  useToast } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
-import { DataTable, PageHeader, ConfirmModal, type Column } from '../../components';
+import { DataTable,
+  PageHeader,
+  ConfirmModal,
+  type Column } from '../../components';
 import type { SuperAdminTenant } from '../../api/types';
 
+import { Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 export function TenantList() {
   const { t } = useTranslation('admin');
   usePageTitle(t('super.page_title'));
@@ -161,25 +171,25 @@ export function TenantList() {
           </Button>
         </DropdownTrigger>
         <DropdownMenu aria-label={t('super.tenant_actions')} onAction={handleMenuAction}>
-          <DropdownItem key="view" startContent={<Eye size={14} />}>
+          <DropdownItem key="view" id="view" startContent={<Eye size={14} />}>
             {t('super.action_view')}
           </DropdownItem>
-          <DropdownItem key="edit" startContent={<Edit size={14} />}>
+          <DropdownItem key="edit" id="edit" startContent={<Edit size={14} />}>
             {t('common.edit')}
           </DropdownItem>
-          <DropdownItem key="toggle-hub" startContent={tenant.allows_subtenants ? <ToggleLeft size={14} /> : <ToggleRight size={14} />}>
+          <DropdownItem key="toggle-hub" id="toggle-hub" startContent={tenant.allows_subtenants ? <ToggleLeft size={14} /> : <ToggleRight size={14} />}>
             {tenant.allows_subtenants ? t('super.disable_hub') : t('super.enable_hub')}
           </DropdownItem>
           {tenant.is_active ? (
-            <DropdownItem key="deactivate" startContent={<Shield size={14} />} className="text-warning" color="warning">
+            <DropdownItem key="deactivate" id="deactivate" startContent={<Shield size={14} />} className="text-warning" color="warning">
               {t('super.deactivate')}
             </DropdownItem>
           ) : (
-            <DropdownItem key="reactivate" startContent={<Shield size={14} />} className="text-success" color="success">
+            <DropdownItem key="reactivate" id="reactivate" startContent={<Shield size={14} />} className="text-success" color="success">
               {t('super.reactivate')}
             </DropdownItem>
           )}
-          <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
+          <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
             {t('common.delete')}
           </DropdownItem>
         </DropdownMenu>

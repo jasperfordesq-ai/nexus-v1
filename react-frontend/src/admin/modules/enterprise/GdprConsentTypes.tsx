@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,27 +10,9 @@
  * Route: /admin/enterprise/gdpr/consent-types
  */
 
+import { useEffect, useState, useCallback } from 'react';
 import {
-  useEffect,
-  useState,
-  useCallback } from 'react';
-import {
-  Card,
-  CardBody,
-  Button,
-  Chip,
-  Spinner,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Input,
-  Textarea,
-  Select,
-  SelectItem,
-  Switch,
-} from '@heroui/react';
+  Card, CardBody, Button, Chip, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea, Switch } from '@heroui/react';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Plus from 'lucide-react/icons/plus';
 import Edit from 'lucide-react/icons/square-pen';
@@ -415,7 +398,7 @@ export function GdprConsentTypes() {
                 variant="bordered"
               >
                 {CATEGORY_OPTIONS.map((key) => (
-                  <SelectItem key={key} className="capitalize">{t(`enterprise.gdpr_category_${key}`)}</SelectItem>
+                  <SelectItem key={key} id={key} className="capitalize">{t(`enterprise.gdpr_category_${key}`)}</SelectItem>
                 ))}
               </Select>
               <Input

@@ -19,19 +19,15 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Button,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-} from '@heroui/react';
+  Button } from '@heroui/react';
 import Repeat2 from 'lucide-react/icons/repeat-2';
 import Quote from 'lucide-react/icons/quote';
 import Copy from 'lucide-react/icons/copy';
 import Share2 from 'lucide-react/icons/share-2';
 import MessageSquare from 'lucide-react/icons/message-square';
 import { useTranslation } from 'react-i18next';
-import { useToast, useTenant } from '@/contexts';
+import { useToast,
+  useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { FeedItem } from './types';
@@ -40,6 +36,12 @@ import { QuotePostModal } from './QuotePostModal';
 import { ExternalShareModal } from './ExternalShareModal';
 import { ShareViaDMModal } from './ShareViaDMModal';
 
+import { Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 export interface ShareButtonProps {
   /**
    * Legacy: pass when `type` is omitted — resolves to type='post'. Prefer `type` + `id`.
@@ -290,7 +292,7 @@ export function ShareButton({
           disabledKeys={isNativePost ? [] : ['quote']}
         >
           <DropdownItem
-            key="repost"
+            key="repost" id="repost"
             startContent={<Repeat2 className="w-4 h-4" aria-hidden="true" />}
             description={localIsShared
               ? t('share.repost_remove_desc')
@@ -305,7 +307,7 @@ export function ShareButton({
           */}
           {isNativePost && post ? (
             <DropdownItem
-              key="quote"
+              key="quote" id="quote"
               startContent={<Quote className="w-4 h-4" aria-hidden="true" />}
               description={t('share.quote_desc')}
             >
@@ -313,19 +315,19 @@ export function ShareButton({
             </DropdownItem>
           ) : null}
           <DropdownItem
-            key="copy"
+            key="copy" id="copy"
             startContent={<Copy className="w-4 h-4" aria-hidden="true" />}
           >
             {t('share.copy_link')}
           </DropdownItem>
           <DropdownItem
-            key="external"
+            key="external" id="external"
             startContent={<Share2 className="w-4 h-4" aria-hidden="true" />}
           >
             {t('share.external')}
           </DropdownItem>
           <DropdownItem
-            key="dm"
+            key="dm" id="dm"
             startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
           >
             {t('share.send_dm')}

@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -25,7 +26,7 @@
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Input, Chip, Tabs, Tab, Select, SelectItem, Switch } from '@heroui/react';
+import { Button, Input, Chip, Tabs, Tab, Switch } from '@heroui/react';
 import Briefcase from 'lucide-react/icons/briefcase';
 import Search from 'lucide-react/icons/search';
 import Plus from 'lucide-react/icons/plus';
@@ -464,9 +465,9 @@ export function JobsPage() {
               }}
               aria-label={t('sort.label')}
             >
-              <SelectItem key="newest">{t('sort.newest')}</SelectItem>
-              <SelectItem key="deadline">{t('sort.deadline')}</SelectItem>
-              <SelectItem key="salary_desc">{t('sort.salary')}</SelectItem>
+              <SelectItem key="newest" id="newest">{t('sort.newest')}</SelectItem>
+              <SelectItem key="deadline" id="deadline">{t('sort.deadline')}</SelectItem>
+              <SelectItem key="salary_desc" id="salary_desc">{t('sort.salary')}</SelectItem>
             </Select>
             <div className="flex items-center gap-2">
               <Switch

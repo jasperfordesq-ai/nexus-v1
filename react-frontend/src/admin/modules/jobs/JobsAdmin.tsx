@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +11,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Tabs, Tab, Chip, Button, Tooltip, Avatar, Spinner, Textarea, Select, SelectItem, Card, CardBody } from '@heroui/react';
+import { Tabs, Tab, Chip, Button, Tooltip, Avatar, Spinner, Textarea, Card, CardBody } from '@heroui/react';
 import Briefcase from 'lucide-react/icons/briefcase';
 import Star from 'lucide-react/icons/star';
 import StarOff from 'lucide-react/icons/star-off';
@@ -87,7 +88,7 @@ function ApplicationCard({ application, onStatusUpdate }: ApplicationCardProps) 
       <div className='flex items-end gap-2 flex-wrap'>
         <div className='flex-1 min-w-[160px]'>
           <Select size='sm' label={t('jobs.status_label')} selectedKeys={new Set([selectedStatus])} onSelectionChange={(keys) => { const val = Array.from(keys)[0] as string; if (val) setSelectedStatus(val); }} aria-label={t('jobs.update_status_aria')} classNames={{ trigger: 'min-h-unit-10 h-10' }}>
-            {APPLICATION_STAGE_KEYS.map((stage) => <SelectItem key={stage}>{t(`jobs.stage_${stage}`)}</SelectItem>)}
+            {APPLICATION_STAGE_KEYS.map((stage) => <SelectItem key={stage} id={stage}>{t(`jobs.stage_${stage}`)}</SelectItem>)}
           </Select>
         </div>
         <Tooltip content={notesOpen ? t('jobs.hide_notes') : t('jobs.add_edit_notes')}>

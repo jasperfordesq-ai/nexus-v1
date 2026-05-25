@@ -9,7 +9,11 @@
  * Includes test delivery, delivery logs with retry, and expandable log rows.
  */
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import {
+  useState,
+  useCallback,
+  useEffect,
+  useRef } from 'react';
 import {
   Button,
   Chip,
@@ -30,10 +34,6 @@ import {
   TableRow,
   TableCell,
   useDisclosure,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
   Tooltip,
 } from '@heroui/react';
 import Webhook from 'lucide-react/icons/webhook';
@@ -51,7 +51,13 @@ import ChevronDown from 'lucide-react/icons/chevron-down';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
-import { Snippet } from '@/components/ui';
+import { Snippet,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { formatRelativeTime } from '@/lib/helpers';
@@ -500,16 +506,16 @@ export function Webhooks() {
                       else if (key === 'delete') setDeleteTarget(webhook);
                     }}
                   >
-                    <DropdownItem key="edit" startContent={<Pencil size={14} />}>
+                    <DropdownItem key="edit" id="edit" startContent={<Pencil size={14} />}>
                       {t('federation.edit')}
                     </DropdownItem>
-                    <DropdownItem key="test" startContent={testingId === webhook.id ? <Spinner size="sm" /> : <Send size={14} />}>
+                    <DropdownItem key="test" id="test" startContent={testingId === webhook.id ? <Spinner size="sm" /> : <Send size={14} />}>
                       {t('federation.webhooks_test')}
                     </DropdownItem>
-                    <DropdownItem key="logs" startContent={<ScrollText size={14} />}>
+                    <DropdownItem key="logs" id="logs" startContent={<ScrollText size={14} />}>
                       {t('federation.view_logs')}
                     </DropdownItem>
-                    <DropdownItem key="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
+                    <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
                       {t('federation.delete')}
                     </DropdownItem>
                   </DropdownMenu>

@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -18,7 +19,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Input, Select, SelectItem, Checkbox, CheckboxGroup, Chip, Spinner } from '@heroui/react';
+import { Button, Input, Checkbox, CheckboxGroup, Chip, Spinner } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Search from 'lucide-react/icons/search';
 import SlidersHorizontal from 'lucide-react/icons/sliders-horizontal';
@@ -398,7 +399,7 @@ export function MarketplaceCategoryPage() {
                   }}
                 >
                   {field.options.map((opt) => (
-                    <SelectItem key={opt}>{opt}</SelectItem>
+                    <SelectItem key={opt} id={opt}>{opt}</SelectItem>
                   ))}
                 </Select>
               );
@@ -503,7 +504,7 @@ export function MarketplaceCategoryPage() {
             aria-label={t('common.sort_by')}
           >
             {SORT_OPTIONS.map((opt) => (
-              <SelectItem key={opt.value}>{t(`sort.${opt.value}`)}</SelectItem>
+              <SelectItem key={opt.value} id={opt.value}>{t(`sort.${opt.value}`)}</SelectItem>
             ))}
           </Select>
           <Button
@@ -587,7 +588,7 @@ export function MarketplaceCategoryPage() {
                     aria-label={t('common.sort_by')}
                   >
                     {SORT_OPTIONS.map((opt) => (
-                      <SelectItem key={opt.value}>{t(`sort.${opt.value}`)}</SelectItem>
+                      <SelectItem key={opt.value} id={opt.value}>{t(`sort.${opt.value}`)}</SelectItem>
                     ))}
                   </Select>
                 </div>

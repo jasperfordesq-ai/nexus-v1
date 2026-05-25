@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,8 +12,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  Button, Card, CardBody, CardHeader, Select, SelectItem, Chip,
-} from '@heroui/react';
+  Button, Card, CardBody, CardHeader, Chip } from '@heroui/react';
 import Clock from 'lucide-react/icons/clock';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import TrendingUp from 'lucide-react/icons/trending-up';
@@ -108,10 +108,10 @@ export function NewsletterSendTimeOptimizer() {
               className="w-32"
               size="sm"
             >
-              <SelectItem key="7">{t('newsletter_send_time.days', { count: 7 })}</SelectItem>
-              <SelectItem key="30">{t('newsletter_send_time.days', { count: 30 })}</SelectItem>
-              <SelectItem key="60">{t('newsletter_send_time.days', { count: 60 })}</SelectItem>
-              <SelectItem key="90">{t('newsletter_send_time.days', { count: 90 })}</SelectItem>
+              <SelectItem key="7" id="7">{t('newsletter_send_time.days', { count: 7 })}</SelectItem>
+              <SelectItem key="30" id="30">{t('newsletter_send_time.days', { count: 30 })}</SelectItem>
+              <SelectItem key="60" id="60">{t('newsletter_send_time.days', { count: 60 })}</SelectItem>
+              <SelectItem key="90" id="90">{t('newsletter_send_time.days', { count: 90 })}</SelectItem>
             </Select>
             <Button
               variant="flat"

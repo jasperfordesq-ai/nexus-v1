@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,21 +13,15 @@
 
 import { useState, useCallback } from 'react';
 import {
-  Accordion,
-  AccordionItem,
-  Button,
-  CheckboxGroup,
-  Checkbox,
-  Input,
-  RadioGroup,
-  Radio,
-  Select,
-  SelectItem,
-} from '@heroui/react';
+  Button, CheckboxGroup, Checkbox, Input, RadioGroup, Radio } from '@heroui/react';
 import SlidersHorizontal from 'lucide-react/icons/sliders-horizontal';
 import { useTranslation } from 'react-i18next';
-import type { MarketplaceFilters, MarketplaceCategory } from '@/types/marketplace';
+import type { MarketplaceFilters,
+  MarketplaceCategory } from '@/types/marketplace';
 
+import { Accordion,
+  AccordionItem,
+} from '@/components/ui';
 interface MarketplaceFacetedSearchProps {
   filters: MarketplaceFilters;
   onChange: (filters: MarketplaceFilters) => void;
@@ -96,7 +91,7 @@ export function MarketplaceFacetedSearch({
           }}
         >
           {categories.map((cat) => (
-            <SelectItem key={String(cat.id)}>
+            <SelectItem key={String(cat.id)} id={String(cat.id)}>
               {cat.name}
             </SelectItem>
           ))}
@@ -194,7 +189,7 @@ export function MarketplaceFacetedSearch({
           }}
         >
           {SORT_OPTIONS.map((opt) => (
-            <SelectItem key={opt.value}>
+            <SelectItem key={opt.value} id={opt.value}>
               {t(`sort.${opt.value}`)}
             </SelectItem>
           ))}
@@ -218,7 +213,7 @@ export function MarketplaceFacetedSearch({
           }}
         >
           {POSTED_WITHIN_OPTIONS.map((opt) => (
-            <SelectItem key={opt.value}>
+            <SelectItem key={opt.value} id={opt.value}>
               {t(opt.tKey, 'count' in opt ? { count: opt.count } : undefined)}
             </SelectItem>
           ))}
@@ -246,7 +241,7 @@ export function MarketplaceFacetedSearch({
       <div className="lg:hidden">
         <Accordion variant="bordered">
           <AccordionItem
-            key="filters"
+            key="filters" id="filters"
             aria-label={t('filters.title')}
             title={t('filters.title')}
             startContent={<SlidersHorizontal className="w-4 h-4" aria-hidden="true" />}

@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -20,24 +21,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import {
-  Card,
-  CardBody,
-  CardHeader,
-  Switch,
-  Button,
-  Spinner,
-  Select,
-  SelectItem,
-  Input,
-  Textarea,
-  Chip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-} from '@heroui/react';
+  Card, CardBody, CardHeader, Switch, Button, Spinner, Input, Textarea, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@heroui/react';
 import Save from 'lucide-react/icons/save';
 import Sparkles from 'lucide-react/icons/sparkles';
 import UserCircle from 'lucide-react/icons/circle-user';
@@ -354,7 +338,7 @@ export function OnboardingSettings() {
           <CardBody className="gap-4">
             <Select label={t('system.onboarding.listing_creation_mode')} selectedKeys={[config.listing_creation_mode]} onSelectionChange={(keys) => { const key = Array.from(keys)[0] as string; updateConfig('listing_creation_mode', key); }} variant="bordered" description={t(LISTING_MODES.find(m => m.key === config.listing_creation_mode)?.descriptionKey ?? 'system.onboarding.listing_mode_disabled_desc')}>
               {LISTING_MODES.map((mode) => (
-                <SelectItem key={mode.key} textValue={t(mode.labelKey)}>
+                <SelectItem key={mode.key} id={mode.key} textValue={t(mode.labelKey)}>
                   <div>
                     <p className="font-medium">{t(mode.labelKey)}</p>
                     <p className="text-xs text-default-500">{t(mode.descriptionKey)}</p>
@@ -414,7 +398,7 @@ export function OnboardingSettings() {
                 {Object.keys(COUNTRY_PRESET_LABEL_KEYS).map((key) => {
                   const label = getCountryPresetLabel(key);
                   return (
-                    <SelectItem key={key} textValue={label}>
+                    <SelectItem key={key} id={key} textValue={label}>
                       <div className="flex items-center gap-2">
                         <Globe className="w-4 h-4" />
                         {label}

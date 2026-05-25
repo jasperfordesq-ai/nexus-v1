@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,7 +12,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Select, SelectItem, Textarea, useDisclosure } from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, useDisclosure } from '@heroui/react';
 import Award from 'lucide-react/icons/award';
 import Users from 'lucide-react/icons/users';
 import Zap from 'lucide-react/icons/zap';
@@ -310,7 +311,7 @@ export function GamificationHub() {
                 onSelectionChange={(keys) => setSelectedBadge(Array.from(keys)[0] as string ?? '')}
               >
                 {badges.map((b) => (
-                  <SelectItem key={b.key}>{b.name}</SelectItem>
+                  <SelectItem key={b.key} id={b.key}>{b.name}</SelectItem>
                 ))}
               </Select>
             )}

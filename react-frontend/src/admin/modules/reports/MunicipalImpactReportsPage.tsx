@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -5,7 +6,7 @@
 
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Spinner, Switch, Textarea, useDisclosure } from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Switch, Textarea, useDisclosure } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import { Link } from 'react-router-dom';
 import BarChart3 from 'lucide-react/icons/chart-column';
@@ -566,7 +567,7 @@ export default function MunicipalImpactReportsPage() {
               }}
               items={templateOptions}
             >
-              {(item) => <SelectItem key={item.id}>{item.label}</SelectItem>}
+              {(item) => <SelectItem key={item.id} id={item.id}>{item.label}</SelectItem>}
             </Select>
             <Button
               variant="flat"
@@ -788,7 +789,7 @@ export default function MunicipalImpactReportsPage() {
                 }}
               >
                 {(['municipality', 'canton', 'cooperative', 'foundation'] as const).map((audience) => (
-                  <SelectItem key={audience}>{t(`municipal_reports.templates.audiences.${audience}`)}</SelectItem>
+                  <SelectItem key={audience} id={audience}>{t(`municipal_reports.templates.audiences.${audience}`)}</SelectItem>
                 ))}
               </Select>
               <Select
@@ -801,7 +802,7 @@ export default function MunicipalImpactReportsPage() {
                 }}
               >
                 {(['last_30_days', 'last_90_days', 'year_to_date', 'previous_quarter'] as const).map((period) => (
-                  <SelectItem key={period}>{t(`caring_workflow.policy.periods.${period}`)}</SelectItem>
+                  <SelectItem key={period} id={period}>{t(`caring_workflow.policy.periods.${period}`)}</SelectItem>
                 ))}
               </Select>
             </div>

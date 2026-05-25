@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -15,24 +16,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  Button,
-  Avatar,
-  Checkbox,
-  Chip,
-  Spinner,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Select,
-  SelectItem,
-  Input,
-  Textarea,
-  Tooltip,
-  Tabs,
-  Tab,
-} from '@heroui/react';
+  Button, Avatar, Checkbox, Chip, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea, Tooltip, Tabs, Tab } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Briefcase from 'lucide-react/icons/briefcase';
 import Download from 'lucide-react/icons/download';
@@ -844,7 +828,7 @@ export function JobKanbanPage() {
             onSelectionChange={(keys) => setBulkStatus(Array.from(keys)[0] as string ?? '')}
           >
             {(['screening', 'reviewed', 'interview', 'rejected'] as const).map((s) => (
-              <SelectItem key={s}>{getApplicationStatusLabel(t, s)}</SelectItem>
+              <SelectItem key={s} id={s}>{getApplicationStatusLabel(t, s)}</SelectItem>
             ))}
           </Select>
           <Button
@@ -952,9 +936,9 @@ export function JobKanbanPage() {
                 setInterviewForm((f) => ({ ...f, interview_type: key }));
               }}
             >
-              <SelectItem key="video">{t('interview.type_video')}</SelectItem>
-              <SelectItem key="phone">{t('interview.type_phone')}</SelectItem>
-              <SelectItem key="in_person">{t('interview.type_in_person')}</SelectItem>
+              <SelectItem key="video" id="video">{t('interview.type_video')}</SelectItem>
+              <SelectItem key="phone" id="phone">{t('interview.type_phone')}</SelectItem>
+              <SelectItem key="in_person" id="in_person">{t('interview.type_in_person')}</SelectItem>
             </Select>
             <Input
               type="datetime-local"
@@ -971,10 +955,10 @@ export function JobKanbanPage() {
                 setInterviewForm((f) => ({ ...f, duration_mins: val }));
               }}
             >
-              <SelectItem key="30">{t('self_scheduling.duration_30')}</SelectItem>
-              <SelectItem key="45">{t('self_scheduling.duration_45')}</SelectItem>
-              <SelectItem key="60">{t('self_scheduling.duration_60')}</SelectItem>
-              <SelectItem key="90">{t('kanban.duration_90')}</SelectItem>
+              <SelectItem key="30" id="30">{t('self_scheduling.duration_30')}</SelectItem>
+              <SelectItem key="45" id="45">{t('self_scheduling.duration_45')}</SelectItem>
+              <SelectItem key="60" id="60">{t('self_scheduling.duration_60')}</SelectItem>
+              <SelectItem key="90" id="90">{t('kanban.duration_90')}</SelectItem>
             </Select>
             <Input
               label={t('interview.location')}
@@ -1071,9 +1055,9 @@ export function JobKanbanPage() {
                 setOfferForm((f) => ({ ...f, salary_currency: key }));
               }}
             >
-              <SelectItem key="EUR">{t('salary.currency_eur')}</SelectItem>
-              <SelectItem key="GBP">{t('salary.currency_gbp')}</SelectItem>
-              <SelectItem key="USD">{t('salary.currency_usd')}</SelectItem>
+              <SelectItem key="EUR" id="EUR">{t('salary.currency_eur')}</SelectItem>
+              <SelectItem key="GBP" id="GBP">{t('salary.currency_gbp')}</SelectItem>
+              <SelectItem key="USD" id="USD">{t('salary.currency_usd')}</SelectItem>
             </Select>
             <Select
               label={t('salary.form_type_label')}
@@ -1083,9 +1067,9 @@ export function JobKanbanPage() {
                 setOfferForm((f) => ({ ...f, salary_type: key }));
               }}
             >
-              <SelectItem key="hourly">{t('salary.hourly')}</SelectItem>
-              <SelectItem key="monthly">{t('kanban.salary_monthly')}</SelectItem>
-              <SelectItem key="annual">{t('salary.annual')}</SelectItem>
+              <SelectItem key="hourly" id="hourly">{t('salary.hourly')}</SelectItem>
+              <SelectItem key="monthly" id="monthly">{t('kanban.salary_monthly')}</SelectItem>
+              <SelectItem key="annual" id="annual">{t('salary.annual')}</SelectItem>
             </Select>
             <Input
               type="date"

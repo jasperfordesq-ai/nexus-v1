@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,21 +11,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import {
-  Button,
-  Chip,
-  Input,
-  Select,
-  SelectItem,
-  Switch,
-  Textarea,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Spinner,
-  Tooltip,
-} from '@heroui/react';
+  Button, Chip, Input, Switch, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Spinner, Tooltip } from '@heroui/react';
 import CalendarClock from 'lucide-react/icons/calendar-clock';
 import Plus from 'lucide-react/icons/plus';
 import X from 'lucide-react/icons/x';
@@ -263,7 +250,7 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
                 variant="bordered"
               >
                 {POST_TYPES.map((type) => (
-                  <SelectItem key={type}>
+                  <SelectItem key={type} id={type}>
                     {t(`scheduled.type_${type}`)}
                   </SelectItem>
                 ))}
@@ -319,7 +306,7 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
                     size="sm"
                   >
                     {RECURRENCE_PATTERNS.map((pattern) => (
-                      <SelectItem key={pattern}>
+                      <SelectItem key={pattern} id={pattern}>
                         {t(`scheduled.pattern_${pattern}`)}
                       </SelectItem>
                     ))}

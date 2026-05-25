@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,11 +11,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import {
-  Card, CardBody, Button, Input, Textarea, Select, SelectItem,
-  Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
-  useDisclosure, Chip, Spinner, Pagination, Avatar,
-  Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Checkbox,
-} from '@heroui/react';
+  Card, CardBody, Button, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Chip, Spinner, Pagination, Avatar, Checkbox } from '@heroui/react';
 import ClipboardList from 'lucide-react/icons/clipboard-list';
 import Plus from 'lucide-react/icons/plus';
 import Calendar from 'lucide-react/icons/calendar';
@@ -28,11 +25,20 @@ import User from 'lucide-react/icons/user';
 import Search from 'lucide-react/icons/search';
 import { Link } from 'react-router-dom';
 import { useAdminPageMeta } from '../../AdminMetaContext';
-import { useTenant, useToast } from '@/contexts';
+import { useTenant,
+  useToast } from '@/contexts';
 import { adminCrm } from '../../api/adminApi';
-import { PageHeader, MemberSearchPicker, type MemberSearchMember } from '../../components';
+import { PageHeader,
+  MemberSearchPicker,
+  type MemberSearchMember } from '../../components';
 
 import { useTranslation } from 'react-i18next';
+import { Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 interface Task {
   id: number;
   tenant_id: number;
@@ -343,7 +349,7 @@ export default function CoordinatorTasks() {
           className="max-w-[180px]"
         >
           {PRIORITY_OPTIONS.map((opt) => (
-            <SelectItem key={opt.key}>{t(opt.labelKey)}</SelectItem>
+            <SelectItem key={opt.key} id={opt.key}>{t(opt.labelKey)}</SelectItem>
           ))}
         </Select>
 
@@ -436,35 +442,35 @@ export default function CoordinatorTasks() {
                           </DropdownTrigger>
                           <DropdownMenu aria-label={t('crm.label_task_actions')}>
                             <DropdownItem
-                              key="edit"
+                              key="edit" id="edit"
                               startContent={<Edit3 className="w-4 h-4" />}
                               onPress={() => openEdit(task)}
                             >
                               {t('crm.action_edit')}
                             </DropdownItem>
                             <DropdownItem
-                              key="complete"
+                              key="complete" id="complete"
                               startContent={<CheckCircle className="w-4 h-4" />}
                               onPress={() => handleStatusChange(task, 'completed')}
                             >
                               {t('crm.action_mark_complete')}
                             </DropdownItem>
                             <DropdownItem
-                              key="in_progress"
+                              key="in_progress" id="in_progress"
                               startContent={<Clock className="w-4 h-4" />}
                               onPress={() => handleStatusChange(task, 'in_progress')}
                             >
                               {t('crm.action_mark_in_progress')}
                             </DropdownItem>
                             <DropdownItem
-                              key="cancel"
+                              key="cancel" id="cancel"
                               startContent={<AlertTriangle className="w-4 h-4" />}
                               onPress={() => handleStatusChange(task, 'cancelled')}
                             >
                               {t('crm.action_cancel')}
                             </DropdownItem>
                             <DropdownItem
-                              key="delete"
+                              key="delete" id="delete"
                               className="text-danger"
                               color="danger"
                               startContent={<Trash2 className="w-4 h-4" />}
@@ -575,10 +581,10 @@ export default function CoordinatorTasks() {
                     selectedKeys={[formPriority]}
                     onChange={(e) => setFormPriority(e.target.value || 'medium')}
                   >
-                    <SelectItem key="low">{t('crm.priority_low')}</SelectItem>
-                    <SelectItem key="medium">{t('crm.priority_medium')}</SelectItem>
-                    <SelectItem key="high">{t('crm.priority_high')}</SelectItem>
-                    <SelectItem key="urgent">{t('crm.priority_urgent')}</SelectItem>
+                    <SelectItem key="low" id="low">{t('crm.priority_low')}</SelectItem>
+                    <SelectItem key="medium" id="medium">{t('crm.priority_medium')}</SelectItem>
+                    <SelectItem key="high" id="high">{t('crm.priority_high')}</SelectItem>
+                    <SelectItem key="urgent" id="urgent">{t('crm.priority_urgent')}</SelectItem>
                   </Select>
                   <Select
                     label={t('crm.label_assign_to')}
@@ -586,7 +592,7 @@ export default function CoordinatorTasks() {
                     onChange={(e) => setFormAssignedTo(e.target.value)}
                   >
                     {admins.map((admin) => (
-                      <SelectItem key={String(admin.id)}>
+                      <SelectItem key={String(admin.id)} id={String(admin.id)}>
                         {admin.name} ({admin.role})
                       </SelectItem>
                     ))}

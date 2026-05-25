@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -5,7 +6,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardBody, Chip, Select, SelectItem, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+import { Card, CardBody, Chip, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
 import BarChart3 from 'lucide-react/icons/bar-chart-3';
 import Clock from 'lucide-react/icons/clock';
 import DollarSign from 'lucide-react/icons/dollar-sign';
@@ -88,7 +89,7 @@ export default function AiTraceMetricsAdminPage() {
             className="w-44"
           >
             {WINDOWS.map((w) => (
-              <SelectItem key={w}>{t(`ai.trace_metrics.windows.${w}`)}</SelectItem>
+              <SelectItem key={w} id={w}>{t(`ai.trace_metrics.windows.${w}`)}</SelectItem>
             ))}
           </Select>
         </div>

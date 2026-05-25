@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,19 +13,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import {
-  Button,
-  Input,
-  Select,
-  SelectItem,
-  Chip,
-  Spinner,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-} from '@heroui/react';
+  Button, Input, Chip, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@heroui/react';
 import Search from 'lucide-react/icons/search';
 import Plus from 'lucide-react/icons/plus';
 import X from 'lucide-react/icons/x';
@@ -392,7 +381,7 @@ export function SkillSelector({
                 }}
               >
                 {categories.map((cat) => (
-                  <SelectItem key={cat.id.toString()}>
+                  <SelectItem key={cat.id.toString()} id={cat.id.toString()}>
                     {cat.icon ? `${cat.icon} ${cat.name}` : cat.name}
                   </SelectItem>
                 ))}
@@ -409,10 +398,10 @@ export function SkillSelector({
                 value: 'text-theme-primary',
               }}
             >
-              <SelectItem key="beginner">{tc('skills.proficiency.beginner')}</SelectItem>
-              <SelectItem key="intermediate">{tc('skills.proficiency.intermediate')}</SelectItem>
-              <SelectItem key="advanced">{tc('skills.proficiency.advanced')}</SelectItem>
-              <SelectItem key="expert">{tc('skills.proficiency.expert')}</SelectItem>
+              <SelectItem key="beginner" id="beginner">{tc('skills.proficiency.beginner')}</SelectItem>
+              <SelectItem key="intermediate" id="intermediate">{tc('skills.proficiency.intermediate')}</SelectItem>
+              <SelectItem key="advanced" id="advanced">{tc('skills.proficiency.advanced')}</SelectItem>
+              <SelectItem key="expert" id="expert">{tc('skills.proficiency.expert')}</SelectItem>
             </Select>
 
             {/* Selected skill preview */}

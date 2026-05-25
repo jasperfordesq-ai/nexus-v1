@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,9 +12,7 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import {
-  Card, CardBody, Button, Select, SelectItem,
-  Chip, Spinner, Pagination, Avatar,
-} from '@heroui/react';
+  Card, CardBody, Button, Chip, Spinner, Pagination, Avatar } from '@heroui/react';
 import Activity from 'lucide-react/icons/activity';
 import Filter from 'lucide-react/icons/filter';
 import User from 'lucide-react/icons/user';
@@ -244,7 +243,7 @@ export function ActivityTimeline() {
           }}
         >
           {ACTIVITY_TYPE_KEYS.map(key => (
-            <SelectItem key={key}>{t(`crm.activity_type_${key}`)}</SelectItem>
+            <SelectItem key={key} id={key}>{t(`crm.activity_type_${key}`)}</SelectItem>
           ))}
         </Select>
 
@@ -260,7 +259,7 @@ export function ActivityTimeline() {
           }}
         >
           {DATE_RANGE_KEYS.map(opt => (
-            <SelectItem key={opt.key}>{t(opt.labelKey)}</SelectItem>
+            <SelectItem key={opt.key} id={opt.key}>{t(opt.labelKey)}</SelectItem>
           ))}
         </Select>
 

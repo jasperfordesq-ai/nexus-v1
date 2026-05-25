@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +11,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardBody, CardHeader, Select, SelectItem, Switch, Button, Spinner, Chip, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Accordion, AccordionItem, Tooltip } from '@heroui/react';
+import { Card, CardBody, CardHeader, Switch, Button, Spinner, Chip, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Tooltip } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import Save from 'lucide-react/icons/save';
@@ -37,10 +38,14 @@ import { VerificationReviewQueue } from './VerificationReviewQueue';
 import { ProviderHealthDashboard } from './ProviderHealthDashboard';
 import { RegistrationBreakerCard } from './RegistrationBreakerCard';
 import { usePageTitle } from '@/hooks';
-import { useToast, useAuth } from '@/contexts';
+import { useToast,
+  useAuth } from '@/contexts';
 import { api } from '@/lib/api';
 import { PageHeader } from '../../components';
 
+import { Accordion,
+  AccordionItem,
+} from '@/components/ui';
 interface RegistrationPolicy {
   registration_mode: string;
   verification_provider: string | null;
@@ -339,7 +344,7 @@ export function RegistrationPolicySettings() {
               {REGISTRATION_MODES.map((mode) => {
                 const Icon = mode.icon;
                 return (
-                  <SelectItem key={mode.key} textValue={mode.label}>
+                  <SelectItem key={mode.key} id={mode.key} textValue={mode.label}>
                     <div className="flex items-center gap-2">
                       {Icon && <Icon size={16} />}
                       <span>{mode.label}</span>
@@ -401,7 +406,7 @@ export function RegistrationPolicySettings() {
                 }
               >
                 {providers.map((p) => (
-                  <SelectItem key={p.slug} textValue={p.name}>
+                  <SelectItem key={p.slug} id={p.slug} textValue={p.name}>
                     <div className="flex items-center gap-2">
                       <span>{p.name}</span>
                       {p.available ? (
@@ -425,7 +430,7 @@ export function RegistrationPolicySettings() {
                 description={VERIFICATION_LEVELS.find(l => l.key === policy.verification_level)?.description}
               >
                 {VERIFICATION_LEVELS.map((level) => (
-                  <SelectItem key={level.key}>
+                  <SelectItem key={level.key} id={level.key}>
                     {level.label}
                   </SelectItem>
                 ))}
@@ -444,7 +449,7 @@ export function RegistrationPolicySettings() {
                 description={POST_VERIFICATION_ACTIONS.find(a => a.key === policy.post_verification)?.description}
               >
                 {POST_VERIFICATION_ACTIONS.map((action) => (
-                  <SelectItem key={action.key}>
+                  <SelectItem key={action.key} id={action.key}>
                     {action.label}
                   </SelectItem>
                 ))}
@@ -461,7 +466,7 @@ export function RegistrationPolicySettings() {
                 description={FALLBACK_MODES.find(f => f.key === policy.fallback_mode)?.description}
               >
                 {FALLBACK_MODES.map((fb) => (
-                  <SelectItem key={fb.key}>
+                  <SelectItem key={fb.key} id={fb.key}>
                     {fb.label}
                   </SelectItem>
                 ))}
@@ -554,7 +559,7 @@ export function RegistrationPolicySettings() {
 
                   return (
                     <AccordionItem
-                      key={p.slug}
+                      key={p.slug} id={p.slug}
                       aria-label={p.name}
                       title={
                         <div className="flex items-center gap-2 flex-wrap">

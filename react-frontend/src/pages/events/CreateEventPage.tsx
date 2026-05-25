@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,7 +13,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Button, Input, Textarea, Select, SelectItem, DatePicker, Switch, CheckboxGroup, Checkbox, Chip } from '@heroui/react';
+import { Button, Input, Textarea, DatePicker, Switch, CheckboxGroup, Checkbox, Chip } from '@heroui/react';
 import type { DateInputValue } from '@heroui/react';
 import { parseDate, parseTime, today, getLocalTimeZone } from '@internationalized/date';
 import Save from 'lucide-react/icons/save';
@@ -704,7 +705,7 @@ export function CreateEventPage() {
               }}
             >
               {EVENT_CATEGORY_IDS.map((catId) => (
-                <SelectItem key={catId}>{t(`category.${catId}`)}</SelectItem>
+                <SelectItem key={catId} id={catId}>{t(`category.${catId}`)}</SelectItem>
               ))}
             </Select>
           </div>
@@ -850,10 +851,10 @@ export function CreateEventPage() {
                     label: 'text-theme-muted',
                   }}
                 >
-                  <SelectItem key="daily">{t('form.freq_daily')}</SelectItem>
-                  <SelectItem key="weekly">{t('form.freq_weekly')}</SelectItem>
-                  <SelectItem key="biweekly">{t('form.freq_biweekly')}</SelectItem>
-                  <SelectItem key="monthly">{t('form.freq_monthly')}</SelectItem>
+                  <SelectItem key="daily" id="daily">{t('form.freq_daily')}</SelectItem>
+                  <SelectItem key="weekly" id="weekly">{t('form.freq_weekly')}</SelectItem>
+                  <SelectItem key="biweekly" id="biweekly">{t('form.freq_biweekly')}</SelectItem>
+                  <SelectItem key="monthly" id="monthly">{t('form.freq_monthly')}</SelectItem>
                 </Select>
 
                 {/* Days of Week (for weekly/biweekly) */}
@@ -905,8 +906,8 @@ export function CreateEventPage() {
                       label: 'text-theme-muted',
                     }}
                   >
-                    <SelectItem key="after_count">{t('form.end_after_count')}</SelectItem>
-                    <SelectItem key="on_date">{t('form.end_on_date')}</SelectItem>
+                    <SelectItem key="after_count" id="after_count">{t('form.end_after_count')}</SelectItem>
+                    <SelectItem key="on_date" id="on_date">{t('form.end_on_date')}</SelectItem>
                   </Select>
 
                   {formData.recurrenceEndType === 'after_count' ? (
@@ -1081,7 +1082,7 @@ export function CreateEventPage() {
                 }}
               >
                 {availablePolls.map((poll) => (
-                  <SelectItem key={String(poll.id)}>
+                  <SelectItem key={String(poll.id)} id={String(poll.id)}>
                     {poll.question}
                   </SelectItem>
                 ))}

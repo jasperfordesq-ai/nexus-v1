@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,7 +10,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Switch, Spinner, Button, Select, SelectItem, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+import { Card, CardBody, CardHeader, Switch, Spinner, Button, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Settings from 'lucide-react/icons/settings';
 import BookOpen from 'lucide-react/icons/book-open';
@@ -284,7 +285,7 @@ export function TranslationConfig() {
                 isDisabled={saving === 'translation.engine'}
               >
                 {ENGINE_OPTIONS.map((opt) => (
-                  <SelectItem key={opt.key}>{opt.label}</SelectItem>
+                  <SelectItem key={opt.key} id={opt.key}>{opt.label}</SelectItem>
                 ))}
               </Select>
             </div>
@@ -418,7 +419,7 @@ export function TranslationConfig() {
                   size="sm"
                 >
                   {LANGUAGES.map((lang) => (
-                    <SelectItem key={lang.code}>{lang.label}</SelectItem>
+                    <SelectItem key={lang.code} id={lang.code}>{lang.label}</SelectItem>
                   ))}
                 </Select>
                 <Button

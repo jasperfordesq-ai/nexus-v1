@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +11,7 @@
  */
 
 import { useState, useEffect, lazy, Suspense } from 'react';
-import { Card, CardBody, CardHeader, Input, Select, SelectItem, Button, Spinner, Switch } from '@heroui/react';
+import { Card, CardBody, CardHeader, Input, Button, Spinner, Switch } from '@heroui/react';
 import FileText from 'lucide-react/icons/file-text';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
@@ -255,8 +256,8 @@ export function PageBuilder() {
                 if (selected) handleChange('status', selected);
               }}
             >
-              <SelectItem key="draft">{t('content.draft')}</SelectItem>
-              <SelectItem key="published">{t('content.published')}</SelectItem>
+              <SelectItem key="draft" id="draft">{t('content.draft')}</SelectItem>
+              <SelectItem key="published" id="published">{t('content.published')}</SelectItem>
             </Select>
           </CardBody>
         </Card>
@@ -282,8 +283,8 @@ export function PageBuilder() {
                     if (selected) handleChange('menu_location', selected);
                   }}
                 >
-                  <SelectItem key="about">{t('content.about_section')}</SelectItem>
-                  <SelectItem key="footer">{t('content.footer')}</SelectItem>
+                  <SelectItem key="about" id="about">{t('content.about_section')}</SelectItem>
+                  <SelectItem key="footer" id="footer">{t('content.footer')}</SelectItem>
                 </Select>
                 <Input
                   type="number"

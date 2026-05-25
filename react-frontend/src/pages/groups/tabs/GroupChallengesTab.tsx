@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,26 +10,9 @@
  * and admin challenge creation.
  */
 
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
-  useState,
-  useEffect,
-  useCallback,
-  useMemo } from 'react';
-import {
-  Button,
-  Spinner,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Input,
-  Textarea,
-  Select,
-  SelectItem,
-  Chip,
-  useDisclosure,
-  } from '@heroui/react';
+  Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea, Chip, useDisclosure } from '@heroui/react';
 import Trophy from 'lucide-react/icons/trophy';
 import Target from 'lucide-react/icons/target';
 import Clock from 'lucide-react/icons/clock';
@@ -474,7 +458,7 @@ export function GroupChallengesTab({ groupId, isAdmin }: GroupChallengesTabProps
                   }}
                 >
                   {METRIC_OPTIONS.map((metric) => (
-                    <SelectItem key={metric}>
+                    <SelectItem key={metric} id={metric}>
                       {t(`challenges.metric_${metric}`)}
                     </SelectItem>
                   ))}

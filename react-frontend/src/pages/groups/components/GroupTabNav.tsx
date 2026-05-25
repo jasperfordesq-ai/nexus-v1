@@ -5,12 +5,7 @@
 
 import { useTranslation } from 'react-i18next';
 import {
-  Button,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-} from '@heroui/react';
+  Button } from '@heroui/react';
 import Users from 'lucide-react/icons/users';
 import MessageSquare from 'lucide-react/icons/message-square';
 import Calendar from 'lucide-react/icons/calendar';
@@ -26,6 +21,12 @@ import ChevronDown from 'lucide-react/icons/chevron-down';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import { useTenant } from '@/contexts';
 
+import { Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 interface GroupTabNavProps {
   activeTab: string;
   userIsAdmin: boolean;
@@ -141,7 +142,7 @@ export function GroupTabNav({
             const showSection = tab.section && (idx === 0 || secondaryTabs[idx - 1]?.section !== tab.section);
             return (
               <DropdownItem
-                key={tab.key}
+                key={tab.key} id={tab.key}
                 startContent={<Icon className="w-4 h-4" />}
                 className={activeTab === tab.key ? 'bg-primary/10 text-primary' : ''}
               >

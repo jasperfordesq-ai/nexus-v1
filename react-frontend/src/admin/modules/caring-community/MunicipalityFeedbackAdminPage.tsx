@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,7 +7,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import { Button, Card, CardBody, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea } from '@heroui/react';
+import { Button, Card, CardBody, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Inbox from 'lucide-react/icons/inbox';
 import Download from 'lucide-react/icons/download';
@@ -396,7 +397,7 @@ export default function MunicipalityFeedbackAdminPage() {
             size="sm"
           >
             {STATUS_OPTIONS.map((s) => (
-              <SelectItem key={s}>{statusLabel(s)}</SelectItem>
+              <SelectItem key={s} id={s}>{statusLabel(s)}</SelectItem>
             ))}
           </Select>
           <Select
@@ -411,7 +412,7 @@ export default function MunicipalityFeedbackAdminPage() {
             size="sm"
           >
             {CATEGORY_OPTIONS.map((c) => (
-              <SelectItem key={c}>{categoryLabel(c)}</SelectItem>
+              <SelectItem key={c} id={c}>{categoryLabel(c)}</SelectItem>
             ))}
           </Select>
           <Input
@@ -596,7 +597,7 @@ export default function MunicipalityFeedbackAdminPage() {
                         isDisabled={!canManage}
                       >
                         {STATUS_OPTIONS.map((s) => (
-                          <SelectItem key={s}>{statusLabel(s)}</SelectItem>
+                          <SelectItem key={s} id={s}>{statusLabel(s)}</SelectItem>
                         ))}
                       </Select>
                       <Input

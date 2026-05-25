@@ -1,36 +1,11 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  useCallback,
-  useEffect,
-  useState } from 'react';
-import { Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Select,
-  SelectItem,
-  Spinner,
-  Switch,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Textarea,
-  useDisclosure,
-} from '@heroui/react';
+import { useCallback, useEffect, useState } from 'react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, useDisclosure } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import CheckCircle from 'lucide-react/icons/check-circle';
 import Flag from 'lucide-react/icons/flag';
@@ -303,7 +278,7 @@ export default function ProjectAnnouncementsAdminPage() {
               variant="bordered"
             >
               {STATUS_FILTER_ITEMS.map((item) => (
-                <SelectItem key={item}>
+                <SelectItem key={item} id={item}>
                   {item === '' ? t('filters.all') : t(`status.${item}`)}
                 </SelectItem>
               ))}

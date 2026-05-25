@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,14 +11,7 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import {
-  Button,
-  Chip,
-  Checkbox,
-  Select,
-  SelectItem,
-  Card,
-  CardBody,
-} from '@heroui/react';
+  Button, Chip, Checkbox, Card, CardBody } from '@heroui/react';
 import GraduationCap from 'lucide-react/icons/graduation-cap';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
@@ -477,11 +471,11 @@ export function VolunteerTraining() {
           selectedKeys={[statusFilter]}
           onSelectionChange={(keys) => setStatusFilter(Array.from(keys)[0] as string)}
         >
-          <SelectItem key="all">{t('volunteering.tab_all')}</SelectItem>
-          <SelectItem key="pending">{t('volunteering.status_pending')}</SelectItem>
-          <SelectItem key="verified">{t('volunteering.status_verified')}</SelectItem>
-          <SelectItem key="expired">{t('volunteering.status_expired')}</SelectItem>
-          <SelectItem key="rejected">{t('volunteering.status_rejected')}</SelectItem>
+          <SelectItem key="all" id="all">{t('volunteering.tab_all')}</SelectItem>
+          <SelectItem key="pending" id="pending">{t('volunteering.status_pending')}</SelectItem>
+          <SelectItem key="verified" id="verified">{t('volunteering.status_verified')}</SelectItem>
+          <SelectItem key="expired" id="expired">{t('volunteering.status_expired')}</SelectItem>
+          <SelectItem key="rejected" id="rejected">{t('volunteering.status_rejected')}</SelectItem>
         </Select>
         <Select
           label={t('volunteering.filter_type')}
@@ -490,12 +484,12 @@ export function VolunteerTraining() {
           selectedKeys={[typeFilter]}
           onSelectionChange={(keys) => setTypeFilter(Array.from(keys)[0] as string)}
         >
-          <SelectItem key="all">{t('volunteering.tab_all')}</SelectItem>
-          <SelectItem key="children_first">{t('volunteering.type_children_first')}</SelectItem>
-          <SelectItem key="vulnerable_adults">{t('volunteering.type_vulnerable_adults')}</SelectItem>
-          <SelectItem key="first_aid">{t('volunteering.type_first_aid')}</SelectItem>
-          <SelectItem key="manual_handling">{t('volunteering.type_manual_handling')}</SelectItem>
-          <SelectItem key="other">{t('volunteering.type_other')}</SelectItem>
+          <SelectItem key="all" id="all">{t('volunteering.tab_all')}</SelectItem>
+          <SelectItem key="children_first" id="children_first">{t('volunteering.type_children_first')}</SelectItem>
+          <SelectItem key="vulnerable_adults" id="vulnerable_adults">{t('volunteering.type_vulnerable_adults')}</SelectItem>
+          <SelectItem key="first_aid" id="first_aid">{t('volunteering.type_first_aid')}</SelectItem>
+          <SelectItem key="manual_handling" id="manual_handling">{t('volunteering.type_manual_handling')}</SelectItem>
+          <SelectItem key="other" id="other">{t('volunteering.type_other')}</SelectItem>
         </Select>
       </div>
 

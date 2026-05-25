@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,17 +7,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Button,
-  Card,
-  CardBody,
-  Chip,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  Select,
-  SelectItem,
-  Skeleton,
-} from '@heroui/react';
+  Button, Card, CardBody, Chip, Popover, PopoverContent, PopoverTrigger, Skeleton } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import type { LucideIcon } from 'lucide-react';
 import AlertTriangle from 'lucide-react/icons/alert-triangle';
@@ -388,9 +379,9 @@ export function CivicDigestPage() {
             }}
             variant="bordered"
           >
-            <SelectItem key="off">{t('prefs_cadence_off')}</SelectItem>
-            <SelectItem key="daily">{t('prefs_cadence_daily')}</SelectItem>
-            <SelectItem key="monthly">{t('prefs_cadence_monthly')}</SelectItem>
+            <SelectItem key="off" id="off">{t('prefs_cadence_off')}</SelectItem>
+            <SelectItem key="daily" id="daily">{t('prefs_cadence_daily')}</SelectItem>
+            <SelectItem key="monthly" id="monthly">{t('prefs_cadence_monthly')}</SelectItem>
           </Select>
 
           <div className="space-y-2">

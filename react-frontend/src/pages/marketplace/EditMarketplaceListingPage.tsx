@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -22,17 +23,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import {
-  Button,
-  Input,
-  Textarea,
-  Select,
-  SelectItem,
-  RadioGroup,
-  Radio,
-  Spinner,
-  Chip,
-  Switch,
-} from '@heroui/react';
+  Button, Input, Textarea, RadioGroup, Radio, Spinner, Chip, Switch } from '@heroui/react';
 import Camera from 'lucide-react/icons/camera';
 import X from 'lucide-react/icons/x';
 import Plus from 'lucide-react/icons/plus';
@@ -666,7 +657,7 @@ export function EditMarketplaceListingPage() {
             isLoading={isLoadingCategories}
           >
             {categories.map((cat) => (
-              <SelectItem key={String(cat.id)}>
+              <SelectItem key={String(cat.id)} id={String(cat.id)}>
                 {cat.name}
               </SelectItem>
             ))}
@@ -683,7 +674,7 @@ export function EditMarketplaceListingPage() {
             isRequired
           >
             {CONDITIONS.map((c) => (
-              <SelectItem key={c.value}>
+              <SelectItem key={c.value} id={c.value}>
                 {t(c.tKey)}
               </SelectItem>
             ))}
@@ -764,7 +755,7 @@ export function EditMarketplaceListingPage() {
                       isRequired={field.required}
                     >
                       {field.options.map((opt) => (
-                        <SelectItem key={opt}>{opt}</SelectItem>
+                        <SelectItem key={opt} id={opt}>{opt}</SelectItem>
                       ))}
                     </Select>
                   );
@@ -832,18 +823,18 @@ export function EditMarketplaceListingPage() {
                 }}
                 className="w-full sm:w-32"
               >
-                <SelectItem key="EUR">EUR</SelectItem>
-                <SelectItem key="GBP">GBP</SelectItem>
-                <SelectItem key="USD">USD</SelectItem>
-                <SelectItem key="CAD">CAD</SelectItem>
-                <SelectItem key="AUD">AUD</SelectItem>
-                <SelectItem key="NZD">NZD</SelectItem>
-                <SelectItem key="CHF">CHF</SelectItem>
-                <SelectItem key="SEK">SEK</SelectItem>
-                <SelectItem key="NOK">NOK</SelectItem>
-                <SelectItem key="DKK">DKK</SelectItem>
-                <SelectItem key="PLN">PLN</SelectItem>
-                <SelectItem key="JPY">JPY</SelectItem>
+                <SelectItem key="EUR" id="EUR">EUR</SelectItem>
+                <SelectItem key="GBP" id="GBP">GBP</SelectItem>
+                <SelectItem key="USD" id="USD">USD</SelectItem>
+                <SelectItem key="CAD" id="CAD">CAD</SelectItem>
+                <SelectItem key="AUD" id="AUD">AUD</SelectItem>
+                <SelectItem key="NZD" id="NZD">NZD</SelectItem>
+                <SelectItem key="CHF" id="CHF">CHF</SelectItem>
+                <SelectItem key="SEK" id="SEK">SEK</SelectItem>
+                <SelectItem key="NOK" id="NOK">NOK</SelectItem>
+                <SelectItem key="DKK" id="DKK">DKK</SelectItem>
+                <SelectItem key="PLN" id="PLN">PLN</SelectItem>
+                <SelectItem key="JPY" id="JPY">JPY</SelectItem>
               </Select>
             </div>
           )}

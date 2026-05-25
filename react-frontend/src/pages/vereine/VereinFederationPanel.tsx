@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -14,7 +15,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Spinner, Switch, Tab, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tabs } from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Switch, Tab, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tabs } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import Network from 'lucide-react/icons/network';
 import Share2 from 'lucide-react/icons/share-2';
@@ -244,7 +245,7 @@ export default function VereinFederationPanel({ organizationId }: Props) {
             isDisabled={!isActive}
           >
             {SCOPES.map((s) => (
-              <SelectItem key={s} textValue={t(`verein_federation.scope_${s}`)}>
+              <SelectItem key={s} id={s} textValue={t(`verein_federation.scope_${s}`)}>
                 {t(`verein_federation.scope_${s}`)}
               </SelectItem>
             ))}
@@ -390,7 +391,7 @@ export default function VereinFederationPanel({ organizationId }: Props) {
                   onChange={(e) => setSelectedEventId(e.target.value)}
                 >
                   {shareEvents.map((ev) => (
-                    <SelectItem key={String(ev.id)} textValue={ev.title}>
+                    <SelectItem key={String(ev.id)} id={String(ev.id)} textValue={ev.title}>
                       {ev.title}
                     </SelectItem>
                   ))}

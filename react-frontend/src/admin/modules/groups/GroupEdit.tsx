@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -7,19 +8,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Input,
-  Select,
-  SelectItem,
-  Spinner,
-  Switch,
-  Textarea,
-  Avatar,
-  Chip,
-} from '@heroui/react';
+  Button, Card, CardBody, CardHeader, Input, Spinner, Switch, Textarea, Avatar, Chip } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
 import Users from 'lucide-react/icons/users';
@@ -339,7 +328,7 @@ export function GroupEdit() {
               placeholder={t('groups.edit_placeholder_type')}
             >
               {groupTypes.map((gt) => (
-                <SelectItem key={String(gt.id)} textValue={gt.name}>
+                <SelectItem key={String(gt.id)} id={String(gt.id)} textValue={gt.name}>
                   <div className="flex items-center gap-2">
                     {gt.color && (
                       <span
@@ -374,8 +363,8 @@ export function GroupEdit() {
               onSelectionChange={(keys) => setVisibility(Array.from(keys)[0] as string)}
               variant="bordered"
             >
-              <SelectItem key="public">{t('groups.visibility_public')}</SelectItem>
-              <SelectItem key="private">{t('groups.visibility_private')}</SelectItem>
+              <SelectItem key="public" id="public">{t('groups.visibility_public')}</SelectItem>
+              <SelectItem key="private" id="private">{t('groups.visibility_private')}</SelectItem>
             </Select>
             <Select
               label={t('groups.edit_label_status')}
@@ -383,9 +372,9 @@ export function GroupEdit() {
               onSelectionChange={(keys) => setStatus(Array.from(keys)[0] as string)}
               variant="bordered"
             >
-              <SelectItem key="active">{t('groups.status_active')}</SelectItem>
-              <SelectItem key="inactive">{t('groups.status_inactive')}</SelectItem>
-              <SelectItem key="archived">{t('groups.status_archived')}</SelectItem>
+              <SelectItem key="active" id="active">{t('groups.status_active')}</SelectItem>
+              <SelectItem key="inactive" id="inactive">{t('groups.status_inactive')}</SelectItem>
+              <SelectItem key="archived" id="archived">{t('groups.status_archived')}</SelectItem>
             </Select>
           </CardBody>
         </Card>
@@ -405,9 +394,9 @@ export function GroupEdit() {
                 variant="bordered"
                 description={t('groups.edit_federated_desc')}
               >
-                <SelectItem key="none">{t('groups.federated_none')}</SelectItem>
-                <SelectItem key="listed">{t('groups.federated_listed')}</SelectItem>
-                <SelectItem key="joinable">{t('groups.federated_joinable')}</SelectItem>
+                <SelectItem key="none" id="none">{t('groups.federated_none')}</SelectItem>
+                <SelectItem key="listed" id="listed">{t('groups.federated_listed')}</SelectItem>
+                <SelectItem key="joinable" id="joinable">{t('groups.federated_joinable')}</SelectItem>
               </Select>
             </CardBody>
           </Card>

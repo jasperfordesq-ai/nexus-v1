@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -8,7 +9,6 @@
  */
 
 import { useState, useEffect, type CSSProperties } from 'react';
-import { Select, SelectItem } from '@heroui/react';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import type { TransactionCategory } from '@/types/api';
@@ -69,7 +69,7 @@ export function CategorySelect({
       }}
     >
       {(Array.isArray(categories) ? categories : []).map((cat) => (
-        <SelectItem key={String(cat.id)} textValue={cat.name}>
+        <SelectItem key={String(cat.id)} id={String(cat.id)} textValue={cat.name}>
           <div className="flex items-center gap-2">
             {cat.color && (
               <div

@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -13,24 +14,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import {
-  Card,
-  CardBody,
-  CardHeader,
-  Input,
-  Button,
-  Select,
-  SelectItem,
-  Textarea,
-  Chip,
-  Spinner,
-  Avatar,
-  Switch,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-} from '@heroui/react';
+  Card, CardBody, CardHeader, Input, Button, Textarea, Chip, Spinner, Avatar, Switch, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
 import Trash2 from 'lucide-react/icons/trash-2';
@@ -547,20 +531,20 @@ export function UserEdit() {
                 <Select label={t('fields.role')} placeholder={t('placeholders.role')} selectedKeys={role ? [role] : []}
                   onSelectionChange={(keys) => setRole(Array.from(keys)[0] as string)}
                   isRequired isInvalid={!!errors.role} errorMessage={errors.role} isDisabled={submitting}>
-                  <SelectItem key="member">{t('roles.member')}</SelectItem>
-                  <SelectItem key="broker">{t('roles.broker')}</SelectItem>
-                  <SelectItem key="moderator">{t('roles.moderator')}</SelectItem>
-                  <SelectItem key="newsletter_admin">{t('roles.newsletter_admin')}</SelectItem>
-                  <SelectItem key="admin">{t('roles.admin')}</SelectItem>
-                  <SelectItem key="tenant_admin">{t('roles.tenant_admin')}</SelectItem>
+                  <SelectItem key="member" id="member">{t('roles.member')}</SelectItem>
+                  <SelectItem key="broker" id="broker">{t('roles.broker')}</SelectItem>
+                  <SelectItem key="moderator" id="moderator">{t('roles.moderator')}</SelectItem>
+                  <SelectItem key="newsletter_admin" id="newsletter_admin">{t('roles.newsletter_admin')}</SelectItem>
+                  <SelectItem key="admin" id="admin">{t('roles.admin')}</SelectItem>
+                  <SelectItem key="tenant_admin" id="tenant_admin">{t('roles.tenant_admin')}</SelectItem>
                 </Select>
                 <Select label={t('fields.status')} placeholder={t('placeholders.status')} selectedKeys={status ? [status] : []}
                   onSelectionChange={(keys) => setStatus(Array.from(keys)[0] as string)}
                   isRequired isInvalid={!!errors.status} errorMessage={errors.status} isDisabled={submitting}>
-                  <SelectItem key="active">{t('statuses.active')}</SelectItem>
-                  <SelectItem key="pending">{t('statuses.pending')}</SelectItem>
-                  <SelectItem key="suspended">{t('statuses.suspended')}</SelectItem>
-                  <SelectItem key="banned">{t('statuses.banned')}</SelectItem>
+                  <SelectItem key="active" id="active">{t('statuses.active')}</SelectItem>
+                  <SelectItem key="pending" id="pending">{t('statuses.pending')}</SelectItem>
+                  <SelectItem key="suspended" id="suspended">{t('statuses.suspended')}</SelectItem>
+                  <SelectItem key="banned" id="banned">{t('statuses.banned')}</SelectItem>
                 </Select>
               </div>
 
@@ -573,8 +557,8 @@ export function UserEdit() {
                   onSelectionChange={(keys) => setProfileType(Array.from(keys)[0] as 'individual' | 'organisation')}
                   isDisabled={submitting}
                 >
-                  <SelectItem key="individual">{t('profile_types.individual')}</SelectItem>
-                  <SelectItem key="organisation">{t('profile_types.organisation')}</SelectItem>
+                  <SelectItem key="individual" id="individual">{t('profile_types.individual')}</SelectItem>
+                  <SelectItem key="organisation" id="organisation">{t('profile_types.organisation')}</SelectItem>
                 </Select>
                 {profileType === 'organisation' && (
                   <Input

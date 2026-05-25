@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -23,15 +24,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  Button,
-  Chip,
-  Input,
-  Tabs,
-  Tab,
-  Spinner,
-  Select,
-  SelectItem,
-} from '@heroui/react';
+  Button, Chip, Input, Tabs, Tab, Spinner } from '@heroui/react';
 import Lightbulb from 'lucide-react/icons/lightbulb';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -406,7 +399,7 @@ export function IdeationPage() {
               className="max-w-xs"
             >
               {categories.map((cat) => (
-                <SelectItem key={cat.slug}>
+                <SelectItem key={cat.slug} id={cat.slug}>
                   {cat.name}
                 </SelectItem>
               ))}

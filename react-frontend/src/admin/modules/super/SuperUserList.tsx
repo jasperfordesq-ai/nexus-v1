@@ -1,3 +1,4 @@
+import { Select, SelectItem } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -7,9 +8,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
-  Button, Avatar, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem,
-  Select, SelectItem, Switch,
-} from '@heroui/react';
+  Button, Avatar, Chip, Switch } from '@heroui/react';
 import Plus from 'lucide-react/icons/plus';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import Shield from 'lucide-react/icons/shield';
@@ -18,11 +17,22 @@ import Eye from 'lucide-react/icons/eye';
 import UserCheck from 'lucide-react/icons/user-check';
 import UserX from 'lucide-react/icons/user-x';
 import { usePageTitle } from '@/hooks';
-import { useTenant, useToast } from '@/contexts';
+import { useTenant,
+  useToast } from '@/contexts';
 import { adminSuper } from '../../api/adminApi';
-import { DataTable, PageHeader, StatusBadge, ConfirmModal, type Column } from '../../components';
+import { DataTable,
+  PageHeader,
+  StatusBadge,
+  ConfirmModal,
+  type Column } from '../../components';
 import type { SuperAdminUser } from '../../api/types';
 
+import { Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  DropdownSection,
+} from '@/components/ui';
 export function SuperUserList() {
   const { t } = useTranslation('admin');
   usePageTitle(t('super.page_title'));
@@ -184,15 +194,15 @@ export function SuperUserList() {
             else if (key === 'grant-global') setConfirmAction({ type: 'grant-global', user });
             else if (key === 'revoke-global') setConfirmAction({ type: 'revoke-global', user });
           }}>
-            <DropdownItem key="view" startContent={<Eye size={14} />}>{t('super.action_view')}</DropdownItem>
-            <DropdownItem key="edit" startContent={<ArrowRight size={14} />}>{t('super.action_edit')}</DropdownItem>
+            <DropdownItem key="view" id="view" startContent={<Eye size={14} />}>{t('super.action_view')}</DropdownItem>
+            <DropdownItem key="edit" id="edit" startContent={<ArrowRight size={14} />}>{t('super.action_edit')}</DropdownItem>
             {!user.is_tenant_super_admin
-              ? <DropdownItem key="grant-sa" startContent={<UserCheck size={14} />} className="text-success">{t('super.action_grant_tenant_sa')}</DropdownItem>
-              : <DropdownItem key="revoke-sa" startContent={<UserX size={14} />} className="text-warning">{t('super.action_revoke_tenant_sa')}</DropdownItem>
+              ? <DropdownItem key="grant-sa" id="grant-sa" startContent={<UserCheck size={14} />} className="text-success">{t('super.action_grant_tenant_sa')}</DropdownItem>
+              : <DropdownItem key="revoke-sa" id="revoke-sa" startContent={<UserX size={14} />} className="text-warning">{t('super.action_revoke_tenant_sa')}</DropdownItem>
             }
             {!user.is_super_admin
-              ? <DropdownItem key="grant-global" startContent={<Shield size={14} />} className="text-secondary">{t('super.action_grant_global_sa')}</DropdownItem>
-              : <DropdownItem key="revoke-global" startContent={<Shield size={14} />} className="text-danger">{t('super.action_revoke_global_sa')}</DropdownItem>
+              ? <DropdownItem key="grant-global" id="grant-global" startContent={<Shield size={14} />} className="text-secondary">{t('super.action_grant_global_sa')}</DropdownItem>
+              : <DropdownItem key="revoke-global" id="revoke-global" startContent={<Shield size={14} />} className="text-danger">{t('super.action_revoke_global_sa')}</DropdownItem>
             }
           </DropdownMenu>
         </Dropdown>
@@ -243,7 +253,7 @@ export function SuperUserList() {
             setPage(1);
           }}
         >
-          {tenants.map((t) => <SelectItem key={String(t.id)}>{t.name}</SelectItem>)}
+          {tenants.map((t) => <SelectItem key={String(t.id)} id={String(t.id)}>{t.name}</SelectItem>)}
         </Select>
         <Select
           label={t('super.label_filter_by_role')}
@@ -256,9 +266,9 @@ export function SuperUserList() {
             setPage(1);
           }}
         >
-          <SelectItem key="member">{t('super.role_member')}</SelectItem>
-          <SelectItem key="admin">{t('super.role_admin')}</SelectItem>
-          <SelectItem key="tenant_admin">{t('super.role_tenant_admin')}</SelectItem>
+          <SelectItem key="member" id="member">{t('super.role_member')}</SelectItem>
+          <SelectItem key="admin" id="admin">{t('super.role_admin')}</SelectItem>
+          <SelectItem key="tenant_admin" id="tenant_admin">{t('super.role_tenant_admin')}</SelectItem>
         </Select>
         <Switch
           size="sm"
