@@ -131,7 +131,7 @@ export function FederationCommunityPicker({ isOpen, onClose, onSelect }: Props) 
                     <CardBody className="flex flex-row items-start gap-3 px-4 py-3">
                       <input
                         type="radio"
-                        className="mt-1 h-4 w-4 accent-primary"
+                        className="mt-1 h-4 w-4 accent-[var(--accent)]"
                         checked={selectedSlug === peer.slug}
                         onChange={() => setSelectedSlug(peer.slug)}
                         aria-label={peer.display_name}

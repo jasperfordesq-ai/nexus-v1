@@ -343,7 +343,7 @@ export function UserList() {
             src={resolveAvatarUrl(user.avatar_url || user.avatar) || undefined}
             name={user.name}
             size="sm"
-            className="ring-2 ring-content1"
+            className="ring-2 ring-surface"
           />
           <div>
             <Link

@@ -876,7 +876,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
     return (
       <Link
         to={tenantPath(`/listings/${listing.id}`)}
-        className="block rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+        className="block rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         aria-label={t('open_listing_aria', { title: listing.title })}
       >
         <GlassCard className={`cursor-pointer p-4 transition-all duration-200 hover:-translate-y-0.5 hover:bg-theme-hover hover:shadow-md border-l-4 ${listing.type === 'offer' ? 'border-l-emerald-500/70' : 'border-l-amber-500/70'}`}>
@@ -988,7 +988,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
   return (
     <Link
       to={tenantPath(`/listings/${listing.id}`)}
-      className="group block h-full rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      className="group block h-full rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
       aria-label={t('open_listing_aria', { title: listing.title })}
     >
       <GlassCard className="flex h-full cursor-pointer flex-col overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">

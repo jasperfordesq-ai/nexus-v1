@@ -205,7 +205,7 @@ export function NewsletterSendTimeOptimizer() {
                               role="gridcell"
                               tabIndex={0}
                               aria-label={cellLabel}
-                              className={`flex aspect-square cursor-pointer items-center justify-center rounded border text-xs font-bold transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${getHeatCellClass(score)}`}
+                              className={`flex aspect-square cursor-pointer items-center justify-center rounded border text-xs font-bold transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${getHeatCellClass(score)}`}
                               title={cellLabel}
                             >
                               {score > 0 && <span>{score}</span>}

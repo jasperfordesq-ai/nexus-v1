@@ -238,7 +238,7 @@ export function VolunteerApprovals() {
       key: 'applicant', label: t('volunteering.col_applicant'), sortable: true,
       render: (item) => (
         <div className="flex items-center gap-3">
-          <Avatar name={`${item.first_name} ${item.last_name}`} size="sm" className="ring-2 ring-content1" />
+          <Avatar name={`${item.first_name} ${item.last_name}`} size="sm" className="ring-2 ring-surface" />
           <div>
             <p className="font-medium text-foreground">{item.first_name} {item.last_name}</p>
             <p className="text-xs text-default-500">{item.email}</p>

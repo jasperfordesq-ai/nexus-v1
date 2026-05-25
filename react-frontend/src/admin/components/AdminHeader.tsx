@@ -89,7 +89,7 @@ export function AdminHeader({ sidebarCollapsed, onSidebarToggle }: AdminHeaderPr
                 src={resolveAvatarUrl(user?.avatar_url || user?.avatar) || undefined}
                 name={user?.name || adminLabel}
                 size="sm"
-                className="h-8 w-8 ring-2 ring-content1"
+                className="h-8 w-8 ring-2 ring-surface"
               />
               <span className="hidden max-w-[10rem] truncate text-sm font-medium text-foreground sm:block">
                 {user?.name || adminLabel}
