@@ -213,4 +213,12 @@ EXPOSE 80
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
     CMD curl -f http://localhost/health.php || exit 1
 
-CMD ["sh", "-c", "umask 0002; chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true; chmod -R ug+rwX /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true; find /var/www/html/storage -type d -exec chmod g+s {} + 2>/dev/null || true; php artisan optimize || { echo '[FATAL] artisan optimize failed'; exit 1; }; php artisan horizon:publish 2>/dev/null || true; chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true; chmod -R ug+rwX /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true; exec apache2-foreground"]
+CMD ["sh", "-c", "umask 0002; \
+    mkdir -p /var/www/html/storage/logs /var/www/html/storage/framework/cache/data /var/www/html/storage/framework/sessions /var/www/html/storage/framework/views /var/www/html/bootstrap/cache; \
+    if ! chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache; then echo '[WARN] startup chown failed — log writes may fail'; fi; \
+    if ! find /var/www/html/storage /var/www/html/bootstrap/cache -type d -exec chmod 2775 {} +; then echo '[WARN] startup chmod dirs failed'; fi; \
+    if ! find /var/www/html/storage /var/www/html/bootstrap/cache -type f -exec chmod 664 {} +; then echo '[WARN] startup chmod files failed'; fi; \
+    php artisan optimize || { echo '[FATAL] artisan optimize failed'; exit 1; }; \
+    php artisan horizon:publish 2>/dev/null || true; \
+    chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true; \
+    exec apache2-foreground"]
