@@ -1,3 +1,4 @@
+import { Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -8,7 +9,7 @@
  * Uses HeroUI Skeleton for consistent loading states
  */
 
-import { Skeleton } from '@heroui/react';
+
 
 /**
  * Skeleton for listing grid cards — matches ListingCard grid layout

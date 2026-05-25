@@ -14,7 +14,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Skeleton } from '@heroui/react';
+
 import Target from 'lucide-react/icons/target';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Calendar from 'lucide-react/icons/calendar';
@@ -26,7 +26,7 @@ import Lock from 'lucide-react/icons/lock';
 import History from 'lucide-react/icons/history';
 import Sparkles from 'lucide-react/icons/sparkles';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
-import { GlassCard, Progress, Button, Chip, Avatar } from '@/components/ui';
+import { GlassCard, Progress, Button, Chip, Avatar, Skeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { PageMeta } from '@/components/seo';
 import { SocialInteractionPanel } from '@/components/social';

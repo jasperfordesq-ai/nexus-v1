@@ -1,4 +1,4 @@
-import { Button, Chip, Card, CardBody, GlassCard, Avatar } from '@/components/ui';
+import { Button, Chip, Card, CardBody, GlassCard, Avatar, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,7 +12,7 @@ import { Button, Chip, Card, CardBody, GlassCard, Avatar } from '@/components/ui
 
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Skeleton } from '@heroui/react';
+
 import UserPlus from 'lucide-react/icons/user-plus';
 import Users from 'lucide-react/icons/users';
 import X from 'lucide-react/icons/x';

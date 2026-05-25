@@ -9,7 +9,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { Skeleton } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import Rss from 'lucide-react/icons/rss';
 import ChevronDown from 'lucide-react/icons/chevron-down';
@@ -18,7 +18,7 @@ import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { FeedCard } from '@/components/feed/FeedCard';
-import { GlassCard, Button } from '@/components/ui';
+import { GlassCard, Button, Skeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useAuth, useToast } from '@/contexts';
 import { useInfiniteScroll } from '@/hooks/useInfiniteScroll';

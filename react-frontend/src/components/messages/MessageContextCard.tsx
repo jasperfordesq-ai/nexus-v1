@@ -12,7 +12,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Skeleton } from '@heroui/react';
+
 import ListChecks from 'lucide-react/icons/list-checks';
 import Calendar from 'lucide-react/icons/calendar';
 import Briefcase from 'lucide-react/icons/briefcase';
@@ -23,7 +23,7 @@ import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { resolveAssetUrl } from '@/lib/helpers';
-import { Chip } from '@/components/ui';
+import { Chip, Skeleton } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

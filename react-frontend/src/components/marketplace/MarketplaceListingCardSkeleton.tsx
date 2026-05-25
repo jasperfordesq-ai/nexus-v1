@@ -1,4 +1,4 @@
-import { Card, CardBody } from '@/components/ui';
+import { Card, CardBody, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,7 +11,7 @@ import { Card, CardBody } from '@/components/ui';
  * Uses HeroUI Skeleton for consistent pulse animation.
  */
 
-import { Skeleton } from '@heroui/react';
+
 
 export function MarketplaceListingCardSkeleton() {
   return (

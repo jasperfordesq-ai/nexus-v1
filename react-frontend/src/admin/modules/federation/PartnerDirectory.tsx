@@ -1,6 +1,6 @@
-import { Button, Card, CardBody, CardFooter, Chip, Input, Textarea, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Button, Card, CardBody, CardFooter, Chip, Input, Textarea, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Skeleton } from '@/components/ui';
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import { Skeleton } from '@heroui/react';
+
 import Globe from 'lucide-react/icons/globe';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Search from 'lucide-react/icons/search';

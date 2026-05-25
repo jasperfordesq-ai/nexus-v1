@@ -1,6 +1,6 @@
-import { Card, CardBody, CardHeader, Button, Chip, Avatar } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Chip, Avatar, Skeleton } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
-import { ButtonGroup, Skeleton } from '@heroui/react';
+import { ButtonGroup } from '@heroui/react';
 import Heart from 'lucide-react/icons/heart';
 import Users from 'lucide-react/icons/users';
 import Clock from 'lucide-react/icons/clock';

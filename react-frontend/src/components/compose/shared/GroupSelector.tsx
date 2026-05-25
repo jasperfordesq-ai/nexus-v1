@@ -1,4 +1,4 @@
-import { Select, SelectItem } from '@/components/ui';
+import { Select, SelectItem, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -9,7 +9,7 @@ import { Select, SelectItem } from '@/components/ui';
  */
 
 import { useState, useEffect } from 'react';
-import { Skeleton } from '@heroui/react';
+
 import Users from 'lucide-react/icons/users';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';

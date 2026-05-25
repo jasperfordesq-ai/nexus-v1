@@ -13,7 +13,7 @@
 
 import { useState, useCallback, useRef, useEffect, memo } from 'react';
 import { Link } from 'react-router-dom';
-import { Popover, PopoverTrigger, PopoverContent, Skeleton } from '@heroui/react';
+import { Popover, PopoverTrigger, PopoverContent } from '@heroui/react';
 import UserPlus from 'lucide-react/icons/user-plus';
 import UserCheck from 'lucide-react/icons/user-check';
 import Check from 'lucide-react/icons/check';
@@ -24,7 +24,7 @@ import { api } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { logError } from '@/lib/logger';
 import { PresenceIndicator } from './PresenceIndicator';
-import { Button, Chip, Avatar } from '@/components/ui';
+import { Button, Chip, Avatar, Skeleton } from '@/components/ui';
 
 /* ─── Types ────────────────────────────────────────────────── */
 

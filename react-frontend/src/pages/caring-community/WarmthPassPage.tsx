@@ -1,4 +1,4 @@
-import { CardBody, Card, GlassCard, Chip } from '@/components/ui';
+import { CardBody, Card, GlassCard, Chip, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,7 +6,7 @@ import { CardBody, Card, GlassCard, Chip } from '@/components/ui';
 
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Skeleton } from '@heroui/react';
+
 import AlertCircle from 'lucide-react/icons/alert-circle';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CheckCircle from 'lucide-react/icons/check-circle';

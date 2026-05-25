@@ -5,7 +5,7 @@
 
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Skeleton } from '@heroui/react';
+
 import AlertTriangle from 'lucide-react/icons/alert-triangle';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CalendarClock from 'lucide-react/icons/calendar-clock';
@@ -14,7 +14,7 @@ import HeartHandshake from 'lucide-react/icons/heart-handshake';
 import Plus from 'lucide-react/icons/plus';
 import UserRoundCheck from 'lucide-react/icons/user-round-check';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Accordion, AccordionItem, Button, Chip, Avatar } from '@/components/ui';
+import { GlassCard, Accordion, AccordionItem, Button, Chip, Avatar, Skeleton } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { useApi } from '@/hooks/useApi';

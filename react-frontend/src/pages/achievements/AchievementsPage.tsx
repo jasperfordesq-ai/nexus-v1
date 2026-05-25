@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Progress, Button, Chip, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Progress, Button, Chip, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -10,7 +10,7 @@ import { Select, SelectItem, GlassCard, Progress, Button, Chip, Spinner, Modal, 
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Checkbox, Skeleton } from '@heroui/react';
+import { Checkbox } from '@heroui/react';
 import Trophy from 'lucide-react/icons/trophy';
 import Medal from 'lucide-react/icons/medal';
 import Star from 'lucide-react/icons/star';

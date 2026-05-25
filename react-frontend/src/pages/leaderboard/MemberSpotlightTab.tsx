@@ -13,11 +13,11 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Skeleton } from '@heroui/react';
+
 import Sparkles from 'lucide-react/icons/sparkles';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Avatar } from '@/components/ui';
+import { GlassCard, Avatar, Skeleton } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';

@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Input } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Input, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,7 +11,7 @@ import { Select, SelectItem, GlassCard, Button, Chip, Input } from '@/components
 import { useState, useEffect, useCallback, useRef, memo, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Skeleton } from '@heroui/react';
+
 import Search from 'lucide-react/icons/search';
 import Calendar from 'lucide-react/icons/calendar';
 import MapPin from 'lucide-react/icons/map-pin';

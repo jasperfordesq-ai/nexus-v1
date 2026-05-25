@@ -22,6 +22,7 @@ export { TimeInput, type TimeInputProps, type TimeInputValue } from './TimeInput
 export { Button, type ButtonProps } from './Button';
 export { Chip, type ChipProps } from './Chip';
 export { Spinner, type SpinnerProps } from './Spinner';
+export { Skeleton, type SkeletonProps } from './Skeleton';
 export { Input, type InputProps } from './Input';
 export { Textarea, type TextareaProps } from './Textarea';
 export { Switch, type SwitchProps } from './Switch';

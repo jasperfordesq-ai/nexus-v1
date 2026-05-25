@@ -1,4 +1,4 @@
-import { CardBody, Card, Progress, Button, Chip, Input, Avatar, Tabs, Tab } from '@/components/ui';
+import { CardBody, Card, Progress, Button, Chip, Input, Avatar, Tabs, Tab, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -7,7 +7,7 @@ import { CardBody, Card, Progress, Button, Chip, Input, Avatar, Tabs, Tab } from
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Skeleton } from '@heroui/react';
+
 import Search from 'lucide-react/icons/search';
 import Users from 'lucide-react/icons/users';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';

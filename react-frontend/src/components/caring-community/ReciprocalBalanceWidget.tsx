@@ -4,12 +4,12 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { Link } from 'react-router-dom';
-import { Skeleton } from '@heroui/react';
+
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import HandHeart from 'lucide-react/icons/hand-heart';
 import Sparkles from 'lucide-react/icons/sparkles';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Skeleton } from '@/components/ui';
 import { useTenant } from '@/contexts';
 import { useApi } from '@/hooks/useApi';
 

@@ -1,4 +1,4 @@
-import { CardBody, Card, Select, SelectItem, Button, Chip, Input, Tooltip } from '@/components/ui';
+import { CardBody, Card, Select, SelectItem, Button, Chip, Input, Tooltip, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,7 +12,7 @@ import { CardBody, Card, Select, SelectItem, Button, Chip, Input, Tooltip } from
  */
 
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import { Checkbox, Skeleton } from '@heroui/react';
+import { Checkbox } from '@heroui/react';
 import Mail from 'lucide-react/icons/mail';
 import CreditCard from 'lucide-react/icons/credit-card';
 import UserPlus from 'lucide-react/icons/user-plus';

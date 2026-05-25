@@ -10,12 +10,12 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Skeleton } from '@heroui/react';
+
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 
 import { api } from '@/lib/api';
-import { Button } from '@/components/ui';
+import { Button, Skeleton } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types

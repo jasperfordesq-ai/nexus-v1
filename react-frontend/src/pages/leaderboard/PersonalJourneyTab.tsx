@@ -12,14 +12,14 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Skeleton } from '@heroui/react';
+
 import Award from 'lucide-react/icons/award';
 import Calendar from 'lucide-react/icons/calendar';
 import Target from 'lucide-react/icons/target';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import Milestone from 'lucide-react/icons/milestone';
 import { useTranslation } from 'react-i18next';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Skeleton } from '@/components/ui';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 

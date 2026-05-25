@@ -1,11 +1,11 @@
-import { CardBody, Card, Button, Chip, Input, Tab, Tabs } from '@/components/ui';
+import { CardBody, Card, Button, Chip, Input, Tab, Tabs, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useState } from 'react';
-import { Skeleton } from '@heroui/react';
+
 import BadgeCheck from 'lucide-react/icons/badge-check';
 import AlertCircle from 'lucide-react/icons/alert-circle';
 import Building2 from 'lucide-react/icons/building-2';

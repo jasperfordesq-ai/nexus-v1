@@ -11,7 +11,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Skeleton } from '@heroui/react';
+
 import Send from 'lucide-react/icons/send';
 import MessageCircle from 'lucide-react/icons/message-circle';
 import Clock from 'lucide-react/icons/clock';
@@ -29,7 +29,7 @@ import type { MentionUser } from '@/hooks/useSocialInteractions';
 import { MentionRenderer } from './MentionRenderer';
 import { UserHoverCard } from './UserHoverCard';
 import { SafeHtml, containsHtml } from '@/components/ui/SafeHtml';
-import { Button, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tooltip } from '@/components/ui';
+import { Button, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tooltip, Skeleton } from '@/components/ui';
 
 /* ─── Props ─────────────────────────────────────────────────── */
 

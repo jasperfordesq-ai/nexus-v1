@@ -1,4 +1,4 @@
-import { Button, Input, Card, CardBody, Chip, Avatar, Tabs, Tab } from '@/components/ui';
+import { Button, Input, Card, CardBody, Chip, Avatar, Tabs, Tab, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -16,7 +16,7 @@ import { Button, Input, Card, CardBody, Chip, Avatar, Tabs, Tab } from '@/compon
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Skeleton } from '@heroui/react';
+
 import Users2 from 'lucide-react/icons/users-round';
 import UserCheck from 'lucide-react/icons/user-check';
 import UserX from 'lucide-react/icons/user-x';

@@ -1,7 +1,7 @@
-import { Card, CardBody, CardHeader, Button, Chip, Progress } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Chip, Progress, Skeleton } from '@/components/ui';
 import { useState, useCallback, useEffect, useMemo, type CSSProperties } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Skeleton, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+import { Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
 import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CheckCircle from 'lucide-react/icons/circle-check-big';

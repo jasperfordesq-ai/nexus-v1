@@ -12,7 +12,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Skeleton } from '@heroui/react';
+
 import Plus from 'lucide-react/icons/plus';
 import ChevronLeft from 'lucide-react/icons/chevron-left';
 import ChevronRight from 'lucide-react/icons/chevron-right';
@@ -23,7 +23,7 @@ import { logError } from '@/lib/logger';
 import { resolveAvatarUrl } from '@/lib/helpers';
 import { StoryViewer } from '@/components/stories/StoryViewer';
 import { StoryCreator } from '@/components/stories/StoryCreator';
-import { Button, Avatar } from '@/components/ui';
+import { Button, Avatar, Skeleton } from '@/components/ui';
 
 export interface StoryUser {
   user_id: number;

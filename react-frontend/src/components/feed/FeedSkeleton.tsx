@@ -13,9 +13,9 @@
  * skeleton shape roughly matches the loaded card — reduces layout shift.
  */
 
-import { Skeleton } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
-import { GlassCard } from '@/components/ui';
+import { GlassCard, Skeleton } from '@/components/ui';
 
 type SkeletonVariant =
   | 'with-image'

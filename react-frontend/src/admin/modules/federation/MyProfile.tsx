@@ -1,6 +1,6 @@
-import { Card, CardBody, CardHeader, Input, Textarea, Button, Spinner, Chip } from '@/components/ui';
+import { Card, CardBody, CardHeader, Input, Textarea, Button, Spinner, Chip, Skeleton } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
-import { Skeleton } from '@heroui/react';
+
 import Building from 'lucide-react/icons/building';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Save from 'lucide-react/icons/save';

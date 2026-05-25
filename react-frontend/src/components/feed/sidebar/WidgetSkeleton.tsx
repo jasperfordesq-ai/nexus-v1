@@ -7,8 +7,8 @@
  * WidgetSkeleton - Reusable loading skeleton for sidebar widgets
  */
 
-import { Skeleton } from '@heroui/react';
-import { GlassCard } from '@/components/ui';
+
+import { GlassCard, Skeleton } from '@/components/ui';
 
 interface WidgetSkeletonProps {
   lines?: number;

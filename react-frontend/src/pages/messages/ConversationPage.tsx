@@ -17,7 +17,7 @@ import { useState, useEffect, useRef, useCallback, type ChangeEvent, type FormEv
 import { useTranslation } from 'react-i18next';
 import { useParams, Link, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
-import { Skeleton } from '@heroui/react';
+
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Info from 'lucide-react/icons/info';
 import Loader2 from 'lucide-react/icons/loader-circle';
@@ -31,7 +31,7 @@ import Languages from 'lucide-react/icons/languages';
 import MessageCircle from 'lucide-react/icons/message-circle';
 import { useToast,
   useNotifications } from '@/contexts';
-import { GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tooltip } from '@/components/ui';
+import { GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tooltip, Skeleton } from '@/components/ui';
 import { LoadingScreen } from '@/components/feedback';
 import { useAuth, usePusherOptional, useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';

@@ -11,8 +11,8 @@
  * and description section.
  */
 
-import { Skeleton } from '@heroui/react';
-import { GlassCard } from '@/components/ui';
+
+import { GlassCard, Skeleton } from '@/components/ui';
 
 export function MarketplaceListingDetailSkeleton() {
   return (

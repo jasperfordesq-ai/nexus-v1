@@ -1,4 +1,4 @@
-import { CardBody, Card, Select, SelectItem, Button, Chip } from '@/components/ui';
+import { CardBody, Card, Select, SelectItem, Button, Chip, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -6,7 +6,7 @@ import { CardBody, Card, Select, SelectItem, Button, Chip } from '@/components/u
 
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Popover, PopoverContent, PopoverTrigger, Skeleton } from '@heroui/react';
+import { Popover, PopoverContent, PopoverTrigger } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
 import type { LucideIcon } from 'lucide-react';
 import AlertTriangle from 'lucide-react/icons/alert-triangle';

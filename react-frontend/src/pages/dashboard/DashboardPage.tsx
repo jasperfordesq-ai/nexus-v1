@@ -15,7 +15,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Skeleton } from '@heroui/react';
+
 import Clock from 'lucide-react/icons/clock';
 import ListTodo from 'lucide-react/icons/list-todo';
 import MessageSquare from 'lucide-react/icons/message-square';
@@ -37,7 +37,7 @@ import UserPlus from 'lucide-react/icons/user-plus';
 import Award from 'lucide-react/icons/award';
 import Star from 'lucide-react/icons/star';
 import ThumbsUp from 'lucide-react/icons/thumbs-up';
-import { GlassCard, Progress, Button, Chip, Avatar } from '@/components/ui';
+import { GlassCard, Progress, Button, Chip, Avatar, Skeleton } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useAuth, useTenant, useFeature, useModule, useNotifications } from '@/contexts';
 import { usePageTitle } from '@/hooks';

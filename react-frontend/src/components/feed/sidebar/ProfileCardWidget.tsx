@@ -9,11 +9,11 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Skeleton } from '@heroui/react';
+
 import Heart from 'lucide-react/icons/heart';
 import HandHelping from 'lucide-react/icons/hand-helping';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Avatar } from '@/components/ui';
+import { GlassCard, Avatar, Skeleton } from '@/components/ui';
 import { useAuth, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { resolveAvatarUrl } from '@/lib/helpers';

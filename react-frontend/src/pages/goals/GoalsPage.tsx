@@ -1,4 +1,4 @@
-import { Select, SelectItem, useDisclosure, GlassCard, ConfettiCelebration, Progress, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch } from '@/components/ui';
+import { Select, SelectItem, useDisclosure, GlassCard, ConfettiCelebration, Progress, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch, Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -19,7 +19,7 @@ import { Select, SelectItem, useDisclosure, GlassCard, ConfettiCelebration, Prog
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Skeleton } from '@heroui/react';
+
 import Target from 'lucide-react/icons/target';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
