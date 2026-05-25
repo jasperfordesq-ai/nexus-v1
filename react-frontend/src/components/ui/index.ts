@@ -19,6 +19,7 @@ export { Code, type CodeProps } from './Code';
 export { Snippet, type SnippetProps } from './Snippet';
 export { Progress, type ProgressProps } from './Progress';
 export { TimeInput, type TimeInputProps, type TimeInputValue } from './TimeInput';
+export { DatePicker, type DatePickerProps } from './DatePicker';
 export { Button, type ButtonProps } from './Button';
 export { Chip, type ChipProps } from './Chip';
 export { Spinner, type SpinnerProps } from './Spinner';

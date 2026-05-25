@@ -9,7 +9,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
-import { DatePicker } from '@heroui/react';
+import { DatePicker } from '@/components/ui';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui';
 import type { DateInputValue } from '@heroui/react';
 import { today, getLocalTimeZone } from '@internationalized/date';

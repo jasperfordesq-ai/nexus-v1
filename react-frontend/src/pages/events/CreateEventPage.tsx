@@ -12,7 +12,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { DatePicker } from '@heroui/react';
+import { DatePicker } from '@/components/ui';
 import type { DateInputValue } from '@heroui/react';
 import { parseDate, parseTime, today, getLocalTimeZone } from '@internationalized/date';
 import Save from 'lucide-react/icons/save';

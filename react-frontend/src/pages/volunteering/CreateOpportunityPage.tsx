@@ -15,7 +15,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { DatePicker } from '@heroui/react';
+import { DatePicker } from '@/components/ui';
 import type { DateInputValue } from '@heroui/react';
 import { today, getLocalTimeZone } from '@internationalized/date';
 import Save from 'lucide-react/icons/save';
