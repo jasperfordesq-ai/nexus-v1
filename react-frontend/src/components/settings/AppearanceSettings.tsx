@@ -10,7 +10,7 @@
  * to both localStorage and the backend API.
  */
 
-import { ButtonGroup } from '@heroui/react';
+import { ButtonGroup } from '@/components/ui';
 import Check from 'lucide-react/icons/check';
 import { useTheme } from '@/contexts';
 import { useTranslation } from 'react-i18next';

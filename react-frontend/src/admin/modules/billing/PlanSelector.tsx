@@ -11,7 +11,7 @@ import { Card, CardBody, CardHeader, CardFooter, Button, Chip, Spinner } from '@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ButtonGroup } from '@heroui/react';
+import { ButtonGroup } from '@/components/ui';
 import { Separator } from '@heroui-v3/react';
 import Check from 'lucide-react/icons/check';
 import { useTranslation } from 'react-i18next';
