@@ -1,6 +1,6 @@
-import { Card, CardBody, CardHeader, Button, Input, Textarea, Chip, Spinner, Select, SelectItem, useDisclosure, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Input, Textarea, Chip, Spinner, Select, SelectItem, useDisclosure, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Pagination } from '@/components/ui';
 import { useState, useCallback, useEffect } from 'react';
-import { Pagination } from '@heroui/react';
+
 import StickyNote from 'lucide-react/icons/sticky-note';
 import Plus from 'lucide-react/icons/plus';
 import Pin from 'lucide-react/icons/pin';

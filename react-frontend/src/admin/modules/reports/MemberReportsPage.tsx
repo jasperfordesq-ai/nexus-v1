@@ -1,6 +1,6 @@
-import { Card, CardBody, CardHeader, Spinner, Button, Chip, Select, SelectItem, Avatar, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
+import { Card, CardBody, CardHeader, Spinner, Button, Chip, Select, SelectItem, Avatar, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
-import { Pagination } from '@heroui/react';
+
 import {
   BarChart,
   Bar,

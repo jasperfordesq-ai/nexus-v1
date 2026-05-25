@@ -30,6 +30,7 @@ export { Textarea, type TextareaProps } from './Textarea';
 export { Switch, type SwitchProps } from './Switch';
 export { Tabs, Tab, type TabsProps, type TabProps } from './Tabs';
 export { Tooltip, type TooltipProps } from './Tooltip';
+export { Pagination, type PaginationProps } from './Pagination';
 export {
   Table,
   TableHeader,

@@ -1,4 +1,4 @@
-import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Avatar } from '@/components/ui';
+import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Avatar, Pagination } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,7 +11,7 @@ import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Avatar } fro
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Pagination } from '@heroui/react';
+
 import Activity from 'lucide-react/icons/activity';
 import Filter from 'lucide-react/icons/filter';
 import User from 'lucide-react/icons/user';

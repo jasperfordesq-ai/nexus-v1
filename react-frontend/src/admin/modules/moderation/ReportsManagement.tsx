@@ -1,11 +1,11 @@
-import { Button, Input, Chip, Spinner, Card, CardBody, Select, SelectItem, Avatar, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
+import { Button, Input, Chip, Spinner, Card, CardBody, Select, SelectItem, Avatar, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 import React, { useState, useEffect } from 'react';
-import { Pagination } from '@heroui/react';
+
 import Search from 'lucide-react/icons/search';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import CheckCircle2 from 'lucide-react/icons/circle-check';

@@ -1,4 +1,4 @@
-import { Button, Chip, Card, CardBody, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tooltip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@/components/ui';
+import { Button, Chip, Card, CardBody, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tooltip, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Pagination } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,7 +11,7 @@ import { Button, Chip, Card, CardBody, Input, Modal, ModalContent, ModalHeader, 
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import Papa from 'papaparse';
-import { Pagination } from '@heroui/react';
+
 import Users from 'lucide-react/icons/users';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Download from 'lucide-react/icons/download';

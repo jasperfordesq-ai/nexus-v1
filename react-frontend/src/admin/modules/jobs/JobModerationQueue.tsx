@@ -1,6 +1,6 @@
-import { Button, Chip, Card, CardBody, CardHeader, Textarea, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tooltip } from '@/components/ui';
+import { Button, Chip, Card, CardBody, CardHeader, Textarea, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tooltip, Pagination } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
-import { Pagination } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import XCircle from 'lucide-react/icons/circle-x';
