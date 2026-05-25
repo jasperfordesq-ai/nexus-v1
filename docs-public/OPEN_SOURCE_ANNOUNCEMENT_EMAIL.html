@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Project NEXUS V1.5 — Open Source Announcement</title>
+<title>Project NEXUS V1.5.1 — Open Source Announcement</title>
 <style>
   @page { size: A4; margin: 22mm 20mm; }
   html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -132,11 +132,11 @@
 </head>
 <body>
 
-<h1>Project NEXUS V1.5 is Now Open Source</h1>
+<h1>Project NEXUS V1.5.1 is Now Open Source</h1>
 <p class="subtitle">Building the Future of Community Exchange — Together</p>
 
 <div class="meta">
-  <strong>Date:</strong> 12 April 2026 &nbsp;·&nbsp;
+  <strong>Date:</strong> 25 May 2026 &nbsp;·&nbsp;
   <strong>Status:</strong> Ready to send &nbsp;·&nbsp;
   <strong>License:</strong> AGPL-3.0-or-later
 </div>
@@ -150,6 +150,8 @@
   <span class="tag">Build-Time SEO</span>
   <span class="tag">Stripe Payments</span>
   <span class="tag">Passkeys · CSP · CORS</span>
+  <span class="tag">Accessible Frontend · GOV.UK Alpha</span>
+  <span class="tag">Email Deliverability Suite</span>
 </div>
 
 <p>Dear Community Builders, Developers, and Changemakers,</p>
@@ -157,20 +159,21 @@
 <p>Today marks a pivotal moment in our mission to reimagine how communities connect, exchange, and thrive.</p>
 
 <div class="lede">
-  <p><strong>We're releasing Project NEXUS V1.5 to the world — fully open source, built for everyone.</strong> This updated announcement covers the major work shipped through Spring 2026: a standalone Marketplace, Donations, Identity Verification, a four-protocol Federation layer (Nexus, Komunitin, Credit Commons, TimeOverflow), 11 languages with right-to-left support, a build-time SEO pipeline, and a hardened payments and security layer.</p>
+  <p><strong>We're releasing Project NEXUS V1.5.1 to the world — fully open source, built for everyone.</strong> This updated announcement covers the major work shipped through Spring 2026: a standalone Marketplace, Donations, Identity Verification, a four-protocol Federation layer (Nexus, Komunitin, Credit Commons, TimeOverflow), 11 languages with right-to-left support, a self-hosted build-time SEO pipeline, hierarchical domain inheritance for sub-tenants, proximity search, a dedicated accessible frontend on GOV.UK's design system, a full email deliverability suite with SendGrid webhook processing, mobile push from every notification path, RFC-compliant one-click unsubscribe, structured data enhancements, and a hardened payments and security layer.</p>
 </div>
 
 <h2>What is Project NEXUS?</h2>
 <p>Project NEXUS is an enterprise-grade, multi-tenant community platform that puts people before profit. At its core is timebanking — a radical idea that every hour of your time is worth exactly one hour of someone else's, regardless of what you do.</p>
 <p>But NEXUS goes far beyond timebanking. It is a complete ecosystem for building connected, engaged, and empowered communities — <strong>and we're building the infrastructure to connect those communities across borders.</strong></p>
 
-<h2>What's Inside V1.5?</h2>
+<h2>What's Inside V1.5.1?</h2>
 <p>At a glance: <strong>a timebanking engine, real-time messaging, AI-powered matching, multi-tenant architecture, a four-protocol federation layer (Nexus, Komunitin, Credit Commons, TimeOverflow), a Stripe payments layer (subscriptions, donations, marketplace payouts, identity verification), gamification, and a complete social platform in 11 languages</strong> — all production-ready and fully Dockerized.</p>
 
 <h3>Core Platform</h3>
 <ul>
   <li><span class="ic">⏰</span><strong>Timebanking Engine</strong> — full credit exchange system with wallet, transactions, and broker controls.</li>
-  <li><span class="ic">🏢</span><strong>Multi-Tenancy</strong> — host unlimited communities on a single platform, each with its own branding and configuration.</li>
+  <li><span class="ic">🏢</span><strong>Multi-Tenancy</strong> — host unlimited communities on a single platform, each with its own branding and configuration; hierarchical parent-child tenant relationships with feature toggling per tenant.</li>
+  <li><span class="ic">🌳</span><strong>Hierarchical Domain Inheritance</strong> — sub-tenants are accessible at <code>parent.domain/child-slug</code> (e.g. <code>timebanking.uk/cardiff</code>) alongside their own app URL. Full sitemap support, the prerender pipeline fires at the parent domain, and all email and notification links generate correctly. No DNS changes required beyond pointing the parent domain at the platform.</li>
   <li><span class="ic">🎯</span><strong>Smart Matching</strong> — AI-powered matching with semantic embeddings, collaborative filtering, availability scheduling, and learned preferences.</li>
   <li><span class="ic">💬</span><strong>Real-Time Messaging</strong> — private conversations with Pusher WebSocket integration and live presence.</li>
   <li><span class="ic">📱</span><strong>Progressive Web App + Native Mobile App</strong> — install as a PWA on any device, or deploy natively via Capacitor (iOS &amp; Android).</li>
@@ -180,6 +183,7 @@
 <h3>Member Experience</h3>
 <ul>
   <li><span class="ic">📋</span><strong>Service Listings</strong> — post offers and requests, browse and smart-match listings.</li>
+  <li><span class="ic">📍</span><strong>Proximity "Near me" Search</strong> — Haversine-formula distance filtering across listings, events, and members with nearest-first ordering, correct pagination on Load More, and a live distance badge on every result. Works with any coordinate worldwide.</li>
   <li><span class="ic">🛒</span><strong>Marketplace</strong> — a standalone classifieds module with Stripe Connect payouts, orders, seller profiles, and AI-powered reply suggestions.</li>
   <li><span class="ic">💳</span><strong>Donations</strong> — one-off and recurring donations via Stripe, with full dashboards and receipts for organisations.</li>
   <li><span class="ic">🪪</span><strong>Identity Verification</strong> — optional Stripe Identity flow (document + selfie + name/DOB matching) with a verified-member badge.</li>
@@ -203,6 +207,7 @@
   <li><span class="ic">🤖</span><strong>AI Chat</strong> — OpenAI-powered assistant for platform guidance.</li>
   <li><span class="ic">📄</span><strong>Legal Hub</strong> — versioned legal documents with acceptance gates and an audit trail.</li>
   <li><span class="ic">🏥</span><strong>Impact Reports &amp; Social Prescribing</strong> — SROI analysis, member outcome reports, and tooling for community health integration workflows.</li>
+  <li><span class="ic">♿</span><strong>Accessible Frontend (GOV.UK Alpha)</strong> — a parallel HTML-first, progressively-enhanced accessible interface at <code>accessible.project-nexus.ie</code> built on official <code>govuk-frontend v6</code>. Designed for users who benefit from a keyboard-first, screen-reader-optimised experience. WCAG 2.1 AA. All tenant modules, authentication, and registration fully supported.</li>
 </ul>
 
 <h3>Trust &amp; Reputation</h3>
@@ -223,7 +228,7 @@
 
 <h3>Modern Tech Stack</h3>
 <ul class="tech-list">
-  <li>Frontend: React 18 + TypeScript + HeroUI + Tailwind CSS 4.</li>
+  <li>Frontend: React 19 + TypeScript + HeroUI v3 + Tailwind CSS 4.</li>
   <li>Backend: Laravel 12 + PHP 8.2+.</li>
   <li>Database: MariaDB 10.11.</li>
   <li>Search: Meilisearch v1.7.</li>
@@ -236,15 +241,20 @@
 <h3>Built for Production</h3>
 <ul>
   <li><span class="ic">🔐</span><strong>Enterprise security</strong> — CSRF, rate limiting, TOTP 2FA, WebAuthn passkeys, CSP nonces, a CORS allowlist, Form Request validation, email verification gates, and invite-code registration.</li>
+  <li><span class="ic">🛡️</span><strong>Registration fraud prevention</strong> — multi-field honeypot, MX-record checks on email domains, disposable-email blocklist, per-IP daily signup cap, per-tenant hourly circuit breaker with admin one-click resume, and verified place-autocomplete location requirement.</li>
   <li><span class="ic">💳</span><strong>Stripe payments layer</strong> — subscriptions, donations, marketplace (Connect), and identity verification, with idempotent webhook handling and deep money-flow test coverage.</li>
+  <li><span class="ic">📧</span><strong>Email deliverability suite</strong> — every <code>Mailer::send()</code> writes a row to an <code>email_log</code> audit table (status: queued / sent / delivered / bounced / failed / suppressed). Real-time SendGrid webhook processing advances delivery status and populates the suppression list. Admin dashboard at <code>/admin/email-deliverability</code> shows per-tenant delivered %, bounced %, and open rates over 1 / 7 / 30 / 90 days with a filterable log feed and one-click suppression list management synced back to SendGrid.</li>
+  <li><span class="ic">📲</span><strong>Mobile push from every notification path</strong> — Firebase Cloud Messaging fully wired in parallel to web push across all notification types: direct messages, connection requests, volunteer status, @mentions, and group chat. Honours per-user <code>push_enabled</code> preference.</li>
+  <li><span class="ic">🔔</span><strong>One-click email unsubscribe</strong> — RFC-compliant <code>List-Unsubscribe</code> and <code>List-Unsubscribe-Post</code> headers auto-attached to every outbound email. HMAC-signed category tokens cover 10 notification preference categories. Gmail / Yahoo February 2024 bulk-sender compliant.</li>
+  <li><span class="ic">📊</span><strong>SEO structured data enhancements</strong> — tenant super-admins can set <code>seo_organization_type</code> (LocalBusiness, NonprofitOrganization, EducationalOrganization, etc.) overriding the global Schema.org <code>@type</code>. Geo meta tags (<code>geo.region</code>, <code>geo.country</code>, ICBM lat/long) emitted when coordinates are set. <code>LocalBusiness</code> tenants get an <code>areaServed</code> block. <code>@id</code> anchor added for cross-referencing.</li>
   <li><span class="ic">🛡️</span><strong>GDPR compliance suite</strong> — data requests, consent management, cookie consent, breach tracking, and a full audit log.</li>
   <li><span class="ic">🚨</span><strong>Fraud &amp; abuse detection</strong> — automated suspicious activity alerts and content moderation.</li>
   <li><span class="ic">🏢</span><strong>Enterprise RBAC</strong> — role-based access control across 13+ modules with a full permission matrix.</li>
-  <li><span class="ic">♿</span><strong>WCAG 2.1 AA accessibility compliance.</strong></li>
+  <li><span class="ic">♿</span><strong>WCAG 2.1 AA accessibility compliance</strong> — enforced in the React frontend and the GOV.UK accessible interface.</li>
   <li><span class="ic">🌍</span><strong>11 languages</strong> — English, Irish, German, French, Italian, Portuguese, Spanish, Dutch, Polish, Japanese, and <strong>Arabic with full right-to-left layout.</strong></li>
-  <li><span class="ic">🔎</span><strong>SEO at build time</strong> — 19+ public pages pre-rendered with Playwright, structured data, sitemaps, and Prerender.io fallback for dynamic routes.</li>
+  <li><span class="ic">🔎</span><strong>SEO at build time</strong> — 19+ public pages fully self-hosted pre-rendered with Playwright, structured data, sitemaps, and nginx-served HTML for bots and users alike — no third-party prerender dependency.</li>
   <li><span class="ic">📊</span><strong>Admin panel</strong> — tenant configuration, algorithm controls, diagnostics, cron job monitoring, and email deliverability tracking.</li>
-  <li><span class="ic">🏗️</span><strong>Tenant hierarchy</strong> — parent-child tenant relationships with feature toggling per tenant.</li>
+  <li><span class="ic">🏗️</span><strong>Tenant hierarchy with domain inheritance</strong> — parent-child tenant relationships with feature toggling and sub-tenant URLs at the parent domain.</li>
   <li><span class="ic">🧪</span><strong>500+ PHPUnit tests</strong> (money flow, webhooks, federation, groups, marketplace) plus Vitest suites — run on every commit.</li>
   <li><span class="ic">📦</span><strong>Fully Dockerized.</strong></li>
 </ul>
@@ -252,7 +262,7 @@
 <h2>Global Federation: Connecting Timebanks Worldwide</h2>
 
 <div class="callout">
-  <p><strong>V1.5 ships with native adapters for four federation protocols</strong> — Nexus (our own), the complete <a href="https://github.com/komunitin/komunitin-spec">Komunitin specification</a> (all 15 endpoints), the <a href="https://creditcommons.org/">Credit Commons Protocol</a> (11 endpoints, CEN-compatible mutual credit with a P→V→C→E→X transaction lifecycle), and <strong>TimeOverflow</strong>. Two-way sync across 9 entity types (members, listings, events, groups, connections, volunteering, reviews, transfers, messages), event-driven push, reputation portability, and end-to-end integration test coverage.</p>
+  <p><strong>V1.5.1 ships with native adapters for four federation protocols</strong> — Nexus (our own), the complete <a href="https://github.com/komunitin/komunitin-spec">Komunitin specification</a> (all 15 endpoints), the <a href="https://creditcommons.org/">Credit Commons Protocol</a> (11 endpoints, CEN-compatible mutual credit with a P→V→C→E→X transaction lifecycle), and <strong>TimeOverflow</strong>. Two-way sync across 9 entity types (members, listings, events, groups, connections, volunteering, reviews, transfers, messages), event-driven push, reputation portability, and end-to-end integration test coverage.</p>
 </div>
 
 <p>The vision is simple but ambitious: <strong>a global time bank where external federation partners can discover each other, exchange services, and trade time credits across platforms and across borders.</strong></p>
@@ -290,7 +300,7 @@
 <p>While V1 represents years of refinement and real-world use, we're already building the next generation.</p>
 <p><strong>Project NEXUS V2</strong> is in early-stage development, exploring:</p>
 <ul>
-  <li>Modern microservices architecture (ASP.NET Core 8 + React 18).</li>
+  <li>Modern microservices architecture (ASP.NET Core 8).</li>
   <li>Enhanced scalability for global networks.</li>
   <li>Advanced AI integration for matching and insights.</li>
   <li><strong>Extended Federation Protocol</strong> — building on V1's Federation API with deeper cross-platform credit exchange and expanded global network capabilities.</li>
@@ -336,7 +346,7 @@
 <p>Welcome to Project NEXUS. Welcome home.</p>
 
 <div class="footer-signoff">
-  Project NEXUS V1.5 · Built by Jasper Ford · Licensed under AGPL-3.0-or-later<br>
+  Project NEXUS V1.5.1 · Built by Jasper Ford · Licensed under AGPL-3.0-or-later<br>
   Get started: <a href="https://github.com/jasperfordesq-ai/nexus-v1">github.com/jasperfordesq-ai/nexus-v1</a> &nbsp;·&nbsp;
   See it live: <a href="https://app.project-nexus.ie">app.project-nexus.ie</a>
 </div>

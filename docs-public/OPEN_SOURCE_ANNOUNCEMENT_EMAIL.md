@@ -1,8 +1,8 @@
 # Project NEXUS V1.5.1 — Open Source Announcement Email
 
-**Date:** 2026-05-21 (updated)
+**Date:** 2026-05-25 (updated)
 **Status:** Ready to send
-**Purpose:** Public announcement of Project NEXUS V1.5.1 open source release — refreshed with Spring 2026 feature work (Marketplace, Donations, Identity Verification, four-protocol Federation layer including Credit Commons / CEN, 11 languages, self-hosted SEO pre-rendering, registration fraud prevention, and a hardened security/payments layer).
+**Purpose:** Public announcement of Project NEXUS V1.5.1 open source release — refreshed with Spring 2026 feature work (Marketplace, Donations, Identity Verification, four-protocol Federation layer including Credit Commons / CEN, 11 languages, self-hosted SEO pre-rendering, hierarchical domain inheritance, proximity search, accessible GOV.UK Alpha frontend, email deliverability suite with SendGrid webhook processing, mobile push from every notification path, RFC-compliant one-click unsubscribe, SEO structured data enhancements, registration fraud prevention, and a hardened security/payments layer).
 
 ---
 
@@ -32,7 +32,8 @@ Here's the full breakdown:
 
 **Core Platform:**
 - ⏰ **Timebanking Engine** — Full credit exchange system with wallet, transactions, and broker controls
-- 🏢 **Multi-Tenancy** — Host unlimited communities on a single platform, each with their own branding and configuration; hierarchical parent-child tenant relationships with domain inheritance
+- 🏢 **Multi-Tenancy** — Host unlimited communities on a single platform, each with their own branding and configuration; hierarchical parent-child tenant relationships with feature toggling per tenant
+- 🌳 **Hierarchical Domain Inheritance** — Sub-tenants accessible at `parent.domain/child-slug` (e.g. `timebanking.uk/cardiff`) alongside their own app URL. Full sitemap support, the prerender pipeline fires at the parent domain, and all email and notification links generate correctly. No DNS changes required beyond pointing the parent domain at the platform.
 - 🎯 **Smart Matching** — AI-powered matching with semantic embeddings, collaborative filtering, availability scheduling, and learned preferences
 - 💬 **Real-Time Messaging** — Private conversations with Pusher WebSocket integration and real-time presence/online status
 - 📱 **Progressive Web App + Native Mobile App** — Install as a PWA on any device, or deploy as a native iOS/Android app via Capacitor
@@ -40,6 +41,7 @@ Here's the full breakdown:
 
 **Member Experience:**
 - 📋 **Service Listings** — Post offers and requests, browse and smart-match listings
+- 📍 **Proximity "Near me" Search** — Haversine-formula distance filtering across listings, events, and members with nearest-first ordering, correct pagination on Load More, and a live distance badge on every result. Works with any coordinate worldwide.
 - 🛒 **Marketplace** — Standalone classifieds module with Stripe Connect payouts, orders, seller profiles, and AI-powered reply suggestions
 - 💳 **Donations** — One-off and recurring donations via Stripe with full dashboards and receipts for organisations
 - 🪪 **Identity Verification** — Optional Stripe Identity flow (document + selfie + name/DOB matching) with a verified-member badge on your profile
@@ -54,7 +56,7 @@ Here's the full breakdown:
 - 🏆 **Gamification** — Verification badges, journeys, XP, leaderboards, achievements, challenges, streaks, XP shop rewards, community dashboard, and seasonal leaderboard competitions
 - 🎯 **Goals & Impact** — Track personal goals and community impact with mentoring and deliverables tracking
 - 💡 **Ideation Challenges** — Innovation hub with campaigns, ideas, voting, and outcomes tracking
-- 🤝 **Volunteering** — Manage volunteer opportunities, track hours, check-ins, expenses, certificates, wellbeing monitoring, and emergency alerts — **now with a volunteer organisation time-credit wallet: member deposits, admin adjustments, and time-credit payouts to volunteers on approved hours**
+- 🙋 **Volunteering** — Manage volunteer opportunities, track hours, check-ins, expenses, certificates, wellbeing monitoring, and emergency alerts — **now with a volunteer organisation time-credit wallet: member deposits, admin adjustments, and time-credit payouts to volunteers on approved hours**
 - 💼 **Job Vacancies** — Full recruitment module with alerts, analytics, and public RSS/JSON job feed syndication for aggregators
 - 🏛️ **Organisations** — Company and employer profiles with sub-accounts and a dedicated organisation wallet
 - 👨‍👩‍👧 **Sub-Accounts / Family Accounts** — Parent-child account relationships for household and family management
@@ -75,6 +77,7 @@ Here's the full breakdown:
 - 📄 **Legal Hub** — Versioned legal documents with acceptance gates and audit trail
 - 📊 **Impact Reports** — SROI analysis, member outcome reports, and social impact case studies
 - 🏥 **Social Prescribing** — Information and tooling for community health integration workflows
+- ♿ **Accessible Frontend (GOV.UK Alpha)** — A parallel HTML-first, progressively-enhanced accessible interface at `accessible.project-nexus.ie` built on official `govuk-frontend v6`. Designed for users who benefit from a keyboard-first, screen-reader-optimised experience. WCAG 2.1 AA. All tenant modules, authentication, and registration fully supported.
 
 **Trust & Reputation:**
 - ✅ **Member Verification Badges** — Verified status indicators on member profiles
@@ -95,7 +98,7 @@ Here's the full breakdown:
 - 📊 **Algorithm Health Dashboard** — Live admin monitoring and tuning of all ranking systems
 
 **Modern Tech Stack:**
-- Frontend: React 18 + TypeScript + HeroUI + Tailwind CSS 4
+- Frontend: React 19 + TypeScript + HeroUI v3 + Tailwind CSS 4
 - Backend: Laravel 12 + PHP 8.2+
 - Database: MariaDB 10.11
 - Search: Meilisearch v1.7
@@ -105,23 +108,26 @@ Here's the full breakdown:
 - API: OpenAPI 3.0 specification with Swagger UI docs
 
 **Built for Production:**
-- 🔐 Enterprise security — CSRF, rate limiting, TOTP 2FA, WebAuthn passkeys, CSP nonces, a CORS allowlist, Form Request validation, email verification gates, and invite-code registration
-- 🛡️ Registration fraud prevention — multi-field honeypot, MX-record checks on email domains, disposable-email blocklist, per-IP daily signup cap, per-tenant hourly circuit breaker with admin one-click resume, and verified place-autocomplete location requirement
-- 💳 Stripe payments layer — subscriptions, donations, marketplace (Connect), and identity verification, with idempotent webhook handling and deep money-flow test coverage
-- 🛡️ GDPR compliance suite — data requests, consent management, cookie consent, breach tracking, and full audit log
-- 🚨 Fraud & abuse detection — automated suspicious activity alerts and content moderation
-- 🛡️ Insurance certificate tracking — volunteer insurance management and verification
-- 🏢 Enterprise RBAC — role-based access control across 13+ modules with a full permission matrix
-- ♿ WCAG 2.1 AA accessibility compliance
-- 🌍 Multi-language support — **11 languages**: English, Irish, German, French, Italian, Portuguese, Spanish, Dutch, Polish, Japanese, and **Arabic with full right-to-left layout**
-- 🔎 SEO at build time — 19+ public pages fully self-hosted pre-rendered with Playwright, structured data (organization type, geo meta tags, lat/lng schema), sitemaps, and nginx-served HTML for bots and users alike
-- 🚀 Guided onboarding wizard for new members
-- 📊 Comprehensive admin panel with algorithm controls, diagnostics, cron job monitoring, and email deliverability monitoring
-- 🏗️ Tenant hierarchy — parent-child tenant relationships with feature toggling per tenant
-- 📧 Email webhook processing — SendGrid bounce, complaint, and delivery event handling
-- 🧪 500+ PHPUnit tests (money flow, webhooks, federation, groups, marketplace) plus Vitest suites
-- ⚙️ Queue watchdog — automated cron recovery for dead Horizon workers; zero manual intervention on transient queue failures
-- 📦 Fully Dockerized
+- 🔐 **Enterprise security** — CSRF, rate limiting, TOTP 2FA, WebAuthn passkeys, CSP nonces, a CORS allowlist, Form Request validation, email verification gates, and invite-code registration
+- 🛡️ **Registration fraud prevention** — multi-field honeypot, MX-record checks on email domains, disposable-email blocklist, per-IP daily signup cap, per-tenant hourly circuit breaker with admin one-click resume, and verified place-autocomplete location requirement
+- 💳 **Stripe payments layer** — subscriptions, donations, marketplace (Connect), and identity verification, with idempotent webhook handling and deep money-flow test coverage
+- 📧 **Email deliverability suite** — every `Mailer::send()` writes a row to an `email_log` audit table (status: queued / sent / delivered / bounced / failed / suppressed). Real-time SendGrid webhook processing advances delivery status and populates the suppression list. Admin dashboard at `/admin/email-deliverability` shows per-tenant delivered %, bounced %, and open rates over 1 / 7 / 30 / 90 days with a filterable log feed and one-click suppression list management synced back to SendGrid.
+- 📲 **Mobile push from every notification path** — Firebase Cloud Messaging fully wired in parallel to web push across all notification types: direct messages, connection requests, volunteer status, @mentions, and group chat. Honours per-user `push_enabled` preference.
+- 🔔 **One-click email unsubscribe** — RFC-compliant `List-Unsubscribe` and `List-Unsubscribe-Post` headers auto-attached to every outbound email. HMAC-signed category tokens cover 10 notification preference categories. Gmail / Yahoo February 2024 bulk-sender compliant.
+- 📊 **SEO structured data enhancements** — tenant super-admins can set `seo_organization_type` (LocalBusiness, NonprofitOrganization, EducationalOrganization, etc.) overriding the global Schema.org `@type`. Geo meta tags (`geo.region`, `geo.country`, ICBM lat/long) emitted when coordinates are set. `LocalBusiness` tenants get an `areaServed` block. `@id` anchor added for cross-referencing.
+- 🛡️ **GDPR compliance suite** — data requests, consent management, cookie consent, breach tracking, and full audit log
+- 🚨 **Fraud & abuse detection** — automated suspicious activity alerts and content moderation
+- 🛡️ **Insurance certificate tracking** — volunteer insurance management and verification
+- 🏢 **Enterprise RBAC** — role-based access control across 13+ modules with a full permission matrix
+- ♿ **WCAG 2.1 AA accessibility compliance** — enforced in the React frontend and the GOV.UK accessible interface
+- 🌍 **Multi-language support** — **11 languages**: English, Irish, German, French, Italian, Portuguese, Spanish, Dutch, Polish, Japanese, and **Arabic with full right-to-left layout**
+- 🔎 **SEO at build time** — 19+ public pages fully self-hosted pre-rendered with Playwright, structured data (organization type, geo meta tags, lat/lng schema), sitemaps, and nginx-served HTML for bots and users alike — no third-party prerender dependency
+- 🚀 **Guided onboarding wizard** for new members
+- 📊 **Comprehensive admin panel** with algorithm controls, diagnostics, cron job monitoring, and email deliverability monitoring
+- 🏗️ **Tenant hierarchy with domain inheritance** — parent-child tenant relationships with feature toggling and sub-tenant URLs at the parent domain
+- 🧪 **500+ PHPUnit tests** (money flow, webhooks, federation, groups, marketplace) plus Vitest suites
+- ⚙️ **Queue watchdog** — automated cron recovery for dead Horizon workers; zero manual intervention on transient queue failures
+- 📦 **Fully Dockerized**
 
 ---
 
@@ -134,13 +140,13 @@ This is where it gets exciting.
 Imagine a member in Dublin helping someone in São Paulo with web design, while a member in Tokyo teaches Irish students origami — all through interconnected timebanking platforms, all valuing every hour equally.
 
 The Federation API — available in V1.5.1 right now — enables:
-- **Cross-platform discovery** — Find members and services on partner timebanking platforms globally
-- **Interoperable time credit exchange** — Trade time credits between different timebanking systems seamlessly
-- **Federation Neighborhoods** — Geographically grouped clusters of federated communities for regional coordination
-- **Credit Agreements** — Negotiated exchange rate terms between federated communities
-- **External federation partnerships** — Any timebanking platform worldwide can connect to the network via standardized API endpoints
-- **Global marketplace** — A unified view of offers and requests spanning multiple platforms and communities
-- **Trust & verification** — Federated reputation and review systems that travel with members across platforms
+- 🌍 **Cross-platform discovery** — Find members and services on partner timebanking platforms globally
+- 🔄 **Interoperable time credit exchange** — Trade time credits between different timebanking systems seamlessly
+- 🏘️ **Federation Neighborhoods** — Geographically grouped clusters of federated communities for regional coordination
+- 📜 **Credit Agreements** — Negotiated exchange rate terms between federated communities
+- 🤝 **External federation partnerships** — Any timebanking platform worldwide can connect to the network via standardized API endpoints
+- 🛒 **Global marketplace** — A unified view of offers and requests spanning multiple platforms and communities
+- 🏅 **Trust & verification** — Federated reputation and review systems that travel with members across platforms
 
 This isn't just about connecting NEXUS communities to each other — it's about building the **open infrastructure for a worldwide timebanking economy.** V2 will extend and deepen this foundation further. We're inviting timebanking platforms, community currency projects, and mutual aid networks everywhere to join us in defining this standard together.
 
@@ -181,7 +187,7 @@ Clone it, deploy it, break it, improve it. The full platform is yours to explore
 While V1 represents years of refinement and real-world use, we're already building the next generation.
 
 **Project NEXUS V2** is in early-stage development, exploring:
-- Modern microservices architecture (ASP.NET Core 8 + React 18)
+- Modern microservices architecture (ASP.NET Core 8)
 - Enhanced scalability for global networks
 - Advanced AI integration for matching and insights
 - **Extended Federation Protocol** — building on V1's Federation API with deeper cross-platform credit exchange, richer interoperability standards, and expanded global network capabilities
