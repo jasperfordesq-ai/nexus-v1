@@ -6,11 +6,11 @@
 
 | Item | Value |
 |------|-------|
-| **Framework** | React 18 + TypeScript (strict) |
-| **Component Library** | HeroUI (`@heroui/react`) |
+| **Framework** | React 19 + TypeScript (strict) |
+| **Component Library** | HeroUI v3 (`@heroui/react`) |
 | **CSS** | Tailwind CSS 4 (`@tailwindcss/vite` plugin) |
 | **Icons** | Lucide React (`lucide-react`) |
-| **Animation** | Framer Motion |
+| **Animation** | Framer Motion (being removed — HeroUI v3 migration in progress) |
 | **Rich Text** | Lexical editor |
 | **Charts** | Recharts |
 | **Routing** | React Router v6 (tenant slug support) |

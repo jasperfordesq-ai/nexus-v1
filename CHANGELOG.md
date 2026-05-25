@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **React upgraded from 18 to 19.** Full production upgrade including React 19 concurrent features, updated type definitions (`@types/react` 19.x), and Vitest/testing-library compatibility fixes. All 223 usages of deprecated APIs resolved. Build, type-check, and smoke tests pass.
+
+- **HeroUI v3 migration — incremental (phases 1–5 of 10 complete).** Frontend component library migrated from v2 to v3 using `@heroui-v3/react` alias coexistence strategy so the app stays functional throughout. Phases complete: (1) v3 aliases and styles installed; (2) `Divider` → `Separator` (126 files); (3) removed v2 components replaced — `Code` and `Snippet` with app-local wrappers, `Image` with native `img`; (4) `Progress` → `ProgressBar` compound component via app-local wrapper (51 files); (5) `TimeInput` → `TimeField` compound component via app-local wrapper (3 files). Remaining phases cover `Dropdown*`, `AccordionItem`, `SelectItem` (197 files), `useDisclosure` → `useOverlayState`, and final provider/deps cleanup.
+
 ### Fixed
 
 - **Welcome credits now granted when admin approves via status change.** Admins were approving members by editing their status to "active" (the user detail edit page) rather than using the dedicated Approve button. The generic `update()` endpoint set `is_approved=1` but never called `grantWelcomeCredits`, so no starting balance was applied. Fix: detect the `pending → active` transition in `update()` and run the same credit-grant + welcome-email + in-app-notification flow as the dedicated `/approve` endpoint. Also fixed: `grantWelcomeCredits` was reading the `welcome_credits` tenant-settings key (which doesn't exist) instead of `wallet.starting_balance` (the key the admin Settings page actually writes). The code now reads `wallet.starting_balance` with a fallback chain so every tenant resolves the correct value. Backfilled 5 credits to the one user who had been approved but received nothing.
