@@ -22,6 +22,7 @@ export { TimeInput, type TimeInputProps, type TimeInputValue } from './TimeInput
 export { DatePicker, type DatePickerProps } from './DatePicker';
 export { Button, type ButtonProps } from './Button';
 export { ButtonGroup, type ButtonGroupProps } from './ButtonGroup';
+export { Badge, type BadgeProps } from './Badge';
 export { Chip, type ChipProps } from './Chip';
 export { Spinner, type SpinnerProps } from './Spinner';
 export { Skeleton, type SkeletonProps } from './Skeleton';

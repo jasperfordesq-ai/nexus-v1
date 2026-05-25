@@ -11,7 +11,7 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Badge } from '@heroui/react';
+import { Badge } from '@/components/ui';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import Clock from 'lucide-react/icons/clock';
 import Coins from 'lucide-react/icons/coins';

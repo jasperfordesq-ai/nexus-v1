@@ -15,7 +15,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Badge } from '@heroui/react';
+import { Badge } from '@/components/ui';
 import Search from 'lucide-react/icons/search';
 import MessageSquare from 'lucide-react/icons/message-square';
 import Circle from 'lucide-react/icons/circle';

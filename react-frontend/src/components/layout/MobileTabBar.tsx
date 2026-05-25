@@ -14,7 +14,7 @@ import React, { useState, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Badge } from '@heroui/react';
+import { Badge } from '@/components/ui';
 import House from 'lucide-react/icons/house';
 import ListTodo from 'lucide-react/icons/list-todo';
 import Plus from 'lucide-react/icons/plus';
