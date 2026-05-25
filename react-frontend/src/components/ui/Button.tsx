@@ -10,6 +10,7 @@ import {
   Spinner as HeroUISpinner,
   type ButtonProps as HeroUIButtonProps,
 } from '@heroui/react';
+import { buttonVariants } from '@heroui/styles';
 
 type V2ButtonColor =
   | 'default'
@@ -124,10 +125,6 @@ function combineClasses(...classes: Array<string | false | undefined>): string |
   return className || undefined;
 }
 
-function buttonSizeClass(size?: ButtonProps['size']): string {
-  return size === 'sm' || size === 'lg' ? `button--${size}` : 'button--md';
-}
-
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
@@ -194,11 +191,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           } as never)
         : content;
       const directClassName = combineClasses(
-        'button',
-        buttonSizeClass(size),
-        `button--${mappedVariant}`,
+        buttonVariants({
+          fullWidth,
+          isIconOnly,
+          size,
+          variant: mappedVariant,
+        }),
         fullWidth && 'w-full',
-        isIconOnly && 'button--icon-only',
         classNames?.base,
         radiusClass(radius),
         className,
