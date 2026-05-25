@@ -1,4 +1,4 @@
-import { CardBody, Card, Button, Spinner, Input, Textarea } from '@/components/ui';
+import { CardBody, Card, Button, Spinner, Input, Textarea, Checkbox } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,7 +12,7 @@ import { CardBody, Card, Button, Spinner, Input, Textarea } from '@/components/u
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Checkbox } from '@heroui/react';
+
 import Save from 'lucide-react/icons/save';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { usePageTitle } from '@/hooks';

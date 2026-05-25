@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Progress, Button, Input } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Progress, Button, Input, Checkbox } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -18,7 +18,7 @@ import { Select, SelectItem, GlassCard, Progress, Button, Input } from '@/compon
 
 import { useState, useEffect, useRef, useCallback, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Checkbox } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import { motion,
   AnimatePresence } from 'framer-motion';

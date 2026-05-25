@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input, Checkbox, CheckboxGroup } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -19,7 +19,7 @@ import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input } from '@/c
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Checkbox, CheckboxGroup } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import Search from 'lucide-react/icons/search';
 import SlidersHorizontal from 'lucide-react/icons/sliders-horizontal';

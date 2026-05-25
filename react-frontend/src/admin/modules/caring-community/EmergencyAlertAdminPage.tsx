@@ -1,6 +1,6 @@
-import { Button, Card, CardBody, CardHeader, Chip, Spinner, Textarea, Input, Select, SelectItem, useDisclosure, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
+import { Button, Card, CardBody, CardHeader, Chip, Spinner, Textarea, Input, Select, SelectItem, useDisclosure, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Checkbox } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
-import { Checkbox } from '@heroui/react';
+
 import { Separator } from '@heroui-v3/react';
 import AlertTriangle from 'lucide-react/icons/alert-triangle';
 import Bell from 'lucide-react/icons/bell';

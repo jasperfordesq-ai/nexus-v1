@@ -1,6 +1,6 @@
-import { Card, CardBody, CardHeader, Button, Input } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Input, Checkbox } from '@/components/ui';
 import { useState, useRef } from 'react';
-import { Checkbox } from '@heroui/react';
+
 import Database from 'lucide-react/icons/database';
 import Play from 'lucide-react/icons/play';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';

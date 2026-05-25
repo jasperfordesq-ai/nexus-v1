@@ -12,10 +12,10 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CheckboxGroup, Checkbox, RadioGroup, Radio } from '@heroui/react';
+import { RadioGroup, Radio } from '@heroui/react';
 import CheckCircle from 'lucide-react/icons/check-circle';
 import ClipboardList from 'lucide-react/icons/clipboard-list';
-import { GlassCard, Button, Spinner, Textarea } from '@/components/ui';
+import { GlassCard, Button, Spinner, Textarea, CheckboxGroup, Checkbox } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useAuth } from '@/contexts';
 import { usePageTitle } from '@/hooks';

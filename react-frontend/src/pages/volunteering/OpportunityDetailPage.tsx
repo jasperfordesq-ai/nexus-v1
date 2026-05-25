@@ -1,4 +1,4 @@
-import { Card, GlassCard, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar } from '@/components/ui';
+import { Card, GlassCard, useDisclosure, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Checkbox } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -14,7 +14,7 @@ import { Card, GlassCard, useDisclosure, Button, Chip, Spinner, Input, Textarea,
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Checkbox } from '@heroui/react';
+
 import MapPin from 'lucide-react/icons/map-pin';
 import Calendar from 'lucide-react/icons/calendar';
 import Clock from 'lucide-react/icons/clock';

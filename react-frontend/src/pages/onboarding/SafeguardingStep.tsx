@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Spinner } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Spinner, Checkbox } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -16,7 +16,7 @@ import { Select, SelectItem, GlassCard, Button, Spinner } from '@/components/ui'
  */
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { Checkbox } from '@heroui/react';
+
 import Shield from 'lucide-react/icons/shield';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import ArrowLeft from 'lucide-react/icons/arrow-left';

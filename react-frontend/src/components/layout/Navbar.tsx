@@ -59,7 +59,7 @@ import Fingerprint from 'lucide-react/icons/fingerprint';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import Bookmark from 'lucide-react/icons/bookmark';
 import Crown from 'lucide-react/icons/crown';
-import Accessibility from 'lucide-react/icons/accessibility';
+import BadgeCheck from 'lucide-react/icons/badge-check';
 import ExternalLink from 'lucide-react/icons/external-link';
 import Download from 'lucide-react/icons/download';
 import { useInstallPrompt,
@@ -85,7 +85,7 @@ import { useHeaderScroll } from '@/hooks/useHeaderScroll';
 import { CARING_COMMUNITY_ROUTE } from '@/pages/caring-community/config';
 import type { TenantFeatures } from '@/types/api';
 
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Avatar } from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, DropdownSection, Button, Avatar, Tooltip } from '@/components/ui';
 interface IdentityStatusResponse {
   has_id_verified_badge: boolean;
 }
@@ -491,17 +491,19 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
               )}
               {isAuthenticated && <span className="text-[var(--border-default)] text-xs select-none shrink-0">|</span>}
               {accessibleFrontendUrl && (
-                <a
-                  href={accessibleFrontendUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center rounded-small text-theme-muted hover:text-theme-primary hover:bg-default/40 h-7 min-w-0 px-2 gap-1 text-xs shrink-0 outline-solid outline-transparent focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2"
-                  aria-label={t('accessibility.accessibility_alpha_new_tab')}
-                >
-                  <Accessibility className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-                  <span className="hidden md:inline">{t('nav.accessibility_alpha')}</span>
-                  <ExternalLink className="hidden lg:block w-3 h-3 shrink-0" aria-hidden="true" />
-                </a>
+                <Tooltip content={t('nav.accessibility_alpha_tooltip')} placement="bottom" delay={300}>
+                  <a
+                    href={accessibleFrontendUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center rounded-small text-theme-muted hover:text-theme-primary hover:bg-default/40 h-7 min-w-0 px-2 gap-1 text-xs shrink-0 outline-solid outline-transparent focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2"
+                    aria-label={t('accessibility.accessibility_alpha_new_tab')}
+                  >
+                    <BadgeCheck className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                    <span className="hidden md:inline">{t('nav.accessibility_alpha')}</span>
+                    <ExternalLink className="hidden lg:block w-3 h-3 shrink-0" aria-hidden="true" />
+                  </a>
+                </Tooltip>
               )}
               <LanguageSwitcher />
               <Button

@@ -1,4 +1,4 @@
-import { Select, SelectItem, Button, Input, Avatar, Tabs, Tab } from '@/components/ui';
+import { Select, SelectItem, Button, Input, Avatar, Tabs, Tab, Checkbox } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -11,7 +11,7 @@ import { Select, SelectItem, Button, Input, Avatar, Tabs, Tab } from '@/componen
  */
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import { Checkbox } from '@heroui/react';
+
 import ClipboardCheck from 'lucide-react/icons/clipboard-check';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import CheckCircle from 'lucide-react/icons/circle-check-big';

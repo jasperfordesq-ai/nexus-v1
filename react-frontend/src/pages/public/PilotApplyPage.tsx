@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Input, Textarea } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Input, Textarea, CheckboxGroup, Checkbox } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -13,7 +13,7 @@ import { Select, SelectItem, GlassCard, Button, Input, Textarea } from '@/compon
 
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { motion } from 'framer-motion';
-import { CheckboxGroup, Checkbox } from '@heroui/react';
+
 import Building from 'lucide-react/icons/building';
 import Globe from 'lucide-react/icons/globe';
 import CheckCircle2 from 'lucide-react/icons/check-circle-2';

@@ -1,4 +1,4 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Input } from '@/components/ui';
+import { Select, SelectItem, GlassCard, Button, Chip, Input, Checkbox, CheckboxGroup } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -18,7 +18,7 @@ import { Select, SelectItem, GlassCard, Button, Chip, Input } from '@/components
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Checkbox, CheckboxGroup } from '@heroui/react';
+
 import Search from 'lucide-react/icons/search';
 import SlidersHorizontal from 'lucide-react/icons/sliders-horizontal';
 import RotateCcw from 'lucide-react/icons/rotate-ccw';

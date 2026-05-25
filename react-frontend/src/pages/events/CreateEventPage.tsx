@@ -1,4 +1,4 @@
-import { Select, SelectItem, TimeInput, type TimeInputValue, GlassCard, Button, Chip, Input, Textarea, Switch } from '@/components/ui';
+import { Select, SelectItem, TimeInput, type TimeInputValue, GlassCard, Button, Chip, Input, Textarea, Switch, CheckboxGroup, Checkbox } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -12,7 +12,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { DatePicker, CheckboxGroup, Checkbox } from '@heroui/react';
+import { DatePicker } from '@heroui/react';
 import type { DateInputValue } from '@heroui/react';
 import { parseDate, parseTime, today, getLocalTimeZone } from '@internationalized/date';
 import Save from 'lucide-react/icons/save';

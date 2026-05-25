@@ -57,7 +57,7 @@ import Sun from 'lucide-react/icons/sun';
 import Moon from 'lucide-react/icons/moon';
 import Fingerprint from 'lucide-react/icons/fingerprint';
 import Bookmark from 'lucide-react/icons/bookmark';
-import Accessibility from 'lucide-react/icons/accessibility';
+import BadgeCheck from 'lucide-react/icons/badge-check';
 import ExternalLink from 'lucide-react/icons/external-link';
 import Download from 'lucide-react/icons/download';
 import { InstallAppButton } from '@/components/pwa/InstallAppButton';
@@ -577,7 +577,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                       aria-label={t('accessibility.accessibility_alpha_new_tab')}
                       onClick={onClose}
                     >
-                      <Accessibility className="w-4 h-4 shrink-0" aria-hidden="true" />
+                      <BadgeCheck className="w-4 h-4 shrink-0" aria-hidden="true" />
                       <span className="truncate">{t('nav.accessibility_alpha')}</span>
                       <ExternalLink className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                     </a>
