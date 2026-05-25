@@ -52,9 +52,9 @@ jest.mock('@/lib/hooks/useTheme', () => ({
   }),
 }));
 
-const mockUseApi = jest.fn();
-jest.mock('@/lib/hooks/useApi', () => ({
-  useApi: (...args: unknown[]) => mockUseApi(...args),
+const mockUsePaginatedApi = jest.fn();
+jest.mock('@/lib/hooks/usePaginatedApi', () => ({
+  usePaginatedApi: (...args: unknown[]) => mockUsePaginatedApi(...args),
 }));
 
 jest.mock('expo-haptics', () => ({
@@ -64,12 +64,27 @@ jest.mock('expo-haptics', () => ({
   NotificationFeedbackType: { Success: 'success', Warning: 'warning' },
 }));
 
+// Make Swipeable transparent so FlatList items render their children in tests
+jest.mock('react-native-gesture-handler', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return {
+    Swipeable: ({ children }: { children: React.ReactNode }) => React.createElement(View, null, children),
+    GestureHandlerRootView: ({ children }: { children: React.ReactNode }) => React.createElement(View, null, children),
+    PanGestureHandler: ({ children }: { children: React.ReactNode }) => React.createElement(View, null, children),
+    State: {},
+  };
+});
+
 jest.mock('@expo/vector-icons', () => ({
   Ionicons: 'View',
 }));
 
 jest.mock('@/lib/api/messages', () => ({
   getConversations: jest.fn(),
+  deleteConversation: jest.fn().mockResolvedValue(undefined),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  displayName: (user: any) => user?.name ?? 'Unknown',
 }));
 
 jest.mock('@/lib/utils/formatRelativeTime', () => ({
@@ -87,10 +102,18 @@ jest.mock('@/components/ui/Skeleton', () => ({
 
 import MessagesScreen from './messages';
 
-const defaultApiState = { data: null, isLoading: false, error: null, refresh: jest.fn() };
+const defaultPaginatedState = {
+  items: [],
+  isLoading: false,
+  isLoadingMore: false,
+  error: null,
+  hasMore: false,
+  loadMore: jest.fn(),
+  refresh: jest.fn(),
+};
 
 beforeEach(() => {
-  mockUseApi.mockReturnValue(defaultApiState);
+  mockUsePaginatedApi.mockReturnValue(defaultPaginatedState);
 });
 
 const mockConversation = {
@@ -116,11 +139,9 @@ describe('MessagesScreen', () => {
   });
 
   it('does not show empty text while loading', () => {
-    mockUseApi.mockReturnValueOnce({
-      data: null,
+    mockUsePaginatedApi.mockReturnValue({
+      ...defaultPaginatedState,
       isLoading: true,
-      error: null,
-      refresh: jest.fn(),
     });
 
     const { queryByText } = render(<MessagesScreen />);
@@ -128,11 +149,9 @@ describe('MessagesScreen', () => {
   });
 
   it('renders conversation rows when conversations are loaded', () => {
-    mockUseApi.mockReturnValueOnce({
-      data: { data: [mockConversation] },
-      isLoading: false,
-      error: null,
-      refresh: jest.fn(),
+    mockUsePaginatedApi.mockReturnValue({
+      ...defaultPaginatedState,
+      items: [mockConversation],
     });
 
     const { getByText } = render(<MessagesScreen />);
@@ -141,11 +160,9 @@ describe('MessagesScreen', () => {
   });
 
   it('shows unread badge on conversation with unread messages', () => {
-    mockUseApi.mockReturnValueOnce({
-      data: { data: [{ ...mockConversation, unread_count: 4 }] },
-      isLoading: false,
-      error: null,
-      refresh: jest.fn(),
+    mockUsePaginatedApi.mockReturnValue({
+      ...defaultPaginatedState,
+      items: [{ ...mockConversation, unread_count: 4 }],
     });
 
     const { getByText } = render(<MessagesScreen />);
@@ -153,11 +170,9 @@ describe('MessagesScreen', () => {
   });
 
   it('shows error message with Retry when conversations fail to load', () => {
-    mockUseApi.mockReturnValueOnce({
-      data: null,
-      isLoading: false,
+    mockUsePaginatedApi.mockReturnValue({
+      ...defaultPaginatedState,
       error: 'Could not load messages.',
-      refresh: jest.fn(),
     });
 
     const { getByText } = render(<MessagesScreen />);
@@ -166,16 +181,12 @@ describe('MessagesScreen', () => {
   });
 
   it('prefixes own last message with "You: "', () => {
-    mockUseApi.mockReturnValueOnce({
-      data: {
-        data: [{
-          ...mockConversation,
-          last_message: { body: 'Sure, on my way!', created_at: '2026-03-20T15:00:00Z', is_own: true },
-        }],
-      },
-      isLoading: false,
-      error: null,
-      refresh: jest.fn(),
+    mockUsePaginatedApi.mockReturnValue({
+      ...defaultPaginatedState,
+      items: [{
+        ...mockConversation,
+        last_message: { body: 'Sure, on my way!', created_at: '2026-03-20T15:00:00Z', is_own: true },
+      }],
     });
 
     const { getByText } = render(<MessagesScreen />);
@@ -183,11 +194,9 @@ describe('MessagesScreen', () => {
   });
 
   it('shows relative timestamp next to the last message', () => {
-    mockUseApi.mockReturnValueOnce({
-      data: { data: [mockConversation] },
-      isLoading: false,
-      error: null,
-      refresh: jest.fn(),
+    mockUsePaginatedApi.mockReturnValue({
+      ...defaultPaginatedState,
+      items: [mockConversation],
     });
 
     const { getByText } = render(<MessagesScreen />);

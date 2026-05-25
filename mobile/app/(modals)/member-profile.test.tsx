@@ -79,6 +79,10 @@ jest.mock('@/lib/api/members', () => ({
   getMember: jest.fn(),
 }));
 
+jest.mock('@/lib/hooks/useAuth', () => ({
+  useAuth: () => ({ user: { id: 1, name: 'Test User' }, isAuthenticated: true }),
+}));
+
 jest.mock('@/components/ui/Avatar', () => 'View');
 jest.mock('@/components/ui/LoadingSpinner', () => () => null);
 

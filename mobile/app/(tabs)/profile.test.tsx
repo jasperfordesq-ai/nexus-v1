@@ -47,6 +47,7 @@ jest.mock('react-i18next', () => ({
         'skills': 'Skills & Endorsements',
         'federation': 'Federation',
         'common:buttons.cancel': 'Cancel',
+        'common:attribution': 'Project NEXUS is open-source software licensed under AGPL-3.0-or-later.',
       };
       return map[key] ?? key;
     },

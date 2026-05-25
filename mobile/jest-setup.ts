@@ -116,15 +116,47 @@ jest.mock('expo-secure-store', () => ({
 jest.mock('expo-haptics', () => ({
   impactAsync: jest.fn().mockResolvedValue(undefined),
   notificationAsync: jest.fn().mockResolvedValue(undefined),
+  selectionAsync: jest.fn().mockResolvedValue(undefined),
   ImpactFeedbackStyle: { Light: 'light', Medium: 'medium', Heavy: 'heavy' },
   NotificationFeedbackType: { Success: 'success', Warning: 'warning', Error: 'error' },
 }));
+
+// Mock @/lib/haptics globally so Button.tsx and other components get complete
+// ImpactFeedbackStyle/NotificationFeedbackType enums even when individual test
+// files partially override the expo-haptics mock.
+jest.mock('@/lib/haptics', () => ({
+  impactAsync: jest.fn().mockResolvedValue(undefined),
+  notificationAsync: jest.fn().mockResolvedValue(undefined),
+  selectionAsync: jest.fn().mockResolvedValue(undefined),
+  ImpactFeedbackStyle: { Light: 'light', Medium: 'medium', Heavy: 'heavy' },
+  NotificationFeedbackType: { Success: 'success', Warning: 'warning', Error: 'error' },
+}));
+
+// Mock react-native-safe-area-context so screens using useSafeAreaInsets
+// work without a SafeAreaProvider in the test tree.
+jest.mock('react-native-safe-area-context', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  const insets = { top: 0, right: 0, bottom: 0, left: 0 };
+  return {
+    useSafeAreaInsets: () => insets,
+    SafeAreaProvider: ({ children }: { children: React.ReactNode }) => children,
+    SafeAreaView: View,
+    SafeAreaConsumer: ({ children }: { children: (insets: typeof insets) => React.ReactNode }) =>
+      children(insets),
+    initialWindowMetrics: { insets, frame: { x: 0, y: 0, width: 390, height: 844 } },
+  };
+});
 
 // Mock shared UI components used across screen tests
 jest.mock('@/components/OfflineBanner', () => () => null);
 jest.mock('@/components/TenantBanner', () => () => null);
 jest.mock('@/components/ui/LoadingSpinner', () => () => null);
 jest.mock('@/components/ui/Skeleton', () => ({
+  SkeletonBox: () => null,
+  FeedItemSkeleton: () => null,
+  ConversationSkeleton: () => null,
+  EventCardSkeleton: () => null,
   ExchangeCardSkeleton: () => null,
   ProfileSkeleton: () => null,
   GroupCardSkeleton: () => null,

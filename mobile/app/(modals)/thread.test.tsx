@@ -67,11 +67,17 @@ jest.mock('@/lib/api/messages', () => ({
   getThread: jest.fn(),
   getOrCreateThread: jest.fn(),
   sendMessage: jest.fn().mockResolvedValue({ data: { id: 99 } }),
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  displayName: (user: any) => user?.name ?? 'Unknown',
 }));
 
 jest.mock('expo-haptics', () => ({
   notificationAsync: jest.fn().mockResolvedValue(undefined),
   NotificationFeedbackType: { Success: 'success', Error: 'error' },
+}));
+
+jest.mock('@/lib/hooks/useAuth', () => ({
+  useAuth: () => ({ user: { id: 1, name: 'Test User' }, isAuthenticated: true }),
 }));
 
 jest.mock('@expo/vector-icons', () => ({ Ionicons: 'View' }));

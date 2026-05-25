@@ -56,9 +56,9 @@ jest.mock('@/lib/hooks/useTheme', () => ({
   }),
 }));
 
-const mockUseApi = jest.fn();
-jest.mock('@/lib/hooks/useApi', () => ({
-  useApi: (...args: unknown[]) => mockUseApi(...args),
+const mockUsePaginatedApi = jest.fn();
+jest.mock('@/lib/hooks/usePaginatedApi', () => ({
+  usePaginatedApi: (...args: unknown[]) => mockUsePaginatedApi(...args),
 }));
 
 jest.mock('@/lib/hooks/useDebounce', () => ({
@@ -84,10 +84,18 @@ jest.mock('@/components/OfflineBanner', () => () => null);
 
 import SearchScreen from './search';
 
-const defaultApiState = { data: null, isLoading: false, error: null, refresh: jest.fn() };
+const defaultPaginatedState = {
+  items: [],
+  isLoading: false,
+  isLoadingMore: false,
+  error: null,
+  hasMore: false,
+  loadMore: jest.fn(),
+  refresh: jest.fn(),
+};
 
 beforeEach(() => {
-  mockUseApi.mockReturnValue(defaultApiState);
+  mockUsePaginatedApi.mockReturnValue(defaultPaginatedState);
 });
 
 const mockSearchResult = {
@@ -124,11 +132,9 @@ describe('SearchScreen', () => {
   });
 
   it('renders results when data is provided', () => {
-    mockUseApi.mockReturnValueOnce({
-      data: { data: [mockSearchResult] },
-      isLoading: false,
-      error: null,
-      refresh: jest.fn(),
+    mockUsePaginatedApi.mockReturnValueOnce({
+      ...defaultPaginatedState,
+      items: [mockSearchResult],
     });
 
     const { getByText } = render(<SearchScreen />);
@@ -136,11 +142,9 @@ describe('SearchScreen', () => {
   });
 
   it('renders empty state when query returns no results', () => {
-    mockUseApi.mockReturnValueOnce({
-      data: { data: [] },
-      isLoading: false,
-      error: null,
-      refresh: jest.fn(),
+    mockUsePaginatedApi.mockReturnValueOnce({
+      ...defaultPaginatedState,
+      items: [],
     });
 
     const { getByText } = render(<SearchScreen />);

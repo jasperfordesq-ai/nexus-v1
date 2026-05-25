@@ -4,6 +4,49 @@
 // See NOTICE file for attribution and acknowledgements.
 
 module.exports = {
-    preset: "jest-expo",
-    setupFilesAfterEnv: ["<rootDir>/jest-setup.ts"],
+  preset: 'jest-expo',
+  // React Native Gesture Handler requires its mock setup to run before tests.
+  setupFiles: ['./node_modules/react-native-gesture-handler/jestSetup.js'],
+  setupFilesAfterEnv: ['<rootDir>/jest-setup.ts'],
+  // Custom resolver to stub heroui-native's animation-settings context modules so
+  // components work without HeroUINativeProvider in the test tree.
+  resolver: '<rootDir>/jest-resolver.js',
+
+  // Map react-native-reanimated to a self-contained manual mock so the native
+  // react-native-worklets initialisation (NativeWorklets) is never invoked in tests.
+  moduleNameMapper: {
+    '^react-native-reanimated$': '<rootDir>/__mocks__/react-native-reanimated.js',
+    '^react-native-worklets$': '<rootDir>/__mocks__/react-native-worklets.js',
+  },
+
+  // heroui-native and its peer deps ship as ESM — must be transformed by Babel.
+  // IMPORTANT: No trailing `/` after the alternation group — bare `expo` matches
+  // expo-modules-core, expo-router, etc. (same pattern as jest-expo's own preset).
+  // Second entry prevents the reanimated reentrant-plugin error in multi-platform tests.
+  transformIgnorePatterns: [
+    'node_modules/(?!(' +
+      '\\.pnpm|' +
+      'react-native|' +
+      '@react-native(-community)?|' +
+      'expo|' +
+      '@expo|' +
+      '@expo-google-fonts|' +
+      'react-navigation|' +
+      '@react-navigation|' +
+      '@unimodules|' +
+      'unimodules|' +
+      'sentry-expo|' +
+      '@sentry|' +
+      'native-base|' +
+      'react-native-svg|' +
+      'react-native-reanimated|' +
+      'react-native-gesture-handler|' +
+      '@gorhom|' +
+      'heroui-native|' +
+      'tailwind-variants|' +
+      'nativewind|' +
+      'uniwind' +
+    '))',
+    'node_modules/react-native-reanimated/plugin/',
+  ],
 };
