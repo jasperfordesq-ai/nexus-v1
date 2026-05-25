@@ -17,7 +17,7 @@
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ScrollShadow } from '@heroui/react';
+import { ScrollShadow } from '@/components/ui';
 import { useAuth,
   useTenant } from '@/contexts';
 import { api } from '@/lib/api';

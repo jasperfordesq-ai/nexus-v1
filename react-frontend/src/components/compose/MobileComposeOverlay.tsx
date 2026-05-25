@@ -13,7 +13,7 @@
 
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ScrollShadow } from '@heroui/react';
+import { ScrollShadow } from '@/components/ui';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
 import { useComposeSubmit } from './ComposeSubmitContext';

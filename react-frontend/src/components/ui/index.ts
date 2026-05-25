@@ -24,6 +24,7 @@ export { Button, type ButtonProps } from './Button';
 export { Chip, type ChipProps } from './Chip';
 export { Spinner, type SpinnerProps } from './Spinner';
 export { Skeleton, type SkeletonProps } from './Skeleton';
+export { ScrollShadow, type ScrollShadowProps } from './ScrollShadow';
 export { Checkbox, CheckboxGroup, type CheckboxProps, type CheckboxGroupProps } from './Checkbox';
 export { Radio, RadioGroup, type RadioProps, type RadioGroupProps } from './Radio';
 export { Input, type InputProps } from './Input';

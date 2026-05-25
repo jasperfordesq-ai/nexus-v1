@@ -16,7 +16,7 @@ import { Button, Textarea, Card, CardBody, Chip, Avatar } from '@/components/ui'
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ScrollShadow } from '@heroui/react';
+import { ScrollShadow } from '@/components/ui';
 import Bot from 'lucide-react/icons/bot';
 import BookOpen from 'lucide-react/icons/book-open';
 import Send from 'lucide-react/icons/send';
