@@ -23,7 +23,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Slider } from '@heroui/react';
+import { Slider } from '@/components/ui';
 import Coins from 'lucide-react/icons/coins';
 import Sparkles from 'lucide-react/icons/sparkles';
 import CheckCircle2 from 'lucide-react/icons/circle-check';

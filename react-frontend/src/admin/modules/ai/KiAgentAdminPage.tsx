@@ -6,7 +6,7 @@ import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Input, Modal
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Slider } from '@heroui/react';
+import { Slider } from '@/components/ui';
 import Bot from 'lucide-react/icons/bot';
 import Brain from 'lucide-react/icons/brain';
 import Info from 'lucide-react/icons/info';

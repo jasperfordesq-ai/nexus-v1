@@ -29,6 +29,7 @@ export { Radio, RadioGroup, type RadioProps, type RadioGroupProps } from './Radi
 export { Input, type InputProps } from './Input';
 export { Textarea, type TextareaProps } from './Textarea';
 export { Switch, type SwitchProps } from './Switch';
+export { Slider, type SliderProps } from './Slider';
 export { Tabs, Tab, type TabsProps, type TabProps } from './Tabs';
 export { Tooltip, type TooltipProps } from './Tooltip';
 export { Popover, PopoverTrigger, PopoverContent, type PopoverProps, type PopoverTriggerProps, type PopoverContentProps } from './Popover';
