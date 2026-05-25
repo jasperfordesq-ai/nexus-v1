@@ -5,7 +5,7 @@ import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Select, Selec
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert } from '@heroui/react';
+import { Alert } from '@/components/ui';
 import { Separator } from '@heroui-v3/react';
 import Activity from 'lucide-react/icons/activity';
 import AlertTriangle from 'lucide-react/icons/alert-triangle';

@@ -68,6 +68,8 @@ export type TableBodyProps = Omit<HeroUITableBodyProps, 'renderEmptyState'> & {
 };
 export type TableRowProps = HeroUITablerowProps;
 export type TableCellProps = HeroUITableCellProps;
+export type Selection = HeroUITableContentProps['selectedKeys'];
+export type SortDescriptor = HeroUITableContentProps['sortDescriptor'];
 
 function combineClasses(...classes: Array<string | false | undefined>): string | undefined {
   const className = classes.filter(Boolean).join(' ');

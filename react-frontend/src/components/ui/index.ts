@@ -15,6 +15,8 @@ export { AlgorithmLabel, useAlgorithmInfo } from './AlgorithmLabel';
 export { ImagePlaceholder } from './ImagePlaceholder';
 export { DynamicIcon, ICON_MAP, ICON_NAMES } from './DynamicIcon';
 export { ConfettiCelebration } from './ConfettiCelebration';
+export { Alert, type AlertProps } from './Alert';
+export { Link, type LinkProps } from './Link';
 export { Code, type CodeProps } from './Code';
 export { Snippet, type SnippetProps } from './Snippet';
 export { Progress, type ProgressProps } from './Progress';
@@ -50,6 +52,8 @@ export {
   type TableBodyProps,
   type TableRowProps,
   type TableCellProps,
+  type Selection,
+  type SortDescriptor,
 } from './Table';
 export {
   Card,
