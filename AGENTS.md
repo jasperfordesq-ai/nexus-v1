@@ -16,7 +16,7 @@ This is the single source of truth for project conventions, rules, and workflows
 | **PHP Version** | 8.2+ (API backend only) |
 | **Database** | MariaDB 10.11 (MySQL compatible) |
 | **Cache** | Redis 7+ |
-| **Production Server** | Azure VM `20.224.171.253` |
+| **Production Server** | Azure VM — see `.secrets.local/deploy.env` (`PROD_SSH_HOST`) |
 | **React Frontend URL** | <https://app.project-nexus.ie> |
 | **Accessible Frontend URL** | <https://accessible.project-nexus.ie> |
 | **PHP API URL** | <https://api.project-nexus.ie> |
@@ -445,8 +445,8 @@ Full deployment guide: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
 
 | Item | Value |
 |------|-------|
-| **Host** | `20.224.171.253` (Azure VM) |
-| **SSH** | `ssh -i "C:\ssh-keys\project-nexus.pem" azureuser@20.224.171.253` |
+| **Host** | Azure VM — IP in `.secrets.local/deploy.env` as `PROD_SSH_HOST` |
+| **SSH** | `ssh -i "$PROD_SSH_KEY" azureuser@"$PROD_SSH_HOST"` (see `.secrets.local/deploy.env`) |
 | **Deploy Path** | `/opt/nexus-php/` |
 | **Deploy Script** | `scripts/deploy/bluegreen-deploy.sh` (canonical production deploy engine) |
 | **Legacy Wrapper** | `scripts/safe-deploy.sh` (compatibility shim only; production delegates to blue-green) |
@@ -457,11 +457,13 @@ Full deployment guide: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
 git push origin main
 
 # Step 2: Deploy with the canonical blue-green engine
-ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253 \
+source .secrets.local/deploy.env
+ssh -i "$PROD_SSH_KEY" -o RequestTTY=force "$PROD_SSH_USER@$PROD_SSH_HOST" \
   "cd /opt/nexus-php && sudo bash scripts/deploy/bluegreen-deploy.sh deploy --detach"
 
 # Step 3: Check progress
-ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253 \
+source .secrets.local/deploy.env
+ssh -i "$PROD_SSH_KEY" -o RequestTTY=force "$PROD_SSH_USER@$PROD_SSH_HOST" \
   "cd /opt/nexus-php && sudo bash scripts/deploy/bluegreen-deploy.sh logs"
 
 # Other modes
@@ -561,20 +563,24 @@ Located in `/migrations/` with timestamp naming. **Do not add new legacy SQL mig
 
 **Laravel migrations (preferred):**
 ```bash
-ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253 \
+source .secrets.local/deploy.env
+ssh -i "$PROD_SSH_KEY" -o RequestTTY=force "$PROD_SSH_USER@$PROD_SSH_HOST" \
     "sudo docker exec nexus-php-app php artisan migrate --force"
 ```
 
 **Legacy SQL migrations (if needed):**
 ```bash
 # Step 1 — SCP the file to the server (from local machine)
-scp -i "C:\ssh-keys\project-nexus.pem" migrations/your_file.sql \
-    azureuser@20.224.171.253:/opt/nexus-php/migrations/
+source .secrets.local/deploy.env
+scp -i "$PROD_SSH_KEY" migrations/your_file.sql \
+    "$PROD_SSH_USER@$PROD_SSH_HOST":/opt/nexus-php/migrations/
 
 # Step 2 — Run it (from local machine, one-liner)
-ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253 \
-    "sudo docker exec -i nexus-php-db mysql -u nexus -pYOUR_DB_PASS nexus \
-    < /opt/nexus-php/migrations/your_file.sql; echo EXIT:\$?"
+# Reads DB password from .env on the server — never inline credentials
+ssh -i "$PROD_SSH_KEY" -o RequestTTY=force "$PROD_SSH_USER@$PROD_SSH_HOST" \
+    "DB_PASS=\$(sudo grep ^DB_PASS= /opt/nexus-php/.env | cut -d= -f2); \
+     sudo docker exec -i -e MYSQL_PWD=\"\$DB_PASS\" nexus-php-db mariadb -u nexus nexus \
+     < /opt/nexus-php/migrations/your_file.sql; echo EXIT:\$?"
 ```
 
 **Why `-o RequestTTY=force`?** Sudoers has `use_pty` — sudo refuses without a terminal. `-t` and `-tt` fail when stdin isn't a TTY. `-o RequestTTY=force` is the only flag that works.
@@ -707,7 +713,8 @@ bash scripts/purge-cloudflare-cache.sh                         # Cache purge onl
 # Meilisearch — re-sync search index (run from LOCAL machine via SSH)
 # scripts/ is NOT volume-mounted in the PHP container, so must docker cp before exec
 # Run after: bulk listing imports, data migrations, or any Meilisearch data loss
-ssh -i "C:\ssh-keys\project-nexus.pem" -o RequestTTY=force azureuser@20.224.171.253 \
+source .secrets.local/deploy.env
+ssh -i "$PROD_SSH_KEY" -o RequestTTY=force "$PROD_SSH_USER@$PROD_SSH_HOST" \
   "sudo docker exec nexus-php-app mkdir -p /var/www/html/scripts && \
    sudo docker cp /opt/nexus-php/scripts/sync_search_index.php \
      nexus-php-app:/var/www/html/scripts/sync_search_index.php && \
