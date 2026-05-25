@@ -9,3 +9,5 @@ test-results
 public/changelog.md
 # Staged into the frontend Docker build context by bluegreen-deploy.sh (so copy-changelog.mjs can find it)
 CHANGELOG.md
+# heroui-agents-md
+.heroui-docs/
