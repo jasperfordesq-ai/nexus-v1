@@ -12,17 +12,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import {
-  Button,
-  Avatar,
-  Divider,
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerBody,
-  Accordion,
-  AccordionItem,
-} from '@heroui/react';
+import { Button, Avatar, Drawer, DrawerContent, DrawerHeader, DrawerBody, Accordion, AccordionItem } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import X from 'lucide-react/icons/x';
 import Home from 'lucide-react/icons/house';
 import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
@@ -678,7 +669,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
 
             {/* Attribution (AGPL Section 7(b) — required on all pages) */}
             <div className="pt-4 pb-4 px-4">
-              <Divider className="bg-theme-elevated mb-3" />
+              <Separator className="bg-theme-elevated mb-3" />
               <div className="flex flex-col items-center gap-2">
                 <SourceRepositoryLink compact className="w-full justify-center" />
                 <p className="text-center text-sm text-theme-muted">

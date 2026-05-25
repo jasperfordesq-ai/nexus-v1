@@ -19,23 +19,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Spinner,
-  Button,
-  Input,
-  Divider,
-  Select,
-  SelectItem,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Spinner, Button, Input, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import {
   AreaChart,
   Area,
@@ -649,7 +634,7 @@ export function ImpactReport() {
 
       {(extras?.skills || extras?.events || extras?.members) && (
         <>
-          <Divider className="mb-6" />
+          <Separator className="mb-6" />
           <div className="mb-2">
             <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
               <Lightbulb size={20} className="text-warning" />
@@ -731,7 +716,7 @@ export function ImpactReport() {
 
       {/* Community Health Section -------------------------------------- */}
 
-      <Divider className="mb-6" />
+      <Separator className="mb-6" />
 
       <div className="mb-2">
         <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -830,7 +815,7 @@ export function ImpactReport() {
 
       {/* Impact Timeline ----------------------------------------------- */}
 
-      <Divider className="mb-6" />
+      <Separator className="mb-6" />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 mb-8">
         <Card shadow="sm">
@@ -917,7 +902,7 @@ export function ImpactReport() {
             <p className="text-sm text-foreground leading-relaxed whitespace-pre-line">
               {extras.summary}
             </p>
-            <Divider className="my-4" />
+            <Separator className="my-4" />
             <div className="text-xs text-default-400 space-y-1">
               <p>
                 <strong>{t('impact.label_hour_value')}:</strong> {formatCurrency(extras.config.hour_value, currency)}/{t('impact.unit_hour_short')}
@@ -997,7 +982,7 @@ export function ImpactReport() {
                 ))}
               </Select>
             </div>
-            <Divider className="my-4" />
+            <Separator className="my-4" />
             <div className="text-xs text-default-400 space-y-1">
               <p>
                 <strong>{t('impact.label_sroi_formula')}:</strong> {t('impact.formula_detailed', {

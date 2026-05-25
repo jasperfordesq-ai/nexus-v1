@@ -11,23 +11,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Chip,
-  Avatar,
-  Spinner,
-  Progress,
-  Textarea,
-  Divider,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Chip, Avatar, Spinner, Progress, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
@@ -403,7 +388,7 @@ export function MatchDetail() {
               </div>
               {item.notes && (
                 <>
-                  <Divider className="my-2" />
+                  <Separator className="my-2" />
                   <div>
                     <p className="mb-1 text-sm text-default-400">
                       {item.status === 'rejected' ? t('matching.rejection_reason_label') : t('matching.notes_label')}

@@ -87,6 +87,7 @@ const i18nMap: Record<string, string> = {
   'nav.messages': 'Messages',
   'nav.community': 'Community',
   'nav.more': 'More',
+  'nav.unread_notifications': 'Notifications, 5 unread',
   'nav.accessibility_alpha': 'Accessibility (alpha)',
   'accessibility.create_new': 'Create new',
   'accessibility.open_menu': 'Open menu',
@@ -94,6 +95,8 @@ const i18nMap: Record<string, string> = {
   'accessibility.search_ctrl_k': 'Search (Ctrl+K)',
   'accessibility.skip_to_content': 'Skip to main content',
   'accessibility.accessibility_alpha_new_tab': 'Open Accessibility (alpha) in a new tab',
+  'accessibility.switch_to_dark': 'Switch to dark mode',
+  'accessibility.switch_to_light': 'Switch to light mode',
   'aria.main_navigation': 'Main navigation',
   'aria.timebanking_navigation': 'Timebanking navigation',
   'aria.community_navigation': 'Community navigation',
@@ -105,9 +108,18 @@ const i18nMap: Record<string, string> = {
   'create.new_event': 'New Event',
   'create.new_post': 'New Post',
   'user_menu.log_out': 'Log Out',
+  'flyout.bell_aria': 'Notifications',
 };
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => i18nMap[key] ?? key, i18n: { language: 'en', changeLanguage: vi.fn() } }),
+  useTranslation: () => ({
+    t: (key: string, opts?: { count?: number }) => {
+      if (key === 'nav.unread_notifications' || key === 'flyout.bell_unread_aria') {
+        return `Notifications, ${opts?.count ?? 0} unread`;
+      }
+      return i18nMap[key] ?? key;
+    },
+    i18n: { language: 'en', changeLanguage: vi.fn() },
+  }),
   initReactI18next: { type: '3rdParty', init: () => {} },
 }));
 

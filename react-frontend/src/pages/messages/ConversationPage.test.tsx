@@ -6,6 +6,17 @@
 import { render, screen, waitFor } from '@/test/test-utils';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 
+const stableMocks = vi.hoisted(() => ({
+  hasFeature: vi.fn(() => true),
+  hasModule: vi.fn(() => true),
+  navigate: vi.fn(),
+  refreshCounts: vi.fn(() => Promise.resolve()),
+  setSearchParams: vi.fn(),
+  showToast: vi.fn(),
+  tenantPath: vi.fn((p: string) => `/t/test${p}`),
+  t: vi.fn((key: string) => key),
+}));
+
 vi.mock('@/lib/api', () => ({
   api: {
     get: vi.fn(),
@@ -24,16 +35,17 @@ vi.mock('@/lib/helpers', () => ({
 
 vi.mock('@/contexts', () => ({
   useAuth: () => ({ user: { id: 1, name: 'Alice' }, isAuthenticated: true }),
-  useToast: () => ({ showToast: vi.fn() }),
+  useToast: () => ({ showToast: stableMocks.showToast, error: vi.fn(), success: vi.fn() }),
   useTenant: () => ({
-    tenantPath: (p: string) => `/t/test${p}`,
-    hasFeature: vi.fn().mockReturnValue(true),
-    hasModule: vi.fn().mockReturnValue(true),
+    tenantPath: stableMocks.tenantPath,
+    hasFeature: stableMocks.hasFeature,
+    hasModule: stableMocks.hasModule,
+    tenantSlug: 'test',
   }),
   usePusherOptional: () => null,
 
   useTheme: () => ({ resolvedTheme: 'light', toggleTheme: vi.fn(), theme: 'system', setTheme: vi.fn() }),
-  useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn() }),
+  useNotifications: () => ({ unreadCount: 0, counts: {}, notifications: [], markAsRead: vi.fn(), markAllAsRead: vi.fn(), hasMore: false, loadMore: vi.fn(), isLoading: false, refresh: vi.fn(), refreshCounts: stableMocks.refreshCounts }),
   usePusher: () => ({ channel: null, isConnected: false }),
   useCookieConsent: () => ({ consent: null, showBanner: false, openPreferences: vi.fn(), resetConsent: vi.fn(), saveConsent: vi.fn(), hasConsent: vi.fn(() => true), updateConsent: vi.fn() }),
   readStoredConsent: () => null,
@@ -46,7 +58,7 @@ vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string) => key,
+    t: stableMocks.t,
     i18n: { changeLanguage: vi.fn() },
   }),
 }));
@@ -62,6 +74,57 @@ vi.mock('framer-motion', () => ({
   }),
   AnimatePresence: ({ children }: React.PropsWithChildren) => children,
 }));
+
+vi.mock('@heroui/react', () => {
+  const React = require('react');
+  const cleanProps = (props: Record<string, unknown>) => {
+    const {
+      classNames: _classNames,
+      endContent: _endContent,
+      fullWidth: _fullWidth,
+      isIconOnly: _isIconOnly,
+      isLoading: _isLoading,
+      isOpen: _isOpen,
+      onOpenChange: _onOpenChange,
+      onPress,
+      startContent,
+      ...rest
+    } = props;
+    return {
+      ...rest,
+      ...(onPress ? { onClick: onPress } : {}),
+      ...(startContent ? { children: <>{startContent}{props.children as React.ReactNode}</> } : {}),
+    };
+  };
+  const passthrough = (tag = 'div') =>
+    ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
+      const cleaned = cleanProps({ ...props, children });
+      return React.createElement(tag, cleaned, cleaned.children);
+    };
+  const button = ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) =>
+    React.createElement('button', cleanProps(props), children);
+  const input = ({ value, onChange, placeholder, 'aria-label': ariaLabel }: Record<string, unknown>) =>
+    React.createElement('input', { value, onChange, placeholder, 'aria-label': ariaLabel });
+
+  return {
+    HeroUIProvider: passthrough('div'),
+    Button: button,
+    Avatar: ({ src }: Record<string, unknown>) => React.createElement('div', {}, src ? React.createElement('img', { src }) : null),
+    Modal: passthrough('div'),
+    ModalContent: passthrough('div'),
+    ModalHeader: passthrough('div'),
+    ModalBody: passthrough('div'),
+    ModalFooter: passthrough('div'),
+    Dropdown: passthrough('div'),
+    DropdownTrigger: passthrough('div'),
+    DropdownMenu: passthrough('div'),
+    DropdownItem: passthrough('button'),
+    Input: input,
+    Tooltip: passthrough('span'),
+    Skeleton: passthrough('div'),
+    Chip: passthrough('span'),
+  };
+});
 
 vi.mock('@/components/ui', () => ({
   GlassCard: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
@@ -94,6 +157,10 @@ vi.mock('@/components/messages/MessageContextCard', () => ({
   MessageContextCard: () => <div data-testid="context-card" />,
 }));
 
+vi.mock('@/components/verification/VerificationBadge', () => ({
+  VerificationBadgeRow: () => <div data-testid="verification-badge-row" />,
+}));
+
 vi.mock('./components/MessageBubble', () => ({
   MessageBubble: ({ message }: { message: { content: string } }) => (
     <div data-testid="message-bubble">{message.content}</div>
@@ -109,8 +176,8 @@ vi.mock('react-router-dom', async () => {
   return {
     ...actual,
     useParams: () => ({ id: '42' }),
-    useSearchParams: () => [new URLSearchParams(), vi.fn()],
-    useNavigate: () => vi.fn(),
+    useSearchParams: () => [new URLSearchParams(), stableMocks.setSearchParams],
+    useNavigate: () => stableMocks.navigate,
   };
 });
 

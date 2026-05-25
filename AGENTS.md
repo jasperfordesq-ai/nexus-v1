@@ -23,6 +23,13 @@
   - `php scripts/safe_migrate.php --run-pending --dry-run`
   - `php scripts/safe_migrate.php --run-pending`
 
+### HeroUI migration workflow
+
+- For any HeroUI v2/v3 migration, component API question, or related React code change, use the `heroui-react` MCP server before giving migration advice or editing components.
+- Prefer official HeroUI v3 migration docs from the MCP over memory, especially for `Select`, `Dropdown`, `Accordion`, `Progress`, `DateInput`, `TimeInput`, modals, hooks, and styling.
+- Treat broad renames as suspicious until verified against the MCP docs, because many v3 components use compound APIs rather than simple find-and-replace migrations.
+- In progress updates or final summaries, state which HeroUI MCP docs were checked when HeroUI migration work was involved.
+
 ### Validation commands
 
 - Backend CI gates include:

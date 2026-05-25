@@ -11,20 +11,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Button,
-  Avatar,
-  Chip,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-  Tooltip,
-  Skeleton,
-  Divider,
-  Card,
-  CardBody,
-} from '@heroui/react';
+import { Button, Avatar, Chip, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Tooltip, Skeleton, Card, CardBody } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Heart from 'lucide-react/icons/heart';
 import MessageCircle from 'lucide-react/icons/message-circle';
 import MoreHorizontal from 'lucide-react/icons/ellipsis';
@@ -1509,7 +1497,7 @@ const FeedCard = React.memo(function FeedCard({
         )}
 
         {/* Divider before actions */}
-        <Divider className="mb-1" />
+        <Separator className="mb-1" />
 
         {/* Action Buttons — reactions + comment as primary; share + bookmark as ghost icon-only secondary actions */}
         <div className="flex flex-wrap items-center justify-between gap-1 -mx-1">

@@ -14,16 +14,8 @@
  */
 
 import { useState, useCallback, useMemo } from 'react';
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  Divider,
-  Spinner,
-} from '@heroui/react';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Spinner } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import CreditCard from 'lucide-react/icons/credit-card';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import AlertCircle from 'lucide-react/icons/circle-alert';
@@ -143,7 +135,7 @@ function CheckoutForm({
               <span className="text-foreground">{formatAmount(shippingCost, currency)}</span>
             </div>
           )}
-          <Divider />
+          <Separator />
           <div className="flex justify-between">
             <span className="font-semibold text-foreground">{t('checkout.total')}</span>
             <span className="font-bold text-lg text-primary">{formatAmount(totalAmount, currency)}</span>

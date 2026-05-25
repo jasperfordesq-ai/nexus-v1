@@ -10,21 +10,8 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Spinner,
-  Chip,
-  Divider,
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableColumn,
-  TableCell,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Spinner, Chip, Table, TableHeader, TableBody, TableRow, TableColumn, TableCell } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -209,7 +196,7 @@ export function HealthCheck() {
                 {t('enterprise.last_n_checks', { count: history.length })}
               </Chip>
             </CardHeader>
-            <Divider className="mt-3" />
+            <Separator className="mt-3" />
             <CardBody className="px-0 pb-0">
               {historyLoading ? (
                 <div className="flex justify-center py-8">

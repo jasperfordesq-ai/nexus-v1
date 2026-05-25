@@ -38,13 +38,13 @@ const mockUpdateInfo = {
 describe('AppUpdateModal', () => {
   it('renders update modal with version info', () => {
     render(<AppUpdateModal updateInfo={mockUpdateInfo} onDismiss={vi.fn()} />);
-    expect(screen.getByText('Update Available')).toBeInTheDocument();
+    expect(screen.getByText('Update available')).toBeInTheDocument();
     expect(screen.getByText('A new version is available.')).toBeInTheDocument();
   });
 
   it('displays version numbers', () => {
     render(<AppUpdateModal updateInfo={mockUpdateInfo} onDismiss={vi.fn()} />);
-    expect(screen.getByText(/Version 2.0.0.*you have 1.5.0/)).toBeInTheDocument();
+    expect(screen.getByText(/Current: 2\.0\.0.*Available: 1\.5\.0/)).toBeInTheDocument();
   });
 
   it('shows release notes', () => {
@@ -67,6 +67,6 @@ describe('AppUpdateModal', () => {
 
   it('shows Download Update button', () => {
     render(<AppUpdateModal updateInfo={mockUpdateInfo} onDismiss={vi.fn()} />);
-    expect(screen.getByText('Download Update')).toBeInTheDocument();
+    expect(screen.getByText('Download update')).toBeInTheDocument();
   });
 });

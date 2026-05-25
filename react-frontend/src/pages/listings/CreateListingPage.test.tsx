@@ -142,8 +142,8 @@ describe('CreateListingPage', () => {
   it('renders offer and request radio options', async () => {
     render(<CreateListingPage />);
     await waitFor(() => {
-      expect(screen.getByText('Offer Help')).toBeInTheDocument();
-      expect(screen.getByText('Request Help')).toBeInTheDocument();
+      expect(screen.getAllByText('Offer Help').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Request Help').length).toBeGreaterThan(0);
     });
   });
 

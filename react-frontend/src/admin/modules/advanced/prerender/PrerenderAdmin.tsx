@@ -20,13 +20,8 @@
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import {
-  Card, CardBody, CardHeader, Button, Tabs, Tab, Chip, Spinner,
-  Input, Switch, Select, SelectItem, Table, TableHeader, TableColumn,
-  TableBody, TableRow, TableCell, Modal, ModalContent, ModalHeader,
-  ModalBody, ModalFooter, useDisclosure, Tooltip, Divider, Code,
-  Checkbox,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Tabs, Tab, Chip, Spinner, Input, Switch, Select, SelectItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Tooltip, Code, Checkbox } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Play from 'lucide-react/icons/play';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
@@ -604,7 +599,7 @@ function FreshnessControls({
           </div>
         </div>
 
-        <Divider className="my-2" />
+        <Separator className="my-2" />
 
         <div className="space-y-2">
           <p className="font-medium flex items-center gap-2">
@@ -1181,7 +1176,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                         )}
                       </div>
                     )}
-                    <Divider />
+                    <Separator />
                     <div className="grid grid-cols-2 gap-2">
                       <Info label={t('inspect.path')} value={inspecting.cache_path} mono />
                       <Info label={t('inspect.size')} value={formatBytes(inspecting.size_bytes)} />
@@ -1192,7 +1187,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                       <Info label={t('inspect.meta_description')} value={inspecting.meta_description || t('inspect.missing')} />
                       <Info label={t('inspect.h1_count')} value={`${inspecting.h1_texts.length}${inspecting.h1_texts.length > 0 ? ` - "${inspecting.h1_texts[0]}"` : ''}`} />
                     </div>
-                    <Divider />
+                    <Separator />
                     <div>
                       <p className="font-semibold mb-1">{t('inspect.flags')}</p>
                       <div className="flex flex-wrap gap-2">
@@ -1209,7 +1204,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                     </div>
                     {inspecting.parse_warnings.length > 0 && (
                       <>
-                        <Divider />
+                        <Separator />
                         <div>
                           <p className="font-semibold mb-1 text-warning">{t('inspect.html_parse_warnings')}</p>
                           <Code className="text-xs whitespace-pre-wrap block">
@@ -1218,7 +1213,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                         </div>
                       </>
                     )}
-                    <Divider />
+                    <Separator />
                     <div>
                       <p className="font-semibold mb-1">
                         {t('inspect.json_ld', {
@@ -1244,7 +1239,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                     </div>
                     {Object.keys(inspecting.og_tags).length > 0 && (
                       <>
-                        <Divider />
+                        <Separator />
                         <div>
                           <p className="font-semibold mb-1">{t('inspect.open_graph')}</p>
                           <div className="text-xs space-y-0.5">
@@ -1258,7 +1253,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                         </div>
                       </>
                     )}
-                    <Divider />
+                    <Separator />
                     <div>
                       <p className="font-semibold mb-1">
                         {t('inspect.asset_references', { count: inspecting.asset_refs.length })}
@@ -1272,7 +1267,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                         {inspecting.asset_refs.map((r) => `${inspecting.asset_issues.includes(r) ? 'x ' : '  '}${r}`).join('\n') || t('inspect.none')}
                       </Code>
                     </div>
-                    <Divider />
+                    <Separator />
                     <div>
                       <p className="font-semibold mb-1">{t('inspect.html_preview')}</p>
                       <Code className="text-xs whitespace-pre-wrap block max-h-96 overflow-auto">
@@ -1836,14 +1831,14 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
                     </div>
                     {expanded.error_message && (
                       <>
-                        <Divider />
+                        <Separator />
                         <p className="font-semibold text-danger">{t('detail.error')}</p>
                         <Code className="text-xs whitespace-pre-wrap block">{expanded.error_message}</Code>
                       </>
                     )}
                     {expanded.log_excerpt && (
                       <>
-                        <Divider />
+                        <Separator />
                         <p className="font-semibold">{t('detail.log_tail')}</p>
                         <Code className="text-xs whitespace-pre-wrap block max-h-96 overflow-auto">
                           {expanded.log_excerpt}

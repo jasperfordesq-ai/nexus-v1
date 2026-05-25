@@ -10,7 +10,8 @@
  * redirecting to the Groups list.
  */
 
-import { Card, CardBody, CardHeader, Divider, Code } from '@heroui/react';
+import { Card, CardBody, CardHeader, Code } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import MapPin from 'lucide-react/icons/map-pin';
 import Info from 'lucide-react/icons/info';
 import { useTranslation } from 'react-i18next';
@@ -35,7 +36,7 @@ export function GroupGeocode() {
             {t('groups.geocode_not_migrated_title')}
           </h3>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="gap-3">
           <div className="flex items-start gap-3">
             <Info size={18} className="text-default-400 shrink-0 mt-0.5" />

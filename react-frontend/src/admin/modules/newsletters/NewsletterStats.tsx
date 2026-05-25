@@ -12,11 +12,8 @@
 
 import { useState, useCallback, useEffect, useMemo, type CSSProperties } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import {
-  Card, CardBody, CardHeader, Button, Chip, Progress, Skeleton,
-  Table, TableHeader, TableColumn, TableBody, TableRow, TableCell,
-  Divider,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Chip, Progress, Skeleton, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Eye from 'lucide-react/icons/eye';
@@ -639,7 +636,7 @@ export function NewsletterStats() {
                   </LineChart>
                 </ResponsiveContainer>
               </div>
-              <Divider className="my-3" />
+              <Separator className="my-3" />
               <p className="text-center text-sm text-default-400">
                 {t('newsletters.total_opens_label')}: {engagement.total_opens.toLocaleString()} | {t('newsletters.total_clicks_label')}: {engagement.total_clicks.toLocaleString()}
                 {peak_engagement && peak_engagement.max_opens_per_hour > 0 && (

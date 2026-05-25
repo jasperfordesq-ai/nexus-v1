@@ -15,15 +15,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import {
-  Button,
-  Chip,
-  Spinner,
-  Avatar,
-  Tabs,
-  Tab,
-  Divider,
-} from '@heroui/react';
+import { Button, Chip, Spinner, Avatar, Tabs, Tab } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Star from 'lucide-react/icons/star';
 import Clock from 'lucide-react/icons/clock';
@@ -344,7 +337,7 @@ export function SellerProfilePage() {
           </div>
 
           {/* Stats row */}
-          <Divider className="my-5" />
+          <Separator className="my-5" />
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <StatCard
               icon={ShoppingBag}

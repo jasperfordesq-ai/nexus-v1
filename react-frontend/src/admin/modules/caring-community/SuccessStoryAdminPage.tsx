@@ -5,32 +5,8 @@
 
 import { useCallback, useEffect, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Card,
-  CardBody,
-  Chip,
-  Divider,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Select,
-  SelectItem,
-  Spinner,
-  Switch,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Textarea,
-  Tooltip,
-  useDisclosure,
-} from '@heroui/react';
+import { Button, Card, CardBody, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Spinner, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, Tooltip, useDisclosure } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Award from 'lucide-react/icons/award';
 import Info from 'lucide-react/icons/info';
 import Pencil from 'lucide-react/icons/pencil';
@@ -648,7 +624,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                 onValueChange={(v) => setForm({ ...form, evidence_source: v })}
               />
 
-              <Divider />
+              <Separator />
 
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <div className="flex items-center justify-between rounded-lg border border-default-200 px-4 py-3">
@@ -706,7 +682,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                   <span className="font-semibold">{target.title}</span>{' '}
                   {t('success_stories_admin.delete_modal.body_suffix')}
                 </p>
-                <Divider />
+                <Separator />
                 <p className="text-xs text-default-500">{t('success_stories_admin.delete_modal.warning')}</p>
               </div>
             ) : null}

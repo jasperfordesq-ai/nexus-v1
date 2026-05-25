@@ -19,12 +19,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import {
-  Button,
-  Chip,
-  Spinner,
-  Divider,
-} from '@heroui/react';
+import { Button, Chip, Spinner } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import BookOpen from 'lucide-react/icons/book-open';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import ThumbsUp from 'lucide-react/icons/thumbs-up';
@@ -322,7 +318,7 @@ export function KBArticlePage() {
             </div>
           </div>
 
-          <Divider className="my-4" />
+          <Separator className="my-4" />
 
           {/* YouTube Video */}
           {article.video_url && extractYouTubeId(article.video_url) && (
@@ -361,7 +357,7 @@ export function KBArticlePage() {
           {/* Attachments */}
           {article.attachments && article.attachments.length > 0 && (
             <>
-              <Divider className="my-4" />
+              <Separator className="my-4" />
               <div className="space-y-2">
                 <h3 className="text-sm font-semibold text-theme-primary flex items-center gap-2">
                   <File className="w-4 h-4 text-blue-400" aria-hidden="true" />

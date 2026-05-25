@@ -11,23 +11,8 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Input,
-  Button,
-  Slider,
-  Divider,
-  Switch,
-  Spinner,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Input, Button, Slider, Switch, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
 import Trash2 from 'lucide-react/icons/trash-2';
@@ -256,7 +241,7 @@ export function MatchingConfig() {
                   aria-label={t('matching.label_toggle_smart_matching')}
                 />
               </div>
-              <Divider />
+              <Separator />
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium">{t('matching.broker_approval_required')}</p>
@@ -273,7 +258,7 @@ export function MatchingConfig() {
                   aria-label={t('matching.label_toggle_broker_approval')}
                 />
               </div>
-              <Divider />
+              <Separator />
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <Input
                   type="number"

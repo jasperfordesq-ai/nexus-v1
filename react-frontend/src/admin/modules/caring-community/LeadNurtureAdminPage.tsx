@@ -4,31 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Select,
-  SelectItem,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Textarea,
-  Tooltip,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, Tooltip } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Download from 'lucide-react/icons/download';
 import Filter from 'lucide-react/icons/filter';
 import Info from 'lucide-react/icons/info';
@@ -256,7 +233,7 @@ export default function LeadNurtureAdminPage() {
               <span className="text-2xl font-bold">{summary.total}</span>
               <span className="text-sm text-default-500">{t('lead_nurture.summary.total_contacts')}</span>
             </div>
-            <Divider />
+            <Separator />
             <div className="flex flex-wrap gap-2">
               <span className="text-xs text-default-500 self-center">{t('lead_nurture.summary.by_segment')}</span>
               {segmentChips}

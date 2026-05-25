@@ -9,11 +9,8 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import {
-  Card, CardBody, CardHeader, Switch, Spinner, Button, Divider,
-  Select, SelectItem, Input,
-  Table, TableHeader, TableColumn, TableBody, TableRow, TableCell,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Switch, Spinner, Button, Select, SelectItem, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Settings from 'lucide-react/icons/settings';
 import BookOpen from 'lucide-react/icons/book-open';
 import Trash2 from 'lucide-react/icons/trash-2';
@@ -364,7 +361,7 @@ export function TranslationConfig() {
               />
             </div>
 
-            <Divider />
+            <Separator />
 
             {/* translation.glossary_enabled */}
             <div className="flex items-center justify-between py-3">
@@ -436,7 +433,7 @@ export function TranslationConfig() {
                 </Button>
               </div>
 
-              <Divider />
+              <Separator />
 
               {/* Glossary table */}
               {glossaryLoading ? (

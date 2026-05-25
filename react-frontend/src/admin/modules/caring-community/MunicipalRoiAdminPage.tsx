@@ -4,25 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  Input,
-  Select,
-  SelectItem,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Tooltip,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Select, SelectItem, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Building2 from 'lucide-react/icons/building-2';
 import Clock from 'lucide-react/icons/clock';
 import Download from 'lucide-react/icons/download';
@@ -454,7 +437,7 @@ export default function MunicipalRoiAdminPage() {
               </div>
               <p className="text-sm text-default-500">{t('municipal_roi_page.roi.prevented_this_period')}</p>
 
-              <Divider />
+              <Separator />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">

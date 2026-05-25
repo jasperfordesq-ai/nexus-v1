@@ -10,16 +10,8 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Input,
-  Spinner,
-  Divider,
-  Chip,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Input, Spinner, Chip } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Globe from 'lucide-react/icons/globe';
 import Save from 'lucide-react/icons/save';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -272,7 +264,7 @@ export function CreditCommonsConfig() {
                   {config?.last_hash || t('federation.cc_no_hash')}
                 </code>
               </div>
-              <Divider />
+              <Separator />
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-default-500">{t('federation.cc_total_trades')}</p>

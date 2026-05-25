@@ -15,21 +15,8 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import {
-  Tabs,
-  Tab,
-  Button,
-  Chip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Textarea,
-  Select,
-  SelectItem,
-  Divider,
-} from '@heroui/react';
+import { Tabs, Tab, Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, Select, SelectItem } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Flag from 'lucide-react/icons/flag';
@@ -525,7 +512,7 @@ export function MessageReview() {
                   )}
                 </div>
 
-                <Divider />
+                <Separator />
 
                 <div>
                   <p className="text-xs text-default-400 uppercase font-medium mb-2">{t('messages.content_label')}</p>
@@ -536,7 +523,7 @@ export function MessageReview() {
 
                 {detail?.thread && detail.thread.length > 0 && (
                   <>
-                    <Divider />
+                    <Separator />
                     <div>
                       <p className="text-xs text-default-400 uppercase font-medium mb-2">
                         {t('messages.conversation_label')} ({detail.thread.length})
@@ -561,7 +548,7 @@ export function MessageReview() {
 
                 {isDetailReviewed ? (
                   <>
-                    <Divider />
+                    <Separator />
                     <div className="flex items-center gap-2 text-sm text-success">
                       <Chip size="sm" color="success" variant="flat">{t('messages.status_reviewed')}</Chip>
                       <span className="text-default-500">
@@ -571,7 +558,7 @@ export function MessageReview() {
                   </>
                 ) : (
                   <>
-                    <Divider />
+                    <Separator />
                     <Textarea
                       label={t('messages.review_notes_label')}
                       placeholder={t('messages.review_notes_placeholder')}

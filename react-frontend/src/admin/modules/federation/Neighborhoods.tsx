@@ -10,25 +10,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Spinner,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Input,
-  Textarea,
-  Select,
-  SelectItem,
-  Avatar,
-  Divider,
-  useDisclosure,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea, Select, SelectItem, Avatar, useDisclosure } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import MapPin from 'lucide-react/icons/map-pin';
 import Plus from 'lucide-react/icons/plus';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -317,7 +300,7 @@ export function Neighborhoods() {
                   </span>
                 </div>
 
-                <Divider />
+                <Separator />
 
                 {/* Tenants list */}
                 <div className="space-y-2">

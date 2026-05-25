@@ -10,9 +10,8 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import {
-  Card, CardBody, CardHeader, Button, Switch, Chip, Divider, Spinner,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Switch, Chip, Spinner } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import { useParams } from 'react-router-dom';
 import Shield from 'lucide-react/icons/shield';
 import Network from 'lucide-react/icons/network';
@@ -220,17 +219,17 @@ export function FederationTenantFeatures() {
               <span className="text-default-500">{t('super.label_name')}</span>
               <span className="font-medium">{tenant.name}</span>
             </div>
-            <Divider />
+            <Separator />
             <div className="flex justify-between items-center">
               <span className="text-default-500">{t('super.label_slug')}</span>
               <Chip size="sm" variant="flat">{tenant.slug}</Chip>
             </div>
-            <Divider />
+            <Separator />
             <div className="flex justify-between items-center">
               <span className="text-default-500">{t('super.label_domain')}</span>
               <span className="text-sm">{tenant.domain || t('super.not_applicable')}</span>
             </div>
-            <Divider />
+            <Separator />
             <div className="flex justify-between items-center">
               <span className="text-default-500">{t('super.label_tenant_id')}</span>
               <Chip size="sm" variant="flat" color="primary">{tenant.id}</Chip>

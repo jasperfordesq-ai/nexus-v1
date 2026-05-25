@@ -13,16 +13,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Chip,
-  Divider,
-  Spinner,
-  ScrollShadow,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Chip, Spinner, ScrollShadow } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Lock from 'lucide-react/icons/lock';
 import Flag from 'lucide-react/icons/flag';
@@ -137,7 +129,7 @@ export function ArchiveDetail() {
           )}
           <span className="font-semibold">{t('archives.section_decision')}</span>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="space-y-3">
           <div className="flex flex-wrap items-center gap-4">
             <div>
@@ -197,7 +189,7 @@ export function ArchiveDetail() {
           <Mail aria-hidden="true" size={18} />
           <span className="font-semibold">{t('archives.section_target')}</span>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="space-y-3">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="flex items-center gap-2">
@@ -216,7 +208,7 @@ export function ArchiveDetail() {
             </div>
           </div>
 
-          <Divider />
+          <Separator />
 
           <div>
             <p className="text-xs text-default-400">{t('archives.label_body')}</p>
@@ -255,7 +247,7 @@ export function ArchiveDetail() {
             {t('archives.messages_count', { count: data.conversation_snapshot.length })}
           </Chip>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody>
           {data.conversation_snapshot.length === 0 ? (
             <p className="text-sm text-default-500">{t('archives.no_snapshot')}</p>
@@ -264,7 +256,7 @@ export function ArchiveDetail() {
               <div className="space-y-0">
                 {data.conversation_snapshot.map((msg, index) => (
                   <div key={msg.id}>
-                    {index > 0 && <Divider className="my-3" />}
+                    {index > 0 && <Separator className="my-3" />}
                     <div className="py-1">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-sm font-semibold text-foreground">

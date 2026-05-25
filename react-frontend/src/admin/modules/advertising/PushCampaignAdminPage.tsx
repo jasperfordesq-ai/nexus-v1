@@ -22,34 +22,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  ChipProps,
-  Divider,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Select,
-  SelectItem,
-  Spinner,
-  Tab,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Tabs,
-  Textarea,
-  useDisclosure,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, ChipProps, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Spinner, Tab, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tabs, Textarea, useDisclosure } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import BarChart3 from 'lucide-react/icons/bar-chart-3';
 import Bell from 'lucide-react/icons/bell';
 import CheckCircle from 'lucide-react/icons/check-circle';
@@ -506,7 +480,7 @@ export default function PushCampaignAdminPage() {
             {t('advertising.shared.actions.new_campaign')}
           </Button>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody>
           {actionMsg && (
             <div className="mb-3 px-3 py-2 rounded-lg bg-default-100 text-sm text-default-700">
@@ -728,7 +702,7 @@ export default function PushCampaignAdminPage() {
                   )}
                 </div>
 
-                <Divider />
+                <Separator />
 
                 {/* Metrics */}
                 <div className="grid grid-cols-4 gap-3 text-center text-sm">
@@ -753,7 +727,7 @@ export default function PushCampaignAdminPage() {
                 {/* Analytics chart */}
                 {detailCampaign.analytics && (
                   <>
-                    <Divider />
+                    <Separator />
                     <div>
                       <p className="text-sm font-medium mb-3">{t('advertising.push.daily_breakdown')}</p>
                       <MiniBarChart breakdown={detailCampaign.analytics.daily_breakdown} t={t} />
@@ -764,7 +738,7 @@ export default function PushCampaignAdminPage() {
                 {/* Rejection reason */}
                 {detailCampaign.rejection_reason && (
                   <>
-                    <Divider />
+                    <Separator />
                     <div className="rounded-lg bg-danger-50 border border-danger-200 p-3 text-sm">
                       <p className="font-medium text-danger mb-1">{t('advertising.shared.rejection_reason')}</p>
                       <p className="text-danger-700">{detailCampaign.rejection_reason}</p>
@@ -773,7 +747,7 @@ export default function PushCampaignAdminPage() {
                 )}
 
                 {/* Dates */}
-                <Divider />
+                <Separator />
                 <div className="grid grid-cols-2 gap-3 text-xs text-default-400">
                   <div>
                     <span>{t('advertising.push.dates.created')}: </span>

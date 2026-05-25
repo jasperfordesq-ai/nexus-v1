@@ -4,6 +4,7 @@
 
 /* Tailwind v4 */
 @import "tailwindcss" source(none);
+@import "@heroui-v3/styles";
 
 /* Hero UI Tailwind plugin */
 @plugin "./hero.ts";

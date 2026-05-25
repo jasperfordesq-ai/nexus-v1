@@ -11,16 +11,8 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Progress,
-  Chip,
-  Spinner,
-  Divider,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Progress, Chip, Spinner } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Settings from 'lucide-react/icons/settings';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import Trash2 from 'lucide-react/icons/trash-2';
@@ -213,7 +205,7 @@ export function SmartMatchingOverview() {
                     </div>
                   );
                 })}
-                <Divider className="my-2" />
+                <Separator className="my-2" />
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-default-500">{t('matching.total')}</span>
                   <span className="font-semibold">
@@ -276,7 +268,7 @@ export function SmartMatchingOverview() {
               >
                 {t('matching.clear_match_cache')}
               </Button>
-              <Divider className="my-2" />
+              <Separator className="my-2" />
               <Button
                 as={Link}
                 to={tenantPath('/admin/match-approvals')}

@@ -12,7 +12,8 @@
 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Chip, Divider, Spinner } from '@heroui/react';
+import { Button, Chip, Spinner } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Shield from 'lucide-react/icons/shield';
 import Database from 'lucide-react/icons/database';
 import PieChart from 'lucide-react/icons/chart-pie';
@@ -484,7 +485,7 @@ export function PrivacyPage() {
             <p className="text-theme-muted text-sm mb-6 max-w-lg mx-auto">
               {t('privacy.cta_body')}
             </p>
-            <Divider className="my-4" />
+            <Separator className="my-4" />
             <div className="flex flex-wrap justify-center gap-3 mt-4">
               <Link to={tenantPath('/contact')}>
                 <Button

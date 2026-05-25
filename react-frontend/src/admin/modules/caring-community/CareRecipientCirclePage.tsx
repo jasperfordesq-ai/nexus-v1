@@ -5,22 +5,8 @@
 
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  Input,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import AlertTriangle from 'lucide-react/icons/alert-triangle';
 import Clock from 'lucide-react/icons/clock';
 import Heart from 'lucide-react/icons/heart';
@@ -282,7 +268,7 @@ export default function CareRecipientCirclePage() {
             />
           </div>
 
-          <Divider />
+          <Separator />
 
           {/* Support Relationships table */}
           <Card shadow="none" className="border border-divider/70 shadow-sm shadow-black/[0.03]">

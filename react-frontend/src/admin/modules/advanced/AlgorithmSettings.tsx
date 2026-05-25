@@ -10,10 +10,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import {
-  Card, CardBody, CardHeader,
-  Slider, Button, Spinner, Switch, Chip, Divider,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Slider, Button, Spinner, Switch, Chip } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Settings from 'lucide-react/icons/settings';
 import Save from 'lucide-react/icons/save';
 import Activity from 'lucide-react/icons/activity';
@@ -310,7 +308,7 @@ export function AlgorithmSettings() {
                   ))}
                 </div>
 
-                <Divider />
+                <Separator />
 
                 <div className="flex justify-end">
                   <Button
@@ -408,7 +406,7 @@ export function AlgorithmSettings() {
                   )}
                 </div>
 
-                <Divider />
+                <Separator />
 
                 {/* Collaborative Filtering */}
                 <div>
@@ -432,7 +430,7 @@ export function AlgorithmSettings() {
                   )}
                 </div>
 
-                <Divider />
+                <Separator />
 
                 {/* Embeddings */}
                 <div>
@@ -465,7 +463,7 @@ export function AlgorithmSettings() {
 
                 {health.search && (
                   <>
-                    <Divider />
+                    <Separator />
                     <div>
                       <p className="text-sm font-semibold mb-2 flex items-center gap-2">
                         <Search size={14} /> {t('search_engine_title')}

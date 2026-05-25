@@ -5,31 +5,8 @@
 
 import { useCallback, useEffect, useMemo, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Select,
-  SelectItem,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Textarea,
-  useDisclosure,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, useDisclosure } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import TriangleAlert from 'lucide-react/icons/triangle-alert';
@@ -282,7 +259,7 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
         <CardHeader>
           <p className="text-sm font-semibold">{t('admin.safeguarding_reports.severity_legend.title')}</p>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="py-3">
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4 text-sm">
             <div className="flex items-start gap-2">
@@ -310,7 +287,7 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
         <CardHeader>
           <p className="text-sm font-semibold">{t('admin.safeguarding_reports.workflow.title')}</p>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="py-3">
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-5 text-sm">
             <div>
@@ -377,7 +354,7 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
             {t('admin.common.refresh')}
           </Button>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody>
           {loading ? (
             <div className="flex justify-center py-12">
@@ -518,7 +495,7 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
                   </div>
                 )}
 
-                <Divider />
+                <Separator />
 
                 <div className="space-y-3">
                   <h3 className="text-sm font-semibold">{t('admin.safeguarding_reports.actions.title')}</h3>
@@ -601,7 +578,7 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
                   </div>
                 </div>
 
-                <Divider />
+                <Separator />
 
                 <div className="space-y-3">
                   <h3 className="text-sm font-semibold">{t('admin.safeguarding_reports.history.title')}</h3>

@@ -4,29 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Textarea,
-  useDisclosure,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, useDisclosure } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Wand2 from 'lucide-react/icons/wand-2';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Sparkles from 'lucide-react/icons/sparkles';
@@ -416,7 +395,7 @@ export default function MunicipalCopilotAdminPage() {
 
                 {latest.status === 'proposed' && (
                   <>
-                    <Divider />
+                    <Separator />
                     <div className="flex justify-end gap-2">
                       <Button
                         size="sm"

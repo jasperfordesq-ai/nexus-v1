@@ -9,7 +9,8 @@
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button, Avatar, Skeleton, Divider } from '@heroui/react';
+import { Button, Avatar, Skeleton } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Lock from 'lucide-react/icons/lock';
 import Newspaper from 'lucide-react/icons/newspaper';
 import Plus from 'lucide-react/icons/plus';
@@ -165,7 +166,7 @@ export function GroupFeedTab({
               </div>
               <Skeleton className="h-4 w-full rounded mb-2" />
               <Skeleton className="h-4 w-4/5 rounded mb-4" />
-              <Divider />
+              <Separator />
               <div className="flex gap-4 pt-3">
                 <Skeleton className="h-8 w-20 rounded-lg" />
                 <Skeleton className="h-8 w-24 rounded-lg" />

@@ -45,7 +45,8 @@ import { TOGGLE_LINK_COMMAND } from '@lexical/link';
 import { $isLinkNode } from '@lexical/link';
 import { $getNearestNodeOfType } from '@lexical/utils';
 import { $isListNode, ListNode as ListNodeClass } from '@lexical/list';
-import { Button, Tooltip, Divider } from '@heroui/react';
+import { Button, Tooltip } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Bold from 'lucide-react/icons/bold';
 import Italic from 'lucide-react/icons/italic';
 import Underline from 'lucide-react/icons/underline';
@@ -237,7 +238,7 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
         </Button>
       </Tooltip>
 
-      <Divider orientation="vertical" className="h-5 mx-1" />
+      <Separator orientation="vertical" className="h-5 mx-1" />
 
       {/* Headings */}
       <Tooltip content={t('rte.heading_2')} size="sm" delay={500}>
@@ -269,7 +270,7 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
         </Button>
       </Tooltip>
 
-      <Divider orientation="vertical" className="h-5 mx-1" />
+      <Separator orientation="vertical" className="h-5 mx-1" />
 
       {/* Inline formatting */}
       <Tooltip content={t('rte.bold')} size="sm" delay={500}>
@@ -343,7 +344,7 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
         </Button>
       </Tooltip>
 
-      <Divider orientation="vertical" className="h-5 mx-1" />
+      <Separator orientation="vertical" className="h-5 mx-1" />
 
       {/* Block formatting */}
       <Tooltip content={t('rte.bullet_list')} size="sm" delay={500}>
@@ -389,7 +390,7 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
         </Button>
       </Tooltip>
 
-      <Divider orientation="vertical" className="h-5 mx-1" />
+      <Separator orientation="vertical" className="h-5 mx-1" />
 
       {/* Link */}
       <Tooltip content={isLink ? t('rte.remove_link') : t('rte.insert_link')} size="sm" delay={500}>
@@ -410,7 +411,7 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
       {/* Import Markdown */}
       {showMarkdownImport && (
         <>
-          <Divider orientation="vertical" className="h-5 mx-1" />
+          <Separator orientation="vertical" className="h-5 mx-1" />
           <Tooltip content={t('rte.import_markdown')} size="sm" delay={500}>
             <Button
               size="sm"

@@ -12,7 +12,8 @@
 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Divider } from '@heroui/react';
+import { Button } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Scale from 'lucide-react/icons/scale';
 import Shield from 'lucide-react/icons/shield';
 import FileText from 'lucide-react/icons/file-text';
@@ -287,7 +288,7 @@ export function LegalHubPage() {
             <p className="text-theme-muted text-sm mb-6 max-w-lg mx-auto">
               {t('hub.cta_body')}
             </p>
-            <Divider className="my-4" />
+            <Separator className="my-4" />
             <div className="flex flex-wrap justify-center gap-3 mt-4">
               <Link to={tenantPath('/contact')}>
                 <Button

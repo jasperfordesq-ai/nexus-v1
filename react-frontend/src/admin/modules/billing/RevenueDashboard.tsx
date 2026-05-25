@@ -10,21 +10,8 @@
 
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Spinner,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Button,
-  Divider,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Chip, Spinner, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Button } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import Users from 'lucide-react/icons/users';
 import DollarSign from 'lucide-react/icons/dollar-sign';
@@ -275,7 +262,7 @@ export function RevenueDashboard() {
             <CardHeader>
               <h2 className="text-lg font-semibold">{t('billing.plan_breakdown')}</h2>
             </CardHeader>
-            <Divider />
+            <Separator />
             <CardBody className="p-0">
               <Table removeWrapper aria-label={t('billing.plan_breakdown')}>
                 <TableHeader>
@@ -316,7 +303,7 @@ export function RevenueDashboard() {
             <CardHeader>
               <h2 className="text-lg font-semibold">{t('billing.recent_changes')}</h2>
             </CardHeader>
-            <Divider />
+            <Separator />
             <CardBody className="p-0">
               <Table removeWrapper aria-label={t('billing.recent_changes')}>
                 <TableHeader>

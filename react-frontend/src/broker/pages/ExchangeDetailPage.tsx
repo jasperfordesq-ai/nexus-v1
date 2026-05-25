@@ -12,7 +12,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Card, CardBody, CardHeader, Button, Chip, Divider, Spinner } from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Chip, Spinner } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import User from 'lucide-react/icons/user';
 import Shield from 'lucide-react/icons/shield';
@@ -144,7 +145,7 @@ export default function ExchangeDetail() {
             <User aria-hidden="true" className="w-4 h-4" />
             <span className="font-semibold">{t('exchanges.detail_requester')}</span>
           </CardHeader>
-          <Divider />
+          <Separator />
           <CardBody>
             <p className="font-medium">{exchange.requester_name}</p>
             {exchange.requester_email && (
@@ -157,7 +158,7 @@ export default function ExchangeDetail() {
             <User aria-hidden="true" className="w-4 h-4" />
             <span className="font-semibold">{t('exchanges.detail_provider')}</span>
           </CardHeader>
-          <Divider />
+          <Separator />
           <CardBody>
             <p className="font-medium">{exchange.provider_name}</p>
             {exchange.provider_email && (
@@ -174,7 +175,7 @@ export default function ExchangeDetail() {
             <Shield aria-hidden="true" className="w-4 h-4 text-warning" />
             <span className="font-semibold">{t('exchanges.detail_risk_tag')}</span>
           </CardHeader>
-          <Divider />
+          <Separator />
           <CardBody>
             <div className="flex items-center gap-3">
               <Chip
@@ -208,7 +209,7 @@ export default function ExchangeDetail() {
       {exchange.broker_notes && (
         <Card shadow="sm">
           <CardHeader><span className="font-semibold">{t('exchanges.detail_broker_notes')}</span></CardHeader>
-          <Divider />
+          <Separator />
           <CardBody>
             <p className="text-sm">{exchange.broker_notes}</p>
           </CardBody>
@@ -219,7 +220,7 @@ export default function ExchangeDetail() {
       {exchange.broker_conditions && (
         <Card shadow="sm">
           <CardHeader><span className="font-semibold">{t('exchanges.detail_broker_conditions')}</span></CardHeader>
-          <Divider />
+          <Separator />
           <CardBody>
             <p className="text-sm">{exchange.broker_conditions}</p>
           </CardBody>
@@ -232,7 +233,7 @@ export default function ExchangeDetail() {
           <Clock aria-hidden="true" className="w-4 h-4" />
           <span className="font-semibold">{t('exchanges.detail_history')}</span>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody>
           {history.length === 0 ? (
             <p className="text-sm text-default-500">{t('exchanges.detail_no_history')}</p>

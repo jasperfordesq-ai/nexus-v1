@@ -13,32 +13,8 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Spinner,
-  Chip,
-  Tabs,
-  Tab,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Textarea,
-  Input,
-  Avatar,
-  Divider,
-  useDisclosure,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Spinner, Chip, Tabs, Tab, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, Input, Avatar, useDisclosure } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Shield from 'lucide-react/icons/shield';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
 import ShieldCheck from 'lucide-react/icons/shield-check';
@@ -778,7 +754,7 @@ export function SafeguardingDashboard() {
                         <span className="text-sm text-default-400 mx-1">{t('safeguarding.to')}</span>
                         <span className="text-sm">{reviewTarget.recipient.name}</span>
                       </div>
-                      <Divider className="my-2" />
+                      <Separator className="my-2" />
                       <p className="text-sm text-default-700 whitespace-pre-wrap">
                         {reviewTarget.message_content}
                       </p>

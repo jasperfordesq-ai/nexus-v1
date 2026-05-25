@@ -20,23 +20,8 @@
 import { ChangeEvent, useCallback, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  Input,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Textarea,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Upload from 'lucide-react/icons/upload';
 import FileText from 'lucide-react/icons/file-text';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
@@ -220,7 +205,7 @@ export default function VereinMembersImportPage() {
             {t('verein_import.step1')}
           </h2>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="space-y-4">
           <p className="rounded-md border border-default-200 bg-default-50 px-3 py-2 text-sm text-default-600">
             {t('verein_import.csv_format')}
@@ -269,7 +254,7 @@ export default function VereinMembersImportPage() {
             </h2>
             <span className="text-sm text-default-500 ml-2">{preview.organization.name}</span>
           </CardHeader>
-          <Divider />
+          <Separator />
           <CardBody className="space-y-4">
             {/* Summary */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
@@ -365,7 +350,7 @@ export default function VereinMembersImportPage() {
               {t('verein_import.result.title')}
             </h2>
           </CardHeader>
-          <Divider />
+          <Separator />
           <CardBody className="space-y-3">
             <p className="text-sm">
               {t('verein_import.result.summary', {

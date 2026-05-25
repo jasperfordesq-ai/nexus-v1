@@ -6,9 +6,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import {
-  Card, CardBody, CardHeader, Button, Select, SelectItem, Switch, Divider, Chip, Checkbox, RadioGroup, Radio,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Select, SelectItem, Switch, Chip, Checkbox, RadioGroup, Radio } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Users from 'lucide-react/icons/users';
 import Building2 from 'lucide-react/icons/building-2';
 import ArrowRight from 'lucide-react/icons/arrow-right';
@@ -170,7 +169,7 @@ export function BulkOperations() {
             )}
             {loading && <p className="text-center text-default-400 text-sm">{t('super.loading_users')}</p>}
 
-            <Divider />
+            <Separator />
             <Select label={t('super.label_target_tenant')} selectedKeys={targetTenant ? [targetTenant] : []}
               onSelectionChange={(keys) => setTargetTenant(String(Array.from(keys)[0] || ''))}>
               {tenants.filter(t => String(t.id) !== sourceTenant).map(t =>
@@ -245,7 +244,7 @@ export function BulkOperations() {
                 </Checkbox>
               ))}
             </div>
-            <Divider />
+            <Separator />
             <div>
               <p className="text-sm font-medium mb-3">{t('super.select_action')}</p>
               <RadioGroup value={bulkAction} onValueChange={setBulkAction}>

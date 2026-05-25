@@ -4,26 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Progress,
-  Select,
-  SelectItem,
-  Spinner,
-  Textarea,
-  Tooltip,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Progress, Select, SelectItem, Spinner, Textarea, Tooltip } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import CheckCircle2 from 'lucide-react/icons/check-circle-2';
 import Info from 'lucide-react/icons/info';
 import Pencil from 'lucide-react/icons/pencil';
@@ -420,7 +402,7 @@ export default function IsolatedNodeAdminPage() {
 
           {data.last_updated_at && (
             <>
-              <Divider />
+              <Separator />
               <p className="text-xs text-default-500">
                 {t('isolated_node.timestamps.last_updated', {
                   date: new Date(data.last_updated_at).toLocaleString(),

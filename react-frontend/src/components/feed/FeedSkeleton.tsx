@@ -13,7 +13,8 @@
  * skeleton shape roughly matches the loaded card — reduces layout shift.
  */
 
-import { Skeleton, Divider } from '@heroui/react';
+import { Skeleton } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import { GlassCard } from '@/components/ui';
 
 type SkeletonVariant =
@@ -69,7 +70,7 @@ export function FeedSkeleton({ variant = 'random', index = 0 }: FeedSkeletonProp
 
       <div className="p-5 pt-4">
         {/* Divider */}
-        <Divider className="mb-3" />
+        <Separator className="mb-3" />
 
         {/* Action bar: reactions+comment (primary) + share+bookmark (secondary) */}
         <div className="flex items-center justify-between gap-2">
@@ -99,7 +100,7 @@ function CardShell({ accentClass, children }: { accentClass: string; children: R
 function FooterSkeleton() {
   return (
     <div className="p-5 pt-4">
-      <Divider className="mb-3" />
+      <Separator className="mb-3" />
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Skeleton className="h-8 w-20 rounded-lg" />

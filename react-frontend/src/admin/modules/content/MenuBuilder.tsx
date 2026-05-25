@@ -10,19 +10,8 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Input,
-  Button,
-  Spinner,
-  Select,
-  SelectItem,
-  Switch,
-  Chip,
-  Divider,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Input, Button, Spinner, Select, SelectItem, Switch, Chip } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Menu from 'lucide-react/icons/menu';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
@@ -1133,7 +1122,7 @@ export function MenuBuilder() {
                     </span>
                   </Switch>
 
-                  <Divider />
+                  <Separator />
 
                   {/* Advanced (collapsible) */}
                   <Button
@@ -1162,7 +1151,7 @@ export function MenuBuilder() {
                     </div>
                   )}
 
-                  <Divider />
+                  <Separator />
 
                   <div className="flex gap-2">
                     <Button

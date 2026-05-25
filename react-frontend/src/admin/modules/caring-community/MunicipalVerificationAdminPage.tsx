@@ -17,26 +17,8 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Code,
-  Divider,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Spinner,
-  Tabs,
-  Tab,
-  Textarea,
-  useDisclosure,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Code, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Tabs, Tab, Textarea, useDisclosure } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Info from 'lucide-react/icons/info';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
@@ -274,7 +256,7 @@ export default function MunicipalVerificationAdminPage() {
           )}
           <h2 className="text-base font-semibold">{t('municipal_verification.current.title')}</h2>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody>
           {data.verified && active ? (
             <div className="space-y-2">
@@ -305,7 +287,7 @@ export default function MunicipalVerificationAdminPage() {
           <Globe className="w-5 h-5 text-primary" />
           <h2 className="text-base font-semibold">{t('municipal_verification.request.title')}</h2>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody>
           <Tabs aria-label={t('municipal_verification.request.method_aria')}>
             <Tab key="dns" title={t('municipal_verification.request.dns_tab')}>
@@ -374,7 +356,7 @@ export default function MunicipalVerificationAdminPage() {
             {items.length}
           </Chip>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="p-0">
           {items.length === 0 ? (
             <div className="text-center py-12 text-sm text-default-500">

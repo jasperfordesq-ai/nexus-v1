@@ -11,24 +11,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import {
-  Button,
-  Chip,
-  Card,
-  CardBody,
-  CardHeader,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Textarea,
-  Spinner,
-  Avatar,
-  Tooltip,
-  Divider,
-  Pagination,
-} from '@heroui/react';
+import { Button, Chip, Card, CardBody, CardHeader, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, Spinner, Avatar, Tooltip, Pagination } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import XCircle from 'lucide-react/icons/circle-x';
 import Flag from 'lucide-react/icons/flag';
@@ -403,7 +387,7 @@ export function JobModerationQueue() {
                     </div>
                   </div>
 
-                  <Divider className="sm:hidden" />
+                  <Separator className="sm:hidden" />
 
                   {/* Actions */}
                   <div className="flex gap-2 shrink-0 sm:flex-col sm:items-end">

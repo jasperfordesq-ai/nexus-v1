@@ -4,26 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState, type ChangeEvent, type JSX } from 'react';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  Input,
-  Select,
-  SelectItem,
-  Spinner,
-  Switch,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Textarea,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Select, SelectItem, Spinner, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Building2 from 'lucide-react/icons/building-2';
@@ -597,7 +579,7 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: Pred
           {t('caring_workflow.actions.refresh')}
         </Button>
       </CardHeader>
-      <Divider />
+      <Separator />
       <CardBody className="gap-4">
         {isInitialLoading ? (
           <div className="flex items-center justify-center py-10">
@@ -1585,7 +1567,7 @@ export default function CaringCommunityWorkflowPage() {
                 </div>
               )}
             </CardHeader>
-            <Divider />
+            <Separator />
             <CardBody className="gap-3">
               {summary?.pending_reviews.length === 0 ? (
                 <div className="rounded-lg bg-success/10 p-4 text-sm text-success-700">
@@ -1680,7 +1662,7 @@ export default function CaringCommunityWorkflowPage() {
                 {t('caring_workflow.actions.refresh')}
               </Button>
             </CardHeader>
-            <Divider />
+            <Separator />
             <CardBody className="gap-4">
               <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
                 <SignalRow label={t('caring_workflow.relationships.active')} value={relationships?.stats.active_count ?? 0} />
@@ -1847,7 +1829,7 @@ export default function CaringCommunityWorkflowPage() {
                 </Button>
               </div>
             </CardHeader>
-            <Divider />
+            <Separator />
             <CardBody className="space-y-4">
               {loadingSafeguarding && !safeguardingSummary ? (
                 <div className="flex justify-center py-6">
@@ -1990,7 +1972,7 @@ export default function CaringCommunityWorkflowPage() {
                 {t('caring_workflow.actions.refresh')}
               </Button>
             </CardHeader>
-            <Divider />
+            <Separator />
             <CardBody className="gap-3">
               {loadingTandems && tandemSuggestions.length === 0 ? (
                 <div className="flex items-center justify-center py-8">
@@ -2123,7 +2105,7 @@ export default function CaringCommunityWorkflowPage() {
                   {t('caring_workflow.policy.save')}
                 </Button>
               </CardHeader>
-              <Divider />
+              <Separator />
               <CardBody className="gap-4">
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <Input
@@ -2217,7 +2199,7 @@ export default function CaringCommunityWorkflowPage() {
                 </p>
               </div>
             </CardHeader>
-            <Divider />
+            <Separator />
             <CardBody className="gap-4">
               <Input
                 type="number"
@@ -2307,7 +2289,7 @@ export default function CaringCommunityWorkflowPage() {
                 </p>
               </div>
             </CardHeader>
-            <Divider />
+            <Separator />
             <CardBody className="gap-3">
               <SignalRow label={t('caring_workflow.signals.active_requests')} value={signals?.active_requests ?? 0} />
               <SignalRow label={t('caring_workflow.signals.active_offers')} value={signals?.active_offers ?? 0} />
@@ -2329,7 +2311,7 @@ export default function CaringCommunityWorkflowPage() {
                 </div>
               </div>
             </CardHeader>
-            <Divider />
+            <Separator />
             <CardBody className="gap-2">
               {loadingFavours && (
                 <p className="text-sm text-default-500">{t('caring_workflow.favours.loading_favours')}</p>
@@ -2372,7 +2354,7 @@ export default function CaringCommunityWorkflowPage() {
                 {installingRoles ? t('caring_workflow.role_pack.installing') : t('caring_workflow.role_pack.install')}
               </Button>
             </CardHeader>
-            <Divider />
+            <Separator />
             <CardBody className="gap-3">
               {rolePresets.map((role) => {
                 const Icon = role.icon;
@@ -2414,7 +2396,7 @@ export default function CaringCommunityWorkflowPage() {
             </p>
           </div>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="gap-4">
           <div className="rounded-lg border border-default-200 bg-default-50 p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
@@ -2618,7 +2600,7 @@ export default function CaringCommunityWorkflowPage() {
             {t('caring_workflow.actions.refresh')}
           </Button>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="gap-4">
           {/* Generate form */}
           <div className="flex flex-wrap items-end gap-3">
@@ -2786,7 +2768,7 @@ export default function CaringCommunityWorkflowPage() {
             <p className="mt-1 text-sm text-default-500">{t('caring_workflow.stages.description')}</p>
           </div>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="grid grid-cols-1 gap-3 md:grid-cols-5">
           {workflowStages.map((stage, index) => {
             const Icon = stage.icon;

@@ -15,21 +15,8 @@
  * system behaviour changes.
  */
 
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Accordion,
-  AccordionItem,
-  Divider,
-  Chip,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Accordion, AccordionItem, Chip, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import { useTranslation } from 'react-i18next';
 import BookOpen from 'lucide-react/icons/book-open';
 import Shield from 'lucide-react/icons/shield';
@@ -87,7 +74,7 @@ export function SafeguardingHelp() {
             </p>
           </div>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="pt-4">
           <Accordion variant="splitted" selectionMode="multiple">
             {/* ─────────────────────────────────────────────────────────────── */}

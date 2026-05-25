@@ -14,32 +14,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Select,
-  SelectItem,
-  Spinner,
-  Switch,
-  Tab,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Tabs,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Spinner, Switch, Tab, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tabs } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Network from 'lucide-react/icons/network';
 import Share2 from 'lucide-react/icons/share-2';
 import Calendar from 'lucide-react/icons/calendar';
@@ -250,7 +226,7 @@ export default function VereinFederationPanel({ organizationId }: Props) {
         <CardHeader>
           <h3 className="text-base font-semibold">{t('verein_federation.consent_title')}</h3>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="space-y-4">
           <div className="flex items-center justify-between gap-4">
             <span className="text-sm">{t('verein_federation.consent_toggle_label')}</span>
@@ -296,7 +272,7 @@ export default function VereinFederationPanel({ organizationId }: Props) {
         <CardHeader>
           <h3 className="text-base font-semibold">{t('verein_federation.network_title')}</h3>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody>
           {network.length === 0 ? (
             <p className="text-sm text-default-500 py-4 text-center">
@@ -347,7 +323,7 @@ export default function VereinFederationPanel({ organizationId }: Props) {
             {t('verein_federation.shared_events_title')}
           </h3>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody>
           <Tabs aria-label={t('verein_federation.shared_events_title')}>
             <Tab key="incoming" title={t('verein_federation.tab_incoming')}>

@@ -18,7 +18,8 @@
  */
 
 import { type ReactNode } from 'react';
-import { Card, CardBody, CardHeader, Divider, Chip } from '@heroui/react';
+import { Card, CardBody, CardHeader, Chip } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
@@ -113,7 +114,7 @@ function FeatureSection({
         {icon}
         <h2 className="text-lg font-semibold">{t(`${groupKey}.title`)}</h2>
       </CardHeader>
-      <Divider />
+      <Separator />
       <CardBody className="space-y-3">
         {intro && <p className="text-sm text-foreground-600">{intro}</p>}
         <FeatureList groupKey={group.key} items={group.items} />
@@ -516,7 +517,7 @@ export function FeaturesPage() {
             {t('features_page.tech_stack_title')}
           </h2>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="text-sm text-foreground-600">
           <ul className="grid sm:grid-cols-2 gap-y-1.5 gap-x-6 list-none">
             <li><strong>{t('features_page.tech_stack.frontend_label')}:</strong> {t('features_page.tech_stack.frontend_value')}</li>
@@ -539,7 +540,7 @@ export function FeaturesPage() {
             {t('features_page.open_source_title')}
           </h2>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="text-sm text-foreground-600 space-y-3">
           <p>
             {t('features_page.open_source_body')}
@@ -589,7 +590,7 @@ export function FeaturesPage() {
             {t('features_page.security_title')}
           </h2>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="text-sm text-foreground-600">
           <p>
             {t('features_page.security_body_before')}

@@ -10,11 +10,8 @@
  */
 
 import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
-import {
-  Card, CardBody, CardHeader, Input, Button, Select, SelectItem,
-  Divider, Switch, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
-  Tooltip, Spinner,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Input, Button, Select, SelectItem, Switch, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tooltip, Spinner } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Save from 'lucide-react/icons/save';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Send from 'lucide-react/icons/send';
@@ -544,7 +541,7 @@ export function NewsletterForm() {
                 </div>
               )}
 
-              <Divider />
+              <Separator />
               <Suspense fallback={<Spinner size="sm" className="m-4" />}>
                 <RichTextEditor
                   label={t('newsletter_form.label_content')}
@@ -766,7 +763,7 @@ export function NewsletterForm() {
                 </Select>
               )}
 
-              <Divider />
+              <Separator />
 
               {/* Geo targeting */}
               <div className="space-y-3">

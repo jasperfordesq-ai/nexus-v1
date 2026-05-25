@@ -59,7 +59,8 @@ import {
   $insertNodeToNearestRoot,
 } from '@lexical/utils';
 import { $isListNode, ListNode as ListNodeClass } from '@lexical/list';
-import { Button, Tooltip, Divider } from '@heroui/react';
+import { Button, Tooltip } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Bold from 'lucide-react/icons/bold';
 import Italic from 'lucide-react/icons/italic';
 import Underline from 'lucide-react/icons/underline';
@@ -292,7 +293,7 @@ function LegalDocToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
         </Button>
       </Tooltip>
 
-      <Divider orientation="vertical" className="h-5 mx-1" />
+      <Separator orientation="vertical" className="h-5 mx-1" />
 
       {/* Headings */}
       <Tooltip content={t('rte.heading_2')} size="sm" delay={500}>
@@ -324,7 +325,7 @@ function LegalDocToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
         </Button>
       </Tooltip>
 
-      <Divider orientation="vertical" className="h-5 mx-1" />
+      <Separator orientation="vertical" className="h-5 mx-1" />
 
       {/* Inline formatting */}
       <Tooltip content={t('rte.bold')} size="sm" delay={500}>
@@ -398,7 +399,7 @@ function LegalDocToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
         </Button>
       </Tooltip>
 
-      <Divider orientation="vertical" className="h-5 mx-1" />
+      <Separator orientation="vertical" className="h-5 mx-1" />
 
       {/* Block formatting */}
       <Tooltip content={t('rte.bullet_list')} size="sm" delay={500}>
@@ -444,7 +445,7 @@ function LegalDocToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
         </Button>
       </Tooltip>
 
-      <Divider orientation="vertical" className="h-5 mx-1" />
+      <Separator orientation="vertical" className="h-5 mx-1" />
 
       {/* Link */}
       <Tooltip
@@ -466,7 +467,7 @@ function LegalDocToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
         </Button>
       </Tooltip>
 
-      <Divider orientation="vertical" className="h-5 mx-1" />
+      <Separator orientation="vertical" className="h-5 mx-1" />
 
       {/* Notice Box — amber when cursor is inside a legal-notice block */}
       <Tooltip content={t('rte.notice_box')} size="sm" delay={500}>

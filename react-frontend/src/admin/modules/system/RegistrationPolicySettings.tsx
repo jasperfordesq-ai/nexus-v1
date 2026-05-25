@@ -10,12 +10,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Card, CardBody, CardHeader, Select, SelectItem, Switch, Button, Spinner, Chip,
-  Divider, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell,
-  Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure,
-  Accordion, AccordionItem, Tooltip,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Select, SelectItem, Switch, Button, Spinner, Chip, Input, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Accordion, AccordionItem, Tooltip } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import Save from 'lucide-react/icons/save';
 import Info from 'lucide-react/icons/info';
@@ -435,7 +431,7 @@ export function RegistrationPolicySettings() {
                 ))}
               </Select>
 
-              <Divider />
+              <Separator />
 
               <Select
                 label={t('system.label_after_verification_passes')}
@@ -521,7 +517,7 @@ export function RegistrationPolicySettings() {
           </Button>
         </div>
 
-        <Divider className="my-2" />
+        <Separator className="my-2" />
 
         {/* ── Section 4: Provider API Credentials (always visible) ── */}
         {realProviders.length > 0 && (
@@ -874,7 +870,7 @@ export function RegistrationPolicySettings() {
                     <p>{t('system.reg.info_gov_id')}</p>
                   </div>
                 </div>
-                <Divider className="my-2" />
+                <Separator className="my-2" />
                 <p className="text-default-500">
                   {t('system.reg.tip_change_modes')}
                 </p>

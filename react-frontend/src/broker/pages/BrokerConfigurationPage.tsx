@@ -10,7 +10,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Card, CardHeader, CardBody, Button, Input, Switch, Divider, Spinner } from '@heroui/react';
+import { Card, CardHeader, CardBody, Button, Input, Switch, Spinner } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
 import { Link } from 'react-router-dom';
@@ -198,7 +199,7 @@ export default function BrokerConfiguration() {
         <CardHeader>
           <h3 className="text-lg font-semibold">{t('configuration.section_messaging')}</h3>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
@@ -211,7 +212,7 @@ export default function BrokerConfiguration() {
               isDisabled={!canEditKey('broker_messaging_enabled')}
             />
           </div>
-          <Divider />
+          <Separator />
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_broker_copy_all_messages_label')}</p>
@@ -223,7 +224,7 @@ export default function BrokerConfiguration() {
               isDisabled={!canEditKey('broker_copy_all_messages')}
             />
           </div>
-          <Divider />
+          <Separator />
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_broker_copy_threshold_hours_label')}</p>
@@ -240,7 +241,7 @@ export default function BrokerConfiguration() {
               size="sm"
             />
           </div>
-          <Divider />
+          <Separator />
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_new_member_monitoring_days_label')}</p>
@@ -257,7 +258,7 @@ export default function BrokerConfiguration() {
               size="sm"
             />
           </div>
-          <Divider />
+          <Separator />
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_require_exchange_for_listings_label')}</p>
@@ -277,7 +278,7 @@ export default function BrokerConfiguration() {
         <CardHeader>
           <h3 className="text-lg font-semibold">{t('configuration.section_risk_tagging')}</h3>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
@@ -290,7 +291,7 @@ export default function BrokerConfiguration() {
               isDisabled={!canEditKey('risk_tagging_enabled')}
             />
           </div>
-          <Divider />
+          <Separator />
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_auto_flag_high_risk_label')}</p>
@@ -302,7 +303,7 @@ export default function BrokerConfiguration() {
               isDisabled={!canEditKey('auto_flag_high_risk')}
             />
           </div>
-          <Divider />
+          <Separator />
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_require_approval_high_risk_label')}</p>
@@ -314,7 +315,7 @@ export default function BrokerConfiguration() {
               isDisabled={!canEditKey('require_approval_high_risk')}
             />
           </div>
-          <Divider />
+          <Separator />
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_notify_on_high_risk_match_label')}</p>
@@ -334,7 +335,7 @@ export default function BrokerConfiguration() {
         <CardHeader>
           <h3 className="text-lg font-semibold">{t('configuration.section_exchange_workflow')}</h3>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
@@ -347,7 +348,7 @@ export default function BrokerConfiguration() {
               isDisabled={!canEditKey('broker_approval_required')}
             />
           </div>
-          <Divider />
+          <Separator />
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_auto_approve_low_risk_label')}</p>
@@ -359,7 +360,7 @@ export default function BrokerConfiguration() {
               isDisabled={!canEditKey('auto_approve_low_risk')}
             />
           </div>
-          <Divider />
+          <Separator />
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_exchange_timeout_days_label')}</p>
@@ -376,7 +377,7 @@ export default function BrokerConfiguration() {
               size="sm"
             />
           </div>
-          <Divider />
+          <Separator />
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_max_hours_without_approval_label')}</p>
@@ -395,7 +396,7 @@ export default function BrokerConfiguration() {
               isDisabled={!canEditKey('max_hours_without_approval')}
             />
           </div>
-          <Divider />
+          <Separator />
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_confirmation_deadline_hours_label')}</p>
@@ -412,7 +413,7 @@ export default function BrokerConfiguration() {
               size="sm"
             />
           </div>
-          <Divider />
+          <Separator />
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_expiry_hours_label')}</p>
@@ -429,7 +430,7 @@ export default function BrokerConfiguration() {
               size="sm"
             />
           </div>
-          <Divider />
+          <Separator />
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_allow_hour_adjustment_label')}</p>
@@ -442,7 +443,7 @@ export default function BrokerConfiguration() {
           </div>
           {config.allow_hour_adjustment && (
             <>
-              <Divider />
+              <Separator />
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">{t('configuration.field_max_hour_variance_percent_label')}</p>
@@ -469,7 +470,7 @@ export default function BrokerConfiguration() {
         <CardHeader>
           <h3 className="text-lg font-semibold">{t('configuration.section_broker_visibility')}</h3>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
@@ -481,7 +482,7 @@ export default function BrokerConfiguration() {
               onValueChange={v => updateConfig('broker_visible_to_members', v)}
             />
           </div>
-          <Divider />
+          <Separator />
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_show_broker_name_label')}</p>
@@ -492,7 +493,7 @@ export default function BrokerConfiguration() {
               onValueChange={v => updateConfig('show_broker_name', v)}
             />
           </div>
-          <Divider />
+          <Separator />
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_broker_contact_email_label')}</p>
@@ -516,7 +517,7 @@ export default function BrokerConfiguration() {
         <CardHeader>
           <h3 className="text-lg font-semibold">{t('configuration.section_message_copy_rules')}</h3>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
@@ -528,7 +529,7 @@ export default function BrokerConfiguration() {
               onValueChange={v => updateConfig('copy_first_contact', v)}
             />
           </div>
-          <Divider />
+          <Separator />
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_copy_new_member_messages_label')}</p>
@@ -539,7 +540,7 @@ export default function BrokerConfiguration() {
               onValueChange={v => updateConfig('copy_new_member_messages', v)}
             />
           </div>
-          <Divider />
+          <Separator />
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_copy_high_risk_listing_messages_label')}</p>
@@ -550,7 +551,7 @@ export default function BrokerConfiguration() {
               onValueChange={v => updateConfig('copy_high_risk_listing_messages', v)}
             />
           </div>
-          <Divider />
+          <Separator />
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_random_sample_percentage_label')}</p>
@@ -567,7 +568,7 @@ export default function BrokerConfiguration() {
               size="sm"
             />
           </div>
-          <Divider />
+          <Separator />
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_retention_days_label')}</p>
@@ -592,7 +593,7 @@ export default function BrokerConfiguration() {
         <CardHeader>
           <h3 className="text-lg font-semibold">{t('configuration.section_compliance_safeguarding')}</h3>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="gap-4">
           <div className="flex justify-between items-center">
             <div>
@@ -618,7 +619,7 @@ export default function BrokerConfiguration() {
               isDisabled={!canEditKey('insurance_enabled')}
             />
           </div>
-          <Divider />
+          <Separator />
           <div className="flex justify-between items-center">
             <div>
               <p className="font-medium">{t('configuration.field_enforce_vetting_on_exchanges_label')}</p>
@@ -643,7 +644,7 @@ export default function BrokerConfiguration() {
               isDisabled={!config.insurance_enabled || !canEditKey('enforce_insurance_on_exchanges')}
             />
           </div>
-          <Divider />
+          <Separator />
           <div className="flex items-center gap-3">
             <p className="text-sm text-default-600">{t('configuration.field_vetting_expiry_warning_days_label')}:</p>
             <Input

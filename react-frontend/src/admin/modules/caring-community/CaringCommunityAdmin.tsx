@@ -4,7 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button, Card, CardBody, CardHeader, Chip, Divider, Spinner, Switch } from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Spinner, Switch } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Heart from 'lucide-react/icons/heart';
@@ -206,7 +207,7 @@ export default function CaringCommunityAdmin() {
               aria-label={t('caring_community.switch.aria')}
             />
           </CardHeader>
-          <Divider />
+          <Separator />
           <CardBody className="space-y-4">
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               {dependentCapabilities.map((capability) => {
@@ -247,7 +248,7 @@ export default function CaringCommunityAdmin() {
               </p>
             </div>
           </CardHeader>
-          <Divider />
+          <Separator />
           <CardBody className="space-y-3">
             <Button
               as={Link}
@@ -276,7 +277,7 @@ export default function CaringCommunityAdmin() {
             >
               {t('caring_community.reporting.municipal_pack')}
             </Button>
-            <Divider />
+            <Separator />
             <div className="rounded-lg bg-default-100 p-3 text-sm text-default-600">
               {t('caring_community.reporting.note')}
             </div>

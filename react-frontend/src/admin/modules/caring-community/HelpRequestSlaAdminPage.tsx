@@ -5,24 +5,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Tab,
-  Tabs,
-  Tooltip,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tab, Tabs, Tooltip } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import AlarmClock from 'lucide-react/icons/alarm-clock';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import Info from 'lucide-react/icons/info';
@@ -449,7 +433,7 @@ export default function HelpRequestSlaAdminPage() {
             </Card>
           )}
 
-          <Divider />
+          <Separator />
           <p className="text-xs text-default-500">
             {t('help_request_sla.footer.generated', { date: new Date(data.generated_at).toLocaleString() })}{' '}
             <Abbr term="SLA" /> {t('help_request_sla.footer.proxy_prefix')}{' '}

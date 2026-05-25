@@ -11,7 +11,8 @@
  */
 
 import { useState, useCallback } from 'react';
-import { Button, Input, Spinner, Divider } from '@heroui/react';
+import { Button, Input, Spinner } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Plus from 'lucide-react/icons/plus';
 import FolderOpen from 'lucide-react/icons/folder-open';
 import Check from 'lucide-react/icons/check';
@@ -91,7 +92,7 @@ export function BookmarkCollectionPicker({ selectedId, onSelect, onClose }: Book
         </Button>
       ))}
 
-      <Divider className="my-1" />
+      <Separator className="my-1" />
 
       {/* Create new collection */}
       {isCreating ? (

@@ -12,17 +12,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  Spinner,
-  Tab,
-  Tabs,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Spinner, Tab, Tabs } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import UserPlus from 'lucide-react/icons/user-plus';
 import { PageMeta } from '@/components/seo';
 import { useAuth, useToast } from '@/contexts';
@@ -172,7 +163,7 @@ export default function MyVereinInvitationsPage() {
         <CardHeader>
           <h2 className="sr-only">{t('verein_federation.my_invitations_title')}</h2>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody>
           {loading ? (
             <div className="flex items-center justify-center py-8">

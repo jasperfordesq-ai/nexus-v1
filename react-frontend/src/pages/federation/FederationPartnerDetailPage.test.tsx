@@ -23,6 +23,7 @@ vi.mock('react-i18next', () => ({
     t: (key: string, opts?: Record<string, unknown>) =>
       (opts?.fallbackValue as string | undefined) ?? key,
   }),
+  initReactI18next: { type: '3rdParty', init: vi.fn() },
 }));
 
 vi.mock('react-router-dom', async () => {
@@ -100,7 +101,7 @@ describe('FederationPartnerDetailPage', () => {
   });
 
   it('renders partner name and description on success', async () => {
-    vi.mocked(api.get).mockResolvedValue({ success: true, data: [mockPartner] });
+    vi.mocked(api.get).mockResolvedValue({ success: true, data: mockPartner });
     render(<FederationPartnerDetailPage />);
     await waitFor(() => {
       expect(screen.getAllByText('Cork Timebank').length).toBeGreaterThanOrEqual(1);
@@ -108,10 +109,10 @@ describe('FederationPartnerDetailPage', () => {
     });
   });
 
-  it('shows not-found error when partner is not in list', async () => {
+  it('shows not-found error when API returns no partner', async () => {
     vi.mocked(api.get).mockResolvedValue({
-      success: true,
-      data: [{ ...mockPartner, id: 99 }],
+      success: false,
+      data: null,
     });
     render(<FederationPartnerDetailPage />);
     await waitFor(() => {
@@ -128,7 +129,7 @@ describe('FederationPartnerDetailPage', () => {
   });
 
   it('shows permission chips for enabled permissions', async () => {
-    vi.mocked(api.get).mockResolvedValue({ success: true, data: [mockPartner] });
+    vi.mocked(api.get).mockResolvedValue({ success: true, data: mockPartner });
     render(<FederationPartnerDetailPage />);
     await waitFor(() => {
       expect(screen.getAllByText('Cork Timebank').length).toBeGreaterThanOrEqual(1);
@@ -138,18 +139,18 @@ describe('FederationPartnerDetailPage', () => {
   });
 
   it('shows member count', async () => {
-    vi.mocked(api.get).mockResolvedValue({ success: true, data: [mockPartner] });
+    vi.mocked(api.get).mockResolvedValue({ success: true, data: mockPartner });
     render(<FederationPartnerDetailPage />);
     await waitFor(() => {
       expect(screen.getByText('partner_detail.member_count')).toBeInTheDocument();
     });
   });
 
-  it('calls the correct API endpoint to load partners list', async () => {
-    vi.mocked(api.get).mockResolvedValue({ success: true, data: [mockPartner] });
+  it('calls the correct API endpoint to load partner detail', async () => {
+    vi.mocked(api.get).mockResolvedValue({ success: true, data: mockPartner });
     render(<FederationPartnerDetailPage />);
     await waitFor(() => {
-      expect(api.get).toHaveBeenCalledWith('/v2/federation/partners');
+      expect(api.get).toHaveBeenCalledWith('/v2/federation/partners/3', expect.any(Object));
     });
   });
 });

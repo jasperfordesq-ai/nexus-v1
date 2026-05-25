@@ -16,7 +16,14 @@ import { HeroUIProvider } from '@heroui/react';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, fallback?: string) => fallback ?? key,
+    t: (key: string, opts?: { label?: string }) => {
+      const translations: Record<string, string> = {
+        'card.like_action': 'Like',
+        'reaction.react_to_post': 'React to this post',
+        'reaction.click_to_remove': `Click to remove ${opts?.label ?? 'reaction'}`,
+      };
+      return translations[key] ?? key;
+    },
     i18n: { language: 'en', changeLanguage: vi.fn() },
   }),
   initReactI18next: { type: '3rdParty', init: () => {} },
@@ -149,10 +156,7 @@ describe('ReactionPicker', () => {
     });
 
     // Picker should now be open — reaction buttons should be visible
-    const reactionButtons = screen.getAllByRole('button').filter(
-      (b) => b.getAttribute('aria-label') !== null && b.getAttribute('type') === 'button'
-    );
-    expect(reactionButtons.length).toBeGreaterThanOrEqual(8); // 8 reaction buttons + main button
+    expect(screen.getAllByRole('menuitem').length).toBe(8);
   });
 
   it('does not open picker on hover when not authenticated', () => {
@@ -178,7 +182,7 @@ describe('ReactionPicker', () => {
     act(() => { vi.advanceTimersByTime(350); });
 
     // Verify picker is open (more than 1 button)
-    expect(screen.getAllByRole('button').length).toBeGreaterThan(1);
+    expect(screen.getAllByRole('menuitem').length).toBe(8);
 
     // Mouse leave triggers close timeout — the AnimatePresence exit animation
     // may keep DOM nodes briefly. Just verify mouse leave does not throw.
@@ -200,7 +204,7 @@ describe('ReactionPicker', () => {
     act(() => { vi.advanceTimersByTime(350); });
 
     // Click the "love" reaction button
-    const loveButton = screen.getByRole('button', { name: 'reaction.love' });
+    const loveButton = screen.getByRole('menuitem', { name: 'reaction.love' });
     fireEvent.click(loveButton);
 
     expect(onReact).toHaveBeenCalledWith('love');

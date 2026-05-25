@@ -10,17 +10,8 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  CardFooter,
-  Button,
-  Chip,
-  Spinner,
-  Divider,
-  ButtonGroup,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, CardFooter, Button, Chip, Spinner, ButtonGroup } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Check from 'lucide-react/icons/check';
 import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
@@ -205,7 +196,7 @@ export function PlanSelector() {
                       </span>
                     </div>
 
-                    <Divider />
+                    <Separator />
 
                     <ul className="space-y-2">
                       {(Array.isArray(plan.features) ? plan.features : []).map((feature, idx) => (

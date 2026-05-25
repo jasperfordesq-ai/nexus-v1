@@ -19,20 +19,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Button,
-  Chip,
-  Avatar,
-  Divider,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Input,
-  Textarea,
-  useDisclosure,
-} from '@heroui/react';
+import { Button, Chip, Avatar, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Input, Textarea, useDisclosure } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Heart from 'lucide-react/icons/heart';
 import MessageCircle from 'lucide-react/icons/message-circle';
 import MapPin from 'lucide-react/icons/map-pin';
@@ -772,7 +760,7 @@ export function MarketplaceListingPage() {
           {/* Template fields */}
           {listing.template_data && Object.keys(listing.template_data).length > 0 && (
             <>
-              <Divider />
+              <Separator />
               <h3 className="text-md font-semibold text-foreground">{t('listing.details')}</h3>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {Object.entries(listing.template_data).map(([key, value]) => (

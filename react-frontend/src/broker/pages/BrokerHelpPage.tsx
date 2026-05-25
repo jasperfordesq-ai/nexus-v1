@@ -15,7 +15,8 @@
  * The standalone wrapper `BrokerHelpPage` owns the title for the /broker/help route.
  */
 
-import { Card, CardBody, CardHeader, Accordion, AccordionItem, Divider } from '@heroui/react';
+import { Card, CardBody, CardHeader, Accordion, AccordionItem } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import { Trans, useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import BookOpen from 'lucide-react/icons/book-open';
@@ -54,7 +55,7 @@ export function BrokerControlsHelp() {
             </p>
           </div>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="pt-4">
           <Accordion variant="splitted" selectionMode="multiple">
             {/* Overview */}

@@ -4,20 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  Input,
-  Spinner,
-  Tab,
-  Tabs,
-  Textarea,
-  Tooltip,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Tab, Tabs, Textarea, Tooltip } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Download from 'lucide-react/icons/download';
 import FileText from 'lucide-react/icons/file-text';
 import Info from 'lucide-react/icons/info';
@@ -432,7 +420,7 @@ export default function DisclosurePackAdminPage() {
 
       {!loading && data?.last_updated_at && (
         <>
-          <Divider />
+          <Separator />
           <p className="text-xs text-default-500 flex items-center gap-2">
             <FileText size={12} />
             {t('disclosure_pack.footer.last_saved', { date: new Date(data.last_updated_at).toLocaleString() })}

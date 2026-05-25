@@ -11,13 +11,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import {
-  Card, CardBody, CardHeader,
-  Button, Chip, Divider,
-  Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
-  Textarea, Select, SelectItem,
-  ScrollShadow, Spinner,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, Select, SelectItem, ScrollShadow, Spinner } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Flag from 'lucide-react/icons/flag';
@@ -230,7 +225,7 @@ export function MessageDetail() {
           <Shield className="w-4 h-4" />
           <span className="font-semibold">{t('messages.detail_metadata')}</span>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Sender */}
@@ -325,7 +320,7 @@ export function MessageDetail() {
           {/* Flag reason details */}
           {isFlagged && copy.flag_reason && (
             <>
-              <Divider className="my-3" />
+              <Separator className="my-3" />
               <div className="space-y-1">
                 <p className="text-sm text-default-500">{t('messages.detail_flag_reason')}</p>
                 <p className="text-sm text-foreground">{copy.flag_reason}</p>
@@ -344,7 +339,7 @@ export function MessageDetail() {
             {t('messages.detail_message_count', { count: thread.length })}
           </Chip>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="p-0">
           {thread.length === 0 ? (
             <div className="p-6 text-center">
@@ -418,7 +413,7 @@ export function MessageDetail() {
             <Archive className="w-4 h-4 text-secondary" />
             <span className="font-semibold">{t('messages.detail_archive_record')}</span>
           </CardHeader>
-          <Divider />
+          <Separator />
           <CardBody>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="space-y-1">
@@ -445,7 +440,7 @@ export function MessageDetail() {
             </div>
             {archive.decision_notes && (
               <>
-                <Divider className="my-3" />
+                <Separator className="my-3" />
                 <div className="space-y-1">
                   <p className="text-sm text-default-500">{t('messages.detail_notes')}</p>
                   <p className="text-sm text-foreground">{archive.decision_notes}</p>
@@ -462,7 +457,7 @@ export function MessageDetail() {
           <Shield className="w-4 h-4" />
           <span className="font-semibold">{t('messages.detail_actions')}</span>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody>
           {isArchived ? (
             <p className="text-sm text-default-500">

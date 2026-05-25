@@ -4,27 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Tooltip,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import ClipboardCheck from 'lucide-react/icons/clipboard-check';
@@ -298,7 +279,7 @@ export default function DataQualityAdminPage() {
                     {severityLabel(check.severity)}
                   </Chip>
                 </CardHeader>
-                <Divider />
+                <Separator />
                 <CardBody className="space-y-3 pt-3">
                   <div className="flex items-end gap-2">
                     <span className="text-3xl font-extrabold text-foreground">

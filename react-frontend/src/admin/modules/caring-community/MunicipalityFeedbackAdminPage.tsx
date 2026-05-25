@@ -6,29 +6,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
-import {
-  Button,
-  Card,
-  CardBody,
-  Chip,
-  Divider,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Select,
-  SelectItem,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Textarea,
-} from '@heroui/react';
+import { Button, Card, CardBody, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Inbox from 'lucide-react/icons/inbox';
 import Download from 'lucide-react/icons/download';
 import Info from 'lucide-react/icons/info';
@@ -368,7 +347,7 @@ export default function MunicipalityFeedbackAdminPage() {
                 {t('admin.feedback.stats.last_7_days')}: <span className="font-semibold ml-1">{stats.recent_count_7d}</span>
               </Chip>
             </div>
-            <Divider />
+            <Separator />
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-xs uppercase tracking-wide text-default-500 mr-2">{t('admin.feedback.stats.by_status')}</span>
               {Object.entries(stats.by_status).map(([k, v]) => (
@@ -606,7 +585,7 @@ export default function MunicipalityFeedbackAdminPage() {
                       <p className="text-xs uppercase tracking-wide text-default-500 mb-1">{t('admin.feedback.modal.body')}</p>
                       <p className="text-sm whitespace-pre-wrap leading-relaxed">{selected.body}</p>
                     </div>
-                    <Divider />
+                    <Separator />
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <Select
                         label={t('admin.feedback.filters.status')}

@@ -4,27 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  Alert,
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  Input,
-  Pagination,
-  Select,
-  SelectItem,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Tooltip,
-} from '@heroui/react';
+import { Alert, Button, Card, CardBody, CardHeader, Chip, Input, Pagination, Select, SelectItem, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tooltip } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Activity from 'lucide-react/icons/activity';
 import AlertTriangle from 'lucide-react/icons/alert-triangle';
 import CheckCircle2 from 'lucide-react/icons/check-circle-2';
@@ -469,7 +450,7 @@ export default function EmailDeliverability() {
             )}
           </div>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody>
           <div className="grid gap-3 md:grid-cols-3">
             <div className="rounded-md border border-[var(--color-border)] p-3">
@@ -493,7 +474,7 @@ export default function EmailDeliverability() {
           <h2 className="text-lg font-semibold text-theme-primary">{t('email_deliverability.trigger_issues.title')}</h2>
           <p className="text-sm text-theme-secondary">{t('email_deliverability.trigger_issues.subtitle')}</p>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody>
           <Table aria-label={t('email_deliverability.trigger_issues.table_label')} removeWrapper>
             <TableHeader>
@@ -553,7 +534,7 @@ export default function EmailDeliverability() {
             </Button>
           </Tooltip>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody>
           {loadingQueues ? <Spinner /> : (
             <Table aria-label={t('email_deliverability.queues.table_label')} removeWrapper>

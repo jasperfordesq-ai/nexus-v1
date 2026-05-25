@@ -11,19 +11,8 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Input,
-  Switch,
-  Button,
-  Textarea,
-  Spinner,
-  Select,
-  SelectItem,
-  Divider,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Input, Switch, Button, Textarea, Spinner, Select, SelectItem } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import ChevronUp from 'lucide-react/icons/chevron-up';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import Save from 'lucide-react/icons/save';
@@ -227,7 +216,7 @@ function HeroEditor({
         size="sm"
         minRows={2}
       />
-      <Divider />
+      <Separator />
       <p className="text-sm font-medium text-default-600">{t('content.landing_primary_cta')}</p>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Input
@@ -344,7 +333,7 @@ function AudienceCardsEditor({
           size="sm"
         />
       </div>
-      <Divider />
+      <Separator />
       <p className="text-xs text-default-500">
         {t('content.landing_audience_cards_hint')}
       </p>
@@ -630,7 +619,7 @@ function HowItWorksEditor({
           size="sm"
         />
       </div>
-      <Divider />
+      <Separator />
       {steps.map((step, i) => (
         <Card key={i} shadow="none" className="border border-default-200">
           <CardBody className="flex flex-col gap-3 p-3">
@@ -734,7 +723,7 @@ function CoreValuesEditor({
           size="sm"
         />
       </div>
-      <Divider />
+      <Separator />
       {values.map((val, i) => (
         <Card key={i} shadow="none" className="border border-default-200">
           <CardBody className="flex flex-col gap-3 p-3">
@@ -977,7 +966,7 @@ function SectionCard({
       </CardHeader>
       {isExpanded && (
         <CardBody className="px-4 pb-4 pt-0">
-          <Divider className="mb-4" />
+          <Separator className="mb-4" />
           {renderEditor()}
         </CardBody>
       )}

@@ -13,15 +13,8 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import {
-  Button,
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  Input,
-  Spinner,
-  Divider,
-} from '@heroui/react';
+import { Button, Popover, PopoverTrigger, PopoverContent, Input, Spinner } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Bookmark from 'lucide-react/icons/bookmark';
 import BookmarkPlus from 'lucide-react/icons/bookmark-plus';
 import Plus from 'lucide-react/icons/plus';
@@ -228,7 +221,7 @@ export function SaveButton({
                 </Button>
               ))}
 
-              <Divider className="my-1" />
+              <Separator className="my-1" />
 
               {creating ? (
                 <div className="flex items-center gap-1 px-1 py-1">

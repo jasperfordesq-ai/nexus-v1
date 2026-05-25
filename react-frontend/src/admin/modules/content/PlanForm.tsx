@@ -10,10 +10,8 @@
  */
 
 import { useState, useEffect } from 'react';
-import {
-  Card, CardBody, CardHeader,
-  Input, Textarea, Switch, Button, Spinner, Chip, Divider,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Input, Textarea, Switch, Button, Spinner, Chip } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import CreditCard from 'lucide-react/icons/credit-card';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
@@ -324,7 +322,7 @@ export function PlanForm() {
                   aria-label={t('content.label_active')}
                 />
               </div>
-              <Divider />
+              <Separator />
               <div className="grid grid-cols-2 gap-3">
                 <Input
                   label={t('content.max_menus')}

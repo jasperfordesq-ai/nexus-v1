@@ -12,22 +12,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Button,
-  Spinner,
-  Input,
-  Divider,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Chip, Button, Spinner, Input, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import Clock from 'lucide-react/icons/clock';
 import Users from 'lucide-react/icons/users';
@@ -252,7 +238,7 @@ function JobBiasAudit() {
                 {t('jobs.bias_hiring_funnel')}
               </h3>
             </CardHeader>
-            <Divider />
+            <Separator />
             <CardBody className="space-y-3 py-6">
               {FUNNEL_STAGES.map((stage) => {
                 const count = report.funnel[stage] ?? 0;
@@ -289,7 +275,7 @@ function JobBiasAudit() {
                   {t('jobs.bias_rejection_rates')}
                 </h3>
               </CardHeader>
-              <Divider />
+              <Separator />
               <CardBody>
                 <Table
                   aria-label={t('jobs.bias_rejection_rates_table')}
@@ -331,7 +317,7 @@ function JobBiasAudit() {
                   {t('jobs.bias_avg_time_stage')}
                 </h3>
               </CardHeader>
-              <Divider />
+              <Separator />
               <CardBody>
                 <Table
                   aria-label={t('jobs.bias_avg_time_stage_table')}
@@ -370,7 +356,7 @@ function JobBiasAudit() {
                 {t('jobs.bias_source_effectiveness')}
               </h3>
             </CardHeader>
-            <Divider />
+            <Separator />
             <CardBody>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {/* Direct */}

@@ -14,11 +14,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import {
-  Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
-  Card, CardBody, Switch, Input, Select, SelectItem,
-  Button, Chip, Spinner, Divider,
-} from '@heroui/react';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Card, CardBody, Switch, Input, Select, SelectItem, Button, Chip, Spinner } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import ExternalLink from 'lucide-react/icons/external-link';
 import Save from 'lucide-react/icons/save';
 import Info from 'lucide-react/icons/info';
@@ -499,7 +496,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
 
                     return (
                       <div key={option.key}>
-                        {idx > 0 && <Divider className="my-2" />}
+                        {idx > 0 && <Separator className="my-2" />}
                         <ConfigOptionRow
                           option={option}
                           value={currentValue}

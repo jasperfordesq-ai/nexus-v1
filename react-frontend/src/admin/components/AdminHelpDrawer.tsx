@@ -3,7 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Button, Divider, Chip } from '@heroui/react';
+import { Button, Chip } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import { Link } from 'react-router-dom';
 import X from 'lucide-react/icons/x';
 import LightbulbIcon from 'lucide-react/icons/lightbulb';
@@ -73,7 +74,7 @@ export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerPro
           {/* Steps */}
           {article.steps && article.steps.length > 0 && (
             <>
-              <Divider />
+              <Separator />
               <div>
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-default-400 mb-3">
                   {t('help_drawer.how_to_use')}
@@ -104,7 +105,7 @@ export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerPro
           {/* Tips */}
           {article.tips && article.tips.length > 0 && (
             <>
-              <Divider />
+              <Separator />
               <div>
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-default-400 mb-3">
                   {t('help_drawer.tips')}
@@ -131,7 +132,7 @@ export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerPro
           {/* Caution */}
           {article.caution && (
             <>
-              <Divider />
+              <Separator />
               <div className="flex gap-2.5 rounded-lg border border-danger-200 bg-danger-50 px-3 py-3 text-xs text-danger-700 leading-relaxed">
                 <TriangleAlertIcon
                   size={14}
@@ -146,7 +147,7 @@ export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerPro
           {/* Related pages */}
           {article.relatedPaths && article.relatedPaths.length > 0 && (
             <>
-              <Divider />
+              <Separator />
               <div>
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-default-400 mb-3">
                   {t('help_drawer.related_pages')}

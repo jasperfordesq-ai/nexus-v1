@@ -17,10 +17,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import {
-  Card, CardBody, CardHeader, Switch, Input, Button, Spinner,
-  Chip, Divider, Textarea,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Switch, Input, Button, Spinner, Chip, Textarea } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Save from 'lucide-react/icons/save';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import ExternalLink from 'lucide-react/icons/external-link';
@@ -466,7 +464,7 @@ export function SeoOverview() {
               </div>
               <Switch isSelected={!!formData.seo_auto_sitemap} onValueChange={(v) => updateField('seo_auto_sitemap', v)} aria-label={t('label_auto_sitemap')} />
             </div>
-            <Divider />
+            <Separator />
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{t('canonical_urls')}</p>
@@ -474,7 +472,7 @@ export function SeoOverview() {
               </div>
               <Switch isSelected={!!formData.seo_canonical_urls} onValueChange={(v) => updateField('seo_canonical_urls', v)} aria-label={t('canonical_urls')} />
             </div>
-            <Divider />
+            <Separator />
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{t('open_graph_tags')}</p>
@@ -482,7 +480,7 @@ export function SeoOverview() {
               </div>
               <Switch isSelected={!!formData.seo_open_graph} onValueChange={(v) => updateField('seo_open_graph', v)} aria-label={t('label_open_graph')} />
             </div>
-            <Divider />
+            <Separator />
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{t('twitter_cards')}</p>
@@ -573,12 +571,12 @@ export function SeoOverview() {
                     <ExternalLink size={12} />
                   </a>
                 </div>
-                <Divider />
+                <Separator />
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">{t('sitemap_total_urls')}</span>
                   <Chip color="primary" variant="flat">{sitemapStats.total_urls}</Chip>
                 </div>
-                <Divider />
+                <Separator />
                 <div>
                   <p className="text-sm font-medium mb-2">{t('sitemap_urls_by_type')}</p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">

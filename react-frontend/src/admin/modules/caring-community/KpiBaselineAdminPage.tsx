@@ -5,29 +5,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Textarea,
-  Tooltip,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, Tooltip } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import BarChart2 from 'lucide-react/icons/bar-chart-2';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import Database from 'lucide-react/icons/database';
@@ -470,7 +449,7 @@ export default function KpiBaselineAdminPage() {
                   minRows={2}
                   description={t('kpi_baselines.fields.notes_description')}
                 />
-                <Divider />
+                <Separator />
                 <p className="text-xs text-[var(--color-text-muted)]">
                   {t('kpi_baselines.modal.metrics_captured')}
                 </p>

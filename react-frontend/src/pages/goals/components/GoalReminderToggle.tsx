@@ -15,13 +15,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import {
-  Button,
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  Divider,
-} from '@heroui/react';
+import { Button, Popover, PopoverTrigger, PopoverContent } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Bell from 'lucide-react/icons/bell';
 import BellOff from 'lucide-react/icons/bell-off';
 import BellRing from 'lucide-react/icons/bell-ring';
@@ -160,7 +155,7 @@ export function GoalReminderToggle({ goalId, className = '' }: GoalReminderToggl
             </p>
           )}
 
-          <Divider />
+          <Separator />
 
           <div className="space-y-1">
             {FREQUENCIES.map((freq) => (
@@ -184,7 +179,7 @@ export function GoalReminderToggle({ goalId, className = '' }: GoalReminderToggl
 
           {hasReminder && (
             <>
-              <Divider />
+              <Separator />
               <Button
                 size="sm"
                 variant="flat"

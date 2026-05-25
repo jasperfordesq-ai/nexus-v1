@@ -4,20 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  Accordion,
-  AccordionItem,
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  Select,
-  SelectItem,
-  Spinner,
-  Tooltip,
-} from '@heroui/react';
+import { Accordion, AccordionItem, Button, Card, CardBody, CardHeader, Chip, Select, SelectItem, Spinner, Tooltip } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Building from 'lucide-react/icons/building';
 import Download from 'lucide-react/icons/download';
 import Info from 'lucide-react/icons/info';
@@ -455,7 +443,7 @@ function CapabilityRow({ capability, saving, onChange, onReset, t }: CapabilityR
         </div>
       </div>
 
-      <Divider className="mt-3" />
+      <Separator className="mt-3" />
       <p className="mt-2 text-[10px] uppercase tracking-wide text-default-400">
         {t('commercial_boundary.labels.key')}: <code>{capability.key}</code>
       </p>

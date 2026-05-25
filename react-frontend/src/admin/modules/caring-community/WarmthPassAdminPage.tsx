@@ -6,16 +6,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  Input,
-  Spinner,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import CheckCircle from 'lucide-react/icons/check-circle';
 import Clock from 'lucide-react/icons/clock';
 import Info from 'lucide-react/icons/info';
@@ -136,7 +128,7 @@ export function WarmthPassAdminPage() {
         <CardHeader>
           <p className="font-semibold text-sm">{t('admin.warmth_pass.lookup.title')}</p>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="p-5">
           <div className="flex items-end gap-3">
             <Input
@@ -204,7 +196,7 @@ export function WarmthPassAdminPage() {
               </Chip>
             </div>
           </CardHeader>
-          <Divider />
+          <Separator />
           <CardBody className="space-y-5 p-6">
             {/* Not eligible notice */}
             {result.tier < 2 && (
@@ -257,7 +249,7 @@ export function WarmthPassAdminPage() {
               </div>
             </div>
 
-            <Divider />
+            <Separator />
 
             {/* Stats */}
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
@@ -277,7 +269,7 @@ export function WarmthPassAdminPage() {
               </div>
             </div>
 
-            <Divider />
+            <Separator />
 
             {/* Categories */}
             <div>
@@ -297,7 +289,7 @@ export function WarmthPassAdminPage() {
               )}
             </div>
 
-            <Divider />
+            <Separator />
 
             {/* Dates */}
             <div className="grid gap-4 sm:grid-cols-2">

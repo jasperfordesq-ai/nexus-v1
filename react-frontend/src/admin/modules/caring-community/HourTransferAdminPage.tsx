@@ -19,29 +19,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Spinner,
-  Tab,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Tabs,
-  Textarea,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Tab, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tabs, Textarea } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import Check from 'lucide-react/icons/check';
 import Inbox from 'lucide-react/icons/inbox';
@@ -262,7 +241,7 @@ export default function HourTransferAdminPage() {
                 {t('admin.hour_transfers.pending.description')}
               </p>
             </CardHeader>
-            <Divider />
+            <Separator />
             <CardBody className="p-0">
               {loadingPending ? (
                 <div className="flex justify-center py-12">
@@ -360,7 +339,7 @@ export default function HourTransferAdminPage() {
                 {t('admin.hour_transfers.inbound.description')}
               </p>
             </CardHeader>
-            <Divider />
+            <Separator />
             <CardBody className="p-0">
               {loadingInbound ? (
                 <div className="flex justify-center py-12">

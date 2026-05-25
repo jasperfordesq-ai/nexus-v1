@@ -18,7 +18,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Card, CardBody, CardHeader, Input, Switch, Button, Select, SelectItem, Spinner, Divider, Chip } from '@heroui/react';
+import { Card, CardBody, CardHeader, Input, Switch, Button, Select, SelectItem, Spinner, Chip } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Bot from 'lucide-react/icons/bot';
 import Save from 'lucide-react/icons/save';
 import Key from 'lucide-react/icons/key';
@@ -389,7 +390,7 @@ export function AiSettings() {
                     ))}
                   </Select>
 
-                  {provider.key !== PROVIDERS[PROVIDERS.length - 1]!.key && <Divider />}
+                  {provider.key !== PROVIDERS[PROVIDERS.length - 1]!.key && <Separator />}
                 </div>
               );
             })}

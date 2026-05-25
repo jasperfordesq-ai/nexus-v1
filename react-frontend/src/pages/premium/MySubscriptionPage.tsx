@@ -5,7 +5,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardBody, CardHeader, Button, Chip, Spinner, Divider } from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Chip, Spinner } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Crown from 'lucide-react/icons/crown';
 import ExternalLink from 'lucide-react/icons/external-link';
 import { useTranslation } from 'react-i18next';
@@ -200,7 +201,7 @@ export function MySubscriptionPage() {
             </div>
           )}
 
-          <Divider />
+          <Separator />
 
           <div className="flex flex-col gap-2 sm:flex-row">
             <Button

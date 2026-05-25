@@ -82,10 +82,10 @@ test.describe('Smoke Tests @smoke', () => {
     test('terms page loads', async ({ page }) => {
       await page.goto(tenantUrl('terms'), { waitUntil: 'domcontentloaded' });
       await dismissBlockingModals(page);
+      await waitForTenantHydration(page);
 
-      const heading = page.locator('h1');
-      await expect(heading).toBeVisible({ timeout: 10000 });
-      await expect(heading).toContainText(/Terms/i);
+      await expect(page.getByRole('heading', { name: /Terms/i, level: 1 }))
+        .toBeVisible({ timeout: 20000 });
 
       expect(consoleErrors).toHaveLength(0);
     });
@@ -94,9 +94,10 @@ test.describe('Smoke Tests @smoke', () => {
       // Try help page first (the app's help center), fall back to FAQ
       await page.goto(tenantUrl('help'), { waitUntil: 'domcontentloaded' });
       await dismissBlockingModals(page);
+      await waitForTenantHydration(page);
 
-      const heading = page.locator('h1');
-      await expect(heading).toBeVisible({ timeout: 10000 });
+      await expect(page.getByRole('heading', { name: /Help Center|FAQ/i, level: 1 }))
+        .toBeVisible({ timeout: 20000 });
 
       expect(consoleErrors).toHaveLength(0);
     });

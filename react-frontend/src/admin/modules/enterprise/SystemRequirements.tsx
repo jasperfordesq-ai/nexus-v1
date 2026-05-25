@@ -10,16 +10,8 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Spinner,
-  Chip,
-  Input,
-  Divider,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Spinner, Chip, Input } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import XCircle from 'lucide-react/icons/circle-x';
@@ -276,7 +268,7 @@ export function SystemRequirements() {
                     </div>
                   ))}
                 </div>
-                <Divider className="my-0" />
+                <Separator className="my-0" />
               </CardBody>
             </Card>
           )}

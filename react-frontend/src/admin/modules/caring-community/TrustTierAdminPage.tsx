@@ -4,22 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState } from 'react';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Divider,
-  Input,
-  Spinner,
-  Switch,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Input, Spinner, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Save from 'lucide-react/icons/save';
@@ -229,7 +215,7 @@ export function TrustTierAdminPage() {
           <CardHeader>
             <p className="font-semibold text-sm">{t('admin.trust_tier.criteria.title')}</p>
           </CardHeader>
-          <Divider />
+          <Separator />
           <CardBody className="space-y-6 p-6">
             {TIER_ORDER.map((tierName, i) => (
               <div key={tierName}>
@@ -238,7 +224,7 @@ export function TrustTierAdminPage() {
                   criteria={criteria[tierName]}
                   onChange={handleChange}
                 />
-                {i < TIER_ORDER.length - 1 && <Divider className="mt-6" />}
+                {i < TIER_ORDER.length - 1 && <Separator className="mt-6" />}
               </div>
             ))}
           </CardBody>
@@ -249,7 +235,7 @@ export function TrustTierAdminPage() {
         <CardHeader>
           <p className="font-semibold text-sm">{t('admin.trust_tier.reference.title')}</p>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="p-0">
           <Table aria-label={t('admin.trust_tier.reference.aria')} removeWrapper>
             <TableHeader>

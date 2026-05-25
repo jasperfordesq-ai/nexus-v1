@@ -6,9 +6,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import {
-  Card, CardBody, CardHeader, Button, Input, Select, SelectItem, Switch, Divider,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Input, Select, SelectItem, Switch } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Save from 'lucide-react/icons/save';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
@@ -186,7 +185,7 @@ export function SuperUserForm() {
                 <Input label={t('super.label_location')} value={form.location} onValueChange={(v) => update('location', v)} />
                 <Input label={t('super.label_phone')} value={form.phone} onValueChange={(v) => update('phone', v)} />
               </div>
-              <Divider />
+              <Separator />
               <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-lg p-4">
                 <Switch
                   isSelected={form.is_tenant_super_admin}
@@ -218,7 +217,7 @@ export function SuperUserForm() {
             {/* User Details Form */}
             <Card>
               <CardHeader className="font-semibold text-lg">{t('super.section_user_details')}</CardHeader>
-              <Divider />
+              <Separator />
               <CardBody>
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                   <div className="grid grid-cols-2 gap-4">
@@ -253,7 +252,7 @@ export function SuperUserForm() {
                 <ArrowRightLeft size={18} />
                 {t('super.move_user_to_tenant_title')}
               </CardHeader>
-              <Divider />
+              <Separator />
               <CardBody className="flex flex-col gap-4">
                 <div className="bg-primary-50 border border-primary-200 text-primary-700 rounded-medium p-3">
                   <p className="text-sm font-medium mb-2">{t('super.how_it_works')}</p>
@@ -293,7 +292,7 @@ export function SuperUserForm() {
                 <Crown size={18} className="text-secondary" />
                 {t('super.move_and_promote_to_hub')}
               </CardHeader>
-              <Divider />
+              <Separator />
               <CardBody className="flex flex-col gap-4">
                 <div className="bg-purple-50 dark:bg-purple-50/10 border border-purple-200 dark:border-purple-200/20 rounded-lg p-3">
                   <p className="text-sm text-purple-700 dark:text-purple-400 font-medium mb-2">{t('super.four_step_workflow')}</p>
@@ -339,7 +338,7 @@ export function SuperUserForm() {
             {/* Status Card */}
             <Card>
               <CardHeader className="font-semibold text-lg">{t('super.section_status')}</CardHeader>
-              <Divider />
+              <Separator />
               <CardBody>
                 <div className="flex flex-col gap-3">
                   <div>
@@ -363,7 +362,7 @@ export function SuperUserForm() {
             {/* Super Admin Privileges */}
             <Card className="bg-gradient-to-br from-purple-500/5 to-pink-500/5 border border-purple-500/20">
               <CardHeader className="font-semibold text-lg">{t('super.super_admin_privileges')}</CardHeader>
-              <Divider />
+              <Separator />
               <CardBody className="flex flex-col gap-3">
                 <div>
                   <p className="text-xs text-default-400 mb-1">{t('super.tenant_super_admin')}</p>
@@ -397,7 +396,7 @@ export function SuperUserForm() {
             {/* Quick Links */}
             <Card>
               <CardHeader className="font-semibold text-lg">{t('super.quick_links')}</CardHeader>
-              <Divider />
+              <Separator />
               <CardBody className="flex flex-col gap-2">
                 <Button
                   variant="flat"

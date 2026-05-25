@@ -10,6 +10,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@/test/test-utils';
 
+const tenantHasFeature = vi.fn(() => true);
+const tenantHasModule = vi.fn(() => true);
+const tenantPath = (p: string) => `/test${p}`;
+
 // Mock API module
 // Default mock: returns exchange_workflow_enabled config and empty exchanges
 vi.mock('@/lib/api', () => ({
@@ -37,9 +41,9 @@ vi.mock('@/contexts', () => ({
   })),
   useTenant: vi.fn(() => ({
     tenant: { id: 2, name: 'Test Tenant', slug: 'test' },
-    tenantPath: (p: string) => `/test${p}`,
-    hasFeature: vi.fn(() => true),
-    hasModule: vi.fn(() => true),
+    tenantPath,
+    hasFeature: tenantHasFeature,
+    hasModule: tenantHasModule,
   })),
   useToast: vi.fn(() => ({
     success: vi.fn(),
@@ -139,7 +143,23 @@ import { ExchangesPage } from './ExchangesPage';
 describe('ExchangesPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    tenantHasFeature.mockReturnValue(true);
+    tenantHasModule.mockReturnValue(true);
   });
+
+  const mockLoadedExchanges = async (exchanges: unknown[]) => {
+    const { api } = await import('@/lib/api');
+    vi.mocked(api.get).mockImplementation((url: string) => {
+      if (url.includes('/config')) {
+        return Promise.resolve({
+          success: true,
+          data: { exchange_workflow_enabled: true },
+          meta: {},
+        });
+      }
+      return Promise.resolve({ success: true, data: exchanges, meta: { has_more: false } });
+    });
+  };
 
   it('renders page title and description', () => {
     render(<ExchangesPage />);
@@ -178,7 +198,6 @@ describe('ExchangesPage', () => {
   });
 
   it('displays exchanges when loaded', async () => {
-    const { api } = await import('@/lib/api');
     const mockExchanges = [
       {
         id: 1,
@@ -195,10 +214,7 @@ describe('ExchangesPage', () => {
       },
     ];
 
-    // First call for config, second for exchanges
-    vi.mocked(api.get)
-      .mockResolvedValueOnce({ success: true, data: { exchange_workflow_enabled: true }, meta: {} })
-      .mockResolvedValueOnce({ success: true, data: mockExchanges, meta: {} });
+    await mockLoadedExchanges(mockExchanges);
 
     render(<ExchangesPage />);
 
@@ -209,7 +225,6 @@ describe('ExchangesPage', () => {
   });
 
   it('shows role indicator for requester', async () => {
-    const { api } = await import('@/lib/api');
     const mockExchanges = [
       {
         id: 1,
@@ -226,9 +241,7 @@ describe('ExchangesPage', () => {
       },
     ];
 
-    vi.mocked(api.get)
-      .mockResolvedValueOnce({ success: true, data: { exchange_workflow_enabled: true }, meta: {} })
-      .mockResolvedValueOnce({ success: true, data: mockExchanges, meta: {} });
+    await mockLoadedExchanges(mockExchanges);
 
     render(<ExchangesPage />);
 
@@ -238,7 +251,6 @@ describe('ExchangesPage', () => {
   });
 
   it('shows hour count on exchange cards', async () => {
-    const { api } = await import('@/lib/api');
     const mockExchanges = [
       {
         id: 1,
@@ -255,9 +267,7 @@ describe('ExchangesPage', () => {
       },
     ];
 
-    vi.mocked(api.get)
-      .mockResolvedValueOnce({ success: true, data: { exchange_workflow_enabled: true }, meta: {} })
-      .mockResolvedValueOnce({ success: true, data: mockExchanges, meta: {} });
+    await mockLoadedExchanges(mockExchanges);
 
     render(<ExchangesPage />);
 

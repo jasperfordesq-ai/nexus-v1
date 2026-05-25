@@ -11,15 +11,8 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Progress,
-  Spinner,
-  Divider,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Progress, Spinner } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import Target from 'lucide-react/icons/target';
@@ -294,32 +287,32 @@ export function MatchingAnalytics() {
                       label={t('matching.label_matches_today')}
                       value={overview.total_matches_today}
                     />
-                    <Divider />
+                    <Separator />
                     <ActivityRow
                       label={t('matching.label_matches_this_week')}
                       value={overview.total_matches_week}
                     />
-                    <Divider />
+                    <Separator />
                     <ActivityRow
                       label={t('matching.label_matches_this_month')}
                       value={overview.total_matches_month}
                     />
-                    <Divider />
+                    <Separator />
                     <ActivityRow
                       label={t('matching.label_hot_matches')}
                       value={overview.hot_matches_count}
                     />
-                    <Divider />
+                    <Separator />
                     <ActivityRow
                       label={t('matching.label_mutual_matches')}
                       value={overview.mutual_matches_count}
                     />
-                    <Divider />
+                    <Separator />
                     <ActivityRow
                       label={t('matching.label_active_users_in_matching')}
                       value={overview.active_users_matching}
                     />
-                    <Divider />
+                    <Separator />
                     <ActivityRow
                       label={t('matching.label_cache_entries')}
                       value={overview.cache_entries}
@@ -347,19 +340,19 @@ export function MatchingAnalytics() {
                       value={stats.pending_approvals}
                       color="text-warning"
                     />
-                    <Divider />
+                    <Separator />
                     <ActivityRow
                       label={t('matching.label_approved_matches')}
                       value={stats.approved_count}
                       color="text-success"
                     />
-                    <Divider />
+                    <Separator />
                     <ActivityRow
                       label={t('matching.label_rejected_matches')}
                       value={stats.rejected_count}
                       color="text-danger"
                     />
-                    <Divider />
+                    <Separator />
                     <div className="flex items-center justify-between py-1">
                       <span className="text-sm text-default-600">{t('matching.label_approval_rate')}</span>
                       <span className="text-sm font-bold text-success">
@@ -372,7 +365,7 @@ export function MatchingAnalytics() {
                       size="sm"
                       aria-label={t('matching.approval_rate_aria', { value: stats.approval_rate })}
                     />
-                    <Divider />
+                    <Separator />
                     <div className="flex items-center justify-between py-1">
                       <span className="text-sm text-default-600">
                         {t('matching.label_broker_approval')}

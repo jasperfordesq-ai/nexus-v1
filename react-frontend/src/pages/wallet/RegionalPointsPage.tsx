@@ -15,23 +15,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  Input,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Textarea,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Coins from 'lucide-react/icons/coins';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Send from 'lucide-react/icons/send';
@@ -279,7 +264,7 @@ export default function RegionalPointsPage() {
               {t('regional_points.transfer.title')}
             </h2>
           </CardHeader>
-          <Divider />
+          <Separator />
           <CardBody className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Input
@@ -333,7 +318,7 @@ export default function RegionalPointsPage() {
             {history?.length ?? 0}
           </Chip>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="p-0">
           {!history || history.length === 0 ? (
             <div className="text-center py-12 text-sm text-default-500">

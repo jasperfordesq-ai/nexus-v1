@@ -10,20 +10,8 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import {
-  Button,
-  Card,
-  CardHeader,
-  CardBody,
-  Input,
-  Select,
-  SelectItem,
-  Switch,
-  Chip,
-  Spinner,
-  Divider,
-  Tooltip,
-} from '@heroui/react';
+import { Button, Card, CardHeader, CardBody, Input, Select, SelectItem, Switch, Chip, Spinner, Tooltip } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Save from 'lucide-react/icons/save';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Plus from 'lucide-react/icons/plus';
@@ -448,7 +436,7 @@ export function SegmentForm() {
               : t('segment_form.match_any_description')}
           </p>
 
-          <Divider />
+          <Separator />
 
           {rules.map((rule, index) => (
             <div key={rule.id} className="flex flex-wrap items-end gap-2">

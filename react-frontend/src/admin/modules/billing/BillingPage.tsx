@@ -10,23 +10,8 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Chip,
-  Spinner,
-  Divider,
-  Progress,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Textarea,
-  useDisclosure,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Chip, Spinner, Progress, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, useDisclosure } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import CreditCard from 'lucide-react/icons/credit-card';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import Receipt from 'lucide-react/icons/receipt';
@@ -190,7 +175,7 @@ export function BillingPage() {
               {t('billing.your_plan_usage')}
             </h3>
           </CardHeader>
-          <Divider />
+          <Separator />
           <CardBody className="gap-4">
             {maxUsers === null ? (
               <p className="text-success font-medium">
@@ -278,7 +263,7 @@ export function BillingPage() {
               <CreditCard className="w-5 h-5 text-primary" />
               <h3 className="text-lg font-semibold">{t('billing.current_plan')}</h3>
             </CardHeader>
-            <Divider />
+            <Separator />
             <CardBody className="gap-4">
               {hasActiveSubscription ? (
                 <>
@@ -354,7 +339,7 @@ export function BillingPage() {
             <CardHeader>
               <h3 className="text-lg font-semibold">{t('billing.actions')}</h3>
             </CardHeader>
-            <Divider />
+            <Separator />
             <CardBody className="gap-3">
               <Button
                 as={Link}

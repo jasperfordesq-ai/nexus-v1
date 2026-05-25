@@ -15,32 +15,8 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Checkbox,
-  Chip,
-  Divider,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Select,
-  SelectItem,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Textarea,
-  Input,
-  useDisclosure,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Checkbox, Chip, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, Input, useDisclosure } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import AlertTriangle from 'lucide-react/icons/alert-triangle';
 import Bell from 'lucide-react/icons/bell';
 import BellOff from 'lucide-react/icons/bell-off';
@@ -244,7 +220,7 @@ export default function EmergencyAlertAdminPage() {
             {t('caring_emergency.actions.open_send_modal')}
           </Button>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody>
           {loading && (
             <div className="flex justify-center py-10">
@@ -435,7 +411,7 @@ export default function EmergencyAlertAdminPage() {
               variant="bordered"
               description={t('caring_emergency.form.expires_at_description')}
             />
-            <Divider />
+            <Separator />
             <Checkbox
               isSelected={confirmed}
               onValueChange={setConfirmed}

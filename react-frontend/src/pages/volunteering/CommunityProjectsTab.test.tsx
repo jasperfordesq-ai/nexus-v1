@@ -13,7 +13,22 @@ import { framerMotionMock } from '@/test/mocks';
 
 vi.mock('framer-motion', () => framerMotionMock);
 
-const stableT = (_key: string, fallback: string, _opts?: object) => fallback ?? _key;
+const communityProjectTranslations: Record<string, string> = {
+  'community_projects.heading': 'Community Projects',
+  'community_projects.propose': 'Propose a Project',
+  'community_projects.empty_title': 'No community projects yet',
+  'community_projects.empty_description': 'Propose a project to mobilize your community.',
+  'community_projects.load_error': 'Unable to load community projects.',
+  'community_projects.try_again': 'Try Again',
+  'community_projects.status.proposed': 'Proposed',
+};
+
+const stableT = (key: string, opts?: { count?: number }) => {
+  if (key === 'community_projects.volunteers_needed') {
+    return `${opts?.count ?? 0} volunteers needed`;
+  }
+  return communityProjectTranslations[key] ?? key;
+};
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: stableT,

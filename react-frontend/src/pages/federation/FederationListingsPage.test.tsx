@@ -23,6 +23,7 @@ vi.mock('react-i18next', () => ({
     t: (key: string, opts?: Record<string, unknown>) =>
       (opts?.fallbackValue as string | undefined) ?? key,
   }),
+  initReactI18next: { type: '3rdParty', init: vi.fn() },
 }));
 
 vi.mock('react-router-dom', async () => {
@@ -195,6 +196,7 @@ describe('FederationListingsPage', () => {
     await waitFor(() => {
       expect(api.get).toHaveBeenCalledWith(
         expect.stringContaining('/v2/federation/listings'),
+        expect.any(Object),
       );
     });
     expect(api.get).toHaveBeenCalledWith(

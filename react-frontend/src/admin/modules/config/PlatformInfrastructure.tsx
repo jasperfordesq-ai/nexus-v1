@@ -16,10 +16,8 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import {
-  Card, CardBody, CardHeader, Switch, Spinner, Button, Divider,
-  Select, SelectItem, Checkbox, Input,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Switch, Spinner, Button, Select, SelectItem, Checkbox, Input } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Globe from 'lucide-react/icons/globe';
 import MapPin from 'lucide-react/icons/map-pin';
 import KeyRound from 'lucide-react/icons/key-round';
@@ -231,7 +229,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                 ))}
               </Select>
             </div>
-            <Divider />
+            <Separator />
             <div>
               <p className="text-sm font-medium mb-1">{t('tenant_features.available_languages')}</p>
               <p className="text-xs text-default-400 mb-3">
@@ -299,7 +297,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
               </div>
             )}
 
-            <Divider />
+            <Separator />
 
             <div className="flex items-center justify-between rounded-lg bg-default-100 dark:bg-default-50/5 px-3 py-3 opacity-60">
               <div className="pr-4">
@@ -324,7 +322,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
               />
             </div>
 
-            <Divider />
+            <Separator />
 
             <div>
               <p className="text-sm font-medium mb-1">
@@ -471,7 +469,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
               />
             </div>
 
-            <Divider />
+            <Separator />
 
             <div>
               <div className="flex items-center justify-between mb-1">

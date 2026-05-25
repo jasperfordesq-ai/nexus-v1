@@ -12,18 +12,8 @@
 
 import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import {
-  Card,
-  CardBody,
-  Input,
-  Button,
-  Select,
-  SelectItem,
-  Switch,
-  Textarea,
-  Divider,
-  Spinner,
-} from '@heroui/react';
+import { Card, CardBody, Input, Button, Select, SelectItem, Switch, Textarea, Spinner } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 const RichTextEditor = lazy(() =>
   import('../../components/RichTextEditor').then((m) => ({ default: m.RichTextEditor })),
 );
@@ -348,7 +338,7 @@ export function BlogPostForm() {
             />
 
             {/* SEO Override (Optional) */}
-            <Divider />
+            <Separator />
             <div className="flex items-center gap-2 text-default-600">
               <Search size={16} />
               <span className="text-sm font-semibold">{t('blog.seo_override')}</span>

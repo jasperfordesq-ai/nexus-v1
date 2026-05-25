@@ -4,19 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useState } from 'react';
-import {
-  Button,
-  Card,
-  CardBody,
-  Chip,
-  Divider,
-  Input,
-  Select,
-  SelectItem,
-  Spinner,
-  Switch,
-  Textarea,
-} from '@heroui/react';
+import { Button, Card, CardBody, Chip, Input, Select, SelectItem, Spinner, Switch, Textarea } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Inbox from 'lucide-react/icons/inbox';
 import MessageSquare from 'lucide-react/icons/message-square';
 import { useTranslation } from 'react-i18next';
@@ -207,7 +196,7 @@ export default function MunicipalityFeedbackPage() {
             <SelectItem key="concerned">{t('sentiment_concerned')}</SelectItem>
           </Select>
 
-          <Divider />
+          <Separator />
 
           <div className="space-y-3">
             <div className="flex items-start justify-between gap-4">

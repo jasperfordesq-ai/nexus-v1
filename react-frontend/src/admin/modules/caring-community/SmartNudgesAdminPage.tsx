@@ -28,29 +28,8 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Spinner,
-  Switch,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  useDisclosure,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, useDisclosure } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Bell from 'lucide-react/icons/bell';
 import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -334,7 +313,7 @@ export default function SmartNudgesAdminPage() {
           <TrendingUp className="w-5 h-5 text-primary" />
           <h2 className="text-base font-semibold">{t('smart_nudges.chart.title')}</h2>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody>
           <div className="w-full h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -358,7 +337,7 @@ export default function SmartNudgesAdminPage() {
           <Bell className="w-5 h-5 text-warning" />
           <h2 className="text-base font-semibold">{t('smart_nudges.config.title')}</h2>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
@@ -437,7 +416,7 @@ export default function SmartNudgesAdminPage() {
               {t('smart_nudges.dry_run.candidates', { count: dryResult.candidates?.length ?? 0 })}
             </Chip>
           </CardHeader>
-          <Divider />
+          <Separator />
           <CardBody>
             {!dryResult.candidates || dryResult.candidates.length === 0 ? (
               <p className="text-sm text-default-500">{t('smart_nudges.dry_run.empty')}</p>
@@ -472,7 +451,7 @@ export default function SmartNudgesAdminPage() {
             {data.recent.length}
           </Chip>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="p-0">
           {data.recent.length === 0 ? (
             <div className="text-center py-12 text-sm text-default-500">{t('smart_nudges.recent.empty')}</div>

@@ -6,18 +6,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  RadioGroup,
-  Radio,
-  Spinner,
-  Tooltip,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, RadioGroup, Radio, Spinner, Tooltip } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Newspaper from 'lucide-react/icons/newspaper';
 import Save from 'lucide-react/icons/save';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -220,7 +210,7 @@ export default function CivicDigestAdminPage() {
             </CardBody>
           </Card>
 
-          <Divider />
+          <Separator />
           <p className="text-xs text-default-500">
             {t('admin.civic_digest.member_override')}
           </p>

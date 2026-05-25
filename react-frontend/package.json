@@ -34,6 +34,8 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@googlemaps/markerclusterer": "^2.6.2",
+    "@heroui-v3/react": "npm:@heroui/react@^3.0.5",
+    "@heroui-v3/styles": "npm:@heroui/styles@^3.0.5",
     "@heroui/react": "^2.6.0",
     "@heroui/theme": "^2.4.0",
     "@lexical/html": "^0.44.0",

@@ -13,7 +13,8 @@
 
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button, Chip, Divider, Spinner } from '@heroui/react';
+import { Button, Chip, Spinner } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import FileText from 'lucide-react/icons/file-text';
 import Clock from 'lucide-react/icons/clock';
 import Users from 'lucide-react/icons/users';
@@ -455,7 +456,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
             <p className="text-theme-muted text-sm mb-6 max-w-lg mx-auto">
               {t('terms.cta_body')}
             </p>
-            <Divider className="my-4" />
+            <Separator className="my-4" />
             <div className="flex flex-wrap justify-center gap-3 mt-4">
               <Link to={tenantPath('/contact')}>
                 <Button

@@ -11,26 +11,8 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Chip,
-  Divider,
-  Avatar,
-  Spinner,
-  Input,
-  Select,
-  SelectItem,
-  Switch,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Chip, Avatar, Spinner, Input, Select, SelectItem, Switch, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Building2 from 'lucide-react/icons/building-2';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Edit from 'lucide-react/icons/square-pen';
@@ -392,7 +374,7 @@ export function TenantShow() {
               </dl>
               {tenant.description && (
                 <>
-                  <Divider className="my-4" />
+                  <Separator className="my-4" />
                   <div>
                     <p className="text-xs font-medium uppercase text-default-400 mb-1">{t('super.label_description')}</p>
                     <p className="text-sm text-default-700 whitespace-pre-line">{tenant.description}</p>
@@ -616,7 +598,7 @@ export function TenantShow() {
                   <span className="text-sm font-medium">{tenant.listing_count}</span>
                 </div>
               )}
-              <Divider />
+              <Separator />
               <div className="text-xs text-default-400">
                 <p>{t('super.created')}: {new Date(tenant.created_at).toLocaleDateString()}</p>
                 {tenant.updated_at && (

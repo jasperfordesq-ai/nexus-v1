@@ -16,33 +16,8 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Select,
-  SelectItem,
-  Spinner,
-  Switch,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Textarea,
-  useDisclosure,
-  Progress,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Spinner, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, useDisclosure, Progress } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import BarChart3 from 'lucide-react/icons/bar-chart-3';
 import CheckCircle from 'lucide-react/icons/check-circle';
 import ClipboardList from 'lucide-react/icons/clipboard-list';
@@ -454,7 +429,7 @@ export default function MunicipalSurveyAdminPage() {
             </Select>
           </div>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody>
           {loading && (
             <div className="flex justify-center py-10">

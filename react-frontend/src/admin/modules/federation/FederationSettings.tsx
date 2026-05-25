@@ -10,7 +10,8 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Switch, Button, Input, Divider, Skeleton } from '@heroui/react';
+import { Card, CardBody, CardHeader, Switch, Button, Input, Skeleton } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Network from 'lucide-react/icons/network';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Save from 'lucide-react/icons/save';
@@ -245,7 +246,7 @@ export function FederationSettings() {
                 aria-label={t('allow_inbound_partnerships')}
               />
             </div>
-            <Divider />
+            <Separator />
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{t('auto_approve_partners')}</p>
@@ -257,7 +258,7 @@ export function FederationSettings() {
                 aria-label={t('auto_approve_partners')}
               />
             </div>
-            <Divider />
+            <Separator />
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="font-medium">{t('max_partnerships')}</p>

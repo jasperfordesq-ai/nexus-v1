@@ -5,18 +5,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Divider,
-  Input,
-  Select,
-  SelectItem,
-  Spinner,
-  Tooltip,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Input, Select, SelectItem, Spinner, Tooltip } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Save from 'lucide-react/icons/save';
@@ -311,7 +301,7 @@ export default function OperatingPolicyAdminPage() {
 
       {!loading && data?.last_updated_at && (
         <>
-          <Divider />
+          <Separator />
           <p className="text-xs text-default-500">
             {t('admin.operating_policy.last_updated', {
               date: new Date(data.last_updated_at).toLocaleString(),

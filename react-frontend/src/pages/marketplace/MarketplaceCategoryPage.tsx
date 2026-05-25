@@ -18,17 +18,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import {
-  Button,
-  Input,
-  Select,
-  SelectItem,
-  Checkbox,
-  CheckboxGroup,
-  Chip,
-  Spinner,
-  Divider,
-} from '@heroui/react';
+import { Button, Input, Select, SelectItem, Checkbox, CheckboxGroup, Chip, Spinner } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Search from 'lucide-react/icons/search';
 import SlidersHorizontal from 'lucide-react/icons/sliders-horizontal';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
@@ -387,7 +378,7 @@ export function MarketplaceCategoryPage() {
       {/* Dynamic template fields */}
       {templateFields.length > 0 && (
         <div className="space-y-3">
-          <Divider />
+          <Separator />
           <p className="text-sm font-medium text-default-500">{t('category.category_details', { name: category.name })}</p>
           {templateFields.map((field) => {
             if (field.type === 'select' && field.options) {

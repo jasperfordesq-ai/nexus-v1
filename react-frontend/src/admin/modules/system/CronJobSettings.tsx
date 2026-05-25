@@ -10,19 +10,8 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Button,
-  Input,
-  Textarea,
-  Switch,
-  Select,
-  SelectItem,
-  Divider,
-  Spinner,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Input, Textarea, Switch, Select, SelectItem, Spinner } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Settings from 'lucide-react/icons/settings';
 import Save from 'lucide-react/icons/save';
 import AlertCircle from 'lucide-react/icons/circle-alert';
@@ -207,7 +196,7 @@ export function CronJobSettingsPage() {
 
                 {selectedJobId && (
                   <>
-                    <Divider />
+                    <Separator />
 
                     {loadingJobSettings ? (
                       <div className="flex items-center justify-center py-8">

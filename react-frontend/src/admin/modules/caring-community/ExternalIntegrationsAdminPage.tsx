@@ -5,30 +5,8 @@
 
 import { useCallback, useEffect, useState, type JSX } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Card,
-  CardBody,
-  Chip,
-  Divider,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Select,
-  SelectItem,
-  Spinner,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Textarea,
-  useDisclosure,
-} from '@heroui/react';
+import { Button, Card, CardBody, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Spinner, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea, useDisclosure } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Info from 'lucide-react/icons/info';
 import PlugZap from 'lucide-react/icons/plug-zap';
 import Pencil from 'lucide-react/icons/pencil';
@@ -663,7 +641,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
                   <span className="font-semibold">{target.name}</span>.{' '}
                   {t('external_integrations.delete_modal.body_suffix')}
                 </p>
-                <Divider />
+                <Separator />
                 <p className="text-xs text-default-500">
                   {t('external_integrations.delete_modal.warning')}
                 </p>

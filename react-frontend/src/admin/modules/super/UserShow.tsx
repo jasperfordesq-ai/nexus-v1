@@ -5,10 +5,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import {
-  Card, CardBody, CardHeader, Button, Chip, Divider, Avatar, Spinner,
-  Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Select, SelectItem,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Chip, Avatar, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Select, SelectItem } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Edit from 'lucide-react/icons/square-pen';
 import Shield from 'lucide-react/icons/shield';
@@ -268,7 +266,7 @@ export function UserShow() {
               <User size={18} />
               {t('super.user_information')}
             </CardHeader>
-            <Divider />
+            <Separator />
             <CardBody>
               <div className="flex items-start gap-4">
                 <Avatar
@@ -312,7 +310,7 @@ export function UserShow() {
           {/* Profile Info */}
           <Card>
             <CardHeader className="font-semibold text-lg">{t('super.profile_info')}</CardHeader>
-            <Divider />
+            <Separator />
             <CardBody>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex items-center gap-3">
@@ -362,7 +360,7 @@ export function UserShow() {
               <Building2 size={18} />
               {t('super.tenant_association')}
             </CardHeader>
-            <Divider />
+            <Separator />
             <CardBody className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
                 <div>
@@ -379,7 +377,7 @@ export function UserShow() {
                   <p className="text-sm text-foreground">{user.tenant_id}</p>
                 </div>
               </div>
-              <Divider />
+              <Separator />
               <div className="flex flex-col gap-2">
                 <Button
                   variant="flat"
@@ -412,7 +410,7 @@ export function UserShow() {
                 {t('super.god_level_access')}
               </span>
             </CardHeader>
-            <Divider className="bg-purple-500/20" />
+            <Separator className="bg-purple-500/20" />
             <CardBody className="flex flex-col gap-3">
               <p className="text-xs text-default-600">
                 {t('super.god_level_desc')}
@@ -454,7 +452,7 @@ export function UserShow() {
               <Shield size={18} />
               {t('super.tenant_super_admin')}
             </CardHeader>
-            <Divider />
+            <Separator />
             <CardBody className="flex flex-col gap-3">
               <p className="text-xs text-default-600">
                 {t('super.tenant_sa_desc')}
@@ -484,7 +482,7 @@ export function UserShow() {
           {/* Privilege Level */}
           <Card>
             <CardHeader className="font-semibold text-lg">{t('super.privilege_level')}</CardHeader>
-            <Divider />
+            <Separator />
             <CardBody>
               <div className="flex flex-col items-center gap-3 py-2">
                 <div className={`w-16 h-16 rounded-full flex items-center justify-center ${
@@ -535,7 +533,7 @@ export function UserShow() {
           {/* Quick Actions */}
           <Card>
             <CardHeader className="font-semibold text-lg">{t('super.quick_actions')}</CardHeader>
-            <Divider />
+            <Separator />
             <CardBody>
               <div className="flex flex-col gap-2">
                 <Button

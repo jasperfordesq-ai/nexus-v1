@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Divider } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import MapPin from 'lucide-react/icons/map-pin';
 import Clock from 'lucide-react/icons/clock';
 import DollarSign from 'lucide-react/icons/dollar-sign';
@@ -119,7 +119,7 @@ export function JobMetadataSidebar({
 
       {(vacancy.contact_email || vacancy.contact_phone) && (
         <>
-          <Divider />
+          <Separator />
           <h3 className="text-sm font-semibold text-theme-primary">{t('detail.contact_label')}</h3>
 
           {vacancy.contact_email && (

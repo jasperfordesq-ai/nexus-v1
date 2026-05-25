@@ -9,7 +9,8 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { Button, Skeleton, Divider } from '@heroui/react';
+import { Button, Skeleton } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Rss from 'lucide-react/icons/rss';
 import ChevronDown from 'lucide-react/icons/chevron-down';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
@@ -45,7 +46,7 @@ function FeedSkeleton() {
       </div>
       <Skeleton className="h-4 w-full rounded mb-2" />
       <Skeleton className="h-4 w-4/5 rounded mb-4" />
-      <Divider />
+      <Separator />
       <div className="flex gap-4 pt-3">
         <Skeleton className="h-8 w-20 rounded-lg" />
         <Skeleton className="h-8 w-24 rounded-lg" />

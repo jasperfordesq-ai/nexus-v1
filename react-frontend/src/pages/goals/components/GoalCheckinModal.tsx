@@ -17,19 +17,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import {
-  Button,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Textarea,
-  Slider,
-  Spinner,
-  Chip,
-  Divider,
-} from '@heroui/react';
+import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, Slider, Spinner, Chip } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import ClipboardCheck from 'lucide-react/icons/clipboard-check';
 import Smile from 'lucide-react/icons/smile';
 import Frown from 'lucide-react/icons/frown';
@@ -315,7 +304,7 @@ export function GoalCheckinModal({
                 </div>
               </div>
 
-              <Divider />
+              <Separator />
 
               {/* Mood Selector */}
               <div>
@@ -344,7 +333,7 @@ export function GoalCheckinModal({
                 </div>
               </div>
 
-              <Divider />
+              <Separator />
 
               {/* Note */}
               <div>

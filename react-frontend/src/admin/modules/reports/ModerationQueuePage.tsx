@@ -19,34 +19,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Spinner,
-  Button,
-  Select,
-  SelectItem,
-  Pagination,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Avatar,
-  Chip,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
-  Textarea,
-  Switch,
-  Input,
-  Divider,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Spinner, Button, Select, SelectItem, Pagination, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Avatar, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, useDisclosure, Textarea, Switch, Input } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Shield from 'lucide-react/icons/shield';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
@@ -640,7 +614,7 @@ export function ModerationQueuePage() {
                   <span className="text-sm font-medium">{t('reports.enable_moderation')}</span>
                 </Switch>
 
-                <Divider />
+                <Separator />
 
                 <p className="text-sm font-medium text-foreground">{t('reports.require_moderation_for')}</p>
 
@@ -675,7 +649,7 @@ export function ModerationQueuePage() {
                   </Switch>
                 </div>
 
-                <Divider />
+                <Separator />
 
                 <Switch
                   isSelected={localSettings.auto_filter}

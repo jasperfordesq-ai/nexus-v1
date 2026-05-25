@@ -11,11 +11,8 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import {
-  Card, CardBody, CardHeader, Chip, Button, Spinner,
-  Modal, ModalContent, ModalHeader, ModalBody, ModalFooter,
-  Textarea, Input, Progress, Divider,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Chip, Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Textarea, Input, Progress } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import MessageSquarePlus from 'lucide-react/icons/message-square-plus';
 import UserPlus from 'lucide-react/icons/user-plus';
@@ -497,7 +494,7 @@ export function GdprRequestDetail() {
                   </Button>
                 </>
               )}
-              <Divider />
+              <Separator />
               <Button
                 color="secondary"
                 variant="flat"

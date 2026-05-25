@@ -15,7 +15,8 @@
 
 import { useState, useEffect, useRef, useCallback, type FormEvent } from 'react';
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { Button, Input, Checkbox, Divider, Select, SelectItem } from '@heroui/react';
+import { Button, Input, Checkbox, Select, SelectItem } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Mail from 'lucide-react/icons/mail';
 import Lock from 'lucide-react/icons/lock';
@@ -616,7 +617,7 @@ export function LoginPage() {
                   )}
 
                   {/* Divider */}
-                  <Divider className="my-6 bg-[var(--border-default)]" />
+                  <Separator className="my-6 bg-[var(--border-default)]" />
 
                   {/* Register Link */}
                   <p className="text-center text-theme-muted text-sm">

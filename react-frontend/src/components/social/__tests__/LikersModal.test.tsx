@@ -16,7 +16,11 @@ import { HeroUIProvider } from '@heroui/react';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, fallback?: string) => fallback ?? key,
+    t: (key: string) => ({
+      likers_title: 'Liked by',
+      load_more: 'Load More',
+      no_likes: 'No likes yet',
+    })[key] ?? key,
     i18n: { language: 'en', changeLanguage: vi.fn() },
   }),
   initReactI18next: { type: '3rdParty', init: () => {} },

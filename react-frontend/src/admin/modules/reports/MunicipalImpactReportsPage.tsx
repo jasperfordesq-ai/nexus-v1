@@ -5,26 +5,8 @@
 
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Select,
-  SelectItem,
-  Spinner,
-  Switch,
-  Textarea,
-  useDisclosure,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Select, SelectItem, Spinner, Switch, Textarea, useDisclosure } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import { Link } from 'react-router-dom';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import Info from 'lucide-react/icons/info';
@@ -522,7 +504,7 @@ export default function MunicipalImpactReportsPage() {
           <h2 className="text-base font-semibold">{t('municipal_reports.filters.title')}</h2>
           <p className="text-sm text-default-500">{t('municipal_reports.filters.description')}</p>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_1fr_auto_auto]">
           <Input
             type="date"
@@ -571,7 +553,7 @@ export default function MunicipalImpactReportsPage() {
             {t('municipal_reports.templates.create')}
           </Button>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="gap-4">
           <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
             <Select
@@ -648,7 +630,7 @@ export default function MunicipalImpactReportsPage() {
                 </div>
                 <Chip className="ml-auto" size="sm" variant="flat" color="primary">{value}</Chip>
               </CardHeader>
-              <Divider />
+              <Separator />
               <CardBody className="flex flex-col gap-3">
                 <div className="flex flex-wrap gap-2">
                   <Chip size="sm" variant="flat" color="primary">{t(`municipal_reports.cards.${report.key}.metric_1`)}</Chip>
@@ -683,7 +665,7 @@ export default function MunicipalImpactReportsPage() {
                 {t('municipal_reports.readiness_intro.needs_data_suffix')}
               </p>
             </CardHeader>
-            <Divider />
+            <Separator />
             <CardBody className="grid grid-cols-1 gap-3 md:grid-cols-4">
               {(summary.readiness_signals ?? []).map((signal) => {
                 const help = READINESS_HELP[signal.key];
@@ -715,7 +697,7 @@ export default function MunicipalImpactReportsPage() {
             <CardHeader>
               <h2 className="text-base font-semibold">{t('municipal_reports.sections.categories')}</h2>
             </CardHeader>
-            <Divider />
+            <Separator />
             <CardBody className="gap-3">
               {summary.categories.length === 0 ? (
                 <p className="text-sm text-default-500">{t('municipal_reports.empty.categories')}</p>
@@ -735,7 +717,7 @@ export default function MunicipalImpactReportsPage() {
             <CardHeader>
               <h2 className="text-base font-semibold">{t('municipal_reports.sections.trends')}</h2>
             </CardHeader>
-            <Divider />
+            <Separator />
             <CardBody className="gap-3">
               {summary.trends.length === 0 ? (
                 <p className="text-sm text-default-500">{t('municipal_reports.empty.trends')}</p>
@@ -889,7 +871,7 @@ function NarrativeShell({
         </div>
         <p className="text-sm text-default-500">{description}</p>
       </CardHeader>
-      <Divider />
+      <Separator />
       <CardBody className="gap-3">{children}</CardBody>
     </Card>
   );

@@ -17,29 +17,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Spinner,
-  Switch,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Textarea,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Spinner, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Textarea } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Coins from 'lucide-react/icons/coins';
 import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -324,7 +303,7 @@ export default function LoyaltyAdminPage() {
           <Store className="w-5 h-5 text-primary" />
           <h2 className="text-base font-semibold">{t('admin.loyalty.settings.title')}</h2>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="space-y-4">
           <p className="text-sm text-default-600">
             {t('admin.loyalty.settings.description')}
@@ -437,7 +416,7 @@ export default function LoyaltyAdminPage() {
             {redemptions.length}
           </Chip>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="p-0">
           <Table removeWrapper aria-label={t('admin.loyalty.ledger.aria')}>
             <TableHeader>

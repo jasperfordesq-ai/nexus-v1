@@ -4,19 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  Accordion,
-  AccordionItem,
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  Snippet,
-  Spinner,
-  Tooltip,
-} from '@heroui/react';
+import { Accordion, AccordionItem, Button, Card, CardBody, CardHeader, Chip, Snippet, Spinner, Tooltip } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import ClipboardList from 'lucide-react/icons/clipboard-list';
 import ExternalLink from 'lucide-react/icons/external-link';
 import FileCode from 'lucide-react/icons/file-code';
@@ -255,7 +244,7 @@ export default function IntegrationShowcaseAdminPage() {
 
                   {section.docs_link && (
                     <>
-                      <Divider />
+                      <Separator />
                       <a
                         href={section.docs_link}
                         target="_blank"

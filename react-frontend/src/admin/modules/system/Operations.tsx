@@ -11,7 +11,8 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Card, CardBody, CardHeader, Spinner, Button, Divider } from '@heroui/react';
+import { Card, CardBody, CardHeader, Spinner, Button } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import Trash2 from 'lucide-react/icons/trash-2';
 import Database from 'lucide-react/icons/database';
@@ -107,7 +108,7 @@ export default function Operations() {
               <span className="text-default-500">Keys</span>
               <span>{cacheStats?.redis_keys_count ?? '—'}</span>
             </div>
-            <Divider />
+            <Separator />
             <Button
               fullWidth
               variant="flat"

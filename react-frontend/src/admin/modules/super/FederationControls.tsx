@@ -11,10 +11,8 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Card, CardBody, CardHeader, Button, Switch, Chip, Divider, Input, Spinner,
-  Code, Snippet, Accordion, AccordionItem,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Button, Switch, Chip, Input, Spinner, Code, Snippet, Accordion, AccordionItem } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Globe from 'lucide-react/icons/globe';
 import Shield from 'lucide-react/icons/shield';
 import Lock from 'lucide-react/icons/lock';
@@ -296,7 +294,7 @@ export function FederationControls() {
             <Code size="sm">{jwtStatus?.issuer || t('super.jwt_issuer_not_set')}</Code>
           </div>
 
-          <Divider />
+          <Separator />
 
           <Accordion variant="light" isCompact>
             <AccordionItem
@@ -476,7 +474,7 @@ export function FederationControls() {
                 onValueChange={(v) => updateControl('federation_enabled', v)}
               />
             </div>
-            <Divider />
+            <Separator />
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{t('super.whitelist_mode')}</p>
@@ -488,7 +486,7 @@ export function FederationControls() {
                 onValueChange={(v) => updateControl('whitelist_mode_enabled', v)}
               />
             </div>
-            <Divider />
+            <Separator />
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 {controls.emergency_lockdown_active ? <Lock size={16} className="text-danger" /> : <Unlock size={16} className="text-success" />}

@@ -9,23 +9,8 @@
  */
 
 import { useState } from 'react';
-import {
-  Tabs,
-  Tab,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Accordion,
-  AccordionItem,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Divider,
-} from '@heroui/react';
+import { Tabs, Tab, Card, CardBody, CardHeader, Chip, Accordion, AccordionItem, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import BookOpen from 'lucide-react/icons/book-open';
 import Shield from 'lucide-react/icons/shield';
 import Code from 'lucide-react/icons/code';
@@ -88,7 +73,7 @@ function OverviewTab() {
             </p>
           </div>
 
-          <Divider />
+          <Separator />
 
           <div>
             <h4 className="font-semibold text-base mb-1">{t('federation.api_doc_what_is_api_key')}</h4>
@@ -100,7 +85,7 @@ function OverviewTab() {
             </p>
           </div>
 
-          <Divider />
+          <Separator />
 
           <div>
             <h4 className="font-semibold text-base mb-1">{t('federation.api_doc_what_is_webhook')}</h4>
@@ -112,7 +97,7 @@ function OverviewTab() {
             </p>
           </div>
 
-          <Divider />
+          <Separator />
 
           <div>
             <h4 className="font-semibold text-base mb-2">{t('federation.api_doc_when_need_what')}</h4>
@@ -165,7 +150,7 @@ function OverviewTab() {
             </p>
           </div>
 
-          <Divider />
+          <Separator />
 
           <div>
             <h4 className="font-semibold text-base mb-2">{t('federation.api_doc_setup_title')}</h4>
@@ -179,7 +164,7 @@ function OverviewTab() {
             </ol>
           </div>
 
-          <Divider />
+          <Separator />
 
           <div>
             <h4 className="font-semibold text-base mb-2">{t('federation.api_doc_safeguards_title')}</h4>
@@ -217,7 +202,7 @@ function OverviewTab() {
             </Table>
           </div>
 
-          <Divider />
+          <Separator />
 
           <div>
             <h4 className="font-semibold text-base mb-1">{t('federation.api_doc_summary_title')}</h4>
@@ -226,7 +211,7 @@ function OverviewTab() {
             </blockquote>
           </div>
 
-          <Divider />
+          <Separator />
 
           <div className="text-default-500">
             <p>
@@ -1212,7 +1197,7 @@ function WebhooksTab() {
             <code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">X-Webhook-Signature</code>.
           </p>
 
-          <Divider />
+          <Separator />
 
           <p className="text-sm font-semibold text-default-700">{t('federation.api_doc_node_verification_example')}</p>
           <CodeBlock>{`const crypto = require('crypto');

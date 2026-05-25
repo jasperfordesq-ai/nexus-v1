@@ -16,21 +16,8 @@
 
 import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import {
-  Card,
-  CardBody,
-  Input,
-  Button,
-  Select,
-  SelectItem,
-  Switch,
-  Textarea,
-  Spinner,
-  Tabs,
-  Tab,
-  Chip,
-  Divider,
-} from '@heroui/react';
+import { Card, CardBody, Input, Button, Select, SelectItem, Switch, Textarea, Spinner, Tabs, Tab, Chip } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 const RichTextEditor = lazy(() =>
   import('../../components/RichTextEditor').then((m) => ({ default: m.RichTextEditor })),
 );
@@ -677,7 +664,7 @@ export function KBArticleForm() {
             {/* Attachments section (edit mode) */}
             {isEdit && (
               <>
-                <Divider />
+                <Separator />
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <h3 className="text-sm font-semibold text-foreground">

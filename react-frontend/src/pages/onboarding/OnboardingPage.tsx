@@ -19,14 +19,8 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import {
-  Button,
-  Spinner,
-  Chip,
-  Avatar,
-  Textarea,
-  Divider,
-} from '@heroui/react';
+import { Button, Spinner, Chip, Avatar, Textarea } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Sparkles from 'lucide-react/icons/sparkles';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
@@ -1199,7 +1193,7 @@ export function OnboardingPage() {
                   </div>
                 </div>
 
-                <Divider className="my-4" />
+                <Separator className="my-4" />
 
                 {/* Interests summary */}
                 <div className="space-y-4">
@@ -1213,7 +1207,7 @@ export function OnboardingPage() {
                     onEdit={() => goToStep(stepSlugToIndex.get('interests') ?? 3)}
                   />
 
-                  <Divider />
+                  <Separator />
 
                   <SummarySection
                     icon={<HandHeart className="w-4 h-4 text-emerald-500" />}
@@ -1225,7 +1219,7 @@ export function OnboardingPage() {
                     onEdit={() => goToStep(stepSlugToIndex.get('skills') ?? 4)}
                   />
 
-                  <Divider />
+                  <Separator />
 
                   <SummarySection
                     icon={<HelpCircle className="w-4 h-4 text-[var(--color-warning)]" />}

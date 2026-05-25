@@ -5,22 +5,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  Progress,
-  Spinner,
-  Tooltip,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Progress, Spinner, Tooltip } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import CheckCircle2 from 'lucide-react/icons/circle-check';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
@@ -482,7 +468,7 @@ export default function PilotLaunchReadinessAdminPage() {
             ))}
           </div>
 
-          <Divider />
+          <Separator />
           <p className="text-xs text-default-500">
             {t('pilot_launch_readiness.timestamps.report_generated', {
               date: new Date(report.generated_at).toLocaleString(),

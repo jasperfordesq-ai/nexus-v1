@@ -11,10 +11,8 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import {
-  Card, CardBody, CardHeader, Chip, Button, Spinner,
-  Textarea, Divider, Progress,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Chip, Button, Spinner, Textarea, Progress } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Save from 'lucide-react/icons/save';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
@@ -503,7 +501,7 @@ export function GdprBreachDetail() {
                   {t('enterprise.gdpr_mark_resolved')}
                 </Button>
               )}
-              <Divider />
+              <Separator />
               <Button
                 color="danger"
                 variant="flat"

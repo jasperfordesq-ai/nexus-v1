@@ -14,15 +14,8 @@
  */
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  Tabs,
-  Tab,
-  Divider,
-} from '@heroui/react';
+import { Modal, ModalContent, ModalHeader, ModalBody, Tabs, Tab } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import Calendar from 'lucide-react/icons/calendar';
@@ -225,7 +218,7 @@ export function ComposeHub({
             </div>
           </ModalHeader>
 
-          <Divider className="bg-[var(--border-default)]" />
+          <Separator className="bg-[var(--border-default)]" />
 
           <ModalBody className="pt-4 pb-4">
             {bodyContent}

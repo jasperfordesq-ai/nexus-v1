@@ -10,7 +10,8 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { Card, CardBody, CardHeader, CardFooter, Button, Chip, Spinner, Divider } from '@heroui/react';
+import { Card, CardBody, CardHeader, CardFooter, Button, Chip, Spinner } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Clock from 'lucide-react/icons/clock';
 import Play from 'lucide-react/icons/play';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -446,7 +447,7 @@ export function CronJobs() {
                       </span>
                     </div>
 
-                    <Divider className="my-1" />
+                    <Separator className="my-1" />
 
                     {/* Last Run */}
                     <div className="flex items-center justify-between">

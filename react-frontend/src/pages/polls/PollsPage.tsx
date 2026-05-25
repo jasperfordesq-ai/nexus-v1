@@ -18,27 +18,8 @@
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Button,
-  Input,
-  Textarea,
-  Progress,
-  Chip,
-  Avatar,
-  Tabs,
-  Tab,
-  Divider,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  DatePicker,
-  Switch,
-  Select,
-  SelectItem,
-  useDisclosure,
-} from '@heroui/react';
+import { Button, Input, Textarea, Progress, Chip, Avatar, Tabs, Tab, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, DatePicker, Switch, Select, SelectItem, useDisclosure } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import type { DateInputValue } from '@heroui/react';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import Plus from 'lucide-react/icons/plus';
@@ -983,7 +964,7 @@ export function PollsPage() {
                   description={t('no_deadline')}
                 />
 
-                <Divider />
+                <Separator />
 
                 {/* Actions */}
                 <div className="flex items-center justify-end gap-2">

@@ -4,17 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useEffect, useCallback } from 'react';
-import {
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  Switch,
-  Input,
-  Divider,
-} from '@heroui/react';
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Switch, Input } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts/ToastContext';
 import { adminGroups } from '@/admin/api/adminApi';
@@ -203,7 +194,7 @@ export default function GroupPolicies({
                       </div>
                     ))}
                   </div>
-                  <Divider className="mt-4" />
+                  <Separator className="mt-4" />
                 </div>
               ))}
             </div>

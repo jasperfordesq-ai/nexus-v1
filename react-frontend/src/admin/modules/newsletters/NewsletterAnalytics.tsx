@@ -10,20 +10,8 @@
  */
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  Table,
-  TableHeader,
-  TableColumn,
-  TableBody,
-  TableRow,
-  TableCell,
-  Chip,
-  Button,
-  Divider,
-} from '@heroui/react';
+import { Card, CardBody, CardHeader, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, Chip, Button } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import BarChart3 from 'lucide-react/icons/chart-column';
 import Mail from 'lucide-react/icons/mail';
 import Users from 'lucide-react/icons/users';
@@ -351,7 +339,7 @@ export function NewsletterAnalytics() {
             </ResponsiveContainer>
 
             {/* Monthly data table below chart */}
-            <Divider className="my-4" />
+            <Separator className="my-4" />
             <div className="overflow-x-auto">
               <Table
                 aria-label={t('newsletters.section_monthly_performance')}
@@ -598,7 +586,7 @@ function BenchmarkCard({
           <p className="text-2xl font-bold text-default-400">{benchmark}%</p>
         </div>
       </div>
-      <Divider className="my-3" />
+      <Separator className="my-3" />
       <div className="flex items-center gap-2">
         <Chip
           size="sm"

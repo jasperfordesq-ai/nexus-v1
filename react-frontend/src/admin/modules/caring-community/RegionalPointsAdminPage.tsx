@@ -16,26 +16,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Chip,
-  Divider,
-  Input,
-  Spinner,
-  Switch,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-  Tabs,
-  Tab,
-  Textarea,
-} from '@heroui/react';
+import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner, Switch, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow, Tabs, Tab, Textarea } from '@heroui/react';
+import { Separator } from '@heroui-v3/react';
 import Coins from 'lucide-react/icons/coins';
 import Info from 'lucide-react/icons/info';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
@@ -304,7 +286,7 @@ export default function RegionalPointsAdminPage() {
           <SlidersHorizontal className="w-5 h-5 text-primary" />
           <h2 className="text-base font-semibold">{t('admin.regional_points.config.title')}</h2>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
@@ -361,7 +343,7 @@ export default function RegionalPointsAdminPage() {
             isDisabled={!config.auto_issue_enabled}
           />
 
-          <Divider />
+          <Separator />
 
           <div className="flex items-center justify-between">
             <div>
@@ -410,7 +392,7 @@ export default function RegionalPointsAdminPage() {
           <Plus className="w-5 h-5 text-success" />
           <h2 className="text-base font-semibold">{t('admin.regional_points.member_balance.title')}</h2>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="space-y-4">
           <MemberSearchPicker
             label={t('admin.regional_points.member_balance.member')}
@@ -492,7 +474,7 @@ export default function RegionalPointsAdminPage() {
             {items.length}
           </Chip>
         </CardHeader>
-        <Divider />
+        <Separator />
         <CardBody className="p-0">
           <Table removeWrapper aria-label={t('admin.regional_points.ledger.aria')}>
             <TableHeader>
