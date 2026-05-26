@@ -191,10 +191,10 @@ export function ReactionSummary({
     <>
       {/* Inline summary row */}
       <Button
-        variant="light"
+        variant="ghost"
         size="sm"
         onPress={handleOpenModal}
-        className="flex items-center gap-1.5 text-xs text-[var(--text-subtle)] hover:text-[var(--text-primary)] transition-colors h-auto p-0 min-w-0"
+        className="flex min-h-[28px] items-center gap-1.5 px-0 py-0 text-xs text-[var(--text-subtle)] transition-colors hover:text-[var(--text-primary)]"
         aria-label={viewReactionsLabel}
       >
         {/* Emoji badges */}

@@ -128,10 +128,7 @@ export function LinkPreviewCard({ preview, compact = false }: LinkPreviewCardPro
         className="block group/link"
         onClick={(e) => e.stopPropagation()}
       >
-        <Card
-          shadow="none"
-          className="flex-row overflow-hidden border border-[var(--border-default)] bg-[var(--surface-elevated)] hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
-        >
+        <Card className="flex-row overflow-hidden border border-[var(--border-default)] bg-[var(--surface-elevated)] hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
           {/* Thumbnail */}
           {showImage && (
             <div className="w-20 h-20 flex-shrink-0 overflow-hidden">
@@ -196,10 +193,7 @@ export function LinkPreviewCard({ preview, compact = false }: LinkPreviewCardPro
       className="block group/link"
       onClick={(e) => e.stopPropagation()}
     >
-      <Card
-        shadow="none"
-        className="overflow-hidden border border-[var(--border-default)] bg-[var(--surface-elevated)] hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
-      >
+      <Card className="overflow-hidden border border-[var(--border-default)] bg-[var(--surface-elevated)] hover:shadow-md hover:-translate-y-0.5 transition-all duration-200">
         {/* Image */}
         {showImage && (
           <div className="w-full overflow-hidden" style={{ aspectRatio: '2 / 1' }}>

@@ -67,9 +67,9 @@ export function BookmarkCollectionPicker({ selectedId, onSelect, onClose }: Book
 
       {/* "No collection" option */}
       <Button
-        variant="light"
+        variant="ghost"
         onPress={() => handleSelect(null)}
-        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-hover)] rounded-lg transition-colors h-auto justify-start"
+        className="w-full min-h-[40px] flex items-center gap-2 px-3 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-hover)] rounded-lg transition-colors justify-start"
       >
         <FolderOpen className="w-4 h-4 text-[var(--text-muted)]" />
         <span className="flex-1 text-left">{t('bookmark.no_collection')}</span>
@@ -80,9 +80,9 @@ export function BookmarkCollectionPicker({ selectedId, onSelect, onClose }: Book
       {collections.map((col) => (
         <Button
           key={col.id}
-          variant="light"
+          variant="ghost"
           onPress={() => handleSelect(col.id)}
-          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-hover)] rounded-lg transition-colors h-auto justify-start"
+          className="w-full min-h-[40px] flex items-center gap-2 px-3 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--surface-hover)] rounded-lg transition-colors justify-start"
         >
           <FolderOpen className="w-4 h-4 text-[var(--color-warning)]" />
           <span className="flex-1 text-left truncate">{col.name}</span>
@@ -98,7 +98,7 @@ export function BookmarkCollectionPicker({ selectedId, onSelect, onClose }: Book
         <div className="flex items-center gap-1 px-2 py-1">
           <Input
             size="sm"
-            variant="bordered"
+            variant="secondary"
             placeholder={t('bookmark.collection_name')}
             value={newName}
             onValueChange={setNewName}
@@ -106,15 +106,15 @@ export function BookmarkCollectionPicker({ selectedId, onSelect, onClose }: Book
             autoFocus
             className="flex-1"
           />
-          <Button size="sm" isIconOnly color="primary" onPress={handleCreate} isLoading={isSubmitting}>
+          <Button size="sm" isIconOnly onPress={handleCreate} isLoading={isSubmitting}>
             <Check className="w-3 h-3" />
           </Button>
         </div>
       ) : (
         <Button
-          variant="light"
+          variant="ghost"
           onPress={() => setIsCreating(true)}
-          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-[var(--color-primary)] hover:bg-[var(--surface-hover)] rounded-lg transition-colors h-auto justify-start"
+          className="w-full min-h-[40px] flex items-center gap-2 px-3 py-2 text-sm text-[var(--color-primary)] hover:bg-[var(--surface-hover)] rounded-lg transition-colors justify-start"
         >
           <Plus className="w-4 h-4" />
           <span>{t('bookmark.new_collection')}</span>

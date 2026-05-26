@@ -177,7 +177,7 @@ function CommentItemInner({
                 <Button
                   size="sm"
                   isIconOnly
-                  variant="flat"
+                  variant="secondary"
                   className="w-6 h-6 min-w-0 bg-emerald-500/20 text-emerald-500"
                   onPress={handleSaveEdit}
                   isLoading={isSubmittingEdit}
@@ -217,10 +217,10 @@ function CommentItemInner({
             <>
               {depth < 2 && (
                 <Button
-                  variant="light"
+                  variant="ghost"
                   size="sm"
                   onPress={() => onReply(comment.id)}
-                  className="text-[10px] text-[var(--color-primary)] hover:underline flex items-center gap-0.5 h-auto p-0 min-w-0"
+                  className="flex min-h-[24px] items-center gap-0.5 px-0 py-0 text-[10px] text-[var(--color-primary)] hover:underline"
                   startContent={<CornerDownRight className="w-2.5 h-2.5" aria-hidden="true" />}
                 >
                   {tr('reply', 'Reply')}
@@ -228,10 +228,10 @@ function CommentItemInner({
               )}
 
               <Button
-                variant="light"
+                variant="ghost"
                 size="sm"
                 onPress={() => setShowReactions(!showReactions)}
-                className="text-[10px] text-[var(--text-subtle)] hover:text-[var(--text-primary)] h-auto p-0 min-w-0"
+                className="min-h-[24px] px-0 py-0 text-[10px] text-[var(--text-subtle)] hover:text-[var(--text-primary)]"
               >
                 {tr('react', 'React')}
               </Button>
@@ -239,19 +239,19 @@ function CommentItemInner({
               {isOwn && (
                 <>
                   <Button
-                    variant="light"
+                    variant="ghost"
                     size="sm"
                     onPress={() => { setIsEditing(true); setEditContent(comment.content); }}
-                    className="text-[10px] text-[var(--text-subtle)] hover:text-[var(--text-primary)] flex items-center gap-0.5 h-auto p-0 min-w-0"
+                    className="flex min-h-[24px] items-center gap-0.5 px-0 py-0 text-[10px] text-[var(--text-subtle)] hover:text-[var(--text-primary)]"
                     startContent={<Pencil className="w-2.5 h-2.5" aria-hidden="true" />}
                   >
                     {tr('edit', 'Edit')}
                   </Button>
                   <Button
-                    variant="light"
+                    variant="danger-soft"
                     size="sm"
                     onPress={() => setShowDeleteModal(true)}
-                    className="text-[10px] text-red-400 hover:text-[var(--color-error)] flex items-center gap-0.5 h-auto p-0 min-w-0"
+                    className="flex min-h-[24px] items-center gap-0.5 px-0 py-0 text-[10px] text-red-400 hover:text-[var(--color-error)]"
                     startContent={<Trash2 className="w-2.5 h-2.5" aria-hidden="true" />}
                   >
                     {tr('delete', 'Delete')}
@@ -273,7 +273,7 @@ function CommentItemInner({
                   variant="flat"
                   size="sm"
                   onPress={() => isAuthenticated && onToggleReaction(comment.id, reactionType)}
-                  className={`inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 rounded-full border transition-colors h-auto min-w-0 ${
+                  className={`inline-flex min-h-[24px] items-center gap-0.5 rounded-full border px-1.5 py-0.5 text-[10px] transition-colors ${
                     userReactions.includes(reactionType)
                       ? 'border-[var(--color-primary)]/50 bg-[var(--color-primary)]/10 text-[var(--color-primary)]'
                       : 'border-[var(--border-default)] bg-[var(--surface-elevated)] text-[var(--text-subtle)]'
@@ -344,8 +344,8 @@ function CommentItemInner({
                       <Button
                         isIconOnly
                         size="sm"
-                        variant="light"
-                        className="text-[var(--color-primary)] min-w-0 w-auto h-auto p-0 disabled:opacity-30"
+                        variant="ghost"
+                        className="min-h-[28px] w-auto px-0 py-0 text-[var(--color-primary)] disabled:opacity-30"
                         onPress={onSubmitReply}
                         isDisabled={!replyContent.trim() || isSubmittingReply}
                         aria-label={tr('send_reply', 'Send reply')}
@@ -355,8 +355,8 @@ function CommentItemInner({
                       <Button
                         isIconOnly
                         size="sm"
-                        variant="light"
-                        className="text-[var(--text-subtle)] min-w-0 w-auto h-auto p-0"
+                        variant="ghost"
+                        className="min-h-[28px] w-auto px-0 py-0 text-[var(--text-subtle)]"
                         onPress={onCancelReply}
                         aria-label={tr('cancel', 'Cancel')}
                       >
@@ -574,11 +574,11 @@ function MentionInput({
           {mentionResults.map((user, idx) => (
             <Button
               key={user.id}
-              variant="light"
+              variant="ghost"
               onPress={() => selectMention(user)}
               onMouseDown={(e) => { e.preventDefault(); }}
               onMouseEnter={() => setSelectedIndex(idx)}
-              className={`w-full flex items-center gap-2.5 px-3 py-2 text-start transition-colors justify-start h-auto rounded-none ${
+              className={`w-full min-h-[40px] flex items-center gap-2.5 px-3 py-2 text-start transition-colors justify-start rounded-none ${
                 idx === selectedIndex
                   ? 'bg-[var(--color-primary)]/10 text-[var(--color-primary)]'
                   : 'text-[var(--text-primary)] hover:bg-[var(--surface-hover)]'
@@ -748,8 +748,8 @@ export function CommentsSection({
               <Button
                 isIconOnly
                 size="sm"
-                variant="light"
-                className="text-[var(--color-primary)] min-w-0 w-auto h-auto p-0 disabled:opacity-30"
+                variant="ghost"
+                className="min-h-[28px] w-auto px-0 py-0 text-[var(--color-primary)] disabled:opacity-30"
                 onPress={handleSubmit}
                 isDisabled={!newComment.trim() || isSubmitting}
                 aria-label={tr('send_comment', 'Send comment')}

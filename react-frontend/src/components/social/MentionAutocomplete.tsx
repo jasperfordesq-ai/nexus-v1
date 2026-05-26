@@ -118,11 +118,11 @@ export const MentionAutocomplete = forwardRef<HTMLDivElement, MentionAutocomplet
               {suggestions.map((user, idx) => (
                 <Button
                   key={user.id}
-                  variant="light"
+                  variant="ghost"
                   role="option"
                   id={`mention-option-${user.id}`}
                   aria-selected={idx === selectedIndex}
-                  className={`w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors h-auto justify-start rounded-none ${
+                  className={`w-full min-h-[40px] flex items-center gap-2.5 px-3 py-2 text-left transition-colors justify-start rounded-none ${
                     idx === selectedIndex
                       ? 'bg-accent-soft dark:bg-accent-soft text-[var(--color-primary)]'
                       : 'text-[var(--text-primary)] hover:bg-[var(--surface-hover)]'

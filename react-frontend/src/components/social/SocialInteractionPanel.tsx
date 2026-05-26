@@ -132,9 +132,9 @@ export function SocialInteractionPanel({
           <div>
             {social.likesCount > 0 && (
               <Button
-                variant="light"
+                variant="ghost"
                 size="sm"
-                className="h-auto min-w-0 px-0 py-0 text-xs text-theme-subtle hover:text-theme-primary"
+                className="min-h-[28px] px-0 py-0 text-xs text-theme-subtle hover:text-theme-primary"
                 onPress={() => setIsLikersOpen(true)}
                 aria-label={t('view_likes')}
               >
@@ -150,9 +150,9 @@ export function SocialInteractionPanel({
 
           {social.commentsCount > 0 && (
             <Button
-              variant="light"
+              variant="ghost"
               size="sm"
-              className="h-auto min-w-0 px-0 py-0 text-xs text-theme-subtle hover:text-theme-primary"
+              className="min-h-[28px] px-0 py-0 text-xs text-theme-subtle hover:text-theme-primary"
               onPress={() => setShowComments(true)}
               aria-expanded={showComments}
             >
