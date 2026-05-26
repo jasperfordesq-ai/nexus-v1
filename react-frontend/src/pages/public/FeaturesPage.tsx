@@ -1,4 +1,5 @@
-import { Card, CardBody, CardHeader, Chip } from '@/components/ui';
+import { Card } from '@heroui/react';
+import { Chip } from '@/components/ui';
 import { type ReactNode } from 'react';
 import { Separator } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
@@ -110,15 +111,15 @@ function FeatureSection({
 
   return (
     <Card className="border border-default-200 shadow-sm">
-      <CardHeader className="flex gap-2 items-center">
+      <Card.Header className="flex gap-2 items-center">
         {icon}
         <h2 className="text-lg font-semibold">{t(`${groupKey}.title`)}</h2>
-      </CardHeader>
+      </Card.Header>
       <Separator />
-      <CardBody className="space-y-3">
+      <Card.Content className="space-y-3">
         {intro && <p className="text-sm text-foreground-600">{intro}</p>}
         <FeatureList groupKey={group.key} items={group.items} />
-      </CardBody>
+      </Card.Content>
     </Card>
   );
 }
@@ -464,7 +465,7 @@ export function FeaturesPage() {
 
       {/* Maturity key */}
       <Card className="border border-default-200 shadow-sm">
-        <CardBody className="text-sm space-y-2">
+        <Card.Content className="text-sm space-y-2">
           <p className="font-semibold text-foreground">
             {t('features_page.maturity_key_title')}
           </p>
@@ -492,7 +493,7 @@ export function FeaturesPage() {
               </span>
             </li>
           </ul>
-        </CardBody>
+        </Card.Content>
       </Card>
 
       {/* Feature groups */}
@@ -512,13 +513,13 @@ export function FeaturesPage() {
 
       {/* Modern Tech Stack */}
       <Card className="border border-default-200 shadow-sm">
-        <CardHeader>
+        <Card.Header>
           <h2 className="text-lg font-semibold">
             {t('features_page.tech_stack_title')}
           </h2>
-        </CardHeader>
+        </Card.Header>
         <Separator />
-        <CardBody className="text-sm text-foreground-600">
+        <Card.Content className="text-sm text-foreground-600">
           <ul className="grid sm:grid-cols-2 gap-y-1.5 gap-x-6 list-none">
             <li><strong>{t('features_page.tech_stack.frontend_label')}:</strong> {t('features_page.tech_stack.frontend_value')}</li>
             <li><strong>{t('features_page.tech_stack.backend_label')}:</strong> {t('features_page.tech_stack.backend_value')}</li>
@@ -529,19 +530,19 @@ export function FeaturesPage() {
             <li><strong>{t('features_page.tech_stack.mobile_label')}:</strong> {t('features_page.tech_stack.mobile_value')}</li>
             <li><strong>{t('features_page.tech_stack.infrastructure_label')}:</strong> {t('features_page.tech_stack.infrastructure_value')}</li>
           </ul>
-        </CardBody>
+        </Card.Content>
       </Card>
 
       {/* Open source + how to help */}
       <Card className="border border-accent dark:border-accent">
-        <CardHeader className="flex gap-2 items-center">
+        <Card.Header className="flex gap-2 items-center">
           <Github className="w-5 h-5 text-accent" aria-hidden="true" />
           <h2 className="text-lg font-semibold">
             {t('features_page.open_source_title')}
           </h2>
-        </CardHeader>
+        </Card.Header>
         <Separator />
-        <CardBody className="text-sm text-foreground-600 space-y-3">
+        <Card.Content className="text-sm text-foreground-600 space-y-3">
           <p>
             {t('features_page.open_source_body')}
           </p>
@@ -579,19 +580,19 @@ export function FeaturesPage() {
               {t('features_page.link_about')}
             </Link>
           </div>
-        </CardBody>
+        </Card.Content>
       </Card>
 
       {/* Security disclosure */}
       <Card className="border border-danger-200 dark:border-danger-800">
-        <CardHeader className="flex gap-2 items-center">
+        <Card.Header className="flex gap-2 items-center">
           <Shield className="w-5 h-5 text-danger" aria-hidden="true" />
           <h2 className="text-lg font-semibold">
             {t('features_page.security_title')}
           </h2>
-        </CardHeader>
+        </Card.Header>
         <Separator />
-        <CardBody className="text-sm text-foreground-600">
+        <Card.Content className="text-sm text-foreground-600">
           <p>
             {t('features_page.security_body_before')}
             <a
@@ -602,7 +603,7 @@ export function FeaturesPage() {
             </a>
             {t('features_page.security_body_after')}
           </p>
-        </CardBody>
+        </Card.Content>
       </Card>
     </div>
   );

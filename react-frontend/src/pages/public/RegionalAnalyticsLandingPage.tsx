@@ -1,4 +1,5 @@
-import { Card, CardBody, Button, Chip } from '@/components/ui';
+import { Card } from '@heroui/react';
+import { Button, Chip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -121,8 +122,8 @@ export default function RegionalAnalyticsLandingPage() {
           {features.map((feature) => {
             const Icon = feature.icon;
             return (
-              <Card key={feature.title} shadow="sm">
-                <CardBody className="flex flex-row gap-4 p-5">
+              <Card key={feature.title} className="shadow-sm">
+                <Card.Content className="flex flex-row gap-4 p-5">
                   <div className="rounded-lg bg-accent-soft dark:bg-accent-soft p-3 h-fit">
                     <Icon size={22} className="text-accent dark:text-accent" aria-hidden="true" />
                   </div>
@@ -130,7 +131,7 @@ export default function RegionalAnalyticsLandingPage() {
                     <h3 className="font-semibold mb-1">{feature.title}</h3>
                     <p className="text-sm text-[var(--color-text-muted)]">{feature.body}</p>
                   </div>
-                </CardBody>
+                </Card.Content>
               </Card>
             );
           })}
@@ -145,8 +146,8 @@ export default function RegionalAnalyticsLandingPage() {
           {tiers.map((tier) => {
             const tierLabel = t(`regional_analytics.tiers.${tier.key}.label`);
             return (
-              <Card key={tier.key} shadow={tier.key === 'pro' ? 'lg' : 'sm'} className={tier.key === 'pro' ? 'border-2 border-accent0' : ''}>
-                <CardBody className="p-6">
+              <Card key={tier.key} className={tier.key === 'pro' ? 'border-2 border-accent0 shadow-lg' : 'shadow-sm'}>
+                <Card.Content className="p-6">
                   <Chip size="sm" variant="flat" color={tier.key === 'pro' ? 'primary' : 'default'} className="mb-3">
                     {tierLabel}
                   </Chip>
@@ -170,7 +171,7 @@ export default function RegionalAnalyticsLandingPage() {
                   >
                     {t('regional_analytics.tier_cta')}
                   </Button>
-                </CardBody>
+                </Card.Content>
               </Card>
             );
           })}
