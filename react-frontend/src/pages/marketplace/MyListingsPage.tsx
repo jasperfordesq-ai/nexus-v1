@@ -373,8 +373,8 @@ export function MyListingsPage() {
         <Tabs
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(key as ListingTab)}
-          color="primary"
-          variant="underlined"
+
+          variant="secondary"
           classNames={{ base: 'w-full overflow-x-auto', tabList: 'gap-2 sm:gap-4' }}
         >
           {TABS.map((tab) => (
@@ -398,7 +398,7 @@ export function MyListingsPage() {
         {/* Listings */}
         {isLoading ? (
           <div className="flex justify-center py-16">
-            <Spinner size="lg" color="primary" />
+            <Spinner size="lg" color="accent" />
           </div>
         ) : listings.length === 0 ? (
           <EmptyState

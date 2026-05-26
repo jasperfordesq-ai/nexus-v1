@@ -112,7 +112,7 @@ export function ShippingSelector({ sellerId, onSelect, localPickup }: ShippingSe
   if (isLoading) {
     return (
       <div className="flex items-center gap-2 py-4">
-        <Spinner size="sm" color="primary" />
+        <Spinner size="sm" color="accent" />
         <span className="text-sm text-muted">
           {t('shipping.loading')}
         </span>

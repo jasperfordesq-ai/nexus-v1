@@ -476,7 +476,7 @@ export function EditMarketplaceListingPage() {
   if (isLoadingListing) {
     return (
       <div className="flex justify-center py-16">
-        <Spinner size="lg" color="primary" />
+        <Spinner size="lg" color="accent" />
       </div>
     );
   }

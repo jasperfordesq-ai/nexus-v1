@@ -77,7 +77,7 @@ export function MarketplaceFacetedSearch({
       <div>
         <Select
           label={t('filters.category')}
-          variant="bordered"
+          variant="secondary"
           size="sm"
           selectedKeys={localFilters.category_id != null ? [String(localFilters.category_id)] : []}
           onSelectionChange={(keys) => {
@@ -175,7 +175,7 @@ export function MarketplaceFacetedSearch({
       <div>
         <Select
           label={t('filters.sort')}
-          variant="bordered"
+          variant="secondary"
           size="sm"
           selectedKeys={localFilters.sort ? [localFilters.sort] : ['newest']}
           onSelectionChange={(keys) => {
@@ -195,7 +195,7 @@ export function MarketplaceFacetedSearch({
       <div>
         <Select
           label={t('filters.posted_within')}
-          variant="bordered"
+          variant="secondary"
           size="sm"
           selectedKeys={
             localFilters.posted_within != null
@@ -234,7 +234,7 @@ export function MarketplaceFacetedSearch({
 
       {/* Mobile/Tablet: collapsible accordion */}
       <div className="lg:hidden">
-        <Accordion variant="bordered">
+        <Accordion variant="surface">
           <AccordionItem
             key="filters" id="filters"
             aria-label={t('filters.title')}

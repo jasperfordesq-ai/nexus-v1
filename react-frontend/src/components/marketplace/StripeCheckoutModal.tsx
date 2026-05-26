@@ -147,7 +147,7 @@ function CheckoutForm({
         <div className="min-h-[200px]">
           {!isReady && (
             <div className="flex justify-center py-8">
-              <Spinner size="lg" color="primary" />
+              <Spinner size="lg" color="accent" />
             </div>
           )}
           {PaymentElement && (

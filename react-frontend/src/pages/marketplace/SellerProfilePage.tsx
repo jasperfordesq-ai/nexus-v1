@@ -207,7 +207,7 @@ export function SellerProfilePage() {
   if (isLoading) {
     return (
       <div className="flex justify-center py-24">
-        <Spinner size="lg" color="primary" />
+        <Spinner size="lg" color="accent" />
       </div>
     );
   }
@@ -260,7 +260,7 @@ export function SellerProfilePage() {
               name={seller.display_name}
               className="w-20 h-20 text-xl"
               isBordered
-              color="primary"
+              color="accent"
             />
             <div className="flex-1 text-center sm:text-left space-y-2">
               <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
@@ -366,8 +366,8 @@ export function SellerProfilePage() {
         <Tabs
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(String(key))}
-          variant="underlined"
-          color="primary"
+          variant="secondary"
+
         >
           <Tab
             key="listings"
@@ -396,7 +396,7 @@ export function SellerProfilePage() {
           <div>
             {isLoadingListings ? (
               <div className="flex justify-center py-12">
-                <Spinner size="lg" color="primary" />
+                <Spinner size="lg" color="accent" />
               </div>
             ) : listings.length === 0 ? (
               <EmptyState

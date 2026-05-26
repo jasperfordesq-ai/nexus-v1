@@ -193,7 +193,7 @@ export function FreeItemsPage() {
         {/* Listings */}
         {isLoading ? (
           <div className="flex justify-center py-16">
-            <Spinner size="lg" color="primary" />
+            <Spinner size="lg" color="accent" />
           </div>
         ) : error ? (
           <GlassCard className="p-8 text-center">

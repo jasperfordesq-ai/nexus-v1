@@ -314,7 +314,7 @@ export function MarketplaceCategoryPage() {
   if (isCategoryLoading) {
     return (
       <div className="flex justify-center py-24">
-        <Spinner size="lg" color="primary" />
+        <Spinner size="lg" color="accent" />
       </div>
     );
   }

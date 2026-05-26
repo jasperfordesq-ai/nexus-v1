@@ -134,7 +134,7 @@ export function PromotionSelector({
         <ModalBody>
           {isLoading ? (
             <div className="flex justify-center py-8">
-              <Spinner size="lg" color="primary" />
+              <Spinner size="lg" color="accent" />
             </div>
           ) : error && products.length === 0 ? (
             <p className="text-center text-danger py-4">{error}</p>

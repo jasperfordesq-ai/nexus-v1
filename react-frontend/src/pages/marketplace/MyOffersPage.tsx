@@ -272,8 +272,8 @@ export function MyOffersPage() {
         <Tabs
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(key as OfferTab)}
-          color="primary"
-          variant="underlined"
+
+          variant="secondary"
           classNames={{ tabList: 'gap-4' }}
         >
           <Tab
@@ -299,7 +299,7 @@ export function MyOffersPage() {
         {/* Offers list */}
         {isLoading ? (
           <div className="flex justify-center py-16">
-            <Spinner size="lg" color="primary" />
+            <Spinner size="lg" color="accent" />
           </div>
         ) : offers.length === 0 ? (
           <EmptyState

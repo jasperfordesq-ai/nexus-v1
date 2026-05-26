@@ -117,7 +117,7 @@ function ShippingForm({ form, onChange, onSubmit, onCancel, isSubmitting, submit
               if (selected) onChange('currency', String(selected));
             }}
             size="sm"
-            variant="bordered"
+            variant="secondary"
             className="w-28"
           >
             {CURRENCY_OPTIONS.map((opt) => (
@@ -327,7 +327,7 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
   if (isLoading) {
     return (
       <div className="flex justify-center py-8">
-        <Spinner size="md" color="primary" />
+        <Spinner size="md" color="accent" />
       </div>
     );
   }

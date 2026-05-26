@@ -265,7 +265,7 @@ export function MarketplaceCollectionsPage() {
 
           {isLoadingItems ? (
             <div className="flex justify-center py-16">
-              <Spinner size="lg" color="primary" />
+              <Spinner size="lg" color="accent" />
             </div>
           ) : collectionItems.length === 0 ? (
             <EmptyState
@@ -368,8 +368,8 @@ export function MarketplaceCollectionsPage() {
         <Tabs
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(key as string)}
-          variant="underlined"
-          color="primary"
+          variant="secondary"
+
         >
           <Tab
             key="collections"
@@ -385,7 +385,7 @@ export function MarketplaceCollectionsPage() {
           >
             {isLoadingCollections ? (
               <div className="flex justify-center py-16">
-                <Spinner size="lg" color="primary" />
+                <Spinner size="lg" color="accent" />
               </div>
             ) : collections.length === 0 ? (
               <EmptyState
@@ -424,7 +424,7 @@ export function MarketplaceCollectionsPage() {
           >
             {isLoadingSearches ? (
               <div className="flex justify-center py-16">
-                <Spinner size="lg" color="primary" />
+                <Spinner size="lg" color="accent" />
               </div>
             ) : savedSearches.length === 0 ? (
               <EmptyState

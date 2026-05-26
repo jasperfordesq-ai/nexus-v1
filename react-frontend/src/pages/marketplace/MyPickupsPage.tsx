@@ -81,7 +81,7 @@ export function MyPickupsPage() {
 
       {loading ? (
         <div className="flex justify-center py-16">
-          <Spinner size="lg" color="primary" />
+          <Spinner size="lg" color="accent" />
         </div>
       ) : reservations.length === 0 ? (
         <GlassCard className="p-8 text-center text-muted">

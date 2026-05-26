@@ -361,8 +361,8 @@ export function BuyerOrdersPage() {
         <Tabs
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(key as OrderTab)}
-          color="primary"
-          variant="underlined"
+
+          variant="secondary"
           classNames={{ tabList: 'gap-4' }}
         >
           <Tab key="all" title={t('orders.tab_all')} />
@@ -374,7 +374,7 @@ export function BuyerOrdersPage() {
         {/* Orders list */}
         {isLoading ? (
           <div className="flex justify-center py-16">
-            <Spinner size="lg" color="primary" />
+            <Spinner size="lg" color="accent" />
           </div>
         ) : orders.length === 0 ? (
           <EmptyState

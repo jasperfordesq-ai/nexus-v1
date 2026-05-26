@@ -376,7 +376,7 @@ export function MarketplaceMapSearchPage() {
               {/* List view of results */}
               {isLoading ? (
                 <div className="flex justify-center py-12">
-                  <Spinner size="lg" color="primary" />
+                  <Spinner size="lg" color="accent" />
                 </div>
               ) : listings.length === 0 ? (
                 <EmptyState
@@ -460,7 +460,7 @@ export function MarketplaceMapSearchPage() {
             <div className={viewMode === 'map' ? 'hidden' : 'lg:hidden'}>
               {isLoading ? (
                 <div className="flex justify-center py-12">
-                  <Spinner size="lg" color="primary" />
+                  <Spinner size="lg" color="accent" />
                 </div>
               ) : listings.length === 0 ? (
                 <EmptyState

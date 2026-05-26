@@ -169,7 +169,7 @@ export function MapSearchView({
         className={`rounded-xl bg-surface-secondary animate-pulse flex items-center justify-center ${className}`}
         style={{ height }}
       >
-        <Spinner size="lg" color="primary" />
+        <Spinner size="lg" color="accent" />
       </div>
     );
   }
