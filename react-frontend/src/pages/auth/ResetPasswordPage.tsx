@@ -176,8 +176,8 @@ export function ResetPasswordPage() {
                   <Button
                     isIconOnly
                     size="sm"
-                    variant="light"
-                    className="min-w-0 w-auto h-auto p-0 text-theme-subtle"
+                    variant="tertiary"
+                    className="min-h-8 min-w-8 p-0 text-theme-subtle"
                     onPress={() => setShowPassword(!showPassword)}
                     aria-label={showPassword ? t('reset_password.hide_password') : t('reset_password.show_password')}
                   >

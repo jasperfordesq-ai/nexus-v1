@@ -739,8 +739,8 @@ export function RegisterPage() {
                   <Button
                     isIconOnly
                     size="sm"
-                    variant="light"
-                    className="min-w-0 w-auto h-auto p-0 text-theme-subtle"
+                    variant="tertiary"
+                    className="min-h-8 min-w-8 p-0 text-theme-subtle"
                     onPress={() => setShowPassword(!showPassword)}
                     aria-label={showPassword ? t('register.hide_password') : t('register.show_password')}
                   >
