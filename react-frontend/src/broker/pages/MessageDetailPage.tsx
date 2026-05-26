@@ -1,8 +1,8 @@
-import { Card, CardBody, CardHeader, Button, Chip, Textarea, Spinner, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Textarea, Spinner, Select, SelectItem, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ScrollShadow } from '@/components/ui';
-import { Separator } from '@heroui/react';
+import { Chip, Separator } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Flag from 'lucide-react/icons/flag';
@@ -33,12 +33,12 @@ import type { BrokerMessageDetail, ConversationMessage } from '@/admin/api/types
 
 // ─── Copy reason chip colors ──────────────────────────────────────────────────
 
-const COPY_REASON_COLORS: Record<string, 'primary' | 'danger' | 'success' | 'warning' | 'secondary' | 'default'> = {
-  first_contact: 'primary',
+const COPY_REASON_COLORS: Record<string, 'accent' | 'danger' | 'success' | 'warning' | 'default'> = {
+  first_contact: 'accent',
   high_risk_listing: 'danger',
   new_member: 'success',
   flagged_user: 'warning',
-  manual_monitoring: 'secondary',
+  manual_monitoring: 'default',
   random_sample: 'default',
 };
 
@@ -258,7 +258,7 @@ export function MessageDetail() {
               <p className="text-sm text-default-500">{t('messages.detail_copy_reason')}</p>
               <Chip
                 size="sm"
-                variant="flat"
+                variant="tertiary"
                 color={COPY_REASON_COLORS[copy.copy_reason] ?? 'default'}
               >
                 {t(`messages.copy_reason_${copy.copy_reason}`)}
@@ -282,35 +282,37 @@ export function MessageDetail() {
                 {isFlagged && (
                   <Chip
                     size="sm"
-                    variant="flat"
+                    variant="tertiary"
                     color="danger"
-                    startContent={<Flag className="w-3 h-3" />}
                   >
-                    {t('messages.flagged_label')}{copy.flag_severity ? ` (${copy.flag_severity})` : ''}
+                    <Flag className="w-3 h-3" />
+                    <Chip.Label>
+                      {t('messages.flagged_label')}{copy.flag_severity ? ` (${copy.flag_severity})` : ''}
+                    </Chip.Label>
                   </Chip>
                 )}
                 {isReviewed && (
                   <Chip
                     size="sm"
-                    variant="flat"
+                    variant="tertiary"
                     color="success"
-                    startContent={<CheckCircle className="w-3 h-3" />}
                   >
-                    {t('messages.status_reviewed')}
+                    <CheckCircle className="w-3 h-3" />
+                    <Chip.Label>{t('messages.status_reviewed')}</Chip.Label>
                   </Chip>
                 )}
                 {isArchived && (
                   <Chip
                     size="sm"
-                    variant="flat"
-                    color="secondary"
-                    startContent={<Archive className="w-3 h-3" />}
+                    variant="tertiary"
+                    color="default"
                   >
-                    {t('messages.detail_archived')}
+                    <Archive className="w-3 h-3" />
+                    <Chip.Label>{t('messages.detail_archived')}</Chip.Label>
                   </Chip>
                 )}
                 {!isFlagged && !isReviewed && !isArchived && (
-                  <Chip size="sm" variant="flat" color="warning">
+                  <Chip size="sm" variant="tertiary" color="warning">
                     {t('messages.status_unreviewed')}
                   </Chip>
                 )}
@@ -336,7 +338,7 @@ export function MessageDetail() {
         <CardHeader className="flex items-center gap-2">
           <MessageCircle className="w-4 h-4" />
           <span className="font-semibold">{t('messages.detail_conversation_thread')}</span>
-          <Chip size="sm" variant="flat" className="ml-auto">
+          <Chip size="sm" variant="tertiary" className="ml-auto">
             {t('messages.detail_message_count', { count: thread.length })}
           </Chip>
         </CardHeader>
@@ -367,9 +369,9 @@ export function MessageDetail() {
                             {msg.sender_name}
                           </span>
                           {isTarget && (
-                            <Chip size="sm" variant="flat" color="warning">
-                              <AlertTriangle className="w-3 h-3 mr-1 inline" />
-                              {t('messages.detail_copied')}
+                            <Chip size="sm" variant="tertiary" color="warning">
+                              <AlertTriangle className="w-3 h-3" />
+                              <Chip.Label>{t('messages.detail_copied')}</Chip.Label>
                             </Chip>
                           )}
                           {msg.is_edited && (
@@ -421,7 +423,7 @@ export function MessageDetail() {
                 <p className="text-sm text-default-500">{t('messages.detail_decision')}</p>
                 <Chip
                   size="sm"
-                  variant="flat"
+                  variant="tertiary"
                   color={archive.decision === 'approved' ? 'success' : 'danger'}
                   className="capitalize"
                 >

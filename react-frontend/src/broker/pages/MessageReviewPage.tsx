@@ -1,4 +1,4 @@
-import { Select, SelectItem, Button, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab } from '@/components/ui';
+import { Select, SelectItem, Button, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -17,7 +17,7 @@ import { Select, SelectItem, Button, Chip, Textarea, Modal, ModalContent, ModalH
 import { useState, useCallback, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 
-import { Separator } from '@heroui/react';
+import { Chip, Separator } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Flag from 'lucide-react/icons/flag';
@@ -32,21 +32,21 @@ import { DataTable, PageHeader, type Column } from '@/admin/components';
 import type { BrokerMessage, BrokerMessageDetail } from '@/admin/api/types';
 
 type SeverityChipColor = 'default' | 'warning' | 'danger';
-type SeverityChipVariant = 'flat' | 'solid';
+type SeverityChipVariant = 'tertiary' | 'primary';
 
 function severityColor(severity?: string): { color: SeverityChipColor; variant: SeverityChipVariant } {
   switch (severity?.toLowerCase()) {
     case 'medium':
     case 'warning':
-      return { color: 'warning', variant: 'flat' };
+      return { color: 'warning', variant: 'tertiary' };
     case 'high':
     case 'concern':
-      return { color: 'danger', variant: 'flat' };
+      return { color: 'danger', variant: 'tertiary' };
     case 'critical':
     case 'urgent':
-      return { color: 'danger', variant: 'solid' };
+      return { color: 'danger', variant: 'primary' };
     default:
-      return { color: 'default', variant: 'flat' };
+      return { color: 'default', variant: 'tertiary' };
   }
 }
 
@@ -256,7 +256,7 @@ export function MessageReview() {
       label: t('messages.col_reason'),
       render: (item) => (
         item.copy_reason ? (
-          <Chip size="sm" variant="flat" color="default">
+          <Chip size="sm" variant="tertiary" color="default">
             {item.copy_reason.replace(/_/g, ' ')}
           </Chip>
         ) : <span className="text-sm text-default-400">—</span>
@@ -276,11 +276,11 @@ export function MessageReview() {
         return (
           <Chip
             size="sm"
-            variant="flat"
+            variant="tertiary"
             color={severityChipColor}
-            startContent={<Flag size={12} />}
           >
-            {item.flag_severity || t('messages.flagged_label')}
+            <Flag size={12} />
+            <Chip.Label>{item.flag_severity || t('messages.flagged_label')}</Chip.Label>
           </Chip>
         );
       },
@@ -290,11 +290,11 @@ export function MessageReview() {
       label: t('messages.col_status'),
       render: (item) => (
         item.reviewed_at ? (
-          <Chip size="sm" variant="flat" color="success">
+          <Chip size="sm" variant="tertiary" color="success">
             {t('messages.status_reviewed')}
           </Chip>
         ) : (
-          <Chip size="sm" variant="flat" color="warning">
+          <Chip size="sm" variant="tertiary" color="warning">
             {t('messages.status_unreviewed')}
           </Chip>
         )
@@ -551,7 +551,7 @@ export function MessageReview() {
                   <>
                     <Separator />
                     <div className="flex items-center gap-2 text-sm text-success">
-                      <Chip size="sm" color="success" variant="flat">{t('messages.status_reviewed')}</Chip>
+                      <Chip size="sm" color="success" variant="tertiary">{t('messages.status_reviewed')}</Chip>
                       <span className="text-default-500">
                         {formatServerDateTime(detailItem.reviewed_at!)}
                       </span>
