@@ -13,6 +13,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Chip, CloseButton } from '@heroui/react';
 
 import Search from 'lucide-react/icons/search';
 import MapPin from 'lucide-react/icons/map-pin';
@@ -23,7 +24,7 @@ import Filter from 'lucide-react/icons/filter';
 import X from 'lucide-react/icons/x';
 import UserSearch from 'lucide-react/icons/user-search';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Spinner, Input, Avatar } from '@/components/ui';
+import { GlassCard, Button, Spinner, Input, Avatar } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTenant } from '@/contexts';
 import { api } from '@/lib/api';
@@ -280,34 +281,46 @@ export function TalentSearchPage() {
               {keywords.trim() && (
                 <Chip
                   size="sm"
-                  variant="flat"
-                  color="primary"
-                  onClose={() => setKeywords('')}
+                  variant="tertiary"
+                  color="accent"
                 >
-                  {keywords}
+                  <Chip.Label>{keywords}</Chip.Label>
+                  <CloseButton
+                    aria-label={t('talent_search.clear_filters')}
+                    className="inline-flex size-3 items-center justify-center text-current opacity-70 hover:opacity-100"
+                    onPress={() => setKeywords('')}
+                  />
                 </Chip>
               )}
               {skillsInput.trim() && (
                 <Chip
                   size="sm"
-                  variant="flat"
-                  color="secondary"
-                  onClose={() => setSkillsInput('')}
+                  variant="tertiary"
+                  color="default"
                 >
-                  {t('talent_search.skills_chip', { skills: skillsInput })}
+                  <Chip.Label>{t('talent_search.skills_chip', { skills: skillsInput })}</Chip.Label>
+                  <CloseButton
+                    aria-label={t('talent_search.clear_filters')}
+                    className="inline-flex size-3 items-center justify-center text-current opacity-70 hover:opacity-100"
+                    onPress={() => setSkillsInput('')}
+                  />
                 </Chip>
               )}
               {locationInput.trim() && (
                 <Chip
                   size="sm"
-                  variant="flat"
+                  variant="tertiary"
                   color="default"
-                  onClose={() => setLocationInput('')}
                 >
-                  <span className="flex items-center gap-1">
-                    <MapPin className="w-3 h-3" aria-hidden="true" />
+                  <MapPin className="w-3 h-3" aria-hidden="true" />
+                  <Chip.Label>
                     {locationInput}
-                  </span>
+                  </Chip.Label>
+                  <CloseButton
+                    aria-label={t('talent_search.clear_filters')}
+                    className="inline-flex size-3 items-center justify-center text-current opacity-70 hover:opacity-100"
+                    onPress={() => setLocationInput('')}
+                  />
                 </Chip>
               )}
               <Button
@@ -409,15 +422,15 @@ export function TalentSearchPage() {
                         <Chip
                           key={idx}
                           size="sm"
-                          variant="flat"
-                          color="primary"
+                          variant="tertiary"
+                          color="accent"
                           className="bg-accent/10 text-accent"
                         >
                           {skill}
                         </Chip>
                       ))}
                       {candidate.skills.length > 5 && (
-                        <Chip size="sm" variant="flat" color="default">
+                        <Chip size="sm" variant="tertiary" color="default">
                           +{candidate.skills.length - 5}
                         </Chip>
                       )}

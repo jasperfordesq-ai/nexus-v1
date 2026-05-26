@@ -1,4 +1,5 @@
 import { Select, SelectItem, GlassCard, Button, Chip, Input, Switch, Tabs, Tab } from '@/components/ui';
+import { Chip as HeroChip } from '@heroui/react';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -713,10 +714,10 @@ interface JobCardProps {
   vacancy: JobVacancy;
 }
 
-const TYPE_CHIP_COLORS: Record<string, 'success' | 'secondary' | 'primary'> = {
+const TYPE_CHIP_COLORS: Record<string, 'success' | 'default' | 'accent'> = {
   paid: 'success',
-  volunteer: 'secondary',
-  timebank: 'primary',
+  volunteer: 'default',
+  timebank: 'accent',
 };
 
 const JobCard = memo(function JobCard({ vacancy }: JobCardProps) {
@@ -788,44 +789,44 @@ const JobCard = memo(function JobCard({ vacancy }: JobCardProps) {
                 <h3 className="font-semibold text-theme-primary text-lg">{vacancy.title}</h3>
                 {/* J10: Featured chip */}
                 {vacancy.is_featured && (
-                  <Chip size="sm" variant="flat" color="warning" className="text-xs">
+                  <HeroChip size="sm" variant="tertiary" color="warning" className="text-xs">
                     {t('featured')}
-                  </Chip>
+                  </HeroChip>
                 )}
-                <Chip size="sm" variant="flat" color={TYPE_CHIP_COLORS[vacancy.type] ?? 'default'} className="text-xs">
+                <HeroChip size="sm" variant="tertiary" color={TYPE_CHIP_COLORS[vacancy.type] ?? 'default'} className="text-xs">
                   {t(`type.${vacancy.type}`)}
-                </Chip>
-                <Chip size="sm" variant="flat" color="default" className="text-xs">
+                </HeroChip>
+                <HeroChip size="sm" variant="tertiary" color="default" className="text-xs">
                   {t(`commitment.${vacancy.commitment}`)}
-                </Chip>
+                </HeroChip>
                 {vacancy.has_applied && (
-                  <Chip size="sm" variant="flat" color="warning" className="text-xs">
+                  <HeroChip size="sm" variant="tertiary" color="warning" className="text-xs">
                     {t('apply.applied')}
-                  </Chip>
+                  </HeroChip>
                 )}
                 {/* Deadline countdown chip */}
                 {daysUntilDeadline != null && daysUntilDeadline <= 0 && (
-                  <Chip size="sm" variant="flat" color="danger" className="text-xs font-medium">
+                  <HeroChip size="sm" variant="tertiary" color="danger" className="text-xs font-medium">
                     {t('deadline_closed')}
-                  </Chip>
+                  </HeroChip>
                 )}
                 {daysUntilDeadline != null && daysUntilDeadline > 0 && daysUntilDeadline <= 7 && (
-                  <Chip size="sm" variant="flat" color="warning" className="text-xs font-medium">
+                  <HeroChip size="sm" variant="tertiary" color="warning" className="text-xs font-medium">
                     {t('deadline_countdown', { count: daysUntilDeadline })}
-                  </Chip>
+                  </HeroChip>
                 )}
                 {/* Salary negotiable chip */}
                 {vacancy.salary_negotiable && (vacancy.salary_min || vacancy.salary_max) && (
-                  <Chip size="sm" variant="flat" color="secondary" className="text-xs">
+                  <HeroChip size="sm" variant="tertiary" color="default" className="text-xs">
                     {t('salary_negotiable')}
-                  </Chip>
+                  </HeroChip>
                 )}
                 {/* Skills match badge */}
                 {matchColor && vacancy.match_percentage != null && (
-                  <Chip size="sm" variant="flat" color={matchColor} className="text-xs font-medium"
-                    startContent={<TrendingUp className="w-3 h-3" aria-hidden="true" />}>
+                  <HeroChip size="sm" variant="tertiary" color={matchColor} className="text-xs font-medium">
+                    <TrendingUp className="w-3 h-3" aria-hidden="true" />
                     {t('match_badge', { count: Math.round(vacancy.match_percentage) })}
-                  </Chip>
+                  </HeroChip>
                 )}
                 {/* J1: Saved indicator */}
                 {vacancy.is_saved && (
@@ -890,7 +891,7 @@ const JobCard = memo(function JobCard({ vacancy }: JobCardProps) {
   );
 });
 
-const MY_POSTING_STATUS_COLORS: Record<string, 'success' | 'danger' | 'warning' | 'default' | 'primary' | 'secondary'> = {
+const MY_POSTING_STATUS_COLORS: Record<string, 'success' | 'danger' | 'warning' | 'default' | 'accent'> = {
   open: 'success',
   draft: 'default',
   closed: 'danger',
@@ -920,20 +921,20 @@ const MyPostingCard = memo(function MyPostingCard({ vacancy }: MyPostingCardProp
           <div className="flex items-center gap-2 flex-wrap">
             <h3 className="font-semibold text-theme-primary text-lg">{vacancy.title}</h3>
             {/* Status chip — prominent */}
-            <Chip
+            <HeroChip
               size="sm"
-              variant="flat"
+              variant="tertiary"
               color={MY_POSTING_STATUS_COLORS[vacancy.status] ?? 'default'}
               className="font-medium"
             >
               {t(`status.${vacancy.status}`, vacancy.status)}
-            </Chip>
-            <Chip size="sm" variant="flat" color={TYPE_CHIP_COLORS[vacancy.type] ?? 'default'} className="text-xs">
+            </HeroChip>
+            <HeroChip size="sm" variant="tertiary" color={TYPE_CHIP_COLORS[vacancy.type] ?? 'default'} className="text-xs">
               {t(`type.${vacancy.type}`)}
-            </Chip>
-            <Chip size="sm" variant="flat" color="default" className="text-xs">
+            </HeroChip>
+            <HeroChip size="sm" variant="tertiary" color="default" className="text-xs">
               {t(`commitment.${vacancy.commitment}`)}
-            </Chip>
+            </HeroChip>
           </div>
 
           {/* Stats row */}

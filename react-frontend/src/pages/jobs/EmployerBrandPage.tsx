@@ -11,6 +11,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Chip } from '@heroui/react';
 import { Slider } from '@/components/ui';
 import Briefcase from 'lucide-react/icons/briefcase';
 import MapPin from 'lucide-react/icons/map-pin';
@@ -20,7 +21,7 @@ import ChevronRight from 'lucide-react/icons/chevron-right';
 import Star from 'lucide-react/icons/star';
 import MessageSquare from 'lucide-react/icons/message-square';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Progress, Button, Chip, Textarea, Avatar } from '@/components/ui';
+import { GlassCard, Progress, Button, Textarea, Avatar } from '@/components/ui';
 import { LoadingScreen } from '@/components/feedback';
 import { Breadcrumbs } from '@/components/navigation';
 import { useTenant, useAuth } from '@/contexts';
@@ -291,12 +292,14 @@ export function EmployerBrandPage() {
             )}
             <div className="flex flex-wrap gap-2 mt-2">
               {employer?.company_size && (
-                <Chip size="sm" variant="flat" startContent={<Building2 size={12} />}>
-                  {t('employer.employees', { size: employer.company_size })}
+                <Chip size="sm" variant="tertiary">
+                  <Building2 size={12} />
+                  <Chip.Label>{t('employer.employees', { size: employer.company_size })}</Chip.Label>
                 </Chip>
               )}
-              <Chip size="sm" variant="flat" color="primary" startContent={<Briefcase size={12} />}>
-                {t('employer.open_roles_count', { count: jobs.length })}
+              <Chip size="sm" variant="tertiary" color="accent">
+                <Briefcase size={12} />
+                <Chip.Label>{t('employer.open_roles_count', { count: jobs.length })}</Chip.Label>
               </Chip>
             </div>
           </div>
@@ -346,13 +349,13 @@ export function EmployerBrandPage() {
                             {job.location}
                           </span>
                         ) : null}
-                        <Chip size="sm" variant="flat">
+                        <Chip size="sm" variant="tertiary">
                           {t(`commitment.${job.commitment}`)}
                         </Chip>
                         <Chip
                           size="sm"
-                          variant="flat"
-                          color={job.type === 'paid' ? 'primary' : job.type === 'volunteer' ? 'success' : 'secondary'}
+                          variant="tertiary"
+                          color={job.type === 'paid' ? 'accent' : job.type === 'volunteer' ? 'success' : 'default'}
                         >
                           {t(`type.${job.type}`)}
                         </Chip>
@@ -368,7 +371,10 @@ export function EmployerBrandPage() {
                       {job.benefits && job.benefits.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">
                           {job.benefits.slice(0, 4).map((b, i) => (
-                            <Chip key={i} size="sm" variant="dot" color="success">{b}</Chip>
+                            <Chip key={i} size="sm" variant="soft" color="success">
+                              <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
+                              <Chip.Label>{b}</Chip.Label>
+                            </Chip>
                           ))}
                         </div>
                       )}
@@ -602,7 +608,7 @@ export function EmployerBrandPage() {
                       {review.dimensions && (
                         <div className="flex flex-wrap gap-2 mt-2">
                           {Object.entries(review.dimensions).map(([key, val]) => (
-                            <Chip key={key} size="sm" variant="flat">
+                            <Chip key={key} size="sm" variant="tertiary">
                               {t(`employer.dim_${key}`, key)}: {val}/5
                             </Chip>
                           ))}
