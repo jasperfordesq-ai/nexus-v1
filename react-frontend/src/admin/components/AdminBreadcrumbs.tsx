@@ -367,10 +367,10 @@ export function AdminBreadcrumbs({ items }: AdminBreadcrumbsProps) {
 
   return (
     <nav aria-label={t('aria.breadcrumbs')} className="mb-4 max-w-full overflow-x-auto pb-1">
-      <ol className="flex w-max max-w-full items-center gap-1.5 text-sm text-default-500">
+      <ol className="flex w-max max-w-full items-center gap-1.5 text-sm text-muted">
         {breadcrumbs.map((crumb, index) => (
           <li key={crumb.label} className="flex min-w-0 items-center gap-1.5">
-            {index > 0 && <ChevronRight size={14} className="shrink-0 text-default-300" />}
+            {index > 0 && <ChevronRight size={14} className="shrink-0 text-muted/60" />}
             {index === 0 && <LayoutDashboard size={14} className="mr-1 shrink-0" />}
             {crumb.href ? (
               <Link

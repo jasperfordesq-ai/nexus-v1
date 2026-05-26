@@ -83,7 +83,7 @@ const editorTheme = {
     italic: 'italic',
     underline: 'underline',
     strikethrough: 'line-through',
-    code: 'bg-default-100 dark:bg-default-50 px-1.5 py-0.5 rounded text-sm font-mono',
+    code: 'bg-surface-secondary dark:bg-surface px-1.5 py-0.5 rounded text-sm font-mono',
   },
   list: {
     ul: 'list-disc pl-6 mb-3',
@@ -94,8 +94,8 @@ const editorTheme = {
     },
   },
   link: 'text-accent underline cursor-pointer hover:text-accent',
-  quote: 'border-l-4 border-accent pl-4 italic text-default-500 my-4',
-  code: 'bg-default-100 dark:bg-default-50 px-1.5 py-0.5 rounded text-sm font-mono',
+  quote: 'border-l-4 border-accent pl-4 italic text-muted my-4',
+  code: 'bg-surface-secondary dark:bg-surface px-1.5 py-0.5 rounded text-sm font-mono',
 };
 
 /* ───────────────────────── Toolbar ───────────────────────── */
@@ -246,13 +246,13 @@ function LegalDocToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-0.5 border-b border-default-200 dark:border-default-100 px-2 py-1.5 bg-default-50 dark:bg-default-100 rounded-t-lg">
+    <div className="flex flex-wrap items-center gap-0.5 border-b border-border dark:border-border px-2 py-1.5 bg-surface dark:bg-surface-secondary rounded-t-lg">
       {/* Undo / Redo */}
       <Tooltip content={t('rte.undo')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
-          variant="light"
+          variant="tertiary"
           isDisabled={isDisabled}
           onPress={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
           aria-label={t('rte.undo')}
@@ -265,7 +265,7 @@ function LegalDocToolbarPlugin({ isDisabled }: { isDisabled?: boolean }) {
         <Button
           isIconOnly
           size="sm"
-          variant="light"
+          variant="tertiary"
           isDisabled={isDisabled}
           onPress={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
           aria-label={t('rte.redo')}
@@ -654,7 +654,7 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
           <Button
             isIconOnly
             size="sm"
-            variant="light"
+            variant="tertiary"
             onPress={() => setShowPreview((v) => !v)}
             aria-label={showPreview
               ? t('rte.editor_only')
@@ -675,7 +675,7 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
               rounded-lg border-2 transition-colors
               ${errorMessage
                 ? 'border-danger'
-                : 'border-default-200 dark:border-default-100 focus-within:border-accent'}
+                : 'border-border dark:border-border focus-within:border-accent'}
               ${disabled ? 'opacity-50 pointer-events-none' : ''}
             `}
           >
@@ -690,7 +690,7 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
                     />
                   }
                   placeholder={
-                    <div className="pointer-events-none absolute top-3 left-4 text-default-400">
+                    <div className="pointer-events-none absolute top-3 left-4 text-muted">
                       {t('rte.content_placeholder')}
                     </div>
                   }
@@ -714,8 +714,8 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
         {/* Live preview — pointer-events-none prevents accidental navigation via
             the Contact Us / version-history links that CustomLegalDocument renders */}
         {showPreview && (
-          <div className="w-full lg:w-1/2 overflow-y-auto max-h-[600px] rounded-lg border border-default-200 dark:border-default-100 bg-[var(--color-surface)] px-4 pt-3 pb-6">
-            <p className="text-[0.7rem] font-semibold text-default-400 uppercase tracking-wider mb-4 sticky top-0 bg-[var(--color-surface)] py-1">
+          <div className="w-full lg:w-1/2 overflow-y-auto max-h-[600px] rounded-lg border border-border dark:border-border bg-[var(--color-surface)] px-4 pt-3 pb-6">
+            <p className="text-[0.7rem] font-semibold text-muted uppercase tracking-wider mb-4 sticky top-0 bg-[var(--color-surface)] py-1">
               {t('rte.preview')}
             </p>
             {currentHtml ? (
@@ -723,7 +723,7 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
                 <CustomLegalDocument document={previewDoc} accentColor="blue" />
               </div>
             ) : (
-              <p className="text-sm text-default-400 italic">
+              <p className="text-sm text-muted italic">
                 {t('rte.content_placeholder')}
               </p>
             )}
@@ -737,7 +737,7 @@ export function LegalDocEditor({ value, onChange, disabled = false, errorMessage
       )}
 
       {/* Helper description */}
-      <p className="text-xs text-default-400">
+      <p className="text-xs text-muted">
         {t('rte.content_helper')}
       </p>
     </div>

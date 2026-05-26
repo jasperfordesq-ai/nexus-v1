@@ -42,7 +42,7 @@ const colorMap = {
   warning: 'text-warning bg-warning/10',
   danger: 'text-danger bg-danger/10',
   secondary: 'text-accent bg-accent-soft',
-  default: 'text-default-600 bg-default/20',
+  default: 'text-muted bg-default/20',
 };
 
 export function StatCard({
@@ -70,16 +70,16 @@ export function StatCard({
         {iconNode}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium text-default-500">{resolvedLabel}</p>
+        <p className="text-sm font-medium text-muted">{resolvedLabel}</p>
         {loading ? (
-          <div className="mt-1 h-7 w-20 animate-pulse rounded bg-default-200" />
+          <div className="mt-1 h-7 w-20 animate-pulse rounded bg-surface-tertiary" />
         ) : (
           <p className="mt-0.5 text-2xl font-semibold text-foreground">
             {typeof value === 'number' ? value.toLocaleString() : value}
           </p>
         )}
         {description && (
-          <p className="mt-0.5 text-xs text-default-400">{description}</p>
+          <p className="mt-0.5 text-xs text-muted">{description}</p>
         )}
         {trend !== undefined && (
           <div className="mt-0.5 flex items-center gap-1">
@@ -92,7 +92,7 @@ export function StatCard({
               {trend > 0 ? '+' : ''}{trend}%
             </span>
             {trendLabel && (
-              <span className="text-xs text-default-400">{trendLabel}</span>
+              <span className="text-xs text-muted">{trendLabel}</span>
             )}
           </div>
         )}
@@ -100,7 +100,7 @@ export function StatCard({
       {to && (
         <ChevronRight
           size={18}
-          className="shrink-0 text-default-300 transition-transform group-hover:translate-x-0.5 group-hover:text-default-500"
+          className="shrink-0 text-muted/60 transition-transform group-hover:translate-x-0.5 group-hover:text-muted"
           aria-hidden="true"
         />
       )}
@@ -110,7 +110,6 @@ export function StatCard({
   if (to) {
     return (
       <Card
-        shadow="sm"
         isPressable
         as={Link}
         to={to}
@@ -122,7 +121,7 @@ export function StatCard({
     );
   }
 
-  return <Card shadow="sm" className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">{body}</Card>;
+  return <Card className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">{body}</Card>;
 }
 
 export default StatCard;

@@ -83,7 +83,7 @@ const editorTheme = {
     italic: 'italic',
     underline: 'underline',
     strikethrough: 'line-through',
-    code: 'bg-default-100 dark:bg-default-50 px-1.5 py-0.5 rounded text-sm font-mono',
+    code: 'bg-surface-secondary dark:bg-surface px-1.5 py-0.5 rounded text-sm font-mono',
   },
   list: {
     ul: 'list-disc pl-6 mb-3',
@@ -94,8 +94,8 @@ const editorTheme = {
     },
   },
   link: 'text-accent underline cursor-pointer hover:text-accent',
-  quote: 'border-l-4 border-accent pl-4 italic text-default-500 my-4',
-  code: 'bg-default-100 dark:bg-default-50 px-1.5 py-0.5 rounded text-sm font-mono',
+  quote: 'border-l-4 border-accent pl-4 italic text-muted my-4',
+  code: 'bg-surface-secondary dark:bg-surface px-1.5 py-0.5 rounded text-sm font-mono',
 };
 
 /* ───────────────────────── Toolbar ───────────────────────── */
@@ -198,13 +198,13 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-0.5 border-b border-default-200 dark:border-default-100 px-2 py-1.5 bg-default-50 dark:bg-default-100 rounded-t-lg">
+    <div className="flex flex-wrap items-center gap-0.5 border-b border-border dark:border-border px-2 py-1.5 bg-surface dark:bg-surface-secondary rounded-t-lg">
       {/* Undo / Redo */}
       <Tooltip content={t('rte.undo')} size="sm" delay={500}>
         <Button
           isIconOnly
           size="sm"
-          variant="light"
+          variant="tertiary"
           isDisabled={isDisabled}
           onPress={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
           aria-label={t('rte.undo')}
@@ -217,7 +217,7 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
         <Button
           isIconOnly
           size="sm"
-          variant="light"
+          variant="tertiary"
           isDisabled={isDisabled}
           onPress={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
           aria-label={t('rte.redo')}
@@ -404,7 +404,7 @@ function ToolbarPlugin({ isDisabled, showMarkdownImport }: { isDisabled?: boolea
           <Tooltip content={t('rte.import_markdown')} size="sm" delay={500}>
             <Button
               size="sm"
-              variant="light"
+              variant="tertiary"
               isDisabled={isDisabled}
               onPress={() => {
                 const input = document.createElement('input');
@@ -528,7 +528,7 @@ export function RichTextEditor({
       <div
         className={`
           rounded-lg border-2 transition-colors
-          border-default-200 dark:border-default-100
+          border-border dark:border-border
           focus-within:border-accent
           ${isDisabled ? 'opacity-50 pointer-events-none' : ''}
         `}
@@ -544,7 +544,7 @@ export function RichTextEditor({
                 />
               }
               placeholder={
-                <div className="pointer-events-none absolute top-3 left-4 text-default-400">
+                <div className="pointer-events-none absolute top-3 left-4 text-muted">
                   {editorPlaceholder}
                 </div>
               }

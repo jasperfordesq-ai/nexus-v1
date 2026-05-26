@@ -741,7 +741,7 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
         className={`group relative flex min-h-9 items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors ${
           active
             ? 'bg-accent/10 text-accent font-semibold shadow-sm'
-            : 'text-default-500 hover:bg-default-100 hover:text-foreground'
+            : 'text-muted hover:bg-surface-secondary hover:text-foreground'
         } ${compact ? 'justify-center px-2' : ''}`}
       >
         {active && !compact && <span className="absolute left-0 top-2 h-5 w-0.5 rounded-r bg-accent" />}
@@ -763,7 +763,7 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
           to={tenantPath(href)}
           aria-current={active ? 'page' : undefined}
           className={`flex items-center justify-center rounded-lg px-2 py-2 transition-colors ${
-            active ? 'bg-accent/10 text-accent' : 'text-default-500 hover:bg-default-100 hover:text-foreground'
+            active ? 'bg-accent/10 text-accent' : 'text-muted hover:bg-surface-secondary hover:text-foreground'
           }`}
         >
           <Icon size={18} />
@@ -801,7 +801,6 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
         <Accordion
           selectedKeys={openSection === section.key ? new Set<string>([section.key]) : new Set<string>()}
           selectionMode="single"
-          variant="light"
           onSelectionChange={(keys) => {
             const selected = Array.from(keys as Set<string>)[0]?.toString() ?? null;
             setOpenSection(selected === section.key ? section.key : null);
@@ -809,11 +808,11 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
           itemClasses={{
             base: 'py-0',
             trigger: `rounded-lg px-3 py-2 text-sm transition-colors ${
-              active ? 'bg-accent/10 text-accent font-semibold' : 'text-default-600 hover:bg-default-100 hover:text-foreground'
+              active ? 'bg-accent/10 text-accent font-semibold' : 'text-muted hover:bg-surface-secondary hover:text-foreground'
             }`,
             title: 'text-sm font-medium',
             content: 'pb-1 pt-0',
-            indicator: 'text-default-400',
+            indicator: 'text-muted',
           }}
         >
           <AccordionItem
@@ -833,7 +832,7 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
               {(section.items ?? []).map((item, idx) => (
                 <Fragment key={item.href}>
                   {item.group && (
-                    <li className={`px-3 text-[10px] font-semibold uppercase tracking-wider text-default-400 ${idx === 0 ? 'pb-0.5' : 'pb-0.5 pt-2'}`}>
+                    <li className={`px-3 text-[10px] font-semibold uppercase tracking-wider text-muted ${idx === 0 ? 'pb-0.5' : 'pb-0.5 pt-2'}`}>
                       {item.group}
                     </li>
                   )}
@@ -869,10 +868,10 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
           </Link>
         )}
         <Button
-          variant="light"
+          variant="tertiary"
           isIconOnly
           onPress={onToggle}
-          className="h-auto min-w-0 rounded-lg p-2 text-default-500 hover:bg-default-100 hover:text-foreground"
+          className="min-h-10 min-w-0 rounded-lg p-2 text-muted hover:bg-surface-secondary hover:text-foreground"
           aria-label={collapsed ? t('expand_sidebar') : t('collapse_sidebar')}
         >
           {collapsed ? <PanelLeft size={20} /> : <PanelLeftClose size={20} />}
@@ -883,7 +882,7 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
         <div className="shrink-0 border-b border-divider px-2 py-2">
           <Input
             size="sm"
-            variant="flat"
+            variant="secondary"
             type="search"
             name="admin-sidebar-search"
             autoComplete="off"
@@ -893,12 +892,12 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
             placeholder={t('search_nav')}
             value={searchQuery}
             onValueChange={setSearchQuery}
-            startContent={<Search size={14} className="text-default-400" />}
+            startContent={<Search size={14} className="text-muted" />}
             endContent={
               searchQuery ? (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="text-default-400 hover:text-foreground"
+                  className="text-muted hover:text-foreground"
                   aria-label={t('clear_search')}
                 >
                   <X size={14} />
@@ -915,7 +914,7 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
         {searchQuery.trim() ? (
           <ul className="space-y-0.5 py-1">
             {filteredResults.length === 0 ? (
-              <li className="px-4 py-6 text-center text-sm text-default-400">{t('no_results')}</li>
+              <li className="px-4 py-6 text-center text-sm text-muted">{t('no_results')}</li>
             ) : (
               filteredResults.map((item) => {
                 const ItemIcon = item.icon;
@@ -930,12 +929,12 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
                       className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-colors ${
                         isActive(item.href)
                           ? 'bg-accent/10 text-accent font-semibold'
-                          : 'text-default-500 hover:bg-default-100 hover:text-foreground'
+                          : 'text-muted hover:bg-surface-secondary hover:text-foreground'
                       }`}
                     >
                       <ItemIcon size={16} className="shrink-0" />
                       <span className="min-w-0 flex-1 truncate">{item.label}</span>
-                      <span className="max-w-[80px] truncate text-[10px] text-default-400">{item.sectionLabel}</span>
+                      <span className="max-w-[80px] truncate text-[10px] text-muted">{item.sectionLabel}</span>
                     </Link>
                   </li>
                 );
@@ -970,7 +969,7 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
 
             {showRecent && (
               <>
-                <li className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-default-400">
+                <li className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wider text-muted">
                   {t('recent')}
                 </li>
                 {recentPages.map((page) => (
@@ -980,10 +979,10 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
                       className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-colors ${
                         isActive(page.href)
                           ? 'bg-accent/10 text-accent font-semibold'
-                          : 'text-default-500 hover:bg-default-100 hover:text-foreground'
+                          : 'text-muted hover:bg-surface-secondary hover:text-foreground'
                       }`}
                     >
-                      <Clock size={14} className="shrink-0 text-default-400" />
+                      <Clock size={14} className="shrink-0 text-muted" />
                       <span className="truncate">{hrefToLabel.get(page.href) ?? hrefToLabel.get(page.href.split('?')[0] ?? page.href) ?? page.label}</span>
                     </Link>
                   </li>
@@ -994,7 +993,7 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
 
             {groupedSections.map((zone, zoneIdx) => (
               <li key={zone.key}>
-                <div className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-wider text-default-400">
+                <div className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-wider text-muted">
                   {t(zone.label)}
                 </div>
                 <div className="space-y-1">{zone.sections.map((section) => renderSection(section))}</div>
@@ -1016,8 +1015,8 @@ export function AdminSidebar({ collapsed = false, onToggle = () => undefined }: 
         <Tooltip content={t('help_centre')} placement="right" isDisabled={!collapsed}>
           <Link
             to={tenantPath('/admin/help')}
-            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-default-100 ${
-              location.pathname.includes('/admin/help') ? 'bg-accent/10 text-accent' : 'text-default-600'
+            className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-surface-secondary ${
+              location.pathname.includes('/admin/help') ? 'bg-accent/10 text-accent' : 'text-muted'
             } ${collapsed ? 'justify-center' : ''}`}
             title={t('help_centre')}
           >

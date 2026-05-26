@@ -76,11 +76,11 @@ export function ConfirmModal({
           {title}
         </ModalHeader>
         <ModalBody>
-          <p className="text-default-600">{message}</p>
+          <p className="text-muted">{message}</p>
           {children}
         </ModalBody>
         <ModalFooter>
-          <Button autoFocus variant="flat" onPress={onClose} isDisabled={isLoading}>
+          <Button autoFocus variant="tertiary" onPress={onClose} isDisabled={isLoading}>
             {resolvedCancelLabel}
           </Button>
           <Button

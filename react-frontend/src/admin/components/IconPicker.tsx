@@ -43,7 +43,7 @@ export function IconPicker({ value, onChange, label }: IconPickerProps) {
       <p className="text-sm font-medium text-theme-primary mb-1.5">{resolvedLabel}</p>
       <div className="flex items-center gap-2">
         <Button
-          variant="flat"
+          variant="secondary"
           className="flex items-center gap-2 px-3 py-2 bg-theme-elevated hover:bg-theme-hover border border-theme-default rounded-lg h-10 min-w-[140px] justify-start"
           onPress={() => setIsOpen(true)}
         >
@@ -59,7 +59,7 @@ export function IconPicker({ value, onChange, label }: IconPickerProps) {
         {value && (
           <Button
             isIconOnly
-            variant="light"
+            variant="tertiary"
             size="sm"
             onPress={handleClear}
             aria-label={t('icon_picker.clear_icon')}
@@ -101,8 +101,8 @@ export function IconPicker({ value, onChange, label }: IconPickerProps) {
                     <Button
                       key={name}
                       onPress={() => handleSelect(name)}
-                      variant="flat"
-                      className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all text-center hover:bg-theme-hover h-auto min-w-0 ${
+                      variant="tertiary"
+                      className={`flex min-h-14 min-w-0 flex-col items-center gap-1 rounded-lg p-2 text-center transition-all hover:bg-theme-hover ${
                         isSelected
                           ? 'bg-indigo-500/10 ring-2 ring-indigo-500 text-indigo-600 dark:text-indigo-400'
                           : 'text-theme-muted'

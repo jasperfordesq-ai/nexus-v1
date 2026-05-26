@@ -134,22 +134,22 @@ export function DataTable<T extends Record<string, any>>({
               autoComplete="off"
               placeholder={effectiveSearchPlaceholder}
               aria-label={effectiveSearchPlaceholder}
-              startContent={<Search size={16} className="text-default-400" />}
+              startContent={<Search size={16} className="text-muted" />}
               value={searchValue}
               onValueChange={handleSearchChange}
               size="sm"
-              variant="bordered"
+              variant="secondary"
               classNames={{ inputWrapper: 'bg-surface-secondary/40 border-divider/70' }}
             />
           )}
           {onRefresh && (
             <Button
               isIconOnly
-              variant="flat"
+              variant="tertiary"
               size="sm"
               onPress={onRefresh}
               aria-label={t('shared.refresh')}
-              className="bg-default-100/70 text-default-600"
+              className="bg-surface-secondary/70 text-muted"
             >
               <RefreshCw size={16} />
             </Button>
@@ -166,7 +166,7 @@ export function DataTable<T extends Record<string, any>>({
     if (!onPageChange || totalPages <= 1) return null;
     return (
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-2 py-2">
-        <span className="text-sm text-default-400">
+        <span className="text-sm text-muted">
           {totalItems ? t('shared.total_count', { count: totalItems }) : ''}
         </span>
         <Pagination
@@ -196,7 +196,7 @@ export function DataTable<T extends Record<string, any>>({
         base: 'min-w-0',
         wrapper: 'max-w-full overflow-x-auto border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]',
         table: 'min-w-max',
-        th: 'whitespace-nowrap bg-surface-secondary/70 text-xs font-semibold uppercase tracking-normal text-default-500',
+        th: 'whitespace-nowrap bg-surface-secondary/70 text-xs font-semibold uppercase tracking-normal text-muted',
         td: 'align-top text-sm',
       }}
     >
@@ -291,7 +291,7 @@ export function StatusBadge({ status }: { status: string }) {
   const safeStatus = status || 'unknown';
   const color = statusColorMap[safeStatus.toLowerCase()] || 'default';
   return (
-    <Chip size="sm" variant="flat" color={color} className="capitalize">
+    <Chip size="sm" variant="soft" color={color} className="capitalize">
       {safeStatus}
     </Chip>
   );

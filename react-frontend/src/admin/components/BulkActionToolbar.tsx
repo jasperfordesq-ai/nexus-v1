@@ -81,7 +81,7 @@ export function BulkActionToolbar({
           </span>
           <Button
             size="sm"
-            variant="light"
+            variant="tertiary"
             isIconOnly
             onPress={onClearSelection}
             aria-label={t('bulk.clear_selection')}
@@ -131,7 +131,7 @@ export function BulkActionToolbar({
                 ?? t('bulk.confirm_title', { action: pending.label })}
             </ModalHeader>
             <ModalBody>
-              <p className="text-default-600">
+              <p className="text-muted">
                 {pending.confirmMessage
                   ?? t('bulk.confirm_message', {
                     action: pending.label.toLowerCase(),
@@ -152,14 +152,14 @@ export function BulkActionToolbar({
                   onValueChange={setReason}
                   minRows={3}
                   maxRows={6}
-                  variant="bordered"
+                  variant="secondary"
                   isRequired
                 />
               )}
             </ModalBody>
             <ModalFooter>
               <Button
-                variant="flat"
+                variant="tertiary"
                 onPress={() => {
                   setPending(null);
                   setReason('');

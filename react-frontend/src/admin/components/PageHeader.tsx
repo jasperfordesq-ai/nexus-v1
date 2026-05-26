@@ -54,9 +54,9 @@ export function PageHeader({ title, description, subtitle, icon, actions }: Page
                 <Button
                   isIconOnly
                   size="sm"
-                  variant="light"
+                  variant="tertiary"
                   onClick={() => setHelpOpen(true)}
-                  className="ml-1 shrink-0 text-default-400 hover:text-accent"
+                  className="ml-1 shrink-0 text-muted hover:text-accent"
                   aria-label={t('shared.open_page_help')}
                   title={t('shared.help')}
                 >
@@ -65,7 +65,7 @@ export function PageHeader({ title, description, subtitle, icon, actions }: Page
               )}
             </div>
             {body && (
-              <p className="mt-2 max-w-3xl break-words text-sm leading-6 text-default-500 [overflow-wrap:anywhere]">{body}</p>
+              <p className="mt-2 max-w-3xl break-words text-sm leading-6 text-muted [overflow-wrap:anywhere]">{body}</p>
             )}
           </div>
           {actions && <div className="flex flex-wrap items-center gap-2 sm:justify-end">{actions}</div>}

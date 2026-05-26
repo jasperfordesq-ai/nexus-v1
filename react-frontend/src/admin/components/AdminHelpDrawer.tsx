@@ -39,7 +39,7 @@ export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerPro
         {/* Header */}
         <div className="flex shrink-0 items-start justify-between gap-3 px-5 py-4 border-b border-divider pt-[calc(var(--safe-area-top)+1rem)]">
           <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-wider text-default-400 mb-0.5">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted mb-0.5">
               {t('help_drawer.label')}
             </p>
             <h2 className="text-base font-bold text-foreground leading-snug">
@@ -49,9 +49,9 @@ export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerPro
           <Button
             isIconOnly
             size="sm"
-            variant="light"
+            variant="tertiary"
             onPress={onClose}
-            className="mt-0.5 shrink-0 text-default-400"
+            className="mt-0.5 shrink-0 text-muted"
             aria-label={t('help_drawer.close_panel')}
           >
             <X size={18} />
@@ -62,7 +62,7 @@ export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerPro
         <div className="flex-1 overflow-y-auto px-5 py-4 pb-[calc(var(--safe-area-bottom)+1rem)] space-y-5">
 
           {/* Summary */}
-          <p className="text-sm text-default-600 leading-relaxed">
+          <p className="text-sm text-muted leading-relaxed">
             {article.summary}
           </p>
 
@@ -71,7 +71,7 @@ export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerPro
             <>
               <Separator />
               <div>
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-default-400 mb-3">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted mb-3">
                   {t('help_drawer.how_to_use')}
                 </h3>
                 <ol className="space-y-3">
@@ -85,7 +85,7 @@ export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerPro
                           {step.label}
                         </p>
                         {step.detail && (
-                          <p className="mt-0.5 text-xs text-default-500 leading-relaxed">
+                          <p className="mt-0.5 text-xs text-muted leading-relaxed">
                             {step.detail}
                           </p>
                         )}
@@ -102,14 +102,14 @@ export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerPro
             <>
               <Separator />
               <div>
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-default-400 mb-3">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted mb-3">
                   {t('help_drawer.tips')}
                 </h3>
                 <ul className="space-y-2">
                   {article.tips.map((tip, idx) => (
                     <li
                       key={idx}
-                      className="flex gap-2.5 rounded-lg bg-default-50 px-3 py-2.5 text-xs text-default-600 leading-relaxed"
+                      className="flex gap-2.5 rounded-lg bg-surface px-3 py-2.5 text-xs text-muted leading-relaxed"
                     >
                       <LightbulbIcon
                         size={14}
@@ -144,7 +144,7 @@ export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerPro
             <>
               <Separator />
               <div>
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-default-400 mb-3">
+                <h3 className="text-xs font-semibold uppercase tracking-wider text-muted mb-3">
                   {t('help_drawer.related_pages')}
                 </h3>
                 <div className="flex flex-wrap gap-2">
@@ -154,8 +154,7 @@ export function AdminHelpDrawer({ article, isOpen, onClose }: AdminHelpDrawerPro
                       as={Link}
                       to={rel.path}
                       size="sm"
-                      variant="flat"
-                      color="primary"
+                      variant="secondary"
                       className="cursor-pointer"
                       onClick={onClose}
                     >

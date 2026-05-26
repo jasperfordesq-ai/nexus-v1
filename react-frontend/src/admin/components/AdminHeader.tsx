@@ -44,26 +44,26 @@ export function AdminHeader({ sidebarCollapsed, onSidebarToggle }: AdminHeaderPr
         {onSidebarToggle && (
           <Button
             isIconOnly
-            variant="light"
+            variant="tertiary"
             size="sm"
             onPress={onSidebarToggle}
-            className="text-default-500 md:hidden"
+            className="text-muted md:hidden"
             aria-label={t('toggle_sidebar')}
           >
             <Menu size={20} />
           </Button>
         )}
         <Button
-          variant="flat"
+          variant="tertiary"
           size="sm"
           onPress={() => navigate(tenantPath('/dashboard'))}
           startContent={<ArrowLeft size={16} />}
-          className="min-w-0 bg-default-100/70 px-2 text-default-600 hover:bg-default-200/70 sm:px-3"
+          className="min-w-0 bg-surface-secondary/70 px-2 text-muted hover:bg-surface-tertiary/70 sm:px-3"
         >
           <span className="hidden sm:inline">{t('back_to_site_header')}</span>
         </Button>
         {tenant?.name && (
-          <span className="min-w-0 max-w-[9rem] truncate text-sm font-medium text-default-400 sm:max-w-[18rem]">
+          <span className="min-w-0 max-w-[9rem] truncate text-sm font-medium text-muted sm:max-w-[18rem]">
             {tenant.name}
           </span>
         )}
@@ -73,18 +73,18 @@ export function AdminHeader({ sidebarCollapsed, onSidebarToggle }: AdminHeaderPr
       <div className="flex shrink-0 items-center gap-2 sm:gap-3">
         <Button
           isIconOnly
-          variant="flat"
+          variant="tertiary"
           size="sm"
           onPress={() => navigate(tenantPath('/notifications'))}
           aria-label={t('notifications')}
-          className="bg-default-100/70 text-default-600 hover:bg-default-200/70"
+          className="bg-surface-secondary/70 text-muted hover:bg-surface-tertiary/70"
         >
           <Bell size={18} />
         </Button>
 
         <Dropdown placement="bottom-end">
           <DropdownTrigger>
-            <Button variant="flat" className="flex h-auto min-w-0 items-center gap-2 bg-default-100/70 px-2 py-1 hover:bg-default-200/70">
+            <Button variant="tertiary" className="flex min-h-10 min-w-0 items-center gap-2 bg-surface-secondary/70 px-2 py-1 hover:bg-surface-tertiary/70">
               <Avatar
                 src={resolveAvatarUrl(user?.avatar_url || user?.avatar) || undefined}
                 name={user?.name || adminLabel}
@@ -113,7 +113,6 @@ export function AdminHeader({ sidebarCollapsed, onSidebarToggle }: AdminHeaderPr
               key="logout" id="logout"
               startContent={<LogOut size={16} />}
               className="text-danger"
-              color="danger"
             >
               {t('sign_out')}
             </DropdownItem>

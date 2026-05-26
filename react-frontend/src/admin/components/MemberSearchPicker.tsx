@@ -197,7 +197,7 @@ export function MemberSearchPicker({
           {label}
           {isRequired ? <span className="text-danger"> *</span> : null}
         </p>
-        <div className="flex items-center justify-between gap-3 rounded-[14px] border border-default-200 bg-default-50 px-3 py-2">
+        <div className="flex items-center justify-between gap-3 rounded-[14px] border border-border bg-surface px-3 py-2">
           <div className="flex min-w-0 items-center gap-3">
             <Avatar
               src={resolvedSelectedMember.avatar_url || undefined}
@@ -207,10 +207,10 @@ export function MemberSearchPicker({
             />
             <div className="min-w-0">
               <p className="truncate text-sm font-medium text-foreground">{resolvedSelectedMember.name}</p>
-              <p className="truncate text-xs text-default-500">{resolvedSelectedMember.email}</p>
+              <p className="truncate text-xs text-muted">{resolvedSelectedMember.email}</p>
             </div>
           </div>
-          <Button size={size} variant="flat" onPress={handleClear}>
+          <Button size={size} variant="tertiary" onPress={handleClear}>
             {clearText}
           </Button>
         </div>
@@ -235,17 +235,17 @@ export function MemberSearchPicker({
         }}
         isRequired={isRequired}
         size={size}
-        startContent={<Search size={14} className="text-default-400" />}
+        startContent={<Search size={14} className="text-muted" />}
         endContent={searchLoading || hydrationLoading ? <Spinner size="sm" /> : undefined}
       />
 
       {showDropdown && results.length > 0 && (
-        <div className="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-[14px] border border-default-200 bg-overlay shadow-lg">
+        <div className="absolute z-50 mt-1 max-h-56 w-full overflow-y-auto rounded-[14px] border border-border bg-overlay shadow-lg">
           {results.map((member) => (
             <Button
               key={member.id}
-              variant="light"
-              className="h-auto w-full justify-start gap-3 rounded-none px-3 py-2"
+              variant="tertiary"
+              className="min-h-10 w-full justify-start gap-3 rounded-none px-3 py-2"
               onMouseDown={(event) => event.preventDefault()}
               onPress={() => handleSelect(member)}
             >
@@ -257,7 +257,7 @@ export function MemberSearchPicker({
               />
               <div className="min-w-0 text-left">
                 <p className="truncate text-sm font-medium">{member.name}</p>
-                <p className="truncate text-xs text-default-400">{member.email}</p>
+                <p className="truncate text-xs text-muted">{member.email}</p>
               </div>
             </Button>
           ))}
@@ -265,7 +265,7 @@ export function MemberSearchPicker({
       )}
 
       {query.trim().length >= 2 && !searchLoading && results.length === 0 && (
-        <p className="mt-1 text-xs text-default-400">{noResultsText}</p>
+        <p className="mt-1 text-xs text-muted">{noResultsText}</p>
       )}
     </div>
   );
