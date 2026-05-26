@@ -157,7 +157,7 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
         {showLeftArrow && (
           <Button
             isIconOnly
-            variant="flat"
+            variant="tertiary"
             size="sm"
             onPress={() => scroll('left')}
             className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-[var(--surface-elevated)] shadow-md opacity-0 group-hover:opacity-100 transition-opacity border border-[var(--border-default)]"
@@ -171,7 +171,7 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
         {showRightArrow && (
           <Button
             isIconOnly
-            variant="flat"
+            variant="tertiary"
             size="sm"
             onPress={() => scroll('right')}
             className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-[var(--surface-elevated)] shadow-md opacity-0 group-hover:opacity-100 transition-opacity border border-[var(--border-default)]"
@@ -188,9 +188,9 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
           <div className="flex items-start gap-3 px-1 py-2 min-w-min">
             {/* Your Story — create button */}
             <Button
-              variant="light"
+              variant="ghost"
               onPress={handleCreateClick}
-              className="flex flex-col items-center gap-1.5 flex-shrink-0 w-16 h-auto group/create p-0 min-w-0"
+              className="flex min-h-[82px] w-16 flex-shrink-0 flex-col items-center gap-1.5 p-0 group/create"
               aria-label={t('stories.create_your_story')}
             >
               <div className="relative">
@@ -229,9 +229,9 @@ export function StoriesBar({ friends: _friends }: StoriesBarProps) {
               return (
                 <Button
                   key={`${storyUser.user_id}-${actualIndex}`}
-                  variant="light"
+                  variant="ghost"
                   onPress={() => handleStoryClick(actualIndex)}
-                  className="flex flex-col items-center gap-1.5 flex-shrink-0 w-16 h-auto p-0 min-w-0"
+                  className="flex min-h-[82px] w-16 flex-shrink-0 flex-col items-center gap-1.5 p-0"
                   aria-label={t('stories.view_story_from', { name: storyUser.name })}
                 >
                   <div className="relative">

@@ -530,8 +530,8 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
       <div className="flex items-center justify-between px-4 py-3 z-10">
         <Button
           isIconOnly
-          variant="flat"
-          className="p-2 rounded-full hover:bg-white/10 transition-colors min-w-0 w-auto h-auto"
+          variant="tertiary"
+          className="size-9 min-h-9 rounded-full p-2 transition-colors hover:bg-white/10"
           onPress={onClose}
           aria-label={t('creator.close')}
         >
@@ -553,9 +553,9 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
         ]).map(({ key, icon: Icon, label }) => (
           <Button
             key={key}
-            variant="flat"
+            variant="secondary"
             onPress={() => setMode(key)}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-all h-auto min-w-0 ${
+            className={`flex min-h-[40px] items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all ${
               mode === key
                 ? 'bg-white text-black'
                 : 'bg-white/10 text-white/70 hover:bg-white/20'
@@ -598,8 +598,8 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                   <div className="absolute top-3 right-3 flex flex-col gap-2 z-30">
                     <Button
                       isIconOnly
-                      variant="flat"
-                      className={`p-2 rounded-full backdrop-blur transition-colors min-w-0 w-auto h-auto ${
+                      variant="tertiary"
+                      className={`size-9 min-h-9 rounded-full p-2 backdrop-blur transition-colors ${
                         drawingActive ? 'bg-white text-black' : 'bg-black/40 text-white hover:bg-black/60'
                       }`}
                       onPress={() => setDrawingActive(!drawingActive)}
@@ -611,8 +611,8 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                       <>
                         <Button
                           isIconOnly
-                          variant="flat"
-                          className="p-2 rounded-full bg-black/40 backdrop-blur text-white hover:bg-black/60 transition-colors min-w-0 w-auto h-auto"
+                          variant="tertiary"
+                          className="size-9 min-h-9 rounded-full bg-black/40 p-2 text-white backdrop-blur transition-colors hover:bg-black/60"
                           onPress={clearDrawing}
                           aria-label={t('creator.draw_clear')}
                         >
@@ -623,7 +623,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                             <Button
                               key={c}
                               isIconOnly
-                              variant="flat"
+                              variant="secondary"
                               onPress={() => setDrawColor(c)}
                               className={`w-5 h-5 rounded-full transition-all min-w-0 p-0 ${
                                 drawColor === c ? 'ring-2 ring-white scale-110' : ''
@@ -638,7 +638,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                             <Button
                               key={s}
                               isIconOnly
-                              variant="flat"
+                              variant="secondary"
                               onPress={() => setDrawSize(s)}
                               className={`w-5 h-5 rounded-full transition-all min-w-0 p-0 ${
                                 drawSize === s ? 'bg-white/30' : ''
@@ -658,7 +658,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                       value={photoText}
                       onValueChange={setPhotoText}
                       placeholder={t('creator.text_overlay')}
-                      variant="bordered"
+                      variant="secondary"
                       size="sm"
                       classNames={{
                         input: 'text-white placeholder:text-white/50',
@@ -675,9 +675,9 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                     {IMAGE_FILTERS.map((f) => (
                       <Button
                         key={f.value}
-                        variant="light"
+                        variant="ghost"
                         onPress={() => setImageFilter(f.value)}
-                        className={`flex-shrink-0 flex flex-col items-center gap-1 h-auto min-w-0 p-0 ${
+                        className={`flex min-h-[76px] flex-shrink-0 flex-col items-center gap-1 p-0 ${
                           imageFilter === f.value ? 'opacity-100' : 'opacity-60 hover:opacity-80'
                         }`}
                         aria-label={`${t(f.labelKey)} filter`}
@@ -717,8 +717,8 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                 <div className="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-8">
                   <Button
                     isIconOnly
-                    variant="flat"
-                    className="p-3 rounded-full bg-white/20 backdrop-blur hover:bg-white/30 transition-colors min-w-0 w-auto h-auto"
+                    variant="tertiary"
+                    className="size-11 min-h-11 rounded-full bg-white/20 p-3 backdrop-blur transition-colors hover:bg-white/30"
                     onPress={flipCamera}
                     aria-label={t('creator.flip_camera')}
                   >
@@ -726,15 +726,15 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                   </Button>
                   <Button
                     isIconOnly
-                    variant="flat"
+                    variant="secondary"
                     className="w-16 h-16 rounded-full border-4 border-white bg-white/20 hover:bg-white/40 transition-colors active:scale-90 min-w-0"
                     onPress={capturePhoto}
                     aria-label={t('creator.capture')}
                   />
                   <Button
                     isIconOnly
-                    variant="flat"
-                    className="p-3 rounded-full bg-white/20 backdrop-blur hover:bg-white/30 transition-colors min-w-0 w-auto h-auto"
+                    variant="tertiary"
+                    className="size-11 min-h-11 rounded-full bg-white/20 p-3 backdrop-blur transition-colors hover:bg-white/30"
                     onPress={stopCamera}
                     aria-label={t('creator.close_camera')}
                   >
@@ -745,9 +745,9 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
             ) : (
               <div className="flex flex-col items-center gap-4 w-full max-w-sm">
                 <Button
-                  variant="flat"
+                  variant="secondary"
                   onPress={startCamera}
-                  className="flex flex-col items-center gap-4 p-10 w-full rounded-2xl border-2 border-dashed border-white/20 hover:border-white/40 transition-colors cursor-pointer h-auto min-w-0"
+                  className="flex min-h-[180px] w-full cursor-pointer flex-col items-center gap-4 rounded-2xl border-2 border-dashed border-white/20 p-10 transition-colors hover:border-white/40"
                   aria-label={t('creator.open_camera')}
                 >
                   <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center">
@@ -760,9 +760,9 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                 </Button>
                 <div className="text-white/30 text-xs uppercase tracking-wider">{t('creator.or_divider')}</div>
                 <Button
-                  variant="flat"
+                  variant="secondary"
                   onPress={() => fileInputRef.current?.click()}
-                  className="flex flex-col items-center gap-3 p-8 w-full rounded-2xl border-2 border-dashed border-white/20 hover:border-white/40 transition-colors cursor-pointer h-auto min-w-0"
+                  className="flex min-h-[148px] w-full cursor-pointer flex-col items-center gap-3 rounded-2xl border-2 border-dashed border-white/20 p-8 transition-colors hover:border-white/40"
                   aria-label={t('creator.select_image')}
                 >
                   <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
@@ -826,8 +826,8 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                 <div className="absolute bottom-6 left-0 right-0 flex items-center justify-center gap-8">
                   <Button
                     isIconOnly
-                    variant="flat"
-                    className="p-3 rounded-full bg-white/20 backdrop-blur hover:bg-white/30 transition-colors min-w-0 w-auto h-auto"
+                    variant="tertiary"
+                    className="size-11 min-h-11 rounded-full bg-white/20 p-3 backdrop-blur transition-colors hover:bg-white/30"
                     onPress={flipCamera}
                     aria-label={t('creator.flip_camera')}
                   >
@@ -836,7 +836,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                   {isRecording ? (
                     <Button
                       isIconOnly
-                      variant="flat"
+                      variant="secondary"
                       className="w-16 h-16 rounded-full border-4 border-red-500 bg-red-500/30 hover:bg-red-500/50 transition-colors min-w-0"
                       onPress={stopRecording}
                       aria-label={t('creator.stop_recording')}
@@ -846,7 +846,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                   ) : (
                     <Button
                       isIconOnly
-                      variant="flat"
+                      variant="secondary"
                       className="w-16 h-16 rounded-full border-4 border-red-500 bg-red-500/20 hover:bg-red-500/40 transition-colors min-w-0"
                       onPress={startRecording}
                       aria-label={t('creator.start_recording')}
@@ -856,8 +856,8 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                   )}
                   <Button
                     isIconOnly
-                    variant="flat"
-                    className="p-3 rounded-full bg-white/20 backdrop-blur hover:bg-white/30 transition-colors min-w-0 w-auto h-auto"
+                    variant="tertiary"
+                    className="size-11 min-h-11 rounded-full bg-white/20 p-3 backdrop-blur transition-colors hover:bg-white/30"
                     onPress={stopCamera}
                     aria-label={t('creator.close_camera')}
                   >
@@ -868,9 +868,9 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
             ) : (
               <div className="flex flex-col items-center gap-4 w-full max-w-sm">
                 <Button
-                  variant="flat"
+                  variant="secondary"
                   onPress={startCamera}
-                  className="flex flex-col items-center gap-4 p-10 w-full rounded-2xl border-2 border-dashed border-white/20 hover:border-white/40 transition-colors cursor-pointer h-auto min-w-0"
+                  className="flex min-h-[180px] w-full cursor-pointer flex-col items-center gap-4 rounded-2xl border-2 border-dashed border-white/20 p-10 transition-colors hover:border-white/40"
                   aria-label={t('creator.record_video')}
                 >
                   <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center">
@@ -883,9 +883,9 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                 </Button>
                 <div className="text-white/30 text-xs uppercase tracking-wider">{t('creator.or_divider')}</div>
                 <Button
-                  variant="flat"
+                  variant="secondary"
                   onPress={() => videoInputRef.current?.click()}
-                  className="flex flex-col items-center gap-3 p-8 w-full rounded-2xl border-2 border-dashed border-white/20 hover:border-white/40 transition-colors cursor-pointer h-auto min-w-0"
+                  className="flex min-h-[148px] w-full cursor-pointer flex-col items-center gap-3 rounded-2xl border-2 border-dashed border-white/20 p-8 transition-colors hover:border-white/40"
                   aria-label={t('creator.select_video')}
                 >
                   <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
@@ -940,13 +940,13 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                     {STORY_TEMPLATES.map((tpl, idx) => (
                       <Button
                         key={idx}
-                        variant="flat"
+                        variant="secondary"
                         onPress={() => {
                           setTextContent(tpl.text);
                           setSelectedGradient(tpl.gradient);
                           setSelectedFont(tpl.font);
                         }}
-                        className="flex-shrink-0 px-3 py-1.5 rounded-full bg-white/10 text-white/70 text-xs hover:bg-white/20 transition-colors whitespace-nowrap h-auto min-w-0"
+                        className="min-h-[32px] flex-shrink-0 whitespace-nowrap rounded-full bg-white/10 px-3 py-1.5 text-xs text-white/70 transition-colors hover:bg-white/20"
                       >
                         {t(tpl.labelKey)}
                       </Button>
@@ -959,7 +959,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                 value={textContent}
                 onValueChange={setTextContent}
                 placeholder={t('creator.compose_placeholder')}
-                variant="bordered"
+                variant="secondary"
                 maxLength={500}
                 minRows={2}
                 maxRows={4}
@@ -979,7 +979,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                     <Button
                       key={idx}
                       isIconOnly
-                      variant="flat"
+                      variant="secondary"
                       onPress={() => setSelectedGradient(idx)}
                       className={`w-8 h-8 rounded-full transition-all min-w-0 p-0 ${
                         selectedGradient === idx ? 'ring-2 ring-white ring-offset-2 ring-offset-black scale-110' : 'hover:scale-105'
@@ -999,9 +999,9 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                   {FONT_STYLES.map((f, idx) => (
                     <Button
                       key={idx}
-                      variant="flat"
+                      variant="secondary"
                       onPress={() => setSelectedFont(idx)}
-                      className={`px-4 py-1.5 rounded-full text-sm transition-all h-auto min-w-0 ${
+                      className={`min-h-[34px] rounded-full px-4 py-1.5 text-sm transition-all ${
                         selectedFont === idx
                           ? 'bg-white text-black font-medium'
                           : 'bg-white/10 text-white/70 hover:bg-white/20'
@@ -1050,7 +1050,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                 value={pollQuestion}
                 onValueChange={setPollQuestion}
                 placeholder={t('creator.poll_question_placeholder')}
-                variant="bordered"
+                variant="secondary"
                 maxLength={255}
                 classNames={{
                   input: 'text-white',
@@ -1067,7 +1067,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                       value={option}
                       onValueChange={(v) => updatePollOption(idx, v)}
                       placeholder={`Option ${idx + 1}`}
-                      variant="bordered"
+                      variant="secondary"
                       maxLength={100}
                       classNames={{
                         input: 'text-white',
@@ -1079,7 +1079,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                       <Button
                         isIconOnly
                         size="sm"
-                        variant="flat"
+                        variant="tertiary"
                         className="bg-white/10 text-white/70"
                         onPress={() => removePollOption(idx)}
                         aria-label={`Remove option ${idx + 1}`}
@@ -1092,7 +1092,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                 {pollOptions.length < 4 && (
                   <Button
                     size="sm"
-                    variant="flat"
+                    variant="secondary"
                     className="bg-white/10 text-white/70"
                     startContent={<Plus className="w-4 h-4" />}
                     onPress={addPollOption}
@@ -1110,7 +1110,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
                     <Button
                       key={idx}
                       isIconOnly
-                      variant="flat"
+                      variant="secondary"
                       onPress={() => setPollGradient(idx)}
                       className={`w-8 h-8 rounded-full transition-all min-w-0 p-0 ${
                         pollGradient === idx ? 'ring-2 ring-white ring-offset-2 ring-offset-black scale-110' : 'hover:scale-105'
@@ -1138,9 +1138,9 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
           ]).map(({ key, icon: Icon, labelKey }) => (
             <Button
               key={key}
-              variant="flat"
+              variant="secondary"
               onPress={() => setAudience(key)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all h-auto min-w-0 ${
+              className={`flex min-h-[32px] items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
                 audience === key
                   ? 'bg-white text-black'
                   : 'bg-white/10 text-white/60 hover:bg-white/20'
@@ -1156,7 +1156,7 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
 
         <div className="flex items-center justify-between">
           <Button
-            variant="flat"
+            variant="tertiary"
             className="bg-white/10 text-white/70"
             onPress={handleDiscard}
             startContent={<Trash2 className="w-4 h-4" />}
@@ -1165,7 +1165,6 @@ export function StoryCreator({ onClose, onCreated }: StoryCreatorProps) {
           </Button>
 
           <Button
-            color="primary"
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium"
             onPress={handleSubmit}
             isLoading={isSubmitting}

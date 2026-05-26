@@ -304,9 +304,9 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
           {/* Create new highlight button (owner only) */}
           {isOwner && (
             <Button
-              variant="light"
+              variant="ghost"
               onPress={onCreateOpen}
-              className="flex flex-col items-center gap-1.5 flex-shrink-0 w-18 group h-auto min-w-0 p-0"
+              className="flex min-h-[92px] w-18 flex-shrink-0 flex-col items-center gap-1.5 p-0 group"
               aria-label={t('highlights.aria_create')}
             >
               <div className="w-16 h-16 rounded-full border-2 border-dashed border-[var(--border-default)] flex items-center justify-center group-hover:border-[var(--color-primary)] transition-colors">
@@ -320,9 +320,9 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
           {highlights.map((highlight) => (
             <Button
               key={highlight.id}
-              variant="light"
+              variant="ghost"
               onPress={() => handleHighlightClick(highlight)}
-              className="flex flex-col items-center gap-1.5 flex-shrink-0 w-18 group relative h-auto min-w-0 p-0"
+              className="relative flex min-h-[92px] w-18 flex-shrink-0 flex-col items-center gap-1.5 p-0 group"
               aria-label={t('highlights.aria_view', { title: highlight.title })}
             >
               <div className="w-16 h-16 rounded-full p-[2px] bg-[var(--border-default)] group-hover:bg-gradient-to-tr group-hover:from-yellow-400 group-hover:via-red-500 group-hover:to-purple-600 transition-all">
@@ -353,7 +353,7 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
                   {/* Edit button */}
                   <Button
                     isIconOnly
-                    variant="flat"
+                    variant="secondary"
                     className="absolute -top-1 -left-1 w-5 h-5 rounded-full bg-[var(--color-primary)] text-white opacity-0 group-hover:opacity-100 transition-opacity min-w-0 p-0"
                     onClick={(e) => { e.stopPropagation(); handleEditClick(highlight, e); }}
                     aria-label={t('highlights.aria_edit', { title: highlight.title })}
@@ -363,7 +363,7 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
                   {/* Delete button */}
                   <Button
                     isIconOnly
-                    variant="flat"
+                    variant="danger"
                     className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity min-w-0 p-0"
                     onClick={(e) => { e.stopPropagation(); handleDeleteHighlight(highlight.id, e); }}
                     aria-label={t('highlights.aria_delete', { title: highlight.title })}
@@ -387,7 +387,7 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
               onValueChange={setNewTitle}
               label={t('highlights.title_label')}
               placeholder={t('highlights.title_placeholder')}
-              variant="bordered"
+              variant="secondary"
               maxLength={100}
               autoFocus
             />
@@ -396,11 +396,10 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
             </p>
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={onCreateClose}>
+            <Button variant="tertiary" onPress={onCreateClose}>
               {t('highlights.cancel')}
             </Button>
             <Button
-              color="primary"
               onPress={handleCreateHighlight}
               isLoading={isCreating}
               isDisabled={!newTitle.trim()}
@@ -422,12 +421,11 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
                 value={editTitle}
                 onValueChange={setEditTitle}
                 label={t('highlights.title_label')}
-                variant="bordered"
+                variant="secondary"
                 maxLength={100}
                 className="flex-1"
               />
               <Button
-                color="primary"
                 size="sm"
                 onPress={handleSaveTitle}
                 isLoading={isSavingTitle}
@@ -492,8 +490,7 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
                       {/* Remove button */}
                       <Button
                         size="sm"
-                        variant="light"
-                        color="danger"
+                        variant="danger-soft"
                         isIconOnly
                         isLoading={removingStoryId === story.id}
                         onPress={() => handleRemoveStory(story.id)}
@@ -508,7 +505,7 @@ export function StoryHighlights({ userId, userName, userAvatar }: StoryHighlight
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={handleEditClose}>
+            <Button variant="tertiary" onPress={handleEditClose}>
               {t('common:common.dismiss')}
             </Button>
           </ModalFooter>

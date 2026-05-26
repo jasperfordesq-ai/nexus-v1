@@ -42,9 +42,9 @@ export function WhyShown({ item, feedMode }: WhyShownProps) {
       <PopoverTrigger>
         <Button
           isIconOnly
-          variant="light"
+          variant="ghost"
           size="sm"
-          className="text-[var(--text-subtle)] hover:text-[var(--text-muted)] transition-colors opacity-70 sm:opacity-40 sm:group-hover:opacity-100 focus-visible:opacity-100 min-w-0 min-h-0 w-auto h-auto p-0.5"
+          className="size-6 min-h-6 w-6 p-0.5 text-[var(--text-subtle)] opacity-70 transition-colors hover:text-[var(--text-muted)] focus-visible:opacity-100 sm:opacity-40 sm:group-hover:opacity-100"
           aria-label={t('why_shown.label')}
         >
           <Info className="w-3.5 h-3.5" />
