@@ -1,4 +1,5 @@
-import { CardBody, Card, Button } from '@/components/ui';
+import { Card } from '@heroui/react';
+import { Button } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -100,8 +101,8 @@ export function PremiumGate({ featureKey, children, fallback, silent = false }: 
   if (fallback !== undefined) return <>{fallback}</>;
 
   return (
-    <Card shadow="sm">
-      <CardBody className="text-center py-8 flex flex-col items-center gap-3">
+    <Card className="shadow-sm">
+      <Card.Content className="text-center py-8 flex flex-col items-center gap-3">
         <Crown size={36} className="text-yellow-500" />
         <h3 className="text-lg font-semibold">
           {t('premium.gate_title')}
@@ -112,7 +113,7 @@ export function PremiumGate({ featureKey, children, fallback, silent = false }: 
         <Button as={Link} to={tenantPath('/premium')} color="primary">
           {t('premium.gate_cta')}
         </Button>
-      </CardBody>
+      </Card.Content>
     </Card>
   );
 }

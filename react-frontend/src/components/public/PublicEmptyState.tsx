@@ -1,4 +1,5 @@
-import { Card, CardBody, Chip } from '@/components/ui';
+import { Card } from '@heroui/react';
+import { Chip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -32,8 +33,8 @@ export function PublicEmptyState({
   accent = 'indigo',
 }: PublicEmptyStateProps) {
   return (
-    <Card className="border border-theme-default bg-theme-surface/80 shadow-sm" radius="lg">
-      <CardBody className="items-center px-5 py-10 text-center sm:px-8">
+    <Card className="rounded-lg border border-theme-default bg-theme-surface/80 shadow-sm">
+      <Card.Content className="items-center px-5 py-10 text-center sm:px-8">
         <div className={`mb-5 rounded-2xl bg-gradient-to-br p-4 ${accentClasses[accent]}`}>
           {icon}
         </div>
@@ -49,7 +50,7 @@ export function PublicEmptyState({
           </div>
         ) : null}
         {action ? <div className="mt-6">{action}</div> : null}
-      </CardBody>
+      </Card.Content>
     </Card>
   );
 }
