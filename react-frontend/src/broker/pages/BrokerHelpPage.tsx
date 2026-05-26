@@ -42,7 +42,7 @@ export function BrokerControlsHelp() {
 
   return (
     <section className="mt-10">
-      <Card shadow="sm" className="border border-default-200">
+      <Card className="border border-border">
         <CardHeader className="flex items-center gap-3 pb-2">
           <div className="p-2 rounded-lg bg-accent/10">
             <BookOpen className="w-5 h-5 text-accent" />
@@ -51,7 +51,7 @@ export function BrokerControlsHelp() {
             <h2 className="text-lg font-semibold text-foreground">
               {t('help.title')}
             </h2>
-            <p className="text-xs text-default-500">
+            <p className="text-xs text-muted">
               {t('help.subtitle')}
             </p>
           </div>
@@ -70,7 +70,7 @@ export function BrokerControlsHelp() {
                 </div>
               }
             >
-              <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
+              <div className="text-sm leading-relaxed text-muted space-y-3">
                 <p>{t('help.overview.intro')}</p>
                 <ul className="list-disc pl-5 space-y-1">
                   <li><Trans t={t} i18nKey="help.overview.bullet_exchange" components={richComponents} /></li>
@@ -95,7 +95,7 @@ export function BrokerControlsHelp() {
                 </div>
               }
             >
-              <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
+              <div className="text-sm leading-relaxed text-muted space-y-3">
                 <p>{t('help.workflow.intro')}</p>
                 <ol className="list-decimal pl-5 space-y-2">
                   <li><Trans t={t} i18nKey="help.workflow.step_unreviewed" components={richComponents} /></li>
@@ -104,7 +104,7 @@ export function BrokerControlsHelp() {
                   <li><Trans t={t} i18nKey="help.workflow.step_vetting" components={richComponents} /></li>
                   <li><Trans t={t} i18nKey="help.workflow.step_activity" components={richComponents} /></li>
                 </ol>
-                <p className="italic text-default-500">{t('help.workflow.tip')}</p>
+                <p className="italic text-muted">{t('help.workflow.tip')}</p>
               </div>
             </AccordionItem>
 
@@ -119,7 +119,7 @@ export function BrokerControlsHelp() {
                 </div>
               }
             >
-              <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
+              <div className="text-sm leading-relaxed text-muted space-y-3">
                 <p>{t('help.messages.intro')}</p>
                 <p className="font-medium text-foreground">{t('help.messages.severity_heading')}</p>
                 <ul className="list-disc pl-5 space-y-1">
@@ -149,7 +149,7 @@ export function BrokerControlsHelp() {
                 </div>
               }
             >
-              <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
+              <div className="text-sm leading-relaxed text-muted space-y-3">
                 <p>{t('help.monitoring.intro')}</p>
                 <ul className="list-disc pl-5 space-y-2">
                   <li><Trans t={t} i18nKey="help.monitoring.automatic" components={richComponents} /></li>
@@ -171,7 +171,7 @@ export function BrokerControlsHelp() {
                 </div>
               }
             >
-              <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
+              <div className="text-sm leading-relaxed text-muted space-y-3">
                 <p>{t('help.vetting.intro')}</p>
                 <ul className="list-disc pl-5 space-y-1">
                   <li><Trans t={t} i18nKey="help.vetting.type_garda" components={richComponents} /></li>
@@ -189,7 +189,7 @@ export function BrokerControlsHelp() {
                   <li><Trans t={t} i18nKey="help.vetting.lifecycle_expired" components={richComponents} /></li>
                   <li><Trans t={t} i18nKey="help.vetting.lifecycle_rejected" components={richComponents} /></li>
                 </ol>
-                <p className="italic text-default-500"><Trans t={t} i18nKey="help.vetting.match_note" components={richComponents} /></p>
+                <p className="italic text-muted"><Trans t={t} i18nKey="help.vetting.match_note" components={richComponents} /></p>
               </div>
             </AccordionItem>
 
@@ -204,7 +204,7 @@ export function BrokerControlsHelp() {
                 </div>
               }
             >
-              <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
+              <div className="text-sm leading-relaxed text-muted space-y-3">
                 <p>{t('help.alerts.intro')}</p>
                 <ul className="list-disc pl-5 space-y-1">
                   <li>{t('help.alerts.counts_messages')}</li>
@@ -225,12 +225,12 @@ export function BrokerControlsHelp() {
               aria-label={t('help.legal.aria')}
               title={
                 <div className="flex items-center gap-2">
-                  <Scale className="w-4 h-4 text-default-500" />
+                  <Scale className="w-4 h-4 text-muted" />
                   <span className="font-medium">{t('help.legal.title')}</span>
                 </div>
               }
             >
-              <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
+              <div className="text-sm leading-relaxed text-muted space-y-3">
                 <p>{t('help.legal.disclaimer')}</p>
                 <ul className="list-disc pl-5 space-y-2">
                   <li><Trans t={t} i18nKey="help.legal.law_nvb" components={richComponents} /></li>
@@ -249,12 +249,12 @@ export function BrokerControlsHelp() {
               aria-label={t('help.data.aria')}
               title={
                 <div className="flex items-center gap-2">
-                  <Database className="w-4 h-4 text-default-500" />
+                  <Database className="w-4 h-4 text-muted" />
                   <span className="font-medium">{t('help.data.title')}</span>
                 </div>
               }
             >
-              <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
+              <div className="text-sm leading-relaxed text-muted space-y-3">
                 <ul className="list-disc pl-5 space-y-2">
                   <li><Trans t={t} i18nKey="help.data.monitoring_status" components={richComponents} /></li>
                   <li><Trans t={t} i18nKey="help.data.message_copies" components={richComponents} /></li>
@@ -277,7 +277,7 @@ export function BrokerControlsHelp() {
                 </div>
               }
             >
-              <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
+              <div className="text-sm leading-relaxed text-muted space-y-3">
                 <ul className="list-disc pl-5 space-y-2">
                   <li><Trans t={t} i18nKey="help.contacts.technical" components={richComponents} /></li>
                   <li><Trans t={t} i18nKey="help.contacts.safeguarding" components={richComponents} /></li>
@@ -298,7 +298,7 @@ export function BrokerControlsHelp() {
                 </div>
               }
             >
-              <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
+              <div className="text-sm leading-relaxed text-muted space-y-3">
                 <ul className="list-disc pl-5 space-y-2">
                   <li><Trans t={t} i18nKey="help.troubleshooting.cant_message" components={richComponents} /></li>
                   <li><Trans t={t} i18nKey="help.troubleshooting.wrong_member" components={richComponents} /></li>

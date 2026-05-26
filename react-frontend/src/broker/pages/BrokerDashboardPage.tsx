@@ -54,7 +54,7 @@ const quickLinkBgClass: Record<string, string> = {
   warning: 'bg-warning/10',
   secondary: 'bg-accent-soft',
   success: 'bg-success/10',
-  default: 'bg-default/10',
+  default: 'bg-surface-secondary',
 };
 const quickLinkTextClass: Record<string, string> = {
   primary: 'text-accent',
@@ -62,7 +62,7 @@ const quickLinkTextClass: Record<string, string> = {
   warning: 'text-warning',
   secondary: 'text-accent',
   success: 'text-success',
-  default: 'text-default-500',
+  default: 'text-muted',
 };
 
 export function BrokerDashboard() {
@@ -119,7 +119,7 @@ export function BrokerDashboard() {
         description={t('dashboard.description')}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<RefreshCw size={16} />}
             onPress={loadDashboard}
             isLoading={loading}
@@ -135,14 +135,14 @@ export function BrokerDashboard() {
           a DB hiccup as a clean dashboard, exactly the wrong direction
           for a risk-surfacing UI. */}
       {stats?._partial && (
-        <Card shadow="sm" className="mb-4 border border-warning-200 bg-warning-50/50">
+        <Card className="mb-4 border border-warning/30 bg-warning/10">
           <CardBody className="flex flex-row items-start gap-3 py-3">
             <AlertCircle size={20} className="text-warning shrink-0 mt-0.5" />
             <div className="flex-1 text-sm">
-              <p className="font-medium text-warning-700">{t('dashboard.partial_title')}</p>
-              <p className="text-default-600">{t('dashboard.partial_body')}</p>
+              <p className="font-medium text-warning">{t('dashboard.partial_title')}</p>
+              <p className="text-muted">{t('dashboard.partial_body')}</p>
             </div>
-            <Button size="sm" variant="flat" color="warning" onPress={loadDashboard}>
+            <Button size="sm" variant="tertiary" onPress={loadDashboard}>
               {t('dashboard.refresh')}
             </Button>
           </CardBody>
@@ -228,16 +228,16 @@ export function BrokerDashboard() {
         {QUICK_LINKS.map((link) => {
           const Icon = link.icon;
           return (
-            <Card key={link.path} shadow="sm" isPressable as={Link} to={tenantPath(link.path)}>
+            <Card key={link.path} isPressable as={Link} to={tenantPath(link.path)}>
               <CardBody className="flex flex-row items-center gap-4 p-4">
                 <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${quickLinkBgClass[link.color]}`}>
                   <Icon size={24} className={quickLinkTextClass[link.color]} />
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="font-semibold text-foreground">{t(`dashboard.links.${link.key}_title`)}</p>
-                  <p className="text-sm text-default-500">{t(`dashboard.links.${link.key}_desc`)}</p>
+                  <p className="text-sm text-muted">{t(`dashboard.links.${link.key}_desc`)}</p>
                 </div>
-                <ChevronRight size={20} className="text-default-400 shrink-0" />
+                <ChevronRight size={20} className="text-muted shrink-0" />
               </CardBody>
             </Card>
           );
@@ -254,22 +254,22 @@ export function BrokerDashboard() {
         // Distinct error state — without this, a load failure rendered as
         // the friendly "no recent activity yet" empty state, which lies
         // about what happened.
-        <Card shadow="sm">
+        <Card>
           <CardBody className="flex flex-col items-center justify-center py-10 text-center">
             <AlertCircle size={40} className="text-danger mb-3" />
             <p className="text-danger font-medium">{t('dashboard.load_error_title')}</p>
-            <p className="text-sm text-default-400 mt-1 mb-3">
+            <p className="text-sm text-muted mt-1 mb-3">
               {t('dashboard.load_error_hint')}
             </p>
-            <Button size="sm" variant="flat" color="danger" onPress={loadDashboard}>
+            <Button size="sm" variant="danger-soft" onPress={loadDashboard}>
               {t('dashboard.refresh')}
             </Button>
           </CardBody>
         </Card>
       ) : stats?.recent_activity && stats.recent_activity.length > 0 ? (
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="flex items-center gap-2 pb-0">
-            <Activity size={18} className="text-default-500" />
+            <Activity size={18} className="text-muted" />
             <span className="text-sm font-semibold text-foreground">{t('dashboard.broker_actions_heading')}</span>
           </CardHeader>
           <Separator className="my-2" />
@@ -292,10 +292,10 @@ export function BrokerDashboard() {
                         {' '}{formatActionLabel(entry.action_type, t)}
                       </p>
                       {entry.details && (
-                        <p className="text-xs text-default-400 truncate">{entry.details}</p>
+                        <p className="text-xs text-muted truncate">{entry.details}</p>
                       )}
                     </div>
-                    <span className="shrink-0 text-xs text-default-400">
+                    <span className="shrink-0 text-xs text-muted">
                       {formatTimeAgo(entry.created_at, t)}
                     </span>
                   </li>
@@ -305,11 +305,11 @@ export function BrokerDashboard() {
           </CardBody>
         </Card>
       ) : (
-        <Card shadow="sm">
+        <Card>
           <CardBody className="flex flex-col items-center justify-center py-10 text-center">
-            <Activity size={40} className="text-default-300 mb-3" />
-            <p className="text-default-500 font-medium">{t('dashboard.no_recent_activity')}</p>
-            <p className="text-sm text-default-400 mt-1">
+            <Activity size={40} className="text-muted/60 mb-3" />
+            <p className="text-muted font-medium">{t('dashboard.no_recent_activity')}</p>
+            <p className="text-sm text-muted mt-1">
               {t('dashboard.no_recent_activity_hint')}
             </p>
           </CardBody>
