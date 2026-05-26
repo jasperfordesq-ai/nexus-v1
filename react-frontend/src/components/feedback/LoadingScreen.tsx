@@ -1,4 +1,5 @@
-import { CardBody, Card, Skeleton } from '@/components/ui';
+import { Card } from '@heroui/react';
+import { Skeleton } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -36,8 +37,8 @@ export function LoadingScreen({ message }: LoadingScreenProps) {
         animate={{ opacity: 1, scale: 1 }}
         className="relative z-10 w-full max-w-sm px-4"
       >
-        <Card className="border border-theme-default bg-theme-surface/80 shadow-xl" radius="lg">
-          <CardBody className="items-center px-6 py-8 text-center">
+        <Card className="rounded-lg border border-theme-default bg-theme-surface/80 shadow-xl">
+          <Card.Content className="items-center px-6 py-8 text-center">
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
@@ -52,7 +53,7 @@ export function LoadingScreen({ message }: LoadingScreenProps) {
               <Skeleton className="mx-auto h-2.5 w-1/2 rounded-full" />
             </div>
             <span className="sr-only">{displayMessage}</span>
-          </CardBody>
+          </Card.Content>
         </Card>
       </motion.div>
     </div>

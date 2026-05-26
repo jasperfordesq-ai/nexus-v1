@@ -1,4 +1,5 @@
-import { CardBody, Card, Button, Chip, Switch } from '@/components/ui';
+import { Card } from '@heroui/react';
+import { Button, Chip, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -68,14 +69,13 @@ export function CookieConsentBanner() {
         data-nosnippet
       >
         <Card
-          className="mx-auto max-w-3xl border border-[var(--border-strong)] bg-[var(--surface-overlay)] shadow-2xl shadow-black/20 supports-[backdrop-filter]:bg-[var(--glass-bg)]"
-          radius="lg"
+          className="mx-auto max-w-3xl rounded-lg border border-[var(--border-strong)] bg-[var(--surface-overlay)] shadow-2xl shadow-black/20 supports-[backdrop-filter]:bg-[var(--glass-bg)]"
           style={{
             backdropFilter: 'blur(var(--glass-blur)) saturate(var(--glass-saturate))',
             WebkitBackdropFilter: 'blur(var(--glass-blur)) saturate(var(--glass-saturate))',
           }}
         >
-          <CardBody className="p-4 sm:p-5">
+          <Card.Content className="p-4 sm:p-5">
             {/* Header row */}
             <div className="flex items-start gap-3">
               <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-amber-400/20 bg-amber-500/15 shadow-sm">
@@ -224,7 +224,7 @@ export function CookieConsentBanner() {
                 </>
               )}
             </div>
-          </CardBody>
+          </Card.Content>
         </Card>
       </motion.div>
     </AnimatePresence>

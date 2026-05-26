@@ -54,6 +54,7 @@ This is the living tracker for migrating `react-frontend` from HeroUI v2 to Hero
 | 2026-05-25 | `/docs/react/getting-started/styling`, `/docs/react/components/card`, `/docs/react/components/input`, `/docs/react/components/text-field`, `/docs/react/components/dropdown`, `/docs/react/components/select`, `/docs/react/components/table` | Visual consistency sweep for cards, auth fields, popovers/selects, and table surfaces |
 | 2026-05-25 | `/docs/react/migration/agent-guide-full` | Test cleanup audit for remaining v2 assumptions, collection item identity, removed providers, and direct v3 package state |
 | 2026-05-25 | `/docs/react/migration`, `/docs/react/migration/styling`, `/docs/react/migration/agent-guide-full` | Final migration audit for direct v3 package state, removed provider/plugin/alias checks, stale v2 utility cleanup, and completion recommendations |
+| 2026-05-26 | `/docs/react/getting-started/composition`, `/docs/react/migration/card`, `/docs/react/components/card` | Wrapper retirement slice for native v3 `Card` compound usage in feedback surfaces |
 
 ## Current Baseline
 
@@ -191,6 +192,12 @@ Captured: 2026-05-25 after Phase 44.
 | Compatibility wrappers | The migration is real at the dependency/runtime layer: wrappers now render v3 primitives. Several wrappers intentionally preserve the old app API to keep call sites stable and should be simplified gradually. |
 | Remaining risks | Authenticated/tenant-specific visual smoke is still limited by local unauthenticated redirects and community bootstrap loading. Existing ESLint warnings remain in shared wrappers and unrelated public code. Build still reports existing chunk-size and dynamic-import warnings. |
 | Recommended next work | Convert high-churn features to native v3 compound usage as they are touched, especially `Card`, `Modal`, `Drawer`, `Dropdown`, `Select`, `Table`, and `Tabs`; then retire compatibility props after call sites are converted. |
+
+## Wrapper Retirement Tracker
+
+| Date | Slice | Docs checked | Files changed | Verification | Status | Follow-up |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-05-26 | Native v3 Card in feedback surfaces | `/docs/react/getting-started/composition`, `/docs/react/migration/card`, `/docs/react/components/card` | `react-frontend/src/components/feedback/LoadingScreen.tsx`, `react-frontend/src/components/feedback/CookieConsentBanner.tsx` | Targeted ESLint passed. `npm run build` passed after a longer retry with existing Vite warnings. `git diff --check` passed with line-ending warnings only. Full `npx tsc --noEmit --pretty false --noErrorTruncation` is blocked by unrelated `unknown` row diagnostics in admin table consumers while local `Table.tsx` work is dirty. | Complete | Continue with similarly small Card call-site conversions before tackling interactive or custom-root cards. Resolve the unrelated table typing drift before requiring full TypeScript as a green gate again. |
 
 ## Per-Phase Log
 
