@@ -381,7 +381,7 @@ export function Subscribers() {
         actions={
           <div className="flex items-center gap-2">
             <Button
-              variant="flat"
+              variant="secondary"
               size="sm"
               startContent={<RefreshCw size={14} />}
               onPress={() => loadData()}
@@ -390,7 +390,7 @@ export function Subscribers() {
               {t('newsletters.refresh')}
             </Button>
             <Button
-              variant="flat"
+              variant="secondary"
               size="sm"
               startContent={<Download size={14} />}
               onPress={handleExport}
@@ -399,7 +399,7 @@ export function Subscribers() {
               {t('newsletters.export_csv')}
             </Button>
             <Button
-              variant="flat"
+              variant="secondary"
               size="sm"
               startContent={<Upload size={14} />}
               onPress={() => setImportModalOpen(true)}
@@ -407,7 +407,7 @@ export function Subscribers() {
               {t('newsletters.import_csv')}
             </Button>
             <Button
-              color="primary"
+
               size="sm"
               startContent={<UserPlus size={14} />}
               onPress={() => setAddModalOpen(true)}
@@ -419,20 +419,19 @@ export function Subscribers() {
       />
 
       {/* Sync Platform Members card */}
-      <Card shadow="sm">
+      <Card>
         <CardBody className="flex flex-row items-center gap-4 p-4">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
             <Users size={20} />
           </div>
           <div className="min-w-0 flex-1">
             <p className="font-medium text-foreground">{t('newsletters.sync_platform_members')}</p>
-            <p className="text-sm text-default-500">
+            <p className="text-sm text-muted">
               {t('newsletters.sync_platform_members_desc')}
             </p>
           </div>
           <Button
-            color="primary"
-            variant="flat"
+            variant="primary"
             size="sm"
             startContent={<RefreshCw size={14} />}
             onPress={handleSync}
@@ -445,16 +444,16 @@ export function Subscribers() {
 
       {/* Stats cards */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <Button variant="light" className="text-left h-auto p-0" onPress={() => handleStatusFilter('')}>
-          <StatCard label={t('newsletters.label_total_subscribers')} value={stats.total} icon={Mail} color="primary" loading={loading} />
+        <Button variant="tertiary" className="min-h-12 justify-start p-0 text-left" onPress={() => handleStatusFilter('')}>
+          <StatCard label={t('newsletters.label_total_subscribers')} value={stats.total} icon={Mail} color="default" loading={loading} />
         </Button>
-        <Button variant="light" className="text-left h-auto p-0" onPress={() => handleStatusFilter('active')}>
+        <Button variant="tertiary" className="min-h-12 justify-start p-0 text-left" onPress={() => handleStatusFilter('active')}>
           <StatCard label={t('newsletters.label_active')} value={stats.active} icon={CheckCircle} color="success" loading={loading} />
         </Button>
-        <Button variant="light" className="text-left h-auto p-0" onPress={() => handleStatusFilter('pending')}>
+        <Button variant="tertiary" className="min-h-12 justify-start p-0 text-left" onPress={() => handleStatusFilter('pending')}>
           <StatCard label={t('newsletters.label_pending')} value={stats.pending} icon={Clock} color="warning" loading={loading} />
         </Button>
-        <Button variant="light" className="text-left h-auto p-0" onPress={() => handleStatusFilter('unsubscribed')}>
+        <Button variant="tertiary" className="min-h-12 justify-start p-0 text-left" onPress={() => handleStatusFilter('unsubscribed')}>
           <StatCard label={t('newsletters.label_unsubscribed')} value={stats.unsubscribed} icon={UserX} color="danger" loading={loading} />
         </Button>
       </div>
@@ -479,7 +478,7 @@ export function Subscribers() {
             size="sm"
             placeholder={t('newsletters.placeholder_search_by_name_or_email')}
             aria-label={t('newsletters.label_search_subscribers')}
-            startContent={<Search size={14} className="text-default-400" />}
+            startContent={<Search size={14} className="text-muted" />}
             value={searchInput}
             onValueChange={handleSearchChange}
             isClearable
@@ -491,12 +490,12 @@ export function Subscribers() {
       {/* Data table */}
       <Table
         aria-label={t('newsletters.label_subscribers')}
-        shadow="sm"
+
         isStriped
         bottomContent={
           totalPages > 1 ? (
             <div className="flex items-center justify-between px-2 py-2">
-              <p className="text-sm text-default-500">
+              <p className="text-sm text-muted">
                 {t('newsletters.subscriber_total', { count: total })}
               </p>
               <Pagination
@@ -519,14 +518,14 @@ export function Subscribers() {
         </TableHeader>
         <TableBody
           emptyContent={
-            <div className="flex flex-col items-center gap-2 py-8 text-default-400">
+            <div className="flex flex-col items-center gap-2 py-8 text-muted">
               <Users size={40} />
               <p className="text-lg font-medium">{t('newsletters.no_subscribers_found')}</p>
               <p className="text-sm">{t('newsletters.no_subscribers_hint')}</p>
             </div>
           }
           isLoading={loading && items.length === 0}
-          loadingContent={<RefreshCw size={24} className="animate-spin text-default-400" />}
+          loadingContent={<RefreshCw size={24} className="animate-spin text-muted" />}
         >
           {items.map((sub) => (
             <TableRow key={sub.id}>
@@ -543,27 +542,26 @@ export function Subscribers() {
                         ? `${sub.first_name || ''} ${sub.last_name || ''}`.trim()
                         : '--'}
                     </p>
-                    <p className="truncate text-xs text-default-400">{sub.email}</p>
+                    <p className="truncate text-xs text-muted">{sub.email}</p>
                   </div>
                 </div>
               </TableCell>
               <TableCell>
-                <Chip size="sm" variant="flat" color={statusColor(sub.status)}>
+                <Chip size="sm" variant="soft" color={statusColor(sub.status)}>
                   {sub.status}
                 </Chip>
               </TableCell>
-              <TableCell className="text-sm text-default-500">
+              <TableCell className="text-sm text-muted">
                 {sourceLabel(sub.source)}
               </TableCell>
-              <TableCell className="text-sm text-default-500">
+              <TableCell className="text-sm text-muted">
                 {sub.created_at ? new Date(sub.created_at).toLocaleDateString() : '--'}
               </TableCell>
               <TableCell className="text-right">
                 <Tooltip content={t('newsletters.remove_subscriber')}>
                   <Button
                     isIconOnly
-                    variant="light"
-                    color="danger"
+                    variant="danger"
                     size="sm"
                     aria-label={t('newsletters.remove')}
                     onPress={() => setRemoveTarget(sub)}
@@ -579,18 +577,18 @@ export function Subscribers() {
 
       {/* Public subscribe link */}
       {showPublicSubscribeLink && subscribeUrl && (
-        <Card shadow="sm">
+        <Card>
           <CardBody className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center">
             <div className="min-w-0 flex-1">
               <p className="text-sm font-medium text-foreground">{t('newsletters.public_subscribe_link')}</p>
-              <p className="truncate text-xs text-default-400">{subscribeUrl}</p>
+              <p className="truncate text-xs text-muted">{subscribeUrl}</p>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="flat" size="sm" startContent={<Copy size={14} />} onPress={copySubscribeLink}>
+              <Button variant="secondary" size="sm" startContent={<Copy size={14} />} onPress={copySubscribeLink}>
                 {t('newsletters.copy')}
               </Button>
               <Button
-                variant="flat"
+                variant="secondary"
                 size="sm"
                 startContent={<ExternalLink size={14} />}
                 as="a"
@@ -635,11 +633,11 @@ export function Subscribers() {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={() => setAddModalOpen(false)} isDisabled={addLoading}>
+            <Button variant="secondary" onPress={() => setAddModalOpen(false)} isDisabled={addLoading}>
               {t('newsletter_form.cancel')}
             </Button>
             <Button
-              color="primary"
+
               onPress={handleAddSubscriber}
               isLoading={addLoading}
               isDisabled={!addForm.email}
@@ -658,8 +656,8 @@ export function Subscribers() {
             <div className="space-y-4">
               <Button
                 type="button"
-                variant="bordered"
-                className="h-auto w-full flex-col items-center gap-2 border-2 border-dashed border-default-300 p-8 text-center"
+                variant="secondary"
+                className="min-h-24 w-full flex-col items-center gap-2 border-2 border-dashed border-border p-8 text-center"
                 onPress={() => fileInputRef.current?.click()}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => {
@@ -673,11 +671,11 @@ export function Subscribers() {
                   }
                 }}
               >
-                <Upload size={32} className="text-default-400" />
+                <Upload size={32} className="text-muted" />
                 <p className="font-medium text-foreground">
                   {importFileName || t('newsletters.click_or_drag_csv')}
                 </p>
-                <p className="text-xs text-default-400">
+                <p className="text-xs text-muted">
                   {t('newsletters.accepted_format_csv')}
                 </p>
               </Button>
@@ -697,13 +695,13 @@ export function Subscribers() {
                 </div>
               )}
 
-              <Card shadow="none" className="bg-default-50">
+              <Card className="bg-surface">
                 <CardBody className="p-3">
-                  <p className="text-xs font-medium text-default-600">{t('newsletters.required_csv_format')}</p>
-                  <code className="mt-1 block text-xs text-default-500">
+                  <p className="text-xs font-medium text-foreground">{t('newsletters.required_csv_format')}</p>
+                  <code className="mt-1 block text-xs text-muted">
                     email,first_name,last_name
                   </code>
-                  <p className="mt-1 text-xs text-default-400">
+                  <p className="mt-1 text-xs text-muted">
                     {t('newsletters.csv_email_required_hint')}
                   </p>
                 </CardBody>
@@ -711,11 +709,11 @@ export function Subscribers() {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={() => { setImportModalOpen(false); setImportRows([]); setImportFileName(''); }} isDisabled={importLoading}>
+            <Button variant="secondary" onPress={() => { setImportModalOpen(false); setImportRows([]); setImportFileName(''); }} isDisabled={importLoading}>
               {t('newsletter_form.cancel')}
             </Button>
             <Button
-              color="primary"
+
               onPress={handleImport}
               isLoading={importLoading}
               isDisabled={importRows.length === 0}

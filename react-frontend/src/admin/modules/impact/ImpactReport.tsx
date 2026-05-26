@@ -483,7 +483,7 @@ export function ImpactReport() {
               onValueChange={setDateFrom}
               aria-label={t('impact.label_from_date')}
               className="w-36"
-              variant="bordered"
+              variant="secondary"
             />
             <Input
               type="date"
@@ -492,10 +492,10 @@ export function ImpactReport() {
               onValueChange={setDateTo}
               aria-label={t('impact.label_to_date')}
               className="w-36"
-              variant="bordered"
+              variant="secondary"
             />
             <Button
-              variant="flat"
+              variant="secondary"
               startContent={<Settings size={16} />}
               onPress={openConfig}
               size="sm"
@@ -503,7 +503,7 @@ export function ImpactReport() {
               {t('impact.btn_configure')}
             </Button>
             <Button
-              variant="flat"
+              variant="secondary"
               startContent={<Download size={16} />}
               onPress={exportPdf}
               isDisabled={!data || loading}
@@ -512,7 +512,7 @@ export function ImpactReport() {
               {t('impact.btn_export_pdf')}
             </Button>
             <Button
-              variant="flat"
+              variant="secondary"
               startContent={<Download size={16} />}
               onPress={async () => {
                 try { await exportCsv(dateFrom, dateTo); } catch { toast.error(t('impact.failed_to_export_csv')); }
@@ -522,7 +522,7 @@ export function ImpactReport() {
               {t('impact.btn_export_csv')}
             </Button>
             <Button
-              variant="flat"
+              variant="secondary"
               startContent={<RefreshCw size={16} />}
               onPress={loadData}
               isLoading={loading}
@@ -541,7 +541,7 @@ export function ImpactReport() {
           <Sparkles size={20} className="text-accent" />
           {t('impact.section_sroi')}
         </h2>
-        <p className="text-sm text-default-500 mt-0.5">
+        <p className="text-sm text-muted mt-0.5">
           {t('impact.period_description')}
         </p>
       </div>
@@ -558,7 +558,7 @@ export function ImpactReport() {
           label={t('impact.label_monetary_value')}
           value={data ? formatCurrency(data.sroi.monetary_value, currency) : '\u2014'}
           icon={TrendingUp}
-          color="primary"
+          color="default"
           loading={loading}
         />
         <StatCard
@@ -572,21 +572,21 @@ export function ImpactReport() {
           label={t('impact.label_sroi_ratio')}
           value={data ? `${data.sroi.sroi_ratio}:1` : '\u2014'}
           icon={TrendingUp}
-          color="secondary"
+          color="default"
           loading={loading}
         />
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-8">
-        <Card shadow="sm">
+        <Card>
           <CardBody className="flex flex-row items-center gap-4 p-4">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10">
               <ArrowLeftRight size={20} className="text-accent" />
             </div>
             <div>
-              <p className="text-sm text-default-500">{t('impact.chart_transactions_name')}</p>
+              <p className="text-sm text-muted">{t('impact.chart_transactions_name')}</p>
               {loading ? (
-                <div className="mt-1 h-6 w-16 animate-pulse rounded bg-default-200" />
+                <div className="mt-1 h-6 w-16 animate-pulse rounded bg-surface-tertiary" />
               ) : (
                 <p className="text-xl font-bold text-foreground">
                   {data?.sroi.total_transactions.toLocaleString() ?? '\u2014'}
@@ -595,15 +595,15 @@ export function ImpactReport() {
             </div>
           </CardBody>
         </Card>
-        <Card shadow="sm">
+        <Card>
           <CardBody className="flex flex-row items-center gap-4 p-4">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-success/10">
               <Users size={20} className="text-success" />
             </div>
             <div>
-              <p className="text-sm text-default-500">{t('impact.pdf_unique_givers')}</p>
+              <p className="text-sm text-muted">{t('impact.pdf_unique_givers')}</p>
               {loading ? (
-                <div className="mt-1 h-6 w-16 animate-pulse rounded bg-default-200" />
+                <div className="mt-1 h-6 w-16 animate-pulse rounded bg-surface-tertiary" />
               ) : (
                 <p className="text-xl font-bold text-foreground">
                   {data?.sroi.unique_givers.toLocaleString() ?? '\u2014'}
@@ -612,15 +612,15 @@ export function ImpactReport() {
             </div>
           </CardBody>
         </Card>
-        <Card shadow="sm">
+        <Card>
           <CardBody className="flex flex-row items-center gap-4 p-4">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-warning/10">
               <Users size={20} className="text-warning" />
             </div>
             <div>
-              <p className="text-sm text-default-500">{t('impact.pdf_unique_receivers')}</p>
+              <p className="text-sm text-muted">{t('impact.pdf_unique_receivers')}</p>
               {loading ? (
-                <div className="mt-1 h-6 w-16 animate-pulse rounded bg-default-200" />
+                <div className="mt-1 h-6 w-16 animate-pulse rounded bg-surface-tertiary" />
               ) : (
                 <p className="text-xl font-bold text-foreground">
                   {data?.sroi.unique_receivers.toLocaleString() ?? '\u2014'}
@@ -641,7 +641,7 @@ export function ImpactReport() {
               <Lightbulb size={20} className="text-warning" />
               {t('impact.section_skills_events')}
             </h2>
-            <p className="text-sm text-default-500 mt-0.5">
+            <p className="text-sm text-muted mt-0.5">
               {t('impact.desc_skills_events')}
             </p>
           </div>
@@ -651,14 +651,14 @@ export function ImpactReport() {
               label={t('impact.label_active_members')}
               value={extras.members?.active_traders ?? '\u2014'}
               icon={Users}
-              color="primary"
+              color="default"
               loading={loading}
             />
             <StatCard
               label={t('impact.label_skills_shared')}
               value={extras.skills?.unique_skills ?? '\u2014'}
               icon={Lightbulb}
-              color="secondary"
+              color="warning"
               loading={loading}
             />
             <StatCard
@@ -685,27 +685,27 @@ export function ImpactReport() {
           </div>
 
           {extras.skills && (
-            <Card shadow="sm" className="mb-8">
+            <Card  className="mb-8">
               <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
                 <Lightbulb size={18} className="text-warning" />
                 <h3 className="font-semibold">{t('impact.section_skills_overview')}</h3>
               </CardHeader>
               <CardBody className="px-4 pb-4">
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                  <div className="p-4 rounded-lg bg-default-50">
-                    <p className="text-xs text-default-500 mb-1">{t('impact.label_skills_offered')}</p>
+                  <div className="p-4 rounded-lg bg-surface">
+                    <p className="text-xs text-muted mb-1">{t('impact.label_skills_offered')}</p>
                     <p className="text-2xl font-bold text-accent">{extras.skills.skills_offered ?? 0}</p>
                   </div>
-                  <div className="p-4 rounded-lg bg-default-50">
-                    <p className="text-xs text-default-500 mb-1">{t('impact.label_skills_requested')}</p>
+                  <div className="p-4 rounded-lg bg-surface">
+                    <p className="text-xs text-muted mb-1">{t('impact.label_skills_requested')}</p>
                     <p className="text-2xl font-bold text-accent">{extras.skills.skills_requested ?? 0}</p>
                   </div>
-                  <div className="p-4 rounded-lg bg-default-50">
-                    <p className="text-xs text-default-500 mb-1">{t('impact.label_unique_skills')}</p>
+                  <div className="p-4 rounded-lg bg-surface">
+                    <p className="text-xs text-muted mb-1">{t('impact.label_unique_skills')}</p>
                     <p className="text-2xl font-bold text-success">{extras.skills.unique_skills ?? 0}</p>
                   </div>
-                  <div className="p-4 rounded-lg bg-default-50">
-                    <p className="text-xs text-default-500 mb-1">{t('impact.label_active_listings')}</p>
+                  <div className="p-4 rounded-lg bg-surface">
+                    <p className="text-xs text-muted mb-1">{t('impact.label_active_listings')}</p>
                     <p className="text-2xl font-bold text-warning">{extras.skills.total_listings ?? 0}</p>
                   </div>
                 </div>
@@ -724,7 +724,7 @@ export function ImpactReport() {
           <Activity size={20} className="text-success" />
           {t('impact.section_community_health')}
         </h2>
-        <p className="text-sm text-default-500 mt-0.5">
+        <p className="text-sm text-muted mt-0.5">
           {t('impact.section_community_health_desc')}
         </p>
       </div>
@@ -734,14 +734,14 @@ export function ImpactReport() {
           label={t('impact.label_engagement_rate')}
           value={data ? formatPercent(data.health.engagement_rate) : '\u2014'}
           icon={Users}
-          color="primary"
+          color="default"
           loading={loading}
         />
         <StatCard
           label={t('impact.label_reciprocity_score')}
           value={data ? data.health.reciprocity_score.toFixed(2) : '\u2014'}
           icon={ArrowLeftRight}
-          color="secondary"
+          color="default"
           loading={loading}
         />
         <StatCard
@@ -761,11 +761,11 @@ export function ImpactReport() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-        <Card shadow="sm">
+        <Card>
           <CardBody className="p-4">
-            <p className="text-sm text-default-500">{t('impact.label_total_members')}</p>
+            <p className="text-sm text-muted">{t('impact.label_total_members')}</p>
             {loading ? (
-              <div className="mt-1 h-7 w-20 animate-pulse rounded bg-default-200" />
+              <div className="mt-1 h-7 w-20 animate-pulse rounded bg-surface-tertiary" />
             ) : (
               <p className="text-2xl font-bold text-foreground">
                 {data?.health.total_users.toLocaleString() ?? '\u2014'}
@@ -773,11 +773,11 @@ export function ImpactReport() {
             )}
           </CardBody>
         </Card>
-        <Card shadow="sm">
+        <Card>
           <CardBody className="p-4">
-            <p className="text-sm text-default-500">{t('impact.label_active_90d')}</p>
+            <p className="text-sm text-muted">{t('impact.label_active_90d')}</p>
             {loading ? (
-              <div className="mt-1 h-7 w-20 animate-pulse rounded bg-default-200" />
+              <div className="mt-1 h-7 w-20 animate-pulse rounded bg-surface-tertiary" />
             ) : (
               <p className="text-2xl font-bold text-foreground">
                 {data?.health.active_users_90d.toLocaleString() ?? '\u2014'}
@@ -785,11 +785,11 @@ export function ImpactReport() {
             )}
           </CardBody>
         </Card>
-        <Card shadow="sm">
+        <Card>
           <CardBody className="p-4">
-            <p className="text-sm text-default-500">{t('impact.label_new_30d')}</p>
+            <p className="text-sm text-muted">{t('impact.label_new_30d')}</p>
             {loading ? (
-              <div className="mt-1 h-7 w-20 animate-pulse rounded bg-default-200" />
+              <div className="mt-1 h-7 w-20 animate-pulse rounded bg-surface-tertiary" />
             ) : (
               <p className="text-2xl font-bold text-foreground">
                 {data?.health.new_users_30d.toLocaleString() ?? '\u2014'}
@@ -797,17 +797,17 @@ export function ImpactReport() {
             )}
           </CardBody>
         </Card>
-        <Card shadow="sm">
+        <Card>
           <CardBody className="p-4">
-            <p className="text-sm text-default-500">{t('impact.label_network_density')}</p>
+            <p className="text-sm text-muted">{t('impact.label_network_density')}</p>
             {loading ? (
-              <div className="mt-1 h-7 w-20 animate-pulse rounded bg-default-200" />
+              <div className="mt-1 h-7 w-20 animate-pulse rounded bg-surface-tertiary" />
             ) : (
               <p className="text-2xl font-bold text-foreground">
                 {data?.health.network_density.toFixed(4) ?? '\u2014'}
               </p>
             )}
-            <p className="text-xs text-default-400 mt-1">
+            <p className="text-xs text-muted mt-1">
               {data?.health.total_connections.toLocaleString() ?? 0} {t('impact.unit_connections')}
             </p>
           </CardBody>
@@ -819,7 +819,7 @@ export function ImpactReport() {
       <Separator className="mb-6" />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 mb-8">
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Clock size={18} className="text-accent" />
             <h3 className="font-semibold">{t('impact.chart_hours_exchanged_title')}</h3>
@@ -853,14 +853,14 @@ export function ImpactReport() {
                 </AreaChart>
               </ResponsiveContainer>
             ) : (
-              <p className="flex h-[300px] items-center justify-center text-sm text-default-400">
+              <p className="flex h-[300px] items-center justify-center text-sm text-muted">
                 {t('impact.empty_timeline')}
               </p>
             )}
           </CardBody>
         </Card>
 
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Activity size={18} className="text-success" />
             <h3 className="font-semibold">{t('impact.chart_activity_breakdown_title')}</h3>
@@ -883,7 +883,7 @@ export function ImpactReport() {
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <p className="flex h-[300px] items-center justify-center text-sm text-default-400">
+              <p className="flex h-[300px] items-center justify-center text-sm text-muted">
                 {t('impact.empty_activity')}
               </p>
             )}
@@ -894,7 +894,7 @@ export function ImpactReport() {
       {/* Impact Summary ------------------------------------------------ */}
 
       {extras?.summary && (
-        <Card shadow="sm" className="mb-8">
+        <Card  className="mb-8">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Sparkles size={18} className="text-success" />
             <h3 className="font-semibold">{t('impact.section_impact_summary')}</h3>
@@ -904,7 +904,7 @@ export function ImpactReport() {
               {extras.summary}
             </p>
             <Separator className="my-4" />
-            <div className="text-xs text-default-400 space-y-1">
+            <div className="text-xs text-muted space-y-1">
               <p>
                 <strong>{t('impact.label_hour_value')}:</strong> {formatCurrency(extras.config.hour_value, currency)}/{t('impact.unit_hour_short')}
               </p>
@@ -925,7 +925,7 @@ export function ImpactReport() {
         <ModalContent>
           <ModalHeader>{t('impact.modal_sroi_config_title')}</ModalHeader>
           <ModalBody>
-            <p className="text-sm text-default-500 mb-4">
+            <p className="text-sm text-muted mb-4">
               {t('impact.desc_sroi_config')}
             </p>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -936,7 +936,7 @@ export function ImpactReport() {
                   const v = Array.from(keys)[0];
                   if (v) setConfigCurrency(String(v));
                 }}
-                variant="bordered"
+                variant="secondary"
               >
                 {CURRENCY_OPTIONS.map((opt) => (
                   <SelectItem key={opt.key} id={opt.key}>{opt.label}</SelectItem>
@@ -950,9 +950,9 @@ export function ImpactReport() {
                 step={0.5}
                 value={configHourValue}
                 onValueChange={setConfigHourValue}
-                variant="bordered"
+                variant="secondary"
                 startContent={
-                  <span className="text-default-400 text-sm">
+                  <span className="text-muted text-sm">
                     {CURRENCY_SYMBOLS[configCurrency] || configCurrency}
                   </span>
                 }
@@ -966,8 +966,8 @@ export function ImpactReport() {
                 step={0.1}
                 value={configMultiplier}
                 onValueChange={setConfigMultiplier}
-                variant="bordered"
-                startContent={<span className="text-default-400 text-sm">×</span>}
+                variant="secondary"
+                startContent={<span className="text-muted text-sm">×</span>}
               />
               <Select
                 label={t('impact.label_reporting_period')}
@@ -976,7 +976,7 @@ export function ImpactReport() {
                   const v = Array.from(keys)[0];
                   if (v) setConfigPeriod(String(v));
                 }}
-                variant="bordered"
+                variant="secondary"
               >
                 {REPORTING_PERIOD_OPTIONS.map((opt) => (
                   <SelectItem key={opt.key} id={opt.key}>{t(opt.labelKey)}</SelectItem>
@@ -984,7 +984,7 @@ export function ImpactReport() {
               </Select>
             </div>
             <Separator className="my-4" />
-            <div className="text-xs text-default-400 space-y-1">
+            <div className="text-xs text-muted space-y-1">
               <p>
                 <strong>{t('impact.label_sroi_formula')}:</strong> {t('impact.formula_detailed', {
                   currency: CURRENCY_SYMBOLS[configCurrency] || configCurrency,
@@ -1007,8 +1007,8 @@ export function ImpactReport() {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={closeConfig}>{t('common.cancel')}</Button>
-            <Button color="primary" onPress={handleSaveConfig} isLoading={saving} isDisabled={saving}>
+            <Button variant="secondary" onPress={closeConfig}>{t('common.cancel')}</Button>
+            <Button  onPress={handleSaveConfig} isLoading={saving} isDisabled={saving}>
               {t('impact.save_configuration')}
             </Button>
           </ModalFooter>

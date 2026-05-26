@@ -314,13 +314,13 @@ export function RegistrationPolicySettings() {
         <RegistrationBreakerCard />
 
         {/* ── Section 1: Registration Method ── */}
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="pb-0">
             <div>
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <ShieldCheck size={20} className="text-accent" /> {t('system.reg.registration_method')}
               </h3>
-              <p className="text-sm text-default-500 mt-1">
+              <p className="text-sm text-muted mt-1">
                 {t('system.reg.registration_method_desc')}
               </p>
             </div>
@@ -333,8 +333,8 @@ export function RegistrationPolicySettings() {
                 const key = Array.from(keys)[0] as string;
                 if (key) setPolicy(prev => prev ? { ...prev, registration_mode: key } : prev);
               }}
-              variant="bordered"
-              classNames={{ description: 'text-default-500' }}
+              variant="secondary"
+              classNames={{ description: 'text-muted' }}
               description={selectedMode?.description}
             >
               {REGISTRATION_MODES.map((mode) => {
@@ -375,13 +375,13 @@ export function RegistrationPolicySettings() {
 
         {/* ── Section 2: Identity Verification Settings (conditional) ── */}
         {showVerificationOptions && (
-          <Card shadow="sm">
+          <Card>
             <CardHeader className="pb-0">
               <div>
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                   <UserCheck size={20} className="text-accent" /> {t('system.reg.verification_settings')}
                 </h3>
-                <p className="text-sm text-default-500 mt-1">
+                <p className="text-sm text-muted mt-1">
                   {t('system.reg.verification_settings_desc')}
                 </p>
               </div>
@@ -394,7 +394,7 @@ export function RegistrationPolicySettings() {
                   const key = Array.from(keys)[0] as string;
                   setPolicy(prev => prev ? { ...prev, verification_provider: key || null } : prev);
                 }}
-                variant="bordered"
+                variant="secondary"
                 description={
                   availableProviderCount > 0
                     ? t('system.reg.providers_available')
@@ -406,9 +406,9 @@ export function RegistrationPolicySettings() {
                     <div className="flex items-center gap-2">
                       <span>{p.name}</span>
                       {p.available ? (
-                        <Chip size="sm" color="success" variant="flat">{t('system.reg.available')}</Chip>
+                        <Chip size="sm" color="success" variant="soft">{t('system.reg.available')}</Chip>
                       ) : (
-                        <Chip size="sm" color="danger" variant="flat">{t('system.reg.unavailable')}</Chip>
+                        <Chip size="sm" color="danger" variant="soft">{t('system.reg.unavailable')}</Chip>
                       )}
                     </div>
                   </SelectItem>
@@ -422,7 +422,7 @@ export function RegistrationPolicySettings() {
                   const key = Array.from(keys)[0] as string;
                   if (key) setPolicy(prev => prev ? { ...prev, verification_level: key } : prev);
                 }}
-                variant="bordered"
+                variant="secondary"
                 description={VERIFICATION_LEVELS.find(l => l.key === policy.verification_level)?.description}
               >
                 {VERIFICATION_LEVELS.map((level) => (
@@ -441,7 +441,7 @@ export function RegistrationPolicySettings() {
                   const key = Array.from(keys)[0] as string;
                   if (key) setPolicy(prev => prev ? { ...prev, post_verification: key } : prev);
                 }}
-                variant="bordered"
+                variant="secondary"
                 description={POST_VERIFICATION_ACTIONS.find(a => a.key === policy.post_verification)?.description}
               >
                 {POST_VERIFICATION_ACTIONS.map((action) => (
@@ -458,7 +458,7 @@ export function RegistrationPolicySettings() {
                   const key = Array.from(keys)[0] as string;
                   if (key) setPolicy(prev => prev ? { ...prev, fallback_mode: key } : prev);
                 }}
-                variant="bordered"
+                variant="secondary"
                 description={FALLBACK_MODES.find(f => f.key === policy.fallback_mode)?.description}
               >
                 {FALLBACK_MODES.map((fb) => (
@@ -472,7 +472,7 @@ export function RegistrationPolicySettings() {
         )}
 
         {/* ── Section 3: Email Verification ── */}
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="pb-0">
             <div>
               <h3 className="text-lg font-semibold flex items-center gap-2">
@@ -487,11 +487,11 @@ export function RegistrationPolicySettings() {
                   <p className="font-medium">{t('system.label_require_email_verification')}</p>
                   {!isGod && (
                     <Tooltip content={t('system.reg.require_email_tooltip')}>
-                      <Chip size="sm" color="warning" variant="flat" startContent={<Lock size={10} />}>{t('system.reg.god_only')}</Chip>
+                      <Chip size="sm" color="warning" variant="soft" startContent={<Lock size={10} />}>{t('system.reg.god_only')}</Chip>
                     </Tooltip>
                   )}
                 </div>
-                <p className="text-sm text-default-500">
+                <p className="text-sm text-muted">
                   {t('system.reg.require_email_desc')}
                 </p>
               </div>
@@ -508,7 +508,7 @@ export function RegistrationPolicySettings() {
         {/* ── Save Button ── */}
         <div className="flex justify-end">
           <Button
-            color="primary"
+
             size="lg"
             startContent={!saving ? <Save size={18} /> : undefined}
             onPress={handleSave}
@@ -522,7 +522,7 @@ export function RegistrationPolicySettings() {
 
         {/* ── Section 4: Provider API Credentials (always visible) ── */}
         {realProviders.length > 0 && (
-          <Card shadow="sm">
+          <Card>
             <CardHeader className="pb-0">
               <div className="w-full">
                 <div className="flex items-center justify-between">
@@ -531,16 +531,16 @@ export function RegistrationPolicySettings() {
                   </h3>
                   <div className="flex items-center gap-2">
                     {configuredProviderCount > 0 && (
-                      <Chip size="sm" color="success" variant="flat" startContent={<CheckCircle2 size={12} />}>
+                      <Chip size="sm" color="success" variant="soft" startContent={<CheckCircle2 size={12} />}>
                         {t('system.reg.n_configured', { count: configuredProviderCount })}
                       </Chip>
                     )}
-                    <Chip size="sm" color={availableProviderCount > 0 ? 'success' : 'default'} variant="flat">
+          <Chip size="sm" color={availableProviderCount > 0 ? 'success' : 'default'} variant="soft">
                       {t('system.reg.n_available', { count: availableProviderCount })}
                     </Chip>
                   </div>
                 </div>
-                <p className="text-sm text-default-500 mt-1">
+                <p className="text-sm text-muted mt-1">
                   {t('system.reg.provider_credentials_desc')}
                 </p>
               </div>
@@ -561,9 +561,9 @@ export function RegistrationPolicySettings() {
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-medium">{p.name}</span>
                           {p.has_credentials ? (
-                            <Chip size="sm" color="success" variant="flat" startContent={<CheckCircle2 size={12} />}>{t('system.reg.credentials_saved_chip')}</Chip>
+                            <Chip size="sm" color="success" variant="soft" startContent={<CheckCircle2 size={12} />}>{t('system.reg.credentials_saved_chip')}</Chip>
                           ) : (
-                            <Chip size="sm" color="default" variant="flat">{t('system.reg.not_configured')}</Chip>
+                            <Chip size="sm" color="default" variant="soft">{t('system.reg.not_configured')}</Chip>
                           )}
                           {p.available ? (
                             <Chip size="sm" color="success" variant="dot">{t('system.reg.available')}</Chip>
@@ -575,7 +575,7 @@ export function RegistrationPolicySettings() {
                     >
                       <div className="space-y-4 pb-2">
                         {description && (
-                          <p className="text-sm text-default-500">{description}</p>
+                          <p className="text-sm text-muted">{description}</p>
                         )}
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -585,11 +585,11 @@ export function RegistrationPolicySettings() {
                             value={inputs.api_key}
                             onChange={(e) => setCredentialInputs(prev => ({ ...prev, [p.slug]: { ...inputs, api_key: e.target.value } }))}
                             type={visibility.api_key ? 'text' : 'password'}
-                            variant="bordered"
+                            variant="secondary"
                             size="sm"
                             description={t('system.reg.api_key_desc')}
                             endContent={
-                              <Button isIconOnly size="sm" variant="light" aria-label={visibility.api_key ? t('system.reg.hide_api_key') : t('system.reg.show_api_key')} onPress={() => setCredentialVisibility(prev => ({ ...prev, [p.slug]: { ...visibility, api_key: !visibility.api_key } }))}>
+                              <Button isIconOnly size="sm" variant="tertiary" aria-label={visibility.api_key ? t('system.reg.hide_api_key') : t('system.reg.show_api_key')} onPress={() => setCredentialVisibility(prev => ({ ...prev, [p.slug]: { ...visibility, api_key: !visibility.api_key } }))}>
                                 {visibility.api_key ? <EyeOff size={14} /> : <Eye size={14} />}
                               </Button>
                             }
@@ -600,11 +600,11 @@ export function RegistrationPolicySettings() {
                             value={inputs.webhook_secret}
                             onChange={(e) => setCredentialInputs(prev => ({ ...prev, [p.slug]: { ...inputs, webhook_secret: e.target.value } }))}
                             type={visibility.webhook_secret ? 'text' : 'password'}
-                            variant="bordered"
+                            variant="secondary"
                             size="sm"
                             description={t('system.reg.webhook_desc')}
                             endContent={
-                              <Button isIconOnly size="sm" variant="light" aria-label={visibility.webhook_secret ? t('system.reg.hide_webhook') : t('system.reg.show_webhook')} onPress={() => setCredentialVisibility(prev => ({ ...prev, [p.slug]: { ...visibility, webhook_secret: !visibility.webhook_secret } }))}>
+                              <Button isIconOnly size="sm" variant="tertiary" aria-label={visibility.webhook_secret ? t('system.reg.hide_webhook') : t('system.reg.show_webhook')} onPress={() => setCredentialVisibility(prev => ({ ...prev, [p.slug]: { ...visibility, webhook_secret: !visibility.webhook_secret } }))}>
                                 {visibility.webhook_secret ? <EyeOff size={14} /> : <Eye size={14} />}
                               </Button>
                             }
@@ -616,8 +616,7 @@ export function RegistrationPolicySettings() {
                             {p.has_credentials && (
                               <Button
                                 size="sm"
-                                variant="light"
-                                color="danger"
+                                variant="danger"
                                 startContent={<Trash2 size={14} />}
                                 onPress={() => handleDeleteCredentials(p.slug)}
                               >
@@ -628,7 +627,7 @@ export function RegistrationPolicySettings() {
                           {(inputs.api_key || inputs.webhook_secret) && (
                             <Button
                               size="sm"
-                              color="primary"
+
                               startContent={!isSaving ? <Save size={14} /> : undefined}
                               isLoading={isSaving}
                               onPress={() => handleSaveCredentials(p.slug)}
@@ -644,9 +643,9 @@ export function RegistrationPolicySettings() {
               </Accordion>
 
               {realProviders.length > 0 && configuredProviderCount === 0 && (
-                <div className="flex items-start gap-2 p-3 rounded-lg bg-default-100 dark:bg-default-50/10">
-                  <HelpCircle size={16} className="text-default-500 shrink-0 mt-0.5" />
-                  <div className="text-sm text-default-600 dark:text-default-400">
+                <div className="flex items-start gap-2 p-3 rounded-lg bg-surface-secondary dark:bg-surface/10">
+                  <HelpCircle size={16} className="text-muted shrink-0 mt-0.5" />
+                  <div className="text-sm text-foreground dark:text-muted">
                     <p className="font-medium">{t('system.reg.how_to_get_credentials')}</p>
                     <ol className="list-decimal list-inside space-y-1 mt-1">
                       <li>{t('system.reg.credential_step_1')}</li>
@@ -654,7 +653,7 @@ export function RegistrationPolicySettings() {
                       <li>{t('system.reg.credential_step_3')}</li>
                       <li>{t('system.reg.credential_step_4')}</li>
                     </ol>
-                    <p className="mt-2 text-default-500">
+                    <p className="mt-2 text-muted">
                       {t('system.reg.credential_note')}
                     </p>
                   </div>
@@ -666,19 +665,19 @@ export function RegistrationPolicySettings() {
 
         {/* ── Section 5: Invite Codes (conditional) ── */}
         {policy.registration_mode === 'invite_only' && (
-          <Card shadow="sm">
+          <Card>
             <CardHeader className="flex justify-between items-center">
               <div>
                 <h3 className="text-lg font-semibold flex items-center gap-2">
                   <Ticket size={20} className="text-warning" /> {t('system.reg.invite_codes')}
                 </h3>
-                <p className="text-sm text-default-500 mt-1">
+                <p className="text-sm text-muted mt-1">
                   {t('system.reg.invite_codes_desc')}
                 </p>
               </div>
               <Button
                 size="sm"
-                color="primary"
+
                 startContent={<Plus size={14} />}
                 onPress={() => { setGeneratedCodes([]); setGenerateCount(1); setGenerateMaxUses(1); setGenerateExpiry(''); setGenerateNote(''); generateModal.onOpen(); }}
               >
@@ -690,9 +689,9 @@ export function RegistrationPolicySettings() {
                 <div className="flex justify-center py-4"><Spinner /></div>
               ) : inviteCodes.length === 0 ? (
                 <div className="text-center py-8">
-                  <Ticket size={32} className="mx-auto text-default-300 mb-2" />
-                  <p className="text-sm text-default-500">{t('system.reg.no_invite_codes')}</p>
-                  <p className="text-xs text-default-400 mt-1">{t('system.reg.no_invite_codes_hint')}</p>
+              <Ticket size={32} className="mx-auto text-muted mb-2" />
+                  <p className="text-sm text-muted">{t('system.reg.no_invite_codes')}</p>
+                  <p className="text-xs text-muted mt-1">{t('system.reg.no_invite_codes_hint')}</p>
                 </div>
               ) : (
                 <Table aria-label={t('system.reg.invite_codes')} removeWrapper>
@@ -710,7 +709,7 @@ export function RegistrationPolicySettings() {
                         <TableCell>
                           <div className="flex items-center gap-1">
                             <code className="text-sm font-mono">{ic.code}</code>
-                            <Button isIconOnly size="sm" variant="light" aria-label={t('system.reg.copy_invite_code')} onPress={() => copyToClipboard(ic.code)}>
+                            <Button isIconOnly size="sm" variant="tertiary" aria-label={t('system.reg.copy_invite_code')} onPress={() => copyToClipboard(ic.code)}>
                               <Copy size={12} />
                             </Button>
                           </div>
@@ -722,24 +721,24 @@ export function RegistrationPolicySettings() {
                         </TableCell>
                         <TableCell>
                           {!ic.is_active ? (
-                            <Chip size="sm" color="default" variant="flat">{t('system.reg.deactivated')}</Chip>
+                            <Chip size="sm" color="default" variant="soft">{t('system.reg.deactivated')}</Chip>
                           ) : ic.uses_count >= ic.max_uses ? (
-                            <Chip size="sm" color="warning" variant="flat">{t('system.reg.exhausted')}</Chip>
+                            <Chip size="sm" color="warning" variant="soft">{t('system.reg.exhausted')}</Chip>
                           ) : ic.expires_at && new Date(ic.expires_at) < new Date() ? (
-                            <Chip size="sm" color="warning" variant="flat">{t('system.reg.expired')}</Chip>
+                            <Chip size="sm" color="warning" variant="soft">{t('system.reg.expired')}</Chip>
                           ) : (
-                            <Chip size="sm" color="success" variant="flat">{t('system.reg.active')}</Chip>
+                            <Chip size="sm" color="success" variant="soft">{t('system.reg.active')}</Chip>
                           )}
                         </TableCell>
-                        <TableCell><span className="text-sm text-default-500">{ic.note || '—'}</span></TableCell>
+                        <TableCell><span className="text-sm text-muted">{ic.note || '—'}</span></TableCell>
                         <TableCell>
-                          <span className="text-sm text-default-500">
+                          <span className="text-sm text-muted">
                             {ic.expires_at ? new Date(ic.expires_at).toLocaleDateString() : t('system.reg.never')}
                           </span>
                         </TableCell>
                         <TableCell>
                           {ic.is_active ? (
-                            <Button isIconOnly size="sm" variant="light" color="danger" aria-label={t('system.reg.deactivate_invite_code')} onPress={() => handleDeactivateCode(ic.id)}>
+                            <Button isIconOnly size="sm" variant="danger" aria-label={t('system.reg.deactivate_invite_code')} onPress={() => handleDeactivateCode(ic.id)}>
                               <Trash2 size={14} />
                             </Button>
                           ) : null}
@@ -750,7 +749,7 @@ export function RegistrationPolicySettings() {
                 </Table>
               )}
               {inviteCodesTotal > 0 && (
-                <p className="text-xs text-default-400 mt-2">{t('system.reg.total_codes_count', { count: inviteCodesTotal })}</p>
+                <p className="text-xs text-muted mt-2">{t('system.reg.total_codes_count', { count: inviteCodesTotal })}</p>
               )}
             </CardBody>
           </Card>
@@ -763,12 +762,12 @@ export function RegistrationPolicySettings() {
             <ModalBody>
               {generatedCodes.length > 0 ? (
                 <div className="space-y-2">
-                  <p className="text-sm text-default-500">{t('system.reg.generated_share')}</p>
+                  <p className="text-sm text-muted">{t('system.reg.generated_share')}</p>
                   <div className="space-y-1">
                     {generatedCodes.map((code) => (
-                      <div key={code} className="flex items-center justify-between p-2 bg-default-100 rounded-lg">
+                      <div key={code} className="flex items-center justify-between p-2 bg-surface-secondary rounded-lg">
                         <code className="font-mono text-sm">{code}</code>
-                        <Button isIconOnly size="sm" variant="light" aria-label={t('system.reg.copy_code')} onPress={() => copyToClipboard(code)}>
+                        <Button isIconOnly size="sm" variant="tertiary" aria-label={t('system.reg.copy_code')} onPress={() => copyToClipboard(code)}>
                           <Copy size={14} />
                         </Button>
                       </div>
@@ -776,7 +775,7 @@ export function RegistrationPolicySettings() {
                   </div>
                   <Button
                     size="sm"
-                    variant="flat"
+                    variant="secondary"
                     onPress={() => copyToClipboard(generatedCodes.join('\n'))}
                     startContent={<Copy size={14} />}
                     className="mt-2"
@@ -793,7 +792,7 @@ export function RegistrationPolicySettings() {
                     max={100}
                     value={String(generateCount)}
                     onChange={(e) => setGenerateCount(Math.max(1, Math.min(100, parseInt(e.target.value) || 1)))}
-                    variant="bordered"
+                    variant="secondary"
                     description={t('system.reg.generate_count_desc')}
                   />
                   <Input
@@ -803,7 +802,7 @@ export function RegistrationPolicySettings() {
                     max={1000}
                     value={String(generateMaxUses)}
                     onChange={(e) => setGenerateMaxUses(Math.max(1, Math.min(1000, parseInt(e.target.value) || 1)))}
-                    variant="bordered"
+                    variant="secondary"
                     description={t('system.reg.max_uses_desc')}
                   />
                   <Input
@@ -811,7 +810,7 @@ export function RegistrationPolicySettings() {
                     type="date"
                     value={generateExpiry}
                     onChange={(e) => setGenerateExpiry(e.target.value)}
-                    variant="bordered"
+                    variant="secondary"
                     description={t('system.reg.expiry_desc')}
                   />
                   <Input
@@ -819,18 +818,18 @@ export function RegistrationPolicySettings() {
                     placeholder={t('system.reg.note_placeholder')}
                     value={generateNote}
                     onChange={(e) => setGenerateNote(e.target.value)}
-                    variant="bordered"
+                    variant="secondary"
                     description={t('system.reg.note_desc')}
                   />
                 </div>
               )}
             </ModalBody>
             <ModalFooter>
-              <Button variant="flat" onPress={generateModal.onClose}>
+              <Button variant="secondary" onPress={generateModal.onClose}>
                 {generatedCodes.length > 0 ? t('system.reg.done') : t('system.reg.cancel')}
               </Button>
               {generatedCodes.length === 0 && (
-                <Button color="primary" onPress={handleGenerateInviteCodes} isLoading={generating} isDisabled={generating}>
+                <Button  onPress={handleGenerateInviteCodes} isLoading={generating} isDisabled={generating}>
                   {t('system.reg.generate')}
                 </Button>
               )}
@@ -839,13 +838,13 @@ export function RegistrationPolicySettings() {
         </Modal>
 
         {/* ── Section 6: How Registration Modes Work ── */}
-        <Card shadow="sm" className="bg-accent-soft dark:bg-accent-soft border border-accent dark:border-accent">
+        <Card  className="bg-accent-soft dark:bg-accent-soft border border-accent dark:border-accent">
           <CardBody>
             <div className="flex gap-3">
               <Info size={20} className="text-accent shrink-0 mt-0.5" />
               <div className="text-sm space-y-2">
                 <p className="font-semibold text-base">{t('system.reg.understanding_modes')}</p>
-                <div className="space-y-2 text-default-700 dark:text-default-300">
+            <div className="space-y-2 text-foreground dark:text-muted">
                   <div className="flex items-start gap-2">
                     <Globe size={14} className="shrink-0 mt-1 text-success" />
                     <p>{t('system.reg.info_open')}</p>
@@ -863,16 +862,16 @@ export function RegistrationPolicySettings() {
                     <p>{t('system.reg.info_invite')}</p>
                   </div>
                   <div className="flex items-start gap-2">
-                    <Clock size={14} className="shrink-0 mt-1 text-default-500" />
+                    <Clock size={14} className="shrink-0 mt-1 text-muted" />
                     <p>{t('system.reg.info_waitlist')}</p>
                   </div>
                   <div className="flex items-start gap-2">
-                    <Shield size={14} className="shrink-0 mt-1 text-default-400" />
+                    <Shield size={14} className="shrink-0 mt-1 text-muted" />
                     <p>{t('system.reg.info_gov_id')}</p>
                   </div>
                 </div>
                 <Separator className="my-2" />
-                <p className="text-default-500">
+                <p className="text-muted">
                   {t('system.reg.tip_change_modes')}
                 </p>
               </div>

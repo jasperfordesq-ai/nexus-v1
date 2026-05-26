@@ -390,7 +390,7 @@ export function NewsletterForm() {
   };
 
   if (loading) {
-    return <div className="flex justify-center py-16"><span className="text-default-400">{t('newsletter_form.loading')}</span></div>;
+    return <div className="flex justify-center py-16"><span className="text-muted">{t('newsletter_form.loading')}</span></div>;
   }
 
   const isSent = newsletterStatus === 'sent' || newsletterStatus === 'sending';
@@ -431,13 +431,12 @@ export function NewsletterForm() {
         description={isEdit ? t('newsletter_form.desc_edit') : t('newsletter_form.desc_create')}
         actions={
           <div className="flex gap-2">
-            <Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/newsletters'))}>
+            <Button variant="secondary" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/newsletters'))}>
               {t('newsletter_form.back')}
             </Button>
             {isEdit && !isSent && (
               <Button
-                variant="flat"
-                color="secondary"
+                variant="secondary"
                 startContent={<TestTube size={16} />}
                 onPress={handleSendTest}
                 isLoading={sendingTest}
@@ -452,7 +451,7 @@ export function NewsletterForm() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* ── Main Content ── */}
         <div className="lg:col-span-2 space-y-6">
-          <Card shadow="sm">
+          <Card>
             <CardHeader><h3 className="text-lg font-semibold">{t('newsletter_form.section_details')}</h3></CardHeader>
             <CardBody className="gap-4">
               <Input
@@ -461,7 +460,7 @@ export function NewsletterForm() {
                 value={subject}
                 onValueChange={setSubject}
                 isRequired
-                variant="bordered"
+                variant="secondary"
                 isDisabled={isSent}
               />
               <Input
@@ -469,16 +468,16 @@ export function NewsletterForm() {
                 placeholder={t('newsletter_form.preview_text_placeholder')}
                 value={previewText}
                 onValueChange={setPreviewText}
-                variant="bordered"
+                variant="secondary"
                 description={t('newsletter_form.preview_text_description')}
                 isDisabled={isSent}
               />
 
               {/* A/B Testing */}
-              <div className="flex items-center justify-between p-3 rounded-lg border border-default-200">
+              <div className="flex items-center justify-between p-3 rounded-lg border border-border">
                 <div>
                   <p className="text-sm font-medium">{t('newsletter_form.ab_test_subject_lines')}</p>
-                  <p className="text-xs text-default-400">{t('newsletter_form.ab_test_subject_lines_desc')}</p>
+                  <p className="text-xs text-muted">{t('newsletter_form.ab_test_subject_lines_desc')}</p>
                 </div>
                 <Switch isSelected={abTestEnabled} onValueChange={setAbTestEnabled} size="sm" isDisabled={isSent} />
               </div>
@@ -489,7 +488,7 @@ export function NewsletterForm() {
                     placeholder={t('newsletter_form.subject_b_placeholder')}
                     value={subjectB}
                     onValueChange={setSubjectB}
-                    variant="bordered"
+                    variant="secondary"
                     isDisabled={isSent}
                   />
                   <div className="grid grid-cols-2 gap-3">
@@ -498,7 +497,7 @@ export function NewsletterForm() {
                       label={t('newsletter_form.label_split_percent')}
                       value={String(abSplitPercentage)}
                       onValueChange={(v) => setAbSplitPercentage(Math.max(10, Math.min(90, Number(v) || 50)))}
-                      variant="bordered"
+                      variant="secondary"
                       size="sm"
                       description={`A: ${abSplitPercentage}% / B: ${100 - abSplitPercentage}%`}
                       isDisabled={isSent}
@@ -507,7 +506,7 @@ export function NewsletterForm() {
                       label={t('newsletter_form.label_winning_metric')}
                       selectedKeys={[abWinnerMetric]}
                       onSelectionChange={(keys) => { const v = Array.from(keys)[0]; if (v) setAbWinnerMetric(String(v)); }}
-                      variant="bordered"
+                      variant="secondary"
                       size="sm"
                       isDisabled={isSent}
                     >
@@ -516,10 +515,10 @@ export function NewsletterForm() {
                       <SelectItem key="conversions" id="conversions">{t('newsletter_form.metric_conversion_rate')}</SelectItem>
                     </Select>
                   </div>
-                  <div className="flex items-center justify-between p-2 rounded-lg bg-default-50">
+                  <div className="flex items-center justify-between p-2 rounded-lg bg-surface">
                     <div>
                       <p className="text-xs font-medium">{t('newsletter_form.auto_select_winner')}</p>
-                      <p className="text-xs text-default-400">{t('newsletter_form.auto_select_winner_desc')}</p>
+                      <p className="text-xs text-muted">{t('newsletter_form.auto_select_winner_desc')}</p>
                     </div>
                     <Switch
                       isSelected={abAutoSelectWinner}
@@ -534,7 +533,7 @@ export function NewsletterForm() {
                       label={t('newsletter_form.label_auto_select_after')}
                       value={String(abAutoSelectAfterHours)}
                       onValueChange={(v) => setAbAutoSelectAfterHours(Math.max(1, Number(v) || 24))}
-                      variant="bordered"
+                      variant="secondary"
                       size="sm"
                       isDisabled={isSent}
                     />
@@ -552,23 +551,23 @@ export function NewsletterForm() {
                   isDisabled={saving || isSent}
                 />
               </Suspense>
-              <div className="rounded-lg border border-default-200 bg-default-50 p-3">
+              <div className="rounded-lg border border-border bg-surface p-3">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="text-sm font-semibold text-foreground">
                     {t('newsletter_form.personalization_title')}
                   </span>
-                  <span className="text-xs text-default-500">
+                  <span className="text-xs text-muted">
                     {t('newsletter_form.personalization_desc')}
                   </span>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {personalizationTags.map((tag) => (
-                    <Chip key={tag.token} size="sm" variant="flat" className="font-mono">
-                      {tag.token} <span className="font-sans text-default-500">{t(tag.labelKey)}</span>
+                    <Chip key={tag.token} size="sm" variant="soft" className="font-mono">
+                      {tag.token} <span className="font-sans text-muted">{t(tag.labelKey)}</span>
                     </Chip>
                   ))}
                 </div>
-                <p className="mt-2 text-xs text-default-500">
+                <p className="mt-2 text-xs text-muted">
                   {t('newsletter_form.personalization_body_only')}
                 </p>
               </div>
@@ -579,7 +578,7 @@ export function NewsletterForm() {
         {/* ── Sidebar ── */}
         <div className="space-y-6">
           {/* Recipient Preview */}
-          <Card shadow="sm" className="border-2 border-accent">
+          <Card  className="border-2 border-accent">
             <CardBody className="gap-3">
               <div className="flex items-center gap-2">
                 <Users size={18} className="text-accent" />
@@ -587,33 +586,33 @@ export function NewsletterForm() {
               </div>
               <div className="text-center">
                 {recipientLoading ? (
-                  <span className="text-sm text-default-400">{t('newsletter_form.calculating')}</span>
+                  <span className="text-sm text-muted">{t('newsletter_form.calculating')}</span>
                 ) : recipientCount !== null ? (
                   <div>
                     <p className="text-3xl font-bold text-accent">{recipientCount.toLocaleString()}</p>
-                    <p className="text-xs text-default-500">
+                    <p className="text-xs text-muted">
                       {targetAudience === 'segment' ? t('newsletter_form.matching_segment_rules') : targetAudience.replace(/_/g, ' ')}
                     </p>
                   </div>
                 ) : (
-                  <span className="text-sm text-default-400">{t('newsletter_form.unable_to_calculate')}</span>
+                  <span className="text-sm text-muted">{t('newsletter_form.unable_to_calculate')}</span>
                 )}
               </div>
-              <Button size="sm" variant="flat" onPress={fetchRecipientCount} isLoading={recipientLoading} isDisabled={recipientLoading}>
+              <Button size="sm" variant="secondary" onPress={fetchRecipientCount} isLoading={recipientLoading} isDisabled={recipientLoading}>
                 {t('newsletter_form.refresh_count')}
               </Button>
             </CardBody>
           </Card>
 
           {/* Status & Scheduling */}
-          <Card shadow="sm">
+          <Card>
             <CardHeader><h3 className="text-sm font-semibold">{t('newsletter_form.section_status_scheduling')}</h3></CardHeader>
             <CardBody className="gap-4">
               <Select
                 label={t('newsletter_form.label_status')}
                 selectedKeys={[status]}
                 onSelectionChange={(keys) => { const v = Array.from(keys)[0]; if (v) setStatus(String(v)); }}
-                variant="bordered"
+                variant="secondary"
                 size="sm"
                 isDisabled={isSent}
               >
@@ -627,7 +626,7 @@ export function NewsletterForm() {
                   type="datetime-local"
                   value={scheduledAt}
                   onValueChange={setScheduledAt}
-                  variant="bordered"
+                  variant="secondary"
                   size="sm"
                   isDisabled={isSent}
                 />
@@ -636,7 +635,7 @@ export function NewsletterForm() {
           </Card>
 
           {/* Recurring Schedule */}
-          <Card shadow="sm">
+          <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Repeat size={16} />
@@ -655,7 +654,7 @@ export function NewsletterForm() {
                     label={t('newsletter_form.label_frequency')}
                     selectedKeys={[recurringFrequency]}
                     onSelectionChange={(keys) => { const v = Array.from(keys)[0]; if (v) setRecurringFrequency(String(v)); }}
-                    variant="bordered"
+                    variant="secondary"
                     size="sm"
                     isDisabled={isSent}
                   >
@@ -669,7 +668,7 @@ export function NewsletterForm() {
                       label={t('newsletter_form.label_day_of_week')}
                       selectedKeys={[recurringDay]}
                       onSelectionChange={(keys) => { const v = Array.from(keys)[0]; if (v) setRecurringDay(String(v)); }}
-                      variant="bordered"
+                      variant="secondary"
                       size="sm"
                       isDisabled={isSent}
                     >
@@ -684,7 +683,7 @@ export function NewsletterForm() {
                       label={t('newsletter_form.label_day_of_month')}
                       selectedKeys={[recurringDayOfMonth]}
                       onSelectionChange={(keys) => { const v = Array.from(keys)[0]; if (v) setRecurringDayOfMonth(String(v)); }}
-                      variant="bordered"
+                      variant="secondary"
                       size="sm"
                       isDisabled={isSent}
                     >
@@ -699,7 +698,7 @@ export function NewsletterForm() {
                     type="time"
                     value={recurringTime}
                     onValueChange={setRecurringTime}
-                    variant="bordered"
+                    variant="secondary"
                     size="sm"
                     isDisabled={isSent}
                   />
@@ -709,7 +708,7 @@ export function NewsletterForm() {
                     type="date"
                     value={recurringEndDate}
                     onValueChange={setRecurringEndDate}
-                    variant="bordered"
+                    variant="secondary"
                     size="sm"
                     description={t('newsletter_form.end_date_description')}
                     isDisabled={isSent}
@@ -720,7 +719,7 @@ export function NewsletterForm() {
           </Card>
 
           {/* Audience */}
-          <Card shadow="sm">
+          <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Target size={16} />
@@ -732,7 +731,7 @@ export function NewsletterForm() {
                 label={t('newsletter_form.label_recipients')}
                 selectedKeys={[targetAudience]}
                 onSelectionChange={(keys) => { const v = Array.from(keys)[0]; if (v) setTargetAudience(String(v)); }}
-                variant="bordered"
+                variant="secondary"
                 size="sm"
                 isDisabled={isSent}
               >
@@ -747,7 +746,7 @@ export function NewsletterForm() {
                   label={t('newsletter_form.label_segment')}
                   selectedKeys={segmentId ? [segmentId] : []}
                   onSelectionChange={(keys) => { const v = Array.from(keys)[0]; if (v) setSegmentId(String(v)); }}
-                  variant="bordered"
+                  variant="secondary"
                   size="sm"
                   isDisabled={isSent}
                 >
@@ -756,7 +755,7 @@ export function NewsletterForm() {
                       <div className="flex justify-between items-center">
                         <span>{s.name}</span>
                         {s.member_count !== undefined && (
-                          <Chip size="sm" variant="flat">{s.member_count}</Chip>
+                          <Chip size="sm" variant="soft">{s.member_count}</Chip>
                         )}
                       </div>
                     </SelectItem>
@@ -769,15 +768,15 @@ export function NewsletterForm() {
               {/* Geo targeting */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <MapPin size={14} className="text-default-400" />
-                  <p className="text-xs font-medium text-default-600">{t('newsletter_form.geo_targeting_optional')}</p>
+                  <MapPin size={14} className="text-muted" />
+                  <p className="text-xs font-medium text-foreground">{t('newsletter_form.geo_targeting_optional')}</p>
                 </div>
                 <Input
                   label={t('newsletter_form.label_counties')}
                   placeholder={t('newsletter_form.counties_placeholder')}
                   value={targetCounties}
                   onValueChange={setTargetCounties}
-                  variant="bordered"
+                  variant="secondary"
                   size="sm"
                   description={t('newsletter_form.counties_description')}
                   isDisabled={isSent}
@@ -787,7 +786,7 @@ export function NewsletterForm() {
                   placeholder={t('newsletter_form.towns_placeholder')}
                   value={targetTowns}
                   onValueChange={setTargetTowns}
-                  variant="bordered"
+                  variant="secondary"
                   size="sm"
                   description={t('newsletter_form.towns_description')}
                   isDisabled={isSent}
@@ -798,15 +797,15 @@ export function NewsletterForm() {
               {groups.length > 0 && (
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <UsersRound size={14} className="text-default-400" />
-                    <p className="text-xs font-medium text-default-600">{t('newsletter_form.group_targeting_optional')}</p>
+                    <UsersRound size={14} className="text-muted" />
+                    <p className="text-xs font-medium text-foreground">{t('newsletter_form.group_targeting_optional')}</p>
                   </div>
                   <Select
                     label={t('newsletter_form.label_target_groups')}
                     selectionMode="multiple"
                     selectedKeys={new Set(targetGroups)}
                     onSelectionChange={(keys) => setTargetGroups(Array.from(keys) as string[])}
-                    variant="bordered"
+                    variant="secondary"
                     size="sm"
                     isDisabled={isSent}
                     placeholder={t('newsletters.placeholder_select_groups')}
@@ -816,7 +815,7 @@ export function NewsletterForm() {
                     ))}
                   </Select>
                   {targetGroups.length > 0 && (
-                    <p className="text-xs text-default-500">{t('newsletter_form.groups_selected')}</p>
+                    <p className="text-xs text-muted">{t('newsletter_form.groups_selected')}</p>
                   )}
                 </div>
               )}
@@ -825,7 +824,7 @@ export function NewsletterForm() {
 
           {/* Template */}
           {templates.length > 0 && (
-            <Card shadow="sm">
+            <Card>
               <CardHeader>
                 <div className="flex items-center gap-2">
                   <Calendar size={16} />
@@ -837,7 +836,7 @@ export function NewsletterForm() {
                   label={t('newsletter_form.label_load_template')}
                   selectedKeys={templateId ? [templateId] : []}
                   onSelectionChange={(keys) => { const v = Array.from(keys)[0]; if (v) setTemplateId(String(v)); }}
-                  variant="bordered"
+                  variant="secondary"
                   size="sm"
                   placeholder={t('newsletters.placeholder_choose_a_template')}
                   isDisabled={isSent}
@@ -855,7 +854,7 @@ export function NewsletterForm() {
             {!isSent && (
               <>
                 <Button
-                  color="primary"
+
                   startContent={<Save size={16} />}
                   onPress={handleSubmit}
                   isLoading={saving}
@@ -867,7 +866,7 @@ export function NewsletterForm() {
                 {isEdit && (
                   <Tooltip content={recipientCount === 0 ? t('newsletter_form.no_recipients_match') : t('newsletter_form.send_to_all_targeted')}>
                     <Button
-                      color="success"
+
                       startContent={<Send size={16} />}
                       onPress={() => setConfirmSendOpen(true)}
                       isDisabled={recipientCount === 0}
@@ -892,7 +891,7 @@ export function NewsletterForm() {
               </Card>
             )}
 
-            <Button variant="flat" onPress={() => navigate(tenantPath('/admin/newsletters'))} className="w-full">
+            <Button variant="secondary" onPress={() => navigate(tenantPath('/admin/newsletters'))} className="w-full">
               {t('newsletter_form.cancel')}
             </Button>
           </div>
@@ -909,32 +908,32 @@ export function NewsletterForm() {
           <ModalBody>
             <div className="space-y-3">
               <p className="text-sm">{t('newsletter_form.confirm_send_message')}</p>
-              <Card className="bg-default-50">
+              <Card className="bg-surface">
                 <CardBody className="gap-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-default-500">{t('newsletter_form.label_subject_line')}</span>
+                    <span className="text-muted">{t('newsletter_form.label_subject_line')}</span>
                     <span className="font-medium">{subject}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-default-500">{t('newsletter_form.label_recipients')}</span>
+                    <span className="text-muted">{t('newsletter_form.label_recipients')}</span>
                     <span className="font-medium text-accent">{recipientCount?.toLocaleString() || '--'}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-default-500">{t('newsletter_form.section_target_audience')}</span>
+                    <span className="text-muted">{t('newsletter_form.section_target_audience')}</span>
                     <span className="font-medium">{audienceLabel(targetAudience)}</span>
                   </div>
                   {abTestEnabled && (
                     <div className="flex justify-between text-sm">
-                      <span className="text-default-500">{t('newsletter_form.ab_test_label')}</span>
-                      <Chip size="sm" color="warning" variant="flat">
+                      <span className="text-muted">{t('newsletter_form.ab_test_label')}</span>
+                      <Chip size="sm" color="warning" variant="soft">
                         {t('newsletter_form.ab_test_enabled', { a: abSplitPercentage, b: 100 - abSplitPercentage })}
                       </Chip>
                     </div>
                   )}
                   {isRecurring && (
                     <div className="flex justify-between text-sm">
-                      <span className="text-default-500">{t('newsletter_form.recurring_label')}</span>
-                      <Chip size="sm" color="secondary" variant="flat">{frequencyLabel(recurringFrequency)}</Chip>
+                      <span className="text-muted">{t('newsletter_form.recurring_label')}</span>
+                      <Chip size="sm" color="default" variant="soft">{frequencyLabel(recurringFrequency)}</Chip>
                     </div>
                   )}
                 </CardBody>
@@ -945,11 +944,11 @@ export function NewsletterForm() {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={() => setConfirmSendOpen(false)} isDisabled={sending}>
+            <Button variant="secondary" onPress={() => setConfirmSendOpen(false)} isDisabled={sending}>
               {t('newsletter_form.cancel')}
             </Button>
             <Button
-              color="success"
+
               startContent={<Send size={16} />}
               onPress={handleSendNow}
               isLoading={sending}

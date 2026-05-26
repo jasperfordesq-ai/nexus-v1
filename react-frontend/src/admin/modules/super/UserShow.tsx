@@ -41,8 +41,8 @@ type ConfirmActionType =
 
 function getPrivilegeLevel(user: SuperAdminUserDetail) {
   if (user.is_super_admin) return { labelKey: 'super.privilege_global_super_admin', color: 'danger' as const, level: 4 };
-  if (user.is_tenant_super_admin) return { labelKey: 'super.privilege_tenant_super_admin', color: 'secondary' as const, level: 3 };
-  if (user.role === 'admin' || user.role === 'tenant_admin') return { labelKey: 'super.privilege_admin', color: 'primary' as const, level: 2 };
+  if (user.is_tenant_super_admin) return { labelKey: 'super.privilege_tenant_super_admin', color: 'default' as const, level: 3 };
+  if (user.role === 'admin' || user.role === 'tenant_admin') return { labelKey: 'super.privilege_admin', color: 'accent' as const, level: 2 };
   return { labelKey: 'super.privilege_regular_member', color: 'default' as const, level: 1 };
 }
 
@@ -223,8 +223,8 @@ export function UserShow() {
   if (!user) {
     return (
       <div className="p-8 text-center">
-        <p className="text-default-500">{t('super.user_not_found')}</p>
-        <Button className="mt-4" variant="flat" onPress={() => navigate(tenantPath('/admin/super/users'))}>
+        <p className="text-muted">{t('super.user_not_found')}</p>
+        <Button className="mt-4" variant="secondary" onPress={() => navigate(tenantPath('/admin/super/users'))}>
           {t('super.back_to_users')}
         </Button>
       </div>
@@ -241,14 +241,14 @@ export function UserShow() {
         actions={
           <div className="flex items-center gap-2">
             <Button
-              variant="flat"
+              variant="primary"
               startContent={<Edit size={16} />}
               onPress={() => navigate(tenantPath(`/admin/super/users/${user.id}/edit`))}
             >
               {t('super.edit')}
             </Button>
             <Button
-              variant="light"
+              variant="secondary"
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/super/users'))}
             >
@@ -279,26 +279,26 @@ export function UserShow() {
                 <div className="flex flex-col gap-2 flex-1">
                   <div>
                     <h2 className="text-xl font-semibold text-foreground">{user.first_name} {user.last_name}</h2>
-                    <p className="text-default-500">{user.email}</p>
+                    <p className="text-muted">{user.email}</p>
                   </div>
                   <div className="flex flex-wrap items-center gap-2 mt-1">
-                    <Chip size="sm" variant="flat" color={user.role === 'admin' || user.role === 'tenant_admin' ? 'primary' : 'default'}>
+                    <Chip size="sm" variant="soft" color={user.role === 'admin' || user.role === 'tenant_admin' ? 'accent' : 'default'}>
                       {user.role}
                     </Chip>
                     <Chip
                       size="sm"
-                      variant="flat"
+                      variant="soft"
                       color={user.status === 'active' ? 'success' : user.status === 'pending' ? 'warning' : 'danger'}
                     >
                       {user.status}
                     </Chip>
                     {user.is_super_admin && (
-                      <Chip size="sm" variant="flat" color="danger" startContent={<ShieldAlert size={12} />}>
+                      <Chip size="sm" variant="soft" color="danger" startContent={<ShieldAlert size={12} />}>
                         {t('super.privilege_global_super_admin')}
                       </Chip>
                     )}
                     {user.is_tenant_super_admin && (
-                      <Chip size="sm" variant="flat" color="secondary" startContent={<Shield size={12} />}>
+                      <Chip size="sm" variant="soft" color="default" startContent={<Shield size={12} />}>
                         {t('super.privilege_tenant_super_admin')}
                       </Chip>
                     )}
@@ -315,38 +315,38 @@ export function UserShow() {
             <CardBody>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex items-center gap-3">
-                  <MapPin size={16} className="text-default-400 shrink-0" />
+                  <MapPin size={16} className="text-muted shrink-0" />
                   <div>
-                    <p className="text-xs text-default-400">{t('super.label_location')}</p>
+                    <p className="text-xs text-muted">{t('super.label_location')}</p>
                     <p className="text-sm text-foreground">{user.location || t('super.not_set')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Phone size={16} className="text-default-400 shrink-0" />
+                  <Phone size={16} className="text-muted shrink-0" />
                   <div>
-                    <p className="text-xs text-default-400">{t('super.label_phone')}</p>
+                    <p className="text-xs text-muted">{t('super.label_phone')}</p>
                     <p className="text-sm text-foreground">{user.phone || t('super.not_set')}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CalendarDays size={16} className="text-default-400 shrink-0" />
+                  <CalendarDays size={16} className="text-muted shrink-0" />
                   <div>
-                    <p className="text-xs text-default-400">{t('super.label_member_since')}</p>
+                    <p className="text-xs text-muted">{t('super.label_member_since')}</p>
                     <p className="text-sm text-foreground">{formatDate(user.created_at, t('super.never'))}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Clock size={16} className="text-default-400 shrink-0" />
+                  <Clock size={16} className="text-muted shrink-0" />
                   <div>
-                    <p className="text-xs text-default-400">{t('super.label_last_login')}</p>
+                    <p className="text-xs text-muted">{t('super.label_last_login')}</p>
                     <p className="text-sm text-foreground">{formatDate(user.last_login_at, t('super.never'))}</p>
                   </div>
                 </div>
                 {user.balance !== undefined && (
                   <div className="flex items-center gap-3">
-                    <Wallet size={16} className="text-default-400 shrink-0" />
+                    <Wallet size={16} className="text-muted shrink-0" />
                     <div>
-                      <p className="text-xs text-default-400">{t('super.label_time_balance')}</p>
+                      <p className="text-xs text-muted">{t('super.label_time_balance')}</p>
                       <p className="text-sm font-medium text-foreground">{user.balance} {t('super.hours')}</p>
                     </div>
                   </div>
@@ -365,7 +365,7 @@ export function UserShow() {
             <CardBody className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
                 <div>
-                  <p className="text-xs text-default-400">{t('super.label_current_tenant')}</p>
+                  <p className="text-xs text-muted">{t('super.label_current_tenant')}</p>
                   <Link
                     to={tenantPath(`/admin/super/tenants/${user.tenant_id}`)}
                     className="text-sm font-medium text-accent hover:underline"
@@ -374,23 +374,21 @@ export function UserShow() {
                   </Link>
                 </div>
                 <div>
-                  <p className="text-xs text-default-400">{t('super.label_tenant_id')}</p>
+                  <p className="text-xs text-muted">{t('super.label_tenant_id')}</p>
                   <p className="text-sm text-foreground">{user.tenant_id}</p>
                 </div>
               </div>
               <Separator />
               <div className="flex flex-col gap-2">
                 <Button
-                  variant="flat"
-                  color="default"
+                  variant="secondary"
                   startContent={<ArrowRightLeft size={16} />}
                   onPress={() => setMoveModalOpen(true)}
                 >
                   {t('super.move_to_different_tenant')}
                 </Button>
                 <Button
-                  variant="flat"
-                  color="secondary"
+                  variant="secondary"
                   startContent={<Crown size={16} />}
                   onPress={() => setPromoteModalOpen(true)}
                 >
@@ -413,12 +411,12 @@ export function UserShow() {
             </CardHeader>
             <Separator className="bg-purple-500/20" />
             <CardBody className="flex flex-col gap-3">
-              <p className="text-xs text-default-600">
+              <p className="text-xs text-muted">
                 {t('super.god_level_desc')}
               </p>
               {user.is_super_admin ? (
                 <Button
-                  variant="flat"
+                  variant="danger-soft"
                   className="bg-gradient-to-r from-red-500/10 to-pink-500/10 border border-red-500/30"
                   startContent={<ShieldOff size={16} />}
                   onPress={() => setConfirmAction('revoke-global')}
@@ -430,7 +428,7 @@ export function UserShow() {
               ) : (
                 <div>
                   <Button
-                    variant="flat"
+                    variant="secondary"
                     className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-2 border-purple-500/50 w-full"
                     startContent={<ShieldAlert size={16} />}
                     onPress={() => setConfirmAction('grant-global')}
@@ -455,13 +453,13 @@ export function UserShow() {
             </CardHeader>
             <Separator />
             <CardBody className="flex flex-col gap-3">
-              <p className="text-xs text-default-600">
+              <p className="text-xs text-muted">
                 {t('super.tenant_sa_desc')}
               </p>
               {user.is_tenant_super_admin ? (
                 <Button
-                  variant="flat"
-                  color="warning"
+                  variant="secondary"
+                  className="text-warning"
                   startContent={<ShieldOff size={16} />}
                   onPress={() => setConfirmAction('revoke-sa')}
                 >
@@ -469,8 +467,7 @@ export function UserShow() {
                 </Button>
               ) : (
                 <Button
-                  variant="flat"
-                  color="secondary"
+                  variant="secondary"
                   startContent={<Shield size={16} />}
                   onPress={() => setConfirmAction('grant-sa')}
                 >
@@ -490,7 +487,7 @@ export function UserShow() {
                   privilege.level === 4 ? 'bg-gradient-to-br from-purple-500/20 to-pink-500/20' :
                   privilege.level === 3 ? 'bg-accent-soft' :
                   privilege.level === 2 ? 'bg-accent/10' :
-                  'bg-default/10'
+                  'bg-surface-tertiary'
                 }`}>
                   {privilege.level >= 3 ? (
                     <CrownIcon size={28} className={
@@ -498,11 +495,11 @@ export function UserShow() {
                     } />
                   ) : (
                     <Shield size={28} className={
-                      privilege.level === 2 ? 'text-accent' : 'text-default-400'
+                      privilege.level === 2 ? 'text-accent' : 'text-muted'
                     } />
                   )}
                 </div>
-                <Chip size="lg" variant="flat" color={privilege.color}>
+                <Chip size="lg" variant="soft" color={privilege.color}>
                   {t(privilege.labelKey)}
                 </Chip>
                 {/* Privilege bar */}
@@ -513,15 +510,15 @@ export function UserShow() {
                       className={`h-2 flex-1 rounded-full ${
                         level <= privilege.level
                           ? privilege.level === 4 ? 'bg-gradient-to-r from-purple-500 to-pink-500'
-                            : privilege.level === 3 ? 'bg-default'
+                            : privilege.level === 3 ? 'bg-muted'
                             : privilege.level === 2 ? 'bg-accent'
-                            : 'bg-default-300'
-                          : 'bg-default-100'
+                            : 'bg-muted/50'
+                          : 'bg-surface-tertiary'
                       }`}
                     />
                   ))}
                 </div>
-                <div className="flex justify-between w-full text-[10px] text-default-400">
+                <div className="flex justify-between w-full text-[10px] text-muted">
                   <span>{t('super.privilege_member_short')}</span>
                   <span>{t('super.privilege_admin_short')}</span>
                   <span>{t('super.privilege_tsa_short')}</span>
@@ -538,8 +535,7 @@ export function UserShow() {
             <CardBody>
               <div className="flex flex-col gap-2">
                 <Button
-                  color="primary"
-                  variant="flat"
+                  variant="primary"
                   startContent={<Edit size={16} />}
                   fullWidth
                   onPress={() => navigate(tenantPath(`/admin/super/users/${user.id}/edit`))}
@@ -548,8 +544,8 @@ export function UserShow() {
                 </Button>
                 {isCurrentSuperAdmin && (
                   <Button
-                    color="warning"
-                    variant="flat"
+                    variant="secondary"
+                    className="text-warning"
                     startContent={<UserCog size={16} />}
                     fullWidth
                     onPress={() => setImpersonateModalOpen(true)}
@@ -558,7 +554,7 @@ export function UserShow() {
                   </Button>
                 )}
                 <Button
-                  variant="light"
+                  variant="secondary"
                   startContent={<ArrowLeft size={16} />}
                   fullWidth
                   onPress={() => navigate(tenantPath('/admin/super/users'))}
@@ -590,11 +586,12 @@ export function UserShow() {
         <ModalContent>
           <ModalHeader>{t('super.move_user_to_tenant_title')}</ModalHeader>
           <ModalBody>
-            <p className="text-sm text-default-600 mb-3">
+            <p className="text-sm text-muted mb-3">
               {t('super.move_user_to_tenant_desc')}
             </p>
 
             <Select
+              variant="secondary"
               label={t('super.target_tenant')}
               placeholder={t('super.select_tenant')}
               selectedKeys={moveTargetTenant ? [moveTargetTenant] : []}
@@ -606,11 +603,11 @@ export function UserShow() {
             </Select>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={() => { setMoveModalOpen(false); setMoveTargetTenant(''); }} isDisabled={moveLoading}>
+            <Button variant="tertiary" onPress={() => { setMoveModalOpen(false); setMoveTargetTenant(''); }} isDisabled={moveLoading}>
               {t('common.cancel')}
             </Button>
             <Button
-              color="primary"
+              variant="primary"
               onPress={handleMoveTenant}
               isLoading={moveLoading}
               isDisabled={!moveTargetTenant}
@@ -633,7 +630,7 @@ export function UserShow() {
             {t('super.impersonate_user_title')}
           </ModalHeader>
           <ModalBody>
-            <p className="text-sm text-default-600">
+            <p className="text-sm text-muted">
               {t('super.impersonate_user_desc', {
                 name: user.name,
               })}
@@ -646,14 +643,15 @@ export function UserShow() {
           </ModalBody>
           <ModalFooter>
             <Button
-              variant="flat"
+              variant="tertiary"
               onPress={() => setImpersonateModalOpen(false)}
               isDisabled={impersonateLoading}
             >
               {t('common.cancel')}
             </Button>
             <Button
-              color="warning"
+              variant="secondary"
+              className="text-warning"
               onPress={handleImpersonate}
               isLoading={impersonateLoading}
               startContent={<UserCog size={16} />}
@@ -672,7 +670,7 @@ export function UserShow() {
             {t('super.move_and_promote')}
           </ModalHeader>
           <ModalBody>
-            <p className="text-sm text-default-600 mb-3">
+            <p className="text-sm text-muted mb-3">
               {t('super.move_and_promote_desc')}
             </p>
             <div className="bg-warning-50 dark:bg-warning-50/10 border border-warning-200 dark:border-warning-200/20 rounded-lg p-3 mb-3">
@@ -681,6 +679,7 @@ export function UserShow() {
               </p>
             </div>
             <Select
+              variant="secondary"
               label={t('super.target_hub_tenant')}
               placeholder={t('super.select_hub_tenant')}
               selectedKeys={promoteTargetTenant ? [promoteTargetTenant] : []}
@@ -691,15 +690,15 @@ export function UserShow() {
                 .map(t => <SelectItem key={String(t.id)} id={String(t.id)}>{t.name}</SelectItem>)}
             </Select>
             {hubTenants.filter(t => t.id !== user.tenant_id).length === 0 && (
-              <p className="text-xs text-default-400 mt-1">{t('super.no_hub_tenants_found')}</p>
+              <p className="text-xs text-muted mt-1">{t('super.no_hub_tenants_found')}</p>
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={() => { setPromoteModalOpen(false); setPromoteTargetTenant(''); }} isDisabled={promoteLoading}>
+            <Button variant="tertiary" onPress={() => { setPromoteModalOpen(false); setPromoteTargetTenant(''); }} isDisabled={promoteLoading}>
               {t('common.cancel')}
             </Button>
             <Button
-              color="secondary"
+              variant="secondary"
               onPress={handleMoveAndPromote}
               isLoading={promoteLoading}
               isDisabled={!promoteTargetTenant}
