@@ -93,11 +93,11 @@ export function RatingModal({ isOpen, onClose, exchangeId, otherPartyName, onRat
                 key={star}
                 isIconOnly
                 size="sm"
-                variant="light"
+                variant="tertiary"
                 onPress={() => setRating(star)}
                 onMouseEnter={() => setHoveredRating(star)}
                 onMouseLeave={() => setHoveredRating(0)}
-                className="p-1 transition-transform hover:scale-110 w-auto h-auto min-w-0"
+                className="min-h-12 min-w-12 p-1 transition-transform hover:scale-110"
                 aria-label={`${star} star${star > 1 ? 's' : ''}`}
               >
                 <Star

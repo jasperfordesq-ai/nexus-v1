@@ -73,7 +73,6 @@ export function YouTubeEmbed({ embedUrl, thumbnailUrl, title }: YouTubeEmbedProp
 
   return (
     <Card
-      shadow="none"
       className="overflow-hidden border border-[var(--border-default)] bg-[var(--surface-elevated)]"
     >
       <div className="relative w-full" style={{ aspectRatio: '16 / 9' }}>

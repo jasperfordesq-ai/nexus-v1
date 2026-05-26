@@ -216,10 +216,10 @@ export function Footer({ children, copyright }: FooterProps) {
             <div className="border-t border-theme-default pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
               <p className="text-sm text-theme-subtle">{footerText}</p>
               <Button
-                variant="light"
+                variant="tertiary"
                 size="sm"
                 onPress={resetConsent}
-                className="inline-flex items-center gap-1 text-xs text-theme-subtle hover:text-theme-primary transition-colors h-auto p-0 min-w-0"
+                className="inline-flex min-h-7 min-w-0 items-center gap-1 px-1 text-xs text-theme-subtle transition-colors hover:text-theme-primary"
                 aria-label={t('aria.cookie_settings')}
                 startContent={<Cookie className="w-3 h-3" aria-hidden="true" />}
               >

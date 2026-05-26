@@ -87,9 +87,9 @@ export function QuotedPostEmbed({ post, isPreview = false }: QuotedPostEmbedProp
           </p>
           {shouldTruncate && !expanded && (
             <Button
-              variant="light"
+              variant="tertiary"
               size="sm"
-              className="text-xs text-[var(--color-primary)] p-0 min-w-0 h-auto mt-1"
+              className="mt-1 min-h-7 min-w-0 px-1 text-xs text-[var(--color-primary)]"
               aria-expanded={expanded}
               onClick={(e) => e.stopPropagation()}
               onPress={() => setExpanded(true)}

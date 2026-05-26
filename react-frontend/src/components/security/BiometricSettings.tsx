@@ -429,9 +429,9 @@ export function BiometricSettings() {
         <p className="text-xs text-theme-muted">
           {t('passkey_device_tip')}{' '}
           <Button
-            variant="light"
+            variant="tertiary"
             size="sm"
-            className="text-indigo-500 hover:underline h-auto p-0 min-w-0"
+            className="min-h-7 min-w-0 px-1 text-indigo-500 hover:underline"
             onPress={() => setShowInstructions(true)}
           >
             {t('passkey_setup_guide')}

@@ -119,7 +119,7 @@ export function PostAnalyticsModal({ isOpen, onClose, postId }: PostAnalyticsMod
                 {stats.map((stat) => {
                   const Icon = stat.icon;
                   return (
-                    <Card key={stat.label} shadow="none" className="border border-[var(--border-default)]">
+                    <Card key={stat.label} className="border border-[var(--border-default)]">
                       <CardBody className="p-4 text-center">
                         <div className={`mx-auto w-10 h-10 rounded-full ${stat.bg} flex items-center justify-center mb-2`}>
                           <Icon className={`w-5 h-5 ${stat.color}`} aria-hidden="true" />

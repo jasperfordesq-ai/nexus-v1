@@ -61,7 +61,7 @@ export default function DevelopersEndpointsPage() {
         <p className="text-[var(--color-text-muted)]">{t('developers.endpoints_intro')}</p>
       </header>
 
-      <Card shadow="sm">
+      <Card>
         <CardBody className="p-0">
           <Table aria-label={t('developers.endpoints_table_aria')} removeWrapper>
             <TableHeader>
