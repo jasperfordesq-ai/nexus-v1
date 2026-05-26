@@ -205,9 +205,9 @@ export function ImpactReportPage() {
                   <Button
                     key={section.id}
                     type="button"
-                    variant="light"
+                    variant="tertiary"
                     onPress={() => scrollTo(section.id)}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-left transition-colors text-sm h-auto min-w-0 justify-start ${
+                    className={`flex min-h-10 min-w-0 items-center justify-start gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors ${
                       activeSection === section.id
                         ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-medium'
                         : 'text-theme-muted hover:bg-theme-hover/50 hover:text-theme-primary'
@@ -327,7 +327,7 @@ export function ImpactReportPage() {
 
               {/* Activity Stats Table */}
               <GlassCard className="overflow-hidden">
-                <Table aria-label={t('impact_report.aria.activity_statistics')} shadow="none" isStriped>
+                <Table aria-label={t('impact_report.aria.activity_statistics')} isStriped>
                   <TableHeader>
                     <TableColumn>{t('impact_report.activity_metric_header')}</TableColumn>
                     <TableColumn className="text-right">{t('impact_report.activity_value_header')}</TableColumn>
@@ -480,7 +480,7 @@ export function ImpactReportPage() {
                 <div className="p-4 sm:p-6 border-b border-theme-default">
                   <h3 className="text-base font-semibold text-theme-primary">{t('impact_report.sroi_breakdown_heading')}</h3>
                 </div>
-                <Table aria-label={t('impact_report.aria.sroi_breakdown')} shadow="none" isStriped>
+                <Table aria-label={t('impact_report.aria.sroi_breakdown')} isStriped>
                   <TableHeader>
                     <TableColumn>{t('impact_report.sroi_component_header')}</TableColumn>
                     <TableColumn className="text-right">{t('impact_report.sroi_value_header')}</TableColumn>
@@ -566,7 +566,7 @@ export function ImpactReportPage() {
 
             <div className="space-y-6 mt-6">
               <GlassCard className="overflow-hidden">
-                <Table aria-label={t('impact_report.aria.recommendations')} shadow="none" isStriped>
+                <Table aria-label={t('impact_report.aria.recommendations')} isStriped>
                   <TableHeader>
                     <TableColumn className="w-8">#</TableColumn>
                     <TableColumn>{t('impact_report.rec_header')}</TableColumn>

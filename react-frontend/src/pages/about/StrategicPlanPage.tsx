@@ -162,9 +162,9 @@ export function StrategicPlanPage() {
                   <Button
                     key={section.id}
                     type="button"
-                    variant="light"
+                    variant="tertiary"
                     onPress={() => scrollTo(section.id)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-theme-muted hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors h-auto min-w-0"
+                    className="flex min-h-10 min-w-0 items-center gap-2 rounded-lg px-3 py-2 text-sm text-theme-muted transition-colors hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400"
                   >
                     <span className="flex-shrink-0 w-6 h-6 rounded-md bg-gradient-to-br from-indigo-500/20 to-purple-500/20 flex items-center justify-center text-xs font-bold text-indigo-600 dark:text-indigo-400">
                       {index + 1}
@@ -343,7 +343,7 @@ export function StrategicPlanPage() {
                     </div>
                   </div>
                 </div>
-                <Table aria-label={t('strategic_plan.aria.pillar_1_initiatives')} shadow="none" isStriped>
+                <Table aria-label={t('strategic_plan.aria.pillar_1_initiatives')} isStriped>
                   <TableHeader>
                     <TableColumn>{t('strategic_plan.pillar_initiative_header')}</TableColumn>
                     <TableColumn>{t('strategic_plan.pillar_priority_header')}</TableColumn>
@@ -378,7 +378,7 @@ export function StrategicPlanPage() {
                     </div>
                   </div>
                 </div>
-                <Table aria-label={t('strategic_plan.aria.pillar_2_initiatives')} shadow="none" isStriped>
+                <Table aria-label={t('strategic_plan.aria.pillar_2_initiatives')} isStriped>
                   <TableHeader>
                     <TableColumn>{t('strategic_plan.pillar_initiative_header')}</TableColumn>
                     <TableColumn>{t('strategic_plan.pillar_priority_header')}</TableColumn>
@@ -416,7 +416,7 @@ export function StrategicPlanPage() {
 
             <div className="mt-6">
               <GlassCard className="overflow-hidden">
-                <Table aria-label={t('strategic_plan.aria.year_1_roadmap')} shadow="none" isStriped>
+                <Table aria-label={t('strategic_plan.aria.year_1_roadmap')} isStriped>
                   <TableHeader>
                     <TableColumn className="min-w-[160px]">{t('strategic_plan.roadmap_activity_header')}</TableColumn>
                     <TableColumn className="text-center min-w-[90px]">{t('strategic_plan.roadmap_q1')}</TableColumn>
@@ -522,7 +522,7 @@ export function StrategicPlanPage() {
 
             <div className="mt-6">
               <GlassCard className="overflow-hidden">
-                <Table aria-label={t('strategic_plan.aria.risk_and_mitigation')} shadow="none" isStriped>
+                <Table aria-label={t('strategic_plan.aria.risk_and_mitigation')} isStriped>
                   <TableHeader>
                     <TableColumn>{t('strategic_plan.risk_header')}</TableColumn>
                     <TableColumn className="text-center w-24">{t('strategic_plan.likelihood_header')}</TableColumn>
