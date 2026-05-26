@@ -220,10 +220,10 @@ export function DonateModal({ isOpen, onClose, currentBalance, onDonationComplet
                   </div>
                   <Button
                     type="button"
-                    variant="light"
+                    variant="tertiary"
                     isIconOnly
                     onPress={handleClearRecipient}
-                    className="text-theme-subtle hover:text-theme-primary p-1 min-w-0 h-auto"
+                    className="size-8 min-h-8 p-1 text-theme-subtle hover:text-theme-primary"
                     aria-label={t('remove_recipient')}
                   >
                     <X className="w-4 h-4" />
@@ -270,9 +270,9 @@ export function DonateModal({ isOpen, onClose, currentBalance, onDonationComplet
                             key={user.id}
                             type="button"
                             role="option"
-                            variant="light"
+                            variant="ghost"
                             onPress={() => handleSelectRecipient(user)}
-                            className="w-full flex items-center gap-3 p-3 hover:bg-theme-hover transition-colors text-left h-auto min-w-0 justify-start rounded-none"
+                            className="w-full min-h-[64px] flex items-center justify-start gap-3 rounded-none p-3 text-left transition-colors hover:bg-theme-hover"
                           >
                             <Avatar
                               src={resolveAvatarUrl(user.avatar) || undefined}
@@ -336,7 +336,7 @@ export function DonateModal({ isOpen, onClose, currentBalance, onDonationComplet
         </ModalBody>
         <ModalFooter>
           <Button
-            variant="flat"
+            variant="tertiary"
             onPress={onClose}
             className="bg-theme-elevated text-theme-primary"
             isDisabled={isSubmitting}
@@ -344,7 +344,7 @@ export function DonateModal({ isOpen, onClose, currentBalance, onDonationComplet
             {t('cancel')}
           </Button>
           <Button
-            color="danger"
+            variant="danger"
             onPress={handleDonate}
             isLoading={isSubmitting}
             isDisabled={isSubmitting}

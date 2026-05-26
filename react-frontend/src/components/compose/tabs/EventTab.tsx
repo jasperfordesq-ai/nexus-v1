@@ -251,7 +251,7 @@ export function EventTab({ onSuccess, onClose, groupId, templateData }: TabSubmi
         {!isMobile && (
           <div className="flex items-center gap-2">
             <Button
-              variant="flat"
+              variant="tertiary"
               size="sm"
               onPress={onClose}
               className="text-[var(--text-muted)]"

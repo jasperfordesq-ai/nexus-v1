@@ -139,7 +139,7 @@ export function TemplatePicker({ tab, onSelect }: TemplatePickerProps) {
       <DropdownTrigger>
         <Button
           size="sm"
-          variant="flat"
+          variant="secondary"
           className="bg-[var(--surface-elevated)] text-[var(--text-muted)] border border-[var(--border-default)] hover:border-[var(--color-primary)]/40 hover:text-[var(--color-primary)] transition-colors"
           startContent={
             <FileText className="w-3.5 h-3.5" aria-hidden="true" />

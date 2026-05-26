@@ -313,10 +313,10 @@ export function TransferModal({
                     </div>
                     <Button
                       type="button"
-                      variant="light"
+                      variant="tertiary"
                       isIconOnly
                       onPress={handleClearRecipient}
-                      className="text-theme-subtle hover:text-theme-primary transition-colors p-1 min-w-0 h-auto"
+                      className="size-8 min-h-8 p-1 text-theme-subtle transition-colors hover:text-theme-primary"
                       aria-label={t('remove_recipient')}
                     >
                       <X className="w-4 h-4" aria-hidden="true" />
@@ -370,9 +370,9 @@ export function TransferModal({
                               key={user.id}
                               type="button"
                               role="option"
-                              variant="light"
+                              variant="ghost"
                               onPress={() => handleSelectRecipient(user)}
-                              className="w-full flex items-center gap-3 p-3 hover:bg-theme-hover transition-colors text-left h-auto min-w-0 justify-start rounded-none"
+                              className="w-full min-h-[64px] flex items-center justify-start gap-3 rounded-none p-3 text-left transition-colors hover:bg-theme-hover"
                             >
                               <Avatar
                                 src={resolveAvatarUrl(user.avatar) || undefined}
@@ -498,7 +498,7 @@ export function TransferModal({
 
             <ModalFooter className="gap-3">
               <Button
-                variant="flat"
+                variant="tertiary"
                 className="flex-1 bg-theme-elevated text-theme-primary"
                 onPress={onModalClose}
                 isDisabled={isSubmitting}

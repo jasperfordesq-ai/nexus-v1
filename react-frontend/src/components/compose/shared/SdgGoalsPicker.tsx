@@ -30,7 +30,7 @@ export function SdgGoalsPicker({ selected, onChange }: SdgGoalsPickerProps) {
             <Chip
               key={goal.id}
               size="sm"
-              variant={isActive ? 'solid' : 'flat'}
+              variant={isActive ? 'primary' : 'secondary'}
               className={`cursor-pointer transition-all text-xs ${
                 isActive
                   ? 'text-white shadow-sm'

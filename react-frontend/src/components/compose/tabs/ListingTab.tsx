@@ -1,4 +1,4 @@
-import { Select, SelectItem, Button, Chip, Input, Textarea } from '@/components/ui';
+import { Select, SelectItem, Button, Input, Textarea } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -298,9 +298,9 @@ export function ListingTab({ onSuccess, onClose, templateData }: TabSubmitProps)
             />
             <Button
               isIconOnly
-              variant="flat"
+              variant="tertiary"
               size="sm"
-              className="absolute top-1 right-1 bg-black/60 text-white min-w-7 w-7 h-7 backdrop-blur-sm"
+              className="absolute top-1 right-1 size-7 min-h-7 bg-black/60 text-white backdrop-blur-sm"
               onPress={handleImageRemove}
               aria-label={t('compose.image_remove_aria')}
             >
@@ -310,7 +310,7 @@ export function ListingTab({ onSuccess, onClose, templateData }: TabSubmitProps)
         ) : (
           <Button
             size="sm"
-            variant="flat"
+            variant="secondary"
             className="bg-[var(--surface-elevated)] text-[var(--text-muted)] hover:text-[var(--color-primary)] min-h-[44px]"
             startContent={<ImagePlus className="w-4 h-4" aria-hidden="true" />}
             onPress={() => imageInputRef.current?.click()}
@@ -370,7 +370,7 @@ export function ListingTab({ onSuccess, onClose, templateData }: TabSubmitProps)
         {!isMobile && (
           <div className="flex items-center gap-2">
             <Button
-              variant="flat"
+              variant="tertiary"
               size="sm"
               onPress={onClose}
               className="text-[var(--text-muted)]"

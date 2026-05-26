@@ -95,9 +95,9 @@ export function GifPicker({ onSelect }: GifPickerProps) {
           ref={triggerRef}
           isIconOnly
           size="sm"
-          variant="light"
+          variant="tertiary"
           aria-label={t('gif.button_label')}
-          className="min-w-11 w-11 h-11"
+          className="size-11 min-h-11"
         >
           <Film className="w-4 h-4" aria-hidden="true" />
         </Button>
@@ -139,9 +139,9 @@ export function GifPicker({ onSelect }: GifPickerProps) {
                 <Button
                   key={gif.id}
                   isIconOnly
-                  variant="flat"
+                  variant="ghost"
                   onPress={() => handleGifClick(gif)}
-                  className="relative overflow-hidden rounded-lg cursor-pointer hover:opacity-80 transition-opacity p-0 min-w-0 h-auto"
+                  className="relative aspect-square size-full min-h-20 overflow-hidden rounded-lg p-0 transition-opacity hover:opacity-80"
                   aria-label={t('gif.select')}
                 >
                   <img

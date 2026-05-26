@@ -135,14 +135,14 @@ export function RatingModal({ isOpen, onClose, exchangeId, otherPartyName, onRat
         </ModalBody>
         <ModalFooter>
           <Button
-            variant="flat"
+            variant="tertiary"
             onPress={onClose}
             className="bg-theme-elevated text-theme-primary"
           >
             {t('rating.skip')}
           </Button>
           <Button
-            color="warning"
+            variant="secondary"
             onPress={handleSubmit}
             isLoading={isSubmitting}
             isDisabled={rating === 0}

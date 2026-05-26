@@ -101,8 +101,8 @@ function SortableMediaItem({
       <Button
         isIconOnly
         size="sm"
-        variant="flat"
-        className="absolute top-1.5 left-1.5 z-10 bg-black/60 text-white rounded-lg p-1.5 opacity-0 group-hover/item:opacity-100 focus:opacity-100 transition-opacity cursor-grab active:cursor-grabbing backdrop-blur-sm min-w-0 w-auto h-auto"
+        variant="tertiary"
+        className="absolute top-1.5 left-1.5 z-10 size-8 min-h-8 cursor-grab rounded-lg bg-black/60 p-1.5 text-white opacity-0 backdrop-blur-sm transition-opacity group-hover/item:opacity-100 focus:opacity-100 active:cursor-grabbing"
         aria-label={tc('aria.drag_to_reorder')}
         {...attributes}
         {...listeners}
@@ -126,9 +126,9 @@ function SortableMediaItem({
       {/* Remove button */}
       <Button
         isIconOnly
-        variant="flat"
+        variant="tertiary"
         size="sm"
-        className="absolute top-1.5 right-1.5 bg-black/60 text-white min-w-8 w-8 h-8 backdrop-blur-sm z-10"
+        className="absolute top-1.5 right-1.5 z-10 size-8 min-h-8 bg-black/60 text-white backdrop-blur-sm"
         onPress={() => onRemove(index)}
         aria-label={t('compose.image_remove_number_aria', { number: index + 1 })}
       >
@@ -138,9 +138,9 @@ function SortableMediaItem({
       {/* Alt text toggle button */}
       <Button
         isIconOnly
-        variant="flat"
+        variant="tertiary"
         size="sm"
-        className={`absolute bottom-1.5 right-1.5 min-w-8 w-8 h-8 backdrop-blur-sm z-10 ${
+        className={`absolute bottom-1.5 right-1.5 z-10 size-8 min-h-8 backdrop-blur-sm ${
           item.altText
             ? 'bg-[var(--color-primary)]/80 text-white'
             : 'bg-black/60 text-white opacity-0 group-hover/item:opacity-100 focus:opacity-100'
@@ -159,7 +159,7 @@ function SortableMediaItem({
         >
           <Input
             size="sm"
-            variant="bordered"
+            variant="secondary"
             placeholder={t('compose.alt_text_placeholder')}
             value={item.altText}
             onChange={(e) => onAltTextChange(index, e.target.value)}
@@ -402,11 +402,11 @@ export function MediaUploader({
                 {/* Add more button (inline in grid) */}
                 {canAddMore && (
                   <Button
-                    variant="flat"
+                    variant="secondary"
                     onPress={() => inputRef.current?.click()}
                     isDisabled={compressing}
                     aria-label={tc('aria.add_more_photos')}
-                    className={`aspect-square rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1 cursor-pointer transition-all h-auto min-w-0 ${
+                    className={`aspect-square min-h-[96px] rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1 cursor-pointer transition-all ${
                       isDragOver
                         ? 'border-[var(--color-primary)] bg-[var(--color-primary)]/5'
                         : 'border-gray-300 dark:border-gray-600 hover:border-[var(--color-primary)]/50'

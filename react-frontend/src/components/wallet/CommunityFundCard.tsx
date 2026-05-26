@@ -73,7 +73,7 @@ export function CommunityFundCard({ onDonateClick, compact = false }: CommunityF
           </div>
           <Button
             size="sm"
-            variant="flat"
+            variant="tertiary"
             className="bg-theme-elevated text-theme-muted"
             startContent={<RefreshCw className="w-3 h-3" />}
             onPress={loadFund}
@@ -103,7 +103,7 @@ export function CommunityFundCard({ onDonateClick, compact = false }: CommunityF
           {onDonateClick && (
             <Button
               size="sm"
-              variant="flat"
+              variant="secondary"
               className="bg-rose-500/10 text-rose-400"
               startContent={<Heart className="w-3 h-3" />}
               onPress={onDonateClick}

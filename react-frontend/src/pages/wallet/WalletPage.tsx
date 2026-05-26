@@ -236,7 +236,7 @@ export function WalletPage() {
             <p className="mt-1 max-w-2xl text-sm text-theme-muted sm:text-base">{t('subtitle')}</p>
           </div>
           <Button
-            variant="flat"
+            variant="tertiary"
             size="sm"
             className="w-full bg-theme-elevated text-theme-muted sm:w-auto"
             startContent={<RefreshCw className="h-4 w-4" aria-hidden="true" />}
@@ -541,7 +541,7 @@ function TransactionCard({ transaction }: TransactionCardProps) {
               {description}
             </h4>
             {transaction.status === 'pending' && (
-              <Chip size="sm" variant="flat" className="shrink-0 bg-amber-500/10 text-amber-600 dark:text-amber-300">
+              <Chip size="sm" variant="soft" color="warning" className="shrink-0">
                 {t('filter.pending')}
               </Chip>
             )}

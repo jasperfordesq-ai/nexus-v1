@@ -304,10 +304,10 @@ export function PostTab({ onSuccess, onClose, isOpen, groupId, templateData, onC
           />
           <Button
             isIconOnly
-            variant="flat"
+            variant="danger-soft"
             size="sm"
             onPress={() => setSelectedGifUrl(null)}
-            className="absolute -top-1.5 -right-1.5 w-5 h-5 min-w-0 min-h-0 bg-red-500 rounded-full text-white hover:bg-red-600 transition-colors"
+            className="absolute -top-1.5 -right-1.5 size-6 min-h-6 rounded-full bg-red-500 text-white transition-colors hover:bg-red-600"
             aria-label={t('compose.cancel')}
           >
             <X className="w-3 h-3" />
@@ -322,10 +322,10 @@ export function PostTab({ onSuccess, onClose, isOpen, groupId, templateData, onC
           <span>{t('compose.schedule_set', { date: toScheduleIso(scheduleDate, scheduleTime) })}</span>
           <Button
             isIconOnly
-            variant="light"
+            variant="ghost"
             size="sm"
             onPress={() => { setScheduleDate(null); setScheduleTime(null); }}
-            className="ml-auto p-0.5 min-w-0 min-h-0 h-auto hover:bg-accent-soft dark:hover:bg-accent"
+            className="ml-auto size-7 min-h-7 p-0.5 hover:bg-accent-soft dark:hover:bg-accent"
             aria-label={t('compose.schedule_clear')}
           >
             <X className="w-3.5 h-3.5" />
@@ -342,7 +342,7 @@ export function PostTab({ onSuccess, onClose, isOpen, groupId, templateData, onC
           <Popover isOpen={isScheduleOpen} onOpenChange={setIsScheduleOpen} placement="top-start">
             <PopoverTrigger>
               <Button
-                variant="light"
+                variant="tertiary"
                 size="sm"
                 isIconOnly
                 aria-label={t('compose.schedule_label')}
@@ -355,7 +355,7 @@ export function PostTab({ onSuccess, onClose, isOpen, groupId, templateData, onC
               <p className="text-sm font-medium text-[var(--text-primary)]">{t('compose.schedule_label')}</p>
               <DatePicker
                 label={t('compose.schedule_date_label')}
-                variant="bordered"
+                variant="secondary"
                 size="sm"
                 value={scheduleDate}
                 onChange={setScheduleDate}
@@ -364,7 +364,7 @@ export function PostTab({ onSuccess, onClose, isOpen, groupId, templateData, onC
               />
               <TimeInput
                 label={t('compose.schedule_time_label')}
-                variant="bordered"
+                variant="secondary"
                 size="sm"
                 value={scheduleTime}
                 onChange={setScheduleTime}
@@ -372,7 +372,7 @@ export function PostTab({ onSuccess, onClose, isOpen, groupId, templateData, onC
               <div className="flex gap-2 justify-end">
                 {isScheduled && (
                   <Button
-                    variant="flat"
+                    variant="tertiary"
                     size="sm"
                     onPress={() => { setScheduleDate(null); setScheduleTime(null); setIsScheduleOpen(false); }}
                   >
@@ -380,7 +380,7 @@ export function PostTab({ onSuccess, onClose, isOpen, groupId, templateData, onC
                   </Button>
                 )}
                 <Button
-                  color="primary"
+                  variant="primary"
                   size="sm"
                   isDisabled={!scheduleDate}
                   onPress={() => setIsScheduleOpen(false)}
@@ -395,7 +395,7 @@ export function PostTab({ onSuccess, onClose, isOpen, groupId, templateData, onC
         {!isMobile && (
           <div className="flex items-center gap-2">
             <Button
-              variant="flat"
+              variant="tertiary"
               size="sm"
               onPress={onClose}
               className="text-[var(--text-muted)]"

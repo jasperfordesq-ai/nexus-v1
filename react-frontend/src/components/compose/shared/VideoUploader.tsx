@@ -81,7 +81,7 @@ export function VideoUploader({ onVideoSelect, onVideoRemove, selectedVideo }: V
       {!selectedVideo && (
         <Button
           size="sm"
-          variant="light"
+          variant="tertiary"
           startContent={<Video className="w-4 h-4" aria-hidden="true" />}
           onPress={handleTrigger}
           className="text-[var(--text-muted)]"
@@ -109,8 +109,9 @@ export function VideoUploader({ onVideoSelect, onVideoRemove, selectedVideo }: V
           <Button
             isIconOnly
             size="sm"
-            variant="light"
+            variant="tertiary"
             onPress={handleRemove}
+            className="size-9 min-h-9"
             aria-label={t('compose.video_remove')}
           >
             <X className="w-4 h-4" aria-hidden="true" />

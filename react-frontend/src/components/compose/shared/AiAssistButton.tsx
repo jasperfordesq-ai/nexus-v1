@@ -65,7 +65,7 @@ export function AiAssistButton({ type, title, context, onGenerated }: AiAssistBu
     <Tooltip content={t('compose.ai_tooltip')} placement="top">
       <Button
         size="sm"
-        variant="flat"
+        variant="secondary"
         className="bg-gradient-to-r from-violet-500/10 to-purple-500/10 text-violet-600 dark:text-violet-400 border border-violet-500/20 hover:border-violet-500/40"
         startContent={<Sparkles className="w-3.5 h-3.5" aria-hidden="true" />}
         onPress={handleGenerate}

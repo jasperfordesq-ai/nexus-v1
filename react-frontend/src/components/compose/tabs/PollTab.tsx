@@ -202,8 +202,8 @@ export function PollTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
               <Button
                 isIconOnly
                 size="sm"
-                variant="light"
-                className="text-[var(--text-muted)] min-w-11 w-11 h-11 hover:text-danger"
+                variant="tertiary"
+                className="size-11 min-h-11 text-[var(--text-muted)] hover:text-danger"
                 onPress={() => removeOption(index)}
                 aria-label={`Remove option ${index + 1}`}
               >
@@ -216,7 +216,7 @@ export function PollTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
         {draft.options.length < 6 && (
           <Button
             size="sm"
-            variant="flat"
+            variant="secondary"
             className="bg-[var(--surface-elevated)] text-[var(--color-primary)]"
             startContent={<Plus className="w-3 h-3" aria-hidden="true" />}
             onPress={addOption}
@@ -252,7 +252,7 @@ export function PollTab({ onSuccess, onClose, groupId, templateData }: TabSubmit
         {!isMobile && (
           <div className="flex items-center gap-2">
             <Button
-              variant="flat"
+              variant="tertiary"
               size="sm"
               onPress={onClose}
               className="text-[var(--text-muted)]"

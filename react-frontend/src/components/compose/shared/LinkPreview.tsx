@@ -205,9 +205,9 @@ export function LinkPreview({ content, onPreviewData }: LinkPreviewProps) {
       <Button
         isIconOnly
         size="sm"
-        variant="flat"
+        variant="tertiary"
         onPress={handleDismiss}
-        className="absolute top-2 right-2 z-10 w-6 h-6 min-w-0 flex items-center justify-center rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
+        className="absolute top-2 right-2 z-10 size-7 min-h-7 rounded-full bg-black/50 text-white transition-colors hover:bg-black/70"
         aria-label={t('compose.link_preview_remove')}
       >
         <X className="w-3.5 h-3.5" aria-hidden="true" />

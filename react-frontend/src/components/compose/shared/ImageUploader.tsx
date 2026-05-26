@@ -71,8 +71,8 @@ export function ImageUploader({
           <img src={preview} alt={t('compose.image_preview_alt')} className="w-full max-h-60 object-cover" loading="eager" />
           <Button
             isIconOnly
-            variant="flat"
-            className="absolute top-2 right-2 bg-black/60 text-white min-w-11 w-11 h-11 backdrop-blur-sm"
+            variant="tertiary"
+            className="absolute top-2 right-2 size-11 min-h-11 bg-black/60 text-white backdrop-blur-sm"
             onPress={handleRemove}
             aria-label={t('compose.image_remove_aria')}
           >
@@ -84,7 +84,7 @@ export function ImageUploader({
       <div className="flex items-center gap-2">
         <Button
           size="sm"
-          variant="flat"
+          variant="secondary"
           className="bg-[var(--surface-elevated)] text-[var(--text-muted)] hover:text-[var(--color-primary)] min-h-[44px]"
           startContent={<ImagePlus className="w-4 h-4" aria-hidden="true" />}
           onPress={() => inputRef.current?.click()}

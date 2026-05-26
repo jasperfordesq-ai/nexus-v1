@@ -95,9 +95,9 @@ export function EmojiPicker({ onSelect }: EmojiPickerProps) {
           ref={triggerRef}
           isIconOnly
           size="sm"
-          variant="light"
+          variant="tertiary"
           aria-label={t('compose.emoji_search')}
-          className="min-w-11 w-11 h-11"
+          className="size-11 min-h-11"
         >
           <Smile className="w-4 h-4" aria-hidden="true" />
         </Button>
@@ -121,10 +121,10 @@ export function EmojiPicker({ onSelect }: EmojiPickerProps) {
               key={cat.key}
               isIconOnly
               size="sm"
-              variant="light"
+              variant={activeCategory === cat.key ? 'secondary' : 'ghost'}
               onPress={() => handleCategoryClick(cat.key)}
               className={`
-                w-10 h-10 flex items-center justify-center rounded-lg text-base
+                size-10 min-h-10 flex items-center justify-center rounded-lg text-base
                 cursor-pointer transition-colors shrink-0
                 ${activeCategory === cat.key
                   ? 'bg-[var(--surface-hover)]'
@@ -161,9 +161,9 @@ export function EmojiPicker({ onSelect }: EmojiPickerProps) {
                     key={emoji}
                     isIconOnly
                     size="sm"
-                    variant="light"
+                    variant="ghost"
                     onPress={() => handleEmojiClick(emoji)}
-                    className="w-11 h-11 text-lg cursor-pointer hover:bg-[var(--surface-hover)] rounded-lg flex items-center justify-center"
+                    className="size-11 min-h-11 text-lg cursor-pointer hover:bg-[var(--surface-hover)] rounded-lg flex items-center justify-center"
                     aria-label={emoji}
                   >
                     {emoji}

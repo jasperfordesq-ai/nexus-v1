@@ -62,11 +62,11 @@ export function MobileComposeOverlay({
             {/* Close */}
             <Button
               isIconOnly
-              variant="light"
+              variant="tertiary"
               size="sm"
               onPress={onClose}
               aria-label={t('compose.close_compose')}
-              className="min-w-11 w-11 h-11"
+              className="size-11 min-h-11"
             >
               <X className="w-5 h-5" aria-hidden="true" />
             </Button>
@@ -98,7 +98,7 @@ export function MobileComposeOverlay({
             <Tabs
               selectedKey={activeTab}
               onSelectionChange={(key) => onTabChange(key as ComposeTab)}
-              variant="light"
+              variant="primary"
               size="sm"
               classNames={{
                 tabList: 'gap-1 p-0',

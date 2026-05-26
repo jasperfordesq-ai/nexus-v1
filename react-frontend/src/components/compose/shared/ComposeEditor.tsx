@@ -314,22 +314,20 @@ function ComposeToolbar({ isDisabled }: { isDisabled?: boolean }) {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
-            color="success"
+            variant="secondary"
             onPress={confirmLink}
             aria-label={t('aria.confirm_link')}
-            className="min-w-8 w-8 h-8"
+            className="size-8 min-h-8 text-success"
           >
             <Check size={14} />
           </Button>
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
-            color="danger"
+            variant="danger-soft"
             onPress={cancelLink}
             aria-label={t('aria.cancel_link')}
-            className="min-w-8 w-8 h-8"
+            className="size-8 min-h-8"
           >
             <X size={14} />
           </Button>
