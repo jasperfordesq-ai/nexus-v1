@@ -22,7 +22,9 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';import { sanitizeRichText } from '@/lib/sanitize';
+import { motion, AnimatePresence } from 'framer-motion';
+import { sanitizeRichText } from '@/lib/sanitize';
+import { Chip } from '@heroui/react';
 import History from 'lucide-react/icons/history';
 import CalendarDays from 'lucide-react/icons/calendar-days';
 import ChevronDown from 'lucide-react/icons/chevron-down';
@@ -35,7 +37,7 @@ import Info from 'lucide-react/icons/info';
 import GitCompareArrows from 'lucide-react/icons/git-compare-arrows';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Spinner } from '@/components/ui';
+import { GlassCard, Button, Spinner } from '@/components/ui';
 import { PageMeta } from '@/components/seo';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
@@ -311,20 +313,20 @@ export function LegalVersionHistoryPage() {
                         {version.is_current && (
                           <Chip
                             size="sm"
-                            variant="flat"
-                            startContent={<CheckCircle className="w-3 h-3" aria-hidden="true" />}
-                            classNames={{ base: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' }}
+                            variant="tertiary"
+                            className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
                           >
+                            <CheckCircle className="w-3 h-3" aria-hidden="true" />
                             {t('version_history.current')}
                           </Chip>
                         )}
                         {!version.is_current && isLastVersion && (
                           <Chip
                             size="sm"
-                            variant="flat"
-                            startContent={<Clock className="w-3 h-3" aria-hidden="true" />}
-                            classNames={{ base: 'bg-[var(--surface-elevated)] text-theme-subtle' }}
+                            variant="tertiary"
+                            className="bg-[var(--surface-elevated)] text-theme-subtle"
                           >
+                            <Clock className="w-3 h-3" aria-hidden="true" />
                             {t('version_history.original')}
                           </Chip>
                         )}
@@ -434,7 +436,7 @@ export function LegalVersionHistoryPage() {
                                             new: diffData.version2.version_number,
                                           })}
                                         </span>
-                                        <Chip size="sm" variant="flat" classNames={{ base: 'bg-amber-500/10 text-amber-600 dark:text-amber-400' }}>
+                                        <Chip size="sm" variant="tertiary" className="bg-amber-500/10 text-amber-600 dark:text-amber-400">
                                           {t('version_history.changes_count', {
                                             count: diffData.changes_count,
                                           })}
