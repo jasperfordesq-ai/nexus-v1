@@ -127,7 +127,7 @@ export default function CommunityImpactTab() {
             <GlassCard className="p-4">
               <div className="flex items-center gap-2 mb-2">
                 <div className={`p-1.5 rounded-lg ${stat.bg} ${stat.color}`}>{stat.icon}</div>
-                <span className="text-xs text-default-500">{stat.label}</span>
+                <span className="text-xs text-muted">{stat.label}</span>
               </div>
               <p className="text-2xl font-bold">{typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}</p>
             </GlassCard>
@@ -139,10 +139,10 @@ export default function CommunityImpactTab() {
       <div className="grid grid-cols-3 gap-4">
         {secondaryStats.map((stat) => (
           <GlassCard key={stat.label} className="p-3 flex items-center gap-3">
-            <span className="text-default-400">{stat.icon}</span>
+            <span className="text-muted">{stat.icon}</span>
             <div>
               <p className="text-lg font-semibold">{stat.value}</p>
-              <p className="text-xs text-default-500">{stat.label}</p>
+              <p className="text-xs text-muted">{stat.label}</p>
             </div>
           </GlassCard>
         ))}
@@ -153,11 +153,11 @@ export default function CommunityImpactTab() {
         <h3 className="text-lg font-semibold mb-4">{t('community.this_month')}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {monthMetrics.map((metric) => (
-            <div key={metric.label} className="flex items-center justify-between p-3 rounded-lg bg-default-100/50">
+            <div key={metric.label} className="flex items-center justify-between p-3 rounded-lg bg-surface-secondary/50">
               <div className="flex items-center gap-2">
-                <span className="text-default-400">{metric.icon}</span>
+                <span className="text-muted">{metric.icon}</span>
                 <div>
-                  <p className="text-sm text-default-500">{metric.label}</p>
+                  <p className="text-sm text-muted">{metric.label}</p>
                   <p className="text-lg font-semibold">{metric.value}</p>
                 </div>
               </div>

@@ -97,7 +97,7 @@ export default function MemberSpotlightTab() {
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-2">
         <Sparkles className="w-5 h-5 text-[var(--color-warning)]" />
-        <p className="text-sm text-default-500">
+        <p className="text-sm text-muted">
           {t('spotlight.description')}
         </p>
       </div>
@@ -111,7 +111,7 @@ export default function MemberSpotlightTab() {
             transition={{ delay: i * 0.1 }}
           >
             <Link to={tenantPath(`/members/${member.id}`)}>
-              <GlassCard className="p-6 hover:ring-1 hover:ring-accent0/30 transition-all cursor-pointer">
+                <GlassCard className="p-6 hover:ring-1 hover:ring-accent/30 transition-all cursor-pointer">
                 <div className="flex items-center gap-3 mb-3">
                   <Avatar
                     src={resolveAvatarUrl(member.avatar_url)}
@@ -124,23 +124,23 @@ export default function MemberSpotlightTab() {
                       {member.first_name} {member.last_name}
                     </p>
                     {member.member_since && (
-                      <p className="text-xs text-default-400">
+                       <p className="text-xs text-muted">
                         {t('spotlight.member_since')} {member.member_since}
                       </p>
                     )}
                   </div>
-                  <ChevronRight className="w-4 h-4 text-default-300 flex-shrink-0" />
+                  <ChevronRight className="w-4 h-4 text-muted flex-shrink-0" />
                 </div>
 
                 <div className="flex items-center gap-2 text-sm">
-                  <span className="text-accent0 font-medium">{member.recent_activity}</span>
+                  <span className="text-accent font-medium">{member.recent_activity}</span>
                   {member.xp > 0 && (
-                    <span className="text-default-400 text-xs">{member.xp.toLocaleString()} XP</span>
+                    <span className="text-muted text-xs">{member.xp.toLocaleString()} XP</span>
                   )}
                 </div>
 
                 {member.bio && (
-                  <p className="text-xs text-default-400 mt-2 line-clamp-2">
+                  <p className="text-xs text-muted mt-2 line-clamp-2">
                     {member.bio}
                   </p>
                 )}

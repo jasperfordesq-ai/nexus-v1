@@ -194,16 +194,16 @@ function SeasonCard() {
       <GlassCard className="p-5" aria-label={t('leaderboard.season.loading')} aria-busy="true">
         <div className="space-y-3">
           <Skeleton className="rounded-lg">
-            <div className="h-5 rounded-lg bg-default-300 w-1/3" />
+            <div className="h-5 rounded-lg bg-surface-tertiary w-1/3" />
           </Skeleton>
           <Skeleton className="rounded-lg">
-            <div className="h-3 rounded-lg bg-default-200 w-2/3" />
+            <div className="h-3 rounded-lg bg-surface-secondary w-2/3" />
           </Skeleton>
           <Skeleton className="rounded-lg">
-            <div className="h-2 rounded-lg bg-default-200 w-full" />
+            <div className="h-2 rounded-lg bg-surface-secondary w-full" />
           </Skeleton>
           <Skeleton className="rounded-lg">
-            <div className="h-3 rounded-lg bg-default-200 w-1/4" />
+            <div className="h-3 rounded-lg bg-surface-secondary w-1/4" />
           </Skeleton>
         </div>
       </GlassCard>
@@ -793,21 +793,21 @@ function CompetitiveLeaderboard(props: CompetitiveLeaderboardProps) {
               {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="flex items-center gap-4 p-4">
                   <Skeleton className="rounded-full flex-shrink-0">
-                    <div className="w-8 h-8 rounded-full bg-default-300" />
+                    <div className="w-8 h-8 rounded-full bg-surface-tertiary" />
                   </Skeleton>
                   <Skeleton className="rounded-full flex-shrink-0">
-                    <div className="w-10 h-10 rounded-full bg-default-300" />
+                    <div className="w-10 h-10 rounded-full bg-surface-tertiary" />
                   </Skeleton>
                   <div className="flex-1 space-y-2">
                     <Skeleton className="rounded-lg">
-                      <div className="h-4 rounded-lg bg-default-300 w-1/3" />
+                      <div className="h-4 rounded-lg bg-surface-tertiary w-1/3" />
                     </Skeleton>
                     <Skeleton className="rounded-lg">
-                      <div className="h-3 rounded-lg bg-default-200 w-1/5" />
+                      <div className="h-3 rounded-lg bg-surface-secondary w-1/5" />
                     </Skeleton>
                   </div>
                   <Skeleton className="rounded-lg">
-                    <div className="h-5 rounded-lg bg-default-300 w-16" />
+                    <div className="h-5 rounded-lg bg-surface-tertiary w-16" />
                   </Skeleton>
                 </div>
               ))}

@@ -149,7 +149,7 @@ export default function PersonalJourneyTab() {
           <SummaryCard
             label={t('journey.member_since')}
             value={summary.member_since}
-            icon={<Calendar aria-hidden="true" className="w-4 h-4 text-default-400" />}
+            icon={<Calendar aria-hidden="true" className="w-4 h-4 text-muted" />}
             isText
           />
         )}
@@ -181,11 +181,11 @@ export default function PersonalJourneyTab() {
                   transition={{ delay: i * 0.05, duration: 0.3 }}
                   style={{ transformOrigin: 'bottom' }}
                 >
-                  <span className="text-[10px] text-default-400 font-medium">
+                  <span className="text-[10px] text-muted font-medium">
                     {month.xp_earned || ''}
                   </span>
                   <div
-                    className="w-full rounded-t bg-gradient-to-t from-accent-soft0 to-accent min-h-1"
+                    className="w-full rounded-t bg-gradient-to-t from-accent-soft to-accent min-h-1"
                     style={{ height: `${height}%` }}
                     title={t('journey.monthly_activity_bar_title', {
                       month: month.month,
@@ -193,7 +193,7 @@ export default function PersonalJourneyTab() {
                       badges: month.badges,
                     })}
                   />
-                  <span className="text-[9px] text-default-400 truncate w-full text-center">
+                  <span className="text-[9px] text-muted truncate w-full text-center">
                     {month.month.split(' ')[0]?.slice(0, 3)}
                   </span>
                 </motion.div>
@@ -213,7 +213,7 @@ export default function PersonalJourneyTab() {
             {badge_progression.slice(-10).map((badge, i) => (
               <motion.div
                 key={badge.badge_key}
-                className="flex items-center gap-3 p-2 rounded-lg hover:bg-default-100/50 transition-colors"
+                className="flex items-center gap-3 p-2 rounded-lg hover:bg-surface-secondary/50 transition-colors"
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.05 }}
@@ -222,7 +222,7 @@ export default function PersonalJourneyTab() {
                 <div className="flex-1">
                   <p className="text-sm font-medium">{badge.name}</p>
                   {badge.earned_at && (
-                    <p className="text-xs text-default-400">{badge.earned_at}</p>
+                    <p className="text-xs text-muted">{badge.earned_at}</p>
                   )}
                 </div>
               </motion.div>
@@ -244,11 +244,11 @@ export default function PersonalJourneyTab() {
                 key={`${milestone.type}-${i}`}
                 className="flex items-center gap-3 p-2"
               >
-                <div className="w-2 h-2 rounded-full bg-accent-soft0" />
+                <div className="w-2 h-2 rounded-full bg-accent-soft" />
                 <div className="flex-1">
                   <p className="text-sm">{milestone.label}</p>
                   {milestone.date && (
-                    <p className="text-xs text-default-400">{milestone.date}</p>
+                    <p className="text-xs text-muted">{milestone.date}</p>
                   )}
                 </div>
               </div>
@@ -275,7 +275,7 @@ function SummaryCard({
     <GlassCard className="p-4">
       <div className="flex items-center gap-2 mb-1">
         {icon}
-        <span className="text-xs text-default-500">{label}</span>
+        <span className="text-xs text-muted">{label}</span>
       </div>
       <p className={isText ? 'text-sm font-medium' : 'text-xl font-bold'}>
         {typeof value === 'number' ? value.toLocaleString() : value}
