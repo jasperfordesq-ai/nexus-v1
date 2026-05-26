@@ -201,7 +201,7 @@ export default function CreateOpportunityPage() {
               </Button>
             </Link>
             <Link to={tenantPath('/volunteering')}>
-              <Button variant="flat" className="bg-theme-elevated text-theme-primary">
+              <Button variant="tertiary">
                 {t('form_cancel')}
               </Button>
             </Link>
@@ -382,8 +382,7 @@ export default function CreateOpportunityPage() {
             <Link to={tenantPath('/volunteering')}>
               <Button
                 type="button"
-                variant="flat"
-                className="bg-theme-elevated text-theme-primary"
+                variant="tertiary"
               >
                 {t('form_cancel')}
               </Button>

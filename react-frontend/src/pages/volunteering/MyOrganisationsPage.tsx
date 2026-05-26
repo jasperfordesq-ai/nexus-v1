@@ -147,7 +147,7 @@ export default function MyOrganisationsPage() {
                     <p className="font-medium text-theme-primary">{org.name}</p>
                     <p className="text-xs text-theme-muted">{t('my_organisations_pending_desc')}</p>
                   </div>
-                  <Chip size="sm" color="warning" variant="flat">{t('status_pending')}</Chip>
+                  <Chip size="sm" color="warning" variant="soft">{t('status_pending')}</Chip>
                 </div>
               ))}
             </GlassCard>
@@ -173,8 +173,8 @@ export default function MyOrganisationsPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h2 className="text-lg font-bold text-theme-primary">{org.name}</h2>
-                        <Chip size="sm" color="success" variant="flat">{t('status_active')}</Chip>
-                        <Chip size="sm" variant="flat" className="bg-theme-elevated text-theme-muted capitalize">{org.member_role}</Chip>
+                        <Chip size="sm" color="success" variant="soft">{t('status_active')}</Chip>
+                        <Chip size="sm" variant="soft" className="capitalize">{org.member_role}</Chip>
                       </div>
                       {org.description && (
                         <p className="text-sm text-theme-muted mt-1 line-clamp-2">{org.description}</p>

@@ -186,8 +186,7 @@ export function RecommendedShiftsTab() {
         </div>
         <Button
           size="sm"
-          variant="flat"
-          className="bg-theme-elevated text-theme-muted"
+          variant="tertiary"
           startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
           onPress={load}
           isLoading={isLoading}
@@ -246,7 +245,7 @@ export function RecommendedShiftsTab() {
                       <Chip
                         size="sm"
                         color={getMatchColor(item.match_score)}
-                        variant="flat"
+                        variant="soft"
                         startContent={<Zap className="w-3 h-3" />}
                       >
                         {t('recommendations.match_score', { score: item.match_score })}
@@ -280,7 +279,7 @@ export function RecommendedShiftsTab() {
                     {item.match_reasons.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
                         {item.match_reasons.map((reason, i) => (
-                          <Chip key={i} size="sm" variant="flat" className="text-theme-subtle text-xs">
+                          <Chip key={i} size="sm" variant="soft" className="text-theme-subtle text-xs">
                             {reason}
                           </Chip>
                         ))}
@@ -290,7 +289,7 @@ export function RecommendedShiftsTab() {
                     {item.shift.required_skills.length > 0 && (
                       <div className="flex flex-wrap gap-1 mt-2">
                         {item.shift.required_skills.map((skill, i) => (
-                          <Chip key={i} size="sm" variant="dot" color="primary" className="text-xs">
+                          <Chip key={i} size="sm" variant="soft" color="accent" className="text-xs">
                             {skill}
                           </Chip>
                         ))}

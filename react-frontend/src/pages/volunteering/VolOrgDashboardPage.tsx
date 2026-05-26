@@ -165,7 +165,7 @@ export default function VolOrgDashboardPage() {
             {t('org_dashboard.access_denied_desc')}
           </p>
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<ArrowLeft className="w-4 h-4" />}
             onPress={() => navigate(tenantPath('/volunteering'))}
           >
@@ -207,7 +207,7 @@ export default function VolOrgDashboardPage() {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <h1 className="text-2xl font-bold text-theme-primary">{org.name}</h1>
-                <Chip size="sm" color={org.status === 'active' ? 'success' : 'warning'} variant="flat">
+                <Chip size="sm" color={org.status === 'active' ? 'success' : 'warning'} variant="soft">
                   {org.status}
                 </Chip>
               </div>

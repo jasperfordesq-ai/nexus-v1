@@ -162,8 +162,7 @@ export default function OrgVolunteersTab({ orgId }: OrgVolunteersTabProps) {
           <div className="flex justify-center pt-4">
             <Button
               size="sm"
-              variant="flat"
-              className="bg-theme-elevated text-theme-muted"
+              variant="tertiary"
               startContent={isLoadingMore ? <Spinner size="sm" /> : <ChevronDown className="w-4 h-4" />}
               isDisabled={isLoadingMore}
               onPress={() => loadVolunteers(true)}

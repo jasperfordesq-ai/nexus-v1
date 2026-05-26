@@ -389,7 +389,7 @@ export function CredentialVerificationTab() {
                       <Chip
                         size="sm"
                         color={getStatusColor(credential.status)}
-                        variant="flat"
+                        variant="soft"
                         startContent={getStatusIcon(credential.status)}
                       >
                         {getStatusLabel(credential.status, t)}
@@ -503,7 +503,7 @@ export function CredentialVerificationTab() {
                     <Button
                       size="sm"
                       isIconOnly
-                      variant="flat"
+                      variant="tertiary"
                       className="text-theme-muted"
                       onPress={() => {
                         setSelectedFile(null);
@@ -553,7 +553,7 @@ export function CredentialVerificationTab() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={handleModalClose} className="text-theme-muted">{t('credentials.cancel')}</Button>
+            <Button variant="tertiary" onPress={handleModalClose}>{t('credentials.cancel')}</Button>
             <Button
               className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
               onPress={handleUpload}

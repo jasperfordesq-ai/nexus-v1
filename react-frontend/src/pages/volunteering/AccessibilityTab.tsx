@@ -224,13 +224,12 @@ export function AccessibilityTab() {
             <motion.div key={need.id ?? index} variants={itemVariants}>
               <GlassCard className="p-5 space-y-4">
                 <div className="flex items-center justify-between gap-3">
-                  <Chip size="sm" color={NEED_TYPE_COLORS[need.need_type] ?? 'default'} variant="flat">
+                  <Chip size="sm" color={NEED_TYPE_COLORS[need.need_type] ?? 'default'} variant="soft">
                     {t(`accessibility.types.${need.need_type}`)}
                   </Chip>
                   <Button
                     size="sm"
-                    variant="light"
-                    color="danger"
+                    variant="danger-soft"
                     isIconOnly
                     aria-label={t('accessibility.remove')}
                     onPress={() => removeNeed(index)}
@@ -289,8 +288,8 @@ export function AccessibilityTab() {
 
           {needs.length > 0 && (
             <Button
-              variant="flat"
-              className="bg-theme-elevated text-theme-muted w-full"
+              variant="tertiary"
+              className="w-full"
               startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
               onPress={() => setNeeds((prev) => [...prev, emptyNeed()])}
             >

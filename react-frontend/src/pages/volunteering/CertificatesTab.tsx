@@ -230,7 +230,7 @@ export function CertificatesTab() {
                     {cert.organizations.length > 0 && (
                       <div className="flex flex-wrap gap-2">
                         {cert.organizations.map((org, i) => (
-                          <Chip key={i} size="sm" variant="flat" startContent={<Building2 className="w-3 h-3" />}>
+                          <Chip key={i} size="sm" variant="soft" startContent={<Building2 className="w-3 h-3" />}>
                             {t('certificates.organization_hours', { name: org.name, hours: org.hours })}
                           </Chip>
                         ))}
@@ -249,8 +249,7 @@ export function CertificatesTab() {
                     </Button>
                     <Button
                       size="sm"
-                      variant="flat"
-                      className="bg-theme-elevated text-theme-muted"
+                      variant="tertiary"
                       startContent={<ExternalLink className="w-4 h-4" aria-hidden="true" />}
                       onPress={() => window.open(cert.verification_url, '_blank')}
                     >

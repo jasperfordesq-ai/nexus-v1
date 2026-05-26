@@ -75,7 +75,7 @@ export default function OrgSettingsTab({ orgId, orgData, onOrgUpdate }: OrgSetti
           value={name}
           onValueChange={setName}
           isRequired
-          variant="bordered"
+          variant="secondary"
           classNames={{ inputWrapper: 'bg-theme-elevated' }}
         />
 
@@ -83,7 +83,7 @@ export default function OrgSettingsTab({ orgId, orgData, onOrgUpdate }: OrgSetti
           label={t('org_settings.description')}
           value={description}
           onValueChange={setDescription}
-          variant="bordered"
+          variant="secondary"
           minRows={3}
           maxRows={8}
           classNames={{ inputWrapper: 'bg-theme-elevated' }}
@@ -94,7 +94,7 @@ export default function OrgSettingsTab({ orgId, orgData, onOrgUpdate }: OrgSetti
           value={contactEmail}
           onValueChange={setContactEmail}
           type="email"
-          variant="bordered"
+          variant="secondary"
           classNames={{ inputWrapper: 'bg-theme-elevated' }}
         />
 
@@ -103,14 +103,13 @@ export default function OrgSettingsTab({ orgId, orgData, onOrgUpdate }: OrgSetti
           value={website}
           onValueChange={setWebsite}
           type="url"
-          variant="bordered"
+          variant="secondary"
           placeholder="https://"
           classNames={{ inputWrapper: 'bg-theme-elevated' }}
         />
 
         <div className="flex justify-end pt-2">
           <Button
-            color="primary"
             className="w-full sm:w-auto"
             isLoading={isSaving}
             startContent={!isSaving ? <Save className="w-4 h-4" /> : undefined}
