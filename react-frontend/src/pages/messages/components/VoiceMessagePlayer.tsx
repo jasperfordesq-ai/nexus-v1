@@ -87,7 +87,7 @@ export function VoiceMessagePlayer({ audioUrl, audioBlob, transcript }: VoiceMes
         <Button
           isIconOnly
           size="sm"
-          variant="light"
+          variant="tertiary"
           className="w-8 h-8 min-w-0 bg-black/20 dark:bg-white/20 rounded-full"
           onPress={togglePlay}
           aria-label={isPlaying ? t('voice_pause') : t('voice_play')}
@@ -117,8 +117,8 @@ export function VoiceMessagePlayer({ audioUrl, audioBlob, transcript }: VoiceMes
         <div className="mt-2">
           <Button
             size="sm"
-            variant="light"
-            className="h-6 min-w-0 px-2 text-xs opacity-60 hover:opacity-100 gap-1"
+            variant="tertiary"
+            className="min-h-6 min-w-0 px-2 text-xs opacity-60 hover:opacity-100 gap-1"
             onPress={() => setShowTranscript(!showTranscript)}
             startContent={<FileText className="w-3 h-3" aria-hidden="true" />}
           >

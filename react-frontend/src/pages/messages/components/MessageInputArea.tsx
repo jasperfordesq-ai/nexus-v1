@@ -137,7 +137,7 @@ export function MessageInputArea({
           <div className="flex gap-2 sm:ml-auto">
             <Button
               size="sm"
-              variant="flat"
+              variant="secondary"
               className="bg-theme-elevated text-theme-muted"
               onPress={onClearAudioBlob}
             >
@@ -164,7 +164,7 @@ export function MessageInputArea({
           <div className="flex w-full gap-2 sm:ml-auto sm:w-auto">
             <Button
               size="sm"
-              variant="flat"
+              variant="secondary"
               className="bg-theme-elevated text-theme-muted"
               onPress={onCancelRecording}
             >
@@ -172,7 +172,7 @@ export function MessageInputArea({
             </Button>
             <Button
               size="sm"
-              color="danger"
+              variant="danger"
               onPress={onStopRecording}
               startContent={<Square className="w-3 h-3" />}
             >
@@ -231,7 +231,7 @@ export function MessageInputArea({
           <Button
             type="button"
             isIconOnly
-            variant="flat"
+            variant="secondary"
             className="shrink-0 bg-theme-elevated text-theme-muted hover:text-theme-primary"
             onPress={() => fileInputRef.current?.click()}
             aria-label={t('aria_add_attachment')}
@@ -282,7 +282,7 @@ export function MessageInputArea({
             <Button
               type="button"
               isIconOnly
-              variant="flat"
+              variant="secondary"
               className="shrink-0 bg-theme-elevated text-theme-muted hover:text-theme-primary"
               onPress={onStartRecording}
               aria-label={t('aria_record_voice')}

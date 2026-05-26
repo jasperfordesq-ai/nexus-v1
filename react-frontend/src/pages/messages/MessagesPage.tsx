@@ -473,7 +473,7 @@ export function MessagesPage() {
             {t('new_message')}
           </Button>
           <Button
-            variant="flat"
+            variant="secondary"
             className="min-w-0 bg-theme-elevated text-theme-primary"
             startContent={<UsersIcon className="h-4 w-4 flex-shrink-0" aria-hidden="true" />}
             onPress={() => setIsCreateGroupOpen(true)}
@@ -506,7 +506,7 @@ export function MessagesPage() {
                   <MessageSquare className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
                   <span className="truncate">{t('tab_inbox')}</span>
                   {totalUnread > 0 && (
-                    <Chip size="sm" color="primary" variant="flat" className="h-5 min-w-5 px-1.5">
+                    <Chip size="sm" color="accent" variant="soft" className="h-5 min-w-5 px-1.5">
                       {totalUnread > 99 ? '99+' : totalUnread}
                     </Chip>
                   )}
@@ -575,7 +575,7 @@ export function MessagesPage() {
                   <p className="text-[var(--color-error)] text-sm">{userSearchError}</p>
                   <Button
                     size="sm"
-                    variant="flat"
+                    variant="secondary"
                     className="mt-2 bg-theme-elevated text-theme-muted"
                     onPress={() => searchUsers(userSearchQuery)}
                   >
@@ -586,8 +586,8 @@ export function MessagesPage() {
                 userSearchResults.map((user) => (
                   <Button
                     key={user.id}
-                    variant="light"
-                    className="flex h-auto w-full items-center justify-start gap-3 rounded-xl bg-theme-elevated p-3 text-left"
+                    variant="secondary"
+                    className="flex min-h-14 w-full items-center justify-start gap-3 rounded-xl bg-theme-elevated p-3 text-left"
                     onPress={() => handleSelectUser(user)}
                   >
                     <Avatar
@@ -729,7 +729,7 @@ function ConversationCard({ conversation }: ConversationCardProps) {
         <div className="flex items-center gap-3 sm:gap-4">
           <Badge
             content={unread_count > 9 ? '9+' : unread_count}
-            color="primary"
+            color="accent"
             size="sm"
             isInvisible={unread_count === 0}
             placement="top-right"
@@ -817,7 +817,7 @@ function ArchivedConversationCard({ conversation, onRestore }: ArchivedConversat
 
         <Button
           size="sm"
-          variant="flat"
+          variant="secondary"
           className="flex-shrink-0 bg-theme-hover text-theme-muted hover:bg-theme-elevated"
           startContent={<RotateCcw className="h-3 w-3" aria-hidden="true" />}
           onPress={onRestore}
@@ -837,14 +837,14 @@ function ConversationListSkeleton({ label, count }: { label: string; count: numb
         <GlassCard key={index} className="p-4 sm:p-5">
           <div className="flex items-center gap-3 sm:gap-4">
             <Skeleton className="h-12 w-12 flex-shrink-0 rounded-full">
-              <div className="h-12 w-12 rounded-full bg-default-300" />
+              <div className="h-12 w-12 rounded-full bg-surface-tertiary" />
             </Skeleton>
             <div className="min-w-0 flex-1 space-y-2">
               <Skeleton className="w-2/5 rounded-lg">
-                <div className="h-4 rounded-lg bg-default-300" />
+                <div className="h-4 rounded-lg bg-surface-tertiary" />
               </Skeleton>
               <Skeleton className="w-4/5 rounded-lg">
-                <div className="h-3 rounded-lg bg-default-200" />
+                <div className="h-3 rounded-lg bg-surface-secondary" />
               </Skeleton>
             </div>
           </div>

@@ -1362,7 +1362,7 @@ export function ConversationPage() {
           <p className="mx-auto mb-5 max-w-md text-sm text-theme-muted">{t('conversation_load_failed')}</p>
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
             <Button
-              variant="flat"
+              variant="secondary"
               className="bg-theme-elevated text-theme-muted"
               onPress={() => navigate(tenantPath('/messages'))}
             >
@@ -1396,7 +1396,7 @@ export function ConversationPage() {
             <Button
               isIconOnly
               size="sm"
-              variant="light"
+              variant="tertiary"
               className="shrink-0 text-theme-muted data-[hover=true]:bg-theme-elevated"
               onPress={() => navigate(tenantPath('/messages'))}
               aria-label={t('aria_back')}
@@ -1418,7 +1418,7 @@ export function ConversationPage() {
                 />
                 {other_user.is_online !== undefined && (
                   <span
-                    className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-[var(--color-surface)] ${other_user.is_online ? 'bg-success' : 'bg-default-400'}`}
+                    className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-[var(--color-surface)] ${other_user.is_online ? 'bg-success' : 'bg-muted'}`}
                     aria-label={statusLabel ?? undefined}
                     role="img"
                   />
@@ -1430,7 +1430,7 @@ export function ConversationPage() {
                     <h2 className="min-w-0 truncate text-base font-semibold leading-6 text-theme-primary sm:text-lg">{other_user.name}</h2>
                   ) : (
                     <Skeleton className="rounded-md">
-                      <div className="h-4 w-32 rounded-md bg-default-300" />
+                      <div className="h-4 w-32 rounded-md bg-surface-tertiary" />
                     </Skeleton>
                   )}
                   <VerificationBadgeRow userId={other_user.id} size="sm" />
@@ -1450,7 +1450,7 @@ export function ConversationPage() {
           <div className="flex max-w-[44vw] shrink-0 items-center justify-end gap-1 sm:max-w-none sm:gap-2">
             <Button
               isIconOnly
-              variant="flat"
+              variant="secondary"
               size="sm"
               className={`bg-theme-elevated text-theme-muted ${showSearch ? 'ring-1 ring-accent/40 text-accent' : ''}`}
               aria-label={t('aria_search_messages')}
@@ -1465,7 +1465,7 @@ export function ConversationPage() {
               <Tooltip content={autoTranslateOn ? t('auto_translate.tooltip_on') : t('auto_translate.tooltip_off')}>
                 <Button
                   isIconOnly
-                  variant="flat"
+                  variant="secondary"
                   size="sm"
                   className={autoTranslateOn
                     ? 'bg-indigo-500/20 text-indigo-500 ring-1 ring-indigo-500/30'
@@ -1485,7 +1485,7 @@ export function ConversationPage() {
             >
               <Button
                 isIconOnly
-                variant="flat"
+                variant="secondary"
                 size="sm"
                 className="bg-theme-elevated text-theme-muted"
                 aria-label={t('aria_view_profile')}
@@ -1498,7 +1498,7 @@ export function ConversationPage() {
               <DropdownTrigger>
                 <Button
                   isIconOnly
-                  variant="flat"
+                  variant="secondary"
                   size="sm"
                   className="bg-theme-elevated text-theme-muted"
                   aria-label={t('aria_more_options')}
@@ -1511,7 +1511,6 @@ export function ConversationPage() {
                   key="delete_self" id="delete_self"
                   startContent={<Trash2 className="w-4 h-4" />}
                   className="text-danger"
-                  color="danger"
                   onPress={() => { setDeleteScope('self'); setShowArchiveModal(true); }}
                 >
                   {t('delete_conversation_for_me')}
@@ -1520,7 +1519,6 @@ export function ConversationPage() {
                   key="delete_everyone" id="delete_everyone"
                   startContent={<Trash2 className="w-4 h-4" />}
                   className="text-danger"
-                  color="danger"
                   onPress={() => { setDeleteScope('everyone'); setShowArchiveModal(true); }}
                 >
                   {t('delete_conversation_for_everyone')}
@@ -1557,7 +1555,7 @@ export function ConversationPage() {
                 <Button
                   isIconOnly
                   size="sm"
-                  variant="flat"
+                  variant="secondary"
                   className="bg-theme-elevated text-theme-muted"
                   onPress={() => navigateSearchResult('prev')}
                   aria-label={t('aria_prev_result')}
@@ -1567,7 +1565,7 @@ export function ConversationPage() {
                 <Button
                   isIconOnly
                   size="sm"
-                  variant="flat"
+                  variant="secondary"
                   className="bg-theme-elevated text-theme-muted"
                   onPress={() => navigateSearchResult('next')}
                   aria-label={t('aria_next_result')}
@@ -1579,7 +1577,7 @@ export function ConversationPage() {
             <Button
               isIconOnly
               size="sm"
-              variant="flat"
+              variant="secondary"
               className="self-end bg-theme-elevated text-theme-muted sm:self-auto"
               onPress={() => {
                 setShowSearch(false);
@@ -1604,7 +1602,7 @@ export function ConversationPage() {
           <Button
             isIconOnly
             size="sm"
-            variant="light"
+            variant="tertiary"
             className="text-[var(--color-warning)] hover:text-amber-700 dark:hover:text-amber-300 flex-shrink-0 -mt-0.5"
             onPress={() => setIsSafeguardingDismissed(true)}
             aria-label={t('aria_dismiss_safeguarding')}
@@ -1625,7 +1623,7 @@ export function ConversationPage() {
           <Button
             isIconOnly
             size="sm"
-            variant="light"
+            variant="tertiary"
             className="text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-200 flex-shrink-0 -mt-0.5"
             onPress={dismissTranslationHint}
             aria-label={t('translate_hint.dismiss')}
@@ -1644,8 +1642,8 @@ export function ConversationPage() {
           </p>
           <Button
             size="sm"
-            variant="light"
-            className="h-6 min-w-0 px-2 text-xs text-indigo-500"
+            variant="tertiary"
+            className="min-h-6 min-w-0 px-2 text-xs text-indigo-500"
             onPress={handleAutoTranslateToggle}
           >
             {t('auto_translate.turn_off')}
@@ -1709,7 +1707,7 @@ export function ConversationPage() {
           {pagination.hasOlderMessages && !isLoadingOlder && (
             <div className="flex justify-center py-2">
               <Button
-                variant="flat"
+                variant="secondary"
                 size="sm"
                 className="bg-theme-elevated text-sm text-theme-muted"
                 onPress={loadOlderMessages}
@@ -1732,7 +1730,7 @@ export function ConversationPage() {
                   <MessageCircle className="h-4 w-4" aria-hidden="true" />
                 </span>
               </div>
-              <Chip size="sm" variant="flat" className="mb-3 bg-theme-elevated text-theme-muted">
+              <Chip size="sm" variant="soft" className="mb-3 bg-theme-elevated text-theme-muted">
                 {t('new_message')}
               </Chip>
               <h3 className="mb-1 max-w-full truncate text-lg font-semibold text-theme-primary">{other_user.name}</h3>
@@ -1848,14 +1846,14 @@ export function ConversationPage() {
           </ModalBody>
           <ModalFooter>
             <Button
-              variant="flat"
+              variant="secondary"
               className="bg-theme-elevated text-theme-muted"
               onPress={() => setShowArchiveModal(false)}
             >
               {t('cancel')}
             </Button>
             <Button
-              color="danger"
+              variant="danger"
               onPress={() => deleteConversation(deleteScope)}
               isLoading={isArchiving}
             >
@@ -1884,13 +1882,13 @@ export function ConversationPage() {
             <p className="text-theme-muted text-sm">{t('delete_message_body')}</p>
           </ModalBody>
           <ModalFooter className="flex-col gap-2">
-            <Button color="danger" variant="flat" fullWidth onPress={() => executeDelete('everyone')}>
+            <Button variant="danger-soft" fullWidth onPress={() => executeDelete('everyone')}>
               {t('delete_for_everyone')}
             </Button>
-            <Button variant="bordered" fullWidth onPress={() => executeDelete('self')}>
+            <Button variant="secondary" fullWidth onPress={() => executeDelete('self')}>
               {t('delete_for_me')}
             </Button>
-            <Button variant="light" fullWidth onPress={() => setPendingDeleteId(null)}>
+            <Button variant="tertiary" fullWidth onPress={() => setPendingDeleteId(null)}>
               {t('cancel')}
             </Button>
           </ModalFooter>

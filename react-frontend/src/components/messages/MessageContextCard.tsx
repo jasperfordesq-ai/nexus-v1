@@ -42,9 +42,9 @@ interface MessageContextCardProps {
   contextId: number;
 }
 
-const CONTEXT_CONFIG: Record<string, { icon: typeof ListChecks; labelKey: string; color: string; apiPath: string; detailPath: string }> = {
-  listing: { icon: ListChecks, labelKey: 'context_type_listing', color: 'primary', apiPath: '/listings', detailPath: '/listings' },
-  event: { icon: Calendar, labelKey: 'context_type_event', color: 'secondary', apiPath: '/events', detailPath: '/events' },
+const CONTEXT_CONFIG: Record<string, { icon: typeof ListChecks; labelKey: string; color: 'accent' | 'default' | 'warning' | 'danger'; apiPath: string; detailPath: string }> = {
+  listing: { icon: ListChecks, labelKey: 'context_type_listing', color: 'accent', apiPath: '/listings', detailPath: '/listings' },
+  event: { icon: Calendar, labelKey: 'context_type_event', color: 'default', apiPath: '/events', detailPath: '/events' },
   job: { icon: Briefcase, labelKey: 'context_type_job', color: 'warning', apiPath: '/jobs', detailPath: '/jobs' },
   volunteering: { icon: Heart, labelKey: 'context_type_volunteering', color: 'danger', apiPath: '/volunteering/opportunities', detailPath: '/volunteering/opportunities' },
 };
@@ -138,7 +138,7 @@ export function MessageContextCard({ contextType, contextId }: MessageContextCar
           <div className="flex items-center gap-2">
             <LinkIcon className="w-3 h-3 text-theme-subtle flex-shrink-0" />
             <span className="text-xs text-theme-subtle">{t('context_regarding')}</span>
-            <Chip size="sm" variant="flat" color={config.color as 'primary' | 'secondary' | 'warning' | 'danger'}>
+            <Chip size="sm" variant="soft" color={config.color}>
               {t(config.labelKey)}
             </Chip>
           </div>

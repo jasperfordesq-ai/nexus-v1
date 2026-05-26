@@ -227,7 +227,7 @@ export const MessageBubble = memo(function MessageBubble({
                 }}
               />
               <div className="flex gap-2 mt-2 justify-end">
-                <Button size="sm" variant="flat" className="bg-black/10 dark:bg-white/10 text-inherit/70" onPress={onCancelEdit}>
+                <Button size="sm" variant="secondary" className="bg-black/10 dark:bg-white/10 text-inherit/70" onPress={onCancelEdit}>
                   {t('cancel')}
                 </Button>
                 <Button size="sm" className="bg-black/20 dark:bg-white/20 text-inherit" onPress={onSaveEdit}>
@@ -251,8 +251,8 @@ export const MessageBubble = memo(function MessageBubble({
                   <div className="flex items-center gap-1.5">
                     <Button
                       size="sm"
-                      variant="light"
-                      className={`h-6 min-w-0 px-2 text-xs gap-1 ${isOwn ? 'text-white/60 hover:text-white/100' : 'opacity-60 hover:opacity-100'} ${isTranslating ? 'animate-pulse' : ''}`}
+                      variant="tertiary"
+                      className={`min-h-6 min-w-0 px-2 text-xs gap-1 ${isOwn ? 'text-white/60 hover:text-white/100' : 'opacity-60 hover:opacity-100'} ${isTranslating ? 'animate-pulse' : ''}`}
                       onPress={handleTranslate}
                       isDisabled={isTranslating}
                       startContent={<Languages className="w-3 h-3" aria-hidden="true" />}
@@ -303,8 +303,8 @@ export const MessageBubble = memo(function MessageBubble({
                 <div className="mt-1 flex items-center gap-1.5">
                   <Button
                     size="sm"
-                    variant="light"
-                    className={`h-6 min-w-0 px-2 text-xs gap-1 ${isOwn ? 'text-white/60 hover:text-white/100' : 'opacity-60 hover:opacity-100'} ${isTranslating ? 'animate-pulse' : ''}`}
+                    variant="tertiary"
+                    className={`min-h-6 min-w-0 px-2 text-xs gap-1 ${isOwn ? 'text-white/60 hover:text-white/100' : 'opacity-60 hover:opacity-100'} ${isTranslating ? 'animate-pulse' : ''}`}
                     onPress={handleTranslate}
                     isDisabled={isTranslating}
                     startContent={<Languages className="w-3 h-3" aria-hidden="true" />}
@@ -372,8 +372,8 @@ export const MessageBubble = memo(function MessageBubble({
               <Button
                 isIconOnly
                 size="sm"
-                variant="light"
-                className="w-5 h-5 min-w-0 bg-theme-elevated rounded-full border border-theme-default"
+                variant="tertiary"
+                className="min-h-5 w-5 h-5 min-w-0 bg-theme-elevated rounded-full border border-theme-default"
                 onPress={() => setShowReactionPicker(!showReactionPicker)}
                 aria-label={t('aria_add_reaction')}
               >
@@ -385,8 +385,8 @@ export const MessageBubble = memo(function MessageBubble({
                 <Button
                   isIconOnly
                   size="sm"
-                  variant="light"
-                  className="w-5 h-5 min-w-0 bg-theme-elevated rounded-full border border-theme-default"
+                  variant="tertiary"
+                  className="min-h-5 w-5 h-5 min-w-0 bg-theme-elevated rounded-full border border-theme-default"
                   onPress={() => setShowMessageMenu(!showMessageMenu)}
                   aria-label={t('aria_message_options')}
                 >
@@ -413,7 +413,7 @@ export const MessageBubble = memo(function MessageBubble({
                   key={emoji}
                   isIconOnly
                   size="sm"
-                  variant="light"
+                  variant="tertiary"
                   className="w-7 h-7 min-w-0 rounded-full"
                   onPress={() => {
                     onReact?.(message.id, emoji);
@@ -441,7 +441,7 @@ export const MessageBubble = memo(function MessageBubble({
             >
               {isOwn && (
                 <Button
-                  variant="light"
+                  variant="tertiary"
                   size="sm"
                   className="justify-start text-sm text-theme-muted"
                   startContent={<Pencil className="w-3 h-3" aria-hidden="true" />}
@@ -455,7 +455,7 @@ export const MessageBubble = memo(function MessageBubble({
                 </Button>
               )}
               <Button
-                variant="light"
+                variant="danger-soft"
                 size="sm"
                 className="justify-start text-sm text-red-600 dark:text-red-400"
                 startContent={<Trash2 className="w-3 h-3" aria-hidden="true" />}
@@ -478,8 +478,8 @@ export const MessageBubble = memo(function MessageBubble({
               <Button
                 key={emoji}
                 size="sm"
-                variant="light"
-                className="min-w-0 h-auto px-1.5 py-0.5 bg-theme-elevated rounded-full text-xs gap-0.5"
+                variant="tertiary"
+                className="min-h-6 min-w-0 px-1.5 py-0.5 bg-theme-elevated rounded-full text-xs gap-0.5"
                 onPress={() => onReact?.(message.id, emoji)}
                 aria-label={t('aria_toggle_reaction', { emoji })}
               >

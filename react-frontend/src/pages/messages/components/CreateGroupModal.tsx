@@ -153,7 +153,7 @@ export function CreateGroupModal({ isOpen, onClose, onCreated }: CreateGroupModa
                   <Chip
                     key={member.id}
                     onClose={() => handleRemoveMember(member.id)}
-                    variant="flat"
+                    variant="soft"
                     avatar={
                       <Avatar
                         src={resolveAvatarUrl(member.avatar_url || member.avatar)}
@@ -193,8 +193,8 @@ export function CreateGroupModal({ isOpen, onClose, onCreated }: CreateGroupModa
             {searchResults.map((user) => (
               <Button
                 key={user.id}
-                variant="light"
-                className="w-full flex items-center gap-3 p-3 rounded-lg bg-theme-elevated h-auto text-left justify-start"
+                variant="secondary"
+                className="w-full flex min-h-14 items-center gap-3 p-3 rounded-lg bg-theme-elevated text-left justify-start"
                 onPress={() => handleSelectMember(user)}
               >
                 <Avatar
@@ -217,7 +217,7 @@ export function CreateGroupModal({ isOpen, onClose, onCreated }: CreateGroupModa
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button variant="flat" onPress={handleClose}>
+          <Button variant="tertiary" onPress={handleClose}>
             {t('cancel')}
           </Button>
           <Button
