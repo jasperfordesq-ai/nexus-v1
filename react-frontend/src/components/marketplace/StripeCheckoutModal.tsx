@@ -120,8 +120,8 @@ function CheckoutForm({
     <>
       <ModalBody className="space-y-4">
         {/* Order summary */}
-        <div className="bg-default-50 rounded-xl p-4 space-y-2">
-          <h4 className="text-sm font-semibold text-default-500 uppercase tracking-wide">
+        <div className="bg-surface-secondary rounded-xl p-4 space-y-2">
+          <h4 className="text-sm font-semibold text-muted uppercase tracking-wide">
             {t('checkout.order_summary')}
           </h4>
           {listingTitle && (
@@ -132,7 +132,7 @@ function CheckoutForm({
           )}
           {shippingCost != null && shippingCost > 0 && (
             <div className="flex justify-between text-sm">
-              <span className="text-default-500">{t('checkout.shipping')}</span>
+              <span className="text-muted">{t('checkout.shipping')}</span>
               <span className="text-foreground">{formatAmount(shippingCost, currency)}</span>
             </div>
           )}
@@ -169,7 +169,7 @@ function CheckoutForm({
         )}
 
         {/* Security notice */}
-        <div className="flex items-center gap-2 text-xs text-default-400">
+        <div className="flex items-center gap-2 text-xs text-muted">
           <ShieldCheck className="w-4 h-4 shrink-0" aria-hidden="true" />
           <span>{t('checkout.secure_notice')}</span>
         </div>
@@ -238,7 +238,7 @@ export function StripeCheckoutModal({
                     <p className="text-foreground font-medium">
                       {t('checkout.not_available_title')}
                     </p>
-                    <p className="text-sm text-default-500">
+                    <p className="text-sm text-muted">
                       {t('checkout.not_available_description')}
                     </p>
                   </div>

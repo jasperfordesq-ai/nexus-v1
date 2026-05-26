@@ -97,7 +97,7 @@ function SellerOrderCard({
         {/* Listing image */}
         <Link
           to={tenantPath(`/marketplace/${order.listing.id}`)}
-          className="shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-default-100"
+          className="shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-surface-secondary"
         >
           {order.listing.image?.url ? (
             <img
@@ -108,7 +108,7 @@ function SellerOrderCard({
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <Package className="w-8 h-8 text-default-300" />
+              <Package className="w-8 h-8 text-muted" />
             </div>
           )}
         </Link>
@@ -130,7 +130,7 @@ function SellerOrderCard({
                   size="sm"
                   className="w-5 h-5"
                 />
-                <span className="text-xs text-default-500">
+                <span className="text-xs text-muted">
                   {t('orders.seller.buyer_label')} {order.buyer.name}
                 </span>
               </div>
@@ -144,19 +144,19 @@ function SellerOrderCard({
                 {formatPrice(order.total_price, order.currency)}
               </span>
               {order.quantity > 1 && (
-                <span className="text-xs text-default-400 ml-1">
+                <span className="text-xs text-muted ml-1">
                   {t('orders.quantity_multiplier', { count: order.quantity })}
                 </span>
               )}
             </div>
-            <span className="text-xs text-default-400">
+            <span className="text-xs text-muted">
               #{order.order_number} - {new Date(order.created_at).toLocaleDateString()}
             </span>
           </div>
 
           {/* Tracking info */}
           {order.tracking_number && (order.status === 'shipped' || order.status === 'delivered') && (
-            <div className="flex items-center gap-2 mt-2 text-xs text-default-500">
+            <div className="flex items-center gap-2 mt-2 text-xs text-muted">
               <Truck className="w-3.5 h-3.5" />
               <span>{t('orders.tracking_number')} {order.tracking_number}</span>
               {order.tracking_url && (
@@ -362,7 +362,7 @@ export function SellerOrdersPage() {
             <Store className="w-7 h-7 text-accent" />
             {t('orders.seller.title')}
           </h1>
-          <p className="text-default-500 text-sm mt-1">
+          <p className="text-muted text-sm mt-1">
             {t('orders.seller.subtitle')}
           </p>
         </div>
@@ -388,7 +388,7 @@ export function SellerOrdersPage() {
           </div>
         ) : orders.length === 0 ? (
           <EmptyState
-            icon={<Store className="w-10 h-10 text-default-400" />}
+            icon={<Store className="w-10 h-10 text-muted" />}
             title={t('orders.seller.empty_title')}
             description={t('orders.seller.empty_description')}
             action={{
@@ -431,7 +431,7 @@ export function SellerOrdersPage() {
             {t('orders.seller.ship_modal_title')}
           </ModalHeader>
           <ModalBody className="space-y-4">
-            <p className="text-sm text-default-500">
+            <p className="text-sm text-muted">
               {t('orders.seller.ship_modal_description')}
             </p>
             <Select

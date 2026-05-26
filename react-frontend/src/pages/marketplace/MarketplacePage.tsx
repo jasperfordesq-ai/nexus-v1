@@ -366,7 +366,7 @@ export function MarketplacePage() {
             ) : (
               <>
                 <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
-                  <Grid3X3 className="w-5 h-5 text-default-400" />
+                  <Grid3X3 className="w-5 h-5 text-muted" />
                   {debouncedQuery || selectedCategoryId != null ? t('hub.search_results') : t('hub.latest_listings')}
                 </h2>
                 <MarketplaceListingGrid
@@ -420,7 +420,7 @@ export function MarketplacePage() {
               <div className="space-y-2">
                 <Link
                   to={tenantPath('/marketplace/search')}
-                  className="flex items-center gap-2 text-sm text-default-600 hover:text-accent transition-colors"
+                  className="flex items-center gap-2 text-sm text-muted hover:text-accent transition-colors"
                 >
                   <Search className="w-4 h-4" />
                   {t('hub.advanced_search')}
@@ -429,28 +429,28 @@ export function MarketplacePage() {
                   <>
                     <Link
                       to={tenantPath('/marketplace/my-listings')}
-                      className="flex items-center gap-2 text-sm text-default-600 hover:text-accent transition-colors"
+                      className="flex items-center gap-2 text-sm text-muted hover:text-accent transition-colors"
                     >
                       <Package className="w-4 h-4" />
                       {t('hub.my_listings')}
                     </Link>
                     <Link
                       to={tenantPath('/marketplace/my-offers')}
-                      className="flex items-center gap-2 text-sm text-default-600 hover:text-accent transition-colors"
+                      className="flex items-center gap-2 text-sm text-muted hover:text-accent transition-colors"
                     >
                       <HandCoins className="w-4 h-4" />
                       {t('hub.my_offers')}
                     </Link>
                     <Link
                       to={tenantPath('/marketplace/orders')}
-                      className="flex items-center gap-2 text-sm text-default-600 hover:text-accent transition-colors"
+                      className="flex items-center gap-2 text-sm text-muted hover:text-accent transition-colors"
                     >
                       <ShoppingBag className="w-4 h-4" />
                       {t('hub.my_orders')}
                     </Link>
                     <Link
                       to={tenantPath('/marketplace/collections')}
-                      className="flex items-center gap-2 text-sm text-default-600 hover:text-accent transition-colors"
+                      className="flex items-center gap-2 text-sm text-muted hover:text-accent transition-colors"
                     >
                       <Heart className="w-4 h-4" />
                       {t('hub.saved_items')}

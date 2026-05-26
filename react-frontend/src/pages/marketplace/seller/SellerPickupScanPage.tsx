@@ -67,7 +67,7 @@ export function SellerPickupScanPage() {
           <QrCode className="w-7 h-7 text-accent" />
           {t('marketplace.pickup.scan_title')}
         </h1>
-        <p className="text-default-500 text-sm mt-1">
+        <p className="text-muted text-sm mt-1">
           {t('marketplace.pickup.scan_subtitle')}
         </p>
       </div>
@@ -97,7 +97,7 @@ export function SellerPickupScanPage() {
           <p className="font-semibold text-success">
             {t('marketplace.pickup.last_scan')}
           </p>
-          <p className="text-sm text-default-700 mt-1">
+          <p className="text-sm text-foreground mt-1">
             {t('marketplace.pickup.order_n', { id: last.order_id })} —{' '}
             {t('marketplace.pickup.status_picked_up')}
           </p>

@@ -263,7 +263,7 @@ export function MyOffersPage() {
             <HandCoins className="w-7 h-7 text-accent" />
             {t('my_offers.title')}
           </h1>
-          <p className="text-default-500 text-sm mt-1">
+          <p className="text-muted text-sm mt-1">
             {t('my_offers.subtitle')}
           </p>
         </div>

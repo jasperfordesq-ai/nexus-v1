@@ -103,8 +103,8 @@ export function ListingLocationMap({
         </div>
       ) : (
         <div className="px-4 py-6 flex flex-col items-center gap-2">
-          <MapPinOff className="w-10 h-10 text-default-300" aria-hidden="true" />
-          <p className="text-xs text-default-400">
+          <MapPinOff className="w-10 h-10 text-muted" aria-hidden="true" />
+          <p className="text-xs text-muted">
             {t('map.not_available_short')}
           </p>
         </div>
@@ -114,7 +114,7 @@ export function ListingLocationMap({
       <div className="px-4 py-3 flex items-center justify-between gap-2">
         <div className="min-w-0">
           <p className="text-sm text-foreground truncate">{location}</p>
-          <p className="text-xs text-default-400">
+          <p className="text-xs text-muted">
             {t('listing.approximate_location')}
           </p>
         </div>

@@ -169,7 +169,7 @@ export function LoyaltyRedemptionCard({ sellerId, listingId, orderTotalChf, curr
                 discount: confirmed.discountChf.toFixed(2),
               })}
             </p>
-            <p className="text-xs text-default-500 mt-1">
+            <p className="text-xs text-muted mt-1">
               {t('loyalty.history.subtitle')}
             </p>
           </div>
@@ -187,7 +187,7 @@ export function LoyaltyRedemptionCard({ sellerId, listingId, orderTotalChf, curr
         </h3>
       </div>
 
-      <div className="space-y-1 text-xs text-default-600">
+      <div className="space-y-1 text-xs text-muted">
         <p className="flex items-center gap-1.5">
           <Sparkles className="w-3.5 h-3.5 text-warning" />
           {t('loyalty.merchant_accepts')}
@@ -198,7 +198,7 @@ export function LoyaltyRedemptionCard({ sellerId, listingId, orderTotalChf, curr
       </div>
 
       <div className="space-y-2">
-        <label className="text-xs font-medium text-default-700 block">
+        <label className="text-xs font-medium text-foreground block">
           {t('loyalty.credits_to_use_label')}
         </label>
         <Slider
@@ -213,16 +213,16 @@ export function LoyaltyRedemptionCard({ sellerId, listingId, orderTotalChf, curr
           showTooltip
         />
         <div className="flex items-center justify-between text-xs">
-          <span className="text-default-500">
+          <span className="text-muted">
             <strong>{t('hours_short', { count: Number(credits.toFixed(2)) })}</strong>
           </span>
-          <span className="text-default-500">
+          <span className="text-muted">
             {t('loyalty.discount_preview', { discount: previewDiscount.toFixed(2) })}
           </span>
         </div>
       </div>
 
-      <div className="flex items-center justify-between pt-1 border-t border-default-200">
+      <div className="flex items-center justify-between pt-1 border-t border-separator">
         <Chip variant="flat" color="warning" size="sm">
           {currency} {previewNewTotal.toFixed(2)}
         </Chip>

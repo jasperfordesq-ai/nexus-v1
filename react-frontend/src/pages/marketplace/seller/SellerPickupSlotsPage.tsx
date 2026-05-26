@@ -130,7 +130,7 @@ export function SellerPickupSlotsPage() {
             <Calendar className="w-7 h-7 text-accent" />
             {t('marketplace.pickup.slots_title')}
           </h1>
-          <p className="text-default-500 text-sm mt-1">
+          <p className="text-muted text-sm mt-1">
             {t('marketplace.pickup.slots_subtitle')}
           </p>
         </div>
@@ -145,7 +145,7 @@ export function SellerPickupSlotsPage() {
         </div>
       ) : slots.length === 0 ? (
         <GlassCard className="p-8 text-center">
-          <p className="text-default-500">
+          <p className="text-muted">
             {t('marketplace.pickup.no_slots')}
           </p>
         </GlassCard>

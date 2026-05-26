@@ -250,7 +250,7 @@ export function MarketplaceMapSearchPage() {
           >
             {t('page_title')}
           </Button>
-          <span className="text-default-300">/</span>
+          <span className="text-muted">/</span>
           <span className="text-foreground font-medium">{t('map.breadcrumb')}</span>
         </div>
 
@@ -260,7 +260,7 @@ export function MarketplaceMapSearchPage() {
             placeholder={t('map.search_placeholder')}
             value={searchQuery}
             onValueChange={setSearchQuery}
-            startContent={<Search className="w-4 h-4 text-default-400" />}
+            startContent={<Search className="w-4 h-4 text-muted" />}
             size="lg"
             variant="bordered"
             classNames={{ inputWrapper: 'bg-background' }}
@@ -354,7 +354,7 @@ export function MarketplaceMapSearchPage() {
         {/* Results info */}
         {!isLoading && listings.length > 0 && (
           <div className="flex items-center justify-between">
-            <p className="text-sm text-default-500">
+            <p className="text-sm text-muted">
               {t('map.results_count', { count: listings.length })}
             </p>
             <Button
@@ -395,7 +395,7 @@ export function MarketplaceMapSearchPage() {
                       <GlassCard hoverable className="p-3">
                         <div className="flex gap-3">
                           {/* Thumbnail */}
-                          <div className="w-16 h-16 shrink-0 rounded-lg overflow-hidden bg-default-100">
+                          <div className="w-16 h-16 shrink-0 rounded-lg overflow-hidden bg-surface-secondary">
                             {listing.image ? (
                               <img
                                 src={listing.image.thumbnail_url || listing.image.url}
@@ -404,8 +404,8 @@ export function MarketplaceMapSearchPage() {
                                 loading="lazy"
                               />
                             ) : (
-                              <div className="w-full h-full flex items-center justify-center bg-default-100">
-                                <Search className="w-5 h-5 text-default-300" />
+                              <div className="w-full h-full flex items-center justify-center bg-surface-secondary">
+                                <Search className="w-5 h-5 text-muted" />
                               </div>
                             )}
                           </div>
@@ -425,7 +425,7 @@ export function MarketplaceMapSearchPage() {
                                   }).format(listing.price)}
                             </p>
                             {listing.distance_km != null && (
-                              <p className="text-xs text-default-400 mt-0.5">
+                              <p className="text-xs text-muted mt-0.5">
                                 {listing.distance_km < 1
                                   ? t('map.distance_meters', { m: Math.round(listing.distance_km * 1000) })
                                   : t('map.distance_km', { km: listing.distance_km.toFixed(1) })}

@@ -153,7 +153,7 @@ export function StripeOnboardingPage() {
           <h1 className="text-2xl font-bold text-foreground">
             {t('onboarding.title')}
           </h1>
-          <p className="text-default-500 text-sm max-w-md mx-auto">
+          <p className="text-muted text-sm max-w-md mx-auto">
             {t('onboarding.subtitle')}
           </p>
         </div>
@@ -168,7 +168,7 @@ export function StripeOnboardingPage() {
               <h2 className="text-lg font-semibold text-foreground">
                 {t('onboarding.complete_title')}
               </h2>
-              <p className="text-default-500 text-sm mt-1">
+              <p className="text-muted text-sm mt-1">
                 {t('onboarding.complete_description')}
               </p>
             </div>
@@ -204,7 +204,7 @@ export function StripeOnboardingPage() {
               <h2 className="text-lg font-semibold text-foreground">
                 {t('onboarding.incomplete_title')}
               </h2>
-              <p className="text-default-500 text-sm mt-1">
+              <p className="text-muted text-sm mt-1">
                 {t('onboarding.incomplete_description')}
               </p>
             </div>
@@ -236,7 +236,7 @@ export function StripeOnboardingPage() {
               <h2 className="text-lg font-semibold text-foreground">
                 {t('onboarding.what_is_stripe_title')}
               </h2>
-              <p className="text-sm text-default-600">
+              <p className="text-sm text-muted">
                 {t('onboarding.what_is_stripe_description')}
               </p>
             </GlassCard>
@@ -255,7 +255,7 @@ export function StripeOnboardingPage() {
                     <p className="text-sm font-medium text-foreground">
                       {t('onboarding.need_bank')}
                     </p>
-                    <p className="text-xs text-default-500">
+                    <p className="text-xs text-muted">
                       {t('onboarding.need_bank_desc')}
                     </p>
                   </div>
@@ -268,7 +268,7 @@ export function StripeOnboardingPage() {
                     <p className="text-sm font-medium text-foreground">
                       {t('onboarding.need_id')}
                     </p>
-                    <p className="text-xs text-default-500">
+                    <p className="text-xs text-muted">
                       {t('onboarding.need_id_desc')}
                     </p>
                   </div>
@@ -291,7 +291,7 @@ export function StripeOnboardingPage() {
             </div>
 
             {/* Security note */}
-            <p className="text-center text-xs text-default-400">
+            <p className="text-center text-xs text-muted">
               {t('onboarding.security_note')}
             </p>
           </>

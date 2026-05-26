@@ -347,7 +347,7 @@ export function MarketplaceCategoryPage() {
             value={priceMin}
             onValueChange={setPriceMin}
           />
-          <span className="text-default-400">-</span>
+          <span className="text-muted">-</span>
           <Input
             size="sm"
             type="number"
@@ -379,7 +379,7 @@ export function MarketplaceCategoryPage() {
       {templateFields.length > 0 && (
         <div className="space-y-3">
           <Separator />
-          <p className="text-sm font-medium text-default-500">{t('category.category_details', { name: category.name })}</p>
+          <p className="text-sm font-medium text-muted">{t('category.category_details', { name: category.name })}</p>
           {templateFields.map((field) => {
             if (field.type === 'select' && field.options) {
               return (
@@ -448,11 +448,11 @@ export function MarketplaceCategoryPage() {
         <nav aria-label={t('breadcrumb')} className="flex items-center gap-2 text-sm flex-wrap">
           <Link
             to={tenantPath('/marketplace')}
-            className="text-default-500 hover:text-accent transition-colors"
+            className="text-muted hover:text-accent transition-colors"
           >
             {t('category.marketplace')}
           </Link>
-          <ChevronRight className="w-3.5 h-3.5 text-default-300" />
+          <ChevronRight className="w-3.5 h-3.5 text-muted" />
           <span className="text-foreground font-medium">{category.name}</span>
         </nav>
 
@@ -469,9 +469,9 @@ export function MarketplaceCategoryPage() {
             <div className="flex-1 min-w-0">
               <h1 className="text-2xl font-bold text-foreground">{category.name}</h1>
               {category.description && (
-                <p className="text-sm text-default-500 mt-1">{category.description}</p>
+                <p className="text-sm text-muted mt-1">{category.description}</p>
               )}
-              <p className="text-xs text-default-400 mt-1">
+              <p className="text-xs text-muted mt-1">
                 {t('category.listings_count', { count: category.listing_count })}
               </p>
             </div>
@@ -484,7 +484,7 @@ export function MarketplaceCategoryPage() {
             placeholder={t('category.search_placeholder', { name: category.name })}
             value={searchQuery}
             onValueChange={setSearchQuery}
-            startContent={<Search className="w-4 h-4 text-default-400" />}
+            startContent={<Search className="w-4 h-4 text-muted" />}
             size="lg"
             variant="bordered"
             classNames={{ inputWrapper: 'bg-background' }}
@@ -573,7 +573,7 @@ export function MarketplaceCategoryPage() {
             ) : (
               <>
                 <div className="flex items-center justify-between mb-4">
-                  <p className="text-sm text-default-500">
+                  <p className="text-sm text-muted">
                     {t('category.results_count', { count: listings.length })}
                   </p>
                   <Select

@@ -128,7 +128,7 @@ export function PromotionSelector({
       <ModalContent>
         <ModalHeader className="flex flex-col gap-1">
           <span>{t('promotions.title')}</span>
-          <span className="text-sm font-normal text-default-500 truncate">{listingTitle}</span>
+          <span className="text-sm font-normal text-muted truncate">{listingTitle}</span>
         </ModalHeader>
 
         <ModalBody>
@@ -153,7 +153,7 @@ export function PromotionSelector({
                     className={`border-2 transition-colors ${
                       isSelected
                         ? 'border-accent bg-accent/5'
-                        : 'border-divider hover:border-default-300'
+                        : 'border-border hover:border-border'
                     }`}
                   >
                     <CardBody className="p-4">
@@ -173,10 +173,10 @@ export function PromotionSelector({
                               {isSelected && <Check aria-hidden="true" className="w-5 h-5 text-accent" />}
                             </div>
                           </div>
-                          <p className="text-sm text-default-500 mt-1">{product.description}</p>
+                          <p className="text-sm text-muted mt-1">{product.description}</p>
                           <div className="flex items-center gap-1 mt-2">
-                            <Clock aria-hidden="true" className="w-3.5 h-3.5 text-default-400" />
-                            <span className="text-xs text-default-400">
+                            <Clock aria-hidden="true" className="w-3.5 h-3.5 text-muted" />
+                            <span className="text-xs text-muted">
                               {formatPromotionDuration(product.duration_hours)}
                             </span>
                           </div>

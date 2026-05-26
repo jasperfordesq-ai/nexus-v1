@@ -149,7 +149,7 @@ export function FreeItemsPage() {
               <Gift className="w-7 h-7 text-success" />
               {t('free.page_title')}
             </h1>
-            <p className="text-default-500 text-sm mt-1">
+            <p className="text-muted text-sm mt-1">
               {t('free.subtitle')}
             </p>
           </div>
@@ -174,7 +174,7 @@ export function FreeItemsPage() {
               <h3 className="font-semibold text-foreground">
                 {t('free.cta_title')}
               </h3>
-              <p className="text-sm text-default-500">
+              <p className="text-sm text-muted">
                 {t('free.cta_description')}
               </p>
             </div>

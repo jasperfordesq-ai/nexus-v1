@@ -287,7 +287,7 @@ export function MyListingsPage() {
               <ShoppingBag className="w-7 h-7 text-accent" />
               {t('my_listings.title')}
             </h1>
-            <p className="text-default-500 text-sm mt-1">
+            <p className="text-muted text-sm mt-1">
               {t('my_listings.subtitle')}
             </p>
           </div>
@@ -308,7 +308,7 @@ export function MyListingsPage() {
               <p className="font-semibold text-foreground">
                 {t('onboarding.nudge_title')}
               </p>
-              <p className="text-sm text-default-500">
+              <p className="text-sm text-muted">
                 {t('onboarding.nudge_description')}
               </p>
             </div>
@@ -345,17 +345,17 @@ export function MyListingsPage() {
             <GlassCard className="p-4 text-center">
               <Package className="w-5 h-5 text-accent mx-auto mb-1" />
               <p className="text-2xl font-bold text-foreground">{stats.active_listings}</p>
-              <p className="text-xs text-default-500">{t('my_listings.stat_active')}</p>
+              <p className="text-xs text-muted">{t('my_listings.stat_active')}</p>
             </GlassCard>
             <GlassCard className="p-4 text-center">
               <DollarSign className="w-5 h-5 text-success mx-auto mb-1" />
               <p className="text-2xl font-bold text-foreground">{stats.sold_listings}</p>
-              <p className="text-xs text-default-500">{t('my_listings.stat_sold')}</p>
+              <p className="text-xs text-muted">{t('my_listings.stat_sold')}</p>
             </GlassCard>
             <GlassCard className="p-4 text-center">
               <Eye className="w-5 h-5 text-accent mx-auto mb-1" />
               <p className="text-2xl font-bold text-foreground">{stats.total_views}</p>
-              <p className="text-xs text-default-500">{t('my_listings.stat_views')}</p>
+              <p className="text-xs text-muted">{t('my_listings.stat_views')}</p>
             </GlassCard>
             <GlassCard className="p-4 text-center">
               <BarChart3 className="w-5 h-5 text-warning mx-auto mb-1" />
@@ -364,7 +364,7 @@ export function MyListingsPage() {
                   ? formatCurrency(stats.total_revenue, stats.revenue_currency || 'EUR')
                   : '0'}
               </p>
-              <p className="text-xs text-default-500">{t('my_listings.stat_revenue')}</p>
+              <p className="text-xs text-muted">{t('my_listings.stat_revenue')}</p>
             </GlassCard>
           </div>
         )}
@@ -385,7 +385,7 @@ export function MyListingsPage() {
                   <tab.icon className="w-4 h-4" />
                   <span>{t(tab.tKey)}</span>
                   {stats && (
-                    <span className="text-xs text-default-400">
+                    <span className="text-xs text-muted">
                       ({stats[`${tab.key}_listings`] ?? 0})
                     </span>
                   )}
@@ -422,7 +422,7 @@ export function MyListingsPage() {
                 <GlassCard key={listing.id} className="overflow-hidden">
                   {/* Image */}
                   <Link to={tenantPath(`/marketplace/${listing.id}`)}>
-                    <div className="aspect-square bg-default-100 relative overflow-hidden">
+                    <div className="aspect-square bg-surface-secondary relative overflow-hidden">
                       {listing.image?.url ? (
                         <img
                           src={listing.image.thumbnail_url || listing.image.url}
@@ -432,7 +432,7 @@ export function MyListingsPage() {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <Package className="w-10 h-10 text-default-300" />
+                          <Package className="w-10 h-10 text-muted" />
                         </div>
                       )}
                     </div>
@@ -457,7 +457,7 @@ export function MyListingsPage() {
                     )}
 
                     <div
-                      className="flex items-center gap-1 text-xs text-default-400 mt-1"
+                      className="flex items-center gap-1 text-xs text-muted mt-1"
                       aria-label={t('my_listings.views_count_aria', { count: listing.views_count })}
                     >
                       <Eye className="w-3 h-3" />
@@ -484,7 +484,7 @@ export function MyListingsPage() {
                         );
                       }
                       return (
-                        <span className="inline-block mt-1 text-[10px] font-medium px-2 py-0.5 rounded bg-default-100 text-default-600">
+                        <span className="inline-block mt-1 text-[10px] font-medium px-2 py-0.5 rounded bg-surface-secondary text-muted">
                           {t('inventory.count_chip', { count: inv })}
                         </span>
                       );
@@ -554,7 +554,7 @@ export function MyListingsPage() {
         <ModalContent>
           <ModalHeader>{t('my_listings.remove_confirm_title')}</ModalHeader>
           <ModalBody>
-            <p className="text-default-600">
+            <p className="text-muted">
               {t('my_listings.remove_confirm_description')}
             </p>
           </ModalBody>

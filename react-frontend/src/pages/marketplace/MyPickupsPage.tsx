@@ -74,7 +74,7 @@ export function MyPickupsPage() {
           <ShoppingBag className="w-7 h-7 text-accent" />
           {t('pickup.my_pickups_title')}
         </h1>
-        <p className="text-default-500 text-sm mt-1">
+        <p className="text-muted text-sm mt-1">
           {t('pickup.my_pickups_subtitle')}
         </p>
       </div>
@@ -84,7 +84,7 @@ export function MyPickupsPage() {
           <Spinner size="lg" color="primary" />
         </div>
       ) : reservations.length === 0 ? (
-        <GlassCard className="p-8 text-center text-default-500">
+        <GlassCard className="p-8 text-center text-muted">
           {t('pickup.no_pickups')}
         </GlassCard>
       ) : (
@@ -96,7 +96,7 @@ export function MyPickupsPage() {
                   <p className="font-semibold text-foreground">
                     {r.listing_title || t('pickup.order_n', { id: r.order_id })}
                   </p>
-                  <p className="text-sm text-default-500">
+                  <p className="text-sm text-muted">
                     {t('pickup.window')}: {formatTime(r.slot?.slot_start ?? null)}
                   </p>
                 </div>
@@ -106,10 +106,10 @@ export function MyPickupsPage() {
               </div>
 
               {r.status === 'reserved' && (
-                <div className="flex items-center gap-3 p-3 rounded-md bg-default-100">
+                <div className="flex items-center gap-3 p-3 rounded-md bg-surface-secondary">
                   <QrCode className="w-10 h-10 text-accent shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-default-500">
+                    <p className="text-xs text-muted">
                       {t('pickup.show_this_code')}
                     </p>
                     <p className="font-mono text-sm font-semibold break-all text-foreground">

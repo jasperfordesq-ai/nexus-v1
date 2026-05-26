@@ -315,7 +315,7 @@ export function MarketplaceSearchPage() {
             value={priceMin}
             onValueChange={setPriceMin}
           />
-          <span className="text-default-400">-</span>
+          <span className="text-muted">-</span>
           <Input
             size="sm"
             type="number"
@@ -431,7 +431,7 @@ export function MarketplaceSearchPage() {
             >
               {t('page_title')}
             </Button>
-            <span className="text-default-300">/</span>
+            <span className="text-muted">/</span>
             <span className="text-foreground font-medium">{t('search.breadcrumb_search')}</span>
           </div>
 
@@ -441,7 +441,7 @@ export function MarketplaceSearchPage() {
               placeholder={t('search.search_placeholder')}
               value={searchQuery}
               onValueChange={setSearchQuery}
-              startContent={<Search className="w-4 h-4 text-default-400" />}
+              startContent={<Search className="w-4 h-4 text-muted" />}
               size="lg"
               variant="bordered"
               classNames={{ inputWrapper: 'bg-background' }}
@@ -578,7 +578,7 @@ export function MarketplaceSearchPage() {
             ) : (
               <>
                 <div className="flex items-center justify-between mb-4">
-                  <p className="text-sm text-default-500">
+                  <p className="text-sm text-muted">
                     {t('search.results_count', { count: listings.length })}
                     {debouncedQuery && (
                       <> {t('search.results_for')} &quot;<span className="font-medium text-foreground">{debouncedQuery}</span>&quot;</>

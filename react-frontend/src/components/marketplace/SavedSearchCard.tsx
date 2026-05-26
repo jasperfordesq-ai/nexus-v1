@@ -51,7 +51,7 @@ export function SavedSearchCard({ search, onToggle, onDelete, onRun }: SavedSear
   }
 
   return (
-    <Card className="bg-background/60 border border-divider">
+    <Card className="bg-background/60 border border-border">
       <CardBody className="p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
@@ -89,7 +89,7 @@ export function SavedSearchCard({ search, onToggle, onDelete, onRun }: SavedSear
 
             {/* Alert frequency */}
             <div className="flex items-center gap-2 mt-2">
-              <Bell aria-hidden="true" className="w-3.5 h-3.5 text-default-400" />
+              <Bell aria-hidden="true" className="w-3.5 h-3.5 text-muted" />
               <Chip
                 size="sm"
                 variant="flat"
@@ -97,7 +97,7 @@ export function SavedSearchCard({ search, onToggle, onDelete, onRun }: SavedSear
               >
                 {t(`saved_searches.frequency_${search.alert_frequency}`)}
               </Chip>
-              <span className="text-xs text-default-400">
+              <span className="text-xs text-muted">
                 {search.alert_channel === 'both'
                   ? t('saved_searches.channel_both')
                   : search.alert_channel === 'push'

@@ -31,7 +31,7 @@ export function CollectionCard({ collection, thumbnails = [], onClick }: Collect
     <Card
       isPressable={!!onClick}
       onPress={() => onClick?.(collection)}
-      className="bg-background/60 border border-divider hover:border-accent/40 transition-colors"
+      className="bg-background/60 border border-border hover:border-accent/40 transition-colors"
     >
       <CardBody className="p-0">
         {/* Thumbnail grid */}

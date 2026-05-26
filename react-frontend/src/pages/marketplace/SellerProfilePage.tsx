@@ -80,7 +80,7 @@ function StatCard({
     <div className="text-center space-y-1">
       <Icon className="w-5 h-5 text-accent mx-auto" />
       <p className="text-lg font-bold text-foreground">{value}</p>
-      <p className="text-xs text-default-400">{label}</p>
+      <p className="text-xs text-muted">{label}</p>
     </div>
   );
 }
@@ -284,10 +284,10 @@ export function SellerProfilePage() {
               </div>
 
               {seller.bio && (
-                <p className="text-sm text-default-600 max-w-lg">{seller.bio}</p>
+                <p className="text-sm text-muted max-w-lg">{seller.bio}</p>
               )}
 
-              <div className="flex items-center justify-center sm:justify-start gap-4 text-xs text-default-400 flex-wrap">
+              <div className="flex items-center justify-center sm:justify-start gap-4 text-xs text-muted flex-wrap">
                 {seller.location && (
                   <span className="flex items-center gap-1">
                     <MapPin className="w-3 h-3" />
@@ -303,7 +303,7 @@ export function SellerProfilePage() {
               {/* Trust score */}
               {seller.community_trust_score !== null && seller.community_trust_score > 0 && (
                 <div className="flex items-center justify-center sm:justify-start gap-1.5">
-                  <span className="text-xs text-default-400">{t('seller.community_trust')}</span>
+                  <span className="text-xs text-muted">{t('seller.community_trust')}</span>
                   <div className="flex items-center gap-0.5">
                     {[1, 2, 3, 4, 5].map((level) => (
                       <Star
@@ -311,7 +311,7 @@ export function SellerProfilePage() {
                         className={`w-3.5 h-3.5 ${
                           level <= Math.round((seller.community_trust_score ?? 0) / 20)
                             ? 'fill-warning text-warning'
-                            : 'text-default-200'
+                            : 'text-muted'
                         }`}
                       />
                     ))}
@@ -416,9 +416,9 @@ export function SellerProfilePage() {
 
         {activeTab === 'reviews' && (
           <GlassCard className="p-8 text-center">
-            <Star className="w-12 h-12 text-default-200 mx-auto mb-3" />
+            <Star className="w-12 h-12 text-muted mx-auto mb-3" />
             <h3 className="text-lg font-semibold text-foreground mb-2">{t('seller.reviews_coming_soon_title')}</h3>
-            <p className="text-sm text-default-500 max-w-md mx-auto">
+            <p className="text-sm text-muted max-w-md mx-auto">
               {t('seller.reviews_coming_soon_description')}
             </p>
           </GlassCard>

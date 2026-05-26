@@ -244,7 +244,7 @@ export function MarketplaceCollectionsPage() {
             <div className="min-w-0">
               <h1 className="text-2xl font-bold text-foreground">{selectedCollection.name}</h1>
               {selectedCollection.description && (
-                <p className="text-sm text-default-500 mt-1">{selectedCollection.description}</p>
+                <p className="text-sm text-muted mt-1">{selectedCollection.description}</p>
               )}
               <div className="flex flex-wrap items-center gap-2 mt-1">
                 <Chip size="sm" variant="flat">
@@ -282,7 +282,7 @@ export function MarketplaceCollectionsPage() {
               {collectionItems.map((item) => (
                 <GlassCard key={item.collection_item_id} className="overflow-hidden">
                   <Link to={tenantPath(`/marketplace/${item.listing.id}`)}>
-                    <div className="aspect-square bg-default-100 overflow-hidden">
+                    <div className="aspect-square bg-surface-secondary overflow-hidden">
                       {item.listing.image ? (
                         <img
                           src={item.listing.image.thumbnail_url || item.listing.image.url}
@@ -292,7 +292,7 @@ export function MarketplaceCollectionsPage() {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <Package className="w-10 h-10 text-default-300" />
+                          <Package className="w-10 h-10 text-muted" />
                         </div>
                       )}
                     </div>
@@ -312,7 +312,7 @@ export function MarketplaceCollectionsPage() {
                           : ''}
                     </p>
                     {item.note && (
-                      <p className="text-xs text-default-400 mt-1 italic line-clamp-2">{item.note}</p>
+                      <p className="text-xs text-muted mt-1 italic line-clamp-2">{item.note}</p>
                     )}
                     <Button
                       size="sm"
@@ -351,7 +351,7 @@ export function MarketplaceCollectionsPage() {
               <FolderHeart className="w-7 h-7 text-accent" />
               {t('collections.page_title')}
             </h1>
-            <p className="text-default-500 text-sm mt-1">
+            <p className="text-muted text-sm mt-1">
               {t('collections.subtitle')}
             </p>
           </div>

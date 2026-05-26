@@ -70,7 +70,7 @@ function StarRating({
               className={`w-8 h-8 transition-colors ${
                 filled
                   ? 'fill-warning text-warning'
-                  : 'text-default-300'
+                  : 'text-muted'
               }`}
             />
           </Button>
@@ -144,7 +144,7 @@ export function RatingModal({ orderId, isOpen, onClose, onSuccess }: RatingModal
 
         <ModalBody className="space-y-4">
           <div>
-            <p className="text-sm text-default-500 mb-2">
+            <p className="text-sm text-muted mb-2">
               {t('orders.rating.how_was_experience')}
             </p>
             <StarRating value={rating} onChange={setRating} />

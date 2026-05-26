@@ -205,8 +205,8 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
 
   if (images.length === 0 && !videoUrl) {
     return (
-      <div className="aspect-video bg-default-100 rounded-xl flex items-center justify-center">
-        <ShoppingBag className="w-16 h-16 text-default-300" />
+      <div className="aspect-video bg-surface-secondary rounded-xl flex items-center justify-center">
+        <ShoppingBag className="w-16 h-16 text-muted" />
       </div>
     );
   }
@@ -231,7 +231,7 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
       {images.length === 0 ? null : (
       <>
       {/* Main image */}
-      <div className="relative aspect-video bg-default-100 rounded-xl overflow-hidden">
+      <div className="relative aspect-video bg-surface-secondary rounded-xl overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.img
             key={activeIndex}
@@ -534,10 +534,10 @@ export function MarketplaceListingPage() {
           </Button>
           {listing.category?.name && listing.category?.slug && (
             <>
-              <span className="text-default-300">/</span>
+              <span className="text-muted">/</span>
               <Link
                 to={tenantPath(`/marketplace/category/${listing.category?.slug}`)}
-                className="text-default-500 hover:text-accent transition-colors"
+                className="text-muted hover:text-accent transition-colors"
               >
                 {listing.category?.name}
               </Link>
@@ -617,7 +617,7 @@ export function MarketplaceListingPage() {
                 )}
               </div>
 
-              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-default-400">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted">
                 {listing.location && (
                   <span className="flex items-center gap-1">
                     <MapPin className="w-3 h-3" />
@@ -682,7 +682,7 @@ export function MarketplaceListingPage() {
               </div>
 
               {!isAuthenticated && (
-                <p className="text-xs text-default-400 text-center">
+                <p className="text-xs text-muted text-center">
                   <Link to={tenantPath('/login')} className="text-accent hover:underline">
                     {t('listing.sign_in')}
                   </Link>
@@ -694,7 +694,7 @@ export function MarketplaceListingPage() {
             {/* Seller card */}
             {listing.user && (
             <GlassCard className="p-5 space-y-3">
-              <h3 className="text-sm font-semibold text-default-500 uppercase tracking-wide">
+              <h3 className="text-sm font-semibold text-muted uppercase tracking-wide">
                 {t('listing.seller')}
               </h3>
               <div className="flex items-center gap-3">
@@ -711,7 +711,7 @@ export function MarketplaceListingPage() {
                     {listing.user.name}
                   </Link>
                   <VerificationBadgeRow userId={listing.user.id} size="sm" />
-                  <div className="flex items-center gap-3 text-xs text-default-400 mt-0.5">
+                  <div className="flex items-center gap-3 text-xs text-muted mt-0.5">
                     {listing.user.member_since && (
                       <span>{t('listing.member_since', { date: new Date(listing.user.member_since).getFullYear() })}</span>
                     )}
@@ -739,7 +739,7 @@ export function MarketplaceListingPage() {
             {/* Delivery */}
             {listing.delivery_method && (
               <GlassCard className="p-5">
-                <h3 className="text-sm font-semibold text-default-500 uppercase tracking-wide mb-2">
+                <h3 className="text-sm font-semibold text-muted uppercase tracking-wide mb-2">
                   {t('listing.delivery')}
                 </h3>
                 <p className="text-sm text-foreground">
@@ -765,7 +765,7 @@ export function MarketplaceListingPage() {
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {Object.entries(listing.template_data).map(([key, value]) => (
                   <div key={key} className="space-y-0.5">
-                    <span className="text-xs text-default-400 capitalize">
+                    <span className="text-xs text-muted capitalize">
                       {t('listing.detail_field_label', { field: key.replace(/_/g, ' ') })}
                     </span>
                     <p className="text-sm text-foreground">{String(value)}</p>
@@ -781,7 +781,7 @@ export function MarketplaceListingPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                <User className="w-5 h-5 text-default-400" />
+                <User className="w-5 h-5 text-muted" />
                 {t('listing.more_from_seller', { name: listing.user?.name ?? '' })}
               </h2>
               <Button
@@ -802,7 +802,7 @@ export function MarketplaceListingPage() {
                   className="block group"
                 >
                   <GlassCard hoverable className="overflow-hidden">
-                    <div className="aspect-square bg-default-100 overflow-hidden rounded-t-xl">
+                    <div className="aspect-square bg-surface-secondary overflow-hidden rounded-t-xl">
                       {item.images?.[0] ? (
                         <img
                           src={item.images[0].thumbnail_url || item.images[0].url}
@@ -814,7 +814,7 @@ export function MarketplaceListingPage() {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <ShoppingBag className="w-8 h-8 text-default-300" />
+                          <ShoppingBag className="w-8 h-8 text-muted" />
                         </div>
                       )}
                     </div>
@@ -892,7 +892,7 @@ export function MarketplaceListingPage() {
               <ModalHeader>{t('offer.modal_title')}</ModalHeader>
               <ModalBody className="space-y-4">
                 <div>
-                  <p className="text-sm text-default-500 mb-3">
+                  <p className="text-sm text-muted mb-3">
                     {t('offer.asking_price')}{' '}
                     <span className="font-semibold text-foreground">{priceDisplay}</span>
                   </p>
@@ -906,7 +906,7 @@ export function MarketplaceListingPage() {
                     value={offerAmount}
                     onValueChange={setOfferAmount}
                     startContent={
-                      <span className="text-default-400 text-sm">
+                      <span className="text-muted text-sm">
                         {listing.price_currency || 'EUR'}
                       </span>
                     }

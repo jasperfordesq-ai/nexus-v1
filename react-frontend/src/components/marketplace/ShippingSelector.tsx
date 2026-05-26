@@ -113,7 +113,7 @@ export function ShippingSelector({ sellerId, onSelect, localPickup }: ShippingSe
     return (
       <div className="flex items-center gap-2 py-4">
         <Spinner size="sm" color="primary" />
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {t('shipping.loading')}
         </span>
       </div>
@@ -131,7 +131,7 @@ export function ShippingSelector({ sellerId, onSelect, localPickup }: ShippingSe
   if (options.length === 0 && !localPickup) {
     return (
       <div className="py-3">
-        <p className="text-sm text-default-500">
+        <p className="text-sm text-muted">
           {t('shipping.no_options')}
         </p>
       </div>
@@ -156,7 +156,7 @@ export function ShippingSelector({ sellerId, onSelect, localPickup }: ShippingSe
           <Radio
             value={LOCAL_PICKUP_ID}
             classNames={{
-              base: 'max-w-full m-0 border border-default-200 rounded-lg p-3 data-[selected=true]:border-accent',
+              base: 'max-w-full m-0 border border-separator rounded-lg p-3 data-[selected=true]:border-accent',
             }}
           >
             <div className="flex items-center gap-3">
@@ -165,7 +165,7 @@ export function ShippingSelector({ sellerId, onSelect, localPickup }: ShippingSe
                 <span className="text-sm font-medium text-foreground">
                   {t('shipping.local_pickup')}
                 </span>
-                <span className="text-xs text-default-500 ml-2">
+                <span className="text-xs text-muted ml-2">
                   {t('shipping.local_pickup_subtitle')}
                 </span>
               </div>
@@ -182,7 +182,7 @@ export function ShippingSelector({ sellerId, onSelect, localPickup }: ShippingSe
             key={option.id}
             value={String(option.id)}
             classNames={{
-              base: 'max-w-full m-0 border border-default-200 rounded-lg p-3 data-[selected=true]:border-accent',
+              base: 'max-w-full m-0 border border-separator rounded-lg p-3 data-[selected=true]:border-accent',
             }}
           >
             <div className="flex items-center gap-3">
@@ -199,7 +199,7 @@ export function ShippingSelector({ sellerId, onSelect, localPickup }: ShippingSe
                   )}
                 </div>
                 {option.estimated_days != null && (
-                  <span className="text-xs text-default-500 flex items-center gap-1 mt-0.5">
+                  <span className="text-xs text-muted flex items-center gap-1 mt-0.5">
                     <Clock className="w-3 h-3" aria-hidden="true" />
                     {t('shipping.estimated_delivery', { days: option.estimated_days })}
                   </span>

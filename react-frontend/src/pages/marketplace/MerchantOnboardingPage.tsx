@@ -114,7 +114,7 @@ function StepIndicator({ current, labels }: StepIndicatorProps) {
                     ? 'bg-success border-success text-white'
                     : isActive
                       ? 'bg-accent border-accent text-white'
-                      : 'bg-[var(--color-surface)] border-default-300 text-default-400',
+                      : 'bg-[var(--color-surface)] border-border text-muted',
                 ].join(' ')}
               >
                 {isComplete ? <CheckCircle2 size={16} /> : step}
@@ -122,7 +122,7 @@ function StepIndicator({ current, labels }: StepIndicatorProps) {
               <span
                 className={[
                   'mt-1 text-xs hidden sm:block max-w-[72px] text-center leading-tight',
-                  isActive ? 'text-accent font-medium' : 'text-default-400',
+                  isActive ? 'text-accent font-medium' : 'text-muted',
                 ].join(' ')}
               >
                 {label}
@@ -132,7 +132,7 @@ function StepIndicator({ current, labels }: StepIndicatorProps) {
               <div
                 className={[
                   'h-0.5 w-12 sm:w-16 mx-1 mb-4 transition-colors',
-                  isComplete ? 'bg-success' : 'bg-default-200',
+                  isComplete ? 'bg-success' : 'bg-surface-tertiary',
                 ].join(' ')}
               />
             )}
@@ -474,10 +474,10 @@ export function MerchantOnboardingPage() {
         <h1 className="text-2xl sm:text-3xl font-bold text-[var(--color-text)]">
           {t('hero_title')}
         </h1>
-        <p className="mt-2 text-default-500 text-sm sm:text-base">
+        <p className="mt-2 text-muted text-sm sm:text-base">
           {t('hero_subtitle')}
         </p>
-        <p className="mt-1 text-xs text-default-400">
+        <p className="mt-1 text-xs text-muted">
           {t('step_of', { current: step, total: TOTAL_STEPS })}
         </p>
       </div>
@@ -591,7 +591,7 @@ export function MerchantOnboardingPage() {
                   const isOpen = hours !== null;
                   return (
                     <div key={day} className="flex items-center gap-3">
-                      <span className="w-20 text-sm text-default-600 shrink-0">
+                      <span className="w-20 text-sm text-muted shrink-0">
                         {t(`days.${day}`)}
                       </span>
                       <Switch
@@ -600,7 +600,7 @@ export function MerchantOnboardingPage() {
                         onValueChange={() => toggleDay(day)}
                         aria-label={isOpen ? t('open') : t('closed')}
                       />
-                      <span className="text-xs text-default-400 w-14">
+                      <span className="text-xs text-muted w-14">
                         {isOpen ? t('open') : t('closed')}
                       </span>
                       {isOpen && (
@@ -618,7 +618,7 @@ export function MerchantOnboardingPage() {
                               input: 'text-sm',
                             }}
                           />
-                          <span className="text-default-400 text-xs">-</span>
+                          <span className="text-muted text-xs">-</span>
                           <Input
                             type="time"
                             size="sm"
@@ -659,8 +659,8 @@ export function MerchantOnboardingPage() {
                   className="w-24 h-24 rounded-full object-cover border-2 border-accent"
                 />
               ) : (
-                <div className="w-24 h-24 rounded-full bg-default-100 flex items-center justify-center border-2 border-dashed border-default-300">
-                  <Camera size={32} className="text-default-400" />
+                <div className="w-24 h-24 rounded-full bg-surface-secondary flex items-center justify-center border-2 border-dashed border-border">
+                  <Camera size={32} className="text-muted" />
                 </div>
               )}
               <input
@@ -703,7 +703,7 @@ export function MerchantOnboardingPage() {
                 <img
                   src={coverPreview}
                   alt={t('upload_cover')}
-                  className="w-full h-32 object-cover rounded-xl border border-default-200"
+                  className="w-full h-32 object-cover rounded-xl border border-separator"
                 />
               )}
               <input
@@ -735,31 +735,31 @@ export function MerchantOnboardingPage() {
             <h2 className="text-lg font-semibold text-[var(--color-text)]">
               {t('complete_title')}
             </h2>
-            <p className="text-sm text-default-500">{t('complete_summary')}</p>
+            <p className="text-sm text-muted">{t('complete_summary')}</p>
 
             {/* Summary card */}
-            <div className="rounded-xl border border-default-200 p-4 space-y-2 text-sm">
+            <div className="rounded-xl border border-separator p-4 space-y-2 text-sm">
               {displayName && (
                 <div className="flex gap-2">
-                  <span className="font-medium text-default-600 w-32 shrink-0">{t('display_name')}:</span>
+                  <span className="font-medium text-muted w-32 shrink-0">{t('display_name')}:</span>
                   <span className="text-[var(--color-text)]">{displayName}</span>
                 </div>
               )}
               {businessName && (
                 <div className="flex gap-2">
-                  <span className="font-medium text-default-600 w-32 shrink-0">{t('business_name')}:</span>
+                  <span className="font-medium text-muted w-32 shrink-0">{t('business_name')}:</span>
                   <span className="text-[var(--color-text)]">{businessName}</span>
                 </div>
               )}
               {bio && (
                 <div className="flex gap-2">
-                  <span className="font-medium text-default-600 w-32 shrink-0">{t('bio')}:</span>
+                  <span className="font-medium text-muted w-32 shrink-0">{t('bio')}:</span>
                   <span className="text-[var(--color-text)] line-clamp-2">{bio}</span>
                 </div>
               )}
               {address.city && (
                 <div className="flex gap-2">
-                  <span className="font-medium text-default-600 w-32 shrink-0">{t('address_city')}:</span>
+                  <span className="font-medium text-muted w-32 shrink-0">{t('address_city')}:</span>
                   <span className="text-[var(--color-text)]">{address.city}, {address.country}</span>
                 </div>
               )}
@@ -768,7 +768,7 @@ export function MerchantOnboardingPage() {
                   <img
                     src={avatarPreview}
                     alt={t('steps.photo')}
-                    className="w-10 h-10 rounded-full object-cover border border-default-200"
+                    className="w-10 h-10 rounded-full object-cover border border-separator"
                   />
                 </div>
               )}
@@ -812,7 +812,7 @@ export function MerchantOnboardingPage() {
 
         {/* ── Navigation buttons ───────────────────────────────────────── */}
         {step < 4 && (
-          <div className="flex justify-between mt-6 pt-4 border-t border-default-100">
+          <div className="flex justify-between mt-6 pt-4 border-t border-separator">
             <Button
               variant="flat"
               startContent={<ArrowLeft size={16} />}

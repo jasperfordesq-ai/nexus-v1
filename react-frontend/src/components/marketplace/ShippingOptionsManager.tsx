@@ -391,10 +391,10 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
                 submitLabel={t('shipping.save_changes')}
               />
             ) : (
-              <GlassCard key={option.id} className="border border-default-200 p-4 shadow-sm">
+              <GlassCard key={option.id} className="border border-separator p-4 shadow-sm">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-center gap-3 min-w-0 flex-1">
-                    <Truck className="w-5 h-5 text-default-400 shrink-0" />
+                    <Truck className="w-5 h-5 text-muted shrink-0" />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-medium text-foreground">
@@ -406,7 +406,7 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
                           </Chip>
                         )}
                       </div>
-                      <div className="flex items-center gap-3 text-sm text-default-500 mt-0.5">
+                      <div className="flex items-center gap-3 text-sm text-muted mt-0.5">
                         <span className="font-semibold text-foreground">
                           {new Intl.NumberFormat(undefined, {
                             style: 'currency',
