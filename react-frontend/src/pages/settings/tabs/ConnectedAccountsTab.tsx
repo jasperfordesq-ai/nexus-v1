@@ -150,7 +150,7 @@ export function ConnectedAccountsTab() {
               {linked ? (
                 <Button
                   size="sm"
-                  variant="bordered"
+                  variant="outline"
                   isDisabled={isBusy || isOnlyAuthMethod}
                   isLoading={isBusy}
                   onPress={() => handleDisconnect(provider)}

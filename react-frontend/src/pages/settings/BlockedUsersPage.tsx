@@ -93,12 +93,12 @@ export function BlockedUsersPage() {
         <div className="flex flex-col gap-5 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex max-w-2xl items-start gap-4">
             <Link to={tenantPath('/settings?tab=privacy')}>
-              <Button isIconOnly variant="flat" className="bg-theme-elevated text-theme-primary" aria-label={t('back', { ns: 'common' })}>
+              <Button isIconOnly variant="tertiary" aria-label={t('back', { ns: 'common' })}>
                 <ArrowLeft className="h-5 w-5" />
               </Button>
             </Link>
             <div>
-              <Chip size="sm" variant="flat" color="danger" className="mb-3 font-medium">
+              <Chip size="sm" variant="soft" color="danger" className="mb-3 font-medium">
                 {t('blocked_users.privacy_badge')}
               </Chip>
               <h1 className="flex items-center gap-3 text-3xl font-bold leading-tight text-theme-primary sm:text-4xl">
@@ -151,7 +151,7 @@ export function BlockedUsersPage() {
                 </div>
                 <Button
                   size="sm"
-                  variant="flat"
+                  variant="danger-soft"
                   className="bg-red-500/10 text-red-600 dark:text-red-400 sm:ml-auto"
                   onPress={() => setUnblockTarget(user)}
                 >
@@ -182,11 +182,10 @@ export function BlockedUsersPage() {
             </p>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={() => setUnblockTarget(null)}>
+            <Button variant="tertiary" onPress={() => setUnblockTarget(null)}>
               {t('cancel', { ns: 'common' })}
             </Button>
             <Button
-              color="primary"
               onPress={handleUnblock}
               isLoading={isUnblocking}
             >

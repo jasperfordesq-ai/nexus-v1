@@ -159,7 +159,7 @@ export function DataExportPage(): JSX.Element {
               <ShieldCheck className="h-7 w-7 text-indigo-500" aria-hidden="true" />
             </div>
             <div className="space-y-2">
-              <Chip size="sm" variant="flat" color="primary" className="font-medium">
+              <Chip size="sm" variant="soft" color="accent" className="font-medium">
                 {t('data_export.format.label')}
               </Chip>
               <h1 className="text-3xl font-bold leading-tight text-theme-primary sm:text-4xl">{t('data_export.title')}</h1>
@@ -197,7 +197,6 @@ export function DataExportPage(): JSX.Element {
             <span>{t('data_export.warning')}</span>
           </div>
           <Button
-            color="primary"
             size="lg"
             onPress={handleDownload}
             isLoading={isDownloading}

@@ -172,7 +172,6 @@ export function TranslationTab() {
 
       <div className="flex justify-end">
         <Button
-          color="primary"
           isLoading={isSaving}
           isDisabled={isLoading}
           onPress={handleSave}

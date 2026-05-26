@@ -238,7 +238,7 @@ export function VerifyIdentityOptionalPage() {
       <div className="min-h-[60vh] flex items-center justify-center p-4">
         <GlassCard className="p-8 text-center max-w-md">
           <p className="text-theme-muted mb-4">{t('identity_auth.please_login')}</p>
-          <Link to={tenantPath('/login')}><Button color="primary">{t('identity_auth.go_to_login')}</Button></Link>
+          <Link to={tenantPath('/login')}><Button>{t('identity_auth.go_to_login')}</Button></Link>
         </GlassCard>
       </div>
     );
@@ -274,8 +274,8 @@ export function VerifyIdentityOptionalPage() {
               <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">{t('identity.verified_badge_label')}</span>
             </div>
             <div className="flex flex-col gap-3">
-              <Button color="primary" className="w-full" onPress={() => navigate(tenantPath('/settings'))}>{t('identity.go_to_settings')}</Button>
-              <Button variant="flat" className="w-full" startContent={<ArrowLeft className="w-4 h-4" />} onPress={() => navigate(tenantPath('/dashboard'))}>{t('identity.back_to_dashboard')}</Button>
+              <Button className="w-full" onPress={() => navigate(tenantPath('/settings'))}>{t('identity.go_to_settings')}</Button>
+              <Button variant="tertiary" className="w-full" startContent={<ArrowLeft className="w-4 h-4" />} onPress={() => navigate(tenantPath('/dashboard'))}>{t('identity.back_to_dashboard')}</Button>
             </div>
           </GlassCard>
         </motion.div>
@@ -298,7 +298,7 @@ export function VerifyIdentityOptionalPage() {
             <p className="text-theme-subtle text-sm mb-6">{t('identity.failed_hint')}</p>
             <div className="flex flex-col gap-3">
               <Button onPress={handleStartVerification} isLoading={isStarting} className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white" startContent={!isStarting ? <RefreshCw className="w-4 h-4" /> : undefined}>{t('identity.try_again')}</Button>
-              <Button variant="flat" className="w-full" startContent={<ArrowLeft className="w-4 h-4" />} onPress={() => navigate(tenantPath('/dashboard'))}>{t('identity.back_to_dashboard')}</Button>
+              <Button variant="tertiary" className="w-full" startContent={<ArrowLeft className="w-4 h-4" />} onPress={() => navigate(tenantPath('/dashboard'))}>{t('identity.back_to_dashboard')}</Button>
             </div>
           </GlassCard>
         </motion.div>
@@ -351,7 +351,7 @@ export function VerifyIdentityOptionalPage() {
                 label={t('identity.dob_label')}
                 value={dob}
                 onChange={(e) => setDob(e.target.value)}
-                variant="bordered"
+                variant="secondary"
                 max={new Date().toISOString().split('T')[0]}
                 classNames={{ label: 'text-theme-primary' }}
               />
@@ -366,7 +366,7 @@ export function VerifyIdentityOptionalPage() {
                 {t('identity.continue')}
               </Button>
 
-              <Button variant="flat" className="w-full" startContent={<ArrowLeft className="w-4 h-4" />} onPress={() => navigate(tenantPath('/dashboard'))}>{t('identity.maybe_later')}</Button>
+              <Button variant="tertiary" className="w-full" startContent={<ArrowLeft className="w-4 h-4" />} onPress={() => navigate(tenantPath('/dashboard'))}>{t('identity.maybe_later')}</Button>
             </div>
           </GlassCard>
         </motion.div>
@@ -417,7 +417,7 @@ export function VerifyIdentityOptionalPage() {
                   {t('identity.pay_button', { fee: feeDisplay })}
                 </Button>
 
-                <Button variant="flat" className="w-full" startContent={<ArrowLeft className="w-4 h-4" />} onPress={() => navigate(tenantPath('/dashboard'))}>{t('identity.maybe_later')}</Button>
+                <Button variant="tertiary" className="w-full" startContent={<ArrowLeft className="w-4 h-4" />} onPress={() => navigate(tenantPath('/dashboard'))}>{t('identity.maybe_later')}</Button>
               </div>
             ) : (
               <div className="space-y-4">
@@ -448,7 +448,7 @@ export function VerifyIdentityOptionalPage() {
               className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-emerald-500/20 mb-4"
             >
               {pageState === 'in_progress' ? (
-                <Spinner size="lg" color="secondary" />
+                <Spinner size="lg" color="accent" />
               ) : (
                 <Fingerprint className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
               )}
@@ -490,14 +490,14 @@ export function VerifyIdentityOptionalPage() {
                 {t('identity.start_button')}
               </Button>
 
-              <Button variant="flat" className="w-full" startContent={<ArrowLeft className="w-4 h-4" />} onPress={() => navigate(tenantPath('/dashboard'))}>{t('identity.maybe_later')}</Button>
+              <Button variant="tertiary" className="w-full" startContent={<ArrowLeft className="w-4 h-4" />} onPress={() => navigate(tenantPath('/dashboard'))}>{t('identity.maybe_later')}</Button>
             </div>
           )}
 
           {pageState === 'in_progress' && (
             <div className="space-y-4">
               {redirectUrl && (
-                <Button as="a" href={redirectUrl} target="_blank" rel="noopener noreferrer" variant="bordered" className="w-full border-indigo-500/30 text-theme-primary hover:bg-indigo-500/10" size="lg" startContent={<ExternalLink className="w-4 h-4" />}>
+                <Button as="a" href={redirectUrl} target="_blank" rel="noopener noreferrer" variant="outline" className="w-full border-indigo-500/30 text-theme-primary hover:bg-indigo-500/10" size="lg" startContent={<ExternalLink className="w-4 h-4" />}>
                   {t('identity.open_window')}
                 </Button>
               )}
@@ -508,8 +508,8 @@ export function VerifyIdentityOptionalPage() {
               </div>
 
               <div className="flex flex-col gap-2 pt-2">
-                <Button variant="flat" size="sm" className="w-full text-theme-muted" onPress={() => { stopPolling(); setPageState('start'); setRedirectUrl(null); userStartedRef.current = false; }}>{t('identity.cancel_start_over')}</Button>
-                <Button variant="light" size="sm" className="w-full text-theme-subtle" startContent={<ArrowLeft className="w-3.5 h-3.5" />} onPress={() => navigate(tenantPath('/dashboard'))}>{t('identity.back_to_dashboard')}</Button>
+                <Button variant="tertiary" size="sm" className="w-full text-theme-muted" onPress={() => { stopPolling(); setPageState('start'); setRedirectUrl(null); userStartedRef.current = false; }}>{t('identity.cancel_start_over')}</Button>
+                <Button variant="tertiary" size="sm" className="w-full text-theme-subtle" startContent={<ArrowLeft className="w-3.5 h-3.5" />} onPress={() => navigate(tenantPath('/dashboard'))}>{t('identity.back_to_dashboard')}</Button>
               </div>
             </div>
           )}

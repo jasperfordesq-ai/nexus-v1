@@ -190,7 +190,7 @@ export function SafeguardingTab() {
                       {!isDeclination && activationChips.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">
                           {activationChips.map((label, idx) => (
-                            <Chip key={idx} size="sm" variant="flat" color="warning">
+                            <Chip key={idx} size="sm" variant="soft" color="warning">
                               {label}
                             </Chip>
                           ))}
@@ -199,8 +199,7 @@ export function SafeguardingTab() {
                     </div>
                     <Button
                       size="sm"
-                      variant="light"
-                      color="danger"
+                      variant="danger-soft"
                       className="shrink-0"
                       onPress={() => handleRevokeClick(pref)}
                       isLoading={revokingId === pref.option_id}
@@ -235,11 +234,11 @@ export function SafeguardingTab() {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button variant="light" onPress={onClose}>
+                <Button variant="tertiary" onPress={onClose}>
                   {t('safeguarding.revoke_confirm_no')}
                 </Button>
                 <Button
-                  color="danger"
+                  variant="danger"
                   onPress={handleRevokeConfirm}
                   isLoading={revokingId !== null}
                 >

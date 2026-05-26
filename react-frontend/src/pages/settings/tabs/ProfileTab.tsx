@@ -113,7 +113,6 @@ export function ProfileTab({
             <Button
               isIconOnly
               size="md"
-              color="primary"
               className="absolute bottom-0 right-0 h-10 min-w-10 rounded-full shadow-lg"
               onPress={() => fileInputRef.current?.click()}
               isDisabled={isUploading}
@@ -279,7 +278,6 @@ export function ProfileTab({
 
           <Button
             onPress={onSave}
-            color="primary"
             startContent={<Save className="w-4 h-4" aria-hidden="true" />}
             isLoading={isSaving}
             isDisabled={!isDirty || isSaving}

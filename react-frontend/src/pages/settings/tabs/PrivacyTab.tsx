@@ -421,7 +421,7 @@ export function PrivacyTab({
                   {insuranceCerts.map((cert) => (
                     <div
                       key={cert.id}
-                      className="flex items-center justify-between rounded-lg border border-default-200 bg-theme-elevated p-3"
+                      className="flex items-center justify-between rounded-lg border border-border bg-theme-elevated p-3"
                     >
                       <div>
                         <p className="text-sm font-medium text-theme-primary">
@@ -436,7 +436,7 @@ export function PrivacyTab({
                         cert.status === 'verified' ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400'
                           : cert.status === 'pending' || cert.status === 'submitted' ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
                           : cert.status === 'rejected' ? 'bg-red-500/20 text-red-600 dark:text-red-400'
-                          : 'bg-default-200 text-default-600'
+                          : 'bg-surface-secondary text-muted'
                       }`}>
                         {getInsuranceStatusLabel(cert.status)}
                       </span>
@@ -453,7 +453,7 @@ export function PrivacyTab({
                     const val = Array.from(keys)[0] as string;
                     if (val) onInsuranceTypeChange(val);
                   }}
-                  variant="bordered"
+                  variant="secondary"
                   size="sm"
                   className="max-w-xs"
                 >
@@ -464,7 +464,7 @@ export function PrivacyTab({
                   <SelectItem key="personal_accident" id="personal_accident">{t('insurance.personal_accident')}</SelectItem>
                   <SelectItem key="other" id="other">{t('insurance.other')}</SelectItem>
                 </Select>
-                <label className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-theme-elevated hover:bg-theme-hover cursor-pointer transition-colors border border-default-200">
+                <label className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-theme-elevated hover:bg-theme-hover cursor-pointer transition-colors border border-border">
                   <Upload className="w-4 h-4 text-theme-primary" />
                   <span className="text-sm font-medium text-theme-primary">
                     {insuranceUploading ? t('insurance.uploading') : t('insurance.upload_certificate')}

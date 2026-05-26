@@ -907,7 +907,7 @@ export function SettingsPage() {
       <motion.div variants={itemVariants} className="overflow-hidden rounded-2xl border border-theme-default bg-theme-surface">
         <div className="flex flex-col gap-5 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-2xl">
-            <Chip size="sm" variant="flat" color={isDirty ? 'warning' : 'primary'} className="mb-3 font-medium">
+            <Chip size="sm" variant="soft" color={isDirty ? 'warning' : 'accent'} className="mb-3 font-medium">
               {isDirty ? t('header.unsaved_badge') : t('header.badge')}
             </Chip>
             <h1 className="flex items-center gap-3 text-3xl font-bold leading-tight text-theme-primary sm:text-4xl">
@@ -1207,8 +1207,7 @@ export function SettingsPage() {
           </ModalBody>
           <ModalFooter>
             <Button
-              variant="flat"
-              className="bg-theme-elevated text-theme-primary"
+              variant="tertiary"
               onPress={() => {
                 setPendingTab(null);
                 unsavedChangesModal.onClose();
@@ -1216,7 +1215,7 @@ export function SettingsPage() {
             >
               {t('unsaved_changes.stay')}
             </Button>
-            <Button color="danger" onPress={discardChangesAndSwitchTab}>
+            <Button variant="danger" onPress={discardChangesAndSwitchTab}>
               {t('unsaved_changes.leave')}
             </Button>
           </ModalFooter>
@@ -1244,7 +1243,7 @@ export function SettingsPage() {
             </p>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={marketingConsentModal.onClose}>
+            <Button variant="tertiary" onPress={marketingConsentModal.onClose}>
               {t('cancel')}
             </Button>
             <Button
@@ -1328,7 +1327,7 @@ export function SettingsPage() {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={gdprModal.onClose}>
+            <Button variant="tertiary" onPress={gdprModal.onClose}>
               {t("cancel")}
             </Button>
             <Button
