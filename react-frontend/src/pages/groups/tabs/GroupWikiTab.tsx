@@ -342,7 +342,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                   <li key={page.id}>
                     <Button
                       variant="light"
-                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 h-auto min-w-0 justify-start ${
+                      className={`w-full min-h-[40px] text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 justify-start ${
                         selectedPage?.id === page.id
                           ? 'bg-accent/10 text-accent font-medium'
                           : 'text-theme-secondary hover:bg-theme-hover'
@@ -390,7 +390,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                       {idx < breadcrumbs.length - 1 ? (
                         <Button
                           variant="light"
-                          className="hover:text-accent transition-colors underline-offset-2 hover:underline h-auto min-w-0 p-0"
+                          className="min-h-[28px] px-0 py-0 hover:text-accent transition-colors underline-offset-2 hover:underline"
                           onPress={() => loadPage(crumb.slug)}
                         >
                           {crumb.title}

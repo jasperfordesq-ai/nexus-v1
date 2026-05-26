@@ -232,7 +232,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
   return (
     <div className="space-y-4">
       {/* Toolbar: filter chips + upload */}
-      <div className="flex flex-col gap-3 rounded-xl border border-default-200 bg-surface/80 p-3 shadow-sm sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-3 rounded-xl border border-border bg-surface/80 p-3 shadow-sm sm:flex-row sm:items-center">
         <div className="flex flex-wrap gap-2 flex-1" role="group" aria-label={t('media.filter_group')}>
           {FILTER_CHIPS.map((chip) => (
             <Chip
@@ -285,7 +285,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
       {/* Gallery grid */}
       {items.length === 0 ? (
         <EmptyState
-          icon={<Camera className="w-10 h-10 text-default-400" />}
+          icon={<Camera className="w-10 h-10 text-muted" />}
           title={t('media.empty_title')}
           description={
             filter !== 'all'
@@ -300,13 +300,13 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
           {items.map((item, index) => (
             <GlassCard
               key={item.id}
-              className="relative group overflow-hidden cursor-pointer border border-default-200 bg-surface shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+              className="relative group overflow-hidden cursor-pointer border border-border bg-surface shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
               onClick={() => openLightbox(index)}
             >
               {/* Thumbnail */}
               <div className="aspect-square relative">
                 {item.type === 'video' ? (
-                  <div className="w-full h-full bg-default-100 flex items-center justify-center">
+                  <div className="w-full h-full bg-surface-secondary flex items-center justify-center">
                     {item.thumbnail_url ? (
                       <img
                         src={item.thumbnail_url}
@@ -314,7 +314,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <Film className="w-12 h-12 text-default-400" aria-hidden="true" />
+                      <Film className="w-12 h-12 text-muted" aria-hidden="true" />
                     )}
                     {/* Video badge */}
                     <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1">

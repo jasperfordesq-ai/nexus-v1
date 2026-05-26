@@ -380,7 +380,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
           isIconOnly
           variant="light"
           size="sm"
-          className={userVote === 1 ? 'text-success' : 'text-default-400'}
+          className={userVote === 1 ? 'text-success' : 'text-muted'}
           onPress={() => handleVote(type, targetId, 1)}
           isDisabled={isVoting || !isMember}
           aria-label={t('qa.upvote_aria')}
@@ -393,7 +393,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
               ? 'text-success'
               : voteCount < 0
                 ? 'text-danger'
-                : 'text-default-500'
+                : 'text-muted'
           }`}
           aria-label={t('qa.vote_count_aria', { count: voteCount })}
         >
@@ -403,7 +403,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
           isIconOnly
           variant="light"
           size="sm"
-          className={userVote === -1 ? 'text-danger' : 'text-default-400'}
+          className={userVote === -1 ? 'text-danger' : 'text-muted'}
           onPress={() => handleVote(type, targetId, -1)}
           isDisabled={isVoting || !isMember}
           aria-label={t('qa.downvote_aria')}
@@ -438,7 +438,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
           placeholder={t('qa.search_placeholder')}
           value={search}
           onValueChange={setSearch}
-          startContent={<Search className="w-4 h-4 text-default-400" aria-hidden="true" />}
+          startContent={<Search className="w-4 h-4 text-muted" aria-hidden="true" />}
           className="flex-1"
           size="sm"
           aria-label={t('qa.search_aria')}
@@ -463,7 +463,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
         variant="underlined"
         color="primary"
         classNames={{
-          tabList: 'w-full gap-2 overflow-x-auto rounded-lg border border-default-200 bg-surface px-2',
+          tabList: 'w-full gap-2 overflow-x-auto rounded-lg border border-border bg-surface px-2',
           tab: 'h-10 px-3',
         }}
       >
@@ -490,7 +490,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
               {/* Question row */}
               <Button
                 variant="light"
-                className="w-full text-left p-3 hover:bg-default-100/50 transition-colors h-auto min-w-0 justify-start rounded-none"
+                className="w-full min-h-[44px] text-left p-3 hover:bg-surface-secondary/50 transition-colors justify-start rounded-none"
                 onPress={() => toggleExpand(question.id)}
                 aria-expanded={expandedId === question.id}
                 aria-label={t('qa.expand_aria', {
@@ -556,7 +556,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
 
               {/* Expanded detail */}
               {expandedId === question.id && (
-                <div className="border-t border-default-200 p-4 space-y-4">
+                <div className="border-t border-border p-4 space-y-4">
                   {loadingDetail ? (
                     <div className="flex justify-center py-6" aria-busy="true">
                       <Spinner size="sm" />
@@ -581,7 +581,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
                               className={`flex items-start gap-3 p-3 rounded-lg ${
                                 answer.is_accepted
                                   ? 'bg-success-50 dark:bg-success-50/10 border border-success-200 dark:border-success-800'
-                                  : 'bg-default-50 dark:bg-default-100/5'
+                                  : 'bg-surface-secondary/50'
                               }`}
                             >
                               {/* Answer vote controls */}
@@ -635,7 +635,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
 
                       {/* Answer form */}
                       {isMember && (
-                        <div className="space-y-2 pt-2 border-t border-default-200">
+                        <div className="space-y-2 pt-2 border-t border-border">
                           <Textarea
                             placeholder={t('qa.answer_placeholder')}
                             value={answerBody}

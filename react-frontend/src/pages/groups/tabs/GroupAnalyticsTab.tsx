@@ -311,7 +311,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
       </div>
 
       {/* Member Growth Chart */}
-      <Card shadow="sm">
+      <Card className="border border-border bg-surface">
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
           <Users className="w-[18px] h-[18px] text-success" aria-hidden="true" />
           <h3 className="font-semibold">{t('analytics.member_growth')}</h3>
@@ -331,16 +331,16 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
                 <CartesianGrid
                   strokeDasharray="3 3"
                   stroke="currentColor"
-                  className="text-default-200"
+                  className="text-border"
                 />
                 <XAxis
                   dataKey="date"
                   tick={{ fontSize: 11 }}
-                  className="text-default-500"
+                  className="text-muted"
                 />
                 <YAxis
                   tick={{ fontSize: 11 }}
-                  className="text-default-500"
+                  className="text-muted"
                   allowDecimals={false}
                 />
                 <Tooltip contentStyle={tooltipStyle} labelStyle={{ fontWeight: 600 }} />
@@ -365,7 +365,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <p className="flex h-[300px] items-center justify-center text-sm text-default-400">
+            <p className="flex h-[300px] items-center justify-center text-sm text-muted">
               {t('analytics.no_growth_data')}
             </p>
           )}
@@ -373,7 +373,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
       </Card>
 
       {/* Engagement Timeline Chart */}
-      <Card shadow="sm">
+      <Card className="border border-border bg-surface">
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
           <BarChart3 className="w-[18px] h-[18px] text-accent" aria-hidden="true" />
           <h3 className="font-semibold">{t('analytics.engagement_timeline')}</h3>
@@ -393,16 +393,16 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
                 <CartesianGrid
                   strokeDasharray="3 3"
                   stroke="currentColor"
-                  className="text-default-200"
+                  className="text-border"
                 />
                 <XAxis
                   dataKey="date"
                   tick={{ fontSize: 11 }}
-                  className="text-default-500"
+                  className="text-muted"
                 />
                 <YAxis
                   tick={{ fontSize: 11 }}
-                  className="text-default-500"
+                  className="text-muted"
                   allowDecimals={false}
                 />
                 <Tooltip contentStyle={tooltipStyle} labelStyle={{ fontWeight: 600 }} />
@@ -431,7 +431,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <p className="flex h-[300px] items-center justify-center text-sm text-default-400">
+            <p className="flex h-[300px] items-center justify-center text-sm text-muted">
               {t('analytics.no_engagement_data')}
             </p>
           )}
@@ -441,7 +441,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
       {/* Top Contributors + Activity Breakdown (side by side) */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Top Contributors */}
-        <Card shadow="sm">
+        <Card className="border border-border bg-surface">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Award className="w-[18px] h-[18px] text-warning" aria-hidden="true" />
             <h3 className="font-semibold">{t('analytics.top_contributors')}</h3>
@@ -458,7 +458,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
                     key={contributor.user_id}
                     className="flex items-center gap-3 p-3 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors"
                   >
-                    <span className="text-sm font-bold text-default-400 w-6 text-center">
+                    <span className="text-sm font-bold text-muted w-6 text-center">
                       {index + 1}
                     </span>
                     <Avatar
@@ -477,7 +477,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
                 ))}
               </div>
             ) : (
-              <p className="flex h-[300px] items-center justify-center text-sm text-default-400">
+              <p className="flex h-[300px] items-center justify-center text-sm text-muted">
                 {t('analytics.no_contributors')}
               </p>
             )}
@@ -485,7 +485,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
         </Card>
 
         {/* Activity Breakdown (Pie Chart) */}
-        <Card shadow="sm">
+        <Card className="border border-border bg-surface">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <BarChart3 className="w-[18px] h-[18px] text-accent" aria-hidden="true" />
             <h3 className="font-semibold">{t('analytics.activity_breakdown')}</h3>
@@ -531,7 +531,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <p className="flex h-[300px] items-center justify-center text-sm text-default-400">
+              <p className="flex h-[300px] items-center justify-center text-sm text-muted">
                 {t('analytics.no_activity_data')}
               </p>
             )}
@@ -540,7 +540,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
       </div>
 
       {/* Retention Cohorts */}
-      <Card shadow="sm">
+      <Card className="border border-border bg-surface">
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
           <TrendingUp className="w-[18px] h-[18px] text-info" aria-hidden="true" />
           <h3 className="font-semibold">{t('analytics.retention_cohorts')}</h3>
@@ -585,7 +585,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
               </TableBody>
             </Table>
           ) : (
-            <p className="flex h-[200px] items-center justify-center text-sm text-default-400">
+            <p className="flex h-[200px] items-center justify-center text-sm text-muted">
               {t('analytics.no_retention_data')}
             </p>
           )}
@@ -594,7 +594,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
 
       {/* Comparative Stats */}
       {data?.comparative && (
-        <Card shadow="sm">
+        <Card className="border border-border bg-surface">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <BarChart3 className="w-[18px] h-[18px] text-accent" aria-hidden="true" />
             <h3 className="font-semibold">{t('analytics.comparative_stats')}</h3>
@@ -612,7 +612,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
                 </p>
                 <p className="text-xs text-theme-subtle mt-1">
                   {t('analytics.vs_average')}{' '}
-                  <span className="font-semibold text-default-600">
+                  <span className="font-semibold text-foreground">
                     {data.comparative.avg_members}
                   </span>
                 </p>
@@ -628,7 +628,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
                 </p>
                 <p className="text-xs text-theme-subtle mt-1">
                   {t('analytics.vs_average')}{' '}
-                  <span className="font-semibold text-default-600">
+                  <span className="font-semibold text-foreground">
                     {data.comparative.avg_activity}
                   </span>
                 </p>
