@@ -232,7 +232,7 @@ export function NationalKissDashboardPage() {
       <Chip
         startContent={positive ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
         color={positive ? 'success' : 'danger'}
-        variant="flat"
+        variant="tertiary"
         size="sm"
       >
         {t('national_kiss_dashboard.metrics.yoy', {
@@ -248,22 +248,22 @@ export function NationalKissDashboardPage() {
         title={t('national_kiss_dashboard.meta.title')}
         description={t('national_kiss_dashboard.meta.description')}
         actions={
-          <span className="inline-flex items-center gap-2 text-default-500">
+          <span className="inline-flex items-center gap-2 text-muted">
             <Landmark size={20} />
           </span>
         }
       />
 
-      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" >
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('national_kiss_dashboard.about.title')}</p>
-              <p className="text-default-600">
+              <p className="text-muted">
                 {t('national_kiss_dashboard.about.body_prefix')} <Abbr term="KISS" /> {t('national_kiss_dashboard.about.body_suffix')}
               </p>
-              <p className="text-default-500">
+              <p className="text-muted">
                 {t('national_kiss_dashboard.about.health_prefix')} <strong>{t('national_kiss_dashboard.status.thriving')}</strong> =
                 {t('national_kiss_dashboard.about.thriving_definition')} <strong>{t('national_kiss_dashboard.status.stable')}</strong> = {t('national_kiss_dashboard.about.stable_definition')}{' '}
                 <strong>{t('national_kiss_dashboard.status.struggling')}</strong> = {t('national_kiss_dashboard.about.struggling_definition')}
@@ -274,21 +274,21 @@ export function NationalKissDashboardPage() {
       </Card>
 
       {/* Health status legend */}
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 rounded-lg border border-default-200 bg-default-50 px-3 py-2 text-xs text-default-500">
-        <span className="font-medium text-default-700">{t('national_kiss_dashboard.health_legend.title')}</span>
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 rounded-lg border border-border bg-surface-secondary px-3 py-2 text-xs text-muted">
+        <span className="font-medium text-foreground">{t('national_kiss_dashboard.health_legend.title')}</span>
         <span className="flex items-center gap-1.5">
-          <Chip size="sm" color="success" variant="flat">{t('national_kiss_dashboard.status.thriving')}</Chip>
+          <Chip size="sm" color="success" variant="soft">{t('national_kiss_dashboard.status.thriving')}</Chip>
           {t('national_kiss_dashboard.health_legend.thriving')}
         </span>
         <span className="flex items-center gap-1.5">
-          <Chip size="sm" color="warning" variant="flat">{t('national_kiss_dashboard.status.stable')}</Chip>
+          <Chip size="sm" color="warning" variant="soft">{t('national_kiss_dashboard.status.stable')}</Chip>
           {t('national_kiss_dashboard.health_legend.stable')}
         </span>
         <span className="flex items-center gap-1.5">
-          <Chip size="sm" color="danger" variant="flat">{t('national_kiss_dashboard.status.struggling')}</Chip>
+          <Chip size="sm" color="danger" variant="soft">{t('national_kiss_dashboard.status.struggling')}</Chip>
           {t('national_kiss_dashboard.health_legend.struggling')}
         </span>
-        <span className="ml-3 text-default-400">
+        <span className="ml-3 text-muted">
           {t('national_kiss_dashboard.health_legend.privacy_note')}
         </span>
       </div>
@@ -327,7 +327,7 @@ export function NationalKissDashboardPage() {
             className="md:max-w-xs"
             aria-label={t('national_kiss_dashboard.filters.to_aria')}
           />
-          <Button color="primary" onPress={fetchAll} isLoading={loading}>
+          <Button onPress={fetchAll} isLoading={loading}>
             {t('national_kiss_dashboard.actions.refresh')}
           </Button>
         </CardBody>
@@ -339,7 +339,6 @@ export function NationalKissDashboardPage() {
           label={t('national_kiss_dashboard.stats.total_cooperatives')}
           value={summary?.cooperatives_count ?? '—'}
           icon={Building2}
-          color="primary"
           loading={loading}
         />
         <StatCard
@@ -357,7 +356,7 @@ export function NationalKissDashboardPage() {
           label={t('national_kiss_dashboard.stats.total_hours')}
           value={summary?.total_approved_hours_national.toFixed(1) ?? '—'}
           icon={Clock}
-          color="secondary"
+          color="default"
           loading={loading}
         />
         <StatCard
@@ -373,12 +372,12 @@ export function NationalKissDashboardPage() {
       {summary && !loading && (
         <Card>
           <CardBody className="flex flex-wrap items-center gap-3 text-sm">
-            <span className="text-default-500">{t('national_kiss_dashboard.inline.active_members')}</span>
-            <Chip variant="flat">{summary.total_active_members_bucket}</Chip>
-            <span className="text-default-500">{t('national_kiss_dashboard.inline.recipients_reached')}</span>
-            <Chip variant="flat">{summary.total_recipients_reached_bucket}</Chip>
-            <span className="text-default-500">{t('national_kiss_dashboard.inline.safeguarding_reports')}</span>
-            <Chip variant="flat">{summary.safeguarding_reports_total}</Chip>
+            <span className="text-muted">{t('national_kiss_dashboard.inline.active_members')}</span>
+            <Chip variant="soft">{summary.total_active_members_bucket}</Chip>
+            <span className="text-muted">{t('national_kiss_dashboard.inline.recipients_reached')}</span>
+            <Chip variant="soft">{summary.total_recipients_reached_bucket}</Chip>
+            <span className="text-muted">{t('national_kiss_dashboard.inline.safeguarding_reports')}</span>
+            <Chip variant="soft">{summary.safeguarding_reports_total}</Chip>
             {yoyChip}
           </CardBody>
         </Card>
@@ -396,7 +395,7 @@ export function NationalKissDashboardPage() {
               <Spinner />
             </div>
           ) : trend.length === 0 ? (
-            <p className="text-sm text-default-500">{t('national_kiss_dashboard.trend.empty')}</p>
+            <p className="text-sm text-muted">{t('national_kiss_dashboard.trend.empty')}</p>
           ) : (
             <div className="h-72 w-full">
               <ResponsiveContainer width="100%" height="100%">
@@ -444,7 +443,7 @@ export function NationalKissDashboardPage() {
       <Card>
         <CardHeader className="flex items-center justify-between">
           <h2 className="text-lg font-semibold">{t('national_kiss_dashboard.comparative.title')}</h2>
-          <span className="text-xs text-default-500">{t('national_kiss_dashboard.comparative.sort_hint')}</span>
+          <span className="text-xs text-muted">{t('national_kiss_dashboard.comparative.sort_hint')}</span>
         </CardHeader>
         <CardBody>
           {loading ? (
@@ -452,7 +451,7 @@ export function NationalKissDashboardPage() {
               <Spinner />
             </div>
           ) : sortedRows.length === 0 ? (
-            <p className="text-sm text-default-500">
+            <p className="text-sm text-muted">
               {t('national_kiss_dashboard.comparative.empty_prefix')} <Abbr term="KISS" /> {t('national_kiss_dashboard.comparative.empty_middle')} <strong>{t('national_kiss_dashboard.comparative.super_admin_tenants')}</strong> {t('national_kiss_dashboard.comparative.empty_suffix')}{' '}
               <strong>{'kiss_cooperative'}</strong> {t('national_kiss_dashboard.comparative.empty_tail')}
             </p>
@@ -478,13 +477,13 @@ export function NationalKissDashboardPage() {
                   <TableRow key={row.tenant_id}>
                     <TableCell className="font-medium">{row.name}</TableCell>
                     <TableCell className="text-right">{row.hours.toFixed(1)}</TableCell>
-                    <TableCell><Chip variant="flat" size="sm">{row.members_bracket}</Chip></TableCell>
-                    <TableCell><Chip variant="flat" size="sm">{row.recipients_bracket}</Chip></TableCell>
+                    <TableCell><Chip variant="soft" size="sm">{row.members_bracket}</Chip></TableCell>
+                    <TableCell><Chip variant="soft" size="sm">{row.recipients_bracket}</Chip></TableCell>
                     <TableCell className="text-right">{row.active_tandems}</TableCell>
                     <TableCell className="text-right">{row.retention_rate_pct.toFixed(1)}%</TableCell>
                     <TableCell className="text-right">{row.reciprocity_pct.toFixed(1)}%</TableCell>
                     <TableCell>
-                      <Chip color={statusChip[row.status].color} variant="flat" size="sm">
+                      <Chip color={statusChip[row.status].color} variant="soft" size="sm">
                         {t(`national_kiss_dashboard.status.${row.status}`)}
                       </Chip>
                     </TableCell>
@@ -508,13 +507,13 @@ export function NationalKissDashboardPage() {
               <ol className="space-y-2">
                 {summary.top_5_cooperatives_by_hours.map((c, idx) => (
                   <li key={c.tenant_id} className="flex items-center justify-between text-sm">
-                    <span><span className="font-mono text-default-400">#{idx + 1}</span> {c.name}</span>
-                    <Chip variant="flat" size="sm" color="success">{c.hours.toFixed(1)} h</Chip>
+                    <span><span className="font-mono text-muted">#{idx + 1}</span> {c.name}</span>
+                    <Chip variant="soft" size="sm" color="success">{c.hours.toFixed(1)} h</Chip>
                   </li>
                 ))}
               </ol>
             ) : (
-              <p className="text-sm text-default-500">{t('national_kiss_dashboard.empty.no_data')}</p>
+              <p className="text-sm text-muted">{t('national_kiss_dashboard.empty.no_data')}</p>
             )}
           </CardBody>
         </Card>
@@ -528,13 +527,13 @@ export function NationalKissDashboardPage() {
               <ol className="space-y-2">
                 {summary.bottom_5_active_cooperatives_by_hours.map((c, idx) => (
                   <li key={c.tenant_id} className="flex items-center justify-between text-sm">
-                    <span><span className="font-mono text-default-400">#{idx + 1}</span> {c.name}</span>
-                    <Chip variant="flat" size="sm" color="danger">{c.hours.toFixed(1)} h</Chip>
+                    <span><span className="font-mono text-muted">#{idx + 1}</span> {c.name}</span>
+                    <Chip variant="soft" size="sm" color="danger">{c.hours.toFixed(1)} h</Chip>
                   </li>
                 ))}
               </ol>
             ) : (
-              <p className="text-sm text-default-500">{t('national_kiss_dashboard.empty.no_active_cooperatives')}</p>
+              <p className="text-sm text-muted">{t('national_kiss_dashboard.empty.no_active_cooperatives')}</p>
             )}
           </CardBody>
         </Card>
@@ -542,7 +541,7 @@ export function NationalKissDashboardPage() {
 
       {/* Footer */}
       {summary && (
-        <p className="text-xs text-default-400">
+        <p className="text-xs text-muted">
           {t('national_kiss_dashboard.footer.generated_at', {
             date: new Date(summary.generated_at).toLocaleString(),
           })}{' '}

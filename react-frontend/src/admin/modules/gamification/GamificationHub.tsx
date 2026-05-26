@@ -131,15 +131,13 @@ export function GamificationHub() {
         actions={
           <div className="flex gap-2">
             <Button
-              variant="flat"
-              color="secondary"
+              variant="secondary"
               startContent={<Gift size={16} />}
               onPress={handleOpenBulkAward}
             >
               {t('gamification.bulk_award_button')}
             </Button>
             <Button
-              color="primary"
               startContent={<RefreshCw size={16} />}
               onPress={handleRecheckAll}
               isLoading={rechecking}
@@ -156,7 +154,7 @@ export function GamificationHub() {
           label={t('gamification.label_total_badges_awarded')}
           value={stats?.total_badges_awarded ?? 0}
           icon={Award}
-          color="primary"
+          color="default"
           loading={loading}
         />
         <StatCard
@@ -177,18 +175,18 @@ export function GamificationHub() {
           label={t('gamification.label_active_campaigns')}
           value={stats?.active_campaigns ?? 0}
           icon={Target}
-          color="secondary"
+          color="default"
           loading={loading}
         />
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Badge Distribution Chart */}
-        <Card shadow="sm" className="lg:col-span-2">
+        <Card className="lg:col-span-2">
           <CardHeader className="flex items-center justify-between pb-0">
             <div>
               <h3 className="text-lg font-semibold text-foreground">{t('gamification.badge_distribution')}</h3>
-              <p className="text-sm text-default-500">{t('gamification.top_10_badges')}</p>
+              <p className="text-sm text-muted">{t('gamification.top_10_badges')}</p>
             </div>
           </CardHeader>
           <CardBody>
@@ -203,7 +201,7 @@ export function GamificationHub() {
                     <span className="w-36 truncate text-sm text-foreground font-medium" title={badge.badge_name}>
                       {badge.badge_name}
                     </span>
-                    <div className="flex-1 h-6 rounded-lg bg-default-100 overflow-hidden">
+                    <div className="flex-1 h-6 rounded-lg bg-surface-secondary overflow-hidden">
                       <div
                         className="h-full rounded-lg bg-accent transition-all duration-500"
                         style={{ width: `${Math.max(2, (badge.count / maxDistCount) * 100)}%` }}
@@ -217,75 +215,75 @@ export function GamificationHub() {
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center">
-                <Award size={40} className="text-default-300 mb-2" />
-                <p className="text-default-500">{t('gamification.no_badges_awarded')}</p>
+                <Award size={40} className="text-muted mb-2" />
+                <p className="text-muted">{t('gamification.no_badges_awarded')}</p>
               </div>
             )}
           </CardBody>
         </Card>
 
         {/* Quick Links */}
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="pb-0">
             <h3 className="text-lg font-semibold text-foreground">{t('gamification.quick_links')}</h3>
           </CardHeader>
           <CardBody className="gap-3">
             <Link to={tenantPath("/admin/gamification/campaigns")} className="block">
-              <Card shadow="none" className="bg-default-50 hover:bg-default-100 transition-colors cursor-pointer">
+              <Card className="bg-surface-secondary hover:bg-surface-tertiary transition-colors cursor-pointer">
                 <CardBody className="flex flex-row items-center gap-3 p-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
                     <Megaphone size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-foreground">{t('gamification.campaigns')}</p>
-                    <p className="text-xs text-default-500">{t('gamification.manage_badge_campaigns')}</p>
+                    <p className="text-xs text-muted">{t('gamification.manage_badge_campaigns')}</p>
                   </div>
-                  <ArrowRight size={16} className="text-default-400" />
+                  <ArrowRight size={16} className="text-muted" />
                 </CardBody>
               </Card>
             </Link>
 
             <Link to={tenantPath("/admin/custom-badges")} className="block">
-              <Card shadow="none" className="bg-default-50 hover:bg-default-100 transition-colors cursor-pointer">
+              <Card className="bg-surface-secondary hover:bg-surface-tertiary transition-colors cursor-pointer">
                 <CardBody className="flex flex-row items-center gap-3 p-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-success/10 text-success">
                     <Award size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-foreground">{t('gamification.custom_badges')}</p>
-                    <p className="text-xs text-default-500">{t('gamification.create_and_manage_badges')}</p>
+                    <p className="text-xs text-muted">{t('gamification.create_and_manage_badges')}</p>
                   </div>
-                  <ArrowRight size={16} className="text-default-400" />
+                  <ArrowRight size={16} className="text-muted" />
                 </CardBody>
               </Card>
             </Link>
 
             <Link to={tenantPath("/admin/gamification/badge-config")} className="block">
-              <Card shadow="none" className="bg-default-50 hover:bg-default-100 transition-colors cursor-pointer">
+              <Card className="bg-surface-secondary hover:bg-surface-tertiary transition-colors cursor-pointer">
                 <CardBody className="flex flex-row items-center gap-3 p-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent">
                     <Settings2 size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-foreground">{t('gamification.badge_configuration')}</p>
-                    <p className="text-xs text-default-500">{t('gamification.configure_badge_availability')}</p>
+                    <p className="text-xs text-muted">{t('gamification.configure_badge_availability')}</p>
                   </div>
-                  <ArrowRight size={16} className="text-default-400" />
+                  <ArrowRight size={16} className="text-muted" />
                 </CardBody>
               </Card>
             </Link>
 
             <Link to={tenantPath("/admin/gamification/analytics")} className="block">
-              <Card shadow="none" className="bg-default-50 hover:bg-default-100 transition-colors cursor-pointer">
+              <Card className="bg-surface-secondary hover:bg-surface-tertiary transition-colors cursor-pointer">
                 <CardBody className="flex flex-row items-center gap-3 p-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-warning/10 text-warning">
                     <BarChart3 size={20} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-foreground">{t('gamification.analytics')}</p>
-                    <p className="text-xs text-default-500">{t('gamification.gamification_insights')}</p>
+                    <p className="text-xs text-muted">{t('gamification.gamification_insights')}</p>
                   </div>
-                  <ArrowRight size={16} className="text-default-400" />
+                  <ArrowRight size={16} className="text-muted" />
                 </CardBody>
               </Card>
             </Link>
@@ -298,7 +296,7 @@ export function GamificationHub() {
         <ModalContent>
           <ModalHeader>{t('gamification.bulk_award_modal_title')}</ModalHeader>
           <ModalBody className="gap-4">
-            <p className="text-sm text-default-500">
+            <p className="text-sm text-muted">
               {t('gamification.bulk_award_modal_desc')}
             </p>
             {badgesLoading ? (
@@ -325,10 +323,10 @@ export function GamificationHub() {
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onBulkClose}>
+            <Button variant="tertiary" onPress={onBulkClose}>
               {t('gamification.cancel')}
             </Button>
-            <Button color="secondary" onPress={handleBulkAward} isLoading={awarding}>
+            <Button variant="secondary" onPress={handleBulkAward} isLoading={awarding}>
               {t('gamification.bulk_award_submit')}
             </Button>
           </ModalFooter>

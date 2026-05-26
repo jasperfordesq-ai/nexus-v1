@@ -204,7 +204,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
       <div className="lg:col-span-3 space-y-6">
 
         {/* Languages */}
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Globe size={18} className="text-accent" />
             <h3 className="font-semibold">{t('tenant_features.language_localisation_heading')}</h3>
@@ -212,7 +212,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
           <CardBody className="px-4 pb-4 space-y-4">
             <div>
               <p className="text-sm font-medium mb-1">{t('tenant_features.default_language')}</p>
-              <p className="text-xs text-default-400 mb-2">
+              <p className="text-xs text-muted mb-2">
                 {t('tenant_features.default_language_hint')}
               </p>
               <Select
@@ -233,7 +233,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
             <Separator />
             <div>
               <p className="text-sm font-medium mb-1">{t('tenant_features.available_languages')}</p>
-              <p className="text-xs text-default-400 mb-3">
+              <p className="text-xs text-muted mb-3">
                 {t('tenant_features.available_languages_hint')}
               </p>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -247,7 +247,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                     <span className="text-sm">
                       {lang.label} ({lang.short})
                       {lang.code === 'en' && (
-                        <span className="ml-2 text-xs text-default-400">{t('tenant_features.always_enabled')}</span>
+                        <span className="ml-2 text-xs text-muted">{t('tenant_features.always_enabled')}</span>
                       )}
                     </span>
                   </Checkbox>
@@ -256,7 +256,6 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
             </div>
             <div className="flex justify-end">
               <Button
-                color="primary"
                 size="sm"
                 isLoading={savingLang}
                 isDisabled={savingLang}
@@ -269,18 +268,18 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
         </Card>
 
         {/* Maps & Location */}
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <MapPin size={18} className="text-warning" />
             <h3 className="font-semibold">{t('tenant_features.maps_card_title')}</h3>
-            <span className="text-sm text-default-400">
+            <span className="text-sm text-muted">
               {t('tenant_features.maps_card_subtitle')}
             </span>
           </CardHeader>
           <CardBody className="px-4 pb-4 space-y-4">
             <div className="flex flex-wrap gap-2 items-center text-xs">
-              <span className="text-default-500">{t('tenant_features.currently_serving')}:</span>
-              <span className="px-2 py-0.5 rounded-full font-medium bg-default-200 text-default-600">
+              <span className="text-muted">{t('tenant_features.currently_serving')}:</span>
+              <span className="px-2 py-0.5 rounded-full font-medium bg-surface-secondary text-muted">
                 {t('tenant_features.status_maps')}{': '}
                 {t('tenant_features.status_off')}
               </span>
@@ -300,18 +299,18 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
 
             <Separator />
 
-            <div className="flex items-center justify-between rounded-lg bg-default-100 dark:bg-default-50/5 px-3 py-3 opacity-60">
+            <div className="flex items-center justify-between rounded-lg bg-surface-secondary px-3 py-3 opacity-60">
               <div className="pr-4">
                 <div className="flex items-center gap-1.5 mb-0.5">
                   <p className="font-medium text-sm">
                     {t('tenant_features.maps_kill_switch_label')}
                   </p>
-                  <span className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full bg-default-200 text-default-600">
+                  <span className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full bg-surface text-muted">
                     <Lock size={10} />
                     {t('tenant_features.maps_policy_locked')}
                   </span>
                 </div>
-                <p className="text-xs text-default-500 mt-0.5">
+                <p className="text-xs text-muted mt-0.5">
                   {t('tenant_features.maps_policy_desc')}
                 </p>
               </div>
@@ -329,7 +328,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
               <p className="text-sm font-medium mb-1">
                 {t('tenant_features.map_provider_label')}
               </p>
-              <p className="text-xs text-default-400 mb-2">
+              <p className="text-xs text-muted mb-2">
                 {t('tenant_features.map_provider_desc')}
               </p>
               <Select
@@ -352,7 +351,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
               <p className="text-sm font-medium mb-1">
                 {t('tenant_features.geocoding_provider_label')}
               </p>
-              <p className="text-xs text-default-400 mb-2">
+              <p className="text-xs text-muted mb-2">
                 {t('tenant_features.geocoding_provider_desc')}
               </p>
               <Select
@@ -372,7 +371,6 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
 
             <div className="flex justify-end">
               <Button
-                color="primary"
                 size="sm"
                 isLoading={savingProviders}
                 isDisabled={savingProviders}
@@ -385,18 +383,18 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
         </Card>
 
         {/* API Keys */}
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <KeyRound size={18} className="text-accent" />
             <h3 className="font-semibold">
               {t('tenant_features.api_keys_card_title')}
             </h3>
-            <span className="text-sm text-default-400">
+            <span className="text-sm text-muted">
               {t('tenant_features.api_keys_card_subtitle')}
             </span>
           </CardHeader>
           <CardBody className="px-4 pb-4 space-y-5">
-            <p className="text-xs text-default-500">
+            <p className="text-xs text-muted">
               {t('tenant_features.api_keys_intro')}
             </p>
 
@@ -405,13 +403,13 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                 <p className="text-sm font-medium">
                   {t('tenant_features.google_maps_api_key_label')}
                 </p>
-                <span className={`text-xs px-2 py-0.5 rounded-full ${googleMapsKeySet ? 'bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-300' : 'bg-default-200 text-default-600'}`}>
+                <span className={`text-xs px-2 py-0.5 rounded-full ${googleMapsKeySet ? 'bg-success/10 text-success' : 'bg-surface-secondary text-muted'}`}>
                   {googleMapsKeySet
                     ? t('tenant_features.key_status_set')
                     : t('tenant_features.key_status_default')}
                 </span>
               </div>
-              <p className="text-xs text-default-400 mb-2">
+              <p className="text-xs text-muted mb-2">
                 {t('tenant_features.google_maps_api_key_hint')}
               </p>
               <div className="flex gap-2">
@@ -428,8 +426,8 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                     <Button
                       isIconOnly
                       size="sm"
-                      variant="light"
-                      className="text-default-500"
+                      variant="ghost"
+                      className="text-muted"
                       aria-label={showGoogleKey ? t('tenant_features.hide_key') : t('tenant_features.show_key')}
                       onPress={() => setShowGoogleKey((v) => !v)}
                     >
@@ -440,8 +438,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                 {googleMapsKeySet && (
                   <Button
                     size="sm"
-                    variant="flat"
-                    color="danger"
+                    variant="danger"
                     isDisabled={savingKeys}
                     onPress={handleClearGoogleKey}
                   >
@@ -455,7 +452,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
               <p className="text-sm font-medium mb-1">
                 {t('tenant_features.google_map_id_label')}
               </p>
-              <p className="text-xs text-default-400 mb-2">
+              <p className="text-xs text-muted mb-2">
                 {t('tenant_features.google_map_id_hint')}
               </p>
               <Input
@@ -477,13 +474,13 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                 <p className="text-sm font-medium">
                   {t('tenant_features.maptiler_api_key_label')}
                 </p>
-                <span className={`text-xs px-2 py-0.5 rounded-full ${maptilerKeySet ? 'bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-300' : 'bg-default-200 text-default-600'}`}>
+                <span className={`text-xs px-2 py-0.5 rounded-full ${maptilerKeySet ? 'bg-success/10 text-success' : 'bg-surface-secondary text-muted'}`}>
                   {maptilerKeySet
                     ? t('tenant_features.tiles_status_maptiler')
                     : t('tenant_features.tiles_status_free_osm')}
                 </span>
               </div>
-              <p className="text-xs text-default-400 mb-2">
+              <p className="text-xs text-muted mb-2">
                 {t('tenant_features.maptiler_api_key_hint')}
               </p>
               <div className="flex gap-2">
@@ -500,8 +497,8 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                     <Button
                       isIconOnly
                       size="sm"
-                      variant="light"
-                      className="text-default-500"
+                      variant="ghost"
+                      className="text-muted"
                       aria-label={showMaptilerKey ? t('tenant_features.hide_key') : t('tenant_features.show_key')}
                       onPress={() => setShowMaptilerKey((v) => !v)}
                     >
@@ -512,8 +509,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                 {maptilerKeySet && (
                   <Button
                     size="sm"
-                    variant="flat"
-                    color="danger"
+                    variant="danger"
                     isDisabled={savingKeys}
                     onPress={handleClearMaptilerKey}
                   >
@@ -525,7 +521,6 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
 
             <div className="flex justify-end">
               <Button
-                color="primary"
                 size="sm"
                 isLoading={savingKeys}
                 isDisabled={savingKeys || (!googleMapsKeyInput && !maptilerKeyInput && googleMapId === '')}

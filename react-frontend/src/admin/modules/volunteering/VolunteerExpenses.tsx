@@ -68,11 +68,11 @@ interface ExpensePolicy {
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
-const STATUS_COLORS: Record<string, 'warning' | 'success' | 'danger' | 'primary'> = {
+const STATUS_COLORS: Record<string, 'warning' | 'success' | 'danger' | 'accent'> = {
   pending: 'warning',
   approved: 'success',
   rejected: 'danger',
-  paid: 'primary',
+  paid: 'accent',
 };
 
 function parsePayload<T>(raw: unknown): T {
@@ -323,7 +323,7 @@ export function VolunteerExpenses() {
       label: t('volunteering.col_type'),
       sortable: true,
       render: (item) => (
-        <Chip size="sm" variant="flat">
+        <Chip size="sm" variant="soft">
           {t(`volunteering.expense_type_${item.type}`)}
         </Chip>
       ),
@@ -333,7 +333,7 @@ export function VolunteerExpenses() {
       label: t('volunteering.col_status'),
       sortable: true,
       render: (item) => (
-        <Chip size="sm" color={STATUS_COLORS[item.status] || 'default'} variant="flat">
+        <Chip size="sm" color={STATUS_COLORS[item.status] || 'default'} variant="soft">
           {t(`volunteering.status_${item.status}`)}
         </Chip>
       ),
@@ -343,7 +343,7 @@ export function VolunteerExpenses() {
       label: t('volunteering.col_submitted'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {item.submitted_at ? new Date(item.submitted_at).toLocaleDateString() : '--'}
         </span>
       ),
@@ -354,14 +354,13 @@ export function VolunteerExpenses() {
       render: (item) =>
         item.has_receipt ? (
           <div className="flex items-center gap-1.5">
-            <Chip size="sm" color="success" variant="flat" startContent={<FileText size={12} />}>
+            <Chip size="sm" color="success" variant="soft" startContent={<FileText size={12} />}>
               {t('volunteering.yes')}
             </Chip>
             {item.receipt_path && (
               <Button
                 size="sm"
-                variant="light"
-                color="primary"
+                variant="tertiary"
                 startContent={item.receipt_path.toLowerCase().endsWith('.pdf') ? <ExternalLink size={12} /> : <Eye size={12} />}
                 onPress={() => openReceipt(item)}
                 className="min-w-0 px-2"
@@ -371,7 +370,7 @@ export function VolunteerExpenses() {
             )}
           </div>
         ) : (
-          <span className="text-sm text-default-400">{t('volunteering.no')}</span>
+          <span className="text-sm text-muted/80">{t('volunteering.no')}</span>
         ),
     },
     {
@@ -380,8 +379,7 @@ export function VolunteerExpenses() {
       render: (item) => (
         <Button
           size="sm"
-          variant="flat"
-          color="primary"
+          variant="tertiary"
           onPress={() => openReview(item)}
         >
           {t('volunteering.review')}
@@ -400,14 +398,14 @@ export function VolunteerExpenses() {
         actions={
           <div className="flex gap-2">
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<Download size={16} />}
               onPress={handleExport}
             >
               {t('volunteering.export_csv')}
             </Button>
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<RefreshCw size={16} />}
               onPress={loadData}
               isLoading={loading}
@@ -445,7 +443,7 @@ export function VolunteerExpenses() {
           label={t('volunteering.stat_paid_total')}
           value={stats?.paid_total ?? 0}
           icon={CreditCard}
-          color="primary"
+          color="default"
           loading={loading}
         />
       </div>
@@ -459,7 +457,7 @@ export function VolunteerExpenses() {
           className="w-44"
           value={dateFrom}
           onValueChange={setDateFrom}
-          startContent={<CalendarRange size={14} className="text-default-400" />}
+          startContent={<CalendarRange size={14} className="text-muted" />}
         />
         <Input
           type="date"
@@ -468,12 +466,12 @@ export function VolunteerExpenses() {
           className="w-44"
           value={dateTo}
           onValueChange={setDateTo}
-          startContent={<CalendarRange size={14} className="text-default-400" />}
+          startContent={<CalendarRange size={14} className="text-muted" />}
         />
         {(dateFrom || dateTo) && (
           <Button
             size="sm"
-            variant="light"
+            variant="ghost"
             onPress={() => { setDateFrom(''); setDateTo(''); }}
           >
             {t('volunteering.clear_dates')}
@@ -553,9 +551,9 @@ export function VolunteerExpenses() {
         </CardHeader>
         <CardBody>
           {policiesLoading ? (
-            <p className="text-default-400 text-sm">{t('volunteering.loading')}</p>
+            <p className="text-muted/80 text-sm">{t('volunteering.loading')}</p>
           ) : policies.length === 0 ? (
-            <p className="text-default-400 text-sm">
+            <p className="text-muted/80 text-sm">
               {t('volunteering.no_policies')}
             </p>
           ) : (
@@ -571,25 +569,25 @@ export function VolunteerExpenses() {
                 >
                   <div className="grid grid-cols-2 gap-4 text-sm mb-3">
                     <div>
-                      <span className="text-default-400">
+                      <span className="text-muted/80">
                         {t('volunteering.policy_max_amount')}:
                       </span>{' '}
                       <span className="font-medium">{policy.max_amount}</span>
                     </div>
                     <div>
-                      <span className="text-default-400">
+                      <span className="text-muted/80">
                         {t('volunteering.policy_max_monthly')}:
                       </span>{' '}
                       <span className="font-medium">{policy.max_monthly}</span>
                     </div>
                     <div>
-                      <span className="text-default-400">
+                      <span className="text-muted/80">
                         {t('volunteering.policy_receipt_threshold')}:
                       </span>{' '}
                       <span className="font-medium">{policy.requires_receipt_above}</span>
                     </div>
                     <div>
-                      <span className="text-default-400">
+                      <span className="text-muted/80">
                         {t('volunteering.policy_requires_approval')}:
                       </span>{' '}
                       <span className="font-medium">
@@ -599,8 +597,7 @@ export function VolunteerExpenses() {
                   </div>
                   <Button
                     size="sm"
-                    variant="flat"
-                    color="primary"
+                    variant="tertiary"
                     onPress={() => openPolicyEdit(policy)}
                   >
                     {t('volunteering.edit')}
@@ -623,26 +620,26 @@ export function VolunteerExpenses() {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <span className="text-default-400">{t('volunteering.col_volunteer')}:</span>
+                    <span className="text-muted/80">{t('volunteering.col_volunteer')}:</span>
                     <p className="font-medium">{reviewExpense.volunteer_name}</p>
                   </div>
                   <div>
-                    <span className="text-default-400">{t('volunteering.col_organization')}:</span>
+                    <span className="text-muted/80">{t('volunteering.col_organization')}:</span>
                     <p className="font-medium">{reviewExpense.organization_name}</p>
                   </div>
                   <div>
-                    <span className="text-default-400">{t('volunteering.col_amount')}:</span>
+                    <span className="text-muted/80">{t('volunteering.col_amount')}:</span>
                     <p className="font-semibold">{reviewExpense.currency || '\u20AC'}{reviewExpense.amount.toFixed(2)}</p>
                   </div>
                   <div>
-                    <span className="text-default-400">{t('volunteering.col_type')}:</span>
+                    <span className="text-muted/80">{t('volunteering.col_type')}:</span>
                     <p className="font-medium">{t(`volunteering.expense_type_${reviewExpense.type}`)}</p>
                   </div>
                 </div>
 
                 {reviewExpense.description && (
                   <div>
-                    <span className="text-default-400 text-sm">{t('volunteering.description')}:</span>
+                    <span className="text-muted/80 text-sm">{t('volunteering.description')}:</span>
                     <p className="text-sm">{reviewExpense.description}</p>
                   </div>
                 )}
@@ -679,11 +676,11 @@ export function VolunteerExpenses() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={() => setReviewModal(false)}>
+            <Button variant="tertiary" onPress={() => setReviewModal(false)}>
               {t('volunteering.cancel')}
             </Button>
             <Button
-              color={reviewAction === 'rejected' ? 'danger' : 'primary'}
+              variant={reviewAction === 'rejected' ? 'danger' : 'primary'}
               onPress={handleReview}
               isLoading={actionLoading}
               startContent={
@@ -723,12 +720,11 @@ export function VolunteerExpenses() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={() => setReceiptModal(false)}>
+            <Button variant="tertiary" onPress={() => setReceiptModal(false)}>
               {t('volunteering.close')}
             </Button>
             <Button
-              color="primary"
-              variant="flat"
+              variant="tertiary"
               startContent={<ExternalLink size={14} />}
               onPress={() => window.open(receiptUrl, '_blank')}
             >
@@ -778,10 +774,10 @@ export function VolunteerExpenses() {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={() => setPolicyModal(false)}>
+            <Button variant="tertiary" onPress={() => setPolicyModal(false)}>
               {t('volunteering.cancel')}
             </Button>
-            <Button color="primary" onPress={handlePolicySave} isLoading={actionLoading}>
+            <Button onPress={handlePolicySave} isLoading={actionLoading}>
               {t('volunteering.save')}
             </Button>
           </ModalFooter>

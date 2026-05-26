@@ -190,20 +190,20 @@ export default function MunicipalVerificationAdminPage() {
   const StatusChip = ({ status }: { status: string }) => {
     if (status === 'verified') {
       return (
-        <Chip color="success" variant="flat" size="sm" startContent={<ShieldCheck className="w-3.5 h-3.5" />}>
+        <Chip color="success" variant="soft" size="sm" startContent={<ShieldCheck className="w-3.5 h-3.5" />}>
           {t('municipal_verification.status.verified')}
         </Chip>
       );
     }
     if (status === 'pending') {
       return (
-        <Chip color="warning" variant="flat" size="sm">
+        <Chip color="warning" variant="soft" size="sm">
           {t('municipal_verification.status.pending_dns')}
         </Chip>
       );
     }
     return (
-      <Chip color="default" variant="flat" size="sm" startContent={<ShieldAlert className="w-3.5 h-3.5" />}>
+      <Chip color="default" variant="soft" size="sm" startContent={<ShieldAlert className="w-3.5 h-3.5" />}>
         {status}
       </Chip>
     );
@@ -217,7 +217,7 @@ export default function MunicipalVerificationAdminPage() {
         actions={
           <Button
             size="sm"
-            variant="bordered"
+            variant="secondary"
             startContent={<RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />}
             onPress={() => void load()}
             isDisabled={refreshing}
@@ -228,16 +228,16 @@ export default function MunicipalVerificationAdminPage() {
       />
 
       {/* Intro card */}
-      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" >
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('municipal_verification.about.title')}</p>
-              <p className="text-default-600">
+              <p className="text-muted">
                 {t('municipal_verification.about.body')}
               </p>
-              <div className="space-y-0.5 pt-1 text-default-500">
+              <div className="space-y-0.5 pt-1 text-muted">
                 <p><strong>{t('municipal_verification.status.pending_dns')}:</strong> {t('municipal_verification.about.pending_dns')}</p>
                 <p><strong>{t('municipal_verification.status.verified')}:</strong> {t('municipal_verification.about.verified')}</p>
                 <p><strong>{t('municipal_verification.status.revoked')}:</strong> {t('municipal_verification.about.revoked')}</p>
@@ -253,7 +253,7 @@ export default function MunicipalVerificationAdminPage() {
           {data.verified ? (
             <ShieldCheck className="w-5 h-5 text-success" />
           ) : (
-            <ShieldAlert className="w-5 h-5 text-default-400" />
+            <ShieldAlert className="w-5 h-5 text-muted" />
           )}
           <h2 className="text-base font-semibold">{t('municipal_verification.current.title')}</h2>
         </CardHeader>
@@ -263,19 +263,19 @@ export default function MunicipalVerificationAdminPage() {
             <div className="space-y-2">
               <div className="flex items-center gap-3">
                 <StatusChip status="verified" />
-                <span className="text-sm text-default-700">{active.domain}</span>
+                <span className="text-sm text-foreground">{active.domain}</span>
               </div>
               {active.verified_at && (
-                <p className="text-xs text-default-500">
+                <p className="text-xs text-muted">
                   {t('municipal_verification.current.verified_on', { date: new Date(active.verified_at).toLocaleString() })}
                 </p>
               )}
               {active.attestation_note && (
-                <p className="text-sm text-default-600 italic">"{active.attestation_note}"</p>
+                <p className="text-sm text-muted italic">"{active.attestation_note}"</p>
               )}
             </div>
           ) : (
-            <p className="text-sm text-default-500">
+            <p className="text-sm text-muted">
               {t('municipal_verification.current.not_verified')}
             </p>
           )}
@@ -293,7 +293,7 @@ export default function MunicipalVerificationAdminPage() {
           <Tabs aria-label={t('municipal_verification.request.method_aria')}>
             <Tab key="dns" title={t('municipal_verification.request.dns_tab')}>
               <div className="space-y-3 pt-3">
-                <p className="text-sm text-default-600">
+                <p className="text-sm text-muted">
                   {t('municipal_verification.request.dns_body')}
                 </p>
                 <Input
@@ -301,11 +301,10 @@ export default function MunicipalVerificationAdminPage() {
                   placeholder={t('municipal_verification.fields.domain_placeholder')}
                   value={dnsDomain}
                   onValueChange={setDnsDomain}
-                  startContent={<Globe className="w-4 h-4 text-default-400" />}
+                  startContent={<Globe className="w-4 h-4 text-muted" />}
                 />
                 <div className="flex justify-end">
                   <Button
-                    color="primary"
                     onPress={() => void handleStartDns()}
                     isLoading={submittingDns}
                   >
@@ -316,7 +315,7 @@ export default function MunicipalVerificationAdminPage() {
             </Tab>
             <Tab key="attest" title={t('municipal_verification.request.attestation_tab')}>
               <div className="space-y-3 pt-3">
-                <p className="text-sm text-default-600">
+                <p className="text-sm text-muted">
                   {t('municipal_verification.request.attestation_body')}
                 </p>
                 <Input
@@ -351,16 +350,16 @@ export default function MunicipalVerificationAdminPage() {
       {/* History / pending DNS records */}
       <Card>
         <CardHeader className="flex items-center gap-2">
-          <ShieldCheck className="w-5 h-5 text-default-500" />
+          <ShieldCheck className="w-5 h-5 text-muted" />
           <h2 className="text-base font-semibold">{t('municipal_verification.history.title')}</h2>
-          <Chip size="sm" variant="flat" className="ml-auto">
+          <Chip size="sm" variant="soft" className="ml-auto">
             {items.length}
           </Chip>
         </CardHeader>
         <Separator />
         <CardBody className="p-0">
           {items.length === 0 ? (
-            <div className="text-center py-12 text-sm text-default-500">
+            <div className="text-center py-12 text-sm text-muted">
               {t('municipal_verification.history.empty')}
             </div>
           ) : (
@@ -372,16 +371,16 @@ export default function MunicipalVerificationAdminPage() {
                       <div className="flex items-center gap-2">
                         <StatusChip status={item.status} />
                         <span className="font-medium">{item.domain}</span>
-                        <span className="text-xs text-default-500">{t('municipal_verification.history.via_method', { method: item.method })}</span>
+                        <span className="text-xs text-muted">{t('municipal_verification.history.via_method', { method: item.method })}</span>
                       </div>
-                      <p className="text-xs text-default-500 mt-1">
+                      <p className="text-xs text-muted mt-1">
                         {t('municipal_verification.history.updated', { date: new Date(item.updated_at).toLocaleString() })}
                       </p>
                     </div>
                     {item.status !== 'revoked' && (
                       <Button
                         size="sm"
-                        variant="flat"
+                        variant="tertiary"
                         color="danger"
                         startContent={<Trash2 className="w-3.5 h-3.5" />}
                         onPress={() => {
@@ -395,26 +394,26 @@ export default function MunicipalVerificationAdminPage() {
                   </div>
 
                   {item.status === 'pending' && item.dns_record_name && item.dns_record_value && (
-                    <div className="bg-default-50 border border-default-200 rounded-md p-3 text-sm space-y-2">
+                    <div className="bg-surface-secondary border border-border rounded-md p-3 text-sm space-y-2">
                       <p className="font-medium">{t('municipal_verification.dns.publish_record')}</p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                         <div>
-                          <p className="text-xs text-default-500 uppercase tracking-wide">{t('municipal_verification.dns.record_name')}</p>
+                          <p className="text-xs text-muted uppercase tracking-wide">{t('municipal_verification.dns.record_name')}</p>
                           <Code className="text-xs">{item.dns_record_name}</Code>
                         </div>
                         <div>
-                          <p className="text-xs text-default-500 uppercase tracking-wide">{t('municipal_verification.dns.value')}</p>
+                          <p className="text-xs text-muted uppercase tracking-wide">{t('municipal_verification.dns.value')}</p>
                           <Code className="text-xs break-all">{item.dns_record_value}</Code>
                         </div>
                       </div>
-                      <p className="text-xs text-default-500">
+                      <p className="text-xs text-muted">
                         {t('municipal_verification.dns.type_label')}: <Code className="text-xs">{t('municipal_verification.dns.txt_type')}</Code> · {t('municipal_verification.dns.ttl_label')}: <Code className="text-xs">{t('municipal_verification.dns.ttl_value')}</Code>
                       </p>
                     </div>
                   )}
 
                   {item.attestation_note && (
-                    <p className="text-sm text-default-600 italic">"{item.attestation_note}"</p>
+                    <p className="text-sm text-muted italic">"{item.attestation_note}"</p>
                   )}
                 </div>
               ))}
@@ -429,17 +428,17 @@ export default function MunicipalVerificationAdminPage() {
           <ModalHeader>{t('municipal_verification.revoke_modal.title')}</ModalHeader>
           <ModalBody>
             {revokeTarget && (
-              <p className="text-sm text-default-600">
+              <p className="text-sm text-muted">
                 {t('municipal_verification.revoke_modal.body_prefix')}{' '}
                 <strong>{revokeTarget.domain}</strong>? {t('municipal_verification.revoke_modal.body_suffix')}
               </p>
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={closeRevoke}>
+            <Button variant="tertiary" onPress={closeRevoke}>
               {t('municipal_verification.actions.cancel')}
             </Button>
-            <Button color="danger" onPress={() => void handleRevoke()} isLoading={submittingRevoke}>
+            <Button variant="danger" onPress={() => void handleRevoke()} isLoading={submittingRevoke}>
               {t('municipal_verification.actions.revoke')}
             </Button>
           </ModalFooter>

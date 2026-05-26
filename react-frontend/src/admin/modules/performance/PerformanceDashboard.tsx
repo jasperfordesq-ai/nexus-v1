@@ -102,7 +102,7 @@ export default function PerformanceDashboard() {
               <Activity className="w-5 h-5 text-accent" />
             </div>
             <div>
-              <div className="text-sm text-default-500">{t('performance.label_total_requests')}</div>
+              <div className="text-sm text-muted">{t('performance.label_total_requests')}</div>
               <div className="text-2xl font-bold">{summary.total_requests}</div>
             </div>
           </div>
@@ -114,7 +114,7 @@ export default function PerformanceDashboard() {
               <Clock className="w-5 h-5 text-warning" />
             </div>
             <div>
-              <div className="text-sm text-default-500">{t('performance.label_slow_queries')}</div>
+              <div className="text-sm text-muted">{t('performance.label_slow_queries')}</div>
               <div className="text-2xl font-bold">{summary.total_slow_queries}</div>
             </div>
           </div>
@@ -126,7 +126,7 @@ export default function PerformanceDashboard() {
               <AlertTriangle className="w-5 h-5 text-danger" />
             </div>
             <div>
-              <div className="text-sm text-default-500">{t('performance.label_n_plus_one_warnings')}</div>
+              <div className="text-sm text-muted">{t('performance.label_n_plus_one_warnings')}</div>
               <div className="text-2xl font-bold">{summary.n_plus_one_warnings}</div>
             </div>
           </div>
@@ -138,7 +138,7 @@ export default function PerformanceDashboard() {
               <MemoryStick className="w-5 h-5 text-accent" />
             </div>
             <div>
-              <div className="text-sm text-default-500">{t('performance.label_memory_spikes')}</div>
+              <div className="text-sm text-muted">{t('performance.label_memory_spikes')}</div>
               <div className="text-2xl font-bold">{summary.memory_spikes.length}</div>
             </div>
           </div>
@@ -150,7 +150,7 @@ export default function PerformanceDashboard() {
   const renderSlowRequests = () => {
     if (!summary || summary.slowest_requests.length === 0) {
       return (
-        <div className="text-center py-8 text-default-400">
+        <div className="text-center py-8 text-muted">
           {t('performance.no_slow_requests')}
         </div>
       );
@@ -163,10 +163,10 @@ export default function PerformanceDashboard() {
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
-                  <Chip size="sm" variant="flat">{request.method}</Chip>
+                  <Chip size="sm" variant="soft">{request.method}</Chip>
                   <code className="text-sm truncate">{request.endpoint}</code>
                 </div>
-                <div className="flex items-center gap-4 text-sm text-default-500">
+                <div className="flex items-center gap-4 text-sm text-muted">
                   <span>{formatTimestamp(request.timestamp)}</span>
                   <span>{t('performance.query_count')}</span>
                   <span>{request.memory_mb.toFixed(2)} MB</span>
@@ -174,7 +174,7 @@ export default function PerformanceDashboard() {
                 {request.warnings && request.warnings.length > 0 && (
                   <div className="flex gap-2 mt-2">
                     {request.warnings.map((warning, i) => (
-                      <Chip key={i} size="sm" color="warning" variant="flat">
+                      <Chip key={i} size="sm" color="warning" variant="soft">
                         {warning.replace(/_/g, ' ')}
                       </Chip>
                     ))}
@@ -183,7 +183,7 @@ export default function PerformanceDashboard() {
               </div>
               <Chip
                 color={getDurationColor(request.duration_ms)}
-                variant="flat"
+                variant="soft"
                 size="lg"
               >
                 {formatDuration(request.duration_ms)}
@@ -198,7 +198,7 @@ export default function PerformanceDashboard() {
   const renderSlowQueries = () => {
     if (!summary || summary.slowest_queries.length === 0) {
       return (
-        <div className="text-center py-8 text-default-400">
+        <div className="text-center py-8 text-muted">
           {t('performance.no_slow_queries')}
         </div>
       );
@@ -212,20 +212,20 @@ export default function PerformanceDashboard() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
                   <Database className="w-4 h-4 text-accent" />
-                  <span className="text-sm text-default-500">{formatTimestamp(query.timestamp)}</span>
+                  <span className="text-sm text-muted">{formatTimestamp(query.timestamp)}</span>
                 </div>
-                <code className="text-sm bg-default-100 dark:bg-default-50 p-2 rounded block overflow-x-auto">
+                <code className="text-sm bg-surface-secondary dark:bg-surface-secondary p-2 rounded block overflow-x-auto">
                   {query.sql}
                 </code>
                 {query.caller && (
-                  <div className="mt-2 text-xs text-default-500">
+                  <div className="mt-2 text-xs text-muted">
                     {t('performance.called_from')}
                   </div>
                 )}
               </div>
               <Chip
                 color={getDurationColor(query.duration_ms)}
-                variant="flat"
+                variant="soft"
                 size="lg"
               >
                 {formatDuration(query.duration_ms)}
@@ -240,7 +240,7 @@ export default function PerformanceDashboard() {
   const renderMemorySpikes = () => {
     if (!summary || summary.memory_spikes.length === 0) {
       return (
-        <div className="text-center py-8 text-default-400">
+        <div className="text-center py-8 text-muted">
           {t('performance.no_memory_spikes')}
         </div>
       );
@@ -256,12 +256,12 @@ export default function PerformanceDashboard() {
                   <MemoryStick className="w-4 h-4 text-accent" />
                   <code className="text-sm truncate">{spike.endpoint}</code>
                 </div>
-                <div className="flex items-center gap-4 text-sm text-default-500">
+                <div className="flex items-center gap-4 text-sm text-muted">
                   <span>{formatTimestamp(spike.timestamp)}</span>
                   <span>{t('performance.peak_memory')}</span>
                 </div>
               </div>
-              <Chip color="secondary" variant="flat" size="lg">
+              <Chip color="default" variant="soft" size="lg">
                 {spike.memory_mb.toFixed(2)} MB
               </Chip>
             </div>
@@ -274,7 +274,7 @@ export default function PerformanceDashboard() {
   const renderVolumeChart = () => {
     if (!summary || Object.keys(summary.request_volume).length === 0) {
       return (
-        <div className="text-center py-8 text-default-400">
+        <div className="text-center py-8 text-muted">
           {t('performance.no_volume_data')}
         </div>
       );
@@ -291,8 +291,8 @@ export default function PerformanceDashboard() {
 
           return (
             <div key={hour} className="flex items-center gap-4">
-              <div className="w-32 text-sm text-default-500">{hour}</div>
-              <div className="flex-1 bg-default-100 dark:bg-default-50 rounded-full h-8 overflow-hidden">
+              <div className="w-32 text-sm text-muted">{hour}</div>
+              <div className="flex-1 bg-surface-secondary dark:bg-surface-secondary rounded-full h-8 overflow-hidden">
                 <div
                   className="bg-accent h-full flex items-center justify-end px-3 transition-all"
                   style={{ width: `${percentage}%` }}
@@ -303,7 +303,7 @@ export default function PerformanceDashboard() {
                 </div>
               </div>
               {percentage <= 20 && (
-                <div className="w-12 text-sm text-default-500">{volume}</div>
+                <div className="w-12 text-sm text-muted">{volume}</div>
               )}
             </div>
           );
@@ -328,38 +328,35 @@ export default function PerformanceDashboard() {
             <Zap className="w-7 h-7 text-accent" />
             {t('performance.page_title')}
           </h1>
-          <p className="text-default-500 mt-1">
+          <p className="text-muted mt-1">
             {t('performance.page_description')}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button
             size="sm"
-            variant={hours === 1 ? 'solid' : 'flat'}
-            color="primary"
+            variant={hours === 1 ? 'primary' : 'tertiary'}
             onPress={() => setHours(1)}
           >
             {t('performance.filter_1_hour')}
           </Button>
           <Button
             size="sm"
-            variant={hours === 24 ? 'solid' : 'flat'}
-            color="primary"
+            variant={hours === 24 ? 'primary' : 'tertiary'}
             onPress={() => setHours(24)}
           >
             {t('performance.filter_24_hours')}
           </Button>
           <Button
             size="sm"
-            variant={hours === 168 ? 'solid' : 'flat'}
-            color="primary"
+            variant={hours === 168 ? 'primary' : 'tertiary'}
             onPress={() => setHours(168)}
           >
             {t('performance.filter_7_days')}
           </Button>
           <Button
             size="sm"
-            variant="bordered"
+            variant="secondary"
             onPress={loadSummary}
           >
             {t('performance.refresh')}
@@ -396,7 +393,7 @@ export default function PerformanceDashboard() {
             <AlertTriangle className="w-5 h-5 text-warning mt-0.5" />
             <div>
               <h3 className="font-semibold text-warning mb-1">{t('performance.n_plus_one_title')}</h3>
-              <p className="text-sm text-default-600">
+              <p className="text-sm text-muted">
                 {t('performance.n_plus_one_body')}
               </p>
             </div>

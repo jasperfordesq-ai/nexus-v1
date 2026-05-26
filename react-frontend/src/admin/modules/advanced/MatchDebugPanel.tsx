@@ -203,7 +203,7 @@ export function MatchDebugPanel() {
             <Button
               onPress={handleReload}
               isDisabled={matchesLoading}
-              variant="flat"
+              variant="tertiary"
               className="flex items-center gap-2"
               aria-label={t('label_reload_matches')}
               startContent={<RefreshCw className={`w-4 h-4 ${matchesLoading ? 'animate-spin' : ''}`} />}
@@ -222,7 +222,7 @@ export function MatchDebugPanel() {
           </div>
           <div>
             <p className="text-sm font-semibold text-foreground">{t('select_a_user')}</p>
-            <p className="text-xs text-default-500">{t('select_a_user_desc')}</p>
+            <p className="text-xs text-muted">{t('select_a_user_desc')}</p>
           </div>
         </CardHeader>
         <CardBody>
@@ -235,7 +235,7 @@ export function MatchDebugPanel() {
               startContent={
                 searchLoading
                   ? <Spinner size="sm" />
-                  : <Search className="w-4 h-4 text-default-400" />
+                  : <Search className="w-4 h-4 text-muted" />
               }
               isClearable
               onClear={() => {
@@ -255,8 +255,8 @@ export function MatchDebugPanel() {
                   <Button
                     key={user.id}
                     onPress={() => selectUser(user)}
-                    variant="light"
-                    className="w-full flex items-center gap-3 px-4 py-3 justify-start h-auto rounded-none"
+                    variant="tertiary"
+                    className="w-full flex items-center gap-3 px-4 py-3 justify-start min-h-12 rounded-none"
                   >
                     <Avatar
                       src={resolveAvatarUrl(user.avatar_url)}
@@ -265,9 +265,9 @@ export function MatchDebugPanel() {
                     />
                     <div className="min-w-0 text-left">
                       <p className="text-sm font-medium text-foreground truncate">{user.name}</p>
-                      <p className="text-xs text-default-500 truncate">{user.email}</p>
+                      <p className="text-xs text-muted truncate">{user.email}</p>
                     </div>
-                    <span className="ml-auto text-xs text-default-400 shrink-0">#{user.id}</span>
+                    <span className="ml-auto text-xs text-muted shrink-0">#{user.id}</span>
                   </Button>
                 ))}
               </div>
@@ -277,7 +277,7 @@ export function MatchDebugPanel() {
           {/* Selected user pill */}
           {selectedUser && (
             <div className="mt-4 flex items-center gap-2">
-              <span className="text-sm text-default-500">{t('inspecting')}</span>
+              <span className="text-sm text-muted">{t('inspecting')}</span>
               <div className="flex items-center gap-2 bg-accent/10 rounded-full px-3 py-1">
                 <Avatar
                   src={resolveAvatarUrl(selectedUser.avatar_url)}
@@ -289,7 +289,7 @@ export function MatchDebugPanel() {
                 <span className="text-xs text-accent/70">#{selectedUser.id}</span>
               </div>
               {total > 0 && (
-                <Chip size="sm" variant="flat" color="primary">
+                <Chip size="sm" variant="soft">
                   {t('match_count', { count: total })}
                 </Chip>
               )}
@@ -303,7 +303,7 @@ export function MatchDebugPanel() {
         <div className="flex justify-center py-16">
           <div className="flex flex-col items-center gap-3">
             <Spinner size="lg" />
-            <p className="text-sm text-default-500">{t('loading_match_scores')}</p>
+            <p className="text-sm text-muted">{t('loading_match_scores')}</p>
           </div>
         </div>
       )}
@@ -313,11 +313,11 @@ export function MatchDebugPanel() {
         <Card>
           <CardBody>
             <div className="flex flex-col items-center gap-3 py-10 text-center">
-              <div className="p-4 rounded-full bg-default-100">
-                <Sparkles className="w-8 h-8 text-default-400" />
+              <div className="p-4 rounded-full bg-surface-secondary">
+                <Sparkles className="w-8 h-8 text-muted" />
               </div>
               <p className="font-semibold text-foreground">{t('no_matches_found')}</p>
-              <p className="text-sm text-default-500 max-w-sm">
+              <p className="text-sm text-muted max-w-sm">
                 {t('no_matches_desc')}
               </p>
             </div>
@@ -330,11 +330,11 @@ export function MatchDebugPanel() {
         <Card>
           <CardBody>
             <div className="flex flex-col items-center gap-3 py-10 text-center">
-              <div className="p-4 rounded-full bg-default-100">
-                <User className="w-8 h-8 text-default-400" />
+              <div className="p-4 rounded-full bg-surface-secondary">
+                <User className="w-8 h-8 text-muted" />
               </div>
               <p className="font-semibold text-foreground">{t('no_user_selected')}</p>
-              <p className="text-sm text-default-500">
+              <p className="text-sm text-muted">
                 {t('no_user_selected_desc')}
               </p>
             </div>
@@ -345,7 +345,7 @@ export function MatchDebugPanel() {
       {/* Match results */}
       {!matchesLoading && matches.length > 0 && (
         <div className="space-y-4">
-          <p className="text-sm text-default-500 font-medium">
+          <p className="text-sm text-muted font-medium">
             {t('top_matches_for_user', { count: matches.length, name: selectedUser?.name ?? '' })}
           </p>
 
@@ -363,7 +363,7 @@ export function MatchDebugPanel() {
                       <span className="font-semibold text-foreground truncate">{match.title}</span>
                       <Chip
                         size="sm"
-                        variant="flat"
+                        variant="soft"
                         color={match.source_type === 'listing' ? 'primary'
                           : match.source_type === 'job' ? 'warning'
                           : match.source_type === 'volunteering' ? 'danger'
@@ -372,14 +372,14 @@ export function MatchDebugPanel() {
                         {t(SOURCE_I18N_KEYS[match.source_type] ?? match.source_type)}
                       </Chip>
                       {match.category && (
-                        <Chip size="sm" variant="bordered" className="text-xs">
+                        <Chip size="sm" variant="soft" className="text-xs">
                           {match.category}
                         </Chip>
                       )}
                     </div>
 
                     {match.description && (
-                      <p className="text-xs text-default-500 line-clamp-2 mb-2">
+                      <p className="text-xs text-muted line-clamp-2 mb-2">
                         {match.description}
                       </p>
                     )}
@@ -393,7 +393,7 @@ export function MatchDebugPanel() {
                           size="sm"
                           className="w-5 h-5"
                         />
-                        <span className="text-xs text-default-500">{match.matched_user.name}</span>
+                        <span className="text-xs text-muted">{match.matched_user.name}</span>
                       </div>
                     )}
                   </div>
@@ -408,14 +408,14 @@ export function MatchDebugPanel() {
                   }`}>
                     {match.match_score}
                   </div>
-                  <div className="text-xs text-default-400">/ 100</div>
+                  <div className="text-xs text-muted">/ 100</div>
                 </div>
               </CardHeader>
 
               <CardBody className="pt-0 space-y-4">
                 {/* Overall score bar */}
                 <div>
-                  <div className="flex justify-between text-xs text-default-500 mb-1">
+                  <div className="flex justify-between text-xs text-muted mb-1">
                     <span className="font-medium">{t('overall_match_score')}</span>
                     <span>{match.match_score}%</span>
                   </div>
@@ -430,19 +430,19 @@ export function MatchDebugPanel() {
                 {/* Per-component score breakdown */}
                 {match._debug_scores && (
                   <div>
-                    <p className="text-xs font-medium text-default-500 mb-2">{t('score_breakdown')}</p>
+                    <p className="text-xs font-medium text-muted mb-2">{t('score_breakdown')}</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
                       {SCORE_COMPONENTS.map(({ key, i18nKey }) => {
                         const value = match._debug_scores![key] ?? 0;
                         return (
                           <div key={key}>
                             <div className="flex justify-between text-xs mb-1">
-                              <span className="text-default-500">{t(i18nKey)}</span>
+                              <span className="text-muted">{t(i18nKey)}</span>
                               <span className={`font-medium ${
                                 value >= 70 ? 'text-success'
                                 : value >= 40 ? 'text-warning'
                                 : value >= 1 ? 'text-danger'
-                                : 'text-default-400'
+                                : 'text-muted'
                               }`}>
                                 {value}
                               </span>
@@ -462,7 +462,7 @@ export function MatchDebugPanel() {
 
                 {/* Debug scores not available notice */}
                 {!match._debug_scores && (
-                  <p className="text-xs text-default-400 italic">
+                  <p className="text-xs text-muted italic">
                     {t('no_debug_scores')}
                   </p>
                 )}
@@ -470,10 +470,10 @@ export function MatchDebugPanel() {
                 {/* Match reasons */}
                 {match.reasons && match.reasons.length > 0 && (
                   <div>
-                    <p className="text-xs font-medium text-default-500 mb-2">{t('match_reasons')}</p>
+                    <p className="text-xs font-medium text-muted mb-2">{t('match_reasons')}</p>
                     <div className="flex flex-wrap gap-1.5">
                       {match.reasons.map((reason, i) => (
-                        <Chip key={i} size="sm" variant="flat" color="primary" className="text-xs">
+                        <Chip key={i} size="sm" variant="soft" className="text-xs">
                           {reason}
                         </Chip>
                       ))}

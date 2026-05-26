@@ -186,7 +186,7 @@ export function NewsletterAnalytics() {
         description={t('newsletters.newsletter_analytics_desc')}
         actions={
           <Button
-            variant="flat"
+            variant="secondary"
             startContent={<RefreshCw size={16} />}
             onPress={loadData}
             isLoading={loading}
@@ -202,7 +202,7 @@ export function NewsletterAnalytics() {
           label={t('newsletters.label_campaigns_sent')}
           value={data?.total_newsletters ?? 0}
           icon={Send}
-          color="primary"
+          color="default"
           loading={loading}
         />
         <StatCard
@@ -223,28 +223,28 @@ export function NewsletterAnalytics() {
           label={t('newsletters.label_avg_click_rate')}
           value={`${avgClickRate}%`}
           icon={MousePointer}
-          color="secondary"
+          color="default"
           loading={loading}
         />
         <StatCard
           label={t('newsletters.label_subscribers')}
           value={data?.total_subscribers ?? 0}
           icon={Users}
-          color="primary"
+          color="default"
           loading={loading}
         />
       </div>
 
       {/* ── Engagement Summary ────────────────────────────────────────── */}
       {totals && hasData && (
-        <Card shadow="sm" className="mt-6">
+        <Card className="mt-6">
           <CardHeader className="flex items-center gap-3 px-6 pb-0 pt-5">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
               <BarChart3 size={20} />
             </div>
             <div>
               <h3 className="text-base font-semibold">{t('newsletters.section_engagement_summary')}</h3>
-              <p className="text-sm text-default-500">
+              <p className="text-sm text-muted">
                 {t('newsletters.section_engagement_summary_desc')}
               </p>
             </div>
@@ -286,14 +286,14 @@ export function NewsletterAnalytics() {
 
       {/* ── Monthly Performance Chart ─────────────────────────────────── */}
       {chartData.length > 0 && (
-        <Card shadow="sm" className="mt-6">
+        <Card className="mt-6">
           <CardHeader className="flex items-center gap-3 px-6 pb-0 pt-5">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
               <TrendingUp size={20} />
             </div>
             <div>
               <h3 className="text-base font-semibold">{t('newsletters.section_monthly_performance')}</h3>
-              <p className="text-sm text-default-500">
+              <p className="text-sm text-muted">
                 {t('newsletters.section_monthly_performance_desc')}
               </p>
             </div>
@@ -308,8 +308,8 @@ export function NewsletterAnalytics() {
                 <Tooltip
                   contentStyle={{
                     borderRadius: 12,
-                    border: '1px solid var(--heroui-default-200)',
-                    background: 'var(--heroui-content1, #fff)',
+                    border: '1px solid var(--border)',
+                    background: 'var(--surface)',
                   }}
                   formatter={(value, name) => {
                     const v = value as number;
@@ -331,7 +331,7 @@ export function NewsletterAnalytics() {
                     return labels[value] ?? value;
                   }}
                 />
-                <Bar yAxisId="left" dataKey="sent" fill="hsl(var(--heroui-primary, 212 100% 48%))" radius={[4, 4, 0, 0]} />
+                <Bar yAxisId="left" dataKey="sent" fill="var(--accent)" radius={[4, 4, 0, 0]} />
                 <Bar yAxisId="left" dataKey="opens" fill="hsl(var(--heroui-warning, 37 91% 55%))" radius={[4, 4, 0, 0]} />
                 <Bar yAxisId="left" dataKey="clicks" fill="hsl(var(--heroui-success, 142 71% 45%))" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -371,7 +371,7 @@ export function NewsletterAnalytics() {
                       <TableCell className="text-center">
                         <Chip
                           size="sm"
-                          variant="flat"
+                          variant="soft"
                           color={rateColor(row.openRate, BENCHMARK_OPEN_RATE)}
                         >
                           {row.openRate}%
@@ -380,7 +380,7 @@ export function NewsletterAnalytics() {
                       <TableCell className="text-center">
                         <Chip
                           size="sm"
-                          variant="flat"
+                          variant="soft"
                           color={rateColor(row.clickRate, BENCHMARK_CLICK_RATE)}
                         >
                           {row.clickRate}%
@@ -397,14 +397,14 @@ export function NewsletterAnalytics() {
 
       {/* ── Top 10 Performers ─────────────────────────────────────────── */}
       {topPerformers.length > 0 && (
-        <Card shadow="sm" className="mt-6">
+        <Card className="mt-6">
           <CardHeader className="flex items-center gap-3 px-6 pb-0 pt-5">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-warning/10 text-warning">
               <Trophy size={20} />
             </div>
             <div>
               <h3 className="text-base font-semibold">{t('newsletters.section_top_performers')}</h3>
-              <p className="text-sm text-default-500">
+              <p className="text-sm text-muted">
                 {t('newsletters.section_top_performers_desc')}
               </p>
             </div>
@@ -430,19 +430,19 @@ export function NewsletterAnalytics() {
                       {idx < 3 ? (
                         <RankBadge rank={idx + 1} />
                       ) : (
-                        <span className="pl-2 text-default-400">{idx + 1}</span>
+                        <span className="pl-2 text-muted">{idx + 1}</span>
                       )}
                     </TableCell>
                     <TableCell>
                       <span className="font-medium">{truncate(nl.subject, 55)}</span>
                     </TableCell>
-                    <TableCell className="text-center text-default-500">
+                    <TableCell className="text-center text-muted">
                       {nl.total_sent.toLocaleString()}
                     </TableCell>
                     <TableCell className="text-center">
                       <Chip
                         size="sm"
-                        variant="flat"
+                        variant="soft"
                         color={rateColor(nl.open_rate, BENCHMARK_OPEN_RATE)}
                       >
                         {nl.open_rate}%
@@ -451,13 +451,13 @@ export function NewsletterAnalytics() {
                     <TableCell className="text-center">
                       <Chip
                         size="sm"
-                        variant="flat"
+                        variant="soft"
                         color={rateColor(nl.click_rate, BENCHMARK_CLICK_RATE)}
                       >
                         {nl.click_rate}%
                       </Chip>
                     </TableCell>
-                    <TableCell className="text-end text-sm text-default-500">
+                    <TableCell className="text-end text-sm text-muted">
                       {formatDate(nl.sent_at)}
                     </TableCell>
                   </TableRow>
@@ -470,14 +470,14 @@ export function NewsletterAnalytics() {
 
       {/* ── Benchmark Comparison ──────────────────────────────────────── */}
       {hasData && (
-        <Card shadow="sm" className="mt-6">
+        <Card className="mt-6">
           <CardHeader className="flex items-center gap-3 px-6 pb-0 pt-5">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-success/10 text-success">
               <Target size={20} />
             </div>
             <div>
               <h3 className="text-base font-semibold">{t('newsletters.section_benchmark')}</h3>
-              <p className="text-sm text-default-500">
+              <p className="text-sm text-muted">
                 {t('newsletters.section_benchmark_desc')}
               </p>
             </div>
@@ -501,13 +501,13 @@ export function NewsletterAnalytics() {
 
       {/* ── Empty State ───────────────────────────────────────────────── */}
       {!loading && !hasData && (
-        <Card shadow="sm" className="mt-6">
+        <Card className="mt-6">
           <CardBody className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-default-100">
-              <BarChart3 size={40} className="text-default-300" />
+            <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-surface-secondary">
+              <BarChart3 size={40} className="text-muted" />
             </div>
             <h3 className="text-lg font-semibold">{t('newsletters.empty_no_analytics')}</h3>
-            <p className="mt-1 text-default-500">
+            <p className="mt-1 text-muted">
               {t('newsletters.empty_no_analytics_desc')}
             </p>
           </CardBody>
@@ -538,7 +538,7 @@ function EngagementStat({
         {icon}
         <span className={`text-2xl font-bold ${color}`}>{value.toLocaleString()}</span>
       </div>
-      <p className="mt-1 text-xs text-default-500">{label}</p>
+      <p className="mt-1 text-xs text-muted">{label}</p>
     </div>
   );
 }
@@ -546,7 +546,7 @@ function EngagementStat({
 function RankBadge({ rank }: { rank: number }) {
   const colors: Record<number, string> = {
     1: 'bg-warning text-warning-foreground',
-    2: 'bg-default-200 text-default-600',
+    2: 'bg-surface-secondary text-muted',
     3: 'bg-orange-300 text-orange-900',
   };
   return (
@@ -573,23 +573,23 @@ function BenchmarkCard({
   const isAbove = diff >= 0;
 
   return (
-    <div className="rounded-xl border border-default-200 p-5">
-      <p className="mb-3 text-sm font-semibold text-default-700">{label}</p>
+    <div className="rounded-xl border border-border p-5">
+      <p className="mb-3 text-sm font-semibold text-foreground">{label}</p>
       <div className="flex items-end justify-between gap-4">
         <div>
-          <p className="text-xs text-default-500">{tLocal('newsletters.your_average')}</p>
+          <p className="text-xs text-muted">{tLocal('newsletters.your_average')}</p>
           <p className="text-2xl font-bold text-foreground">{yours}%</p>
         </div>
         <div className="text-right">
-          <p className="text-xs text-default-500">{tLocal('newsletters.industry_avg')}</p>
-          <p className="text-2xl font-bold text-default-400">{benchmark}%</p>
+          <p className="text-xs text-muted">{tLocal('newsletters.industry_avg')}</p>
+          <p className="text-2xl font-bold text-muted">{benchmark}%</p>
         </div>
       </div>
       <Separator className="my-3" />
       <div className="flex items-center gap-2">
         <Chip
           size="sm"
-          variant="flat"
+          variant="soft"
           color={isAbove ? 'success' : 'danger'}
           startContent={
             isAbove ? <TrendingUp size={12} /> : <TrendingUp size={12} className="rotate-180" />
@@ -599,7 +599,7 @@ function BenchmarkCard({
           {diff.toFixed(1)}pp ({isAbove ? '+' : ''}
           {diffPct}%)
         </Chip>
-        <span className="text-xs text-default-500">
+        <span className="text-xs text-muted">
           {isAbove ? tLocal('newsletters.above_benchmark') : tLocal('newsletters.below_benchmark')}
         </span>
       </div>

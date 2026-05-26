@@ -544,12 +544,12 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
           <div key={def.key} className="flex items-center justify-between gap-4 py-2">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-1.5">
-                <span className={`text-sm font-medium ${isReadOnly ? 'text-default-400' : 'text-foreground'}`}>{def.label}</span>
+                <span className={`text-sm font-medium ${isReadOnly ? 'text-muted' : 'text-foreground'}`}>{def.label}</span>
                 <Tooltip content={def.description} delay={300}>
-                  <Info size={14} className="text-default-400 shrink-0 cursor-help" />
+                  <Info size={14} className="text-muted shrink-0 cursor-help" />
                 </Tooltip>
               </div>
-              <p className="text-xs text-default-400 mt-0.5">{def.description}</p>
+              <p className="text-xs text-muted mt-0.5">{def.description}</p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               {def.manage && (
@@ -557,8 +557,7 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
                   as={Link}
                   to={tenantPath(def.manage.href)}
                   size="sm"
-                  variant="flat"
-                  color="primary"
+                  variant="secondary"
                   endContent={<ArrowRight size={14} />}
                 >
                   {def.manage.label}
@@ -582,7 +581,7 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
             <div className="flex items-center gap-1.5 mb-1">
               <span className="text-sm font-medium text-foreground">{def.label}</span>
               <Tooltip content={def.description} delay={300}>
-                <Info size={14} className="text-default-400 shrink-0 cursor-help" />
+                <Info size={14} className="text-muted shrink-0 cursor-help" />
               </Tooltip>
             </div>
             <Select
@@ -592,7 +591,7 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
                 if (selected !== undefined) handleChange(def.key, String(selected), def);
               }}
               aria-label={def.label}
-              variant="bordered"
+              variant="secondary"
               size="sm"
               className="max-w-xs"
               isInvalid={!!error}
@@ -602,7 +601,7 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
                 <SelectItem key={opt.value} id={opt.value}>{opt.label}</SelectItem>
               ))}
             </Select>
-            <p className="text-xs text-default-400 mt-1">{def.description}</p>
+            <p className="text-xs text-muted mt-1">{def.description}</p>
           </div>
         );
 
@@ -612,21 +611,21 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
             <div className="flex items-center gap-1.5 mb-1">
               <span className="text-sm font-medium text-foreground">{def.label}</span>
               <Tooltip content={def.description} delay={300}>
-                <Info size={14} className="text-default-400 shrink-0 cursor-help" />
+                <Info size={14} className="text-muted shrink-0 cursor-help" />
               </Tooltip>
             </div>
             <Textarea
               value={String(value)}
               onValueChange={(v) => handleChange(def.key, v, def)}
               aria-label={def.label}
-              variant="bordered"
+              variant="secondary"
               size="sm"
               minRows={2}
               maxRows={5}
               isInvalid={!!error}
               errorMessage={error}
             />
-            <p className="text-xs text-default-400 mt-1">{def.description}</p>
+            <p className="text-xs text-muted mt-1">{def.description}</p>
           </div>
         );
 
@@ -636,7 +635,7 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
             <div className="flex items-center gap-1.5 mb-1">
               <span className="text-sm font-medium text-foreground">{def.label}</span>
               <Tooltip content={def.description} delay={300}>
-                <Info size={14} className="text-default-400 shrink-0 cursor-help" />
+                <Info size={14} className="text-muted shrink-0 cursor-help" />
               </Tooltip>
             </div>
             <Input
@@ -644,7 +643,7 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
               value={String(value ?? '')}
               onValueChange={(v) => handleChange(def.key, v === '' ? (def.default ?? 0) : Number(v), def)}
               aria-label={def.label}
-              variant="bordered"
+              variant="secondary"
               size="sm"
               className="max-w-xs"
               isInvalid={!!error}
@@ -652,7 +651,7 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
               min={def.validation?.min}
               max={def.validation?.max}
             />
-            <p className="text-xs text-default-400 mt-1">{def.description}</p>
+            <p className="text-xs text-muted mt-1">{def.description}</p>
           </div>
         );
 
@@ -663,7 +662,7 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
             <div className="flex items-center gap-1.5 mb-1">
               <span className="text-sm font-medium text-foreground">{def.label}</span>
               <Tooltip content={def.description} delay={300}>
-                <Info size={14} className="text-default-400 shrink-0 cursor-help" />
+                <Info size={14} className="text-muted shrink-0 cursor-help" />
               </Tooltip>
             </div>
             <Input
@@ -671,13 +670,13 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
               value={String(value)}
               onValueChange={(v) => handleChange(def.key, v, def)}
               aria-label={def.label}
-              variant="bordered"
+              variant="secondary"
               size="sm"
               className="max-w-md"
               isInvalid={!!error}
               errorMessage={error}
             />
-            <p className="text-xs text-default-400 mt-1">{def.description}</p>
+            <p className="text-xs text-muted mt-1">{def.description}</p>
           </div>
         );
       }
@@ -696,11 +695,11 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
 
   if (loadError) {
     return (
-      <Card shadow="sm" className="border-danger-200 bg-danger-50">
+      <Card className="border border-danger/30 bg-danger/10">
         <CardBody className="text-center py-12">
           <p className="text-danger font-medium mb-3">{t('enterprise.failed_to_load_settings')}</p>
-          <p className="text-sm text-default-500 mb-4">{t('enterprise.failed_to_load_settings_desc')}</p>
-          <Button color="primary" variant="flat" onPress={loadData} startContent={<RefreshCw size={16} />}>
+          <p className="text-sm text-muted mb-4">{t('enterprise.failed_to_load_settings_desc')}</p>
+          <Button variant="secondary" onPress={loadData} startContent={<RefreshCw size={16} />}>
             {t('common.retry')}
           </Button>
         </CardBody>
@@ -715,7 +714,7 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
       <div className="flex justify-end mb-3">
         <div className="flex gap-2 flex-wrap">
           <Button
-            variant="flat"
+            variant="secondary"
             startContent={<RefreshCw size={16} />}
             onPress={loadData}
             size="sm"
@@ -723,8 +722,7 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
             {t('enterprise.reload')}
           </Button>
           <Button
-            variant="flat"
-            color="danger"
+            variant="danger"
             startContent={<RotateCcw size={16} />}
             onPress={() => setShowResetModal(true)}
             size="sm"
@@ -732,7 +730,6 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
             {t('enterprise.reset_to_defaults')}
           </Button>
           <Button
-            color="primary"
             startContent={<Save size={16} />}
             onPress={handleSave}
             isLoading={saving}
@@ -746,18 +743,18 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
 
       <div className="space-y-6">
         {configSchema.map((group) => (
-          <Card key={group.key} shadow="sm">
+          <Card key={group.key}>
             <CardHeader className="flex items-center gap-3 pb-1">
               <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-accent/10 text-accent">
                 {group.icon}
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="text-base font-semibold text-foreground">{group.label}</h3>
-                <p className="text-xs text-default-400">{group.description}</p>
+                <p className="text-xs text-muted">{group.description}</p>
               </div>
             </CardHeader>
             <CardBody className="px-5 pb-4 pt-2">
-              <div className="divide-y divide-default-100">
+              <div className="divide-y divide-border">
                 {group.settings.map((def) => renderSetting(def))}
               </div>
             </CardBody>
@@ -767,32 +764,31 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
         {/* Related admin pages — peer configuration surfaces that don't fit
             the schema above. Always visible since these admin pages always
             exist on the platform. */}
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="flex items-center gap-3 pb-1">
             <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-accent/10 text-accent">
               <Settings2 size={18} />
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="text-base font-semibold text-foreground">{t('enterprise.related_admin_pages')}</h3>
-              <p className="text-xs text-default-400">
+              <p className="text-xs text-muted">
                 {t('enterprise.related_admin_pages_desc')}
               </p>
             </div>
           </CardHeader>
           <CardBody className="px-5 pb-4 pt-2">
-            <div className="divide-y divide-default-100">
+            <div className="divide-y divide-border">
               {RELATED_ADMIN_PAGES.map((entry) => (
                 <div key={entry.href} className="flex items-center justify-between gap-4 py-3">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground">{t(entry.labelKey)}</p>
-                    <p className="text-xs text-default-500 mt-0.5">{t(entry.descriptionKey)}</p>
+                    <p className="text-xs text-muted mt-0.5">{t(entry.descriptionKey)}</p>
                   </div>
                   <Button
                     as={Link}
                     to={tenantPath(entry.href)}
                     size="sm"
-                    variant="flat"
-                    color="primary"
+                    variant="secondary"
                     endContent={<ArrowRight size={14} />}
                   >
                     {t('enterprise.open_related_page', { name: t(entry.destLabelKey) })}
@@ -813,13 +809,13 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
                 {t('enterprise.reset_configuration_to_defaults')}
               </ModalHeader>
               <ModalBody>
-                <p className="text-sm text-default-700">
+                <p className="text-sm text-foreground">
                   {t('enterprise.reset_configuration_intro')}
                 </p>
-                <p className="text-sm text-default-600">
+                <p className="text-sm text-muted">
                   {t('enterprise.reset_configuration_cleared')}
                 </p>
-                <p className="text-sm text-default-600">
+                <p className="text-sm text-muted">
                   {t('enterprise.reset_configuration_preserved')}
                 </p>
                 <p className="text-sm font-medium text-danger">
@@ -827,11 +823,11 @@ export function SystemConfig({ excludeKeys, onAfterChange }: SystemConfigProps =
                 </p>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose} size="sm">
+                <Button variant="tertiary" onPress={onClose} size="sm">
                   {t('common.cancel')}
                 </Button>
                 <Button
-                  color="danger"
+                  variant="danger"
                   onPress={handleReset}
                   isLoading={resetting}
                   size="sm"

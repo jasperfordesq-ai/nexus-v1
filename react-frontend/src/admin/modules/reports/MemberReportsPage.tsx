@@ -120,9 +120,9 @@ interface ReportData extends Partial<EngagementMetrics> {
 
 const tooltipStyle = {
   borderRadius: '8px',
-  border: '1px solid hsl(var(--heroui-default-200))',
-  backgroundColor: 'hsl(var(--heroui-content1))',
-  color: 'hsl(var(--heroui-foreground))',
+  border: '1px solid var(--color-border)',
+  backgroundColor: 'var(--color-surface)',
+  color: 'var(--color-foreground)',
 };
 
 // GROUP_BY_OPTIONS and PERIOD_OPTIONS are defined inside the component to access t()
@@ -215,7 +215,7 @@ export function MemberReportsPage() {
 
     return (
       <>
-        <Table aria-label={t('reports.active_members')} shadow="sm">
+        <Table aria-label={t('reports.active_members')} >
           <TableHeader>
             <TableColumn>{t('reports.col_member')}</TableColumn>
             <TableColumn>{t('reports.col_last_login')}</TableColumn>
@@ -236,21 +236,21 @@ export function MemberReportsPage() {
                     <Avatar size="sm" src={resolveAvatarUrl(m.avatar_url) || undefined} name={m.name} />
                     <div>
                       <p className="text-sm font-medium">{m.name}</p>
-                      <p className="text-xs text-default-400">{m.email}</p>
+                      <p className="text-xs text-muted">{m.email}</p>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm text-default-600">
+                  <span className="text-sm text-muted">
                     {m.last_login ? new Date(m.last_login).toLocaleDateString() : t('reports.never')}
                   </span>
                 </TableCell>
                 <TableCell>
-                  <Chip size="sm" variant="flat" color="primary">{m.transaction_count}</Chip>
+                  <Chip size="sm" variant="soft">{m.transaction_count}</Chip>
                 </TableCell>
                 <TableCell className="text-sm text-success font-medium">{m.hours_given?.toFixed(1) ?? '0.0'}</TableCell>
                 <TableCell className="text-sm text-warning font-medium">{m.hours_received?.toFixed(1) ?? '0.0'}</TableCell>
-                <TableCell className="text-sm text-default-500">
+                <TableCell className="text-sm text-muted">
                   {m.joined_at ? new Date(m.joined_at).toLocaleDateString() : '---'}
                 </TableCell>
               </TableRow>
@@ -270,7 +270,7 @@ export function MemberReportsPage() {
     const trends = (data?.trends ?? data?.registrations ?? []) as RegistrationTrend[];
 
     return (
-      <Card shadow="sm">
+      <Card >
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
           <TrendingUp size={18} className="text-success" />
           <h3 className="font-semibold">{t('reports.registration_trends')}</h3>
@@ -306,7 +306,7 @@ export function MemberReportsPage() {
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <p className="flex h-[350px] items-center justify-center text-sm text-default-400">
+            <p className="flex h-[350px] items-center justify-center text-sm text-muted">
               {t('reports.no_registration_data')}
             </p>
           )}
@@ -319,13 +319,13 @@ export function MemberReportsPage() {
     const cohorts = (data?.cohorts ?? data?.retention ?? []) as RetentionCohort[];
 
     return (
-      <Card shadow="sm">
+      <Card >
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
           <UserCheck size={18} className="text-accent" />
           <h3 className="font-semibold">{t('reports.retention_cohorts')}</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">
-          <Table aria-label={t('reports.label_retention_cohorts')} shadow="sm" isStriped>
+          <Table aria-label={t('reports.label_retention_cohorts')}  isStriped>
             <TableHeader>
               <TableColumn>{t('reports.col_cohort')}</TableColumn>
               <TableColumn className="text-center">{t('reports.col_initial')}</TableColumn>
@@ -347,7 +347,7 @@ export function MemberReportsPage() {
                   return (
                     <TableCell key={key} className={`text-center font-medium ${color}`}>
                       {pct.toFixed(0)}%
-                      <span className="text-xs text-default-400 ml-1">({val})</span>
+                      <span className="text-xs text-muted ml-1">({val})</span>
                     </TableCell>
                   );
                 };
@@ -380,7 +380,6 @@ export function MemberReportsPage() {
             label={t('reports.label_login_rate')}
             value={metrics ? `${(Number(metrics.login_rate ?? 0) * 100).toFixed(1)}%` : '\u2014'}
             icon={Users}
-            color="primary"
             loading={loading}
           />
           <StatCard
@@ -401,17 +400,17 @@ export function MemberReportsPage() {
             label={t('reports.label_messaging_rate')}
             value={metrics ? `${(Number(metrics.messaging_rate ?? 0) * 100).toFixed(1)}%` : '\u2014'}
             icon={Activity}
-            color="secondary"
+            color="default"
             loading={loading}
           />
         </div>
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <Card shadow="sm">
+          <Card >
             <CardBody className="p-4">
-              <p className="text-sm text-default-500">{t('reports.active_30d_total')}</p>
+              <p className="text-sm text-muted">{t('reports.active_30d_total')}</p>
               {loading ? (
-                <div className="mt-1 h-7 w-20 animate-pulse rounded bg-default-200" />
+                <div className="mt-1 h-7 w-20 animate-pulse rounded bg-surface-secondary" />
               ) : (
                 <p className="text-2xl font-bold text-foreground">
                   {metrics?.total_active_30d?.toLocaleString() ?? 0} / {metrics?.total_members?.toLocaleString() ?? 0}
@@ -419,11 +418,11 @@ export function MemberReportsPage() {
               )}
             </CardBody>
           </Card>
-          <Card shadow="sm">
+          <Card >
             <CardBody className="p-4">
-              <p className="text-sm text-default-500">{t('reports.avg_sessions_per_user')}</p>
+              <p className="text-sm text-muted">{t('reports.avg_sessions_per_user')}</p>
               {loading ? (
-                <div className="mt-1 h-7 w-20 animate-pulse rounded bg-default-200" />
+                <div className="mt-1 h-7 w-20 animate-pulse rounded bg-surface-secondary" />
               ) : (
                 <p className="text-2xl font-bold text-foreground">
                   {metrics?.avg_sessions_per_user?.toFixed(1) ?? '0.0'}
@@ -431,11 +430,11 @@ export function MemberReportsPage() {
               )}
             </CardBody>
           </Card>
-          <Card shadow="sm">
+          <Card >
             <CardBody className="p-4">
-              <p className="text-sm text-default-500">{t('reports.avg_transactions_per_user')}</p>
+              <p className="text-sm text-muted">{t('reports.avg_transactions_per_user')}</p>
               {loading ? (
-                <div className="mt-1 h-7 w-20 animate-pulse rounded bg-default-200" />
+                <div className="mt-1 h-7 w-20 animate-pulse rounded bg-surface-secondary" />
               ) : (
                 <p className="text-2xl font-bold text-foreground">
                   {metrics?.avg_transactions_per_user?.toFixed(1) ?? '0.0'}
@@ -452,13 +451,13 @@ export function MemberReportsPage() {
     const contributors = (data?.contributors ?? []) as TopContributor[];
 
     return (
-      <Card shadow="sm">
+      <Card >
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
           <Trophy size={18} className="text-warning" />
           <h3 className="font-semibold">{t('reports.top_contributors')}</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">
-          <Table aria-label={t('reports.label_top_contributors')} shadow="sm" isStriped>
+          <Table aria-label={t('reports.label_top_contributors')}  isStriped>
             <TableHeader>
               <TableColumn>{t('reports.col_rank')}</TableColumn>
               <TableColumn>{t('reports.col_member')}</TableColumn>
@@ -475,7 +474,7 @@ export function MemberReportsPage() {
               {contributors.map((c, i) => (
                 <TableRow key={c.id}>
                   <TableCell>
-                    <span className={`font-bold ${i < 3 ? 'text-warning' : 'text-default-400'}`}>
+                    <span className={`font-bold ${i < 3 ? 'text-warning' : 'text-muted'}`}>
                       {i + 1}
                     </span>
                   </TableCell>
@@ -488,7 +487,7 @@ export function MemberReportsPage() {
                   <TableCell className="text-right text-success font-medium">{c.hours_given?.toFixed(1)}</TableCell>
                   <TableCell className="text-right text-warning font-medium">{c.hours_received?.toFixed(1)}</TableCell>
                   <TableCell className="text-right text-accent">{c.transaction_count}</TableCell>
-                  <TableCell className="text-right text-default-600">{c.listings_count}</TableCell>
+                  <TableCell className="text-right text-muted">{c.listings_count}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -505,7 +504,7 @@ export function MemberReportsPage() {
 
     return (
       <>
-        <Table aria-label={t('reports.label_least_active_members')} shadow="sm">
+        <Table aria-label={t('reports.label_least_active_members')} >
           <TableHeader>
             <TableColumn>{t('reports.col_member')}</TableColumn>
             <TableColumn>{t('reports.col_last_login')}</TableColumn>
@@ -524,21 +523,21 @@ export function MemberReportsPage() {
                     <Avatar size="sm" src={resolveAvatarUrl(m.avatar_url) || undefined} name={m.name} />
                     <div>
                       <p className="text-sm font-medium">{m.name}</p>
-                      <p className="text-xs text-default-400">{m.email}</p>
+                      <p className="text-xs text-muted">{m.email}</p>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
                   <Chip
                     size="sm"
-                    variant="flat"
+                    variant="soft"
                     color={m.last_login ? 'default' : 'danger'}
                   >
                     {m.last_login ? new Date(m.last_login).toLocaleDateString() : t('reports.never')}
                   </Chip>
                 </TableCell>
                 <TableCell className="text-sm">{m.transaction_count}</TableCell>
-                <TableCell className="text-sm text-default-500">
+                <TableCell className="text-sm text-muted">
                   {m.joined_at ? new Date(m.joined_at).toLocaleDateString() : '---'}
                 </TableCell>
               </TableRow>
@@ -580,7 +579,7 @@ export function MemberReportsPage() {
               ))}
             </Select>
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<Download size={16} />}
               onPress={async () => {
                 try { await exportCsv(reportType); } catch { toast.error(t('reports.failed_to_export_c_s_v')); }
@@ -590,7 +589,7 @@ export function MemberReportsPage() {
               {t('reports.export_csv')}
             </Button>
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<RefreshCw size={16} />}
               onPress={loadData}
               isLoading={loading}
@@ -606,7 +605,6 @@ export function MemberReportsPage() {
         selectedKey={reportType}
         onSelectionChange={(key) => setReportType(String(key))}
         variant="underlined"
-        color="primary"
         classNames={{ tabList: 'mb-4' }}
       >
         <Tab key="active" title={<span className="flex items-center gap-1.5"><Users size={14} /> {t('reports.tab_active')}</span>} />
