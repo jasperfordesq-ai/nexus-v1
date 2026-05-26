@@ -412,7 +412,7 @@ export function CreateMarketplaceListingPage() {
           <Button
             as={Link}
             to={tenantPath('/marketplace')}
-            variant="light"
+            variant="tertiary"
             isIconOnly
             size="sm"
             aria-label={t('common.go_back')}
@@ -421,9 +421,9 @@ export function CreateMarketplaceListingPage() {
           </Button>
           <div className="min-w-0">
             <h1 className="text-2xl font-bold text-foreground">{t('create.title')}</h1>
-            <p className="text-sm text-default-500">{t('create.subtitle')}</p>
+            <p className="text-sm text-muted">{t('create.subtitle')}</p>
             {(draft.title || draft.description) && (
-              <p className="text-xs text-default-400 mt-1">
+              <p className="text-xs text-muted mt-1">
                 {t('create.draft_saved')}
               </p>
             )}
@@ -435,7 +435,7 @@ export function CreateMarketplaceListingPage() {
           <h2 className="text-lg font-semibold text-foreground flex flex-wrap items-center gap-2">
             <Camera className="w-5 h-5 text-accent" />
             {t('create.photos')}
-            <span className="text-sm font-normal text-default-400">
+            <span className="text-sm font-normal text-muted">
               {t('create.photos_count', { current: images.length, max: MAX_IMAGES })}
             </span>
           </h2>
@@ -448,14 +448,14 @@ export function CreateMarketplaceListingPage() {
             onDragOver={handleDragOver}
             onClick={() => fileInputRef.current?.click()}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInputRef.current?.click(); } }}
-            className="border-2 border-dashed border-default-300 rounded-xl p-8 text-center cursor-pointer
+            className="border-2 border-dashed border-border rounded-xl p-8 text-center cursor-pointer
               hover:border-accent hover:bg-accent/5 transition-colors"
           >
-            <Upload className="w-10 h-10 text-default-300 mx-auto mb-3" />
-            <p className="text-sm text-default-500">
+            <Upload className="w-10 h-10 text-muted mx-auto mb-3" />
+            <p className="text-sm text-muted">
               {t('create.drop_zone_text')}
             </p>
-            <p className="text-xs text-default-400 mt-1">
+            <p className="text-xs text-muted mt-1">
               {t('create.drop_zone_limits', { max: MAX_IMAGES })}
             </p>
             <input
@@ -481,17 +481,17 @@ export function CreateMarketplaceListingPage() {
                   />
                   {idx === 0 && (
                     <div className="absolute top-1 left-1">
-                      <Chip size="sm" color="primary" variant="solid" className="text-[10px]">
+                      <Chip size="sm" color="accent" variant="primary" className="text-[10px]">
                         {t('create.cover')}
                       </Chip>
                     </div>
                   )}
                   <Button
                     isIconOnly
-                    variant="flat"
+                    variant="danger"
                     size="sm"
                     onPress={() => removeImage(img.id)}
-                    className="absolute top-1 right-1 p-1 rounded-full bg-danger/90 text-white opacity-0 group-hover:opacity-100 transition-opacity min-w-0 w-auto h-auto"
+                    className="absolute top-1 right-1 min-h-7 min-w-7 rounded-full p-1 opacity-0 transition-opacity group-hover:opacity-100"
                     aria-label={t('create.remove_image')}
                   >
                     <X className="w-3 h-3" />
@@ -501,12 +501,12 @@ export function CreateMarketplaceListingPage() {
 
               {images.length < MAX_IMAGES && (
                 <Button
-                  variant="flat"
+                  variant="secondary"
                   onPress={() => fileInputRef.current?.click()}
-                  className="aspect-square rounded-lg border-2 border-dashed border-default-300 flex flex-col items-center justify-center hover:border-accent hover:bg-accent/5 transition-colors h-auto min-w-0"
+                  className="aspect-square min-h-24 rounded-lg border-2 border-dashed border-border flex flex-col items-center justify-center hover:border-accent hover:bg-accent/5 transition-colors min-w-0"
                 >
-                  <Plus className="w-5 h-5 text-default-400" />
-                  <span className="text-xs text-default-400 mt-1">{t('create.add')}</span>
+                  <Plus className="w-5 h-5 text-muted" />
+                  <span className="text-xs text-muted mt-1">{t('create.add')}</span>
                 </Button>
               )}
             </div>
@@ -518,7 +518,7 @@ export function CreateMarketplaceListingPage() {
           <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
             <Video className="w-5 h-5 text-accent" />
             {t('create.video')}
-            <span className="text-sm font-normal text-default-400">
+            <span className="text-sm font-normal text-muted">
               {t('create.video_optional')}
             </span>
           </h2>
@@ -533,9 +533,9 @@ export function CreateMarketplaceListingPage() {
               />
               <Button
                 isIconOnly
-                variant="flat"
+                variant="danger"
                 onPress={removeVideo}
-                className="absolute top-2 right-2 p-1.5 rounded-full bg-danger/90 text-white hover:bg-danger transition-colors min-w-0 w-auto h-auto"
+                className="absolute top-2 right-2 min-h-8 min-w-8 rounded-full p-1.5"
                 aria-label={t('create.remove_video')}
               >
                 <X className="w-4 h-4" />
@@ -547,14 +547,14 @@ export function CreateMarketplaceListingPage() {
               tabIndex={0}
               onClick={() => videoInputRef.current?.click()}
               onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); videoInputRef.current?.click(); } }}
-              className="border-2 border-dashed border-default-300 rounded-xl p-6 text-center cursor-pointer
+              className="border-2 border-dashed border-border rounded-xl p-6 text-center cursor-pointer
                 hover:border-accent hover:bg-accent/5 transition-colors"
             >
-              <Video className="w-8 h-8 text-default-300 mx-auto mb-2" />
-              <p className="text-sm text-default-500">
+              <Video className="w-8 h-8 text-muted mx-auto mb-2" />
+              <p className="text-sm text-muted">
                 {t('create.video_drop_zone')}
               </p>
-              <p className="text-xs text-default-400 mt-1">
+              <p className="text-xs text-muted mt-1">
                 {t('create.video_limits')}
               </p>
               <input
@@ -657,12 +657,12 @@ export function CreateMarketplaceListingPage() {
           {isLoadingTemplate && (
             <div className="flex items-center gap-2 py-2">
               <Spinner size="sm" />
-              <span className="text-sm text-default-400">{t('create.loading_category_fields')}</span>
+              <span className="text-sm text-muted">{t('create.loading_category_fields')}</span>
             </div>
           )}
           {categoryTemplate.length > 0 && (
             <div className="space-y-3 pt-2">
-              <p className="text-sm font-medium text-default-500">{t('create.category_specific_details')}</p>
+              <p className="text-sm font-medium text-muted">{t('create.category_specific_details')}</p>
               {categoryTemplate.map((field) => {
                 if (field.type === 'select' && field.options) {
                   return (
@@ -737,7 +737,7 @@ export function CreateMarketplaceListingPage() {
                 isRequired
                 className="w-full sm:flex-1"
                 startContent={
-                  <span className="text-default-400 text-sm">{currency}</span>
+                  <span className="text-muted text-sm">{currency}</span>
                 }
               />
               <Select
