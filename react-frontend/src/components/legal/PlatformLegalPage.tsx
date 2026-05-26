@@ -17,12 +17,13 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';import Hexagon from 'lucide-react/icons/hexagon';
+import { Chip } from '@heroui/react';
 import CalendarDays from 'lucide-react/icons/calendar-days';
 import ExternalLink from 'lucide-react/icons/external-link';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import Info from 'lucide-react/icons/info';
 import type { LucideIcon } from 'lucide-react';
-import { GlassCard, Button, Chip } from '@/components/ui';
+import { GlassCard, Button } from '@/components/ui';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
 
@@ -101,18 +102,18 @@ export function PlatformLegalPage({
         <div className="flex items-center justify-center gap-3 flex-wrap">
           <Chip
             size="sm"
-            variant="flat"
-            startContent={<CalendarDays className="w-3 h-3" />}
-            classNames={{ base: 'bg-slate-500/10 text-slate-600 dark:text-slate-400' }}
+            variant="tertiary"
+            className="bg-slate-500/10 text-slate-600 dark:text-slate-400"
           >
+            <CalendarDays className="w-3 h-3" />
             {t('platform.effective_date', { date: effectiveDate })}
           </Chip>
           <Chip
             size="sm"
-            variant="flat"
-            startContent={<Hexagon className="w-3 h-3" />}
-            classNames={{ base: 'bg-blue-500/10 text-blue-600 dark:text-blue-400' }}
+            variant="tertiary"
+            className="bg-blue-500/10 text-blue-600 dark:text-blue-400"
           >
+            <Hexagon className="w-3 h-3" />
             {t('platform.platform_chip')}
           </Chip>
         </div>
