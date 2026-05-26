@@ -212,13 +212,13 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
           className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
             active
               ? 'bg-accent/10 text-accent'
-              : 'text-default-600 hover:bg-default-100 hover:text-foreground'
+              : 'text-muted hover:bg-surface-secondary hover:text-foreground'
           } ${collapsed ? 'justify-center px-2' : ''}`}
         >
           <Icon
             aria-hidden="true"
             size={18}
-            className={`shrink-0 ${active ? 'text-accent' : 'text-default-400'}`}
+            className={`shrink-0 ${active ? 'text-accent' : 'text-muted'}`}
           />
           {!collapsed && <span className="flex-1 truncate">{label}</span>}
         </Link>
@@ -252,10 +252,10 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
         )}
         <Button
           isIconOnly
-          variant="light"
+          variant="tertiary"
           size="sm"
           onPress={onToggle}
-          className="text-default-500"
+          className="text-muted"
           aria-label={t(collapsed ? 'panel.sidebar.expand' : 'panel.sidebar.collapse')}
         >
           {collapsed ? (
@@ -274,16 +274,16 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
               aria-label={t('panel.sidebar.search_aria')}
               placeholder={t('panel.sidebar.search_placeholder')}
               size="sm"
-              variant="bordered"
+              variant="secondary"
               value={query}
               onValueChange={setQuery}
-              startContent={<Search aria-hidden="true" size={15} className="text-default-400" />}
+              startContent={<Search aria-hidden="true" size={15} className="text-muted" />}
               endContent={query ? (
                 <Button
                   isIconOnly
                   size="sm"
-                  variant="light"
-                  className="h-6 w-6 min-w-6 text-default-400"
+                  variant="tertiary"
+                  className="h-6 w-6 min-w-6 text-muted"
                   aria-label={t('panel.sidebar.clear_search')}
                   onPress={() => setQuery('')}
                 >
@@ -297,14 +297,14 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
           </div>
         )}
         {visibleSections.length === 0 && !collapsed && (
-          <p className="px-3 py-6 text-center text-sm text-default-400">
+          <p className="px-3 py-6 text-center text-sm text-muted">
             {t('panel.sidebar.no_search_results')}
           </p>
         )}
         {visibleSections.map((section, idx) => (
           <div key={section.key} className={idx > 0 ? 'mt-4' : ''}>
             {!collapsed && (
-              <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-default-400">
+              <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-muted">
                 {t(section.titleKey)}
               </p>
             )}
@@ -322,8 +322,8 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
             <Link
               to={tenantPath('/admin/help')}
               aria-label={t('panel.sidebar.help_centre')}
-              className={`flex items-center justify-center rounded-lg px-2 py-2 transition-colors hover:bg-default-100 ${
-                location.pathname.includes('/admin/help') ? 'text-accent' : 'text-default-400 hover:text-foreground'
+              className={`flex items-center justify-center rounded-lg px-2 py-2 transition-colors hover:bg-surface-secondary ${
+                location.pathname.includes('/admin/help') ? 'text-accent' : 'text-muted hover:text-foreground'
               }`}
             >
               <HelpCircle aria-hidden="true" size={18} />
@@ -332,8 +332,8 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
         ) : (
           <Link
             to={tenantPath('/admin/help')}
-            className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-default-100 ${
-              location.pathname.includes('/admin/help') ? 'text-accent font-medium' : 'text-default-400 hover:text-foreground'
+            className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-surface-secondary ${
+              location.pathname.includes('/admin/help') ? 'font-medium text-accent' : 'text-muted hover:text-foreground'
             }`}
           >
             <HelpCircle aria-hidden="true" size={18} />
@@ -347,7 +347,7 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
                 <Link
                   to={tenantPath('/admin')}
                   aria-label={t('panel.sidebar.full_admin')}
-                  className="flex items-center justify-center rounded-lg px-2 py-2 text-default-400 hover:bg-default-100 hover:text-foreground transition-colors"
+                  className="flex items-center justify-center rounded-lg px-2 py-2 text-muted transition-colors hover:bg-surface-secondary hover:text-foreground"
                 >
                   <Settings aria-hidden="true" size={18} />
                 </Link>
@@ -355,7 +355,7 @@ export function CaringPanelSidebar({ collapsed, onToggle }: CaringPanelSidebarPr
             ) : (
               <Link
                 to={tenantPath('/admin')}
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-default-400 hover:bg-default-100 hover:text-foreground transition-colors"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:bg-surface-secondary hover:text-foreground"
               >
                 <Settings aria-hidden="true" size={18} />
                 <span>{t('panel.sidebar.full_admin')}</span>

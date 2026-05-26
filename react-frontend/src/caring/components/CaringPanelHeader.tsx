@@ -37,27 +37,27 @@ export function CaringPanelHeader({ sidebarCollapsed, onSidebarToggle }: CaringP
         {onSidebarToggle && (
           <Button
             isIconOnly
-            variant="light"
+            variant="tertiary"
             size="sm"
             onPress={onSidebarToggle}
-            className="text-default-500 md:hidden"
+            className="text-muted md:hidden"
             aria-label={t('panel.header.toggle_sidebar')}
           >
             <Menu size={20} />
           </Button>
         )}
         <Button
-          variant="light"
+          variant="tertiary"
           size="sm"
           onPress={() => navigate(tenantPath('/dashboard'))}
           startContent={<ArrowLeft size={16} />}
-          className="text-default-500"
+          className="text-muted"
           aria-label={t('panel.header.back_to_site')}
         >
           <span className="hidden sm:inline">{t('panel.header.back_to_site')}</span>
         </Button>
         {tenant?.name && (
-          <span className="hidden max-w-[14rem] truncate text-sm font-medium text-default-400 sm:inline md:max-w-[20rem]">
+          <span className="hidden max-w-[14rem] truncate text-sm font-medium text-muted sm:inline md:max-w-[20rem]">
             {tenant.name}
           </span>
         )}
@@ -67,7 +67,7 @@ export function CaringPanelHeader({ sidebarCollapsed, onSidebarToggle }: CaringP
       <div className="flex shrink-0 items-center gap-2 sm:gap-3">
         <Button
           isIconOnly
-          variant="light"
+          variant="tertiary"
           size="sm"
           onPress={() => navigate(tenantPath('/notifications'))}
           aria-label={t('panel.header.notifications')}
@@ -78,8 +78,9 @@ export function CaringPanelHeader({ sidebarCollapsed, onSidebarToggle }: CaringP
         <Dropdown placement="bottom-end">
           <DropdownTrigger>
             <Button
-              variant="light"
-              className="flex items-center gap-2 px-2 py-1 h-auto min-w-0"
+              variant="tertiary"
+              size="sm"
+              className="min-w-0 gap-2 px-2"
               aria-label={t('panel.header.user_menu')}
             >
               <Avatar
