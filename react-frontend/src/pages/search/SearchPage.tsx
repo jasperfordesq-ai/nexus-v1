@@ -330,16 +330,10 @@ export function SearchPage() {
               {Array.from({ length: 6 }).map((_, i) => (
                 <GlassCard key={i} className="p-4">
                   <div className="flex items-center gap-3">
-                    <Skeleton className="rounded-full flex-shrink-0">
-                      <div className="w-10 h-10 rounded-full bg-default-300" />
-                    </Skeleton>
+                    <Skeleton className="w-10 h-10 rounded-full flex-shrink-0" />
                     <div className="flex-1 space-y-2">
-                      <Skeleton className="rounded-lg">
-                        <div className="h-4 rounded-lg bg-default-300 w-2/3" />
-                      </Skeleton>
-                      <Skeleton className="rounded-lg">
-                        <div className="h-3 rounded-lg bg-default-200 w-1/2" />
-                      </Skeleton>
+                      <Skeleton className="h-4 rounded-lg w-2/3" />
+                      <Skeleton className="h-3 rounded-lg w-1/2" />
                     </div>
                   </div>
                 </GlassCard>

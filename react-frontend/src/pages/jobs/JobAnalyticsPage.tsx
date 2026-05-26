@@ -91,7 +91,7 @@ const STAGE_COLORS: Record<string, string> = {
   offer: 'bg-success/20 text-success',
   accepted: 'bg-success/20 text-success',
   rejected: 'bg-danger/20 text-danger',
-  withdrawn: 'bg-default/20 text-default-500',
+  withdrawn: 'bg-surface-secondary text-muted',
   pending: 'bg-warning/20 text-warning',
 };
 
@@ -491,16 +491,16 @@ export function JobAnalyticsPage() {
         {predictionsLoading ? (
           <div className="flex justify-center py-8"><Spinner size="lg" /></div>
         ) : !predictions ? (
-          <p className="text-center text-default-400 py-6">{t('analytics.no_predictions')}</p>
+          <p className="text-center text-muted py-6">{t('analytics.no_predictions')}</p>
         ) : (
           <div className="space-y-4">
             {/* Prediction cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="p-4 rounded-lg bg-default-50 border border-default-200">
-                <p className="text-xs text-default-500 uppercase tracking-wide">{t('analytics.expected_apps')}</p>
+              <div className="p-4 rounded-lg bg-surface-secondary border border-border">
+                <p className="text-xs text-muted uppercase tracking-wide">{t('analytics.expected_apps')}</p>
                 <p className="text-2xl font-bold text-foreground mt-1">{predictions.expected_applications.value}</p>
                 <p className="text-xs mt-1">
-                  <span className="text-default-400">{t('analytics.current')}: {predictions.expected_applications.current}</span>
+                  <span className="text-muted">{t('analytics.current')}: {predictions.expected_applications.current}</span>
                   {' · '}
                   <Chip size="sm" variant="tertiary" color={predictions.expected_applications.current >= predictions.expected_applications.value ? 'success' : 'warning'}>
                     {predictions.expected_applications.label}
@@ -508,21 +508,21 @@ export function JobAnalyticsPage() {
                 </p>
               </div>
 
-              <div className="p-4 rounded-lg bg-default-50 border border-default-200">
-                <p className="text-xs text-default-500 uppercase tracking-wide">{t('analytics.time_to_fill')}</p>
+              <div className="p-4 rounded-lg bg-surface-secondary border border-border">
+                <p className="text-xs text-muted uppercase tracking-wide">{t('analytics.time_to_fill')}</p>
                 <p className="text-2xl font-bold text-foreground mt-1">
                   {predictions.estimated_time_to_fill.value
                     ? t('analytics.days_short_value', { count: predictions.estimated_time_to_fill.value })
                     : t('analytics.not_available')}
                 </p>
-                <p className="text-xs text-default-400 mt-1">{t('analytics.posted_days_ago', { days: predictions.estimated_time_to_fill.days_posted })}</p>
+                <p className="text-xs text-muted mt-1">{t('analytics.posted_days_ago', { days: predictions.estimated_time_to_fill.days_posted })}</p>
               </div>
 
-              <div className="p-4 rounded-lg bg-default-50 border border-default-200">
-                <p className="text-xs text-default-500 uppercase tracking-wide">{t('analytics.conversion_comparison')}</p>
+              <div className="p-4 rounded-lg bg-surface-secondary border border-border">
+                <p className="text-xs text-muted uppercase tracking-wide">{t('analytics.conversion_comparison')}</p>
                 <p className="text-2xl font-bold text-foreground mt-1">{predictions.conversion_rate.yours}%</p>
                 <p className="text-xs mt-1">
-                  <span className="text-default-400">{t('analytics.avg')}: {predictions.conversion_rate.average}%</span>
+                  <span className="text-muted">{t('analytics.avg')}: {predictions.conversion_rate.average}%</span>
                   {' · '}
                   <Chip size="sm" variant="tertiary" color={predictions.conversion_rate.yours >= predictions.conversion_rate.average ? 'success' : 'warning'}>
                     {predictions.conversion_rate.label}
@@ -533,16 +533,16 @@ export function JobAnalyticsPage() {
 
             {/* Salary comparison */}
             {predictions.salary_comparison && (
-              <div className="p-4 rounded-lg bg-default-50 border border-default-200">
-                <p className="text-xs text-default-500 uppercase tracking-wide mb-2">{t('analytics.salary_comparison')}</p>
+              <div className="p-4 rounded-lg bg-surface-secondary border border-border">
+                <p className="text-xs text-muted uppercase tracking-wide mb-2">{t('analytics.salary_comparison')}</p>
                 <div className="flex items-center gap-4">
                   <div>
-                    <p className="text-sm text-default-500">{t('analytics.yours')}</p>
+                    <p className="text-sm text-muted">{t('analytics.yours')}</p>
                     <p className="text-lg font-bold">{predictions.salary_comparison.your_salary.toLocaleString()}</p>
                   </div>
-                  <div className="text-default-300">{t('analytics.versus')}</div>
+                  <div className="text-muted">{t('analytics.versus')}</div>
                   <div>
-                    <p className="text-sm text-default-500">{t('analytics.market_avg')}</p>
+                    <p className="text-sm text-muted">{t('analytics.market_avg')}</p>
                     <p className="text-lg font-bold">{predictions.salary_comparison.market_avg.toLocaleString()}</p>
                   </div>
                   <Chip size="sm" variant="tertiary" color={predictions.salary_comparison.diff_percent >= 0 ? 'success' : 'danger'}>

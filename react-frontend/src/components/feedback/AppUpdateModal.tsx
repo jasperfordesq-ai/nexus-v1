@@ -43,16 +43,16 @@ export function AppUpdateModal({ updateInfo, onDismiss }: AppUpdateModalProps) {
           {t('update_available')}
         </ModalHeader>
         <ModalBody>
-          <p className="text-default-600">{updateInfo.updateMessage}</p>
+          <p className="text-muted">{updateInfo.updateMessage}</p>
 
-          <p className="text-sm text-default-400">
+          <p className="text-sm text-muted">
             {t('version_info', { currentVersion: updateInfo.currentVersion, clientVersion: updateInfo.clientVersion })}
           </p>
 
           {notes.length > 0 && (
             <div className="mt-2">
-              <p className="text-sm font-medium text-default-700 mb-1">{t('whats_new')}</p>
-              <ul className="list-disc list-inside text-sm text-default-500 space-y-0.5">
+              <p className="text-sm font-medium text-foreground mb-1">{t('whats_new')}</p>
+              <ul className="list-disc list-inside text-sm text-muted space-y-0.5">
                 {notes.map((note, i) => (
                   <li key={i}>{note}</li>
                 ))}
@@ -62,12 +62,11 @@ export function AppUpdateModal({ updateInfo, onDismiss }: AppUpdateModalProps) {
         </ModalBody>
         <ModalFooter>
           {!updateInfo.forceUpdate && (
-            <Button variant="flat" onPress={onDismiss}>
+            <Button variant="tertiary" onPress={onDismiss}>
               {t('later')}
             </Button>
           )}
           <Button
-            color="primary"
             startContent={<Download size={16} />}
             onPress={handleUpdate}
           >

@@ -184,7 +184,7 @@ function AppKanbanCard({ application, onDragStart, onDownloadCv, onScheduleInter
                   {t('kanban.ai_score', { score: aiRanking.score })}
                 </Chip>
                 <Tooltip content={aiRanking.reason}>
-                  <span className="text-[10px] text-default-400 cursor-help">#{aiRanking.rank}</span>
+                  <span className="text-[10px] text-muted cursor-help">#{aiRanking.rank}</span>
                 </Tooltip>
               </div>
             )}
@@ -881,32 +881,32 @@ export function JobKanbanPage() {
           {auditLoading ? (
             <div className="flex justify-center py-12"><Spinner size="lg" /></div>
           ) : auditEvents.length === 0 ? (
-            <div className="text-center py-12 text-default-400">
+            <div className="text-center py-12 text-muted">
               <ScrollText size={32} className="mx-auto mb-3" />
               <p className="font-medium">{t('kanban.no_activity')}</p>
               <p className="text-sm mt-1">{t('kanban.no_activity_hint')}</p>
             </div>
           ) : (
-            <div className="relative pl-6 border-l-2 border-default-200 space-y-4">
+            <div className="relative pl-6 border-l-2 border-border space-y-4">
               {auditEvents.map((event, i) => (
                 <div key={i} className="relative">
                   <div className={`absolute -left-[25px] w-3 h-3 rounded-full border-2 border-background ${
                     event.type === 'status_change' ? 'bg-accent' : event.type === 'interview' ? 'bg-default' : 'bg-warning'
                   }`} />
-                  <div className="bg-default-50 rounded-lg p-3">
+                  <div className="bg-surface-secondary rounded-lg p-3">
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-sm font-medium text-foreground">{event.description}</span>
                       <Chip size="sm" variant="tertiary" color={event.type === 'status_change' ? 'accent' : event.type === 'interview' ? 'default' : 'warning'} className="capitalize shrink-0">
                         {event.type.replace('_', ' ')}
                       </Chip>
                     </div>
-                    <div className="flex items-center gap-2 mt-1 text-xs text-default-400">
+                    <div className="flex items-center gap-2 mt-1 text-xs text-muted">
                       <span>{event.actor}</span>
                       <span>·</span>
                       <span>{new Date(event.timestamp).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
                     {event.details && (
-                      <p className="text-xs text-default-500 mt-1.5 bg-default-100 rounded px-2 py-1">{event.details}</p>
+                      <p className="text-xs text-muted mt-1.5 bg-surface-tertiary rounded px-2 py-1">{event.details}</p>
                     )}
                   </div>
                 </div>

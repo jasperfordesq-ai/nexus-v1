@@ -85,8 +85,7 @@ export function ApplyModal({
                     </div>
                     <Button
                       size="sm"
-                      color="primary"
-                      variant="flat"
+                      variant="secondary"
                       onPress={() => {
                         if (savedProfile.cover_text) setApplyMessage(savedProfile.cover_text);
                         setUsingSavedProfile(true);
@@ -96,7 +95,7 @@ export function ApplyModal({
                     </Button>
                     <Button
                       size="sm"
-                      variant="flat"
+                      variant="tertiary"
                       className="text-theme-muted"
                       onPress={() => setSavedProfile(null)}
                     >
@@ -125,12 +124,12 @@ export function ApplyModal({
                 <div className="space-y-1">
                   <label className="text-sm font-medium text-foreground">
                     {t('apply.cv_label')}{' '}
-                    <span className="text-default-400 text-xs">
+                    <span className="text-muted text-xs">
                       {t('apply.cv_hint')}
                     </span>
                   </label>
                   <div
-                    className="border-2 border-dashed border-default-200 rounded-lg p-4 text-center cursor-pointer hover:border-accent transition-colors"
+                    className="border-2 border-dashed border-border rounded-lg p-4 text-center cursor-pointer hover:border-accent transition-colors"
                     onClick={() => cvInputRef.current?.click()}
                     onDrop={onCvDrop}
                     onDragOver={(e) => e.preventDefault()}
@@ -143,12 +142,12 @@ export function ApplyModal({
                       <div className="flex items-center justify-center gap-2 text-sm text-foreground">
                         <FileTextIcon size={16} aria-hidden="true" />
                         <span>{cvFile.name}</span>
-                        <span className="text-default-400">
+                        <span className="text-muted">
                           {t('apply.cv_size_kb', { count: Number((cvFile.size / 1024).toFixed(0)) })}
                         </span>
                         <Button
                           size="sm"
-                          variant="light"
+                          variant="danger-soft"
                           color="danger"
                           isIconOnly
                           onClick={(e) => { e.stopPropagation(); setCvFile(null); }}
@@ -158,7 +157,7 @@ export function ApplyModal({
                         </Button>
                       </div>
                     ) : (
-                      <div className="text-default-400 text-sm">
+                      <div className="text-muted text-sm">
                         <Upload size={20} className="mx-auto mb-1" aria-hidden="true" />
                         {t('apply.cv_drop_prompt')}
                       </div>
@@ -184,7 +183,7 @@ export function ApplyModal({
                 </div>
 
                 {cvFile && !cvParsed && (
-                  <p className="text-xs text-default-400 flex items-center gap-1 mt-1">
+                  <p className="text-xs text-muted flex items-center gap-1 mt-1">
                     <Sparkles size={12} aria-hidden="true" />
                     {t('cv.parse')}
                   </p>
@@ -201,18 +200,17 @@ export function ApplyModal({
                       ))}
                     </div>
                     {cvParsed.summary && (
-                      <p className="text-default-600 mt-1 italic">{cvParsed.summary}</p>
+                      <p className="text-muted mt-1 italic">{cvParsed.summary}</p>
                     )}
                   </div>
                 )}
               </div>
             </ModalBody>
             <ModalFooter>
-              <Button variant="flat" onPress={onClose}>
+              <Button variant="tertiary" onPress={onClose}>
                 {t('apply.cancel')}
               </Button>
               <Button
-                color="primary"
                 onPress={onApply}
                 isLoading={isSubmitting}
               >

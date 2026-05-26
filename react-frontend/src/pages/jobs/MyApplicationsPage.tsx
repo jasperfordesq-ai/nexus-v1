@@ -131,15 +131,15 @@ const ITEMS_PER_PAGE = 20;
 
 /** Map history statuses to timeline dot colors */
 const TIMELINE_DOT_COLORS: Record<string, string> = {
-  applied: 'bg-default-400',
-  pending: 'bg-default-400',
+  applied: 'bg-surface-tertiary',
+  pending: 'bg-surface-tertiary',
   screening: 'bg-accent',
   reviewed: 'bg-accent',
   interview: 'bg-warning',
   offer: 'bg-default',
   accepted: 'bg-success',
   rejected: 'bg-danger',
-  withdrawn: 'bg-default-300',
+  withdrawn: 'bg-surface-secondary',
 };
 
 type FilterTab = 'all' | 'active' | 'accepted' | 'rejected';
@@ -278,10 +278,10 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
         {application.message && (
           <div className='mb-3'>
             <Button
-              variant="light"
+              variant="ghost"
               size="sm"
               onPress={() => setMessageExpanded((v) => !v)}
-              className="flex items-center gap-1 text-xs text-theme-muted hover:text-theme-primary transition-colors mb-1 h-auto p-0 min-w-0"
+              className="mb-1 flex min-h-[28px] items-center gap-1 px-0 py-0 text-xs text-theme-muted transition-colors hover:text-theme-primary"
               startContent={messageExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
             >
               {messageExpanded
@@ -445,7 +445,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
               </div>
             )}
             {application.offer.message && (
-              <p className='text-xs text-default-600 mt-2 italic'>
+              <p className='text-xs text-muted mt-2 italic'>
                 &ldquo;{application.offer.message}&rdquo;
               </p>
             )}
@@ -476,7 +476,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
               target='_blank'
               rel='noopener noreferrer'
               size='sm'
-              variant='flat'
+              variant='tertiary'
               className='bg-theme-elevated text-theme-muted'
               startContent={<FileDown size={13} aria-hidden="true" />}
             >
@@ -487,7 +487,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
           {application.vacancy.creator?.id && onMessageEmployer && (
             <Button
               size='sm'
-              variant='flat'
+              variant='tertiary'
               className='bg-theme-elevated text-theme-muted'
               startContent={<MessageCircle size={13} aria-hidden="true" />}
               onPress={() => onMessageEmployer(application.vacancy.creator!.id, application.vacancy_id)}
@@ -497,7 +497,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
           )}
           <Button
             size='sm'
-            variant='flat'
+            variant='tertiary'
             startContent={<History size={13} />}
             onPress={() => {
               setHistoryOpen((v) => !v);
@@ -518,8 +518,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
           {isActive && (
             <Button
               size='sm'
-              color='danger'
-              variant='flat'
+              variant='danger-soft'
               aria-label={t('my_applications.withdraw_aria', { title: application.vacancy.title })}
               onPress={() => onWithdraw(application)}>
               {t('my_applications.withdraw')}
@@ -538,35 +537,35 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
               transition={{ duration: 0.2 }}
               className='overflow-hidden'>
               <div className='mt-3 pt-3 border-t border-divider'>
-                <p className='text-xs font-semibold text-default-500 uppercase tracking-wide mb-3'>{t('history.status_history')}</p>
+                <p className='text-xs font-semibold text-muted uppercase tracking-wide mb-3'>{t('history.status_history')}</p>
                 {historyLoading && <div className='flex justify-center py-3'><Spinner size='sm' /></div>}
                 {!historyLoading && history.length === 0 && (
-                  <p className='text-xs text-default-400'>{t('history.empty')}</p>
+                  <p className='text-xs text-muted'>{t('history.empty')}</p>
                 )}
                 {!historyLoading && history.length > 0 && (
                   <ol className='relative ml-2'>
                     {history.map((entry, idx) => {
                       const isLast = idx === history.length - 1;
-                      const dotColor = TIMELINE_DOT_COLORS[entry.to_status] ?? 'bg-default-400';
+                      const dotColor = TIMELINE_DOT_COLORS[entry.to_status] ?? 'bg-surface-tertiary';
                       const statusKey = `timeline.${entry.to_status}` as const;
                       return (
                         <li key={entry.id} className='relative pl-5 pb-4 last:pb-0'>
                           {/* Connecting line */}
                           {!isLast && (
-                            <span className='absolute left-[3px] top-3 bottom-0 w-0.5 bg-default-200 dark:bg-default-700' aria-hidden="true" />
+                            <span className='absolute left-[3px] top-3 bottom-0 w-0.5 bg-border' aria-hidden="true" />
                           )}
                           {/* Dot */}
                           <span className={`absolute left-0 top-1 w-2 h-2 rounded-full ring-2 ring-white dark:ring-default-50 ${dotColor}`} aria-hidden="true" />
                           <div className='min-w-0'>
-                            <span className='text-xs font-medium text-default-700 dark:text-default-300'>
+                            <span className='text-xs font-medium text-foreground'>
                               {entry.from_status
                                 ? t(`application_status.${entry.to_status}`)
                                 : t(statusKey)}
                             </span>
                             {entry.notes && (
-                              <p className='text-xs text-default-400 italic mt-0.5'>{entry.notes}</p>
+                              <p className='text-xs text-muted italic mt-0.5'>{entry.notes}</p>
                             )}
-                            <div className='text-xs text-default-400 mt-0.5'>
+                            <div className='text-xs text-muted mt-0.5'>
                               {new Date(entry.changed_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                               {entry.changed_by_name && <span className='ml-1'>{t('history.by', { name: entry.changed_by_name })}</span>}
                             </div>
