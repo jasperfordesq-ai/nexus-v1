@@ -143,7 +143,7 @@ export function WarmthPassPage() {
           <GlassCard className="p-6 sm:p-8">
             <div className="flex flex-col items-center gap-4 py-6 text-center">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-default/20">
-                <ShieldCheck className="h-8 w-8 text-default-400" aria-hidden="true" />
+                <ShieldCheck className="h-8 w-8 text-muted" aria-hidden="true" />
               </div>
               <div>
                 <p className="text-xl font-semibold text-theme-primary">
@@ -227,7 +227,7 @@ export function WarmthPassPage() {
                     {data.identity_verified ? (
                       <CheckCircle className="h-5 w-5 text-success" aria-hidden="true" />
                     ) : (
-                      <XCircle className="h-5 w-5 text-default-400" aria-hidden="true" />
+                      <XCircle className="h-5 w-5 text-muted" aria-hidden="true" />
                     )}
                     <p className="text-xl font-bold text-theme-primary">
                       {data.identity_verified ? t('warmth_pass.yes') : t('warmth_pass.no')}

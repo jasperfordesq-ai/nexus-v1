@@ -97,7 +97,7 @@ export function FederationCommunityPicker({ isOpen, onClose, onSelect }: Props) 
             placeholder={t('federation_picker.search_placeholder')}
             value={query}
             onValueChange={setQuery}
-            startContent={<Search className="h-4 w-4 text-default-400" aria-hidden="true" />}
+            startContent={<Search className="h-4 w-4 text-muted" aria-hidden="true" />}
             variant="bordered"
             aria-label={t('federation_picker.search_placeholder')}
           />
@@ -125,7 +125,7 @@ export function FederationCommunityPicker({ isOpen, onClose, onSelect }: Props) 
                     className={`border ${
                       selectedSlug === peer.slug
                         ? 'border-accent bg-accent/5'
-                        : 'border-default-200'
+                        : 'border-border'
                     }`}
                   >
                     <CardBody className="flex flex-row items-start gap-3 px-4 py-3">

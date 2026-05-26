@@ -99,7 +99,7 @@ export default function InviteRedemptionPage() {
         <div className="flex min-h-screen items-center justify-center bg-[var(--color-background)]">
           <div className="flex flex-col items-center gap-5" role="status" aria-live="polite" aria-busy="true">
             <Spinner size="lg" color="primary" />
-            <p className="text-base text-default-600">{t('invite.loading')}</p>
+            <p className="text-base text-foreground">{t('invite.loading')}</p>
           </div>
         </div>
       </>
@@ -111,14 +111,14 @@ export default function InviteRedemptionPage() {
       <>
         <PageMeta title={t('invite.valid.title')} description={t('invite.valid.body', { community: tenantName })} noIndex />
         <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-accent/5 to-background p-4">
-          <Card className="w-full max-w-md" shadow="md">
+          <Card className="w-full max-w-md">
             <CardBody className="flex flex-col items-center gap-7 p-8 text-center">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-accent/10 text-accent">
                 <HeartHandshake size={32} aria-hidden="true" />
               </div>
               <div className="min-w-0">
-                <h1 className="text-2xl font-bold text-default-900 sm:text-3xl">{t('invite.valid.title')}</h1>
-                <p className="mt-4 break-words text-base leading-8 text-default-600">
+                <h1 className="text-2xl font-bold text-foreground sm:text-3xl">{t('invite.valid.title')}</h1>
+                <p className="mt-4 break-words text-base leading-8 text-foreground">
                   {t('invite.valid.body', { community: tenantName })}
                 </p>
               </div>
@@ -158,7 +158,7 @@ export default function InviteRedemptionPage() {
     <>
       <PageMeta title={t(titleKey)} description={t(bodyKey)} noIndex />
       <div className="flex min-h-screen items-center justify-center bg-[var(--color-background)] p-4">
-        <Card className="w-full max-w-md" shadow="md">
+        <Card className="w-full max-w-md">
           <CardBody
             className="flex flex-col items-center gap-7 p-8 text-center"
             role={status === 'error' ? 'alert' : undefined}
@@ -167,8 +167,8 @@ export default function InviteRedemptionPage() {
               <AlertCircle size={32} aria-hidden="true" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-2xl font-bold text-default-900 sm:text-3xl">{t(titleKey)}</h1>
-              <p className="mt-4 break-words text-base leading-8 text-default-600">{t(bodyKey)}</p>
+              <h1 className="text-2xl font-bold text-foreground sm:text-3xl">{t(titleKey)}</h1>
+              <p className="mt-4 break-words text-base leading-8 text-foreground">{t(bodyKey)}</p>
             </div>
             {status === 'error' && (
               <Button type="button" color="primary" variant="flat" onPress={() => { lookupInvite(); }}>

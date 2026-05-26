@@ -131,7 +131,7 @@ export function SuccessStoriesPage() {
           <GlassCard className="p-6 sm:p-8">
             <div className="flex flex-col items-center gap-4 py-6 text-center">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-default/20">
-                <Sparkles className="h-8 w-8 text-default-400" aria-hidden="true" />
+                <Sparkles className="h-8 w-8 text-muted" aria-hidden="true" />
               </div>
               <p className="max-w-md text-sm text-theme-muted">{t('empty_state')}</p>
             </div>
@@ -173,7 +173,7 @@ export function SuccessStoriesPage() {
                         </p>
                       </div>
                       <ArrowRight
-                        className="h-5 w-5 shrink-0 text-default-400"
+                        className="h-5 w-5 shrink-0 text-muted"
                         aria-hidden="true"
                       />
                       <div className="min-w-0 flex-1 text-right">
@@ -209,7 +209,7 @@ export function SuccessStoriesPage() {
                     {story.method_caveat && (
                       <div className="flex items-start gap-2">
                         <Info
-                          className="mt-0.5 h-3.5 w-3.5 shrink-0 text-default-400"
+                          className="mt-0.5 h-3.5 w-3.5 shrink-0 text-muted"
                           aria-hidden="true"
                         />
                         <p className="text-xs italic text-theme-muted">
@@ -221,7 +221,7 @@ export function SuccessStoriesPage() {
                       </div>
                     )}
                     {story.evidence_source && (
-                      <p className="text-[11px] text-default-500">
+                      <p className="text-[11px] text-muted">
                         <span className="font-medium">{t('evidence_label')}: </span>
                         {story.evidence_source}
                       </p>

@@ -297,7 +297,7 @@ export function HourGiftPage() {
                     {t('hour_gift.send.recipient_label')}
                   </label>
                   {recipient ? (
-                    <div className="flex items-center justify-between gap-3 rounded-lg border border-default-200 bg-default-50 px-3 py-2">
+                    <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-surface-secondary px-3 py-2">
                       <div className="flex items-center gap-2">
                         <Avatar
                           src={recipient.profile_photo ?? recipient.avatar_url ?? undefined}
@@ -324,11 +324,11 @@ export function HourGiftPage() {
                         value={recipientQuery}
                         onValueChange={setRecipientQuery}
                         variant="bordered"
-                        startContent={<Search className="h-4 w-4 text-default-400" />}
+                        startContent={<Search className="h-4 w-4 text-muted" />}
                       />
                       {searching && <Spinner size="sm" className="mt-2" />}
                       {recipientResults.length > 0 && (
-                        <ul className="mt-2 divide-y divide-default-200 overflow-hidden rounded-lg border border-default-200">
+                        <ul className="mt-2 divide-y divide-border overflow-hidden rounded-lg border border-border">
                           {recipientResults.map((m) => (
                             <li key={m.id}>
                               <Button
@@ -409,7 +409,7 @@ export function HourGiftPage() {
                   inbox.map((g) => (
                     <div
                       key={g.id}
-                      className="rounded-lg border border-default-200 bg-default-50 p-4"
+                      className="rounded-lg border border-border bg-surface-secondary p-4"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex items-center gap-3">
@@ -434,7 +434,7 @@ export function HourGiftPage() {
                         </span>
                       </div>
                       {g.message && (
-                        <p className="mt-3 rounded-md bg-white/60 p-3 text-sm text-theme-muted dark:bg-default-100">
+                        <p className="mt-3 rounded-md bg-white/60 p-3 text-sm text-theme-muted dark:bg-surface-secondary">
                           “{g.message}”
                         </p>
                       )}
@@ -505,7 +505,7 @@ export function HourGiftPage() {
                   sent.map((g) => (
                     <div
                       key={g.id}
-                      className="rounded-lg border border-default-200 bg-default-50 p-4"
+                      className="rounded-lg border border-border bg-surface-secondary p-4"
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex items-center gap-3">

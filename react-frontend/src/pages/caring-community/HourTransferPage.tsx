@@ -229,7 +229,7 @@ export function HourTransferPage() {
                 <p className="text-sm font-medium text-theme-primary">
                   {t('hour_transfer.form.destination_label')}
                 </p>
-                <div className="flex flex-col gap-3 rounded-lg border border-default-200 bg-default-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-col gap-3 rounded-lg border border-border bg-surface-secondary px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="min-w-0 flex-1">
                     {selectedPeer ? (
                       <>
@@ -312,7 +312,7 @@ export function HourTransferPage() {
               maxRows={5}
             />
 
-            <p className="rounded-lg bg-default-100 px-4 py-3 text-sm text-theme-muted">
+            <p className="rounded-lg bg-surface-secondary px-4 py-3 text-sm text-theme-muted">
               {t('hour_transfer.disclaimer')}
             </p>
 

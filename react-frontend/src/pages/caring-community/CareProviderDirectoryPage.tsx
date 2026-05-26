@@ -266,7 +266,7 @@ export default function CareProviderDirectoryPage() {
             placeholder={t('providers.search_placeholder')}
             value={search}
             onValueChange={setSearch}
-            startContent={<Search className="h-4 w-4 text-default-400" aria-hidden="true" />}
+            startContent={<Search className="h-4 w-4 text-muted" aria-hidden="true" />}
             variant="bordered"
             classNames={{ inputWrapper: 'max-w-md' }}
             isClearable

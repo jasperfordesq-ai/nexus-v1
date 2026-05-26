@@ -140,7 +140,7 @@ export default function MunicipalityFeedbackPage() {
             </span>
             <h1 className="text-xl font-bold sm:text-2xl">{t('intro_title')}</h1>
           </div>
-          <p className="text-sm leading-relaxed text-default-500">{t('intro_body')}</p>
+          <p className="text-sm leading-relaxed text-muted">{t('intro_body')}</p>
         </CardBody>
       </Card>
 
@@ -203,7 +203,7 @@ export default function MunicipalityFeedbackPage() {
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
                 <p className="text-sm font-medium">{t('field_anonymous')}</p>
-                <p className="text-xs text-default-500">{t('anonymous_help')}</p>
+                <p className="text-xs text-muted">{t('anonymous_help')}</p>
               </div>
               <Switch
                 size="sm"
@@ -215,7 +215,7 @@ export default function MunicipalityFeedbackPage() {
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
                 <p className="text-sm font-medium">{t('field_public')}</p>
-                <p className="text-xs text-default-500">{t('public_help')}</p>
+                <p className="text-xs text-muted">{t('public_help')}</p>
               </div>
               <Switch
                 size="sm"
@@ -249,13 +249,13 @@ export default function MunicipalityFeedbackPage() {
               <Spinner size="sm" />
             </div>
           ) : items.length === 0 ? (
-            <p className="py-6 text-center text-sm text-default-500">{t('my_submissions_empty')}</p>
+            <p className="py-6 text-center text-sm text-muted">{t('my_submissions_empty')}</p>
           ) : (
             <ul className="space-y-3">
               {items.map((row) => (
                 <li
                   key={row.id}
-                  className="rounded-lg border border-default-200 p-3 hover:bg-default-50"
+                  className="rounded-lg border border-border p-3 hover:bg-surface-secondary"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
@@ -271,10 +271,10 @@ export default function MunicipalityFeedbackPage() {
                         </Chip>
                       )}
                     </div>
-                    <span className="text-xs text-default-500">{fmtDate(row.created_at)}</span>
+                    <span className="text-xs text-muted">{fmtDate(row.created_at)}</span>
                   </div>
                   <p className="mt-2 text-sm font-medium">{row.subject}</p>
-                  <p className="mt-1 text-xs text-default-500 line-clamp-2">{row.body}</p>
+                  <p className="mt-1 text-xs text-muted line-clamp-2">{row.body}</p>
                 </li>
               ))}
             </ul>

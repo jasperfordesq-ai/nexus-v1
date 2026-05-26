@@ -167,7 +167,7 @@ export function SubRegionFilter({
             <SelectItem key={String(r.id)} id={String(r.id)} textValue={r.name}>
               <span className="flex items-center gap-2">
                 <span className="font-medium">{r.name}</span>
-                <span className="text-xs text-default-400">
+                <span className="text-xs text-muted">
                   {t(`sub_region.type_${r.type}` as const)}
                 </span>
               </span>

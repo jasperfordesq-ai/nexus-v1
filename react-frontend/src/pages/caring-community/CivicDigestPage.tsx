@@ -266,7 +266,7 @@ export function CivicDigestPage() {
                 <Card>
                   <CardBody className="gap-3 p-5">
                     <div className="flex items-start gap-3">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-default-100">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface-secondary">
                         <Icon className="h-5 w-5 text-theme-primary" aria-hidden />
                       </div>
                       <div className="flex-1">

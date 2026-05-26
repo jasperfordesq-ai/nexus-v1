@@ -73,9 +73,9 @@ export default function MyDataExportPage(): JSX.Element {
             <h1 className="text-2xl font-semibold">{t('data_export.title')}</h1>
           </header>
 
-          <p className="text-sm text-default-600">{t('data_export.intro')}</p>
+          <p className="text-sm text-foreground">{t('data_export.intro')}</p>
 
-          <div className="rounded-lg border border-default-200 bg-default-50 p-4 text-xs text-default-600 dark:bg-default-100/30">
+          <div className="rounded-lg border border-border bg-surface-secondary p-4 text-xs text-foreground dark:bg-surface-secondary/30">
             {t('data_export.privacy_note')}
           </div>
 
@@ -92,7 +92,7 @@ export default function MyDataExportPage(): JSX.Element {
             {downloading ? t('data_export.downloading') : t('data_export.download_button')}
           </Button>
 
-          <p className="text-xs text-default-500">{t('data_export.format_note')}</p>
+          <p className="text-xs text-muted">{t('data_export.format_note')}</p>
         </GlassCard>
       </div>
     </>

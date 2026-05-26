@@ -112,7 +112,7 @@ export function LoyaltyHistoryPage() {
 
       <Link
         to={tenantPath('/caring-community')}
-        className="inline-flex items-center gap-1 text-sm text-default-500 hover:text-accent mb-4"
+        className="inline-flex items-center gap-1 text-sm text-muted hover:text-accent mb-4"
       >
         <ArrowLeft className="w-4 h-4" />
         {t('loyalty.history.back')}
@@ -124,7 +124,7 @@ export function LoyaltyHistoryPage() {
           {t('loyalty.history.meta.title')}
         </h1>
       </div>
-      <p className="text-sm text-default-500 mb-6">
+      <p className="text-sm text-muted mb-6">
         {t('loyalty.history.subtitle')}
       </p>
 
@@ -140,7 +140,7 @@ export function LoyaltyHistoryPage() {
         <EmptyState
           title={t('loyalty.history.empty.title')}
           description={t('loyalty.history.empty.body')}
-          icon={<Coins className="w-12 h-12 text-default-300" />}
+          icon={<Coins className="w-12 h-12 text-muted" />}
         />
       )}
 
@@ -159,7 +159,7 @@ export function LoyaltyHistoryPage() {
             <TableBody>
               {items.map((row) => (
                 <TableRow key={row.id}>
-                  <TableCell className="text-default-600">
+                  <TableCell className="text-foreground">
                     {formatDate(row.redeemed_at)}
                   </TableCell>
                   <TableCell className="text-foreground">
@@ -167,7 +167,7 @@ export function LoyaltyHistoryPage() {
                       <span aria-label={t('not_available')}>{t('empty_dash')}</span>
                     )}
                   </TableCell>
-                  <TableCell className="hidden sm:table-cell text-default-600">
+                  <TableCell className="hidden sm:table-cell text-foreground">
                     {row.marketplace_listing_id && row.listing_title ? (
                       <Link
                         to={tenantPath(`/marketplace/${row.marketplace_listing_id}`)}

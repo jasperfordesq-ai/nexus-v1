@@ -263,7 +263,7 @@ function SurveyForm({ survey, onBack, onSuccess, t }: SurveyFormProps) {
     return (
       <GlassCard className="p-6 flex flex-col items-center gap-4 text-center">
         <CheckCircle size={48} className="text-success" />
-        <p className="text-default-700">{t('already_responded')}</p>
+        <p className="text-foreground">{t('already_responded')}</p>
         <Button variant="flat" onPress={onBack}>
           {t('back')}
         </Button>
@@ -276,7 +276,7 @@ function SurveyForm({ survey, onBack, onSuccess, t }: SurveyFormProps) {
       <GlassCard className="p-6">
         <h2 className="text-xl font-bold mb-1">{survey.title}</h2>
         {survey.description && (
-          <p className="text-default-600 text-sm">{survey.description}</p>
+          <p className="text-foreground text-sm">{survey.description}</p>
         )}
       </GlassCard>
 
@@ -413,7 +413,7 @@ export default function MunicipalSurveyPage() {
         <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col items-center gap-6 text-center">
           <CheckCircle size={64} className="text-success" />
           <h1 className="text-2xl font-bold">{t('success_title')}</h1>
-          <p className="text-default-600">{t('success_body')}</p>
+          <p className="text-foreground">{t('success_body')}</p>
           <Button color="primary" variant="flat" onPress={handleBack}>
             {t('back')}
           </Button>
@@ -454,7 +454,7 @@ export default function MunicipalSurveyPage() {
           <ClipboardList size={24} className="text-accent" />
           <h1 className="text-2xl font-bold">{t('meta.title')}</h1>
         </div>
-        <p className="text-default-600 text-sm">{t('meta.description')}</p>
+        <p className="text-foreground text-sm">{t('meta.description')}</p>
 
         {loading && (
           <div className="flex justify-center py-10">
@@ -468,7 +468,7 @@ export default function MunicipalSurveyPage() {
 
         {!loading && !error && surveys.length === 0 && (
           <GlassCard className="p-8 text-center">
-            <p className="text-default-400">{t('empty')}</p>
+            <p className="text-muted">{t('empty')}</p>
           </GlassCard>
         )}
 
@@ -478,10 +478,10 @@ export default function MunicipalSurveyPage() {
               <div className="flex flex-col gap-1 flex-1 min-w-0">
                 <h2 className="text-lg font-semibold leading-tight">{survey.title}</h2>
                 {survey.description && (
-                  <p className="text-default-600 text-sm line-clamp-2">{survey.description}</p>
+                  <p className="text-foreground text-sm line-clamp-2">{survey.description}</p>
                 )}
                 {survey.ends_at && (
-                  <p className="text-xs text-default-400">
+                  <p className="text-xs text-muted">
                     {t('closes_on', { date: formatSurveyDate(survey.ends_at) })}
                   </p>
                 )}
