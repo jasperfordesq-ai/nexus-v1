@@ -141,7 +141,7 @@ export default function OrgOverviewTab({ orgId, onTabChange }: OrgOverviewTabPro
                   <Icon className="w-5 h-5 text-white" aria-hidden="true" />
                 </div>
                 {card.badge && (
-                  <Chip size="sm" color="warning" variant="flat">
+                  <Chip size="sm" color="warning" variant="soft">
                     {t('org_dashboard.needs_review')}
                   </Chip>
                 )}
@@ -161,8 +161,8 @@ export default function OrgOverviewTab({ orgId, onTabChange }: OrgOverviewTabPro
         <div className="flex flex-wrap gap-3">
           {stats.pending_applications > 0 && (
             <Button
-              color="warning"
-              variant="flat"
+              variant="secondary"
+              className="bg-warning-soft text-warning hover:bg-warning-soft/80"
               startContent={<ClipboardList className="w-4 h-4" />}
               endContent={<ArrowRight className="w-4 h-4" />}
               onPress={() => onTabChange('applications')}
@@ -172,8 +172,7 @@ export default function OrgOverviewTab({ orgId, onTabChange }: OrgOverviewTabPro
           )}
           {stats.pending_hours > 0 && (
             <Button
-              color="secondary"
-              variant="flat"
+              variant="secondary"
               startContent={<Clock className="w-4 h-4" />}
               endContent={<ArrowRight className="w-4 h-4" />}
               onPress={() => onTabChange('hours-review')}
@@ -182,7 +181,7 @@ export default function OrgOverviewTab({ orgId, onTabChange }: OrgOverviewTabPro
             </Button>
           )}
           <Button
-            variant="flat"
+            variant="primary"
             className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white"
             startContent={<Wallet className="w-4 h-4" />}
             onPress={() => onTabChange('wallet')}
@@ -190,8 +189,7 @@ export default function OrgOverviewTab({ orgId, onTabChange }: OrgOverviewTabPro
             {t('org_dashboard.fund_wallet')}
           </Button>
           <Button
-            variant="flat"
-            className="bg-theme-elevated text-theme-muted"
+            variant="tertiary"
             startContent={<Briefcase className="w-4 h-4" />}
             onPress={() => navigate(tenantPath('/volunteering/create'))}
           >
@@ -218,7 +216,7 @@ export default function OrgOverviewTab({ orgId, onTabChange }: OrgOverviewTabPro
           </div>
           <Button
             size="sm"
-            variant="flat"
+            variant="tertiary"
             className="ml-auto"
             onPress={() => onTabChange('wallet')}
           >

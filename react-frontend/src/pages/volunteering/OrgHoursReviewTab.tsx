@@ -180,7 +180,7 @@ function OrgHoursReviewTab({ orgId, balance, autoPay, onBalanceChange }: OrgHour
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-16">
-        <Spinner size="lg" color="primary" />
+        <Spinner size="lg" color="accent" />
       </div>
     );
   }
@@ -227,7 +227,7 @@ function OrgHoursReviewTab({ orgId, balance, autoPay, onBalanceChange }: OrgHour
 
           <Chip
             size="sm"
-            variant="flat"
+            variant="soft"
             color={autoPay ? 'success' : 'default'}
           >
             {autoPay
@@ -280,7 +280,7 @@ function OrgHoursReviewTab({ orgId, balance, autoPay, onBalanceChange }: OrgHour
               <div className="flex flex-wrap items-center gap-3 text-sm text-theme-muted">
                 <span>{formatDate(entry.date)}</span>
                 {entry.opportunity && (
-                  <Chip size="sm" variant="flat" color="primary">
+                  <Chip size="sm" variant="soft" color="accent">
                     {entry.opportunity.title}
                   </Chip>
                 )}
@@ -296,8 +296,8 @@ function OrgHoursReviewTab({ orgId, balance, autoPay, onBalanceChange }: OrgHour
             <div className="flex gap-2 shrink-0 sm:flex-col">
               <Button
                 size="sm"
-                color="success"
-                variant="flat"
+                variant="secondary"
+                className="bg-success-soft text-success hover:bg-success-soft/80"
                 isDisabled={inFlight}
                 isLoading={inFlight}
                 startContent={!inFlight ? <CheckCircle className="w-4 h-4" aria-hidden="true" /> : undefined}
@@ -308,8 +308,7 @@ function OrgHoursReviewTab({ orgId, balance, autoPay, onBalanceChange }: OrgHour
               </Button>
               <Button
                 size="sm"
-                color="danger"
-                variant="flat"
+                variant="danger-soft"
                 isDisabled={inFlight}
                 isLoading={inFlight}
                 startContent={!inFlight ? <XCircle className="w-4 h-4" aria-hidden="true" /> : undefined}
@@ -326,8 +325,7 @@ function OrgHoursReviewTab({ orgId, balance, autoPay, onBalanceChange }: OrgHour
       {hasMore && (
         <div className="flex justify-center pt-2">
           <Button
-            variant="flat"
-            className="bg-theme-elevated text-theme-muted"
+            variant="tertiary"
             isLoading={isLoadingMore}
             startContent={!isLoadingMore ? <ChevronDown className="w-4 h-4" aria-hidden="true" /> : undefined}
             onPress={() => loadEntries(true)}

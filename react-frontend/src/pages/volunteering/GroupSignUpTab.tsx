@@ -276,8 +276,7 @@ export function GroupSignUpTab() {
         </div>
         <Button
           size="sm"
-          variant="flat"
-          className="bg-theme-elevated text-theme-muted"
+          variant="tertiary"
           startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
           onPress={load}
           isDisabled={isLoading}
@@ -339,7 +338,7 @@ export function GroupSignUpTab() {
                       </h3>
                       <Chip
                         size="sm"
-                        variant="flat"
+                        variant="soft"
                         color={statusColor(res.status)}
                       >
                         {t(`group_signup.status.${res.status}`)}
@@ -347,7 +346,7 @@ export function GroupSignUpTab() {
                       {res.is_leader && (
                         <Chip
                           size="sm"
-                          variant="flat"
+                          variant="soft"
                           color="warning"
                           startContent={<Crown className="w-3 h-3" />}
                         >
@@ -481,8 +480,8 @@ export function GroupSignUpTab() {
                 {searchResults.map((user) => (
                   <Button
                     key={user.id}
-                    variant="light"
-                    className="w-full text-left px-3 py-2 rounded-lg bg-theme-elevated hover:bg-theme-hover text-sm text-theme-primary transition-colors h-auto min-w-0 justify-start"
+                    variant="tertiary"
+                    className="min-h-10 w-full min-w-0 justify-start rounded-lg px-3 py-2 text-left text-sm text-theme-primary"
                     onPress={() => {
                       setNewMemberEmail(user.email);
                       setSearchResults([]);
@@ -499,7 +498,7 @@ export function GroupSignUpTab() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onClose} className="text-theme-muted">{t('common.cancel')}</Button>
+            <Button variant="tertiary" onPress={onClose}>{t('common.cancel')}</Button>
             <Button
               className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
               onPress={handleAddMember}

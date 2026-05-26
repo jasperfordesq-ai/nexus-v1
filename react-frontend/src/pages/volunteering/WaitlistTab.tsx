@@ -147,8 +147,7 @@ export function WaitlistTab() {
         </div>
         <Button
           size="sm"
-          variant="flat"
-          className="bg-theme-elevated text-theme-muted"
+          variant="tertiary"
           startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
           onPress={load}
           isDisabled={isLoading}
@@ -210,7 +209,7 @@ export function WaitlistTab() {
                       <Chip
                         size="sm"
                         color="warning"
-                        variant="flat"
+                        variant="soft"
                         startContent={<Hash className="w-3 h-3" />}
                       >
                         {t('waitlist.position', { position: entry.position })}
@@ -253,8 +252,7 @@ export function WaitlistTab() {
 
                   <Button
                     size="sm"
-                    variant="flat"
-                    color="danger"
+                    variant="danger-soft"
                     startContent={<X className="w-4 h-4" aria-hidden="true" />}
                     onPress={() => setLeaveTarget(entry.shift.id)}
                     isLoading={removingId === entry.shift.id}
@@ -287,8 +285,8 @@ export function WaitlistTab() {
                 </p>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('cancel')}</Button>
-                <Button color="danger" onPress={handleLeaveWaitlist}>{t('waitlist.leave')}</Button>
+                <Button variant="tertiary" onPress={onClose}>{t('cancel')}</Button>
+                <Button variant="danger" onPress={handleLeaveWaitlist}>{t('waitlist.leave')}</Button>
               </ModalFooter>
             </>
           )}

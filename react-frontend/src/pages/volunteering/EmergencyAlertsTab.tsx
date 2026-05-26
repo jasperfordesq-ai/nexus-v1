@@ -141,15 +141,14 @@ export function EmergencyAlertsTab() {
           <Siren className="w-5 h-5 text-red-400" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary">{t('emergency.title')}</h2>
           {alerts.filter(a => a.my_response === 'pending').length > 0 && (
-            <Chip size="sm" color="danger" variant="flat">
+            <Chip size="sm" color="danger" variant="soft">
               {t('emergency.pending_count', { count: alerts.filter(a => a.my_response === 'pending').length })}
             </Chip>
           )}
         </div>
         <Button
           size="sm"
-          variant="flat"
-          className="bg-theme-elevated text-theme-muted"
+          variant="tertiary"
           startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
           onPress={load}
           isLoading={isLoading}
@@ -203,7 +202,7 @@ export function EmergencyAlertsTab() {
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2 flex-wrap">
-                        <Chip size="sm" color={config.color} variant="flat">
+                        <Chip size="sm" color={config.color} variant="soft">
                           {config.label}
                         </Chip>
                         <h3 className="font-semibold text-theme-primary">{alert.opportunity.title}</h3>
@@ -235,7 +234,7 @@ export function EmergencyAlertsTab() {
                       {alert.required_skills.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">
                           {alert.required_skills.map((skill, i) => (
-                            <Chip key={i} size="sm" variant="flat" className="text-xs">
+                            <Chip key={i} size="sm" variant="soft" className="text-xs">
                               {skill}
                             </Chip>
                           ))}
@@ -262,8 +261,7 @@ export function EmergencyAlertsTab() {
                         </Button>
                         <Button
                           size="sm"
-                          variant="flat"
-                          color="danger"
+                          variant="danger-soft"
                           startContent={<XCircle className="w-4 h-4" aria-hidden="true" />}
                           onPress={() => handleRespond(alert.id, 'declined')}
                           isLoading={respondingTo?.id === alert.id && respondingTo?.action === 'declined'}
@@ -278,7 +276,7 @@ export function EmergencyAlertsTab() {
                       <Chip
                         size="sm"
                         color={alert.my_response === 'accepted' ? 'success' : 'danger'}
-                        variant="flat"
+                        variant="soft"
                       >
                         {alert.my_response === 'accepted' ? t('emergency.accepted') : t('emergency.declined')}
                       </Chip>

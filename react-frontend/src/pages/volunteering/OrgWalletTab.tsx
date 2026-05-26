@@ -276,7 +276,7 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
           </div>
           <Button
             size="sm"
-            variant="flat"
+            variant="tertiary"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => {
               onBalanceChange();
@@ -384,7 +384,7 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <Chip size="sm" variant="flat" color={TYPE_COLOR[tx.type]}>
+                        <Chip size="sm" variant="soft" color={TYPE_COLOR[tx.type]}>
                           {t(`org_wallet.types.${tx.type}`)}
                         </Chip>
                         <span className={`font-bold text-lg ${getAmountColor(tx.amount)}`}>
@@ -428,8 +428,7 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
             {hasMore && (
               <div className="flex justify-center pt-2">
                 <Button
-                  variant="flat"
-                  className="bg-theme-elevated text-theme-muted"
+                  variant="tertiary"
                   startContent={
                     isLoadingMore ? (
                       <Spinner size="sm" />
@@ -478,7 +477,7 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
                   step="0.25"
                   value={depositAmount}
                   onValueChange={setDepositAmount}
-                  variant="bordered"
+                  variant="secondary"
                   classNames={{ inputWrapper: 'bg-theme-elevated' }}
                   startContent={<Wallet className="w-4 h-4 text-theme-subtle" />}
                   isRequired
@@ -487,14 +486,14 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
                   label={t('org_wallet.form.note')}
                   value={depositNote}
                   onValueChange={setDepositNote}
-                  variant="bordered"
+                  variant="secondary"
                   classNames={{ inputWrapper: 'bg-theme-elevated' }}
                   minRows={2}
                   maxRows={4}
                 />
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>
+                <Button variant="tertiary" onPress={onClose}>
                   {t('org_wallet.cancel')}
                 </Button>
                 <Button

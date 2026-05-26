@@ -182,7 +182,7 @@ export function HoursReviewTab() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-16">
-        <Spinner size="lg" color="primary" />
+        <Spinner size="lg" color="accent" />
       </div>
     );
   }
@@ -228,7 +228,7 @@ export function HoursReviewTab() {
             <div className="flex-1 min-w-0 space-y-1">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-semibold text-[var(--color-text)]">{entry.user.name}</span>
-                <Chip size="sm" color={statusColor(entry.status)} variant="flat">
+                <Chip size="sm" color={statusColor(entry.status)} variant="soft">
                   {entry.status === 'approved'
                     ? t('status_approved')
                     : entry.status === 'declined'
@@ -265,8 +265,8 @@ export function HoursReviewTab() {
             <div className="flex gap-2 sm:shrink-0 sm:flex-col">
               <Button
                 size="sm"
-                color="success"
-                variant="flat"
+                variant="secondary"
+                className="bg-success-soft text-success hover:bg-success-soft/80"
                 isDisabled={inFlight || isActioned}
                 isLoading={inFlight && entry.status === 'approved'}
                 startContent={!inFlight ? <CheckCircle className="w-4 h-4" aria-hidden="true" /> : undefined}
@@ -277,8 +277,7 @@ export function HoursReviewTab() {
               </Button>
               <Button
                 size="sm"
-                color="danger"
-                variant="flat"
+                variant="danger-soft"
                 isDisabled={inFlight || isActioned}
                 isLoading={inFlight && entry.status === 'declined'}
                 startContent={!inFlight ? <XCircle className="w-4 h-4" aria-hidden="true" /> : undefined}
@@ -295,8 +294,7 @@ export function HoursReviewTab() {
       {hasMore && (
         <div className="flex justify-center pt-2">
           <Button
-            variant="flat"
-            className="bg-theme-elevated text-theme-muted"
+            variant="tertiary"
             isLoading={isLoadingMore}
             startContent={!isLoadingMore ? <ChevronDown className="w-4 h-4" aria-hidden="true" /> : undefined}
             onPress={() => loadEntries(true)}
