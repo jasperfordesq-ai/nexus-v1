@@ -207,7 +207,7 @@ function FieldPreviewModal({
           <Input
             label={field.label}
             type={field.field_type === 'phone' ? 'tel' : field.field_type}
-            variant="bordered"
+            variant="secondary"
             isRequired={field.is_required}
             placeholder={t('volunteering.field_preview_input_placeholder', { label: field.label.toLowerCase() })}
             isReadOnly
@@ -217,7 +217,7 @@ function FieldPreviewModal({
         return (
           <Textarea
             label={field.label}
-            variant="bordered"
+            variant="secondary"
             isRequired={field.is_required}
             placeholder={t('volunteering.field_preview_input_placeholder', { label: field.label.toLowerCase() })}
             minRows={3}
@@ -228,7 +228,7 @@ function FieldPreviewModal({
         return (
           <Select
             label={field.label}
-            variant="bordered"
+            variant="secondary"
             isRequired={field.is_required}
             placeholder={t('volunteering.field_preview_select_placeholder', { label: field.label.toLowerCase() })}
           >
@@ -269,7 +269,7 @@ function FieldPreviewModal({
           <Input
             label={field.label}
             type="date"
-            variant="bordered"
+            variant="secondary"
             isRequired={field.is_required}
             isReadOnly
           />
@@ -279,7 +279,7 @@ function FieldPreviewModal({
           <Input
             label={field.label}
             type="file"
-            variant="bordered"
+            variant="secondary"
             isRequired={field.is_required}
             isReadOnly
           />
@@ -288,7 +288,7 @@ function FieldPreviewModal({
         return (
           <Input
             label={field.label}
-            variant="bordered"
+            variant="secondary"
             isRequired={field.is_required}
             isReadOnly
           />
@@ -305,20 +305,20 @@ function FieldPreviewModal({
         <ModalBody>
           <Card className="border border-divider/70 bg-surface-secondary/50">
             <CardBody className="p-4">
-              <p className="mb-3 text-xs text-default-400">
+              <p className="mb-3 text-xs text-muted">
                 {t('volunteering.preview_description')}
               </p>
               {renderPreview()}
             </CardBody>
           </Card>
-          <div className="mt-3 flex flex-wrap gap-2 text-xs text-default-500">
-            <Chip size="sm" variant="flat">{field.field_type}</Chip>
-            <Chip size="sm" variant="flat" color="primary">{field.applies_to}</Chip>
-            {field.is_required && <Chip size="sm" variant="flat" color="danger">{t('volunteering.required')}</Chip>}
+          <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted">
+            <Chip size="sm" variant="soft">{field.field_type}</Chip>
+            <Chip size="sm" variant="soft" color="accent">{field.applies_to}</Chip>
+            {field.is_required && <Chip size="sm" variant="soft" color="danger">{t('volunteering.required')}</Chip>}
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button variant="flat" onPress={onClose}>{t('volunteering.close')}</Button>
+          <Button variant="secondary" onPress={onClose}>{t('volunteering.close')}</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
@@ -459,25 +459,25 @@ function CustomFieldsTab() {
     {
       key: 'field_type',
       label: t('volunteering.col_field_type'),
-      render: (row) => <Chip size="sm" variant="flat">{t(`volunteering.field_type_${row.field_type}`)}</Chip>,
+      render: (row) => <Chip size="sm" variant="soft">{t(`volunteering.field_type_${row.field_type}`)}</Chip>,
     },
     {
       key: 'applies_to',
       label: t('volunteering.col_applies_to'),
-      render: (row) => <Chip size="sm" variant="flat" color="primary">{t(`volunteering.applies_to_${row.applies_to}`)}</Chip>,
+      render: (row) => <Chip size="sm" variant="soft" color="accent">{t(`volunteering.applies_to_${row.applies_to}`)}</Chip>,
     },
     {
       key: 'is_required',
       label: t('volunteering.col_required'),
       render: (row) => row.is_required
         ? <CheckCircle size={16} className="text-success" />
-        : <XCircle size={16} className="text-default-400" />,
+        : <XCircle size={16} className="text-muted" />,
     },
     {
       key: 'options',
       label: t('volunteering.col_options'),
       render: (row) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {row.options?.length ? row.options.join(', ') : '-'}
         </span>
       ),
@@ -491,7 +491,7 @@ function CustomFieldsTab() {
           <div className="flex items-center gap-1">
             <Button
               size="sm"
-              variant="flat"
+              variant="secondary"
               isIconOnly
               isDisabled={idx <= 0}
               onPress={() => moveField(idx, 'up')}
@@ -501,7 +501,7 @@ function CustomFieldsTab() {
             </Button>
             <Button
               size="sm"
-              variant="flat"
+              variant="secondary"
               isIconOnly
               isDisabled={idx >= sortedFields.length - 1}
               onPress={() => moveField(idx, 'down')}
@@ -509,16 +509,15 @@ function CustomFieldsTab() {
             >
               <ArrowDown size={14} />
             </Button>
-            <Button size="sm" variant="flat" isIconOnly onPress={() => openPreview(row)} aria-label={t('volunteering.preview')}>
+            <Button size="sm" variant="secondary" isIconOnly onPress={() => openPreview(row)} aria-label={t('volunteering.preview')}>
               <Eye size={14} />
             </Button>
-            <Button size="sm" variant="flat" isIconOnly onPress={() => openEdit(row)} aria-label={t('volunteering.edit')}>
+            <Button size="sm" variant="secondary" isIconOnly onPress={() => openEdit(row)} aria-label={t('volunteering.edit')}>
               <Edit2 size={14} />
             </Button>
             <Button
               size="sm"
-              variant="flat"
-              color="danger"
+              variant="danger"
               isIconOnly
               onPress={() => { setDeleteId(row.id); onDeleteOpen(); }}
               aria-label={t('volunteering.delete')}
@@ -536,10 +535,10 @@ function CustomFieldsTab() {
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-lg font-semibold">{t('volunteering.custom_fields_heading')}</h3>
         <div className="flex gap-2">
-          <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>
+          <Button variant="secondary" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>
             {t('volunteering.refresh')}
           </Button>
-          <Button color="primary" startContent={<Plus size={16} />} onPress={openCreate}>
+          <Button  startContent={<Plus size={16} />} onPress={openCreate}>
             {t('volunteering.add_field')}
           </Button>
         </div>
@@ -553,7 +552,6 @@ function CustomFieldsTab() {
             </p>
             <Button
               size="sm"
-              color="primary"
               startContent={<Save size={14} />}
               isLoading={saving}
               onPress={async () => {
@@ -604,7 +602,7 @@ function CustomFieldsTab() {
                 value={form.label}
                 onValueChange={(v) => setForm((f) => ({ ...f, label: v }))}
                 isRequired
-                variant="bordered"
+                variant="secondary"
               />
               <Select
                 label={t('volunteering.field_type_label')}
@@ -613,7 +611,7 @@ function CustomFieldsTab() {
                   const selected = Array.from(keys)[0];
                   if (typeof selected === 'string') setForm((f) => ({ ...f, field_type: selected }));
                 }}
-                variant="bordered"
+                variant="secondary"
               >
                 {fieldTypeOptions.map((ft) => (
                   <SelectItem key={ft} id={ft}>{t(`volunteering.field_type_${ft}`)}</SelectItem>
@@ -626,7 +624,7 @@ function CustomFieldsTab() {
                   const selected = Array.from(keys)[0];
                   if (typeof selected === 'string') setForm((f) => ({ ...f, applies_to: selected }));
                 }}
-                variant="bordered"
+                variant="secondary"
               >
                 {appliesToOptions.map((at) => (
                   <SelectItem key={at} id={at}>{t(`volunteering.applies_to_${at}`)}</SelectItem>
@@ -642,14 +640,14 @@ function CustomFieldsTab() {
                 label={t('volunteering.field_options_label')}
                 value={form.options}
                 onValueChange={(v) => setForm((f) => ({ ...f, options: v }))}
-                variant="bordered"
+                variant="secondary"
                 description={t('volunteering.field_options_desc')}
               />
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onClose}>{t('volunteering.cancel')}</Button>
-            <Button color="primary" onPress={handleSave} isLoading={saving}>
+            <Button variant="secondary" onPress={onClose}>{t('volunteering.cancel')}</Button>
+            <Button  onPress={handleSave} isLoading={saving}>
               {editingId ? t('volunteering.save') : t('volunteering.create')}
             </Button>
           </ModalFooter>
@@ -837,15 +835,15 @@ function RemindersTab() {
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-lg font-semibold">{t('volunteering.reminders_heading')}</h3>
         <div className="flex gap-2">
-          <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>
+          <Button variant="secondary" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>
             {t('volunteering.refresh')}
           </Button>
           {canRunReminderJobs && (
-            <Button variant="flat" color="primary" startContent={<Send size={16} />} onPress={onTestOpen} isLoading={runningReminderJob}>
+            <Button variant="secondary"  startContent={<Send size={16} />} onPress={onTestOpen} isLoading={runningReminderJob}>
               {t('volunteering.run_due_reminders')}
             </Button>
           )}
-          <Button color="primary" startContent={<Save size={16} />} onPress={handleSave} isLoading={saving}>
+          <Button  startContent={<Save size={16} />} onPress={handleSave} isLoading={saving}>
             {t('volunteering.save')}
           </Button>
         </div>
@@ -867,7 +865,7 @@ function RemindersTab() {
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Chip size="sm" variant="flat" color={reminder.enabled ? 'success' : 'default'}>
+                    <Chip size="sm" variant="soft" color={reminder.enabled ? 'success' : 'default'}>
                       {reminder.enabled
                         ? t('volunteering.enabled')
                         : t('volunteering.disabled')}
@@ -882,11 +880,11 @@ function RemindersTab() {
                       label={t('volunteering.timing_value')}
                       value={String(reminder.timing_value)}
                       onValueChange={(v) => updateReminder(index, { timing_value: Number(v) || 0 })}
-                      variant="bordered"
+                      variant="secondary"
                       className="w-28"
                       size="sm"
                       endContent={
-                        <span className="text-xs text-default-400 whitespace-nowrap">
+                        <span className="text-xs text-muted whitespace-nowrap">
                           {t(`volunteering.timing_unit_${reminder.key}`)}
                         </span>
                       }
@@ -933,11 +931,11 @@ function RemindersTab() {
         {deliveryStats && (
           <div className="flex flex-wrap gap-2">
             {Object.entries(deliveryStats.by_channel).map(([ch, count]) => (
-              <Chip key={ch} size="sm" variant="flat" color={ch === 'email' ? 'primary' : ch === 'push' ? 'secondary' : 'warning'}>
+              <Chip key={ch} size="sm" variant="soft" color={ch === 'email' ? 'accent' : ch === 'push' ? 'default' : 'warning'}>
                 {count} {ch}
               </Chip>
             ))}
-            <Chip size="sm" variant="flat" color="default">
+            <Chip size="sm" variant="soft" color="default">
               {t('volunteering.delivery_total_sent', { count: deliveryStats.total_sent })}
             </Chip>
           </div>
@@ -948,7 +946,7 @@ function RemindersTab() {
           <Select
             label={t('volunteering.filter_type')}
             size="sm"
-            variant="bordered"
+            variant="secondary"
             className="w-44"
             selectedKeys={deliveryFilterType ? [deliveryFilterType] : []}
             onSelectionChange={(keys) => {
@@ -967,7 +965,7 @@ function RemindersTab() {
           <Select
             label={t('volunteering.filter_channel')}
             size="sm"
-            variant="bordered"
+            variant="secondary"
             className="w-36"
             selectedKeys={deliveryFilterChannel ? [deliveryFilterChannel] : []}
             onSelectionChange={(keys) => {
@@ -987,7 +985,7 @@ function RemindersTab() {
         {deliveryLoading ? (
           <Card className="border border-divider/70 bg-surface-secondary/50">
             <CardBody className="p-6 flex justify-center">
-              <div className="flex items-center gap-2 text-default-400">
+              <div className="flex items-center gap-2 text-muted">
                 <RefreshCw size={16} className="animate-spin" />
                 <span className="text-sm">{t('volunteering.loading')}</span>
               </div>
@@ -996,8 +994,8 @@ function RemindersTab() {
         ) : deliveryLogs.length === 0 ? (
           <Card className="border border-divider/70 bg-surface-secondary/50">
             <CardBody className="p-6 text-center">
-              <Clock size={32} className="mx-auto mb-3 text-default-300" />
-              <p className="text-default-500 text-sm">
+              <Clock size={32} className="mx-auto mb-3 text-muted" />
+              <p className="text-muted text-sm">
                 {t('volunteering.no_delivery_logs')}
               </p>
             </CardBody>
@@ -1011,17 +1009,17 @@ function RemindersTab() {
                     <div className="flex-1 min-w-0">
                       <span className="text-sm font-medium">{log.user_name}</span>
                     </div>
-                    <Chip size="sm" variant="flat" color="primary">
+                    <Chip size="sm" variant="soft" color="accent">
                       {t(`volunteering.reminder_${log.reminder_type}`)}
                     </Chip>
                     <Chip
                       size="sm"
-                      variant="flat"
-                      color={log.channel === 'email' ? 'default' : log.channel === 'push' ? 'secondary' : 'warning'}
+                      variant="soft"
+                      color={log.channel === 'email' ? 'default' : log.channel === 'push' ? 'accent' : 'warning'}
                     >
                       {t(`volunteering.channel_${log.channel}`)}
                     </Chip>
-                    <span className="text-xs text-default-400 whitespace-nowrap">
+                    <span className="text-xs text-muted whitespace-nowrap">
                       {log.sent_at ? new Date(log.sent_at).toLocaleString() : ''}
                     </span>
                   </div>
@@ -1038,13 +1036,13 @@ function RemindersTab() {
           <ModalContent>
             <ModalHeader>{t('volunteering.run_reminder_job_title')}</ModalHeader>
             <ModalBody>
-              <p className="text-default-600">
+              <p className="text-foreground">
                 {t('volunteering.run_reminder_job_confirm')}
               </p>
             </ModalBody>
             <ModalFooter>
-              <Button variant="flat" onPress={onTestClose}>{t('volunteering.cancel')}</Button>
-              <Button color="primary" startContent={<Send size={14} />} onPress={handleTestSend} isLoading={runningReminderJob}>
+              <Button variant="secondary" onPress={onTestClose}>{t('volunteering.cancel')}</Button>
+              <Button  startContent={<Send size={14} />} onPress={handleTestSend} isLoading={runningReminderJob}>
                 {t('volunteering.confirm_run_reminders')}
               </Button>
             </ModalFooter>
@@ -1228,7 +1226,7 @@ function WebhooksTab() {
       render: (row) => (
         <div className="flex flex-wrap gap-1">
           {row.events?.map((ev) => (
-            <Chip key={ev} size="sm" variant="flat">{ev}</Chip>
+            <Chip key={ev} size="sm" variant="soft">{ev}</Chip>
           ))}
         </div>
       ),
@@ -1237,7 +1235,7 @@ function WebhooksTab() {
       key: 'is_active',
       label: t('volunteering.col_active'),
       render: (row) => (
-        <Chip size="sm" color={row.is_active ? 'success' : 'default'} variant="flat">
+        <Chip size="sm" color={row.is_active ? 'success' : 'default'} variant="soft">
           {row.is_active ? t('volunteering.active') : t('volunteering.inactive')}
         </Chip>
       ),
@@ -1246,7 +1244,7 @@ function WebhooksTab() {
       key: 'failure_count',
       label: t('volunteering.col_failures'),
       render: (row) => (
-        <Chip size="sm" color={row.failure_count > 0 ? 'danger' : 'default'} variant="flat">
+        <Chip size="sm" color={row.failure_count > 0 ? 'danger' : 'default'} variant="soft">
           {row.failure_count}
         </Chip>
       ),
@@ -1256,13 +1254,12 @@ function WebhooksTab() {
       label: t('volunteering.col_actions'),
       render: (row) => (
         <div className="flex items-center gap-1">
-          <Button size="sm" variant="flat" isIconOnly onPress={() => openEdit(row)} aria-label={t('volunteering.edit')}>
+          <Button size="sm" variant="secondary" isIconOnly onPress={() => openEdit(row)} aria-label={t('volunteering.edit')}>
             <Edit2 size={14} />
           </Button>
           <Button
             size="sm"
-            variant="flat"
-            color="primary"
+            variant="secondary"
             isIconOnly
             isLoading={testingId === row.id}
             onPress={() => handleTest(row.id)}
@@ -1273,8 +1270,7 @@ function WebhooksTab() {
           {row.failure_count > 0 && (
             <Button
               size="sm"
-              variant="flat"
-              color="warning"
+              variant="secondary"
               isIconOnly
               isLoading={retryingId === row.id}
               onPress={() => handleRetry(row.id)}
@@ -1285,7 +1281,7 @@ function WebhooksTab() {
           )}
           <Button
             size="sm"
-            variant="flat"
+            variant="secondary"
             isIconOnly
             onPress={() => handleViewLogs(row.id)}
             aria-label={t('volunteering.view_logs')}
@@ -1294,8 +1290,7 @@ function WebhooksTab() {
           </Button>
           <Button
             size="sm"
-            variant="flat"
-            color="danger"
+            variant="danger"
             isIconOnly
             onPress={() => { setDeleteId(row.id); onDeleteOpen(); }}
             aria-label={t('volunteering.delete')}
@@ -1312,10 +1307,10 @@ function WebhooksTab() {
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-lg font-semibold">{t('volunteering.webhooks_heading')}</h3>
         <div className="flex gap-2">
-          <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>
+          <Button variant="secondary" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>
             {t('volunteering.refresh')}
           </Button>
-          <Button color="primary" startContent={<Plus size={16} />} onPress={openCreate}>
+          <Button  startContent={<Plus size={16} />} onPress={openCreate}>
             {t('volunteering.add_webhook')}
           </Button>
         </div>
@@ -1346,14 +1341,14 @@ function WebhooksTab() {
                 value={form.name}
                 onValueChange={(v) => setForm((f) => ({ ...f, name: v }))}
                 isRequired
-                variant="bordered"
+                variant="secondary"
               />
               <Input
                 label={t('volunteering.webhook_url')}
                 value={form.url}
                 onValueChange={(v) => setForm((f) => ({ ...f, url: v }))}
                 isRequired
-                variant="bordered"
+                variant="secondary"
                 type="url"
                 placeholder={t('volunteering.webhook_url_placeholder')}
               />
@@ -1361,7 +1356,7 @@ function WebhooksTab() {
                 label={t('volunteering.webhook_events')}
                 value={form.events}
                 onValueChange={(v) => setForm((f) => ({ ...f, events: v }))}
-                variant="bordered"
+                variant="secondary"
                 placeholder={t('volunteering.webhook_events_placeholder')}
                 description={t('volunteering.webhook_events_desc')}
               />
@@ -1374,8 +1369,8 @@ function WebhooksTab() {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onClose}>{t('volunteering.cancel')}</Button>
-            <Button color="primary" onPress={handleSave} isLoading={saving}>
+            <Button variant="secondary" onPress={onClose}>{t('volunteering.cancel')}</Button>
+            <Button  onPress={handleSave} isLoading={saving}>
               {editingId ? t('volunteering.save') : t('volunteering.create')}
             </Button>
           </ModalFooter>
@@ -1405,16 +1400,16 @@ function WebhooksTab() {
                 placeholder={t('volunteering.filter_logs')}
                 value={logFilter}
                 onValueChange={setLogFilter}
-                variant="bordered"
+                variant="secondary"
                 size="sm"
-                startContent={<Search size={14} className="text-default-400" />}
+                startContent={<Search size={14} className="text-muted" />}
                 className="mb-3"
                 isClearable
                 onClear={() => setLogFilter('')}
               />
             )}
             {filteredLogs.length === 0 ? (
-              <p className="text-default-500 text-center py-8">
+              <p className="text-muted text-center py-8">
                 {logs.length === 0
                   ? t('volunteering.no_webhook_logs')
                   : t('volunteering.no_matching_logs')}
@@ -1426,21 +1421,21 @@ function WebhooksTab() {
                     <CardBody className="p-3">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          <Chip size="sm" variant="flat">{log.event}</Chip>
+                          <Chip size="sm" variant="soft">{log.event}</Chip>
                           <Chip
                             size="sm"
                             color={log.status_code >= 200 && log.status_code < 300 ? 'success' : 'danger'}
-                            variant="flat"
+                            variant="soft"
                           >
                             {log.status_code}
                           </Chip>
                         </div>
-                        <span className="text-xs text-default-400">
+                        <span className="text-xs text-muted">
                           {log.created_at ? new Date(log.created_at).toLocaleString() : '-'}
                         </span>
                       </div>
                       {log.response_body && (
-                        <pre className="text-xs bg-default-100 p-2 rounded overflow-auto max-h-32">
+                        <pre className="text-xs bg-surface-secondary p-2 rounded overflow-auto max-h-32">
                           {log.response_body}
                         </pre>
                       )}
@@ -1451,7 +1446,7 @@ function WebhooksTab() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onLogsClose}>{t('volunteering.close')}</Button>
+            <Button variant="secondary" onPress={onLogsClose}>{t('volunteering.close')}</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

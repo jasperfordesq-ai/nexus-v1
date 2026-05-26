@@ -563,7 +563,7 @@ export function VettingRecords() {
             <p className="font-medium text-foreground truncate">
               {item.first_name} {item.last_name}
             </p>
-            <p className="text-xs text-default-400 truncate">{item.email}</p>
+            <p className="text-xs text-muted truncate">{item.email}</p>
           </div>
         </div>
       ),
@@ -573,7 +573,7 @@ export function VettingRecords() {
       label: t('vetting.col_type'),
       sortable: true,
       render: (item) => (
-        <Chip size="sm" variant="tertiary" color="accent">
+        <Chip size="sm" variant="soft" color="accent">
           {getTypeLabel(item.vetting_type)}
         </Chip>
       ),
@@ -585,7 +585,7 @@ export function VettingRecords() {
       render: (item) => (
         <Chip
           size="sm"
-          variant="tertiary"
+          variant="soft"
           color={STATUS_COLOR_MAP[item.status] || 'default'}
           className="capitalize"
         >
@@ -597,7 +597,7 @@ export function VettingRecords() {
       key: 'reference_number',
       label: t('vetting.col_reference'),
       render: (item) => (
-        <span className="text-sm text-default-600 font-mono">
+        <span className="text-sm text-muted font-mono">
           {item.reference_number || '—'}
         </span>
       ),
@@ -607,7 +607,7 @@ export function VettingRecords() {
       label: t('vetting.col_issue_date'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {formatServerDate(item.issue_date)}
         </span>
       ),
@@ -618,14 +618,14 @@ export function VettingRecords() {
       sortable: true,
       render: (item) => {
         const expiry = parseServerTimestamp(item.expiry_date);
-        if (!expiry) return <span className="text-sm text-default-500">{'—'}</span>;
+        if (!expiry) return <span className="text-sm text-muted">{'—'}</span>;
         const now = new Date();
         const daysUntilExpiry = Math.ceil((expiry.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
         const isExpiringSoon = daysUntilExpiry > 0 && daysUntilExpiry <= 30;
         const isExpired = daysUntilExpiry <= 0;
 
         return (
-          <span className={`text-sm ${isExpired ? 'text-danger font-medium' : isExpiringSoon ? 'text-warning font-medium' : 'text-default-500'}`}>
+          <span className={`text-sm ${isExpired ? 'text-danger font-medium' : isExpiringSoon ? 'text-warning font-medium' : 'text-muted'}`}>
             {expiry.toLocaleDateString()}
           </span>
         );
@@ -651,7 +651,7 @@ export function VettingRecords() {
             </Chip>
           )}
           {!item.works_with_children && !item.works_with_vulnerable_adults && (
-            <span className="text-sm text-default-400">{'—'}</span>
+            <span className="text-sm text-muted">{'—'}</span>
           )}
         </div>
       ),
@@ -664,7 +664,7 @@ export function VettingRecords() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
+            variant="tertiary"
             onPress={() => setViewItem(item)}
             aria-label={t('vetting.action_view_details')}
           >
@@ -673,7 +673,7 @@ export function VettingRecords() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
+            variant="tertiary"
             onPress={() => openEditModal(item)}
             aria-label={t('vetting.action_edit_record')}
           >
@@ -684,9 +684,9 @@ export function VettingRecords() {
               <Button
                 isIconOnly
                 size="sm"
-                variant="flat"
-                color="success"
-                isLoading={verifyingId === item.id}
+                variant="secondary"
+                className="text-success"
+                isPending={verifyingId === item.id}
                 onPress={() => handleVerify(item)}
                 aria-label={t('vetting.action_verify_record')}
               >
@@ -695,8 +695,7 @@ export function VettingRecords() {
               <Button
                 isIconOnly
                 size="sm"
-                variant="flat"
-                color="danger"
+                variant="danger-soft"
                 onPress={() => { setRejectModal(item); setRejectReason(''); }}
                 aria-label={t('vetting.action_reject_record')}
               >
@@ -707,8 +706,7 @@ export function VettingRecords() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
-            color="danger"
+            variant="danger-soft"
             onPress={() => setDeleteItem(item)}
             aria-label={t('vetting.action_delete_record')}
           >
@@ -727,7 +725,7 @@ export function VettingRecords() {
         actions={
           <div className="flex gap-2">
             <Button
-              color="primary"
+              variant="primary"
               startContent={<Plus size={16} />}
               size="sm"
               onPress={() => { resetCreateForm(); setCreateOpen(true); }}
@@ -737,7 +735,7 @@ export function VettingRecords() {
             <Button
               as={Link}
               to={tenantPath('/broker')}
-              variant="flat"
+              variant="secondary"
               startContent={<ArrowLeft size={16} />}
               size="sm"
             >
@@ -752,9 +750,9 @@ export function VettingRecords() {
           <ShieldAlert size={20} className="text-warning shrink-0 mt-0.5" />
           <div className="flex-1 text-sm">
             <p className="font-medium text-warning-700">{t('vetting.stats_error_title')}</p>
-            <p className="text-default-600">{t('vetting.stats_error_body')}</p>
+            <p className="text-muted">{t('vetting.stats_error_body')}</p>
           </div>
-          <Button size="sm" variant="flat" color="warning" onPress={loadStats}>
+          <Button size="sm" variant="secondary" className="text-warning" onPress={loadStats}>
             {t('vetting.retry')}
           </Button>
         </div>
@@ -766,7 +764,7 @@ export function VettingRecords() {
           label={t('vetting.stat_total_records')}
           value={stats?.total ?? 0}
           icon={FileText}
-          color="primary"
+          color="default"
           loading={statsLoading}
         />
         <StatCard
@@ -802,8 +800,8 @@ export function VettingRecords() {
           aria-label={t('vetting.search_aria')}
           value={searchQuery}
           onValueChange={(val) => { setSearchQuery(val); setPage(1); }}
-          startContent={<Search size={16} className="text-default-400" />}
-          variant="bordered"
+          startContent={<Search size={16} className="text-muted" />}
+          variant="secondary"
           size="sm"
           className="max-w-md"
           isClearable
@@ -839,8 +837,8 @@ export function VettingRecords() {
           <div className="flex gap-2">
             <Button
               size="sm"
-              color="success"
-              variant="flat"
+              variant="secondary"
+              className="text-success"
               startContent={<Check size={14} />}
               onPress={() => setBulkAction('verify')}
             >
@@ -848,8 +846,7 @@ export function VettingRecords() {
             </Button>
             <Button
               size="sm"
-              color="danger"
-              variant="flat"
+              variant="danger-soft"
               startContent={<X size={14} />}
               onPress={() => { setBulkAction('reject'); setBulkRejectReason(''); }}
             >
@@ -857,8 +854,7 @@ export function VettingRecords() {
             </Button>
             <Button
               size="sm"
-              color="danger"
-              variant="flat"
+              variant="danger-soft"
               startContent={<Trash2 size={14} />}
               onPress={() => setBulkAction('delete')}
             >
@@ -867,7 +863,7 @@ export function VettingRecords() {
           </div>
           <Button
             size="sm"
-            variant="light"
+            variant="tertiary"
             onPress={() => setSelectedIds(new Set())}
           >
             {t('vetting.bulk_clear')}
@@ -919,17 +915,17 @@ export function VettingRecords() {
           <ModalBody className="gap-4">
             {/* Member search instead of raw User ID */}
             {selectedUser ? (
-              <div className="flex items-center justify-between p-3 rounded-lg border border-default-200 bg-default-50">
+              <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-surface-secondary">
                 <div className="flex items-center gap-2">
                   <Avatar name={`${selectedUser.first_name} ${selectedUser.last_name}`} size="sm" />
                   <div>
                     <p className="text-sm font-medium">{selectedUser.first_name} {selectedUser.last_name}</p>
-                    <p className="text-xs text-default-400">{selectedUser.email}</p>
+                    <p className="text-xs text-muted">{selectedUser.email}</p>
                   </div>
                 </div>
                 <Button
                   size="sm"
-                  variant="flat"
+                  variant="secondary"
                   onPress={() => {
                     setSelectedUser(null);
                     setCreateForm(prev => ({ ...prev, user_id: '' }));
@@ -946,18 +942,18 @@ export function VettingRecords() {
                   placeholder={t('vetting.search_member_placeholder')}
                   value={userSearchQuery}
                   onValueChange={setUserSearchQuery}
-                  variant="bordered"
+                  variant="secondary"
                   isRequired
-                  startContent={<Search size={14} className="text-default-400" />}
+                  startContent={<Search size={14} className="text-muted" />}
                   endContent={userSearchLoading ? <Spinner size="sm" /> : undefined}
                 />
                 {userSearchResults.length > 0 && (
-                  <div className="mt-1 border border-default-200 rounded-lg overflow-hidden max-h-48 overflow-y-auto">
+                  <div className="mt-1 border border-border rounded-lg overflow-hidden max-h-48 overflow-y-auto">
                     {userSearchResults.map((u) => (
                       <Button
                         key={u.id}
-                        variant="light"
-                        className="w-full flex items-center gap-2 p-2 justify-start h-auto rounded-none"
+                        variant="tertiary"
+                        className="w-full min-h-12 flex items-center gap-2 p-2 justify-start rounded-none"
                         onPress={() => {
                           setSelectedUser(u);
                           setCreateForm(prev => ({ ...prev, user_id: String(u.id) }));
@@ -968,14 +964,14 @@ export function VettingRecords() {
                         <Avatar name={`${u.first_name} ${u.last_name}`} size="sm" className="shrink-0" />
                         <div className="min-w-0 text-left">
                           <p className="text-sm font-medium truncate">{u.first_name} {u.last_name}</p>
-                          <p className="text-xs text-default-400 truncate">{u.email}</p>
+                          <p className="text-xs text-muted truncate">{u.email}</p>
                         </div>
                       </Button>
                     ))}
                   </div>
                 )}
                 {userSearchQuery.trim().length >= 2 && !userSearchLoading && userSearchResults.length === 0 && (
-                  <p className="text-xs text-default-400 mt-1">{t('vetting.no_members_found')}</p>
+                  <p className="text-xs text-muted mt-1">{t('vetting.no_members_found')}</p>
                 )}
               </div>
             )}
@@ -986,7 +982,7 @@ export function VettingRecords() {
                 const val = Array.from(keys)[0] as VettingRecord['vetting_type'];
                 if (val) setCreateForm(prev => ({ ...prev, vetting_type: val }));
               }}
-              variant="bordered"
+              variant="secondary"
               isRequired
             >
               {Object.keys(VETTING_TYPE_KEYS).map((key) => (
@@ -998,7 +994,7 @@ export function VettingRecords() {
               placeholder={t('vetting.field_reference_number_placeholder')}
               value={createForm.reference_number}
               onValueChange={(val) => setCreateForm(prev => ({ ...prev, reference_number: val }))}
-              variant="bordered"
+              variant="secondary"
             />
             <div className="grid grid-cols-2 gap-4">
               <Input
@@ -1006,14 +1002,14 @@ export function VettingRecords() {
                 type="date"
                 value={createForm.issue_date}
                 onValueChange={(val) => setCreateForm(prev => ({ ...prev, issue_date: val }))}
-                variant="bordered"
+                variant="secondary"
               />
               <Input
                 label={t('vetting.field_expiry_date')}
                 type="date"
                 value={createForm.expiry_date}
                 onValueChange={(val) => setCreateForm(prev => ({ ...prev, expiry_date: val }))}
-                variant="bordered"
+                variant="secondary"
               />
             </div>
             <div className="flex flex-col gap-2">
@@ -1041,22 +1037,22 @@ export function VettingRecords() {
               placeholder={t('vetting.field_notes_placeholder')}
               value={createForm.notes}
               onValueChange={(val) => setCreateForm(prev => ({ ...prev, notes: val }))}
-              variant="bordered"
+              variant="secondary"
               minRows={3}
             />
           </ModalBody>
           <ModalFooter>
             <Button
-              variant="flat"
+              variant="tertiary"
               onPress={() => setCreateOpen(false)}
               isDisabled={createLoading}
             >
               {t('vetting.cancel')}
             </Button>
             <Button
-              color="primary"
+              variant="primary"
               onPress={handleCreate}
-              isLoading={createLoading}
+              isPending={createLoading}
             >
               {t('vetting.create_record')}
             </Button>
@@ -1078,7 +1074,7 @@ export function VettingRecords() {
               {t('vetting.modal_edit_title')}
             </ModalHeader>
             <ModalBody className="gap-4">
-              <div className="flex items-center gap-2 p-3 rounded-lg border border-default-200 bg-default-50">
+              <div className="flex items-center gap-2 p-3 rounded-lg border border-border bg-surface-secondary">
                 <Avatar
                   src={resolveAvatarUrl(editItem.avatar_url) || undefined}
                   name={`${editItem.first_name} ${editItem.last_name}`}
@@ -1086,7 +1082,7 @@ export function VettingRecords() {
                 />
                 <div>
                   <p className="text-sm font-medium">{editItem.first_name} {editItem.last_name}</p>
-                  <p className="text-xs text-default-400">{editItem.email}</p>
+                  <p className="text-xs text-muted">{editItem.email}</p>
                 </div>
               </div>
               <Select
@@ -1096,7 +1092,7 @@ export function VettingRecords() {
                   const val = Array.from(keys)[0] as VettingRecord['vetting_type'];
                   if (val) setEditForm(prev => ({ ...prev, vetting_type: val }));
                 }}
-                variant="bordered"
+                variant="secondary"
                 isRequired
               >
                 {Object.keys(VETTING_TYPE_KEYS).map((key) => (
@@ -1108,7 +1104,7 @@ export function VettingRecords() {
                 placeholder={t('vetting.field_reference_number_placeholder')}
                 value={editForm.reference_number}
                 onValueChange={(val) => setEditForm(prev => ({ ...prev, reference_number: val }))}
-                variant="bordered"
+                variant="secondary"
               />
               <div className="grid grid-cols-2 gap-4">
                 <Input
@@ -1116,14 +1112,14 @@ export function VettingRecords() {
                   type="date"
                   value={editForm.issue_date}
                   onValueChange={(val) => setEditForm(prev => ({ ...prev, issue_date: val }))}
-                  variant="bordered"
+                  variant="secondary"
                 />
                 <Input
                   label={t('vetting.field_expiry_date')}
                   type="date"
                   value={editForm.expiry_date}
                   onValueChange={(val) => setEditForm(prev => ({ ...prev, expiry_date: val }))}
-                  variant="bordered"
+                  variant="secondary"
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -1151,22 +1147,22 @@ export function VettingRecords() {
                 placeholder={t('vetting.field_notes_placeholder')}
                 value={editForm.notes}
                 onValueChange={(val) => setEditForm(prev => ({ ...prev, notes: val }))}
-                variant="bordered"
+                variant="secondary"
                 minRows={3}
               />
             </ModalBody>
             <ModalFooter>
               <Button
-                variant="flat"
+                variant="tertiary"
                 onPress={() => setEditItem(null)}
                 isDisabled={editLoading}
               >
                 {t('vetting.cancel')}
               </Button>
               <Button
-                color="primary"
+                variant="primary"
                 onPress={handleEdit}
-                isLoading={editLoading}
+                isPending={editLoading}
               >
                 {t('vetting.save_changes')}
               </Button>
@@ -1188,7 +1184,7 @@ export function VettingRecords() {
               {t('vetting.modal_reject_title')}
             </ModalHeader>
             <ModalBody>
-              <p className="text-default-600 mb-3">
+              <p className="text-muted mb-3">
                 {t('vetting.reject_confirm_prefix')}{' '}
                 <strong>{rejectModal.first_name} {rejectModal.last_name}</strong>{t('vetting.reject_confirm_suffix')}
               </p>
@@ -1198,22 +1194,22 @@ export function VettingRecords() {
                 value={rejectReason}
                 onValueChange={setRejectReason}
                 minRows={3}
-                variant="bordered"
+                variant="secondary"
                 isRequired
               />
             </ModalBody>
             <ModalFooter>
               <Button
-                variant="flat"
+                variant="tertiary"
                 onPress={() => { setRejectModal(null); setRejectReason(''); }}
                 isDisabled={rejectLoading}
               >
                 {t('vetting.cancel')}
               </Button>
               <Button
-                color="danger"
+                variant="danger"
                 onPress={handleReject}
-                isLoading={rejectLoading}
+                isPending={rejectLoading}
               >
                 {t('vetting.reject')}
               </Button>
@@ -1243,34 +1239,34 @@ export function VettingRecords() {
                 />
                 <div>
                   <p className="text-lg font-semibold">{viewItem.first_name} {viewItem.last_name}</p>
-                  <p className="text-sm text-default-500">{viewItem.email}</p>
+                  <p className="text-sm text-muted">{viewItem.email}</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
                 <div>
-                  <p className="text-default-400">{t('vetting.col_type')}</p>
+                  <p className="text-muted">{t('vetting.col_type')}</p>
                   <p className="font-medium">{getTypeLabel(viewItem.vetting_type)}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">{t('vetting.col_status')}</p>
-                  <Chip size="sm" variant="tertiary" color={STATUS_COLOR_MAP[viewItem.status] || 'default'} className="capitalize">
+                  <p className="text-muted">{t('vetting.col_status')}</p>
+                  <Chip size="sm" variant="soft" color={STATUS_COLOR_MAP[viewItem.status] || 'default'} className="capitalize">
                     {t(`status.${viewItem.status}`)}
                   </Chip>
                 </div>
                 <div>
-                  <p className="text-default-400">{t('vetting.field_reference_number')}</p>
+                  <p className="text-muted">{t('vetting.field_reference_number')}</p>
                   <p className="font-medium font-mono">{viewItem.reference_number || '—'}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">{t('vetting.field_issue_date')}</p>
+                  <p className="text-muted">{t('vetting.field_issue_date')}</p>
                   <p className="font-medium">{formatServerDate(viewItem.issue_date)}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">{t('vetting.field_expiry_date')}</p>
+                  <p className="text-muted">{t('vetting.field_expiry_date')}</p>
                   <p className="font-medium">{formatServerDate(viewItem.expiry_date)}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">{t('vetting.verified_by')}</p>
+                  <p className="text-muted">{t('vetting.verified_by')}</p>
                   <p className="font-medium">
                     {viewItem.verifier_first_name
                       ? `${viewItem.verifier_first_name} ${viewItem.verifier_last_name}`
@@ -1278,11 +1274,11 @@ export function VettingRecords() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-default-400">{t('vetting.verified_at')}</p>
+                  <p className="text-muted">{t('vetting.verified_at')}</p>
                   <p className="font-medium">{formatServerDateTime(viewItem.verified_at)}</p>
                 </div>
                 <div>
-                  <p className="text-default-400">{t('vetting.created')}</p>
+                  <p className="text-muted">{t('vetting.created')}</p>
                   <p className="font-medium">{formatServerDateTime(viewItem.created_at)}</p>
                 </div>
               </div>
@@ -1293,7 +1289,7 @@ export function VettingRecords() {
                   <p className="text-sm font-medium text-danger mb-1">{t('vetting.rejection_details')}</p>
                   <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
                     <div>
-                      <p className="text-default-400">{t('vetting.rejected_by')}</p>
+                      <p className="text-muted">{t('vetting.rejected_by')}</p>
                       <p className="font-medium">
                         {viewItem.rejector_first_name
                           ? `${viewItem.rejector_first_name} ${viewItem.rejector_last_name}`
@@ -1301,13 +1297,13 @@ export function VettingRecords() {
                       </p>
                     </div>
                     <div>
-                      <p className="text-default-400">{t('vetting.rejected_at')}</p>
+                      <p className="text-muted">{t('vetting.rejected_at')}</p>
                       <p className="font-medium">{formatServerDateTime(viewItem.rejected_at)}</p>
                     </div>
                   </div>
                   {viewItem.rejection_reason && (
                     <div className="mt-2">
-                      <p className="text-default-400 text-sm">{t('vetting.reason')}</p>
+                      <p className="text-muted text-sm">{t('vetting.reason')}</p>
                       <p className="text-sm">{viewItem.rejection_reason}</p>
                     </div>
                   )}
@@ -1316,19 +1312,19 @@ export function VettingRecords() {
 
               <div className="mt-4 flex gap-2 flex-wrap">
                 {viewItem.works_with_children && (
-                  <Chip size="sm" variant="tertiary" color="warning">
+                  <Chip size="sm" variant="soft" color="warning">
                     <Baby size={12} />
                     <Chip.Label>{t('vetting.works_with_children')}</Chip.Label>
                   </Chip>
                 )}
                 {viewItem.works_with_vulnerable_adults && (
-                  <Chip size="sm" variant="tertiary" color="warning">
+                  <Chip size="sm" variant="soft" color="warning">
                     <HeartHandshake size={12} />
                     <Chip.Label>{t('vetting.works_with_vulnerable_adults')}</Chip.Label>
                   </Chip>
                 )}
                 {viewItem.requires_enhanced_check && (
-                  <Chip size="sm" variant="tertiary" color="danger">
+                  <Chip size="sm" variant="soft" color="danger">
                     <ShieldAlert size={12} />
                     <Chip.Label>{t('vetting.requires_enhanced_check')}</Chip.Label>
                   </Chip>
@@ -1336,14 +1332,14 @@ export function VettingRecords() {
               </div>
               {viewItem.notes && (
                 <div className="mt-4">
-                  <p className="text-default-400 text-sm mb-1">{t('vetting.field_notes')}</p>
-                  <p className="text-sm bg-default-100 p-3 rounded-lg whitespace-pre-wrap">{viewItem.notes}</p>
+                  <p className="text-muted text-sm mb-1">{t('vetting.field_notes')}</p>
+                  <p className="text-sm bg-surface-secondary p-3 rounded-lg whitespace-pre-wrap">{viewItem.notes}</p>
                 </div>
               )}
 
               {/* #10: Document section */}
               <div className="mt-4">
-                <p className="text-default-400 text-sm mb-2">{t('vetting.document')}</p>
+                <p className="text-muted text-sm mb-2">{t('vetting.document')}</p>
                 {viewItem.document_url ? (
                   <div className="flex items-center gap-2">
                     <a
@@ -1357,8 +1353,8 @@ export function VettingRecords() {
                     </a>
                     <Button
                       size="sm"
-                      variant="flat"
-                      isLoading={uploadingId === viewItem.id}
+                      variant="secondary"
+                      isPending={uploadingId === viewItem.id}
                       onPress={() => openFilePickerForRecord(viewItem.id)}
                     >
                       {t('vetting.replace')}
@@ -1367,19 +1363,19 @@ export function VettingRecords() {
                 ) : (
                   <Button
                     size="sm"
-                    variant="flat"
+                    variant="secondary"
                     startContent={<Upload size={14} />}
-                    isLoading={uploadingId === viewItem.id}
+                    isPending={uploadingId === viewItem.id}
                     onPress={() => openFilePickerForRecord(viewItem.id)}
                   >
                     {t('vetting.upload_document')}
                   </Button>
                 )}
-                <p className="text-xs text-default-400 mt-1">{t('vetting.document_types_hint')}</p>
+                <p className="text-xs text-muted mt-1">{t('vetting.document_types_hint')}</p>
               </div>
             </ModalBody>
             <ModalFooter>
-              <Button variant="flat" onPress={() => setViewItem(null)}>
+              <Button variant="tertiary" onPress={() => setViewItem(null)}>
                 {t('vetting.close')}
               </Button>
             </ModalFooter>
@@ -1428,7 +1424,7 @@ export function VettingRecords() {
               {t('vetting.modal_bulk_reject_title')}
             </ModalHeader>
             <ModalBody>
-              <p className="text-default-600 mb-3">
+              <p className="text-muted mb-3">
                 {t('vetting.bulk_reject_confirm', { count: selectedIds.size })}
               </p>
               <Textarea
@@ -1437,22 +1433,22 @@ export function VettingRecords() {
                 value={bulkRejectReason}
                 onValueChange={setBulkRejectReason}
                 minRows={3}
-                variant="bordered"
+                variant="secondary"
                 isRequired
               />
             </ModalBody>
             <ModalFooter>
               <Button
-                variant="flat"
+                variant="tertiary"
                 onPress={() => { setBulkAction(null); setBulkRejectReason(''); }}
                 isDisabled={bulkLoading}
               >
                 {t('vetting.cancel')}
               </Button>
               <Button
-                color="danger"
+                variant="danger"
                 onPress={handleBulkAction}
-                isLoading={bulkLoading}
+                isPending={bulkLoading}
               >
                 {t('vetting.reject_all')}
               </Button>
