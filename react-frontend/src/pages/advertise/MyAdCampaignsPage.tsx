@@ -189,8 +189,8 @@ export function MyAdCampaignsPage() {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <PageMeta title={t('advertise.page_title')} noIndex />
-        <Megaphone size={48} className="mb-4 text-default-300" aria-hidden="true" />
-        <p className="text-default-500">{t('advertise.feature_disabled')}</p>
+        <Megaphone size={48} className="mb-4 text-muted" aria-hidden="true" />
+        <p className="text-muted">{t('advertise.feature_disabled')}</p>
       </div>
     );
   }
@@ -225,13 +225,13 @@ export function MyAdCampaignsPage() {
         ) : error ? (
           <div className="flex flex-col items-center py-12 text-center gap-4">
             <AlertTriangle size={40} className="text-warning" aria-hidden="true" />
-            <p className="text-default-500">{error}</p>
+            <p className="text-muted">{error}</p>
             <Button variant="flat" onPress={fetchCampaigns}>{t('advertise.retry')}</Button>
           </div>
         ) : campaigns.length === 0 ? (
           <div className="flex flex-col items-center py-12 text-center gap-3">
-            <Megaphone size={40} className="text-default-300" aria-hidden="true" />
-            <p className="text-default-500">{t('advertise.empty.title')}</p>
+            <Megaphone size={40} className="text-muted" aria-hidden="true" />
+            <p className="text-muted">{t('advertise.empty.title')}</p>
             <Button color="primary" onPress={createModal.onOpen}>
               {t('advertise.create_first')}
             </Button>
@@ -254,7 +254,7 @@ export function MyAdCampaignsPage() {
                 return (
                   <TableRow key={campaign.id}>
                     <TableCell className="font-medium text-theme-primary">{campaign.name}</TableCell>
-                    <TableCell className="capitalize text-default-500">
+                    <TableCell className="capitalize text-muted">
                       {t(`advertise.type_${campaign.type}`)}
                     </TableCell>
                     <TableCell>
@@ -266,13 +266,13 @@ export function MyAdCampaignsPage() {
                         {t(`advertise.status_${campaign.status}`)}
                       </Chip>
                     </TableCell>
-                    <TableCell className="text-default-600">{formatBudget(campaign.budget_cents)}</TableCell>
-                    <TableCell className="text-default-500 whitespace-nowrap">
+                    <TableCell className="text-foreground">{formatBudget(campaign.budget_cents)}</TableCell>
+                    <TableCell className="text-muted whitespace-nowrap">
                       {t('advertise.date_range', { start: campaign.start_date, end: campaign.end_date })}
                     </TableCell>
-                    <TableCell className="text-default-600">{formatMetric(s?.impressions)}</TableCell>
-                    <TableCell className="text-default-600">{formatMetric(s?.clicks)}</TableCell>
-                    <TableCell className="text-default-600">{s ? formatCtr(s.ctr) : t('empty_dash')}</TableCell>
+                    <TableCell className="text-foreground">{formatMetric(s?.impressions)}</TableCell>
+                    <TableCell className="text-foreground">{formatMetric(s?.clicks)}</TableCell>
+                    <TableCell className="text-foreground">{s ? formatCtr(s.ctr) : t('empty_dash')}</TableCell>
                   </TableRow>
                 );
               })}
@@ -334,7 +334,7 @@ export function MyAdCampaignsPage() {
                 type="number"
                 min="1"
                 step="0.01"
-                startContent={<span className="text-default-400 text-sm">€</span>}
+                startContent={<span className="text-muted text-sm">€</span>}
                 value={form.budget_cents}
                 onValueChange={(v) => setForm((p) => ({ ...p, budget_cents: v }))}
                 variant="bordered"
@@ -348,7 +348,7 @@ export function MyAdCampaignsPage() {
                 type="number"
                 min="1"
                 /* eslint-disable-next-line i18next/no-literal-string */
-                endContent={<span className="text-default-400 text-sm" aria-hidden="true">km</span>}
+                endContent={<span className="text-muted text-sm" aria-hidden="true">km</span>}
                 value={form.targeting_radius_km}
                 onValueChange={(v) => setForm((p) => ({ ...p, targeting_radius_km: v }))}
                 variant="bordered"

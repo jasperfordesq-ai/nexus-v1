@@ -200,8 +200,8 @@ export function MyPushCampaignsPage() {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <PageMeta title={t('push_campaign.page_title')} noIndex />
-        <BellRing size={48} className="mb-4 text-default-300" aria-hidden="true" />
-        <p className="text-default-500">{t('push_campaign.feature_disabled')}</p>
+        <BellRing size={48} className="mb-4 text-muted" aria-hidden="true" />
+        <p className="text-muted">{t('push_campaign.feature_disabled')}</p>
       </div>
     );
   }
@@ -236,13 +236,13 @@ export function MyPushCampaignsPage() {
         ) : error ? (
           <div className="flex flex-col items-center py-12 text-center gap-4">
             <AlertTriangle size={40} className="text-warning" aria-hidden="true" />
-            <p className="text-default-500">{error}</p>
+            <p className="text-muted">{error}</p>
             <Button variant="flat" onPress={fetchCampaigns}>{t('push_campaign.retry')}</Button>
           </div>
         ) : campaigns.length === 0 ? (
           <div className="flex flex-col items-center py-12 text-center gap-3">
-            <BellRing size={40} className="text-default-300" aria-hidden="true" />
-            <p className="text-default-500">{t('push_campaign.empty.title')}</p>
+            <BellRing size={40} className="text-muted" aria-hidden="true" />
+            <p className="text-muted">{t('push_campaign.empty.title')}</p>
             <Button color="primary" onPress={createModal.onOpen}>
               {t('push_campaign.create_first')}
             </Button>
@@ -261,7 +261,7 @@ export function MyPushCampaignsPage() {
               {campaigns.map((campaign) => (
                 <TableRow key={campaign.id}>
                   <TableCell className="font-medium text-theme-primary">{campaign.name}</TableCell>
-                  <TableCell className="text-default-600 max-w-[200px] truncate">{campaign.title}</TableCell>
+                  <TableCell className="text-foreground max-w-[200px] truncate">{campaign.title}</TableCell>
                   <TableCell>
                     <Chip
                       size="sm"
@@ -271,13 +271,13 @@ export function MyPushCampaignsPage() {
                       {t(`push_campaign.status_${campaign.status}`)}
                     </Chip>
                   </TableCell>
-                  <TableCell className="text-default-500 whitespace-nowrap">
+                  <TableCell className="text-muted whitespace-nowrap">
                     {campaign.schedule_at ? formatDateTime(campaign.schedule_at) : t('empty_dash')}
                   </TableCell>
-                  <TableCell className="text-default-500">
+                  <TableCell className="text-muted">
                     {campaign.audience_radius_km ? t('push_campaign.radius_km', { radius: campaign.audience_radius_km }) : t('empty_dash')}
                   </TableCell>
-                  <TableCell className="text-default-500 capitalize">
+                  <TableCell className="text-muted capitalize">
                     {t(`push_campaign.tier_${campaign.audience_min_trust_tier}`)}
                   </TableCell>
                 </TableRow>
@@ -338,7 +338,7 @@ export function MyPushCampaignsPage() {
                 type="number"
                 min="1"
                 /* eslint-disable-next-line i18next/no-literal-string */
-                endContent={<span className="text-default-400 text-sm" aria-hidden="true">km</span>}
+                endContent={<span className="text-muted text-sm" aria-hidden="true">km</span>}
                 value={form.audience_radius_km}
                 onValueChange={(v) => setForm((p) => ({ ...p, audience_radius_km: v }))}
                 variant="bordered"
@@ -364,7 +364,7 @@ export function MyPushCampaignsPage() {
               {/* Audience estimate */}
               <div className="rounded-lg border border-divider p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm text-default-500">
+                  <div className="flex items-center gap-2 text-sm text-muted">
                     <Users size={16} aria-hidden="true" />
                     <span>{t('push_campaign.estimate_label')}</span>
                   </div>
