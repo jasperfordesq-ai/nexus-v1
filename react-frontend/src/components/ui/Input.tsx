@@ -100,7 +100,7 @@ function combineClasses(...classes: Array<string | false | undefined>): string |
 
 function decoratedInputClass(className?: string): string | undefined {
   return combineClasses(
-    'h-full min-h-0 w-full min-w-0 flex-1 self-stretch rounded-none border-0 bg-transparent px-0 py-0 shadow-none outline-none',
+    'h-full min-h-7 w-full min-w-0 flex-1 self-stretch rounded-none border-0 bg-transparent px-0 py-0 leading-7 shadow-none outline-none',
     'focus-visible:border-transparent focus-visible:ring-0',
     className,
   );
