@@ -55,6 +55,7 @@ This is the living tracker for migrating `react-frontend` from HeroUI v2 to Hero
 | 2026-05-25 | `/docs/react/migration/agent-guide-full` | Test cleanup audit for remaining v2 assumptions, collection item identity, removed providers, and direct v3 package state |
 | 2026-05-25 | `/docs/react/migration`, `/docs/react/migration/styling`, `/docs/react/migration/agent-guide-full` | Final migration audit for direct v3 package state, removed provider/plugin/alias checks, stale v2 utility cleanup, and completion recommendations |
 | 2026-05-26 | `/docs/react/getting-started/composition`, `/docs/react/migration/card`, `/docs/react/components/card` | Wrapper retirement slice for native v3 `Card` compound usage in feedback surfaces |
+| 2026-05-26 | `/docs/react/migration/tabs`, `/docs/react/components/tabs`, `/docs/react/components/toggle-button-group`, `/docs/react/components/toggle-button` | Wrapper retirement slice for a tab-only feed mode control, using native v3 single-selection toggle buttons instead of panel-oriented tabs |
 
 ## Current Baseline
 
@@ -198,6 +199,7 @@ Captured: 2026-05-25 after Phase 44.
 | Date | Slice | Docs checked | Files changed | Verification | Status | Follow-up |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-05-26 | Native v3 Card in feedback surfaces | `/docs/react/getting-started/composition`, `/docs/react/migration/card`, `/docs/react/components/card` | `react-frontend/src/components/feedback/LoadingScreen.tsx`, `react-frontend/src/components/feedback/CookieConsentBanner.tsx` | Targeted ESLint passed. `npm run build` passed after a longer retry with existing Vite warnings. `git diff --check` passed with line-ending warnings only. Full `npx tsc --noEmit --pretty false --noErrorTruncation` is blocked by unrelated `unknown` row diagnostics in admin table consumers while local `Table.tsx` work is dirty. | Complete | Continue with similarly small Card call-site conversions before tackling interactive or custom-root cards. Resolve the unrelated table typing drift before requiring full TypeScript as a green gate again. |
+| 2026-05-26 | Native v3 toggle group for feed mode | `/docs/react/migration/tabs`, `/docs/react/components/tabs`, `/docs/react/components/toggle-button-group`, `/docs/react/components/toggle-button` | `react-frontend/src/components/feed/FeedModeToggle.tsx` | Targeted ESLint passed. `npm run build` passed with existing Vite warnings. `git diff --check` passed with line-ending warnings only. Full `npx tsc --noEmit --pretty false --noErrorTruncation` remains blocked by the unrelated admin table consumer `unknown` row diagnostics and produced no diagnostics for this file. | Complete | Continue replacing tab-only filter controls with native `ToggleButtonGroup`; reserve native `Tabs` compound conversion for call sites with real panels. |
 
 ## Per-Phase Log
 

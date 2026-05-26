@@ -9,10 +9,10 @@
 
 
 import Sparkles from 'lucide-react/icons/sparkles';
-import { Tabs, Tab } from '@/components/ui';
+import { ToggleButton, ToggleButtonGroup } from '@heroui/react';
 import Clock from 'lucide-react/icons/clock';
 import { useTranslation } from 'react-i18next';
-import type { Key } from 'react';
+import type { Key } from '@heroui/react';
 
 interface FeedModeToggleProps {
   mode: 'ranking' | 'recent';
@@ -21,44 +21,43 @@ interface FeedModeToggleProps {
 
 export function FeedModeToggle({ mode, onModeChange }: FeedModeToggleProps) {
   const { t } = useTranslation('feed');
+  const selectedKeys = new Set<Key>([mode]);
 
-  const handleSelectionChange = (key: Key) => {
-    onModeChange(key as 'ranking' | 'recent');
+  const handleSelectionChange = (keys: Set<Key>) => {
+    const [key] = Array.from(keys);
+    if (key) {
+      onModeChange(key as 'ranking' | 'recent');
+    }
   };
 
   return (
-    <Tabs
-      selectedKey={mode}
-      onSelectionChange={handleSelectionChange}
-      variant="underlined"
-      size="sm"
-      classNames={{
-        tabList: 'gap-4 p-0',
-        cursor: 'bg-gradient-to-r from-indigo-500 to-purple-500',
-        tab: 'px-0 h-8',
-        tabContent: 'group-data-[selected=true]:text-[var(--text-primary)] text-[var(--text-muted)]',
-      }}
+    <ToggleButtonGroup
       aria-label={t('mode.label')}
+      className="gap-4 p-0"
+      selectedKeys={selectedKeys}
+      onSelectionChange={handleSelectionChange}
+      selectionMode="single"
+      disallowEmptySelection
+      isDetached
+      size="sm"
     >
-      <Tab
-        key="ranking"
-        title={
-          <div className="flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
-            <span>{t('mode.for_you')}</span>
-          </div>
-        }
-      />
-      <Tab
-        key="recent"
-        title={
-          <div className="flex items-center gap-1.5">
-            <Clock className="w-3.5 h-3.5" aria-hidden="true" />
-            <span>{t('mode.recent')}</span>
-          </div>
-        }
-      />
-    </Tabs>
+      <ToggleButton
+        id="ranking"
+        variant="ghost"
+        className="h-8 px-0 text-[var(--text-muted)] data-[selected=true]:text-[var(--text-primary)]"
+      >
+        <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
+        <span>{t('mode.for_you')}</span>
+      </ToggleButton>
+      <ToggleButton
+        id="recent"
+        variant="ghost"
+        className="h-8 px-0 text-[var(--text-muted)] data-[selected=true]:text-[var(--text-primary)]"
+      >
+        <Clock className="w-3.5 h-3.5" aria-hidden="true" />
+        <span>{t('mode.recent')}</span>
+      </ToggleButton>
+    </ToggleButtonGroup>
   );
 }
 
