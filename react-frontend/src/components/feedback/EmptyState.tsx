@@ -24,7 +24,7 @@ import Inbox from 'lucide-react/icons/inbox';import { Button } from '@/component
 export interface EmptyStateActionConfig {
   label: string;
   onClick: () => void;
-  variant?: 'solid' | 'bordered' | 'light';
+  variant?: 'primary' | 'secondary' | 'tertiary' | 'outline' | 'ghost' | 'danger' | 'solid' | 'bordered' | 'light';
 }
 
 export interface EmptyStateProps {
@@ -83,6 +83,15 @@ function isActionConfig(v: unknown): v is EmptyStateActionConfig {
   );
 }
 
+function normalizeActionVariant(
+  variant: EmptyStateActionConfig['variant'],
+): 'primary' | 'secondary' | 'tertiary' | 'outline' | 'ghost' | 'danger' {
+  if (variant === 'solid' || variant == null) return 'primary';
+  if (variant === 'bordered') return 'secondary';
+  if (variant === 'light') return 'tertiary';
+  return variant;
+}
+
 export function EmptyState({
   icon,
   title,
@@ -114,17 +123,17 @@ export function EmptyState({
       <h3 className="text-xl font-semibold text-foreground mb-2">{title}</h3>
 
       {displayMessage && (
-        <p className="text-default-500 text-sm max-w-sm mb-6">{displayMessage}</p>
+        <p className="text-muted text-sm max-w-sm mb-6">{displayMessage}</p>
       )}
 
       {/* action: ReactNode or config object */}
       {action != null && (
         isActionConfig(action) ? (
           <Button
-            variant={action.variant ?? 'solid'}
+            variant={normalizeActionVariant(action.variant)}
             onPress={action.onClick}
             className={
-              action.variant && action.variant !== 'solid'
+              action.variant && action.variant !== 'solid' && action.variant !== 'primary'
                 ? undefined
                 : 'bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium'
             }

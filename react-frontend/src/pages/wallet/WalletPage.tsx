@@ -278,7 +278,7 @@ export function WalletPage() {
               {isLoading ? (
                 <div className="mt-3" aria-label={t('aria.loading_balance')} aria-busy="true">
                   <Skeleton className="rounded-xl">
-                    <div className="h-16 w-48 rounded-xl bg-default-300" />
+                    <div className="h-16 w-48 rounded-xl bg-surface-tertiary" />
                   </Skeleton>
                 </div>
               ) : (
@@ -293,7 +293,7 @@ export function WalletPage() {
               <div className="mt-4 flex flex-wrap items-center gap-2">
                 <Chip
                   size="sm"
-                  variant="flat"
+                  variant="tertiary"
                   className="bg-amber-500/10 text-amber-600 dark:text-amber-300"
                   startContent={<Clock className="h-3.5 w-3.5" aria-hidden="true" />}
                 >
@@ -314,7 +314,7 @@ export function WalletPage() {
                 {t('send_credits')}
               </Button>
               <Button
-                variant="flat"
+                variant="secondary"
                 size="lg"
                 className="w-full bg-rose-500/10 px-6 font-medium text-rose-500 dark:text-rose-300"
                 startContent={<ArrowDownLeft className="h-5 w-5" aria-hidden="true" />}
@@ -378,7 +378,7 @@ export function WalletPage() {
             </h2>
 
             <Button
-              variant="flat"
+              variant="secondary"
               size="sm"
               className="bg-theme-elevated text-theme-muted"
               startContent={<Download className="w-4 h-4" aria-hidden="true" />}
@@ -415,10 +415,10 @@ export function WalletPage() {
                 {Array.from({ length: 5 }).map((_, i) => (
                 <div key={i} className="p-4 rounded-lg bg-theme-elevated">
                   <div className="flex items-center gap-4">
-                    <Skeleton className="rounded-full flex-shrink-0"><div className="w-10 h-10 rounded-full bg-default-300" /></Skeleton>
+                    <Skeleton className="rounded-full flex-shrink-0"><div className="w-10 h-10 rounded-full bg-surface-tertiary" /></Skeleton>
                     <div className="flex-1 space-y-2">
-                      <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-300 w-1/3" /></Skeleton>
-                      <Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-default-200 w-1/4" /></Skeleton>
+                      <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-surface-tertiary w-1/3" /></Skeleton>
+                      <Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-surface-secondary w-1/4" /></Skeleton>
                     </div>
                   </div>
                 </div>
@@ -429,7 +429,7 @@ export function WalletPage() {
                 icon={<Wallet className="w-12 h-12" />}
                 title={filter === 'all' ? t('no_transactions') : t('no_filtered_transactions')}
                 description={filter === 'all' ? t('no_transactions_desc') : t('no_filtered_transactions_desc')}
-                action={filter === 'all' ? undefined : { label: t('filter.all'), onClick: () => setFilter('all'), variant: 'bordered' }}
+                action={filter === 'all' ? undefined : { label: t('filter.all'), onClick: () => setFilter('all'), variant: 'secondary' }}
               />
             ) : (
               <>
@@ -440,7 +440,7 @@ export function WalletPage() {
                 {hasMoreTransactions && (
                   <div className="pt-4 text-center">
                     <Button
-                      variant="flat"
+                      variant="secondary"
                       className="bg-theme-elevated text-theme-muted"
                       onPress={loadMoreTransactions}
                       isLoading={isLoadingMore}
@@ -500,7 +500,7 @@ function StatCard({ icon, label, value, color, isLoading }: StatCardProps) {
       </div>
       <div className="mb-1 text-xs font-medium text-theme-subtle">{label}</div>
       {isLoading ? (
-        <Skeleton className="rounded-lg"><div className="h-7 w-16 rounded-lg bg-default-300" /></Skeleton>
+        <Skeleton className="rounded-lg"><div className="h-7 w-16 rounded-lg bg-surface-tertiary" /></Skeleton>
       ) : (
         <div className="text-2xl font-bold text-theme-primary">{value}</div>
       )}

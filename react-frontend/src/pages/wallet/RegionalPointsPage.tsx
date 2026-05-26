@@ -198,7 +198,7 @@ export default function RegionalPointsPage() {
         description={t('regional_points.subtitle')}
       />
 
-      <div className="flex flex-col gap-4 rounded-2xl border border-default-200 bg-surface/80 p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 rounded-2xl border border-border bg-surface/80 p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
           <h1 className="text-2xl font-bold flex items-center gap-2 text-foreground">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-warning/15 text-warning">
@@ -206,13 +206,13 @@ export default function RegionalPointsPage() {
             </span>
             {cfg.label || t('regional_points.title')}
           </h1>
-          <p className="text-sm text-default-500 mt-2 max-w-2xl">
+          <p className="text-sm text-muted mt-2 max-w-2xl">
             {t('regional_points.subtitle')}
           </p>
         </div>
         <Button
           size="sm"
-          variant="bordered"
+          variant="secondary"
           className="w-full sm:w-auto"
           startContent={<RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />}
           onPress={() => void load()}
@@ -224,33 +224,33 @@ export default function RegionalPointsPage() {
 
       {/* Balance */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="border border-default-200 bg-surface/80 shadow-sm">
+        <Card className="border border-border bg-surface/80 shadow-sm">
           <CardBody>
-            <p className="text-xs uppercase text-default-500 tracking-wide">
+            <p className="text-xs uppercase text-muted tracking-wide">
               {t('regional_points.balance')}
             </p>
             <p className="text-3xl font-bold tabular-nums mt-1">
-              {account.balance.toFixed(2)} <span className="text-base text-default-500">{symbol}</span>
+              {account.balance.toFixed(2)} <span className="text-base text-muted">{symbol}</span>
             </p>
           </CardBody>
         </Card>
-        <Card className="border border-default-200 bg-surface/80 shadow-sm">
+        <Card className="border border-border bg-surface/80 shadow-sm">
           <CardBody>
-            <p className="text-xs uppercase text-default-500 tracking-wide">
+            <p className="text-xs uppercase text-muted tracking-wide">
               {t('regional_points.lifetime_earned')}
             </p>
             <p className="text-3xl font-bold tabular-nums mt-1">
-              {account.lifetime_earned.toFixed(2)} <span className="text-base text-default-500">{symbol}</span>
+              {account.lifetime_earned.toFixed(2)} <span className="text-base text-muted">{symbol}</span>
             </p>
           </CardBody>
         </Card>
-        <Card className="border border-default-200 bg-surface/80 shadow-sm">
+        <Card className="border border-border bg-surface/80 shadow-sm">
           <CardBody>
-            <p className="text-xs uppercase text-default-500 tracking-wide">
+            <p className="text-xs uppercase text-muted tracking-wide">
               {t('regional_points.lifetime_spent')}
             </p>
             <p className="text-3xl font-bold tabular-nums mt-1">
-              {account.lifetime_spent.toFixed(2)} <span className="text-base text-default-500">{symbol}</span>
+              {account.lifetime_spent.toFixed(2)} <span className="text-base text-muted">{symbol}</span>
             </p>
           </CardBody>
         </Card>
@@ -258,7 +258,7 @@ export default function RegionalPointsPage() {
 
       {/* Transfer */}
       {cfg.member_transfers_enabled && (
-        <Card className="border border-default-200 bg-surface/80 shadow-sm">
+        <Card className="border border-border bg-surface/80 shadow-sm">
           <CardHeader className="flex items-center gap-2">
             <Send className="w-5 h-5 text-accent" />
             <h2 className="text-base font-semibold">
@@ -283,7 +283,7 @@ export default function RegionalPointsPage() {
                 min="0"
                 value={points}
                 onValueChange={setPoints}
-                endContent={<span className="text-default-400 text-xs">{symbol}</span>}
+                endContent={<span className="text-muted text-xs">{symbol}</span>}
               />
             </div>
             <Textarea
@@ -296,7 +296,6 @@ export default function RegionalPointsPage() {
             />
             <div className="flex justify-end">
               <Button
-                color="primary"
                 startContent={<Send className="w-4 h-4" />}
                 onPress={() => void handleTransfer()}
                 isLoading={submitting}
@@ -309,20 +308,20 @@ export default function RegionalPointsPage() {
       )}
 
       {/* History */}
-      <Card className="border border-default-200 bg-surface/80 shadow-sm">
+      <Card className="border border-border bg-surface/80 shadow-sm">
         <CardHeader className="flex items-center gap-2">
           <Coins className="w-5 h-5 text-warning" />
           <h2 className="text-base font-semibold">
             {t('regional_points.history.title')}
           </h2>
-          <Chip size="sm" variant="flat" className="ml-auto">
+          <Chip size="sm" variant="tertiary" className="ml-auto">
             {history?.length ?? 0}
           </Chip>
         </CardHeader>
         <Separator />
         <CardBody className="p-0">
           {!history || history.length === 0 ? (
-            <div className="text-center py-12 text-sm text-default-500">
+            <div className="text-center py-12 text-sm text-muted">
               {t('regional_points.history.empty')}
             </div>
           ) : (
@@ -350,12 +349,12 @@ export default function RegionalPointsPage() {
                             {row.type}
                           </span>
                         </TableCell>
-                        <TableCell className="text-default-600">{row.description || t('empty_dash')}</TableCell>
+                        <TableCell className="text-muted">{row.description || t('empty_dash')}</TableCell>
                         <TableCell className={`text-right tabular-nums ${inbound ? 'text-success' : 'text-danger'}`}>
                           {inbound ? '+' : '-'}
                           {row.points.toFixed(2)} {symbol}
                         </TableCell>
-                        <TableCell className="text-right tabular-nums text-default-500">
+                        <TableCell className="text-right tabular-nums text-muted">
                           {row.balance_after.toFixed(2)}
                         </TableCell>
                       </TableRow>

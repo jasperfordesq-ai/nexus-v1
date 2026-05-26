@@ -17,7 +17,7 @@ import { Avatar as HeroUIAvatar } from '@heroui/react';
 
 type HeroUIAvatarProps = ComponentPropsWithoutRef<typeof HeroUIAvatar>;
 type AvatarSize = 'sm' | 'md' | 'lg' | string;
-type AvatarColor = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
+type AvatarColor = 'default' | 'accent' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger';
 type AvatarRadius = 'none' | 'sm' | 'md' | 'lg' | 'full';
 
 export type AvatarProps = Omit<HTMLAttributes<HTMLDivElement>, 'color' | 'children'> & {
