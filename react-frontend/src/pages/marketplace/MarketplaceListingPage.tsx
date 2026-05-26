@@ -250,7 +250,7 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
           <>
             <Button
               isIconOnly
-              variant="flat"
+              variant="tertiary"
               size="sm"
               onPress={() => setActiveIndex((i) => (i - 1 + images.length) % images.length)}
               className="absolute left-2 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm"
@@ -260,7 +260,7 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
             </Button>
             <Button
               isIconOnly
-              variant="flat"
+              variant="tertiary"
               size="sm"
               onPress={() => setActiveIndex((i) => (i + 1) % images.length)}
               className="absolute right-2 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm"
@@ -273,7 +273,7 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
                 <Button
                   key={idx}
                   isIconOnly
-                  variant="light"
+                  variant="tertiary"
                   size="sm"
                   onPress={() => setActiveIndex(idx)}
                   className={`w-2 h-2 min-w-0 min-h-0 rounded-full p-0 ${
@@ -294,7 +294,7 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
             <Button
               key={img.id || idx}
               isIconOnly
-              variant="light"
+              variant="tertiary"
               size="sm"
               onPress={() => setActiveIndex(idx)}
               aria-label={t('listing.thumbnail_label', { n: idx + 1 })}
@@ -526,7 +526,7 @@ export function MarketplaceListingPage() {
           <Button
             as={Link}
             to={tenantPath('/marketplace')}
-            variant="light"
+            variant="tertiary"
             size="sm"
             startContent={<ArrowLeft className="w-4 h-4" />}
           >
@@ -560,12 +560,12 @@ export function MarketplaceListingPage() {
                 <div>
                   <span className="text-3xl font-bold text-foreground">{priceDisplay}</span>
                   {listing.price_type === 'negotiable' && (
-                    <Chip size="sm" color="warning" variant="flat" className="ml-2">
+                    <Chip size="sm" color="warning" variant="soft" className="ml-2">
                       {t('listing.negotiable')}
                     </Chip>
                   )}
                   {listing.price_type === 'free' && (
-                    <Chip size="sm" color="success" variant="flat" className="ml-2">
+                    <Chip size="sm" color="success" variant="soft" className="ml-2">
                       {t('listing.free')}
                     </Chip>
                   )}
@@ -573,7 +573,7 @@ export function MarketplaceListingPage() {
                 <div className="flex gap-1.5 shrink-0">
                   <Button
                     isIconOnly
-                    variant="flat"
+                    variant="tertiary"
                     size="sm"
                     onPress={handleShare}
                     aria-label={t('listing.share_aria')}
@@ -582,9 +582,8 @@ export function MarketplaceListingPage() {
                   </Button>
                   <Button
                     isIconOnly
-                    variant="flat"
+                    variant={listing.is_saved ? 'danger-soft' : 'tertiary'}
                     size="sm"
-                    color={listing.is_saved ? 'danger' : 'default'}
                     onPress={handleToggleSave}
                     aria-label={listing.is_saved ? t('listing.unsave_aria') : t('listing.save_aria')}
                   >
@@ -599,19 +598,19 @@ export function MarketplaceListingPage() {
                 {listing.condition && (
                   <Chip
                     size="sm"
-                    variant="flat"
+                    variant="soft"
                     color={CONDITION_COLORS[listing.condition] || 'default'}
                   >
                     {t(`condition.${listing.condition}`)}
                   </Chip>
                 )}
                 {listing.quantity > 1 && (
-                  <Chip size="sm" variant="flat" startContent={<Package className="w-3 h-3" />}>
+                  <Chip size="sm" variant="soft" startContent={<Package className="w-3 h-3" />}>
                     {t('listing.available_count', { count: listing.quantity })}
                   </Chip>
                 )}
                 {listing.is_promoted && (
-                  <Chip size="sm" color="warning" variant="flat" startContent={<Star className="w-3 h-3" />}>
+                  <Chip size="sm" color="warning" variant="soft" startContent={<Star className="w-3 h-3" />}>
                     {t('listing.featured')}
                   </Chip>
                 )}
@@ -659,7 +658,6 @@ export function MarketplaceListingPage() {
                 <div className="flex flex-col gap-2 sm:flex-row">
                   {listing.price_type !== 'free' && (
                     <Button
-                      color="primary"
                       fullWidth
                       startContent={<DollarSign className="w-4 h-4" />}
                       onPress={offerModal.onOpen}
@@ -669,7 +667,7 @@ export function MarketplaceListingPage() {
                     </Button>
                   )}
                   <Button
-                    variant="bordered"
+                    variant="secondary"
                     fullWidth
                     startContent={<MessageCircle className="w-4 h-4" />}
                     as={listing.user ? Link : undefined}
@@ -717,7 +715,7 @@ export function MarketplaceListingPage() {
                     )}
                   </div>
                   {listing.seller_type === 'business' && (
-                    <Chip size="sm" variant="flat" color="secondary" className="mt-1">
+                    <Chip size="sm" variant="soft" className="mt-1">
                       {t('listing.seller_type_business')}
                     </Chip>
                   )}
@@ -726,7 +724,7 @@ export function MarketplaceListingPage() {
               <Button
                 as={Link}
                 to={tenantPath(`/marketplace/seller/${listing.user.id}`)}
-                variant="flat"
+                variant="tertiary"
                 fullWidth
                 size="sm"
                 endContent={<ExternalLink className="w-3.5 h-3.5" />}
@@ -787,7 +785,7 @@ export function MarketplaceListingPage() {
               <Button
                 as={Link}
                 to={tenantPath(`/marketplace/seller/${listing.user?.id}`)}
-                variant="light"
+                variant="tertiary"
                 size="sm"
                 endContent={<ChevronRight className="w-4 h-4" />}
               >
@@ -836,9 +834,8 @@ export function MarketplaceListingPage() {
         {/* Report link */}
         <div className="flex justify-center pb-4">
           <Button
-            variant="light"
+            variant="danger-soft"
             size="sm"
-            color="danger"
             startContent={<Flag className="w-3.5 h-3.5" />}
             onPress={() => {
               if (!isAuthenticated) { toast.error(t('listing.sign_in_to_report')); return; }
@@ -868,7 +865,7 @@ export function MarketplaceListingPage() {
                 />
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>
+                <Button variant="tertiary" onPress={onClose}>
                   {t('offer.cancel')}
                 </Button>
                 <Button
@@ -923,11 +920,10 @@ export function MarketplaceListingPage() {
                 />
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>
+                <Button variant="tertiary" onPress={onClose}>
                   {t('offer.cancel')}
                 </Button>
                 <Button
-                  color="primary"
                   onPress={handleMakeOffer}
                   isLoading={isSubmittingOffer}
                   isDisabled={!offerAmount || parseFloat(offerAmount) <= 0}
