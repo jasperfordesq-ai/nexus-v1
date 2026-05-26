@@ -3,7 +3,14 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { type ComponentPropsWithoutRef, type ReactNode } from 'react';
+import {
+  Children,
+  cloneElement,
+  Fragment,
+  isValidElement,
+  type ComponentPropsWithoutRef,
+  type ReactNode,
+} from 'react';
 import { Table as HeroUITable } from '@heroui/react';
 
 type HeroUITableProps = ComponentPropsWithoutRef<typeof HeroUITable>;
@@ -65,11 +72,11 @@ export type TableColumnProps = Omit<HeroUITableColumnProps, 'align' | 'className
   scope?: string;
   title?: string;
 };
-export type TableBodyProps = Omit<HeroUITableBodyProps, 'children' | 'isLoading' | 'items' | 'renderEmptyState'> & {
-  children?: ReactNode | ((item: any) => ReactNode);
+export type TableBodyProps<T extends object = object> = Omit<HeroUITableBodyProps, 'children' | 'isLoading' | 'items' | 'renderEmptyState'> & {
+  children?: ReactNode | ((item: T) => ReactNode);
   emptyContent?: ReactNode;
   isLoading?: boolean;
-  items?: Iterable<any>;
+  items?: Iterable<T>;
   loadingContent?: ReactNode;
   loadingState?: 'idle' | 'loading' | 'loadingMore' | 'sorting' | 'error' | 'filtering';
   renderEmptyState?: HeroUITableBodyProps['renderEmptyState'];
@@ -160,10 +167,6 @@ export function Table({
   );
 }
 
-export function TableHeader({ className, ...props }: TableHeaderProps) {
-  return <HeroUITable.Header className={className} {...props} />;
-}
-
 function getAlignClass(align?: TableColumnProps['align']): string | undefined {
   if (align === 'center') {
     return 'text-center';
@@ -180,14 +183,56 @@ export function TableColumn({ align, className, scope: _scope, ...props }: Table
   return <HeroUITable.Column className={combineClasses(getAlignClass(align), className)} {...props} />;
 }
 
-export function TableBody({
+function withDefaultRowHeader(children: TableHeaderProps['children']) {
+  if (typeof children === 'function') {
+    return children;
+  }
+
+  const columns = Children.toArray(children);
+
+  if (
+    columns.some(
+      (child) =>
+        isValidElement<Partial<TableColumnProps>>(child) &&
+        Boolean(child.props.isRowHeader)
+    )
+  ) {
+    return children;
+  }
+
+  let didSetRowHeader = false;
+
+  return columns.map((child) => {
+    if (
+      didSetRowHeader ||
+      !isValidElement<Partial<TableColumnProps>>(child) ||
+      child.type === Fragment
+    ) {
+      return child;
+    }
+
+    didSetRowHeader = true;
+    return cloneElement(child, { isRowHeader: true });
+  });
+}
+
+export function TableHeader({ children, className, ...props }: TableHeaderProps) {
+  return (
+    <HeroUITable.Header className={className} {...props}>
+      {withDefaultRowHeader(children)}
+    </HeroUITable.Header>
+  );
+}
+
+export function TableBody<T extends object = object>({
+  children,
   emptyContent,
   isLoading: isLoadingProp,
   loadingContent,
   loadingState,
   renderEmptyState,
   ...props
-}: TableBodyProps) {
+}: TableBodyProps<T>) {
   const isLoading = isLoadingProp || loadingState === 'loading' || loadingState === 'loadingMore';
   const resolvedRenderEmptyState =
     renderEmptyState ??
@@ -202,7 +247,7 @@ export function TableBody({
       renderEmptyState={resolvedRenderEmptyState}
       {...(props as HeroUITableBodyProps)}
     >
-      {props.children}
+      {children as HeroUITableBodyProps['children']}
     </HeroUITable.Body>
   );
 }
