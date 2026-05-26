@@ -439,12 +439,11 @@ export function MerchantOnboardingPage() {
         <PartyPopper size={56} className="mx-auto text-warning" />
         <h1 className="text-3xl font-bold text-[var(--color-text)]">{t('success_title')}</h1>
         {badgeGranted && (
-          <Chip color="warning" variant="flat" startContent={<Award size={14} />}>
+          <Chip color="warning" variant="soft" startContent={<Award size={14} />}>
             {t('badge_earned')}
           </Chip>
         )}
         <Button
-          color="primary"
           size="lg"
           endContent={<ArrowRight size={16} />}
           onPress={() => navigate(tenantPath('/marketplace/listings/new'))}
@@ -508,7 +507,7 @@ export function MerchantOnboardingPage() {
             {sellerType === 'business' && (
               <Input
                 label={t('business_name')}
-                variant="bordered"
+                variant="secondary"
                 value={businessName}
                 onValueChange={setBusinessName}
                 isRequired
@@ -517,14 +516,14 @@ export function MerchantOnboardingPage() {
 
             <Input
               label={t('display_name')}
-              variant="bordered"
+              variant="secondary"
               value={displayName}
               onValueChange={setDisplayName}
             />
 
             <Textarea
               label={t('bio')}
-              variant="bordered"
+              variant="secondary"
               value={bio}
               onValueChange={setBio}
               minRows={3}
@@ -534,7 +533,7 @@ export function MerchantOnboardingPage() {
             {sellerType === 'business' && (
               <Input
                 label={t('business_reg')}
-                variant="bordered"
+                variant="secondary"
                 value={businessReg}
                 onValueChange={setBusinessReg}
               />
@@ -553,26 +552,26 @@ export function MerchantOnboardingPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input
                 label={t('address_street')}
-                variant="bordered"
+                variant="secondary"
                 className="sm:col-span-2"
                 value={address.street}
                 onValueChange={v => setAddress(a => ({ ...a, street: v }))}
               />
               <Input
                 label={t('address_city')}
-                variant="bordered"
+                variant="secondary"
                 value={address.city}
                 onValueChange={v => setAddress(a => ({ ...a, city: v }))}
               />
               <Input
                 label={t('address_postal')}
-                variant="bordered"
+                variant="secondary"
                 value={address.postal_code}
                 onValueChange={v => setAddress(a => ({ ...a, postal_code: v }))}
               />
               <Input
                 label={t('address_country')}
-                variant="bordered"
+                variant="secondary"
                 className="sm:col-span-2"
                 value={address.country}
                 onValueChange={v => setAddress(a => ({ ...a, country: v }))}
@@ -608,7 +607,7 @@ export function MerchantOnboardingPage() {
                           <Input
                             type="time"
                             size="sm"
-                            variant="bordered"
+                            variant="secondary"
                             aria-label={t('open_time')}
                             value={hours.open}
                             onValueChange={value => setDayTime(day, 'open', value)}
@@ -622,7 +621,7 @@ export function MerchantOnboardingPage() {
                           <Input
                             type="time"
                             size="sm"
-                            variant="bordered"
+                            variant="secondary"
                             aria-label={t('close_time')}
                             value={hours.close}
                             onValueChange={value => setDayTime(day, 'close', value)}
@@ -674,7 +673,7 @@ export function MerchantOnboardingPage() {
                 }}
               />
               <Button
-                variant="bordered"
+                variant="secondary"
                 startContent={uploadingAvatar ? <Spinner size="sm" /> : <Upload size={16} />}
                 isDisabled={uploadingAvatar}
                 onPress={() => avatarInputRef.current?.click()}
@@ -685,7 +684,7 @@ export function MerchantOnboardingPage() {
               {!avatarPreview && (
                 <Input
                   label="or paste image URL"
-                  variant="flat"
+                  variant="secondary"
                   size="sm"
                   value={avatarUrl}
                   onValueChange={v => {
@@ -717,7 +716,7 @@ export function MerchantOnboardingPage() {
                 }}
               />
               <Button
-                variant="flat"
+                variant="secondary"
                 size="sm"
                 startContent={uploadingCover ? <Spinner size="sm" /> : <Upload size={14} />}
                 isDisabled={uploadingCover}
@@ -775,7 +774,6 @@ export function MerchantOnboardingPage() {
             </div>
 
             <Button
-              color="primary"
               size="lg"
               className="w-full font-semibold"
               isLoading={saving}
@@ -795,12 +793,11 @@ export function MerchantOnboardingPage() {
               {t('success_title')}
             </h2>
             {badgeGranted && (
-              <Chip color="warning" variant="flat" startContent={<Award size={14} />} size="lg">
+              <Chip color="warning" variant="soft" startContent={<Award size={14} />} size="lg">
                 {t('badge_earned')}
               </Chip>
             )}
             <Button
-              color="primary"
               size="lg"
               endContent={<ArrowRight size={16} />}
               onPress={() => navigate(tenantPath('/marketplace/listings/new'))}
@@ -814,7 +811,7 @@ export function MerchantOnboardingPage() {
         {step < 4 && (
           <div className="flex justify-between mt-6 pt-4 border-t border-separator">
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<ArrowLeft size={16} />}
               isDisabled={step === 1 || saving}
               onPress={handleBack}
@@ -822,7 +819,6 @@ export function MerchantOnboardingPage() {
               {t('back')}
             </Button>
             <Button
-              color="primary"
               endContent={saving ? undefined : <ArrowRight size={16} />}
               isLoading={saving}
               isDisabled={saving}
