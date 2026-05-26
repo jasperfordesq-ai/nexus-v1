@@ -11,6 +11,7 @@
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Chip } from '@heroui/react';
 import { Badge } from '@/components/ui';
 import MoreVertical from 'lucide-react/icons/ellipsis-vertical';
 import Clock from 'lucide-react/icons/clock';
@@ -37,7 +38,7 @@ import { parseServerTimestamp,
   formatServerDate,
   formatServerDateTime } from '@/lib/serverTime';
 
-import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab, Tooltip } from '@/components/ui';
+import { Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab, Tooltip } from '@/components/ui';
 // ─────────────────────────────────────────────────────────────────────────────
 // Types & Constants
 // ─────────────────────────────────────────────────────────────────────────────
@@ -324,15 +325,16 @@ export default function MembersPage() {
           <div className="flex flex-col gap-1">
             <Chip
               size="sm"
-              variant="flat"
+              variant="tertiary"
               color={STATUS_COLOR[user.status] ?? 'default'}
               className="capitalize"
             >
               {t(`status.${user.status}`)}
             </Chip>
             {user.onboarding_completed === false && user.status !== 'pending' && (
-              <Chip size="sm" variant="dot" color="warning" className="text-xs">
-                {t('members.onboarding_incomplete')}
+              <Chip size="sm" variant="soft" color="warning" className="text-xs">
+                <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
+                <Chip.Label>{t('members.onboarding_incomplete')}</Chip.Label>
               </Chip>
             )}
           </div>
@@ -591,7 +593,7 @@ export default function MembersPage() {
                           {note.category && (
                             <>
                               <span>&middot;</span>
-                              <Chip size="sm" variant="flat" className="text-xs capitalize">{note.category}</Chip>
+                              <Chip size="sm" variant="tertiary" className="text-xs capitalize">{note.category}</Chip>
                             </>
                           )}
                         </div>

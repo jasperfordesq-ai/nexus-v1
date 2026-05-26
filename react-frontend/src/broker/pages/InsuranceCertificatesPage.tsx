@@ -1,4 +1,4 @@
-import { Select, SelectItem, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab } from '@/components/ui';
+import { Select, SelectItem, Button, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -14,6 +14,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router-dom';
 
+import { Chip } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
@@ -55,9 +56,9 @@ const INSURANCE_TYPE_LABEL_KEYS: Record<(typeof INSURANCE_TYPE_KEYS)[number], st
   other: 'insurance.type_other',
 };
 
-const STATUS_COLOR_MAP: Record<string, 'warning' | 'success' | 'danger' | 'primary' | 'default'> = {
+const STATUS_COLOR_MAP: Record<string, 'warning' | 'success' | 'danger' | 'accent' | 'default'> = {
   pending: 'warning',
-  submitted: 'primary',
+  submitted: 'accent',
   verified: 'success',
   expired: 'danger',
   rejected: 'danger',
@@ -494,7 +495,7 @@ export function InsuranceCertificates() {
       label: t('insurance.col_type'),
       sortable: true,
       render: (item) => (
-        <Chip size="sm" variant="flat" color="primary">
+        <Chip size="sm" variant="tertiary" color="accent">
           {formatInsuranceType(item.insurance_type)}
         </Chip>
       ),
@@ -506,7 +507,7 @@ export function InsuranceCertificates() {
       render: (item) => (
         <Chip
           size="sm"
-          variant="flat"
+          variant="tertiary"
           color={STATUS_COLOR_MAP[item.status] || 'default'}
           className="capitalize"
         >
@@ -1088,7 +1089,7 @@ export function InsuranceCertificates() {
                 </div>
                 <div>
                   <p className="text-default-400">{t('insurance.label_status')}</p>
-                  <Chip size="sm" variant="flat" color={STATUS_COLOR_MAP[viewItem.status] || 'default'} className="capitalize">
+                  <Chip size="sm" variant="tertiary" color={STATUS_COLOR_MAP[viewItem.status] || 'default'} className="capitalize">
                     {t(`status.${viewItem.status}`)}
                   </Chip>
                 </div>

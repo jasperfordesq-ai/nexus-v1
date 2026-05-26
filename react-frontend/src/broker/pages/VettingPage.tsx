@@ -1,4 +1,4 @@
-import { Select, SelectItem, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab, Checkbox } from '@/components/ui';
+import { Select, SelectItem, Button, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab, Checkbox } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -14,6 +14,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router-dom';
 
+import { Chip } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
@@ -49,9 +50,9 @@ const VETTING_TYPE_KEYS: Record<string, string> = {
   other: 'type_other',
 };
 
-const STATUS_COLOR_MAP: Record<string, 'warning' | 'success' | 'danger' | 'primary' | 'default'> = {
+const STATUS_COLOR_MAP: Record<string, 'warning' | 'success' | 'danger' | 'accent' | 'default'> = {
   pending: 'warning',
-  submitted: 'primary',
+  submitted: 'accent',
   verified: 'success',
   expired: 'danger',
   rejected: 'danger',
@@ -572,7 +573,7 @@ export function VettingRecords() {
       label: t('vetting.col_type'),
       sortable: true,
       render: (item) => (
-        <Chip size="sm" variant="flat" color="primary">
+        <Chip size="sm" variant="tertiary" color="accent">
           {getTypeLabel(item.vetting_type)}
         </Chip>
       ),
@@ -584,7 +585,7 @@ export function VettingRecords() {
       render: (item) => (
         <Chip
           size="sm"
-          variant="flat"
+          variant="tertiary"
           color={STATUS_COLOR_MAP[item.status] || 'default'}
           className="capitalize"
         >
@@ -636,13 +637,17 @@ export function VettingRecords() {
       render: (item) => (
         <div className="flex gap-1">
           {item.works_with_children && (
-            <Chip size="sm" variant="dot" color="warning" startContent={<Baby size={10} />}>
-              {t('vetting.works_with_children')}
+            <Chip size="sm" variant="soft" color="warning">
+              <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
+              <Baby size={10} />
+              <Chip.Label>{t('vetting.works_with_children')}</Chip.Label>
             </Chip>
           )}
           {item.works_with_vulnerable_adults && (
-            <Chip size="sm" variant="dot" color="warning" startContent={<HeartHandshake size={10} />}>
-              {t('vetting.works_with_vulnerable_adults')}
+            <Chip size="sm" variant="soft" color="warning">
+              <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
+              <HeartHandshake size={10} />
+              <Chip.Label>{t('vetting.works_with_vulnerable_adults')}</Chip.Label>
             </Chip>
           )}
           {!item.works_with_children && !item.works_with_vulnerable_adults && (
@@ -1248,7 +1253,7 @@ export function VettingRecords() {
                 </div>
                 <div>
                   <p className="text-default-400">{t('vetting.col_status')}</p>
-                  <Chip size="sm" variant="flat" color={STATUS_COLOR_MAP[viewItem.status] || 'default'} className="capitalize">
+                  <Chip size="sm" variant="tertiary" color={STATUS_COLOR_MAP[viewItem.status] || 'default'} className="capitalize">
                     {t(`status.${viewItem.status}`)}
                   </Chip>
                 </div>
@@ -1311,18 +1316,21 @@ export function VettingRecords() {
 
               <div className="mt-4 flex gap-2 flex-wrap">
                 {viewItem.works_with_children && (
-                  <Chip size="sm" variant="flat" color="warning" startContent={<Baby size={12} />}>
-                    {t('vetting.works_with_children')}
+                  <Chip size="sm" variant="tertiary" color="warning">
+                    <Baby size={12} />
+                    <Chip.Label>{t('vetting.works_with_children')}</Chip.Label>
                   </Chip>
                 )}
                 {viewItem.works_with_vulnerable_adults && (
-                  <Chip size="sm" variant="flat" color="warning" startContent={<HeartHandshake size={12} />}>
-                    {t('vetting.works_with_vulnerable_adults')}
+                  <Chip size="sm" variant="tertiary" color="warning">
+                    <HeartHandshake size={12} />
+                    <Chip.Label>{t('vetting.works_with_vulnerable_adults')}</Chip.Label>
                   </Chip>
                 )}
                 {viewItem.requires_enhanced_check && (
-                  <Chip size="sm" variant="flat" color="danger" startContent={<ShieldAlert size={12} />}>
-                    {t('vetting.requires_enhanced_check')}
+                  <Chip size="sm" variant="tertiary" color="danger">
+                    <ShieldAlert size={12} />
+                    <Chip.Label>{t('vetting.requires_enhanced_check')}</Chip.Label>
                   </Chip>
                 )}
               </div>

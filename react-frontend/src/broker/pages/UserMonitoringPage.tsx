@@ -1,4 +1,4 @@
-import { Select, SelectItem, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch } from '@/components/ui';
+import { Select, SelectItem, Button, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -13,6 +13,7 @@ import { Select, SelectItem, Button, Chip, Spinner, Input, Textarea, Modal, Moda
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
+import { Chip } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Eye from 'lucide-react/icons/eye';
 import MessageCircleOff from 'lucide-react/icons/message-circle-off';
@@ -235,20 +236,20 @@ export function UserMonitoring() {
         <div className="flex flex-wrap gap-1">
           <Chip
             size="sm"
-            variant="flat"
+            variant="tertiary"
             color={item.under_monitoring ? 'warning' : 'default'}
-            startContent={<Eye size={12} />}
           >
-            {t('monitoring.status_monitored')}
+            <Eye size={12} />
+            <Chip.Label>{t('monitoring.status_monitored')}</Chip.Label>
           </Chip>
           {item.messaging_disabled && (
             <Chip
               size="sm"
-              variant="flat"
+              variant="tertiary"
               color="danger"
-              startContent={<MessageCircleOff size={12} />}
             >
-              {t('monitoring.status_messaging_off')}
+              <MessageCircleOff size={12} />
+              <Chip.Label>{t('monitoring.status_messaging_off')}</Chip.Label>
             </Chip>
           )}
         </div>
@@ -289,7 +290,7 @@ export function UserMonitoring() {
         return (
           <Chip
             size="sm"
-            variant="flat"
+            variant="tertiary"
             color={isExpired ? 'danger' : 'default'}
           >
             {expiresAt.toLocaleDateString()}
@@ -384,7 +385,7 @@ export function UserMonitoring() {
                   <p className="text-sm font-medium text-foreground truncate">{selectedUser.name}</p>
                   <p className="text-xs text-default-500 truncate">{selectedUser.email}</p>
                 </div>
-                <Chip size="sm" variant="flat" color={selectedUser.status === 'active' ? 'success' : 'default'}>
+                <Chip size="sm" variant="tertiary" color={selectedUser.status === 'active' ? 'success' : 'default'}>
                   {t(`status.${selectedUser.status}`)}
                 </Chip>
                 <Button
@@ -446,7 +447,7 @@ export function UserMonitoring() {
                           <p className="text-sm font-medium text-foreground truncate">{user.name}</p>
                           <p className="text-xs text-default-500 truncate">{user.email}</p>
                         </div>
-                        <Chip size="sm" variant="flat" color={user.status === 'active' ? 'success' : 'default'}>
+                        <Chip size="sm" variant="tertiary" color={user.status === 'active' ? 'success' : 'default'}>
                           {t(`status.${user.status}`)}
                         </Chip>
                       </li>
