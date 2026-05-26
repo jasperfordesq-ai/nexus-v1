@@ -228,8 +228,8 @@ export function CaringCommunityPage() {
                       key={item.key}
                       as={Link}
                       to={tenantPath(item.href)}
-                      className="group h-auto min-h-28 w-full min-w-0 flex-col items-start justify-between gap-3 whitespace-normal bg-theme-elevated px-4 py-4 text-theme-primary transition-colors hover:bg-[var(--color-surface-hover)]"
-                      variant="flat"
+                      className="group min-h-28 w-full min-w-0 flex-col items-start justify-between gap-3 whitespace-normal bg-theme-elevated px-4 py-4 text-theme-primary transition-colors hover:bg-[var(--color-surface-hover)]"
+                      variant="tertiary"
                     >
                       <span className="flex w-full min-w-0 items-start gap-3">
                         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">

@@ -140,8 +140,8 @@ export function OnboardingChoiceModal({ isOpen, onChoice, onClose, tenantScope }
                 <Button
                   key={c.choice}
                   type="button"
-                  variant="bordered"
-                  className="h-auto w-full justify-start border-theme-default bg-theme-elevated p-4 text-left"
+                  variant="outline"
+                  className="min-h-20 w-full justify-start border-theme-default bg-theme-elevated p-4 text-left"
                   onPress={() => handlePick(c.choice)}
                 >
                   <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">

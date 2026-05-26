@@ -174,8 +174,8 @@ export function LinkCareReceiverPage() {
 
                           <Button
                             type="button"
-                            variant="light"
-                            className="h-auto w-full justify-start rounded-none px-4 py-3 text-left"
+                            variant="tertiary"
+                            className="min-h-14 w-full justify-start rounded-none px-4 py-3 text-left"
                             startContent={
                               <Avatar
                                 src={user.avatar_url ?? undefined}

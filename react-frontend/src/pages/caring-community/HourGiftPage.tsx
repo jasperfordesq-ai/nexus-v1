@@ -333,8 +333,8 @@ export function HourGiftPage() {
                             <li key={m.id}>
                               <Button
                                 type="button"
-                                variant="light"
-                                className="h-auto w-full justify-start rounded-none px-3 py-2 text-left"
+                                variant="tertiary"
+                                className="min-h-12 w-full justify-start rounded-none px-3 py-2 text-left"
                                 startContent={
                                   <Avatar
                                     src={m.profile_photo ?? m.avatar_url ?? undefined}
