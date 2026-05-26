@@ -358,7 +358,7 @@ export default function MunicipalImpactReportsPage() {
             <Button
               as={Link}
               to={tenantPath('/admin/community-analytics')}
-              variant="flat"
+              variant="secondary"
               size="sm"
               startContent={<BarChart3 size={16} />}
             >
@@ -367,15 +367,14 @@ export default function MunicipalImpactReportsPage() {
             <Button
               as={Link}
               to={tenantPath('/admin/impact-report')}
-              variant="flat"
+              variant="secondary"
               size="sm"
               startContent={<FileText size={16} />}
             >
               {t('municipal_reports.actions.impact_report')}
             </Button>
             <Button
-              variant="solid"
-              color="primary"
+              variant="primary"
               size="sm"
               isLoading={exporting === 'csv'}
               startContent={<Download size={16} />}
@@ -384,7 +383,7 @@ export default function MunicipalImpactReportsPage() {
               {t('municipal_reports.actions.export_csv')}
             </Button>
             <Button
-              variant="flat"
+              variant="secondary"
               size="sm"
               isLoading={exporting === 'pdf'}
               startContent={<FileText size={16} />}
@@ -396,23 +395,23 @@ export default function MunicipalImpactReportsPage() {
         }
       />
 
-      <p className="mb-2 text-xs text-default-400">
+      <p className="mb-2 text-xs text-muted">
         <strong>{t('municipal_reports.export_note.pdf_label')}</strong>{t('municipal_reports.export_note.pdf_text')}{' '}
         <strong>{t('municipal_reports.export_note.csv_label')}</strong>{t('municipal_reports.export_note.csv_text')}
       </p>
 
-      <Card className="mb-4 border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="mb-4 border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('municipal_reports.about.title')}</p>
-              <p className="text-default-600">
+              <p className="text-foreground/70">
                 {t('municipal_reports.about.body_1_before_kiss')} <Abbr term={t('municipal_reports.about.kiss_abbr')}>{t('municipal_reports.about.kiss_abbr')}</Abbr>
                 {t('municipal_reports.about.body_1_after_kiss')} <Abbr term={t('municipal_reports.about.chf_abbr')}>{t('municipal_reports.about.chf_abbr')}</Abbr>
                 {t('municipal_reports.about.body_1_after_chf')}
               </p>
-              <p className="text-default-500">
+              <p className="text-muted">
                 {t('municipal_reports.about.body_2_prefix')} <strong>{t('municipal_reports.audience_selector.title')}</strong>
                 {t('municipal_reports.about.body_2_after_audience')} <strong>{t('municipal_reports.templates.audiences.canton')}</strong>
                 {t('municipal_reports.about.body_2_after_canton')}{' '}
@@ -424,23 +423,23 @@ export default function MunicipalImpactReportsPage() {
         </CardBody>
       </Card>
 
-      <Card className="mb-4" shadow="sm">
+      <Card className="mb-4 border border-border bg-surface">
         <CardBody className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="text-xs font-medium uppercase text-default-500">{t('municipal_reports.audience_selector.title')}</p>
-            <p className="text-sm text-default-600">
+            <p className="text-xs font-medium uppercase text-muted">{t('municipal_reports.audience_selector.title')}</p>
+            <p className="text-sm text-foreground/70">
               {t('municipal_reports.audience_selector.description')}
             </p>
           </div>
-          <div className="inline-flex rounded-lg border border-default-200 bg-default-50 p-1">
+          <div className="inline-flex min-h-10 rounded-lg border border-border bg-surface-secondary p-1">
             {(['canton', 'municipality', 'cooperative'] as const).map((mode) => {
               const active = audienceMode === mode;
               return (
                 <Button
                   key={mode}
                   size="sm"
-                  color={active ? 'primary' : 'default'}
-                  variant={active ? 'solid' : 'light'}
+                  className="min-h-8"
+                  variant={active ? 'primary' : 'tertiary'}
                   aria-pressed={active}
                   onPress={() => setAudienceMode(mode)}
                 >
@@ -455,8 +454,8 @@ export default function MunicipalImpactReportsPage() {
       <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-4">
         <StatCard label={t('municipal_reports.stats.verified_hours')} value={formatHours(metric('verified_hours'))} icon={Heart} color="success" />
         <StatCard label={t('municipal_reports.stats.participants')} value={metric('participating_members').toLocaleString()} icon={Users} color="warning" />
-        <StatCard label={t('municipal_reports.stats.organisations')} value={metric('trusted_organisations').toLocaleString()} icon={Building2} color="primary" />
-        <StatCard label={t('municipal_reports.stats.total_value')} value={currencyFormatter.format(metric('total_value'))} icon={Download} color="secondary" />
+        <StatCard label={t('municipal_reports.stats.organisations')} value={metric('trusted_organisations').toLocaleString()} icon={Building2} color="success" />
+        <StatCard label={t('municipal_reports.stats.total_value')} value={currencyFormatter.format(metric('total_value'))} icon={Download} color="default" />
       </div>
 
       {loading && (
@@ -466,33 +465,33 @@ export default function MunicipalImpactReportsPage() {
       )}
 
       {!loading && summary && (
-        <Card className="mb-6" shadow="sm">
+        <Card className="mb-6 border border-border bg-surface">
           <CardBody className="grid grid-cols-1 gap-4 md:grid-cols-5">
             <div>
-              <p className="text-xs font-medium uppercase text-default-500">{t('municipal_reports.period')}</p>
-              <p className="mt-1 text-sm font-semibold text-default-800">{summary.period.from} - {summary.period.to}</p>
+              <p className="text-xs font-medium uppercase text-muted">{t('municipal_reports.period')}</p>
+              <p className="mt-1 text-sm font-semibold text-foreground">{summary.period.from} - {summary.period.to}</p>
             </div>
             <div>
-              <p className="text-xs font-medium uppercase text-default-500">{t('municipal_reports.audience')}</p>
-              <p className="mt-1 text-sm font-semibold text-default-800">
+              <p className="text-xs font-medium uppercase text-muted">{t('municipal_reports.audience')}</p>
+              <p className="mt-1 text-sm font-semibold text-foreground">
                 {t(`municipal_reports.templates.audiences.${reportAudience}`)}
               </p>
             </div>
             <div>
-              <p className="text-xs font-medium uppercase text-default-500">{t('municipal_reports.hour_value')}</p>
-              <p className="mt-1 text-sm font-semibold text-default-800">{currencyFormatter.format(summary.hour_value)}</p>
+              <p className="text-xs font-medium uppercase text-muted">{t('municipal_reports.hour_value')}</p>
+              <p className="mt-1 text-sm font-semibold text-foreground">{currencyFormatter.format(summary.hour_value)}</p>
             </div>
             <div>
-              <p className="text-xs font-medium uppercase text-default-500">{t('municipal_reports.multiplier')}</p>
-              <p className="mt-1 text-sm font-semibold text-default-800">
+              <p className="text-xs font-medium uppercase text-muted">{t('municipal_reports.multiplier')}</p>
+              <p className="mt-1 text-sm font-semibold text-foreground">
                 {summary.policy?.include_social_value_estimate === false
                   ? t('municipal_reports.values.disabled')
                   : `${summary.social_multiplier}x`}
               </p>
             </div>
             <div>
-              <p className="text-xs font-medium uppercase text-default-500">{t('municipal_reports.policy_default')}</p>
-              <p className="mt-1 text-sm font-semibold text-default-800">
+              <p className="text-xs font-medium uppercase text-muted">{t('municipal_reports.policy_default')}</p>
+              <p className="mt-1 text-sm font-semibold text-foreground">
                 {t(`caring_workflow.policy.periods.${summary.policy?.default_period ?? 'last_90_days'}`)}
               </p>
             </div>
@@ -500,30 +499,33 @@ export default function MunicipalImpactReportsPage() {
         </Card>
       )}
 
-      <Card className="mb-6" shadow="sm">
+      <Card className="mb-6 border border-border bg-surface">
         <CardHeader className="flex flex-col items-start gap-1">
           <h2 className="text-base font-semibold">{t('municipal_reports.filters.title')}</h2>
-          <p className="text-sm text-default-500">{t('municipal_reports.filters.description')}</p>
+          <p className="text-sm text-muted">{t('municipal_reports.filters.description')}</p>
         </CardHeader>
         <Separator />
         <CardBody className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_1fr_auto_auto]">
           <Input
             type="date"
+            variant="secondary"
             label={t('municipal_reports.filters.date_from')}
             value={dateFilters.dateFrom}
             onValueChange={(dateFrom) => setDateFilters((filters) => ({ ...filters, dateFrom }))}
           />
           <Input
             type="date"
+            variant="secondary"
             label={t('municipal_reports.filters.date_to')}
             value={dateFilters.dateTo}
             onValueChange={(dateTo) => setDateFilters((filters) => ({ ...filters, dateTo }))}
           />
-          <Button variant="flat" onPress={loadSummary} isLoading={loading}>
+          <Button className="min-h-10 md:self-end" variant="secondary" onPress={loadSummary} isLoading={loading}>
             {t('municipal_reports.filters.apply')}
           </Button>
           <Button
-            variant="light"
+            className="min-h-10 md:self-end"
+            variant="tertiary"
             onPress={() => setDateFilters({ dateFrom: '', dateTo: '' })}
             isDisabled={!dateFilters.dateFrom && !dateFilters.dateTo}
           >
@@ -532,7 +534,7 @@ export default function MunicipalImpactReportsPage() {
         </CardBody>
       </Card>
 
-      <Card className="mb-6" shadow="sm">
+      <Card className="mb-6 border border-border bg-surface">
         <CardHeader className="flex flex-col items-start gap-3 md:flex-row md:items-center">
           <div className="flex items-start gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent">
@@ -540,13 +542,12 @@ export default function MunicipalImpactReportsPage() {
             </div>
             <div>
               <h2 className="text-base font-semibold">{t('municipal_reports.templates.title')}</h2>
-              <p className="mt-1 text-sm text-default-500">{t('municipal_reports.templates.description')}</p>
+              <p className="mt-1 text-sm text-muted">{t('municipal_reports.templates.description')}</p>
             </div>
           </div>
           <Button
             className="md:ml-auto"
-            color="primary"
-            variant="flat"
+            variant="secondary"
             size="sm"
             startContent={<Plus size={16} />}
             onPress={openTemplateModal}
@@ -559,6 +560,7 @@ export default function MunicipalImpactReportsPage() {
           <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
             <Select
               label={t('municipal_reports.templates.select_label')}
+              variant="secondary"
               selectedKeys={[selectedTemplateId ? String(selectedTemplateId) : 'default']}
               isLoading={templatesLoading}
               onSelectionChange={(keys) => {
@@ -570,7 +572,8 @@ export default function MunicipalImpactReportsPage() {
               {(item) => <SelectItem key={item.id} id={item.id}>{item.label}</SelectItem>}
             </Select>
             <Button
-              variant="flat"
+              className="min-h-10 md:self-end"
+              variant="secondary"
               startContent={<Save size={16} />}
               onPress={loadSummary}
               isLoading={loading}
@@ -580,29 +583,28 @@ export default function MunicipalImpactReportsPage() {
           </div>
 
           {selectedTemplate && (
-            <div className="grid grid-cols-1 gap-3 rounded-lg border border-default-200 p-3 md:grid-cols-[minmax(0,1fr)_auto]">
+            <div className="grid grid-cols-1 gap-3 rounded-lg border border-border bg-surface-secondary p-3 md:grid-cols-[minmax(0,1fr)_auto]">
               <div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-sm font-semibold text-default-800">{selectedTemplate.name}</p>
-                  <Chip size="sm" variant="flat" color="primary">
+                  <p className="text-sm font-semibold text-foreground">{selectedTemplate.name}</p>
+                  <Chip size="sm" variant="soft" color="accent">
                     {t(`municipal_reports.templates.audiences.${selectedTemplate.audience}`)}
                   </Chip>
-                  <Chip size="sm" variant="flat" color="secondary">
+                  <Chip size="sm" variant="soft">
                     {t(`caring_workflow.policy.periods.${selectedTemplate.date_preset}`)}
                   </Chip>
                   {selectedTemplate.hour_value_chf !== null && (
-                    <Chip size="sm" variant="flat" color="success">
+                    <Chip size="sm" variant="soft" color="success">
                       {t('municipal_reports.templates.hour_value_chip', { value: selectedTemplate.hour_value_chf })}
                     </Chip>
                   )}
                 </div>
                 {selectedTemplate.description && (
-                  <p className="mt-2 text-sm text-default-500">{selectedTemplate.description}</p>
+                  <p className="mt-2 text-sm text-muted">{selectedTemplate.description}</p>
                 )}
               </div>
               <Button
-                color="danger"
-                variant="light"
+                variant="danger-soft"
                 size="sm"
                 startContent={<Trash2 size={16} />}
                 isLoading={deletingTemplateId === selectedTemplate.id}
@@ -620,28 +622,28 @@ export default function MunicipalImpactReportsPage() {
           const Icon = report.icon;
           const value = report.statKey === 'pending_hours' ? formatHours(metric(report.statKey)) : metric(report.statKey).toLocaleString();
           return (
-            <Card key={report.key} shadow="sm">
+            <Card key={report.key} className="border border-border bg-surface">
               <CardHeader className="flex items-start gap-3">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
                   <Icon size={20} />
                 </div>
                 <div>
                   <h2 className="text-base font-semibold">{t(`municipal_reports.cards.${report.key}.title`)}</h2>
-                  <p className="mt-1 text-sm text-default-500">{t(`municipal_reports.cards.${report.key}.description`)}</p>
+                  <p className="mt-1 text-sm text-muted">{t(`municipal_reports.cards.${report.key}.description`)}</p>
                 </div>
-                <Chip className="ml-auto" size="sm" variant="flat" color="primary">{value}</Chip>
+                <Chip className="ml-auto" size="sm" variant="soft" color="accent">{value}</Chip>
               </CardHeader>
               <Separator />
               <CardBody className="flex flex-col gap-3">
                 <div className="flex flex-wrap gap-2">
-                  <Chip size="sm" variant="flat" color="primary">{t(`municipal_reports.cards.${report.key}.metric_1`)}</Chip>
-                  <Chip size="sm" variant="flat" color="secondary">{t(`municipal_reports.cards.${report.key}.metric_2`)}</Chip>
-                  <Chip size="sm" variant="flat" color="success">{t(`municipal_reports.cards.${report.key}.metric_3`)}</Chip>
+                  <Chip size="sm" variant="soft" color="accent">{t(`municipal_reports.cards.${report.key}.metric_1`)}</Chip>
+                  <Chip size="sm" variant="soft">{t(`municipal_reports.cards.${report.key}.metric_2`)}</Chip>
+                  <Chip size="sm" variant="soft" color="success">{t(`municipal_reports.cards.${report.key}.metric_3`)}</Chip>
                 </div>
                 <Button
                   as={Link}
                   to={tenantPath(report.href)}
-                  variant="flat"
+                  variant="secondary"
                   className="justify-start"
                   startContent={<FileText size={16} />}
                 >
@@ -655,14 +657,14 @@ export default function MunicipalImpactReportsPage() {
 
       {!loading && summary && (
         <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <Card shadow="sm" className="lg:col-span-2">
+          <Card className="border border-border bg-surface lg:col-span-2">
             <CardHeader className="flex flex-col items-start gap-1">
               <h2 className="text-base font-semibold">{t('municipal_reports.sections.readiness')}</h2>
-              <p className="text-xs text-default-500">
+              <p className="text-xs text-muted">
                 {t('municipal_reports.readiness_intro.prefix')}
-                <strong className="text-success-600"> {t('municipal_reports.readiness.status.ready')}</strong>
+                <strong className="text-success"> {t('municipal_reports.readiness.status.ready')}</strong>
                 {t('municipal_reports.readiness_intro.ready_suffix')}
-                <strong className="text-warning-600"> {t('municipal_reports.readiness.status.needs_data')}</strong>
+                <strong className="text-warning"> {t('municipal_reports.readiness.status.needs_data')}</strong>
                 {t('municipal_reports.readiness_intro.needs_data_suffix')}
               </p>
             </CardHeader>
@@ -673,18 +675,18 @@ export default function MunicipalImpactReportsPage() {
                 return (
                   <div
                     key={signal.key}
-                    className="rounded-lg border border-default-200 p-3"
+                    className="rounded-lg border border-border bg-surface-secondary p-3"
                     title={help ? t(signal.status === 'needs_data' ? help.fixKey : help.whatKey) : undefined}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <p className="text-sm font-medium text-default-800">{t(`municipal_reports.readiness.${signal.key}`)}</p>
-                      <Chip size="sm" color={signal.status === 'ready' ? 'success' : 'warning'} variant="flat">
+                      <p className="text-sm font-medium text-foreground">{t(`municipal_reports.readiness.${signal.key}`)}</p>
+                      <Chip size="sm" color={signal.status === 'ready' ? 'success' : 'warning'} variant="soft">
                         {t(`municipal_reports.readiness.status.${signal.status}`)}
                       </Chip>
                     </div>
-                    <p className="mt-2 text-2xl font-semibold text-default-900">{signal.value.toLocaleString(undefined, { maximumFractionDigits: 1 })}</p>
+                    <p className="mt-2 text-2xl font-semibold text-foreground">{signal.value.toLocaleString(undefined, { maximumFractionDigits: 1 })}</p>
                     {help && (
-                      <p className="mt-1 text-xs text-default-400">
+                      <p className="mt-1 text-xs text-muted">
                         {t(signal.status === 'needs_data' ? help.fixKey : help.whatKey)}
                       </p>
                     )}
@@ -694,43 +696,43 @@ export default function MunicipalImpactReportsPage() {
             </CardBody>
           </Card>
 
-          <Card shadow="sm">
+          <Card className="border border-border bg-surface">
             <CardHeader>
               <h2 className="text-base font-semibold">{t('municipal_reports.sections.categories')}</h2>
             </CardHeader>
             <Separator />
             <CardBody className="gap-3">
               {summary.categories.length === 0 ? (
-                <p className="text-sm text-default-500">{t('municipal_reports.empty.categories')}</p>
+                <p className="text-sm text-muted">{t('municipal_reports.empty.categories')}</p>
               ) : summary.categories.map((category) => (
                 <div key={category.name} className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-sm font-medium text-default-800">{category.name}</p>
-                    <p className="text-xs text-default-500">{t('municipal_reports.values.activities', { count: category.count })}</p>
+                    <p className="text-sm font-medium text-foreground">{category.name}</p>
+                    <p className="text-xs text-muted">{t('municipal_reports.values.activities', { count: category.count })}</p>
                   </div>
-                  <Chip size="sm" variant="flat" color="success">{formatHours(category.hours)}</Chip>
+                  <Chip size="sm" variant="soft" color="success">{formatHours(category.hours)}</Chip>
                 </div>
               ))}
             </CardBody>
           </Card>
 
-          <Card shadow="sm">
+          <Card className="border border-border bg-surface">
             <CardHeader>
               <h2 className="text-base font-semibold">{t('municipal_reports.sections.trends')}</h2>
             </CardHeader>
             <Separator />
             <CardBody className="gap-3">
               {summary.trends.length === 0 ? (
-                <p className="text-sm text-default-500">{t('municipal_reports.empty.trends')}</p>
+                <p className="text-sm text-muted">{t('municipal_reports.empty.trends')}</p>
               ) : summary.trends.slice(-6).map((trend) => (
                 <div key={trend.period} className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-sm font-medium text-default-800">{trend.period}</p>
-                    <p className="text-xs text-default-500">
+                    <p className="text-sm font-medium text-foreground">{trend.period}</p>
+                    <p className="text-xs text-muted">
                       {t('municipal_reports.values.trend_detail', { participants: trend.participants, activities: trend.activities })}
                     </p>
                   </div>
-                  <Chip size="sm" variant="flat" color="secondary">{formatHours(trend.verified_hours)}</Chip>
+                  <Chip size="sm" variant="soft">{formatHours(trend.verified_hours)}</Chip>
                 </div>
               ))}
             </CardBody>
@@ -766,6 +768,7 @@ export default function MunicipalImpactReportsPage() {
           <ModalBody className="gap-4">
             <Input
               label={t('municipal_reports.templates.fields.name')}
+              variant="secondary"
               placeholder={t('municipal_reports.templates.placeholders.name')}
               value={templateForm.name}
               onValueChange={(name) => setTemplateForm((form) => ({ ...form, name }))}
@@ -773,6 +776,7 @@ export default function MunicipalImpactReportsPage() {
             />
             <Textarea
               label={t('municipal_reports.templates.fields.description')}
+              variant="secondary"
               placeholder={t('municipal_reports.templates.placeholders.description')}
               value={templateForm.description}
               onValueChange={(description) => setTemplateForm((form) => ({ ...form, description }))}
@@ -781,6 +785,7 @@ export default function MunicipalImpactReportsPage() {
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <Select
                 label={t('municipal_reports.templates.fields.audience')}
+                variant="secondary"
                 description={t('municipal_reports.templates.descriptions.audience')}
                 selectedKeys={[templateForm.audience]}
                 onSelectionChange={(keys) => {
@@ -794,6 +799,7 @@ export default function MunicipalImpactReportsPage() {
               </Select>
               <Select
                 label={t('municipal_reports.templates.fields.period')}
+                variant="secondary"
                 description={t('municipal_reports.templates.descriptions.period')}
                 selectedKeys={[templateForm.date_preset]}
                 onSelectionChange={(keys) => {
@@ -809,6 +815,7 @@ export default function MunicipalImpactReportsPage() {
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               <Input
                 label={t('municipal_reports.templates.fields.hour_value')}
+                variant="secondary"
                 description={t('municipal_reports.templates.descriptions.hour_value')}
                 type="number"
                 min={0}
@@ -816,7 +823,7 @@ export default function MunicipalImpactReportsPage() {
                 value={templateForm.hour_value_chf}
                 onValueChange={(hour_value_chf) => setTemplateForm((form) => ({ ...form, hour_value_chf }))}
               />
-              <div className="flex items-center rounded-lg border border-default-200 px-3">
+              <div className="flex min-h-12 items-center rounded-lg border border-border bg-surface-secondary px-3">
                 <Switch
                   isSelected={templateForm.include_social_value}
                   onValueChange={(include_social_value) => setTemplateForm((form) => ({ ...form, include_social_value }))}
@@ -827,10 +834,10 @@ export default function MunicipalImpactReportsPage() {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onClose} isDisabled={savingTemplate}>
+            <Button variant="tertiary" onPress={onClose} isDisabled={savingTemplate}>
               {t('municipal_reports.templates.cancel')}
             </Button>
-            <Button color="primary" startContent={<Save size={16} />} onPress={saveTemplate} isLoading={savingTemplate}>
+            <Button variant="primary" startContent={<Save size={16} />} onPress={saveTemplate} isLoading={savingTemplate}>
               {t('municipal_reports.templates.save')}
             </Button>
           </ModalFooter>
@@ -860,17 +867,17 @@ function NarrativeShell({
   const { t } = useTranslation('admin');
 
   return (
-    <Card shadow="sm" className={isActive ? 'border-2 border-accent/40' : 'opacity-70'}>
+    <Card className={isActive ? 'border-2 border-accent/40 bg-surface' : 'border border-border bg-surface opacity-70'}>
       <CardHeader className="flex flex-col items-start gap-1">
         <div className="flex items-center gap-2">
           <h2 className="text-base font-semibold">{title}</h2>
           {isActive && (
-            <Chip size="sm" color="primary" variant="flat">
+            <Chip size="sm" color="accent" variant="soft">
               {t('municipal_reports.narrative.in_export')}
             </Chip>
           )}
         </div>
-        <p className="text-sm text-default-500">{description}</p>
+        <p className="text-sm text-muted">{description}</p>
       </CardHeader>
       <Separator />
       <CardBody className="gap-3">{children}</CardBody>
@@ -904,7 +911,7 @@ function CantonNarrativeSection({
         title={t('municipal_reports.narrative.canton.empty_title')}
         description={t('municipal_reports.narrative.canton.empty_description')}
       >
-        <p className="text-sm text-default-500">
+        <p className="text-sm text-muted">
           {t('municipal_reports.narrative.canton.empty_body')}
         </p>
       </NarrativeShell>
@@ -914,9 +921,9 @@ function CantonNarrativeSection({
   const yoy = variant.yoy_change_percent;
   const yoyChip =
     yoy === null ? (
-      <Chip size="sm" variant="flat">{t('municipal_reports.narrative.no_prior_data')}</Chip>
+      <Chip size="sm" variant="soft">{t('municipal_reports.narrative.no_prior_data')}</Chip>
     ) : (
-      <Chip size="sm" color={yoy >= 0 ? 'success' : 'warning'} variant="flat">
+      <Chip size="sm" color={yoy >= 0 ? 'success' : 'warning'} variant="soft">
         {yoy >= 0 ? '+' : ''}
         {yoy.toFixed(1)}% YoY
       </Chip>
@@ -933,36 +940,36 @@ function CantonNarrativeSection({
       description={t('municipal_reports.narrative.canton.description')}
     >
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-        <div className="rounded-lg border border-default-200 p-3">
-          <p className="text-xs uppercase text-default-500">{t('municipal_reports.narrative.canton.municipalities_reporting')}</p>
+        <div className="rounded-lg border border-border bg-surface-secondary p-3">
+          <p className="text-xs uppercase text-muted">{t('municipal_reports.narrative.canton.municipalities_reporting')}</p>
           <p className="mt-1 text-2xl font-semibold">{variant.aggregate_municipalities_count.toLocaleString()}</p>
-          <p className="text-xs text-default-500 mt-1">
+          <p className="mt-1 text-xs text-muted">
             {t('municipal_reports.narrative.canton.municipalities_reporting_desc')}
           </p>
         </div>
-        <div className="rounded-lg border border-default-200 p-3">
-          <p className="text-xs uppercase text-default-500">{t('municipal_reports.narrative.canton.multi_node_total_hours')}</p>
+        <div className="rounded-lg border border-border bg-surface-secondary p-3">
+          <p className="text-xs uppercase text-muted">{t('municipal_reports.narrative.canton.multi_node_total_hours')}</p>
           <p className="mt-1 text-2xl font-semibold">
             {variant.multi_node_total_hours.toLocaleString(undefined, { maximumFractionDigits: 1 })}
           </p>
-          <p className="text-xs text-default-500 mt-1">{t('municipal_reports.narrative.canton.multi_node_total_hours_desc')}</p>
+          <p className="mt-1 text-xs text-muted">{t('municipal_reports.narrative.canton.multi_node_total_hours_desc')}</p>
         </div>
-        <div className="rounded-lg border border-default-200 p-3">
-          <p className="text-xs uppercase text-default-500">{t('municipal_reports.narrative.canton.estimated_cost_avoidance')}</p>
+        <div className="rounded-lg border border-border bg-surface-secondary p-3">
+          <p className="text-xs uppercase text-muted">{t('municipal_reports.narrative.canton.estimated_cost_avoidance')}</p>
           <p className="mt-1 text-2xl font-semibold">{formatter.format(variant.est_cost_avoidance_chf)}</p>
-          <p className="text-xs text-default-500 mt-1">
+          <p className="mt-1 text-xs text-muted">
             {t('municipal_reports.narrative.canton.estimated_cost_avoidance_desc', {
               multiplier: variant.cost_avoidance_multiplier.toFixed(1),
             })}
           </p>
         </div>
       </div>
-      <div className="rounded-lg border border-default-200 p-3">
+      <div className="rounded-lg border border-border bg-surface-secondary p-3">
         <div className="flex items-center justify-between">
           <p className="text-sm font-semibold">{t('municipal_reports.narrative.canton.yoy_change')}</p>
           {yoyChip}
         </div>
-        <p className="mt-1 text-xs text-default-500">
+        <p className="mt-1 text-xs text-muted">
           {t('municipal_reports.narrative.canton.prior_period_detail', {
             from: variant.yoy_prior_period.from,
             to: variant.yoy_prior_period.to,
@@ -992,7 +999,7 @@ function MunicipalityNarrativeSection({
         title={t('municipal_reports.narrative.municipality.empty_title')}
         description={t('municipal_reports.narrative.municipality.empty_description')}
       >
-        <p className="text-sm text-default-500">
+        <p className="text-sm text-muted">
           {t('municipal_reports.narrative.municipality.empty_body')}
         </p>
       </NarrativeShell>
@@ -1006,38 +1013,38 @@ function MunicipalityNarrativeSection({
       description={t('municipal_reports.narrative.municipality.description')}
     >
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-        <div className="rounded-lg border border-default-200 p-3">
-          <p className="text-xs uppercase text-default-500">{t('municipal_reports.narrative.municipality.partner_organisations')}</p>
+        <div className="rounded-lg border border-border bg-surface-secondary p-3">
+          <p className="text-xs uppercase text-muted">{t('municipal_reports.narrative.municipality.partner_organisations')}</p>
           <p className="mt-1 text-2xl font-semibold">{variant.partner_organisations_count}</p>
-          <p className="text-xs text-default-500 mt-1">
+          <p className="mt-1 text-xs text-muted">
             {t('municipal_reports.narrative.municipality.trusted_total', { count: variant.trusted_organisations_total })}
           </p>
         </div>
-        <div className="rounded-lg border border-default-200 p-3">
-          <p className="text-xs uppercase text-default-500">{t('municipal_reports.narrative.municipality.recipients_reached')}</p>
+        <div className="rounded-lg border border-border bg-surface-secondary p-3">
+          <p className="text-xs uppercase text-muted">{t('municipal_reports.narrative.municipality.recipients_reached')}</p>
           <p className="mt-1 text-2xl font-semibold">{variant.recipients_reached_count.toLocaleString()}</p>
-          <p className="text-xs text-default-500 mt-1">{t('municipal_reports.narrative.municipality.recipients_reached_desc')}</p>
+          <p className="mt-1 text-xs text-muted">{t('municipal_reports.narrative.municipality.recipients_reached_desc')}</p>
         </div>
-        <div className="rounded-lg border border-default-200 p-3">
-          <p className="text-xs uppercase text-default-500">{t('municipal_reports.narrative.municipality.top_categories')}</p>
+        <div className="rounded-lg border border-border bg-surface-secondary p-3">
+          <p className="text-xs uppercase text-muted">{t('municipal_reports.narrative.municipality.top_categories')}</p>
           <p className="mt-1 text-2xl font-semibold">{variant.geographic_distribution.length}</p>
-          <p className="text-xs text-default-500 mt-1">{t('municipal_reports.narrative.municipality.top_categories_desc')}</p>
+          <p className="mt-1 text-xs text-muted">{t('municipal_reports.narrative.municipality.top_categories_desc')}</p>
         </div>
       </div>
 
       <div>
         <p className="text-sm font-semibold mb-2">{t('municipal_reports.narrative.municipality.partner_organisations_by_hours')}</p>
         {variant.partner_organisations.length === 0 ? (
-          <p className="text-sm text-default-500">{t('municipal_reports.narrative.municipality.no_partner_activity')}</p>
+          <p className="text-sm text-muted">{t('municipal_reports.narrative.municipality.no_partner_activity')}</p>
         ) : (
           <div className="space-y-1">
             {variant.partner_organisations.map((org) => (
-              <div key={org.id} className="flex items-center justify-between rounded border border-default-200 px-3 py-2">
+              <div key={org.id} className="flex items-center justify-between rounded border border-border bg-surface-secondary px-3 py-2">
                 <div>
                   <p className="text-sm font-medium">{org.name}</p>
-                  <p className="text-xs text-default-500">{t('municipal_reports.narrative.logs_count', { count: org.log_count })}</p>
+                  <p className="text-xs text-muted">{t('municipal_reports.narrative.logs_count', { count: org.log_count })}</p>
                 </div>
-                <Chip size="sm" variant="flat" color="success">
+                <Chip size="sm" variant="soft" color="success">
                   {t('municipal_reports.values.hours', { count: Number(org.hours.toFixed(1)) })}
                 </Chip>
               </div>
@@ -1049,16 +1056,16 @@ function MunicipalityNarrativeSection({
       <div>
         <p className="text-sm font-semibold mb-2">{t('municipal_reports.narrative.municipality.top_5_categories')}</p>
         {variant.geographic_distribution.length === 0 ? (
-          <p className="text-sm text-default-500">{t('municipal_reports.narrative.municipality.no_category_data')}</p>
+          <p className="text-sm text-muted">{t('municipal_reports.narrative.municipality.no_category_data')}</p>
         ) : (
           <div className="space-y-1">
             {variant.geographic_distribution.map((cat) => (
-              <div key={cat.name} className="flex items-center justify-between rounded border border-default-200 px-3 py-2">
+              <div key={cat.name} className="flex items-center justify-between rounded border border-border bg-surface-secondary px-3 py-2">
                 <div>
                   <p className="text-sm font-medium">{cat.name}</p>
-                  <p className="text-xs text-default-500">{t('municipal_reports.values.activities', { count: cat.count })}</p>
+                  <p className="text-xs text-muted">{t('municipal_reports.values.activities', { count: cat.count })}</p>
                 </div>
-                <Chip size="sm" variant="flat" color="primary">
+                <Chip size="sm" variant="soft" color="accent">
                   {t('municipal_reports.values.hours', { count: Number(cat.hours.toFixed(1)) })}
                 </Chip>
               </div>
@@ -1088,7 +1095,7 @@ function CooperativeNarrativeSection({
         title={t('municipal_reports.narrative.cooperative.empty_title')}
         description={t('municipal_reports.narrative.cooperative.empty_description')}
       >
-        <p className="text-sm text-default-500">
+        <p className="text-sm text-muted">
           {t('municipal_reports.narrative.cooperative.empty_body')}
         </p>
       </NarrativeShell>
@@ -1105,43 +1112,43 @@ function CooperativeNarrativeSection({
       description={t('municipal_reports.narrative.cooperative.description')}
     >
       <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-        <div className="rounded-lg border border-default-200 p-3">
-          <p className="text-xs uppercase text-default-500">{t('municipal_reports.narrative.cooperative.member_retention')}</p>
+        <div className="rounded-lg border border-border bg-surface-secondary p-3">
+          <p className="text-xs uppercase text-muted">{t('municipal_reports.narrative.cooperative.member_retention')}</p>
           <p className="mt-1 text-2xl font-semibold">{retentionPct}%</p>
-          <p className="text-xs text-default-500 mt-1">
+          <p className="mt-1 text-xs text-muted">
             {t('municipal_reports.narrative.cooperative.member_retention_desc', { count: variant.retained_members_count })}
           </p>
         </div>
-        <div className="rounded-lg border border-default-200 p-3">
-          <p className="text-xs uppercase text-default-500">{t('municipal_reports.narrative.cooperative.reciprocity_rate')}</p>
+        <div className="rounded-lg border border-border bg-surface-secondary p-3">
+          <p className="text-xs uppercase text-muted">{t('municipal_reports.narrative.cooperative.reciprocity_rate')}</p>
           <p className="mt-1 text-2xl font-semibold">{reciprocityPct}%</p>
-          <p className="text-xs text-default-500 mt-1">
+          <p className="mt-1 text-xs text-muted">
             {t('municipal_reports.narrative.cooperative.reciprocity_rate_desc', { count: variant.reciprocal_members_count })}
           </p>
         </div>
-        <div className="rounded-lg border border-default-200 p-3">
-          <p className="text-xs uppercase text-default-500">{t('municipal_reports.narrative.cooperative.active_tandems')}</p>
+        <div className="rounded-lg border border-border bg-surface-secondary p-3">
+          <p className="text-xs uppercase text-muted">{t('municipal_reports.narrative.cooperative.active_tandems')}</p>
           <p className="mt-1 text-2xl font-semibold">{variant.tandem_count}</p>
-          <p className="text-xs text-default-500 mt-1">{t('municipal_reports.narrative.cooperative.active_tandems_desc')}</p>
+          <p className="mt-1 text-xs text-muted">{t('municipal_reports.narrative.cooperative.active_tandems_desc')}</p>
         </div>
-        <div className="rounded-lg border border-default-200 p-3">
-          <p className="text-xs uppercase text-default-500">{t('municipal_reports.narrative.cooperative.coordinator_load')}</p>
+        <div className="rounded-lg border border-border bg-surface-secondary p-3">
+          <p className="text-xs uppercase text-muted">{t('municipal_reports.narrative.cooperative.coordinator_load')}</p>
           <p className="mt-1 text-2xl font-semibold">{variant.coordinator_load_avg.toFixed(1)}</p>
-          <p className="text-xs text-default-500 mt-1">
+          <p className="mt-1 text-xs text-muted">
             {t('municipal_reports.narrative.cooperative.coordinator_load_desc', {
               pending: variant.pending_reviews_total,
               coordinators: variant.coordinator_count,
             })}
           </p>
         </div>
-        <div className="rounded-lg border border-default-200 p-3 md:col-span-2">
-          <p className="text-xs uppercase text-default-500">{t('municipal_reports.narrative.cooperative.future_care_credit_pool')}</p>
+        <div className="rounded-lg border border-border bg-surface-secondary p-3 md:col-span-2">
+          <p className="text-xs uppercase text-muted">{t('municipal_reports.narrative.cooperative.future_care_credit_pool')}</p>
           <p className="mt-1 text-2xl font-semibold">
             {t('municipal_reports.values.hours', {
               count: Number(variant.future_care_credit_pool.toFixed(1)),
             })}
           </p>
-          <p className="text-xs text-default-500 mt-1">
+          <p className="mt-1 text-xs text-muted">
             {t('municipal_reports.narrative.cooperative.future_care_credit_pool_desc', {
               count: variant.active_members_total,
             })}

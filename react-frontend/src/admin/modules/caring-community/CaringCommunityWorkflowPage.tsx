@@ -467,9 +467,9 @@ function ForecastMiniChart({ title, series, valueSuffix, t }: { title: string; s
 
   if (series.history.every((p) => p.hours === 0) && series.forecast.length === 0) {
     return (
-      <div className="rounded-lg border border-default-200 p-4">
-        <div className="text-sm font-semibold text-default-900">{title}</div>
-        <div className="mt-3 rounded-md bg-default-100 p-3 text-xs text-default-500">
+      <div className="rounded-lg border border-border p-4">
+        <div className="text-sm font-semibold text-foreground">{title}</div>
+        <div className="mt-3 rounded-md bg-surface-secondary p-3 text-xs text-muted">
           {t('caring_workflow.predictive.not_enough_activity')}
         </div>
       </div>
@@ -477,10 +477,10 @@ function ForecastMiniChart({ title, series, valueSuffix, t }: { title: string; s
   }
 
   return (
-    <div className="rounded-lg border border-default-200 p-4">
+    <div className="rounded-lg border border-border p-4">
       <div className="flex items-center justify-between gap-2">
-        <div className="text-sm font-semibold text-default-900">{title}</div>
-        <Chip size="sm" variant="flat" color={chip.color} startContent={<ChipIcon size={14} />}>
+        <div className="text-sm font-semibold text-foreground">{title}</div>
+        <Chip size="sm" variant="soft" color={chip.color} startContent={<ChipIcon size={14} />}>
           {chip.label}
         </Chip>
       </div>
@@ -531,17 +531,17 @@ function ForecastMiniChart({ title, series, valueSuffix, t }: { title: string; s
           </ComposedChart>
         </ResponsiveContainer>
       </div>
-      <div className="mt-1 text-[11px] text-default-400">
+      <div className="mt-1 text-[11px] text-muted">
         {t('caring_workflow.predictive.confidence')}: <span className="capitalize">{series.confidence}</span>
       </div>
     </div>
   );
 }
 
-function alertSeverityChipColor(severity: ForecastAlert['severity']): 'danger' | 'warning' | 'primary' {
+function alertSeverityChipColor(severity: ForecastAlert['severity']): 'danger' | 'warning' | 'accent' {
   if (severity === 'critical') return 'danger';
   if (severity === 'warning') return 'warning';
-  return 'primary';
+  return 'accent';
 }
 
 function alertSeverityLabel(severity: ForecastAlert['severity'], t: AdminT): string {
@@ -559,20 +559,20 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: Pred
     : false;
 
   return (
-    <Card shadow="sm">
+    <Card>
       <CardHeader className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="text-lg font-semibold flex items-center gap-2">
             <BrainCircuit size={18} className="text-accent" />
             {t('caring_workflow.predictive.title')}
           </h2>
-          <p className="mt-1 text-sm text-default-500">
+          <p className="mt-1 text-sm text-muted">
             {t('caring_workflow.predictive.subtitle')}
           </p>
         </div>
         <Button
           size="sm"
-          variant="flat"
+          variant="secondary"
           startContent={<RefreshCw size={16} />}
           isLoading={loading}
           onPress={onRefresh}
@@ -589,16 +589,16 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: Pred
         ) : error ? (
           <div className="rounded-lg bg-danger-50 p-4 text-sm text-danger-700 flex items-center justify-between gap-3">
             <span>{error}</span>
-            <Button size="sm" variant="flat" color="danger" startContent={<RefreshCw size={14} />} onPress={onRefresh}>
+            <Button size="sm" variant="danger" startContent={<RefreshCw size={14} />} onPress={onRefresh}>
               {t('caring_workflow.actions.retry')}
             </Button>
           </div>
         ) : !forecast ? (
-          <div className="rounded-lg bg-default-100 p-4 text-sm text-default-500">
+          <div className="rounded-lg bg-surface-secondary p-4 text-sm text-muted">
             {t('caring_workflow.predictive.no_forecast')}
           </div>
         ) : !hasAnyHistory ? (
-          <div className="rounded-lg bg-default-100 p-4 text-sm text-default-500">
+          <div className="rounded-lg bg-surface-secondary p-4 text-sm text-muted">
             {t('caring_workflow.predictive.not_enough_activity')}
           </div>
         ) : (
@@ -610,13 +610,13 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: Pred
             </div>
             {forecast.sub_region_demand && forecast.sub_region_demand.sub_regions.length > 0 && (
               <div className="space-y-2">
-                <div className="text-sm font-semibold text-default-900 flex items-center gap-2">
+                <div className="text-sm font-semibold text-foreground flex items-center gap-2">
                   <Info size={14} />
                   {t('caring_workflow.predictive.sub_region_coverage', {
                     days: forecast.sub_region_demand.window_days.long,
                   })}
                   {forecast.sub_region_demand.under_supplied_count > 0 && (
-                    <Chip size="sm" variant="flat" color="warning">
+                    <Chip size="sm" variant="soft" color="warning">
                       {t('caring_workflow.predictive.under_supplied_count', {
                         count: forecast.sub_region_demand.under_supplied_count,
                       })}
@@ -639,7 +639,7 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: Pred
                         <TableCell className="text-right tabular-nums">{r.fulfilled_90d.toFixed(1)}</TableCell>
                         <TableCell className="text-right tabular-nums">{(r.coverage_ratio_90d * 100).toFixed(0)}%</TableCell>
                         <TableCell>
-                          <Chip size="sm" variant="flat" color={r.flagged ? 'warning' : 'default'}>
+                          <Chip size="sm" variant="soft" color={r.flagged ? 'warning' : 'default'}>
                             {r.flagged ? t('caring_workflow.predictive.status.under_supplied') : t('caring_workflow.predictive.status.ok')}
                           </Chip>
                         </TableCell>
@@ -652,14 +652,14 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: Pred
 
             {forecast.helper_churn && forecast.helper_churn.overall.prior_active > 0 && (
               <div className="space-y-2">
-                <div className="text-sm font-semibold text-default-900 flex items-center gap-2">
+                <div className="text-sm font-semibold text-foreground flex items-center gap-2">
                   <Info size={14} />
                   {t('caring_workflow.predictive.helper_churn', {
                     days: forecast.helper_churn.lapsed_threshold_days,
                   })}
                   <Chip
                     size="sm"
-                    variant="flat"
+                    variant="soft"
                     color={forecast.helper_churn.overall.churn_rate > 0.3 ? 'warning' : 'default'}
                   >
                     {t('caring_workflow.predictive.overall_percent', {
@@ -667,7 +667,7 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: Pred
                     })}
                   </Chip>
                 </div>
-                <p className="text-xs text-default-500">
+                <p className="text-xs text-muted">
                   {t('caring_workflow.predictive.helper_churn_note', {
                     lapsed: forecast.helper_churn.overall.lapsed,
                     prior: forecast.helper_churn.overall.prior_active,
@@ -698,18 +698,18 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: Pred
 
             {forecast.coefficient_drift && forecast.coefficient_drift.categories.length > 0 && (
               <div className="space-y-2">
-                <div className="text-sm font-semibold text-default-900 flex items-center gap-2">
+                <div className="text-sm font-semibold text-foreground flex items-center gap-2">
                   <Info size={14} />
                   {t('caring_workflow.predictive.coefficient_drift')}
                   {forecast.coefficient_drift.drift_count > 0 && (
-                    <Chip size="sm" variant="flat" color="warning">
+                    <Chip size="sm" variant="soft" color="warning">
                       {t('caring_workflow.predictive.drifting_count', {
                         count: forecast.coefficient_drift.drift_count,
                       })}
                     </Chip>
                   )}
                 </div>
-                <p className="text-xs text-default-500">
+                <p className="text-xs text-muted">
                   {t('caring_workflow.predictive.coefficient_drift_note', {
                     threshold: (forecast.coefficient_drift.threshold * 100).toFixed(0),
                   })}
@@ -731,7 +731,7 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: Pred
                         <TableCell className="text-right tabular-nums">{c.expected_session_hours.toFixed(2)}</TableCell>
                         <TableCell className="text-right tabular-nums">{c.observed_session_hours.toFixed(2)}</TableCell>
                         <TableCell className="text-right tabular-nums">
-                          <Chip size="sm" variant="flat" color={c.flagged ? 'warning' : 'default'}>
+                          <Chip size="sm" variant="soft" color={c.flagged ? 'warning' : 'default'}>
                             {(c.drift * 100).toFixed(0)}%
                           </Chip>
                         </TableCell>
@@ -745,30 +745,29 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: Pred
 
             {forecast.alerts.length > 0 && (
               <div className="space-y-2">
-                <div className="text-sm font-semibold text-default-900 flex items-center gap-2">
+                <div className="text-sm font-semibold text-foreground flex items-center gap-2">
                   <Info size={14} />
                   {t('caring_workflow.predictive.proactive_alerts')}
                 </div>
                 {forecast.alerts.map((alert) => (
-                  <div key={alert.id} className="rounded-lg border border-default-200 p-3 flex flex-wrap items-start justify-between gap-3">
+                  <div key={alert.id} className="rounded-lg border border-border p-3 flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <Chip size="sm" variant="flat" color={alertSeverityChipColor(alert.severity)}>
+                        <Chip size="sm" variant="soft" color={alertSeverityChipColor(alert.severity)}>
                           {alertSeverityLabel(alert.severity, t)}
                         </Chip>
-                        <span className="text-sm font-semibold text-default-900">{alert.title}</span>
-                        <Chip size="sm" variant="flat" color="default">
+                        <span className="text-sm font-semibold text-foreground">{alert.title}</span>
+                        <Chip size="sm" variant="soft" color="default">
                           {alert.count.toLocaleString()}
                         </Chip>
                       </div>
-                      <p className="mt-1 text-xs text-default-500">{alert.message}</p>
+                      <p className="mt-1 text-xs text-muted">{alert.message}</p>
                     </div>
                     {alert.action_url && alert.action_label && (
                       <Button
                         as={Link}
                         size="sm"
-                        variant="flat"
-                        color={alertSeverityChipColor(alert.severity)}
+                        variant={alert.severity === 'critical' ? 'danger' : 'secondary'}
                         to={alert.action_url}
                       >
                         {alert.action_label}
@@ -1514,7 +1513,7 @@ export default function CaringCommunityWorkflowPage() {
             <Button
               as={Link}
               to={tenantPath('/admin/volunteering/hours')}
-              variant="flat"
+              variant="secondary"
               size="sm"
               startContent={<ClipboardCheck size={16} />}
             >
@@ -1523,14 +1522,14 @@ export default function CaringCommunityWorkflowPage() {
             <Button
               as={Link}
               to={tenantPath('/caring/municipal-impact')}
-              variant="flat"
+              variant="secondary"
               size="sm"
               startContent={<FileText size={16} />}
             >
               {t('caring_workflow.actions.open_report_pack')}
             </Button>
             <Button
-              variant="flat"
+              variant="secondary"
               size="sm"
               startContent={<RefreshCw size={16} />}
               onPress={loadWorkflow}
@@ -1543,18 +1542,18 @@ export default function CaringCommunityWorkflowPage() {
 
       <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-4">
         <StatCard label={t('caring_workflow.stats.pending_reviews')} value={(stats?.pending_count ?? 0).toLocaleString()} icon={ClipboardCheck} color="warning" />
-        <StatCard label={t('caring_workflow.stats.pending_hours')} value={formatHours(stats?.pending_hours ?? 0)} icon={Clock} color="primary" />
+        <StatCard label={t('caring_workflow.stats.pending_hours')} value={formatHours(stats?.pending_hours ?? 0)} icon={Clock} color="warning" />
         <StatCard label={t('caring_workflow.stats.approved_30d')} value={formatHours(stats?.approved_30d_hours ?? 0)} icon={CheckCircle2} color="success" />
-        <StatCard label={t('caring_workflow.stats.coordinators')} value={(stats?.coordinator_count ?? 0).toLocaleString()} icon={Users} color="secondary" />
+        <StatCard label={t('caring_workflow.stats.coordinators')} value={(stats?.coordinator_count ?? 0).toLocaleString()} icon={Users} color="default" />
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
         <div className="space-y-6">
-          <Card shadow="sm">
+          <Card>
             <CardHeader className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-lg font-semibold">{t('caring_workflow.pending.title')}</h2>
-                <p className="mt-1 text-sm text-default-500">
+                <p className="mt-1 text-sm text-muted">
                   {t('caring_workflow.pending.description_prefix')} <span className="font-medium text-warning-600">{t('caring_workflow.pending.needs_review')}</span> {t('caring_workflow.pending.description_middle')}{' '}
                   <span className="font-medium text-danger-600">{t('caring_workflow.pending.escalate_now')}</span> {t('caring_workflow.pending.description_suffix')}
                 </p>
@@ -1562,9 +1561,9 @@ export default function CaringCommunityWorkflowPage() {
               {(stats?.overdue_count ?? 0) > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {(stats?.escalated_count ?? 0) > 0 && (
-                    <Chip color="danger" variant="flat">{t('caring_workflow.pending.escalated_count', { count: stats?.escalated_count ?? 0 })}</Chip>
+                    <Chip color="danger" variant="soft">{t('caring_workflow.pending.escalated_count', { count: stats?.escalated_count ?? 0 })}</Chip>
                   )}
-                  <Chip color="warning" variant="flat">{t('caring_workflow.pending.overdue_count', { count: stats?.overdue_count ?? 0 })}</Chip>
+                  <Chip color="warning" variant="soft">{t('caring_workflow.pending.overdue_count', { count: stats?.overdue_count ?? 0 })}</Chip>
                 </div>
               )}
             </CardHeader>
@@ -1575,21 +1574,21 @@ export default function CaringCommunityWorkflowPage() {
                   {t('caring_workflow.pending.empty')}
                 </div>
               ) : summary?.pending_reviews.map((review) => (
-                <div key={review.id} className="rounded-lg border border-default-200 p-4">
+                <div key={review.id} className="rounded-lg border border-border p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                      <p className="text-sm font-semibold text-default-900">{review.member_name}</p>
-                      <p className="mt-1 text-sm text-default-500">
+                      <p className="text-sm font-semibold text-foreground">{review.member_name}</p>
+                      <p className="mt-1 text-sm text-muted">
                         {review.organisation_name || review.opportunity_title || t('caring_workflow.empty.unassigned')}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      {review.is_escalated && <Chip size="sm" color="danger" variant="flat">{t('caring_workflow.pending.escalate_now')}</Chip>}
-                      {!review.is_escalated && review.is_overdue && <Chip size="sm" color="warning" variant="flat">{t('caring_workflow.pending.needs_review')}</Chip>}
-                      <Chip size="sm" color="primary" variant="flat">{formatHours(review.hours)}</Chip>
+                      {review.is_escalated && <Chip size="sm" color="danger" variant="soft">{t('caring_workflow.pending.escalate_now')}</Chip>}
+                      {!review.is_escalated && review.is_overdue && <Chip size="sm" color="warning" variant="soft">{t('caring_workflow.pending.needs_review')}</Chip>}
+                      <Chip size="sm" color="accent" variant="soft">{formatHours(review.hours)}</Chip>
                     </div>
                   </div>
-                  <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-default-500">
+                  <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted">
                     <span>{t('caring_workflow.pending.logged', { date: review.date_logged })}</span>
                     <span>{t('caring_workflow.pending.submitted', { date: review.created_at })}</span>
                     <span>{t('caring_workflow.pending.age_days', { count: review.age_days })}</span>
@@ -1612,8 +1611,7 @@ export default function CaringCommunityWorkflowPage() {
                     </Select>
                     <Button
                       size="sm"
-                      variant="flat"
-                      color={review.is_escalated ? 'danger' : 'warning'}
+                      variant={review.is_escalated ? 'danger' : 'secondary'}
                       startContent={review.is_escalated ? <TriangleAlert size={16} /> : <UserPlus size={16} />}
                       isLoading={escalatingReviewId === review.id}
                       isDisabled={decidingReviewId === review.id}
@@ -1623,8 +1621,7 @@ export default function CaringCommunityWorkflowPage() {
                     </Button>
                     <Button
                       size="sm"
-                      variant="flat"
-                      color="success"
+                      variant="primary"
                       startContent={<CheckCircle2 size={16} />}
                       isLoading={decidingReviewId === review.id}
                       onPress={() => decideReview(review, 'approve')}
@@ -1633,8 +1630,7 @@ export default function CaringCommunityWorkflowPage() {
                     </Button>
                     <Button
                       size="sm"
-                      variant="flat"
-                      color="danger"
+                      variant="danger"
                       startContent={<XCircle size={16} />}
                       isDisabled={decidingReviewId === review.id}
                       onPress={() => decideReview(review, 'decline')}
@@ -1647,15 +1643,15 @@ export default function CaringCommunityWorkflowPage() {
             </CardBody>
           </Card>
 
-          <Card shadow="sm">
+          <Card>
             <CardHeader className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <h2 className="text-lg font-semibold">{t('caring_workflow.relationships.title')}</h2>
-                <p className="mt-1 text-sm text-default-500">{t('caring_workflow.relationships.description')}</p>
+                <p className="mt-1 text-sm text-muted">{t('caring_workflow.relationships.description')}</p>
               </div>
               <Button
                 size="sm"
-                variant="flat"
+                variant="secondary"
                 startContent={<RefreshCw size={16} />}
                 isLoading={loadingRelationships}
                 onPress={loadSupportRelationships}
@@ -1671,7 +1667,7 @@ export default function CaringCommunityWorkflowPage() {
                 <SignalRow label={t('caring_workflow.relationships.check_ins_due')} value={relationships?.stats.check_ins_due ?? 0} />
                 <SignalRow label={t('caring_workflow.relationships.expected_hours')} value={relationships?.stats.expected_active_hours ?? 0} />
               </div>
-              <div id="caring-support-relationship-form" className="rounded-lg border border-default-200 p-3">
+              <div id="caring-support-relationship-form" className="rounded-lg border border-border p-3">
                 <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
                   <MemberSearchPicker
                     value={relationshipSupporterId}
@@ -1708,32 +1704,32 @@ export default function CaringCommunityWorkflowPage() {
                   <Input type="date" label={t('caring_workflow.relationships.start_date')} value={relationshipStartDate} onValueChange={setRelationshipStartDate} />
                 </div>
                 <div className="mt-3">
-                  <Button color="primary" variant="flat" startContent={<Plus size={16} />} isLoading={savingRelationship} onPress={createSupportRelationship}>
+                  <Button variant="primary" startContent={<Plus size={16} />} isLoading={savingRelationship} onPress={createSupportRelationship}>
                     {t('caring_workflow.relationships.create')}
                   </Button>
                 </div>
               </div>
               {(relationships?.items.length ?? 0) === 0 ? (
-                <div className="rounded-lg bg-default-100 p-4 text-sm text-default-500">
+                <div className="rounded-lg bg-surface-secondary p-4 text-sm text-muted">
                   {t('caring_workflow.relationships.empty')}
                 </div>
               ) : relationships?.items.map((relationship) => (
-                <div key={relationship.id} className="rounded-lg border border-default-200 p-4">
+                <div key={relationship.id} className="rounded-lg border border-border p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                      <p className="text-sm font-semibold text-default-900">{relationship.title}</p>
-                      <p className="mt-1 text-sm text-default-500">
+                      <p className="text-sm font-semibold text-foreground">{relationship.title}</p>
+                      <p className="mt-1 text-sm text-muted">
                         {t('caring_workflow.relationships.pair', { supporter: relationship.supporter.name, recipient: relationship.recipient.name })}
                       </p>
                     </div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <Chip size="sm" color={relationship.status === 'active' ? 'success' : 'warning'} variant="flat">
+                      <Chip size="sm" color={relationship.status === 'active' ? 'success' : 'warning'} variant="soft">
                         {t(`caring_workflow.relationships.status.${relationship.status}`)}
                       </Chip>
-                      <Chip size="sm" color="primary" variant="flat">{formatHours(relationship.expected_hours)}</Chip>
+                      <Chip size="sm" color="accent" variant="soft">{formatHours(relationship.expected_hours)}</Chip>
                     </div>
                   </div>
-                  <div className="mt-3 flex flex-wrap gap-2 text-xs text-default-500">
+                  <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted">
                     <span>{t(`caring_workflow.relationships.frequency.${relationship.frequency}`)}</span>
                     <span>{t('caring_workflow.relationships.started', { date: relationship.start_date })}</span>
                     {relationship.next_check_in_at && <span>{t('caring_workflow.relationships.next_check_in', { date: relationship.next_check_in_at })}</span>}
@@ -1742,8 +1738,7 @@ export default function CaringCommunityWorkflowPage() {
                   <div className="mt-3 flex flex-wrap gap-2">
                     <Button
                       size="sm"
-                      variant="flat"
-                      color={relationship.status === 'active' ? 'warning' : 'success'}
+                      variant="secondary"
                       startContent={relationship.status === 'active' ? <Pause size={16} /> : <CheckCircle2 size={16} />}
                       isLoading={updatingRelationshipId === relationship.id}
                       onPress={() => updateSupportRelationshipStatus(relationship, relationship.status === 'active' ? 'paused' : 'active')}
@@ -1752,7 +1747,7 @@ export default function CaringCommunityWorkflowPage() {
                     </Button>
                   </div>
                   {relationship.status === 'active' && (
-                    <div className="mt-4 rounded-lg bg-default-50 p-3">
+                    <div className="mt-4 rounded-lg bg-surface p-3">
                       <div className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_1fr_2fr_auto]">
                         <Input
                           type="date"
@@ -1780,8 +1775,7 @@ export default function CaringCommunityWorkflowPage() {
                         />
                         <Button
                           size="sm"
-                          color="primary"
-                          variant="flat"
+                          variant="primary"
                           className="self-end"
                           startContent={<ClipboardCheck size={16} />}
                           isLoading={loggingRelationshipId === relationship.id}
@@ -1798,21 +1792,21 @@ export default function CaringCommunityWorkflowPage() {
           </Card>
 
           {/* Safeguarding reports - K9 */}
-          <Card shadow="sm">
+          <Card>
             <CardHeader className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <h2 className="text-lg font-semibold flex items-center gap-2">
                   <TriangleAlert size={18} className="text-danger" />
                   {t('caring_workflow.safeguarding.title')}
                 </h2>
-                <p className="mt-1 text-sm text-default-500">
+                <p className="mt-1 text-sm text-muted">
                   {t('caring_workflow.safeguarding.description')}
                 </p>
               </div>
               <div className="flex gap-2">
                 <Button
                   size="sm"
-                  variant="flat"
+                  variant="secondary"
                   startContent={<RefreshCw size={16} />}
                   isLoading={loadingSafeguarding}
                   onPress={loadSafeguardingSummary}
@@ -1823,8 +1817,7 @@ export default function CaringCommunityWorkflowPage() {
                   as={Link}
                   to={tenantPath('/caring/safeguarding')}
                   size="sm"
-                  color="primary"
-                  variant="flat"
+                  variant="primary"
                 >
                   {t('caring_workflow.safeguarding.view_all')}
                 </Button>
@@ -1837,7 +1830,7 @@ export default function CaringCommunityWorkflowPage() {
                   <Spinner size="sm" />
                 </div>
               ) : !safeguardingSummary ? (
-                <p className="text-sm text-default-500 py-4 text-center">{t('caring_workflow.safeguarding.no_data')}</p>
+                <p className="text-sm text-muted py-4 text-center">{t('caring_workflow.safeguarding.no_data')}</p>
               ) : (
                 <>
                   <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
@@ -1849,12 +1842,12 @@ export default function CaringCommunityWorkflowPage() {
                       <p className="text-xs uppercase tracking-wide text-amber-700 dark:text-amber-300">{t('caring_workflow.safeguarding.severity.high')}</p>
                       <p className="text-2xl font-semibold">{safeguardingSummary.open_by_severity.high}</p>
                     </div>
-                    <div className="rounded-lg border border-default-200 p-3 text-center">
-                      <p className="text-xs uppercase tracking-wide text-default-600">{t('caring_workflow.safeguarding.severity.medium')}</p>
+                    <div className="rounded-lg border border-border p-3 text-center">
+                      <p className="text-xs uppercase tracking-wide text-foreground">{t('caring_workflow.safeguarding.severity.medium')}</p>
                       <p className="text-2xl font-semibold">{safeguardingSummary.open_by_severity.medium}</p>
                     </div>
-                    <div className="rounded-lg border border-default-200 p-3 text-center">
-                      <p className="text-xs uppercase tracking-wide text-default-600">{t('caring_workflow.safeguarding.severity.low')}</p>
+                    <div className="rounded-lg border border-border p-3 text-center">
+                      <p className="text-xs uppercase tracking-wide text-foreground">{t('caring_workflow.safeguarding.severity.low')}</p>
                       <p className="text-2xl font-semibold">{safeguardingSummary.open_by_severity.low}</p>
                     </div>
                     <div className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-3 text-center">
@@ -1866,7 +1859,7 @@ export default function CaringCommunityWorkflowPage() {
                   </div>
 
                   {safeguardingSummary.recent.length === 0 ? (
-                    <p className="text-sm text-default-500 py-4 text-center">{t('caring_workflow.safeguarding.no_reports')}</p>
+                    <p className="text-sm text-muted py-4 text-center">{t('caring_workflow.safeguarding.no_reports')}</p>
                   ) : (
                     <Table aria-label={t('caring_workflow.safeguarding.table_aria')} removeWrapper>
                       <TableHeader>
@@ -1902,7 +1895,7 @@ export default function CaringCommunityWorkflowPage() {
                             return (
                               <TableRow key={r.id}>
                                 <TableCell>
-                                  <Chip size="sm" color={severityColor[r.severity]} variant="flat">
+                                  <Chip size="sm" color={severityColor[r.severity]} variant="soft">
                                     {t(`caring_workflow.safeguarding.severity.${r.severity}`)}
                                   </Chip>
                                 </TableCell>
@@ -1911,11 +1904,11 @@ export default function CaringCommunityWorkflowPage() {
                                   {r.subject_user_name ?? (r.subject_organisation_id ? t('caring_workflow.safeguarding.org_subject', { id: r.subject_organisation_id }) : t('caring_workflow.empty.value'))}
                                 </TableCell>
                                 <TableCell>
-                                  <Chip size="sm" color={statusColor[r.status]} variant="flat">
+                                  <Chip size="sm" color={statusColor[r.status]} variant="soft">
                                     {t(`caring_workflow.safeguarding.status.${r.status}`)}
                                   </Chip>
                                   {r.is_overdue && (
-                                    <Chip size="sm" color="danger" variant="bordered" className="ml-1">
+                                    <Chip size="sm" color="danger" variant="secondary" className="ml-1">
                                       {t('caring_workflow.safeguarding.overdue')}
                                     </Chip>
                                   )}
@@ -1927,7 +1920,7 @@ export default function CaringCommunityWorkflowPage() {
                                       as={Link}
                                       to={tenantPath('/caring/safeguarding')}
                                       size="sm"
-                                      variant="flat"
+                                      variant="secondary"
                                     >
                                       {t('caring_workflow.safeguarding.open')}
                                     </Button>
@@ -1952,20 +1945,20 @@ export default function CaringCommunityWorkflowPage() {
             t={t}
           />
 
-          <Card shadow="sm">
+          <Card>
             <CardHeader className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <h2 className="text-lg font-semibold flex items-center gap-2">
                   <Sparkles size={18} className="text-accent" />
                   {t('caring_workflow.tandem.title')}
                 </h2>
-                <p className="mt-1 text-sm text-default-500">
+                <p className="mt-1 text-sm text-muted">
                   {t('caring_workflow.tandem.description')}
                 </p>
               </div>
               <Button
                 size="sm"
-                variant="flat"
+                variant="secondary"
                 startContent={<RefreshCw size={16} />}
                 isLoading={loadingTandems}
                 onPress={loadTandemSuggestions}
@@ -1984,7 +1977,7 @@ export default function CaringCommunityWorkflowPage() {
                   {tandemError}
                 </div>
               ) : tandemSuggestions.length === 0 ? (
-                <div className="rounded-lg bg-default-100 p-4 text-sm text-default-500">
+                <div className="rounded-lg bg-surface-secondary p-4 text-sm text-muted">
                   {t('caring_workflow.tandem.empty')}
                 </div>
               ) : (
@@ -2010,11 +2003,11 @@ export default function CaringCommunityWorkflowPage() {
                     chips.push({ key: 'interests', label: t('caring_workflow.tandem.shared_interests') });
                   }
                   return (
-                    <div key={key} className="rounded-lg border border-default-200 p-4">
+                    <div key={key} className="rounded-lg border border-border p-4">
                       <div className="flex flex-wrap items-center justify-between gap-3">
                         <div className="flex flex-wrap items-center gap-3">
                           <div className="flex items-center gap-2">
-                            <div className="h-9 w-9 overflow-hidden rounded-full bg-default-100 flex items-center justify-center text-xs font-semibold">
+                            <div className="h-9 w-9 overflow-hidden rounded-full bg-surface-secondary flex items-center justify-center text-xs font-semibold">
                               {suggestion.supporter.avatar_url ? (
                                 <img src={suggestion.supporter.avatar_url} alt="" className="h-full w-full object-cover" />
                               ) : (
@@ -2022,13 +2015,13 @@ export default function CaringCommunityWorkflowPage() {
                               )}
                             </div>
                             <div className="text-sm">
-                              <div className="font-semibold text-default-900">{suggestion.supporter.name}</div>
-                              <div className="text-xs text-default-500">{t('caring_workflow.relationships.supporter')}</div>
+                              <div className="font-semibold text-foreground">{suggestion.supporter.name}</div>
+                              <div className="text-xs text-muted">{t('caring_workflow.relationships.supporter')}</div>
                             </div>
                           </div>
                           <HeartHandshake size={20} className="text-accent" />
                           <div className="flex items-center gap-2">
-                            <div className="h-9 w-9 overflow-hidden rounded-full bg-default-100 flex items-center justify-center text-xs font-semibold">
+                            <div className="h-9 w-9 overflow-hidden rounded-full bg-surface-secondary flex items-center justify-center text-xs font-semibold">
                               {suggestion.recipient.avatar_url ? (
                                 <img src={suggestion.recipient.avatar_url} alt="" className="h-full w-full object-cover" />
                               ) : (
@@ -2036,32 +2029,31 @@ export default function CaringCommunityWorkflowPage() {
                               )}
                             </div>
                             <div className="text-sm">
-                              <div className="font-semibold text-default-900">{suggestion.recipient.name}</div>
-                              <div className="text-xs text-default-500">{t('caring_workflow.relationships.recipient')}</div>
+                              <div className="font-semibold text-foreground">{suggestion.recipient.name}</div>
+                              <div className="text-xs text-muted">{t('caring_workflow.relationships.recipient')}</div>
                             </div>
                           </div>
                         </div>
-                        <Chip size="sm" color={scoreColor} variant="flat">
+                        <Chip size="sm" color={scoreColor} variant="soft">
                           {t('caring_workflow.tandem.score', { value: Math.round(suggestion.score * 100) })}
                         </Chip>
                       </div>
                       {chips.length > 0 && (
                         <div className="mt-3 flex flex-wrap gap-2">
                           {chips.map((chip) => (
-                            <Chip key={chip.key} size="sm" variant="flat" color="primary">
+                            <Chip key={chip.key} size="sm" variant="soft" color="accent">
                               {chip.label}
                             </Chip>
                           ))}
                         </div>
                       )}
                       {suggestion.reason && (
-                        <p className="mt-2 text-xs text-default-500">{suggestion.reason}</p>
+                        <p className="mt-2 text-xs text-muted">{suggestion.reason}</p>
                       )}
                       <div className="mt-3 flex flex-wrap justify-end gap-2">
                         <Button
                           size="sm"
-                          variant="light"
-                          color="default"
+                          variant="tertiary"
                           startContent={<XCircle size={16} />}
                           isLoading={dismissingTandemKey === key}
                           onPress={() => dismissTandemSuggestion(suggestion)}
@@ -2070,8 +2062,7 @@ export default function CaringCommunityWorkflowPage() {
                         </Button>
                         <Button
                           size="sm"
-                          color="primary"
-                          variant="flat"
+                          variant="primary"
                           startContent={<Heart size={16} />}
                           onPress={() => createTandemFromSuggestion(suggestion)}
                         >
@@ -2088,16 +2079,15 @@ export default function CaringCommunityWorkflowPage() {
 
         <div className="space-y-6">
           {summary?.policy && (
-            <Card shadow="sm">
+            <Card>
               <CardHeader className="flex items-start justify-between gap-3">
                 <div>
                   <h2 className="text-lg font-semibold">{t('caring_workflow.policy.title')}</h2>
-                  <p className="mt-1 text-sm text-default-500">
+                  <p className="mt-1 text-sm text-muted">
                     {t('caring_workflow.policy.description')}
                   </p>
                 </div>
                 <Button
-                  color="primary"
                   size="sm"
                   startContent={<Save size={16} />}
                   isLoading={savingPolicy}
@@ -2191,11 +2181,11 @@ export default function CaringCommunityWorkflowPage() {
             </Card>
           )}
 
-          <Card shadow="sm">
+          <Card>
             <CardHeader>
               <div>
                 <h2 className="text-lg font-semibold">{t('caring_workflow.member_statement.title')}</h2>
-                <p className="mt-1 text-sm text-default-500">
+                <p className="mt-1 text-sm text-muted">
                   {t('caring_workflow.member_statement.description')}
                 </p>
               </div>
@@ -2225,8 +2215,7 @@ export default function CaringCommunityWorkflowPage() {
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button
-                  color="primary"
-                  variant="flat"
+                  variant="primary"
                   startContent={<Search size={16} />}
                   isLoading={loadingStatement}
                   onPress={loadMemberStatement}
@@ -2234,7 +2223,7 @@ export default function CaringCommunityWorkflowPage() {
                   {t('caring_workflow.member_statement.preview')}
                 </Button>
                 <Button
-                  variant="flat"
+                  variant="secondary"
                   startContent={<Download size={16} />}
                   isLoading={loadingStatement}
                   onPress={exportMemberStatement}
@@ -2243,13 +2232,13 @@ export default function CaringCommunityWorkflowPage() {
                 </Button>
               </div>
               {memberStatement ? (
-                <div className="rounded-lg border border-default-200 p-3">
+                <div className="rounded-lg border border-border p-3">
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div>
-                      <p className="text-sm font-semibold text-default-900">{memberStatement.user.name}</p>
-                      <p className="text-xs text-default-500">{memberStatement.user.email}</p>
+                      <p className="text-sm font-semibold text-foreground">{memberStatement.user.name}</p>
+                      <p className="text-xs text-muted">{memberStatement.user.email}</p>
                     </div>
-                    <Chip size="sm" color="success" variant="flat">
+                    <Chip size="sm" color="success" variant="soft">
                       {formatHours(memberStatement.summary.current_balance)}
                     </Chip>
                   </div>
@@ -2259,33 +2248,33 @@ export default function CaringCommunityWorkflowPage() {
                     <SignalRow label={t('caring_workflow.member_statement.wallet_hours_earned')} value={memberStatement.summary.wallet_hours_earned} />
                     <SignalRow label={t('caring_workflow.member_statement.wallet_hours_spent')} value={memberStatement.summary.wallet_hours_spent} />
                   </div>
-                  <div className="mt-3 rounded-lg bg-default-100 px-3 py-2 text-sm text-default-700">
+                  <div className="mt-3 rounded-lg bg-surface-secondary px-3 py-2 text-sm text-foreground">
                     {formatChf(memberStatement.summary.estimated_social_value_chf)}
                   </div>
                   {memberStatement.support_hours_by_organisation.length > 0 && (
                     <div className="mt-3 space-y-2">
                       {memberStatement.support_hours_by_organisation.slice(0, 3).map((organisation) => (
                         <div key={organisation.organisation_name} className="flex items-center justify-between gap-3 text-xs">
-                          <span className="truncate text-default-600">{organisation.organisation_name}</span>
-                          <span className="font-semibold text-default-900">{formatHours(organisation.approved_hours)}</span>
+                          <span className="truncate text-foreground">{organisation.organisation_name}</span>
+                          <span className="font-semibold text-foreground">{formatHours(organisation.approved_hours)}</span>
                         </div>
                       ))}
                     </div>
                   )}
                 </div>
               ) : (
-                <div className="rounded-lg bg-default-100 p-3 text-sm text-default-500">
+                <div className="rounded-lg bg-surface-secondary p-3 text-sm text-muted">
                   {t('caring_workflow.member_statement.empty')}
                 </div>
               )}
             </CardBody>
           </Card>
 
-          <Card shadow="sm">
+          <Card>
             <CardHeader>
               <div>
                 <h2 className="text-lg font-semibold">{t('caring_workflow.signals.title')}</h2>
-                <p className="mt-1 text-sm text-default-500">
+                <p className="mt-1 text-sm text-muted">
                   {t('caring_workflow.signals.description')}
                 </p>
               </div>
@@ -2300,13 +2289,13 @@ export default function CaringCommunityWorkflowPage() {
           </Card>
 
           {/* Informal Favours (AG11) */}
-          <Card shadow="sm">
+          <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
                 <Heart size={18} className="text-rose-500" />
                 <div>
                   <h2 className="text-lg font-semibold">{t('caring_workflow.favours.title')}</h2>
-                  <p className="mt-0.5 text-sm text-default-500">
+                  <p className="mt-0.5 text-sm text-muted">
                     {loadingFavours ? t('caring_workflow.favours.loading') : t('caring_workflow.favours.total_recorded', { count: favoursData?.count ?? 0 })}
                   </p>
                 </div>
@@ -2315,20 +2304,20 @@ export default function CaringCommunityWorkflowPage() {
             <Separator />
             <CardBody className="gap-2">
               {loadingFavours && (
-                <p className="text-sm text-default-500">{t('caring_workflow.favours.loading_favours')}</p>
+                <p className="text-sm text-muted">{t('caring_workflow.favours.loading_favours')}</p>
               )}
               {!loadingFavours && !favoursData?.items?.length && (
-                <p className="text-sm text-default-500">{t('caring_workflow.favours.empty')}</p>
+                <p className="text-sm text-muted">{t('caring_workflow.favours.empty')}</p>
               )}
               {!loadingFavours && (favoursData?.items ?? []).slice(0, 5).map((f) => (
-                <div key={f.id} className="rounded-lg border border-default-200 p-3">
-                  <div className="flex items-center justify-between gap-2 text-xs text-default-500">
+                <div key={f.id} className="rounded-lg border border-border p-3">
+                  <div className="flex items-center justify-between gap-2 text-xs text-muted">
                     <span>{f.is_anonymous ? t('caring_workflow.favours.anonymous') : (f.offerer_name ?? t('caring_workflow.favours.unknown'))}</span>
                     <span>{f.favour_date}</span>
                   </div>
-                  <p className="mt-1 text-sm text-default-800 line-clamp-2">{f.description}</p>
+                  <p className="mt-1 text-sm text-foreground line-clamp-2">{f.description}</p>
                   {f.category && (
-                    <span className="mt-1 inline-block rounded bg-default-100 px-1.5 py-0.5 text-xs text-default-600">
+                    <span className="mt-1 inline-block rounded bg-surface-secondary px-1.5 py-0.5 text-xs text-foreground">
                       {f.category}
                     </span>
                   )}
@@ -2337,18 +2326,17 @@ export default function CaringCommunityWorkflowPage() {
             </CardBody>
           </Card>
 
-          <Card shadow="sm">
+          <Card>
             <CardHeader className="flex items-start justify-between gap-3">
               <div>
                 <h2 className="text-lg font-semibold">{t('caring_workflow.role_pack.title')}</h2>
-                <p className="mt-1 text-sm text-default-500">
+                <p className="mt-1 text-sm text-muted">
                   {t('caring_workflow.role_pack.description', { countLabel: roleCountLabel })}
                 </p>
               </div>
               <Button
-                color="primary"
                 size="sm"
-                variant="flat"
+                variant="secondary"
                 isLoading={installingRoles}
                 onPress={installRolePack}
               >
@@ -2361,20 +2349,20 @@ export default function CaringCommunityWorkflowPage() {
                 const Icon = role.icon;
                 const status = roleStatusByKey.get(role.key);
                 return (
-                  <div key={role.key} className="flex items-start gap-3 rounded-lg border border-default-200 p-3">
+                  <div key={role.key} className="flex items-start gap-3 rounded-lg border border-border p-3">
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
                       <Icon size={18} />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-sm font-semibold text-default-900">{t(`caring_workflow.role_pack.presets.${role.key}.title`)}</p>
-                        <Chip size="sm" color={status?.installed ? 'success' : 'default'} variant="flat">
+                        <p className="text-sm font-semibold text-foreground">{t(`caring_workflow.role_pack.presets.${role.key}.title`)}</p>
+                        <Chip size="sm" color={status?.installed ? 'success' : 'default'} variant="soft">
                           {status?.installed ? t('caring_workflow.role_pack.installed') : t('caring_workflow.role_pack.not_installed')}
                         </Chip>
                       </div>
-                      <p className="mt-1 text-xs text-default-500">{t(`caring_workflow.role_pack.presets.${role.key}.description`)}</p>
+                      <p className="mt-1 text-xs text-muted">{t(`caring_workflow.role_pack.presets.${role.key}.description`)}</p>
                       {status && (
-                        <p className="mt-2 text-xs text-default-400">
+                        <p className="mt-2 text-xs text-muted">
                           {t('caring_workflow.role_pack.permissions_granted', { installed: status.installed_permissions, total: status.permission_count })}
                         </p>
                       )}
@@ -2388,30 +2376,30 @@ export default function CaringCommunityWorkflowPage() {
       </div>
 
       {/* Assisted Onboarding card */}
-      <Card className="mt-6" shadow="sm">
+      <Card className="mt-6" >
         <CardHeader>
           <div>
             <h2 className="text-lg font-semibold">{t('caring_workflow.assisted_onboarding.title')}</h2>
-            <p className="mt-1 text-sm text-default-500">
+            <p className="mt-1 text-sm text-muted">
               {t('caring_workflow.assisted_onboarding.description')}
             </p>
           </div>
         </CardHeader>
         <Separator />
         <CardBody className="gap-4">
-          <div className="rounded-lg border border-default-200 bg-default-50 p-4">
+          <div className="rounded-lg border border-border bg-surface p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h3 className="text-sm font-semibold text-default-900">
+                <h3 className="text-sm font-semibold text-foreground">
                   {t('caring_workflow.paper_onboarding.title')}
                 </h3>
-                <p className="mt-1 text-xs text-default-500">
+                <p className="mt-1 text-xs text-muted">
                   {t('caring_workflow.paper_onboarding.description')}
                 </p>
               </div>
               <Button
                 size="sm"
-                variant="flat"
+                variant="secondary"
                 startContent={<RefreshCw size={14} />}
                 isLoading={paperLoading}
                 onPress={loadPaperIntakes}
@@ -2462,8 +2450,7 @@ export default function CaringCommunityWorkflowPage() {
 
             <div className="mt-3 flex flex-wrap gap-2">
               <Button
-                color="primary"
-                variant="flat"
+                variant="primary"
                 startContent={<FileText size={16} />}
                 isLoading={paperUploading}
                 onPress={uploadPaperOnboarding}
@@ -2472,8 +2459,7 @@ export default function CaringCommunityWorkflowPage() {
               </Button>
               {paperReviewingId && (
                 <Button
-                  color="success"
-                  variant="flat"
+                  variant="primary"
                   startContent={<CheckCircle2 size={16} />}
                   isLoading={onboardingLoading}
                   onPress={confirmPaperOnboarding}
@@ -2500,14 +2486,14 @@ export default function CaringCommunityWorkflowPage() {
                   return (
                     <div key={intake.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-background px-3 py-2">
                       <div>
-                        <p className="text-sm font-medium text-default-900">
+                        <p className="text-sm font-medium text-foreground">
                           {fields.name || intake.original_filename}
                         </p>
-                        <p className="text-xs text-default-500">
+                        <p className="text-xs text-muted">
                           {fields.email || t('caring_workflow.paper_onboarding.no_email')} · {intake.original_filename}
                         </p>
                       </div>
-                      <Button size="sm" variant="flat" onPress={() => startPaperReview(intake)}>
+                      <Button size="sm" variant="secondary" onPress={() => startPaperReview(intake)}>
                         {t('caring_workflow.paper_onboarding.review_cta')}
                       </Button>
                     </div>
@@ -2547,8 +2533,7 @@ export default function CaringCommunityWorkflowPage() {
             />
           </div>
           <Button
-            color="primary"
-            variant="flat"
+            variant="primary"
             startContent={<UserPlus size={16} />}
             isLoading={onboardingLoading}
             onPress={submitAssistedOnboarding}
@@ -2561,16 +2546,16 @@ export default function CaringCommunityWorkflowPage() {
               <p className="text-sm font-semibold text-success-700">
                 {t('caring_workflow.assisted_onboarding.created_for', { name: onboardingResult.user.name, email: onboardingResult.user.email })}
               </p>
-              <p className="mt-2 text-xs text-default-500">
+              <p className="mt-2 text-xs text-muted">
                 {t('caring_workflow.assisted_onboarding.password_note')}
               </p>
               <div className="mt-3 flex items-center gap-2">
-                <code className="flex-1 rounded bg-default-100 px-3 py-2 text-sm font-mono text-default-900">
+                <code className="flex-1 rounded bg-surface-secondary px-3 py-2 text-sm font-mono text-foreground">
                   {onboardingResult.temp_password}
                 </code>
                 <Button
                   size="sm"
-                  variant="flat"
+                  variant="secondary"
                   startContent={<Copy size={14} />}
                   onPress={copyTempPassword}
                 >
@@ -2583,17 +2568,17 @@ export default function CaringCommunityWorkflowPage() {
       </Card>
 
       {/* Invite Codes card */}
-      <Card className="mt-6" shadow="sm">
+      <Card className="mt-6" >
         <CardHeader className="flex items-start justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold">{t('caring_workflow.invite_codes.title')}</h2>
-            <p className="mt-1 text-sm text-default-500">
+            <p className="mt-1 text-sm text-muted">
               {t('caring_workflow.invite_codes.description')}
             </p>
           </div>
           <Button
             size="sm"
-            variant="flat"
+            variant="secondary"
             startContent={<RefreshCw size={16} />}
             isLoading={loadingInviteCodes}
             onPress={loadInviteCodes}
@@ -2613,8 +2598,7 @@ export default function CaringCommunityWorkflowPage() {
               onValueChange={setInviteLabel}
             />
             <Button
-              color="primary"
-              variant="flat"
+              variant="primary"
               startContent={<Plus size={16} />}
               isLoading={generatingCode}
               onPress={generateInviteCode}
@@ -2628,21 +2612,21 @@ export default function CaringCommunityWorkflowPage() {
             <div className="rounded-lg border border-success-200 bg-success-50 p-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="text-xs text-default-500">{t('caring_workflow.invite_codes.new_code')}</p>
+                  <p className="text-xs text-muted">{t('caring_workflow.invite_codes.new_code')}</p>
                   <p className="mt-1 font-mono text-3xl font-bold tracking-widest text-success-700">
                     {generatedCode.code}
                   </p>
                   {generatedCode.label && (
-                    <p className="mt-1 text-xs text-default-600">{generatedCode.label}</p>
+                    <p className="mt-1 text-xs text-foreground">{generatedCode.label}</p>
                   )}
-                  <p className="mt-1 text-xs text-default-400">
+                  <p className="mt-1 text-xs text-muted">
                     {t('caring_workflow.invite_codes.expires', { date: new Date(generatedCode.expires_at).toLocaleDateString() })}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Button
                     size="sm"
-                    variant="flat"
+                    variant="secondary"
                     startContent={<Copy size={14} />}
                     onPress={() => copyInviteCode(generatedCode.invite_url)}
                   >
@@ -2650,7 +2634,7 @@ export default function CaringCommunityWorkflowPage() {
                   </Button>
                   <Button
                     size="sm"
-                    variant="flat"
+                    variant="secondary"
                     startContent={<Printer size={14} />}
                     onPress={() => printInviteCard(generatedCode)}
                   >
@@ -2662,7 +2646,7 @@ export default function CaringCommunityWorkflowPage() {
                     target="_blank"
                     rel="noreferrer"
                     size="sm"
-                    variant="flat"
+                    variant="secondary"
                     startContent={<ExternalLink size={14} />}
                   >
                     {t('caring_workflow.invite_codes.open')}
@@ -2697,13 +2681,13 @@ export default function CaringCommunityWorkflowPage() {
               <TableBody>
                   {inviteCodes.map((ic) => (
                     <TableRow key={ic.id}>
-                      <TableCell className="font-mono font-semibold tracking-wider text-default-900">{ic.code}</TableCell>
-                      <TableCell className="text-default-600">{ic.label ?? t('caring_workflow.empty.value')}</TableCell>
-                      <TableCell className="text-default-500">{new Date(ic.expires_at).toLocaleDateString()}</TableCell>
+                      <TableCell className="font-mono font-semibold tracking-wider text-foreground">{ic.code}</TableCell>
+                      <TableCell className="text-foreground">{ic.label ?? t('caring_workflow.empty.value')}</TableCell>
+                      <TableCell className="text-muted">{new Date(ic.expires_at).toLocaleDateString()}</TableCell>
                       <TableCell>
                         <Chip
                           size="sm"
-                          variant="flat"
+                          variant="soft"
                           color={ic.status === 'active' ? 'success' : ic.status === 'used' ? 'default' : 'warning'}
                         >
                           {ic.status === 'active'
@@ -2718,7 +2702,7 @@ export default function CaringCommunityWorkflowPage() {
                           <Button
                             size="sm"
                             isIconOnly
-                            variant="light"
+                            variant="tertiary"
                             title={t('caring_workflow.invite_codes.copy_url')}
                             onPress={() => copyInviteCode(ic.invite_url)}
                           >
@@ -2728,7 +2712,7 @@ export default function CaringCommunityWorkflowPage() {
                             <Button
                               size="sm"
                               isIconOnly
-                              variant="light"
+                              variant="tertiary"
                               title={t('caring_workflow.invite_codes.print_card')}
                               onPress={() => printInviteCard(ic)}
                             >
@@ -2755,18 +2739,18 @@ export default function CaringCommunityWorkflowPage() {
           )}
 
           {inviteCodes.length === 0 && !loadingInviteCodes && (
-            <div className="rounded-lg bg-default-100 p-3 text-sm text-default-500">
+            <div className="rounded-lg bg-surface-secondary p-3 text-sm text-muted">
               {t('caring_workflow.invite_codes.empty')}
             </div>
           )}
         </CardBody>
       </Card>
 
-      <Card className="mt-6" shadow="sm">
+      <Card className="mt-6" >
         <CardHeader>
           <div>
             <h2 className="text-lg font-semibold">{t('caring_workflow.stages.title')}</h2>
-            <p className="mt-1 text-sm text-default-500">{t('caring_workflow.stages.description')}</p>
+            <p className="mt-1 text-sm text-muted">{t('caring_workflow.stages.description')}</p>
           </div>
         </CardHeader>
         <Separator />
@@ -2774,15 +2758,15 @@ export default function CaringCommunityWorkflowPage() {
           {workflowStages.map((stage, index) => {
             const Icon = stage.icon;
             return (
-              <div key={stage.key} className="rounded-lg border border-default-200 p-3">
+              <div key={stage.key} className="rounded-lg border border-border p-3">
                 <div className="mb-3 flex items-center justify-between">
                   <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-soft text-accent">
                     <Icon size={18} />
                   </div>
-                  <Chip size="sm" variant="flat">{index + 1}</Chip>
+                  <Chip size="sm" variant="soft">{index + 1}</Chip>
                 </div>
-                <p className="text-sm font-semibold text-default-900">{t(`caring_workflow.stages.${stage.key}.title`)}</p>
-                <p className="mt-1 text-xs text-default-500">{t(`caring_workflow.stages.${stage.key}.description`)}</p>
+                <p className="text-sm font-semibold text-foreground">{t(`caring_workflow.stages.${stage.key}.title`)}</p>
+                <p className="mt-1 text-xs text-muted">{t(`caring_workflow.stages.${stage.key}.description`)}</p>
               </div>
             );
           })}
@@ -2794,19 +2778,19 @@ export default function CaringCommunityWorkflowPage() {
 
 function SignalRow({ label, value }: { label: string; value: number }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-lg bg-default-100 px-3 py-2">
-      <span className="text-sm text-default-600">{label}</span>
-      <span className="text-sm font-semibold text-default-900">{value.toLocaleString()}</span>
+    <div className="flex items-center justify-between gap-3 rounded-lg bg-surface-secondary px-3 py-2">
+      <span className="text-sm text-foreground">{label}</span>
+      <span className="text-sm font-semibold text-foreground">{value.toLocaleString()}</span>
     </div>
   );
 }
 
 function PolicySwitch({ label, description, value, onChange }: { label: string; description: string; value: boolean; onChange: (value: boolean) => void }) {
   return (
-    <div className="flex items-center justify-between gap-4 rounded-lg border border-default-200 p-3">
+    <div className="flex items-center justify-between gap-4 rounded-lg border border-border p-3">
       <div>
-        <p className="text-sm font-semibold text-default-900">{label}</p>
-        <p className="mt-1 text-xs text-default-500">{description}</p>
+        <p className="text-sm font-semibold text-foreground">{label}</p>
+        <p className="mt-1 text-xs text-muted">{description}</p>
       </div>
       <Switch isSelected={value} onValueChange={onChange} aria-label={label} />
     </div>
@@ -2827,26 +2811,26 @@ function PrintableInviteCard({
   const { t } = useTranslation('admin');
 
   return (
-    <div className="mx-auto max-w-[400px] rounded-xl border-[3px] border-default-800 p-8 text-center font-serif">
-      <p className="mb-1 text-[13px] font-semibold uppercase tracking-wider text-default-500">
+    <div className="mx-auto max-w-[400px] rounded-xl border-[3px] border-foreground p-8 text-center font-serif">
+      <p className="mb-1 text-[13px] font-semibold uppercase tracking-wider text-muted">
         {t('caring_workflow.invite_card.brand')}
       </p>
-      <p className="mb-5 text-[13px] text-default-400">
+      <p className="mb-5 text-[13px] text-muted">
         {t('caring_workflow.invite_card.subtitle')}
       </p>
-      <div className="mb-5 inline-block rounded-lg border-2 border-default-800 bg-default-50 px-6 py-4 dark:bg-default-100">
-        <span className="font-mono text-[40px] font-bold tracking-[0.25em] text-default-900">
+      <div className="mb-5 inline-block rounded-lg border-2 border-foreground bg-surface px-6 py-4 dark:bg-surface-secondary">
+        <span className="font-mono text-[40px] font-bold tracking-[0.25em] text-foreground">
           {code}
         </span>
       </div>
       {label && (
-        <p className="mb-3 text-sm italic text-default-600">{label}</p>
+        <p className="mb-3 text-sm italic text-foreground">{label}</p>
       )}
-      <p className="mb-2 text-xs text-default-600">
+      <p className="mb-2 text-xs text-foreground">
         {t('caring_workflow.invite_card.instructions')}
       </p>
-      <p className="break-all font-mono text-[11px] text-default-700">{inviteUrl}</p>
-      <p className="mt-3 text-[11px] text-default-400">
+      <p className="break-all font-mono text-[11px] text-foreground">{inviteUrl}</p>
+      <p className="mt-3 text-[11px] text-muted">
         {t('caring_workflow.invite_card.valid_until', { date: new Date(expiresAt).toLocaleDateString() })}
       </p>
     </div>

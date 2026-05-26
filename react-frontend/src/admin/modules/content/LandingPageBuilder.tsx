@@ -155,7 +155,7 @@ function IconSelect({
         const selected = Array.from(keys)[0] as string | undefined;
         onChange(selected as LandingIconId | undefined);
       }}
-      variant="bordered"
+      variant="secondary"
       size="sm"
     >
       {ICON_OPTIONS.map((icon) => (
@@ -187,7 +187,7 @@ function HeroEditor({
         placeholder={t('content.landing_placeholder_badge_text')}
         value={content.badge_text || ''}
         onValueChange={(v) => update('badge_text', v)}
-        variant="bordered"
+        variant="secondary"
         size="sm"
       />
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -196,7 +196,7 @@ function HeroEditor({
           placeholder={t('content.landing_placeholder_headline_1')}
           value={content.headline_1 || ''}
           onValueChange={(v) => update('headline_1', v)}
-          variant="bordered"
+          variant="secondary"
           size="sm"
         />
         <Input
@@ -204,7 +204,7 @@ function HeroEditor({
           placeholder={t('content.landing_placeholder_headline_2')}
           value={content.headline_2 || ''}
           onValueChange={(v) => update('headline_2', v)}
-          variant="bordered"
+          variant="secondary"
           size="sm"
         />
       </div>
@@ -213,19 +213,19 @@ function HeroEditor({
         placeholder={t('content.landing_placeholder_subheadline')}
         value={content.subheadline || ''}
         onValueChange={(v) => update('subheadline', v)}
-        variant="bordered"
+        variant="secondary"
         size="sm"
         minRows={2}
       />
       <Separator />
-      <p className="text-sm font-medium text-default-600">{t('content.landing_primary_cta')}</p>
+      <p className="text-sm font-medium text-muted">{t('content.landing_primary_cta')}</p>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Input
           label={t('content.landing_label_button_text')}
           placeholder={t('content.landing_placeholder_button_text_get_started')}
           value={content.cta_primary_text || ''}
           onValueChange={(v) => update('cta_primary_text', v)}
-          variant="bordered"
+          variant="secondary"
           size="sm"
         />
         <Input
@@ -233,18 +233,18 @@ function HeroEditor({
           placeholder={t('content.landing_placeholder_button_link_register')}
           value={content.cta_primary_link || ''}
           onValueChange={(v) => update('cta_primary_link', v)}
-          variant="bordered"
+          variant="secondary"
           size="sm"
         />
       </div>
-      <p className="text-sm font-medium text-default-600">{t('content.landing_secondary_cta')}</p>
+      <p className="text-sm font-medium text-muted">{t('content.landing_secondary_cta')}</p>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Input
           label={t('content.landing_label_button_text')}
           placeholder={t('content.landing_placeholder_button_text_learn_more')}
           value={content.cta_secondary_text || ''}
           onValueChange={(v) => update('cta_secondary_text', v)}
-          variant="bordered"
+          variant="secondary"
           size="sm"
         />
         <Input
@@ -252,11 +252,11 @@ function HeroEditor({
           placeholder={t('content.landing_placeholder_button_link_about')}
           value={content.cta_secondary_link || ''}
           onValueChange={(v) => update('cta_secondary_link', v)}
-          variant="bordered"
+          variant="secondary"
           size="sm"
         />
       </div>
-      <p className="text-xs text-default-400">{t(HELPER_TEXT_KEY)}</p>
+      <p className="text-xs text-muted">{t(HELPER_TEXT_KEY)}</p>
     </div>
   );
 }
@@ -322,7 +322,7 @@ function AudienceCardsEditor({
           placeholder={t('content.landing_placeholder_audience_title')}
           value={content.title || ''}
           onValueChange={(v) => onChange({ ...content, title: v })}
-          variant="bordered"
+          variant="secondary"
           size="sm"
         />
         <Input
@@ -330,26 +330,26 @@ function AudienceCardsEditor({
           placeholder={t('content.landing_placeholder_audience_subtitle')}
           value={content.subtitle || ''}
           onValueChange={(v) => onChange({ ...content, subtitle: v })}
-          variant="bordered"
+          variant="secondary"
           size="sm"
         />
       </div>
       <Separator />
-      <p className="text-xs text-default-500">
+      <p className="text-xs text-muted">
         {t('content.landing_audience_cards_hint')}
       </p>
       {cards.map((card, i) => (
-        <Card key={i} shadow="none" className="border border-default-200">
+        <Card key={i} variant="transparent" className="border border-border bg-surface">
           <CardBody className="flex flex-col gap-3 p-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-default-600">
+              <span className="text-sm font-medium text-foreground">
                 {t('content.landing_card_number', { number: i + 1 })}
               </span>
               <div className="flex items-center gap-1">
                 <Button
                   isIconOnly
                   size="sm"
-                  variant="light"
+                  variant="tertiary"
                   isDisabled={i === 0}
                   onPress={() => moveCard(i, 'up')}
                   aria-label={t('content.landing_move_card_up', { number: i + 1 })}
@@ -359,7 +359,7 @@ function AudienceCardsEditor({
                 <Button
                   isIconOnly
                   size="sm"
-                  variant="light"
+                  variant="tertiary"
                   isDisabled={i === cards.length - 1}
                   onPress={() => moveCard(i, 'down')}
                   aria-label={t('content.landing_move_card_down', { number: i + 1 })}
@@ -368,8 +368,7 @@ function AudienceCardsEditor({
                 </Button>
                 <Button
                   size="sm"
-                  color="danger"
-                  variant="light"
+                  variant="danger-soft"
                   startContent={<Trash2 size={14} />}
                   onPress={() => removeCard(i)}
                 >
@@ -389,7 +388,7 @@ function AudienceCardsEditor({
                 placeholder={t('content.landing_placeholder_card_title')}
                 value={card.title}
                 onValueChange={(v) => updateCard(i, 'title', v)}
-                variant="bordered"
+                variant="secondary"
                 size="sm"
               />
             </div>
@@ -398,7 +397,7 @@ function AudienceCardsEditor({
               placeholder={t('content.landing_placeholder_card_description')}
               value={card.description}
               onValueChange={(v) => updateCard(i, 'description', v)}
-              variant="bordered"
+              variant="secondary"
               size="sm"
               minRows={2}
             />
@@ -408,7 +407,7 @@ function AudienceCardsEditor({
                 placeholder={t('content.landing_placeholder_button_text_get_started')}
                 value={card.cta_label}
                 onValueChange={(v) => updateCard(i, 'cta_label', v)}
-                variant="bordered"
+                variant="secondary"
                 size="sm"
               />
               <Input
@@ -416,7 +415,7 @@ function AudienceCardsEditor({
                 placeholder={t('content.landing_placeholder_button_link_about')}
                 value={card.target_url}
                 onValueChange={(v) => updateCard(i, 'target_url', v)}
-                variant="bordered"
+                variant="secondary"
                 size="sm"
               />
             </div>
@@ -427,7 +426,7 @@ function AudienceCardsEditor({
         {cards.length < 4 && (
           <Button
             size="sm"
-            variant="flat"
+            variant="secondary"
             startContent={<Plus size={14} />}
             onPress={addCard}
           >
@@ -436,14 +435,14 @@ function AudienceCardsEditor({
         )}
         <Button
           size="sm"
-          variant="flat"
+          variant="secondary"
           startContent={<RotateCcw size={14} />}
           onPress={resetToDefaults}
         >
           {t('content.landing_reset_cards_to_defaults')}
         </Button>
       </div>
-      <p className="text-xs text-default-400">{t(HELPER_TEXT_KEY)}</p>
+      <p className="text-xs text-muted">{t(HELPER_TEXT_KEY)}</p>
     </div>
   );
 }
@@ -486,16 +485,15 @@ function FeaturePillsEditor({
   return (
     <div className="flex flex-col gap-4">
       {items.map((item, i) => (
-        <Card key={i} shadow="none" className="border border-default-200">
+        <Card key={i} variant="transparent" className="border border-border bg-surface">
           <CardBody className="flex flex-col gap-3 p-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-default-600">
+              <span className="text-sm font-medium text-foreground">
                 {t('content.landing_item_number', { number: i + 1 })}
               </span>
               <Button
                 size="sm"
-                color="danger"
-                variant="light"
+                variant="danger-soft"
                 startContent={<Trash2 size={14} />}
                 onPress={() => removeItem(i)}
               >
@@ -513,14 +511,14 @@ function FeaturePillsEditor({
                 label={t('content.landing_label_title')}
                 value={item.title}
                 onValueChange={(v) => updateItem(i, 'title', v)}
-                variant="bordered"
+                variant="secondary"
                 size="sm"
               />
               <Input
                 label={t('content.landing_label_description')}
                 value={item.description}
                 onValueChange={(v) => updateItem(i, 'description', v)}
-                variant="bordered"
+                variant="secondary"
                 size="sm"
               />
             </div>
@@ -530,7 +528,7 @@ function FeaturePillsEditor({
       {items.length < 6 && (
         <Button
           size="sm"
-          variant="flat"
+          variant="secondary"
           startContent={<Plus size={14} />}
           onPress={addItem}
           className="self-start"
@@ -538,7 +536,7 @@ function FeaturePillsEditor({
           {t('content.landing_add_item')}
         </Button>
       )}
-      <p className="text-xs text-default-400">{t(HELPER_TEXT_KEY)}</p>
+      <p className="text-xs text-muted">{t(HELPER_TEXT_KEY)}</p>
     </div>
   );
 }
@@ -560,7 +558,7 @@ function StatsEditor({
       >
         {t('content.landing_show_live_stats')}
       </Switch>
-      <p className="text-xs text-default-400">
+      <p className="text-xs text-muted">
         {t('content.landing_show_live_stats_desc')}
       </p>
     </div>
@@ -608,7 +606,7 @@ function HowItWorksEditor({
           placeholder={t('content.landing_placeholder_section_title_how_it_works')}
           value={content.title || ''}
           onValueChange={(v) => onChange({ ...content, title: v })}
-          variant="bordered"
+          variant="secondary"
           size="sm"
         />
         <Input
@@ -616,22 +614,21 @@ function HowItWorksEditor({
           placeholder={t('content.landing_placeholder_section_subtitle_how_it_works')}
           value={content.subtitle || ''}
           onValueChange={(v) => onChange({ ...content, subtitle: v })}
-          variant="bordered"
+          variant="secondary"
           size="sm"
         />
       </div>
       <Separator />
       {steps.map((step, i) => (
-        <Card key={i} shadow="none" className="border border-default-200">
+        <Card key={i} variant="transparent" className="border border-border bg-surface">
           <CardBody className="flex flex-col gap-3 p-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-default-600">
+              <span className="text-sm font-medium text-foreground">
                 {t('content.landing_step_number', { number: i + 1 })}
               </span>
               <Button
                 size="sm"
-                color="danger"
-                variant="light"
+                variant="danger-soft"
                 startContent={<Trash2 size={14} />}
                 onPress={() => removeStep(i)}
               >
@@ -649,14 +646,14 @@ function HowItWorksEditor({
                 label={t('content.landing_label_title')}
                 value={step.title}
                 onValueChange={(v) => updateStep(i, 'title', v)}
-                variant="bordered"
+                variant="secondary"
                 size="sm"
               />
               <Input
                 label={t('content.landing_label_description')}
                 value={step.description}
                 onValueChange={(v) => updateStep(i, 'description', v)}
-                variant="bordered"
+                variant="secondary"
                 size="sm"
               />
             </div>
@@ -665,14 +662,14 @@ function HowItWorksEditor({
       ))}
       <Button
         size="sm"
-        variant="flat"
+        variant="secondary"
         startContent={<Plus size={14} />}
         onPress={addStep}
         className="self-start"
       >
         {t('content.landing_add_step')}
       </Button>
-      <p className="text-xs text-default-400">{t(HELPER_TEXT_KEY)}</p>
+      <p className="text-xs text-muted">{t(HELPER_TEXT_KEY)}</p>
     </div>
   );
 }
@@ -712,7 +709,7 @@ function CoreValuesEditor({
           placeholder={t('content.landing_placeholder_section_title_core_values')}
           value={content.title || ''}
           onValueChange={(v) => onChange({ ...content, title: v })}
-          variant="bordered"
+          variant="secondary"
           size="sm"
         />
         <Input
@@ -720,22 +717,21 @@ function CoreValuesEditor({
           placeholder={t('content.landing_placeholder_section_subtitle_core_values')}
           value={content.subtitle || ''}
           onValueChange={(v) => onChange({ ...content, subtitle: v })}
-          variant="bordered"
+          variant="secondary"
           size="sm"
         />
       </div>
       <Separator />
       {values.map((val, i) => (
-        <Card key={i} shadow="none" className="border border-default-200">
+        <Card key={i} variant="transparent" className="border border-border bg-surface">
           <CardBody className="flex flex-col gap-3 p-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-default-600">
+              <span className="text-sm font-medium text-foreground">
                 {t('content.landing_value_number', { number: i + 1 })}
               </span>
               <Button
                 size="sm"
-                color="danger"
-                variant="light"
+                variant="danger-soft"
                 startContent={<Trash2 size={14} />}
                 onPress={() => removeValue(i)}
               >
@@ -746,14 +742,14 @@ function CoreValuesEditor({
               label={t('content.landing_label_title')}
               value={val.title}
               onValueChange={(v) => updateValue(i, 'title', v)}
-              variant="bordered"
+              variant="secondary"
               size="sm"
             />
             <Textarea
               label={t('content.landing_label_description')}
               value={val.description}
               onValueChange={(v) => updateValue(i, 'description', v)}
-              variant="bordered"
+              variant="secondary"
               size="sm"
               minRows={2}
             />
@@ -762,14 +758,14 @@ function CoreValuesEditor({
       ))}
       <Button
         size="sm"
-        variant="flat"
+        variant="secondary"
         startContent={<Plus size={14} />}
         onPress={addValue}
         className="self-start"
       >
         {t('content.landing_add_value')}
       </Button>
-      <p className="text-xs text-default-400">{t(HELPER_TEXT_KEY)}</p>
+      <p className="text-xs text-muted">{t(HELPER_TEXT_KEY)}</p>
     </div>
   );
 }
@@ -792,7 +788,7 @@ function CtaEditor({
         placeholder={t('content.landing_placeholder_cta_title')}
         value={content.title || ''}
         onValueChange={(v) => update('title', v)}
-        variant="bordered"
+        variant="secondary"
         size="sm"
       />
       <Textarea
@@ -800,7 +796,7 @@ function CtaEditor({
         placeholder={t('content.landing_placeholder_cta_description')}
         value={content.description || ''}
         onValueChange={(v) => update('description', v)}
-        variant="bordered"
+        variant="secondary"
         size="sm"
         minRows={2}
       />
@@ -810,7 +806,7 @@ function CtaEditor({
           placeholder={t('content.landing_placeholder_button_text_join_now')}
           value={content.button_text || ''}
           onValueChange={(v) => update('button_text', v)}
-          variant="bordered"
+          variant="secondary"
           size="sm"
         />
         <Input
@@ -818,11 +814,11 @@ function CtaEditor({
           placeholder={t('content.landing_placeholder_button_link_register')}
           value={content.button_link || ''}
           onValueChange={(v) => update('button_link', v)}
-          variant="bordered"
+          variant="secondary"
           size="sm"
         />
       </div>
-      <p className="text-xs text-default-400">{t(HELPER_TEXT_KEY)}</p>
+      <p className="text-xs text-muted">{t(HELPER_TEXT_KEY)}</p>
     </div>
   );
 }
@@ -909,15 +905,12 @@ function SectionCard({
           />
         );
       default:
-        return <p className="text-sm text-default-400">{t('content.landing_no_editor_available')}</p>;
+        return <p className="text-sm text-muted">{t('content.landing_no_editor_available')}</p>;
     }
   };
 
   return (
-    <Card
-      shadow="sm"
-      className={`transition-opacity ${!section.enabled ? 'opacity-60' : ''}`}
-    >
+    <Card className={`border border-border bg-surface transition-opacity ${!section.enabled ? 'opacity-60' : ''}`}>
       <CardHeader
         className="flex cursor-pointer items-center justify-between gap-3 px-4 py-3"
         onClick={onToggleExpand}
@@ -925,13 +918,13 @@ function SectionCard({
         <div className="flex items-center gap-3">
           <ChevronRight
             size={16}
-            className={`text-default-400 transition-transform ${
+            className={`text-muted transition-transform ${
               isExpanded ? 'rotate-90' : ''
             }`}
           />
           <div>
             <p className="text-sm font-semibold">{label}</p>
-            <p className="text-xs text-default-400">
+            <p className="text-xs text-muted">
               {section.enabled ? t('content.landing_visible') : t('content.landing_hidden')}
             </p>
           </div>
@@ -946,7 +939,7 @@ function SectionCard({
           <Button
             isIconOnly
             size="sm"
-            variant="light"
+            variant="tertiary"
             isDisabled={isFirst}
             onPress={onMoveUp}
             aria-label={t('content.landing_move_up', { section: label })}
@@ -956,7 +949,7 @@ function SectionCard({
           <Button
             isIconOnly
             size="sm"
-            variant="light"
+            variant="tertiary"
             isDisabled={isLast}
             onPress={onMoveDown}
             aria-label={t('content.landing_move_down', { section: label })}
@@ -1164,8 +1157,7 @@ export function LandingPageBuilder() {
                 <span className="text-sm text-danger">{t('content.landing_reset_confirm_prompt')}</span>
                 <Button
                   size="sm"
-                  color="danger"
-                  variant="flat"
+                  variant="danger-soft"
                   onPress={handleReset}
                   isLoading={saving}
                 >
@@ -1173,7 +1165,7 @@ export function LandingPageBuilder() {
                 </Button>
                 <Button
                   size="sm"
-                  variant="flat"
+                  variant="secondary"
                   onPress={() => setConfirmReset(false)}
                   isDisabled={saving}
                 >
@@ -1183,7 +1175,7 @@ export function LandingPageBuilder() {
             ) : (
               <Button
                 size="sm"
-                variant="flat"
+                variant="secondary"
                 startContent={<RotateCcw size={14} />}
                 onPress={() => setConfirmReset(true)}
                 isDisabled={saving}
@@ -1193,7 +1185,6 @@ export function LandingPageBuilder() {
             )}
             <Button
               size="sm"
-              color="primary"
               startContent={<Save size={14} />}
               onPress={handleSave}
               isDisabled={!isDirty || saving}
@@ -1206,9 +1197,9 @@ export function LandingPageBuilder() {
       />
 
       {/* Section ordering info */}
-      <div className="mb-4 flex items-center gap-2 rounded-lg border border-default-200 bg-default-50 px-4 py-3">
-        <Layers size={16} className="text-default-400" />
-        <p className="text-sm text-default-500">
+      <div className="mb-4 flex items-center gap-2 rounded-lg border border-border bg-surface-secondary px-4 py-3">
+        <Layers size={16} className="text-muted" />
+        <p className="text-sm text-muted">
           {t('content.landing_ordering_info')}
         </p>
       </div>

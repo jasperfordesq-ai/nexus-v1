@@ -167,20 +167,20 @@ function getRateTone(rate: number): {
 
 function MetricCard({ icon: Icon, label, value, caption, accentClassName }: MetricCardProps) {
   return (
-    <Card className="border border-default-200/70 bg-surface/85 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-surface/75">
+    <Card className="border border-border bg-surface/85 backdrop-blur supports-[backdrop-filter]:bg-surface/75">
       <CardBody className="gap-4 p-5">
         <div className="flex items-start justify-between gap-3">
           <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${accentClassName}`}>
             <Icon size={20} />
           </div>
-          <span className="text-xs font-medium uppercase tracking-[0.22em] text-default-500">
+          <span className="text-xs font-medium uppercase tracking-[0.22em] text-muted">
             {label}
           </span>
         </div>
 
         <div className="space-y-1">
           <p className="text-3xl font-semibold tracking-tight text-foreground">{value}</p>
-          <p className="text-sm text-default-500">{caption}</p>
+          <p className="text-sm text-muted">{caption}</p>
         </div>
       </CardBody>
     </Card>
@@ -189,14 +189,14 @@ function MetricCard({ icon: Icon, label, value, caption, accentClassName }: Metr
 
 function GuideCard({ icon: Icon, title, body, accentClassName }: GuideCardProps) {
   return (
-    <div className="rounded-2xl border border-default-200/70 bg-surface/70 p-4 shadow-sm">
+    <div className="rounded-2xl border border-border bg-surface/70 p-4">
       <div className="flex items-start gap-3">
         <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl ${accentClassName}`}>
           <Icon size={18} />
         </div>
         <div className="space-y-1">
           <p className="font-medium text-foreground">{title}</p>
-          <p className="text-sm leading-6 text-default-500">{body}</p>
+          <p className="text-sm leading-6 text-muted">{body}</p>
         </div>
       </div>
     </div>
@@ -205,12 +205,12 @@ function GuideCard({ icon: Icon, title, body, accentClassName }: GuideCardProps)
 
 function SnapshotCard({ eyebrow, value, body, accentClassName }: SnapshotCardProps) {
   return (
-    <div className="rounded-[26px] border border-default-200/70 bg-surface/80 p-5 shadow-sm">
+    <div className="rounded-[26px] border border-border bg-surface/80 p-5">
       <div className={`inline-flex rounded-full px-3 py-1 text-xs font-medium ${accentClassName}`}>
         {eyebrow}
       </div>
       <p className="mt-4 text-2xl font-semibold tracking-tight text-foreground">{value}</p>
-      <p className="mt-3 text-sm leading-6 text-default-500">{body}</p>
+      <p className="mt-3 text-sm leading-6 text-muted">{body}</p>
     </div>
   );
 }
@@ -360,16 +360,16 @@ export default function OnboardingFunnel() {
               <h1 className="text-2xl font-semibold text-foreground">
                 {t('crm.onboarding_funnel_title')}
               </h1>
-              <p className="text-default-500">{error || t('crm.no_data_available')}</p>
+              <p className="text-muted">{error || t('crm.no_data_available')}</p>
             </div>
             <div className="flex flex-wrap gap-3">
-              <Button color="primary" onPress={fetchData} startContent={<RefreshCw size={16} />}>
+              <Button onPress={fetchData} startContent={<RefreshCw size={16} />}>
                 {t('crm.refresh')}
               </Button>
               <Button
                 as={Link}
                 to={tenantPath('/admin/crm')}
-                variant="flat"
+                variant="secondary"
                 endContent={<ChevronRight size={16} />}
               >
                 {t('crm.crm_dashboard')}
@@ -488,8 +488,9 @@ export default function OnboardingFunnel() {
         <div className="relative flex flex-col gap-8 xl:flex-row xl:items-end xl:justify-between">
           <div className="max-w-3xl space-y-5">
             <Chip
-              variant="flat"
-              className="border border-accent/15 bg-accent/10 px-3 text-accent"
+              variant="soft"
+              color="accent"
+              className="border border-accent/15 px-3"
             >
               {t('crm.crm_label')}
             </Chip>
@@ -498,7 +499,7 @@ export default function OnboardingFunnel() {
               <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
                 {t('crm.onboarding_funnel_title')}
               </h1>
-              <p className="max-w-2xl text-base leading-7 text-default-600 dark:text-default-400">
+              <p className="max-w-2xl text-base leading-7 text-muted">
                 {t('crm.onboarding_funnel_desc')}
               </p>
             </div>
@@ -509,7 +510,7 @@ export default function OnboardingFunnel() {
                   key={stat.label}
                   className="rounded-2xl border border-white/40 bg-white/65 p-4 backdrop-blur supports-[backdrop-filter]:bg-white/55 dark:border-white/10 dark:bg-white/5"
                 >
-                  <p className="text-xs font-medium uppercase tracking-[0.22em] text-default-500">
+                  <p className="text-xs font-medium uppercase tracking-[0.22em] text-muted">
                     {stat.label}
                   </p>
                   <p className="mt-2 text-2xl font-semibold text-foreground">{stat.value}</p>
@@ -520,7 +521,6 @@ export default function OnboardingFunnel() {
 
           <div className="flex w-full flex-col gap-3 xl:w-auto xl:min-w-[320px]">
             <Button
-              color="primary"
               onPress={fetchData}
               isLoading={loading}
               startContent={<RefreshCw size={16} />}
@@ -530,7 +530,7 @@ export default function OnboardingFunnel() {
             <Button
               as={Link}
               to={tenantPath('/admin/crm')}
-              variant="flat"
+              variant="secondary"
               endContent={<ChevronRight size={16} />}
             >
               {t('crm.crm_dashboard')}
@@ -538,7 +538,7 @@ export default function OnboardingFunnel() {
             <Button
               as={Link}
               to={tenantPath('/admin/users')}
-              variant="flat"
+              variant="secondary"
               endContent={<ChevronRight size={16} />}
             >
               {t('crm.all_members')}
@@ -546,7 +546,7 @@ export default function OnboardingFunnel() {
             <Button
               as={Link}
               to={tenantPath('/admin/crm/tasks')}
-              variant="flat"
+              variant="secondary"
               endContent={<ChevronRight size={16} />}
             >
               {t('crm.crm_tasks')}
@@ -596,10 +596,10 @@ export default function OnboardingFunnel() {
         />
       </div>
 
-      <Card className="border border-default-200/70 bg-surface/90 shadow-sm">
+      <Card className="border border-border bg-surface/90">
         <CardHeader className="flex flex-col items-start gap-2 px-6 pb-0 pt-6">
           <h2 className="text-lg font-semibold text-foreground">{t('crm.how_to_read_title')}</h2>
-          <p className="text-sm text-default-500">{t('crm.how_to_read_desc')}</p>
+          <p className="text-sm text-muted">{t('crm.how_to_read_desc')}</p>
         </CardHeader>
         <CardBody className="grid gap-4 px-6 pb-6 pt-5 md:grid-cols-3">
           {guideCards.map((card) => (
@@ -608,10 +608,10 @@ export default function OnboardingFunnel() {
         </CardBody>
       </Card>
 
-      <Card className="border border-default-200/70 bg-surface/90 shadow-sm">
+      <Card className="border border-border bg-surface/90">
         <CardHeader className="flex flex-col items-start gap-2 px-6 pb-0 pt-6">
           <h2 className="text-lg font-semibold text-foreground">{t('crm.funnel_summary_title')}</h2>
-          <p className="text-sm text-default-500">{t('crm.funnel_summary_desc')}</p>
+          <p className="text-sm text-muted">{t('crm.funnel_summary_desc')}</p>
         </CardHeader>
         <CardBody className="grid gap-4 px-6 pb-6 pt-5 lg:grid-cols-3">
           {snapshotCards.map((card) => (
@@ -621,7 +621,7 @@ export default function OnboardingFunnel() {
       </Card>
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_minmax(320px,0.95fr)]">
-        <Card className="overflow-hidden border border-default-200/70 bg-surface/90 shadow-lg">
+        <Card className="overflow-hidden border border-border bg-surface/90">
           <CardHeader className="flex flex-col items-start gap-3 px-6 pb-0 pt-6">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent/10 text-accent">
@@ -629,7 +629,7 @@ export default function OnboardingFunnel() {
               </div>
               <div>
                 <h2 className="text-xl font-semibold text-foreground">{t('crm.member_funnel_title')}</h2>
-                <p className="text-sm text-default-500">{t('crm.member_funnel_desc')}</p>
+                <p className="text-sm text-muted">{t('crm.member_funnel_desc')}</p>
               </div>
             </div>
           </CardHeader>
@@ -638,7 +638,7 @@ export default function OnboardingFunnel() {
             {stageInsights.length > 0 ? (
               <>
                 <div className="rounded-[28px] border border-accent/10 bg-accent/5 p-4 sm:p-5">
-                  <p className="text-sm leading-7 text-default-600 dark:text-default-400">
+                  <p className="text-sm leading-7 text-muted">
                     {t('crm.member_funnel_help')}
                   </p>
                 </div>
@@ -653,13 +653,13 @@ export default function OnboardingFunnel() {
                     return (
                       <div key={stage.name} className="space-y-3">
                         {previous && (
-                          <div className="flex items-center gap-3 px-2 text-sm text-default-500">
+                          <div className="flex items-center gap-3 px-2 text-sm text-muted">
                             <div className="flex items-center gap-2">
                               <ArrowDownRight size={15} className={stageTone.textClassName} />
                               <Chip
                                 size="sm"
                                 color={stageTone.chipColor}
-                                variant="flat"
+                                variant="soft"
                                 className="font-medium"
                               >
                                 {formatPercent(stage.conversionFromPrevious ?? 0)}
@@ -669,27 +669,27 @@ export default function OnboardingFunnel() {
                           </div>
                         )}
 
-                        <div className="rounded-[28px] border border-default-200/70 bg-default-50/70 p-4 dark:border-white/10 dark:bg-white/[0.03] sm:p-5">
+                        <div className="rounded-[28px] border border-border bg-surface-secondary p-4 sm:p-5">
                           <div className="mb-3 flex flex-wrap items-start justify-between gap-3">
                             <div className="space-y-2">
-                              <Chip size="sm" variant="flat" className="w-fit">
+                              <Chip size="sm" variant="soft" className="w-fit">
                                 {t('crm.stage_number', { number: index + 1 })}
                               </Chip>
                               <p className="text-lg font-semibold text-foreground">{stage.name}</p>
-                              <p className="text-sm text-default-500">
+                              <p className="text-sm text-muted">
                                 {formatPercent(stage.shareOfEntry)} {t('crm.stage_share_label')}
                               </p>
                             </div>
                             <div className="space-y-2 text-right">
                               {index > 0 && (
-                                <Chip size="sm" color="danger" variant="flat" className="font-medium">
+                                <Chip size="sm" color="danger" variant="soft" className="font-medium">
                                   {t('crm.lost_since_previous_stage', { count: stage.lossFromPrevious })}
                                 </Chip>
                               )}
                               <p className="text-2xl font-semibold tracking-tight text-foreground">
                                 {stage.count.toLocaleString()}
                               </p>
-                              <p className="text-sm text-default-500">{t('crm.members')}</p>
+                              <p className="text-sm text-muted">{t('crm.members')}</p>
                             </div>
                           </div>
 
@@ -728,8 +728,8 @@ export default function OnboardingFunnel() {
                 {entryStage && finalStage && (
                   <div className="flex flex-wrap items-center justify-between gap-4 rounded-[28px] border border-accent/10 bg-accent/5 px-5 py-4">
                     <div className="space-y-1">
-                      <p className="text-sm font-medium text-default-500">{t('crm.overall_conversion')}</p>
-                      <div className="flex items-center gap-2 text-sm text-default-600 dark:text-default-400">
+                      <p className="text-sm font-medium text-muted">{t('crm.overall_conversion')}</p>
+                      <div className="flex items-center gap-2 text-sm text-muted">
                         <span>{entryStage.name}</span>
                         <ArrowRight size={14} />
                         <span>{finalStage.name}</span>
@@ -740,13 +740,13 @@ export default function OnboardingFunnel() {
                 )}
               </>
             ) : (
-              <p className="py-10 text-center text-sm text-default-400">{t('crm.no_stages_available')}</p>
+              <p className="py-10 text-center text-sm text-muted">{t('crm.no_stages_available')}</p>
             )}
           </CardBody>
         </Card>
 
         <div className="space-y-6">
-          <Card className="border border-default-200/70 bg-surface/90 shadow-sm">
+          <Card className="border border-border bg-surface/90">
             <CardHeader className="flex flex-col items-start gap-3 px-6 pb-0 pt-6">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-warning/10 text-warning">
@@ -754,7 +754,7 @@ export default function OnboardingFunnel() {
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-foreground">{t('crm.funnel_focus_title')}</h2>
-                  <p className="text-sm text-default-500">{t('crm.funnel_focus_desc')}</p>
+                  <p className="text-sm text-muted">{t('crm.funnel_focus_desc')}</p>
                 </div>
               </div>
             </CardHeader>
@@ -762,10 +762,10 @@ export default function OnboardingFunnel() {
             <CardBody className="gap-4 px-6 pb-6 pt-6">
               <div className="rounded-2xl border border-danger/10 bg-danger/5 p-4">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-medium text-default-600 dark:text-default-300">
+                  <p className="text-sm font-medium text-foreground">
                     {t('crm.biggest_dropoff')}
                   </p>
-                  <Chip color="danger" variant="flat">
+                  <Chip color="danger" variant="soft">
                     {biggestDropoff?.loss.toLocaleString() ?? '0'}
                   </Chip>
                 </div>
@@ -774,19 +774,19 @@ export default function OnboardingFunnel() {
                     ? `${biggestDropoff.from.name} -> ${biggestDropoff.to.name}`
                     : t('crm.not_enough_stages')}
                 </p>
-                <p className="mt-2 text-sm leading-6 text-default-500">
+                <p className="mt-2 text-sm leading-6 text-muted">
                   {t('crm.biggest_dropoff_help')}
                 </p>
               </div>
 
               <div className="rounded-2xl border border-warning/10 bg-warning/5 p-4">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-medium text-default-600 dark:text-default-300">
+                  <p className="text-sm font-medium text-foreground">
                     {t('crm.weakest_handoff')}
                   </p>
                   <Chip
-                    color={weakestHandoff ? getRateTone(weakestHandoff.rate).chipColor : 'default'}
-                    variant="flat"
+                    color={weakestHandoff ? getRateTone(weakestHandoff.rate).chipColor : undefined}
+                    variant="soft"
                   >
                     {weakestHandoff ? formatPercent(weakestHandoff.rate) : '0%'}
                   </Chip>
@@ -796,31 +796,31 @@ export default function OnboardingFunnel() {
                     ? `${weakestHandoff.from.name} -> ${weakestHandoff.to.name}`
                     : t('crm.not_enough_stages')}
                 </p>
-                <p className="mt-2 text-sm leading-6 text-default-500">
+                <p className="mt-2 text-sm leading-6 text-muted">
                   {t('crm.weakest_handoff_help')}
                 </p>
               </div>
 
               <div className="rounded-2xl border border-success/10 bg-success/5 p-4">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-medium text-default-600 dark:text-default-300">
+                  <p className="text-sm font-medium text-foreground">
                     {t('crm.overall_conversion')}
                   </p>
-                  <Chip color="success" variant="flat">
+                  <Chip color="success" variant="soft">
                     {formatPercent(overallConversion)}
                   </Chip>
                 </div>
                 <p className="mt-3 text-base font-semibold text-foreground">
                   {finalStage?.name ?? t('crm.no_stages_available')}
                 </p>
-                <p className="mt-2 text-sm leading-6 text-default-500">
+                <p className="mt-2 text-sm leading-6 text-muted">
                   {t('crm.overall_conversion_help')}
                 </p>
               </div>
             </CardBody>
           </Card>
 
-          <Card className="border border-default-200/70 bg-surface/90 shadow-sm">
+          <Card className="border border-border bg-surface/90">
             <CardHeader className="flex flex-col items-start gap-3 px-6 pb-0 pt-6">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-accent/10 text-accent">
@@ -830,7 +830,7 @@ export default function OnboardingFunnel() {
                   <h2 className="text-lg font-semibold text-foreground">
                     {t('crm.stage_conversion_title')}
                   </h2>
-                  <p className="text-sm text-default-500">{t('crm.stage_conversion_desc')}</p>
+                  <p className="text-sm text-muted">{t('crm.stage_conversion_desc')}</p>
                 </div>
               </div>
             </CardHeader>
@@ -838,7 +838,7 @@ export default function OnboardingFunnel() {
             <CardBody className="gap-4 px-6 pb-6 pt-6">
               {transitions.length > 0 ? (
                 <>
-                  <p className="text-sm leading-7 text-default-500">
+                  <p className="text-sm leading-7 text-muted">
                     {t('crm.stage_conversion_help')}
                   </p>
 
@@ -848,12 +848,12 @@ export default function OnboardingFunnel() {
                     return (
                       <div
                         key={`${transition.from.name}-${transition.to.name}`}
-                        className="rounded-2xl border border-default-200/70 bg-default-50/70 p-4 dark:border-white/10 dark:bg-white/[0.03]"
+                        className="rounded-2xl border border-border bg-surface-secondary p-4"
                       >
                         <div className="mb-3 flex items-start justify-between gap-3">
                           <div>
                             <p className="font-medium text-foreground">{transition.from.name}</p>
-                            <div className="mt-1 flex items-center gap-2 text-sm text-default-500">
+                            <div className="mt-1 flex items-center gap-2 text-sm text-muted">
                               <ArrowDown size={13} />
                               <span>{transition.to.name}</span>
                             </div>
@@ -863,9 +863,9 @@ export default function OnboardingFunnel() {
                           </p>
                         </div>
 
-                        <div className="mb-3 flex items-center justify-between gap-3 text-sm text-default-500">
+                        <div className="mb-3 flex items-center justify-between gap-3 text-sm text-muted">
                           <span>{t('crm.members_lost_at_step', { count: transition.loss })}</span>
-                          <Chip size="sm" color={tone.chipColor} variant="flat">
+                          <Chip size="sm" color={tone.chipColor} variant="soft">
                             {transition.loss.toLocaleString()} {t('crm.dropped_off')}
                           </Chip>
                         </div>
@@ -884,7 +884,7 @@ export default function OnboardingFunnel() {
                   })}
                 </>
               ) : (
-                <p className="py-6 text-center text-sm text-default-400">{t('crm.not_enough_stages')}</p>
+                <p className="py-6 text-center text-sm text-muted">{t('crm.not_enough_stages')}</p>
               )}
             </CardBody>
           </Card>
@@ -892,7 +892,7 @@ export default function OnboardingFunnel() {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(320px,0.85fr)]">
-        <Card className="border border-default-200/70 bg-surface/90 shadow-lg">
+        <Card className="border border-border bg-surface/90">
           <CardHeader className="flex flex-col items-start gap-3 px-6 pb-0 pt-6">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-accent-soft text-accent">
@@ -902,7 +902,7 @@ export default function OnboardingFunnel() {
                 <h2 className="text-xl font-semibold text-foreground">
                   {t('crm.monthly_registrations_title')}
                 </h2>
-                <p className="text-sm text-default-500">{t('crm.monthly_registrations_desc')}</p>
+                <p className="text-sm text-muted">{t('crm.monthly_registrations_desc')}</p>
               </div>
             </div>
           </CardHeader>
@@ -910,25 +910,25 @@ export default function OnboardingFunnel() {
           <CardBody className="gap-5 px-6 pb-6 pt-6">
             {monthlyRegistrations.length > 0 ? (
               <>
-                <p className="text-sm leading-7 text-default-500">{t('crm.monthly_registrations_help')}</p>
+                <p className="text-sm leading-7 text-muted">{t('crm.monthly_registrations_help')}</p>
 
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-2xl border border-default-200/70 bg-default-50/70 p-4 dark:border-white/10 dark:bg-white/[0.03]">
-                    <p className="text-sm font-medium text-default-500">{t('crm.latest_month')}</p>
+                  <div className="rounded-2xl border border-border bg-surface-secondary p-4">
+                    <p className="text-sm font-medium text-muted">{t('crm.latest_month')}</p>
                     <p className="mt-2 text-2xl font-semibold text-foreground">
                       {latestMonth?.count.toLocaleString() ?? '0'}
                     </p>
-                    <p className="mt-1 text-sm text-default-500">
+                    <p className="mt-1 text-sm text-muted">
                       {latestMonth ? formatMonthLabel(latestMonth.month) : t('crm.no_registration_data')}
                     </p>
                   </div>
 
-                  <div className="rounded-2xl border border-default-200/70 bg-default-50/70 p-4 dark:border-white/10 dark:bg-white/[0.03]">
-                    <p className="text-sm font-medium text-default-500">{t('crm.change_from_previous_month')}</p>
+                  <div className="rounded-2xl border border-border bg-surface-secondary p-4">
+                    <p className="text-sm font-medium text-muted">{t('crm.change_from_previous_month')}</p>
                     <p className="mt-2 text-2xl font-semibold text-foreground">
                       {monthOverMonthChange !== null ? formatSignedPercent(monthOverMonthChange) : '0%'}
                     </p>
-                    <p className="mt-1 text-sm text-default-500">
+                    <p className="mt-1 text-sm text-muted">
                       {previousMonth ? formatMonthLabel(previousMonth.month) : t('crm.no_registration_data')}
                     </p>
                   </div>
@@ -939,8 +939,8 @@ export default function OnboardingFunnel() {
                     <AreaChart data={monthlyRegistrations} margin={{ top: 12, right: 10, left: -12, bottom: 6 }}>
                       <defs>
                         <linearGradient id="crmRegistrationsFill" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="hsl(var(--heroui-primary))" stopOpacity={0.35} />
-                          <stop offset="95%" stopColor="hsl(var(--heroui-primary))" stopOpacity={0.02} />
+                          <stop offset="5%" stopColor="var(--accent)" stopOpacity={0.35} />
+                          <stop offset="95%" stopColor="var(--accent)" stopOpacity={0.02} />
                         </linearGradient>
                       </defs>
                       <CartesianGrid vertical={false} strokeDasharray="4 4" className="opacity-20" />
@@ -960,16 +960,16 @@ export default function OnboardingFunnel() {
                         ] as [string, string]}
                         contentStyle={{
                           borderRadius: '16px',
-                          border: '1px solid hsl(var(--heroui-divider))',
-                          backgroundColor: 'hsl(var(--heroui-content1))',
-                          color: 'hsl(var(--heroui-foreground))',
+                          border: '1px solid var(--border)',
+                          backgroundColor: 'var(--overlay)',
+                          color: 'var(--overlay-foreground)',
                           boxShadow: '0 18px 50px rgba(15, 23, 42, 0.12)',
                         }}
                       />
                       <Area
                         type="monotone"
                         dataKey="count"
-                        stroke="hsl(var(--heroui-primary))"
+                        stroke="var(--accent)"
                         strokeWidth={3}
                         fill="url(#crmRegistrationsFill)"
                         activeDot={{ r: 5 }}
@@ -979,12 +979,12 @@ export default function OnboardingFunnel() {
                 </div>
               </>
             ) : (
-              <p className="py-10 text-center text-sm text-default-400">{t('crm.no_registration_data')}</p>
+              <p className="py-10 text-center text-sm text-muted">{t('crm.no_registration_data')}</p>
             )}
           </CardBody>
         </Card>
 
-        <Card className="border border-default-200/70 bg-surface/90 shadow-sm">
+        <Card className="border border-border bg-surface/90">
           <CardHeader className="flex flex-col items-start gap-3 px-6 pb-0 pt-6">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-success/10 text-success">
@@ -994,7 +994,7 @@ export default function OnboardingFunnel() {
                 <h2 className="text-xl font-semibold text-foreground">
                   {t('crm.stage_health_title')}
                 </h2>
-                <p className="text-sm text-default-500">{t('crm.stage_health_desc')}</p>
+                <p className="text-sm text-muted">{t('crm.stage_health_desc')}</p>
               </div>
             </div>
           </CardHeader>
@@ -1002,7 +1002,7 @@ export default function OnboardingFunnel() {
           <CardBody className="gap-5 px-6 pb-6 pt-6">
             {stageInsights.length > 0 ? (
               <>
-                <p className="text-sm leading-7 text-default-500">{t('crm.stage_health_help')}</p>
+                <p className="text-sm leading-7 text-muted">{t('crm.stage_health_help')}</p>
 
                 {stageInsights.map((stage, index) => {
                   const tone =
@@ -1013,16 +1013,16 @@ export default function OnboardingFunnel() {
                   return (
                     <div
                       key={stage.name}
-                      className="rounded-2xl border border-default-200/70 bg-default-50/70 p-4 dark:border-white/10 dark:bg-white/[0.03]"
+                      className="rounded-2xl border border-border bg-surface-secondary p-4"
                     >
                       <div className="mb-4 flex items-start justify-between gap-3">
                         <div>
                           <p className="font-semibold text-foreground">{stage.name}</p>
-                          <p className="text-sm text-default-500">{stage.count.toLocaleString()}</p>
+                          <p className="text-sm text-muted">{stage.count.toLocaleString()}</p>
                         </div>
                         <Chip
-                          color={index === 0 ? 'primary' : tone.chipColor}
-                          variant="flat"
+                          color={index === 0 ? 'accent' : tone.chipColor}
+                          variant="soft"
                           className="font-medium"
                         >
                           {formatPercent(stage.shareOfEntry)}
@@ -1031,13 +1031,12 @@ export default function OnboardingFunnel() {
 
                       <div className="space-y-3">
                         <div className="space-y-1">
-                          <div className="flex items-center justify-between text-xs font-medium uppercase tracking-[0.18em] text-default-500">
+                          <div className="flex items-center justify-between text-xs font-medium uppercase tracking-[0.18em] text-muted">
                             <span>{t('crm.stage_share_label')}</span>
                             <span>{formatPercent(stage.shareOfEntry)}</span>
                           </div>
                           <Progress
                             value={stage.shareOfEntry}
-                            color="primary"
                             aria-label={t('crm.stage_share_progress_label', { stage: stage.name })}
                             classNames={{
                               track: 'h-2',
@@ -1048,7 +1047,7 @@ export default function OnboardingFunnel() {
 
                         {index > 0 && (
                           <div className="space-y-1">
-                            <div className="flex items-center justify-between text-xs font-medium uppercase tracking-[0.18em] text-default-500">
+                            <div className="flex items-center justify-between text-xs font-medium uppercase tracking-[0.18em] text-muted">
                               <span>{t('crm.conversion_from_previous')}</span>
                               <span className={tone.textClassName}>
                                 {formatPercent(stage.conversionFromPrevious ?? 0)}
@@ -1071,7 +1070,7 @@ export default function OnboardingFunnel() {
                 })}
               </>
             ) : (
-              <p className="py-10 text-center text-sm text-default-400">{t('crm.no_stages_available')}</p>
+              <p className="py-10 text-center text-sm text-muted">{t('crm.no_stages_available')}</p>
             )}
           </CardBody>
         </Card>

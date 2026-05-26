@@ -204,26 +204,26 @@ function LivePreview({ items, t }: { items: MenuItemData[]; t: TFunction }) {
   const topLevel = items.filter((i) => !i.parent_id && i.is_active);
 
   return (
-    <Card shadow="sm" className="mb-4 border border-indigo-200 dark:border-indigo-800">
+    <Card className="mb-4 border border-border bg-surface">
       <CardHeader className="pb-2">
-        <h3 className="text-sm font-semibold flex items-center gap-2 text-indigo-600 dark:text-indigo-400">
+        <h3 className="text-sm font-semibold flex items-center gap-2 text-accent">
           <Eye size={15} />
           {t('menu_builder.live_preview')}
-          <Chip size="sm" variant="flat" color="secondary" className="text-[10px]">
+          <Chip size="sm" variant="soft" className="text-[10px]">
             {t('menu_builder.preview')}
           </Chip>
         </h3>
       </CardHeader>
       <CardBody className="pt-0">
-        <div className="flex items-center gap-1 min-h-[40px] px-3 py-2 rounded-lg bg-[var(--color-surface,#f9fafb)] dark:bg-default-800/50 flex-wrap border border-dashed border-default-200">
+        <div className="flex min-h-10 flex-wrap items-center gap-1 rounded-lg border border-dashed border-border bg-surface-secondary px-3 py-2">
           {topLevel.length === 0 ? (
-            <p className="text-xs text-default-400">{t('menu_builder.no_data')}</p>
+            <p className="text-xs text-muted">{t('menu_builder.no_data')}</p>
           ) : (
             topLevel.map((item) => {
               const children = items.filter((i) => i.parent_id === item.id && i.is_active);
 
               if (item.type === 'divider') {
-                return <div key={item.id} className="w-px h-5 bg-default-300 mx-1 shrink-0" />;
+                return <div key={item.id} className="mx-1 h-5 w-px shrink-0 bg-border" />;
               }
 
               if (item.type === 'dropdown' || children.length > 0) {
@@ -231,18 +231,18 @@ function LivePreview({ items, t }: { items: MenuItemData[]; t: TFunction }) {
                   <div key={item.id} className="relative group/preview">
                     <Button
                       size="sm"
-                      variant="light"
-                      className="h-8 min-w-0 gap-1.5 px-3 text-xs font-medium text-default-600"
+                      variant="tertiary"
+                      className="min-h-8 min-w-0 gap-1.5 px-3 text-xs font-medium text-foreground"
                     >
                       <DynamicIcon name={item.icon} className="w-3.5 h-3.5 shrink-0" />
                       <span>{item.label}</span>
                       <ChevronDown size={11} />
                     </Button>
                     {children.length > 0 && (
-                      <div className="hidden group-hover/preview:block absolute top-full left-0 z-20 bg-white dark:bg-default-800 border border-default-200 rounded-lg shadow-lg p-1 min-w-[150px]">
+                      <div className="absolute left-0 top-full z-20 hidden min-w-[150px] rounded-lg border border-border bg-overlay p-1 shadow-overlay group-hover/preview:block">
                         {children.map((child) => (
-                          <div key={child.id} className="flex items-center gap-2 px-3 py-1.5 text-xs rounded hover:bg-default-100">
-                            <DynamicIcon name={child.icon} className="w-3 h-3 text-default-400 shrink-0" />
+                          <div key={child.id} className="flex items-center gap-2 rounded px-3 py-1.5 text-xs hover:bg-surface-secondary">
+                            <DynamicIcon name={child.icon} className="h-3 w-3 shrink-0 text-muted" />
                             <span>{child.label}</span>
                           </div>
                         ))}
@@ -253,7 +253,7 @@ function LivePreview({ items, t }: { items: MenuItemData[]; t: TFunction }) {
               }
 
               return (
-                <div key={item.id} className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium text-default-600">
+                <div key={item.id} className="flex items-center gap-1.5 rounded px-3 py-1.5 text-xs font-medium text-foreground">
                   <DynamicIcon name={item.icon} className="w-3.5 h-3.5 shrink-0" />
                   <span>{item.label}</span>
                 </div>
@@ -261,7 +261,7 @@ function LivePreview({ items, t }: { items: MenuItemData[]; t: TFunction }) {
             })
           )}
         </div>
-        <p className="text-[10px] text-default-400 mt-1.5">{t('menu_builder.drag_hint')}</p>
+        <p className="mt-1.5 text-[10px] text-muted">{t('menu_builder.drag_hint')}</p>
       </CardBody>
     </Card>
   );
@@ -304,15 +304,15 @@ function SortableItem({ item, isSelected, onSelect, onDelete, t, depth = 0 }: So
       className={`flex items-center gap-2 rounded-lg border p-2.5 transition-colors cursor-pointer ${
         isSelected
           ? 'border-indigo-500 bg-indigo-500/5'
-          : 'border-default-200 hover:border-default-300'
+          : 'border-border hover:border-border-secondary'
       } ${!item.is_active ? 'opacity-50' : ''}`}
       onClick={onSelect}
     >
       <Button
         isIconOnly
-        variant="light"
+        variant="tertiary"
         size="sm"
-        className="cursor-grab active:cursor-grabbing text-default-300 hover:text-default-500 p-0.5 min-w-0 h-auto shrink-0"
+        className="min-h-8 min-w-8 shrink-0 cursor-grab p-0.5 text-muted hover:text-foreground active:cursor-grabbing"
         {...attributes}
         {...listeners}
         aria-label={t('menu_builder.drag_to_reorder')}
@@ -326,18 +326,18 @@ function SortableItem({ item, isSelected, onSelect, onDelete, t, depth = 0 }: So
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5">
           <p className="text-sm font-medium truncate">{item.label}</p>
-          <Chip size="sm" variant="flat" className="text-[10px] h-4 shrink-0">
+          <Chip size="sm" variant="soft" className="h-4 shrink-0 text-[10px]">
             {getTypeLabel(item.type, t)}
           </Chip>
-          {!item.is_active && <EyeOff size={12} className="text-default-300 shrink-0" />}
+          {!item.is_active && <EyeOff size={12} className="shrink-0 text-muted" />}
         </div>
         {item.url && (
-          <p className="text-[11px] text-default-400 truncate">{item.url}</p>
+          <p className="truncate text-[11px] text-muted">{item.url}</p>
         )}
       </div>
 
       {item.children && item.children.length > 0 && (
-        <Chip size="sm" variant="flat" color="secondary" className="text-[10px] shrink-0">
+        <Chip size="sm" variant="soft" className="shrink-0 text-[10px]">
           {t('menu_builder.sub_items', { count: item.children.length })}
         </Chip>
       )}
@@ -345,7 +345,7 @@ function SortableItem({ item, isSelected, onSelect, onDelete, t, depth = 0 }: So
       <Button
         isIconOnly
         size="sm"
-        variant="light"
+        variant="tertiary"
         onPress={onSelect}
         aria-label={t('menu_builder.edit_item')}
         onClick={(e) => e.stopPropagation()}
@@ -356,8 +356,7 @@ function SortableItem({ item, isSelected, onSelect, onDelete, t, depth = 0 }: So
       <Button
         isIconOnly
         size="sm"
-        variant="light"
-        color="danger"
+        variant="danger-soft"
         onPress={() => onDelete()}
         aria-label={t('menu_builder.delete_item')}
         onClick={(e) => e.stopPropagation()}
@@ -371,11 +370,11 @@ function SortableItem({ item, isSelected, onSelect, onDelete, t, depth = 0 }: So
 /** Static card used in DragOverlay — no DnD hooks */
 function DragItemCard({ item, t }: { item: MenuItemData; t: TFunction }) {
   return (
-    <div className="flex items-center gap-2 rounded-lg border border-indigo-400 bg-indigo-50 dark:bg-indigo-950 p-2.5 shadow-lg opacity-90">
-      <GripVertical size={16} className="text-indigo-400 shrink-0" />
-      <DynamicIcon name={item.icon} className="w-4 h-4 text-indigo-500 shrink-0" />
-      <p className="text-sm font-medium truncate text-indigo-700 dark:text-indigo-300">{item.label}</p>
-      <Chip size="sm" variant="flat" color="secondary" className="text-[10px] h-4 shrink-0">
+    <div className="flex items-center gap-2 rounded-lg border border-accent/40 bg-accent-soft p-2.5 opacity-90 shadow-overlay">
+      <GripVertical size={16} className="shrink-0 text-accent" />
+      <DynamicIcon name={item.icon} className="h-4 w-4 shrink-0 text-accent" />
+      <p className="truncate text-sm font-medium text-accent-soft-foreground">{item.label}</p>
+      <Chip size="sm" variant="soft" className="h-4 shrink-0 text-[10px]">
         {getTypeLabel(item.type, t)}
       </Chip>
     </div>
@@ -776,7 +775,7 @@ export function MenuBuilder() {
         actions={
           <div className="flex gap-2">
             <Button
-              variant="flat"
+              variant="secondary"
               size="sm"
               startContent={showPreview ? <EyeOff size={15} /> : <Eye size={15} />}
               onPress={() => setShowPreview((v) => !v)}
@@ -784,14 +783,13 @@ export function MenuBuilder() {
               {showPreview ? t('menu_builder.hide_preview') : t('menu_builder.live_preview')}
             </Button>
             <Button
-              variant="flat"
+              variant="secondary"
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/menus'))}
             >
               {t('menu_builder.back')}
             </Button>
             <Button
-              color="primary"
               startContent={<Save size={16} />}
               onPress={handleSave}
               isLoading={saving}
@@ -803,21 +801,21 @@ export function MenuBuilder() {
       />
 
       {/* Menu Settings */}
-      <Card shadow="sm" className="mb-4">
+      <Card className="mb-4 border border-border bg-surface">
         <CardBody>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Input
               label={t('menu_builder.menu_name')}
               placeholder={t('menu_builder.menu_item_text_placeholder')}
               isRequired
-              variant="bordered"
+              variant="secondary"
               value={formData.name}
               onValueChange={(v) => handleChange('name', v)}
             />
             <Select
               label={t('menu_builder.location')}
               isRequired
-              variant="bordered"
+              variant="secondary"
               selectedKeys={formData.location ? [formData.location] : []}
               onSelectionChange={(keys) => {
                 const sel = Array.from(keys)[0] as string;
@@ -832,7 +830,7 @@ export function MenuBuilder() {
               <Input
                 label={t('menu_builder.description')}
                 placeholder={t('menu_builder.optional_placeholder')}
-                variant="bordered"
+                variant="secondary"
                 value={formData.description}
                 onValueChange={(v) => handleChange('description', v)}
                 className="flex-1"
@@ -855,16 +853,15 @@ export function MenuBuilder() {
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
         {/* Left: Item Tree */}
         <div className="lg:col-span-3">
-          <Card shadow="sm">
+          <Card className="border border-border bg-surface">
             <CardHeader className="flex items-center justify-between">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <Menu size={20} /> {t('menu_builder.menu_builder_title')}
-                <Chip size="sm" variant="flat">{menuItems.length}</Chip>
+                <Chip size="sm" variant="soft">{menuItems.length}</Chip>
               </h3>
               <Button
                 size="sm"
-                variant="flat"
-                color="primary"
+                variant="secondary"
                 startContent={<Plus size={14} />}
                 onPress={handleAddItem}
               >
@@ -873,13 +870,12 @@ export function MenuBuilder() {
             </CardHeader>
             <CardBody>
               {menuItems.length === 0 ? (
-                <div className="flex flex-col items-center py-12 text-default-400 gap-3">
+                <div className="flex flex-col items-center gap-3 py-12 text-muted">
                   <Menu size={40} />
                   <p className="text-sm">{t('menu_builder.no_data')}</p>
                   <div className="flex gap-2 flex-wrap justify-center">
                     <Button
                       size="sm"
-                      color="primary"
                       startContent={<Plus size={14} />}
                       onPress={handleAddItem}
                     >
@@ -887,14 +883,14 @@ export function MenuBuilder() {
                     </Button>
                     <Button
                       size="sm"
-                      variant="flat"
+                      variant="secondary"
                       startContent={<Eye size={14} />}
                       onPress={() => setMenuItems(getDefaultItems(t as TFunction))}
                     >
                       {t('menu_builder.load_defaults')}
                     </Button>
                   </div>
-                  <p className="text-[11px] text-default-400">{t('menu_builder.load_defaults_hint')}</p>
+                  <p className="text-[11px] text-muted">{t('menu_builder.load_defaults_hint')}</p>
                 </div>
               ) : (
                 <>
@@ -926,7 +922,7 @@ export function MenuBuilder() {
                       {activeItem ? <DragItemCard item={activeItem} t={t as TFunction} /> : null}
                     </DragOverlay>
                   </DndContext>
-                  <p className="text-[11px] text-default-400 mt-3 text-center">
+                  <p className="mt-3 text-center text-[11px] text-muted">
                     {t('menu_builder.drag_hint')}
                   </p>
                 </>
@@ -937,7 +933,7 @@ export function MenuBuilder() {
 
         {/* Right: Item Editor */}
         <div className="lg:col-span-2">
-          <Card shadow="sm" className="sticky top-20">
+          <Card className="sticky top-20 border border-border bg-surface">
             <CardHeader>
               <h3 className="text-lg font-semibold">
                 {selectedItemId ? t('menu_builder.edit_item') : t('menu_builder.menu_builder_title')}
@@ -945,7 +941,7 @@ export function MenuBuilder() {
             </CardHeader>
             <CardBody className="gap-3">
               {!selectedItemId ? (
-                <div className="flex flex-col items-center py-8 text-default-400">
+                <div className="flex flex-col items-center py-8 text-muted">
                   <Pencil size={32} className="mb-3" />
                   <p className="text-sm">{t('menu_builder.menu_builder_desc')}</p>
                 </div>
@@ -956,7 +952,7 @@ export function MenuBuilder() {
                     label={t('menu_builder.label')}
                     placeholder={t('menu_builder.menu_item_text_placeholder')}
                     isRequired
-                    variant="bordered"
+                    variant="secondary"
                     size="sm"
                     value={editForm.label || ''}
                     onValueChange={(v) => setEditForm((f) => ({ ...f, label: v }))}
@@ -965,7 +961,7 @@ export function MenuBuilder() {
                   {/* Type */}
                   <Select
                     label={t('menu_builder.type')}
-                    variant="bordered"
+                    variant="secondary"
                     size="sm"
                     selectedKeys={editForm.type ? [editForm.type] : ['link']}
                     onSelectionChange={(keys) => {
@@ -984,7 +980,7 @@ export function MenuBuilder() {
                       <SelectItem key={opt.key} id={opt.key} textValue={opt.label}>
                         <div>
                           <p className="text-sm font-medium">{opt.label}</p>
-                          <p className="text-xs text-default-400">{opt.description}</p>
+                          <p className="text-xs text-muted">{opt.description}</p>
                         </div>
                       </SelectItem>
                     ))}
@@ -995,7 +991,7 @@ export function MenuBuilder() {
                     <Input
                       label={t('menu_builder.url')}
                       placeholder={editForm.type === 'external' ? 'https://example.com' : '/dashboard'}
-                      variant="bordered"
+                      variant="secondary"
                       size="sm"
                       value={editForm.url || ''}
                       onValueChange={(v) => setEditForm((f) => ({ ...f, url: v }))}
@@ -1006,7 +1002,7 @@ export function MenuBuilder() {
                   {editForm.type === 'page' && (
                     <Select
                       label={t('menu_builder.select_page')}
-                      variant="bordered"
+                      variant="secondary"
                       size="sm"
                       isLoading={!pagesLoaded}
                       selectedKeys={editForm.page_id ? [String(editForm.page_id)] : []}
@@ -1026,7 +1022,7 @@ export function MenuBuilder() {
                         <SelectItem key={String(page.id)} id={String(page.id)} textValue={page.title}>
                           <div>
                             <p className="text-sm font-medium">{page.title}</p>
-                            <p className="text-xs text-default-400">/page/{page.slug}</p>
+                            <p className="text-xs text-muted">/page/{page.slug}</p>
                           </div>
                         </SelectItem>
                       ))}
@@ -1037,7 +1033,7 @@ export function MenuBuilder() {
                   {editForm.type === 'route' && (
                     <Select
                       label={t('menu_builder.select_route')}
-                      variant="bordered"
+                      variant="secondary"
                       size="sm"
                       selectedKeys={editForm.url ? [editForm.url] : []}
                       onSelectionChange={(keys) => {
@@ -1056,7 +1052,7 @@ export function MenuBuilder() {
                         <SelectItem key={route.value} id={route.value} textValue={route.label}>
                           <div className="flex items-center justify-between gap-2">
                             <span className="text-sm font-medium">{route.label}</span>
-                            <span className="text-xs text-default-400 font-mono">{route.value}</span>
+                            <span className="font-mono text-xs text-muted">{route.value}</span>
                           </div>
                         </SelectItem>
                       ))}
@@ -1075,7 +1071,7 @@ export function MenuBuilder() {
                   {editForm.type !== 'divider' && editForm.type !== 'dropdown' && (
                     <Select
                       label={t('menu_builder.open_in')}
-                      variant="bordered"
+                      variant="secondary"
                       size="sm"
                       selectedKeys={[editForm.target || '_self']}
                       onSelectionChange={(keys) => {
@@ -1092,7 +1088,7 @@ export function MenuBuilder() {
                   {editForm.type !== 'dropdown' && parentOptions.length > 0 && (
                     <Select
                       label={t('menu_builder.parent_item')}
-                      variant="bordered"
+                      variant="secondary"
                       size="sm"
                       selectedKeys={editForm.parent_id ? [String(editForm.parent_id)] : ['']}
                       onSelectionChange={(keys) => {
@@ -1125,8 +1121,8 @@ export function MenuBuilder() {
 
                   {/* Advanced (collapsible) */}
                   <Button
-                    variant="light"
-                    className="flex items-center gap-1.5 text-sm text-theme-muted hover:text-theme-primary transition-colors h-auto p-0 justify-start"
+                    variant="ghost"
+                    className="min-h-8 justify-start gap-1.5 p-0 text-sm text-muted hover:text-accent"
                     onPress={() => setShowAdvanced(!showAdvanced)}
                   >
                     {showAdvanced ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
@@ -1134,11 +1130,11 @@ export function MenuBuilder() {
                   </Button>
 
                   {showAdvanced && (
-                    <div className="space-y-3 pl-2 border-l-2 border-default-100">
+                    <div className="space-y-3 border-l-2 border-border pl-2">
                       <Input
                         label={t('menu_builder.css_class')}
                         placeholder={t('menu_builder.placeholder_css')}
-                        variant="bordered"
+                        variant="secondary"
                         size="sm"
                         value={editForm.css_class || ''}
                         onValueChange={(v) => setEditForm((f) => ({ ...f, css_class: v || null }))}
@@ -1154,7 +1150,6 @@ export function MenuBuilder() {
 
                   <div className="flex gap-2">
                     <Button
-                      color="primary"
                       size="sm"
                       className="flex-1"
                       onPress={handleUpdateItem}
@@ -1162,7 +1157,7 @@ export function MenuBuilder() {
                       {t('menu_builder.save_changes')}
                     </Button>
                     <Button
-                      variant="flat"
+                      variant="secondary"
                       size="sm"
                       onPress={clearSelection}
                     >
