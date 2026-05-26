@@ -458,7 +458,7 @@ export function ListingDetailPage() {
           <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/70 via-black/20 to-transparent p-4 sm:p-6">
             <div className="flex flex-wrap items-center gap-2">
               <Chip
-                variant="flat"
+                variant="soft"
                 className={listing.type === 'offer' ? 'bg-emerald-500/90 text-white' : 'bg-amber-500/90 text-white'}
               >
                 {listing.type === 'offer' ? t('offering') : t('requesting')}
@@ -466,7 +466,7 @@ export function ListingDetailPage() {
               {listing.is_featured && <FeaturedBadge size="md" />}
               {(listing.category || listing.category_name) && (
                 <Chip
-                  variant="flat"
+                  variant="soft"
                   startContent={<Tag className="h-3.5 w-3.5" aria-hidden="true" />}
                   className="max-w-full bg-white/90 text-slate-800"
                 >
@@ -494,7 +494,7 @@ export function ListingDetailPage() {
               <Link to={tenantPath(`/listings/edit/${listing.id}`)}>
                 <Button
                   size="sm"
-                  variant="flat"
+                  variant="secondary"
                   className="bg-theme-elevated text-theme-primary"
                   startContent={<Edit className="w-4 h-4" aria-hidden="true" />}
                 >
@@ -503,7 +503,7 @@ export function ListingDetailPage() {
               </Link>
               <Button
                 size="sm"
-                variant="flat"
+                variant="secondary"
                 className="bg-theme-elevated text-theme-primary"
                 startContent={<BarChart3 className="w-4 h-4" aria-hidden="true" />}
                 onPress={() => setShowAnalytics(!showAnalytics)}
@@ -513,7 +513,7 @@ export function ListingDetailPage() {
               {(listing.status === 'expired' || listing.expires_at) && (
                 <Button
                   size="sm"
-                  variant="flat"
+                  variant="secondary"
                   className="bg-emerald-500/10 text-emerald-500"
                   startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
                   onPress={handleRenew}
@@ -524,7 +524,7 @@ export function ListingDetailPage() {
               )}
               <Button
                 size="sm"
-                variant="flat"
+                variant="danger-soft"
                 className="bg-red-500/10 text-red-400"
                 startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
                 onPress={onDeleteOpen}
@@ -659,7 +659,7 @@ export function ListingDetailPage() {
                   )}
                   {isLongDesc && (
                     <Button
-                      variant="light"
+                      variant="tertiary"
                       size="sm"
                       className="mt-2 text-theme-accent px-0"
                       onPress={() => setShowFullDesc((prev) => !prev)}
@@ -678,10 +678,10 @@ export function ListingDetailPage() {
           <div className="flex gap-4 text-sm text-theme-subtle mb-4">
             {social.likesCount > 0 && (
               <Button
-                variant="light"
+                variant="ghost"
                 size="sm"
                 onPress={onLikersOpen}
-                className="flex items-center gap-1.5 hover:text-theme-primary transition-colors h-auto p-0 min-w-0"
+                className="flex min-h-7 items-center gap-1.5 p-0 transition-colors hover:text-theme-primary"
               >
                 <span className="w-4 h-4 rounded-full bg-gradient-to-br from-rose-500 to-pink-500 flex items-center justify-center">
                   <Heart className="w-2.5 h-2.5 text-white fill-white" aria-hidden="true" />
@@ -691,11 +691,11 @@ export function ListingDetailPage() {
             )}
             {social.commentsCount > 0 && (
               <Button
-                variant="light"
+                variant="ghost"
                 size="sm"
                 onPress={toggleComments}
                 aria-expanded={showComments}
-                className="hover:text-theme-primary transition-colors h-auto p-0 min-w-0"
+                className="min-h-7 p-0 transition-colors hover:text-theme-primary"
               >
                 {social.commentsCount} {social.commentsCount === 1 ? t('comment') : t('comments')}
               </Button>
@@ -718,7 +718,7 @@ export function ListingDetailPage() {
                     className="w-full bg-theme-elevated text-theme-primary"
                     startContent={<ArrowRightLeft className="w-4 h-4" aria-hidden="true" />}
                     endContent={
-                      <Chip size="sm" variant="flat" color={
+                      <Chip size="sm" variant="soft" color={
                         activeExchange.status === 'accepted' || activeExchange.status === 'in_progress' ? 'success' :
                         activeExchange.status === 'pending_provider' || activeExchange.status === 'pending_broker' ? 'warning' :
                         activeExchange.status === 'pending_confirmation' ? 'primary' :
@@ -758,7 +758,7 @@ export function ListingDetailPage() {
               </Link>
             )}
             <Button
-              variant="flat"
+              variant="secondary"
               className={`w-full ${social.isLiked ? 'bg-rose-500/20 text-rose-500' : 'bg-theme-elevated text-theme-primary'}`}
               startContent={<Heart className={`w-4 h-4 ${social.isLiked ? 'fill-current' : ''}`} aria-hidden="true" />}
               onPress={() => void social.toggleLike()}
@@ -768,7 +768,7 @@ export function ListingDetailPage() {
               {social.likesCount > 0 ? `${social.likesCount} ` : ''}{social.isLiked ? t('detail_liked') : t('detail_like')}
             </Button>
             <Button
-              variant="flat"
+              variant="secondary"
               className={`w-full ${showComments ? 'bg-indigo-500/20 text-indigo-400' : 'bg-theme-elevated text-theme-primary'}`}
               startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
               onPress={toggleComments}
@@ -778,7 +778,7 @@ export function ListingDetailPage() {
               {social.commentsCount > 0 ? `${social.commentsCount} ` : ''}{t('detail_comments')}
             </Button>
             <Button
-              variant="flat"
+              variant="secondary"
               className={`w-full ${isSaved ? 'bg-indigo-500/20 text-indigo-400' : 'bg-theme-elevated text-theme-primary'}`}
               startContent={isSaved ? <Bookmark className="w-4 h-4 fill-current" aria-hidden="true" /> : <Bookmark className="w-4 h-4" aria-hidden="true" />}
               onPress={() => void handleSave()}
@@ -797,7 +797,7 @@ export function ListingDetailPage() {
               className="w-full"
             />
             <Button
-              variant="flat"
+              variant="secondary"
               className={`w-full ${isReported ? 'bg-orange-500/20 text-orange-500' : 'bg-theme-elevated text-theme-primary'}`}
               startContent={<Flag className="w-4 h-4" aria-hidden="true" />}
               onPress={onReportOpen}
@@ -812,7 +812,7 @@ export function ListingDetailPage() {
         {isAuthenticated && isOwner && (
           <div className="grid grid-cols-1 gap-2 rounded-2xl border border-theme-default bg-theme-hover/70 p-3 sm:grid-cols-3 sm:p-4">
             <Button
-              variant="flat"
+              variant="secondary"
               className={`w-full ${social.isLiked ? 'bg-rose-500/20 text-rose-500' : 'bg-theme-elevated text-theme-primary'}`}
               startContent={<Heart className={`w-4 h-4 ${social.isLiked ? 'fill-current' : ''}`} aria-hidden="true" />}
               onPress={() => void social.toggleLike()}
@@ -822,7 +822,7 @@ export function ListingDetailPage() {
               {social.likesCount > 0 ? `${social.likesCount} ` : ''}{social.isLiked ? t('detail_liked') : t('detail_like')}
             </Button>
             <Button
-              variant="flat"
+              variant="secondary"
               className={`w-full ${showComments ? 'bg-indigo-500/20 text-indigo-400' : 'bg-theme-elevated text-theme-primary'}`}
               startContent={<MessageSquare className="w-4 h-4" aria-hidden="true" />}
               onPress={toggleComments}
@@ -882,8 +882,8 @@ export function ListingDetailPage() {
             <p className="text-theme-secondary">{t('delete_confirm_body')}</p>
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={onDeleteClose}>{t('cancel')}</Button>
-            <Button color="danger" onPress={() => { onDeleteClose(); void handleDelete(); }} isLoading={isDeleting}>
+            <Button variant="tertiary" onPress={onDeleteClose}>{t('cancel')}</Button>
+            <Button variant="danger" onPress={() => { onDeleteClose(); void handleDelete(); }} isLoading={isDeleting}>
               {t('delete_confirm_button')}
             </Button>
           </ModalFooter>
@@ -914,17 +914,17 @@ export function ListingDetailPage() {
               value={reportDetails}
               onValueChange={setReportDetails}
               maxLength={500}
-              variant="bordered"
+              variant="secondary"
               description={`${reportDetails.length}/500`}
               classNames={{ label: 'text-theme-secondary' }}
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={onReportClose}>
+            <Button variant="tertiary" onPress={onReportClose}>
               {t('cancel')}
             </Button>
             <Button
-              color="danger"
+              variant="danger"
               onPress={() => void handleReport()}
               isDisabled={!reportReason || isReporting}
               isLoading={isReporting}
@@ -1041,7 +1041,7 @@ export function ListingDetailPage() {
               <Chip
                 key={tag}
                 size="sm"
-                variant="flat"
+                variant="secondary"
                 className="max-w-full bg-accent/10 text-accent"
               >
                 <span className="truncate">{tag}</span>
@@ -1064,7 +1064,7 @@ export function ListingDetailPage() {
               <div className="flex flex-wrap gap-2">
                 {listing.member_offers!.map((l) => (
                   <Link key={l.id} to={tenantPath(`/listings/${l.id}`)}>
-                    <Chip variant="flat" className="max-w-full cursor-pointer bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 dark:text-emerald-400">
+                    <Chip variant="soft" className="max-w-full cursor-pointer bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/20 dark:text-emerald-400">
                       <span className="truncate">{l.title}</span>
                     </Chip>
                   </Link>
@@ -1078,7 +1078,7 @@ export function ListingDetailPage() {
               <div className="flex flex-wrap gap-2">
                 {listing.member_requests!.map((l) => (
                   <Link key={l.id} to={tenantPath(`/listings/${l.id}`)}>
-                    <Chip variant="flat" className="max-w-full cursor-pointer bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400">
+                    <Chip variant="soft" className="max-w-full cursor-pointer bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400">
                       <span className="truncate">{l.title}</span>
                     </Chip>
                   </Link>

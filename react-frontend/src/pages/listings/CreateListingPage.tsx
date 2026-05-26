@@ -360,7 +360,7 @@ export function CreateListingPage() {
       <header className="overflow-hidden rounded-2xl border border-theme-default bg-theme-elevated">
         <div className="flex flex-col gap-5 p-6 sm:p-8 lg:flex-row lg:items-center lg:justify-between">
           <div className="max-w-2xl space-y-3">
-            <Chip size="sm" variant="flat" color={formData.type === 'offer' ? 'success' : 'warning'} className="font-medium">
+            <Chip size="sm" variant="soft" color={formData.type === 'offer' ? 'success' : 'warning'} className="font-medium">
               {formData.type === 'offer' ? t('form.offer_badge') : t('form.request_badge')}
             </Chip>
             <div>
@@ -499,7 +499,7 @@ export function CreateListingPage() {
             <div className="flex flex-col items-stretch gap-2 mt-2 sm:flex-row sm:items-center">
               <Button
                 size="sm"
-                variant="flat"
+                variant="secondary"
                 className="bg-theme-elevated text-theme-primary"
                 startContent={<Sparkles className="w-3.5 h-3.5" aria-hidden="true" />}
                 onPress={handleGenerateDescription}
@@ -827,7 +827,7 @@ export function CreateListingPage() {
             <Link to={tenantPath("/listings")} className="sm:mr-auto">
               <Button
                 type="button"
-                variant="flat"
+                variant="tertiary"
                 className="w-full bg-theme-elevated text-theme-primary sm:w-auto sm:min-w-24"
               >
                 {t('form.cancel')}
@@ -835,7 +835,7 @@ export function CreateListingPage() {
             </Link>
             <Button
               type="submit"
-              color="primary"
+              variant="primary"
               className="w-full font-semibold text-white sm:w-auto sm:min-w-44"
               startContent={isEditing ? <CheckCircle className="w-4 h-4" aria-hidden="true" /> : <Save className="w-4 h-4" aria-hidden="true" />}
               isLoading={isSubmitting}

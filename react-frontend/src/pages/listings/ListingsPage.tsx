@@ -409,8 +409,8 @@ export function ListingsPage() {
             {isAuthenticated && (
               <Link to={tenantPath('/listings/create')}>
                 <Button
-                  color="primary"
-                  className="shrink-0 font-semibold shadow-sm"
+                  variant="primary"
+                  className="shrink-0 font-semibold"
                   startContent={<Plus className="w-4 h-4" />}
                 >
                   {t('create')}
@@ -452,8 +452,8 @@ export function ListingsPage() {
             <Button
               isIconOnly
               type="submit"
-              color="primary"
-              className="min-h-[48px] min-w-[48px] shrink-0 shadow-sm"
+              variant="primary"
+              className="min-h-[48px] min-w-[48px] shrink-0"
               aria-label={t('search_action')}
             >
               <Search className="h-4 w-4" aria-hidden="true" />
@@ -545,7 +545,7 @@ export function ListingsPage() {
             <div className="flex overflow-hidden rounded-xl border border-theme-default bg-theme-elevated" role="group" aria-label={t('aria.view_mode')}>
               <Button
                 isIconOnly
-                variant="light"
+                variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
                 className={`min-h-[44px] min-w-[44px] rounded-none transition-colors ${viewMode === 'grid' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300' : 'text-theme-muted'}`}
                 aria-label={t('aria_grid_view')}
                 aria-pressed={viewMode === 'grid'}
@@ -555,7 +555,7 @@ export function ListingsPage() {
               </Button>
               <Button
                 isIconOnly
-                variant="light"
+                variant={viewMode === 'list' ? 'secondary' : 'ghost'}
                 className={`min-h-[44px] min-w-[44px] rounded-none ${!MAPS_ENABLED ? 'rounded-r-xl' : ''} transition-colors ${viewMode === 'list' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300' : 'text-theme-muted'}`}
                 aria-label={t('aria_list_view')}
                 aria-pressed={viewMode === 'list'}
@@ -566,7 +566,7 @@ export function ListingsPage() {
               {MAPS_ENABLED && (
                 <Button
                   isIconOnly
-                  variant="light"
+                  variant={viewMode === 'map' ? 'secondary' : 'ghost'}
                   className={`min-h-[44px] min-w-[44px] rounded-none rounded-r-xl transition-colors ${viewMode === 'map' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-300' : 'text-theme-muted'}`}
                   aria-label={t('aria_map_view')}
                   aria-pressed={viewMode === 'map'}
@@ -652,7 +652,7 @@ export function ListingsPage() {
 
             {activeFilterCount > 0 && (
               <Button
-                variant="light"
+                variant="tertiary"
                 className="min-h-[40px] text-theme-muted hover:text-theme-primary"
                 startContent={<X className="w-4 h-4" aria-hidden="true" />}
                 onPress={resetFilters}
@@ -687,7 +687,7 @@ export function ListingsPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('load_error_title')}</h2>
           <p className="text-theme-muted mb-4">{loadError}</p>
           <Button
-            color="primary"
+            variant="primary"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={() => loadListings(true)}
           >
@@ -705,7 +705,7 @@ export function ListingsPage() {
               action={
                 hasActiveFilters ? (
                   <Button
-                    color="primary"
+                    variant="primary"
                     startContent={<X className="w-4 h-4" aria-hidden="true" />}
                     onPress={resetFilters}
                   >
@@ -713,7 +713,7 @@ export function ListingsPage() {
                   </Button>
                 ) : isAuthenticated ? (
                   <Link to={tenantPath('/listings/create')}>
-                    <Button color="primary" startContent={<Plus className="h-4 w-4" aria-hidden="true" />}>
+                    <Button variant="primary" startContent={<Plus className="h-4 w-4" aria-hidden="true" />}>
                       {t('create')}
                     </Button>
                   </Link>
@@ -754,7 +754,7 @@ export function ListingsPage() {
                   <Link to={tenantPath(`/listings/${l.id}`)} className="mt-2 inline-flex">
                     <Button
                       size="sm"
-                      variant="flat"
+                      variant="secondary"
                       className="h-8 min-w-0 bg-theme-elevated px-3 text-xs font-medium text-theme-primary hover:bg-theme-hover"
                       endContent={<ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />}
                     >
@@ -813,7 +813,7 @@ export function ListingsPage() {
               )}
               <div className="text-center">
                 <Button
-                  variant="flat"
+                  variant="secondary"
                   className="bg-theme-elevated text-theme-primary hover:bg-theme-hover"
                   onPress={() => loadListings()}
                   isLoading={isLoading}
@@ -964,7 +964,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
                   <Button
                     isIconOnly
                     size="sm"
-                    variant="flat"
+                    variant="secondary"
                     onPress={handleSaveClick}
                     isDisabled={isSaving}
                     aria-label={isFavorited ? t('unsave_listing') : t('save_listing')}
