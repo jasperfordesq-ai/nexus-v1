@@ -1,7 +1,7 @@
 import Target from 'lucide-react/icons/target';
 import { useTranslation } from 'react-i18next';
+import { Chip } from '@heroui/react';
 import type { MatchResult } from './JobDetailTypes';
-import { Chip } from '@/components/ui';
 
 interface MatchBadgeProps {
   match: MatchResult;
@@ -12,17 +12,17 @@ export function MatchBadge({ match }: MatchBadgeProps) {
 
   if (match.required_skills.length === 0) return null;
 
-  const color = match.percentage >= 80 ? 'success' : match.percentage >= 60 ? 'primary' : match.percentage >= 40 ? 'warning' : 'danger';
+  const color = match.percentage >= 80 ? 'success' : match.percentage >= 60 ? 'accent' : match.percentage >= 40 ? 'warning' : 'danger';
   const label = match.percentage >= 80 ? t('match.excellent') : match.percentage >= 60 ? t('match.good') : match.percentage >= 40 ? t('match.moderate') : t('match.low');
 
   return (
     <div className="flex items-center gap-3">
       <Chip
-        variant="flat"
+        variant="tertiary"
         color={color}
-        startContent={<Target className="w-3.5 h-3.5" aria-hidden="true" />}
         className="text-sm"
       >
+        <Target className="w-3.5 h-3.5" aria-hidden="true" />
         {match.percentage}% {t('match.title')}
       </Chip>
       <span className="text-xs text-theme-subtle">{label}</span>

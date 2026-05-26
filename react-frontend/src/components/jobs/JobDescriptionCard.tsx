@@ -3,7 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState } from 'react';import Target from 'lucide-react/icons/target';
+import { useState } from 'react';
+import { Chip } from '@heroui/react';
+import Target from 'lucide-react/icons/target';
 import Sparkles from 'lucide-react/icons/sparkles';
 import Building2 from 'lucide-react/icons/building-2';
 import ChevronUp from 'lucide-react/icons/chevron-up';
@@ -11,7 +13,7 @@ import ChevronDown from 'lucide-react/icons/chevron-down';
 import Check from 'lucide-react/icons/check';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip } from '@/components/ui';
+import { GlassCard, Button } from '@/components/ui';
 import { SafeHtml } from '@/components/ui/SafeHtml';
 import type { JobVacancy, MatchResult, QualificationData } from './JobDetailTypes';
 
@@ -76,7 +78,7 @@ export function JobDescriptionCard({
                   <p className="text-xs font-medium text-success mb-1">{t('match.you_have')}</p>
                   <div className="flex flex-wrap gap-1">
                     {qualificationData.matched_skills.map((s, i) => (
-                      <Chip key={i} size="sm" color="success" variant="flat">{s}</Chip>
+                      <Chip key={i} size="sm" color="success" variant="tertiary">{s}</Chip>
                     ))}
                   </div>
                 </div>
@@ -86,7 +88,7 @@ export function JobDescriptionCard({
                   <p className="text-xs font-medium text-warning mb-1">{t('match.to_develop')}</p>
                   <div className="flex flex-wrap gap-1">
                     {qualificationData.missing_skills.map((s, i) => (
-                      <Chip key={i} size="sm" color="warning" variant="flat">{s}</Chip>
+                      <Chip key={i} size="sm" color="warning" variant="tertiary">{s}</Chip>
                     ))}
                   </div>
                 </div>
@@ -121,7 +123,7 @@ export function JobDescriptionCard({
           {vacancy.benefits && vacancy.benefits.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {vacancy.benefits.map((b: string, i: number) => (
-                <Chip key={i} size="sm" variant="flat" color="success">{b}</Chip>
+                <Chip key={i} size="sm" variant="tertiary" color="success">{b}</Chip>
               ))}
             </div>
           )}
@@ -152,11 +154,11 @@ export function JobDescriptionCard({
               return (
                 <Chip
                   key={idx}
-                  variant="flat"
-                  color={isMatched ? 'success' : isMissing ? 'danger' : 'primary'}
+                  variant="tertiary"
+                  color={isMatched ? 'success' : isMissing ? 'danger' : 'accent'}
                   className={isMatched ? 'bg-success/10 text-success' : isMissing ? 'bg-danger/10 text-danger' : 'bg-accent/10 text-accent'}
-                  startContent={isMatched ? <Check className="w-3 h-3" /> : isMissing ? <X className="w-3 h-3" /> : undefined}
                 >
+                  {isMatched ? <Check className="w-3 h-3" aria-hidden="true" /> : isMissing ? <X className="w-3 h-3" aria-hidden="true" /> : null}
                   {skill}
                 </Chip>
               );

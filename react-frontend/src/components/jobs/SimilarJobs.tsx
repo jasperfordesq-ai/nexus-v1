@@ -3,14 +3,16 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Link } from 'react-router-dom';import Briefcase from 'lucide-react/icons/briefcase';
+import { Link } from 'react-router-dom';
+import { Chip } from '@heroui/react';
+import Briefcase from 'lucide-react/icons/briefcase';
 import MapPin from 'lucide-react/icons/map-pin';
 import DollarSign from 'lucide-react/icons/dollar-sign';
 import Heart from 'lucide-react/icons/heart';
 import Timer from 'lucide-react/icons/timer';
 import Globe from 'lucide-react/icons/globe';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Chip } from '@/components/ui';
+import { GlassCard } from '@/components/ui';
 import type { JobVacancy } from './JobDetailTypes';
 import { TYPE_CHIP_COLORS } from './JobDetailTypes';
 
@@ -49,21 +51,21 @@ export function SimilarJobs({ jobs, tenantPath }: SimilarJobsProps) {
                   {sj.organization?.name ?? sj.creator?.name}
                 </p>
                 <div className="flex flex-wrap gap-1">
-                  <Chip size="sm" variant="flat" color={TYPE_CHIP_COLORS[sj.type] ?? 'default'} className="text-xs">
+                  <Chip size="sm" variant="tertiary" color={TYPE_CHIP_COLORS[sj.type] ?? 'default'} className="text-xs">
                     <span className="flex items-center gap-0.5">
                       <SjTypeIcon className="w-3 h-3" aria-hidden="true" />
                       {t(`type.${sj.type}`)}
                     </span>
                   </Chip>
                   {sj.is_remote ? (
-                    <Chip size="sm" variant="flat" color="primary" className="text-xs">
+                    <Chip size="sm" variant="tertiary" color="accent" className="text-xs">
                       <span className="flex items-center gap-0.5">
                         <Globe className="w-3 h-3" aria-hidden="true" />
                         {t('remote')}
                       </span>
                     </Chip>
                   ) : sj.location ? (
-                    <Chip size="sm" variant="flat" color="default" className="text-xs">
+                    <Chip size="sm" variant="tertiary" color="default" className="text-xs">
                       <span className="flex items-center gap-0.5">
                         <MapPin className="w-3 h-3" aria-hidden="true" />
                         {sj.location}

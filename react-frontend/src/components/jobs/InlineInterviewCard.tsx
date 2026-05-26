@@ -6,7 +6,8 @@ import XCircle from 'lucide-react/icons/circle-x';
 import Video from 'lucide-react/icons/video';
 import CalendarPlus from 'lucide-react/icons/calendar-plus';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip } from '@/components/ui';
+import { Chip } from '@heroui/react';
+import { GlassCard, Button } from '@/components/ui';
 import { API_BASE } from '@/lib/api';
 import type { InlineInterview } from './JobDetailTypes';
 
@@ -43,7 +44,7 @@ export function InlineInterviewCard({
                 <Calendar className="w-3.5 h-3.5" aria-hidden="true" />
                 {new Date(pendingInterview.scheduled_at).toLocaleString()}
               </span>
-              <Chip size="sm" variant="flat" color="secondary">
+              <Chip size="sm" variant="tertiary" color="accent">
                 {t(`interview.type_${pendingInterview.interview_type}`)}
               </Chip>
               {pendingInterview.duration_mins && (

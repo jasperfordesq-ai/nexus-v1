@@ -27,7 +27,8 @@ import Copy from 'lucide-react/icons/copy';
 import Send from 'lucide-react/icons/send';
 import Share2 from 'lucide-react/icons/share-2';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Avatar, Tooltip } from '@/components/ui';
+import { Chip } from '@heroui/react';
+import { GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Avatar, Tooltip } from '@/components/ui';
 import { formatDateValue, resolveAvatarUrl } from '@/lib/helpers';
 import { MatchBadge } from './MatchBadge';
 import type { JobVacancy, MatchResult } from './JobDetailTypes';
@@ -82,24 +83,26 @@ export function JobDetailHeader({
           <div className="flex items-center gap-3 flex-wrap mb-2">
             <h1 className="text-2xl font-bold text-theme-primary">{vacancy.title}</h1>
             {vacancy.is_featured && (
-              <Chip size="sm" variant="flat" color="warning" startContent={<Star className="w-3 h-3" aria-hidden="true" />}>
+              <Chip size="sm" variant="tertiary" color="warning">
+                <Star className="w-3 h-3" aria-hidden="true" />
                 {t('featured')}
               </Chip>
             )}
-            <Chip size="sm" variant="flat" color={TYPE_CHIP_COLORS[vacancy.type] ?? 'default'}>
+            <Chip size="sm" variant="tertiary" color={TYPE_CHIP_COLORS[vacancy.type] ?? 'default'}>
               <span className="flex items-center gap-1">
                 <TypeIcon className="w-3 h-3" aria-hidden="true" />
                 {t(`type.${vacancy.type}`)}
               </span>
             </Chip>
-            <Chip size="sm" variant="flat" color="default">
+            <Chip size="sm" variant="tertiary" color="default">
               {t(`commitment.${vacancy.commitment}`)}
             </Chip>
-            <Chip size="sm" variant="flat" color={vacancy.status === 'open' ? 'success' : 'default'}>
+            <Chip size="sm" variant="tertiary" color={vacancy.status === 'open' ? 'success' : 'default'}>
               {t(`status.${vacancy.status}`)}
             </Chip>
             {vacancy.blind_hiring && (
-              <Chip size="sm" variant="flat" color="secondary" startContent={<EyeOff className="w-3 h-3" />}>
+              <Chip size="sm" variant="tertiary" color="accent">
+                <EyeOff className="w-3 h-3" aria-hidden="true" />
                 {t('blind_hiring.enabled_badge')}
               </Chip>
             )}

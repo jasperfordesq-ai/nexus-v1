@@ -143,10 +143,10 @@ export interface PipelineRule {
   last_run_at: string | null;
 }
 
-export const TYPE_CHIP_COLORS: Record<string, 'success' | 'secondary' | 'primary'> = {
+export const TYPE_CHIP_COLORS: Record<string, 'success' | 'default' | 'accent'> = {
   paid: 'success',
-  volunteer: 'secondary',
-  timebank: 'primary',
+  volunteer: 'default',
+  timebank: 'accent',
 };
 
 export const STATUS_COLORS: Record<string, 'warning' | 'primary' | 'success' | 'danger' | 'default' | 'secondary'> = {
