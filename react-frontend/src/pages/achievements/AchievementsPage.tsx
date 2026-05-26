@@ -207,12 +207,12 @@ function DailyRewardWidget() {
     return (
       <GlassCard className="p-4" aria-label={t('achievements.daily_reward.loading')} aria-busy="true">
         <div className="flex items-center gap-4">
-          <Skeleton className="rounded-full flex-shrink-0"><div className="w-12 h-12 rounded-full bg-default-300" /></Skeleton>
+          <Skeleton className="rounded-full flex-shrink-0"><div className="w-12 h-12 rounded-full bg-surface-tertiary" /></Skeleton>
           <div className="flex-1 space-y-2">
-            <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-300 w-1/3" /></Skeleton>
-            <Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-default-200 w-1/2" /></Skeleton>
+            <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-surface-tertiary w-1/3" /></Skeleton>
+            <Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-surface-secondary w-1/2" /></Skeleton>
           </div>
-          <Skeleton className="rounded-lg"><div className="h-10 w-28 rounded-lg bg-default-300" /></Skeleton>
+          <Skeleton className="rounded-lg"><div className="h-10 w-28 rounded-lg bg-surface-tertiary" /></Skeleton>
         </div>
       </GlassCard>
     );
@@ -413,12 +413,12 @@ function ChallengesTab() {
         {Array.from({ length: 3 }).map((_, i) => (
           <GlassCard key={i} className="p-5">
             <div className="flex items-start gap-4">
-              <Skeleton className="rounded-lg flex-shrink-0"><div className="w-10 h-10 rounded-lg bg-default-300" /></Skeleton>
+              <Skeleton className="rounded-lg flex-shrink-0"><div className="w-10 h-10 rounded-lg bg-surface-tertiary" /></Skeleton>
               <div className="flex-1 space-y-2">
-                <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-300 w-1/3" /></Skeleton>
-                <Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-default-200 w-2/3" /></Skeleton>
-                <Skeleton className="rounded-lg"><div className="h-2 rounded-lg bg-default-200 w-full" /></Skeleton>
-                <Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-default-200 w-1/4" /></Skeleton>
+                <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-surface-tertiary w-1/3" /></Skeleton>
+                <Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-surface-secondary w-2/3" /></Skeleton>
+                <Skeleton className="rounded-lg"><div className="h-2 rounded-lg bg-surface-secondary w-full" /></Skeleton>
+                <Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-surface-secondary w-1/4" /></Skeleton>
               </div>
             </div>
           </GlassCard>
@@ -626,13 +626,13 @@ function JourneysTab() {
         {Array.from({ length: 3 }).map((_, i) => (
           <GlassCard key={i} className="p-5">
             <div className="space-y-2 mb-3">
-              <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-300 w-1/3" /></Skeleton>
-              <Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-default-200 w-2/3" /></Skeleton>
-              <Skeleton className="rounded-lg"><div className="h-2 rounded-lg bg-default-200 w-full" /></Skeleton>
+              <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-surface-tertiary w-1/3" /></Skeleton>
+              <Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-surface-secondary w-2/3" /></Skeleton>
+              <Skeleton className="rounded-lg"><div className="h-2 rounded-lg bg-surface-secondary w-full" /></Skeleton>
             </div>
             <div className="flex gap-2">
               {Array.from({ length: 4 }).map((_, j) => (
-                <Skeleton key={j} className="rounded-full"><div className="w-8 h-8 rounded-full bg-default-300" /></Skeleton>
+                <Skeleton key={j} className="rounded-full"><div className="w-8 h-8 rounded-full bg-surface-tertiary" /></Skeleton>
               ))}
             </div>
           </GlassCard>
@@ -768,10 +768,10 @@ function EngagementTab() {
     return (
       <div className="mt-4 space-y-4">
         <GlassCard className="p-5">
-          <Skeleton className="rounded-lg"><div className="h-4 w-48 bg-default-300" /></Skeleton>
+          <Skeleton className="rounded-lg"><div className="h-4 w-48 bg-surface-tertiary" /></Skeleton>
           <div className="grid grid-cols-6 gap-2 mt-4">
             {Array.from({ length: 12 }).map((_, i) => (
-              <Skeleton key={i} className="rounded-lg"><div className="h-10 bg-default-200" /></Skeleton>
+              <Skeleton key={i} className="rounded-lg"><div className="h-10 bg-surface-secondary" /></Skeleton>
             ))}
           </div>
         </GlassCard>
@@ -819,7 +819,7 @@ function EngagementTab() {
               className={`flex flex-col items-center p-2 rounded-lg transition-colors ${
                 month.active
                   ? 'bg-emerald-500/20 border border-emerald-500/30'
-                  : 'bg-default-100/50 border border-transparent'
+                  : 'bg-surface-secondary/50 border border-transparent'
               }`}
               title={
                 month.active
@@ -827,11 +827,11 @@ function EngagementTab() {
                   : t('achievements.engagement.month_inactive_tooltip')
               }
             >
-              <span className="text-[10px] text-default-400">{month.label}</span>
+              <span className="text-[10px] text-muted">{month.label}</span>
               {month.active ? (
                 <CheckCircle className="w-5 h-5 text-emerald-500 mt-1" aria-hidden="true" />
               ) : (
-                <div className="w-5 h-5 rounded-full bg-default-200 mt-1" />
+                <div className="w-5 h-5 rounded-full bg-surface-secondary mt-1" />
               )}
             </div>
           ))}
@@ -941,16 +941,16 @@ function XpShopTab({ userXp }: { userXp: number }) {
     return (
       <div className="space-y-4 mt-4">
         <GlassCard className="p-4">
-          <Skeleton className="rounded-lg"><div className="h-6 rounded-lg bg-default-300 w-1/4" /></Skeleton>
+          <Skeleton className="rounded-lg"><div className="h-6 rounded-lg bg-surface-tertiary w-1/4" /></Skeleton>
         </GlassCard>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <GlassCard key={i} className="p-5 text-center">
-              <Skeleton className="rounded-lg mx-auto mb-3"><div className="w-12 h-12 rounded-lg bg-default-300 mx-auto" /></Skeleton>
+              <Skeleton className="rounded-lg mx-auto mb-3"><div className="w-12 h-12 rounded-lg bg-surface-tertiary mx-auto" /></Skeleton>
               <div className="space-y-2">
-              <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-300 w-2/3 mx-auto" /></Skeleton>
-              <Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-default-200 w-full" /></Skeleton>
-              <Skeleton className="rounded-lg"><div className="h-8 rounded-lg bg-default-300 w-1/2 mx-auto" /></Skeleton>
+              <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-surface-tertiary w-2/3 mx-auto" /></Skeleton>
+              <Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-surface-secondary w-full" /></Skeleton>
+              <Skeleton className="rounded-lg"><div className="h-8 rounded-lg bg-surface-tertiary w-1/2 mx-auto" /></Skeleton>
               </div>
             </GlassCard>
           ))}
@@ -1156,9 +1156,9 @@ function BadgeDetailModal({ isOpen, onClose, badgeKey }: BadgeDetailModalProps) 
         {isLoading ? (
           <ModalBody>
             <div className="flex flex-col items-center gap-4 py-8">
-              <Skeleton className="rounded-full"><div className="w-20 h-20 rounded-full bg-default-300" /></Skeleton>
-              <Skeleton className="rounded-lg"><div className="h-6 w-48 rounded-lg bg-default-300" /></Skeleton>
-              <Skeleton className="rounded-lg"><div className="h-4 w-64 rounded-lg bg-default-200" /></Skeleton>
+              <Skeleton className="rounded-full"><div className="w-20 h-20 rounded-full bg-surface-tertiary" /></Skeleton>
+              <Skeleton className="rounded-lg"><div className="h-6 w-48 rounded-lg bg-surface-tertiary" /></Skeleton>
+              <Skeleton className="rounded-lg"><div className="h-4 w-64 rounded-lg bg-surface-secondary" /></Skeleton>
             </div>
           </ModalBody>
         ) : error || !badge ? (
@@ -1549,21 +1549,21 @@ export function AchievementsPage() {
               {/* Daily reward skeleton */}
               <GlassCard className="p-4">
                 <div className="flex items-center gap-4">
-                  <Skeleton className="rounded-full flex-shrink-0"><div className="w-12 h-12 rounded-full bg-default-300" /></Skeleton>
+                  <Skeleton className="rounded-full flex-shrink-0"><div className="w-12 h-12 rounded-full bg-surface-tertiary" /></Skeleton>
                   <div className="flex-1 space-y-2">
-                    <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-300 w-1/3" /></Skeleton>
-                    <Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-default-200 w-1/2" /></Skeleton>
+                    <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-surface-tertiary w-1/3" /></Skeleton>
+                    <Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-surface-secondary w-1/2" /></Skeleton>
                   </div>
                 </div>
               </GlassCard>
               {/* Profile skeleton */}
               <GlassCard className="p-6">
                 <div className="flex items-center gap-4">
-                  <Skeleton className="rounded-full flex-shrink-0"><div className="w-16 h-16 rounded-full bg-default-300" /></Skeleton>
+                  <Skeleton className="rounded-full flex-shrink-0"><div className="w-16 h-16 rounded-full bg-surface-tertiary" /></Skeleton>
                   <div className="flex-1 space-y-2">
-                    <Skeleton className="rounded-lg"><div className="h-5 rounded-lg bg-default-300 w-1/3" /></Skeleton>
-                    <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-200 w-full" /></Skeleton>
-                    <Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-default-200 w-1/4" /></Skeleton>
+                    <Skeleton className="rounded-lg"><div className="h-5 rounded-lg bg-surface-tertiary w-1/3" /></Skeleton>
+                    <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-surface-secondary w-full" /></Skeleton>
+                    <Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-surface-secondary w-1/4" /></Skeleton>
                   </div>
                 </div>
               </GlassCard>
@@ -1571,10 +1571,10 @@ export function AchievementsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <GlassCard key={i} className="p-4 text-center">
-                    <Skeleton className="rounded-full mx-auto mb-3"><div className="w-12 h-12 rounded-full bg-default-300 mx-auto" /></Skeleton>
+                    <Skeleton className="rounded-full mx-auto mb-3"><div className="w-12 h-12 rounded-full bg-surface-tertiary mx-auto" /></Skeleton>
                     <div className="space-y-2">
-                    <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-300 w-2/3 mx-auto" /></Skeleton>
-                    <Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-default-200 w-full" /></Skeleton>
+                    <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-surface-tertiary w-2/3 mx-auto" /></Skeleton>
+                    <Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-surface-secondary w-full" /></Skeleton>
                     </div>
                   </GlassCard>
                 ))}
