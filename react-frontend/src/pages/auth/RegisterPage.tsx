@@ -990,7 +990,7 @@ export function RegisterPage() {
           {currentStep > 1 && (
             <Button
               type="button"
-              variant="flat"
+              variant="tertiary"
               onPress={handleBack}
               className="flex-1 bg-theme-elevated text-theme-secondary"
               startContent={<ChevronLeft className="w-4 h-4" aria-hidden="true" />}

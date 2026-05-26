@@ -100,7 +100,7 @@ function combineClasses(...classes: Array<string | false | undefined>): string |
 
 function decoratedInputClass(className?: string): string | undefined {
   return combineClasses(
-    'min-w-0 flex-1 border-0 bg-transparent px-0 py-0 shadow-none outline-none',
+    'h-full min-h-0 w-full min-w-0 flex-1 self-stretch rounded-none border-0 bg-transparent px-0 py-0 shadow-none outline-none',
     'focus-visible:border-transparent focus-visible:ring-0',
     className,
   );
@@ -112,7 +112,7 @@ function decoratedWrapperClass(
   radius: InputProps['radius'],
 ): string | undefined {
   return combineClasses(
-    'flex w-full items-center gap-2 px-3 py-2',
+    'flex min-h-10 w-full items-center gap-2 px-3 py-2',
     sizeClass(size),
     radiusClass(radius),
     className,
@@ -172,7 +172,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({
           ? decoratedInputClass(classNames?.input)
           : classNames?.input,
         !startContent && !endContent && classNames?.inputWrapper,
-        sizeClass(size),
+        !(startContent || trailingContent) && sizeClass(size),
         !startContent && !endContent && radiusClass(radius),
       )}
       disabled={isDisabled}
@@ -259,7 +259,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({
 
   return (
     <TextField
-      className={combineClasses('flex flex-col gap-1', classNames?.base, className)}
+      className={combineClasses('flex w-full flex-col gap-1', classNames?.base, className)}
       fullWidth={fullWidth}
       isDisabled={isDisabled}
       isInvalid={isInvalid}

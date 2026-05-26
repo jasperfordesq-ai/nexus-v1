@@ -384,7 +384,7 @@ export function LoginPage() {
                           ) : (
                             <Button
                               size="sm"
-                              variant="flat"
+                              variant="secondary"
                               onPress={handleResendVerification}
                               isLoading={isResendingVerification}
                               className="bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20"
@@ -404,7 +404,7 @@ export function LoginPage() {
                             </p>
                             <Button
                               size="sm"
-                              variant="flat"
+                              variant="secondary"
                               as={Link}
                               to={tenantPath('/verify-identity')}
                               className="mt-2 bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20"
@@ -424,7 +424,7 @@ export function LoginPage() {
                             </p>
                             <Button
                               size="sm"
-                              variant="flat"
+                              variant="secondary"
                               as={Link}
                               to={tenantPath('/verify-identity')}
                               className="mt-2 bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-500/20"
@@ -539,7 +539,7 @@ export function LoginPage() {
                         <Button
                           isIconOnly
                           size="sm"
-                          variant="light"
+                          variant="tertiary"
                           className="size-8 min-w-8 p-0 text-theme-subtle"
                           onPress={() => setShowPassword(!showPassword)}
                           aria-label={showPassword ? t('login.hide_password') : t('login.show_password')}
@@ -573,7 +573,6 @@ export function LoginPage() {
                       type="submit"
                       isLoading={isLoading}
                       isDisabled={!canSubmit}
-                      color="primary"
                       className="w-full font-medium"
                       size="lg"
                       spinner={<Loader2 className="w-4 h-4 animate-spin" />}
@@ -595,7 +594,7 @@ export function LoginPage() {
 
                       <Button
                         type="button"
-                        variant="bordered"
+                        variant="secondary"
                         onPress={handleBiometricLogin}
                         isLoading={biometricLoading}
                         isDisabled={isLoading}
@@ -718,7 +717,7 @@ export function LoginPage() {
                     <div className="flex gap-3">
                       <Button
                         type="button"
-                        variant="flat"
+                        variant="tertiary"
                         onPress={handleBack2FA}
                         className="flex-1 bg-theme-elevated text-theme-muted hover:bg-theme-hover"
                         startContent={<ArrowLeft className="w-4 h-4" />}
@@ -730,7 +729,6 @@ export function LoginPage() {
                         type="submit"
                         isLoading={isLoading}
                         isDisabled={!twoFactorCode.trim()}
-                        color="primary"
                         className="flex-1 font-medium"
                         spinner={<Loader2 className="w-4 h-4 animate-spin" />}
                       >
