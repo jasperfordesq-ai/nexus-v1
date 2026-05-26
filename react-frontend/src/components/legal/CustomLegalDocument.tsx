@@ -18,14 +18,16 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
-import { motion } from 'framer-motion';import { sanitizeRichText } from '@/lib/sanitize';
+import { motion } from 'framer-motion';
+import { Chip } from '@heroui/react';
+import { sanitizeRichText } from '@/lib/sanitize';
 import FileText from 'lucide-react/icons/file-text';
 import CalendarDays from 'lucide-react/icons/calendar-days';
 import Send from 'lucide-react/icons/send';
 import List from 'lucide-react/icons/list';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import History from 'lucide-react/icons/history';
-import { GlassCard, Button, Chip } from '@/components/ui';
+import { GlassCard, Button } from '@/components/ui';
 import { useTenant } from '@/contexts';
 import type { LegalDocument } from '@/hooks/useLegalDocument';
 
@@ -238,7 +240,7 @@ export function CustomLegalDocument({ document: doc, accentColor = 'blue' }: Pro
               </>
             )}
             {doc.version_number && (
-              <Chip size="sm" variant="flat" color="default" className="ml-2">
+              <Chip size="sm" variant="tertiary" color="default" className="ml-2">
                 {t('version_history.version_number', { number: doc.version_number })}
               </Chip>
             )}
@@ -302,9 +304,8 @@ export function CustomLegalDocument({ document: doc, accentColor = 'blue' }: Pro
               <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2.5 pb-3 border-b border-(--border-default)">
                 <Chip
                   size="sm"
-                  variant="flat"
-                  classNames={{ base: styles.chipBg }}
-                  className="text-xs font-bold min-w-7"
+                  variant="tertiary"
+                  className={`${styles.chipBg} text-xs font-bold min-w-7`}
                 >
                   {chipLabel}
                 </Chip>

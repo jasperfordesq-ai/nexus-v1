@@ -17,11 +17,12 @@
 
 import FileText from 'lucide-react/icons/file-text';
 import ExternalLink from 'lucide-react/icons/external-link';
+import { Chip } from '@heroui/react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { PendingDocument } from '@/hooks/useLegalGate';
 import { useTenant } from '@/contexts';
-import { Button, Chip, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
+import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 
 // Label keys are resolved via i18n below; this map serves as fallback
 const TYPE_LABEL_KEYS: Record<string, string> = {
@@ -87,7 +88,7 @@ export function LegalAcceptanceGate({
                   <FileText className="w-4 h-4 text-foreground-400 shrink-0" aria-hidden="true" />
                   <span className="text-sm font-medium truncate">{label}</span>
                   {doc.acceptance_status === 'outdated' && (
-                    <Chip color="warning" variant="flat" size="sm" className="shrink-0">
+                    <Chip color="warning" variant="tertiary" size="sm" className="shrink-0">
                       {t('gate.updated')}
                     </Chip>
                   )}
