@@ -237,8 +237,7 @@ export function DonationsTab() {
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <Button
             size="sm"
-            variant="flat"
-            className="bg-theme-elevated text-theme-muted"
+            variant="tertiary"
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={load}
             isDisabled={isLoading}
@@ -255,8 +254,8 @@ export function DonationsTab() {
           </Button>
           <Button
             size="sm"
-            variant="bordered"
-            className="border-rose-500 text-rose-500"
+            variant="outline"
+            className="border-rose-500 text-rose-500 hover:bg-rose-500/10"
             startContent={<CreditCard className="w-4 h-4" aria-hidden="true" />}
             onPress={() => openStripeCheckout()}
           >
@@ -347,7 +346,7 @@ export function DonationsTab() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-2">
                           <h4 className="font-semibold text-theme-primary text-lg">{day.title}</h4>
-                          <Chip size="sm" color={(day.status === 'active' || day.is_active) ? 'success' : 'default'} variant="flat">
+                          <Chip size="sm" color={(day.status === 'active' || day.is_active) ? 'success' : 'default'} variant="soft">
                             {t(`donations.day_status.${day.status ?? (day.is_active ? 'active' : 'ended')}`)}
                           </Chip>
                         </div>
@@ -387,8 +386,8 @@ export function DonationsTab() {
                         </Button>
                         <Button
                           size="sm"
-                          variant="bordered"
-                          className="border-rose-500 text-rose-500"
+                          variant="outline"
+                          className="border-rose-500 text-rose-500 hover:bg-rose-500/10"
                           startContent={<CreditCard className="w-4 h-4" aria-hidden="true" />}
                           onPress={() => openStripeCheckout(day.id)}
                         >
@@ -425,11 +424,11 @@ export function DonationsTab() {
                         <span className="font-semibold text-theme-primary">
                           {d.amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
-                        <Chip size="sm" color={STATUS_COLOR[d.status] || 'default'} variant="flat">
+                        <Chip size="sm" color={STATUS_COLOR[d.status] || 'default'} variant="soft">
                           {t(`donations.status.${d.status}`)}
                         </Chip>
                         {(d.anonymous ?? d.is_anonymous) && (
-                          <Chip size="sm" variant="flat" startContent={<EyeOff className="w-3 h-3" />}>
+                          <Chip size="sm" variant="soft" startContent={<EyeOff className="w-3 h-3" />}>
                             {t('donations.anonymous')}
                           </Chip>
                         )}
@@ -486,7 +485,7 @@ export function DonationsTab() {
                   min="0.01"
                   max="1000000"
                   step="0.01"
-                  variant="bordered"
+                  variant="secondary"
                   value={form.amount}
                   onValueChange={(v) => setForm((f) => ({ ...f, amount: v }))}
                   startContent={<Banknote className="w-4 h-4 text-theme-subtle" />}
@@ -506,7 +505,7 @@ export function DonationsTab() {
                 </RadioGroup>
                 <Textarea
                   label={t('donations.form.message')}
-                  variant="bordered"
+                  variant="secondary"
                   value={form.message}
                   onValueChange={(v) => setForm((f) => ({ ...f, message: v }))}
                   maxRows={3}
@@ -522,7 +521,7 @@ export function DonationsTab() {
                 </Button>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('donations.cancel')}</Button>
+                <Button variant="tertiary" onPress={onClose}>{t('donations.cancel')}</Button>
                 <Button
                   className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
                   onPress={() => handleSubmit(onClose)}

@@ -270,7 +270,7 @@ export function ExpensesTab() {
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <Chip size="sm" variant="flat" color="default">
+                      <Chip size="sm" variant="soft" color="default">
                         {t(`expenses.types.${expense.expense_type}`)}
                       </Chip>
                       <span className="font-bold text-theme-primary text-lg">
@@ -288,7 +288,7 @@ export function ExpensesTab() {
                       </p>
                     )}
                   </div>
-                  <Chip size="sm" variant="flat" color={STATUS_COLOR[expense.status]}>
+                  <Chip size="sm" variant="soft" color={STATUS_COLOR[expense.status]}>
                     {t(`expenses.status.${expense.status}`)}
                   </Chip>
                 </div>
@@ -329,7 +329,7 @@ export function ExpensesTab() {
                       const val = Array.from(keys)[0] as string;
                       if (val) setFormOrgId(val);
                     }}
-                    variant="bordered"
+                    variant="secondary"
                     isRequired
                   >
                     {organisations.map((org) => (
@@ -344,7 +344,7 @@ export function ExpensesTab() {
                     const val = Array.from(keys)[0] as ExpenseType;
                     if (val) setFormType(val);
                   }}
-                  variant="bordered"
+                  variant="secondary"
                 >
                   {EXPENSE_TYPE_OPTIONS.map((opt) => (
                     <SelectItem key={opt.key} id={opt.key} startContent={opt.icon}>
@@ -360,7 +360,7 @@ export function ExpensesTab() {
                     step="0.01"
                     value={formAmount}
                     onValueChange={setFormAmount}
-                    variant="bordered"
+                    variant="secondary"
                     className="sm:flex-1"
                     isRequired
                   />
@@ -368,7 +368,7 @@ export function ExpensesTab() {
                     label={t('expenses.form.currency')}
                     value={formCurrency}
                     onValueChange={setFormCurrency}
-                    variant="bordered"
+                    variant="secondary"
                     className="sm:w-28"
                   />
                 </div>
@@ -376,14 +376,14 @@ export function ExpensesTab() {
                   label={t('expenses.form.description')}
                   value={formDescription}
                   onValueChange={setFormDescription}
-                  variant="bordered"
+                  variant="secondary"
                   minRows={2}
                   maxRows={4}
                   isRequired
                 />
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('expenses.cancel')}</Button>
+                <Button variant="tertiary" onPress={onClose}>{t('expenses.cancel')}</Button>
                 <Button
                   className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
                   onPress={() => handleSubmit(onClose)}

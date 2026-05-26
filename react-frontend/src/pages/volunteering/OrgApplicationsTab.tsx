@@ -226,7 +226,7 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
           <ClipboardList className="w-5 h-5 text-indigo-400" aria-hidden="true" />
           {t('applications.heading')}
           {pendingCount > 0 && (
-            <Chip size="sm" color="warning" variant="flat">
+            <Chip size="sm" color="warning" variant="soft">
               {t('applications.pending_count', { count: pendingCount })}
             </Chip>
           )}
@@ -256,7 +256,7 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
           <Button
             key={f.key}
             size="sm"
-            variant={statusFilter === f.key ? 'solid' : 'flat'}
+            variant={statusFilter === f.key ? 'primary' : 'tertiary'}
             className={
               statusFilter === f.key
                 ? 'bg-gradient-to-r from-indigo-500 to-violet-600 text-white'
@@ -288,8 +288,8 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
           </span>
           <Button
             size="sm"
-            color="success"
-            variant="flat"
+            variant="secondary"
+            className="bg-success-soft text-success hover:bg-success-soft/80"
             startContent={<CheckCircle className="w-3.5 h-3.5" />}
             onPress={() => handleBulkAction('approve')}
           >
@@ -297,8 +297,7 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
           </Button>
           <Button
             size="sm"
-            color="danger"
-            variant="flat"
+            variant="danger-soft"
             startContent={<XCircle className="w-3.5 h-3.5" />}
             onPress={() => handleBulkAction('decline')}
           >
@@ -363,7 +362,7 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-medium text-theme-primary">{app.user.name}</span>
                   <span className="text-xs text-theme-muted">{app.user.email}</span>
-                  <Chip size="sm" color={statusColor(app.status)} variant="flat">
+                  <Chip size="sm" color={statusColor(app.status)} variant="soft">
                     {app.status === 'approved'
                       ? t('status_approved')
                       : app.status === 'declined'
@@ -406,8 +405,8 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
                 <div className="flex gap-2 sm:flex-col sm:items-end sm:shrink-0">
                   <Button
                     size="sm"
-                    color="success"
-                    variant="flat"
+                    variant="secondary"
+                    className="bg-success-soft text-success hover:bg-success-soft/80"
                     isLoading={!!actionLoading[app.id]}
                     startContent={!actionLoading[app.id] ? <CheckCircle className="w-3.5 h-3.5" /> : undefined}
                     onPress={() => handleAction(app.id, 'approve')}
@@ -416,8 +415,7 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
                   </Button>
                   <Button
                     size="sm"
-                    color="danger"
-                    variant="flat"
+                    variant="danger-soft"
                     isLoading={!!actionLoading[app.id]}
                     startContent={!actionLoading[app.id] ? <XCircle className="w-3.5 h-3.5" /> : undefined}
                     onPress={() => handleAction(app.id, 'decline')}
@@ -436,8 +434,7 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
         <div className="flex justify-center pt-2">
           <Button
             size="sm"
-            variant="flat"
-            className="bg-theme-elevated text-theme-muted"
+            variant="tertiary"
             isLoading={isLoadingMore}
             startContent={!isLoadingMore ? <ChevronDown className="w-4 h-4" /> : undefined}
             onPress={() => loadApplications(statusFilter, cursor)}

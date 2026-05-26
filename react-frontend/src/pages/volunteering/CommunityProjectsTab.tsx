@@ -257,7 +257,7 @@ export function CommunityProjectsTab() {
                   <h3 className="min-w-0 flex-1 text-base font-semibold text-theme-primary line-clamp-2">
                     {project.title}
                   </h3>
-                  <Chip size="sm" variant="flat" color={STATUS_COLORS[project.status]} className="shrink-0">
+                  <Chip size="sm" variant="soft" color={STATUS_COLORS[project.status]} className="shrink-0">
                     {t(`community_projects.status.${project.status}`)}
                   </Chip>
                 </div>
@@ -272,7 +272,7 @@ export function CommunityProjectsTab() {
                     {project.proposer_name}
                   </span>
                   {project.category && (
-                    <Chip size="sm" variant="flat" className="bg-theme-elevated text-theme-muted">
+                    <Chip size="sm" variant="soft">
                       {project.category}
                     </Chip>
                   )}
@@ -303,7 +303,7 @@ export function CommunityProjectsTab() {
                   </span>
                   <Button
                     size="sm"
-                    variant={project.has_supported ? 'solid' : 'flat'}
+                    variant={project.has_supported ? 'primary' : 'tertiary'}
                     className={
                       project.has_supported
                         ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white'
@@ -341,7 +341,7 @@ export function CommunityProjectsTab() {
                 <Input
                   label={t('community_projects.form.title')}
                   placeholder={t('community_projects.form.title_placeholder')}
-                  variant="bordered"
+                  variant="secondary"
                   isRequired
                   value={form.title}
                   onValueChange={(v) => setForm((f) => ({ ...f, title: v }))}
@@ -349,7 +349,7 @@ export function CommunityProjectsTab() {
                 <Textarea
                   label={t('community_projects.form.description')}
                   placeholder={t('community_projects.form.description_placeholder')}
-                  variant="bordered"
+                  variant="secondary"
                   isRequired
                   minRows={3}
                   value={form.description}
@@ -359,14 +359,14 @@ export function CommunityProjectsTab() {
                   <Input
                     label={t('community_projects.form.category')}
                     placeholder={t('community_projects.form.category_placeholder')}
-                    variant="bordered"
+                    variant="secondary"
                     value={form.category}
                     onValueChange={(v) => setForm((f) => ({ ...f, category: v }))}
                   />
                   <Input
                     label={t('community_projects.form.location')}
                     placeholder={t('community_projects.form.location_placeholder')}
-                    variant="bordered"
+                    variant="secondary"
                     value={form.location}
                     onValueChange={(v) => setForm((f) => ({ ...f, location: v }))}
                   />
@@ -374,21 +374,21 @@ export function CommunityProjectsTab() {
                     label={t('community_projects.form.target_volunteers')}
                     placeholder={t('community_projects.form.target_volunteers_placeholder')}
                     type="number"
-                    variant="bordered"
+                    variant="secondary"
                     value={form.target_volunteers}
                     onValueChange={(v) => setForm((f) => ({ ...f, target_volunteers: v }))}
                   />
                   <Input
                     label={t('community_projects.form.proposed_date')}
                     type="date"
-                    variant="bordered"
+                    variant="secondary"
                     value={form.proposed_date}
                     onValueChange={(v) => setForm((f) => ({ ...f, proposed_date: v }))}
                   />
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('community_projects.cancel')}</Button>
+                <Button variant="tertiary" onPress={onClose}>{t('community_projects.cancel')}</Button>
                 <Button
                   className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
                   isLoading={isSubmitting}

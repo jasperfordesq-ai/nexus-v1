@@ -228,7 +228,7 @@ export function ShiftSwapsTab() {
         </div>
         <Button
           size="sm"
-          variant="flat"
+          variant="tertiary"
           startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
           onPress={load}
           isDisabled={isLoading}
@@ -242,7 +242,7 @@ export function ShiftSwapsTab() {
       <div className="flex gap-2 flex-wrap">
         <Button
           size="sm"
-          variant={view === 'all' ? 'solid' : 'flat'}
+          variant={view === 'all' ? 'primary' : 'tertiary'}
           className={view === 'all' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
           onPress={() => setView('all')}
         >
@@ -250,7 +250,7 @@ export function ShiftSwapsTab() {
         </Button>
         <Button
           size="sm"
-          variant={view === 'sent' ? 'solid' : 'flat'}
+          variant={view === 'sent' ? 'primary' : 'tertiary'}
           className={view === 'sent' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
           onPress={() => setView('sent')}
           startContent={<Send className="w-3 h-3" aria-hidden="true" />}
@@ -259,7 +259,7 @@ export function ShiftSwapsTab() {
         </Button>
         <Button
           size="sm"
-          variant={view === 'received' ? 'solid' : 'flat'}
+          variant={view === 'received' ? 'primary' : 'tertiary'}
           className={view === 'received' ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white' : 'bg-theme-elevated text-theme-muted'}
           onPress={() => setView('received')}
           startContent={<Inbox className="w-3 h-3" aria-hidden="true" />}
@@ -324,8 +324,8 @@ export function ShiftSwapsTab() {
                     <div className="flex items-center gap-2 mb-3 flex-wrap">
                       <Chip
                         size="sm"
-                        variant="flat"
-                        color={swap.direction === 'sent' ? 'primary' : 'secondary'}
+                        variant="soft"
+                        color={swap.direction === 'sent' ? 'accent' : 'default'}
                         startContent={swap.direction === 'sent'
                           ? <Send className="w-3 h-3" />
                           : <Inbox className="w-3 h-3" />
@@ -335,7 +335,7 @@ export function ShiftSwapsTab() {
                       </Chip>
                       <Chip
                         size="sm"
-                        variant="flat"
+                        variant="soft"
                         color={statusColor(swap.status)}
                       >
                         {t(`swaps.status_${swap.status}`)}
@@ -416,8 +416,7 @@ export function ShiftSwapsTab() {
                       </Button>
                       <Button
                         size="sm"
-                        variant="flat"
-                        color="danger"
+                        variant="danger-soft"
                         startContent={<X className="w-4 h-4" aria-hidden="true" />}
                         onPress={() => setRejectTarget(swap.id)}
                         isLoading={actioningId === swap.id}
@@ -432,8 +431,7 @@ export function ShiftSwapsTab() {
                     <div className="flex flex-col gap-2 sm:flex-shrink-0">
                       <Button
                         size="sm"
-                        variant="flat"
-                        color="danger"
+                        variant="danger-soft"
                         startContent={<Ban className="w-4 h-4" aria-hidden="true" />}
                         onPress={() => handleCancel(swap.id)}
                         isLoading={actioningId === swap.id}
@@ -468,8 +466,8 @@ export function ShiftSwapsTab() {
                 </p>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('cancel')}</Button>
-                <Button color="danger" onPress={handleReject}>{t('swaps.reject')}</Button>
+                <Button variant="tertiary" onPress={onClose}>{t('cancel')}</Button>
+                <Button variant="danger" onPress={handleReject}>{t('swaps.reject')}</Button>
               </ModalFooter>
             </>
           )}
