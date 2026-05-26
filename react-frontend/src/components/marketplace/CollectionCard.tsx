@@ -35,11 +35,11 @@ export function CollectionCard({ collection, thumbnails = [], onClick }: Collect
     >
       <CardBody className="p-0">
         {/* Thumbnail grid */}
-        <div className="aspect-[4/3] bg-default-100 relative overflow-hidden rounded-t-lg">
+        <div className="aspect-[4/3] bg-surface-secondary relative overflow-hidden rounded-t-lg">
           {thumbnails.length > 0 ? (
             <div className="grid grid-cols-2 grid-rows-2 w-full h-full gap-0.5">
               {[0, 1, 2, 3].map((i) => (
-                <div key={i} className="bg-default-200 overflow-hidden">
+                <div key={i} className="bg-surface-tertiary overflow-hidden">
                   {thumbnails[i] ? (
                     <img
                       src={thumbnails[i]}
@@ -49,7 +49,7 @@ export function CollectionCard({ collection, thumbnails = [], onClick }: Collect
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <Package className="w-6 h-6 text-default-300" />
+                      <Package className="w-6 h-6 text-muted" />
                     </div>
                   )}
                 </div>
@@ -57,7 +57,7 @@ export function CollectionCard({ collection, thumbnails = [], onClick }: Collect
             </div>
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <FolderHeart className="w-12 h-12 text-default-300" />
+              <FolderHeart className="w-12 h-12 text-muted" />
             </div>
           )}
         </div>
@@ -68,7 +68,7 @@ export function CollectionCard({ collection, thumbnails = [], onClick }: Collect
             <h3 className="font-semibold text-foreground text-sm truncate">{collection.name}</h3>
             <Chip
               size="sm"
-              variant="flat"
+              variant="soft"
               color={collection.is_public ? 'success' : 'default'}
               startContent={collection.is_public
                 ? <Globe className="w-3 h-3" />
@@ -81,10 +81,10 @@ export function CollectionCard({ collection, thumbnails = [], onClick }: Collect
           </div>
 
           {collection.description && (
-            <p className="text-xs text-default-500 line-clamp-2">{collection.description}</p>
+            <p className="text-xs text-muted line-clamp-2">{collection.description}</p>
           )}
 
-          <p className="text-xs text-default-400">
+          <p className="text-xs text-muted">
             {t('collections.item_count', { count: collection.item_count })}
           </p>
         </div>

@@ -15,7 +15,7 @@ import { Card, CardBody, Skeleton } from '@/components/ui';
 
 export function MarketplaceListingCardSkeleton() {
   return (
-    <Card className="overflow-hidden bg-default-50 border border-default-200">
+    <Card className="overflow-hidden border border-border bg-surface">
       {/* Image area — matches aspect-video */}
       <div className="relative aspect-video overflow-hidden">
         <Skeleton className="w-full h-full rounded-none" />

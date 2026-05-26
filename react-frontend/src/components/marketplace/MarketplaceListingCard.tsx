@@ -49,7 +49,7 @@ export function MarketplaceListingCard({ listing, onSave, onUnsave }: Marketplac
 
   return (
     <Card
-      className="group relative overflow-hidden bg-default-50 border border-default-200 transition-shadow duration-200 hover:shadow-lg focus-within:ring-2 focus-within:ring-accent/45"
+      className="group relative overflow-hidden border border-border bg-surface transition-shadow duration-200 hover:shadow-lg focus-within:ring-2 focus-within:ring-accent/45"
     >
       <Link
         to={tenantPath(`/marketplace/${listing.id}`)}
@@ -93,8 +93,8 @@ export function MarketplaceListingCard({ listing, onSave, onUnsave }: Marketplac
             <div className="absolute bottom-2 right-2">
               <Chip
                 size="sm"
-                variant="solid"
-                color="secondary"
+                variant="primary"
+                color="accent"
                 startContent={<Megaphone className="w-3 h-3" aria-hidden="true" />}
               >
                 {t('listing.promoted')}
@@ -127,7 +127,7 @@ export function MarketplaceListingCard({ listing, onSave, onUnsave }: Marketplac
       {/* Save/Heart button - separate from the listing link */}
       <Button
         isIconOnly
-        variant="flat"
+        variant="secondary"
         size="sm"
         onPress={handleToggleSave}
         className="absolute top-2 right-2 z-20 bg-background/90 text-foreground shadow-lg ring-1 ring-black/10 backdrop-blur-md transition-colors hover:bg-background"

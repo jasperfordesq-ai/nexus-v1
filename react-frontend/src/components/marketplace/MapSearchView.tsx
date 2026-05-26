@@ -71,7 +71,7 @@ function ListingInfoContent({ listing }: { listing: MarketplaceListingItem }) {
     >
       <div className="flex gap-2">
         {/* Thumbnail */}
-        <div className="w-16 h-16 shrink-0 rounded-lg overflow-hidden bg-default-100">
+        <div className="w-16 h-16 shrink-0 rounded-lg overflow-hidden bg-surface-secondary">
           {imageUrl ? (
             <img
               src={imageUrl}
@@ -81,7 +81,7 @@ function ListingInfoContent({ listing }: { listing: MarketplaceListingItem }) {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <ShoppingBag className="w-6 h-6 text-default-300" aria-hidden="true" />
+              <ShoppingBag className="w-6 h-6 text-muted" aria-hidden="true" />
             </div>
           )}
         </div>
@@ -149,12 +149,12 @@ export function MapSearchView({
   if (!MAPS_ENABLED) {
     return (
       <GlassCard className={`p-8 flex flex-col items-center justify-center gap-4 ${className}`}>
-        <MapPinOff className="w-14 h-14 text-default-300" aria-hidden="true" />
+        <MapPinOff className="w-14 h-14 text-muted" aria-hidden="true" />
         <div className="text-center space-y-1">
           <h3 className="text-lg font-semibold text-foreground">
             {t('map.not_available_title')}
           </h3>
-          <p className="text-sm text-default-500">
+          <p className="text-sm text-muted">
             {t('map.not_available_description')}
           </p>
         </div>
@@ -166,7 +166,7 @@ export function MapSearchView({
   if (isLoading) {
     return (
       <div
-        className={`rounded-xl bg-default-100 animate-pulse flex items-center justify-center ${className}`}
+        className={`rounded-xl bg-surface-secondary animate-pulse flex items-center justify-center ${className}`}
         style={{ height }}
       >
         <Spinner size="lg" color="primary" />
@@ -178,19 +178,18 @@ export function MapSearchView({
   if (markers.length === 0) {
     return (
       <GlassCard className={`flex flex-col items-center justify-center gap-4 p-8 ${className}`} style={{ minHeight: '300px' }}>
-        <MapPin className="w-12 h-12 text-default-300" aria-hidden="true" />
+        <MapPin className="w-12 h-12 text-muted" aria-hidden="true" />
         <div className="text-center space-y-1">
           <h3 className="font-semibold text-foreground">
             {t('map.no_results_title')}
           </h3>
-          <p className="text-sm text-default-500">
+          <p className="text-sm text-muted">
             {t('map.no_results_description')}
           </p>
         </div>
         {onRequestLocation && (
           <Button
-            variant="flat"
-            color="primary"
+            variant="secondary"
             startContent={<Navigation className="w-4 h-4" aria-hidden="true" />}
             onPress={onRequestLocation}
             isLoading={locationLoading}
@@ -219,8 +218,7 @@ export function MapSearchView({
       {onRequestLocation && (
         <div className="absolute bottom-4 left-4 z-10">
           <Button
-            variant="solid"
-            color="default"
+            variant="secondary"
             size="sm"
             startContent={<Navigation className="w-3.5 h-3.5" aria-hidden="true" />}
             onPress={onRequestLocation}
@@ -237,15 +235,15 @@ export function MapSearchView({
         <div className="bg-background/90 backdrop-blur-sm rounded-lg p-2 shadow-md space-y-1">
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-green-500" />
-            <span className="text-xs text-default-600">{t('price_type.free')}</span>
+            <span className="text-xs text-muted">{t('price_type.free')}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
-            <span className="text-xs text-default-600">{t('price_type.fixed')}</span>
+            <span className="text-xs text-muted">{t('price_type.fixed')}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="w-2.5 h-2.5 rounded-full bg-yellow-500" />
-            <span className="text-xs text-default-600">{t('price_type.negotiable')}</span>
+            <span className="text-xs text-muted">{t('price_type.negotiable')}</span>
           </div>
         </div>
       </div>
