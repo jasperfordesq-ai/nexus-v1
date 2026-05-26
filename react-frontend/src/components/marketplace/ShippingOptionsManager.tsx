@@ -93,7 +93,7 @@ function ShippingForm({ form, onChange, onSubmit, onCancel, isSubmitting, submit
           onValueChange={(v) => onChange('courier_name', v)}
           size="sm"
           isRequired
-          variant="bordered"
+          variant="secondary"
         />
         <div className="flex gap-2">
           <Input
@@ -106,7 +106,7 @@ function ShippingForm({ form, onChange, onSubmit, onCancel, isSubmitting, submit
             onValueChange={(v) => onChange('price', v)}
             size="sm"
             isRequired
-            variant="bordered"
+            variant="secondary"
             className="flex-1"
           />
           <Select
@@ -136,7 +136,7 @@ function ShippingForm({ form, onChange, onSubmit, onCancel, isSubmitting, submit
           value={form.estimated_days}
           onValueChange={(v) => onChange('estimated_days', v)}
           size="sm"
-          variant="bordered"
+          variant="secondary"
         />
         <div className="flex items-center gap-2 pb-1">
           <Switch
@@ -152,7 +152,7 @@ function ShippingForm({ form, onChange, onSubmit, onCancel, isSubmitting, submit
 
       <div className="flex gap-2 justify-end pt-1">
         <Button
-          variant="flat"
+          variant="tertiary"
           size="sm"
           onPress={onCancel}
           startContent={<X className="w-3.5 h-3.5" />}
@@ -160,7 +160,7 @@ function ShippingForm({ form, onChange, onSubmit, onCancel, isSubmitting, submit
           {t('shipping.cancel')}
         </Button>
         <Button
-          color="primary"
+
           size="sm"
           onPress={onSubmit}
           isLoading={isSubmitting}
@@ -342,8 +342,8 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
         </h3>
         {!showAddForm && editingId === null && (
           <Button
-            color="primary"
-            variant="solid"
+
+            variant="primary"
             size="sm"
             className="w-full sm:w-auto"
             startContent={<Plus className="w-4 h-4" />}
@@ -401,7 +401,7 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
                           {option.courier_name}
                         </span>
                         {option.is_default && (
-                          <Chip size="sm" color="primary" variant="flat">
+                          <Chip size="sm" color="accent" variant="soft">
                             {t('shipping.default_badge')}
                           </Chip>
                         )}
@@ -429,7 +429,7 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
                   <div className="flex shrink-0 gap-1 self-end sm:self-auto">
                     <Button
                       isIconOnly
-                      variant="light"
+                      variant="tertiary"
                       size="sm"
                       onPress={() => startEdit(option)}
                       aria-label={t('shipping.edit_aria')}
@@ -438,9 +438,9 @@ export function ShippingOptionsManager({ sellerId: _sellerId }: ShippingOptionsM
                     </Button>
                     <Button
                       isIconOnly
-                      variant="light"
+                      variant="danger-soft"
                       size="sm"
-                      color="danger"
+
                       onPress={() => handleDelete(option.id)}
                       aria-label={t('shipping.delete_aria')}
                     >

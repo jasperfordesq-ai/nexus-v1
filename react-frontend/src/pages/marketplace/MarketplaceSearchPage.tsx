@@ -399,8 +399,8 @@ export function MarketplaceSearchPage() {
       {/* Reset */}
       {activeFilterCount > 0 && (
         <Button
-          variant="flat"
-          color="danger"
+          variant="danger-soft"
+
           fullWidth
           size="sm"
           startContent={<RotateCcw className="w-3.5 h-3.5" />}
@@ -426,7 +426,7 @@ export function MarketplaceSearchPage() {
             <Button
               as={Link}
               to={tenantPath('/marketplace')}
-              variant="light"
+              variant="tertiary"
               size="sm"
             >
               {t('page_title')}
@@ -443,7 +443,7 @@ export function MarketplaceSearchPage() {
               onValueChange={setSearchQuery}
               startContent={<Search className="w-4 h-4 text-muted" />}
               size="lg"
-              variant="bordered"
+              variant="secondary"
               classNames={{ inputWrapper: 'bg-background' }}
               isClearable
               onClear={() => setSearchQuery('')}
@@ -466,7 +466,7 @@ export function MarketplaceSearchPage() {
 
             {/* Mobile filter toggle */}
             <Button
-              variant="bordered"
+              variant="secondary"
               size="lg"
               className="w-full shrink-0 sm:w-auto lg:hidden"
               startContent={<SlidersHorizontal className="w-4 h-4" />}
@@ -474,7 +474,7 @@ export function MarketplaceSearchPage() {
             >
               {t('search.filters')}
               {activeFilterCount > 0 && (
-                <Chip size="sm" color="primary" variant="solid" className="ml-1">
+                <Chip size="sm" color="accent" variant="primary" className="ml-1">
                   {activeFilterCount}
                 </Chip>
               )}
@@ -487,7 +487,7 @@ export function MarketplaceSearchPage() {
               {categoryId && (
                 <Chip
                   onClose={() => setCategoryId('')}
-                  variant="flat"
+                  variant="soft"
                   size="sm"
                 >
                   {categories.find((c) => String(c.id) === categoryId)?.name || t('filters.category')}
@@ -496,7 +496,7 @@ export function MarketplaceSearchPage() {
               {(priceMin || priceMax) && (
                 <Chip
                   onClose={() => { setPriceMin(''); setPriceMax(''); }}
-                  variant="flat"
+                  variant="soft"
                   size="sm"
                 >
                   {priceMin && priceMax ? `${priceMin} - ${priceMax}` :
@@ -507,7 +507,7 @@ export function MarketplaceSearchPage() {
                 <Chip
                   key={c}
                   onClose={() => setSelectedConditions((prev) => prev.filter((x) => x !== c))}
-                  variant="flat"
+                  variant="soft"
                   size="sm"
                   color={CONDITION_COLORS[c] || 'default'}
                 >
@@ -515,17 +515,17 @@ export function MarketplaceSearchPage() {
                 </Chip>
               ))}
               {sellerType && (
-                <Chip onClose={() => setSellerType('')} variant="flat" size="sm">
+                <Chip onClose={() => setSellerType('')} variant="soft" size="sm">
                   {sellerType === 'business' ? t('search.business') : t('search.private')}
                 </Chip>
               )}
               {deliveryMethod && (
-                <Chip onClose={() => setDeliveryMethod('')} variant="flat" size="sm">
+                <Chip onClose={() => setDeliveryMethod('')} variant="soft" size="sm">
                   {t(`delivery_method.${deliveryMethod}`)}
                 </Chip>
               )}
               {postedWithin && (
-                <Chip onClose={() => setPostedWithin('')} variant="flat" size="sm">
+                <Chip onClose={() => setPostedWithin('')} variant="soft" size="sm">
                   {getPostedWithinLabel(postedWithin)}
                 </Chip>
               )}
@@ -611,8 +611,8 @@ export function MarketplaceSearchPage() {
                 {hasMore && (
                   <div className="flex justify-center mt-8">
                     <Button
-                      variant="flat"
-                      color="primary"
+                      variant="tertiary"
+
                       onPress={() => loadListings(true)}
                       isLoading={isLoadingMore}
                     >

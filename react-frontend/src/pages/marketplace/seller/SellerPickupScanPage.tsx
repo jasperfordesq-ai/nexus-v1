@@ -81,7 +81,7 @@ export function SellerPickupScanPage() {
           autoFocus
         />
         <Button
-          color="primary"
+
           fullWidth
           onPress={handleSubmit}
           isLoading={submitting}

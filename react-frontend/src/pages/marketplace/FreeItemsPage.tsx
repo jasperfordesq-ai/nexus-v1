@@ -157,8 +157,8 @@ export function FreeItemsPage() {
             <Button
               as={Link}
               to={tenantPath('/marketplace/sell')}
-              color="success"
-              variant="flat"
+
+              variant="secondary"
               startContent={<Plus className="w-4 h-4" />}
             >
               {t('free.give_away')}
@@ -178,10 +178,10 @@ export function FreeItemsPage() {
                 {t('free.cta_description')}
               </p>
             </div>
-            <Button
+            <Button variant="secondary"
               as={Link}
               to={tenantPath('/marketplace/sell')}
-              color="success"
+
               size="sm"
               className="w-full sm:w-auto sm:shrink-0"
             >
@@ -198,7 +198,7 @@ export function FreeItemsPage() {
         ) : error ? (
           <GlassCard className="p-8 text-center">
             <p className="text-danger mb-4">{error}</p>
-            <Button color="primary" variant="flat" onPress={() => loadListings()}>
+            <Button variant="tertiary" onPress={() => loadListings()}>
               {t('common.try_again')}
             </Button>
           </GlassCard>
@@ -227,8 +227,8 @@ export function FreeItemsPage() {
             {hasMore && (
               <div className="flex justify-center mt-8">
                 <Button
-                  variant="flat"
-                  color="primary"
+                  variant="tertiary"
+
                   onPress={() => loadListings(true)}
                   isLoading={isLoadingMore}
                 >

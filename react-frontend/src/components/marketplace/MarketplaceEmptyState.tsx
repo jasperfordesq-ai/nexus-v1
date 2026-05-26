@@ -30,8 +30,8 @@ export function MarketplaceEmptyState({ message, showCta = false }: MarketplaceE
         <Button
           as={Link}
           to={tenantPath('/marketplace/sell')}
-          color="primary"
-          variant="solid"
+
+          variant="primary"
         >
           {t('empty.start_selling')}
         </Button>

@@ -245,7 +245,7 @@ export function SellerProfilePage() {
         <Button
           as={Link}
           to={tenantPath('/marketplace')}
-          variant="light"
+          variant="tertiary"
           size="sm"
           startContent={<ArrowLeft className="w-4 h-4" />}
         >
@@ -269,14 +269,14 @@ export function SellerProfilePage() {
                   <Chip
                     size="sm"
                     color="success"
-                    variant="flat"
+                    variant="soft"
                     startContent={<Shield className="w-3 h-3" />}
                   >
                     {t('seller.verified')}
                   </Chip>
                 )}
                 {seller.seller_type && (
-                  <Chip size="sm" variant="flat" color="secondary">
+                  <Chip size="sm" variant="soft" color="default">
                     {seller.seller_type === 'business' ? t('seller.seller_type_business') : t('seller.seller_type_private')}
                   </Chip>
                 )}
@@ -325,7 +325,7 @@ export function SellerProfilePage() {
             <div className="flex w-full gap-2 sm:w-auto sm:shrink-0">
               {isAuthenticated && (
                 <Button
-                  variant="bordered"
+                  variant="secondary"
                   startContent={<MessageCircle className="w-4 h-4" />}
                   as={Link}
                   to={tenantPath(`/messages?to=${seller.user_id}`)}
@@ -375,7 +375,7 @@ export function SellerProfilePage() {
               <div className="flex items-center gap-2">
                 <ShoppingBag className="w-4 h-4" />
                 {t('seller.tab_listings')}
-                <Chip size="sm" variant="flat">{listings.length}</Chip>
+                <Chip size="sm" variant="soft">{listings.length}</Chip>
               </div>
             }
           />
@@ -385,7 +385,7 @@ export function SellerProfilePage() {
               <div className="flex items-center gap-2">
                 <Star className="w-4 h-4" />
                 {t('seller.tab_reviews')}
-                <Chip size="sm" variant="flat">{seller.total_ratings}</Chip>
+                <Chip size="sm" variant="soft">{seller.total_ratings}</Chip>
               </div>
             }
           />

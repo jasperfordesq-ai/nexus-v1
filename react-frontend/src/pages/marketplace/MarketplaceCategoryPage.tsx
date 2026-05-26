@@ -423,8 +423,8 @@ export function MarketplaceCategoryPage() {
       {/* Reset */}
       {activeFilterCount > 0 && (
         <Button
-          variant="flat"
-          color="danger"
+          variant="danger-soft"
+
           fullWidth
           size="sm"
           startContent={<RotateCcw className="w-3.5 h-3.5" />}
@@ -486,7 +486,7 @@ export function MarketplaceCategoryPage() {
             onValueChange={setSearchQuery}
             startContent={<Search className="w-4 h-4 text-muted" />}
             size="lg"
-            variant="bordered"
+            variant="secondary"
             classNames={{ inputWrapper: 'bg-background' }}
             isClearable
             onClear={() => setSearchQuery('')}
@@ -507,7 +507,7 @@ export function MarketplaceCategoryPage() {
             ))}
           </Select>
           <Button
-            variant="bordered"
+            variant="secondary"
             size="lg"
             className="w-full shrink-0 sm:w-auto lg:hidden"
             startContent={<SlidersHorizontal className="w-4 h-4" />}
@@ -515,7 +515,7 @@ export function MarketplaceCategoryPage() {
           >
             {t('category.filters')}
             {activeFilterCount > 0 && (
-              <Chip size="sm" color="primary" variant="solid" className="ml-1">
+              <Chip size="sm" color="accent" variant="primary" className="ml-1">
                 {activeFilterCount}
               </Chip>
             )}
@@ -602,8 +602,8 @@ export function MarketplaceCategoryPage() {
                 {hasMore && (
                   <div className="flex justify-center mt-8">
                     <Button
-                      variant="flat"
-                      color="primary"
+                      variant="tertiary"
+
                       onPress={() => loadListings(true)}
                       isLoading={isLoadingMore}
                     >

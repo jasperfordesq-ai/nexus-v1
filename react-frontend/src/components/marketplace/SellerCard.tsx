@@ -55,7 +55,7 @@ export function SellerCard({ seller }: SellerCardProps) {
         {seller.seller_type && (
           <Chip
             size="sm"
-            variant="flat"
+            variant="soft"
             color={seller.seller_type === 'business' ? 'secondary' : 'default'}
             className="mt-1"
           >

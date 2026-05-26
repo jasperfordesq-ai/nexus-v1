@@ -134,7 +134,7 @@ export function SellerPickupSlotsPage() {
             {t('marketplace.pickup.slots_subtitle')}
           </p>
         </div>
-        <Button color="primary" startContent={<Plus className="w-4 h-4" />} onPress={onOpen}>
+        <Button startContent={<Plus className="w-4 h-4" />} onPress={onOpen}>
           {t('marketplace.pickup.new_slot')}
         </Button>
       </div>
@@ -156,16 +156,16 @@ export function SellerPickupSlotsPage() {
               <div>
                 <p className="font-semibold text-foreground">{formatRange(s.slot_start, s.slot_end)}</p>
                 <div className="flex gap-2 mt-1 flex-wrap">
-                  <Chip size="sm" variant="flat" color="primary">
+                  <Chip size="sm" variant="soft" color="accent">
                     {t('marketplace.pickup.capacity')}: {s.booked_count}/{s.capacity}
                   </Chip>
                   {s.is_recurring && (
-                    <Chip size="sm" variant="flat" color="secondary">
+                    <Chip size="sm" variant="soft" color="default">
                       {t('marketplace.pickup.recurring')}
                     </Chip>
                   )}
                   {!s.is_active && (
-                    <Chip size="sm" variant="flat" color="warning">
+                    <Chip size="sm" variant="soft" color="warning">
                       {t('marketplace.pickup.inactive')}
                     </Chip>
                   )}
@@ -173,8 +173,8 @@ export function SellerPickupSlotsPage() {
               </div>
               <Button
                 size="sm"
-                variant="flat"
-                color="danger"
+                variant="danger-soft"
+
                 isIconOnly
                 onPress={() => handleDelete(s.id)}
                 aria-label={t('common.delete')}
@@ -214,10 +214,10 @@ export function SellerPickupSlotsPage() {
             </Switch>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onClose}>
+            <Button variant="tertiary" onPress={onClose}>
               {t('common.cancel')}
             </Button>
-            <Button color="primary" onPress={handleCreate} isLoading={saving}>
+            <Button onPress={handleCreate} isLoading={saving}>
               {t('common.create')}
             </Button>
           </ModalFooter>

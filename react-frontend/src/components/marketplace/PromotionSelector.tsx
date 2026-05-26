@@ -195,11 +195,11 @@ export function PromotionSelector({
         </ModalBody>
 
         <ModalFooter>
-          <Button variant="flat" onPress={onClose}>
+          <Button variant="tertiary" onPress={onClose}>
             {t('promotions.cancel')}
           </Button>
           <Button
-            color="primary"
+
             isDisabled={!selectedType}
             isLoading={isSubmitting}
             onPress={handleConfirm}

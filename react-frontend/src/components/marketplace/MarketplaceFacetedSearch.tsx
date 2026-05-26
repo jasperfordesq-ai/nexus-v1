@@ -104,7 +104,7 @@ export function MarketplaceFacetedSearch({
             aria-label={t('filters.min')}
             placeholder={t('filters.min')}
             size="sm"
-            variant="bordered"
+            variant="secondary"
             min={0}
             value={localFilters.price_min != null ? String(localFilters.price_min) : ''}
             onValueChange={(v) => updateFilter('price_min', v ? Number(v) : undefined)}
@@ -114,7 +114,7 @@ export function MarketplaceFacetedSearch({
             aria-label={t('filters.max')}
             placeholder={t('filters.max')}
             size="sm"
-            variant="bordered"
+            variant="secondary"
             min={0}
             value={localFilters.price_max != null ? String(localFilters.price_max) : ''}
             onValueChange={(v) => updateFilter('price_max', v ? Number(v) : undefined)}
@@ -217,10 +217,10 @@ export function MarketplaceFacetedSearch({
 
       {/* Actions */}
       <div className="grid grid-cols-1 gap-2 pt-2 sm:grid-cols-[1fr_auto]">
-        <Button color="primary" size="sm" className="w-full" onPress={handleApply}>
+        <Button size="sm" className="w-full" onPress={handleApply}>
           {t('filters.apply')}
         </Button>
-        <Button variant="flat" size="sm" className="w-full sm:w-auto" onPress={handleClearAll}>
+        <Button variant="tertiary" size="sm" className="w-full sm:w-auto" onPress={handleClearAll}>
           {t('filters.clear')}
         </Button>
       </div>

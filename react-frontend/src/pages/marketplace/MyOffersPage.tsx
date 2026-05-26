@@ -334,8 +334,8 @@ export function MyOffersPage() {
             {hasMore && (
               <div className="flex justify-center mt-6">
                 <Button
-                  variant="flat"
-                  color="primary"
+                  variant="tertiary"
+
                   onPress={() => loadOffers(true)}
                   isLoading={isLoadingMore}
                 >
@@ -375,11 +375,11 @@ export function MyOffersPage() {
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onCounterClose}>
+            <Button variant="tertiary" onPress={onCounterClose}>
               {t('common.cancel')}
             </Button>
-            <Button
-              color="secondary"
+            <Button variant="secondary"
+
               onPress={handleSubmitCounter}
               isLoading={isSubmittingCounter}
               startContent={!isSubmittingCounter ? <RotateCcw className="w-4 h-4" /> : undefined}

@@ -245,7 +245,7 @@ export function MarketplaceMapSearchPage() {
           <Button
             as={Link}
             to={tenantPath('/marketplace')}
-            variant="light"
+            variant="tertiary"
             size="sm"
           >
             {t('page_title')}
@@ -262,7 +262,7 @@ export function MarketplaceMapSearchPage() {
             onValueChange={setSearchQuery}
             startContent={<Search className="w-4 h-4 text-muted" />}
             size="lg"
-            variant="bordered"
+            variant="secondary"
             classNames={{ inputWrapper: 'bg-background' }}
             isClearable
             onClear={() => setSearchQuery('')}
@@ -333,7 +333,7 @@ export function MarketplaceMapSearchPage() {
             {categoryId && (
               <Chip
                 onClose={() => setCategoryId('')}
-                variant="flat"
+                variant="soft"
                 size="sm"
               >
                 {categories.find((c) => String(c.id) === categoryId)?.name || t('search.category_label')}
@@ -342,7 +342,7 @@ export function MarketplaceMapSearchPage() {
             {radiusKm !== String(DEFAULT_RADIUS_KM) && (
               <Chip
                 onClose={() => setRadiusKm(String(DEFAULT_RADIUS_KM))}
-                variant="flat"
+                variant="soft"
                 size="sm"
               >
                 {t('map.radius_chip', { km: radiusKm })}
@@ -358,7 +358,7 @@ export function MarketplaceMapSearchPage() {
               {t('map.results_count', { count: listings.length })}
             </p>
             <Button
-              variant="flat"
+              variant="tertiary"
               size="sm"
               startContent={<RefreshCw className="w-3.5 h-3.5" />}
               onPress={loadListings}

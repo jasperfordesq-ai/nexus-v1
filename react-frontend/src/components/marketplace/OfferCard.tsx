@@ -104,7 +104,7 @@ export function OfferCard({
             </div>
             <Chip
               color={statusConfig.color}
-              variant="flat"
+              variant="soft"
               size="sm"
               className="shrink-0"
             >
@@ -165,8 +165,8 @@ export function OfferCard({
                 <>
                   <Button
                     size="sm"
-                    color="success"
-                    variant="flat"
+
+                    variant="secondary"
                     startContent={<Check className="w-3.5 h-3.5" aria-hidden="true" />}
                     onPress={() => onAccept?.(offer.id)}
                   >
@@ -174,8 +174,8 @@ export function OfferCard({
                   </Button>
                   <Button
                     size="sm"
-                    color="danger"
-                    variant="flat"
+
+                    variant="danger-soft"
                     startContent={<X className="w-3.5 h-3.5" aria-hidden="true" />}
                     onPress={() => onDecline?.(offer.id)}
                   >
@@ -183,8 +183,8 @@ export function OfferCard({
                   </Button>
                   <Button
                     size="sm"
-                    color="secondary"
-                    variant="flat"
+
+                    variant="secondary"
                     startContent={<RotateCcw className="w-3.5 h-3.5" aria-hidden="true" />}
                     onPress={() => onCounter?.(offer.id)}
                   >
@@ -195,8 +195,8 @@ export function OfferCard({
               {perspective === 'buyer' && (
                 <Button
                   size="sm"
-                  color="danger"
-                  variant="flat"
+
+                  variant="danger-soft"
                   startContent={<Undo2 className="w-3.5 h-3.5" aria-hidden="true" />}
                   onPress={() => onWithdraw?.(offer.id)}
                 >
@@ -211,8 +211,8 @@ export function OfferCard({
             <div className="flex gap-2 mt-3">
               <Button
                 size="sm"
-                color="success"
-                variant="flat"
+
+                variant="secondary"
                 startContent={<Check className="w-3.5 h-3.5" aria-hidden="true" />}
                 onPress={() => onAcceptCounter?.(offer.id)}
               >
@@ -220,8 +220,8 @@ export function OfferCard({
               </Button>
               <Button
                 size="sm"
-                color="danger"
-                variant="flat"
+
+                variant="danger-soft"
                 startContent={<X className="w-3.5 h-3.5" aria-hidden="true" />}
                 onPress={() => onDecline?.(offer.id)}
               >

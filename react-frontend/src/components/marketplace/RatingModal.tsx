@@ -56,7 +56,7 @@ function StarRating({
           <Button
             key={star}
             isIconOnly
-            variant="light"
+            variant="tertiary"
             size="sm"
             onPress={() => onChange(star)}
             onMouseEnter={() => setHovered(star)}
@@ -171,11 +171,11 @@ export function RatingModal({ orderId, isOpen, onClose, onSuccess }: RatingModal
         </ModalBody>
 
         <ModalFooter>
-          <Button variant="flat" onPress={handleClose} isDisabled={isSubmitting}>
+          <Button variant="tertiary" onPress={handleClose} isDisabled={isSubmitting}>
             {t('common.cancel')}
           </Button>
           <Button
-            color="primary"
+
             onPress={handleSubmit}
             isLoading={isSubmitting}
             isDisabled={rating < 1}

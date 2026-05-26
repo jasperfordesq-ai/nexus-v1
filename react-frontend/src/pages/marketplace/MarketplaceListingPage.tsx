@@ -868,8 +868,8 @@ export function MarketplaceListingPage() {
                 <Button variant="tertiary" onPress={onClose}>
                   {t('offer.cancel')}
                 </Button>
-                <Button
-                  color="danger"
+                <Button variant="danger"
+
                   onPress={handleSubmitReport}
                   isDisabled={!reportReason.trim()}
                 >

@@ -123,9 +123,9 @@ export function ListingLocationMap({
           href={googleMapsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          variant="flat"
+          variant="tertiary"
           size="sm"
-          color="primary"
+
           startContent={<Navigation className="w-3.5 h-3.5" aria-hidden="true" />}
         >
           {t('listing.get_directions')}

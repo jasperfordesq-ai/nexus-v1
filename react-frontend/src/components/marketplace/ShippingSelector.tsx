@@ -169,7 +169,7 @@ export function ShippingSelector({ sellerId, onSelect, localPickup }: ShippingSe
                   {t('shipping.local_pickup_subtitle')}
                 </span>
               </div>
-              <Chip size="sm" color="success" variant="flat">
+              <Chip size="sm" color="success" variant="soft">
                 {t('price.free')}
               </Chip>
             </div>
@@ -193,7 +193,7 @@ export function ShippingSelector({ sellerId, onSelect, localPickup }: ShippingSe
                     {option.courier_name}
                   </span>
                   {option.is_default && (
-                    <Chip size="sm" variant="flat" color="secondary" className="text-[10px]">
+                    <Chip size="sm" variant="soft" color="default" className="text-[10px]">
                       {t('shipping.recommended')}
                     </Chip>
                   )}

@@ -174,19 +174,19 @@ export function StripeOnboardingPage() {
             </div>
             <div className="flex flex-wrap items-center justify-center gap-3">
               {status?.charges_enabled && (
-                <Chip size="sm" color="success" variant="flat">
+                <Chip size="sm" color="success" variant="soft">
                   {t('onboarding.charges_enabled')}
                 </Chip>
               )}
               {status?.payouts_enabled && (
-                <Chip size="sm" color="success" variant="flat">
+                <Chip size="sm" color="success" variant="soft">
                   {t('onboarding.payouts_enabled')}
                 </Chip>
               )}
             </div>
             <Button
-              color="primary"
-              variant="flat"
+
+              variant="tertiary"
               onPress={() => navigate(tenantPath('/marketplace/my-listings'))}
             >
               {t('onboarding.go_to_listings')}
@@ -210,7 +210,7 @@ export function StripeOnboardingPage() {
             </div>
             <div className="flex flex-wrap items-center justify-center gap-3">
               <Button
-                color="primary"
+
                 onPress={handleStartOnboarding}
                 isLoading={isStarting}
                 startContent={!isStarting ? <RefreshCw className="w-4 h-4" /> : undefined}
@@ -218,7 +218,7 @@ export function StripeOnboardingPage() {
                 {t('onboarding.continue_onboarding')}
               </Button>
               <Button
-                variant="flat"
+                variant="tertiary"
                 onPress={loadStatus}
                 startContent={<RefreshCw className="w-4 h-4" />}
               >
@@ -279,7 +279,7 @@ export function StripeOnboardingPage() {
             {/* Start button */}
             <div className="flex justify-center">
               <Button
-                color="primary"
+
                 size="lg"
                 onPress={handleStartOnboarding}
                 isLoading={isStarting}

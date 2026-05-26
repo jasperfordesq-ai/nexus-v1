@@ -294,7 +294,7 @@ export function MyListingsPage() {
           <Button
             as={Link}
             to={tenantPath('/marketplace/sell')}
-            color="primary"
+
             startContent={<Plus className="w-4 h-4" />}
           >
             {t('hub.sell_something')}
@@ -315,7 +315,7 @@ export function MyListingsPage() {
             <div className="flex flex-col gap-2 sm:flex-row">
               <Button
                 size="sm"
-                color="primary"
+
                 as={Link}
                 to={tenantPath('/marketplace/seller/onboarding')}
               >
@@ -323,7 +323,7 @@ export function MyListingsPage() {
               </Button>
               <Button
                 size="sm"
-                variant="light"
+                variant="tertiary"
                 onPress={() => {
                   setOnboardingDismissed(true);
                   try {
@@ -496,8 +496,8 @@ export function MyListingsPage() {
                         as={Link}
                         to={tenantPath(`/marketplace/${listing.id}/edit`)}
                         size="sm"
-                        variant="flat"
-                        color="primary"
+                        variant="tertiary"
+
                         startContent={<Edit3 className="w-3.5 h-3.5" />}
                         className="flex-1"
                       >
@@ -507,8 +507,8 @@ export function MyListingsPage() {
                       {activeTab === 'expired' && (
                         <Button
                           size="sm"
-                          variant="flat"
-                          color="success"
+                          variant="secondary"
+
                           startContent={<RefreshCw className="w-3.5 h-3.5" />}
                           onPress={() => handleRenew(listing.id)}
                         >
@@ -518,8 +518,8 @@ export function MyListingsPage() {
 
                       <Button
                         size="sm"
-                        variant="flat"
-                        color="danger"
+                        variant="danger-soft"
+
                         isIconOnly
                         onPress={() => confirmRemove(listing.id)}
                         aria-label={t('my_listings.action_remove')}
@@ -536,8 +536,8 @@ export function MyListingsPage() {
             {hasMore && (
               <div className="flex justify-center mt-8">
                 <Button
-                  variant="flat"
-                  color="primary"
+                  variant="tertiary"
+
                   onPress={() => loadListings(true)}
                   isLoading={isLoadingMore}
                 >
@@ -559,11 +559,11 @@ export function MyListingsPage() {
             </p>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onRemoveClose}>
+            <Button variant="tertiary" onPress={onRemoveClose}>
               {t('common.cancel')}
             </Button>
-            <Button
-              color="danger"
+            <Button variant="danger"
+
               onPress={handleRemove}
               isLoading={isRemoving}
             >

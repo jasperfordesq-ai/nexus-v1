@@ -100,7 +100,7 @@ export function MyPickupsPage() {
                     {t('pickup.window')}: {formatTime(r.slot?.slot_start ?? null)}
                   </p>
                 </div>
-                <Chip color={statusColor(r.status)} variant="flat" size="sm">
+                <Chip color={statusColor(r.status)} variant="soft" size="sm">
                   {t(`pickup.status_${r.status}`)}
                 </Chip>
               </div>

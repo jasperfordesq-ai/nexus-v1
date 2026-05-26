@@ -169,14 +169,14 @@ function OrderCard({
           {/* Action buttons */}
           <div className="flex items-center gap-2 mt-3">
             {order.status === 'paid' && (
-              <Button size="sm" variant="flat" isDisabled startContent={<Package className="w-3.5 h-3.5" />}>
+              <Button size="sm" variant="tertiary" isDisabled startContent={<Package className="w-3.5 h-3.5" />}>
                 {t('orders.buyer.waiting_shipment')}
               </Button>
             )}
             {order.status === 'shipped' && (
               <Button
                 size="sm"
-                color="primary"
+
                 onPress={() => onRequestConfirmDelivery(order.id)}
                 startContent={<CheckCircle2 className="w-3.5 h-3.5" />}
               >
@@ -186,8 +186,8 @@ function OrderCard({
             {order.status === 'delivered' && !hasRating && (
               <Button
                 size="sm"
-                color="warning"
-                variant="flat"
+
+                variant="secondary"
                 onPress={() => onRate(order.id)}
                 startContent={<Star className="w-3.5 h-3.5" />}
               >
@@ -197,8 +197,8 @@ function OrderCard({
             {order.status === 'completed' && !hasRating && (
               <Button
                 size="sm"
-                color="warning"
-                variant="flat"
+
+                variant="secondary"
                 onPress={() => onRate(order.id)}
                 startContent={<Star className="w-3.5 h-3.5" />}
               >
@@ -212,7 +212,7 @@ function OrderCard({
               </span>
             )}
             {order.status === 'disputed' && (
-              <Button size="sm" variant="flat" color="danger" isDisabled>
+              <Button size="sm" variant="danger-soft" isDisabled>
                 {t('orders.buyer.dispute_open')}
               </Button>
             )}
@@ -401,8 +401,8 @@ export function BuyerOrdersPage() {
             {hasMore && (
               <div className="flex justify-center mt-6">
                 <Button
-                  variant="flat"
-                  color="primary"
+                  variant="tertiary"
+
                   onPress={() => loadOrders(true)}
                   isLoading={isLoadingMore}
                 >
@@ -430,11 +430,11 @@ export function BuyerOrdersPage() {
                 </p>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>
+                <Button variant="tertiary" onPress={onClose}>
                   {t('common.cancel')}
                 </Button>
                 <Button
-                  color="primary"
+
                   onPress={() => {
                     if (confirmDeliveryId !== null) {
                       handleConfirmDelivery(confirmDeliveryId);

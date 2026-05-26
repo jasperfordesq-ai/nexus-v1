@@ -89,8 +89,8 @@ export function AiReplySuggestion({
       <div className="flex items-center gap-2">
         <Button
           size="sm"
-          variant="flat"
-          color="secondary"
+          variant="secondary"
+
           startContent={<Sparkles aria-hidden="true" className="w-3.5 h-3.5" />}
           isLoading={loading}
           onPress={generateReply}
@@ -119,7 +119,7 @@ export function AiReplySuggestion({
         <Textarea
           value={reply}
           onValueChange={setReply}
-          variant="bordered"
+          variant="secondary"
           minRows={2}
           maxRows={6}
           classNames={{
@@ -130,7 +130,7 @@ export function AiReplySuggestion({
         <div className="flex items-center gap-2 justify-end">
           <Button
             size="sm"
-            variant="light"
+            variant="tertiary"
             startContent={<RefreshCw aria-hidden="true" className="w-3.5 h-3.5" />}
             isLoading={loading}
             onPress={generateReply}
@@ -139,7 +139,7 @@ export function AiReplySuggestion({
           </Button>
           <Button
             size="sm"
-            variant="light"
+            variant="tertiary"
             startContent={
               copied ? (
                 <Check aria-hidden="true" className="w-3.5 h-3.5" />
@@ -153,7 +153,7 @@ export function AiReplySuggestion({
           </Button>
           <Button
             size="sm"
-            color="primary"
+
             onPress={handleUseReply}
             isDisabled={!reply.trim()}
           >

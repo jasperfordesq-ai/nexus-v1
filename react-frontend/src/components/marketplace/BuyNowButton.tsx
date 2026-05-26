@@ -245,7 +245,7 @@ export function BuyNowButton({
           />
           <Button
             size="sm"
-            variant="flat"
+            variant="tertiary"
             onPress={handleApplyCoupon}
             isDisabled={!couponCode.trim() || couponApplied}
           >
@@ -254,8 +254,8 @@ export function BuyNowButton({
         </div>
       )}
       <Button
-        color="success"
-        variant="solid"
+
+        variant="secondary"
         fullWidth
         startContent={!isProcessing ? <CreditCard className="w-4 h-4" /> : undefined}
         onPress={handleBuyNow}

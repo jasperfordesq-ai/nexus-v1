@@ -194,7 +194,7 @@ export function GroupMarketplaceTab({ groupId }: GroupMarketplaceTabProps) {
         </div>
 
         <Button
-          color="primary"
+
           startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
           onPress={() => navigate(tenantPath('/marketplace/sell'))}
         >
@@ -217,8 +217,8 @@ export function GroupMarketplaceTab({ groupId }: GroupMarketplaceTabProps) {
             {t('group_marketplace.empty_description')}
           </p>
           <Button
-            color="primary"
-            variant="flat"
+
+            variant="tertiary"
             startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
             onPress={() => navigate(tenantPath('/marketplace/sell'))}
           >
@@ -236,7 +236,7 @@ export function GroupMarketplaceTab({ groupId }: GroupMarketplaceTabProps) {
           {hasMore && (
             <div className="flex justify-center pt-4">
               <Button
-                variant="flat"
+                variant="tertiary"
                 isLoading={loadingMore}
                 onPress={() => loadListings(true, selectedCategory)}
               >

@@ -92,7 +92,7 @@ export function HybridPriceDisplay({
 
         {/* Negotiable badge */}
         {priceType === 'negotiable' && (
-          <Chip color="warning" variant="flat" size="sm">
+          <Chip color="warning" variant="soft" size="sm">
             {t('price.negotiable')}
           </Chip>
         )}

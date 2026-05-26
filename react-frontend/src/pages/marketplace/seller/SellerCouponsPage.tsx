@@ -84,7 +84,7 @@ export default function SellerCouponsPage() {
         <Button
           as={Link}
           to={tenantPath('/marketplace/seller/coupons/new')}
-          color="primary"
+
           startContent={<Plus className="w-4 h-4" />}
         >
           {t('coupon.seller.create_button')}
@@ -125,7 +125,7 @@ export default function SellerCouponsPage() {
                       <Chip
                         size="sm"
                         color={c.status === 'active' ? 'success' : c.status === 'paused' ? 'warning' : 'default'}
-                        variant="flat"
+                        variant="soft"
                       >
                       {t(`coupon.seller.status_${c.status}`, c.status)}
                       </Chip>
@@ -141,7 +141,7 @@ export default function SellerCouponsPage() {
                           to={tenantPath(`/marketplace/seller/coupons/${c.id}/edit`)}
                           isIconOnly
                           size="sm"
-                          variant="light"
+                          variant="tertiary"
                           aria-label={t('marketplace:edit.action_edit')}
                         >
                           <Pencil className="w-4 h-4" />
@@ -149,8 +149,8 @@ export default function SellerCouponsPage() {
                         <Button
                           isIconOnly
                           size="sm"
-                          variant="light"
-                          color="danger"
+                          variant="danger-soft"
+
                           aria-label={t('common.delete')}
                           onPress={() => handleDelete(c.id)}
                         >

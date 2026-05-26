@@ -176,11 +176,11 @@ function CheckoutForm({
       </ModalBody>
 
       <ModalFooter>
-        <Button variant="flat" onPress={onClose} isDisabled={isProcessing}>
+        <Button variant="tertiary" onPress={onClose} isDisabled={isProcessing}>
           {t('checkout.cancel')}
         </Button>
-        <Button
-          color="success"
+        <Button variant="secondary"
+
           onPress={handleSubmit}
           isLoading={isProcessing}
           isDisabled={!stripe || !elements || !isReady}
@@ -244,7 +244,7 @@ export function StripeCheckoutModal({
                   </div>
                 </ModalBody>
                 <ModalFooter>
-                  <Button variant="flat" onPress={onClose}>
+                  <Button variant="tertiary" onPress={onClose}>
                     {t('checkout.close')}
                   </Button>
                 </ModalFooter>

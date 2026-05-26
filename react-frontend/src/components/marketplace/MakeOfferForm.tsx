@@ -94,7 +94,7 @@ export function MakeOfferForm({
         startContent={
           <span className="text-sm text-theme-muted">{currency}</span>
         }
-        variant="bordered"
+        variant="secondary"
         isRequired
         autoFocus
       />
@@ -121,14 +121,14 @@ export function MakeOfferForm({
         value={message}
         onValueChange={setMessage}
         maxLength={MAX_MESSAGE_LENGTH}
-        variant="bordered"
+        variant="secondary"
         description={`${message.length}/${MAX_MESSAGE_LENGTH}`}
       />
 
       {/* Actions */}
       <div className="flex justify-end gap-2 pt-2">
         <Button
-          variant="flat"
+          variant="tertiary"
           onPress={onClose}
           isDisabled={isSubmitting}
         >
@@ -136,7 +136,7 @@ export function MakeOfferForm({
         </Button>
         <Button
           type="submit"
-          color="primary"
+
           isLoading={isSubmitting}
           isDisabled={!isValidAmount}
           startContent={!isSubmitting ? <Send className="w-4 h-4" aria-hidden="true" /> : undefined}

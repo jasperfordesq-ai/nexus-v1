@@ -217,7 +217,7 @@ export function CommunityDeliveryCard({
                       <span className="text-sm font-medium text-theme-primary truncate">
                         {offer.deliverer?.name ?? t('community_delivery.unknown')}
                       </span>
-                      <Chip size="sm" color={statusColor(offer.status)} variant="flat">
+                      <Chip size="sm" color={statusColor(offer.status)} variant="soft">
                         {t(`community_delivery.status.${offer.status}`)}
                       </Chip>
                     </div>
@@ -237,8 +237,8 @@ export function CommunityDeliveryCard({
                   {isOwner && offer.status === 'pending' && (
                     <Button
                       size="sm"
-                      color="primary"
-                      variant="flat"
+
+                      variant="tertiary"
                       onPress={() => handleAcceptOffer(offer.deliverer_id)}
                     >
                       {t('community_delivery.accept')}
@@ -247,8 +247,8 @@ export function CommunityDeliveryCard({
                   {isOwner && offer.status === 'accepted' && (
                     <Button
                       size="sm"
-                      color="success"
-                      variant="flat"
+
+                      variant="secondary"
                       onPress={() => handleConfirmDelivery(offer.deliverer_id)}
                     >
                       {t('community_delivery.confirm')}
@@ -268,8 +268,8 @@ export function CommunityDeliveryCard({
           {/* Offer to deliver button (for non-owners) */}
           {!informational && !isOwner && isAuthenticated && orderId && (
             <Button
-              color="primary"
-              variant="flat"
+
+              variant="tertiary"
               startContent={<Truck className="w-4 h-4" />}
               onPress={onOpen}
               className="w-full"
@@ -320,11 +320,11 @@ export function CommunityDeliveryCard({
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onClose}>
+            <Button variant="tertiary" onPress={onClose}>
               {t('community_delivery.cancel')}
             </Button>
             <Button
-              color="primary"
+
               isLoading={submitting}
               onPress={handleSubmitOffer}
               isDisabled={!timeCredits || parseFloat(timeCredits) <= 0}

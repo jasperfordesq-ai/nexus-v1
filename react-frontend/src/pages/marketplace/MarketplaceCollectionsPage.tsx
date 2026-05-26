@@ -232,7 +232,7 @@ export function MarketplaceCollectionsPage() {
           <div className="flex items-start gap-3">
             <Button
               isIconOnly
-              variant="light"
+              variant="tertiary"
               aria-label={t('common.go_back')}
               onPress={() => {
                 setSelectedCollection(null);
@@ -247,12 +247,12 @@ export function MarketplaceCollectionsPage() {
                 <p className="text-sm text-muted mt-1">{selectedCollection.description}</p>
               )}
               <div className="flex flex-wrap items-center gap-2 mt-1">
-                <Chip size="sm" variant="flat">
+                <Chip size="sm" variant="soft">
                   {t('collections.item_count', { count: selectedCollection.item_count })}
                 </Chip>
                 <Chip
                   size="sm"
-                  variant="flat"
+                  variant="soft"
                   color={selectedCollection.is_public ? 'success' : 'default'}
                 >
                   {selectedCollection.is_public
@@ -316,8 +316,8 @@ export function MarketplaceCollectionsPage() {
                     )}
                     <Button
                       size="sm"
-                      variant="flat"
-                      color="danger"
+                      variant="danger-soft"
+
                       className="mt-2 w-full"
                       startContent={<Trash2 className="w-3.5 h-3.5" />}
                       onPress={() => handleRemoveItem(item.listing.id)}
@@ -356,7 +356,7 @@ export function MarketplaceCollectionsPage() {
             </p>
           </div>
           <Button
-            color="primary"
+
             startContent={<Plus className="w-4 h-4" />}
             onPress={() => setShowCreateModal(true)}
           >
@@ -378,7 +378,7 @@ export function MarketplaceCollectionsPage() {
                 <FolderHeart className="w-4 h-4" />
                 {t('collections.tab_collections')}
                 {collections.length > 0 && (
-                  <Chip size="sm" variant="flat">{collections.length}</Chip>
+                  <Chip size="sm" variant="soft">{collections.length}</Chip>
                 )}
               </div>
             }
@@ -417,7 +417,7 @@ export function MarketplaceCollectionsPage() {
                 <Search className="w-4 h-4" />
                 {t('saved_searches.tab_title')}
                 {savedSearches.length > 0 && (
-                  <Chip size="sm" variant="flat">{savedSearches.length}</Chip>
+                  <Chip size="sm" variant="soft">{savedSearches.length}</Chip>
                 )}
               </div>
             }
@@ -464,7 +464,7 @@ export function MarketplaceCollectionsPage() {
               onValueChange={setNewName}
               maxLength={100}
               isRequired
-              variant="bordered"
+              variant="secondary"
             />
             <Textarea
               label={t('collections.description_label')}
@@ -472,7 +472,7 @@ export function MarketplaceCollectionsPage() {
               value={newDescription}
               onValueChange={setNewDescription}
               maxLength={500}
-              variant="bordered"
+              variant="secondary"
             />
             <div className="flex items-center justify-between gap-4">
               <span className="text-sm text-foreground">
@@ -486,11 +486,11 @@ export function MarketplaceCollectionsPage() {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={() => setShowCreateModal(false)}>
+            <Button variant="tertiary" onPress={() => setShowCreateModal(false)}>
               {t('common.cancel')}
             </Button>
             <Button
-              color="primary"
+
               isDisabled={!newName.trim()}
               isLoading={isCreating}
               onPress={handleCreateCollection}

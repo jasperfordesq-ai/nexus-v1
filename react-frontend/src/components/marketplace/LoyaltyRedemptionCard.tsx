@@ -223,12 +223,12 @@ export function LoyaltyRedemptionCard({ sellerId, listingId, orderTotalChf, curr
       </div>
 
       <div className="flex items-center justify-between pt-1 border-t border-separator">
-        <Chip variant="flat" color="warning" size="sm">
+        <Chip variant="soft" color="warning" size="sm">
           {currency} {previewNewTotal.toFixed(2)}
         </Chip>
         <Button
-          color="warning"
-          variant="solid"
+
+          variant="secondary"
           size="sm"
           onPress={handleApply}
           isLoading={submitting}

@@ -598,7 +598,7 @@ export function CreateMarketplaceListingPage() {
             />
             <div className="flex justify-end">
               <Button
-                variant="flat"
+                variant="tertiary"
                 size="sm"
                 startContent={<Sparkles className="w-3.5 h-3.5" />}
                 onPress={handleGenerateDescription}
@@ -811,14 +811,14 @@ export function CreateMarketplaceListingPage() {
         {/* Submit */}
         <div className="flex flex-col-reverse gap-3 pb-8 sm:flex-row sm:justify-end">
           <Button
-            variant="flat"
+            variant="tertiary"
             as={Link}
             to={tenantPath('/marketplace')}
           >
             {t('create.cancel')}
           </Button>
           <Button
-            color="primary"
+
             size="lg"
             onPress={handleSubmit}
             isLoading={isSubmitting}

@@ -153,7 +153,7 @@ export default function SellerCouponEditPage() {
       <Button
         as={Link}
         to={tenantPath('/marketplace/seller/coupons')}
-        variant="light"
+        variant="tertiary"
         startContent={<ArrowLeft className="w-4 h-4" />}
         className="mb-4"
       >
@@ -269,10 +269,10 @@ export default function SellerCouponEditPage() {
               onValueChange={(v) => setForm((f) => ({ ...f, min_order_cents: v }))}
             />
             <div className="flex flex-col justify-end gap-2 mt-2 sm:flex-row">
-              <Button as={Link} to={tenantPath('/marketplace/seller/coupons')} variant="light">
+              <Button as={Link} to={tenantPath('/marketplace/seller/coupons')} variant="tertiary">
                 {t('common.cancel')}
               </Button>
-              <Button color="primary" type="submit" isLoading={saving}>
+              <Button type="submit" isLoading={saving}>
                 {t('coupon.seller.save')}
               </Button>
             </div>

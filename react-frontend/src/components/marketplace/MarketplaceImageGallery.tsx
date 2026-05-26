@@ -121,7 +121,7 @@ export function MarketplaceImageGallery({ images }: MarketplaceImageGalleryProps
             <Button
               key={image.id}
               isIconOnly
-              variant="light"
+              variant="tertiary"
               size="sm"
               onPress={() => handleThumbnailClick(index)}
               className={`shrink-0 w-16 h-16 min-w-0 rounded-md overflow-hidden border-2 transition-colors p-0 ${

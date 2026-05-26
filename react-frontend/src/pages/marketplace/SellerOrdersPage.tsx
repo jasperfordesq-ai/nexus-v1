@@ -178,7 +178,7 @@ function SellerOrderCard({
             {order.status === 'paid' && (
               <Button
                 size="sm"
-                color="primary"
+
                 onPress={() => onMarkShipped(order.id)}
                 startContent={<Truck className="w-3.5 h-3.5" />}
               >
@@ -186,12 +186,12 @@ function SellerOrderCard({
               </Button>
             )}
             {order.status === 'shipped' && (
-              <Button size="sm" variant="flat" isDisabled startContent={<Clock className="w-3.5 h-3.5" />}>
+              <Button size="sm" variant="tertiary" isDisabled startContent={<Clock className="w-3.5 h-3.5" />}>
                 {t('orders.seller.awaiting_confirmation')}
               </Button>
             )}
             {order.status === 'delivered' && (
-              <Button size="sm" variant="flat" isDisabled startContent={<Clock className="w-3.5 h-3.5" />}>
+              <Button size="sm" variant="tertiary" isDisabled startContent={<Clock className="w-3.5 h-3.5" />}>
                 {t('orders.seller.awaiting_completion')}
               </Button>
             )}
@@ -202,7 +202,7 @@ function SellerOrderCard({
               </span>
             )}
             {order.status === 'disputed' && (
-              <Button size="sm" variant="flat" color="danger" isDisabled>
+              <Button size="sm" variant="danger-soft" isDisabled>
                 {t('orders.seller.dispute_open')}
               </Button>
             )}
@@ -410,8 +410,8 @@ export function SellerOrdersPage() {
             {hasMore && (
               <div className="flex justify-center mt-6">
                 <Button
-                  variant="flat"
-                  color="primary"
+                  variant="tertiary"
+
                   onPress={() => loadOrders(true)}
                   isLoading={isLoadingMore}
                 >
@@ -463,11 +463,11 @@ export function SellerOrdersPage() {
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={shipModal.onClose} isDisabled={isSubmittingShip}>
+            <Button variant="tertiary" onPress={shipModal.onClose} isDisabled={isSubmittingShip}>
               {t('common.cancel')}
             </Button>
             <Button
-              color="primary"
+
               onPress={handleSubmitShipment}
               isLoading={isSubmittingShip}
               startContent={!isSubmittingShip ? <Truck className="w-4 h-4" /> : undefined}

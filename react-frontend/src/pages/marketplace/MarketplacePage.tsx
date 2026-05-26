@@ -285,7 +285,7 @@ export function MarketplacePage() {
               <Button
                 as={Link}
                 to={tenantPath('/marketplace/sell')}
-                color="primary"
+
                 className="shrink-0"
                 startContent={<Plus className="w-4 h-4" />}
               >
@@ -303,7 +303,7 @@ export function MarketplacePage() {
             onValueChange={setSearchQuery}
             startContent={<Search className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
             size="lg"
-            variant="bordered"
+            variant="secondary"
             classNames={{ inputWrapper: 'bg-theme-elevated border-theme-default hover:bg-theme-hover', input: 'text-theme-primary placeholder:text-theme-subtle' }}
             isClearable
             onClear={() => setSearchQuery('')}
@@ -344,7 +344,7 @@ export function MarketplacePage() {
             ) : error ? (
               <GlassCard className="p-8 text-center">
                 <p className="text-danger mb-4">{error}</p>
-                <Button color="primary" variant="flat" onPress={() => loadListings()}>
+                <Button variant="tertiary" onPress={() => loadListings()}>
                   {t('common.try_again')}
                 </Button>
               </GlassCard>
@@ -379,8 +379,8 @@ export function MarketplacePage() {
                 {hasMore && (
                   <div className="flex justify-center mt-8">
                     <Button
-                      variant="flat"
-                      color="primary"
+                      variant="tertiary"
+
                       onPress={() => loadListings(true)}
                       isLoading={isLoadingMore}
                     >
@@ -405,7 +405,7 @@ export function MarketplacePage() {
                 <Button
                   as={Link}
                   to={tenantPath('/marketplace/sell')}
-                  color="primary"
+
                   fullWidth
                   startContent={<Plus className="w-4 h-4" />}
                 >
