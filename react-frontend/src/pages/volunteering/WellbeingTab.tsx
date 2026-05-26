@@ -330,7 +330,7 @@ export function WellbeingTab() {
                   <span className="text-sm font-medium text-theme-primary">{t('wellbeing.score_label')}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Chip size="sm" color={getRiskColor(data.burnout_risk)} variant="flat">
+                  <Chip size="sm" color={getRiskColor(data.burnout_risk)} variant="soft">
                     {data.burnout_risk === 'low' ? t('wellbeing.risk_low') : data.burnout_risk === 'moderate' ? t('wellbeing.risk_moderate') : t('wellbeing.risk_high')}
                   </Chip>
                   <span className={`text-sm font-semibold ${getScoreColor(data.score).text}`}>
@@ -387,8 +387,8 @@ export function WellbeingTab() {
                     <Chip
                       key={i}
                       size="sm"
-                      variant="flat"
-                      color="primary"
+                      variant="soft"
+                      color="accent"
                       startContent={<Sun className="w-3 h-3" />}
                     >
                       {new Date(day).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
@@ -449,7 +449,7 @@ export function WellbeingTab() {
                     </p>
                     <Button
                       size="sm"
-                      variant="flat"
+                      variant="secondary"
                       className="bg-theme-elevated text-theme-muted"
                       startContent={<Coffee className="w-4 h-4" aria-hidden="true" />}
                       onPress={() => setShowTips(!showTips)}
@@ -458,11 +458,11 @@ export function WellbeingTab() {
                     </Button>
                     {showTips && (
                       <div className="mt-4 space-y-2">
-                        <p className="text-sm text-default-600">&#8226; {t('wellbeing.tip_breaks')}</p>
-                        <p className="text-sm text-default-600">&#8226; {t('wellbeing.tip_boundaries')}</p>
-                        <p className="text-sm text-default-600">&#8226; {t('wellbeing.tip_connect')}</p>
-                        <p className="text-sm text-default-600">&#8226; {t('wellbeing.tip_celebrate')}</p>
-                        <p className="text-sm text-default-600">&#8226; {t('wellbeing.tip_reduce')}</p>
+                        <p className="text-sm text-muted">&#8226; {t('wellbeing.tip_breaks')}</p>
+                        <p className="text-sm text-muted">&#8226; {t('wellbeing.tip_boundaries')}</p>
+                        <p className="text-sm text-muted">&#8226; {t('wellbeing.tip_connect')}</p>
+                        <p className="text-sm text-muted">&#8226; {t('wellbeing.tip_celebrate')}</p>
+                        <p className="text-sm text-muted">&#8226; {t('wellbeing.tip_reduce')}</p>
                       </div>
                     )}
                   </div>
@@ -496,9 +496,9 @@ export function WellbeingTab() {
                 {moodOptions.map((mood) => (
                   <Button
                     key={mood.value}
-                    variant="flat"
+                    variant={selectedMood === mood.value ? 'secondary' : 'ghost'}
                     onPress={() => setSelectedMood(mood.value)}
-                    className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all h-auto min-w-0 ${
+                    className={`flex min-h-20 min-w-0 flex-col items-center gap-1 rounded-xl p-3 transition-all ${
                       selectedMood === mood.value
                         ? 'bg-rose-500/20 ring-2 ring-rose-500 scale-110'
                         : 'bg-theme-elevated hover:bg-theme-hover'
@@ -527,7 +527,7 @@ export function WellbeingTab() {
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onClose} className="text-theme-muted">{t('wellbeing.cancel')}</Button>
+            <Button variant="tertiary" onPress={onClose} className="text-theme-muted">{t('wellbeing.cancel')}</Button>
             <Button
               className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
               onPress={handleCheckin}

@@ -266,7 +266,7 @@ export function VolunteeringPage() {
             {hasApprovedOrg && (
               <Link to={tenantPath('/volunteering/create')} className="w-full sm:w-auto">
                 <Button
-                  color="primary"
+                  variant="primary"
                   className="w-full sm:w-auto"
                   startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
                 >
@@ -277,7 +277,7 @@ export function VolunteeringPage() {
             {hasApprovedOrg && (
               <Link to={tenantPath('/volunteering/my-organisations')} className="w-full sm:w-auto">
                 <Button
-                  variant="flat"
+                  variant="secondary"
                   className="w-full sm:w-auto"
                   startContent={<Building2 className="w-4 h-4" aria-hidden="true" />}
                 >
@@ -287,7 +287,7 @@ export function VolunteeringPage() {
             )}
             <Link to={tenantPath('/organisations')} className="w-full sm:w-auto">
               <Button
-                variant="flat"
+                variant="secondary"
                 className="w-full sm:w-auto"
                 startContent={<Globe className="w-4 h-4" aria-hidden="true" />}
               >
@@ -577,7 +577,7 @@ function OpportunitiesTab() {
               {hasMore && (
                 <div className="pt-4 text-center">
                   <Button
-                    variant="flat"
+                    variant="secondary"
                     className="bg-theme-elevated text-theme-muted"
                     onPress={() => loadOpportunities(true)}
                   >
@@ -617,7 +617,7 @@ function OpportunitiesTab() {
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onClose} className="text-theme-muted">{t('cancel')}</Button>
+            <Button variant="tertiary" onPress={onClose} className="text-theme-muted">{t('cancel')}</Button>
             <Button
               className={VOL_GRADIENT}
               onPress={handleApply}
@@ -695,7 +695,7 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
               </span>
             )}
             {opportunity.is_remote && (
-              <Chip size="sm" variant="flat" color="primary" startContent={<Globe className="w-3 h-3" />}>
+              <Chip size="sm" variant="soft" color="accent" startContent={<Globe className="w-3 h-3" />}>
                 {t('remote')}
               </Chip>
             )}
@@ -707,7 +707,7 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
               </span>
             )}
             {opportunity.category && (
-              <Chip size="sm" variant="flat" className="text-theme-subtle">
+              <Chip size="sm" variant="soft" className="text-theme-subtle">
                 {typeof opportunity.category === 'object' ? (opportunity.category as { name?: string }).name : opportunity.category}
               </Chip>
             )}
@@ -720,7 +720,7 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
           </div>
 
           {opportunity.has_applied && (
-            <Chip size="sm" color="success" variant="flat" className="mt-2" startContent={<CheckCircle className="w-3 h-3" />}>
+            <Chip size="sm" color="success" variant="soft" className="mt-2" startContent={<CheckCircle className="w-3 h-3" />}>
               {t('applied')}
             </Chip>
           )}
@@ -730,7 +730,7 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
         <div className="flex flex-col gap-2 w-full sm:w-auto sm:flex-shrink-0">
           <Button
             size="sm"
-            variant="light"
+            variant="tertiary"
             className="text-theme-muted w-full sm:w-auto"
             onPress={() => navigate(tenantPath(`/volunteering/opportunities/${opportunity.id}`))}
             endContent={<ChevronRight className="w-4 h-4" aria-hidden="true" />}
@@ -928,7 +928,7 @@ function ApplicationsTab() {
                           <Chip
                             size="sm"
                             color={statusColor(app.status)}
-                            variant="flat"
+                            variant="soft"
                             startContent={statusIcon(app.status)}
                           >
                             {app.status === 'approved'
@@ -976,8 +976,7 @@ function ApplicationsTab() {
                       {app.status === 'pending' && (
                         <Button
                           size="sm"
-                          variant="flat"
-                          color="danger"
+                          variant="danger-soft"
                           onPress={() => handleWithdraw(app.id)}
                         >
                           {t('withdraw')}
@@ -991,7 +990,7 @@ function ApplicationsTab() {
               {hasMore && (
                 <div className="pt-4 text-center">
                   <Button
-                    variant="flat"
+                    variant="secondary"
                     className="bg-theme-elevated text-theme-muted"
                     onPress={() => loadApplications(true)}
                   >
@@ -1358,7 +1357,7 @@ function HoursTab() {
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onClose} className="text-theme-muted">{t('cancel')}</Button>
+            <Button variant="tertiary" onPress={onClose} className="text-theme-muted">{t('cancel')}</Button>
             <Button
               className={VOL_GRADIENT}
               onPress={handleLogHours}

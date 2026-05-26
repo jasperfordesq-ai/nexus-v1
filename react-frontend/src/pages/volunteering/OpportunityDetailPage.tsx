@@ -246,7 +246,7 @@ function ShiftCheckinPanel({ shifts }: ShiftCheckinPanelProps) {
                     className="w-48 h-48 rounded-lg bg-white p-1"
                     loading="lazy"
                   />
-                  <Chip color={checkinStatusColor(checkin.status)} variant="flat">
+                  <Chip color={checkinStatusColor(checkin.status)} variant="soft">
                     {statusLabel}
                   </Chip>
                   {checkin.checked_in_at && (
@@ -409,7 +409,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
             <ClipboardList className="w-5 h-5 text-indigo-400" aria-hidden="true" />
             {t('applications.heading')}
             {pendingCount > 0 && statusFilter === 'all' && (
-              <Chip size="sm" color="warning" variant="flat">{t('applications.pending_count', { count: pendingCount })}</Chip>
+            <Chip size="sm" color="warning" variant="soft">{t('applications.pending_count', { count: pendingCount })}</Chip>
             )}
           </h2>
           {pendingFiltered.length > 0 && (
@@ -463,8 +463,8 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
             <span className="text-sm text-indigo-400 font-medium">{t('applications.selected_count', { count: selected.size })}</span>
             <Button
               size="sm"
-              color="success"
-              variant="flat"
+              variant="secondary"
+              className="bg-success/10 text-success"
               startContent={<CheckCircle className="w-3.5 h-3.5" />}
               onPress={() => handleBulkAction('approve')}
             >
@@ -472,14 +472,13 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
             </Button>
             <Button
               size="sm"
-              color="danger"
-              variant="flat"
+              variant="danger-soft"
               startContent={<XCircle className="w-3.5 h-3.5" />}
               onPress={() => handleBulkAction('decline')}
             >
               {t('applications.decline_all')}
             </Button>
-            <Button size="sm" variant="light" onPress={() => setSelected(new Set())}>
+            <Button size="sm" variant="tertiary" onPress={() => setSelected(new Set())}>
               {t('applications.clear')}
             </Button>
           </div>
@@ -532,7 +531,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
                 <div className="flex-1 min-w-0 space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-medium text-theme-primary text-sm">{app.user.name}</span>
-                    <Chip size="sm" variant="flat" color={statusColor(app.status)}>
+                    <Chip size="sm" variant="soft" color={statusColor(app.status)}>
                       {app.status === 'approved'
                         ? t('status_approved')
                         : app.status === 'declined'
@@ -559,8 +558,8 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
                   <div className="flex gap-2 sm:flex-shrink-0">
                     <Button
                       size="sm"
-                      color="success"
-                      variant="flat"
+                      variant="secondary"
+                      className="bg-success/10 text-success"
                       startContent={<CheckCircle className="w-3.5 h-3.5" aria-hidden="true" />}
                       isLoading={actionLoading[app.id]}
                       onPress={() => handleAction(app.id, 'approve')}
@@ -569,8 +568,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
                     </Button>
                     <Button
                       size="sm"
-                      color="danger"
-                      variant="flat"
+                      variant="danger-soft"
                       startContent={<XCircle className="w-3.5 h-3.5" aria-hidden="true" />}
                       isLoading={actionLoading[app.id]}
                       onPress={() => handleAction(app.id, 'decline')}
@@ -588,7 +586,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
           <div className="flex justify-center pt-2">
             <Button
               size="sm"
-              variant="flat"
+              variant="secondary"
               className="bg-theme-elevated text-theme-muted"
               startContent={isLoadingMore ? <Spinner size="sm" /> : <ChevronDown className="w-4 h-4" aria-hidden="true" />}
               isDisabled={isLoadingMore}
@@ -785,28 +783,28 @@ export function OpportunityDetailPage() {
           <div className="flex flex-wrap gap-2">
             <Chip
               size="sm"
-              variant="flat"
+              variant="soft"
               color={opp.is_active ? 'success' : 'danger'}
             >
               {opp.is_active ? t('opportunity.status_active') : t('opportunity.status_closed')}
             </Chip>
             {opp.is_remote && (
-              <Chip size="sm" variant="flat" color="secondary" startContent={<Wifi className="w-3 h-3" />}>
+              <Chip size="sm" variant="soft" color="default" startContent={<Wifi className="w-3 h-3" />}>
                 {t('opportunity.remote')}
               </Chip>
             )}
             {opp.category && (
-              <Chip size="sm" variant="flat" color="primary" startContent={<Tag className="w-3 h-3" />}>
+              <Chip size="sm" variant="soft" color="accent" startContent={<Tag className="w-3 h-3" />}>
                 {opp.category}
               </Chip>
             )}
             {opp.has_applied && (
-              <Chip size="sm" variant="flat" color="success" startContent={<CheckCircle className="w-3 h-3" />}>
+              <Chip size="sm" variant="soft" color="success" startContent={<CheckCircle className="w-3 h-3" />}>
                 {t('opportunity.applied')}
               </Chip>
             )}
             {opp.is_owner && (
-              <Chip size="sm" variant="flat" color="secondary" startContent={<ClipboardList className="w-3 h-3" />}>
+              <Chip size="sm" variant="soft" color="default" startContent={<ClipboardList className="w-3 h-3" />}>
                 {t('opportunity.your_opportunity')}
               </Chip>
             )}
@@ -911,9 +909,9 @@ export function OpportunityDetailPage() {
                       {shift.signup_count}{shift.capacity ? `/${shift.capacity}` : ''}
                     </span>
                     {(shift.spots_available === null || shift.spots_available > 0) ? (
-                      <Chip size="sm" variant="flat" color="success">{t('opportunity.shift_open')}</Chip>
+                      <Chip size="sm" variant="soft" color="success">{t('opportunity.shift_open')}</Chip>
                     ) : (
-                      <Chip size="sm" variant="flat" color="danger">{t('opportunity.shift_full')}</Chip>
+                      <Chip size="sm" variant="soft" className="bg-danger/10 text-danger">{t('opportunity.shift_full')}</Chip>
                     )}
                   </div>
                 </div>
@@ -952,7 +950,7 @@ export function OpportunityDetailPage() {
                       <Button
                         key={shift.id}
                         size="sm"
-                        variant={selectedShiftId === shift.id ? 'solid' : 'flat'}
+                        variant={selectedShiftId === shift.id ? 'primary' : 'secondary'}
                         className={selectedShiftId === shift.id
                           ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white w-full justify-start'
                           : 'bg-theme-elevated text-theme-muted w-full justify-start'
@@ -968,7 +966,7 @@ export function OpportunityDetailPage() {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('opportunity.cancel')}</Button>
+                <Button variant="tertiary" onPress={onClose}>{t('opportunity.cancel')}</Button>
                 <Button
                   className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
                   onPress={handleApply}
