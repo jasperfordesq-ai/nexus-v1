@@ -1,4 +1,5 @@
-import { Select, SelectItem, useDisclosure, GlassCard, Button, Chip, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@/components/ui';
+import { Chip } from '@heroui/react';
+import { Select, SelectItem, useDisclosure, GlassCard, Button, Input, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -270,23 +271,24 @@ export function JobAlertsPage() {
                     <div className="flex items-center gap-2 flex-wrap mb-2">
                       <Chip
                         size="sm"
-                        variant="flat"
+                        variant="tertiary"
                         color={alert.is_active ? 'success' : 'default'}
                       >
                         {alert.is_active ? t('alerts.active') : t('alerts.paused')}
                       </Chip>
                       {alert.type && (
-                        <Chip size="sm" variant="flat" color="primary">
+                        <Chip size="sm" variant="tertiary" color="accent">
                           {t(`type.${alert.type}`)}
                         </Chip>
                       )}
                       {alert.commitment && (
-                        <Chip size="sm" variant="flat" color="secondary">
+                        <Chip size="sm" variant="tertiary" color="default">
                           {t(`commitment.${alert.commitment}`)}
                         </Chip>
                       )}
                       {alert.is_remote_only && (
-                        <Chip size="sm" variant="flat" color="default" startContent={<Wifi className="w-3 h-3" />}>
+                        <Chip size="sm" variant="tertiary" color="default">
+                          <Wifi className="w-3 h-3" aria-hidden="true" />
                           {t('remote')}
                         </Chip>
                       )}

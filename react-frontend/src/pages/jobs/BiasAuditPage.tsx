@@ -1,4 +1,5 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Input, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
+import { Chip } from '@heroui/react';
+import { Select, SelectItem, GlassCard, Button, Input, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -408,7 +409,7 @@ export function BiasAuditPage() {
                     <TableCell className="text-right">
                       <Chip
                         size="sm"
-                        variant="flat"
+                        variant="tertiary"
                         color={data.rate > 50 ? 'danger' : data.rate > 25 ? 'warning' : 'success'}
                       >
                         {data.rate}%
@@ -493,7 +494,7 @@ export function BiasAuditPage() {
                     </div>
                     <Chip
                       size="sm"
-                      variant="flat"
+                      variant="tertiary"
                       color={data.acceptance_rate > 20 ? 'success' : 'default'}
                     >
                       {data.acceptance_rate}%
