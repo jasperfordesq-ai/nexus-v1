@@ -3,8 +3,9 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import type { ReactNode } from 'react';import Sparkles from 'lucide-react/icons/sparkles';
-import { Chip } from '@/components/ui';
+import type { ReactNode } from 'react';
+import Sparkles from 'lucide-react/icons/sparkles';
+import { Chip } from '@heroui/react';
 
 interface PublicPageHeroStat {
   label: string;
@@ -70,10 +71,10 @@ export function PublicPageHero({
         <div className="max-w-3xl">
           <Chip
             size="sm"
-            variant="flat"
+            variant="tertiary"
             className={`${classes.chip} mb-4 font-medium`}
-            startContent={<Sparkles className="h-3.5 w-3.5" aria-hidden="true" />}
           >
+            <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
             {eyebrow}
           </Chip>
           <div className="flex items-start gap-4">

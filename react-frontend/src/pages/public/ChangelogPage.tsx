@@ -1,5 +1,5 @@
-import { Card } from '@heroui/react';
-import { Chip, Spinner } from '@/components/ui';
+import { Card, Chip } from '@heroui/react';
+import { Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -67,7 +67,7 @@ export function ChangelogPage() {
           <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
             {t('changelog_page.heading')}
           </h1>
-          <Chip color="success" variant="flat" size="sm">
+          <Chip color="success" variant="tertiary" size="sm">
             {t('release_stage')}
           </Chip>
         </div>

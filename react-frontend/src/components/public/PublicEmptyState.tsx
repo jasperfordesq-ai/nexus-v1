@@ -1,5 +1,4 @@
-import { Card } from '@heroui/react';
-import { Chip } from '@/components/ui';
+import { Card, Chip } from '@heroui/react';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -43,7 +42,7 @@ export function PublicEmptyState({
         {tips?.length ? (
           <div className="mt-5 flex flex-wrap justify-center gap-2">
             {tips.map((tip) => (
-              <Chip key={tip} size="sm" variant="flat" className="bg-theme-elevated text-theme-secondary">
+              <Chip key={tip} size="sm" variant="tertiary" className="bg-theme-elevated text-theme-secondary">
                 {tip}
               </Chip>
             ))}
