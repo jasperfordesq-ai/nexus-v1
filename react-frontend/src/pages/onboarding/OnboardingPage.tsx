@@ -817,10 +817,10 @@ export function OnboardingPage() {
                         {t('photo_uploaded')}
                       </p>
                       <Button
-                        variant="light"
+                        variant="tertiary"
                         size="sm"
                         onPress={() => fileInputRef.current?.click()}
-                        className="text-xs text-theme-subtle hover:text-theme-muted underline mt-1 h-auto p-0 min-w-0"
+                        className="mt-1 min-h-6 min-w-0 p-0 text-xs text-theme-subtle underline hover:text-theme-muted"
                       >
                         {t('change_photo')}
                       </Button>
@@ -828,7 +828,7 @@ export function OnboardingPage() {
                   ) : (
                     <div className="text-center">
                       <Button
-                        variant="flat"
+                        variant="secondary"
                         size="sm"
                         className="mb-2"
                         startContent={<Upload className="w-4 h-4" />}
@@ -880,7 +880,7 @@ export function OnboardingPage() {
               {/* Navigation */}
               <div className="flex items-center justify-between">
                 <Button
-                  variant="light"
+                  variant="tertiary"
                   className="text-theme-muted"
                   onPress={goBackAnimated}
                   startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
@@ -936,7 +936,7 @@ export function OnboardingPage() {
                       return (
                         <Chip
                           key={cat.id}
-                          variant={isSelected ? 'solid' : 'bordered'}
+                          variant={isSelected ? 'primary' : 'secondary'}
                           color={isSelected ? 'success' : 'default'}
                           className="cursor-pointer transition-all hover:scale-105"
                           onClick={() => toggleInterest(cat.id)}
@@ -968,7 +968,7 @@ export function OnboardingPage() {
 
               <div className="flex items-center justify-between">
                 <Button
-                  variant="light"
+                  variant="tertiary"
                   className="text-theme-muted"
                   onPress={goBackAnimated}
                   startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
@@ -977,7 +977,7 @@ export function OnboardingPage() {
                 </Button>
                 <div className="flex items-center gap-2">
                   <Button
-                    variant="light"
+                    variant="tertiary"
                     className="text-theme-subtle"
                     onPress={goNextAnimated}
                     endContent={<SkipForward className="w-4 h-4" aria-hidden="true" />}
@@ -1114,7 +1114,7 @@ export function OnboardingPage() {
 
               <div className="flex items-center justify-between">
                 <Button
-                  variant="light"
+                  variant="tertiary"
                   className="text-theme-muted"
                   onPress={goBackAnimated}
                   startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
@@ -1123,7 +1123,7 @@ export function OnboardingPage() {
                 </Button>
                 <div className="flex items-center gap-2">
                   <Button
-                    variant="light"
+                    variant="tertiary"
                     className="text-theme-subtle"
                     onPress={goNextAnimated}
                     endContent={<SkipForward className="w-4 h-4" aria-hidden="true" />}
@@ -1183,10 +1183,10 @@ export function OnboardingPage() {
                       {bio || user?.bio || t('no_bio_yet')}
                     </p>
                     <Button
-                      variant="light"
+                      variant="tertiary"
                       size="sm"
                       onPress={() => goToStep(profileStepIdx)}
-                      className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline mt-1 h-auto p-0 min-w-0"
+                      className="mt-1 min-h-6 min-w-0 p-0 text-xs text-emerald-600 hover:underline dark:text-emerald-400"
                     >
                       {t('edit_profile')}
                     </Button>
@@ -1202,7 +1202,7 @@ export function OnboardingPage() {
                     title={t('summary_interests')}
                     items={selectedInterests}
                     getCategoryName={getCategoryName}
-                    chipColor="primary"
+                    chipColor="accent"
                     emptyText={t('none_selected')}
                     onEdit={() => goToStep(stepSlugToIndex.get('interests') ?? 3)}
                   />
@@ -1236,7 +1236,7 @@ export function OnboardingPage() {
               {/* Action buttons */}
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <Button
-                  variant="light"
+                  variant="tertiary"
                   className="text-theme-muted"
                   onPress={goBackAnimated}
                   startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
@@ -1246,7 +1246,7 @@ export function OnboardingPage() {
 
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                   <Button
-                    variant="light"
+                    variant="tertiary"
                     className="text-theme-subtle"
                     onPress={handleSkip}
                     isDisabled={isSubmitting}
@@ -1335,13 +1335,13 @@ function StepIndicator({ currentStep, totalSteps, visitedSteps, completedSteps, 
           <div key={step} className="flex min-w-[3rem] items-center flex-1 last:flex-initial">
             {/* Step dot + label */}
             <Button
-              variant="light"
+              variant="ghost"
               onPress={() => isClickable && onStepClick(step)}
               aria-label={t('aria_step', { step, label: t(stepLabelKeys[i] ?? ''), status: isCompleted ? t('aria_completed') : isCurrent ? t('aria_current') : '' })}
               aria-current={isCurrent ? 'step' : undefined}
               isDisabled={!isClickable}
               className={`
-                flex flex-col items-center gap-1 transition-all h-auto min-w-0 p-0
+                flex min-h-14 min-w-0 flex-col items-center gap-1 p-0 transition-all
                 ${isClickable ? 'cursor-pointer' : 'cursor-default'}
               `}
             >
@@ -1436,7 +1436,7 @@ interface SummarySectionProps {
   title: string;
   items: number[];
   getCategoryName: (id: number) => string;
-  chipColor: 'primary' | 'success' | 'warning';
+  chipColor: 'accent' | 'success' | 'warning';
   emptyText: string;
   onEdit: () => void;
 }
@@ -1451,10 +1451,10 @@ function SummarySection({ icon, title, items, getCategoryName, chipColor, emptyT
           {title}
         </h3>
         <Button
-          variant="light"
+          variant="tertiary"
           size="sm"
           onPress={onEdit}
-          className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline h-auto p-0 min-w-0"
+          className="min-h-6 min-w-0 p-0 text-xs text-emerald-600 hover:underline dark:text-emerald-400"
         >
           {t('edit')}
         </Button>
@@ -1462,7 +1462,7 @@ function SummarySection({ icon, title, items, getCategoryName, chipColor, emptyT
       <div className="flex flex-wrap gap-1.5">
         {items.length > 0 ? (
           items.map((catId) => (
-            <Chip key={catId} size="sm" variant="flat" color={chipColor}>
+            <Chip key={catId} size="sm" variant="soft" color={chipColor}>
               {getCategoryName(catId)}
             </Chip>
           ))

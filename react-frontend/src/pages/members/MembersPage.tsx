@@ -333,8 +333,8 @@ export function MembersPage() {
             <Button
               as={Link}
               to={tenantPath(`/profile/${user.id}`)}
-              color="primary"
-              className="shrink-0 font-semibold shadow-sm"
+              variant="primary"
+              className="shrink-0 font-semibold"
               startContent={<UserCircle className="w-4 h-4" aria-hidden="true" />}
             >
               {t('members.my_profile')}
@@ -481,7 +481,7 @@ export function MembersPage() {
               <Button
                 isIconOnly
                 size="sm"
-                variant="light"
+                variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
                 className={`rounded-none transition-colors ${viewMode === 'grid' ? 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400' : 'bg-theme-elevated text-theme-muted'}`}
                 aria-label={t('aria.grid_view')}
                 aria-pressed={viewMode === 'grid'}
@@ -492,7 +492,7 @@ export function MembersPage() {
               <Button
                 isIconOnly
                 size="sm"
-                variant="light"
+                variant={viewMode === 'list' ? 'secondary' : 'ghost'}
                 className={`rounded-none transition-colors ${!canUseMapView ? 'rounded-r-xl' : ''} ${viewMode === 'list' ? 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400' : 'bg-theme-elevated text-theme-muted'}`}
                 aria-label={t('aria.list_view')}
                 aria-pressed={viewMode === 'list'}
@@ -504,7 +504,7 @@ export function MembersPage() {
                 <Button
                   isIconOnly
                   size="sm"
-                  variant="light"
+                  variant={viewMode === 'map' ? 'secondary' : 'ghost'}
                   className={`rounded-none rounded-r-xl transition-colors ${viewMode === 'map' ? 'bg-indigo-500/10 text-indigo-500 dark:text-indigo-400' : 'bg-theme-elevated text-theme-muted'}`}
                   aria-label={t('aria.map_view')}
                   aria-pressed={viewMode === 'map'}
@@ -521,14 +521,14 @@ export function MembersPage() {
             <span className="text-xs font-medium uppercase tracking-wide text-theme-subtle">{t('members.applied_filters')}</span>
             {debouncedQuery && (
               <Chip
-                variant="flat"
+                variant="soft"
                 className="bg-theme-elevated text-theme-secondary"
                 endContent={
                   <Button
                     isIconOnly
                     size="sm"
-                    variant="light"
-                    className="ml-1 h-5 min-w-5 text-theme-subtle"
+                    variant="tertiary"
+                    className="ml-1 min-h-5 h-5 min-w-5 text-theme-subtle"
                     onPress={resetSearch}
                     aria-label={t('members.clear_search')}
                   >
@@ -540,7 +540,7 @@ export function MembersPage() {
               </Chip>
             )}
             {nearMeEnabled && (
-              <Chip variant="flat" className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
+              <Chip variant="soft" className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
                 {t('members.nearby_filter', { radius: radiusKm })}
               </Chip>
             )}
@@ -581,7 +581,7 @@ export function MembersPage() {
               tips={[t('members.empty_tip_profiles'), t('members.empty_tip_skills'), t('members.empty_tip_location')]}
               accent="blue"
               action={debouncedQuery ? (
-                <Button variant="bordered" onPress={resetSearch} startContent={<X className="h-4 w-4" aria-hidden="true" />}>
+                <Button variant="secondary" onPress={resetSearch} startContent={<X className="h-4 w-4" aria-hidden="true" />}>
                   {t('members.clear_search')}
                 </Button>
               ) : undefined}
@@ -601,7 +601,7 @@ export function MembersPage() {
                     </p>
                   )}
                   {debouncedQuery && (
-                    <Button size="sm" variant="light" className="text-theme-muted" onPress={resetSearch} startContent={<X className="h-3.5 w-3.5" aria-hidden="true" />}>
+                    <Button size="sm" variant="tertiary" className="text-theme-muted" onPress={resetSearch} startContent={<X className="h-3.5 w-3.5" aria-hidden="true" />}>
                       {t('members.clear_search')}
                     </Button>
                   )}
@@ -678,7 +678,7 @@ export function MembersPage() {
                   )}
                   <div className="text-center">
                     <Button
-                      variant="flat"
+                      variant="secondary"
                       className="bg-theme-elevated text-theme-muted hover:bg-theme-hover"
                       onPress={loadMoreMembers}
                       isLoading={isLoadingMore}
@@ -756,7 +756,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
                     </Tooltip>
                   )}
                   {hasGamification && level > 0 && (
-                    <Chip size="sm" variant="flat" className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-xs h-5 min-w-0">
+                    <Chip size="sm" variant="soft" className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-xs h-5 min-w-0">
                       {t('level_short', { level })}
                     </Chip>
                   )}
@@ -839,7 +839,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
               </Tooltip>
             )}
             {hasGamification && level > 0 && (
-              <Chip size="sm" variant="flat" className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-xs h-5 min-w-0">
+              <Chip size="sm" variant="soft" className="bg-indigo-100 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 text-xs h-5 min-w-0">
                 {t('level_short', { level })}
               </Chip>
             )}
