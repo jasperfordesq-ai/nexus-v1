@@ -1,6 +1,6 @@
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import { useTranslation } from 'react-i18next';
-import { Chip } from '@/components/ui';
+import { Chip } from '@heroui/react';
 
 interface BusinessSellerBadgeProps {
   sellerType: string;
@@ -18,17 +18,17 @@ export function BusinessSellerBadge({ sellerType, businessVerified }: BusinessSe
     return (
       <Chip
         color="success"
-        variant="flat"
+        variant="tertiary"
         size="sm"
-        startContent={<CheckCircle className="w-3.5 h-3.5" aria-hidden="true" />}
       >
-        {t('seller.verified_business')}
+        <CheckCircle className="w-3.5 h-3.5" aria-hidden="true" />
+        <Chip.Label>{t('seller.verified_business')}</Chip.Label>
       </Chip>
     );
   }
 
   return (
-    <Chip color="secondary" variant="flat" size="sm">
+    <Chip color="default" variant="tertiary" size="sm">
       {t('seller.business')}
     </Chip>
   );

@@ -1,13 +1,13 @@
 import { useTranslation } from 'react-i18next';
-import { Chip } from '@/components/ui';
+import { Chip } from '@heroui/react';
 
 interface ConditionBadgeProps {
   condition: string | null;
 }
 
-const CONDITION_CONFIG: Record<string, { color: 'success' | 'primary' | 'default' | 'warning' | 'danger'; label: string }> = {
+const CONDITION_CONFIG: Record<string, { color: 'success' | 'accent' | 'default' | 'warning' | 'danger'; label: string }> = {
   new: { color: 'success', label: 'New' },
-  like_new: { color: 'primary', label: 'Like New' },
+  like_new: { color: 'accent', label: 'Like New' },
   good: { color: 'default', label: 'Good' },
   fair: { color: 'warning', label: 'Fair' },
   poor: { color: 'danger', label: 'Poor' },
@@ -28,7 +28,7 @@ export function ConditionBadge({ condition }: ConditionBadgeProps) {
   return (
     <Chip
       color={config.color}
-      variant="flat"
+      variant="tertiary"
       size="sm"
       aria-label={t(`condition.${condition}`, config.label)}
     >

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Chip } from '@/components/ui';
+import { Chip } from '@heroui/react';
 
 interface PriceBadgeProps {
   price: number | null;
@@ -37,7 +37,7 @@ export function PriceBadge({ price, currency, priceType, timeCreditPrice, isOver
     return (
       <Chip
         color="success"
-        variant="solid"
+        variant="primary"
         size="sm"
         className={isOverlay ? 'font-semibold shadow-lg ring-1 ring-black/10' : 'font-semibold'}
       >
@@ -50,7 +50,7 @@ export function PriceBadge({ price, currency, priceType, timeCreditPrice, isOver
     return (
       <Chip
         color="default"
-        variant={isOverlay ? 'solid' : 'flat'}
+        variant={isOverlay ? 'primary' : 'tertiary'}
         size="sm"
         className={isOverlay ? 'bg-background/95 text-foreground shadow-lg ring-1 ring-black/10 backdrop-blur-md' : undefined}
       >
@@ -75,7 +75,7 @@ export function PriceBadge({ price, currency, priceType, timeCreditPrice, isOver
         <span className={priceClassName}>
           {formattedPrice}{timeCreditSuffix}
         </span>
-        <Chip color="warning" variant="flat" size="sm">
+        <Chip color="warning" variant="tertiary" size="sm">
           {t('price.negotiable')}
         </Chip>
       </span>

@@ -1,6 +1,6 @@
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import { useTranslation } from 'react-i18next';
-import { Chip } from '@/components/ui';
+import { Chip } from '@heroui/react';
 
 interface MarketplacePartnerBadgeProps {
   grantedAt?: string | null;
@@ -14,12 +14,12 @@ export function MarketplacePartnerBadge({ grantedAt, size = 'sm' }: MarketplaceP
 
   return (
     <Chip
-      color="primary"
-      variant="flat"
+      color="accent"
+      variant="tertiary"
       size={size}
-      startContent={<ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />}
     >
-      {t('marketplace.onboarding.partner_badge')}
+      <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
+      <Chip.Label>{t('marketplace.onboarding.partner_badge')}</Chip.Label>
     </Chip>
   );
 }

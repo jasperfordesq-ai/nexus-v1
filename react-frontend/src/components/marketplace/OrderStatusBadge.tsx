@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Chip } from '@/components/ui';
+import { Chip } from '@heroui/react';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -14,10 +14,10 @@ interface OrderStatusBadgeProps {
 // Status Maps
 // ─────────────────────────────────────────────────────────────────────────────
 
-const STATUS_COLOR_MAP: Record<string, 'warning' | 'primary' | 'secondary' | 'success' | 'danger' | 'default'> = {
+const STATUS_COLOR_MAP: Record<string, 'warning' | 'accent' | 'success' | 'danger' | 'default'> = {
   pending_payment: 'warning',
-  paid: 'primary',
-  shipped: 'secondary',
+  paid: 'accent',
+  shipped: 'default',
   delivered: 'success',
   completed: 'success',
   disputed: 'danger',
@@ -50,7 +50,7 @@ export function OrderStatusBadge({ status, size = 'sm' }: OrderStatusBadgeProps)
   );
 
   return (
-    <Chip size={size} color={color} variant="flat">
+    <Chip size={size} color={color} variant="tertiary">
       {label}
     </Chip>
   );
