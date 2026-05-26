@@ -161,6 +161,18 @@ export const STATUS_COLORS: Record<string, 'warning' | 'primary' | 'success' | '
   withdrawn: 'default',
 };
 
+export const STATUS_CHIP_COLORS: Record<string, 'warning' | 'accent' | 'success' | 'danger' | 'default'> = {
+  applied: 'warning',
+  pending: 'warning',
+  screening: 'accent',
+  reviewed: 'accent',
+  interview: 'default',
+  offer: 'success',
+  accepted: 'success',
+  rejected: 'danger',
+  withdrawn: 'default',
+};
+
 export function parseArrayResponse<T>(data: unknown): T[] {
   if (Array.isArray(data)) return data;
   if (data && typeof data === 'object' && 'data' in data) return (data as { data: T[] }).data ?? [];
