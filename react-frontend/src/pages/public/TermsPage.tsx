@@ -139,9 +139,9 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
           {quickNavIcons.map((item) => (
             <Button
               key={item.id}
-              variant="light"
+              variant="tertiary"
               onPress={() => scrollToSection(item.id)}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-theme-elevated hover:bg-blue-500/10 text-theme-primary text-sm font-medium transition-colors h-auto min-w-0"
+              className="inline-flex min-h-10 min-w-0 items-center gap-2 rounded-xl bg-theme-elevated px-4 py-2 text-sm font-medium text-theme-primary transition-colors hover:bg-blue-500/10"
             >
               <item.icon className="w-4 h-4 text-[var(--color-info)]" aria-hidden="true" />
               {t(item.key)}

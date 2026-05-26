@@ -189,9 +189,9 @@ export function CookiesPage() {
           {quickNavIcons.map((item) => (
             <Button
               key={item.id}
-              variant="light"
+              variant="tertiary"
               onPress={() => scrollToSection(item.id)}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-theme-elevated hover:bg-amber-500/10 text-theme-primary text-sm font-medium transition-colors h-auto min-w-0"
+              className="inline-flex min-h-10 min-w-0 items-center gap-2 rounded-xl bg-theme-elevated px-4 py-2 text-sm font-medium text-theme-primary transition-colors hover:bg-amber-500/10"
             >
               <item.icon className="w-4 h-4 text-amber-500" aria-hidden="true" />
               {t(item.key)}
@@ -286,10 +286,10 @@ export function CookiesPage() {
             {cookieTableDefs.map((cookie) => (
               <div
                 key={cookie.name}
-                className="p-4 rounded-xl bg-theme-elevated border border-default-200 dark:border-default-100"
+                className="p-4 rounded-xl bg-theme-elevated border border-border"
               >
                 <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
-                  <code className="text-sm font-mono font-semibold text-theme-primary bg-default-100 dark:bg-default-50 px-2 py-0.5 rounded">
+                  <code className="text-sm font-mono font-semibold text-theme-primary bg-surface-secondary px-2 py-0.5 rounded">
                     {cookie.name}
                   </code>
                   <Chip size="sm" variant="tertiary" color={getTypeColor(cookie.rawType)} className="text-xs">

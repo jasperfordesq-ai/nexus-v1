@@ -209,9 +209,9 @@ export function PrivacyPage() {
           {quickNavIcons.map((item) => (
             <Button
               key={item.id}
-              variant="light"
+              variant="tertiary"
               onPress={() => scrollToSection(item.id)}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-theme-elevated hover:bg-indigo-500/10 text-theme-primary text-sm font-medium transition-colors h-auto min-w-0"
+              className="inline-flex min-h-10 min-w-0 items-center gap-2 rounded-xl bg-theme-elevated px-4 py-2 text-sm font-medium text-theme-primary transition-colors hover:bg-indigo-500/10"
             >
               <item.icon className="w-4 h-4 text-indigo-500" aria-hidden="true" />
               {t(item.key)}
@@ -260,7 +260,7 @@ export function PrivacyPage() {
             {dataCollectionKeys.map((row) => (
               <div
                 key={row.typeKey}
-                className="p-4 rounded-xl bg-theme-elevated border border-default-200 dark:border-default-100"
+                className="p-4 rounded-xl bg-theme-elevated border border-border"
               >
                 <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
                   <h3 className="font-semibold text-theme-primary">{t(row.typeKey)}</h3>
@@ -415,7 +415,7 @@ export function PrivacyPage() {
             {cookieCategoryKeys.map((cat) => (
               <div
                 key={cat.nameKey}
-                className="flex items-start gap-3 p-4 rounded-xl bg-theme-elevated border border-default-200 dark:border-default-100"
+                className="flex items-start gap-3 p-4 rounded-xl bg-theme-elevated border border-border"
               >
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
