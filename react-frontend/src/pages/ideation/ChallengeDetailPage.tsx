@@ -1063,25 +1063,23 @@ export function ChallengeDetailPage() {
           {/* Sort Toggle */}
           <div className="flex rounded-lg overflow-hidden border border-[var(--color-border)]" role="group" aria-label={t('ideas.sort_label')}>
             <Button
-              variant={sortMode === 'votes' ? 'solid' : 'flat'}
-              color={sortMode === 'votes' ? 'primary' : 'default'}
+              variant={sortMode === 'votes' ? 'primary' : 'tertiary'}
               size="sm"
               onPress={() => setSortMode('votes')}
               aria-pressed={sortMode === 'votes'}
-              className={`px-3 py-1.5 text-sm transition-colors rounded-none h-auto ${
-                sortMode !== 'votes' ? 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)]' : ''
+              className={`min-h-9 rounded-none px-3 py-1.5 text-sm leading-5 transition-colors ${
+                sortMode !== 'votes' ? 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)]' : ''
               }`}
             >
               {t('ideas.sort_votes')}
             </Button>
             <Button
-              variant={sortMode === 'newest' ? 'solid' : 'flat'}
-              color={sortMode === 'newest' ? 'primary' : 'default'}
+              variant={sortMode === 'newest' ? 'primary' : 'tertiary'}
               size="sm"
               onPress={() => setSortMode('newest')}
               aria-pressed={sortMode === 'newest'}
-              className={`px-3 py-1.5 text-sm transition-colors rounded-none h-auto ${
-                sortMode !== 'newest' ? 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)]' : ''
+              className={`min-h-9 rounded-none px-3 py-1.5 text-sm leading-5 transition-colors ${
+                sortMode !== 'newest' ? 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)]' : ''
               }`}
             >
               {t('ideas.sort_newest')}

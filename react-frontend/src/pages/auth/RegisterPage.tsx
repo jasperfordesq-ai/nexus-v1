@@ -944,11 +944,11 @@ export function RegisterPage() {
             {STEPS.map((step) => (
               <Button
                 key={step.id}
-                variant="light"
+                variant="tertiary"
                 size="sm"
-                className={`flex flex-col items-center min-w-0 h-auto p-1 gap-0 ${
+                className={`flex min-h-11 flex-1 flex-col items-center gap-1 rounded-lg px-2 py-1.5 leading-none ${
                   step.id === currentStep
-                    ? 'text-indigo-600 dark:text-indigo-400'
+                    ? 'bg-accent-soft text-accent'
                     : step.id < currentStep
                       ? 'text-theme-muted'
                       : 'text-theme-subtle'
@@ -960,13 +960,13 @@ export function RegisterPage() {
                 <div
                   className={`w-2.5 h-2.5 rounded-full ${
                     step.id === currentStep
-                      ? 'bg-indigo-600 dark:bg-indigo-400'
+                      ? 'bg-accent'
                       : step.id < currentStep
                         ? 'bg-emerald-500'
                         : 'bg-theme-elevated'
                   }`}
                 />
-                <span className="text-[10px] mt-1 hidden xs:block">{getStepLabel(step.id)}</span>
+                <span className="text-[10px] leading-none">{getStepLabel(step.id)}</span>
               </Button>
             ))}
           </div>
