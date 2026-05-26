@@ -162,14 +162,13 @@ export default function BrokerConfiguration() {
             <Button
               as={Link}
               to={tenantPath('/broker')}
-              variant="flat"
+              variant="tertiary"
               startContent={<ArrowLeft className="w-4 h-4" />}
               size="sm"
             >
               {t('configuration.back')}
             </Button>
             <Button
-              color="primary"
               startContent={<Save className="w-4 h-4" />}
               onPress={handleSave}
               isLoading={saving}
@@ -182,12 +181,12 @@ export default function BrokerConfiguration() {
       />
 
       {!isAdminTier && (
-        <Card shadow="sm" className="border border-warning-200 bg-warning-50/60">
+        <Card className="border border-warning/30 bg-warning/10">
           <CardBody className="py-3">
-            <p className="text-sm font-medium text-warning-700">
+            <p className="text-sm font-medium text-warning">
               {t('configuration.limited_access_title')}
             </p>
-            <p className="text-sm text-default-600">
+            <p className="text-sm text-muted">
               {t('configuration.limited_access_body')}
             </p>
           </CardBody>
@@ -195,7 +194,7 @@ export default function BrokerConfiguration() {
       )}
 
       {/* Messaging Settings */}
-      <Card shadow="sm">
+      <Card>
         <CardHeader>
           <h3 className="text-lg font-semibold">{t('configuration.section_messaging')}</h3>
         </CardHeader>
@@ -204,7 +203,7 @@ export default function BrokerConfiguration() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_broker_messaging_enabled_label')}</p>
-              <p className="text-sm text-default-500">{t('configuration.field_broker_messaging_enabled_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_broker_messaging_enabled_help')}</p>
             </div>
             <Switch
               isSelected={config.broker_messaging_enabled}
@@ -216,7 +215,7 @@ export default function BrokerConfiguration() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_broker_copy_all_messages_label')}</p>
-              <p className="text-sm text-default-500">{t('configuration.field_broker_copy_all_messages_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_broker_copy_all_messages_help')}</p>
             </div>
             <Switch
               isSelected={config.broker_copy_all_messages}
@@ -228,7 +227,7 @@ export default function BrokerConfiguration() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_broker_copy_threshold_hours_label')}</p>
-              <p className="text-sm text-default-500">{t('configuration.field_broker_copy_threshold_hours_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_broker_copy_threshold_hours_help')}</p>
             </div>
             <Input
               type="number"
@@ -245,7 +244,7 @@ export default function BrokerConfiguration() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_new_member_monitoring_days_label')}</p>
-              <p className="text-sm text-default-500">{t('configuration.field_new_member_monitoring_days_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_new_member_monitoring_days_help')}</p>
             </div>
             <Input
               type="number"
@@ -262,7 +261,7 @@ export default function BrokerConfiguration() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_require_exchange_for_listings_label')}</p>
-              <p className="text-sm text-default-500">{t('configuration.field_require_exchange_for_listings_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_require_exchange_for_listings_help')}</p>
             </div>
             <Switch
               isSelected={config.require_exchange_for_listings}
@@ -274,7 +273,7 @@ export default function BrokerConfiguration() {
       </Card>
 
       {/* Risk Tagging Settings */}
-      <Card shadow="sm">
+      <Card>
         <CardHeader>
           <h3 className="text-lg font-semibold">{t('configuration.section_risk_tagging')}</h3>
         </CardHeader>
@@ -283,7 +282,7 @@ export default function BrokerConfiguration() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_risk_tagging_enabled_label')}</p>
-              <p className="text-sm text-default-500">{t('configuration.field_risk_tagging_enabled_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_risk_tagging_enabled_help')}</p>
             </div>
             <Switch
               isSelected={config.risk_tagging_enabled}
@@ -295,7 +294,7 @@ export default function BrokerConfiguration() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_auto_flag_high_risk_label')}</p>
-              <p className="text-sm text-default-500">{t('configuration.field_auto_flag_high_risk_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_auto_flag_high_risk_help')}</p>
             </div>
             <Switch
               isSelected={config.auto_flag_high_risk}
@@ -307,7 +306,7 @@ export default function BrokerConfiguration() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_require_approval_high_risk_label')}</p>
-              <p className="text-sm text-default-500">{t('configuration.field_require_approval_high_risk_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_require_approval_high_risk_help')}</p>
             </div>
             <Switch
               isSelected={config.require_approval_high_risk}
@@ -319,7 +318,7 @@ export default function BrokerConfiguration() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_notify_on_high_risk_match_label')}</p>
-              <p className="text-sm text-default-500">{t('configuration.field_notify_on_high_risk_match_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_notify_on_high_risk_match_help')}</p>
             </div>
             <Switch
               isSelected={config.notify_on_high_risk_match}
@@ -331,7 +330,7 @@ export default function BrokerConfiguration() {
       </Card>
 
       {/* Exchange Workflow Settings */}
-      <Card shadow="sm">
+      <Card>
         <CardHeader>
           <h3 className="text-lg font-semibold">{t('configuration.section_exchange_workflow')}</h3>
         </CardHeader>
@@ -340,7 +339,7 @@ export default function BrokerConfiguration() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_broker_approval_required_label')}</p>
-              <p className="text-sm text-default-500">{t('configuration.field_broker_approval_required_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_broker_approval_required_help')}</p>
             </div>
             <Switch
               isSelected={config.broker_approval_required}
@@ -352,7 +351,7 @@ export default function BrokerConfiguration() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_auto_approve_low_risk_label')}</p>
-              <p className="text-sm text-default-500">{t('configuration.field_auto_approve_low_risk_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_auto_approve_low_risk_help')}</p>
             </div>
             <Switch
               isSelected={config.auto_approve_low_risk}
@@ -364,7 +363,7 @@ export default function BrokerConfiguration() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_exchange_timeout_days_label')}</p>
-              <p className="text-sm text-default-500">{t('configuration.field_exchange_timeout_days_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_exchange_timeout_days_help')}</p>
             </div>
             <Input
               type="number"
@@ -381,7 +380,7 @@ export default function BrokerConfiguration() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_max_hours_without_approval_label')}</p>
-              <p className="text-sm text-default-500">{t('configuration.field_max_hours_without_approval_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_max_hours_without_approval_help')}</p>
             </div>
             <Input
               type="number"
@@ -400,7 +399,7 @@ export default function BrokerConfiguration() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_confirmation_deadline_hours_label')}</p>
-              <p className="text-sm text-default-500">{t('configuration.field_confirmation_deadline_hours_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_confirmation_deadline_hours_help')}</p>
             </div>
             <Input
               type="number"
@@ -417,7 +416,7 @@ export default function BrokerConfiguration() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_expiry_hours_label')}</p>
-              <p className="text-sm text-default-500">{t('configuration.field_expiry_hours_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_expiry_hours_help')}</p>
             </div>
             <Input
               type="number"
@@ -434,7 +433,7 @@ export default function BrokerConfiguration() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_allow_hour_adjustment_label')}</p>
-              <p className="text-sm text-default-500">{t('configuration.field_allow_hour_adjustment_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_allow_hour_adjustment_help')}</p>
             </div>
             <Switch
               isSelected={config.allow_hour_adjustment}
@@ -447,7 +446,7 @@ export default function BrokerConfiguration() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium">{t('configuration.field_max_hour_variance_percent_label')}</p>
-                  <p className="text-sm text-default-500">{t('configuration.field_max_hour_variance_percent_help')}</p>
+                  <p className="text-sm text-muted">{t('configuration.field_max_hour_variance_percent_help')}</p>
                 </div>
                 <Input
                   type="number"
@@ -466,7 +465,7 @@ export default function BrokerConfiguration() {
       </Card>
 
       {/* Broker Visibility Settings */}
-      <Card shadow="sm">
+      <Card>
         <CardHeader>
           <h3 className="text-lg font-semibold">{t('configuration.section_broker_visibility')}</h3>
         </CardHeader>
@@ -475,7 +474,7 @@ export default function BrokerConfiguration() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_broker_visible_to_members_label')}</p>
-              <p className="text-sm text-default-500">{t('configuration.field_broker_visible_to_members_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_broker_visible_to_members_help')}</p>
             </div>
             <Switch
               isSelected={config.broker_visible_to_members}
@@ -486,7 +485,7 @@ export default function BrokerConfiguration() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_show_broker_name_label')}</p>
-              <p className="text-sm text-default-500">{t('configuration.field_show_broker_name_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_show_broker_name_help')}</p>
             </div>
             <Switch
               isSelected={config.show_broker_name}
@@ -497,7 +496,7 @@ export default function BrokerConfiguration() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_broker_contact_email_label')}</p>
-              <p className="text-sm text-default-500">{t('configuration.field_broker_contact_email_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_broker_contact_email_help')}</p>
             </div>
             <Input
               type="email"
@@ -513,7 +512,7 @@ export default function BrokerConfiguration() {
       </Card>
 
       {/* Message Copy Rules */}
-      <Card shadow="sm">
+      <Card>
         <CardHeader>
           <h3 className="text-lg font-semibold">{t('configuration.section_message_copy_rules')}</h3>
         </CardHeader>
@@ -522,7 +521,7 @@ export default function BrokerConfiguration() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_copy_first_contact_label')}</p>
-              <p className="text-sm text-default-500">{t('configuration.field_copy_first_contact_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_copy_first_contact_help')}</p>
             </div>
             <Switch
               isSelected={config.copy_first_contact}
@@ -533,7 +532,7 @@ export default function BrokerConfiguration() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_copy_new_member_messages_label')}</p>
-              <p className="text-sm text-default-500">{t('configuration.field_copy_new_member_messages_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_copy_new_member_messages_help')}</p>
             </div>
             <Switch
               isSelected={config.copy_new_member_messages}
@@ -544,7 +543,7 @@ export default function BrokerConfiguration() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_copy_high_risk_listing_messages_label')}</p>
-              <p className="text-sm text-default-500">{t('configuration.field_copy_high_risk_listing_messages_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_copy_high_risk_listing_messages_help')}</p>
             </div>
             <Switch
               isSelected={config.copy_high_risk_listing_messages}
@@ -555,7 +554,7 @@ export default function BrokerConfiguration() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_random_sample_percentage_label')}</p>
-              <p className="text-sm text-default-500">{t('configuration.field_random_sample_percentage_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_random_sample_percentage_help')}</p>
             </div>
             <Input
               type="number"
@@ -572,7 +571,7 @@ export default function BrokerConfiguration() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">{t('configuration.field_retention_days_label')}</p>
-              <p className="text-sm text-default-500">{t('configuration.field_retention_days_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_retention_days_help')}</p>
             </div>
             <Input
               type="number"
@@ -589,7 +588,7 @@ export default function BrokerConfiguration() {
       </Card>
 
       {/* Compliance & Safeguarding */}
-      <Card shadow="sm">
+      <Card>
         <CardHeader>
           <h3 className="text-lg font-semibold">{t('configuration.section_compliance_safeguarding')}</h3>
         </CardHeader>
@@ -598,7 +597,7 @@ export default function BrokerConfiguration() {
           <div className="flex justify-between items-center">
             <div>
               <p className="font-medium">{t('configuration.field_vetting_enabled_label')}</p>
-              <p className="text-sm text-default-400">{t('configuration.field_vetting_enabled_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_vetting_enabled_help')}</p>
             </div>
             <Switch
               isSelected={config.vetting_enabled}
@@ -610,7 +609,7 @@ export default function BrokerConfiguration() {
           <div className="flex justify-between items-center">
             <div>
               <p className="font-medium">{t('configuration.field_insurance_enabled_label')}</p>
-              <p className="text-sm text-default-400">{t('configuration.field_insurance_enabled_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_insurance_enabled_help')}</p>
             </div>
             <Switch
               isSelected={config.insurance_enabled}
@@ -623,7 +622,7 @@ export default function BrokerConfiguration() {
           <div className="flex justify-between items-center">
             <div>
               <p className="font-medium">{t('configuration.field_enforce_vetting_on_exchanges_label')}</p>
-              <p className="text-sm text-default-400">{t('configuration.field_enforce_vetting_on_exchanges_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_enforce_vetting_on_exchanges_help')}</p>
             </div>
             <Switch
               isSelected={config.enforce_vetting_on_exchanges}
@@ -635,7 +634,7 @@ export default function BrokerConfiguration() {
           <div className="flex justify-between items-center">
             <div>
               <p className="font-medium">{t('configuration.field_enforce_insurance_on_exchanges_label')}</p>
-              <p className="text-sm text-default-400">{t('configuration.field_enforce_insurance_on_exchanges_help')}</p>
+              <p className="text-sm text-muted">{t('configuration.field_enforce_insurance_on_exchanges_help')}</p>
             </div>
             <Switch
               isSelected={config.enforce_insurance_on_exchanges}
@@ -646,10 +645,10 @@ export default function BrokerConfiguration() {
           </div>
           <Separator />
           <div className="flex items-center gap-3">
-            <p className="text-sm text-default-600">{t('configuration.field_vetting_expiry_warning_days_label')}:</p>
+            <p className="text-sm text-muted">{t('configuration.field_vetting_expiry_warning_days_label')}:</p>
             <Input
               type="number"
-              variant="bordered"
+              variant="secondary"
               aria-label={t('configuration.field_vetting_expiry_warning_days_aria')}
               value={String(config.vetting_expiry_warning_days)}
               onValueChange={v => updateConfig('vetting_expiry_warning_days', parseInt(v) || 30)}
@@ -661,10 +660,10 @@ export default function BrokerConfiguration() {
             />
           </div>
           <div className="flex items-center gap-3">
-            <p className="text-sm text-default-600">{t('configuration.field_insurance_expiry_warning_days_label')}:</p>
+            <p className="text-sm text-muted">{t('configuration.field_insurance_expiry_warning_days_label')}:</p>
             <Input
               type="number"
-              variant="bordered"
+              variant="secondary"
               aria-label={t('configuration.field_insurance_expiry_warning_days_aria')}
               value={String(config.insurance_expiry_warning_days)}
               onValueChange={v => updateConfig('insurance_expiry_warning_days', parseInt(v) || 30)}
