@@ -1,5 +1,4 @@
-import { Card } from '@heroui/react';
-import { Chip } from '@/components/ui';
+import { Card, Chip } from '@heroui/react';
 import { type ReactNode } from 'react';
 import { Separator } from '@heroui/react';
 import { useTranslation } from 'react-i18next';
@@ -43,13 +42,13 @@ type Maturity = 'ga' | 'beta' | 'preview';
 function MaturityChip({ level }: { level: Maturity }) {
   const { t } = useTranslation('public');
   if (level === 'ga') return null;
-  const config: Record<Exclude<Maturity, 'ga'>, { color: 'warning' | 'secondary'; label: string }> = {
+  const config: Record<Exclude<Maturity, 'ga'>, { color: 'warning' | 'accent'; label: string }> = {
     beta: { color: 'warning', label: t('features_page.chips.beta') },
-    preview: { color: 'secondary', label: t('features_page.chips.preview') },
+    preview: { color: 'accent', label: t('features_page.chips.preview') },
   };
   const { color, label } = config[level];
   return (
-    <Chip color={color} variant="flat" size="sm" className="ms-2 align-middle">
+    <Chip color={color} variant="tertiary" size="sm" className="ms-2 align-middle">
       {label}
     </Chip>
   );
@@ -454,7 +453,7 @@ export function FeaturesPage() {
           <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
             {t('features_page.heading')}
           </h1>
-          <Chip color="success" variant="flat" size="sm">
+          <Chip color="success" variant="tertiary" size="sm">
             {t('release_stage')}
           </Chip>
         </div>
@@ -471,13 +470,13 @@ export function FeaturesPage() {
           </p>
           <ul className="space-y-1.5 list-none">
             <li className="flex items-start gap-2">
-              <Chip color="success" variant="flat" size="sm" className="shrink-0">GA</Chip>
+              <Chip color="success" variant="tertiary" size="sm" className="shrink-0">GA</Chip>
               <span className="text-foreground-600">
                 {t('features_page.maturity_ga')}
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <Chip color="warning" variant="flat" size="sm" className="shrink-0">
+              <Chip color="warning" variant="tertiary" size="sm" className="shrink-0">
                 {t('features_page.chips.beta')}
               </Chip>
               <span className="text-foreground-600">
@@ -485,7 +484,7 @@ export function FeaturesPage() {
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <Chip color="secondary" variant="flat" size="sm" className="shrink-0">
+              <Chip color="accent" variant="tertiary" size="sm" className="shrink-0">
                 {t('features_page.chips.preview')}
               </Chip>
               <span className="text-foreground-600">

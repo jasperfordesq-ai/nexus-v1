@@ -1,5 +1,5 @@
-import { Card } from '@heroui/react';
-import { Button, Chip } from '@/components/ui';
+import { Card, Chip } from '@heroui/react';
+import { Button } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -95,7 +95,8 @@ export default function RegionalAnalyticsLandingPage() {
     <div className="max-w-6xl mx-auto px-6 py-12 space-y-16">
       <PageMeta title={t('regional_analytics.page_title')} description={t('regional_analytics.meta_description')} />
       <section className="text-center space-y-4">
-        <Chip color="primary" variant="flat" startContent={<ShieldCheck size={14} className="ml-1" aria-hidden="true" />}>
+        <Chip color="accent" variant="tertiary">
+          <ShieldCheck size={14} className="ml-1" aria-hidden="true" />
           {t('regional_analytics.privacy_badge')}
         </Chip>
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
@@ -148,7 +149,7 @@ export default function RegionalAnalyticsLandingPage() {
             return (
               <Card key={tier.key} className={tier.key === 'pro' ? 'border-2 border-accent0 shadow-lg' : 'shadow-sm'}>
                 <Card.Content className="p-6">
-                  <Chip size="sm" variant="flat" color={tier.key === 'pro' ? 'primary' : 'default'} className="mb-3">
+                  <Chip size="sm" variant="tertiary" color={tier.key === 'pro' ? 'accent' : 'default'} className="mb-3">
                     {tierLabel}
                   </Chip>
                   <div className="text-2xl font-bold mb-1">{tier.price}</div>
