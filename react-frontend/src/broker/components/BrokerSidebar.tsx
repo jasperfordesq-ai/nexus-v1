@@ -31,7 +31,8 @@ import HelpCircle from 'lucide-react/icons/circle-help';
 import PanelLeftClose from 'lucide-react/icons/panel-left-close';
 import PanelLeft from 'lucide-react/icons/panel-left';
 import Settings from 'lucide-react/icons/settings';
-import { Button, Chip, Tooltip } from '@/components/ui';
+import { Chip } from '@heroui/react';
+import { Button, Tooltip } from '@/components/ui';
 
 export interface BrokerBadgeCounts {
   pending_members: number;
@@ -154,7 +155,7 @@ export function BrokerSidebar({ collapsed, onToggle, badges }: BrokerSidebarProp
             <>
               <span className="flex-1 truncate">{item.label}</span>
               {badgeCount > 0 && (
-                <Chip size="sm" color={active ? 'primary' : 'danger'} variant="flat" className="min-w-[24px] h-5 text-xs">
+                <Chip size="sm" color={active ? 'accent' : 'danger'} variant="tertiary" className="min-w-[24px] h-5 text-xs">
                   {badgeCount > 99 ? '99+' : badgeCount}
                 </Chip>
               )}

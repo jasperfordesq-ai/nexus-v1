@@ -1,8 +1,8 @@
-import { Card, CardBody, CardHeader, Button, Chip, Spinner } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Spinner } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Separator } from '@heroui/react';
+import { Chip, Separator } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import User from 'lucide-react/icons/user';
 import Shield from 'lucide-react/icons/shield';
@@ -25,7 +25,7 @@ import { formatServerDateTime } from '@/lib/serverTime';
  */
 
 
-const STATUS_COLORS: Record<string, 'warning' | 'success' | 'danger' | 'default' | 'primary'> = {
+const STATUS_COLORS: Record<string, 'warning' | 'success' | 'danger' | 'default'> = {
   pending_broker: 'warning',
   accepted: 'success',
   cancelled: 'danger',
@@ -121,7 +121,7 @@ export default function ExchangeDetail() {
         <CardBody className="flex flex-row items-center justify-between">
           <div className="space-y-1">
             <p className="text-sm text-default-500">{t('exchanges.detail_status_label')}</p>
-            <Chip color={statusColor} variant="flat" size="sm">
+            <Chip color={statusColor} variant="tertiary" size="sm">
               {t(`status.${exchange.status}`)}
             </Chip>
           </div>
@@ -180,7 +180,7 @@ export default function ExchangeDetail() {
             <div className="flex items-center gap-3">
               <Chip
                 color={risk_tag.risk_level === 'critical' || risk_tag.risk_level === 'high' ? 'danger' : 'warning'}
-                variant="flat"
+                variant="tertiary"
                 size="sm"
               >
                 {t(`risk_tags.level_${risk_tag.risk_level}`)}
@@ -192,13 +192,22 @@ export default function ExchangeDetail() {
             )}
             <div className="flex gap-3 mt-3">
               {risk_tag.requires_approval && (
-                <Chip size="sm" variant="dot" color="warning">{t('exchanges.detail_approval_required')}</Chip>
+                <Chip size="sm" variant="soft" color="warning">
+                  <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
+                  <Chip.Label>{t('exchanges.detail_approval_required')}</Chip.Label>
+                </Chip>
               )}
               {risk_tag.insurance_required && (
-                <Chip size="sm" variant="dot" color="warning">{t('exchanges.detail_insurance_required')}</Chip>
+                <Chip size="sm" variant="soft" color="warning">
+                  <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
+                  <Chip.Label>{t('exchanges.detail_insurance_required')}</Chip.Label>
+                </Chip>
               )}
               {risk_tag.dbs_required && (
-                <Chip size="sm" variant="dot" color="warning">{t('exchanges.detail_dbs_required')}</Chip>
+                <Chip size="sm" variant="soft" color="warning">
+                  <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
+                  <Chip.Label>{t('exchanges.detail_dbs_required')}</Chip.Label>
+                </Chip>
               )}
             </div>
           </CardBody>

@@ -23,7 +23,8 @@ import { formatServerDate } from '@/lib/serverTime';
 import { adminBroker } from '@/admin/api/adminApi';
 import { DataTable, PageHeader, type Column } from '@/admin/components';
 import type { BrokerArchive } from '@/admin/api/types';
-import { Button, Chip, Input, Tabs, Tab } from '@/components/ui';
+import { Chip } from '@heroui/react';
+import { Button, Input, Tabs, Tab } from '@/components/ui';
 
 export function ReviewArchive() {
   const { t } = useTranslation('broker');
@@ -109,7 +110,7 @@ export function ReviewArchive() {
       key: 'copy_reason',
       label: t('archives.col_copy_reason'),
       render: (item) => (
-        <Chip size="sm" variant="flat" color="default">
+        <Chip size="sm" variant="tertiary" color="default">
           {t(`archives.copy_reason_${item.copy_reason}`)}
         </Chip>
       ),
@@ -122,10 +123,10 @@ export function ReviewArchive() {
         return (
           <Chip
             size="sm"
-            variant="flat"
+            variant="tertiary"
             color={isApproved ? 'success' : 'danger'}
-            startContent={!isApproved ? <Flag size={12} /> : undefined}
           >
+            {!isApproved && <Flag size={12} aria-hidden="true" />}
             {t(`archives.decision_${item.decision}`)}
           </Chip>
         );

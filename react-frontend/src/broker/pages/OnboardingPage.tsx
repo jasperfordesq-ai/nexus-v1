@@ -1,4 +1,5 @@
-import { Card, CardBody, CardHeader, Chip, Button, Spinner, Progress, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Spinner, Progress, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem } from '@/components/ui';
+import { Chip } from '@heroui/react';
 import {
   useEffect,
   useState,
@@ -255,7 +256,7 @@ export default function OnboardingPage() {
                       <div className="flex items-center justify-center gap-2 py-1">
                         <ArrowDown size={14} className="text-default-300" />
                         {conversionRate !== null && (
-                          <Chip size="sm" variant="flat" color="default">
+                          <Chip size="sm" variant="tertiary" color="default">
                             {conversionRate}%
                           </Chip>
                         )}

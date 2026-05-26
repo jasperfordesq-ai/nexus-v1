@@ -1,8 +1,8 @@
-import { Card, CardBody, CardHeader, Button, Spinner, Chip } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Spinner } from '@/components/ui';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Separator } from '@heroui/react';
+import { Chip, Separator } from '@heroui/react';
 import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
 import MessageSquareWarning from 'lucide-react/icons/message-square-warning';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
@@ -322,7 +322,7 @@ export function BrokerDashboard() {
   );
 }
 
-type ChipColor = 'success' | 'danger' | 'primary' | 'warning' | 'secondary' | 'default';
+type ChipColor = 'success' | 'danger' | 'accent' | 'warning' | 'default';
 
 // Action keys MUST match the action strings emitted by the backend dashboard
 // query in AdminBrokerController::dashboard (UNION of activity_log +
@@ -332,27 +332,27 @@ const actionChipColorMap: Record<string, ChipColor> = {
   // org_audit_log entries (broker controller writes via AuditLogService::log)
   exchange_approved: 'success',
   exchange_rejected: 'danger',
-  broker_message_reviewed: 'primary',
+  broker_message_reviewed: 'accent',
   broker_message_approved: 'success',
   broker_message_flagged: 'warning',
   listing_risk_tag_created: 'warning',
   listing_risk_tag_updated: 'warning',
   listing_risk_tag_removed: 'default',
-  user_monitoring_added: 'secondary',
+  user_monitoring_added: 'default',
   user_monitoring_removed: 'default',
-  broker_config_updated: 'primary',
+  broker_config_updated: 'accent',
   // activity_log entries (vetting/insurance controllers write via ActivityLog::log)
   vetting_record_verified: 'success',
   vetting_record_rejected: 'danger',
-  vetting_record_created: 'primary',
-  vetting_record_updated: 'primary',
+  vetting_record_created: 'accent',
+  vetting_record_updated: 'accent',
   vetting_record_deleted: 'default',
-  vetting_document_uploaded: 'primary',
+  vetting_document_uploaded: 'accent',
   vetting_bulk_verify: 'success',
   vetting_bulk_reject: 'danger',
   vetting_bulk_delete: 'default',
-  insurance_cert_created: 'primary',
-  insurance_cert_updated: 'primary',
+  insurance_cert_created: 'accent',
+  insurance_cert_updated: 'accent',
   insurance_cert_verified: 'success',
   insurance_cert_rejected: 'danger',
   insurance_cert_deleted: 'default',
@@ -398,7 +398,7 @@ function ActivityChip({ actionType }: { actionType: string }) {
     ? t(`dashboard.activity.chip_${suffix}`)
     : actionType.replace(/_/g, ' ');
   return (
-    <Chip size="sm" variant="flat" color={color} className="shrink-0">
+    <Chip size="sm" variant="tertiary" color={color} className="shrink-0">
       {label}
     </Chip>
   );

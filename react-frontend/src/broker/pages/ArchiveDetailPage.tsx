@@ -1,9 +1,9 @@
-import { Card, CardBody, CardHeader, Button, Chip, Spinner } from '@/components/ui';
+import { Card, CardBody, CardHeader, Button, Spinner } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ScrollShadow } from '@/components/ui';
-import { Separator } from '@heroui/react';
+import { Chip, Separator } from '@heroui/react';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Lock from 'lucide-react/icons/lock';
 import Flag from 'lucide-react/icons/flag';
@@ -112,12 +112,12 @@ export function ArchiveDetail() {
 
       {/* Read-only compliance badge */}
       <Chip
-        color="secondary"
-        variant="flat"
+        color="default"
+        variant="tertiary"
         size="lg"
-        startContent={<Lock aria-hidden="true" size={14} />}
       >
-        {t('archives.read_only_badge')}
+        <Lock aria-hidden="true" size={14} />
+        <Chip.Label>{t('archives.read_only_badge')}</Chip.Label>
       </Chip>
 
       {/* Decision Card */}
@@ -137,7 +137,7 @@ export function ArchiveDetail() {
               <p className="text-xs text-default-400">{t('archives.label_decision')}</p>
               <Chip
                 size="sm"
-                variant="flat"
+                variant="tertiary"
                 color={isApproved ? 'success' : 'danger'}
                 className="mt-1"
               >
@@ -172,7 +172,7 @@ export function ArchiveDetail() {
                   <span className="text-xs text-danger font-medium">{t('archives.label_severity')}</span>
                   <Chip
                     size="sm"
-                    variant="flat"
+                    variant="tertiary"
                     color="danger"
                   >
                     {t(`archives.severity_${data.flag_severity}`)}
@@ -219,7 +219,7 @@ export function ArchiveDetail() {
           <div className="flex flex-wrap gap-4">
             <div>
               <p className="text-xs text-default-400">{t('archives.label_copy_reason')}</p>
-              <Chip size="sm" variant="flat" color="default" className="mt-1">
+              <Chip size="sm" variant="tertiary" color="default" className="mt-1">
                 {t(`archives.copy_reason_${data.copy_reason}`)}
               </Chip>
             </div>
@@ -244,7 +244,7 @@ export function ArchiveDetail() {
         <CardHeader className="flex items-center gap-2">
           <MessageSquare aria-hidden="true" size={18} />
           <span className="font-semibold">{t('archives.section_conversation_snapshot')}</span>
-          <Chip size="sm" variant="flat" color="default" className="ml-auto">
+          <Chip size="sm" variant="tertiary" color="default" className="ml-auto">
             {t('archives.messages_count', { count: data.conversation_snapshot.length })}
           </Chip>
         </CardHeader>
