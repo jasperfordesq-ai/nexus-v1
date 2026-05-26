@@ -1,4 +1,5 @@
-import { CardBody, Card, Chip, Spinner } from '@/components/ui';
+import { Card } from '@heroui/react';
+import { Chip, Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -88,7 +89,7 @@ export function ChangelogPage() {
 
       {/* Body */}
       <Card>
-        <CardBody className="py-6 px-4 sm:px-6">
+        <Card.Content className="py-6 px-4 sm:px-6">
           {state.status === 'loading' && (
             <div className="flex items-center justify-center py-12 gap-3 text-foreground-500">
               <Spinner size="sm" />
@@ -104,7 +105,7 @@ export function ChangelogPage() {
             </div>
           )}
           {state.status === 'ok' && <MarkdownRenderer content={state.content} />}
-        </CardBody>
+        </Card.Content>
       </Card>
     </div>
   );

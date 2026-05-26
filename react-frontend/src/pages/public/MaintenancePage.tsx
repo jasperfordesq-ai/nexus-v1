@@ -1,4 +1,5 @@
-import { Card, CardBody, Button } from '@/components/ui';
+import { Card } from '@heroui/react';
+import { Button } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -37,7 +38,7 @@ export function MaintenancePage() {
         <meta name="prerender-header" content="Retry-After: 600" />
       </Helmet>
       <Card className="max-w-lg w-full">
-        <CardBody className="text-center py-12 px-6 gap-6">
+        <Card.Content className="text-center py-12 px-6 gap-6">
           <div className="flex justify-center">
             <div className="w-20 h-20 bg-linear-to-br from-accent-soft0 to-default rounded-full flex items-center justify-center">
               <Wrench size={40} className="text-white" />
@@ -83,7 +84,7 @@ export function MaintenancePage() {
               {t('maintenance.admin_login')}
             </Button>
           </div>
-        </CardBody>
+        </Card.Content>
       </Card>
     </div>
   );

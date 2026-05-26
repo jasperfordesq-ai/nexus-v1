@@ -1,4 +1,5 @@
-import { CardBody, Card, Button } from '@/components/ui';
+import { Card } from '@heroui/react';
+import { Button } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -69,7 +70,7 @@ export default function NewsletterUnsubscribePage() {
     <div className="min-h-screen flex items-center justify-center bg-surface-secondary px-4">
       <PageMeta title={t('page_meta.newsletter_unsubscribe.title')} noIndex />
       <Card className="w-full max-w-md">
-      <CardBody className="p-8 text-center">
+      <Card.Content className="p-8 text-center">
         <div className="mb-6">
           <Mail className="mx-auto text-default-400" size={40} />
         </div>
@@ -147,7 +148,7 @@ export default function NewsletterUnsubscribePage() {
             </Button>
           </>
         )}
-      </CardBody>
+      </Card.Content>
       </Card>
     </div>
   );

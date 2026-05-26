@@ -1,4 +1,5 @@
-import { CardBody, Card, Button, Spinner } from '@/components/ui';
+import { Card } from '@heroui/react';
+import { Button, Spinner } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -88,7 +89,7 @@ export function SubscriptionReturnPage() {
         noIndex
       />
       <Card className="border border-divider/70 bg-surface/95 shadow-lg shadow-accent/5">
-        <CardBody className="text-center py-10 flex flex-col items-center gap-4">
+        <Card.Content className="text-center py-10 flex flex-col items-center gap-4">
           {status === 'pending' && (
             <>
               <Spinner size="lg" />
@@ -151,7 +152,7 @@ export function SubscriptionReturnPage() {
               </Button>
             </>
           )}
-        </CardBody>
+        </Card.Content>
       </Card>
     </div>
   );

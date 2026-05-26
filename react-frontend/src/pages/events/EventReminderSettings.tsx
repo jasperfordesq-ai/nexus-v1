@@ -1,4 +1,4 @@
-import { CardBody, Card } from '@/components/ui';
+import { Card } from '@heroui/react';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -33,7 +33,7 @@ export function EventReminderSettings() {
         animate={{ opacity: 1, y: 0 }}
       >
       <Card className="bg-theme-card border border-theme-default shadow-sm">
-        <CardBody className="p-6 text-center space-y-4">
+        <Card.Content className="p-6 text-center space-y-4">
           <div className="flex justify-center">
             <div className="relative p-3 rounded-2xl bg-amber-500/10">
               <Bell className="w-8 h-8 text-[var(--color-warning)]" aria-hidden="true" />
@@ -57,7 +57,7 @@ export function EventReminderSettings() {
             <Clock className="w-3.5 h-3.5" aria-hidden="true" />
             {t('reminder.coming_soon_badge')}
           </div>
-        </CardBody>
+        </Card.Content>
       </Card>
       </motion.div>
     </>
