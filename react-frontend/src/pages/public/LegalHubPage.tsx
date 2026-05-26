@@ -210,7 +210,7 @@ export function LegalHubPage() {
               </p>
               <Link to={tenantPath(doc.path)}>
                 <Button
-                  variant="flat"
+                  variant="tertiary"
                   className="w-full bg-theme-elevated text-theme-primary"
                   endContent={<ArrowRight className="w-4 h-4" aria-hidden="true" />}
                 >
@@ -241,7 +241,7 @@ export function LegalHubPage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <Link to={tenantPath('/platform/terms')}>
               <Button
-                variant="flat"
+                variant="tertiary"
                 className="w-full bg-slate-500/10 text-theme-primary justify-start gap-2"
                 startContent={<FileText className="w-4 h-4 text-slate-500" aria-hidden="true" />}
                 endContent={<ExternalLink className="w-3 h-3 text-theme-subtle" aria-hidden="true" />}
@@ -251,7 +251,7 @@ export function LegalHubPage() {
             </Link>
             <Link to={tenantPath('/platform/privacy')}>
               <Button
-                variant="flat"
+                variant="tertiary"
                 className="w-full bg-slate-500/10 text-theme-primary justify-start gap-2"
                 startContent={<Shield className="w-4 h-4 text-slate-500" aria-hidden="true" />}
                 endContent={<ExternalLink className="w-3 h-3 text-theme-subtle" aria-hidden="true" />}
@@ -261,7 +261,7 @@ export function LegalHubPage() {
             </Link>
             <Link to={tenantPath('/platform/disclaimer')}>
               <Button
-                variant="flat"
+                variant="tertiary"
                 className="w-full bg-slate-500/10 text-theme-primary justify-start gap-2"
                 startContent={<AlertTriangle className="w-4 h-4 text-slate-500" aria-hidden="true" />}
                 endContent={<ExternalLink className="w-3 h-3 text-theme-subtle" aria-hidden="true" />}
@@ -298,7 +298,7 @@ export function LegalHubPage() {
               </Link>
               <Link to={tenantPath('/privacy')}>
                 <Button
-                  variant="flat"
+                  variant="tertiary"
                   className="bg-theme-elevated text-theme-primary"
                   startContent={<Shield className="w-4 h-4" aria-hidden="true" />}
                 >

@@ -110,7 +110,7 @@ export function CustomPage() {
             {t('custom_page.not_found_description')}
           </p>
           <Link to={tenantPath('/')}>
-            <Button color="primary" startContent={<ArrowLeft size={16} />}>
+            <Button variant="primary" startContent={<ArrowLeft size={16} />}>
               {t('custom_page.back_to_home')}
             </Button>
           </Link>

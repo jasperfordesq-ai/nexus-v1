@@ -106,10 +106,10 @@ export default function RegionalAnalyticsLandingPage() {
           {t('regional_analytics.hero_subtitle')}
         </p>
         <div className="flex justify-center gap-3 pt-2">
-          <Button as={Link} to={tenantPath(`/contact?subject=${contactSubject}`)} color="primary" size="lg">
+          <Button as={Link} to={tenantPath(`/contact?subject=${contactSubject}`)} variant="primary" size="lg">
             {t('regional_analytics.cta_request_access')}
           </Button>
-          <Button as={Link} to={tenantPath('/about')} variant="flat" size="lg">
+          <Button as={Link} to={tenantPath('/about')} variant="tertiary" size="lg">
             {t('regional_analytics.cta_learn_more')}
           </Button>
         </div>
@@ -123,7 +123,7 @@ export default function RegionalAnalyticsLandingPage() {
           {features.map((feature) => {
             const Icon = feature.icon;
             return (
-              <Card key={feature.title} className="shadow-sm">
+              <Card key={feature.title}>
                 <Card.Content className="flex flex-row gap-4 p-5">
                   <div className="rounded-lg bg-accent-soft dark:bg-accent-soft p-3 h-fit">
                     <Icon size={22} className="text-accent dark:text-accent" aria-hidden="true" />
@@ -147,7 +147,7 @@ export default function RegionalAnalyticsLandingPage() {
           {tiers.map((tier) => {
             const tierLabel = t(`regional_analytics.tiers.${tier.key}.label`);
             return (
-              <Card key={tier.key} className={tier.key === 'pro' ? 'border-2 border-accent0 shadow-lg' : 'shadow-sm'}>
+              <Card key={tier.key} className={tier.key === 'pro' ? 'border-2 border-accent' : undefined}>
                 <Card.Content className="p-6">
                   <Chip size="sm" variant="tertiary" color={tier.key === 'pro' ? 'accent' : 'default'} className="mb-3">
                     {tierLabel}
@@ -157,7 +157,7 @@ export default function RegionalAnalyticsLandingPage() {
                   <ul className="space-y-2 mb-5">
                     {tier.features.map((feature) => (
                       <li key={feature} className="text-sm flex items-start gap-2">
-                        <span className="text-accent0" aria-hidden="true">-</span>
+                        <span className="text-accent" aria-hidden="true">-</span>
                         <span>{feature}</span>
                       </li>
                     ))}
@@ -165,8 +165,7 @@ export default function RegionalAnalyticsLandingPage() {
                   <Button
                     as={Link}
                     to={tenantPath(`/contact?subject=${contactSubject}%20-%20${encodeURIComponent(tierLabel)}`)}
-                    color={tier.key === 'pro' ? 'primary' : 'default'}
-                    variant={tier.key === 'pro' ? 'solid' : 'flat'}
+                    variant={tier.key === 'pro' ? 'primary' : 'secondary'}
                     fullWidth
                     startContent={<Download size={16} aria-hidden="true" />}
                   >

@@ -230,7 +230,7 @@ export function AboutPage() {
                 >
                   <GlassCard className="p-6 h-full text-center relative group hover:scale-[1.02] transition-transform overflow-hidden">
                     {/* Step number */}
-                    <div className="absolute top-2 right-2 w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold shadow-lg">
+                    <div className="absolute top-2 right-2 w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold">
                       {index + 1}
                     </div>
 
@@ -505,7 +505,7 @@ export function AboutPage() {
                     <Link to={tenantPath("/help")}>
                       <Button
                         size="lg"
-                        variant="bordered"
+                        variant="secondary"
                         className="w-full sm:w-auto border-theme-default text-theme-primary hover:bg-theme-hover"
                         startContent={<HelpCircle className="w-5 h-5" aria-hidden="true" />}
                       >
@@ -516,7 +516,7 @@ export function AboutPage() {
                     <Link to={tenantPath("/contact")}>
                       <Button
                         size="lg"
-                        variant="bordered"
+                        variant="secondary"
                         className="w-full sm:w-auto border-theme-default text-theme-primary hover:bg-theme-hover"
                         startContent={<Mail className="w-5 h-5" aria-hidden="true" />}
                       >

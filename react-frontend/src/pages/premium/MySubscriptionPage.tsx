@@ -136,7 +136,7 @@ export function MySubscriptionPage() {
     return (
       <div className="max-w-xl mx-auto px-4 py-12">
         <PageMeta title={t('premium.manage_title')} noIndex />
-        <Card className="border border-default-200 shadow-sm">
+        <Card className="border border-border">
           <CardBody className="text-center py-10 flex flex-col items-center gap-4">
             <Crown size={48} className="text-yellow-500" />
             <h1 className="text-xl font-semibold">
@@ -145,7 +145,7 @@ export function MySubscriptionPage() {
             <p className="text-[var(--color-text-secondary)]">
               {t('premium.no_subscription_body')}
             </p>
-            <Button as={Link} to={tenantPath('/premium')} color="primary">
+            <Button as={Link} to={tenantPath('/premium')} variant="primary">
               {t('premium.view_pricing_cta')}
             </Button>
           </CardBody>
@@ -157,7 +157,7 @@ export function MySubscriptionPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-10">
       <PageMeta title={t('premium.manage_title')} noIndex />
-      <Card className="border border-default-200 shadow-sm">
+      <Card className="border border-border">
         <CardHeader className="flex items-center gap-3">
           <Crown className="text-yellow-500" size={24} />
           <div>
@@ -174,7 +174,7 @@ export function MySubscriptionPage() {
             <span className="text-sm text-[var(--color-text-secondary)]">
               {t('premium.status_label')}:
             </span>
-            <Chip color={statusChipColor(sub.status)} size="sm" variant="flat">
+            <Chip color={statusChipColor(sub.status)} size="sm" variant="soft">
               {t(getStatusKey(sub.status))}
             </Chip>
           </div>
@@ -205,8 +205,7 @@ export function MySubscriptionPage() {
 
           <div className="flex flex-col gap-2 sm:flex-row">
             <Button
-              color="primary"
-              variant="flat"
+              variant="secondary"
               startContent={<ExternalLink size={16} />}
               onPress={openPortal}
               isLoading={actionBusy === 'portal'}
@@ -216,8 +215,7 @@ export function MySubscriptionPage() {
             </Button>
             {!sub.canceled_at && (
               <Button
-                color="danger"
-                variant="flat"
+                variant="danger-soft"
                 onPress={cancel}
                 isLoading={actionBusy === 'cancel'}
                 isDisabled={actionBusy !== null}
@@ -225,7 +223,7 @@ export function MySubscriptionPage() {
                 {t('premium.cancel_subscription')}
               </Button>
             )}
-            <Button as={Link} to={tenantPath('/premium')} variant="light">
+            <Button as={Link} to={tenantPath('/premium')} variant="tertiary">
               {t('premium.change_plan')}
             </Button>
           </div>

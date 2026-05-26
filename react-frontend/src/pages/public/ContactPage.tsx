@@ -138,7 +138,7 @@ export function ContactPage() {
               </p>
               <Link to={tenantPath('/help')}>
                 <Button
-                  variant="flat"
+                  variant="tertiary"
                   className="bg-theme-elevated text-theme-muted"
                   startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
                 >

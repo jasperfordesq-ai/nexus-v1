@@ -80,7 +80,7 @@ export default function DevelopersWebhooksPage() {
       </header>
 
       <section className="mb-8">
-        <Card shadow="sm">
+        <Card>
           <CardBody className="p-5">
             <h2 className="text-lg font-semibold mb-2 text-[var(--color-text)]">
               {t('developers.webhook_events_title')}
@@ -93,7 +93,7 @@ export default function DevelopersWebhooksPage() {
       </section>
 
       <section className="mb-8">
-        <Card shadow="sm">
+        <Card>
           <CardBody className="p-5">
             <h2 className="text-lg font-semibold mb-2 text-[var(--color-text)]">
               {t('developers.webhook_create_title')}
@@ -114,7 +114,7 @@ export default function DevelopersWebhooksPage() {
         </p>
         <Tabs aria-label={t('developers.tabs.verification_examples')}>
           <Tab key="node" title="Node.js">
-            <Card shadow="sm">
+            <Card>
               <CardBody className="p-0">
                 <pre className="text-xs p-4 overflow-x-auto bg-[var(--color-surface-alt)] text-[var(--color-text)]">
                   <code>{NODE_VERIFY}</code>
@@ -123,7 +123,7 @@ export default function DevelopersWebhooksPage() {
             </Card>
           </Tab>
           <Tab key="php" title="PHP">
-            <Card shadow="sm">
+            <Card>
               <CardBody className="p-0">
                 <pre className="text-xs p-4 overflow-x-auto bg-[var(--color-surface-alt)] text-[var(--color-text)]">
                   <code>{PHP_VERIFY}</code>

@@ -246,7 +246,7 @@ export function PilotInquiryPage() {
             <p className="text-theme-muted mb-6">{t('success_followup')}</p>
             <Link to={tenantPath('/')}>
               <Button
-                variant="flat"
+                variant="tertiary"
                 className="bg-theme-elevated text-theme-muted"
                 startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
               >
@@ -491,7 +491,7 @@ export function PilotInquiryPage() {
         <div className="flex items-center justify-between mt-6 gap-3">
           {step > 1 ? (
             <Button
-              variant="flat"
+              variant="tertiary"
               className="bg-theme-elevated text-theme-muted"
               startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
               onPress={() => setStep(s => s - 1)}
@@ -504,7 +504,7 @@ export function PilotInquiryPage() {
 
           {step < TOTAL_STEPS ? (
             <Button
-              color="primary"
+              variant="primary"
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-medium"
               endContent={<ArrowRight className="w-4 h-4" aria-hidden="true" />}
               isDisabled={!canAdvance()}
@@ -514,7 +514,7 @@ export function PilotInquiryPage() {
             </Button>
           ) : (
             <Button
-              color="primary"
+              variant="primary"
               className="bg-gradient-to-r from-indigo-500 to-emerald-600 text-white font-medium"
               isLoading={submitting}
               isDisabled={!canAdvance() || submitting}

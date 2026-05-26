@@ -437,7 +437,7 @@ export function FaqPage() {
 
                   <Accordion
                     selectionMode="multiple"
-                    variant="bordered"
+                    variant="surface"
                     itemClasses={{
                       base: 'border-theme-default/50',
                       title: 'text-theme-primary font-medium text-sm',

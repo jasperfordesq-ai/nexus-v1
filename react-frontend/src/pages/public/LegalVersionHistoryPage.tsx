@@ -264,7 +264,7 @@ export function LegalVersionHistoryPage() {
             <FileText className="w-12 h-12 text-theme-subtle mx-auto mb-3" aria-hidden="true" />
             <p className="text-theme-muted">{t('version_history.no_versions')}</p>
             <Link to={tenantPath(backRoute)} className="mt-4 inline-block">
-              <Button size="sm" variant="flat" className="bg-theme-elevated text-theme-primary">
+              <Button size="sm" variant="tertiary" className="bg-theme-elevated text-theme-primary">
                 {t('version_history.view_current')}
               </Button>
             </Link>
@@ -301,9 +301,9 @@ export function LegalVersionHistoryPage() {
                 <GlassCard className="overflow-hidden">
                   {/* Version header (clickable) */}
                   <Button
-                    variant="light"
+                    variant="ghost"
                     onPress={() => handleToggle(version)}
-                    className="w-full flex items-center gap-3 p-5 text-left hover:bg-[var(--surface-hover)] transition-colors h-auto min-w-0 justify-start rounded-none"
+                    className="w-full min-h-[76px] flex items-center justify-start gap-3 rounded-none p-5 text-left transition-colors hover:bg-[var(--surface-hover)]"
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-1">
@@ -487,7 +487,7 @@ export function LegalVersionHistoryPage() {
       <motion.div variants={itemVariants} className="text-center pt-2">
         <Link to={tenantPath(backRoute)}>
           <Button
-            variant="flat"
+            variant="tertiary"
             className="bg-theme-elevated text-theme-primary"
             startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
           >

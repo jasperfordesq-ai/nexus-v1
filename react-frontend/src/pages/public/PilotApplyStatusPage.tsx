@@ -121,7 +121,7 @@ export function PilotApplyStatusPage() {
           <div className="mt-6">
             <Link to={tenantPath('/')}>
               <Button
-                variant="flat"
+                variant="tertiary"
                 className="bg-theme-elevated text-theme-muted"
                 startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
               >

@@ -153,7 +153,7 @@ export function PricingPage() {
             const cents = interval === 'yearly' ? tier.yearly_price_cents : tier.monthly_price_cents;
             const isFree = cents === 0;
             return (
-              <Card key={tier.id} className="flex flex-col border border-theme-default bg-surface" shadow="sm">
+              <Card key={tier.id} className="flex flex-col border border-theme-default bg-surface">
                 <CardHeader className="flex flex-col items-start gap-2">
                   <div className="flex items-center gap-2">
                     <Crown size={20} className="text-yellow-500" />
@@ -195,7 +195,7 @@ export function PricingPage() {
                   </ul>
 
                   <Button
-                    color="primary"
+                    variant="primary"
                     onPress={() => handleSubscribe(tier)}
                     isDisabled={submittingTierId !== null}
                     isLoading={submittingTierId === tier.id}
@@ -210,7 +210,7 @@ export function PricingPage() {
       )}
 
       <div className="mt-10 text-center text-sm text-[var(--color-text-secondary)]">
-        <Chip size="sm" variant="flat">
+        <Chip size="sm" variant="secondary">
           {t('premium.cancel_anytime')}
         </Chip>
       </div>

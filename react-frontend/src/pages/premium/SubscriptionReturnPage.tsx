@@ -88,7 +88,7 @@ export function SubscriptionReturnPage() {
         description={t('premium.return_meta_description')}
         noIndex
       />
-      <Card className="border border-divider/70 bg-surface/95 shadow-lg shadow-accent/5">
+      <Card className="border border-border bg-surface/95">
         <Card.Content className="text-center py-10 flex flex-col items-center gap-4">
           {status === 'pending' && (
             <>
@@ -114,10 +114,10 @@ export function SubscriptionReturnPage() {
                   : t('premium.return_success_body')}
               </p>
               <div className="flex gap-2 mt-2">
-                <Button as={Link} to={tenantPath('/premium/manage')} color="primary">
+                <Button as={Link} to={tenantPath('/premium/manage')} variant="primary">
                   {t('premium.manage_cta')}
                 </Button>
-                <Button as={Link} to={tenantPath('/dashboard')} variant="flat">
+                <Button as={Link} to={tenantPath('/dashboard')} variant="tertiary">
                   {t('premium.go_to_dashboard')}
                 </Button>
               </div>
@@ -133,7 +133,7 @@ export function SubscriptionReturnPage() {
               <p className="text-[var(--color-text-secondary)]">
                 {t('premium.return_cancelled_body')}
               </p>
-              <Button as={Link} to={tenantPath('/premium')} color="primary">
+              <Button as={Link} to={tenantPath('/premium')} variant="primary">
                 {t('premium.back_to_pricing')}
               </Button>
             </>
@@ -147,7 +147,7 @@ export function SubscriptionReturnPage() {
               <p className="text-[var(--color-text-secondary)]">
                 {t('premium.return_timeout_body')}
               </p>
-              <Button as={Link} to={tenantPath('/premium/manage')} color="primary">
+              <Button as={Link} to={tenantPath('/premium/manage')} variant="primary">
                 {t('premium.check_status')}
               </Button>
             </>

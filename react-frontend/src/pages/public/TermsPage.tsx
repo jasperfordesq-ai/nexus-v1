@@ -467,7 +467,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
               </Link>
               <Link to={tenantPath('/privacy')}>
                 <Button
-                  variant="flat"
+                  variant="tertiary"
                   className="bg-theme-elevated text-theme-primary"
                   startContent={<Shield className="w-4 h-4" aria-hidden="true" />}
                 >

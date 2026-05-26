@@ -170,12 +170,12 @@ export function TrustSafetyPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link to={tenantPath('/contact')}>
-              <Button color="primary" size="lg">
+              <Button variant="primary" size="lg">
                 {t('trust_safety.contact_cta_button')}
               </Button>
             </Link>
             <Link to={tenantPath('/community-guidelines')}>
-              <Button variant="flat" size="lg">
+              <Button variant="tertiary" size="lg">
                 {t('trust_safety.community_guidelines_link')}
               </Button>
             </Link>

@@ -74,13 +74,13 @@ export default function DevelopersEndpointsPage() {
               {ENDPOINTS.map((e) => (
                 <TableRow key={`${e.method}-${e.path}`}>
                   <TableCell>
-                    <Chip size="sm" color={methodColor(e.method)} variant="flat">
+                    <Chip size="sm" color={methodColor(e.method)} variant="soft">
                       {e.method}
                     </Chip>
                   </TableCell>
                   <TableCell className="font-mono text-xs">{e.path}</TableCell>
                   <TableCell>
-                    <Chip size="sm" variant="flat">
+                    <Chip size="sm" variant="secondary">
                       {e.scope ?? t('empty_dash')}
                     </Chip>
                   </TableCell>

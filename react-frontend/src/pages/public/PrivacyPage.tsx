@@ -496,7 +496,7 @@ export function PrivacyPage() {
               </Link>
               <Link to={tenantPath('/cookies')}>
                 <Button
-                  variant="flat"
+                  variant="tertiary"
                   className="bg-theme-elevated text-theme-primary"
                   startContent={<Cookie className="w-4 h-4" aria-hidden="true" />}
                 >

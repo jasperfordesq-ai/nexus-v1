@@ -213,7 +213,7 @@ export function AccessibilityPage() {
               </Link>
               <Link to={tenantPath("/help")}>
                 <Button
-                  variant="flat"
+                  variant="tertiary"
                   className="bg-theme-elevated text-theme-primary"
                 >
                   {t('accessibility.help_center')}

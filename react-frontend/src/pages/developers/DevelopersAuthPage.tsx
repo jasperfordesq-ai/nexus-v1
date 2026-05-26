@@ -79,7 +79,7 @@ export default function DevelopersAuthPage() {
 
       <section className="space-y-4 mb-10">
         {steps.map(({ titleKey, bodyKey }) => (
-          <Card key={titleKey} shadow="sm">
+          <Card key={titleKey}>
             <CardBody className="p-5">
               <h3 className="font-semibold text-[var(--color-text)] mb-1">{t(titleKey)}</h3>
               <p className="text-sm text-[var(--color-text-muted)]">{t(bodyKey)}</p>
@@ -91,7 +91,7 @@ export default function DevelopersAuthPage() {
       <section>
         <Tabs aria-label={t('developers.tabs.code_examples')}>
           <Tab key="curl" title={t('developers.curl_example')}>
-            <Card shadow="sm">
+            <Card>
               <CardBody className="p-0">
                 <pre className="text-xs p-4 overflow-x-auto bg-[var(--color-surface-alt)] text-[var(--color-text)]">
                   <code>{CURL_SNIPPET}</code>
@@ -100,7 +100,7 @@ export default function DevelopersAuthPage() {
             </Card>
           </Tab>
           <Tab key="js" title={t('developers.js_example')}>
-            <Card shadow="sm">
+            <Card>
               <CardBody className="p-0">
                 <pre className="text-xs p-4 overflow-x-auto bg-[var(--color-surface-alt)] text-[var(--color-text)]">
                   <code>{JS_SNIPPET}</code>

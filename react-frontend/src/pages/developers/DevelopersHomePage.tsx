@@ -59,7 +59,7 @@ export default function DevelopersHomePage() {
 
       <section className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
         {features.map(({ icon: Icon, titleKey, bodyKey }) => (
-          <Card key={titleKey} shadow="sm">
+          <Card key={titleKey}>
             <CardBody className="p-5">
               <div className="flex items-start gap-3">
                 <Icon size={22} className="text-[var(--color-primary)] mt-0.5 shrink-0" />
@@ -76,7 +76,7 @@ export default function DevelopersHomePage() {
       </section>
 
       <section className="mb-10">
-        <Card shadow="sm" className="bg-[var(--color-surface-alt)]">
+        <Card variant="secondary" className="bg-[var(--color-surface-alt)]">
           <CardBody className="p-6">
             <h2 className="text-xl font-semibold mb-2 text-[var(--color-text)]">
               {t('developers.request_access_cta')}
@@ -84,7 +84,7 @@ export default function DevelopersHomePage() {
             <p className="text-[var(--color-text-muted)] mb-4">
               {t('developers.request_access_body')}
             </p>
-            <Button as={Link} to="/contact" color="primary" endContent={<ArrowRight size={16} />}>
+            <Button as={Link} to="/contact" variant="primary" endContent={<ArrowRight size={16} />}>
               {t('developers.request_access_cta')}
             </Button>
           </CardBody>
@@ -97,7 +97,7 @@ export default function DevelopersHomePage() {
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {navLinks.map(({ to, icon: Icon, key }) => (
-            <Card key={to} as={Link} to={to} isPressable shadow="sm" className="block">
+            <Card key={to} as={Link} to={to} isPressable className="block">
               <CardBody className="p-4 flex flex-row items-center gap-3">
                 <Icon size={20} className="text-[var(--color-primary)]" />
                 <span className="font-medium text-[var(--color-text)]">{t(key)}</span>
