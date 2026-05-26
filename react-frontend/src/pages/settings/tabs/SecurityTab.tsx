@@ -178,17 +178,17 @@ export function SecurityTab({
           <div className="space-y-4">
             {/* Change Password */}
             <Button
-              variant="light"
-              className="w-full flex items-center justify-between p-4 rounded-lg bg-theme-elevated hover:bg-theme-hover h-auto text-left"
+              variant="secondary"
+              className="w-full min-h-16 justify-between px-4 py-4 text-left"
               onPress={passwordModalOnOpen}
             >
-              <div className="flex items-center gap-3">
+              <div className="flex min-w-0 items-center gap-3">
                 <div className="p-2 rounded-lg bg-indigo-500/20">
                   <Lock className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
                 </div>
-                <div>
+                <div className="min-w-0 leading-tight">
                   <p className="font-medium text-theme-primary">{t('change_password')}</p>
-                  <p className="text-sm text-theme-subtle">{t('change_password_subtitle')}</p>
+                  <p className="text-sm text-theme-subtle leading-snug">{t('change_password_subtitle')}</p>
                 </div>
               </div>
             </Button>
@@ -229,8 +229,7 @@ export function SecurityTab({
                     {twoFactorEnabled ? (
                       <Button
                         size="sm"
-                        variant="flat"
-                        className="bg-red-500/10 text-[var(--color-error)]"
+                        variant="danger-soft"
                         onPress={twoFactorDisableModalOnOpen}
                       >
                         {t('twofa_disable')}
@@ -285,7 +284,7 @@ export function SecurityTab({
                       <div className="text-sm font-medium text-theme-primary flex items-center gap-2">
                         {session.browser} {t('session_on')} {session.device}
                         {session.is_current && (
-                          <Chip size="sm" color="success" variant="flat">{t('session_current')}</Chip>
+                          <Chip size="sm" color="success" variant="soft">{t('session_current')}</Chip>
                         )}
                       </div>
                       <p className="text-xs text-theme-subtle">
@@ -310,8 +309,8 @@ export function SecurityTab({
 
           <div className="space-y-3">
             <Button
-              variant="flat"
-              className="w-full justify-start bg-theme-elevated text-theme-primary"
+              variant="secondary"
+              className="w-full justify-start"
               startContent={<LogOut className="w-4 h-4" aria-hidden="true" />}
               onPress={logoutModalOnOpen}
             >
@@ -319,8 +318,8 @@ export function SecurityTab({
             </Button>
 
             <Button
-              variant="flat"
-              className="w-full justify-start bg-red-500/10 text-red-400"
+              variant="danger-soft"
+              className="w-full justify-start"
               startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
               onPress={deleteModalOnOpen}
             >
@@ -349,8 +348,8 @@ export function SecurityTab({
                   <Button
                     isIconOnly
                     size="sm"
-                    variant="light"
-                    className="min-w-0 w-auto h-auto p-0"
+                    variant="tertiary"
+                    className="min-h-8 min-w-8 p-0"
                     onPress={onShowCurrentPasswordToggle}
                     aria-label={showCurrentPassword ? t('password.hide_current') : t('password.show_current')}
                   >
@@ -370,8 +369,8 @@ export function SecurityTab({
                   <Button
                     isIconOnly
                     size="sm"
-                    variant="light"
-                    className="min-w-0 w-auto h-auto p-0"
+                    variant="tertiary"
+                    className="min-h-8 min-w-8 p-0"
                     onPress={onShowNewPasswordToggle}
                     aria-label={showNewPassword ? t('password.hide_new') : t('password.show_new')}
                   >
@@ -392,11 +391,11 @@ export function SecurityTab({
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={passwordModalOnClose}>
+            <Button variant="tertiary" onPress={passwordModalOnClose}>
               {t('cancel')}
             </Button>
             <Button
-              color="primary"
+              variant="primary"
               onPress={onChangePassword}
               isLoading={isChangingPassword}
             >
@@ -416,11 +415,11 @@ export function SecurityTab({
             </p>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={logoutModalOnClose}>
+            <Button variant="tertiary" onPress={logoutModalOnClose}>
               {t('cancel')}
             </Button>
             <Button
-              color="primary"
+              variant="primary"
               onPress={onLogout}
             >
               {t('logout_modal.submit')}
@@ -462,11 +461,11 @@ export function SecurityTab({
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={deleteModalOnClose}>
+            <Button variant="tertiary" onPress={deleteModalOnClose}>
               {t('cancel')}
             </Button>
             <Button
-              className="bg-red-500 text-white"
+              variant="danger"
               onPress={onDeleteAccount}
               isLoading={isDeleting}
               isDisabled={deleteConfirmation !== 'DELETE'}
@@ -512,8 +511,7 @@ export function SecurityTab({
                       target="_blank"
                       rel="noopener noreferrer"
                       size="sm"
-                      variant="flat"
-                      color="primary"
+                      variant="secondary"
                       className="min-h-9"
                     >
                       {t('twofa_app_google')}
@@ -524,8 +522,7 @@ export function SecurityTab({
                       target="_blank"
                       rel="noopener noreferrer"
                       size="sm"
-                      variant="flat"
-                      color="primary"
+                      variant="secondary"
                       className="min-h-9"
                     >
                       {t('twofa_app_microsoft')}
@@ -536,8 +533,7 @@ export function SecurityTab({
                       target="_blank"
                       rel="noopener noreferrer"
                       size="sm"
-                      variant="flat"
-                      color="primary"
+                      variant="secondary"
                       className="min-h-9"
                     >
                       {t('twofa_app_authy')}
@@ -579,11 +575,11 @@ export function SecurityTab({
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={twoFactorSetupModalOnClose}>
+            <Button variant="tertiary" onPress={twoFactorSetupModalOnClose}>
               {t('twofa_cancel')}
             </Button>
             <Button
-              color="success"
+              variant="primary"
               onPress={onVerify2FA}
               isLoading={isVerifying2FA}
               isDisabled={!twoFactorSetupData || twoFactorVerifyCode.length < 6}
@@ -619,11 +615,11 @@ export function SecurityTab({
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" className="bg-theme-elevated text-theme-primary" onPress={twoFactorDisableModalOnClose}>
+            <Button variant="tertiary" onPress={twoFactorDisableModalOnClose}>
               {t('twofa_cancel')}
             </Button>
             <Button
-              className="bg-red-500 text-white"
+              variant="danger"
               onPress={onDisable2FA}
               isLoading={isDisabling2FA}
               isDisabled={!twoFactorDisablePassword}
@@ -659,8 +655,8 @@ export function SecurityTab({
               </div>
 
               <Button
-                variant="flat"
-                className="w-full bg-theme-elevated text-theme-primary"
+                variant="secondary"
+                className="w-full"
                 startContent={<Copy className="w-4 h-4" aria-hidden="true" />}
                 onPress={onCopyBackupCodes}
               >
@@ -670,7 +666,7 @@ export function SecurityTab({
           </ModalBody>
           <ModalFooter>
             <Button
-              color="primary"
+              variant="primary"
               onPress={backupCodesModalOnClose}
             >
               {t('backup_codes_saved')}
