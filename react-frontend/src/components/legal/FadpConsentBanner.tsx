@@ -1,4 +1,5 @@
-import { CardBody, Card, Button } from '@/components/ui';
+import { Card } from '@heroui/react';
+import { Button } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -66,11 +67,8 @@ export function FadpConsentBanner() {
       data-nosnippet
     >
       <div className="max-w-3xl mx-auto pointer-events-auto">
-        <Card
-          shadow="lg"
-          className="border border-accent bg-[var(--color-surface)]"
-        >
-          <CardBody className="py-4 px-5">
+        <Card className="border border-accent bg-[var(--color-surface)] shadow-lg">
+          <Card.Content className="py-4 px-5">
             <div className="flex items-start gap-4">
               {/* Swiss flag-adjacent icon */}
               <div className="flex-shrink-0 w-9 h-9 rounded-full bg-danger-100 flex items-center justify-center mt-0.5">
@@ -123,7 +121,7 @@ export function FadpConsentBanner() {
                 {t('fadp.fadp_decline')}
               </Button>
             </div>
-          </CardBody>
+          </Card.Content>
         </Card>
       </div>
     </div>
