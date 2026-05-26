@@ -240,7 +240,7 @@ export function OnboardingSettings() {
       <div className="space-y-6">
 
         {/* Section 1: Module Control */}
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="flex flex-col items-start gap-1 pb-0">
             <h3 className="text-lg font-semibold">{t('system.onboarding.module_control')}</h3>
             <p className="text-sm text-theme-muted">{t('system.onboarding.module_control_desc')}</p>
@@ -262,7 +262,7 @@ export function OnboardingSettings() {
         </Card>
 
         {/* Section 2: Step Configuration */}
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="flex flex-col items-start gap-1 pb-0">
             <h3 className="text-lg font-semibold">{t('system.onboarding.step_configuration')}</h3>
             <p className="text-sm text-theme-muted">{t('system.onboarding.step_configuration_desc')}</p>
@@ -303,7 +303,7 @@ export function OnboardingSettings() {
         </Card>
 
         {/* Section 3: Profile Requirements */}
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="flex flex-col items-start gap-1 pb-0">
             <h3 className="text-lg font-semibold">{t('system.onboarding.profile_requirements')}</h3>
             <p className="text-sm text-theme-muted">{t('system.onboarding.profile_requirements_desc')}</p>
@@ -321,12 +321,12 @@ export function OnboardingSettings() {
                 <p className="text-xs text-theme-muted">{t('system.onboarding.require_bio_desc')}</p>
               </div>
             </Switch>
-            <Input type="number" label={t('system.onboarding.min_bio_length')} value={String(config.bio_min_length)} onValueChange={(v) => updateConfig('bio_min_length', parseInt(v) || 0)} variant="bordered" min={0} max={500} description={t('system.onboarding.min_bio_length_desc')} isDisabled={!config.bio_required} className="max-w-xs" />
+            <Input type="number" label={t('system.onboarding.min_bio_length')} value={String(config.bio_min_length)} onValueChange={(v) => updateConfig('bio_min_length', parseInt(v) || 0)} variant="secondary" min={0} max={500} description={t('system.onboarding.min_bio_length_desc')} isDisabled={!config.bio_required} className="max-w-xs" />
           </CardBody>
         </Card>
 
         {/* Section 4: Listing Creation */}
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="flex flex-col items-start gap-1 pb-0">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <ListChecks className="w-5 h-5" />
@@ -335,24 +335,24 @@ export function OnboardingSettings() {
             <p className="text-sm text-theme-muted">{t('system.onboarding.listing_creation_desc')}</p>
           </CardHeader>
           <CardBody className="gap-4">
-            <Select label={t('system.onboarding.listing_creation_mode')} selectedKeys={[config.listing_creation_mode]} onSelectionChange={(keys) => { const key = Array.from(keys)[0] as string; updateConfig('listing_creation_mode', key); }} variant="bordered" description={t(LISTING_MODES.find(m => m.key === config.listing_creation_mode)?.descriptionKey ?? 'system.onboarding.listing_mode_disabled_desc')}>
+            <Select label={t('system.onboarding.listing_creation_mode')} selectedKeys={[config.listing_creation_mode]} onSelectionChange={(keys) => { const key = Array.from(keys)[0] as string; updateConfig('listing_creation_mode', key); }} variant="secondary" description={t(LISTING_MODES.find(m => m.key === config.listing_creation_mode)?.descriptionKey ?? 'system.onboarding.listing_mode_disabled_desc')}>
               {LISTING_MODES.map((mode) => (
                 <SelectItem key={mode.key} id={mode.key} textValue={t(mode.labelKey)}>
                   <div>
                     <p className="font-medium">{t(mode.labelKey)}</p>
-                    <p className="text-xs text-default-500">{t(mode.descriptionKey)}</p>
+                    <p className="text-xs text-muted">{t(mode.descriptionKey)}</p>
                   </div>
                 </SelectItem>
               ))}
             </Select>
             {config.listing_creation_mode !== 'disabled' && config.listing_creation_mode !== 'suggestions_only' && (
-              <Input type="number" label={t('system.onboarding.max_auto_listings')} value={String(config.listing_max_auto)} onValueChange={(v) => updateConfig('listing_max_auto', Math.min(10, Math.max(0, parseInt(v) || 0)))} variant="bordered" min={0} max={10} description={t('system.onboarding.max_auto_listings_desc')} className="max-w-xs" />
+              <Input type="number" label={t('system.onboarding.max_auto_listings')} value={String(config.listing_max_auto)} onValueChange={(v) => updateConfig('listing_max_auto', Math.min(10, Math.max(0, parseInt(v) || 0)))} variant="secondary" min={0} max={10} description={t('system.onboarding.max_auto_listings_desc')} className="max-w-xs" />
             )}
           </CardBody>
         </Card>
 
         {/* Section 5: Public Visibility Gating */}
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="flex flex-col items-start gap-1 pb-0">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Eye className="w-5 h-5" />
@@ -383,7 +383,7 @@ export function OnboardingSettings() {
         </Card>
 
         {/* Section 6: Safeguarding Configuration */}
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="flex flex-col items-start gap-1 pb-0">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Shield className="w-5 h-5" />
@@ -393,7 +393,7 @@ export function OnboardingSettings() {
           </CardHeader>
           <CardBody className="gap-4">
             <div className="flex items-end gap-3">
-              <Select label={t('system.onboarding.country_preset')} selectedKeys={[config.country_preset]} onSelectionChange={(keys) => { const key = Array.from(keys)[0] as string; updateConfig('country_preset', key); }} variant="bordered" description={t('system.onboarding.country_preset_desc')} className="max-w-xs">
+            <Select label={t('system.onboarding.country_preset')} selectedKeys={[config.country_preset]} onSelectionChange={(keys) => { const key = Array.from(keys)[0] as string; updateConfig('country_preset', key); }} variant="secondary" description={t('system.onboarding.country_preset_desc')} className="max-w-xs">
                 {Object.keys(COUNTRY_PRESET_LABEL_KEYS).map((key) => {
                   const label = getCountryPresetLabel(key);
                   return (
@@ -406,7 +406,7 @@ export function OnboardingSettings() {
                   );
                 })}
               </Select>
-              <Button color="secondary" variant="flat" onPress={presetModal.onOpen} isDisabled={config.country_preset === 'custom'}>
+              <Button variant="secondary" onPress={presetModal.onOpen} isDisabled={config.country_preset === 'custom'}>
                 {t('system.onboarding.apply_preset')}
               </Button>
             </div>
@@ -422,7 +422,7 @@ export function OnboardingSettings() {
             <div className="p-4 rounded-lg bg-theme-elevated">
               <div className="flex items-center justify-between mb-2">
                 <p className="font-medium text-sm">{t('system.onboarding.configured_options')}</p>
-                <Chip size="sm" variant="flat" color={activeOptionCount > 0 ? 'success' : 'default'}>
+                <Chip size="sm" variant="soft" color={activeOptionCount > 0 ? 'success' : 'default'}>
                   {t('system.onboarding.n_active', { count: activeOptionCount })}
                 </Chip>
               </div>
@@ -433,7 +433,7 @@ export function OnboardingSettings() {
                       <CheckCircle className="w-3.5 h-3.5 text-success-500" />
                       <span>{opt.label}</span>
                       {opt.triggers && Object.values(opt.triggers).some(Boolean) && (
-                        <Chip size="sm" variant="flat" color="warning" className="text-xs">{t('system.onboarding.has_triggers')}</Chip>
+                        <Chip size="sm" variant="soft" color="warning" className="text-xs">{t('system.onboarding.has_triggers')}</Chip>
                       )}
                     </div>
                   ))}
@@ -441,17 +441,17 @@ export function OnboardingSettings() {
               ) : (
                 <p className="text-sm text-theme-muted">{t('system.onboarding.no_options_configured')}</p>
               )}
-              <Button size="sm" variant="light" color="primary" className="mt-3" onPress={() => { navigate(tenantPath('/admin/safeguarding-options')); }}>
+              <Button size="sm" variant="secondary" className="mt-3" onPress={() => { navigate(tenantPath('/admin/safeguarding-options')); }}>
                 {t('system.onboarding.manage_options')}
               </Button>
             </div>
 
-            <Textarea label={t('system.onboarding.safeguarding_intro')} value={config.safeguarding_intro_text || ''} onValueChange={(v) => updateConfig('safeguarding_intro_text', v || null)} variant="bordered" placeholder={t('system.onboarding.safeguarding_intro_placeholder')} description={t('system.onboarding.safeguarding_intro_desc')} minRows={2} maxRows={5} />
+            <Textarea label={t('system.onboarding.safeguarding_intro')} value={config.safeguarding_intro_text || ''} onValueChange={(v) => updateConfig('safeguarding_intro_text', v || null)} variant="secondary" placeholder={t('system.onboarding.safeguarding_intro_placeholder')} description={t('system.onboarding.safeguarding_intro_desc')} minRows={2} maxRows={5} />
           </CardBody>
         </Card>
 
         {/* Section 7: Custom Text */}
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="flex flex-col items-start gap-1 pb-0">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <FileText className="w-5 h-5" />
@@ -460,14 +460,14 @@ export function OnboardingSettings() {
             <p className="text-sm text-theme-muted">{t('system.onboarding.custom_text_desc')}</p>
           </CardHeader>
           <CardBody className="gap-4">
-            <Textarea label={t('system.onboarding.welcome_text')} value={config.welcome_text || ''} onValueChange={(v) => updateConfig('welcome_text', v || null)} variant="bordered" placeholder={t('system.onboarding.welcome_text_placeholder')} description={t('system.onboarding.welcome_text_desc')} minRows={2} maxRows={4} />
-            <Textarea label={t('system.onboarding.help_text')} value={config.help_text || ''} onValueChange={(v) => updateConfig('help_text', v || null)} variant="bordered" placeholder={t('system.onboarding.help_text_placeholder')} description={t('system.onboarding.help_text_desc')} minRows={2} maxRows={4} />
+            <Textarea label={t('system.onboarding.welcome_text')} value={config.welcome_text || ''} onValueChange={(v) => updateConfig('welcome_text', v || null)} variant="secondary" placeholder={t('system.onboarding.welcome_text_placeholder')} description={t('system.onboarding.welcome_text_desc')} minRows={2} maxRows={4} />
+            <Textarea label={t('system.onboarding.help_text')} value={config.help_text || ''} onValueChange={(v) => updateConfig('help_text', v || null)} variant="secondary" placeholder={t('system.onboarding.help_text_placeholder')} description={t('system.onboarding.help_text_desc')} minRows={2} maxRows={4} />
           </CardBody>
         </Card>
 
         {/* Save Button */}
         <div className="flex justify-end">
-          <Button color="primary" size="lg" startContent={!saving ? <Save className="w-5 h-5" /> : undefined} onPress={handleSave} isLoading={saving} isDisabled={saving}>
+          <Button size="lg" startContent={!saving ? <Save className="w-5 h-5" /> : undefined} onPress={handleSave} isLoading={saving} isDisabled={saving}>
             {t('system.onboarding.save_settings')}
           </Button>
         </div>
@@ -482,8 +482,8 @@ export function OnboardingSettings() {
             <p className="text-sm text-theme-muted mt-2">{t('system.onboarding.preset_note')}</p>
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={presetModal.onClose}>{t('cancel')}</Button>
-            <Button color="primary" onPress={handleApplyPreset} isLoading={applyingPreset} isDisabled={applyingPreset}>{t('system.onboarding.apply_preset')}</Button>
+            <Button variant="tertiary" onPress={presetModal.onClose}>{t('cancel')}</Button>
+            <Button onPress={handleApplyPreset} isLoading={applyingPreset} isDisabled={applyingPreset}>{t('system.onboarding.apply_preset')}</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

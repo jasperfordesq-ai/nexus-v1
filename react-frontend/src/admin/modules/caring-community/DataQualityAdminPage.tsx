@@ -167,7 +167,7 @@ export default function DataQualityAdminPage() {
             <Button
               isIconOnly
               size="sm"
-              variant="flat"
+              variant="tertiary"
               onPress={load}
               isLoading={loading}
               aria-label={t('data_quality.actions.refresh_aria')}
@@ -178,13 +178,13 @@ export default function DataQualityAdminPage() {
         }
       />
 
-      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('data_quality.about.title')}</p>
-              <p className="text-default-600">
+              <p className="text-muted">
                 {t('data_quality.about.body')}
               </p>
             </div>
@@ -195,26 +195,26 @@ export default function DataQualityAdminPage() {
       {/* Severity legend */}
       <Card className="border border-[var(--color-border)] bg-[var(--color-surface-alt)]">
         <CardBody className="py-3 px-4">
-          <p className="text-xs font-semibold text-default-500 uppercase tracking-wide mb-2">{t('data_quality.severity_guide.title')}</p>
+          <p className="text-xs font-semibold text-muted uppercase tracking-wide mb-2">{t('data_quality.severity_guide.title')}</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 text-sm">
             <div className="flex items-start gap-2">
-              <Chip color="danger" variant="flat" size="sm" startContent={<ShieldAlert size={11} />}>{severityLabel('danger')}</Chip>
-              <span className="text-default-600 text-xs">{t('data_quality.severity_guide.danger')}</span>
+              <Chip color="danger" variant="soft" size="sm" startContent={<ShieldAlert size={11} />}>{severityLabel('danger')}</Chip>
+              <span className="text-muted text-xs">{t('data_quality.severity_guide.danger')}</span>
             </div>
             <div className="flex items-start gap-2">
-              <Chip color="warning" variant="flat" size="sm" startContent={<AlertTriangle size={11} />}>{severityLabel('warning')}</Chip>
-              <span className="text-default-600 text-xs">{t('data_quality.severity_guide.warning')}</span>
+              <Chip color="warning" variant="soft" size="sm" startContent={<AlertTriangle size={11} />}>{severityLabel('warning')}</Chip>
+              <span className="text-muted text-xs">{t('data_quality.severity_guide.warning')}</span>
             </div>
             <div className="flex items-start gap-2">
-              <Chip color="default" variant="flat" size="sm" startContent={<Info size={11} />}>{severityLabel('info')}</Chip>
-              <span className="text-default-600 text-xs">{t('data_quality.severity_guide.info')}</span>
+              <Chip color="default" variant="soft" size="sm" startContent={<Info size={11} />}>{severityLabel('info')}</Chip>
+              <span className="text-muted text-xs">{t('data_quality.severity_guide.info')}</span>
             </div>
             <div className="flex items-start gap-2">
-              <Chip color="success" variant="flat" size="sm" startContent={<CheckCircle2 size={11} />}>{severityLabel('ok')}</Chip>
-              <span className="text-default-600 text-xs">{t('data_quality.severity_guide.ok')}</span>
+              <Chip color="success" variant="soft" size="sm" startContent={<CheckCircle2 size={11} />}>{severityLabel('ok')}</Chip>
+              <span className="text-muted text-xs">{t('data_quality.severity_guide.ok')}</span>
             </div>
           </div>
-          <p className="text-xs text-default-500 mt-2">
+          <p className="text-xs text-muted mt-2">
             {t('data_quality.severity_guide.note_prefix')} <strong>{t('data_quality.actions.view_affected_rows')}</strong>{' '}
             {t('data_quality.severity_guide.note_suffix')}
           </p>
@@ -232,30 +232,30 @@ export default function DataQualityAdminPage() {
         <>
           {/* Summary chip row */}
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-sm text-default-500">{t('data_quality.summary.label')}</span>
-            <Chip color="danger" variant="flat" startContent={<ShieldAlert size={12} />} size="sm">
+            <span className="text-sm text-muted">{t('data_quality.summary.label')}</span>
+            <Chip color="danger" variant="soft" startContent={<ShieldAlert size={12} />} size="sm">
               {t('data_quality.summary.count', { count: totals?.danger ?? 0, label: severityLabel('danger') })}
             </Chip>
             <Chip
               color="warning"
-              variant="flat"
+              variant="soft"
               startContent={<AlertTriangle size={12} />}
               size="sm"
             >
               {t('data_quality.summary.count', { count: totals?.warning ?? 0, label: severityLabel('warning') })}
             </Chip>
-            <Chip color="default" variant="flat" startContent={<Info size={12} />} size="sm">
+            <Chip color="default" variant="soft" startContent={<Info size={12} />} size="sm">
               {t('data_quality.summary.count', { count: totals?.info ?? 0, label: severityLabel('info') })}
             </Chip>
             <Chip
               color="success"
-              variant="flat"
+              variant="soft"
               startContent={<CheckCircle2 size={12} />}
               size="sm"
             >
               {t('data_quality.summary.count', { count: totals?.ok ?? 0, label: severityLabel('ok') })}
             </Chip>
-            <span className="ml-auto text-xs text-default-400">
+            <span className="ml-auto text-xs text-muted">
               {t('data_quality.summary.generated', { date: formatTimestamp(report.generated_at) })}
             </span>
           </div>
@@ -270,11 +270,11 @@ export default function DataQualityAdminPage() {
                 <CardHeader className="flex items-start justify-between gap-3 pb-2">
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-foreground">{check.label}</p>
-                    <p className="mt-0.5 text-xs text-default-400">{check.key}</p>
+                    <p className="mt-0.5 text-xs text-muted">{check.key}</p>
                   </div>
                   <Chip
                     color={SEVERITY_CHIP_COLOR[check.severity]}
-                    variant="flat"
+                    variant="soft"
                     size="sm"
                   >
                     {severityLabel(check.severity)}
@@ -286,14 +286,13 @@ export default function DataQualityAdminPage() {
                     <span className="text-3xl font-extrabold text-foreground">
                       {check.count.toLocaleString()}
                     </span>
-                    <span className="pb-1 text-xs text-default-500">{t('data_quality.summary.affected')}</span>
+                    <span className="pb-1 text-xs text-muted">{t('data_quality.summary.affected')}</span>
                   </div>
-                  <p className="text-sm text-default-600">{check.message}</p>
+                  <p className="text-sm text-muted">{check.message}</p>
                   {check.has_drilldown && (
                     <Button
                       size="sm"
-                      variant="flat"
-                      color="primary"
+                      variant="secondary"
                       startContent={<Eye size={14} />}
                       onPress={() => openDrilldown(check)}
                     >
@@ -317,7 +316,7 @@ export default function DataQualityAdminPage() {
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">
             <span className="text-base font-semibold">{drilldownLabel}</span>
-            <span className="text-xs text-default-400">
+            <span className="text-xs text-muted">
               {t('data_quality.drilldown.subtitle')}
             </span>
           </ModalHeader>
@@ -329,13 +328,13 @@ export default function DataQualityAdminPage() {
             )}
 
             {!drilldownLoading && drilldownNote && (
-              <div className="mb-3 rounded-md border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3 text-sm text-default-600">
+              <div className="mb-3 rounded-md border border-[var(--color-border)] bg-[var(--color-surface-alt)] p-3 text-sm text-muted">
                 {drilldownNote}
               </div>
             )}
 
             {!drilldownLoading && drilldownRows && drilldownRows.length === 0 && !drilldownNote && (
-              <p className="py-6 text-center text-sm text-default-500">{t('data_quality.drilldown.empty')}</p>
+              <p className="py-6 text-center text-sm text-muted">{t('data_quality.drilldown.empty')}</p>
             )}
 
             {!drilldownLoading && drilldownRows && drilldownRows.length > 0 && (
@@ -362,7 +361,7 @@ export default function DataQualityAdminPage() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={closeDrilldown}>
+            <Button variant="tertiary" onPress={closeDrilldown}>
               {t('data_quality.actions.close')}
             </Button>
           </ModalFooter>

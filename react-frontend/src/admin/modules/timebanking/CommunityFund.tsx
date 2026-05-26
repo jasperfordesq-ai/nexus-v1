@@ -32,11 +32,11 @@ const PAGE_SIZE = 20;
 
 const TRANSACTION_TYPE_COLOR: Record<
   CommunityFundTransaction['type'],
-  'success' | 'warning' | 'primary' | 'secondary'
+  'success' | 'warning' | 'accent' | 'default'
 > = {
   deposit: 'success',
-  withdrawal: 'primary',
-  donation: 'secondary',
+  withdrawal: 'accent',
+  donation: 'default',
   starting_balance_grant: 'warning',
 };
 
@@ -88,7 +88,7 @@ function CommunityFundDepositForm({ onComplete }: { onComplete: () => void }) {
   };
 
   return (
-    <Card shadow="sm">
+    <Card>
       <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
         <ArrowDownToLine size={18} className="text-success" aria-hidden="true" />
         <h3 className="font-semibold">{t('timebanking.community_fund_deposit_title')}</h3>
@@ -103,8 +103,8 @@ function CommunityFundDepositForm({ onComplete }: { onComplete: () => void }) {
           value={amount}
           onValueChange={setAmount}
           size="sm"
-          variant="bordered"
-          startContent={<Wallet size={16} className="text-default-400" aria-hidden="true" />}
+          variant="secondary"
+          startContent={<Wallet size={16} className="text-muted" aria-hidden="true" />}
         />
         <Textarea
           label={t('timebanking.label_reason')}
@@ -112,13 +112,13 @@ function CommunityFundDepositForm({ onComplete }: { onComplete: () => void }) {
           value={description}
           onValueChange={setDescription}
           size="sm"
-          variant="bordered"
+          variant="secondary"
           minRows={2}
           maxRows={4}
           description={t('timebanking.community_fund_audit_reason_desc')}
         />
         <Button
-          color="success"
+          variant="primary"
           startContent={<ArrowDownToLine size={16} aria-hidden="true" />}
           isLoading={submitting}
           isDisabled={!amount || !description.trim()}
@@ -210,7 +210,7 @@ function CommunityFundGrantForm({ fundBalance, onComplete }: { fundBalance: numb
   };
 
   return (
-    <Card shadow="sm">
+    <Card>
       <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
         <ArrowUpFromLine size={18} className="text-accent" aria-hidden="true" />
         <h3 className="font-semibold">{t('timebanking.community_fund_grant_title')}</h3>
@@ -224,11 +224,11 @@ function CommunityFundGrantForm({ fundBalance, onComplete }: { fundBalance: numb
               autoComplete="off"
               label={t('timebanking.label_search_member')}
               placeholder={t('timebanking.placeholder_search_by_name_or_email')}
-              startContent={<Search size={16} className="text-default-400" aria-hidden="true" />}
+              startContent={<Search size={16} className="text-muted" aria-hidden="true" />}
               value={searchQuery}
               onValueChange={handleSearch}
               size="sm"
-              variant="bordered"
+              variant="secondary"
             />
             {searching && (
               <div className="flex items-center justify-center py-4">
@@ -240,8 +240,8 @@ function CommunityFundGrantForm({ fundBalance, onComplete }: { fundBalance: numb
                 {searchResults.map((user) => (
                   <Button
                     key={user.id}
-                    variant="light"
-                    className="flex h-auto w-full items-center justify-between rounded-none px-3 py-2"
+                    variant="ghost"
+                    className="flex min-h-12 w-full items-center justify-between rounded-none px-3 py-2"
                     onPress={() => {
                       setSelectedUser(user);
                       setSearchQuery('');
@@ -250,10 +250,10 @@ function CommunityFundGrantForm({ fundBalance, onComplete }: { fundBalance: numb
                   >
                     <div className="min-w-0 flex-1 text-left">
                       <p className="truncate text-sm font-medium text-foreground">{user.name}</p>
-                      <p className="truncate text-xs text-default-500">{user.email}</p>
+                      <p className="truncate text-xs text-muted">{user.email}</p>
                     </div>
                     <div className="ml-3 shrink-0 text-right">
-                      <p className="text-xs text-default-500">{t('timebanking.col_balance')}</p>
+                      <p className="text-xs text-muted">{t('timebanking.col_balance')}</p>
                       <p className="text-sm font-semibold text-foreground">
                         {t('timebanking.hours_value', { count: user.balance })}
                       </p>
@@ -263,7 +263,7 @@ function CommunityFundGrantForm({ fundBalance, onComplete }: { fundBalance: numb
               </div>
             )}
             {searchQuery.length >= 2 && !searching && searchResults.length === 0 && (
-              <p className="mt-2 py-2 text-center text-sm text-default-400">
+              <p className="mt-2 py-2 text-center text-sm text-muted">
                 {t('timebanking.no_members_found')}
               </p>
             )}
@@ -276,12 +276,12 @@ function CommunityFundGrantForm({ fundBalance, onComplete }: { fundBalance: numb
               </div>
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium text-foreground">{selectedUser.name}</p>
-                <p className="truncate text-xs text-default-500">
+                <p className="truncate text-xs text-muted">
                   {selectedUser.email} · {t('timebanking.current_balance')}: {t('timebanking.hours_value', { count: selectedUser.balance })}
                 </p>
               </div>
             </div>
-            <Button size="sm" variant="flat" onPress={() => setSelectedUser(null)}>
+            <Button size="sm" variant="tertiary" onPress={() => setSelectedUser(null)}>
               {t('timebanking.change')}
             </Button>
           </div>
@@ -296,8 +296,8 @@ function CommunityFundGrantForm({ fundBalance, onComplete }: { fundBalance: numb
           value={amount}
           onValueChange={setAmount}
           size="sm"
-          variant="bordered"
-          startContent={<Wallet size={16} className="text-default-400" aria-hidden="true" />}
+          variant="secondary"
+          startContent={<Wallet size={16} className="text-muted" aria-hidden="true" />}
           description={t('timebanking.community_fund_available_balance', {
             amount: t('timebanking.hours_value', { count: fundBalance }),
           })}
@@ -308,13 +308,13 @@ function CommunityFundGrantForm({ fundBalance, onComplete }: { fundBalance: numb
           value={description}
           onValueChange={setDescription}
           size="sm"
-          variant="bordered"
+          variant="secondary"
           minRows={2}
           maxRows={4}
           description={t('timebanking.community_fund_audit_reason_desc')}
         />
         <Button
-          color="primary"
+          variant="primary"
           startContent={<ArrowUpFromLine size={16} aria-hidden="true" />}
           isLoading={submitting}
           isDisabled={!selectedUser || !amount || !description.trim()}
@@ -401,7 +401,7 @@ export function CommunityFund() {
         label: t('timebanking.col_date'),
         sortable: true,
         render: (transaction) => (
-          <span className="text-sm text-default-500">
+          <span className="text-sm text-muted">
             {new Date(transaction.created_at).toLocaleString()}
           </span>
         ),
@@ -411,7 +411,7 @@ export function CommunityFund() {
         label: t('timebanking.col_type'),
         sortable: true,
         render: (transaction) => (
-          <Chip size="sm" variant="flat" color={TRANSACTION_TYPE_COLOR[transaction.type]}>
+          <Chip size="sm" variant="soft" color={TRANSACTION_TYPE_COLOR[transaction.type]}>
             {t(`timebanking.community_fund_type_${transaction.type}`)}
           </Chip>
         ),
@@ -441,7 +441,7 @@ export function CommunityFund() {
         label: t('timebanking.community_fund_balance_after'),
         sortable: true,
         render: (transaction) => (
-          <span className="text-sm text-default-500">
+          <span className="text-sm text-muted">
             {t('timebanking.hours_value', { count: transaction.balance_after })}
           </span>
         ),
@@ -450,7 +450,7 @@ export function CommunityFund() {
         key: 'description',
         label: t('timebanking.col_description'),
         render: (transaction) => (
-          <span className="text-sm text-default-600">{transaction.description || t('timebanking.no_description')}</span>
+          <span className="text-sm text-foreground">{transaction.description || t('timebanking.no_description')}</span>
         ),
       },
     ],
@@ -465,7 +465,7 @@ export function CommunityFund() {
         actions={
           <div className="flex flex-wrap gap-2">
             <Button
-              variant="flat"
+              variant="secondary"
               startContent={<RefreshCw size={16} aria-hidden="true" />}
               onPress={refreshAll}
               isLoading={loadingFund || loadingTransactions}
@@ -476,7 +476,7 @@ export function CommunityFund() {
             <Button
               as={Link}
               to={tenantPath('/admin/timebanking')}
-              variant="flat"
+              variant="tertiary"
               startContent={<ArrowLeft size={16} aria-hidden="true" />}
               size="sm"
             >
@@ -491,7 +491,7 @@ export function CommunityFund() {
           label={t('timebanking.community_fund_current_balance')}
           value={fund ? t('timebanking.hours_value', { count: fund.balance }) : '—'}
           icon={HandHeart}
-          color="primary"
+          color="default"
           loading={loadingFund}
         />
         <StatCard
@@ -512,7 +512,7 @@ export function CommunityFund() {
           label={t('timebanking.community_fund_total_donated')}
           value={fund ? t('timebanking.hours_value', { count: fund.total_donated }) : '—'}
           icon={Users}
-          color="secondary"
+          color="default"
           loading={loadingFund}
         />
       </div>
@@ -522,9 +522,9 @@ export function CommunityFund() {
         <CommunityFundGrantForm fundBalance={fund?.balance ?? 0} onComplete={refreshAll} />
       </div>
 
-      <Card shadow="sm">
+      <Card>
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-          <History size={18} className="text-default-500" aria-hidden="true" />
+          <History size={18} className="text-muted" aria-hidden="true" />
           <h3 className="font-semibold">{t('timebanking.community_fund_history_title')}</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">
@@ -540,8 +540,8 @@ export function CommunityFund() {
             onRefresh={() => loadTransactions(page)}
             emptyContent={
               <div className="flex flex-col items-center gap-2 py-8">
-                <History size={32} className="text-default-300" aria-hidden="true" />
-                <p className="text-sm text-default-400">{t('timebanking.community_fund_no_transactions')}</p>
+                <History size={32} className="text-muted" aria-hidden="true" />
+                <p className="text-sm text-muted">{t('timebanking.community_fund_no_transactions')}</p>
               </div>
             }
           />

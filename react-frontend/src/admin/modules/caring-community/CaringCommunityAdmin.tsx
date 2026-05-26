@@ -109,7 +109,7 @@ export default function CaringCommunityAdmin() {
             <Button
               as={Link}
               to={tenantPath(CARING_COMMUNITY_ROUTE.href)}
-              variant="flat"
+              variant="tertiary"
               size="sm"
               startContent={<Heart size={16} />}
             >
@@ -118,14 +118,14 @@ export default function CaringCommunityAdmin() {
             <Button
               as={Link}
               to={tenantPath('/caring/workflow')}
-              variant="flat"
+              variant="tertiary"
               size="sm"
               startContent={<ListChecks size={16} />}
             >
               {t('caring_community.actions.open_workflow')}
             </Button>
             <Button
-              variant="flat"
+              variant="tertiary"
               size="sm"
               startContent={<RefreshCw size={16} />}
               onPress={loadConfig}
@@ -136,7 +136,7 @@ export default function CaringCommunityAdmin() {
         }
       />
 
-      <Card className="mb-6 border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="mb-6 border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" >
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
@@ -144,7 +144,7 @@ export default function CaringCommunityAdmin() {
               <p className="font-semibold text-accent dark:text-accent">
                 {t('caring_community.about.title')}
               </p>
-              <p className="text-default-600">
+              <p className="text-muted">
                 {t('caring_community.about.body')}
               </p>
             </div>
@@ -152,15 +152,15 @@ export default function CaringCommunityAdmin() {
         </CardBody>
       </Card>
 
-      <Card className="mb-6 border border-default-200" shadow="none">
+      <Card className="mb-6 border border-border" >
         <CardBody className="px-4 py-3">
-          <p className="mb-2 text-sm font-semibold text-default-800">
+          <p className="mb-2 text-sm font-semibold text-foreground">
             {t('caring_community.getting_started.title')}
           </p>
-          <ol className="space-y-1.5 text-sm text-default-600">
+          <ol className="space-y-1.5 text-sm text-muted">
             {[1, 2, 3, 4, 5].map((step) => (
               <li key={step}>
-                <span className="font-semibold text-default-800">{step}.</span>{' '}
+                <span className="font-semibold text-foreground">{step}.</span>{' '}
                 {t(`caring_community.getting_started.step_${step}`)}
               </li>
             ))}
@@ -179,25 +179,24 @@ export default function CaringCommunityAdmin() {
           label={t('caring_community.stats.connected_capabilities')}
           value={`${activeCapabilityCount}/${dependentCapabilities.length}`}
           icon={ListChecks}
-          color="primary"
         />
         <StatCard
           label={t('caring_community.stats.reporting_pack')}
           value={t('caring_community.stats.reporting_ready')}
           icon={BarChart3}
-          color="secondary"
+          color="default"
         />
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
-        <Card shadow="sm">
+        <Card >
           <CardHeader className="flex items-start justify-between gap-4">
             <div>
               <h2 className="text-lg font-semibold">{t('caring_community.switch.title')}</h2>
-              <p className="mt-1 text-sm text-default-500">
+              <p className="mt-1 text-sm text-muted">
                 {t('caring_community.switch.description')}
               </p>
-              <p className="mt-2 text-xs text-default-400">
+              <p className="mt-2 text-xs text-muted">
                 {t('caring_community.switch.dependency_note')}
               </p>
             </div>
@@ -216,7 +215,7 @@ export default function CaringCommunityAdmin() {
                 const source = capability.type === 'module' ? config?.modules : config?.features;
                 const isActive = source?.[capability.key] !== false;
                 return (
-                  <div key={capability.key} className="flex items-center justify-between gap-3 rounded-lg border border-default-200 p-3">
+                  <div key={capability.key} className="flex items-center justify-between gap-3 rounded-lg border border-border p-3">
                     <div className="flex min-w-0 items-center gap-3">
                       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
                         <Icon size={18} />
@@ -225,12 +224,12 @@ export default function CaringCommunityAdmin() {
                         <p className="truncate text-sm font-medium">
                           {t(`caring_community.capabilities.${capability.labelKey}`)}
                         </p>
-                        <p className="text-xs text-default-500">
+                        <p className="text-xs text-muted">
                           {t(`caring_community.capability_type.${capability.type}`)}
                         </p>
                       </div>
                     </div>
-                    <Chip color={isActive ? 'success' : 'default'} variant="flat" size="sm">
+                    <Chip color={isActive ? 'success' : 'default'} variant="soft" size="sm">
                       {isActive ? t('caring_community.status.active') : t('caring_community.status.disabled')}
                     </Chip>
                   </div>
@@ -240,11 +239,11 @@ export default function CaringCommunityAdmin() {
           </CardBody>
         </Card>
 
-        <Card shadow="sm">
+        <Card >
           <CardHeader>
             <div>
               <h2 className="text-lg font-semibold">{t('caring_community.reporting.title')}</h2>
-              <p className="mt-1 text-sm text-default-500">
+              <p className="mt-1 text-sm text-muted">
                 {t('caring_community.reporting.description')}
               </p>
             </div>
@@ -254,7 +253,7 @@ export default function CaringCommunityAdmin() {
             <Button
               as={Link}
               to={tenantPath('/admin/community-analytics')}
-              variant="flat"
+              variant="tertiary"
               className="justify-start"
               startContent={<BarChart3 size={16} />}
             >
@@ -263,7 +262,7 @@ export default function CaringCommunityAdmin() {
             <Button
               as={Link}
               to={tenantPath('/admin/impact-report')}
-              variant="flat"
+              variant="tertiary"
               className="justify-start"
               startContent={<FileText size={16} />}
             >
@@ -272,21 +271,21 @@ export default function CaringCommunityAdmin() {
             <Button
               as={Link}
               to={tenantPath('/admin/reports/municipal-impact')}
-              variant="flat"
+              variant="tertiary"
               className="justify-start"
               startContent={<ListChecks size={16} />}
             >
               {t('caring_community.reporting.municipal_pack')}
             </Button>
             <Separator />
-            <div className="rounded-lg bg-default-100 p-3 text-sm text-default-600">
+            <div className="rounded-lg bg-surface-secondary p-3 text-sm text-muted">
               {t('caring_community.reporting.note')}
             </div>
           </CardBody>
         </Card>
       </div>
 
-      <div className="mt-6 rounded-lg border border-default-200 p-4 text-sm text-default-500">
+      <div className="mt-6 rounded-lg border border-border p-4 text-sm text-muted">
         {t('caring_community.config_route_note', { route: CARING_COMMUNITY_ADMIN_ROUTE.href })}
       </div>
     </div>

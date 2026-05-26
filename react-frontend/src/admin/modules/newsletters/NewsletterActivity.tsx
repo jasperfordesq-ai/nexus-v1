@@ -251,7 +251,7 @@ export function NewsletterActivity() {
           <div className="flex gap-2">
             {showExport && currentData.length > 0 && (
               <Button
-                variant="flat"
+                variant="secondary"
                 startContent={<Download size={16} />}
                 onPress={handleExport}
               >
@@ -259,7 +259,7 @@ export function NewsletterActivity() {
               </Button>
             )}
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(backPath)}
             >
@@ -269,14 +269,13 @@ export function NewsletterActivity() {
         }
       />
 
-      <Card shadow="sm">
+      <Card>
         <CardBody className="space-y-4 p-5">
           {/* Main Tabs */}
           <Tabs
             selectedKey={activeTab}
             onSelectionChange={(key) => setActiveTab(key as ViewTab)}
             aria-label={t('newsletter_activity.engagement')}
-            color="primary"
             variant="underlined"
             classNames={{ tabList: 'flex-wrap' }}
           >
@@ -334,8 +333,8 @@ export function NewsletterActivity() {
                 <Chip
                   key={f}
                   size="sm"
-                  variant={activityFilter === f ? 'solid' : 'flat'}
-                  color={f === 'open' ? 'primary' : f === 'click' ? 'success' : 'default'}
+                  variant="soft"
+                  color={f === 'open' ? 'accent' : f === 'click' ? 'success' : 'default'}
                   className="cursor-pointer"
                   onClick={() => setActivityFilter(f)}
                 >
@@ -355,7 +354,7 @@ export function NewsletterActivity() {
             <Table
               aria-label={t('newsletters.activity_log')}
               isStriped
-              classNames={{ th: 'text-default-500 text-xs uppercase' }}
+              classNames={{ th: 'text-muted text-xs uppercase' }}
             >
               <TableHeader>
                 <TableColumn>{t('newsletter_activity.col_email')}</TableColumn>
@@ -377,8 +376,8 @@ export function NewsletterActivity() {
                     <TableCell>
                       <Chip
                         size="sm"
-                        color={event.action_type === 'open' ? 'primary' : 'success'}
-                        variant="flat"
+                        color={event.action_type === 'open' ? 'accent' : 'success'}
+                        variant="soft"
                         startContent={event.action_type === 'open' ? <Eye size={12} /> : <MousePointer size={12} />}
                       >
                         {event.action_type}
@@ -389,11 +388,11 @@ export function NewsletterActivity() {
                         <a href={event.url} target="_blank" rel="noopener noreferrer" className="break-all text-sm text-accent hover:underline">
                           {event.url.length > 60 ? event.url.substring(0, 60) + '...' : event.url}
                         </a>
-                      ) : <span className="text-sm text-default-400">--</span>}
+                      ) : <span className="text-sm text-muted">--</span>}
                     </TableCell>
-                    <TableCell><span className="text-sm text-default-600">{formatTime(event.action_at)}</span></TableCell>
-                    <TableCell><span className="text-xs text-default-500" title={event.user_agent ?? undefined}>{truncateUA(event.user_agent)}</span></TableCell>
-                    <TableCell><span className="font-mono text-xs text-default-500">{event.ip_address ?? '--'}</span></TableCell>
+                    <TableCell><span className="text-sm text-foreground">{formatTime(event.action_at)}</span></TableCell>
+                    <TableCell><span className="text-xs text-muted" title={event.user_agent ?? undefined}>{truncateUA(event.user_agent)}</span></TableCell>
+                    <TableCell><span className="font-mono text-xs text-muted">{event.ip_address ?? '--'}</span></TableCell>
                   </TableRow>
                 )}
               </TableBody>
@@ -405,7 +404,7 @@ export function NewsletterActivity() {
             <Table
               aria-label={t('newsletter_activity.openers')}
               isStriped
-              classNames={{ th: 'text-default-500 text-xs uppercase' }}
+              classNames={{ th: 'text-muted text-xs uppercase' }}
             >
               <TableHeader>
                 <TableColumn>{t('newsletter_activity.col_email')}</TableColumn>
@@ -421,10 +420,10 @@ export function NewsletterActivity() {
                     <TableCell><span className="font-mono text-sm">{row.email}</span></TableCell>
                     <TableCell>
                       <div className="text-center">
-                        <Chip size="sm" variant="flat" color="primary">{row.open_count}</Chip>
+                        <Chip size="sm" variant="soft" color="accent">{row.open_count}</Chip>
                       </div>
                     </TableCell>
-                    <TableCell><span className="text-sm text-default-600">{formatTime(row.first_opened)}</span></TableCell>
+                    <TableCell><span className="text-sm text-foreground">{formatTime(row.first_opened)}</span></TableCell>
                   </TableRow>
                 )}
               </TableBody>
@@ -436,7 +435,7 @@ export function NewsletterActivity() {
             <Table
               aria-label={t('newsletter_activity.clickers')}
               isStriped
-              classNames={{ th: 'text-default-500 text-xs uppercase' }}
+              classNames={{ th: 'text-muted text-xs uppercase' }}
             >
               <TableHeader>
                 <TableColumn>{t('newsletter_activity.col_email')}</TableColumn>
@@ -453,15 +452,15 @@ export function NewsletterActivity() {
                     <TableCell><span className="font-mono text-sm">{row.email}</span></TableCell>
                     <TableCell>
                       <div className="text-center">
-                        <Chip size="sm" variant="flat" color="success">{row.click_count}</Chip>
+                        <Chip size="sm" variant="soft" color="success">{row.click_count}</Chip>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="text-center">
-                        <span className="text-sm text-default-600">{row.unique_links}</span>
+                        <span className="text-sm text-foreground">{row.unique_links}</span>
                       </div>
                     </TableCell>
-                    <TableCell><span className="text-sm text-default-600">{formatTime(row.first_clicked)}</span></TableCell>
+                    <TableCell><span className="text-sm text-foreground">{formatTime(row.first_clicked)}</span></TableCell>
                   </TableRow>
                 )}
               </TableBody>
@@ -473,7 +472,7 @@ export function NewsletterActivity() {
             <Table
               aria-label={t('newsletter_activity.non_openers')}
               isStriped
-              classNames={{ th: 'text-default-500 text-xs uppercase' }}
+              classNames={{ th: 'text-muted text-xs uppercase' }}
             >
               <TableHeader>
                 <TableColumn>{t('newsletter_activity.col_email')}</TableColumn>
@@ -487,8 +486,8 @@ export function NewsletterActivity() {
                 {(row) => (
                   <TableRow key={row.email}>
                     <TableCell><span className="font-mono text-sm">{row.email}</span></TableCell>
-                    <TableCell><span className="text-sm text-default-600">{row.name || '--'}</span></TableCell>
-                    <TableCell><span className="text-sm text-default-600">{formatTime(row.sent_at)}</span></TableCell>
+                    <TableCell><span className="text-sm text-foreground">{row.name || '--'}</span></TableCell>
+                    <TableCell><span className="text-sm text-foreground">{formatTime(row.sent_at)}</span></TableCell>
                   </TableRow>
                 )}
               </TableBody>
@@ -500,7 +499,7 @@ export function NewsletterActivity() {
             <Table
               aria-label={t('newsletter_activity.opened_no_click')}
               isStriped
-              classNames={{ th: 'text-default-500 text-xs uppercase' }}
+              classNames={{ th: 'text-muted text-xs uppercase' }}
             >
               <TableHeader>
                 <TableColumn>{t('newsletter_activity.col_email')}</TableColumn>
@@ -515,13 +514,13 @@ export function NewsletterActivity() {
                 {(row) => (
                   <TableRow key={row.email}>
                     <TableCell><span className="font-mono text-sm">{row.email}</span></TableCell>
-                    <TableCell><span className="text-sm text-default-600">{row.name || '--'}</span></TableCell>
+                    <TableCell><span className="text-sm text-foreground">{row.name || '--'}</span></TableCell>
                     <TableCell>
                       <div className="text-center">
-                        <Chip size="sm" variant="flat" color="primary">{row.open_count}</Chip>
+                        <Chip size="sm" variant="soft" color="accent">{row.open_count}</Chip>
                       </div>
                     </TableCell>
-                    <TableCell><span className="text-sm text-default-600">{formatTime(row.first_opened)}</span></TableCell>
+                    <TableCell><span className="text-sm text-foreground">{formatTime(row.first_opened)}</span></TableCell>
                   </TableRow>
                 )}
               </TableBody>
@@ -536,7 +535,6 @@ export function NewsletterActivity() {
                 page={page}
                 onChange={setPage}
                 showControls
-                color="primary"
               />
             </div>
           )}
@@ -551,9 +549,9 @@ export function NewsletterActivity() {
 function EmptyState({ title, message, icon }: { title: string; message: string; icon?: ReactNode }) {
   return (
     <div className="flex flex-col items-center gap-3 py-12 text-center">
-      {icon || <Inbox size={48} className="text-default-300" />}
-      <p className="text-lg font-semibold text-default-500">{title}</p>
-      <p className="text-sm text-default-400">{message}</p>
+      {icon || <Inbox size={48} className="text-muted" />}
+      <p className="text-lg font-semibold text-muted">{title}</p>
+      <p className="text-sm text-muted">{message}</p>
     </div>
   );
 }

@@ -159,17 +159,17 @@ export function NativeApp() {
       />
 
       <div className="space-y-4">
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="flex items-center gap-2">
             <Smartphone size={20} />
             <h3 className="text-lg font-semibold">{t('system.native_app.app_configuration')}</h3>
           </CardHeader>
           <CardBody className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <Input label={t('system.native_app.app_name')} variant="bordered" value={fieldValue(formData, 'native_app_name')} onValueChange={(v) => updateField('native_app_name', v)} />
-            <Input label={t('system.native_app.short_name')} variant="bordered" value={fieldValue(formData, 'native_app_short_name')} onValueChange={(v) => updateField('native_app_short_name', v)} />
-            <Input label={t('system.native_app.bundle_id')} variant="bordered" value={fieldValue(formData, 'native_app_bundle_id')} onValueChange={(v) => updateField('native_app_bundle_id', v)} />
-            <Input label={t('system.native_app.package_name')} variant="bordered" value={fieldValue(formData, 'native_app_package_name')} onValueChange={(v) => updateField('native_app_package_name', v)} />
-            <Input label={t('system.native_app.app_version')} variant="bordered" value={fieldValue(formData, 'native_app_version')} onValueChange={(v) => updateField('native_app_version', v)} />
+            <Input label={t('system.native_app.app_name')} variant="secondary" value={fieldValue(formData, 'native_app_name')} onValueChange={(v) => updateField('native_app_name', v)} />
+            <Input label={t('system.native_app.short_name')} variant="secondary" value={fieldValue(formData, 'native_app_short_name')} onValueChange={(v) => updateField('native_app_short_name', v)} />
+            <Input label={t('system.native_app.bundle_id')} variant="secondary" value={fieldValue(formData, 'native_app_bundle_id')} onValueChange={(v) => updateField('native_app_bundle_id', v)} />
+            <Input label={t('system.native_app.package_name')} variant="secondary" value={fieldValue(formData, 'native_app_package_name')} onValueChange={(v) => updateField('native_app_package_name', v)} />
+            <Input label={t('system.native_app.app_version')} variant="secondary" value={fieldValue(formData, 'native_app_version')} onValueChange={(v) => updateField('native_app_version', v)} />
             <Select label={t('system.native_app.store_mode')} selectedKeys={[fieldValue(formData, 'native_app_store_mode')]} onChange={(event) => updateField('native_app_store_mode', event.target.value)}>
               <SelectItem key="shared" id="shared">{t('system.native_app.shared_app')}</SelectItem>
               <SelectItem key="tenant_branded" id="tenant_branded">{t('system.native_app.tenant_branded_app')}</SelectItem>
@@ -181,56 +181,56 @@ export function NativeApp() {
           </CardBody>
         </Card>
 
-        <Card shadow="sm">
+        <Card>
           <CardHeader><h3 className="text-lg font-semibold">{t('system.native_app.store_metadata')}</h3></CardHeader>
           <CardBody className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <Input label={t('system.native_app.ios_app_store_id')} variant="bordered" value={fieldValue(formData, 'native_app_ios_app_store_id')} onValueChange={(v) => updateField('native_app_ios_app_store_id', v)} />
-            <Input label={t('system.native_app.android_play_store_id')} variant="bordered" value={fieldValue(formData, 'native_app_android_play_store_id')} onValueChange={(v) => updateField('native_app_android_play_store_id', v)} />
-            <Input label={t('system.native_app.marketing_url')} variant="bordered" value={fieldValue(formData, 'native_app_marketing_url')} onValueChange={(v) => updateField('native_app_marketing_url', v)} />
-            <Input label={t('system.native_app.privacy_url')} variant="bordered" value={fieldValue(formData, 'native_app_privacy_url')} onValueChange={(v) => updateField('native_app_privacy_url', v)} />
-            <Input label={t('system.native_app.support_url')} variant="bordered" value={fieldValue(formData, 'native_app_support_url')} onValueChange={(v) => updateField('native_app_support_url', v)} className="md:col-span-2" />
+            <Input label={t('system.native_app.ios_app_store_id')} variant="secondary" value={fieldValue(formData, 'native_app_ios_app_store_id')} onValueChange={(v) => updateField('native_app_ios_app_store_id', v)} />
+            <Input label={t('system.native_app.android_play_store_id')} variant="secondary" value={fieldValue(formData, 'native_app_android_play_store_id')} onValueChange={(v) => updateField('native_app_android_play_store_id', v)} />
+            <Input label={t('system.native_app.marketing_url')} variant="secondary" value={fieldValue(formData, 'native_app_marketing_url')} onValueChange={(v) => updateField('native_app_marketing_url', v)} />
+            <Input label={t('system.native_app.privacy_url')} variant="secondary" value={fieldValue(formData, 'native_app_privacy_url')} onValueChange={(v) => updateField('native_app_privacy_url', v)} />
+            <Input label={t('system.native_app.support_url')} variant="secondary" value={fieldValue(formData, 'native_app_support_url')} onValueChange={(v) => updateField('native_app_support_url', v)} className="md:col-span-2" />
           </CardBody>
         </Card>
 
-        <Card shadow="sm">
+        <Card>
           <CardHeader><h3 className="text-lg font-semibold">{t('system.native_app.push_notifications')}</h3></CardHeader>
           <CardBody className="gap-4">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="font-medium">{t('system.native_app.enable_push_notifications')}</p>
-                <p className="text-sm text-default-500">{t('system.native_app.enable_push_notifications_desc')}</p>
+                <p className="text-sm text-muted">{t('system.native_app.enable_push_notifications_desc')}</p>
               </div>
               <Switch isSelected={!!formData.native_app_push_enabled} onValueChange={(v) => updateField('native_app_push_enabled', v)} aria-label={t('system.native_app.push_notifications')} />
             </div>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <Input label={t('system.native_app.fcm_server_key')} type="password" variant="bordered" value={fieldValue(formData, 'native_app_fcm_server_key')} onValueChange={(v) => updateField('native_app_fcm_server_key', v)} />
-              <Input label={t('system.native_app.apns_key_id')} type="password" variant="bordered" value={fieldValue(formData, 'native_app_apns_key_id')} onValueChange={(v) => updateField('native_app_apns_key_id', v)} />
-              <Input label={t('system.native_app.apns_team_id')} variant="bordered" value={fieldValue(formData, 'native_app_apns_team_id')} onValueChange={(v) => updateField('native_app_apns_team_id', v)} />
-              <Input label={t('system.native_app.push_sender_id')} variant="bordered" value={fieldValue(formData, 'native_app_push_sender_id')} onValueChange={(v) => updateField('native_app_push_sender_id', v)} />
-              <Input label={t('system.native_app.tenant_channel_prefix')} variant="bordered" value={fieldValue(formData, 'native_app_tenant_channel_prefix')} onValueChange={(v) => updateField('native_app_tenant_channel_prefix', v)} className="md:col-span-2" />
+              <Input label={t('system.native_app.fcm_server_key')} type="password" variant="secondary" value={fieldValue(formData, 'native_app_fcm_server_key')} onValueChange={(v) => updateField('native_app_fcm_server_key', v)} />
+              <Input label={t('system.native_app.apns_key_id')} type="password" variant="secondary" value={fieldValue(formData, 'native_app_apns_key_id')} onValueChange={(v) => updateField('native_app_apns_key_id', v)} />
+              <Input label={t('system.native_app.apns_team_id')} variant="secondary" value={fieldValue(formData, 'native_app_apns_team_id')} onValueChange={(v) => updateField('native_app_apns_team_id', v)} />
+              <Input label={t('system.native_app.push_sender_id')} variant="secondary" value={fieldValue(formData, 'native_app_push_sender_id')} onValueChange={(v) => updateField('native_app_push_sender_id', v)} />
+              <Input label={t('system.native_app.tenant_channel_prefix')} variant="secondary" value={fieldValue(formData, 'native_app_tenant_channel_prefix')} onValueChange={(v) => updateField('native_app_tenant_channel_prefix', v)} className="md:col-span-2" />
             </div>
           </CardBody>
         </Card>
 
-        <Card shadow="sm">
+        <Card>
           <CardHeader><h3 className="text-lg font-semibold">{t('system.native_app.pwa_settings')}</h3></CardHeader>
           <CardBody className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="flex items-center justify-between rounded-lg border border-divider p-3">
               <div>
                 <p className="font-medium">{t('system.native_app.service_worker')}</p>
-                <p className="text-sm text-default-500">{t('system.native_app.service_worker_desc')}</p>
+                <p className="text-sm text-muted">{t('system.native_app.service_worker_desc')}</p>
               </div>
               <Switch isSelected={!!formData.native_app_service_worker} onValueChange={(v) => updateField('native_app_service_worker', v)} aria-label={t('system.native_app.service_worker')} />
             </div>
             <div className="flex items-center justify-between rounded-lg border border-divider p-3">
               <div>
                 <p className="font-medium">{t('system.native_app.install_prompt')}</p>
-                <p className="text-sm text-default-500">{t('system.native_app.install_prompt_desc')}</p>
+                <p className="text-sm text-muted">{t('system.native_app.install_prompt_desc')}</p>
               </div>
               <Switch isSelected={!!formData.native_app_install_prompt} onValueChange={(v) => updateField('native_app_install_prompt', v)} aria-label={t('system.native_app.install_prompt')} />
             </div>
-            <Input label={t('system.native_app.theme_color')} type="color" variant="bordered" value={fieldValue(formData, 'native_app_theme_color')} onValueChange={(v) => updateField('native_app_theme_color', v)} />
-            <Input label={t('system.native_app.background_color')} type="color" variant="bordered" value={fieldValue(formData, 'native_app_background_color')} onValueChange={(v) => updateField('native_app_background_color', v)} />
+            <Input label={t('system.native_app.theme_color')} type="color" variant="secondary" value={fieldValue(formData, 'native_app_theme_color')} onValueChange={(v) => updateField('native_app_theme_color', v)} />
+            <Input label={t('system.native_app.background_color')} type="color" variant="secondary" value={fieldValue(formData, 'native_app_background_color')} onValueChange={(v) => updateField('native_app_background_color', v)} />
             <Select label={t('system.native_app.display')} selectedKeys={[fieldValue(formData, 'native_app_display')]} onChange={(event) => updateField('native_app_display', event.target.value)}>
               <SelectItem key="standalone" id="standalone">{t('system.native_app.standalone')}</SelectItem>
               <SelectItem key="fullscreen" id="fullscreen">{t('system.native_app.fullscreen')}</SelectItem>
@@ -245,10 +245,10 @@ export function NativeApp() {
           </CardBody>
         </Card>
 
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="flex items-center justify-between">
             <h3 className="text-lg font-semibold">{t('system.native_app.deployment_readiness')}</h3>
-            <Chip color={tenantBranded && readiness.tenant_branded_ready ? 'success' : 'warning'} variant="flat">
+            <Chip color={tenantBranded && readiness.tenant_branded_ready ? 'success' : 'warning'} variant="soft">
               {readyCount} / {readinessLabels.length}
             </Chip>
           </CardHeader>
@@ -257,7 +257,7 @@ export function NativeApp() {
               {readinessLabels.map(([key, labelKey]) => (
                 <div key={key} className="rounded-lg border border-divider p-3">
                   <p className="text-sm font-medium">{t(`system.native_app.${labelKey}`)}</p>
-                  <Chip size="sm" color={readiness[key] ? 'success' : 'default'} variant="flat" className="mt-2">
+                  <Chip size="sm" color={readiness[key] ? 'success' : 'default'} variant="soft" className="mt-2">
                     {readiness[key] ? t('system.native_app.ready') : t('system.native_app.missing')}
                   </Chip>
                 </div>
@@ -277,10 +277,10 @@ export function NativeApp() {
         </Card>
 
         <div className="flex justify-end gap-2">
-          <Button variant="flat" startContent={<Download size={16} />} onPress={() => void exportBuildManifest()} isLoading={exporting}>
+          <Button variant="secondary" startContent={<Download size={16} />} onPress={() => void exportBuildManifest()} isLoading={exporting}>
             {t('system.native_app.export_build_manifest')}
           </Button>
-          <Button color="primary" startContent={<Save size={16} />} onPress={() => void handleSave()} isLoading={saving}>
+          <Button variant="primary" startContent={<Save size={16} />} onPress={() => void handleSave()} isLoading={saving}>
             {t('system.native_app.save_settings')}
           </Button>
         </div>

@@ -108,7 +108,7 @@ export function CrmDashboard() {
         actions={
           <div className="flex gap-2">
             <Button
-              variant="flat"
+              variant="tertiary"
               size="sm"
               startContent={<Download size={14} />}
               onPress={() => handleExport('dashboard')}
@@ -116,7 +116,7 @@ export function CrmDashboard() {
               {t('crm.export_stats')}
             </Button>
             <Button
-              variant="flat"
+              variant="tertiary"
               size="sm"
               startContent={<Download size={14} />}
               onPress={() => handleExport('notes')}
@@ -124,7 +124,7 @@ export function CrmDashboard() {
               {t('crm.export_notes')}
             </Button>
             <Button
-              variant="flat"
+              variant="tertiary"
               size="sm"
               startContent={<Download size={14} />}
               onPress={() => handleExport('tasks')}
@@ -132,7 +132,7 @@ export function CrmDashboard() {
               {t('crm.export_tasks')}
             </Button>
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<RefreshCw size={16} />}
               onPress={loadDashboard}
               isLoading={loading}
@@ -149,7 +149,6 @@ export function CrmDashboard() {
           label={t('crm.label_total_members')}
           value={data?.total_members ?? 0}
           icon={Users}
-          color="primary"
           loading={!data}
         />
         <StatCard
@@ -163,7 +162,7 @@ export function CrmDashboard() {
           label={t('crm.label_new_this_month')}
           value={data?.new_this_month ?? 0}
           icon={UserPlus}
-          color="secondary"
+          color="default"
           loading={!data}
         />
         <StatCard
@@ -177,7 +176,6 @@ export function CrmDashboard() {
           label={t('crm.label_open_tasks')}
           value={data?.open_tasks ?? 0}
           icon={ClipboardList}
-          color="primary"
           loading={!data}
         />
         <StatCard
@@ -191,7 +189,7 @@ export function CrmDashboard() {
           label={t('crm.label_member_notes')}
           value={data?.total_notes ?? 0}
           icon={StickyNote}
-          color="secondary"
+          color="default"
           loading={!data}
         />
         <StatCard
@@ -206,10 +204,10 @@ export function CrmDashboard() {
       {/* Quick Actions + Activity Summary */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* Quick Actions */}
-        <Card shadow="sm">
+        <Card >
           <CardHeader className="flex-col items-start px-4 pb-0 pt-4">
             <h3 className="text-lg font-semibold text-foreground">{t('crm.quick_actions_title')}</h3>
-            <p className="text-sm text-default-500">{t('crm.quick_actions_desc')}</p>
+            <p className="text-sm text-muted">{t('crm.quick_actions_desc')}</p>
           </CardHeader>
           <CardBody className="gap-3 px-4 pb-4 pt-3">
             {QUICK_ACTIONS.map((action) => {
@@ -219,10 +217,10 @@ export function CrmDashboard() {
                   key={action.path}
                   as={Link}
                   to={tenantPath(action.path)}
-                  variant="flat"
+                  variant="tertiary"
                   className="justify-between"
                   fullWidth
-                  endContent={<ChevronRight size={16} className="text-default-400" />}
+                  endContent={<ChevronRight size={16} className="text-muted" />}
                 >
                   <span className="flex items-center gap-3">
                     <span className={`flex h-8 w-8 items-center justify-center rounded-lg ${action.color}`}>
@@ -237,70 +235,70 @@ export function CrmDashboard() {
         </Card>
 
         {/* Activity Summary */}
-        <Card shadow="sm">
+        <Card >
           <CardHeader className="flex-col items-start px-4 pb-0 pt-4">
             <h3 className="text-lg font-semibold text-foreground">{t('crm.activity_summary_title')}</h3>
-            <p className="text-sm text-default-500">{t('crm.activity_summary_desc')}</p>
+            <p className="text-sm text-muted">{t('crm.activity_summary_desc')}</p>
           </CardHeader>
           <CardBody className="gap-4 px-4 pb-4 pt-3">
-            <div className="flex items-center justify-between rounded-lg bg-default-50 p-3">
+            <div className="flex items-center justify-between rounded-lg bg-surface-secondary p-3">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg text-success bg-success/10">
                   <Activity size={20} />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-foreground">{t('crm.active_in_last_30')}</p>
-                  <p className="text-xs text-default-500">{t('crm.members_logged_in_recently')}</p>
+                  <p className="text-xs text-muted">{t('crm.members_logged_in_recently')}</p>
                 </div>
               </div>
-              <Chip color="success" variant="flat" size="lg">
+              <Chip color="success" variant="soft" size="lg">
                 {data?.active_members ?? 0}
               </Chip>
             </div>
 
-            <div className="flex items-center justify-between rounded-lg bg-default-50 p-3">
+            <div className="flex items-center justify-between rounded-lg bg-surface-secondary p-3">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg text-accent bg-accent-soft">
                   <UserPlus size={20} />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-foreground">{t('crm.new_this_month_summary')}</p>
-                  <p className="text-xs text-default-500">{t('crm.signups_in_current_month')}</p>
+                  <p className="text-xs text-muted">{t('crm.signups_in_current_month')}</p>
                 </div>
               </div>
-              <Chip color="secondary" variant="flat" size="lg">
+              <Chip color="default" variant="soft" size="lg">
                 {data?.new_this_month ?? 0}
               </Chip>
             </div>
 
-            <div className="flex items-center justify-between rounded-lg bg-default-50 p-3">
+            <div className="flex items-center justify-between rounded-lg bg-surface-secondary p-3">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg text-warning bg-warning/10">
                   <AlertTriangle size={20} />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-foreground">{t('crm.never_logged_in')}</p>
-                  <p className="text-xs text-default-500">{t('crm.members_not_signed_in')}</p>
+                  <p className="text-xs text-muted">{t('crm.members_not_signed_in')}</p>
                 </div>
               </div>
-              <Chip color="warning" variant="flat" size="lg">
+              <Chip color="warning" variant="soft" size="lg">
                 {data?.never_logged_in ?? 0}
               </Chip>
             </div>
 
-            <div className="flex items-center justify-between rounded-lg bg-default-50 p-3">
+            <div className="flex items-center justify-between rounded-lg bg-surface-secondary p-3">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg text-accent bg-accent/10">
                   <TrendingUp size={20} />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-foreground">{t('crm.retention_rate_summary')}</p>
-                  <p className="text-xs text-default-500">{t('crm.members_active_vs_total')}</p>
+                  <p className="text-xs text-muted">{t('crm.members_active_vs_total')}</p>
                 </div>
               </div>
               <Chip
                 color={(data?.retention_rate ?? 0) >= 50 ? 'success' : 'danger'}
-                variant="flat"
+                variant="tertiary"
                 size="lg"
               >
                 {data?.retention_rate ?? 0}%

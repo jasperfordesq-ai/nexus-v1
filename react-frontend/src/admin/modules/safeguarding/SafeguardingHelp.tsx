@@ -62,7 +62,7 @@ export function SafeguardingHelp() {
 
   return (
     <section className="mt-10">
-      <Card shadow="sm" className="border border-default-200">
+      <Card  className="border border-border">
         <CardHeader className="flex items-center gap-3 pb-2">
           <div className="p-2 rounded-lg bg-accent/10">
             <BookOpen className="w-5 h-5 text-accent" />
@@ -71,7 +71,7 @@ export function SafeguardingHelp() {
             <h2 className="text-lg font-semibold text-foreground">
               {t('safeguarding.help.title')}
             </h2>
-            <p className="text-xs text-default-500">
+            <p className="text-xs text-muted">
               {t('safeguarding.help.subtitle')}
             </p>
           </div>
@@ -90,7 +90,7 @@ export function SafeguardingHelp() {
                 </div>
               }
             >
-              <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
+              <div className="text-sm leading-relaxed text-foreground dark:text-muted space-y-3">
                 <p>
                   {t('safeguarding.help.about.intro')}
                 </p>
@@ -116,13 +116,13 @@ export function SafeguardingHelp() {
                 </div>
               }
             >
-              <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
+              <div className="text-sm leading-relaxed text-foreground dark:text-muted space-y-3">
                 <p>
                   {t('safeguarding.help.flagging.intro')}
                 </p>
                 <div className="p-3 rounded-lg bg-accent/5 border border-accent/20">
                   <p className="font-medium text-foreground mb-1">
-                    <Chip size="sm" color="primary" variant="flat" className="mr-2">
+                    <Chip size="sm" variant="soft" className="mr-2">
                       {t('safeguarding.help.flagging.most_common')}
                     </Chip>
                     {t('safeguarding.help.flagging.self_identification_title')}
@@ -137,7 +137,7 @@ export function SafeguardingHelp() {
                 </div>
                 <div className="p-3 rounded-lg bg-warning/5 border border-warning/20">
                   <p className="font-medium text-foreground mb-1">
-                    <Chip size="sm" color="warning" variant="flat" className="mr-2">
+                    <Chip size="sm" color="warning" variant="soft" className="mr-2">
                       {t('safeguarding.help.flagging.admin_initiated')}
                     </Chip>
                     {t('safeguarding.help.flagging.manual_monitoring_title')}
@@ -160,7 +160,7 @@ export function SafeguardingHelp() {
                 </div>
               }
             >
-              <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
+              <div className="text-sm leading-relaxed text-foreground dark:text-muted space-y-3">
                 <p>
                   {t('safeguarding.help.triggers.intro_prefix')} <em>{t('safeguarding.help.triggers.safeguarding_options')}</em> {t('safeguarding.help.triggers.intro_suffix')}
                 </p>
@@ -180,7 +180,7 @@ export function SafeguardingHelp() {
                     ))}
                   </TableBody>
                 </Table>
-                <p className="italic text-default-500">
+                <p className="italic text-muted">
                   {t('safeguarding.help.triggers.merge_note')}
                 </p>
               </div>
@@ -197,7 +197,7 @@ export function SafeguardingHelp() {
                 </div>
               }
             >
-              <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
+              <div className="text-sm leading-relaxed text-foreground dark:text-muted space-y-3">
                 <p>
                   {t('safeguarding.help.vetting.intro_prefix')} <code>{'VETTING_REQUIRED'}</code> {t('safeguarding.help.vetting.intro_suffix')}
                 </p>
@@ -233,7 +233,7 @@ export function SafeguardingHelp() {
                 </div>
               }
             >
-              <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
+              <div className="text-sm leading-relaxed text-foreground dark:text-muted space-y-3">
                 <p>
                   {t('safeguarding.help.assignments.intro')}
                 </p>
@@ -268,7 +268,7 @@ export function SafeguardingHelp() {
                 </div>
               }
             >
-              <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
+              <div className="text-sm leading-relaxed text-foreground dark:text-muted space-y-3">
                 <p>
                   {t('safeguarding.help.preferences.intro_prefix')} <strong>{t('safeguarding.help.preferences.special_category')}</strong>
                   {t('safeguarding.help.preferences.intro_suffix')}
@@ -296,7 +296,7 @@ export function SafeguardingHelp() {
                 </div>
               }
             >
-              <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
+              <div className="text-sm leading-relaxed text-foreground dark:text-muted space-y-3">
                 <div className="p-3 rounded-lg bg-success/5 border border-success/20">
                   <p className="font-medium text-foreground mb-2">{t('safeguarding.help.autonomy.rule_label')}</p>
                   <p>
@@ -330,7 +330,7 @@ export function SafeguardingHelp() {
                 </div>
               }
             >
-              <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
+              <div className="text-sm leading-relaxed text-foreground dark:text-muted space-y-3">
                 <p>
                   {t('safeguarding.help.annual_review.intro_prefix')} <code>safeguarding:review-flags</code> {t('safeguarding.help.annual_review.intro_suffix')}
                 </p>
@@ -355,12 +355,12 @@ export function SafeguardingHelp() {
               aria-label={t('safeguarding.help.audit.aria')}
               title={
                 <div className="flex items-center gap-2">
-                  <Eye className="w-4 h-4 text-default-500" />
+                  <Eye className="w-4 h-4 text-muted" />
                   <span className="font-medium">{t('safeguarding.help.audit.title')}</span>
                 </div>
               }
             >
-              <div className="text-sm leading-relaxed text-default-700 dark:text-default-400 space-y-3">
+              <div className="text-sm leading-relaxed text-foreground dark:text-muted space-y-3">
                 <p>
                   {t('safeguarding.help.audit.intro_prefix')} <code>activity_log</code> {t('safeguarding.help.audit.intro_middle')}
                   <code> action_type = 'safeguarding'</code>. {t('safeguarding.help.audit.intro_suffix')}

@@ -47,8 +47,8 @@ function formatDate(value: string | null, fallback: string): string {
   return new Date(value).toLocaleDateString();
 }
 
-function statusColor(status: ProjectStatus): 'primary' | 'warning' | 'success' | 'default' | 'danger' {
-  if (status === 'active') return 'primary';
+function statusColor(status: ProjectStatus): 'accent' | 'warning' | 'success' | 'default' | 'danger' {
+  if (status === 'active') return 'accent';
   if (status === 'paused') return 'warning';
   if (status === 'completed') return 'success';
   if (status === 'cancelled') return 'danger';
@@ -226,7 +226,6 @@ export default function ProjectAnnouncementsAdminPage() {
         icon={<Megaphone size={20} />}
         actions={(
           <Button
-            color="primary"
             startContent={<Plus className="h-4 w-4" aria-hidden="true" />}
             onPress={resetCreate}
           >
@@ -235,14 +234,14 @@ export default function ProjectAnnouncementsAdminPage() {
         )}
       />
       {/* Intro card */}
-      <Card className="border border-accent/30 bg-accent-soft shadow-sm shadow-accent/10 dark:bg-accent-soft" shadow="none">
+      <Card className="border border-accent/30 bg-accent-soft shadow-sm shadow-accent/10 dark:bg-accent-soft">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('about.title')}</p>
-              <p className="text-default-600">{t('about.body')}</p>
-              <div className="space-y-0.5 pt-1 text-default-500">
+              <p className="text-muted">{t('about.body')}</p>
+              <div className="space-y-0.5 pt-1 text-muted">
                 <p><strong>{t('status.draft')}:</strong> {t('about.draft')}</p>
                 <p><strong>{t('status.active')}:</strong> {t('about.active')}</p>
                 <p><strong>{t('about.paused_completed_label')}:</strong> {t('about.paused_completed')}</p>
@@ -252,13 +251,13 @@ export default function ProjectAnnouncementsAdminPage() {
         </CardBody>
       </Card>
 
-      <Card shadow="none" className="border border-divider/70 shadow-sm shadow-black/[0.03]">
+      <Card className="border border-divider/70 shadow-sm shadow-black/[0.03]">
         <CardHeader className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Megaphone className="h-5 w-5 text-accent" aria-hidden="true" />
             <div>
               <h2 className="text-lg font-semibold">{t('list.title')}</h2>
-              <p className="text-sm text-default-500">
+              <p className="text-sm text-muted">
                 {t('list.subtitle')}
               </p>
             </div>
@@ -274,7 +273,7 @@ export default function ProjectAnnouncementsAdminPage() {
               selectedKeys={[statusFilter]}
               onSelectionChange={(keys) => setStatusFilter(String(Array.from(keys)[0] ?? ''))}
               size="sm"
-              variant="bordered"
+              variant="secondary"
             >
               {STATUS_FILTER_ITEMS.map((item) => (
                 <SelectItem key={item} id={item}>
@@ -318,7 +317,7 @@ export default function ProjectAnnouncementsAdminPage() {
                       <div className="max-w-xs">
                         <p className="font-medium">{project.title}</p>
                         {project.current_stage && (
-                          <p className="mt-1 flex items-center gap-1 text-xs text-default-500">
+                          <p className="mt-1 flex items-center gap-1 text-xs text-muted">
                             <Flag className="h-3.5 w-3.5" aria-hidden="true" />
                             {project.current_stage}
                           </p>
@@ -326,7 +325,7 @@ export default function ProjectAnnouncementsAdminPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Chip color={statusColor(project.status)} size="sm" variant="flat">
+                      <Chip color={statusColor(project.status)} size="sm" variant="soft">
                         {t(`status.${project.status}`)}
                       </Chip>
                     </TableCell>
@@ -337,7 +336,7 @@ export default function ProjectAnnouncementsAdminPage() {
                           value={project.progress_percent}
                           size="sm"
                         />
-                        <p className="mt-1 text-xs text-default-500">
+                        <p className="mt-1 text-xs text-muted">
                           {t('progress_value', { value: project.progress_percent })}
                         </p>
                       </div>
@@ -351,8 +350,7 @@ export default function ProjectAnnouncementsAdminPage() {
                         {project.status === 'draft' && (
                           <Button
                             size="sm"
-                            color="primary"
-                            variant="flat"
+                            variant="secondary"
                             isLoading={actionId === project.id}
                             startContent={<Rocket className="h-3.5 w-3.5" aria-hidden="true" />}
                             onPress={() => void publishProject(project.id)}
@@ -362,7 +360,7 @@ export default function ProjectAnnouncementsAdminPage() {
                         )}
                         <Button
                           size="sm"
-                          variant="flat"
+                          variant="secondary"
                           startContent={<Milestone className="h-3.5 w-3.5" aria-hidden="true" />}
                           onPress={() => openUpdate(project)}
                         >
@@ -371,8 +369,7 @@ export default function ProjectAnnouncementsAdminPage() {
                         {project.status === 'active' && (
                           <Button
                             size="sm"
-                            color="warning"
-                            variant="flat"
+                            variant="secondary"
                             isLoading={actionId === project.id}
                             startContent={<PauseCircle className="h-3.5 w-3.5" aria-hidden="true" />}
                             onPress={() => void setProjectStatus(project, 'paused')}
@@ -383,8 +380,7 @@ export default function ProjectAnnouncementsAdminPage() {
                         {project.status !== 'completed' && project.status !== 'cancelled' && (
                           <Button
                             size="sm"
-                            color="success"
-                            variant="flat"
+                            variant="secondary"
                             isLoading={actionId === project.id}
                             startContent={<CheckCircle className="h-3.5 w-3.5" aria-hidden="true" />}
                             onPress={() => void setProjectStatus(project, 'completed')}
@@ -410,14 +406,14 @@ export default function ProjectAnnouncementsAdminPage() {
               label={t('fields.title')}
               value={title}
               onValueChange={setTitle}
-              variant="bordered"
+              variant="secondary"
               isRequired
             />
             <Textarea
               label={t('fields.summary')}
               value={summary}
               onValueChange={setSummary}
-              variant="bordered"
+              variant="secondary"
               minRows={3}
             />
             <div className="grid gap-3 sm:grid-cols-2">
@@ -425,13 +421,13 @@ export default function ProjectAnnouncementsAdminPage() {
                 label={t('fields.location')}
                 value={location}
                 onValueChange={setLocation}
-                variant="bordered"
+                variant="secondary"
               />
               <Input
                 label={t('fields.current_stage')}
                 value={currentStage}
                 onValueChange={setCurrentStage}
-                variant="bordered"
+                variant="secondary"
               />
             </div>
             <Input
@@ -441,17 +437,17 @@ export default function ProjectAnnouncementsAdminPage() {
               max={100}
               value={progressPercent}
               onValueChange={setProgressPercent}
-              variant="bordered"
+              variant="secondary"
             />
             <Switch isSelected={publishNow} onValueChange={setPublishNow}>
               {t('fields.publish_now')}
             </Switch>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={createModal.onClose}>
+            <Button variant="tertiary" onPress={createModal.onClose}>
               {t('actions.cancel')}
             </Button>
-            <Button color="primary" isLoading={submitting} onPress={() => void createProject()}>
+            <Button isLoading={submitting} onPress={() => void createProject()}>
               {t('create_modal.submit')}
             </Button>
           </ModalFooter>
@@ -466,14 +462,14 @@ export default function ProjectAnnouncementsAdminPage() {
               label={t('fields.update_title')}
               value={updateTitle}
               onValueChange={setUpdateTitle}
-              variant="bordered"
+              variant="secondary"
               isRequired
             />
             <Textarea
               label={t('fields.update_body')}
               value={updateBody}
               onValueChange={setUpdateBody}
-              variant="bordered"
+              variant="secondary"
               minRows={4}
             />
             <div className="grid gap-3 sm:grid-cols-2">
@@ -481,7 +477,7 @@ export default function ProjectAnnouncementsAdminPage() {
                 label={t('fields.stage')}
                 value={updateStage}
                 onValueChange={setUpdateStage}
-                variant="bordered"
+                variant="secondary"
               />
               <Input
                 label={t('fields.progress')}
@@ -490,7 +486,7 @@ export default function ProjectAnnouncementsAdminPage() {
                 max={100}
                 value={updateProgress}
                 onValueChange={setUpdateProgress}
-                variant="bordered"
+                variant="secondary"
               />
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -503,11 +499,10 @@ export default function ProjectAnnouncementsAdminPage() {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={updateModal.onClose}>
+            <Button variant="tertiary" onPress={updateModal.onClose}>
               {t('actions.cancel')}
             </Button>
             <Button
-              color="primary"
               isLoading={submitting}
               startContent={<Send className="h-4 w-4" aria-hidden="true" />}
               onPress={() => void createUpdate()}

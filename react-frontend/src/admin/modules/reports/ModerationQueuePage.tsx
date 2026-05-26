@@ -122,9 +122,9 @@ const STATUS_COLORS: Record<string, 'warning' | 'danger' | 'success' | 'default'
   rejected: 'default',
 };
 
-const TYPE_COLORS: Record<string, 'primary' | 'secondary' | 'success' | 'warning'> = {
-  post: 'primary',
-  listing: 'secondary',
+const TYPE_COLORS: Record<string, 'accent' | 'default' | 'success' | 'warning'> = {
+  post: 'accent',
+  listing: 'default',
   event: 'success',
   comment: 'warning',
 };
@@ -333,7 +333,7 @@ export function ModerationQueuePage() {
         actions={
           <div className="flex items-center gap-2">
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<Settings size={16} />}
               onPress={() => {
                 setLocalSettings(settings ? { ...settings } : null);
@@ -344,7 +344,7 @@ export function ModerationQueuePage() {
               {t('reports.settings')}
             </Button>
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<RefreshCw size={16} />}
               onPress={() => { loadQueue(); loadStats(); }}
               isLoading={loading}
@@ -391,14 +391,14 @@ export function ModerationQueuePage() {
           label={t('reports.auto_flagged')}
           value={stats?.auto_flagged_total ?? '\u2014'}
           icon={Shield}
-          color="secondary"
+          color="default"
           loading={!stats}
         />
       </div>
 
       {/* Content Type Breakdown */}
       {stats?.by_type && Object.keys(stats.by_type).length > 0 && (
-        <Card shadow="sm" className="mb-6">
+        <Card className="mb-6">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Filter size={18} className="text-accent" />
             <h3 className="font-semibold">{t('reports.by_content_type')}</h3>
@@ -408,19 +408,19 @@ export function ModerationQueuePage() {
               {Object.entries(stats.by_type).map(([type, counts]) => (
                 <div key={type} className="rounded-lg border border-divider p-3">
                     <div className="flex items-center gap-2 mb-2">
-                      <Chip size="sm" variant="flat" color={TYPE_COLORS[type] ?? 'default'}>
+                      <Chip size="sm" variant="soft" color={TYPE_COLORS[type] ?? 'default'}>
                         {contentTypeLabel(type)}
                       </Chip>
                     </div>
                     <div className="grid grid-cols-2 gap-1 text-xs">
-                      <span className="text-default-400">{t('reports.moderation_pending')}</span>
+                      <span className="text-muted">{t('reports.moderation_pending')}</span>
                       <span className="text-warning font-medium">{counts.pending}</span>
-                      <span className="text-default-400">{t('reports.label_flagged')}</span>
+                      <span className="text-muted">{t('reports.label_flagged')}</span>
                       <span className="text-danger font-medium">{counts.flagged}</span>
-                      <span className="text-default-400">{t('reports.label_approved')}</span>
+                      <span className="text-muted">{t('reports.label_approved')}</span>
                       <span className="text-success font-medium">{counts.approved}</span>
-                      <span className="text-default-400">{t('reports.label_rejected')}</span>
-                      <span className="text-default-600 font-medium">{counts.rejected}</span>
+                      <span className="text-muted">{t('reports.label_rejected')}</span>
+                      <span className="text-foreground font-medium">{counts.rejected}</span>
                     </div>
                 </div>
               ))}
@@ -466,13 +466,13 @@ export function ModerationQueuePage() {
           value={search}
           onValueChange={setSearch}
           className="w-48"
-          variant="bordered"
+          variant="secondary"
           isClearable
         />
       </div>
 
       {/* Queue Table */}
-      <Table aria-label={t('reports.label_moderation_queue')} shadow="sm">
+      <Table aria-label={t('reports.label_moderation_queue')}>
         <TableHeader>
           <TableColumn>{t('reports.col_content')}</TableColumn>
           <TableColumn>{t('reports.col_type')}</TableColumn>
@@ -492,7 +492,7 @@ export function ModerationQueuePage() {
                 <div className="max-w-xs">
                   <p className="text-sm font-medium text-foreground truncate">{item.title || t('reports.untitled')}</p>
                   {item.body && (
-                    <p className="text-xs text-default-400 truncate">{truncate(item.body, 80)}</p>
+                    <p className="text-xs text-muted truncate">{truncate(item.body, 80)}</p>
                   )}
                   {item.auto_flagged && item.auto_flag_reason && (
                     <p className="text-xs text-danger mt-1">
@@ -502,7 +502,7 @@ export function ModerationQueuePage() {
                 </div>
               </TableCell>
               <TableCell>
-                <Chip size="sm" variant="flat" color={TYPE_COLORS[item.content_type] ?? 'default'}>
+                <Chip size="sm" variant="soft" color={TYPE_COLORS[item.content_type] ?? 'default'}>
                   {contentTypeLabel(item.content_type)}
                 </Chip>
               </TableCell>
@@ -513,7 +513,7 @@ export function ModerationQueuePage() {
                 </div>
               </TableCell>
               <TableCell>
-                <Chip size="sm" variant="flat" color={STATUS_COLORS[item.status] ?? 'default'}>
+                <Chip size="sm" variant="soft" color={STATUS_COLORS[item.status] ?? 'default'}>
                   {statusLabel(item.status)}
                 </Chip>
                 {item.rejection_reason && (
@@ -522,7 +522,7 @@ export function ModerationQueuePage() {
                   </p>
                 )}
               </TableCell>
-              <TableCell className="text-sm text-default-500">
+              <TableCell className="text-sm text-muted">
                 {new Date(item.submitted_at).toLocaleDateString()}
               </TableCell>
               <TableCell>
@@ -530,8 +530,7 @@ export function ModerationQueuePage() {
                   <div className="flex items-center gap-1">
                     <Button
                       size="sm"
-                      color="success"
-                      variant="flat"
+                      variant="secondary"
                       isIconOnly
                       onPress={() => handleApprove(item.id)}
                       isLoading={actionLoading === item.id}
@@ -542,8 +541,7 @@ export function ModerationQueuePage() {
                     </Button>
                     <Button
                       size="sm"
-                      color="danger"
-                      variant="flat"
+                      variant="danger"
                       isIconOnly
                       onPress={() => openRejectModal(item.id)}
                       isLoading={actionLoading === item.id}
@@ -558,7 +556,7 @@ export function ModerationQueuePage() {
                   <span className="text-xs text-success">{t('reports.label_approved')}</span>
                 )}
                 {item.status === 'rejected' && (
-                  <span className="text-xs text-default-400">{t('reports.label_rejected')}</span>
+                  <span className="text-xs text-muted">{t('reports.label_rejected')}</span>
                 )}
               </TableCell>
             </TableRow>
@@ -577,7 +575,7 @@ export function ModerationQueuePage() {
         <ModalContent>
           <ModalHeader>{t('reports.reject_content')}</ModalHeader>
           <ModalBody>
-            <p className="text-sm text-default-500 mb-3">
+            <p className="text-sm text-muted mb-3">
               {t('reports.reject_content_description')}
             </p>
             <Textarea
@@ -585,13 +583,13 @@ export function ModerationQueuePage() {
               placeholder={t('reports.placeholder_explain_why_this_content_was_rejected')}
               value={rejectReason}
               onValueChange={setRejectReason}
-              variant="bordered"
+              variant="secondary"
               minRows={3}
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onRejectClose}>{t('reports.cancel')}</Button>
-            <Button color="danger" onPress={handleReject} isLoading={actionLoading !== null} isDisabled={actionLoading !== null}>
+            <Button variant="tertiary" onPress={onRejectClose}>{t('reports.cancel')}</Button>
+            <Button variant="danger" onPress={handleReject} isLoading={actionLoading !== null} isDisabled={actionLoading !== null}>
               {t('reports.reject_content')}
             </Button>
           </ModalFooter>
@@ -603,7 +601,7 @@ export function ModerationQueuePage() {
         <ModalContent>
           <ModalHeader>{t('reports.moderation_settings')}</ModalHeader>
           <ModalBody>
-            <p className="text-sm text-default-500 mb-4">
+            <p className="text-sm text-muted mb-4">
               {t('reports.settings_description')}
             </p>
             {localSettings && (
@@ -659,7 +657,7 @@ export function ModerationQueuePage() {
                 >
                   <div>
                     <span className="text-sm font-medium">{t('reports.auto_flag_suspicious_content')}</span>
-                    <p className="text-xs text-default-400">
+                    <p className="text-xs text-muted">
                       {t('reports.auto_flag_suspicious_content_desc')}
                     </p>
                   </div>
@@ -668,8 +666,8 @@ export function ModerationQueuePage() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onSettingsClose}>{t('reports.cancel')}</Button>
-            <Button color="primary" onPress={handleSaveSettings} isLoading={savingSettings} isDisabled={savingSettings}>
+            <Button variant="tertiary" onPress={onSettingsClose}>{t('reports.cancel')}</Button>
+            <Button onPress={handleSaveSettings} isLoading={savingSettings} isDisabled={savingSettings}>
               {t('reports.save_settings')}
             </Button>
           </ModalFooter>

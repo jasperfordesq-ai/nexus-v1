@@ -66,7 +66,7 @@ export function AdminDashboard() {
     { label: t('quick_actions.send_newsletter'), path: '/admin/newsletters', icon: Send, color: 'text-accent bg-accent-soft' },
     { label: t('quick_actions.new_blog_post'), path: '/admin/blog/create', icon: PenSquare, color: 'text-danger bg-danger/10' },
     { label: t('quick_actions.gamification'), path: '/admin/gamification', icon: Trophy, color: 'text-warning bg-warning/10' },
-    { label: t('quick_actions.settings'), path: '/admin/settings', icon: Settings, color: 'text-default-600 bg-default/20' },
+    { label: t('quick_actions.settings'), path: '/admin/settings', icon: Settings, color: 'text-muted bg-surface-secondary' },
   ] as const;
 
   const [stats, setStats] = useState<AdminDashboardStats | null>(null);
@@ -122,7 +122,7 @@ export function AdminDashboard() {
         description={t('subtitle')}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<RefreshCw size={16} />}
             onPress={loadDashboard}
             isLoading={loading}
@@ -135,7 +135,6 @@ export function AdminDashboard() {
 
       {showSafeguardingBanner && (
         <Card
-          shadow="sm"
           className="border border-danger/20 border-l-4 border-l-danger bg-danger/5 shadow-sm shadow-danger/10"
           data-testid="safeguarding-disabled-banner"
         >
@@ -147,16 +146,15 @@ export function AdminDashboard() {
               <p className="text-sm font-semibold text-danger">
                 {t('safeguarding_banner.title')}
               </p>
-              <p className="mt-0.5 text-sm text-default-600">
+              <p className="mt-0.5 text-sm text-muted">
                 {t('safeguarding_banner.body')}
               </p>
             </div>
             <Button
               as={Link}
               to={tenantPath('/admin/onboarding-settings')}
-              color="danger"
               size="sm"
-              variant="solid"
+              variant="danger"
               className="shrink-0"
             >
               {t('safeguarding_banner.cta')}
@@ -171,7 +169,7 @@ export function AdminDashboard() {
           label={t('stats.total_members')}
           value={stats?.total_users ?? '—'}
           icon={Users}
-          color="primary"
+          color="default"
           loading={loading}
         />
         <StatCard
@@ -185,7 +183,7 @@ export function AdminDashboard() {
           label={t('stats.transactions')}
           value={stats?.total_transactions ?? '—'}
           icon={ArrowLeftRight}
-          color="secondary"
+          color="default"
           loading={loading}
         />
         <StatCard
@@ -203,7 +201,7 @@ export function AdminDashboard() {
           label={t('stats.new_users_this_month')}
           value={stats?.new_users_this_month ?? '—'}
           icon={UserPlus}
-          color="primary"
+          color="default"
           loading={loading}
         />
         <StatCard
@@ -233,21 +231,20 @@ export function AdminDashboard() {
       {((stats?.pending_users ?? 0) > 0 || (stats?.pending_listings ?? 0) > 0) && (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
           {stats?.pending_users !== undefined && stats.pending_users > 0 && (
-            <Card shadow="sm" className="border border-warning/20 bg-surface shadow-sm shadow-warning/10">
+            <Card className="border border-warning/20 bg-surface shadow-sm shadow-warning/10">
               <CardBody className="flex flex-row items-center gap-4 p-4">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-warning/10">
                   <UserCheck size={20} className="text-warning" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-default-500">{t('alerts.pending_approvals')}</p>
+                  <p className="text-sm text-muted">{t('alerts.pending_approvals')}</p>
                   <p className="text-lg font-bold">{stats.pending_users}</p>
                 </div>
                 <Button
                   as={Link}
                   to={tenantPath('/admin/users?filter=pending')}
                   size="sm"
-                  color="warning"
-                  variant="flat"
+                  variant="secondary"
                 >
                   {t('alerts.review')}
                 </Button>
@@ -256,21 +253,20 @@ export function AdminDashboard() {
           )}
 
           {stats?.pending_listings !== undefined && stats.pending_listings > 0 && (
-            <Card shadow="sm" className="border border-accent/20 bg-surface shadow-sm shadow-accent/10">
+            <Card className="border border-accent/20 bg-surface shadow-sm shadow-accent/10">
               <CardBody className="flex flex-row items-center gap-4 p-4">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10">
                   <ListChecks size={20} className="text-accent" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-default-500">{t('alerts.pending_listings')}</p>
+                  <p className="text-sm text-muted">{t('alerts.pending_listings')}</p>
                   <p className="text-lg font-bold">{stats.pending_listings}</p>
                 </div>
                 <Button
                   as={Link}
                   to={tenantPath('/admin/listings?status=pending')}
                   size="sm"
-                  color="primary"
-                  variant="flat"
+                  variant="secondary"
                 >
                   {t('alerts.review')}
                 </Button>
@@ -284,7 +280,7 @@ export function AdminDashboard() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
 
         {/* Quick Actions (matches legacy sidebar) */}
-        <Card shadow="sm" className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
+        <Card className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <Rocket size={18} className="text-accent" />
             <h3 className="font-semibold">{t('quick_actions.card_title')}</h3>
@@ -297,12 +293,12 @@ export function AdminDashboard() {
                   <Link
                     key={action.path}
                     to={tenantPath(action.path)}
-                    className="flex flex-col items-center gap-2 rounded-xl border border-divider/70 bg-surface-secondary/30 p-3 text-center transition-all hover:-translate-y-0.5 hover:bg-default-100 hover:shadow-sm"
+                    className="flex flex-col items-center gap-2 rounded-xl border border-divider/70 bg-surface-secondary/30 p-3 text-center transition-all hover:-translate-y-0.5 hover:bg-surface-secondary hover:shadow-sm"
                   >
                     <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${action.color}`}>
                       <Icon size={20} />
                     </div>
-                    <span className="text-xs font-medium text-default-700">{action.label}</span>
+                    <span className="text-xs font-medium text-foreground">{action.label}</span>
                   </Link>
                 );
               })}
@@ -313,7 +309,7 @@ export function AdminDashboard() {
                 className="flex items-center justify-between rounded-xl px-2 py-2 text-sm text-accent transition-colors hover:bg-accent/10"
               >
                 <span className="flex items-center gap-1.5">
-                  <Chip size="sm" color="secondary" variant="flat">{t('quick_actions.enterprise')}</Chip>
+                  <Chip size="sm" color="default" variant="soft">{t('quick_actions.enterprise')}</Chip>
                   {t('quick_actions.advanced_controls')}
                 </span>
                 <ChevronRight size={14} />
@@ -323,7 +319,7 @@ export function AdminDashboard() {
         </Card>
 
         {/* Monthly Trends */}
-        <Card shadow="sm" className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
+        <Card className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
             <TrendingUp size={18} className="text-accent" />
             <h3 className="font-semibold">{t('trends.card_title')}</h3>
@@ -337,7 +333,7 @@ export function AdminDashboard() {
               <div className="space-y-3">
                 {trends.map((trend) => (
                   <div key={trend.month} className="flex items-center justify-between">
-                    <span className="text-sm text-default-600">{trend.month}</span>
+                    <span className="text-sm text-muted">{trend.month}</span>
                     <div className="flex items-center gap-4">
                       <span className="text-sm font-medium">{trend.hours} {t('trends.hours_suffix')}</span>
                       <div
@@ -349,7 +345,7 @@ export function AdminDashboard() {
                 ))}
               </div>
             ) : (
-              <p className="py-8 text-center text-sm text-default-400">
+              <p className="py-8 text-center text-sm text-muted">
                 {t('trends.no_data')}
               </p>
             )}
@@ -357,7 +353,7 @@ export function AdminDashboard() {
         </Card>
 
         {/* Recent Activity */}
-        <Card shadow="sm" className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
+        <Card className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
           <CardHeader className="flex items-center justify-between px-4 pt-4 pb-0">
             <div className="flex items-center gap-2">
               <Activity size={18} className="text-accent" />
@@ -367,7 +363,7 @@ export function AdminDashboard() {
               as={Link}
               to={tenantPath('/admin/activity-log')}
               size="sm"
-              variant="light"
+              variant="tertiary"
             >
               {t('activity.view_all')}
             </Button>
@@ -385,9 +381,9 @@ export function AdminDashboard() {
                     <div className="min-w-0 flex-1">
                       <p className="text-sm">
                         <span className="font-medium">{entry.user_name}</span>{' '}
-                        <span className="text-default-500">{entry.description}</span>
+                        <span className="text-muted">{entry.description}</span>
                       </p>
-                      <p className="text-xs text-default-400">
+                      <p className="text-xs text-muted">
                         {new Date(entry.created_at).toLocaleString()}
                       </p>
                     </div>
@@ -395,7 +391,7 @@ export function AdminDashboard() {
                 ))}
               </div>
             ) : (
-              <p className="py-8 text-center text-sm text-default-400">
+              <p className="py-8 text-center text-sm text-muted">
                 {t('activity.empty')}
               </p>
             )}

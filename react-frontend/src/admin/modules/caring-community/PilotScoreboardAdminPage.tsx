@@ -210,14 +210,13 @@ export default function PilotScoreboardAdminPage() {
         actions={
           <div className="flex gap-2">
             <Tooltip content={t('pilot_scoreboard.actions.refresh')}>
-              <Button isIconOnly size="sm" variant="flat" onPress={load} isLoading={loading} aria-label={t('pilot_scoreboard.actions.refresh')}>
+              <Button isIconOnly size="sm" variant="tertiary" onPress={load} isLoading={loading} aria-label={t('pilot_scoreboard.actions.refresh')}>
                 <RefreshCw size={15} />
               </Button>
             </Tooltip>
             <Button
               size="sm"
-              color="primary"
-              variant="flat"
+              variant="tertiary"
               startContent={<Flag size={14} />}
               onPress={() => setShowPreModal(true)}
               isDisabled={prePilot !== null}
@@ -226,8 +225,8 @@ export default function PilotScoreboardAdminPage() {
             </Button>
             <Button
               size="sm"
-              color="secondary"
-              variant="flat"
+              color="default"
+              variant="tertiary"
               startContent={<CalendarClock size={14} />}
               onPress={() => setShowQuarterlyModal(true)}
               isDisabled={prePilot === null}
@@ -238,16 +237,16 @@ export default function PilotScoreboardAdminPage() {
         }
       />
 
-      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" >
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('pilot_scoreboard.about.title')}</p>
-              <p className="text-default-600">
+              <p className="text-muted">
                 {t('pilot_scoreboard.about.body')}
               </p>
-              <p className="text-default-600">
+              <p className="text-muted">
                 {t('pilot_scoreboard.about.methodology_prefix')} <Abbr term="KISS" />/<abbr title={t('pilot_scoreboard.about.age_stiftung_title')}>{t('pilot_scoreboard.about.age_stiftung')}</abbr>{' '}
                 {t('pilot_scoreboard.about.methodology_middle')} <Abbr term="CHF">{t('pilot_scoreboard.currency.chf')}</Abbr>{' '}
                 {t('pilot_scoreboard.about.methodology_suffix')}
@@ -261,7 +260,7 @@ export default function PilotScoreboardAdminPage() {
         <Card>
           <CardBody className="flex flex-row items-center justify-between py-3">
             <div className="flex items-center gap-3">
-              <CalendarClock size={18} className={quarterly.is_overdue ? 'text-danger' : 'text-default-500'} />
+              <CalendarClock size={18} className={quarterly.is_overdue ? 'text-danger' : 'text-muted'} />
               <span className="text-sm">
                 {t('pilot_scoreboard.quarterly.next_review')}{' '}
                 <span className="font-semibold">
@@ -270,7 +269,7 @@ export default function PilotScoreboardAdminPage() {
               </span>
             </div>
             {quarterly.is_overdue && (
-              <Chip color="danger" variant="flat" size="sm" startContent={<ShieldAlert size={12} />}>
+              <Chip color="danger" variant="soft" size="sm" startContent={<ShieldAlert size={12} />}>
                 {t('pilot_scoreboard.quarterly.overdue')}
               </Chip>
             )}
@@ -288,7 +287,7 @@ export default function PilotScoreboardAdminPage() {
         <Card>
           <CardHeader className="pb-2 flex justify-between">
             <span className="font-semibold text-sm">{t('pilot_scoreboard.sections.metrics')}</span>
-            <span className="text-xs text-default-500">
+            <span className="text-xs text-muted">
               {prePilot
                 ? t('pilot_scoreboard.sections.comparing_baseline', { date: new Date(prePilot.captured_at).toLocaleDateString() })
                 : t('pilot_scoreboard.sections.no_baseline')}
@@ -319,7 +318,7 @@ export default function PilotScoreboardAdminPage() {
                     chip = (
                       <Chip
                         size="sm"
-                        variant="flat"
+                        variant="soft"
                         color={isImprovement ? 'success' : 'danger'}
                         startContent={
                           pct >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />
@@ -334,7 +333,7 @@ export default function PilotScoreboardAdminPage() {
                     <TableRow key={key}>
                       <TableCell>
                         <span className="flex items-center gap-2">
-                          {Icon && <Icon size={14} className="text-default-500" />} {t(`pilot_scoreboard.metrics.${labelKey}`)}
+                          {Icon && <Icon size={14} className="text-muted" />} {t(`pilot_scoreboard.metrics.${labelKey}`)}
                         </span>
                       </TableCell>
                       <TableCell>{baselineVal === null ? t('pilot_scoreboard.empty.value') : formatValue(baselineVal, format)}</TableCell>
@@ -378,12 +377,12 @@ export default function PilotScoreboardAdminPage() {
                     </TableCell>
                     <TableCell>
                       {b.is_pre_pilot ? (
-                        <Chip size="sm" color="primary" variant="flat">{t('pilot_scoreboard.baselines.pre_pilot')}</Chip>
+                        <Chip size="sm" variant="soft">{t('pilot_scoreboard.baselines.pre_pilot')}</Chip>
                       ) : (
-                        <Chip size="sm" variant="flat">{t('pilot_scoreboard.baselines.quarterly')}</Chip>
+                        <Chip size="sm" variant="soft">{t('pilot_scoreboard.baselines.quarterly')}</Chip>
                       )}
                     </TableCell>
-                    <TableCell className="text-xs text-default-600 max-w-md truncate">
+                    <TableCell className="text-xs text-muted max-w-md truncate">
                       {b.notes ?? t('pilot_scoreboard.empty.value')}
                     </TableCell>
                   </TableRow>
@@ -398,7 +397,7 @@ export default function PilotScoreboardAdminPage() {
         <ModalContent>
           <ModalHeader>{t('pilot_scoreboard.pre_modal.title')}</ModalHeader>
           <ModalBody>
-            <p className="text-sm text-default-600">
+            <p className="text-sm text-muted">
                 {t('pilot_scoreboard.pre_modal.body')}
             </p>
             <Textarea
@@ -410,10 +409,10 @@ export default function PilotScoreboardAdminPage() {
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={() => setShowPreModal(false)} isDisabled={submitting}>
+            <Button variant="tertiary" onPress={() => setShowPreModal(false)} isDisabled={submitting}>
               {t('pilot_scoreboard.actions.cancel')}
             </Button>
-            <Button color="primary" onPress={capturePre} isLoading={submitting}>
+            <Button onPress={capturePre} isLoading={submitting}>
               {t('pilot_scoreboard.actions.capture_baseline')}
             </Button>
           </ModalFooter>
@@ -424,7 +423,7 @@ export default function PilotScoreboardAdminPage() {
         <ModalContent>
           <ModalHeader>{t('pilot_scoreboard.quarterly_modal.title')}</ModalHeader>
           <ModalBody>
-            <p className="text-sm text-default-600">
+            <p className="text-sm text-muted">
               {t('pilot_scoreboard.quarterly_modal.body')}
             </p>
             <Input
@@ -443,10 +442,10 @@ export default function PilotScoreboardAdminPage() {
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={() => setShowQuarterlyModal(false)} isDisabled={submitting}>
+            <Button variant="tertiary" onPress={() => setShowQuarterlyModal(false)} isDisabled={submitting}>
               {t('pilot_scoreboard.actions.cancel')}
             </Button>
-            <Button color="primary" onPress={captureQuarterly} isLoading={submitting}>
+            <Button onPress={captureQuarterly} isLoading={submitting}>
               {t('pilot_scoreboard.actions.capture_quarterly')}
             </Button>
           </ModalFooter>
@@ -458,7 +457,7 @@ export default function PilotScoreboardAdminPage() {
       )}
 
       {!loading && current && (
-        <p className="text-xs text-default-500">
+        <p className="text-xs text-muted">
           {t('pilot_scoreboard.methodology.prefix')} <Abbr term="CHF">{t('pilot_scoreboard.currency.chf')}</Abbr> {current.methodology.hourly_rate_chf}
           {t('pilot_scoreboard.methodology.per_hour')} {current.methodology.prevention_multiplier}{' '}
           {t('pilot_scoreboard.methodology.multiplier')} {t('pilot_scoreboard.methodology.window', { days: current.methodology.window_days })}

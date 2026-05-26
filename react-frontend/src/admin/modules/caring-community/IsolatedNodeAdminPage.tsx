@@ -157,11 +157,11 @@ export default function IsolatedNodeAdminPage() {
 
   const renderValueChip = (item: DecisionItem) => {
     if (!item.value) {
-      return <span className="text-default-400 text-sm italic">—</span>;
+      return <span className="text-muted text-sm italic">—</span>;
     }
     if (item.type === 'enum' || item.type === 'choice') {
       return (
-        <Chip size="sm" variant="flat" color="primary">
+        <Chip size="sm" variant="soft">
           {item.value}
         </Chip>
       );
@@ -240,7 +240,7 @@ export default function IsolatedNodeAdminPage() {
             <Button
               isIconOnly
               size="sm"
-              variant="flat"
+              variant="tertiary"
               onPress={load}
               isLoading={loading}
               aria-label={t('isolated_node.actions.refresh_aria')}
@@ -251,17 +251,17 @@ export default function IsolatedNodeAdminPage() {
         }
       />
 
-      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" >
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('isolated_node.about.title')}</p>
-              <p className="text-default-600">
+              <p className="text-muted">
                 {t('isolated_node.about.body_prefix')} <Abbr term="NEXUS" /> {t('isolated_node.about.body_middle')}{' '}
                 <Abbr term="AGORIS" /> {t('isolated_node.about.body_suffix')}
               </p>
-              <p className="text-default-600">
+              <p className="text-muted">
                 {t('isolated_node.about.workflow')}
               </p>
             </div>
@@ -269,13 +269,13 @@ export default function IsolatedNodeAdminPage() {
         </CardBody>
       </Card>
 
-      <Card className="border border-warning-300 bg-warning-50/50 dark:bg-warning-900/10" shadow="none">
+      <Card className="border border-warning-300 bg-warning-50/50 dark:bg-warning-900/10" >
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-warning-600" aria-hidden="true" />
             <div className="text-sm">
               <p className="font-semibold text-warning-800 dark:text-warning-200">{t('isolated_node.warning.title')}</p>
-              <p className="text-default-600 mt-0.5">
+              <p className="text-muted mt-0.5">
                 {t('isolated_node.warning.body_prefix')} <Abbr term="NEXUS" /> {t('isolated_node.warning.body_suffix')}
               </p>
             </div>
@@ -312,7 +312,7 @@ export default function IsolatedNodeAdminPage() {
                         ? t('isolated_node.gate.closed')
                         : t('isolated_node.gate.open')}
                     </p>
-                    <p className="text-sm text-default-500">
+                    <p className="text-sm text-muted">
                       {t('isolated_node.gate.decided_count', {
                         decided: gate.decided_count,
                         total: gate.total_count,
@@ -324,16 +324,16 @@ export default function IsolatedNodeAdminPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Chip size="sm" variant="flat" color={STATUS_COLORS.pending}>
+                  <Chip size="sm" variant="soft" color={STATUS_COLORS.pending}>
                     {t('isolated_node.status_counts.pending', { count: gate.status_counts.pending })}
                   </Chip>
-                  <Chip size="sm" variant="flat" color={STATUS_COLORS.in_progress}>
+                  <Chip size="sm" variant="soft" color={STATUS_COLORS.in_progress}>
                     {t('isolated_node.status_counts.in_progress', { count: gate.status_counts.in_progress })}
                   </Chip>
-                  <Chip size="sm" variant="flat" color={STATUS_COLORS.decided}>
+                  <Chip size="sm" variant="soft" color={STATUS_COLORS.decided}>
                     {t('isolated_node.status_counts.decided', { count: gate.status_counts.decided })}
                   </Chip>
-                  <Chip size="sm" variant="flat" color={STATUS_COLORS.blocked}>
+                  <Chip size="sm" variant="soft" color={STATUS_COLORS.blocked}>
                     {t('isolated_node.status_counts.blocked', { count: gate.status_counts.blocked })}
                   </Chip>
                 </div>
@@ -353,15 +353,15 @@ export default function IsolatedNodeAdminPage() {
                 <CardHeader className="flex flex-wrap items-start justify-between gap-3 pb-2">
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold text-sm">{item.label}</p>
-                    <p className="text-xs text-default-500 mt-0.5">{item.help}</p>
+                    <p className="text-xs text-muted mt-0.5">{item.help}</p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <Chip size="sm" variant="flat" color={STATUS_COLORS[item.status]}>
+                    <Chip size="sm" variant="soft" color={STATUS_COLORS[item.status]}>
                       {t(`isolated_node.status.${item.status}`)}
                     </Chip>
                     <Button
                       size="sm"
-                      variant="flat"
+                      variant="tertiary"
                       startContent={<Pencil size={13} />}
                       onPress={() => openEditor(item)}
                     >
@@ -372,26 +372,26 @@ export default function IsolatedNodeAdminPage() {
                 <CardBody className="pt-0">
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
                     <div>
-                      <p className="text-xs uppercase tracking-wide text-default-400">{t('isolated_node.fields.value')}</p>
+                      <p className="text-xs uppercase tracking-wide text-muted">{t('isolated_node.fields.value')}</p>
                       <div className="mt-1">{renderValueChip(item)}</div>
                     </div>
                     <div>
-                      <p className="text-xs uppercase tracking-wide text-default-400">{t('isolated_node.fields.owner')}</p>
+                      <p className="text-xs uppercase tracking-wide text-muted">{t('isolated_node.fields.owner')}</p>
                       <p className="mt-1">
                         {item.owner ? (
                           item.owner
                         ) : (
-                          <span className="text-default-400 italic">{t('isolated_node.empty.unassigned')}</span>
+                          <span className="text-muted italic">{t('isolated_node.empty.unassigned')}</span>
                         )}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs uppercase tracking-wide text-default-400">{t('isolated_node.fields.notes')}</p>
+                      <p className="text-xs uppercase tracking-wide text-muted">{t('isolated_node.fields.notes')}</p>
                       <p className="mt-1 whitespace-pre-wrap break-words">
                         {item.notes ? (
                           item.notes
                         ) : (
-                          <span className="text-default-400 italic">{t('isolated_node.empty.none')}</span>
+                          <span className="text-muted italic">{t('isolated_node.empty.none')}</span>
                         )}
                       </p>
                     </div>
@@ -404,7 +404,7 @@ export default function IsolatedNodeAdminPage() {
           {data.last_updated_at && (
             <>
               <Separator />
-              <p className="text-xs text-default-500">
+              <p className="text-xs text-muted">
                 {t('isolated_node.timestamps.last_updated', {
                   date: new Date(data.last_updated_at).toLocaleString(),
                 })}
@@ -418,7 +418,7 @@ export default function IsolatedNodeAdminPage() {
         <ModalContent>
           <ModalHeader className="flex flex-col gap-1">
             <span>{editingItem?.label ?? t('isolated_node.modal.edit_decision_item')}</span>
-            <span className="text-xs font-normal text-default-500">
+            <span className="text-xs font-normal text-muted">
               {t('isolated_node.modal.subtitle')}
             </span>
           </ModalHeader>
@@ -457,10 +457,10 @@ export default function IsolatedNodeAdminPage() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={closeModal} isDisabled={saving}>
+            <Button variant="tertiary" onPress={closeModal} isDisabled={saving}>
               {t('isolated_node.actions.cancel')}
             </Button>
-            <Button color="primary" onPress={save} isLoading={saving}>
+            <Button onPress={save} isLoading={saving}>
               {t('isolated_node.actions.save_changes')}
             </Button>
           </ModalFooter>

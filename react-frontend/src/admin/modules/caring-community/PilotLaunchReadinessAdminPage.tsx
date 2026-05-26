@@ -238,7 +238,7 @@ export default function PilotLaunchReadinessAdminPage() {
               <Button
                 isIconOnly
                 size="sm"
-                variant="flat"
+                variant="tertiary"
                 onPress={load}
                 isLoading={loading}
                 aria-label={t('pilot_launch_readiness.actions.refresh_aria')}
@@ -250,16 +250,16 @@ export default function PilotLaunchReadinessAdminPage() {
         }
       />
 
-      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" >
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('pilot_launch_readiness.about.title')}</p>
-              <p className="text-default-600">
+              <p className="text-muted">
                 {t('pilot_launch_readiness.about.body')}
               </p>
-              <p className="text-default-600 mt-1">
+              <p className="text-muted mt-1">
                 {t('pilot_launch_readiness.about.review_help')}
               </p>
             </div>
@@ -275,7 +275,7 @@ export default function PilotLaunchReadinessAdminPage() {
                 <CheckCircle2 size={22} className="text-success" />
                 <div>
                   <p className="text-base font-semibold">{t('pilot_launch_readiness.states.launched_title')}</p>
-                  <p className="text-sm text-default-600">
+                  <p className="text-sm text-muted">
                     {t('pilot_launch_readiness.states.launched_body', {
                       date: report.launched
                         ? new Date(report.launched.launched_at).toLocaleString()
@@ -298,7 +298,7 @@ export default function PilotLaunchReadinessAdminPage() {
                 <CheckCircle2 size={22} className="text-success" />
                 <div>
                   <p className="text-base font-semibold">{t('pilot_launch_readiness.states.ready_title')}</p>
-                  <p className="text-sm text-default-600">
+                  <p className="text-sm text-muted">
                     {t('pilot_launch_readiness.states.ready_body_prefix')} <em>{t('pilot_launch_readiness.actions.launch_pilot')}</em> {t('pilot_launch_readiness.states.ready_body_suffix')}
                   </p>
                 </div>
@@ -314,7 +314,7 @@ export default function PilotLaunchReadinessAdminPage() {
                   <p className="text-base font-semibold">
                     {t('pilot_launch_readiness.states.blocked_title', { count: blockerCount })}
                   </p>
-                  <p className="text-sm text-default-600">
+                  <p className="text-sm text-muted">
                     {t('pilot_launch_readiness.states.blocked_body')}
                   </p>
                 </div>
@@ -337,11 +337,11 @@ export default function PilotLaunchReadinessAdminPage() {
               <AlertTriangle size={22} className="mt-0.5 shrink-0 text-danger" />
               <div className="min-w-0 flex-1">
                 <p className="text-base font-semibold">{t('pilot_launch_readiness.errors.unavailable_title')}</p>
-                <p className="mt-1 text-sm text-default-600">{loadError}</p>
+                <p className="mt-1 text-sm text-muted">{loadError}</p>
               </div>
               <Button
                 size="sm"
-                variant="flat"
+                variant="tertiary"
                 startContent={<RefreshCw size={14} />}
                 onPress={load}
               >
@@ -377,10 +377,10 @@ export default function PilotLaunchReadinessAdminPage() {
                         ? t('pilot_launch_readiness.overall.not_started')
                         : t('pilot_launch_readiness.overall.needs_review')}
                     </p>
-                    <p className="text-sm text-default-500">{overall.summary}</p>
+                    <p className="text-sm text-muted">{overall.summary}</p>
                   </div>
                 </div>
-                <Chip color={STATUS_COLORS[overall.status]} variant="flat" size="lg">
+                <Chip color={STATUS_COLORS[overall.status]} variant="soft" size="lg">
                   {t('pilot_launch_readiness.progress.ready_count', {
                     ready: overall.ready_section_count,
                     total: overall.total_section_count,
@@ -393,7 +393,7 @@ export default function PilotLaunchReadinessAdminPage() {
                 color={STATUS_COLORS[overall.status]}
                 className="max-w-full"
               />
-              <p className="text-xs text-default-500 italic">
+              <p className="text-xs text-muted italic">
                 {report.isolated_node_required
                   ? t('pilot_launch_readiness.isolated_node.required')
                   : t('pilot_launch_readiness.isolated_node.informational')}
@@ -407,17 +407,17 @@ export default function PilotLaunchReadinessAdminPage() {
                 <CardHeader className="flex flex-wrap items-start justify-between gap-3 pb-2">
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold">{section.label}</p>
-                    <p className="text-xs text-default-500 mt-0.5">{section.summary}</p>
+                    <p className="text-xs text-muted mt-0.5">{section.summary}</p>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <Chip size="sm" variant="flat" color={STATUS_COLORS[section.status]}>
+                    <Chip size="sm" variant="soft" color={STATUS_COLORS[section.status]}>
                       {t(`pilot_launch_readiness.status.${section.status}`)}
                     </Chip>
                     <Button
                       as={Link}
                       to={section.admin_path}
                       size="sm"
-                      variant="flat"
+                      variant="tertiary"
                       endContent={<ChevronRight size={14} />}
                     >
                       {t('pilot_launch_readiness.actions.open')}
@@ -438,7 +438,7 @@ export default function PilotLaunchReadinessAdminPage() {
                         </Chip>
                       ))}
                       {section.missing.length > 8 && (
-                        <Chip size="sm" variant="flat" color="default">
+                        <Chip size="sm" variant="soft" color="default">
                           {t('pilot_launch_readiness.more_count', { count: section.missing.length - 8 })}
                         </Chip>
                       )}
@@ -449,8 +449,7 @@ export default function PilotLaunchReadinessAdminPage() {
                     <div>
                       <Button
                         size="sm"
-                        color="primary"
-                        variant="flat"
+                        variant="tertiary"
                         startContent={<ClipboardCheck size={14} />}
                         onPress={acknowledgeBoundary}
                         isLoading={acknowledging}
@@ -461,7 +460,7 @@ export default function PilotLaunchReadinessAdminPage() {
                   )}
 
                   {section.last_updated_at && (
-                    <p className="text-[11px] text-default-400">
+                    <p className="text-[11px] text-muted">
                       {t('pilot_launch_readiness.timestamps.last_updated', {
                         date: new Date(section.last_updated_at).toLocaleString(),
                       })}
@@ -473,7 +472,7 @@ export default function PilotLaunchReadinessAdminPage() {
           </div>
 
           <Separator />
-          <p className="text-xs text-default-500">
+          <p className="text-xs text-muted">
             {t('pilot_launch_readiness.timestamps.report_generated', {
               date: new Date(report.generated_at).toLocaleString(),
             })}
@@ -501,20 +500,20 @@ export default function PilotLaunchReadinessAdminPage() {
             <p>
               {t('pilot_launch_readiness.modal.confirm_intro')}
             </p>
-            <ul className="list-disc pl-6 text-sm text-default-700 space-y-1">
+            <ul className="list-disc pl-6 text-sm text-foreground space-y-1">
               <li>{t('pilot_launch_readiness.modal.check_disclosure')}</li>
               <li>{t('pilot_launch_readiness.modal.check_baseline')}</li>
               <li>{t('pilot_launch_readiness.modal.check_data_quality')}</li>
               <li>{t('pilot_launch_readiness.modal.check_residents')}</li>
             </ul>
             {report && (
-              <div className="rounded-lg border border-default-200 bg-default-50 p-3 text-xs text-default-700 dark:bg-default-100/30">
+              <div className="rounded-lg border border-border bg-surface-secondary p-3 text-xs text-foreground dark:bg-surface-secondary/30">
                 <p className="font-semibold mb-1">{t('pilot_launch_readiness.modal.section_summary')}</p>
                 <ul className="space-y-0.5">
                   {report.sections.map((s) => (
                     <li key={s.key} className="flex items-center justify-between gap-2">
                       <span>{s.label}</span>
-                      <Chip size="sm" variant="flat" color={STATUS_COLORS[s.status]}>
+                      <Chip size="sm" variant="soft" color={STATUS_COLORS[s.status]}>
                         {t(`pilot_launch_readiness.status.${s.status}`)}
                       </Chip>
                     </li>
@@ -525,7 +524,7 @@ export default function PilotLaunchReadinessAdminPage() {
           </ModalBody>
           <ModalFooter>
             <Button
-              variant="flat"
+              variant="tertiary"
               onPress={() => setLaunchModalOpen(false)}
               isDisabled={launching}
             >
