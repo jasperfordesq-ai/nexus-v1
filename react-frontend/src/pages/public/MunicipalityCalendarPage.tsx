@@ -1,8 +1,8 @@
-import { Button, Card, CardBody, CardHeader, Chip, Input, Spinner } from '@/components/ui';
+import { Button, Chip, Input, Spinner } from '@/components/ui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Separator } from '@heroui/react';
+import { Card, Separator } from '@heroui/react';
 import Calendar from 'lucide-react/icons/calendar';
 import ChevronLeft from 'lucide-react/icons/chevron-left';
 import ChevronRight from 'lucide-react/icons/chevron-right';
@@ -164,7 +164,7 @@ export default function MunicipalityCalendarPage() {
       </div>
 
       <Card>
-        <CardHeader className="flex flex-wrap items-end gap-3">
+        <Card.Header className="flex flex-wrap items-end gap-3">
           <Input
             label={t('verein_federation.municipality_code_label')}
             value={inputCode}
@@ -200,9 +200,9 @@ export default function MunicipalityCalendarPage() {
               {t('verein_federation.calendar.today')}
             </Button>
           </div>
-        </CardHeader>
+        </Card.Header>
         <Separator />
-        <CardBody>
+        <Card.Content>
           {!code ? (
             <p className="text-sm text-default-500 py-8 text-center">
               {t('verein_federation.calendar.no_municipality')}
@@ -220,7 +220,7 @@ export default function MunicipalityCalendarPage() {
               {Array.from({ length: daysInMonth }, (_, i) => renderDayCell(i + 1))}
             </div>
           )}
-        </CardBody>
+        </Card.Content>
       </Card>
     </div>
   );
