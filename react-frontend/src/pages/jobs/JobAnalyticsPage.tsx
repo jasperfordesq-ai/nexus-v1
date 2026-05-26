@@ -29,7 +29,8 @@ import Share2 from 'lucide-react/icons/share-2';
 import Star from 'lucide-react/icons/star';
 import Sparkles from 'lucide-react/icons/sparkles';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Progress, Button, Chip, Spinner, Tooltip } from '@/components/ui';
+import { Chip } from '@heroui/react';
+import { GlassCard, Progress, Button, Spinner, Tooltip } from '@/components/ui';
 import { EmptyState } from '@/components/feedback';
 import { useTenant } from '@/contexts';
 import { api, API_BASE } from '@/lib/api';
@@ -481,7 +482,7 @@ export function JobAnalyticsPage() {
             {t('analytics.predictions')}
           </h2>
           {predictions && (
-            <Chip size="sm" variant="flat" color="default">
+            <Chip size="sm" variant="tertiary" color="default">
               {t('analytics.based_on', { count: predictions.similar_jobs_analyzed })}
             </Chip>
           )}
@@ -501,7 +502,7 @@ export function JobAnalyticsPage() {
                 <p className="text-xs mt-1">
                   <span className="text-default-400">{t('analytics.current')}: {predictions.expected_applications.current}</span>
                   {' · '}
-                  <Chip size="sm" variant="flat" color={predictions.expected_applications.current >= predictions.expected_applications.value ? 'success' : 'warning'}>
+                  <Chip size="sm" variant="tertiary" color={predictions.expected_applications.current >= predictions.expected_applications.value ? 'success' : 'warning'}>
                     {predictions.expected_applications.label}
                   </Chip>
                 </p>
@@ -523,7 +524,7 @@ export function JobAnalyticsPage() {
                 <p className="text-xs mt-1">
                   <span className="text-default-400">{t('analytics.avg')}: {predictions.conversion_rate.average}%</span>
                   {' · '}
-                  <Chip size="sm" variant="flat" color={predictions.conversion_rate.yours >= predictions.conversion_rate.average ? 'success' : 'warning'}>
+                  <Chip size="sm" variant="tertiary" color={predictions.conversion_rate.yours >= predictions.conversion_rate.average ? 'success' : 'warning'}>
                     {predictions.conversion_rate.label}
                   </Chip>
                 </p>
@@ -544,7 +545,7 @@ export function JobAnalyticsPage() {
                     <p className="text-sm text-default-500">{t('analytics.market_avg')}</p>
                     <p className="text-lg font-bold">{predictions.salary_comparison.market_avg.toLocaleString()}</p>
                   </div>
-                  <Chip size="sm" variant="flat" color={predictions.salary_comparison.diff_percent >= 0 ? 'success' : 'danger'}>
+                  <Chip size="sm" variant="tertiary" color={predictions.salary_comparison.diff_percent >= 0 ? 'success' : 'danger'}>
                     {predictions.salary_comparison.diff_percent > 0 ? '+' : ''}{predictions.salary_comparison.diff_percent}% {predictions.salary_comparison.label}
                   </Chip>
                 </div>
