@@ -1,4 +1,5 @@
-import { Select, SelectItem, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Tabs, Tab } from '@/components/ui';
+import { Select, SelectItem, Button, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch, Tabs, Tab } from '@/components/ui';
+import { Chip } from '@heroui/react';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -311,15 +312,15 @@ export function RiskTagsPage() {
       render: (item) => (
         <Chip
           size="sm"
-          variant="flat"
+          variant="tertiary"
           color={riskColorMap[item.risk_level] || 'default'}
-          startContent={item.risk_level === 'critical' || item.risk_level === 'high'
-            ? <ShieldAlert size={12} />
-            : <ShieldCheck size={12} />
-          }
           className="capitalize"
         >
-          {t(`risk_tags.level_${item.risk_level}`)}
+          {item.risk_level === 'critical' || item.risk_level === 'high'
+            ? <ShieldAlert size={12} aria-hidden="true" />
+            : <ShieldCheck size={12} aria-hidden="true" />
+          }
+          <Chip.Label>{t(`risk_tags.level_${item.risk_level}`)}</Chip.Label>
         </Chip>
       ),
     },
@@ -337,8 +338,9 @@ export function RiskTagsPage() {
       key: 'requires_approval',
       label: t('risk_tags.col_approval_req'),
       render: (item) => (
-        <Chip size="sm" variant="dot" color={item.requires_approval ? 'warning' : 'default'}>
-          {item.requires_approval ? t('risk_tags.yes') : t('risk_tags.no')}
+        <Chip size="sm" variant={item.requires_approval ? 'soft' : 'tertiary'} color={item.requires_approval ? 'warning' : 'default'}>
+          <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
+          <Chip.Label>{item.requires_approval ? t('risk_tags.yes') : t('risk_tags.no')}</Chip.Label>
         </Chip>
       ),
     },
@@ -346,8 +348,9 @@ export function RiskTagsPage() {
       key: 'insurance_required',
       label: t('risk_tags.col_insurance'),
       render: (item) => (
-        <Chip size="sm" variant="dot" color={item.insurance_required ? 'warning' : 'default'}>
-          {item.insurance_required ? t('risk_tags.yes') : t('risk_tags.no')}
+        <Chip size="sm" variant={item.insurance_required ? 'soft' : 'tertiary'} color={item.insurance_required ? 'warning' : 'default'}>
+          <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
+          <Chip.Label>{item.insurance_required ? t('risk_tags.yes') : t('risk_tags.no')}</Chip.Label>
         </Chip>
       ),
     },
@@ -355,8 +358,9 @@ export function RiskTagsPage() {
       key: 'dbs_required',
       label: t('risk_tags.col_dbs'),
       render: (item) => (
-        <Chip size="sm" variant="dot" color={item.dbs_required ? 'warning' : 'default'}>
-          {item.dbs_required ? t('risk_tags.yes') : t('risk_tags.no')}
+        <Chip size="sm" variant={item.dbs_required ? 'soft' : 'tertiary'} color={item.dbs_required ? 'warning' : 'default'}>
+          <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
+          <Chip.Label>{item.dbs_required ? t('risk_tags.yes') : t('risk_tags.no')}</Chip.Label>
         </Chip>
       ),
     },

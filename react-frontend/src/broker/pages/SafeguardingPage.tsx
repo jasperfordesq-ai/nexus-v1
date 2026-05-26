@@ -27,7 +27,8 @@ import { api } from '@/lib/api';
 import { formatServerDate } from '@/lib/serverTime';
 import { PageHeader, DataTable, StatCard, EmptyState } from '@/admin/components';
 import type { Column } from '@/admin/components';
-import { Button, Chip, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab } from '@/components/ui';
+import { Chip } from '@heroui/react';
+import { Button, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab } from '@/components/ui';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -92,7 +93,7 @@ function SeverityChip({ severity, t }: { severity: string; t: TFunction }) {
     critical: 'danger',
   };
   const color = colorMap[severity] || 'default';
-  const variant = severity === 'critical' ? 'solid' : 'flat';
+  const variant = severity === 'critical' ? 'primary' : 'tertiary';
   // Reuse the existing broker.status namespace which already has
   // low/medium/high/critical translated across all 11 languages —
   // avoids a parallel severity.* keyset that would drift.
@@ -323,9 +324,9 @@ export default function SafeguardingPage() {
       label: t('safeguarding.col_status'),
       render: (item) =>
         (item.is_reviewed || item.reviewed_at) ? (
-          <Chip size="sm" color="success" variant="flat">{t('status.reviewed')}</Chip>
+          <Chip size="sm" color="success" variant="tertiary">{t('status.reviewed')}</Chip>
         ) : (
-          <Chip size="sm" color="warning" variant="flat">{t('status.unreviewed')}</Chip>
+          <Chip size="sm" color="warning" variant="tertiary">{t('status.unreviewed')}</Chip>
         ),
     },
     {
@@ -367,7 +368,7 @@ export default function SafeguardingPage() {
           revoked: 'danger',
         };
         return (
-          <Chip size="sm" color={colorMap[item.status] || 'default'} variant="flat" className="capitalize">
+          <Chip size="sm" color={colorMap[item.status] || 'default'} variant="tertiary" className="capitalize">
             {t(`status.${item.status}`)}
           </Chip>
         );
@@ -404,9 +405,9 @@ export default function SafeguardingPage() {
       label: t('safeguarding.col_has_triggers'),
       render: (item) =>
         item.has_triggers ? (
-          <Chip size="sm" color="danger" variant="flat">{t('safeguarding.yes')}</Chip>
+          <Chip size="sm" color="danger" variant="tertiary">{t('safeguarding.yes')}</Chip>
         ) : (
-          <Chip size="sm" color="success" variant="flat">{t('safeguarding.no')}</Chip>
+          <Chip size="sm" color="success" variant="tertiary">{t('safeguarding.no')}</Chip>
         ),
     },
     {
