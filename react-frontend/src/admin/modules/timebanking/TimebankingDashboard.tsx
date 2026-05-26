@@ -204,9 +204,8 @@ export function TimebankingDashboard() {
             <Button
               as={Link}
               to={tenantPath('/admin/timebanking/alerts')}
-              variant="flat"
-              color="danger"
-              className="justify-between h-auto py-3"
+              variant="danger-soft"
+              className="min-h-11 justify-between px-4 py-3"
               endContent={<ChevronRight size={16} />}
             >
               <div className="flex items-center gap-2">
@@ -218,9 +217,8 @@ export function TimebankingDashboard() {
             <Button
               as={Link}
               to={tenantPath('/admin/timebanking/community-fund')}
-              variant="flat"
-              color="success"
-              className="justify-between h-auto py-3"
+              variant="secondary"
+              className="min-h-11 justify-between px-4 py-3"
               endContent={<ChevronRight size={16} />}
             >
               <div className="flex items-center gap-2">
@@ -232,9 +230,8 @@ export function TimebankingDashboard() {
             <Button
               as={Link}
               to={tenantPath('/admin/timebanking/user-report')}
-              variant="flat"
-              color="primary"
-              className="justify-between h-auto py-3"
+              variant="secondary"
+              className="min-h-11 justify-between px-4 py-3"
               endContent={<ChevronRight size={16} />}
             >
               <div className="flex items-center gap-2">
@@ -246,9 +243,8 @@ export function TimebankingDashboard() {
             <Button
               as={Link}
               to={tenantPath('/admin/timebanking/org-wallets')}
-              variant="flat"
-              color="secondary"
-              className="justify-between h-auto py-3"
+              variant="secondary"
+              className="min-h-11 justify-between px-4 py-3"
               endContent={<ChevronRight size={16} />}
             >
               <div className="flex items-center gap-2">

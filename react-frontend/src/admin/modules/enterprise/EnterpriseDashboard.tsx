@@ -150,8 +150,8 @@ export function EnterpriseDashboard() {
                   key={link.href}
                   as={Link}
                   to={link.href}
-                  variant="flat"
-                  className="justify-between h-auto py-3"
+                  variant="secondary"
+                  className="min-h-11 justify-between px-4 py-3"
                   endContent={<ArrowRight size={16} />}
                   startContent={<link.icon size={18} />}
                 >

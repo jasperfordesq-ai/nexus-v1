@@ -147,8 +147,8 @@ export function SuperDashboard() {
                 key={action.href}
                 as={Link}
                 to={action.href}
-                variant="flat"
-                className="justify-between h-auto py-3"
+                variant="secondary"
+                className="min-h-11 justify-between px-4 py-3"
                 endContent={<ArrowRight size={16} />}
                 startContent={<action.icon size={18} />}
               >
