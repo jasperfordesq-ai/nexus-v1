@@ -12,7 +12,8 @@
  */
 
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';import { Separator } from '@heroui/react';
+import { motion } from 'framer-motion';
+import { Chip, Separator } from '@heroui/react';
 import FileText from 'lucide-react/icons/file-text';
 import Clock from 'lucide-react/icons/clock';
 import Users from 'lucide-react/icons/users';
@@ -31,7 +32,7 @@ import CalendarDays from 'lucide-react/icons/calendar-days';
 import Info from 'lucide-react/icons/info';
 import CircleSlash from 'lucide-react/icons/circle-slash';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Spinner } from '@/components/ui';
+import { GlassCard, Button, Spinner } from '@/components/ui';
 import { CustomLegalDocument } from '@/components/legal/CustomLegalDocument';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { useTenant } from '@/contexts';
@@ -175,7 +176,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
       <motion.div variants={itemVariants} id="time-credits">
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
-            <Chip size="sm" variant="flat" color="primary" className="text-xs font-bold">1</Chip>
+            <Chip size="sm" variant="tertiary" color="accent" className="text-xs font-bold">1</Chip>
             <Clock className="w-5 h-5 text-[var(--color-info)]" aria-hidden="true" />
             {t('terms.section1_title')}
           </h2>
@@ -232,7 +233,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
-            <Chip size="sm" variant="flat" color="primary" className="text-xs font-bold">2</Chip>
+            <Chip size="sm" variant="tertiary" color="accent" className="text-xs font-bold">2</Chip>
             <UserCog className="w-5 h-5 text-[var(--color-info)]" aria-hidden="true" />
             {t('terms.section2_title')}
           </h2>
@@ -263,7 +264,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
         <GlassCard className="p-6 sm:p-8">
           <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 mb-4">
             <h2 className="text-xl font-semibold text-theme-primary mb-2 flex items-center gap-2">
-              <Chip size="sm" variant="flat" color="primary" className="text-xs font-bold">3</Chip>
+              <Chip size="sm" variant="tertiary" color="accent" className="text-xs font-bold">3</Chip>
               <Users className="w-5 h-5 text-[var(--color-info)]" aria-hidden="true" />
               {t('terms.section3_title')}
             </h2>
@@ -299,7 +300,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
       <motion.div variants={itemVariants} id="prohibited">
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
-            <Chip size="sm" variant="flat" color="primary" className="text-xs font-bold">4</Chip>
+            <Chip size="sm" variant="tertiary" color="accent" className="text-xs font-bold">4</Chip>
             <Ban className="w-5 h-5 text-[var(--color-error)]" aria-hidden="true" />
             {t('terms.section4_title')}
           </h2>
@@ -325,7 +326,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
-            <Chip size="sm" variant="flat" color="primary" className="text-xs font-bold">5</Chip>
+            <Chip size="sm" variant="tertiary" color="accent" className="text-xs font-bold">5</Chip>
             <MapPin className="w-5 h-5 text-[var(--color-info)]" aria-hidden="true" />
             {t('terms.section5_title')}
           </h2>
@@ -355,7 +356,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
       <motion.div variants={itemVariants} id="liability">
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
-            <Chip size="sm" variant="flat" color="primary" className="text-xs font-bold">6</Chip>
+            <Chip size="sm" variant="tertiary" color="accent" className="text-xs font-bold">6</Chip>
             <Scale className="w-5 h-5 text-[var(--color-info)]" aria-hidden="true" />
             {t('terms.section6_title')}
           </h2>
@@ -388,7 +389,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
-            <Chip size="sm" variant="flat" color="primary" className="text-xs font-bold">7</Chip>
+            <Chip size="sm" variant="tertiary" color="accent" className="text-xs font-bold">7</Chip>
             <AlertTriangle className="w-5 h-5 text-[var(--color-warning)]" aria-hidden="true" />
             {t('terms.section7_title')}
           </h2>
@@ -419,7 +420,7 @@ function DefaultTermsContent({ branding, tenantPath }: { branding: { name: strin
       <motion.div variants={itemVariants}>
         <GlassCard className="p-6 sm:p-8">
           <h2 className="text-xl font-semibold text-theme-primary mb-4 flex items-center gap-2">
-            <Chip size="sm" variant="flat" color="primary" className="text-xs font-bold">8</Chip>
+            <Chip size="sm" variant="tertiary" color="accent" className="text-xs font-bold">8</Chip>
             <RefreshCw className="w-5 h-5 text-[var(--color-info)]" aria-hidden="true" />
             {t('terms.section8_title')}
           </h2>

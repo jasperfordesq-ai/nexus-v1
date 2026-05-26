@@ -11,12 +11,14 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';import Building from 'lucide-react/icons/building';
+import { motion } from 'framer-motion';
+import { Chip } from '@heroui/react';
+import Building from 'lucide-react/icons/building';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';
 import { usePageTitle } from '@/hooks';
-import { GlassCard, Button, Chip, Spinner } from '@/components/ui';
+import { GlassCard, Button, Spinner } from '@/components/ui';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -30,10 +32,10 @@ interface StatusInfo {
   reviewed_at: string | null;
 }
 
-const STATUS_COLORS: Record<string, 'default' | 'primary' | 'success' | 'warning' | 'danger'> = {
+const STATUS_COLORS: Record<string, 'default' | 'accent' | 'success' | 'warning' | 'danger'> = {
   pending: 'default',
-  under_review: 'primary',
-  approved: 'primary',
+  under_review: 'accent',
+  approved: 'accent',
   provisioned: 'success',
   rejected: 'danger',
   failed: 'warning',
@@ -106,7 +108,7 @@ export function PilotApplyStatusPage() {
               </div>
               <div>
                 <p className="text-xs uppercase tracking-wide text-theme-subtle mb-1">{t('provisioning.status_title')}</p>
-                <Chip color={STATUS_COLORS[info.status] ?? 'default'} variant="flat" size="sm">
+                <Chip color={STATUS_COLORS[info.status] ?? 'default'} variant="tertiary" size="sm">
                   {t(`provisioning.status_labels.${info.status}`)}
                 </Chip>
               </div>

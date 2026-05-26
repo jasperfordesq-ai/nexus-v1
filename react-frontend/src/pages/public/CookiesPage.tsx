@@ -11,7 +11,8 @@
  */
 
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';import { Separator } from '@heroui/react';
+import { motion } from 'framer-motion';
+import { Chip, Separator } from '@heroui/react';
 import Cookie from 'lucide-react/icons/cookie';
 import Shield from 'lucide-react/icons/shield';
 import Settings from 'lucide-react/icons/settings';
@@ -25,7 +26,7 @@ import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Info from 'lucide-react/icons/info';
 import Monitor from 'lucide-react/icons/monitor';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Spinner } from '@/components/ui';
+import { GlassCard, Button, Spinner } from '@/components/ui';
 import { CustomLegalDocument } from '@/components/legal/CustomLegalDocument';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { useTenant } from '@/contexts';
@@ -126,16 +127,16 @@ function scrollToSection(id: string) {
   }
 }
 
-function getTypeColor(type: string): 'success' | 'primary' | 'secondary' {
+function getTypeColor(type: string): 'success' | 'accent' | 'default' {
   switch (type) {
     case 'Essential':
       return 'success';
     case 'Analytics':
-      return 'primary';
+      return 'accent';
     case 'Preference':
-      return 'secondary';
+      return 'default';
     default:
-      return 'primary';
+      return 'accent';
   }
 }
 
@@ -242,7 +243,7 @@ export function CookiesPage() {
                   </h3>
                   <Chip
                     size="sm"
-                    variant="flat"
+                    variant="tertiary"
                     color={cat.required ? 'warning' : 'default'}
                     className="text-xs"
                   >
@@ -291,7 +292,7 @@ export function CookiesPage() {
                   <code className="text-sm font-mono font-semibold text-theme-primary bg-default-100 dark:bg-default-50 px-2 py-0.5 rounded">
                     {cookie.name}
                   </code>
-                  <Chip size="sm" variant="flat" color={getTypeColor(cookie.rawType)} className="text-xs">
+                  <Chip size="sm" variant="tertiary" color={getTypeColor(cookie.rawType)} className="text-xs">
                     {t(cookie.typeKey)}
                   </Chip>
                 </div>

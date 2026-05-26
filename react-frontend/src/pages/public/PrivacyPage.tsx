@@ -11,7 +11,8 @@
  */
 
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';import { Separator } from '@heroui/react';
+import { motion } from 'framer-motion';
+import { Chip, Separator } from '@heroui/react';
 import Shield from 'lucide-react/icons/shield';
 import Database from 'lucide-react/icons/database';
 import PieChart from 'lucide-react/icons/chart-pie';
@@ -29,7 +30,7 @@ import MessageSquare from 'lucide-react/icons/message-square';
 import Send from 'lucide-react/icons/send';
 import CalendarDays from 'lucide-react/icons/calendar-days';
 import { useTranslation } from 'react-i18next';
-import { GlassCard, Button, Chip, Spinner } from '@/components/ui';
+import { GlassCard, Button, Spinner } from '@/components/ui';
 import { CustomLegalDocument } from '@/components/legal/CustomLegalDocument';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { useTenant } from '@/contexts';
@@ -263,7 +264,7 @@ export function PrivacyPage() {
               >
                 <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
                   <h3 className="font-semibold text-theme-primary">{t(row.typeKey)}</h3>
-                  <Chip size="sm" variant="flat" color="primary" className="text-xs">
+                  <Chip size="sm" variant="tertiary" color="accent" className="text-xs">
                     {t(row.basisKey)}
                   </Chip>
                 </div>
@@ -420,7 +421,7 @@ export function PrivacyPage() {
                   <div className="flex items-center gap-2 mb-1">
                     <h3 className="font-medium text-theme-primary text-sm">{t(cat.nameKey)}</h3>
                     {cat.required && (
-                      <Chip size="sm" variant="flat" color="warning" className="text-xs">
+                      <Chip size="sm" variant="tertiary" color="warning" className="text-xs">
                         {t('privacy.cookie_required')}
                       </Chip>
                     )}
