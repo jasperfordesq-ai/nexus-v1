@@ -72,14 +72,14 @@ export default function NewsletterUnsubscribePage() {
       <Card className="w-full max-w-md">
       <Card.Content className="p-8 text-center">
         <div className="mb-6">
-          <Mail className="mx-auto text-default-400" size={40} />
+          <Mail className="mx-auto text-muted" size={40} />
         </div>
 
         {state === 'loading' && (
           <>
             <Loader2 className="mx-auto animate-spin text-accent mb-4" size={32} />
             <h1 className="text-xl font-semibold text-foreground">{t('newsletter.processing')}</h1>
-            <p className="mt-2 text-default-500 text-sm">{t('newsletter.removing_from_list')}</p>
+            <p className="mt-2 text-muted text-sm">{t('newsletter.removing_from_list')}</p>
           </>
         )}
 
@@ -87,13 +87,12 @@ export default function NewsletterUnsubscribePage() {
           <>
             <CheckCircle className="mx-auto text-success mb-4" size={36} />
             <h1 className="text-xl font-semibold text-foreground">{t('newsletter.unsubscribed')}</h1>
-            <p className="mt-2 text-default-500 text-sm">
+            <p className="mt-2 text-muted text-sm">
               {t('newsletter.unsubscribed_description')}
             </p>
             <Button
               className="mt-6"
-              color="primary"
-              variant="flat"
+              variant="secondary"
               as="a"
               href={tenantPath('/settings')}
             >
@@ -106,7 +105,7 @@ export default function NewsletterUnsubscribePage() {
           <>
             <CheckCircle className="mx-auto text-success mb-4" size={36} />
             <h1 className="text-xl font-semibold text-foreground">{t('newsletter.already_unsubscribed')}</h1>
-            <p className="mt-2 text-default-500 text-sm">
+            <p className="mt-2 text-muted text-sm">
               {t('newsletter.already_unsubscribed_description')}
             </p>
           </>
@@ -116,13 +115,12 @@ export default function NewsletterUnsubscribePage() {
           <>
             <XCircle className="mx-auto text-danger mb-4" size={36} />
             <h1 className="text-xl font-semibold text-foreground">{t('newsletter.invalid_link')}</h1>
-            <p className="mt-2 text-default-500 text-sm">
+            <p className="mt-2 text-muted text-sm">
               {t('newsletter.invalid_link_description')}
             </p>
             <Button
               className="mt-6"
-              color="primary"
-              variant="flat"
+              variant="secondary"
               as="a"
               href={tenantPath('/settings')}
             >
@@ -135,13 +133,13 @@ export default function NewsletterUnsubscribePage() {
           <>
             <XCircle className="mx-auto text-danger mb-4" size={36} />
             <h1 className="text-xl font-semibold text-foreground">{t('newsletter.something_went_wrong')}</h1>
-            <p className="mt-2 text-default-500 text-sm">
+            <p className="mt-2 text-muted text-sm">
               {t('newsletter.error_description')}
             </p>
             <Button
               className="mt-6"
               color="default"
-              variant="flat"
+              variant="secondary"
               onPress={() => window.location.reload()}
             >
               {t('newsletter.try_again')}

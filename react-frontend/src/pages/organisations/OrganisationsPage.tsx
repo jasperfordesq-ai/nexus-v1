@@ -231,7 +231,7 @@ export function OrganisationsPage() {
               action={
                 isAuthenticated ? (
                   <Link to={tenantPath('/organisations/register')}>
-                    <Button color="primary" startContent={<Plus className="w-4 h-4" aria-hidden="true" />}>
+                    <Button variant="primary" startContent={<Plus className="w-4 h-4" aria-hidden="true" />}>
                       {t('organisations.register_button')}
                     </Button>
                   </Link>
@@ -256,7 +256,7 @@ export function OrganisationsPage() {
               {hasMore && (
                 <div className="pt-4 text-center">
                   <Button
-                    variant="flat"
+                    variant="secondary"
                     className="bg-theme-elevated text-theme-muted"
                     onPress={() => loadOrganisations(true)}
                     isLoading={isLoadingMore}

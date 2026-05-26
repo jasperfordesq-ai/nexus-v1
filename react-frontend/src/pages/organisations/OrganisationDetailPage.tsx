@@ -232,7 +232,7 @@ export function OrganisationDetailPage() {
               {t('organisation_detail.try_again')}
             </Button>
             <Link to={tenantPath("/organisations")}>
-              <Button variant="flat" className="bg-theme-elevated text-theme-muted">
+              <Button variant="secondary" className="bg-theme-elevated text-theme-muted">
                 {t('organisation_detail.browse_organisations')}
               </Button>
             </Link>
@@ -308,7 +308,7 @@ export function OrganisationDetailPage() {
               {organisation.website && (
                 <a href={organisation.website} target="_blank" rel="noopener noreferrer">
                   <Button
-                    variant="flat"
+                    variant="secondary"
                     className="bg-theme-elevated text-theme-muted"
                     startContent={<Globe className="w-4 h-4" aria-hidden="true" />}
                     endContent={<ExternalLink className="w-3 h-3" aria-hidden="true" />}
@@ -320,7 +320,7 @@ export function OrganisationDetailPage() {
               {organisation.contact_email && (
                 <a href={`mailto:${organisation.contact_email}`}>
                   <Button
-                    variant="flat"
+                    variant="secondary"
                     className="bg-theme-elevated text-theme-muted"
                     startContent={<Mail className="w-4 h-4" aria-hidden="true" />}
                   >
@@ -378,7 +378,7 @@ export function OrganisationDetailPage() {
           <Briefcase className="w-5 h-5 text-rose-400" aria-hidden="true" />
           {t('organisation_detail.active_opportunities')}
           {activeOpps.length > 0 && (
-            <Chip size="sm" variant="flat" className="text-theme-subtle">{activeOpps.length}</Chip>
+            <Chip size="sm" variant="soft" className="text-theme-subtle">{activeOpps.length}</Chip>
           )}
         </h2>
 
@@ -411,7 +411,7 @@ export function OrganisationDetailPage() {
                         </span>
                       )}
                       {opp.is_remote && (
-                        <Chip size="sm" variant="flat" color="primary" startContent={<Globe className="w-3 h-3" />}>
+                        <Chip size="sm" variant="soft" color="accent" startContent={<Globe className="w-3 h-3" />}>
                           {t('organisation_detail.remote')}
                         </Chip>
                       )}
@@ -423,12 +423,12 @@ export function OrganisationDetailPage() {
                         </span>
                       )}
                       {opp.category && (
-                        <Chip size="sm" variant="flat" className="text-theme-subtle">{opp.category}</Chip>
+                        <Chip size="sm" variant="soft" className="text-theme-subtle">{opp.category}</Chip>
                       )}
                     </div>
 
                     {opp.has_applied && (
-                      <Chip size="sm" color="success" variant="flat" className="mt-2">
+                      <Chip size="sm" color="success" variant="soft" className="mt-2">
                         {t('organisation_detail.applied')}
                       </Chip>
                     )}
@@ -461,7 +461,7 @@ export function OrganisationDetailPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <Briefcase className="w-5 h-5 text-indigo-400" aria-hidden="true" />
             {t('organisation_detail.job_openings')}
-            <Chip size="sm" variant="flat" className="text-theme-subtle">{orgJobs.length}</Chip>
+            <Chip size="sm" variant="soft" className="text-theme-subtle">{orgJobs.length}</Chip>
           </h2>
           <div className="space-y-3">
             {orgJobs.map((job) => (
@@ -473,8 +473,8 @@ export function OrganisationDetailPage() {
                       <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-theme-muted">
                         <Chip
                           size="sm"
-                          variant="flat"
-                          color={job.type === 'paid' ? 'success' : job.type === 'timebank' ? 'warning' : 'primary'}
+                          variant="soft"
+                          color={job.type === 'paid' ? 'success' : job.type === 'timebank' ? 'warning' : 'accent'}
                         >
                           {job.type}
                         </Chip>
@@ -503,7 +503,7 @@ export function OrganisationDetailPage() {
           <h2 className="text-lg font-semibold text-theme-primary mb-4 flex items-center gap-2">
             <Star className="w-5 h-5 text-amber-400" aria-hidden="true" />
             {t('organisation_detail.reviews')}
-            <Chip size="sm" variant="flat" className="text-theme-subtle">{reviews.length}</Chip>
+            <Chip size="sm" variant="soft" className="text-theme-subtle">{reviews.length}</Chip>
           </h2>
 
           <div className="space-y-3">
@@ -576,7 +576,7 @@ export function OrganisationDetailPage() {
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={applyModal.onClose} className="text-theme-muted">{t('organisation_detail.cancel')}</Button>
+            <Button variant="tertiary" onPress={applyModal.onClose} className="text-theme-muted">{t('organisation_detail.cancel')}</Button>
             <Button
               className="bg-gradient-to-r from-rose-500 to-pink-600 text-white"
               onPress={handleApply}

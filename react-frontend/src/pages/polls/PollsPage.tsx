@@ -158,7 +158,7 @@ const PollCard = memo(function PollCard({ poll, currentUserId, onVote, onDelete,
                 </Link>
                 <Chip
                   size="sm"
-                  variant="flat"
+                  variant="soft"
                   color={isOpen ? 'warning' : 'default'}
                   startContent={isOpen ? <BarChart3 className="w-3 h-3" /> : <CheckCircle className="w-3 h-3" />}
                   className="text-[10px] h-5"
@@ -169,8 +169,8 @@ const PollCard = memo(function PollCard({ poll, currentUserId, onVote, onDelete,
                 {poll.poll_type === 'ranked' && (
                   <Chip
                     size="sm"
-                    variant="flat"
-                    color="secondary"
+                    variant="soft"
+                    color="default"
                     startContent={<ListOrdered className="w-3 h-3" />}
                     className="text-[10px] h-5"
                   >
@@ -181,7 +181,7 @@ const PollCard = memo(function PollCard({ poll, currentUserId, onVote, onDelete,
                 {poll.is_anonymous && (
                   <Chip
                     size="sm"
-                    variant="flat"
+                    variant="soft"
                     className="text-[10px] h-5 bg-gray-500/10 text-gray-400"
                     startContent={<EyeOff className="w-3 h-3" />}
                   >
@@ -192,7 +192,7 @@ const PollCard = memo(function PollCard({ poll, currentUserId, onVote, onDelete,
                 {poll.category && (
                   <Chip
                     size="sm"
-                    variant="flat"
+                    variant="soft"
                     className="text-[10px] h-5 bg-blue-500/10 text-blue-400"
                     startContent={<Tag className="w-3 h-3" />}
                   >
@@ -224,7 +224,7 @@ const PollCard = memo(function PollCard({ poll, currentUserId, onVote, onDelete,
               <Button
                 isIconOnly
                 size="sm"
-                variant="light"
+                variant="tertiary"
                 className="text-[var(--text-subtle)] hover:text-[var(--color-primary)] min-w-0"
                 onPress={() => onExport(poll.id)}
                 aria-label={t('aria.export_csv')}
@@ -236,7 +236,7 @@ const PollCard = memo(function PollCard({ poll, currentUserId, onVote, onDelete,
               <Button
                 isIconOnly
                 size="sm"
-                variant="light"
+                variant="danger-soft"
                 className="text-[var(--text-subtle)] hover:text-danger min-w-0"
                 onPress={() => onDelete(poll)}
                 aria-label={t('delete_poll')}
@@ -292,7 +292,7 @@ const PollCard = memo(function PollCard({ poll, currentUserId, onVote, onDelete,
                 ) : (
                   /* Standard vote button */
                   <Button
-                    variant="bordered"
+                    variant="secondary"
                     size="sm"
                     className="w-full justify-start text-[var(--text-primary)] border-[var(--border-default)] hover:border-[var(--color-primary)] hover:bg-[var(--color-primary)]/5 transition-all"
                     onPress={() => onVote(poll.id, option.id)}
@@ -884,7 +884,7 @@ export function PollsPage() {
                           <Button
                             isIconOnly
                             size="sm"
-                            variant="light"
+                            variant="tertiary"
                             className="text-[var(--text-muted)] min-w-8 w-8 h-8 hover:text-danger"
                             onPress={() => removeOption(index)}
                             aria-label={`${t('remove_option')} ${index + 1}`}
@@ -898,7 +898,7 @@ export function PollsPage() {
                     {newOptions.length < 6 && (
                       <Button
                         size="sm"
-                        variant="flat"
+                        variant="secondary"
                         className="bg-[var(--surface-elevated)] text-[var(--color-primary)]"
                         startContent={<Plus className="w-3 h-3" aria-hidden="true" />}
                         onPress={addOption}
@@ -969,7 +969,7 @@ export function PollsPage() {
                 {/* Actions */}
                 <div className="flex items-center justify-end gap-2">
                   <Button
-                    variant="flat"
+                    variant="tertiary"
                     size="sm"
                     onPress={() => {
                       resetCreateForm();
@@ -1000,7 +1000,7 @@ export function PollsPage() {
         <Tabs
           selectedKey={tab}
           onSelectionChange={handleTabChange}
-          variant="light"
+          variant="secondary"
           aria-label={t('tabs.aria_label')}
           classNames={{
             tabList: 'gap-2',
@@ -1124,7 +1124,7 @@ export function PollsPage() {
               {hasMore && (
                 <div className="pt-4 text-center">
                   <Button
-                    variant="flat"
+                    variant="secondary"
                     className="bg-theme-elevated text-theme-muted"
                     onPress={loadMore}
                     isLoading={isLoadingMore}
@@ -1181,7 +1181,7 @@ export function PollsPage() {
                           <Button
                             isIconOnly
                             size="sm"
-                            variant="light"
+                            variant="tertiary"
                             className="text-[var(--text-subtle)] min-w-0 w-7 h-7"
                             onPress={() => moveRankUp(index)}
                             isDisabled={index === 0}
@@ -1192,7 +1192,7 @@ export function PollsPage() {
                           <Button
                             isIconOnly
                             size="sm"
-                            variant="light"
+                            variant="tertiary"
                             className="text-[var(--text-subtle)] min-w-0 w-7 h-7 rotate-180"
                             onPress={() => moveRankDown(index)}
                             isDisabled={index === rankOrder.length - 1}
@@ -1211,7 +1211,7 @@ export function PollsPage() {
                   <div className="pt-2">
                     <Button
                       size="sm"
-                      variant="flat"
+                      variant="secondary"
                       className="bg-theme-elevated text-theme-primary"
                       onPress={() => loadRankedResults(rankedPoll.id)}
                       isLoading={isLoadingRanked}
@@ -1275,7 +1275,7 @@ export function PollsPage() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onRankedClose} className="text-[var(--text-muted)]">
+            <Button variant="tertiary" onPress={onRankedClose} className="text-[var(--text-muted)]">
               {t('confirm_delete.cancel')}
             </Button>
             {rankedPoll?.status === 'open' && (
@@ -1309,14 +1309,14 @@ export function PollsPage() {
           </ModalBody>
           <ModalFooter>
             <Button
-              variant="flat"
+              variant="tertiary"
               onPress={onDeleteClose}
               className="text-[var(--text-muted)]"
             >
               {t('confirm_delete.cancel')}
             </Button>
             <Button
-              color="danger"
+              variant="danger"
               onPress={handleDelete}
               isLoading={isDeleting}
             >

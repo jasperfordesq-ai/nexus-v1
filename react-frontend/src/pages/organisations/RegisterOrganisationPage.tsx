@@ -273,7 +273,7 @@ export default function RegisterOrganisationPage() {
             <Link to={tenantPath('/organisations')}>
               <Button
                 type="button"
-                variant="flat"
+                variant="secondary"
                 className="bg-theme-elevated text-theme-primary"
               >
                 {t('organisations.form_cancel')}
