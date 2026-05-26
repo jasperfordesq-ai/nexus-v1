@@ -25,10 +25,10 @@ interface SavedSearchCardProps {
   onRun?: (search: MarketplaceSavedSearch) => void;
 }
 
-const FREQUENCY_COLORS: Record<string, 'primary' | 'warning' | 'secondary'> = {
-  instant: 'primary',
+const FREQUENCY_COLORS: Record<string, 'accent' | 'warning' | 'default'> = {
+  instant: 'accent',
   daily: 'warning',
-  weekly: 'secondary',
+  weekly: 'default',
 };
 
 export function SavedSearchCard({ search, onToggle, onDelete, onRun }: SavedSearchCardProps) {
@@ -57,9 +57,9 @@ export function SavedSearchCard({ search, onToggle, onDelete, onRun }: SavedSear
           <div className="flex-1 min-w-0">
             {/* Name + run */}
             <Button
-              variant="light"
+              variant="ghost"
               onPress={() => onRun?.(search)}
-              className="flex items-center gap-2 text-left hover:text-accent transition-colors h-auto p-0 min-w-0 justify-start"
+              className="flex min-h-8 min-w-0 items-center justify-start gap-2 px-0 text-left transition-colors hover:text-accent"
             >
               <Search aria-hidden="true" className="w-4 h-4 text-accent shrink-0" />
               <span className="font-semibold text-foreground truncate">{search.name}</span>
@@ -69,18 +69,18 @@ export function SavedSearchCard({ search, onToggle, onDelete, onRun }: SavedSear
             {filterSummary.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-2">
                 {search.search_query && (
-                  <Chip size="sm" variant="flat" startContent={<Search aria-hidden="true" className="w-3 h-3" />}>
+                  <Chip size="sm" variant="soft" startContent={<Search aria-hidden="true" className="w-3 h-3" />}>
                     {search.search_query}
                   </Chip>
                 )}
                 {search.filters?.location && (
-                  <Chip size="sm" variant="flat" startContent={<MapPin aria-hidden="true" className="w-3 h-3" />}>
+                  <Chip size="sm" variant="soft" startContent={<MapPin aria-hidden="true" className="w-3 h-3" />}>
                     {search.filters.location}
                     {search.filters.radius ? ` (${search.filters.radius}km)` : ''}
                   </Chip>
                 )}
                 {search.filters?.category_id && (
-                  <Chip size="sm" variant="flat" startContent={<Tag aria-hidden="true" className="w-3 h-3" />}>
+                  <Chip size="sm" variant="soft" startContent={<Tag aria-hidden="true" className="w-3 h-3" />}>
                     {t('collections.category')}: {search.filters.category_id}
                   </Chip>
                 )}
@@ -92,7 +92,7 @@ export function SavedSearchCard({ search, onToggle, onDelete, onRun }: SavedSear
               <Bell aria-hidden="true" className="w-3.5 h-3.5 text-muted" />
               <Chip
                 size="sm"
-                variant="flat"
+                variant="soft"
                 color={FREQUENCY_COLORS[search.alert_frequency] ?? 'default'}
               >
                 {t(`saved_searches.frequency_${search.alert_frequency}`)}
@@ -118,8 +118,7 @@ export function SavedSearchCard({ search, onToggle, onDelete, onRun }: SavedSear
             <Button
               isIconOnly
               size="sm"
-              variant="light"
-              color="danger"
+              variant="danger-soft"
               onPress={() => onDelete?.(search.id)}
               aria-label={t('saved_searches.delete')}
             >
