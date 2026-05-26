@@ -279,7 +279,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
         <div className="flex max-h-[calc(100dvh-var(--safe-area-top)-var(--safe-area-bottom)-2rem)] flex-col overflow-hidden rounded-xl border border-divider bg-overlay shadow-large">
           {/* Search input row */}
           <div className="flex shrink-0 items-center gap-2 px-3 sm:px-4 py-3 border-b border-divider">
-            <Search className="w-5 h-5 text-default-400 flex-shrink-0" />
+            <Search className="w-5 h-5 text-muted flex-shrink-0" />
             <input
               type="text"
               value={query}
@@ -288,25 +288,25 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
               placeholder={t('search.placeholder')}
               aria-label={t('search.placeholder')}
               autoFocus
-              className="min-w-0 flex-1 bg-transparent text-foreground placeholder:text-default-400 text-base outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
+              className="min-w-0 flex-1 bg-transparent text-foreground placeholder:text-muted text-base outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
             />
             {query && (
               <Button
                 isIconOnly
-                variant="light"
+                variant="tertiary"
                 size="sm"
                 onPress={() => setQuery('')}
-                className="p-1 h-auto min-w-0 text-default-400 hover:text-default-700"
+                className="min-h-8 min-w-8 p-1 text-muted hover:text-foreground"
                 aria-label={t('aria.clear')}
               >
                 <X className="w-4 h-4" />
               </Button>
             )}
             <Button
-              variant="flat"
+              variant="secondary"
               size="sm"
               onPress={handleClose}
-              className="hidden min-[360px]:flex items-center gap-1.5 px-2 py-1 rounded-md text-xs h-auto"
+              className="hidden min-h-8 items-center gap-1.5 rounded-md px-2 py-1 text-xs min-[360px]:flex"
               aria-label={t('accessibility.close')}
             >
               <X className="w-3.5 h-3.5" />
@@ -319,7 +319,7 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
             {/* Action mode */}
             {isActionMode ? (
               <div>
-                <p className="text-xs text-default-500 mb-2">{t('search.actions')}</p>
+                <p className="text-xs text-muted mb-2">{t('search.actions')}</p>
                 {filteredActions.length > 0 ? (
                   <div className="space-y-1">
                     {filteredActions.map((action, i) => {
@@ -327,43 +327,43 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                       return (
                         <Button
                           key={action.label}
-                          variant="light"
+                          variant="tertiary"
                           onPress={() => { action.action(); handleClose(); }}
                           onMouseEnter={() => setSelectedIndex(i)}
                           onFocus={() => setSelectedIndex(i)}
-                          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-start h-auto justify-start min-w-0 ${
+                          className={`w-full flex min-h-10 items-center justify-start gap-3 rounded-lg px-3 py-2 text-start min-w-0 ${
                             i === selectedIndex
-                              ? 'bg-accent-soft dark:bg-accent-soft0/10'
-                              : 'hover:bg-default-100'
+                              ? 'bg-accent-soft'
+                              : 'hover:bg-surface-secondary'
                           }`}
                         >
-                          <Icon className="w-4 h-4 shrink-0 text-default-500" />
+                          <Icon className="w-4 h-4 shrink-0 text-muted" />
                           <span className="min-w-0 truncate text-sm text-foreground">{action.label}</span>
                         </Button>
                       );
                     })}
                   </div>
                 ) : (
-                  <p className="text-sm text-default-500">{t('search.no_actions')}</p>
+                  <p className="text-sm text-muted">{t('search.no_actions')}</p>
                 )}
               </div>
             ) : suggestions.length > 0 ? (
               /* Suggestions */
               <div>
-                <p className="text-xs text-default-500 mb-2">{t('search.suggestions')}</p>
+                <p className="text-xs text-muted mb-2">{t('search.suggestions')}</p>
                 <div className="space-y-1">
                   {suggestions.map((s, i) => {
-                    const type = typeLabels[s.type] || { label: s.type, color: 'bg-default-100 text-default-600' };
+                    const type = typeLabels[s.type] || { label: s.type, color: 'bg-surface-secondary text-muted' };
                     return (
                       <Button
                         key={`${s.type}-${s.id}`}
-                        variant="light"
+                        variant="tertiary"
                         onPress={() => goToSuggestion(s)}
                         onMouseEnter={() => setSelectedIndex(i)}
-                        className={`w-full flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-start h-auto min-w-0 ${
+                        className={`w-full flex min-h-10 items-center justify-between gap-2 rounded-lg px-3 py-2 text-start min-w-0 ${
                           i === selectedIndex
-                            ? 'bg-accent-soft dark:bg-accent-soft0/10'
-                            : 'hover:bg-default-100'
+                            ? 'bg-accent-soft'
+                            : 'hover:bg-surface-secondary'
                         }`}
                       >
                         <span className="min-w-0 truncate text-sm text-foreground">{s.title || s.name}</span>
@@ -373,9 +373,9 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                   })}
                 </div>
                 <Button
-                  variant="light"
+                  variant="tertiary"
                   onPress={goToSearch}
-                  className="w-full flex items-center justify-center gap-2 mt-3 pt-3 border-t border-divider text-accent hover:underline text-sm h-auto rounded-none"
+                  className="w-full flex min-h-10 items-center justify-center gap-2 rounded-none border-t border-divider pt-3 mt-3 text-sm text-accent hover:underline"
                 >
                   <Search className="w-4 h-4" />
                   {t('search.view_all')}
@@ -386,16 +386,16 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
               /* Loading */
               <div className="flex items-center gap-2 py-4">
                 <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
-                <span className="text-sm text-default-500">{t('search.searching')}</span>
+                <span className="text-sm text-muted">{t('search.searching')}</span>
               </div>
             ) : query.trim().length >= 2 ? (
               /* No results */
               <div className="py-4 text-center">
-                <p className="text-sm text-default-500 mb-2">{t('search.no_suggestions')}</p>
+                <p className="text-sm text-muted mb-2">{t('search.no_suggestions')}</p>
                 <Button
-                  variant="light"
+                  variant="tertiary"
                   onPress={goToSearch}
-                  className="inline-flex items-center gap-2 text-accent hover:underline text-sm h-auto"
+                  className="inline-flex min-h-10 items-center gap-2 text-sm text-accent hover:underline"
                 >
                   <Search className="w-4 h-4" />
                   {t('search.search_for')} "{query.trim()}"
@@ -407,12 +407,12 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                 {recentSearches.length > 0 && (
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-2">
-                      <p className="text-xs text-default-500">{t('search.recent')}</p>
+                      <p className="text-xs text-muted">{t('search.recent')}</p>
                       <Button
-                        variant="light"
+                        variant="tertiary"
                         size="sm"
                         onPress={clearRecent}
-                        className="text-[10px] text-default-400 hover:text-default-700 h-auto p-0 min-w-0"
+                        className="min-h-7 min-w-0 px-1 py-0 text-[10px] text-muted hover:text-foreground"
                       >
                         {t('search.clear')}
                       </Button>
@@ -421,23 +421,23 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                       {recentSearches.map(q => (
                         <Button
                           key={q}
-                          variant="light"
+                          variant="tertiary"
                           onPress={() => {
                             saveRecent(q);
                             navigate(tenantPath(`/search?q=${encodeURIComponent(q)}`));
                             handleClose();
                           }}
-                          className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-start hover:bg-default-100 h-auto justify-start min-w-0"
+                          className="w-full flex min-h-9 items-center justify-start gap-2 rounded-lg px-3 py-1.5 text-start hover:bg-surface-secondary min-w-0"
                         >
-                          <Clock className="w-3.5 h-3.5 shrink-0 text-default-400" />
-                          <span className="min-w-0 truncate text-sm text-default-600">{q}</span>
+                          <Clock className="w-3.5 h-3.5 shrink-0 text-muted" />
+                          <span className="min-w-0 truncate text-sm text-muted">{q}</span>
                         </Button>
                       ))}
                     </div>
                   </div>
                 )}
 
-                <p className="text-xs text-default-500 mb-2">{t('search.quick_links')}</p>
+                <p className="text-xs text-muted mb-2">{t('search.quick_links')}</p>
                 <div className="flex flex-wrap gap-2 mb-4">
                   {[
                     { label: t('nav.listings'), path: tenantPath('/listings') },
@@ -447,17 +447,17 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
                   ].map(link => (
                     <Button
                       key={link.path}
-                      variant="flat"
+                      variant="secondary"
                       size="sm"
                       onPress={() => { navigate(link.path); handleClose(); }}
-                      className="px-3 py-1.5 rounded-lg text-sm h-auto"
+                      className="min-h-9 rounded-lg px-3 py-1.5 text-sm"
                     >
                       {link.label}
                     </Button>
                   ))}
                 </div>
 
-                <p className="text-[11px] text-default-400 pt-2 border-t border-divider">
+                <p className="text-[11px] text-muted pt-2 border-t border-divider">
                   {t('search.actions_hint')}
                 </p>
               </div>
