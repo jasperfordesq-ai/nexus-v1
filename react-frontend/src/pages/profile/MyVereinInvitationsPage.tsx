@@ -97,7 +97,7 @@ export default function MyVereinInvitationsPage() {
 
   const renderList = (list: InvitationDto[], emptyKey: string, allowRespond: boolean) => {
     if (list.length === 0) {
-      return <p className="text-sm text-default-500 py-8 text-center">{t(emptyKey)}</p>;
+      return <p className="text-sm text-muted py-8 text-center">{t(emptyKey)}</p>;
     }
     return (
       <ul className="space-y-3">
@@ -110,7 +110,7 @@ export default function MyVereinInvitationsPage() {
                     <p className="font-semibold">
                       {t('verein_federation.target_label')}: {inv.target_name ?? '—'}
                     </p>
-                    <p className="text-sm text-default-500">
+                    <p className="text-sm text-muted">
                       {t('verein_federation.from_label')}: {inv.inviter_name || inv.source_name || '—'}
                     </p>
                   </div>
@@ -120,21 +120,21 @@ export default function MyVereinInvitationsPage() {
                 </div>
 
                 {inv.message ? (
-                  <p className="text-sm bg-default-50 rounded p-2 italic">{inv.message}</p>
+                  <p className="text-sm bg-surface-secondary rounded p-2 italic">{inv.message}</p>
                 ) : null}
 
                 {inv.expires_at ? (
-                  <p className="text-xs text-default-400">
+                  <p className="text-xs text-muted">
                     {t('verein_federation.expires_label')}: {new Date(inv.expires_at).toLocaleDateString()}
                   </p>
                 ) : null}
 
                 {allowRespond && inv.status === 'sent' ? (
                   <div className="flex justify-end gap-2 pt-1">
-                    <Button size="sm" variant="flat" color="danger" onPress={() => void respond(inv.id, 'decline')}>
+                    <Button size="sm" variant="danger-soft" onPress={() => void respond(inv.id, 'decline')}>
                       {t('verein_federation.decline')}
                     </Button>
-                    <Button size="sm" color="primary" onPress={() => void respond(inv.id, 'accept')}>
+                    <Button size="sm" onPress={() => void respond(inv.id, 'accept')}>
                       {t('verein_federation.accept')}
                     </Button>
                   </div>
@@ -155,7 +155,7 @@ export default function MyVereinInvitationsPage() {
           <UserPlus className="w-6 h-6 text-accent" />
           {t('verein_federation.my_invitations_title')}
         </h1>
-        <p className="text-sm text-default-500 mt-1">
+        <p className="text-sm text-muted mt-1">
           {t('verein_federation.my_invitations_subtitle')}
         </p>
       </div>

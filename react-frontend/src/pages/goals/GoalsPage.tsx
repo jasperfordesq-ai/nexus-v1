@@ -558,18 +558,10 @@ export function GoalsPage() {
               {[1, 2, 3].map((i) => (
                 <GlassCard key={i} className="p-5">
                   <div className="space-y-3">
-                    <Skeleton className="rounded-lg w-1/3">
-                      <div className="h-5 rounded-lg bg-default-300" />
-                    </Skeleton>
-                    <Skeleton className="rounded-lg w-full">
-                      <div className="h-3 rounded-lg bg-default-200" />
-                    </Skeleton>
-                    <Skeleton className="rounded-lg w-full">
-                      <div className="h-2 rounded-lg bg-default-200" />
-                    </Skeleton>
-                    <Skeleton className="rounded-lg w-1/4">
-                      <div className="h-3 rounded-lg bg-default-200" />
-                    </Skeleton>
+                    <Skeleton className="h-5 rounded-lg w-1/3" />
+                    <Skeleton className="h-3 rounded-lg w-full" />
+                    <Skeleton className="h-2 rounded-lg w-full" />
+                    <Skeleton className="h-3 rounded-lg w-1/4" />
                   </div>
                 </GlassCard>
               ))}
@@ -1084,14 +1076,14 @@ function GoalCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1 flex-wrap">
             <Button
-              variant="light"
-              className="font-semibold text-theme-primary text-lg hover:text-indigo-400 text-left p-0 h-auto min-w-0"
+              variant="ghost"
+              className="min-h-[32px] justify-start px-0 py-0 text-left text-lg font-semibold text-theme-primary hover:text-indigo-400"
               onPress={() => onOpenDetail(goal)}
             >
               {goal.title}
             </Button>
             {isCompleted && (
-              <Chip size="sm" color="success" variant="flat" startContent={<CheckCircle className="w-3 h-3" />}>
+              <Chip size="sm" color="success" variant="soft" startContent={<CheckCircle className="w-3 h-3" />}>
                 {t('goals.status.completed')}
               </Chip>
             )}

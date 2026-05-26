@@ -121,8 +121,8 @@ export default function MunicipalityCalendarPage() {
     const key = date.toISOString().slice(0, 10);
     const events = data?.buckets?.[key] ?? [];
     return (
-      <div key={day} className="border border-default-200 rounded-md p-2 min-h-[80px] text-xs">
-        <div className="font-semibold text-default-600">{day}</div>
+      <div key={day} className="border border-border rounded-md p-2 min-h-[80px] text-xs">
+        <div className="font-semibold text-foreground">{day}</div>
         <div className="space-y-1 mt-1">
           {events.map((ev) => (
             <Link
@@ -157,7 +157,7 @@ export default function MunicipalityCalendarPage() {
           {t('verein_federation.calendar.title')}
         </h1>
         {code ? (
-          <p className="text-sm text-default-500 mt-1">
+          <p className="text-sm text-muted mt-1">
             {t('verein_federation.calendar.subtitle', { municipality: code })}
           </p>
         ) : null}
@@ -172,14 +172,14 @@ export default function MunicipalityCalendarPage() {
             className="max-w-xs"
             placeholder="8001"
           />
-          <Button color="primary" onPress={handleSubmitCode}>
+          <Button onPress={handleSubmitCode}>
             {t('apply')}
           </Button>
 
           <div className="ml-auto flex items-center gap-2">
             <Button
               isIconOnly
-              variant="flat"
+              variant="tertiary"
               size="sm"
               onPress={() => setMonthOffset((m) => m - 1)}
               aria-label={t('verein_federation.calendar.prev')}
@@ -189,14 +189,14 @@ export default function MunicipalityCalendarPage() {
             <Chip variant="tertiary">{monthLabel}</Chip>
             <Button
               isIconOnly
-              variant="flat"
+              variant="tertiary"
               size="sm"
               onPress={() => setMonthOffset((m) => m + 1)}
               aria-label={t('verein_federation.calendar.next')}
             >
               <ChevronRight className="w-4 h-4" />
             </Button>
-            <Button size="sm" variant="flat" onPress={() => setMonthOffset(0)}>
+            <Button size="sm" variant="tertiary" onPress={() => setMonthOffset(0)}>
               {t('verein_federation.calendar.today')}
             </Button>
           </div>
@@ -204,7 +204,7 @@ export default function MunicipalityCalendarPage() {
         <Separator />
         <Card.Content>
           {!code ? (
-            <p className="text-sm text-default-500 py-8 text-center">
+            <p className="text-sm text-muted py-8 text-center">
               {t('verein_federation.calendar.no_municipality')}
             </p>
           ) : loading ? (
@@ -212,7 +212,7 @@ export default function MunicipalityCalendarPage() {
               <Spinner size="lg" />
             </div>
           ) : data && Object.keys(data.buckets).length === 0 ? (
-            <p className="text-sm text-default-500 py-8 text-center">
+            <p className="text-sm text-muted py-8 text-center">
               {t('verein_federation.calendar.empty')}
             </p>
           ) : (

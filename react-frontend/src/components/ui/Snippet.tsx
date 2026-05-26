@@ -65,13 +65,13 @@ export function Snippet({
   return (
     <div
       className={cn(
-        'flex items-start gap-2 rounded-md bg-default-100 px-3 py-2 font-mono text-default-700',
+        'flex items-start gap-2 rounded-md bg-surface-secondary px-3 py-2 font-mono text-foreground',
         sizeClasses[size],
         className,
       )}
     >
       {symbol !== '' && (
-        <span className="shrink-0 select-none text-default-400" aria-hidden="true">
+        <span className="shrink-0 select-none text-muted" aria-hidden="true">
           {symbol}
         </span>
       )}
@@ -81,7 +81,7 @@ export function Snippet({
       {!hideCopyButton && copyText && (
         <button
           type="button"
-          className="shrink-0 rounded p-1 text-default-500 transition-colors hover:bg-default-200 hover:text-default-700 focus:outline-none focus:ring-2 focus:ring-accent"
+          className="shrink-0 rounded p-1 text-muted transition-colors hover:bg-surface-tertiary hover:text-foreground focus:outline-none focus:ring-2 focus:ring-accent"
           onClick={handleCopy}
           aria-label={t('common:copy_code')}
         >

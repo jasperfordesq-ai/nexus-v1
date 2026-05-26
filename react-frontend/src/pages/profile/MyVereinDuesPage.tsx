@@ -138,7 +138,7 @@ export function MyVereinDuesPage() {
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">
             {t('verein_dues.my_page_heading')}
           </h1>
-          <p className="text-sm text-default-500">
+          <p className="text-sm text-muted">
             {t('verein_dues.my_page_subtitle')}
           </p>
         </div>
@@ -156,7 +156,7 @@ export function MyVereinDuesPage() {
       )}
 
       {!isLoading && !error && rows.length === 0 && (
-        <Card><CardBody className="text-center py-10 text-default-500">
+        <Card><CardBody className="text-center py-10 text-muted">
           {t('verein_dues.empty_state')}
         </CardBody></Card>
       )}
@@ -172,7 +172,7 @@ export function MyVereinDuesPage() {
                     <div className="font-semibold text-foreground">
                       {row.organization_name ?? t('verein_dues.unnamed_verein')}
                     </div>
-                    <div className="text-xs text-default-500">
+                    <div className="text-xs text-muted">
                       {t('verein_dues.year_label')} {row.membership_year}
                     </div>
                   </div>
@@ -185,7 +185,7 @@ export function MyVereinDuesPage() {
                 <div>
                   <div className="text-lg font-semibold">{formatAmount(row.amount_cents, row.currency)}</div>
                   {row.due_date && row.status !== 'paid' && (
-                    <div className="text-xs text-default-500">
+                    <div className="text-xs text-muted">
                       {t('verein_dues.due_label')} {row.due_date}
                     </div>
                   )}
@@ -197,7 +197,7 @@ export function MyVereinDuesPage() {
                   )}
                 </div>
                 {isPayable && (
-                  <Button color="primary" startContent={<CreditCard className="w-4 h-4" />} onPress={() => onPayClick(row)}>
+                  <Button startContent={<CreditCard className="w-4 h-4" />} onPress={() => onPayClick(row)}>
                     {t('verein_dues.cta_pay_now')}
                   </Button>
                 )}

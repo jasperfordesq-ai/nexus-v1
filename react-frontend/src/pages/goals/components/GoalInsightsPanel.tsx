@@ -107,9 +107,7 @@ export function GoalInsightsPanel({ goalId, canNudge = false }: GoalInsightsPane
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" aria-busy="true" aria-label={t('insights.loading')}>
         {[1, 2, 3, 4].map((item) => (
-          <Skeleton key={item} className="rounded-lg">
-            <div className="h-20 rounded-lg bg-default-200" />
-          </Skeleton>
+          <Skeleton key={item} className="h-20 rounded-lg" />
         ))}
       </div>
     );

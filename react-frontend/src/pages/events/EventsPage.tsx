@@ -395,19 +395,11 @@ export function EventsPage() {
               {[1, 2, 3].map((i) => (
                 <GlassCard key={i} className="p-5">
                   <div className="flex gap-4">
-                    <Skeleton className="w-16 h-20 rounded-lg flex-shrink-0">
-                      <div className="w-16 h-20 rounded-lg bg-default-300" />
-                    </Skeleton>
+                    <Skeleton className="w-16 h-20 rounded-lg flex-shrink-0" />
                     <div className="flex-1 space-y-2">
-                      <Skeleton className="rounded-lg w-1/2">
-                        <div className="h-5 rounded-lg bg-default-300" />
-                      </Skeleton>
-                      <Skeleton className="rounded-lg w-3/4">
-                        <div className="h-4 rounded-lg bg-default-200" />
-                      </Skeleton>
-                      <Skeleton className="rounded-lg w-1/4">
-                        <div className="h-3 rounded-lg bg-default-200" />
-                      </Skeleton>
+                      <Skeleton className="h-5 rounded-lg w-1/2" />
+                      <Skeleton className="h-4 rounded-lg w-3/4" />
+                      <Skeleton className="h-3 rounded-lg w-1/4" />
                     </div>
                   </div>
                 </GlassCard>

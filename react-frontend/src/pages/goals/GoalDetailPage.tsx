@@ -131,10 +131,10 @@ export function GoalDetailPage() {
         <PageMeta title={t('page_meta.goals.title')} noIndex />
         {backButton}
         <GlassCard className="p-6 space-y-4">
-          <Skeleton className="rounded-lg w-1/2"><div className="h-7 rounded-lg bg-default-300" /></Skeleton>
-          <Skeleton className="rounded-lg w-full"><div className="h-3 rounded-lg bg-default-200" /></Skeleton>
-          <Skeleton className="rounded-lg w-full"><div className="h-2 rounded-lg bg-default-200" /></Skeleton>
-          <Skeleton className="rounded-lg w-1/3"><div className="h-3 rounded-lg bg-default-200" /></Skeleton>
+          <Skeleton className="h-7 rounded-lg w-1/2" />
+          <Skeleton className="h-3 rounded-lg w-full" />
+          <Skeleton className="h-2 rounded-lg w-full" />
+          <Skeleton className="h-3 rounded-lg w-1/3" />
         </GlassCard>
       </div>
     );

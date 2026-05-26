@@ -109,7 +109,7 @@ function FeatureSection({
   const intro = i18n.exists(introKey, { ns: 'public' }) ? t(introKey) : '';
 
   return (
-    <Card className="border border-default-200 shadow-sm">
+    <Card className="border border-border shadow-sm">
       <Card.Header className="flex gap-2 items-center">
         {icon}
         <h2 className="text-lg font-semibold">{t(`${groupKey}.title`)}</h2>
@@ -463,7 +463,7 @@ export function FeaturesPage() {
       </div>
 
       {/* Maturity key */}
-      <Card className="border border-default-200 shadow-sm">
+      <Card className="border border-border shadow-sm">
         <Card.Content className="text-sm space-y-2">
           <p className="font-semibold text-foreground">
             {t('features_page.maturity_key_title')}
@@ -511,7 +511,7 @@ export function FeaturesPage() {
       })}
 
       {/* Modern Tech Stack */}
-      <Card className="border border-default-200 shadow-sm">
+      <Card className="border border-border shadow-sm">
         <Card.Header>
           <h2 className="text-lg font-semibold">
             {t('features_page.tech_stack_title')}
