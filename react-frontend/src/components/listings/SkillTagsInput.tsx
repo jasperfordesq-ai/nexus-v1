@@ -157,8 +157,8 @@ export function SkillTagsInput({ tags, onChange, maxTags = 10 }: SkillTagsInputP
                   key={suggestion}
                   role="option"
                   aria-selected={false}
-                  variant="light"
-                  className="w-full text-left px-3 py-2 text-sm text-theme-primary hover:bg-theme-hover transition-colors justify-start h-auto rounded-none"
+                  variant="tertiary"
+                  className="min-h-9 w-full justify-start rounded-none px-3 py-2 text-left text-sm text-theme-primary transition-colors hover:bg-theme-hover"
                   onPress={() => addTag(suggestion)}
                   onMouseDown={(e) => {
                     e.preventDefault(); // Prevent input blur

@@ -23,7 +23,7 @@ export function Code({ children, className, size = 'sm', ...props }: CodeProps) 
   return (
     <code
       className={cn(
-        'rounded bg-default-100 px-2 py-1 font-mono font-normal text-default-700',
+        'rounded bg-surface-secondary px-2 py-1 font-mono font-normal text-foreground',
         sizeClasses[size],
         className,
       )}

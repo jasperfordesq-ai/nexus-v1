@@ -419,9 +419,9 @@ export function IdeationPage() {
             <Button
               isIconOnly
               size="sm"
-              variant="light"
+              variant="tertiary"
               onPress={() => setSearchQuery('')}
-              className="p-0.5 rounded hover:bg-[var(--color-surface-hover)] min-w-0 w-auto h-auto"
+              className="min-h-8 min-w-8 rounded p-0.5 hover:bg-[var(--color-surface-hover)]"
               aria-label={t('search.clear')}
             >
               <X className="w-3.5 h-3.5 text-[var(--color-text-tertiary)]" />

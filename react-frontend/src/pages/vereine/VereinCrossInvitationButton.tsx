@@ -134,7 +134,7 @@ export default function VereinCrossInvitationButton({ userId }: Props) {
             <>
               <ModalHeader className="flex flex-col gap-1">
                 {t('verein_federation.invite_modal_title')}
-                <span className="text-sm font-normal text-default-500">
+                <span className="text-sm font-normal text-muted">
                   {t('verein_federation.invite_modal_subtitle')}
                 </span>
               </ModalHeader>

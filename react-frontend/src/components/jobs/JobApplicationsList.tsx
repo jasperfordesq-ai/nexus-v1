@@ -35,9 +35,9 @@ export function JobApplicationsList({
     <div id="applications">
       <GlassCard className="p-6">
         <Button
-          variant="light"
+          variant="tertiary"
           onPress={onToggleShow}
-          className="flex items-center gap-2 w-full text-left justify-start h-auto p-0"
+          className="flex min-h-11 w-full items-center justify-start gap-2 px-0 text-left"
           startContent={<Users className="w-5 h-5 text-theme-subtle" aria-hidden="true" />}
           endContent={<ChevronRight className={`w-4 h-4 ml-auto text-theme-subtle transition-transform ${showApplications ? 'rotate-90' : ''}`} aria-hidden="true" />}
         >
@@ -67,7 +67,7 @@ export function JobApplicationsList({
                 <div className="flex gap-2 justify-center">
                   <Button
                     size="sm"
-                    variant="flat"
+                    variant="tertiary"
                     className="bg-theme-elevated text-theme-muted"
                     startContent={<RefreshCw className="w-3.5 h-3.5" aria-hidden="true" />}
                     onPress={onRefresh}

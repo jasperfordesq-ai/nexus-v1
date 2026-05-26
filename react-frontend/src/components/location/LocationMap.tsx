@@ -520,7 +520,7 @@ function ClusterChooser({
             <button
               type="button"
               onClick={() => onPick(m)}
-              className="block w-full cursor-pointer rounded-md border-0 bg-transparent px-2 py-2 text-left text-[13px] text-default-700 transition-colors hover:bg-default-100 hover:text-foreground"
+              className="block w-full cursor-pointer rounded-md border-0 bg-transparent px-2 py-2 text-left text-[13px] text-muted transition-colors hover:bg-surface-secondary hover:text-foreground"
             >
               {m.title}
             </button>

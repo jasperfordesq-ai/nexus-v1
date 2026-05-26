@@ -290,7 +290,7 @@ export function MatchesPage() {
                             ? 'bg-emerald-500 text-white'
                             : match.match_score >= 60
                             ? 'bg-amber-500 text-white'
-                            : 'bg-default-300 text-default-700'
+                            : 'bg-surface-tertiary text-foreground'
                         }`}>
                           {match.match_score}
                         </div>

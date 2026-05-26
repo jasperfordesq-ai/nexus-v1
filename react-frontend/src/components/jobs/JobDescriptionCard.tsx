@@ -49,10 +49,10 @@ export function JobDescriptionCard({
       {qualificationData && !isOwner && (
         <GlassCard className="p-4 mt-4">
           <Button
-            variant="light"
+            variant="tertiary"
             onPress={() => setQualOpen(v => !v)}
             aria-expanded={qualOpen}
-            className="w-full flex items-center justify-between text-left h-auto p-0 justify-between"
+            className="flex min-h-11 w-full items-center justify-between px-0 text-left"
           >
             <span className="font-semibold flex items-center gap-2">
               <Sparkles size={16} className={qualificationData.percentage >= 70 ? 'text-success' : 'text-warning'} aria-hidden="true" />
