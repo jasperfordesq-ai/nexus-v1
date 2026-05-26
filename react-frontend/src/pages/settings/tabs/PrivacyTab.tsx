@@ -124,6 +124,10 @@ export function PrivacyTab({
   const { t } = useTranslation('settings');
   const navigate = useNavigate();
   const { tenantPath } = useTenant();
+  const actionRowClass = 'w-full justify-start text-theme-primary min-h-14 px-4 py-3';
+  const navigationRowClass = 'w-full justify-between text-theme-primary min-h-14 px-4 py-3';
+  const rowContentClass = 'min-w-0 text-left leading-tight';
+  const rowDescriptionClass = 'text-sm text-theme-subtle font-normal leading-snug';
 
   const getInsuranceTypeLabel = (type: string) => (
     INSURANCE_TYPE_KEYS.includes(type as (typeof INSURANCE_TYPE_KEYS)[number])
@@ -221,16 +225,16 @@ export function PrivacyTab({
       {federationEnabled && (
         <GlassCard className="p-6">
           <Button
-            variant="flat"
-            className="w-full justify-between bg-theme-elevated text-theme-primary h-auto py-4 px-4"
+            variant="secondary"
+            className="w-full justify-between text-theme-primary min-h-16 px-4 py-4"
             startContent={
-              <div className="flex items-center gap-3">
+              <div className="flex min-w-0 items-center gap-3">
                 <div className="p-2 rounded-lg bg-indigo-500/20">
                   <Globe className="w-4 h-4 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
                 </div>
-                <div className="text-left">
+                <div className={rowContentClass}>
                   <p className="font-medium">{t('federation.title')}</p>
-                  <p className="text-sm text-theme-subtle font-normal">{t('federation.description')}</p>
+                  <p className={rowDescriptionClass}>{t('federation.description')}</p>
                 </div>
               </div>
             }
@@ -243,16 +247,16 @@ export function PrivacyTab({
       {/* Blocked Users */}
       <GlassCard className="p-6">
         <Button
-          variant="flat"
-          className="w-full justify-between bg-theme-elevated text-theme-primary h-auto py-3 px-4"
+          variant="secondary"
+          className={navigationRowClass}
           startContent={
-            <div className="flex items-center gap-3">
+            <div className="flex min-w-0 items-center gap-3">
               <div className="p-2 rounded-lg bg-red-500/20">
                 <Ban className="w-4 h-4 text-red-600 dark:text-red-400" aria-hidden="true" />
               </div>
-              <div className="text-left">
+              <div className={rowContentClass}>
                 <p className="font-medium">{t('blocked_users.title')}</p>
-                <p className="text-sm text-theme-subtle font-normal">{t('blocked_users.description')}</p>
+                <p className={rowDescriptionClass}>{t('blocked_users.description')}</p>
               </div>
             </div>
           }
@@ -273,8 +277,8 @@ export function PrivacyTab({
 
         <div className="space-y-3">
           <Button
-            variant="flat"
-            className="w-full justify-start bg-theme-elevated text-theme-primary h-auto py-3 px-4"
+            variant="secondary"
+            className={actionRowClass}
             startContent={
               <div className="p-2 rounded-lg bg-indigo-500/20">
                 <Download className="w-4 h-4 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
@@ -283,15 +287,15 @@ export function PrivacyTab({
             endContent={<ChevronRight className="w-4 h-4 text-theme-muted" aria-hidden="true" />}
             onPress={() => navigate(tenantPath('/settings/data-export'))}
           >
-            <div className="text-left">
+            <div className={rowContentClass}>
               <p className="font-medium">{t('data_export.title', { ns: 'common' })}</p>
-              <p className="text-sm text-theme-subtle font-normal">{t('data_export.subtitle', { ns: 'common' })}</p>
+              <p className={rowDescriptionClass}>{t('data_export.subtitle', { ns: 'common' })}</p>
             </div>
           </Button>
 
           <Button
-            variant="flat"
-            className="w-full justify-start bg-theme-elevated text-theme-primary h-auto py-3 px-4"
+            variant="secondary"
+            className={actionRowClass}
             startContent={
               <div className="p-2 rounded-lg bg-blue-500/20">
                 <Download className="w-4 h-4 text-blue-600 dark:text-blue-400" aria-hidden="true" />
@@ -299,15 +303,15 @@ export function PrivacyTab({
             }
             onPress={() => onOpenGdprModal('download')}
           >
-            <div className="text-left">
+            <div className={rowContentClass}>
               <p className="font-medium">{t('gdpr.download_title')}</p>
-              <p className="text-sm text-theme-subtle font-normal">{t('gdpr.download_desc')}</p>
+              <p className={rowDescriptionClass}>{t('gdpr.download_desc')}</p>
             </div>
           </Button>
 
           <Button
-            variant="flat"
-            className="w-full justify-start bg-theme-elevated text-theme-primary h-auto py-3 px-4"
+            variant="secondary"
+            className={actionRowClass}
             startContent={
               <div className="p-2 rounded-lg bg-emerald-500/20">
                 <RefreshCw className="w-4 h-4 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
@@ -315,15 +319,15 @@ export function PrivacyTab({
             }
             onPress={() => onOpenGdprModal('portability')}
           >
-            <div className="text-left">
+            <div className={rowContentClass}>
               <p className="font-medium">{t('gdpr.portability_title')}</p>
-              <p className="text-sm text-theme-subtle font-normal">{t('gdpr.portability_desc')}</p>
+              <p className={rowDescriptionClass}>{t('gdpr.portability_desc')}</p>
             </div>
           </Button>
 
           <Button
-            variant="flat"
-            className="w-full justify-start bg-red-500/10 text-theme-primary h-auto py-3 px-4"
+            variant="danger-soft"
+            className={actionRowClass}
             startContent={
               <div className="p-2 rounded-lg bg-red-500/20">
                 <Trash2 className="w-4 h-4 text-red-600 dark:text-red-400" aria-hidden="true" />
@@ -331,15 +335,15 @@ export function PrivacyTab({
             }
             onPress={() => onOpenGdprModal('deletion')}
           >
-            <div className="text-left">
+            <div className={rowContentClass}>
               <p className="font-medium text-red-600 dark:text-red-400">{t('gdpr.deletion_title')}</p>
-              <p className="text-sm text-theme-subtle font-normal">{t('gdpr.deletion_desc')}</p>
+              <p className={rowDescriptionClass}>{t('gdpr.deletion_desc')}</p>
             </div>
           </Button>
 
           <Button
-            variant="flat"
-            className="w-full justify-start bg-theme-elevated text-theme-primary h-auto py-3 px-4"
+            variant="secondary"
+            className={actionRowClass}
             startContent={
               <div className="p-2 rounded-lg bg-amber-500/20">
                 <PenLine className="w-4 h-4 text-amber-600 dark:text-amber-400" aria-hidden="true" />
@@ -347,15 +351,15 @@ export function PrivacyTab({
             }
             onPress={() => onOpenGdprModal('rectification')}
           >
-            <div className="text-left">
+            <div className={rowContentClass}>
               <p className="font-medium">{t('gdpr.rectification_title')}</p>
-              <p className="text-sm text-theme-subtle font-normal">{t('gdpr.rectification_desc')}</p>
+              <p className={rowDescriptionClass}>{t('gdpr.rectification_desc')}</p>
             </div>
           </Button>
 
           <Button
-            variant="flat"
-            className="w-full justify-start bg-theme-elevated text-theme-primary h-auto py-3 px-4"
+            variant="secondary"
+            className={actionRowClass}
             startContent={
               <div className="p-2 rounded-lg bg-orange-500/20">
                 <Ban className="w-4 h-4 text-orange-600 dark:text-orange-400" aria-hidden="true" />
@@ -363,15 +367,15 @@ export function PrivacyTab({
             }
             onPress={() => onOpenGdprModal('restriction')}
           >
-            <div className="text-left">
+            <div className={rowContentClass}>
               <p className="font-medium">{t('gdpr.restriction_title')}</p>
-              <p className="text-sm text-theme-subtle font-normal">{t('gdpr.restriction_desc')}</p>
+              <p className={rowDescriptionClass}>{t('gdpr.restriction_desc')}</p>
             </div>
           </Button>
 
           <Button
-            variant="flat"
-            className="w-full justify-start bg-theme-elevated text-theme-primary h-auto py-3 px-4"
+            variant="secondary"
+            className={actionRowClass}
             startContent={
               <div className="p-2 rounded-lg bg-violet-500/20">
                 <Scale className="w-4 h-4 text-violet-600 dark:text-violet-400" aria-hidden="true" />
@@ -379,9 +383,9 @@ export function PrivacyTab({
             }
             onPress={() => onOpenGdprModal('objection')}
           >
-            <div className="text-left">
+            <div className={rowContentClass}>
               <p className="font-medium">{t('gdpr.objection_title')}</p>
-              <p className="text-sm text-theme-subtle font-normal">{t('gdpr.objection_desc')}</p>
+              <p className={rowDescriptionClass}>{t('gdpr.objection_desc')}</p>
             </div>
           </Button>
         </div>
