@@ -100,7 +100,7 @@ const SEO_GRADE_TEXT_CLASSES: Record<ReturnType<typeof seoGradeColor>, string> =
   primary: 'text-accent',
   warning: 'text-warning',
   danger: 'text-danger',
-  default: 'text-default-500',
+  default: 'text-muted',
 };
 
 function httpStatusColor(n: number): 'default' | 'success' | 'warning' | 'danger' {
@@ -205,9 +205,9 @@ export function PrerenderAdmin() {
       <div className="flex justify-end mb-2">
         <Chip
           size="sm"
-          variant="flat"
+          variant="soft"
           color={live ? 'success' : 'default'}
-          startContent={<span className={`inline-block w-2 h-2 rounded-full ${live ? 'bg-success animate-pulse' : 'bg-default-400'}`} />}
+          startContent={<span className={`inline-block w-2 h-2 rounded-full ${live ? 'bg-success animate-pulse' : 'bg-muted'}`} />}
         >
           {live ? t('live_connected') : t('polling_fallback')}
         </Chip>
@@ -339,15 +339,15 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
   if (loading && !summary) {
     return <div className="flex justify-center py-8"><Spinner /></div>;
   }
-  if (!summary) return <p className="text-default-500">{t('empty_summary')}</p>;
+  if (!summary) return <p className="text-muted">{t('empty_summary')}</p>;
 
   const healthBadge = !summary.cache_readable
-    ? <Chip color="danger" variant="flat">{t('health.cache_unreachable')}</Chip>
+    ? <Chip color="danger" variant="soft">{t('health.cache_unreachable')}</Chip>
     : summary.missing_count > 0
-      ? <Chip color="warning" variant="flat">{t('health.missing', { count: summary.missing_count })}</Chip>
+      ? <Chip color="warning" variant="soft">{t('health.missing', { count: summary.missing_count })}</Chip>
       : summary.stale_count > 0
-        ? <Chip color="warning" variant="flat">{t('health.stale', { count: summary.stale_count })}</Chip>
-        : <Chip color="success" variant="flat">{t('health.healthy')}</Chip>;
+        ? <Chip color="warning" variant="soft">{t('health.stale', { count: summary.stale_count })}</Chip>
+        : <Chip color="success" variant="soft">{t('health.healthy')}</Chip>;
 
   return (
     <div className="space-y-4">
@@ -372,7 +372,7 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
 
       {/* Last run */}
       {summary.last_run && (
-        <Card shadow="sm">
+        <Card>
           <CardHeader>
             <h3 className="text-lg font-semibold">{t('last_run')}</h3>
           </CardHeader>
@@ -385,24 +385,24 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
       )}
 
       {/* Force refresh */}
-      <Card shadow="sm">
+      <Card>
         <CardHeader className="flex items-center justify-between">
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <Play size={18} />{t('force_refresh.title')}
           </h3>
           {!isSuperAdmin && (
-            <Chip color="warning" variant="flat" size="sm">{t('super_admin_only')}</Chip>
+            <Chip color="warning" variant="soft" size="sm">{t('super_admin_only')}</Chip>
           )}
         </CardHeader>
         <CardBody className="gap-3">
-          <p className="text-sm text-default-500">
+          <p className="text-sm text-muted">
             {t('force_refresh.description')}
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <Input
               label={t('fields.tenant_slug')}
               placeholder={t('placeholders.tenant_slug')}
-              variant="bordered"
+              variant="secondary"
               value={tenantSlug}
               onValueChange={setTenantSlug}
               isDisabled={!isSuperAdmin}
@@ -410,7 +410,7 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
             <Input
               label={t('fields.routes')}
               placeholder={t('placeholders.routes')}
-              variant="bordered"
+              variant="secondary"
               value={routes}
               onValueChange={setRoutes}
               isDisabled={!isSuperAdmin}
@@ -426,7 +426,7 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
           </div>
           <div className="flex justify-end gap-2">
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<RefreshCw size={16} />}
               onPress={load}
               isDisabled={loading}
@@ -434,7 +434,6 @@ function OverviewTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: 
               {t('actions.refresh')}
             </Button>
             <Button
-              color="primary"
               startContent={<Play size={16} />}
               onPress={enqueue}
               isLoading={enqueuing}
@@ -521,7 +520,7 @@ function FreshnessControls({
   };
 
   return (
-    <Card shadow="sm">
+    <Card>
       <CardHeader>
         <h3 className="text-lg font-semibold flex items-center gap-2">
           <Zap size={18} />{t('title')}
@@ -533,12 +532,12 @@ function FreshnessControls({
             <p className="font-medium flex items-center gap-2">
               <Gauge size={16} className="text-warning" />{t('auto_recache.title')}
             </p>
-            <p className="text-sm text-default-500">
+            <p className="text-sm text-muted">
               {t('auto_recache.description')}
             </p>
             <div className="flex flex-wrap gap-2">
               <Button
-                variant="flat"
+                variant="tertiary"
                 onPress={() => runAutoRecache(false)}
                 isLoading={autoRecLoading}
                 isDisabled={!isSuperAdmin}
@@ -547,7 +546,6 @@ function FreshnessControls({
                 {t('actions.dry_run')}
               </Button>
               <Button
-                color="primary"
                 onPress={() => runAutoRecache(true)}
                 isLoading={autoRecLoading}
                 isDisabled={!isSuperAdmin}
@@ -568,12 +566,12 @@ function FreshnessControls({
             <p className="font-medium flex items-center gap-2">
               <Search size={16} className="text-accent" />{t('drift.title')}
             </p>
-            <p className="text-sm text-default-500">
+            <p className="text-sm text-muted">
               {t('drift.description')}
             </p>
             <div className="flex flex-wrap gap-2">
               <Button
-                variant="flat"
+                variant="tertiary"
                 onPress={() => runDriftDetect(false)}
                 isLoading={driftLoading}
                 isDisabled={!isSuperAdmin}
@@ -582,7 +580,6 @@ function FreshnessControls({
                 {t('actions.dry_run')}
               </Button>
               <Button
-                color="primary"
                 onPress={() => runDriftDetect(true)}
                 isLoading={driftLoading}
                 isDisabled={!isSuperAdmin}
@@ -606,12 +603,12 @@ function FreshnessControls({
           <p className="font-medium flex items-center gap-2">
             <Trash size={16} className="text-danger" />{t('purge_ungated.title')}
           </p>
-          <p className="text-sm text-default-500">
+          <p className="text-sm text-muted">
             {t('purge_ungated.description')}
           </p>
           <div className="flex flex-wrap gap-2">
             <Button
-              variant="flat"
+              variant="tertiary"
               onPress={() => runPurgeUnexpected(false)}
               isLoading={purgeLoading}
               isDisabled={!isSuperAdmin}
@@ -619,8 +616,7 @@ function FreshnessControls({
             >
               {t('actions.dry_run')}
             </Button>
-            <Button
-              color="danger"
+            <Button variant="danger"
               onPress={() => runPurgeUnexpected(true)}
               isLoading={purgeLoading}
               isDisabled={!isSuperAdmin}
@@ -692,14 +688,14 @@ function PurgeControls({
   };
 
   return (
-    <Card shadow="sm">
+    <Card>
       <CardHeader>
         <h3 className="text-lg font-semibold flex items-center gap-2">
           <Trash size={18} />{t('title')}
         </h3>
       </CardHeader>
       <CardBody className="gap-3">
-        <p className="text-sm text-default-500">
+        <p className="text-sm text-muted">
           {t('description_prefix')} <code>*</code> {t('description_middle')}
           <code className="ml-1">**</code> {t('description_suffix')} <code>/blog/*</code>,
           <code className="ml-1">/listings/**</code>, <code className="ml-1">/</code>.
@@ -708,7 +704,7 @@ function PurgeControls({
           <Input
             label={t('fields.pattern')}
             placeholder={t('placeholders.pattern')}
-            variant="bordered"
+            variant="secondary"
             value={pattern}
             onValueChange={setPattern}
             isDisabled={!isSuperAdmin}
@@ -716,7 +712,7 @@ function PurgeControls({
           <Input
             label={t('fields.tenant_slug')}
             placeholder={t('placeholders.tenant_slug')}
-            variant="bordered"
+            variant="secondary"
             value={tenant}
             onValueChange={setTenant}
             isDisabled={!isSuperAdmin}
@@ -774,11 +770,11 @@ function KpiCard({
     : tone === 'primary' ? 'text-accent'
     : '';
   return (
-    <Card shadow="sm" className="p-2">
+    <Card className="p-2">
       <CardBody className="py-3">
-        <p className="text-xs text-default-500 uppercase tracking-wide">{label}</p>
+        <p className="text-xs text-muted uppercase tracking-wide">{label}</p>
         <p className={`text-2xl font-semibold ${toneClass} truncate`}>{value}</p>
-        {hint && <p className="text-xs text-default-400 mt-1 truncate">{hint}</p>}
+        {hint && <p className="text-xs text-muted mt-1 truncate">{hint}</p>}
       </CardBody>
     </Card>
   );
@@ -928,12 +924,12 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
 
   return (
     <div className="space-y-3">
-      <Card shadow="sm">
+      <Card>
         <CardBody className="gap-3 flex-row flex-wrap items-end">
           <Input
             label={t('filters.filter')}
             placeholder={t('filters.filter_placeholder')}
-            variant="bordered"
+            variant="secondary"
             value={filter}
             onValueChange={setFilter}
             startContent={<Search size={14} />}
@@ -941,7 +937,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
           />
           <Select
             label={t('filters.staleness')}
-            variant="bordered"
+            variant="secondary"
             selectedKeys={[stalenessFilter]}
             onSelectionChange={(s) => setStalenessFilter(Array.from(s)[0] as string)}
             className="max-w-[180px]"
@@ -953,7 +949,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
           </Select>
           <Select
             label={t('filters.issue')}
-            variant="bordered"
+            variant="secondary"
             selectedKeys={[issueFilter]}
             onSelectionChange={(s) => setIssueFilter(Array.from(s)[0] as string)}
             className="max-w-[180px]"
@@ -964,7 +960,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
           </Select>
           <Select
             label={t('filters.status')}
-            variant="bordered"
+            variant="secondary"
             selectedKeys={[statusFilter]}
             onSelectionChange={(s) => setStatusFilter(Array.from(s)[0] as string)}
             className="max-w-[150px]"
@@ -976,15 +972,15 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
           <Input
             label={t('filters.tenant_slug')}
             placeholder={t('filters.tenant_placeholder')}
-            variant="bordered"
+            variant="secondary"
             value={tenant}
             onValueChange={setTenant}
             className="max-w-xs"
           />
-          <Button variant="flat" onPress={load} startContent={<RefreshCw size={14} />}>
+          <Button variant="tertiary" onPress={load} startContent={<RefreshCw size={14} />}>
             {t('actions.reload')}
           </Button>
-          <span className="text-sm text-default-500 ml-auto self-center">
+          <span className="text-sm text-muted ml-auto self-center">
             {t('summary', { filtered: filtered.length, total: items.length })}
             {selected.size > 0 && (
               <>
@@ -996,7 +992,6 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
           </span>
           {selected.size > 0 && isSuperAdmin && (
             <Button
-              color="primary"
               startContent={<Play size={14} />}
               onPress={bulkRecache}
               isLoading={bulkLoading}
@@ -1049,7 +1044,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                 <TableCell className="text-xs">{it.host}</TableCell>
                 <TableCell className="text-xs font-mono">{it.route}</TableCell>
                 <TableCell>
-                  <Chip color={httpStatusColor(it.http_status)} variant="flat" size="sm">
+                  <Chip color={httpStatusColor(it.http_status)} variant="soft" size="sm">
                     {it.http_status}
                   </Chip>
                 </TableCell>
@@ -1057,17 +1052,17 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                 <TableCell className="text-xs">{formatAge(it.age_s)}</TableCell>
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
-                    <Chip color={stalenessColor(it.staleness)} variant="flat" size="sm">
+                    <Chip color={stalenessColor(it.staleness)} variant="soft" size="sm">
                       {it.staleness}
                     </Chip>
                     {it.content_stale && (
                       <Tooltip content={it.content_stale_reason ?? t('status.content_drifted')}>
-                        <Chip color="warning" variant="flat" size="sm">{t('status.content')}</Chip>
+                        <Chip color="warning" variant="soft" size="sm">{t('status.content')}</Chip>
                       </Tooltip>
                     )}
                     {it.asset_issues.length > 0 && (
                       <Tooltip content={it.asset_issues.join(', ')}>
-                        <Chip color="danger" variant="flat" size="sm">{t('status.asset')}</Chip>
+                        <Chip color="danger" variant="soft" size="sm">{t('status.asset')}</Chip>
                       </Tooltip>
                     )}
                   </div>
@@ -1075,7 +1070,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                 <TableCell>
                   <div className="flex gap-1">
                     <Tooltip content={t('actions.inspect')}>
-                      <Button isIconOnly size="sm" variant="light" onPress={() => openInspect(it)} aria-label={t('actions.inspect_snapshot', { path: it.cache_path })}>
+                      <Button isIconOnly size="sm" variant="tertiary" onPress={() => openInspect(it)} aria-label={t('actions.inspect_snapshot', { path: it.cache_path })}>
                         <Search size={14} />
                       </Button>
                     </Tooltip>
@@ -1083,7 +1078,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                       <Button
                         isIconOnly
                         size="sm"
-                        variant="light"
+                        variant="tertiary"
                         aria-label={t('actions.open_rendered_url')}
                         as="a"
                         href={`https://${it.host}${it.route === '/' ? '' : it.route}`}
@@ -1112,16 +1107,16 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                 ) : (
                   <div className="space-y-3 text-sm">
                     {/* SEO score header — at the top so it's the first thing reviewers see. */}
-                    <div className="flex items-center gap-3 p-3 rounded-lg bg-default-50 border border-default-200">
+                    <div className="flex items-center gap-3 p-3 rounded-lg bg-surface border border-border">
                       <div className={`text-4xl font-bold ${SEO_GRADE_TEXT_CLASSES[seoGradeColor(inspecting.seo.grade)]}`}>
                         {inspecting.seo.grade}
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm text-default-500">{t('inspect.seo_score')}</p>
-                        <p className="text-2xl font-semibold">{inspecting.seo.score}<span className="text-base text-default-400">/100</span></p>
+                        <p className="text-sm text-muted">{t('inspect.seo_score')}</p>
+                        <p className="text-2xl font-semibold">{inspecting.seo.score}<span className="text-base text-muted">/100</span></p>
                       </div>
                       <div className="flex flex-col items-end gap-1">
-                        <Chip color={httpStatusColor(inspecting.http_status)} size="sm" variant="flat">
+                        <Chip color={httpStatusColor(inspecting.http_status)} size="sm" variant="soft">
                           HTTP {inspecting.http_status}
                         </Chip>
                         {inspecting.integrity && (
@@ -1139,7 +1134,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                           }>
                             <Chip
                               size="sm"
-                              variant="flat"
+                              variant="soft"
                               color={
                                 inspecting.integrity.status === 'ok' ? 'success'
                                 : inspecting.integrity.status === 'mismatch' ? 'danger'
@@ -1150,7 +1145,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                             </Chip>
                           </Tooltip>
                         )}
-                        <span className="text-xs text-default-400">{t('inspect.old', { age: formatAge(inspecting.age_s) })}</span>
+                        <span className="text-xs text-muted">{t('inspect.old', { age: formatAge(inspecting.age_s) })}</span>
                       </div>
                     </div>
                     {(inspecting.seo.issues.length > 0 || inspecting.seo.tips.length > 0) && (
@@ -1196,7 +1191,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                           const isBad = k === 'multiple_h1';
                           const good = isBad ? !v : v;
                           return (
-                            <Chip key={k} size="sm" color={good ? 'success' : 'danger'} variant="flat">
+                            <Chip key={k} size="sm" color={good ? 'success' : 'danger'} variant="soft">
                               {good ? '✓' : '✗'} {k}
                             </Chip>
                           );
@@ -1223,12 +1218,12 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                         })}
                       </p>
                       {inspecting.json_ld.blocks.length === 0 ? (
-                        <p className="text-xs text-default-400">{t('inspect.no_structured_data')}</p>
+                        <p className="text-xs text-muted">{t('inspect.no_structured_data')}</p>
                       ) : (
                         <div className="space-y-1">
                           {inspecting.json_ld.blocks.map((b, i) => (
                             <div key={i} className="text-xs flex gap-2 items-center">
-                              <Chip size="sm" color={b.valid ? 'success' : 'danger'} variant="flat">
+                              <Chip size="sm" color={b.valid ? 'success' : 'danger'} variant="soft">
                                 {b.valid ? '✓' : '✗'}
                               </Chip>
                               <span className="font-mono">{b.size}B</span>
@@ -1246,7 +1241,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                           <div className="text-xs space-y-0.5">
                             {Object.entries(inspecting.og_tags).map(([k, v]) => (
                               <div key={k} className="flex gap-2">
-                                <span className="font-mono text-default-500">{k}</span>
+                                <span className="font-mono text-muted">{k}</span>
                                 <span className="truncate">{v}</span>
                               </div>
                             ))}
@@ -1259,7 +1254,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                       <p className="font-semibold mb-1">
                         {t('inspect.asset_references', { count: inspecting.asset_refs.length })}
                         {inspecting.asset_issues.length > 0 && (
-                          <Chip color="danger" variant="flat" size="sm" className="ml-2">
+                          <Chip color="danger" variant="soft" size="sm" className="ml-2">
                             {t('inspect.dead_assets', { count: inspecting.asset_issues.length })}
                           </Chip>
                         )}
@@ -1279,7 +1274,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button variant="light" onPress={onClose}>{t('actions.close')}</Button>
+                <Button variant="tertiary" onPress={onClose}>{t('actions.close')}</Button>
               </ModalFooter>
             </>
           )}
@@ -1292,7 +1287,7 @@ function InventoryTab({ presetTenant, onPresetConsumed }: { presetTenant: string
 function Info({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
   return (
     <div>
-      <p className="text-xs text-default-500">{label}</p>
+      <p className="text-xs text-muted">{label}</p>
       <p className={`text-sm ${mono ? 'font-mono' : ''} break-all`}>{value}</p>
     </div>
   );
@@ -1377,14 +1372,13 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-default-500">
+        <p className="text-sm text-muted">
           {totalNeedingWork === 0
             ? t('summary.healthy', { count: rows.length })
             : t('summary.needs_work', { needing: totalNeedingWork, total: rows.length })}
         </p>
         <Button
-          color="primary"
-          variant="flat"
+          variant="tertiary"
           startContent={<Zap size={14} />}
           onPress={refreshAllStale}
           isLoading={bulkLoading}
@@ -1412,9 +1406,8 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
               <TableCell>
                 <Button
                   size="sm"
-                  variant="light"
-                  color="primary"
-                  className="h-auto min-h-0 justify-start px-0 font-medium"
+                  variant="tertiary"
+                  className="min-h-8 justify-start px-0 font-medium"
                   onPress={() => onDrillDown(r.slug)}
                   title={t('actions.open_in_inventory')}
                 >
@@ -1423,41 +1416,41 @@ function CoverageTab({ isSuperAdmin, toast, onDrillDown }: { isSuperAdmin: boole
               </TableCell>
               <TableCell className="text-xs">{r.host}</TableCell>
               <TableCell>
-                <Chip color={color} variant="flat" size="sm">
+                <Chip color={color} variant="soft" size="sm">
                   {r.rendered}/{r.expected} ({pct}%)
                 </Chip>
               </TableCell>
               <TableCell>
                 {r.stale_routes.length > 0 ? (
                   <Tooltip content={r.stale_routes.join(', ')}>
-                    <Button size="sm" color="warning" variant="flat" onPress={() => onDrillDown(r.slug)}>
+                    <Button size="sm" variant="secondary" onPress={() => onDrillDown(r.slug)}>
                       {r.stale_routes.length}
                     </Button>
                   </Tooltip>
-                ) : <span className="text-default-400 text-xs">—</span>}
+                ) : <span className="text-muted text-xs">—</span>}
               </TableCell>
               <TableCell>
                 {r.asset_invalid_routes.length > 0 ? (
                   <Tooltip content={r.asset_invalid_routes.join(', ')}>
-                    <Button size="sm" color="danger" variant="flat" onPress={() => onDrillDown(r.slug)}>
+                    <Button size="sm" variant="danger" onPress={() => onDrillDown(r.slug)}>
                       {r.asset_invalid_routes.length}
                     </Button>
                   </Tooltip>
-                ) : <span className="text-default-400 text-xs">—</span>}
+                ) : <span className="text-muted text-xs">—</span>}
               </TableCell>
               <TableCell>
                 {r.missing_routes.length > 0 ? (
                   <Tooltip content={r.missing_routes.join(', ')}>
-                    <Button size="sm" color="danger" variant="flat" onPress={() => onDrillDown(r.slug)}>
+                    <Button size="sm" variant="danger" onPress={() => onDrillDown(r.slug)}>
                       {r.missing_routes.length}
                     </Button>
                   </Tooltip>
-                ) : <span className="text-default-400 text-xs">—</span>}
+                ) : <span className="text-muted text-xs">—</span>}
               </TableCell>
               <TableCell>
                 <Button
                   size="sm"
-                  variant="flat"
+                  variant="tertiary"
                   startContent={<Play size={14} />}
                   onPress={() => refreshTenant(r.slug)}
                   isLoading={enqueuingFor === r.slug}
@@ -1502,7 +1495,7 @@ function AnalyticsTab() {
   useEffect(() => { load(); }, [load]);
 
   if (loading && !data) return <div className="flex justify-center py-8"><Spinner /></div>;
-  if (!data) return <p className="text-default-500">{t('empty')}</p>;
+  if (!data) return <p className="text-muted">{t('empty')}</p>;
 
   const verifiedPct = data.total_hits > 0 ? Math.round((data.verified_hits / data.total_hits) * 100) : 0;
   const totalSpoofed = Object.values(data.spoofed_by_crawler).reduce((a, b) => a + b, 0);
@@ -1512,7 +1505,7 @@ function AnalyticsTab() {
       <div className="flex items-center gap-2">
         <Select
           label={t('filters.window')}
-          variant="bordered"
+          variant="secondary"
           selectedKeys={[windowDays]}
           onSelectionChange={(s) => setWindowDays(Array.from(s)[0] as string)}
           className="max-w-[150px]"
@@ -1521,8 +1514,8 @@ function AnalyticsTab() {
           <SelectItem key="7" id="7">{t('windows.7')}</SelectItem>
           <SelectItem key="30" id="30">{t('windows.30')}</SelectItem>
         </Select>
-        <Button variant="flat" onPress={load} startContent={<RefreshCw size={14} />} className="self-end">{t('actions.reload')}</Button>
-        <span className="text-sm text-default-500 ml-auto self-end">
+        <Button variant="tertiary" onPress={load} startContent={<RefreshCw size={14} />} className="self-end">{t('actions.reload')}</Button>
+        <span className="text-sm text-muted ml-auto self-end">
           {t('log_summary', { size: formatBytes(data.log_size_bytes), time: formatTs(data.window_started_at) })}
         </span>
       </div>
@@ -1549,37 +1542,37 @@ function AnalyticsTab() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card shadow="sm">
+        <Card>
           <CardHeader><h3 className="font-semibold">{t('sections.hits_by_crawler')}</h3></CardHeader>
           <CardBody className="text-xs space-y-1">
             {Object.entries(data.hits_by_crawler).map(([k, n]) => (
               <div key={k} className="flex items-center gap-2">
-                <Chip size="sm" variant="flat">{k}</Chip>
+                <Chip size="sm" variant="soft">{k}</Chip>
                 <span className="font-mono ml-auto">{n}</span>
                 {data.spoofed_by_crawler[k] && (
-                  <Chip size="sm" variant="flat" color="danger">{t('labels.spoofed_count', { count: data.spoofed_by_crawler[k] })}</Chip>
+                  <Chip size="sm" variant="soft" color="danger">{t('labels.spoofed_count', { count: data.spoofed_by_crawler[k] })}</Chip>
                 )}
               </div>
             ))}
-            {Object.keys(data.hits_by_crawler).length === 0 && <p className="text-default-400">{t('empty_no_data')}</p>}
+            {Object.keys(data.hits_by_crawler).length === 0 && <p className="text-muted">{t('empty_no_data')}</p>}
           </CardBody>
         </Card>
 
-        <Card shadow="sm">
+        <Card>
           <CardHeader><h3 className="font-semibold">{t('sections.hits_by_status')}</h3></CardHeader>
           <CardBody className="text-xs space-y-1">
             {Object.entries(data.hits_by_status).map(([k, n]) => (
               <div key={k} className="flex items-center gap-2">
-                <Chip size="sm" variant="flat" color={httpStatusColor(Number(k))}>{k}</Chip>
+                <Chip size="sm" variant="soft" color={httpStatusColor(Number(k))}>{k}</Chip>
                 <span className="font-mono ml-auto">{n}</span>
               </div>
             ))}
-            {Object.keys(data.hits_by_status).length === 0 && <p className="text-default-400">{t('empty_no_data')}</p>}
+            {Object.keys(data.hits_by_status).length === 0 && <p className="text-muted">{t('empty_no_data')}</p>}
           </CardBody>
         </Card>
       </div>
 
-      <Card shadow="sm">
+      <Card>
         <CardHeader><h3 className="font-semibold">{t('sections.top_uris')}</h3></CardHeader>
         <CardBody className="p-0">
           <Table aria-label={t('tables.top_uris_aria')} removeWrapper isStriped>
@@ -1599,7 +1592,7 @@ function AnalyticsTab() {
         </CardBody>
       </Card>
 
-      <Card shadow="sm">
+      <Card>
         <CardHeader><h3 className="font-semibold">{t('sections.recent_activity', { count: data.recent.length })}</h3></CardHeader>
         <CardBody className="p-0">
           <Table aria-label={t('tables.recent_hits_aria')} removeWrapper isStriped>
@@ -1616,12 +1609,12 @@ function AnalyticsTab() {
                 <TableRow key={i}>
                   <TableCell className="text-xs">{formatTs(r.ts ?? null)}</TableCell>
                   <TableCell className="text-xs">
-                    <Chip size="sm" variant="flat">{r.crawler}</Chip>
+                    <Chip size="sm" variant="soft">{r.crawler}</Chip>
                   </TableCell>
                   <TableCell className="text-xs">{r.host}</TableCell>
                   <TableCell className="text-xs font-mono">{r.uri}</TableCell>
                   <TableCell>
-                    <Chip size="sm" variant="flat" color={httpStatusColor(r.status)}>{r.status}</Chip>
+                    <Chip size="sm" variant="soft" color={httpStatusColor(r.status)}>{r.status}</Chip>
                   </TableCell>
                   <TableCell className="text-xs font-mono">{r.ip}</TableCell>
                 </TableRow>
@@ -1692,11 +1685,11 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
 
   return (
     <div className="space-y-3">
-      <Card shadow="sm">
+      <Card>
         <CardBody className="flex-row gap-3 items-end">
           <Select
             label={t('filters.status')}
-            variant="bordered"
+            variant="secondary"
             selectedKeys={[status]}
             onSelectionChange={(s) => setStatus(Array.from(s)[0] as string)}
             className="max-w-[180px]"
@@ -1709,7 +1702,7 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
             <SelectItem key="failed" id="failed">{t('filters.failed')}</SelectItem>
             <SelectItem key="cancelled" id="cancelled">{t('filters.cancelled')}</SelectItem>
           </Select>
-          <Button variant="flat" startContent={<RefreshCw size={14} />} onPress={load}>
+          <Button variant="tertiary" startContent={<RefreshCw size={14} />} onPress={load}>
             {t('actions.reload')}
           </Button>
         </CardBody>
@@ -1735,7 +1728,7 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
               <TableRow key={j.id}>
                 <TableCell className="text-xs font-mono">{j.id}</TableCell>
                 <TableCell>
-                  <Chip color={jobStatusColor(j.status)} variant="flat" size="sm">
+                  <Chip color={jobStatusColor(j.status)} variant="soft" size="sm">
                     {j.status}
                   </Chip>
                 </TableCell>
@@ -1744,22 +1737,22 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
                     const p = j.priority ?? 5;
                     // Match service constants: 3=HIGH, 5=NORMAL, 7=LOW.
                     const label = p <= 3 ? t('priority.high') : p >= 7 ? t('priority.low') : t('priority.normal');
-                    const color: 'danger' | 'primary' | 'default' = p <= 3 ? 'danger' : p >= 7 ? 'default' : 'primary';
+                    const color: 'danger' | 'accent' | 'default' = p <= 3 ? 'danger' : p >= 7 ? 'default' : 'accent';
                     return (
                       <Tooltip content={t('priority.tooltip', { priority: p })}>
-                        <Chip size="sm" variant="flat" color={color}>{label}</Chip>
+                        <Chip size="sm" variant="soft" color={color}>{label}</Chip>
                       </Tooltip>
                     );
                   })()}
                 </TableCell>
                 <TableCell className="text-xs">
-                  {j.tenant_slug ? <Chip size="sm" variant="flat">{j.tenant_slug}</Chip> : <span className="text-default-400">{t('scope.all_tenants')}</span>}
+                  {j.tenant_slug ? <Chip size="sm" variant="soft">{j.tenant_slug}</Chip> : <span className="text-muted">{t('scope.all_tenants')}</span>}
                   {j.routes && <div className="font-mono mt-1">{j.routes}</div>}
                 </TableCell>
                 <TableCell>
                   <div className="flex gap-1">
-                    {j.force && <Chip size="sm" color="warning" variant="flat">{t('flags.force')}</Chip>}
-                    {j.dry_run && <Chip size="sm" variant="flat">{t('flags.dry_run')}</Chip>}
+                    {j.force && <Chip size="sm" color="warning" variant="soft">{t('flags.force')}</Chip>}
+                    {j.dry_run && <Chip size="sm" variant="soft">{t('flags.dry_run')}</Chip>}
                   </div>
                 </TableCell>
                 <TableCell className="text-xs">
@@ -1771,14 +1764,13 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
                 <TableCell className="text-xs">{j.requested_by?.name || '—'}</TableCell>
                 <TableCell>
                   <div className="flex gap-1">
-                    <Button size="sm" variant="light" isIconOnly onPress={() => openDetail(j)} aria-label={t('actions.view_details', { id: j.id })}>
+                    <Button size="sm" variant="tertiary" isIconOnly onPress={() => openDetail(j)} aria-label={t('actions.view_details', { id: j.id })}>
                       <Search size={14} />
                     </Button>
                     {j.status === 'queued' && (
                       <Button
                         size="sm"
-                        variant="light"
-                        color="danger"
+                        variant="danger"
                         isIconOnly
                         aria-label={t('actions.cancel_job', { id: j.id })}
                         onPress={() => cancelJob(j.id)}
@@ -1791,8 +1783,7 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
                       <Tooltip content={t('actions.retry_same_parameters')}>
                         <Button
                           size="sm"
-                          variant="light"
-                          color="primary"
+                          variant="tertiary"
                           isIconOnly
                           aria-label={t('actions.retry_job', { id: j.id })}
                           onPress={() => retryJob(j.id)}
@@ -1850,7 +1841,7 @@ function JobsTab({ isSuperAdmin, toast, lastUpdate, live }: { isSuperAdmin: bool
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button variant="light" onPress={onClose}>{t('actions.close')}</Button>
+                <Button variant="tertiary" onPress={onClose}>{t('actions.close')}</Button>
               </ModalFooter>
             </>
           )}
@@ -1890,11 +1881,11 @@ function EventsTab() {
 
   return (
     <div className="space-y-3">
-      <Card shadow="sm">
+      <Card>
         <CardBody className="flex-row gap-3 items-end">
           <Select
             label={t('filters.limit')}
-            variant="bordered"
+            variant="secondary"
             selectedKeys={[String(limit)]}
             onSelectionChange={(s) => setLimit(parseInt(Array.from(s)[0] as string, 10))}
             className="max-w-[140px]"
@@ -1904,10 +1895,10 @@ function EventsTab() {
             <SelectItem key="500" id="500">500</SelectItem>
             <SelectItem key="2000" id="2000">2000</SelectItem>
           </Select>
-          <Button variant="flat" startContent={<RefreshCw size={14} />} onPress={load}>
+          <Button variant="tertiary" startContent={<RefreshCw size={14} />} onPress={load}>
             {t('actions.reload')}
           </Button>
-          <span className="text-sm text-default-500 ml-auto self-center">
+          <span className="text-sm text-muted ml-auto self-center">
             {t('summary', { count: events.length })}
           </span>
         </CardBody>
@@ -1936,7 +1927,7 @@ function EventsTab() {
                 <TableRow key={idx}>
                   <TableCell className="text-xs">{ts ? formatTs(ts) : '—'}</TableCell>
                   <TableCell>
-                    <Chip color={color} variant="flat" size="sm">
+                    <Chip color={color} variant="soft" size="sm">
                       {ev ? eventTypeLabel(ev) : '—'}
                     </Chip>
                   </TableCell>
@@ -1974,9 +1965,9 @@ function FailuresTab() {
 
   return (
     <div className="space-y-3">
-      <Card shadow="sm">
+      <Card>
         <CardBody>
-          <p className="text-sm text-default-500">
+          <p className="text-sm text-muted">
             {t('description_prefix')}{' '}
             {t('description_middle')}{' '}
             <strong>{t('description_action')}</strong>{' '}
@@ -1987,7 +1978,7 @@ function FailuresTab() {
       {loading ? (
         <div className="flex justify-center py-8"><Spinner /></div>
       ) : items.length === 0 ? (
-        <Card shadow="sm">
+        <Card>
           <CardBody className="text-center py-8 flex flex-col items-center gap-2">
             <CheckCircle className="text-success" size={32} />
             <p className="font-medium">{t('empty')}</p>
@@ -2080,10 +2071,10 @@ function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boole
   // Hide the banner entirely when everything is green and nothing's actionable.
   if (health.status === 'green') {
     return (
-      <div className="mb-3 flex items-center gap-2 text-sm text-default-500">
+      <div className="mb-3 flex items-center gap-2 text-sm text-muted">
         <CheckCircle size={14} className="text-success" />
         {t('engine_healthy')}
-        <Button size="sm" variant="light" className="ml-auto h-7 text-xs" onPress={() => setExpanded((v) => !v)}>
+        <Button size="sm" variant="tertiary" className="ml-auto h-7 text-xs" onPress={() => setExpanded((v) => !v)}>
           {expanded ? t('actions.hide_details') : t('actions.details')}
         </Button>
       </div>
@@ -2096,16 +2087,15 @@ function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boole
   return (
     <div className={`mb-3 rounded-md border px-3 py-2 text-sm ${HEALTH_BANNER_CLASSES[tone]}`}>
       <div className="flex items-center gap-2">
-        <Chip size="sm" color={tone} variant="flat">{health.status.toUpperCase()}</Chip>
+        <Chip size="sm" color={tone} variant="soft">{health.status.toUpperCase()}</Chip>
         <span className="font-medium">{t('issue_count', { count: failing.length })}</span>
-        <Button size="sm" variant="light" className="ml-auto h-7 text-xs" onPress={() => setExpanded((v) => !v)}>
+        <Button size="sm" variant="tertiary" className="ml-auto h-7 text-xs" onPress={() => setExpanded((v) => !v)}>
           {expanded ? t('actions.hide') : t('actions.details')}
         </Button>
         {isSuperAdmin && (
           <Button
             size="sm"
-            color="danger"
-            variant="flat"
+            variant="danger"
             isDisabled={busy}
             startContent={<StopCircle size={14} />}
             onPress={onOpen}
@@ -2125,7 +2115,7 @@ function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boole
           ))}
           {health.breaker_until && isSuperAdmin && (
             <li className="pt-1">
-              <Button size="sm" variant="flat" onPress={resetBreaker} isDisabled={busy}>
+              <Button size="sm" variant="tertiary" onPress={resetBreaker} isDisabled={busy}>
                 {t('actions.close_breaker_now')}
               </Button>
             </li>
@@ -2145,8 +2135,8 @@ function HealthBanner({ isSuperAdmin, toast, lastUpdate }: { isSuperAdmin: boole
             </p>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onClose} isDisabled={busy}>{t('actions.cancel')}</Button>
-            <Button color="danger" onPress={resetQueue} isDisabled={busy}>
+            <Button variant="tertiary" onPress={onClose} isDisabled={busy}>{t('actions.cancel')}</Button>
+            <Button variant="danger" onPress={resetQueue} isDisabled={busy}>
               {t('actions.reset_queue')}
             </Button>
           </ModalFooter>
@@ -2194,12 +2184,12 @@ function AuditTab() {
           <SelectItem key="reset_breaker" id="reset_breaker">{t('actions.reset_breaker')}</SelectItem>
           <SelectItem key="reset_queue" id="reset_queue">{t('actions.reset_queue')}</SelectItem>
         </Select>
-        <Button size="sm" variant="flat" onPress={load} isDisabled={loading} startContent={<RefreshCw size={14} />}>
+        <Button size="sm" variant="tertiary" onPress={load} isDisabled={loading} startContent={<RefreshCw size={14} />}>
           {t('buttons.refresh')}
         </Button>
         <Button
           size="sm"
-          variant="flat"
+          variant="tertiary"
           as="a"
           href={`/api/v2/admin/prerender/export/audit.csv${filter ? `?action=${encodeURIComponent(filter)}` : ''}`}
           startContent={<ExternalLink size={14} />}
@@ -2210,7 +2200,7 @@ function AuditTab() {
       {loading && items.length === 0 ? (
         <div className="flex justify-center py-8"><Spinner /></div>
       ) : items.length === 0 ? (
-        <p className="text-default-500">{t('empty')}</p>
+        <p className="text-muted">{t('empty')}</p>
       ) : (
         <Table aria-label={t('table_aria')} removeWrapper>
           <TableHeader>
@@ -2229,19 +2219,19 @@ function AuditTab() {
                 <TableCell>
                   {row.actor_email
                     ? <Tooltip content={`#${row.actor_user_id ?? '?'}`}><span>{row.actor_first} {row.actor_last}</span></Tooltip>
-                    : <span className="text-default-400">{t('fallbacks.system')}</span>}
+                    : <span className="text-muted">{t('fallbacks.system')}</span>}
                 </TableCell>
                 <TableCell><Code size="sm">{row.action}</Code></TableCell>
                 <TableCell>
                   <Chip
                     size="sm"
-                    variant="flat"
+                    variant="soft"
                     color={row.outcome === 'ok' ? 'success' : row.outcome === 'denied' ? 'warning' : 'danger'}
                   >
                     {row.outcome}
                   </Chip>
                 </TableCell>
-                <TableCell>{row.tenant_slug ?? <span className="text-default-400">{t('fallbacks.all')}</span>}</TableCell>
+                <TableCell>{row.tenant_slug ?? <span className="text-muted">{t('fallbacks.all')}</span>}</TableCell>
                 <TableCell>{row.job_id ?? '—'}</TableCell>
                 <TableCell className="max-w-md">
                   {row.details ? (
@@ -2288,27 +2278,27 @@ function TtlInspector() {
   };
 
   return (
-    <Card shadow="sm">
+    <Card>
       <CardHeader>
         <h3 className="text-lg font-semibold flex items-center gap-2">
           <Clock size={18} />{t('title')}
         </h3>
       </CardHeader>
       <CardBody className="space-y-3">
-        <p className="text-sm text-default-500">
+        <p className="text-sm text-muted">
           {t('description_prefix')} <code>config/prerender.php</code> {t('description_suffix')}
         </p>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
           <Input
             label={t('fields.route')}
             placeholder={t('placeholders.route')}
-            variant="bordered"
+            variant="secondary"
             value={route}
             onChange={(e) => setRoute(e.target.value)}
             className="max-w-sm"
             description={t('path_only')}
           />
-          <Button color="primary" onPress={submit} isLoading={loading}>
+          <Button onPress={submit} isLoading={loading}>
             {t('actions.inspect')}
           </Button>
         </div>
@@ -2316,10 +2306,10 @@ function TtlInspector() {
         {result && (
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-3">
-              <Chip color="primary" variant="flat" size="sm">
+              <Chip color="accent" variant="soft" size="sm">
                 {t('result.ttl', { ttl: fmt(result.ttl_seconds), seconds: result.ttl_seconds })}
               </Chip>
-              <Chip variant="flat" size="sm" color={result.source === 'pattern' ? 'success' : 'default'}>
+              <Chip variant="soft" size="sm" color={result.source === 'pattern' ? 'success' : 'default'}>
                 {result.source}
               </Chip>
               {result.matched_pattern && (
@@ -2331,7 +2321,7 @@ function TtlInspector() {
                 <p className="text-xs font-medium mb-1">{t('result.other_patterns')}</p>
                 <ul className="text-xs space-y-1 ml-2">
                   {result.all_matches.slice(1).map((m) => (
-                    <li key={m.pattern} className="font-mono text-default-500">
+                    <li key={m.pattern} className="font-mono text-muted">
                       {t('result.other_pattern_item', { pattern: m.pattern, ttl: fmt(m.ttl), specificity: m.specificity })}
                     </li>
                   ))}
@@ -2375,26 +2365,26 @@ function SitemapExplorer() {
   };
 
   return (
-    <Card shadow="sm">
+    <Card>
       <CardHeader>
         <h3 className="text-lg font-semibold flex items-center gap-2">
           <Search size={18} />{t('title')}
         </h3>
       </CardHeader>
       <CardBody className="space-y-3">
-        <p className="text-sm text-default-500">
+        <p className="text-sm text-muted">
           {t('description_prefix')} <code>SitemapService</code>. {t('description_suffix')}
         </p>
         <div className="flex gap-2 items-end">
           <Input
             label={t('fields.tenant_slug')}
             placeholder={t('placeholders.tenant_slug')}
-            variant="bordered"
+            variant="secondary"
             value={slug}
             onChange={(e) => setSlug(e.target.value)}
             className="max-w-sm"
           />
-          <Button color="primary" onPress={submit} isLoading={loading}>
+          <Button onPress={submit} isLoading={loading}>
             {t('actions.explore')}
           </Button>
         </div>
@@ -2402,9 +2392,9 @@ function SitemapExplorer() {
         {data && (
           <div className="space-y-3">
             <div className="flex gap-2">
-              <Chip color="primary" variant="flat" size="sm">{t('counts.static', { count: data.static_routes.length })}</Chip>
-              <Chip color="secondary" variant="flat" size="sm">{t('counts.dynamic', { count: data.dynamic_routes.length })}</Chip>
-              <Chip variant="flat" size="sm">{t('counts.total', { count: data.total_count })}</Chip>
+              <Chip color="accent" variant="soft" size="sm">{t('counts.static', { count: data.static_routes.length })}</Chip>
+              <Chip color="default" variant="soft" size="sm">{t('counts.dynamic', { count: data.dynamic_routes.length })}</Chip>
+              <Chip variant="soft" size="sm">{t('counts.total', { count: data.total_count })}</Chip>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <div>
