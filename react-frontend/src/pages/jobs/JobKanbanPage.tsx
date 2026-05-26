@@ -1,4 +1,5 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab, Tooltip, Checkbox } from '@/components/ui';
+import { Chip } from '@heroui/react';
+import { Select, SelectItem, GlassCard, Button, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Tabs, Tab, Tooltip, Checkbox } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -69,11 +70,11 @@ interface KanbanVacancy {
 const COLUMNS: Array<{
   id: string;
   status: string;
-  color: 'default' | 'primary' | 'secondary' | 'warning' | 'success' | 'danger';
+  color: 'default' | 'accent' | 'warning' | 'success' | 'danger';
 }> = [
   { id: 'Applied',    status: 'pending',    color: 'default' },
-  { id: 'Screening',  status: 'screening',  color: 'primary' },
-  { id: 'Interview',  status: 'interview',  color: 'secondary' },
+  { id: 'Screening',  status: 'screening',  color: 'accent' },
+  { id: 'Interview',  status: 'interview',  color: 'default' },
   { id: 'Offer',      status: 'offer',      color: 'warning' },
   { id: 'Accepted',   status: 'accepted',   color: 'success' },
   { id: 'Rejected',   status: 'rejected',   color: 'danger' },
@@ -179,7 +180,7 @@ function AppKanbanCard({ application, onDragStart, onDownloadCv, onScheduleInter
             </p>
             {aiRanking && (
               <div className="flex items-center gap-1.5 mt-1">
-                <Chip size="sm" variant="flat" color={aiRanking.score >= 70 ? 'success' : aiRanking.score >= 40 ? 'warning' : 'default'}>
+                <Chip size="sm" variant="tertiary" color={aiRanking.score >= 70 ? 'success' : aiRanking.score >= 40 ? 'warning' : 'default'}>
                   {t('kanban.ai_score', { score: aiRanking.score })}
                 </Chip>
                 <Tooltip content={aiRanking.reason}>
@@ -310,7 +311,7 @@ function KanbanColumn({ column, applications, onDragStart, onDrop, onDownloadCv,
     <div className="flex-shrink-0 w-64">
       {/* Column header */}
       <div className="flex items-center gap-2 mb-3">
-        <Chip size="sm" color={column.color} variant="flat" className="font-medium">
+        <Chip size="sm" color={column.color} variant="tertiary" className="font-medium">
           {getApplicationStatusLabel(t, column.status)}
         </Chip>
         <span className="text-xs text-theme-subtle font-medium bg-theme-elevated rounded-full px-2 py-0.5">
@@ -799,7 +800,7 @@ export function JobKanbanPage() {
           >
             {t('kanban.ai_rank')}
           </Button>
-          <Chip variant="flat" color="default">
+          <Chip variant="tertiary" color="default">
             {t('applications', { count: applications.length })}
           </Chip>
         </div>
@@ -895,7 +896,7 @@ export function JobKanbanPage() {
                   <div className="bg-default-50 rounded-lg p-3">
                     <div className="flex items-center justify-between gap-2">
                       <span className="text-sm font-medium text-foreground">{event.description}</span>
-                      <Chip size="sm" variant="flat" color={event.type === 'status_change' ? 'primary' : event.type === 'interview' ? 'secondary' : 'warning'} className="capitalize shrink-0">
+                      <Chip size="sm" variant="tertiary" color={event.type === 'status_change' ? 'accent' : event.type === 'interview' ? 'default' : 'warning'} className="capitalize shrink-0">
                         {event.type.replace('_', ' ')}
                       </Chip>
                     </div>

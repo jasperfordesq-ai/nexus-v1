@@ -1,5 +1,5 @@
-import { Select, SelectItem, GlassCard, Button, Chip, Input, Switch, Tabs, Tab } from '@/components/ui';
-import { Chip as HeroChip } from '@heroui/react';
+import { Select, SelectItem, GlassCard, Button, Input, Switch, Tabs, Tab } from '@/components/ui';
+import { Chip as HeroChip, ToggleButton, ToggleButtonGroup } from '@heroui/react';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -481,52 +481,74 @@ export function JobsPage() {
           </div>
 
           {/* Type Filter Chips */}
-          <div className="flex flex-wrap gap-2" role="group" aria-label={t('filter_aria')}>
+          <ToggleButtonGroup
+            selectionMode="single"
+            disallowEmptySelection
+            selectedKeys={[selectedType]}
+            onSelectionChange={(keys) => {
+              const nextType = Array.from(keys)[0];
+              if (nextType) {
+                setSelectedType(String(nextType));
+              }
+            }}
+            isDetached
+            size="sm"
+            className="flex flex-wrap gap-2"
+            aria-label={t('filter_aria')}
+          >
             {TYPE_FILTERS.map((filter) => {
               const isSelected = selectedType === filter.id;
               const IconComp = filter.icon;
               return (
-                <Chip
+                <ToggleButton
                   key={filter.id}
-                  variant={isSelected ? 'solid' : 'flat'}
-                  color={isSelected ? 'primary' : 'default'}
+                  id={filter.id}
                   className={
                     isSelected
-                      ? 'bg-linear-to-r from-indigo-500 to-purple-600 text-white cursor-pointer'
-                      : 'bg-theme-elevated text-theme-muted cursor-pointer hover:bg-theme-hover'
+                      ? 'bg-accent text-white'
+                      : 'bg-theme-elevated text-theme-muted hover:bg-theme-hover'
                   }
-                  startContent={<IconComp className="w-3.5 h-3.5" aria-hidden="true" />}
-                  onClick={() => setSelectedType(filter.id)}
-                  aria-pressed={isSelected}
                 >
+                  <IconComp className="w-3.5 h-3.5" aria-hidden="true" />
                   {t(`type.${filter.id}`)}
-                </Chip>
+                </ToggleButton>
               );
             })}
-          </div>
+          </ToggleButtonGroup>
 
           {/* Commitment Filter Chips */}
-          <div className="flex flex-wrap gap-2" role="group" aria-label={t('filter_by_commitment')}>
+          <ToggleButtonGroup
+            selectionMode="single"
+            disallowEmptySelection
+            selectedKeys={[selectedCommitment]}
+            onSelectionChange={(keys) => {
+              const nextCommitment = Array.from(keys)[0];
+              if (nextCommitment) {
+                setSelectedCommitment(String(nextCommitment));
+              }
+            }}
+            isDetached
+            size="sm"
+            className="flex flex-wrap gap-2"
+            aria-label={t('filter_by_commitment')}
+          >
             {COMMITMENT_FILTERS.map((filter) => {
               const isSelected = selectedCommitment === filter.id;
               return (
-                <Chip
+                <ToggleButton
                   key={filter.id}
-                  variant={isSelected ? 'solid' : 'flat'}
-                  color={isSelected ? 'secondary' : 'default'}
+                  id={filter.id}
                   className={
                     isSelected
-                      ? 'bg-linear-to-r from-violet-500 to-fuchsia-600 text-white cursor-pointer'
-                      : 'bg-theme-elevated text-theme-muted cursor-pointer hover:bg-theme-hover'
+                      ? 'bg-accent text-white'
+                      : 'bg-theme-elevated text-theme-muted hover:bg-theme-hover'
                   }
-                  onClick={() => setSelectedCommitment(filter.id)}
-                  aria-pressed={isSelected}
                 >
                   {t(`commitment.${filter.id}`)}
-                </Chip>
+                </ToggleButton>
               );
             })}
-          </div>
+          </ToggleButtonGroup>
 
           {/* Error State */}
           {error && !isLoading && (

@@ -1,4 +1,5 @@
-import { Select, SelectItem, GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Chip, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch, Tooltip } from '@/components/ui';
+import { Chip, CloseButton } from '@heroui/react';
+import { Select, SelectItem, GlassCard, Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Avatar, Switch, Tooltip } from '@/components/ui';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
@@ -902,8 +903,8 @@ export function CreateJobPage() {
             {skillsArray.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-2">
                 {skillsArray.map((skill, idx) => (
-                  <Chip key={idx} size="sm" variant="flat" color="primary" className="bg-accent/10 text-accent">
-                    {skill}
+                  <Chip key={idx} size="sm" variant="tertiary" color="accent" className="bg-accent/10 text-accent">
+                    <Chip.Label>{skill}</Chip.Label>
                   </Chip>
                 ))}
               </div>
@@ -1044,12 +1045,12 @@ export function CreateJobPage() {
                 {/* EU Pay Transparency info chip */}
                 <Chip
                   size="sm"
-                  variant="flat"
-                  color="primary"
-                  startContent={<Info size={12} aria-hidden="true" />}
+                  variant="tertiary"
+                  color="accent"
                   className="text-xs"
                 >
-                  {t('form.salary_transparency_hint')}
+                  <Info size={12} aria-hidden="true" />
+                  <Chip.Label>{t('form.salary_transparency_hint')}</Chip.Label>
                 </Chip>
               </div>
 
@@ -1217,11 +1218,15 @@ export function CreateJobPage() {
                         <Chip
                           key={idx}
                           size="sm"
-                          variant="flat"
+                          variant="tertiary"
                           color="success"
-                          onClose={() => setBenefits((prev) => prev.filter((_, i) => i !== idx))}
                         >
-                          {benefit}
+                          <Chip.Label>{benefit}</Chip.Label>
+                          <CloseButton
+                            aria-label={t('team.remove')}
+                            className="inline-flex size-3 items-center justify-center text-current opacity-70 hover:opacity-100"
+                            onPress={() => setBenefits((prev) => prev.filter((_, i) => i !== idx))}
+                          />
                         </Chip>
                       ))}
                     </div>
@@ -1244,7 +1249,9 @@ export function CreateJobPage() {
                   <Users size={15} aria-hidden="true" />
                   {t('team.title')}
                   {teamMembers.length > 0 && (
-                    <Chip size="sm" variant="flat" color="primary" className="ml-1">{teamMembers.length}</Chip>
+                    <Chip size="sm" variant="tertiary" color="accent" className="ml-1">
+                      <Chip.Label>{teamMembers.length}</Chip.Label>
+                    </Chip>
                   )}
                 </span>
                 {teamOpen
@@ -1260,26 +1267,27 @@ export function CreateJobPage() {
                       {teamMembers.map((member) => (
                         <Chip
                           key={member.id}
-                          variant="flat"
+                          variant="tertiary"
                           color="default"
                           size="lg"
-                          avatar={
-                            <Avatar
-                              src={member.avatar_url || undefined}
-                              name={member.name}
-                              size="sm"
-                            />
-                          }
-                          onClose={() => void handleRemoveTeamMember(member.id)}
-                          classNames={{
-                            base: 'bg-theme-elevated border border-theme-default',
-                            content: 'text-theme-primary',
-                          }}
+                          className="bg-theme-elevated border border-theme-default"
                         >
-                          <span className="flex flex-col leading-tight">
-                            <span className="text-sm font-medium">{member.name}</span>
-                            <span className="text-xs text-theme-subtle">{t(`team.role_${member.role}`, member.role)}</span>
-                          </span>
+                          <Avatar
+                            src={member.avatar_url || undefined}
+                            name={member.name}
+                            size="sm"
+                          />
+                          <Chip.Label className="text-theme-primary">
+                            <span className="flex flex-col leading-tight">
+                              <span className="text-sm font-medium">{member.name}</span>
+                              <span className="text-xs text-theme-subtle">{t(`team.role_${member.role}`, member.role)}</span>
+                            </span>
+                          </Chip.Label>
+                          <CloseButton
+                            aria-label={t('team.remove_member')}
+                            className="inline-flex size-3 items-center justify-center text-current opacity-70 hover:opacity-100"
+                            onPress={() => void handleRemoveTeamMember(member.id)}
+                          />
                         </Chip>
                       ))}
                     </div>
@@ -1488,11 +1496,16 @@ export function CreateJobPage() {
 
             {/* Type + Commitment chips */}
             <div className="flex flex-wrap gap-2">
-              <Chip size="sm" variant="flat" color="primary">{t(`type.${form.type}`)}</Chip>
-              <Chip size="sm" variant="flat" color="secondary">{t(`commitment.${form.commitment}`)}</Chip>
+              <Chip size="sm" variant="tertiary" color="accent">
+                <Chip.Label>{t(`type.${form.type}`)}</Chip.Label>
+              </Chip>
+              <Chip size="sm" variant="tertiary" color="default">
+                <Chip.Label>{t(`commitment.${form.commitment}`)}</Chip.Label>
+              </Chip>
               {form.is_remote && (
-                <Chip size="sm" variant="flat" color="success" startContent={<MapPin className="w-3 h-3" />}>
-                  {t('remote')}
+                <Chip size="sm" variant="tertiary" color="success">
+                  <MapPin className="w-3 h-3" aria-hidden="true" />
+                  <Chip.Label>{t('remote')}</Chip.Label>
                 </Chip>
               )}
             </div>
@@ -1532,8 +1545,8 @@ export function CreateJobPage() {
                 <h3 className="text-sm font-semibold text-theme-primary">{t('detail.skills_required')}</h3>
                 <div className="flex flex-wrap gap-1.5">
                   {skillsArray.map((skill, idx) => (
-                    <Chip key={idx} size="sm" variant="flat" color="primary" className="bg-accent/10 text-accent">
-                      {skill}
+                    <Chip key={idx} size="sm" variant="tertiary" color="accent" className="bg-accent/10 text-accent">
+                      <Chip.Label>{skill}</Chip.Label>
                     </Chip>
                   ))}
                 </div>
