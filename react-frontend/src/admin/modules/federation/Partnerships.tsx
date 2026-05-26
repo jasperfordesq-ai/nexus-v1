@@ -464,7 +464,7 @@ export function Partnerships() {
     {
       key: 'federation_level', label: t('federation.col_level'),
       render: (item) => (
-        <Chip size="sm" variant="flat" color="primary">
+        <Chip size="sm" variant="soft" color="accent">
           {t(LEVEL_LABEL_KEYS[item.federation_level || 1] || 'federation.level_discovery')}
         </Chip>
       ),
@@ -475,14 +475,14 @@ export function Partnerships() {
     },
     {
       key: 'created_at', label: t('federation.col_since'), sortable: true,
-      render: (item) => <span className="text-sm text-default-500">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}</span>,
+      render: (item) => <span className="text-sm text-muted">{item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}</span>,
     },
     {
       key: 'actions', label: t('federation.label_actions'),
       render: (item) => (
         <div className="flex items-center gap-1">
           <Button
-            isIconOnly size="sm" variant="light"
+            isIconOnly size="sm" variant="ghost"
             aria-label={t('federation.label_view_detail')}
             onPress={() => openDetail(item)}
           >
@@ -490,7 +490,7 @@ export function Partnerships() {
           </Button>
           <Dropdown>
             <DropdownTrigger>
-              <Button isIconOnly size="sm" variant="light" aria-label={t('federation.label_actions')} isDisabled={actionLoading}>
+              <Button isIconOnly size="sm" variant="ghost" aria-label={t('federation.label_actions')} isDisabled={actionLoading}>
                 <MoreVertical size={16} />
               </Button>
             </DropdownTrigger>
@@ -558,7 +558,7 @@ export function Partnerships() {
       <PageHeader
         title={t('federation.partnerships_title')}
         description={t('federation.partnerships_desc')}
-        actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('federation.refresh')}</Button>}
+        actions={<Button variant="tertiary" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('federation.refresh')}</Button>}
       />
 
       {/* Tabs: All / Incoming / Active */}
@@ -574,7 +574,7 @@ export function Partnerships() {
             <div className="flex items-center gap-2">
               <Handshake size={16} />
               <span>{t('federation.tab_all')}</span>
-              <Chip size="sm" variant="flat">{items.length}</Chip>
+              <Chip size="sm" variant="soft">{items.length}</Chip>
             </div>
           }
         />
@@ -585,7 +585,7 @@ export function Partnerships() {
               <Inbox size={16} />
               <span>{t('federation.tab_incoming_requests')}</span>
               {incomingRequests.length > 0 && (
-                <Chip size="sm" variant="solid" color="warning">{incomingRequests.length}</Chip>
+                <Chip size="sm" variant="soft" color="warning">{incomingRequests.length}</Chip>
               )}
             </div>
           }
@@ -596,7 +596,7 @@ export function Partnerships() {
             <div className="flex items-center gap-2">
               <CheckCircle size={16} />
               <span>{t('federation.status_active')}</span>
-              <Chip size="sm" variant="flat" color="success">
+              <Chip size="sm" variant="soft" color="success">
                 {items.filter(p => p.status === 'active').length}
               </Chip>
             </div>
@@ -612,8 +612,8 @@ export function Partnerships() {
           </span>
           <Button
             size="sm"
-            color="success"
-            variant="flat"
+            variant="tertiary"
+            className="text-success"
             startContent={<CheckCircle size={14} />}
             onPress={handleBulkApprove}
             isLoading={actionLoading}
@@ -622,8 +622,7 @@ export function Partnerships() {
           </Button>
           <Button
             size="sm"
-            color="danger"
-            variant="flat"
+            variant="danger"
             startContent={<XCircle size={14} />}
             onPress={handleBulkReject}
             isLoading={actionLoading}
@@ -651,7 +650,7 @@ export function Partnerships() {
           title={t('federation.approve_partnership')}
           message={t('federation.confirm_approve_partnership')}
           confirmLabel={t('federation.approve')}
-          confirmColor="primary"
+          confirmColor="warning"
           isLoading={actionLoading}
         />
       )}
@@ -693,7 +692,7 @@ export function Partnerships() {
           title={t('federation.reactivate_partnership')}
           message={t('federation.reactivate_partnership_confirm')}
           confirmLabel={t('federation.reactivate')}
-          confirmColor="primary"
+          confirmColor="warning"
           isLoading={actionLoading}
         />
       )}
@@ -709,7 +708,7 @@ export function Partnerships() {
               </ModalHeader>
               <ModalBody className="gap-4">
                 {counterTarget && (
-                  <p className="text-sm text-default-500">
+                  <p className="text-sm text-muted">
                     {t('federation.counter_propose_desc')}
                   </p>
                 )}
@@ -726,7 +725,7 @@ export function Partnerships() {
                     <SelectItem key={String(level)} id={String(level)} textValue={t(LEVEL_LABEL_KEYS[level] || 'federation.level_discovery')}>
                       <div>
                         <p className="font-medium">{t(LEVEL_LABEL_KEYS[level] || 'federation.level_discovery')}</p>
-                        <p className="text-xs text-default-400">{t(LEVEL_DESCRIPTION_KEYS[level] || 'federation.level_desc_discovery')}</p>
+                        <p className="text-xs text-muted">{t(LEVEL_DESCRIPTION_KEYS[level] || 'federation.level_desc_discovery')}</p>
                       </div>
                     </SelectItem>
                   ))}
@@ -739,7 +738,7 @@ export function Partnerships() {
                     return (
                       <div key={key} className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <Icon size={16} className="text-default-400" />
+                          <Icon size={16} className="text-muted" />
                           <span className="text-sm">{t(`federation.permission_${key}`)}</span>
                         </div>
                         <Switch
@@ -761,9 +760,9 @@ export function Partnerships() {
                 />
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('common.cancel')}</Button>
+                <Button variant="tertiary" onPress={onClose}>{t('common.cancel')}</Button>
                 <Button
-                  color="warning"
+                  variant="secondary"
                   isLoading={counterLoading}
                   onPress={handleCounterPropose}
                 >
@@ -828,25 +827,25 @@ export function Partnerships() {
 
                     {/* Info Tab */}
                     {detailTab === 'info' && (
-                      <Card shadow="none" className="border border-default-200">
+                      <Card className="border border-border">
                         <CardBody className="gap-3">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                             <div>
-                              <p className="text-default-400">{t('federation.label_partner')}</p>
+                              <p className="text-muted">{t('federation.label_partner')}</p>
                               <p className="font-medium">{detailPartnership.resolved_partner_name || detailPartnership.partner_name}</p>
                             </div>
                             <div>
-                              <p className="text-default-400">{t('federation.label_status')}</p>
+                              <p className="text-muted">{t('federation.label_status')}</p>
                               <StatusBadge status={detailPartnership.status} />
                             </div>
                             <div>
-                              <p className="text-default-400">{t('federation.col_level')}</p>
-                              <Chip size="sm" variant="flat" color="primary">
+                              <p className="text-muted">{t('federation.col_level')}</p>
+                              <Chip size="sm" variant="soft" color="accent">
                                 {t(LEVEL_LABEL_KEYS[detailPartnership.federation_level || 1] || 'federation.level_discovery')}
                               </Chip>
                             </div>
                             <div>
-                              <p className="text-default-400">{t('federation.label_direction')}</p>
+                              <p className="text-muted">{t('federation.label_direction')}</p>
                               <p className="font-medium">
                                 {detailPartnership.is_initiator
                                   ? t('federation.outgoing_request')
@@ -855,25 +854,25 @@ export function Partnerships() {
                               </p>
                             </div>
                             <div>
-                              <p className="text-default-400">{t('federation.label_created')}</p>
+                              <p className="text-muted">{t('federation.label_created')}</p>
                               <p>{detailPartnership.created_at ? new Date(detailPartnership.created_at).toLocaleDateString() : '--'}</p>
                             </div>
                             {detailPartnership.approved_at && (
                               <div>
-                                <p className="text-default-400">{t('federation.label_approved')}</p>
+                                <p className="text-muted">{t('federation.label_approved')}</p>
                                 <p>{new Date(detailPartnership.approved_at).toLocaleDateString()}</p>
                               </div>
                             )}
                           </div>
                           {detailPartnership.notes && (
                             <div className="mt-2">
-                              <p className="text-sm text-default-400">{t('federation.label_notes')}</p>
-                              <p className="text-sm mt-1 rounded-lg bg-default-100 p-3">{detailPartnership.notes}</p>
+                              <p className="text-sm text-muted">{t('federation.label_notes')}</p>
+                              <p className="text-sm mt-1 rounded-lg bg-surface-secondary p-3">{detailPartnership.notes}</p>
                             </div>
                           )}
                           {detailPartnership.counter_proposal_message && (
                             <div className="mt-2">
-                              <p className="text-sm text-default-400">{t('federation.label_counter_proposal')}</p>
+                              <p className="text-sm text-muted">{t('federation.label_counter_proposal')}</p>
                               <p className="text-sm mt-1 rounded-lg bg-warning-50 p-3">{detailPartnership.counter_proposal_message}</p>
                             </div>
                           )}
@@ -883,7 +882,7 @@ export function Partnerships() {
 
                     {/* Permissions Tab */}
                     {detailTab === 'permissions' && (
-                      <Card shadow="none" className="border border-default-200">
+                      <Card className="border border-border">
                         <CardHeader>
                           <p className="text-sm font-semibold">{t('federation.label_feature_permissions')}</p>
                         </CardHeader>
@@ -895,10 +894,10 @@ export function Partnerships() {
                             return (
                               <div key={key} className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
-                                  <Icon size={18} className={isEnabled ? 'text-success' : 'text-default-300'} />
+                                  <Icon size={18} className={isEnabled ? 'text-success' : 'text-muted'} />
                                   <div>
                                     <p className="text-sm font-medium">{t(`federation.permission_${key}`)}</p>
-                                    <p className="text-xs text-default-400">
+                                    <p className="text-xs text-muted">
                                       {isEnabled ? t('federation.enabled') : t('federation.disabled')}
                                     </p>
                                   </div>
@@ -913,7 +912,7 @@ export function Partnerships() {
                             );
                           })}
                           {detailPartnership.status !== 'active' && (
-                            <p className="text-xs text-default-400 italic">
+                            <p className="text-xs text-muted italic">
                               {t('federation.permissions_editable_when_active')}
                             </p>
                           )}
@@ -923,7 +922,7 @@ export function Partnerships() {
 
                     {/* History/Audit Tab */}
                     {detailTab === 'history' && (
-                      <Card shadow="none" className="border border-default-200">
+                      <Card className="border border-border">
                         <CardHeader>
                           <p className="text-sm font-semibold">{t('federation.label_timeline')}</p>
                         </CardHeader>
@@ -933,19 +932,19 @@ export function Partnerships() {
                               <Spinner size="sm" />
                             </div>
                           ) : auditLog.length === 0 ? (
-                            <p className="text-sm text-default-400 text-center py-4">
+                            <p className="text-sm text-muted text-center py-4">
                               {t('federation.no_audit_log_entries')}
                             </p>
                           ) : (
                             <div className="space-y-3">
                               {auditLog.map((entry) => (
-                                <div key={entry.id} className="flex items-start gap-3 border-b border-default-100 pb-3 last:border-0">
+                                <div key={entry.id} className="flex items-start gap-3 border-b border-border pb-3 last:border-0">
                                   <div className="mt-1 h-2 w-2 rounded-full bg-accent shrink-0" />
                                   <div className="flex-1 min-w-0">
                                     <p className="text-sm font-medium">
                                       {entry.action.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
                                     </p>
-                                    <p className="text-xs text-default-400">
+                                    <p className="text-xs text-muted">
                                       {entry.first_name && entry.last_name
                                         ? `${entry.first_name} ${entry.last_name}`
                                         : t('federation.system')
@@ -956,13 +955,13 @@ export function Partnerships() {
                                     {entry.details && (() => {
                                       try {
                                         const parsed = JSON.parse(entry.details);
-                                        if (parsed.reason) return <p className="text-xs text-default-500 mt-1">{parsed.reason}</p>;
-                                        if (parsed.message) return <p className="text-xs text-default-500 mt-1">{parsed.message}</p>;
+                                        if (parsed.reason) return <p className="text-xs text-muted mt-1">{parsed.reason}</p>;
+                                        if (parsed.message) return <p className="text-xs text-muted mt-1">{parsed.message}</p>;
                                       } catch { /* not JSON */ }
                                       return null;
                                     })()}
                                   </div>
-                                  <Chip size="sm" variant="flat" color={
+                                  <Chip size="sm" variant="soft" color={
                                     entry.level === 'warning' ? 'warning'
                                       : entry.level === 'critical' ? 'danger'
                                         : 'default'
@@ -979,7 +978,7 @@ export function Partnerships() {
 
                     {/* Statistics Tab */}
                     {detailTab === 'stats' && (
-                      <Card shadow="none" className="border border-default-200">
+                      <Card className="border border-border">
                         <CardHeader>
                           <p className="text-sm font-semibold">{t('federation.label_partnership_statistics')}</p>
                         </CardHeader>
@@ -990,24 +989,24 @@ export function Partnerships() {
                             </div>
                           ) : stats ? (
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                              <div className="text-center p-4 rounded-lg bg-default-50">
+                              <div className="text-center p-4 rounded-lg bg-surface-secondary">
                                 <Mail size={24} className="mx-auto mb-2 text-accent" />
                                 <p className="text-2xl font-bold">{stats.messages_exchanged}</p>
-                                <p className="text-xs text-default-400">{t('federation.stat_messages')}</p>
+                                <p className="text-xs text-muted">{t('federation.stat_messages')}</p>
                               </div>
-                              <div className="text-center p-4 rounded-lg bg-default-50">
+                              <div className="text-center p-4 rounded-lg bg-surface-secondary">
                                 <ArrowLeftRight size={24} className="mx-auto mb-2 text-success" />
                                 <p className="text-2xl font-bold">{stats.transactions_completed}</p>
-                                <p className="text-xs text-default-400">{t('federation.stat_transactions')}</p>
+                                <p className="text-xs text-muted">{t('federation.stat_transactions')}</p>
                               </div>
-                              <div className="text-center p-4 rounded-lg bg-default-50">
+                              <div className="text-center p-4 rounded-lg bg-surface-secondary">
                                 <Users size={24} className="mx-auto mb-2 text-accent" />
                                 <p className="text-2xl font-bold">{stats.connections_made}</p>
-                                <p className="text-xs text-default-400">{t('federation.stat_connections')}</p>
+                                <p className="text-xs text-muted">{t('federation.stat_connections')}</p>
                               </div>
                             </div>
                           ) : (
-                            <p className="text-sm text-default-400 text-center py-4">
+                            <p className="text-sm text-muted text-center py-4">
                               {t('federation.no_stats_available')}
                             </p>
                           )}
@@ -1016,13 +1015,13 @@ export function Partnerships() {
                     )}
                   </div>
                 ) : (
-                  <p className="text-sm text-default-400 text-center py-8">
+                  <p className="text-sm text-muted text-center py-8">
                     {t('federation.partnership_not_found')}
                   </p>
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('common.close')}</Button>
+                <Button variant="tertiary" onPress={onClose}>{t('common.close')}</Button>
               </ModalFooter>
             </>
           )}

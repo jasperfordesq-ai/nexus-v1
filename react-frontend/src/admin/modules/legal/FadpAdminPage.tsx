@@ -362,19 +362,19 @@ export function FadpAdminPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-default-200 bg-surface p-5 shadow-sm">
+      <div className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-border bg-surface p-5 shadow-sm">
         <div className="min-w-0">
           <h1 className="flex items-center gap-2 text-2xl font-bold text-[var(--color-text)]">
             <ShieldCheck className="text-danger-500" size={24} />
             {t('fadp.header.title')}
           </h1>
-          <p className="mt-1 max-w-3xl text-sm text-default-500">
+          <p className="mt-1 max-w-3xl text-sm text-muted">
             {t('fadp.header.description')}
           </p>
         </div>
         <Button
           size="sm"
-          variant="bordered"
+          variant="secondary"
           startContent={<RefreshCw size={14} />}
           onPress={() => {
             void loadActivities();
@@ -387,18 +387,18 @@ export function FadpAdminPage() {
         </Button>
       </div>
 
-      <Tabs aria-label={t('fadp.tabs.aria')} color="primary" variant="underlined">
+      <Tabs aria-label={t('fadp.tabs.aria')} variant="underlined">
         <Tab key="register" title={<span className="flex items-center gap-2"><FileText size={14} />{t('fadp.tabs.register')}</span>}>
           <div className="space-y-4 pt-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="max-w-3xl text-sm text-default-500">
+              <p className="max-w-3xl text-sm text-muted">
                 {t('fadp.register.description')}
               </p>
               <div className="flex gap-2">
-                <Button size="sm" variant="bordered" startContent={<Download size={14} />} onPress={() => void exportRegisterCsv()}>
+                <Button size="sm" variant="secondary" startContent={<Download size={14} />} onPress={() => void exportRegisterCsv()}>
                   {t('fadp.actions.export_csv')}
                 </Button>
-                <Button size="sm" color="primary" startContent={<Plus size={14} />} onPress={openAddActivity}>
+            <Button size="sm" startContent={<Plus size={14} />} onPress={openAddActivity}>
                   {t('fadp.actions.add_activity')}
                 </Button>
               </div>
@@ -407,7 +407,7 @@ export function FadpAdminPage() {
             {activitiesLoading ? (
               <div className="flex justify-center py-12"><Spinner /></div>
             ) : (
-              <Card shadow="sm">
+              <Card >
                 <CardBody className="p-0">
                   <Table aria-label={t('fadp.register.table_aria')} removeWrapper>
                     <TableHeader>
@@ -423,11 +423,11 @@ export function FadpAdminPage() {
                           <TableCell>
                             <div>
                               <p className="text-sm font-medium">{a.activity_name}</p>
-                              <p className="line-clamp-2 text-xs text-default-400">{a.purpose}</p>
+                              <p className="line-clamp-2 text-xs text-muted">{a.purpose}</p>
                               {a.data_categories.length > 0 && (
                                 <div className="mt-2 flex flex-wrap gap-1">
                                   {a.data_categories.map(c => (
-                                    <Chip key={c} size="sm" variant="flat" className="text-xs">{c}</Chip>
+                                    <Chip key={c} size="sm" variant="soft" className="text-xs">{c}</Chip>
                                   ))}
                                 </div>
                               )}
@@ -437,26 +437,26 @@ export function FadpAdminPage() {
                             <Chip
                               size="sm"
                               color={legalBasisColor[a.legal_basis] ?? 'default'}
-                              variant="flat"
+                              variant="soft"
                             >
                               {legalBasisLabel(a.legal_basis)}
                             </Chip>
                           </TableCell>
                           <TableCell>
                             {a.is_automated_profiling ? (
-                              <Chip size="sm" color="danger" variant="flat">{t('fadp.register.profiling_yes')}</Chip>
+                              <Chip size="sm" color="danger" variant="soft">{t('fadp.register.profiling_yes')}</Chip>
                             ) : (
-                              <Chip size="sm" color="default" variant="flat">{t('fadp.common.no')}</Chip>
+                              <Chip size="sm" color="default" variant="soft">{t('fadp.common.no')}</Chip>
                             )}
                           </TableCell>
                           <TableCell>
-                            <span className="text-sm text-default-600">{a.retention_period}</span>
+                            <span className="text-sm text-muted">{a.retention_period}</span>
                           </TableCell>
                           <TableCell>
                             <div className="flex gap-2">
                               <Button
                                 size="sm"
-                                variant="light"
+                                variant="tertiary"
                                 isIconOnly
                                 onPress={() => openEditActivity(a)}
                                 aria-label={t('fadp.actions.edit')}
@@ -465,7 +465,7 @@ export function FadpAdminPage() {
                               </Button>
                               <Button
                                 size="sm"
-                                variant="light"
+                                variant="tertiary"
                                 color="danger"
                                 isIconOnly
                                 onPress={() => setDeleteTarget(a)}
@@ -491,7 +491,7 @@ export function FadpAdminPage() {
               <div className="flex justify-center py-12"><Spinner /></div>
             ) : (
               <>
-                <Card shadow="sm">
+                <Card >
                   <CardHeader>
                     <h3 className="text-base font-semibold">{t('fadp.retention.periods_title')}</h3>
                   </CardHeader>
@@ -511,13 +511,13 @@ export function FadpAdminPage() {
                             config: { ...r.config, [key]: parseInt(v, 10) || 1 },
                           }))
                         }
-                        variant="bordered"
+                        variant="secondary"
                       />
                     ))}
                   </CardBody>
                 </Card>
 
-                <Card shadow="sm">
+                <Card >
                   <CardHeader>
                     <h3 className="text-base font-semibold">{t('fadp.retention.residency_title')}</h3>
                   </CardHeader>
@@ -529,7 +529,7 @@ export function FadpAdminPage() {
                         const v = Array.from(keys)[0] as RetentionConfig['data_residency'];
                         setRetention(r => ({ ...r, data_residency: v }));
                       }}
-                      variant="bordered"
+                      variant="secondary"
                     >
                       {dataResidencyOptions.map(option => (
                         <SelectItem key={option} id={option}>{t(`fadp.data_residency.${option}`)}</SelectItem>
@@ -541,13 +541,12 @@ export function FadpAdminPage() {
                       type="email"
                       value={retention.dpa_contact_email ?? ''}
                       onValueChange={v => setRetention(r => ({ ...r, dpa_contact_email: v || null }))}
-                      variant="bordered"
+                      variant="secondary"
                     />
                   </CardBody>
                 </Card>
 
                 <Button
-                  color="primary"
                   isLoading={retentionSaving}
                   onPress={() => void saveRetention()}
                 >
@@ -561,10 +560,10 @@ export function FadpAdminPage() {
         <Tab key="ledger" title={<span className="flex items-center gap-2"><ShieldCheck size={14} />{t('fadp.tabs.ledger')}</span>}>
           <div className="space-y-4 pt-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="max-w-3xl text-sm text-default-500">
+              <p className="max-w-3xl text-sm text-muted">
                 {t('fadp.ledger.description')}
               </p>
-              <Button size="sm" variant="bordered" startContent={<Download size={14} />} onPress={() => void exportConsentCsv()}>
+              <Button size="sm" variant="secondary" startContent={<Download size={14} />} onPress={() => void exportConsentCsv()}>
                 {t('fadp.actions.export_ledger_csv')}
               </Button>
             </div>
@@ -572,7 +571,7 @@ export function FadpAdminPage() {
             {consentLoading ? (
               <div className="flex justify-center py-12"><Spinner /></div>
             ) : (
-              <Card shadow="sm">
+              <Card >
                 <CardBody className="p-0">
                   <Table aria-label={t('fadp.ledger.table_aria')} removeWrapper>
                     <TableHeader>
@@ -586,25 +585,25 @@ export function FadpAdminPage() {
                       {consentRecords.slice(0, 200).map(r => (
                         <TableRow key={r.id}>
                           <TableCell>
-                            <span className="font-mono text-sm text-default-600">{r.user_id}</span>
+                            <span className="font-mono text-sm text-muted">{r.user_id}</span>
                           </TableCell>
                           <TableCell>
-                            <Chip size="sm" variant="flat">{r.consent_type}</Chip>
+                            <Chip size="sm" variant="soft">{r.consent_type}</Chip>
                           </TableCell>
                           <TableCell>
                             <Chip
                               size="sm"
                               color={r.action === 'granted' ? 'success' : r.action === 'withdrawn' ? 'danger' : 'warning'}
-                              variant="flat"
+                              variant="soft"
                             >
                               {consentActionLabel(r.action)}
                             </Chip>
                           </TableCell>
                           <TableCell>
-                            <span className="font-mono text-xs text-default-400">{r.ip_address ?? t('fadp.common.empty_dash')}</span>
+                            <span className="font-mono text-xs text-muted">{r.ip_address ?? t('fadp.common.empty_dash')}</span>
                           </TableCell>
                           <TableCell>
-                            <span className="text-sm text-default-600">
+                            <span className="text-sm text-muted">
                               {new Date(r.created_at).toLocaleString()}
                             </span>
                           </TableCell>
@@ -616,7 +615,7 @@ export function FadpAdminPage() {
               </Card>
             )}
             {consentRecords.length > 200 && (
-              <p className="text-center text-xs text-default-400">
+              <p className="text-center text-xs text-muted">
                 {t('fadp.ledger.truncated', { count: consentRecords.length })}
               </p>
             )}
@@ -625,7 +624,7 @@ export function FadpAdminPage() {
 
         <Tab key="residency" title={<span className="flex items-center gap-2"><Globe size={14} />{t('fadp.tabs.residency')}</span>}>
           <div className="max-w-2xl space-y-4 pt-4">
-            <Card shadow="sm">
+            <Card >
               <CardBody className="space-y-4 p-6">
                 <div className="flex items-center gap-3">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent-soft">
@@ -633,11 +632,11 @@ export function FadpAdminPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-[var(--color-text)]">{t('fadp.residency.title')}</h3>
-                    <p className="text-sm text-default-500">{t('fadp.residency.description')}</p>
+                    <p className="text-sm text-muted">{t('fadp.residency.description')}</p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 rounded-lg bg-default-50 p-4">
+                <div className="flex items-start gap-3 rounded-lg bg-surface-secondary p-4">
                   <Chip
                     size="lg"
                     color={
@@ -647,17 +646,17 @@ export function FadpAdminPage() {
                         ? 'primary'
                         : 'warning'
                     }
-                    variant="flat"
+                    variant="soft"
                   >
                     {t(`fadp.data_residency.${retention.data_residency}`)}
                   </Chip>
-                  <div className="text-sm text-default-600">
+                  <div className="text-sm text-muted">
                     {t(`fadp.residency.copy.${retention.data_residency}`)}
                   </div>
                 </div>
 
                 {retention.dpa_contact_email && (
-                  <div className="text-sm text-default-600">
+                  <div className="text-sm text-muted">
                     <span className="font-medium">{t('fadp.residency.dpa_contact')}:</span>{' '}
                     <a
                       href={`mailto:${retention.dpa_contact_email}`}
@@ -668,7 +667,7 @@ export function FadpAdminPage() {
                   </div>
                 )}
 
-                <div className="space-y-2 border-t border-default-100 pt-4 text-xs text-default-500">
+                <div className="space-y-2 border-t border-border pt-4 text-xs text-muted">
                   <p>
                     <span className="font-medium">{t('fadp.residency.article_16_label')}:</span>{' '}
                     {t('fadp.residency.article_16')}
@@ -687,26 +686,26 @@ export function FadpAdminPage() {
             </Card>
 
             {registerData && (
-              <Card shadow="sm">
+              <Card >
                 <CardBody className="space-y-2 p-6">
                   <h4 className="text-sm font-semibold">{t('fadp.summary.title')}</h4>
                   <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
                     <div>
-                      <span className="text-default-500">{t('fadp.summary.total_activities')}:</span>{' '}
+                      <span className="text-muted">{t('fadp.summary.total_activities')}:</span>{' '}
                       <span className="font-medium">{(registerData as { total_activities?: number }).total_activities ?? 0}</span>
                     </div>
                     <div>
-                      <span className="text-default-500">{t('fadp.summary.automated_profiling')}:</span>{' '}
+                      <span className="text-muted">{t('fadp.summary.automated_profiling')}:</span>{' '}
                       <span className="font-medium text-danger-600">
                         {(registerData as { automated_profiling_count?: number }).automated_profiling_count ?? 0}
                       </span>
                     </div>
                     <div>
-                      <span className="text-default-500">{t('fadp.summary.tenant')}:</span>{' '}
+                      <span className="text-muted">{t('fadp.summary.tenant')}:</span>{' '}
                       <span className="font-medium">{(registerData as { tenant_name?: string }).tenant_name ?? t('fadp.common.empty_dash')}</span>
                     </div>
                     <div>
-                      <span className="text-default-500">{t('fadp.summary.generated')}:</span>{' '}
+                      <span className="text-muted">{t('fadp.summary.generated')}:</span>{' '}
                       <span className="font-medium">{renderedGeneratedAt}</span>
                     </div>
                   </div>
@@ -735,7 +734,7 @@ export function FadpAdminPage() {
                   isRequired
                   value={activityForm.activity_name}
                   onValueChange={v => setActivityForm(f => ({ ...f, activity_name: v }))}
-                  variant="bordered"
+                  variant="secondary"
                 />
                 <Textarea
                   label={t('fadp.activity_modal.fields.purpose')}
@@ -743,7 +742,7 @@ export function FadpAdminPage() {
                   description={t('fadp.activity_modal.hints.purpose')}
                   value={activityForm.purpose}
                   onValueChange={v => setActivityForm(f => ({ ...f, purpose: v }))}
-                  variant="bordered"
+                  variant="secondary"
                   minRows={2}
                 />
                 <Input
@@ -751,21 +750,21 @@ export function FadpAdminPage() {
                   description={t('fadp.activity_modal.hints.data_categories')}
                   value={activityForm.data_categories}
                   onValueChange={v => setActivityForm(f => ({ ...f, data_categories: v }))}
-                  variant="bordered"
+                  variant="secondary"
                 />
                 <Input
                   label={t('fadp.activity_modal.fields.recipients')}
                   description={t('fadp.activity_modal.hints.recipients')}
                   value={activityForm.recipients}
                   onValueChange={v => setActivityForm(f => ({ ...f, recipients: v }))}
-                  variant="bordered"
+                  variant="secondary"
                 />
                 <Input
                   label={t('fadp.activity_modal.fields.retention_period')}
                   description={t('fadp.activity_modal.hints.retention_period')}
                   value={activityForm.retention_period}
                   onValueChange={v => setActivityForm(f => ({ ...f, retention_period: v }))}
-                  variant="bordered"
+                  variant="secondary"
                 />
                 <Select
                   label={t('fadp.activity_modal.fields.legal_basis')}
@@ -775,16 +774,16 @@ export function FadpAdminPage() {
                     const v = Array.from(keys)[0] as string;
                     setActivityForm(f => ({ ...f, legal_basis: v }));
                   }}
-                  variant="bordered"
+                  variant="secondary"
                 >
                   {legalBasisOptions.map(option => (
                     <SelectItem key={option} id={option}>{t(`fadp.legal_basis.${option}`)}</SelectItem>
                   ))}
                 </Select>
-                <div className="flex items-center justify-between gap-4 rounded-lg border border-default-200 p-3">
+                <div className="flex items-center justify-between gap-4 rounded-lg border border-border p-3">
                   <div>
                     <p className="text-sm font-medium">{t('fadp.activity_modal.fields.automated_profiling')}</p>
-                    <p className="text-xs text-default-500">
+                    <p className="text-xs text-muted">
                       {t('fadp.activity_modal.hints.automated_profiling')}
                     </p>
                   </div>
@@ -800,14 +799,13 @@ export function FadpAdminPage() {
                   type="number"
                   value={activityForm.sort_order}
                   onValueChange={v => setActivityForm(f => ({ ...f, sort_order: v }))}
-                  variant="bordered"
+                  variant="secondary"
                   min={0}
                 />
               </ModalBody>
               <ModalFooter>
-                <Button variant="light" onPress={onClose}>{t('fadp.actions.cancel')}</Button>
+                <Button variant="tertiary" onPress={onClose}>{t('fadp.actions.cancel')}</Button>
                 <Button
-                  color="primary"
                   isLoading={activitySaving}
                   onPress={() => void saveActivity()}
                 >

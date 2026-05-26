@@ -145,7 +145,7 @@ function openRate(campaign: Campaign): string {
 function StatusChip({ status, t }: { status: CampaignStatus; t: Translate }) {
   const cfg = STATUS_CONFIG[status] ?? { labelKey: status, color: 'default' as const };
   return (
-    <Chip size="sm" color={cfg.color} variant="flat">
+    <Chip size="sm" color={cfg.color} variant="soft">
       {t(cfg.labelKey, status)}
     </Chip>
   );
@@ -169,12 +169,12 @@ function StatCard({
   return (
     <Card className="flex-1 min-w-[160px]">
       <CardBody className="flex flex-col gap-2 p-4">
-        <div className="flex items-center gap-2 text-default-500">
+        <div className="flex items-center gap-2 text-muted">
           {icon}
           <span className="text-xs font-medium uppercase tracking-wide">{label}</span>
         </div>
         <p className="text-2xl font-bold">{value}</p>
-        {sub && <p className="text-xs text-default-400">{sub}</p>}
+        {sub && <p className="text-xs text-muted">{sub}</p>}
       </CardBody>
     </Card>
   );
@@ -192,14 +192,14 @@ function MiniBarChart({
   t: Translate;
 }) {
   if (breakdown.length === 0) {
-    return <p className="text-default-400 text-sm">{t('advertising.push.no_daily_data')}</p>;
+    return <p className="text-sm text-muted">{t('advertising.push.no_daily_data')}</p>;
   }
 
   const maxSends = Math.max(...breakdown.map((d) => d.sends), 1);
 
   return (
     <div className="space-y-1">
-      <div className="flex gap-4 text-xs text-default-400 mb-2">
+      <div className="mb-2 flex gap-4 text-xs text-muted">
         <span className="flex items-center gap-1">
           <span className="inline-block w-3 h-3 rounded-sm bg-accent" />
           {t('advertising.push.metrics.sends')}
@@ -228,7 +228,7 @@ function MiniBarChart({
                     title={t('advertising.push.chart_opens_title', { count: d.opens })}
                   />
                 </div>
-                <span className="text-[10px] text-default-400 rotate-45 origin-top-left mt-1 whitespace-nowrap">
+                <span className="mt-1 origin-top-left rotate-45 whitespace-nowrap text-[10px] text-muted">
                   {d.date.slice(5)}
                 </span>
               </div>
@@ -474,7 +474,6 @@ export default function PushCampaignAdminPage() {
             <h2 className="text-lg font-semibold">{t('advertising.push.header.title')}</h2>
           </div>
           <Button
-            color="primary"
             startContent={<Send size={16} />}
             onPress={createDisc.onOpen}
           >
@@ -484,7 +483,7 @@ export default function PushCampaignAdminPage() {
         <Separator />
         <CardBody>
           {actionMsg && (
-            <div className="mb-3 px-3 py-2 rounded-lg bg-default-100 text-sm text-default-700">
+            <div className="mb-3 rounded-lg bg-surface-secondary px-3 py-2 text-sm text-foreground">
               {actionMsg}
             </div>
           )}
@@ -516,7 +515,7 @@ export default function PushCampaignAdminPage() {
           )}
 
           {!loading && !error && campaigns.length === 0 && (
-            <p className="text-default-400 text-sm py-4">{t('advertising.shared.empty.no_campaigns')}</p>
+            <p className="py-4 text-sm text-muted">{t('advertising.shared.empty.no_campaigns')}</p>
           )}
 
           {!loading && !error && campaigns.length > 0 && (
@@ -538,9 +537,8 @@ export default function PushCampaignAdminPage() {
                     <TableCell>
                       <Button
                         size="sm"
-                        variant="light"
-                        color="primary"
-                        className="h-auto min-h-0 justify-start px-0 text-left font-medium"
+                        variant="ghost"
+                        className="min-h-9 justify-start px-0 text-left font-medium"
                         onPress={() => openDetailModal(c)}
                       >
                         {c.name}
@@ -549,7 +547,7 @@ export default function PushCampaignAdminPage() {
                     <TableCell>
                       <div className="text-sm">
                         <p>{c.advertiser_name || '—'}</p>
-                        <p className="text-default-400 text-xs">
+                        <p className="text-xs text-muted">
                           {t(ADVERTISER_LABEL_KEYS[c.advertiser_type], c.advertiser_type)}
                         </p>
                       </div>
@@ -580,7 +578,7 @@ export default function PushCampaignAdminPage() {
                       </span>
                     </TableCell>
                     <TableCell>
-                      <span className="text-xs text-default-400">
+                      <span className="text-xs text-muted">
                         {c.scheduled_at ? formatDate(c.scheduled_at) : t('advertising.push.immediate')}
                       </span>
                     </TableCell>
@@ -590,8 +588,7 @@ export default function PushCampaignAdminPage() {
                           <>
                             <Button
                               size="sm"
-                              color="success"
-                              variant="flat"
+                              variant="secondary"
                               startContent={<CheckCircle size={14} />}
                               isLoading={approving === c.id}
                               onPress={() => handleApprove(c)}
@@ -600,8 +597,7 @@ export default function PushCampaignAdminPage() {
                             </Button>
                             <Button
                               size="sm"
-                              color="danger"
-                              variant="flat"
+                              variant="danger"
                               startContent={<XCircle size={14} />}
                               onPress={() => openRejectModal(c)}
                             >
@@ -612,8 +608,7 @@ export default function PushCampaignAdminPage() {
                         {c.status === 'scheduled' && (
                           <Button
                             size="sm"
-                            color="primary"
-                            variant="flat"
+                            variant="secondary"
                             startContent={<Send size={14} />}
                             isLoading={dispatching === c.id}
                             onPress={() => handleDispatch(c)}
@@ -623,7 +618,7 @@ export default function PushCampaignAdminPage() {
                         )}
                         <Button
                           size="sm"
-                          variant="flat"
+                          variant="tertiary"
                           startContent={<BarChart3 size={14} />}
                           onPress={() => openDetailModal(c)}
                         >
@@ -664,33 +659,33 @@ export default function PushCampaignAdminPage() {
                 {/* Summary */}
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <p className="text-default-400 text-xs mb-0.5">{t('advertising.shared.fields.campaign_name')}</p>
+                    <p className="mb-0.5 text-xs text-muted">{t('advertising.shared.fields.campaign_name')}</p>
                     <p className="font-medium">{detailCampaign.name}</p>
                   </div>
                   <div>
-                    <p className="text-default-400 text-xs mb-0.5">{t('advertising.shared.columns.status')}</p>
+                    <p className="mb-0.5 text-xs text-muted">{t('advertising.shared.columns.status')}</p>
                     <StatusChip status={detailCampaign.status} t={t} />
                   </div>
                   <div>
-                    <p className="text-default-400 text-xs mb-0.5">{t('advertising.shared.columns.advertiser')}</p>
+                    <p className="mb-0.5 text-xs text-muted">{t('advertising.shared.columns.advertiser')}</p>
                     <p>{detailCampaign.advertiser_name || '—'}</p>
-                    <p className="text-default-400 text-xs">{detailCampaign.advertiser_email}</p>
+                    <p className="text-xs text-muted">{detailCampaign.advertiser_email}</p>
                   </div>
                   <div>
-                    <p className="text-default-400 text-xs mb-0.5">{t('advertising.shared.fields.type')}</p>
+                    <p className="mb-0.5 text-xs text-muted">{t('advertising.shared.fields.type')}</p>
                     <p>{t(ADVERTISER_LABEL_KEYS[detailCampaign.advertiser_type], detailCampaign.advertiser_type)}</p>
                   </div>
                   <div className="col-span-2">
-                    <p className="text-default-400 text-xs mb-0.5">{t('advertising.push.fields.push_title')}</p>
+                    <p className="mb-0.5 text-xs text-muted">{t('advertising.push.fields.push_title')}</p>
                     <p className="font-medium">{detailCampaign.title}</p>
                   </div>
                   <div className="col-span-2">
-                    <p className="text-default-400 text-xs mb-0.5">{t('advertising.push.fields.push_body')}</p>
+                    <p className="mb-0.5 text-xs text-muted">{t('advertising.push.fields.push_body')}</p>
                     <p>{detailCampaign.body}</p>
                   </div>
                   {detailCampaign.cta_url && (
                     <div className="col-span-2">
-                      <p className="text-default-400 text-xs mb-0.5">{t('advertising.push.fields.cta_url')}</p>
+                      <p className="mb-0.5 text-xs text-muted">{t('advertising.push.fields.cta_url')}</p>
                       <a
                         href={detailCampaign.cta_url}
                         target="_blank"
@@ -709,19 +704,19 @@ export default function PushCampaignAdminPage() {
                 <div className="grid grid-cols-4 gap-3 text-center text-sm">
                   <div>
                     <p className="text-2xl font-bold">{detailCampaign.actual_send_count.toLocaleString()}</p>
-                    <p className="text-default-400 text-xs">{t('advertising.push.metrics.sent')}</p>
+                    <p className="text-xs text-muted">{t('advertising.push.metrics.sent')}</p>
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{detailCampaign.open_count.toLocaleString()}</p>
-                    <p className="text-default-400 text-xs">{t('advertising.push.metrics.opens')}</p>
+                    <p className="text-xs text-muted">{t('advertising.push.metrics.opens')}</p>
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{openRate(detailCampaign)}</p>
-                    <p className="text-default-400 text-xs">{t('advertising.push.columns.open_rate')}</p>
+                    <p className="text-xs text-muted">{t('advertising.push.columns.open_rate')}</p>
                   </div>
                   <div>
                     <p className="text-2xl font-bold">{formatCents(detailCampaign.total_cost_cents)}</p>
-                    <p className="text-default-400 text-xs">{t('advertising.push.metrics.revenue')}</p>
+                    <p className="text-xs text-muted">{t('advertising.push.metrics.revenue')}</p>
                   </div>
                 </div>
 
@@ -749,7 +744,7 @@ export default function PushCampaignAdminPage() {
 
                 {/* Dates */}
                 <Separator />
-                <div className="grid grid-cols-2 gap-3 text-xs text-default-400">
+                <div className="grid grid-cols-2 gap-3 text-xs text-muted">
                   <div>
                     <span>{t('advertising.push.dates.created')}: </span>
                     <span>{formatDate(detailCampaign.created_at)}</span>
@@ -771,7 +766,7 @@ export default function PushCampaignAdminPage() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={detailDisc.onClose}>
+            <Button variant="tertiary" onPress={detailDisc.onClose}>
               {t('advertising.shared.actions.close')}
             </Button>
           </ModalFooter>
@@ -790,7 +785,7 @@ export default function PushCampaignAdminPage() {
           <ModalBody>
             {rejectTarget && (
               <>
-                <p className="text-sm text-default-600">
+                <p className="text-sm text-muted">
                   {t('advertising.push.reject_intro_prefix')} <strong>{rejectTarget.name}</strong>. {t('advertising.push.reject_intro_suffix')}
                 </p>
                 <Textarea
@@ -798,7 +793,7 @@ export default function PushCampaignAdminPage() {
                   placeholder={t('advertising.push.rejection_placeholder')}
                   value={rejectReason}
                   onValueChange={setRejectReason}
-                  variant="bordered"
+                  variant="secondary"
                   minRows={3}
                   isRequired
                 />
@@ -806,11 +801,11 @@ export default function PushCampaignAdminPage() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={rejectDisc.onClose}>
+            <Button variant="tertiary" onPress={rejectDisc.onClose}>
               {t('advertising.shared.actions.cancel')}
             </Button>
             <Button
-              color="danger"
+              variant="danger"
               isLoading={rejectSubmitting}
               isDisabled={!rejectReason.trim()}
               onPress={handleReject}
@@ -840,7 +835,7 @@ export default function PushCampaignAdminPage() {
                 placeholder={t('advertising.push.placeholders.campaign_name')}
                 value={createName}
                 onValueChange={setCreateName}
-                variant="bordered"
+                variant="secondary"
                 isRequired
               />
               <Select
@@ -850,7 +845,7 @@ export default function PushCampaignAdminPage() {
                   const val = Array.from(keys)[0] as AdvertiserType;
                   if (val) setCreateType(val);
                 }}
-                variant="bordered"
+                variant="secondary"
               >
                 <SelectItem key="sme" id="sme">{t('advertising.advertiser.sme')}</SelectItem>
                 <SelectItem key="verein" id="verein">{t('advertising.advertiser.verein')}</SelectItem>
@@ -862,7 +857,7 @@ export default function PushCampaignAdminPage() {
                 placeholder={t('advertising.push.placeholders.title')}
                 value={createTitle}
                 onValueChange={setCreateTitle}
-                variant="bordered"
+                variant="secondary"
                 isRequired
                 description={`${createTitle.length}/100`}
                 maxLength={100}
@@ -872,7 +867,7 @@ export default function PushCampaignAdminPage() {
                 placeholder={t('advertising.push.placeholders.body')}
                 value={createBody}
                 onValueChange={setCreateBody}
-                variant="bordered"
+                variant="secondary"
                 isRequired
                 minRows={2}
                 description={`${createBody.length}/400`}
@@ -883,23 +878,22 @@ export default function PushCampaignAdminPage() {
                 placeholder="https://... or nexus://..."
                 value={createCtaUrl}
                 onValueChange={setCreateCtaUrl}
-                variant="bordered"
+                variant="secondary"
               />
               <Input
                 type="datetime-local"
                 label={t('advertising.push.fields.scheduled_at')}
                 value={createScheduledAt}
                 onValueChange={setCreateScheduledAt}
-                variant="bordered"
+                variant="secondary"
               />
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={createDisc.onClose}>
+            <Button variant="tertiary" onPress={createDisc.onClose}>
               {t('advertising.shared.actions.cancel')}
             </Button>
             <Button
-              color="primary"
               startContent={<Send size={16} />}
               isLoading={createSubmitting}
               isDisabled={!createName.trim() || !createTitle.trim() || !createBody.trim()}

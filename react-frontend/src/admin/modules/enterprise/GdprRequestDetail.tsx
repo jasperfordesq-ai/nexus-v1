@@ -35,17 +35,17 @@ import { useTranslation } from 'react-i18next';
  */
 
 
-const typeColorMap: Record<string, 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'danger'> = {
-  access: 'primary',
+const typeColorMap: Record<string, 'default' | 'success' | 'warning' | 'danger'> = {
+  access: 'default',
   erasure: 'danger',
-  portability: 'secondary',
+  portability: 'success',
   rectification: 'warning',
   restriction: 'default',
   objection: 'danger',
 };
 
-const actionColorMap: Record<string, 'default' | 'primary' | 'success' | 'warning' | 'danger'> = {
-  created: 'primary',
+const actionColorMap: Record<string, 'default' | 'success' | 'warning' | 'danger'> = {
+  created: 'default',
   processing: 'warning',
   completed: 'success',
   rejected: 'danger',
@@ -223,9 +223,9 @@ export function GdprRequestDetail() {
   if (!request) {
     return (
       <div className="text-center py-16">
-        <p className="text-default-500">{t('enterprise.gdpr_request_not_found')}</p>
+        <p className="text-muted">{t('enterprise.gdpr_request_not_found')}</p>
         <Button
-          variant="flat"
+          variant="secondary"
           className="mt-4"
           onPress={() => navigate(tenantPath('/admin/enterprise/gdpr/requests'))}
         >
@@ -247,7 +247,7 @@ export function GdprRequestDetail() {
         description={t('enterprise.gdpr_request_detail_desc')}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<ArrowLeft size={16} />}
             onPress={() => navigate(tenantPath('/admin/enterprise/gdpr/requests'))}
             size="sm"
@@ -261,7 +261,7 @@ export function GdprRequestDetail() {
         {/* Main Column */}
         <div className="lg:col-span-2 space-y-6">
           {/* Request Info Card */}
-          <Card shadow="sm">
+          <Card>
             <CardHeader className="px-4 pt-4 pb-0">
               <h3 className="text-lg font-semibold">{t('enterprise.gdpr_request_information')}</h3>
             </CardHeader>
@@ -269,7 +269,7 @@ export function GdprRequestDetail() {
               <div className="flex flex-wrap gap-3">
                 <Chip
                   size="sm"
-                  variant="flat"
+                  variant="soft"
                   color={typeColorMap[request.type] || 'default'}
                   className="capitalize"
                 >
@@ -277,7 +277,7 @@ export function GdprRequestDetail() {
                 </Chip>
                 <StatusBadge status={request.status} />
                 {request.priority && (
-                  <Chip size="sm" variant="bordered" className="capitalize">
+                  <Chip size="sm" variant="soft" className="capitalize">
                     {t('enterprise.gdpr_priority_label')}
                   </Chip>
                 )}
@@ -285,23 +285,23 @@ export function GdprRequestDetail() {
 
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div>
-                  <p className="text-sm text-default-500">{t('enterprise.gdpr_user')}</p>
+                  <p className="text-sm text-muted">{t('enterprise.gdpr_user')}</p>
                   <p className="font-medium">{request.user_name}</p>
                   {request.user_email && (
-                    <p className="text-sm text-default-400">{request.user_email}</p>
+                    <p className="text-sm text-muted">{request.user_email}</p>
                   )}
                 </div>
                 <div>
-                  <p className="text-sm text-default-500">{t('enterprise.gdpr_user_id')}</p>
+                  <p className="text-sm text-muted">{t('enterprise.gdpr_user_id')}</p>
                   <p className="font-medium">{request.user_id}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-default-500">{t('enterprise.gdpr_created')}</p>
+                  <p className="text-sm text-muted">{t('enterprise.gdpr_created')}</p>
                   <p className="font-medium">{new Date(request.created_at).toLocaleString()}</p>
                 </div>
                 {request.completed_at && (
                   <div>
-                    <p className="text-sm text-default-500">{t('enterprise.gdpr_completed')}</p>
+                    <p className="text-sm text-muted">{t('enterprise.gdpr_completed')}</p>
                     <p className="font-medium">{new Date(request.completed_at).toLocaleString()}</p>
                   </div>
                 )}
@@ -317,13 +317,12 @@ export function GdprRequestDetail() {
           </Card>
 
           {/* Notes Section Card */}
-          <Card shadow="sm">
+          <Card>
             <CardHeader className="px-4 pt-4 pb-0 flex justify-between items-center">
               <h3 className="text-lg font-semibold">{t('enterprise.gdpr_notes')}</h3>
               <Button
                 size="sm"
-                color="primary"
-                variant="flat"
+                variant="secondary"
                 startContent={<MessageSquarePlus size={14} />}
                 onPress={() => setNoteOpen(true)}
               >
@@ -332,17 +331,17 @@ export function GdprRequestDetail() {
             </CardHeader>
             <CardBody className="p-4">
               {request.notes ? (
-                <div className="whitespace-pre-wrap text-sm text-default-700 bg-default-50 rounded-lg p-3">
+                <div className="whitespace-pre-wrap rounded-lg bg-surface-secondary/50 p-3 text-sm text-foreground">
                   {request.notes}
                 </div>
               ) : (
-                <p className="text-sm text-default-400 italic">{t('enterprise.gdpr_no_notes_yet')}</p>
+                <p className="text-sm text-muted italic">{t('enterprise.gdpr_no_notes_yet')}</p>
               )}
             </CardBody>
           </Card>
 
           {/* Activity Timeline Card */}
-          <Card shadow="sm">
+          <Card>
             <CardHeader className="px-4 pt-4 pb-0">
               <h3 className="text-lg font-semibold">{t('enterprise.gdpr_activity_timeline')}</h3>
             </CardHeader>
@@ -350,32 +349,32 @@ export function GdprRequestDetail() {
               {request.timeline && request.timeline.length > 0 ? (
                 <div className="relative pl-6">
                   {/* Vertical line */}
-                  <div className="absolute left-2 top-1 bottom-1 w-0.5 bg-default-200" />
+                  <div className="absolute left-2 top-1 bottom-1 w-0.5 bg-border" />
 
                   <div className="space-y-4">
                     {request.timeline.map((entry: GdprTimelineEntry) => (
                       <div key={entry.id} className="relative">
                         {/* Dot indicator */}
-                        <div className="absolute -left-4 top-1.5 h-3 w-3 rounded-full border-2 border-default-300 bg-background" />
+                        <div className="absolute -left-4 top-1.5 h-3 w-3 rounded-full border-2 border-border bg-background" />
                         <div className="flex flex-col gap-1">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-xs text-default-400">
+                            <span className="text-xs text-muted">
                               {new Date(entry.created_at).toLocaleString()}
                             </span>
                             <Chip
                               size="sm"
-                              variant="flat"
+                              variant="soft"
                               color={actionColorMap[entry.action] || 'default'}
                               className="capitalize"
                             >
                               {entry.action.replace(/_/g, ' ')}
                             </Chip>
                             {entry.user_name && (
-                              <span className="text-sm text-default-600">{t('enterprise.gdpr_by_user')}</span>
+                              <span className="text-sm text-muted">{t('enterprise.gdpr_by_user')}</span>
                             )}
                           </div>
                           {(entry.old_value || entry.new_value) && (
-                            <p className="text-sm text-default-500">
+                            <p className="text-sm text-muted">
                               {entry.old_value && <span className="line-through mr-2">{entry.old_value}</span>}
                               {entry.new_value && <span>{entry.new_value}</span>}
                             </p>
@@ -386,7 +385,7 @@ export function GdprRequestDetail() {
                   </div>
                 </div>
               ) : (
-                <p className="text-sm text-default-400 italic">{t('enterprise.gdpr_no_activity_recorded')}</p>
+                <p className="text-sm text-muted italic">{t('enterprise.gdpr_no_activity_recorded')}</p>
               )}
             </CardBody>
           </Card>
@@ -395,7 +394,7 @@ export function GdprRequestDetail() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* SLA Status Card */}
-          <Card shadow="sm">
+          <Card>
             <CardHeader className="px-4 pt-4 pb-0">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <Clock size={18} />
@@ -404,11 +403,11 @@ export function GdprRequestDetail() {
             </CardHeader>
             <CardBody className="p-4 space-y-3">
               <div>
-                <p className="text-sm text-default-500">{t('enterprise.gdpr_deadline')}</p>
+                <p className="text-sm text-muted">{t('enterprise.gdpr_deadline')}</p>
                 <p className="font-medium">{slaDeadline.toLocaleDateString()}</p>
               </div>
               <div>
-                <p className="text-sm text-default-500 mb-1">
+                <p className="mb-1 text-sm text-muted">
                   {request.sla_overdue
                     ? t('enterprise.gdpr_sla_overdue_by')
                     : t('enterprise.gdpr_sla_days_remaining')}
@@ -421,7 +420,7 @@ export function GdprRequestDetail() {
                 />
               </div>
               {request.sla_overdue && (
-                <Chip size="sm" color="danger" variant="flat" startContent={<AlertTriangle size={12} />}>
+                <Chip size="sm" color="danger" variant="soft" startContent={<AlertTriangle size={12} />}>
                   {t('enterprise.gdpr_sla_breached')}
                 </Chip>
               )}
@@ -429,7 +428,7 @@ export function GdprRequestDetail() {
           </Card>
 
           {/* Assignment Card */}
-          <Card shadow="sm">
+          <Card>
             <CardHeader className="px-4 pt-4 pb-0">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <UserPlus size={18} />
@@ -438,15 +437,14 @@ export function GdprRequestDetail() {
             </CardHeader>
             <CardBody className="p-4 space-y-3">
               <div>
-                <p className="text-sm text-default-500">{t('enterprise.gdpr_assigned_to')}</p>
+                <p className="text-sm text-muted">{t('enterprise.gdpr_assigned_to')}</p>
                 <p className="font-medium">
                   {request.assigned_to_name || t('enterprise.gdpr_unassigned')}
                 </p>
               </div>
               <Button
                 size="sm"
-                color="primary"
-                variant="flat"
+                variant="secondary"
                 startContent={<UserPlus size={14} />}
                 onPress={() => setAssignOpen(true)}
                 className="w-full"
@@ -457,15 +455,14 @@ export function GdprRequestDetail() {
           </Card>
 
           {/* Actions Card */}
-          <Card shadow="sm">
+          <Card>
             <CardHeader className="px-4 pt-4 pb-0">
               <h3 className="text-lg font-semibold">{t('enterprise.gdpr_actions')}</h3>
             </CardHeader>
             <CardBody className="p-4 space-y-2">
               {request.status === 'pending' && (
                 <Button
-                  color="primary"
-                  variant="flat"
+                  variant="secondary"
                   startContent={<Play size={14} />}
                   onPress={() => handleStatusUpdate('processing')}
                   isLoading={actionLoading}
@@ -478,8 +475,7 @@ export function GdprRequestDetail() {
               {request.status === 'processing' && (
                 <>
                   <Button
-                    color="success"
-                    variant="flat"
+                    variant="secondary"
                     startContent={<CheckCircle size={14} />}
                     onPress={() => handleStatusUpdate('completed')}
                     isLoading={actionLoading}
@@ -489,8 +485,7 @@ export function GdprRequestDetail() {
                     {t('enterprise.gdpr_mark_complete')}
                   </Button>
                   <Button
-                    color="danger"
-                    variant="flat"
+                    variant="danger"
                     startContent={<XCircle size={14} />}
                     onPress={() => setRejectOpen(true)}
                     className="w-full"
@@ -502,8 +497,7 @@ export function GdprRequestDetail() {
               )}
               <Separator />
               <Button
-                color="secondary"
-                variant="flat"
+                variant="secondary"
                 startContent={<Download size={14} />}
                 onPress={handleExport}
                 isLoading={actionLoading}
@@ -530,15 +524,15 @@ export function GdprRequestDetail() {
               placeholder={t('enterprise.gdpr_note_placeholder')}
               value={noteText}
               onValueChange={setNoteText}
-              variant="bordered"
+              variant="secondary"
               minRows={4}
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={() => setNoteOpen(false)} isDisabled={noteLoading}>
+            <Button variant="tertiary" onPress={() => setNoteOpen(false)} isDisabled={noteLoading}>
               {t('enterprise.gdpr_cancel')}
             </Button>
-            <Button color="primary" onPress={handleAddNote} isLoading={noteLoading}>
+            <Button onPress={handleAddNote} isLoading={noteLoading}>
               {t('enterprise.gdpr_add_note')}
             </Button>
           </ModalFooter>
@@ -556,14 +550,14 @@ export function GdprRequestDetail() {
               type="number"
               value={assignUserId}
               onValueChange={setAssignUserId}
-              variant="bordered"
+              variant="secondary"
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={() => setAssignOpen(false)} isDisabled={assignLoading}>
+            <Button variant="tertiary" onPress={() => setAssignOpen(false)} isDisabled={assignLoading}>
               {t('enterprise.gdpr_cancel')}
             </Button>
-            <Button color="primary" onPress={handleAssign} isLoading={assignLoading}>
+            <Button onPress={handleAssign} isLoading={assignLoading}>
               {t('enterprise.gdpr_assign')}
             </Button>
           </ModalFooter>
@@ -583,16 +577,16 @@ export function GdprRequestDetail() {
               placeholder={t('enterprise.gdpr_rejection_reason_placeholder')}
               value={rejectionReason}
               onValueChange={setRejectionReason}
-              variant="bordered"
+              variant="secondary"
               minRows={3}
               isRequired
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={() => setRejectOpen(false)} isDisabled={rejectLoading}>
+            <Button variant="tertiary" onPress={() => setRejectOpen(false)} isDisabled={rejectLoading}>
               {t('enterprise.gdpr_cancel')}
             </Button>
-            <Button color="danger" onPress={handleReject} isLoading={rejectLoading}>
+            <Button variant="danger" onPress={handleReject} isLoading={rejectLoading}>
               {t('enterprise.gdpr_reject_request')}
             </Button>
           </ModalFooter>

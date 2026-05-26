@@ -402,7 +402,7 @@ export function VolunteerOrganizations() {
       label: t('volunteering.col_status'),
       sortable: true,
       render: (item) => (
-        <Chip size="sm" variant="flat" color={STATUS_COLORS[item.status] || 'default'} className="capitalize">
+        <Chip size="sm" variant="soft" color={STATUS_COLORS[item.status] || 'default'} className="capitalize">
           {t(`volunteering.status_${item.status || 'unknown'}`)}
         </Chip>
       ),
@@ -436,7 +436,7 @@ export function VolunteerOrganizations() {
       label: t('volunteering.col_created'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {item.created_at ? new Date(item.created_at).toLocaleDateString() : '--'}
         </span>
       ),
@@ -448,8 +448,7 @@ export function VolunteerOrganizations() {
         <div className="flex gap-1 flex-wrap">
           <Button
             size="sm"
-            variant="flat"
-            color="default"
+            variant="tertiary"
             startContent={<Pencil size={14} />}
             onPress={() => openEditModal(item)}
           >
@@ -457,8 +456,7 @@ export function VolunteerOrganizations() {
           </Button>
           <Button
             size="sm"
-            variant="flat"
-            color="default"
+            variant="tertiary"
             startContent={<Users size={14} />}
             onPress={() => openMembersModal(item)}
           >
@@ -468,8 +466,7 @@ export function VolunteerOrganizations() {
             <>
               <Button
                 size="sm"
-                variant="flat"
-                color="primary"
+                variant="secondary"
                 startContent={<Wallet size={14} />}
                 onPress={() => openAdjustModal(item)}
               >
@@ -477,8 +474,7 @@ export function VolunteerOrganizations() {
               </Button>
               <Button
                 size="sm"
-                variant="flat"
-                color="secondary"
+                variant="secondary"
                 startContent={<ArrowLeftRight size={14} />}
                 onPress={() => openTxModal(item)}
               >
@@ -488,8 +484,7 @@ export function VolunteerOrganizations() {
           )}
           <Button
             size="sm"
-            variant="flat"
-            color={item.status === 'active' ? 'danger' : 'success'}
+            variant={item.status === 'active' ? 'danger' : 'secondary'}
             startContent={item.status === 'active' ? <ShieldOff size={14} /> : <ShieldCheck size={14} />}
             onPress={() => handleStatusToggle(item)}
           >
@@ -508,7 +503,7 @@ export function VolunteerOrganizations() {
       <Input type="search" name="admin-search" autoComplete="off"
         className="max-w-xs"
         placeholder={t('volunteering.search_organizations')}
-        startContent={<Search size={16} className="text-default-400" />}
+        startContent={<Search size={16} className="text-muted" />}
         value={searchQuery}
         onValueChange={setSearchQuery}
         isClearable
@@ -555,10 +550,10 @@ export function VolunteerOrganizations() {
         description={t('volunteering.volunteer_organizations_desc')}
         actions={
           <div className="flex gap-2">
-            <Button variant="flat" color="primary" startContent={<Plus size={16} />} onPress={openCreateModal}>
+            <Button startContent={<Plus size={16} />} onPress={openCreateModal}>
               {t('volunteering.create_organization')}
             </Button>
-            <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>
+            <Button variant="secondary" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>
               {t('volunteering.refresh')}
             </Button>
           </div>
@@ -582,7 +577,7 @@ export function VolunteerOrganizations() {
               <ModalHeader>
                 {t('volunteering.adjust_wallet_title')}
                 {adjustOrg && (
-                  <span className="block text-sm font-normal text-default-500 mt-1">
+                  <span className="mt-1 block text-sm font-normal text-muted">
                     {adjustOrg.org_name} - {t('volunteering.current_balance')}: {t('volunteering.hours_value', { value: adjustOrg.balance ?? 0 })}
                   </span>
                 )}
@@ -594,22 +589,22 @@ export function VolunteerOrganizations() {
                   value={adjustAmount}
                   onValueChange={setAdjustAmount}
                   placeholder={t('volunteering.amount_placeholder')}
-                  variant="bordered"
+                  variant="secondary"
                 />
                 <Textarea
                   label={t('volunteering.reason_label')}
                   value={adjustReason}
                   onValueChange={setAdjustReason}
                   placeholder={t('volunteering.reason_placeholder')}
-                  variant="bordered"
+                  variant="secondary"
                   minRows={2}
                 />
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>
+                <Button variant="tertiary" onPress={onClose}>
                   {t('volunteering.cancel')}
                 </Button>
-                <Button color="primary" onPress={handleAdjustSubmit} isLoading={adjustSubmitting}>
+                <Button onPress={handleAdjustSubmit} isLoading={adjustSubmitting}>
                   {t('volunteering.submit_adjustment')}
                 </Button>
               </ModalFooter>
@@ -626,16 +621,16 @@ export function VolunteerOrganizations() {
               <ModalHeader>
                 {t('volunteering.transaction_history')}
                 {txOrg && (
-                  <span className="block text-sm font-normal text-default-500 mt-1">{txOrg.org_name}</span>
+                  <span className="mt-1 block text-sm font-normal text-muted">{txOrg.org_name}</span>
                 )}
               </ModalHeader>
               <ModalBody>
                 {txLoading && transactions.length === 0 ? (
                   <div className="flex justify-center py-8">
-                    <span className="text-default-400">{t('volunteering.loading')}</span>
+                    <span className="text-muted">{t('volunteering.loading')}</span>
                   </div>
                 ) : transactions.length === 0 ? (
-                  <div className="flex flex-col items-center py-8 text-default-400">
+                  <div className="flex flex-col items-center py-8 text-muted">
                     <ArrowLeftRight size={40} className="mb-2" />
                     <p>{t('volunteering.no_transactions')}</p>
                   </div>
@@ -648,7 +643,7 @@ export function VolunteerOrganizations() {
                       >
                         <div>
                           <p className="text-sm font-medium">{tx.description || tx.type}</p>
-                          <p className="text-xs text-default-400">
+                          <p className="text-xs text-muted">
                             {tx.created_at ? new Date(tx.created_at).toLocaleString() : '--'}
                             {tx.admin_name && t('volunteering.transaction_by_admin', { name: tx.admin_name })}
                           </p>
@@ -664,7 +659,7 @@ export function VolunteerOrganizations() {
                     ))}
                     {txHasMore && (
                       <div className="flex justify-center pt-2">
-                        <Button size="sm" variant="flat" onPress={loadMoreTx} isLoading={txLoading}>
+                        <Button size="sm" variant="secondary" onPress={loadMoreTx} isLoading={txLoading}>
                           {t('volunteering.load_more')}
                         </Button>
                       </div>
@@ -673,7 +668,7 @@ export function VolunteerOrganizations() {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>
+                <Button variant="tertiary" onPress={onClose}>
                   {t('volunteering.close')}
                 </Button>
               </ModalFooter>
@@ -690,7 +685,7 @@ export function VolunteerOrganizations() {
               <ModalHeader>
                 {t('volunteering.edit_organization')}
                 {editOrg && (
-                  <span className="block text-sm font-normal text-default-500 mt-1">{editOrg.org_name}</span>
+                  <span className="mt-1 block text-sm font-normal text-muted">{editOrg.org_name}</span>
                 )}
               </ModalHeader>
               <ModalBody className="flex flex-col gap-3">
@@ -698,14 +693,14 @@ export function VolunteerOrganizations() {
                   label={t('volunteering.org_name_label')}
                   value={editForm.name}
                   onValueChange={(v) => setEditForm(prev => ({ ...prev, name: v }))}
-                  variant="bordered"
+                  variant="secondary"
                   isRequired
                 />
                 <Textarea
                   label={t('volunteering.org_description_label')}
                   value={editForm.description}
                   onValueChange={(v) => setEditForm(prev => ({ ...prev, description: v }))}
-                  variant="bordered"
+                  variant="secondary"
                   minRows={3}
                 />
                 <Input
@@ -713,22 +708,22 @@ export function VolunteerOrganizations() {
                   type="email"
                   value={editForm.contact_email}
                   onValueChange={(v) => setEditForm(prev => ({ ...prev, contact_email: v }))}
-                  variant="bordered"
+                  variant="secondary"
                 />
                 <Input
                   label={t('volunteering.org_website_label')}
                   type="url"
                   value={editForm.website}
                   onValueChange={(v) => setEditForm(prev => ({ ...prev, website: v }))}
-                  variant="bordered"
+                  variant="secondary"
                   placeholder={t('volunteering.website_placeholder')}
                 />
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>
+                <Button variant="tertiary" onPress={onClose}>
                   {t('volunteering.cancel')}
                 </Button>
-                <Button color="primary" onPress={handleEditSubmit} isLoading={editSubmitting}>
+                <Button onPress={handleEditSubmit} isLoading={editSubmitting}>
                   {t('volunteering.save')}
                 </Button>
               </ModalFooter>
@@ -745,7 +740,7 @@ export function VolunteerOrganizations() {
               <ModalHeader>
                 {t('volunteering.organization_members')}
                 {membersOrg && (
-                  <span className="block text-sm font-normal text-default-500 mt-1">
+                  <span className="mt-1 block text-sm font-normal text-muted">
                     {membersOrg.org_name} - {t('volunteering.members_count', { count: membersOrg.member_count ?? 0 })}
                   </span>
                 )}
@@ -753,10 +748,10 @@ export function VolunteerOrganizations() {
               <ModalBody>
                 {membersLoading ? (
                   <div className="flex justify-center py-8">
-                    <span className="text-default-400">{t('volunteering.loading')}</span>
+                    <span className="text-muted">{t('volunteering.loading')}</span>
                   </div>
                 ) : members.length === 0 ? (
-                  <div className="flex flex-col items-center py-8 text-default-400">
+                  <div className="flex flex-col items-center py-8 text-muted">
                     <Users size={40} className="mb-2" />
                     <p>{t('volunteering.no_members')}</p>
                   </div>
@@ -768,15 +763,15 @@ export function VolunteerOrganizations() {
                         className="flex items-center justify-between rounded-xl border border-divider/70 bg-surface-secondary/30 p-3"
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-default-100 flex items-center justify-center text-xs font-semibold text-default-600">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-surface-secondary text-xs font-semibold text-foreground">
                             {(m.first_name?.[0] || '').toUpperCase()}{(m.last_name?.[0] || '').toUpperCase()}
                           </div>
                           <div>
                             <p className="text-sm font-medium">{m.first_name} {m.last_name}</p>
-                            <p className="text-xs text-default-500 capitalize">{m.role || t('volunteering.volunteer')}</p>
+                            <p className="text-xs text-muted capitalize">{m.role || t('volunteering.volunteer')}</p>
                           </div>
                         </div>
-                        <span className="text-sm font-mono text-default-500">
+                        <span className="font-mono text-sm text-muted">
                           {t('volunteering.hours_value', { value: (m.total_hours ?? 0).toLocaleString() })}
                         </span>
                       </div>
@@ -785,7 +780,7 @@ export function VolunteerOrganizations() {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>
+                <Button variant="tertiary" onPress={onClose}>
                   {t('volunteering.close')}
                 </Button>
               </ModalFooter>
@@ -807,14 +802,14 @@ export function VolunteerOrganizations() {
                   label={t('volunteering.org_name_label')}
                   value={createForm.name}
                   onValueChange={(v) => setCreateForm(prev => ({ ...prev, name: v }))}
-                  variant="bordered"
+                  variant="secondary"
                   isRequired
                 />
                 <Textarea
                   label={t('volunteering.org_description_label')}
                   value={createForm.description}
                   onValueChange={(v) => setCreateForm(prev => ({ ...prev, description: v }))}
-                  variant="bordered"
+                  variant="secondary"
                   minRows={3}
                 />
                 <Input
@@ -822,14 +817,14 @@ export function VolunteerOrganizations() {
                   type="email"
                   value={createForm.contact_email}
                   onValueChange={(v) => setCreateForm(prev => ({ ...prev, contact_email: v }))}
-                  variant="bordered"
+                  variant="secondary"
                 />
                 <Input
                   label={t('volunteering.org_website_label')}
                   type="url"
                   value={createForm.website}
                   onValueChange={(v) => setCreateForm(prev => ({ ...prev, website: v }))}
-                  variant="bordered"
+                  variant="secondary"
                   placeholder={t('volunteering.website_placeholder')}
                 />
                 <Select
@@ -839,7 +834,7 @@ export function VolunteerOrganizations() {
                     const val = Array.from(keys)[0] as 'organisation' | 'club';
                     setCreateForm(prev => ({ ...prev, org_type: val || 'organisation' }));
                   }}
-                  variant="bordered"
+                  variant="secondary"
                 >
                   <SelectItem key="organisation" id="organisation">{t('volunteering.org_type_organisation')}</SelectItem>
                   <SelectItem key="club" id="club">{t('volunteering.org_type_club')}</SelectItem>
@@ -849,16 +844,16 @@ export function VolunteerOrganizations() {
                     label={t('volunteering.meeting_schedule_label')}
                     value={createForm.meeting_schedule}
                     onValueChange={(v) => setCreateForm(prev => ({ ...prev, meeting_schedule: v }))}
-                    variant="bordered"
+                    variant="secondary"
                     placeholder={t('volunteering.meeting_schedule_placeholder')}
                   />
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>
+                <Button variant="tertiary" onPress={onClose}>
                   {t('volunteering.cancel')}
                 </Button>
-                <Button color="primary" onPress={handleCreateSubmit} isLoading={createSubmitting}>
+                <Button onPress={handleCreateSubmit} isLoading={createSubmitting}>
                   {t('volunteering.create')}
                 </Button>
               </ModalFooter>

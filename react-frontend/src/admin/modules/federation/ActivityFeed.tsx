@@ -97,8 +97,8 @@ const EVENT_TYPE_STYLES: Record<string, Omit<EventTypeConfig, 'label'>> = {
   partnership_rejected: { icon: Handshake, color: 'danger', bgClass: 'bg-danger-100 text-danger-600 dark:bg-danger-900/30 dark:text-danger-400' },
   partnership_status_changed: { icon: Handshake, color: 'warning', bgClass: 'bg-warning-100 text-warning-600 dark:bg-warning-900/30 dark:text-warning-400' },
   partnership_revoked: { icon: Handshake, color: 'danger', bgClass: 'bg-danger-100 text-danger-600 dark:bg-danger-900/30 dark:text-danger-400' },
-  cross_tenant_profile_view: { icon: Eye, color: 'default', bgClass: 'bg-default-100 text-default-600 dark:bg-default-800 dark:text-default-400' },
-  federated_search: { icon: Search, color: 'default', bgClass: 'bg-default-100 text-default-600 dark:bg-default-800 dark:text-default-400' },
+  cross_tenant_profile_view: { icon: Eye, color: 'default', bgClass: 'bg-surface-secondary text-muted dark:bg-surface-secondary dark:text-muted' },
+  federated_search: { icon: Search, color: 'default', bgClass: 'bg-surface-secondary text-muted dark:bg-surface-secondary dark:text-muted' },
 };
 
 // Filter option i18n keys — resolved at render time via t()
@@ -127,7 +127,7 @@ function getEventConfig(type: string, t: (key: string, defaultValue?: string) =>
     label: type.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
     icon: Activity,
     color: 'default' as const,
-    bgClass: 'bg-default-100 text-default-600 dark:bg-default-800 dark:text-default-400',
+    bgClass: 'bg-surface-secondary text-muted dark:bg-surface-secondary dark:text-muted',
   };
 }
 
@@ -158,7 +158,7 @@ function TimelineItem({ item }: { item: ActivityItem }) {
   return (
     <div className="relative flex gap-4 pb-6 last:pb-0">
       {/* Timeline line */}
-      <div className="absolute left-5 top-10 bottom-0 w-px bg-default-200 dark:bg-default-700 last:hidden" />
+      <div className="absolute left-5 top-10 bottom-0 w-px bg-border dark:bg-border last:hidden" />
 
       {/* Icon circle */}
       <div
@@ -170,47 +170,47 @@ function TimelineItem({ item }: { item: ActivityItem }) {
       {/* Content */}
       <div className="flex-1 min-w-0 pt-0.5">
         <div className="flex flex-wrap items-center gap-2 mb-1">
-          <Chip size="sm" variant="flat" color={config.color}>
+          <Chip size="sm" variant="soft" color={config.color}>
             {config.label}
           </Chip>
           <Chip
             size="sm"
-            variant="flat"
-            color={item.direction === 'inbound' ? 'primary' : 'secondary'}
+            variant="soft"
+            color={item.direction === 'inbound' ? 'accent' : 'default'}
           >
             {item.direction === 'inbound' ? t('federation.direction_inbound') : t('federation.direction_outbound')}
           </Chip>
           {item.level === 'critical' && (
-            <Chip size="sm" variant="flat" color="danger">
+            <Chip size="sm" variant="soft" color="danger">
               {t('federation.level_critical')}
             </Chip>
           )}
           {item.level === 'warning' && (
-            <Chip size="sm" variant="flat" color="warning">
+            <Chip size="sm" variant="soft" color="warning">
               {t('federation.level_warning')}
             </Chip>
           )}
         </div>
 
-        <p className="text-sm text-default-700 dark:text-default-300">{desc}</p>
+        <p className="text-sm text-foreground">{desc}</p>
 
         {item.detail && (
-          <p className="text-xs text-default-400 mt-0.5 truncate">{item.detail}</p>
+          <p className="text-xs text-muted mt-0.5 truncate">{item.detail}</p>
         )}
 
         {item.partner_tenant_name && (
           <div className="flex items-center gap-1.5 mt-1">
-            <div className="h-4 w-4 rounded-full bg-default-200 dark:bg-default-700 flex items-center justify-center">
-              <span className="text-[9px] font-bold text-default-500">
+            <div className="h-4 w-4 rounded-full bg-border dark:bg-border flex items-center justify-center">
+              <span className="text-[9px] font-bold text-muted">
                 {item.partner_tenant_name.charAt(0).toUpperCase()}
               </span>
             </div>
-            <span className="text-xs text-default-500">{item.partner_tenant_name}</span>
+            <span className="text-xs text-muted">{item.partner_tenant_name}</span>
           </div>
         )}
 
         <Tooltip content={absoluteTime}>
-          <span className="text-xs text-default-400 mt-1 inline-block cursor-default">
+          <span className="text-xs text-muted mt-1 inline-block cursor-default">
             {formatRelativeTime(item.timestamp)}
           </span>
         </Tooltip>
@@ -456,7 +456,7 @@ export function ActivityFeed() {
         actions={
           <div className="flex gap-2">
             <Button
-              variant="flat"
+              variant="tertiary"
               size="sm"
               startContent={<RefreshCw size={16} />}
               onPress={() => loadItems(false)}
@@ -466,7 +466,7 @@ export function ActivityFeed() {
             </Button>
             <div className="flex flex-col items-end gap-0.5">
               <Button
-                variant="flat"
+                variant="tertiary"
                 size="sm"
                 startContent={<Download size={16} />}
                 onPress={exportCsv}
@@ -474,7 +474,7 @@ export function ActivityFeed() {
               >
                 {t('federation.export_csv')}
               </Button>
-              <span className="text-xs text-default-400">
+              <span className="text-xs text-muted">
                 {t('federation.export_loaded_only')}
               </span>
             </div>
@@ -488,14 +488,14 @@ export function ActivityFeed() {
           label={t('federation.label_total_activity')}
           value={total}
           icon={Activity}
-          color="primary"
+
           loading={loading && total === 0}
         />
         <StatCard
           label={t('federation.label_messages_in_view')}
           value={statsMessages}
           icon={Mail}
-          color="primary"
+
           loading={loading && total === 0}
         />
         <StatCard
@@ -509,13 +509,13 @@ export function ActivityFeed() {
           label={t('federation.label_partnership_events_in_view')}
           value={statsPartnerships}
           icon={Handshake}
-          color="secondary"
+          color="default"
           loading={loading && total === 0}
         />
       </div>
 
       {/* Filters */}
-      <Card shadow="sm" className="mb-6">
+      <Card className="mb-6">
         <CardBody>
           <div className="flex flex-wrap gap-3 items-end">
             <Input type="search" name="admin-search" autoComplete="off"
@@ -525,7 +525,7 @@ export function ActivityFeed() {
               className="max-w-[220px]"
               value={search}
               onValueChange={setSearch}
-              startContent={<Search size={14} className="text-default-400" />}
+              startContent={<Search size={14} className="text-muted" />}
               isClearable
               onClear={() => setSearch('')}
             />
@@ -567,8 +567,7 @@ export function ActivityFeed() {
             {hasFilters && (
               <Button
                 size="sm"
-                variant="light"
-                color="danger"
+                variant="danger"
                 startContent={<X size={14} />}
                 onPress={clearFilters}
               >
@@ -579,7 +578,7 @@ export function ActivityFeed() {
 
           {/* Event type checkboxes */}
           <div className="flex flex-wrap gap-3 mt-3">
-            <span className="text-xs text-default-500 self-center">{t('federation.event_types_label')}</span>
+            <span className="text-xs text-muted self-center">{t('federation.event_types_label')}</span>
             {EVENT_TYPE_OPTION_KEYS.map((opt) => (
               <Checkbox
                 key={opt.key}
@@ -596,7 +595,7 @@ export function ActivityFeed() {
 
       {/* Timeline */}
       {loading && items.length === 0 ? (
-        <Card shadow="sm">
+        <Card>
           <CardBody className="space-y-4 py-4">
             {[1, 2, 3, 4, 5].map((i) => (
               <div key={i} className="flex items-start gap-3 p-3">
@@ -611,28 +610,28 @@ export function ActivityFeed() {
           </CardBody>
         </Card>
       ) : items.length === 0 ? (
-        <Card shadow="sm">
+        <Card>
           <CardBody className="flex flex-col items-center justify-center py-16 text-center">
-            <Inbox size={48} className="text-default-300 mb-3" />
-            <p className="text-default-500 text-lg font-medium mb-1">
+            <Inbox size={48} className="text-muted mb-3" />
+            <p className="text-muted text-lg font-medium mb-1">
               {t('federation.no_activity_title')}
             </p>
-            <p className="text-default-400 text-sm">
+            <p className="text-muted text-sm">
               {t('federation.no_activity_desc')}
             </p>
           </CardBody>
         </Card>
       ) : (
-        <Card shadow="sm">
+        <Card>
           <CardBody className="p-6">
             {items.map((item) => (
               <TimelineItem key={item.id} item={item} />
             ))}
 
             {hasMore && (
-              <div className="flex justify-center mt-6 pt-4 border-t border-default-100">
+              <div className="flex justify-center mt-6 pt-4 border-t border-border">
                 <Button
-                  variant="flat"
+                  variant="tertiary"
                   startContent={<ArrowDown size={16} />}
                   onPress={handleLoadMore}
                   isLoading={loadingMore}

@@ -447,7 +447,7 @@ export function UserEdit() {
         <PageHeader
           title={t('meta.edit_user')}
           actions={
-            <Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/users'))}>
+            <Button variant="tertiary" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/users'))}>
               {t('actions.back_to_users')}
             </Button>
           }
@@ -456,7 +456,7 @@ export function UserEdit() {
           <CardBody className="p-6">
             <p className="text-center text-danger">{loadError || t('errors.user_not_found')}</p>
             <div className="mt-4 flex justify-center">
-              <Button variant="flat" onPress={() => navigate(tenantPath('/admin/users'))}>{t('actions.return_to_list')}</Button>
+              <Button variant="tertiary" onPress={() => navigate(tenantPath('/admin/users'))}>{t('actions.return_to_list')}</Button>
             </div>
           </CardBody>
         </Card>
@@ -475,7 +475,7 @@ export function UserEdit() {
           <div className="flex items-center gap-2">
             {canImpersonate && (
               <Button
-                variant="flat"
+                variant="tertiary"
                 color="warning"
                 startContent={<LogIn size={16} />}
                 onPress={handleImpersonate}
@@ -485,7 +485,7 @@ export function UserEdit() {
                 {t('actions.impersonate')}
               </Button>
             )}
-            <Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/users'))}>
+            <Button variant="tertiary" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/users'))}>
               {t('actions.back_to_users')}
             </Button>
           </div>
@@ -501,9 +501,9 @@ export function UserEdit() {
                 <Avatar src={resolveAvatarUrl(user.avatar_url || user.avatar) || undefined} name={user.name} size="lg" />
                 <div>
                   <h3 className="text-lg font-semibold text-foreground">{user.name}</h3>
-                  <p className="text-sm text-default-500">{user.email}</p>
+                  <p className="text-sm text-muted">{user.email}</p>
                   {user.balance !== undefined && (
-                    <p className="text-xs text-default-400 mt-0.5">{t('fields.balance')}</p>
+                    <p className="text-xs text-muted mt-0.5">{t('fields.balance')}</p>
                   )}
                 </div>
               </div>
@@ -565,7 +565,7 @@ export function UserEdit() {
                   placeholder={t('placeholders.organisation_name')}
                     value={organizationName}
                     onValueChange={setOrganizationName}
-                    startContent={<Building2 size={14} className="text-default-400" />}
+                    startContent={<Building2 size={14} className="text-muted" />}
                     isDisabled={submitting}
                   />
                 )}
@@ -585,10 +585,10 @@ export function UserEdit() {
 
               {/* Submit */}
               <div className="flex justify-end gap-3 pt-2">
-                <Button variant="flat" onPress={() => navigate(tenantPath('/admin/users'))} isDisabled={submitting}>
+                <Button variant="tertiary" onPress={() => navigate(tenantPath('/admin/users'))} isDisabled={submitting}>
                 {t('actions.cancel')}
                 </Button>
-                <Button type="submit" color="primary" startContent={!submitting ? <Save size={16} /> : undefined}
+          <Button type="submit" startContent={!submitting ? <Save size={16} /> : undefined}
                   isLoading={submitting}>
                 {t('actions.save_changes')}
                 </Button>
@@ -610,7 +610,7 @@ export function UserEdit() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium text-foreground">{t('fields.tenant_super_admin')}</p>
-                  <p className="text-sm text-default-500">
+                  <p className="text-sm text-muted">
                     {t('descriptions.tenant_super_admin')}
                   </p>
                 </div>
@@ -623,7 +623,7 @@ export function UserEdit() {
                 />
               </div>
               {user.id === currentUser?.id && (
-                <p className="text-xs text-default-400 mt-2">{t('descriptions.cannot_modify_self')}</p>
+                <p className="text-xs text-muted mt-2">{t('descriptions.cannot_modify_self')}</p>
               )}
             </CardBody>
           </Card>
@@ -642,7 +642,7 @@ export function UserEdit() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium text-foreground">{t('fields.platform_wide_access')}</p>
-                  <p className="text-sm text-default-500">
+                  <p className="text-sm text-muted">
                     {t('descriptions.global_super_admin')}
                   </p>
                 </div>
@@ -655,7 +655,7 @@ export function UserEdit() {
                 />
               </div>
               {user.id === currentUser?.id && (
-                <p className="text-xs text-default-400 mt-2">{t('descriptions.cannot_modify_self')}</p>
+                <p className="text-xs text-muted mt-2">{t('descriptions.cannot_modify_self')}</p>
               )}
             </CardBody>
           </Card>
@@ -674,7 +674,7 @@ export function UserEdit() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium text-foreground">{t('fields.official_announcement_channel')}</p>
-                  <p className="text-sm text-default-500">
+                  <p className="text-sm text-muted">
                     {t('descriptions.municipal_announcer')}
                   </p>
                 </div>
@@ -682,7 +682,6 @@ export function UserEdit() {
                   isSelected={isMunicipalityAnnouncer}
                   onValueChange={handleToggleMunicipalityAnnouncer}
                   isDisabled={announcerLoading}
-                  color="primary"
                   aria-label={t('aria.toggle_municipal_announcer')}
                 />
               </div>
@@ -702,8 +701,7 @@ export function UserEdit() {
             <div className="flex flex-wrap gap-3">
               <Button
                 size="sm"
-                variant="flat"
-                color="primary"
+                variant="tertiary"
                 startContent={<KeyRound size={14} />}
                 onPress={() => setPasswordModalOpen(true)}
               >
@@ -711,7 +709,7 @@ export function UserEdit() {
               </Button>
               <Button
                 size="sm"
-                variant="flat"
+                variant="tertiary"
                 startContent={<Mail size={14} />}
                 onPress={handleSendPasswordReset}
                 isLoading={resetEmailLoading}
@@ -720,7 +718,7 @@ export function UserEdit() {
               </Button>
               <Button
                 size="sm"
-                variant="flat"
+                variant="tertiary"
                 startContent={<Mail size={14} />}
                 onPress={handleSendWelcomeEmail}
                 isLoading={welcomeEmailLoading}
@@ -739,7 +737,7 @@ export function UserEdit() {
                 <Coins size={18} className="text-accent" />
                 <h3 className="text-lg font-semibold text-foreground">{t('sections.time_credits')}</h3>
               </div>
-              <Button size="sm" variant="flat" color="primary" onPress={() => setBalanceModalOpen(true)}>
+              <Button size="sm" variant="secondary" onPress={() => setBalanceModalOpen(true)}>
                 {t('actions.adjust_balance')}
               </Button>
             </div>
@@ -747,7 +745,7 @@ export function UserEdit() {
           <CardBody className="p-6">
             <div className="flex items-center gap-4">
               <div className="text-3xl font-bold text-foreground">{user.balance ?? 0}h</div>
-              <p className="text-sm text-default-500">{t('fields.current_balance')}</p>
+              <p className="text-sm text-muted">{t('fields.current_balance')}</p>
             </div>
           </CardBody>
         </Card>
@@ -759,7 +757,7 @@ export function UserEdit() {
               <h3 className="text-lg font-semibold text-foreground">{t('sections.badges')}</h3>
               <Button
                 size="sm"
-                variant="flat"
+                variant="tertiary"
                 startContent={<RefreshCw size={14} />}
                 onPress={handleRecheckBadges}
                 isLoading={recheckingBadges}
@@ -774,13 +772,12 @@ export function UserEdit() {
                 {user.badges.map((badge) => (
                   <Chip
                     key={badge.id}
-                    variant="flat"
-                    color="primary"
+                    variant="soft"
                     size="lg"
                     startContent={badge.icon ? <span className="text-sm">{badge.icon}</span> : undefined}
                     endContent={
-                      <Button isIconOnly variant="light" size="sm" onPress={() => setBadgeToRemove(badge)}
-                        className="ml-1 min-w-0 w-5 h-5 rounded-full text-default-400 hover:bg-danger-100 hover:text-danger"
+                      <Button isIconOnly variant="tertiary" size="sm" onPress={() => setBadgeToRemove(badge)}
+                        className="ml-1 min-w-0 w-5 h-5 rounded-full text-muted hover:bg-danger-soft hover:text-danger"
                         aria-label={t('aria.remove_badge', { name: badge.name })}>
                         <Trash2 size={12} />
                       </Button>
@@ -791,7 +788,7 @@ export function UserEdit() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-default-400">{t('empty.no_badges')}</p>
+              <p className="text-sm text-muted">{t('empty.no_badges')}</p>
             )}
           </CardBody>
         </Card>
@@ -812,7 +809,7 @@ export function UserEdit() {
                 {consents.map((consent) => (
                   <div
                     key={consent.consent_type}
-                    className="flex items-center justify-between rounded-lg border border-default-200 p-3"
+                    className="flex items-center justify-between rounded-lg border border-border p-3"
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
@@ -820,13 +817,13 @@ export function UserEdit() {
                           {consent.name || consent.consent_type.replace(/_/g, ' ')}
                         </p>
                         {consent.is_required && (
-                          <Chip size="sm" variant="flat" color="warning">{t('badges.required')}</Chip>
+                          <Chip size="sm" variant="soft" color="warning">{t('badges.required')}</Chip>
                         )}
                       </div>
                       {consent.description && (
-                        <p className="text-xs text-default-400 mt-0.5">{consent.description}</p>
+                        <p className="text-xs text-muted mt-0.5">{consent.description}</p>
                       )}
-                      <p className="text-xs text-default-400 mt-1">
+                      <p className="text-xs text-muted mt-1">
                         {consent.consent_given
                           ? (consent.given_at ? t('consents.consented_on') : t('consents.consented'))
                           : consent.withdrawn_at
@@ -838,7 +835,7 @@ export function UserEdit() {
                     </div>
                     <Chip
                       size="sm"
-                      variant="flat"
+                      variant="soft"
                       color={consent.consent_given ? 'success' : 'danger'}
                     >
                       {consent.consent_given ? t('consents.given') : t('consents.not_given')}
@@ -847,7 +844,7 @@ export function UserEdit() {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-default-400">{t('empty.no_consent_records')}</p>
+              <p className="text-sm text-muted">{t('empty.no_consent_records')}</p>
             )}
           </CardBody>
         </Card>
@@ -875,7 +872,7 @@ export function UserEdit() {
                     <div className="flex items-center gap-2">
                       <Chip
                         size="sm"
-                        variant="flat"
+                        variant="soft"
                         color={
                           user?.vetting_status === 'verified' ? 'success'
                             : user?.vetting_status === 'pending' ? 'warning'
@@ -890,8 +887,7 @@ export function UserEdit() {
                         as={Link}
                         to={tenantPath(user?.id ? `/broker/vetting?user_id=${user.id}` : '/broker/vetting')}
                         size="sm"
-                        variant="flat"
-                        color="primary"
+                        variant="tertiary"
                       >
                         {t('actions.manage')}
                       </Button>
@@ -900,19 +896,19 @@ export function UserEdit() {
                   {vettingRecords.length > 0 ? (
                     <div className="flex flex-col gap-2">
                       {vettingRecords.slice(0, 3).map((vr) => (
-                        <div key={vr.id} className="flex items-center justify-between rounded-lg border border-default-200 p-3">
+                        <div key={vr.id} className="flex items-center justify-between rounded-lg border border-border p-3">
                           <div>
                             <p className="text-sm font-medium text-foreground">
                               {vr.vetting_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
                             </p>
-                            <p className="text-xs text-default-400">
+                            <p className="text-xs text-muted">
                               {vr.reference_number || t('values.no_reference')}
                               {vr.expiry_date ? t('values.expires_prefix') : ''}
                             </p>
                           </div>
                           <Chip
                             size="sm"
-                            variant="flat"
+                            variant="soft"
                             color={
                               vr.status === 'verified' ? 'success'
                                 : vr.status === 'pending' || vr.status === 'submitted' ? 'warning'
@@ -926,11 +922,11 @@ export function UserEdit() {
                         </div>
                       ))}
                       {vettingRecords.length > 3 && (
-                        <p className="text-xs text-default-400">{t('summary.more_records')}</p>
+                        <p className="text-xs text-muted">{t('summary.more_records')}</p>
                       )}
                     </div>
                   ) : (
-                    <p className="text-sm text-default-400">{t('empty.no_vetting_records')}</p>
+                    <p className="text-sm text-muted">{t('empty.no_vetting_records')}</p>
                   )}
                 </div>
 
@@ -944,7 +940,7 @@ export function UserEdit() {
                     <div className="flex items-center gap-2">
                       <Chip
                         size="sm"
-                        variant="flat"
+                        variant="soft"
                         color={
                           user?.insurance_status === 'verified' ? 'success'
                             : user?.insurance_status === 'pending' ? 'warning'
@@ -959,8 +955,7 @@ export function UserEdit() {
                         as={Link}
                         to={tenantPath(user?.id ? `/broker/insurance?user_id=${user.id}` : '/broker/insurance')}
                         size="sm"
-                        variant="flat"
-                        color="primary"
+                        variant="tertiary"
                       >
                         {t('actions.manage')}
                       </Button>
@@ -969,19 +964,19 @@ export function UserEdit() {
                   {insuranceRecords.length > 0 ? (
                     <div className="flex flex-col gap-2">
                       {insuranceRecords.slice(0, 3).map((ic) => (
-                        <div key={ic.id} className="flex items-center justify-between rounded-lg border border-default-200 p-3">
+                        <div key={ic.id} className="flex items-center justify-between rounded-lg border border-border p-3">
                           <div>
                             <p className="text-sm font-medium text-foreground">
                               {ic.insurance_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
                             </p>
-                            <p className="text-xs text-default-400">
+                            <p className="text-xs text-muted">
                               {ic.provider_name || t('values.unknown_provider')}
                               {ic.expiry_date ? t('values.expires_prefix') : ''}
                             </p>
                           </div>
                           <Chip
                             size="sm"
-                            variant="flat"
+                            variant="soft"
                             color={
                               ic.status === 'verified' ? 'success'
                                 : ic.status === 'pending' || ic.status === 'submitted' ? 'warning'
@@ -995,11 +990,11 @@ export function UserEdit() {
                         </div>
                       ))}
                       {insuranceRecords.length > 3 && (
-                        <p className="text-xs text-default-400">{t('summary.more_certificates')}</p>
+                        <p className="text-xs text-muted">{t('summary.more_certificates')}</p>
                       )}
                     </div>
                   ) : (
-                    <p className="text-sm text-default-400">{t('empty.no_insurance_records')}</p>
+                    <p className="text-sm text-muted">{t('empty.no_insurance_records')}</p>
                   )}
                 </div>
               </div>
@@ -1032,7 +1027,7 @@ export function UserEdit() {
             {t('modals.adjust_balance.title')}
           </ModalHeader>
           <ModalBody className="gap-4">
-            <p className="text-sm text-default-500">{t('fields.current_balance')}</p>
+            <p className="text-sm text-muted">{t('fields.current_balance')}</p>
             <Input label={t('fields.amount')} placeholder={t('placeholders.balance_amount')}
               description={t('descriptions.balance_amount')}
               value={balanceAmount} onValueChange={setBalanceAmount}
@@ -1042,12 +1037,12 @@ export function UserEdit() {
               isRequired isDisabled={balanceLoading} />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat"
+            <Button variant="tertiary"
               onPress={() => { setBalanceModalOpen(false); setBalanceAmount(''); setBalanceReason(''); }}
               isDisabled={balanceLoading}>
               {t('actions.cancel')}
             </Button>
-            <Button color="primary" onPress={handleAdjustBalance} isLoading={balanceLoading}
+          <Button onPress={handleAdjustBalance} isLoading={balanceLoading}
               isDisabled={!balanceAmount.trim() || !balanceReason.trim() || balanceLoading}>
               {t('actions.apply_adjustment')}
             </Button>
@@ -1065,7 +1060,7 @@ export function UserEdit() {
             {t('modals.set_password.title')}
           </ModalHeader>
           <ModalBody className="gap-4">
-            <p className="text-sm text-default-500">
+            <p className="text-sm text-muted">
               {t('modals.set_password.body')}
             </p>
             <Input
@@ -1079,12 +1074,12 @@ export function UserEdit() {
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat"
+            <Button variant="tertiary"
               onPress={() => { setPasswordModalOpen(false); setNewPassword(''); }}
               isDisabled={passwordLoading}>
               {t('actions.cancel')}
             </Button>
-            <Button color="primary" onPress={handleSetPassword} isLoading={passwordLoading}
+          <Button onPress={handleSetPassword} isLoading={passwordLoading}
               isDisabled={newPassword.length < 8 || passwordLoading}>
               {t('actions.set_password')}
             </Button>

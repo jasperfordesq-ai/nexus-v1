@@ -392,10 +392,10 @@ export function Webhooks() {
         description={t('federation.webhooks_desc')}
         actions={
           <div className="flex items-center gap-2">
-            <Button variant="flat" size="sm" startContent={<RefreshCw size={16} />} onPress={() => loadData()} isLoading={loading}>
+            <Button variant="tertiary" size="sm" startContent={<RefreshCw size={16} />} onPress={() => loadData()} isLoading={loading}>
               {t('federation.refresh')}
             </Button>
-            <Button color="primary" size="sm" startContent={<Plus size={16} />} onPress={openCreate}>
+            <Button  size="sm" startContent={<Plus size={16} />} onPress={openCreate}>
               {t('federation.webhooks_add')}
             </Button>
           </div>
@@ -418,31 +418,31 @@ export function Webhooks() {
               <TableCell>
                 <div>
                   <Tooltip content={webhook.url}>
-                    <code className="text-xs bg-default-100 px-1.5 py-0.5 rounded cursor-help">
+                    <code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded cursor-help">
                       {truncateUrl(webhook.url)}
                     </code>
                   </Tooltip>
                   {webhook.description && (
-                    <p className="text-xs text-default-400 mt-0.5 truncate max-w-[250px]">{webhook.description}</p>
+                    <p className="text-xs text-muted mt-0.5 truncate max-w-[250px]">{webhook.description}</p>
                   )}
                 </div>
               </TableCell>
               <TableCell>
                 <div className="flex flex-wrap gap-1 max-w-[200px]">
                   {(webhook.events || []).slice(0, 3).map((evt) => (
-                    <Chip key={evt} size="sm" variant="flat" className="text-xs">
+                    <Chip key={evt} size="sm" variant="soft" className="text-xs">
                       {t(`federation.webhook_${evt.replace('.', '_')}`)}
                     </Chip>
                   ))}
                   {(webhook.events || []).length > 3 && (
-                    <Chip size="sm" variant="flat" className="text-xs">+{webhook.events.length - 3}</Chip>
+                    <Chip size="sm" variant="soft" className="text-xs">+{webhook.events.length - 3}</Chip>
                   )}
                 </div>
               </TableCell>
               <TableCell>
                 <Chip
                   size="sm"
-                  variant="flat"
+                  variant="soft"
                   color={STATUS_COLORS[webhook.status] ?? 'default'}
                   className="capitalize"
                 >
@@ -450,19 +450,19 @@ export function Webhooks() {
                 </Chip>
               </TableCell>
               <TableCell>
-                <span className="text-sm text-default-500">
+                <span className="text-sm text-muted">
                   {webhook.last_triggered_at ? formatRelativeTime(webhook.last_triggered_at) : t('federation.never')}
                 </span>
               </TableCell>
               <TableCell>
-                <span className={`text-sm ${webhook.consecutive_failures > 0 ? 'text-danger font-medium' : 'text-default-400'}`}>
+                <span className={`text-sm ${webhook.consecutive_failures > 0 ? 'text-danger font-medium' : 'text-muted'}`}>
                   {webhook.consecutive_failures}
                 </span>
               </TableCell>
               <TableCell>
                 <Dropdown>
                   <DropdownTrigger>
-                    <Button isIconOnly size="sm" variant="light" aria-label={t('federation.label_actions')}>
+                    <Button isIconOnly size="sm" variant="ghost" aria-label={t('federation.label_actions')}>
                       <MoreVertical size={16} />
                     </Button>
                   </DropdownTrigger>
@@ -515,7 +515,7 @@ export function Webhooks() {
                     </p>
                     <Snippet
                       symbol=""
-                      variant="flat"
+                      variant="soft"
                       color="warning"
                       className="w-full"
                     >
@@ -545,7 +545,7 @@ export function Webhooks() {
 
                 {/* Event checkboxes */}
                 <div className="space-y-3">
-                  <p className="text-sm font-semibold text-default-700">
+                  <p className="text-sm font-semibold text-foreground">
                     {t('federation.webhooks_events_label')}
                   </p>
                   <CheckboxGroup
@@ -564,7 +564,7 @@ export function Webhooks() {
                   <div className="flex gap-2">
                     <Button
                       size="sm"
-                      variant="flat"
+                      variant="tertiary"
                       onPress={() => setForm((prev) => ({ ...prev, events: ALL_EVENT_KEYS }))}
                       isDisabled={!!createdSecret}
                     >
@@ -572,7 +572,7 @@ export function Webhooks() {
                     </Button>
                     <Button
                       size="sm"
-                      variant="flat"
+                      variant="tertiary"
                       onPress={() => setForm((prev) => ({ ...prev, events: [] }))}
                       isDisabled={!!createdSecret}
                     >
@@ -582,12 +582,12 @@ export function Webhooks() {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>
+                <Button variant="tertiary" onPress={onClose}>
                   {createdSecret ? t('federation.close') : t('federation.cancel')}
                 </Button>
                 {!createdSecret && (
                   <Button
-                    color="primary"
+
                     isLoading={saving}
                     isDisabled={!form.url.trim() || form.events.length === 0}
                     onPress={handleSave}
@@ -611,7 +611,7 @@ export function Webhooks() {
               <ModalHeader className="flex items-center gap-2">
                 <ScrollText size={20} />
                 {t('federation.webhooks_logs_title')}
-                <code className="text-xs bg-default-100 px-1.5 py-0.5 rounded ml-2">{truncateUrl(logsWebhookUrl, 60)}</code>
+                <code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded ml-2">{truncateUrl(logsWebhookUrl, 60)}</code>
               </ModalHeader>
               <ModalBody>
                 {logsLoading ? (
@@ -619,7 +619,7 @@ export function Webhooks() {
                     <Spinner size="lg" />
                   </div>
                 ) : logs.length === 0 ? (
-                  <div className="flex h-48 items-center justify-center text-default-400">
+                  <div className="flex h-48 items-center justify-center text-muted">
                     {t('federation.webhooks_no_logs')}
                   </div>
                 ) : (
@@ -627,21 +627,21 @@ export function Webhooks() {
                     {logs.map((log) => (
                       <div key={log.id}>
                         {/* Log row — responsive: stacked on mobile, full grid on lg+ */}
-                        <div className="flex flex-col gap-1 py-2 border-b border-default-100 text-sm lg:grid lg:grid-cols-[30px_1fr_60px_60px_80px_70px_120px_50px] lg:items-center lg:gap-2">
+                        <div className="flex flex-col gap-1 py-2 border-b border-border text-sm lg:grid lg:grid-cols-[30px_1fr_60px_60px_80px_70px_120px_50px] lg:items-center lg:gap-2">
                           <div className="flex items-center gap-2 lg:contents">
                             <Button
                               isIconOnly
                               size="sm"
-                              variant="light"
+                              variant="ghost"
                               onPress={() => setExpandedLogId(expandedLogId === log.id ? null : log.id)}
                               aria-label={t('federation.webhooks_expand')}
                             >
                               {expandedLogId === log.id
-                                ? <ChevronDown size={14} className="text-default-400" />
-                                : <ChevronRight size={14} className="text-default-400" />
+                                ? <ChevronDown size={14} className="text-muted" />
+                                : <ChevronRight size={14} className="text-muted" />
                               }
                             </Button>
-                            <Chip size="sm" variant="flat">{log.event_type}</Chip>
+                            <Chip size="sm" variant="soft">{log.event_type}</Chip>
                             <div>
                               {log.success ? (
                                 <Check size={16} className="text-success" />
@@ -649,14 +649,14 @@ export function Webhooks() {
                                 <X size={16} className="text-danger" />
                               )}
                             </div>
-                            <span className={`text-sm ${log.response_code && log.response_code >= 200 && log.response_code < 300 ? 'text-success' : log.response_code ? 'text-danger' : 'text-default-400'}`}>
+                            <span className={`text-sm ${log.response_code && log.response_code >= 200 && log.response_code < 300 ? 'text-success' : log.response_code ? 'text-danger' : 'text-muted'}`}>
                               {log.response_code ?? '--'}
                             </span>
-                            <span className="text-sm text-default-500">
+                            <span className="text-sm text-muted">
                               {log.response_time_ms != null ? `${log.response_time_ms}ms` : '--'}
                             </span>
-                            <span className="text-sm text-default-500">#{log.attempt_number}</span>
-                            <span className="text-sm text-default-400">
+                            <span className="text-sm text-muted">#{log.attempt_number}</span>
+                            <span className="text-sm text-muted">
                               {log.created_at ? formatRelativeTime(log.created_at) : '--'}
                             </span>
                             <div>
@@ -665,7 +665,7 @@ export function Webhooks() {
                                   <Button
                                     isIconOnly
                                     size="sm"
-                                    variant="light"
+                                    variant="ghost"
                                     isLoading={retryingLogId === log.id}
                                     onPress={() => handleRetry(log)}
                                     aria-label={t('federation.webhooks_retry')}
@@ -680,7 +680,7 @@ export function Webhooks() {
 
                         {/* Inline expanded detail */}
                         {expandedLogId === log.id && (
-                          <div className="rounded-lg border border-default-200 p-4 space-y-3 bg-default-50 my-2">
+                          <div className="rounded-lg border border-border p-4 space-y-3 bg-surface-secondary my-2">
                             {log.error_message && (
                               <div>
                                 <p className="text-xs font-semibold text-danger mb-1">{t('federation.webhooks_error')}</p>
@@ -688,15 +688,15 @@ export function Webhooks() {
                               </div>
                             )}
                             <div>
-                              <p className="text-xs font-semibold text-default-500 mb-1">{t('federation.webhooks_payload')}</p>
-                              <pre className="text-xs bg-default-100 rounded p-2 overflow-x-auto max-h-48">
+                              <p className="text-xs font-semibold text-muted mb-1">{t('federation.webhooks_payload')}</p>
+                              <pre className="text-xs bg-surface-secondary rounded p-2 overflow-x-auto max-h-48">
                                 {JSON.stringify(log.payload, null, 2)}
                               </pre>
                             </div>
                             {log.response_body && (
                               <div>
-                                <p className="text-xs font-semibold text-default-500 mb-1">{t('federation.webhooks_response')}</p>
-                                <pre className="text-xs bg-default-100 rounded p-2 overflow-x-auto max-h-48">
+                                <p className="text-xs font-semibold text-muted mb-1">{t('federation.webhooks_response')}</p>
+                                <pre className="text-xs bg-surface-secondary rounded p-2 overflow-x-auto max-h-48">
                                   {log.response_body}
                                 </pre>
                               </div>
@@ -709,7 +709,7 @@ export function Webhooks() {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('federation.close')}</Button>
+                <Button variant="tertiary" onPress={onClose}>{t('federation.close')}</Button>
               </ModalFooter>
             </>
           )}
@@ -742,31 +742,31 @@ export function Webhooks() {
                 {t('federation.webhooks_test_preview_title')}
               </ModalHeader>
               <ModalBody>
-                <p className="text-sm text-default-500 mb-3">
+                <p className="text-sm text-muted mb-3">
                   {t('federation.webhooks_test_preview_desc')}
                 </p>
                 {testPreview && (
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-default-700">{t('federation.webhooks_endpoint')}:</span>
-                      <code className="text-xs bg-default-100 px-2 py-1 rounded break-all">{testPreview.url}</code>
+                      <span className="text-sm font-medium text-foreground">{t('federation.webhooks_endpoint')}:</span>
+                      <code className="text-xs bg-surface-secondary px-2 py-1 rounded break-all">{testPreview.url}</code>
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-default-700 mb-1">{t('federation.webhooks_sample_payload')}</p>
-                      <pre className="text-xs bg-default-100 rounded p-3 overflow-x-auto max-h-48 border border-default-200">
+                      <p className="text-sm font-medium text-foreground mb-1">{t('federation.webhooks_sample_payload')}</p>
+                      <pre className="text-xs bg-surface-secondary rounded p-3 overflow-x-auto max-h-48 border border-border">
                         {JSON.stringify(SAMPLE_PAYLOAD, null, 2)}
                       </pre>
                     </div>
-                    <p className="text-xs text-default-400">
+                    <p className="text-xs text-muted">
                       {t('federation.webhooks_test_note')}
                     </p>
                   </div>
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('federation.cancel')}</Button>
+                <Button variant="tertiary" onPress={onClose}>{t('federation.cancel')}</Button>
                 <Button
-                  color="primary"
+
                   startContent={<Send size={16} />}
                   onPress={handleTestConfirm}
                   isLoading={testingId === testPreview?.id}

@@ -299,7 +299,7 @@ export default function MunicipalityFeedbackAdminPage() {
           <div className="flex flex-wrap items-center justify-end gap-2">
             <Button
               size="sm"
-              variant="flat"
+              variant="tertiary"
               startContent={<RefreshCw size={14} />}
               onPress={() => {
                 void loadList();
@@ -312,7 +312,6 @@ export default function MunicipalityFeedbackAdminPage() {
             {canManage && (
               <Button
                 size="sm"
-                color="primary"
                 startContent={<Download size={14} />}
                 onPress={handleExport}
               >
@@ -323,14 +322,14 @@ export default function MunicipalityFeedbackAdminPage() {
         }
       />
 
-      <Card className="border border-accent/30 bg-accent-soft shadow-sm shadow-accent/10 dark:bg-accent-soft" shadow="none">
+      <Card className="border border-accent/30 bg-accent-soft shadow-sm shadow-accent/10 dark:bg-accent-soft" >
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('admin.feedback.about.title')}</p>
-              <p className="text-default-600">{t('admin.feedback.about.body')}</p>
-              <p className="text-default-500 text-xs pt-1">{t('admin.feedback.about.workflow')}</p>
+              <p className="text-muted">{t('admin.feedback.about.body')}</p>
+              <p className="text-muted text-xs pt-1">{t('admin.feedback.about.workflow')}</p>
             </div>
           </div>
         </CardBody>
@@ -341,38 +340,38 @@ export default function MunicipalityFeedbackAdminPage() {
         <Card>
           <CardBody className="space-y-3">
             <div className="flex flex-wrap items-center gap-3">
-              <Chip color="primary" variant="flat">
+              <Chip variant="soft">
                 {t('admin.feedback.stats.total_open')}: <span className="font-semibold ml-1">{stats.total_open}</span>
               </Chip>
-              <Chip color="default" variant="flat">
+              <Chip color="default" variant="soft">
                 {t('admin.feedback.stats.last_7_days')}: <span className="font-semibold ml-1">{stats.recent_count_7d}</span>
               </Chip>
             </div>
             <Separator />
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs uppercase tracking-wide text-default-500 mr-2">{t('admin.feedback.stats.by_status')}</span>
+              <span className="text-xs uppercase tracking-wide text-muted mr-2">{t('admin.feedback.stats.by_status')}</span>
               {Object.entries(stats.by_status).map(([k, v]) => (
-                <Chip key={k} size="sm" variant="flat">
+                <Chip key={k} size="sm" variant="soft">
                   {statusLabel(k)}: {v}
                 </Chip>
               ))}
               {Object.keys(stats.by_status).length === 0 && (
-                <span className="text-sm text-default-500">{t('admin.feedback.empty.stats')}</span>
+                <span className="text-sm text-muted">{t('admin.feedback.empty.stats')}</span>
               )}
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs uppercase tracking-wide text-default-500 mr-2">{t('admin.feedback.stats.by_category')}</span>
+              <span className="text-xs uppercase tracking-wide text-muted mr-2">{t('admin.feedback.stats.by_category')}</span>
               {Object.entries(stats.by_category).map(([k, v]) => (
-                <Chip key={k} size="sm" variant="flat" color={CATEGORY_COLOR[k as FeedbackCategory] ?? 'default'}>
+                <Chip key={k} size="sm" variant="soft" color={CATEGORY_COLOR[k as FeedbackCategory] ?? 'default'}>
                   {categoryLabel(k)}: {v}
                 </Chip>
               ))}
             </div>
             {Object.keys(stats.sentiment_distribution).length > 0 && (
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs uppercase tracking-wide text-default-500 mr-2">{t('admin.feedback.stats.sentiment')}</span>
+                <span className="text-xs uppercase tracking-wide text-muted mr-2">{t('admin.feedback.stats.sentiment')}</span>
                 {Object.entries(stats.sentiment_distribution).map(([k, v]) => (
-                  <Chip key={k} size="sm" variant="flat">
+                  <Chip key={k} size="sm" variant="soft">
                     {sentimentLabel(k)}: {v}
                   </Chip>
                 ))}
@@ -393,7 +392,7 @@ export default function MunicipalityFeedbackAdminPage() {
               setStatusFilter(e.target.value);
               setPage(1);
             }}
-            variant="bordered"
+            variant="secondary"
             size="sm"
           >
             {STATUS_OPTIONS.map((s) => (
@@ -408,7 +407,7 @@ export default function MunicipalityFeedbackAdminPage() {
               setCategoryFilter(e.target.value);
               setPage(1);
             }}
-            variant="bordered"
+            variant="secondary"
             size="sm"
           >
             {CATEGORY_OPTIONS.map((c) => (
@@ -423,7 +422,7 @@ export default function MunicipalityFeedbackAdminPage() {
               setSubRegionFilter(v);
               setPage(1);
             }}
-            variant="bordered"
+            variant="secondary"
             size="sm"
           />
         </CardBody>
@@ -447,7 +446,7 @@ export default function MunicipalityFeedbackAdminPage() {
             <Table
               aria-label={t('admin.feedback.table.aria')}
               removeWrapper
-              classNames={{ th: 'bg-default-100 text-xs font-semibold uppercase tracking-wide' }}
+              classNames={{ th: 'bg-surface-secondary text-xs font-semibold uppercase tracking-wide' }}
             >
               <TableHeader>
                 <TableColumn>{t('admin.feedback.table.id')}</TableColumn>
@@ -461,36 +460,35 @@ export default function MunicipalityFeedbackAdminPage() {
               <TableBody>
                 {items.map((row) => (
                   <TableRow key={row.id}>
-                    <TableCell className="text-xs font-mono text-default-500">#{row.id}</TableCell>
+                    <TableCell className="text-xs font-mono text-muted">#{row.id}</TableCell>
                     <TableCell>
-                      <Chip size="sm" variant="flat" color={CATEGORY_COLOR[row.category]}>
+                      <Chip size="sm" variant="soft" color={CATEGORY_COLOR[row.category]}>
                         {categoryLabel(row.category)}
                       </Chip>
                     </TableCell>
                     <TableCell>
                       <Button
                         size="sm"
-                        variant="light"
-                        color="primary"
-                        className="h-auto min-h-0 justify-start px-0 text-left font-medium"
+                        variant="tertiary"
+                        className="min-h-10 justify-start px-0 text-left font-medium"
                         onPress={() => openDetail(row)}
                       >
                         {row.subject}
                       </Button>
                     </TableCell>
-                    <TableCell className="text-xs text-default-500">
+                    <TableCell className="text-xs text-muted">
                       <span className={row.is_anonymous ? 'italic' : undefined}>{submitterLabel(row)}</span>
                     </TableCell>
                     <TableCell>
-                      <Chip size="sm" variant="flat" color={STATUS_COLOR[row.status]}>
+                      <Chip size="sm" variant="soft" color={STATUS_COLOR[row.status]}>
                         {statusLabel(row.status)}
                       </Chip>
                     </TableCell>
-                    <TableCell className="text-xs text-default-500 whitespace-nowrap">
+                    <TableCell className="text-xs text-muted whitespace-nowrap">
                       {relativeTime(row.created_at, t)}
                     </TableCell>
                     <TableCell>
-                      <Button size="sm" variant="flat" onPress={() => openDetail(row)}>
+                      <Button size="sm" variant="tertiary" onPress={() => openDetail(row)}>
                         {t('admin.feedback.actions.view')}
                       </Button>
                     </TableCell>
@@ -501,14 +499,14 @@ export default function MunicipalityFeedbackAdminPage() {
             </div>
           )}
           {meta && meta.total_pages > 1 && (
-            <div className="flex items-center justify-between p-3 border-t border-default-200">
-              <span className="text-xs text-default-500">
+            <div className="flex items-center justify-between p-3 border-t border-border">
+              <span className="text-xs text-muted">
                 {t('admin.feedback.pagination.summary', { page: meta.current_page, totalPages: meta.total_pages, total: meta.total })}
               </span>
               <div className="flex gap-2">
                 <Button
                   size="sm"
-                  variant="flat"
+                  variant="tertiary"
                   isDisabled={meta.current_page <= 1}
                   onPress={() => setPage((p) => Math.max(1, p - 1))}
                 >
@@ -516,7 +514,7 @@ export default function MunicipalityFeedbackAdminPage() {
                 </Button>
                 <Button
                   size="sm"
-                  variant="flat"
+                  variant="tertiary"
                   isDisabled={!meta.has_more}
                   onPress={() => setPage((p) => p + 1)}
                 >
@@ -538,25 +536,25 @@ export default function MunicipalityFeedbackAdminPage() {
                   <Inbox size={18} className="text-accent" />
                   <span className="text-base">{t('admin.feedback.modal.title', { id: selected?.id ?? '' })}</span>
                   {selected && (
-                    <Chip size="sm" variant="flat" color={STATUS_COLOR[selected.status]} className="ml-2">
+                    <Chip size="sm" variant="soft" color={STATUS_COLOR[selected.status]} className="ml-2">
                       {statusLabel(selected.status)}
                     </Chip>
                   )}
                 </div>
-                <p className="text-sm font-normal text-default-500">{selected?.subject}</p>
+                <p className="text-sm font-normal text-muted">{selected?.subject}</p>
               </ModalHeader>
               <ModalBody className="gap-4">
                 {selected && (
                   <>
                     <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
                       <div>
-                        <span className="text-default-500">{t('admin.feedback.modal.category')}: </span>
-                        <Chip size="sm" variant="flat" color={CATEGORY_COLOR[selected.category]}>
+                        <span className="text-muted">{t('admin.feedback.modal.category')}: </span>
+                        <Chip size="sm" variant="soft" color={CATEGORY_COLOR[selected.category]}>
                           {categoryLabel(selected.category)}
                         </Chip>
                       </div>
                       <div>
-                        <span className="text-default-500">{t('admin.feedback.modal.submitter')}: </span>
+                        <span className="text-muted">{t('admin.feedback.modal.submitter')}: </span>
                         {selected.is_anonymous ? (
                           <span className="italic">{adminSubmitterLabel(selected)}</span>
                         ) : (
@@ -564,18 +562,18 @@ export default function MunicipalityFeedbackAdminPage() {
                         )}
                       </div>
                       <div>
-                        <span className="text-default-500">{t('admin.feedback.modal.sentiment')}: </span>
+                        <span className="text-muted">{t('admin.feedback.modal.sentiment')}: </span>
                         <span>{sentimentLabel(selected.sentiment_tag)}</span>
                       </div>
                       <div>
-                        <span className="text-default-500">{t('admin.feedback.modal.sub_region')}: </span>
+                        <span className="text-muted">{t('admin.feedback.modal.sub_region')}: </span>
                         <span>{selected.sub_region_id ?? dateFallback}</span>
                       </div>
                       <div className="sm:col-span-2">
-                        <span className="text-default-500">{t('admin.feedback.modal.public_visible')}: </span>
+                        <span className="text-muted">{t('admin.feedback.modal.public_visible')}: </span>
                         <span>{yesNo(selected.is_public)}</span>
                       </div>
-                      <div className="text-xs text-default-500 sm:col-span-2">
+                      <div className="text-xs text-muted sm:col-span-2">
                         {t('admin.feedback.modal.timestamps', {
                           created: fmtDate(selected.created_at, dateFallback),
                           updated: fmtDate(selected.updated_at, dateFallback),
@@ -583,7 +581,7 @@ export default function MunicipalityFeedbackAdminPage() {
                       </div>
                     </div>
                     <div>
-                      <p className="text-xs uppercase tracking-wide text-default-500 mb-1">{t('admin.feedback.modal.body')}</p>
+                      <p className="text-xs uppercase tracking-wide text-muted mb-1">{t('admin.feedback.modal.body')}</p>
                       <p className="text-sm whitespace-pre-wrap leading-relaxed">{selected.body}</p>
                     </div>
                     <Separator />
@@ -592,7 +590,7 @@ export default function MunicipalityFeedbackAdminPage() {
                         label={t('admin.feedback.filters.status')}
                         selectedKeys={[triageStatus]}
                         onChange={(e) => setTriageStatus(e.target.value as FeedbackStatus)}
-                        variant="bordered"
+                        variant="secondary"
                         size="sm"
                         isDisabled={!canManage}
                       >
@@ -605,7 +603,7 @@ export default function MunicipalityFeedbackAdminPage() {
                         placeholder={t('admin.feedback.fields.assigned_user_id_placeholder')}
                         value={triageAssignedUserId}
                         onValueChange={setTriageAssignedUserId}
-                        variant="bordered"
+                        variant="secondary"
                         size="sm"
                         isDisabled={!canManage}
                       />
@@ -614,7 +612,7 @@ export default function MunicipalityFeedbackAdminPage() {
                         placeholder={t('admin.feedback.fields.assigned_role_placeholder')}
                         value={triageAssignedRole}
                         onValueChange={setTriageAssignedRole}
-                        variant="bordered"
+                        variant="secondary"
                         size="sm"
                         isDisabled={!canManage}
                       />
@@ -625,7 +623,7 @@ export default function MunicipalityFeedbackAdminPage() {
                       description={t('admin.feedback.fields.triage_notes_description')}
                       value={triageNotes}
                       onValueChange={setTriageNotes}
-                      variant="bordered"
+                      variant="secondary"
                       size="sm"
                       minRows={2}
                       isDisabled={!canManage}
@@ -636,7 +634,7 @@ export default function MunicipalityFeedbackAdminPage() {
                       description={t('admin.feedback.fields.resolution_notes_description')}
                       value={resolutionNotes}
                       onValueChange={setResolutionNotes}
-                      variant="bordered"
+                      variant="secondary"
                       size="sm"
                       minRows={2}
                       isDisabled={!canManage}
@@ -645,14 +643,14 @@ export default function MunicipalityFeedbackAdminPage() {
                 )}
               </ModalBody>
               <ModalFooter className="flex-wrap gap-2">
-                <Button variant="flat" onPress={onClose} isDisabled={savingTriage}>
+                <Button variant="tertiary" onPress={onClose} isDisabled={savingTriage}>
                   {t('admin.feedback.actions.cancel')}
                 </Button>
                 {canManage && (
                   <>
                     <Button
                       color="default"
-                      variant="flat"
+                      variant="tertiary"
                       startContent={<XCircle size={14} />}
                       onPress={handleClose}
                       isLoading={savingTriage}
@@ -667,7 +665,7 @@ export default function MunicipalityFeedbackAdminPage() {
                     >
                       {t('admin.feedback.actions.resolve')}
                     </Button>
-                    <Button color="primary" onPress={handleSaveTriage} isLoading={savingTriage}>
+          <Button onPress={handleSaveTriage} isLoading={savingTriage}>
                       {t('admin.feedback.actions.save_triage')}
                     </Button>
                   </>

@@ -39,7 +39,7 @@ function MethodChip({ method }: { method: 'GET' | 'POST' }) {
   return (
     <Chip
       size="sm"
-      variant="flat"
+      variant="soft"
       color={method === 'GET' ? 'success' : 'primary'}
       className="font-mono font-bold"
     >
@@ -61,7 +61,7 @@ function OverviewTab() {
           <HelpCircle size={20} className="text-accent" />
           <div>
             <h3 className="text-lg font-semibold">{t('federation.api_doc_overview_title')}</h3>
-            <p className="text-sm text-default-500">{t('federation.api_doc_overview_subtitle')}</p>
+            <p className="text-sm text-muted">{t('federation.api_doc_overview_subtitle')}</p>
           </div>
         </CardHeader>
         <CardBody className="space-y-5 text-sm leading-relaxed">
@@ -112,42 +112,42 @@ function OverviewTab() {
               <TableBody>
                 <TableRow key="nexus-nexus">
                   <TableCell>{t('federation.api_doc_scenario_nexus')}</TableCell>
-                  <TableCell><Chip size="sm" color="success" variant="flat">{t('federation.api_doc_required')}</Chip></TableCell>
-                  <TableCell><Chip size="sm" color="default" variant="flat">{t('federation.api_doc_optional')}</Chip></TableCell>
+                  <TableCell><Chip size="sm" color="success" variant="soft">{t('federation.api_doc_required')}</Chip></TableCell>
+                  <TableCell><Chip size="sm" color="default" variant="soft">{t('federation.api_doc_optional')}</Chip></TableCell>
                 </TableRow>
                 <TableRow key="timeoverflow">
                   <TableCell>{t('federation.api_doc_scenario_timeoverflow')}</TableCell>
-                  <TableCell><Chip size="sm" color="success" variant="flat">{t('federation.api_doc_required')}</Chip></TableCell>
-                  <TableCell><Chip size="sm" color="success" variant="flat">{t('federation.api_doc_required')}</Chip></TableCell>
+                  <TableCell><Chip size="sm" color="success" variant="soft">{t('federation.api_doc_required')}</Chip></TableCell>
+                  <TableCell><Chip size="sm" color="success" variant="soft">{t('federation.api_doc_required')}</Chip></TableCell>
                 </TableRow>
                 <TableRow key="komunitin">
                   <TableCell>{t('federation.api_doc_scenario_komunitin')}</TableCell>
-                  <TableCell><Chip size="sm" color="success" variant="flat">{t('federation.api_doc_required')}</Chip></TableCell>
-                  <TableCell><Chip size="sm" color="success" variant="flat">{t('federation.api_doc_required')}</Chip></TableCell>
+                  <TableCell><Chip size="sm" color="success" variant="soft">{t('federation.api_doc_required')}</Chip></TableCell>
+                  <TableCell><Chip size="sm" color="success" variant="soft">{t('federation.api_doc_required')}</Chip></TableCell>
                 </TableRow>
                 <TableRow key="listings">
                   <TableCell>{t('federation.api_doc_scenario_reading_listings')}</TableCell>
-                  <TableCell><Chip size="sm" color="success" variant="flat">{t('federation.api_doc_required')}</Chip></TableCell>
-                  <TableCell><Chip size="sm" color="default" variant="flat">{t('federation.api_doc_not_needed')}</Chip></TableCell>
+                  <TableCell><Chip size="sm" color="success" variant="soft">{t('federation.api_doc_required')}</Chip></TableCell>
+                  <TableCell><Chip size="sm" color="default" variant="soft">{t('federation.api_doc_not_needed')}</Chip></TableCell>
                 </TableRow>
                 <TableRow key="transfer-send">
                   <TableCell>{t('federation.api_doc_scenario_sending_transfer')}</TableCell>
-                  <TableCell><Chip size="sm" color="success" variant="flat">{t('federation.api_doc_required')}</Chip></TableCell>
-                  <TableCell><Chip size="sm" color="default" variant="flat">{t('federation.api_doc_not_needed')}</Chip></TableCell>
+                  <TableCell><Chip size="sm" color="success" variant="soft">{t('federation.api_doc_required')}</Chip></TableCell>
+                  <TableCell><Chip size="sm" color="default" variant="soft">{t('federation.api_doc_not_needed')}</Chip></TableCell>
                 </TableRow>
                 <TableRow key="transfer-cancel">
                   <TableCell>{t('federation.api_doc_scenario_transfer_cancelled')}</TableCell>
-                  <TableCell><Chip size="sm" color="default" variant="flat">{t('federation.api_doc_not_needed')}</Chip></TableCell>
-                  <TableCell><Chip size="sm" color="success" variant="flat">{t('federation.api_doc_required')}</Chip></TableCell>
+                  <TableCell><Chip size="sm" color="default" variant="soft">{t('federation.api_doc_not_needed')}</Chip></TableCell>
+                  <TableCell><Chip size="sm" color="success" variant="soft">{t('federation.api_doc_required')}</Chip></TableCell>
                 </TableRow>
                 <TableRow key="messages">
                   <TableCell>{t('federation.api_doc_scenario_receiving_messages')}</TableCell>
-                  <TableCell><Chip size="sm" color="default" variant="flat">{t('federation.api_doc_not_needed')}</Chip></TableCell>
-                  <TableCell><Chip size="sm" color="success" variant="flat">{t('federation.api_doc_required')}</Chip></TableCell>
+                  <TableCell><Chip size="sm" color="default" variant="soft">{t('federation.api_doc_not_needed')}</Chip></TableCell>
+                  <TableCell><Chip size="sm" color="success" variant="soft">{t('federation.api_doc_required')}</Chip></TableCell>
                 </TableRow>
               </TableBody>
             </Table>
-            <p className="mt-3 text-default-600">
+            <p className="mt-3 text-muted">
               {t('federation.api_doc_rule_of_thumb')}
             </p>
           </div>
@@ -208,14 +208,14 @@ function OverviewTab() {
 
           <div>
             <h4 className="font-semibold text-base mb-1">{t('federation.api_doc_summary_title')}</h4>
-            <blockquote className="border-l-4 border-accent pl-4 italic text-default-700">
+            <blockquote className="border-l-4 border-accent pl-4 italic text-foreground">
               {t('federation.api_doc_summary_body')}
             </blockquote>
           </div>
 
           <Separator />
 
-          <div className="text-default-500">
+          <div className="text-muted">
             <p>
               {t('federation.api_doc_technical_tabs_hint')}
             </p>
@@ -243,11 +243,11 @@ function AuthenticationTab() {
           <Shield size={20} className="text-accent" />
           <div>
             <h3 className="text-lg font-semibold">{t('federation.api_doc_api_key_auth')}</h3>
-            <p className="text-sm text-default-500">{t('federation.api_doc_api_key_desc')}</p>
+            <p className="text-sm text-muted">{t('federation.api_doc_api_key_desc')}</p>
           </div>
         </CardHeader>
         <CardBody className="space-y-3">
-          <p className="text-sm text-default-600">
+          <p className="text-sm text-muted">
             {t('federation.api_doc_api_key_instructions')}
           </p>
           <CodeBlock>{`
@@ -256,7 +256,7 @@ Host: api.project-nexus.ie
 Authorization: Bearer fed_live_abc123...
 Content-Type: application/json
           `}</CodeBlock>
-          <p className="text-sm text-default-500">
+          <p className="text-sm text-muted">
             {t('federation.api_doc_api_key_scopes')}
           </p>
         </CardBody>
@@ -268,24 +268,24 @@ Content-Type: application/json
           <Shield size={20} className="text-warning" />
           <div>
             <h3 className="text-lg font-semibold">{t('federation.api_doc_hmac_auth')}</h3>
-            <p className="text-sm text-default-500">{t('federation.api_doc_hmac_desc')}</p>
+            <p className="text-sm text-muted">{t('federation.api_doc_hmac_desc')}</p>
           </div>
         </CardHeader>
         <CardBody className="space-y-3">
-          <p className="text-sm text-default-600">
+          <p className="text-sm text-muted">
             {t('federation.api_doc_hmac_instructions')}
           </p>
-          <p className="text-sm font-semibold text-default-700">{t('federation.api_doc_string_to_sign')}</p>
+          <p className="text-sm font-semibold text-foreground">{t('federation.api_doc_string_to_sign')}</p>
           <CodeBlock>{`
 METHOD\n
 URL\n
 TIMESTAMP\n
 BODY
           `}</CodeBlock>
-          <p className="text-sm text-default-600">
+          <p className="text-sm text-muted">
             {t('federation.api_doc_string_to_sign_desc')}
           </p>
-          <p className="text-sm font-semibold text-default-700">{t('federation.api_doc_required_headers')}</p>
+          <p className="text-sm font-semibold text-foreground">{t('federation.api_doc_required_headers')}</p>
           <Table aria-label={t('api_docs.aria_hmac_headers')} removeWrapper>
             <TableHeader>
               <TableColumn>{t('federation.api_doc_col_header')}</TableColumn>
@@ -293,19 +293,19 @@ BODY
             </TableHeader>
             <TableBody>
               <TableRow key="sig">
-                <TableCell><code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">X-Federation-Signature</code></TableCell>
+                <TableCell><code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">X-Federation-Signature</code></TableCell>
                 <TableCell>{t('federation.api_doc_header_signature_desc')}</TableCell>
               </TableRow>
               <TableRow key="ts">
-                <TableCell><code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">X-Federation-Timestamp</code></TableCell>
+                <TableCell><code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">X-Federation-Timestamp</code></TableCell>
                 <TableCell>{t('federation.api_doc_header_timestamp_desc')}</TableCell>
               </TableRow>
               <TableRow key="nonce">
-                <TableCell><code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">X-Federation-Nonce</code></TableCell>
+                <TableCell><code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">X-Federation-Nonce</code></TableCell>
                 <TableCell>{t('federation.api_doc_header_nonce_desc')}</TableCell>
               </TableRow>
               <TableRow key="platform-id">
-                <TableCell><code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">X-Federation-Platform-Id</code></TableCell>
+                <TableCell><code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">X-Federation-Platform-Id</code></TableCell>
                 <TableCell>{t('federation.api_doc_header_platform_id_desc')}</TableCell>
               </TableRow>
             </TableBody>
@@ -319,11 +319,11 @@ BODY
           <Shield size={20} className="text-success" />
           <div>
             <h3 className="text-lg font-semibold">{t('federation.api_doc_jwt_auth')}</h3>
-            <p className="text-sm text-default-500">{t('federation.api_doc_jwt_desc')}</p>
+            <p className="text-sm text-muted">{t('federation.api_doc_jwt_desc')}</p>
           </div>
         </CardHeader>
         <CardBody className="space-y-3">
-          <p className="text-sm text-default-600">
+          <p className="text-sm text-muted">
             {t('federation.api_doc_jwt_instructions')}
           </p>
           <CodeBlock>{`
@@ -353,11 +353,11 @@ grant_type=client_credentials&scope=members:read listings:read
           <AlertTriangle size={20} className="text-danger" />
           <div>
             <h3 className="text-lg font-semibold">{t('federation.api_doc_rate_limits')}</h3>
-            <p className="text-sm text-default-500">{t('federation.api_doc_rate_limits_desc')}</p>
+            <p className="text-sm text-muted">{t('federation.api_doc_rate_limits_desc')}</p>
           </div>
         </CardHeader>
         <CardBody className="space-y-3">
-          <p className="text-sm text-default-600">
+          <p className="text-sm text-muted">
             {t('federation.api_doc_rate_limit_instructions')}
           </p>
           <Table aria-label={t('api_docs.aria_rate_limit_headers')} removeWrapper>
@@ -367,15 +367,15 @@ grant_type=client_credentials&scope=members:read listings:read
             </TableHeader>
             <TableBody>
               <TableRow key="limit">
-                <TableCell><code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">X-RateLimit-Limit</code></TableCell>
+                <TableCell><code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">X-RateLimit-Limit</code></TableCell>
                 <TableCell>{t('federation.api_doc_rate_limit_limit_desc')}</TableCell>
               </TableRow>
               <TableRow key="remaining">
-                <TableCell><code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">X-RateLimit-Remaining</code></TableCell>
+                <TableCell><code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">X-RateLimit-Remaining</code></TableCell>
                 <TableCell>{t('federation.api_doc_rate_limit_remaining_desc')}</TableCell>
               </TableRow>
               <TableRow key="reset">
-                <TableCell><code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">X-RateLimit-Reset</code></TableCell>
+                <TableCell><code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">X-RateLimit-Reset</code></TableCell>
                 <TableCell>{t('federation.api_doc_rate_limit_reset_desc')}</TableCell>
               </TableRow>
             </TableBody>
@@ -762,7 +762,7 @@ const ENDPOINTS: EndpointDef[] = [
 function EndpointsTab() {
   const { t } = useTranslation('admin');
   return (
-    <Accordion variant="bordered" selectionMode="multiple">
+    <Accordion variant="surface" selectionMode="multiple">
       {ENDPOINTS.map((ep, idx) => (
         <AccordionItem
           key={idx} id={idx}
@@ -772,7 +772,7 @@ function EndpointsTab() {
               <MethodChip method={ep.method} />
               <code className="text-sm font-mono">{ep.path}</code>
               {ep.permission !== 'none' && (
-                <Chip size="sm" variant="flat" color="warning" className="text-xs">
+                <Chip size="sm" variant="soft" color="warning" className="text-xs">
                   {ep.permission}
                 </Chip>
               )}
@@ -780,11 +780,11 @@ function EndpointsTab() {
           }
         >
           <div className="space-y-4 pb-2">
-            <p className="text-sm text-default-600">{ep.description}</p>
+            <p className="text-sm text-muted">{ep.description}</p>
 
             {ep.params && ep.params.length > 0 && (
               <>
-                <p className="text-sm font-semibold text-default-700">{t('federation.api_doc_parameters')}</p>
+                <p className="text-sm font-semibold text-foreground">{t('federation.api_doc_parameters')}</p>
                 <Table aria-label={t('api_docs.aria_parameters')} removeWrapper>
                   <TableHeader>
                     <TableColumn>{t('federation.api_doc_col_name')}</TableColumn>
@@ -795,14 +795,14 @@ function EndpointsTab() {
                   <TableBody>
                     {ep.params.map((p) => (
                       <TableRow key={p.name}>
-                        <TableCell><code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">{p.name}</code></TableCell>
-                        <TableCell><span className="text-sm text-default-500">{p.type}</span></TableCell>
+                        <TableCell><code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">{p.name}</code></TableCell>
+                        <TableCell><span className="text-sm text-muted">{p.type}</span></TableCell>
                         <TableCell>
-                          <Chip size="sm" variant="flat" color={p.required ? 'danger' : 'default'}>
+                          <Chip size="sm" variant="soft" color={p.required ? 'danger' : 'default'}>
                             {p.required ? t('federation.api_doc_yes') : t('federation.api_doc_no')}
                           </Chip>
                         </TableCell>
-                        <TableCell><span className="text-sm text-default-600">{p.description}</span></TableCell>
+                        <TableCell><span className="text-sm text-muted">{p.description}</span></TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -810,7 +810,7 @@ function EndpointsTab() {
               </>
             )}
 
-            <p className="text-sm font-semibold text-default-700">{t('federation.api_doc_example_response')}</p>
+            <p className="text-sm font-semibold text-foreground">{t('federation.api_doc_example_response')}</p>
             <CodeBlock>{ep.response}</CodeBlock>
           </div>
         </AccordionItem>
@@ -1005,7 +1005,7 @@ function ExamplesTab() {
       <Tabs
         selectedKey={lang}
         onSelectionChange={(key) => setLang(key as ExampleLang)}
-        variant="bordered"
+        variant="secondary"
         size="sm"
       >
         {Object.entries(langLabels).map(([key, label]) => (
@@ -1061,7 +1061,7 @@ function ErrorCodesTab() {
   const { t } = useTranslation('admin');
   return (
     <div className="space-y-4">
-      <p className="text-sm text-default-600">
+      <p className="text-sm text-muted">
         {t('federation.api_doc_error_format_intro')}
       </p>
       <CodeBlock>{`{
@@ -1083,7 +1083,7 @@ function ErrorCodesTab() {
               <TableCell>
                 <Chip
                   size="sm"
-                  variant="flat"
+                  variant="soft"
                   color={err.code < 500 ? 'warning' : 'danger'}
                   className="font-mono"
                 >
@@ -1091,7 +1091,7 @@ function ErrorCodesTab() {
                 </Chip>
               </TableCell>
               <TableCell><span className="text-sm font-medium">{t(err.nameKey)}</span></TableCell>
-              <TableCell><span className="text-sm text-default-600">{t(err.descriptionKey)}</span></TableCell>
+              <TableCell><span className="text-sm text-muted">{t(err.descriptionKey)}</span></TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -1129,11 +1129,11 @@ function WebhooksTab() {
           <Webhook size={20} className="text-accent" />
           <div>
             <h3 className="text-lg font-semibold">{t('federation.api_doc_webhook_events')}</h3>
-            <p className="text-sm text-default-500">{t('federation.api_doc_webhook_events_desc')}</p>
+            <p className="text-sm text-muted">{t('federation.api_doc_webhook_events_desc')}</p>
           </div>
         </CardHeader>
         <CardBody className="space-y-3">
-          <p className="text-sm text-default-600">
+          <p className="text-sm text-muted">
             {t('federation.api_doc_webhook_delivery_intro')}{' '}
             <a href="../webhooks" className="text-accent underline">{t('federation.api_docs_webhooks')}</a>
             {' '}{t('federation.api_doc_webhook_delivery_suffix')}
@@ -1147,9 +1147,9 @@ function WebhooksTab() {
               {WEBHOOK_EVENTS.map((evt) => (
                 <TableRow key={evt.event}>
                   <TableCell>
-                    <code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">{evt.event}</code>
+                    <code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">{evt.event}</code>
                   </TableCell>
-                  <TableCell><span className="text-sm text-default-600">{t(evt.descriptionKey)}</span></TableCell>
+                  <TableCell><span className="text-sm text-muted">{t(evt.descriptionKey)}</span></TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -1162,7 +1162,7 @@ function WebhooksTab() {
           <h3 className="text-lg font-semibold">{t('federation.api_doc_payload_format')}</h3>
         </CardHeader>
         <CardBody className="space-y-3">
-          <p className="text-sm text-default-600">
+          <p className="text-sm text-muted">
             {t('federation.api_doc_payload_format_desc')}
           </p>
           <CodeBlock>{`{
@@ -1194,14 +1194,14 @@ function WebhooksTab() {
           <h3 className="text-lg font-semibold">{t('federation.api_doc_signature_verification')}</h3>
         </CardHeader>
         <CardBody className="space-y-3">
-          <p className="text-sm text-default-600">
+          <p className="text-sm text-muted">
             {t('federation.api_doc_signature_verification_desc')}{' '}
-            <code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">X-Webhook-Signature</code>.
+            <code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">X-Webhook-Signature</code>.
           </p>
 
           <Separator />
 
-          <p className="text-sm font-semibold text-default-700">{t('federation.api_doc_node_verification_example')}</p>
+          <p className="text-sm font-semibold text-foreground">{t('federation.api_doc_node_verification_example')}</p>
           <CodeBlock>{`const crypto = require('crypto');
 
 function verifyWebhookSignature(payload, signature, secret) {
@@ -1236,7 +1236,7 @@ app.post('/webhooks/nexus', (req, res) => {
   res.status(200).json({ received: true });
 });`}</CodeBlock>
 
-          <p className="text-sm font-semibold text-default-700">{t('federation.api_doc_python_verification_example')}</p>
+          <p className="text-sm font-semibold text-foreground">{t('federation.api_doc_python_verification_example')}</p>
           <CodeBlock>{`import hashlib
 import hmac
 from flask import Flask, request, jsonify
