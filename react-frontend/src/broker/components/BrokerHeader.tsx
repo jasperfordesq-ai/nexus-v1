@@ -42,26 +42,26 @@ export function BrokerHeader({ sidebarCollapsed, onSidebarToggle }: BrokerHeader
         {onSidebarToggle && (
           <Button
             isIconOnly
-            variant="light"
+            variant="tertiary"
             size="sm"
             onPress={onSidebarToggle}
-            className="text-default-500 md:hidden"
+            className="text-muted md:hidden"
             aria-label={t('header.toggle_sidebar')}
           >
             <Menu size={20} />
           </Button>
         )}
         <Button
-          variant="light"
+          variant="tertiary"
           size="sm"
           onPress={() => navigate(tenantPath('/dashboard'))}
           startContent={<ArrowLeft size={16} />}
-          className="text-default-500 min-w-0 px-2 sm:px-3"
+          className="min-w-0 px-2 text-muted sm:px-3"
         >
           <span className="hidden sm:inline">{t('header.back_to_site')}</span>
         </Button>
         {tenant?.name && (
-          <span className="min-w-0 max-w-[9rem] truncate text-sm font-medium text-default-400 sm:max-w-[18rem]">
+          <span className="min-w-0 max-w-[9rem] truncate text-sm font-medium text-muted sm:max-w-[18rem]">
             {tenant.name}
           </span>
         )}
@@ -71,7 +71,7 @@ export function BrokerHeader({ sidebarCollapsed, onSidebarToggle }: BrokerHeader
       <div className="flex shrink-0 items-center gap-2 sm:gap-3">
         <Button
           isIconOnly
-          variant="light"
+          variant="tertiary"
           size="sm"
           onPress={() => navigate(tenantPath('/notifications'))}
           aria-label={t('header.notifications')}
@@ -81,7 +81,7 @@ export function BrokerHeader({ sidebarCollapsed, onSidebarToggle }: BrokerHeader
 
         <Dropdown placement="bottom-end">
           <DropdownTrigger>
-            <Button variant="light" className="flex items-center gap-2 px-2 py-1 h-auto min-w-0">
+            <Button variant="tertiary" size="sm" className="min-w-0 gap-2 px-2">
               <Avatar
                 src={resolveAvatarUrl(user?.avatar_url || user?.avatar) || undefined}
                 name={user?.name || t('header.user_fallback')}

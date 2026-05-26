@@ -147,10 +147,10 @@ export function BrokerSidebar({ collapsed, onToggle, badges }: BrokerSidebarProp
           className={`relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
             active
               ? 'bg-accent/10 text-accent'
-              : 'text-default-600 hover:bg-default-100 hover:text-foreground'
+              : 'text-muted hover:bg-surface-secondary hover:text-foreground'
           } ${collapsed ? 'justify-center px-2' : ''}`}
         >
-          <Icon size={20} className={active ? 'text-accent' : 'text-default-400'} />
+          <Icon size={20} className={active ? 'text-accent' : 'text-muted'} />
           {!collapsed && (
             <>
               <span className="flex-1 truncate">{item.label}</span>
@@ -195,10 +195,10 @@ export function BrokerSidebar({ collapsed, onToggle, badges }: BrokerSidebarProp
         )}
         <Button
           isIconOnly
-          variant="light"
+          variant="tertiary"
           size="sm"
           onPress={onToggle}
-          className="text-default-500"
+          className="text-muted"
           aria-label={collapsed ? t('sidebar.expand') : t('sidebar.collapse')}
         >
           {collapsed ? <PanelLeft size={18} /> : <PanelLeftClose size={18} />}
@@ -210,7 +210,7 @@ export function BrokerSidebar({ collapsed, onToggle, badges }: BrokerSidebarProp
         {sections.map((section, idx) => (
           <div key={section.key} className={idx > 0 ? 'mt-4' : ''}>
             {!collapsed && section.key !== 'overview' && (
-              <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-default-400">
+              <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-muted">
                 {section.title}
               </p>
             )}
@@ -228,7 +228,7 @@ export function BrokerSidebar({ collapsed, onToggle, badges }: BrokerSidebarProp
             <Tooltip content={t('sidebar.full_admin')} placement="right">
               <Link
                 to={tenantPath('/admin')}
-                className="flex items-center justify-center rounded-lg px-2 py-2 text-default-400 hover:bg-default-100 hover:text-foreground transition-colors"
+                className="flex items-center justify-center rounded-lg px-2 py-2 text-muted transition-colors hover:bg-surface-secondary hover:text-foreground"
               >
                 <Settings size={18} />
               </Link>
@@ -236,7 +236,7 @@ export function BrokerSidebar({ collapsed, onToggle, badges }: BrokerSidebarProp
           ) : (
             <Link
               to={tenantPath('/admin')}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-default-400 hover:bg-default-100 hover:text-foreground transition-colors"
+              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted transition-colors hover:bg-surface-secondary hover:text-foreground"
             >
               <Settings size={18} />
               <span>{t('sidebar.full_admin')}</span>
