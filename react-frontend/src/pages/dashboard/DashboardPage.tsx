@@ -161,7 +161,7 @@ function DashboardEmptyState({ icon, title, description, actionTo, actionLabel }
           as={Link}
           to={actionTo}
           size="sm"
-          variant="flat"
+          variant="tertiary"
           className="mt-4 bg-theme-hover text-theme-primary"
           endContent={<ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />}
         >
@@ -348,13 +348,13 @@ export function DashboardPage() {
                   </div>
                 </div>
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 lg:min-w-[420px]">
-                  <Button as={Link} to={tenantPath(CARING_COMMUNITY_ROUTE.href)} className="w-full justify-start bg-theme-elevated text-theme-primary" variant="flat" startContent={<Heart className="w-4 h-4" aria-hidden="true" />}>
+                  <Button as={Link} to={tenantPath(CARING_COMMUNITY_ROUTE.href)} className="w-full justify-start bg-theme-elevated text-theme-primary" variant="tertiary" startContent={<Heart className="w-4 h-4" aria-hidden="true" />}>
                     {t('caring_community.actions.open_hub')}
                   </Button>
-                  <Button as={Link} to={tenantPath('/listings/create?type=request')} className="w-full justify-start bg-theme-elevated text-theme-primary" variant="flat" startContent={<ListTodo className="w-4 h-4" aria-hidden="true" />}>
+                  <Button as={Link} to={tenantPath('/listings/create?type=request')} className="w-full justify-start bg-theme-elevated text-theme-primary" variant="tertiary" startContent={<ListTodo className="w-4 h-4" aria-hidden="true" />}>
                     {t('caring_community.actions.request_help')}
                   </Button>
-                  <Button as={Link} to={tenantPath('/volunteering?tab=hours')} className="w-full justify-start bg-theme-elevated text-theme-primary" variant="flat" startContent={<Clock className="w-4 h-4" aria-hidden="true" />}>
+                  <Button as={Link} to={tenantPath('/volunteering?tab=hours')} className="w-full justify-start bg-theme-elevated text-theme-primary" variant="tertiary" startContent={<Clock className="w-4 h-4" aria-hidden="true" />}>
                     {t('caring_community.actions.log_hours')}
                   </Button>
                 </div>
@@ -380,7 +380,7 @@ export function DashboardPage() {
               <SectionHeader icon={<ListTodo className="w-4 h-4 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />} iconColor="indigo" title={t('sections.recent_listings')} linkTo={tenantPath('/listings')} linkText={t('view_all')} linkAriaLabel={t('aria.view_all_listings')} />
               {isLoading ? (
                 <div aria-label={t('aria.loading_listings')} aria-busy="true" className="space-y-3">
-                  {Array.from({ length: 3 }).map((_, i) => (<Skeleton key={i} className="rounded-lg"><div className="h-16 rounded-lg bg-default-300" /></Skeleton>))}
+                  {Array.from({ length: 3 }).map((_, i) => (<Skeleton key={i} className="rounded-lg"><div className="h-16 rounded-lg bg-surface-tertiary" /></Skeleton>))}
                 </div>
               ) : stats.recentListings.length > 0 ? (
                 <div className="divide-y divide-[var(--glass-border)]">
@@ -394,7 +394,7 @@ export function DashboardPage() {
                             <p className="text-sm text-theme-muted line-clamp-1">{listing.description}</p>
                           </div>
                         </div>
-                        <Chip size="sm" variant="flat" color={listing.type === 'offer' ? 'success' : 'warning'} className="shrink-0">{listing.type === 'offer' ? t('listings.offering') : t('listings.requesting')}</Chip>
+                        <Chip size="sm" variant="soft" color={listing.type === 'offer' ? 'success' : 'warning'} className="shrink-0">{listing.type === 'offer' ? t('listings.offering') : t('listings.requesting')}</Chip>
                       </Link>
                     </article>
                   ))}
@@ -420,10 +420,10 @@ export function DashboardPage() {
                   <div aria-label={t('aria.loading_activity')} aria-busy="true" className="space-y-3">
                     {Array.from({ length: 3 }).map((_, i) => (
                       <div key={i} className="flex items-center gap-3 p-3">
-                        <Skeleton className="rounded-full shrink-0"><div className="w-10 h-10 rounded-full bg-default-300" /></Skeleton>
+                        <Skeleton className="rounded-full shrink-0"><div className="w-10 h-10 rounded-full bg-surface-tertiary" /></Skeleton>
                         <div className="flex-1 space-y-2">
-                          <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-300 w-3/4" /></Skeleton>
-                          <Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-default-200 w-1/2" /></Skeleton>
+                          <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-surface-tertiary w-3/4" /></Skeleton>
+                          <Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-surface-secondary w-1/2" /></Skeleton>
                         </div>
                       </div>
                     ))}
@@ -468,7 +468,7 @@ export function DashboardPage() {
                   {eventsLoading ? (
                     <div aria-label={t('aria.loading_events')} aria-busy="true" className="space-y-3">
                       {Array.from({ length: 3 }).map((_, i) => (
-                        <div key={i} className="flex items-center gap-3"><Skeleton className="rounded-lg shrink-0"><div className="w-12 h-14 rounded-lg bg-default-300" /></Skeleton><div className="flex-1 space-y-2"><Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-300 w-3/4" /></Skeleton><Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-default-200 w-1/2" /></Skeleton></div></div>
+                        <div key={i} className="flex items-center gap-3"><Skeleton className="rounded-lg shrink-0"><div className="w-12 h-14 rounded-lg bg-surface-tertiary" /></Skeleton><div className="flex-1 space-y-2"><Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-surface-tertiary w-3/4" /></Skeleton><Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-surface-secondary w-1/2" /></Skeleton></div></div>
                       ))}
                     </div>
                   ) : stats.upcomingEvents.length > 0 ? (
@@ -513,7 +513,7 @@ export function DashboardPage() {
                 <SectionHeader icon={<Users className="w-4 h-4 text-teal-500 dark:text-teal-400" aria-hidden="true" />} iconColor="teal" title={t('sections.my_groups')} linkTo={tenantPath('/groups')} linkText={t('view_all_caps')} linkAriaLabel={t('aria.view_all_groups')} />
                 {groupsLoading ? (
                   <div aria-label={t('aria.loading_groups')} aria-busy="true" className="space-y-3">
-                    {Array.from({ length: 3 }).map((_, i) => (<div key={i} className="flex items-center gap-3"><Skeleton className="rounded-lg shrink-0"><div className="w-10 h-10 rounded-lg bg-default-300" /></Skeleton><div className="flex-1 space-y-2"><Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-300 w-2/3" /></Skeleton><Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-default-200 w-1/3" /></Skeleton></div></div>))}
+                    {Array.from({ length: 3 }).map((_, i) => (<div key={i} className="flex items-center gap-3"><Skeleton className="rounded-lg shrink-0"><div className="w-10 h-10 rounded-lg bg-surface-tertiary" /></Skeleton><div className="flex-1 space-y-2"><Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-surface-tertiary w-2/3" /></Skeleton><Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-surface-secondary w-1/3" /></Skeleton></div></div>))}
                   </div>
                 ) : stats.myGroups.length > 0 ? (
                   <div className="divide-y divide-[var(--glass-border)]">
@@ -555,15 +555,15 @@ export function DashboardPage() {
                   <SectionHeader icon={<TrendingUp className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" />} iconColor="amber" title={t('sections.your_progress')} linkTo={tenantPath('/achievements')} linkText={t('view_achievements')} linkAriaLabel={t('aria.view_achievements')} />
                   {isLoading ? (
                     <div aria-label={t('aria.loading_progress')} aria-busy="true" className="space-y-4">
-                      <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-300 w-1/2" /></Skeleton>
-                      <Skeleton className="rounded-full"><div className="h-2 rounded-full bg-default-200" /></Skeleton>
-                      <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-200 w-1/3" /></Skeleton>
+                      <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-surface-tertiary w-1/2" /></Skeleton>
+                      <Skeleton className="rounded-full"><div className="h-2 rounded-full bg-surface-secondary" /></Skeleton>
+                      <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-surface-secondary w-1/3" /></Skeleton>
                     </div>
                   ) : stats.gamification ? (
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <span className="text-sm font-medium text-theme-primary flex items-center gap-1.5"><Award className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" />{t('gamification.level', { level: stats.gamification.level })}</span>
-                        <Chip size="sm" variant="flat" color="warning" className="text-xs">{t('gamification.xp_value', { count: stats.gamification.xp })}</Chip>
+                        <Chip size="sm" variant="soft" color="warning" className="text-xs">{t('gamification.xp_value', { count: stats.gamification.xp })}</Chip>
                       </div>
                       <div>
                         <div className="flex justify-between text-xs sm:text-sm mb-1.5">
@@ -582,7 +582,7 @@ export function DashboardPage() {
                   ) : (
                     <div className="space-y-4">
                       <p className="text-sm text-theme-subtle text-center">{t('gamification.start_earning')}</p>
-                      <Button as={Link} to={tenantPath('/achievements')} size="sm" variant="flat" className="w-full bg-theme-elevated text-theme-primary" endContent={<ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />}>{t('view_achievements')}</Button>
+                      <Button as={Link} to={tenantPath('/achievements')} size="sm" variant="tertiary" className="w-full bg-theme-elevated text-theme-primary" endContent={<ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />}>{t('view_achievements')}</Button>
                     </div>
                   )}
                 </div>
@@ -599,7 +599,7 @@ export function DashboardPage() {
                   <SectionHeader icon={<Sparkles className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" />} iconColor="amber" title={t('sections.suggested_for_you')} linkTo={tenantPath('/listings')} linkText={t('browse_all')} linkAriaLabel={t('aria.browse_all_listings')} />
                   {suggestedLoading ? (
                     <div aria-label={t('aria.loading_suggestions')} aria-busy="true" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {Array.from({ length: 4 }).map((_, i) => (<Skeleton key={i} className="rounded-lg"><div className="h-24 rounded-lg bg-default-300" /></Skeleton>))}
+                      {Array.from({ length: 4 }).map((_, i) => (<Skeleton key={i} className="rounded-lg"><div className="h-24 rounded-lg bg-surface-tertiary" /></Skeleton>))}
                     </div>
                   ) : stats.suggestedListings.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -607,7 +607,7 @@ export function DashboardPage() {
                         <Link key={listing.id} to={tenantPath(`/listings/${listing.id}`)} className="block p-3 rounded-lg bg-theme-elevated hover:bg-theme-hover transition-colors group" aria-label={`${listing.title} - ${listing.type === 'offer' ? t('listings.offer') : t('listings.request')}`}>
                           <div className="flex items-center gap-2 mb-2">
                             <Avatar src={resolveAvatarUrl(listing.author_avatar ?? listing.user?.avatar)} name={listing.author_name ?? listing.user?.name ?? t('listings.user_fallback')} size="sm" className="w-6 h-6" />
-                            <Chip size="sm" variant="flat" color={listing.type === 'offer' ? 'success' : 'warning'} className="text-[10px] h-5">{listing.type === 'offer' ? t('listings.offer') : t('listings.request')}</Chip>
+                            <Chip size="sm" variant="soft" color={listing.type === 'offer' ? 'success' : 'warning'} className="h-5 text-[10px]">{listing.type === 'offer' ? t('listings.offer') : t('listings.request')}</Chip>
                           </div>
                           <h3 className="text-sm font-medium text-theme-primary line-clamp-2 group-hover:text-[var(--color-primary)] transition-colors">{listing.title}</h3>
                         </Link>
@@ -634,7 +634,7 @@ export function DashboardPage() {
                 <SectionHeader icon={<ThumbsUp className="w-4 h-4 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />} iconColor="indigo" title={t('sections.endorsements')} linkTo={tenantPath(`/profile/${user?.id}`)} linkText={t('view_all')} linkAriaLabel={t('aria.view_all_endorsements')} />
                 {isLoading ? (
                   <div aria-label={t('aria.loading_endorsements')} aria-busy="true" className="space-y-2">
-                    {Array.from({ length: 3 }).map((_, i) => (<div key={i} className="flex items-center justify-between p-2"><Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-default-300 w-2/3" /></Skeleton><Skeleton className="rounded-full"><div className="h-5 w-8 rounded-full bg-default-300" /></Skeleton></div>))}
+                    {Array.from({ length: 3 }).map((_, i) => (<div key={i} className="flex items-center justify-between p-2"><Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-surface-tertiary w-2/3" /></Skeleton><Skeleton className="rounded-full"><div className="h-5 w-8 rounded-full bg-surface-tertiary" /></Skeleton></div>))}
                   </div>
                 ) : (
                   <div className="divide-y divide-[var(--glass-border)]">
@@ -697,7 +697,7 @@ function StatCard({ icon, label, value, color, href, isLoading }: StatCardProps)
       <GlassCard hoverable className="min-h-[124px] p-4 focus-within:ring-2 focus-within:ring-accent/40">
         <div className={`mb-3 inline-flex rounded-xl p-2.5 ${colorClasses[color]}`}>{icon}</div>
         <div className="text-xs font-medium uppercase tracking-wide text-theme-muted sm:text-sm sm:normal-case sm:tracking-normal">{label}</div>
-        {isLoading ? (<Skeleton className="mt-2 rounded-lg"><div className="h-8 w-16 rounded-lg bg-default-300" /></Skeleton>) : (<div className="mt-1 truncate text-2xl font-bold text-theme-primary">{value}</div>)}
+        {isLoading ? (<Skeleton className="mt-2 rounded-lg"><div className="h-8 w-16 rounded-lg bg-surface-tertiary" /></Skeleton>) : (<div className="mt-1 truncate text-2xl font-bold text-theme-primary">{value}</div>)}
       </GlassCard>
     </Link>
   );
@@ -710,8 +710,8 @@ function QuickActionLink({ to, icon, label }: QuickActionLinkProps) {
     <Button
       as={Link}
       to={to}
-      variant="flat"
-      className="h-auto min-h-24 min-w-0 flex-col gap-2 rounded-lg border border-theme-default bg-theme-elevated px-3 py-3 text-center text-theme-secondary data-[hover=true]:border-theme-default data-[hover=true]:bg-theme-hover data-[hover=true]:text-theme-primary"
+      variant="tertiary"
+      className="min-h-24 min-w-0 flex-col gap-2 rounded-lg border border-theme-default bg-theme-elevated px-3 py-3 text-center text-theme-secondary data-[hover=true]:border-theme-default data-[hover=true]:bg-theme-hover data-[hover=true]:text-theme-primary"
     >
       <span className="text-[var(--color-primary)] [&>svg]:h-5 [&>svg]:w-5">{icon}</span>
       <span className="max-w-full whitespace-normal break-words text-center text-xs font-medium leading-tight">{label}</span>
@@ -757,7 +757,7 @@ function PendingReviewsCard() {
           <h2 className="text-lg font-semibold text-theme-primary">{t('sections.pending_reviews')}</h2>
         </div>
         <div aria-label={t('aria.loading_pending_reviews')} aria-busy="true" className="space-y-3">
-          {Array.from({ length: 2 }).map((_, i) => (<Skeleton key={i} className="rounded-lg"><div className="h-16 rounded-lg bg-default-300" /></Skeleton>))}
+          {Array.from({ length: 2 }).map((_, i) => (<Skeleton key={i} className="rounded-lg"><div className="h-16 rounded-lg bg-surface-tertiary" /></Skeleton>))}
         </div>
       </GlassCard>
     );
@@ -784,7 +784,7 @@ function PendingReviewsCard() {
       <div className="flex items-center gap-2.5 mb-4">
         <SectionIcon color="amber"><Star className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" /></SectionIcon>
         <h2 className="text-lg font-semibold text-theme-primary">{t('sections.pending_reviews')}</h2>
-        <Chip size="sm" color="warning" variant="flat" className="ml-auto">{pending.length}</Chip>
+        <Chip size="sm" color="warning" variant="soft" className="ml-auto">{pending.length}</Chip>
       </div>
       <div className="divide-y divide-[var(--glass-border)]">
         {pending.map((review) => (
