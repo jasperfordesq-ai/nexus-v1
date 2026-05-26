@@ -109,9 +109,9 @@ interface MemberSafeguardingEntry {
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
 
-const SEVERITY_COLORS: Record<string, 'default' | 'primary' | 'warning' | 'danger'> = {
+const SEVERITY_COLORS: Record<string, 'default' | 'warning' | 'danger'> = {
   low: 'default',
-  medium: 'primary',
+  medium: 'warning',
   high: 'warning',
   critical: 'danger',
 };
@@ -360,7 +360,7 @@ export function SafeguardingDashboard() {
         actions={
           <div className="flex items-center gap-2">
             <Button
-              variant="flat"
+              variant="secondary"
               size="sm"
               startContent={<RefreshCw size={16} />}
               onPress={() => loadData()}
@@ -368,7 +368,6 @@ export function SafeguardingDashboard() {
               {t('safeguarding.refresh')}
             </Button>
             <Button
-              color="primary"
               size="sm"
               startContent={<UserPlus size={16} />}
               onPress={assignModal.onOpen}
@@ -402,7 +401,7 @@ export function SafeguardingDashboard() {
             label={t('safeguarding.label_active_assignments')}
             value={stats.active_assignments}
             icon={Shield}
-            color="primary"
+            color="default"
             to={tenantPath('/admin/safeguarding?tab=assignments&filter=active')}
             linkAriaLabel={t('safeguarding.cta_view_active_assignments')}
           />
@@ -418,7 +417,7 @@ export function SafeguardingDashboard() {
             label={t('safeguarding.label_flags_this_month')}
             value={stats.total_flags_this_month}
             icon={Flag}
-            color="secondary"
+            color="default"
             to={tenantPath('/admin/safeguarding?filter=unreviewed')}
             linkAriaLabel={t('safeguarding.cta_view_month_flags')}
           />
@@ -430,11 +429,11 @@ export function SafeguardingDashboard() {
         <div className="flex items-center justify-between rounded-lg border border-accent/20 bg-accent/5 px-4 py-2">
           <div className="flex items-center gap-2 text-sm">
             <Flag size={14} className="text-accent" />
-            <span className="text-default-600">
+            <span className="text-muted">
               {t('safeguarding.filter_showing')} <strong className="text-foreground">{activeFilterLabel}</strong>
             </span>
           </div>
-          <Button size="sm" variant="light" onPress={clearFilter}>
+          <Button size="sm" variant="tertiary" onPress={clearFilter}>
             {t('safeguarding.filter_clear')}
           </Button>
         </div>
@@ -476,14 +475,14 @@ export function SafeguardingDashboard() {
 
       {/* Flagged Messages Tab */}
       {activeTab === 'flagged' && (
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="flex justify-between items-center">
             <h3 className="text-lg font-semibold">{t('safeguarding.flagged_messages')}</h3>
             <Input type="search" name="admin-search" autoComplete="off"
               placeholder={t('safeguarding.placeholder_search_messages')}
               aria-label={t('safeguarding.label_search_safeguarding_messages')}
               size="sm"
-              variant="bordered"
+              variant="secondary"
               className="max-w-xs"
               startContent={<Search size={14} />}
               value={searchQuery}
@@ -518,28 +517,28 @@ export function SafeguardingDashboard() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <p className="text-sm text-default-600 max-w-[200px] truncate">
+                      <p className="max-w-[200px] truncate text-sm text-muted">
                         {flag.message_content}
                       </p>
                     </TableCell>
                     <TableCell>
-                      <Chip size="sm" color={SEVERITY_COLORS[flag.severity] || 'default'} variant="flat">
+                      <Chip size="sm" color={SEVERITY_COLORS[flag.severity] || 'default'} variant="soft">
                         {flag.severity}
                       </Chip>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm text-default-500">{flag.flag_reason}</span>
+                      <span className="text-sm text-muted">{flag.flag_reason}</span>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm text-default-400">{formatRelativeTime(flag.created_at)}</span>
+                      <span className="text-sm text-muted">{formatRelativeTime(flag.created_at)}</span>
                     </TableCell>
                     <TableCell>
                       {flag.is_reviewed ? (
-                        <Chip size="sm" color="success" variant="flat" startContent={<CheckCircle size={12} />}>
+                        <Chip size="sm" color="success" variant="soft" startContent={<CheckCircle size={12} />}>
                           {t('safeguarding.reviewed')}
                         </Chip>
                       ) : (
-                        <Chip size="sm" color="warning" variant="flat" startContent={<Clock size={12} />}>
+                        <Chip size="sm" color="warning" variant="soft" startContent={<Clock size={12} />}>
                           {t('safeguarding.pending')}
                         </Chip>
                       )}
@@ -548,8 +547,7 @@ export function SafeguardingDashboard() {
                       {!flag.is_reviewed && (
                         <Button
                           size="sm"
-                          variant="flat"
-                          color="primary"
+                          variant="secondary"
                           startContent={<Eye size={14} />}
                           onPress={() => {
                             setReviewTarget(flag);
@@ -570,12 +568,11 @@ export function SafeguardingDashboard() {
 
       {/* Guardian Assignments Tab */}
       {activeTab === 'assignments' && (
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="flex justify-between items-center">
             <h3 className="text-lg font-semibold">{t('safeguarding.guardian_assignments')}</h3>
             <Button
               size="sm"
-              color="primary"
               startContent={<UserPlus size={14} />}
               onPress={assignModal.onOpen}
             >
@@ -611,7 +608,7 @@ export function SafeguardingDashboard() {
                     <TableCell>
                       <Chip
                         size="sm"
-                        variant="flat"
+                        variant="soft"
                         color={assignment.status === 'active' ? 'success' : assignment.status === 'revoked' ? 'danger' : 'default'}
                       >
                         {assignment.status}
@@ -625,10 +622,10 @@ export function SafeguardingDashboard() {
                       )}
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm text-default-400">{formatRelativeTime(assignment.created_at)}</span>
+                      <span className="text-sm text-muted">{formatRelativeTime(assignment.created_at)}</span>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm text-default-400">
+                      <span className="text-sm text-muted">
                         {assignment.expires_at ? formatRelativeTime(assignment.expires_at) : t('safeguarding.never')}
                       </span>
                     </TableCell>
@@ -636,8 +633,7 @@ export function SafeguardingDashboard() {
                       {assignment.status === 'active' && (
                         <Button
                           size="sm"
-                          variant="flat"
-                          color="danger"
+                          variant="danger"
                           startContent={<UserMinus size={14} />}
                           onPress={() => handleRevokeAssignment(assignment.id)}
                         >
@@ -655,16 +651,16 @@ export function SafeguardingDashboard() {
 
       {/* Member Safeguarding Preferences Tab */}
       {activeTab === 'preferences' && (
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="flex justify-between items-center">
             <div>
               <h3 className="text-lg font-semibold">{t('safeguarding.member_safeguarding_preferences')}</h3>
-              <p className="text-sm text-default-500">{t('safeguarding.member_preferences_desc')}</p>
+              <p className="text-sm text-muted">{t('safeguarding.member_preferences_desc')}</p>
             </div>
           </CardHeader>
           <CardBody>
             {memberPreferences.length === 0 ? (
-              <div className="text-center py-8 text-default-400">
+              <div className="py-8 text-center text-muted">
                 <Shield size={40} className="mx-auto mb-2 opacity-40" />
                 <p>{t('safeguarding.no_member_preferences')}</p>
                 <p className="text-sm mt-1">{t('safeguarding.no_member_preferences_desc')}</p>
@@ -693,12 +689,12 @@ export function SafeguardingDashboard() {
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
                           {entry.is_declination_only ? (
-                            <Chip size="sm" variant="flat" color="default">{t('safeguarding.declined_none_apply')}</Chip>
+                            <Chip size="sm" variant="soft" color="default">{t('safeguarding.declined_none_apply')}</Chip>
                           ) : (
                             entry.options
                               .filter(opt => !opt.is_declination)
                               .map((opt) => (
-                                <Chip key={opt.option_key} size="sm" variant="flat" color="primary">
+                                <Chip key={opt.option_key} size="sm" variant="soft" color="accent">
                                   {opt.label}
                                 </Chip>
                               ))
@@ -707,15 +703,15 @@ export function SafeguardingDashboard() {
                       </TableCell>
                       <TableCell>
                         {entry.is_declination_only ? (
-                          <Chip size="sm" variant="flat" color="default">{t('safeguarding.declined')}</Chip>
+                          <Chip size="sm" variant="soft" color="default">{t('safeguarding.declined')}</Chip>
                         ) : entry.has_triggers ? (
-                          <Chip size="sm" variant="flat" color="warning">{t('safeguarding.active')}</Chip>
+                          <Chip size="sm" variant="soft" color="warning">{t('safeguarding.active')}</Chip>
                         ) : (
-                          <Chip size="sm" variant="flat" color="default">{t('safeguarding.none')}</Chip>
+                          <Chip size="sm" variant="soft" color="default">{t('safeguarding.none')}</Chip>
                         )}
                       </TableCell>
                       <TableCell>
-                        <span className="text-sm text-default-500">
+                        <span className="text-sm text-muted">
                           {formatRelativeTime(entry.consent_given_at)}
                         </span>
                       </TableCell>
@@ -747,28 +743,28 @@ export function SafeguardingDashboard() {
               <ModalBody className="gap-4">
                 {reviewTarget && (
                   <>
-                    <div className="p-4 rounded-lg bg-default-100">
+                    <div className="rounded-lg bg-surface-secondary p-4">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-sm font-medium">{t('safeguarding.from')}:</span>
                         <span className="text-sm">{reviewTarget.sender.name}</span>
-                        <span className="text-sm text-default-400 mx-1">{t('safeguarding.to')}</span>
+                        <span className="mx-1 text-sm text-muted">{t('safeguarding.to')}</span>
                         <span className="text-sm">{reviewTarget.recipient.name}</span>
                       </div>
                       <Separator className="my-2" />
-                      <p className="text-sm text-default-700 whitespace-pre-wrap">
+                      <p className="whitespace-pre-wrap text-sm text-foreground">
                         {reviewTarget.message_content}
                       </p>
                     </div>
 
                     <div className="flex items-center gap-4">
                       <div>
-                        <span className="text-sm text-default-500">{t('safeguarding.severity')}:</span>{' '}
-                        <Chip size="sm" color={SEVERITY_COLORS[reviewTarget.severity]} variant="flat">
+                        <span className="text-sm text-muted">{t('safeguarding.severity')}:</span>{' '}
+                        <Chip size="sm" color={SEVERITY_COLORS[reviewTarget.severity]} variant="soft">
                           {reviewTarget.severity}
                         </Chip>
                       </div>
                       <div>
-                        <span className="text-sm text-default-500">{t('safeguarding.reason')}:</span>{' '}
+                        <span className="text-sm text-muted">{t('safeguarding.reason')}:</span>{' '}
                         <span className="text-sm">{reviewTarget.flag_reason}</span>
                       </div>
                     </div>
@@ -776,12 +772,12 @@ export function SafeguardingDashboard() {
                     {reviewTarget.ward_name && (
                       <div className="flex items-center gap-2 text-sm">
                         <Shield size={14} className="text-accent" />
-                        <span className="text-default-500">{t('safeguarding.ward')}:</span>
+                        <span className="text-muted">{t('safeguarding.ward')}:</span>
                         <span>{reviewTarget.ward_name}</span>
                         {reviewTarget.guardian_name && (
                           <>
-                            <span className="text-default-400 mx-1">|</span>
-                            <span className="text-default-500">{t('safeguarding.guardian')}:</span>
+                            <span className="mx-1 text-muted">|</span>
+                            <span className="text-muted">{t('safeguarding.guardian')}:</span>
                             <span>{reviewTarget.guardian_name}</span>
                           </>
                         )}
@@ -799,9 +795,8 @@ export function SafeguardingDashboard() {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('safeguarding.cancel')}</Button>
+                <Button variant="tertiary" onPress={onClose}>{t('safeguarding.cancel')}</Button>
                 <Button
-                  color="primary"
                   isLoading={reviewing}
                   startContent={<CheckCircle size={16} />}
                   onPress={handleReview}
@@ -843,9 +838,8 @@ export function SafeguardingDashboard() {
                 />
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('safeguarding.cancel')}</Button>
+                <Button variant="tertiary" onPress={onClose}>{t('safeguarding.cancel')}</Button>
                 <Button
-                  color="primary"
                   isLoading={creating}
                   isDisabled={!wardEmail.trim() || !guardianEmail.trim()}
                   onPress={handleCreateAssignment}

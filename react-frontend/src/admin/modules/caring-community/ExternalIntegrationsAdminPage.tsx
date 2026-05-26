@@ -299,7 +299,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
           <>
             <Button
               size="sm"
-              variant="flat"
+              variant="secondary"
               startContent={<RefreshCw size={14} />}
               onPress={() => void load()}
               isLoading={loading}
@@ -308,7 +308,6 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
             </Button>
             <Button
               size="sm"
-              color="primary"
               startContent={<Plus size={14} />}
               onPress={openCreate}
             >
@@ -319,16 +318,16 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
       />
 
       {/* Intro card */}
-      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('external_integrations.about.title')}</p>
-              <p className="text-default-600">
+              <p className="text-foreground">
                 {t('external_integrations.about.body')}
               </p>
-              <div className="space-y-0.5 pt-1 text-default-500">
+              <div className="space-y-0.5 pt-1 text-muted">
                 <p><strong>{t('external_integrations.about.dsa_label')}</strong> {t('external_integrations.about.dsa_body')}</p>
                 <p><strong>{t('external_integrations.about.sandbox_label')}</strong> {t('external_integrations.about.sandbox_body')}</p>
                 <p><strong>{t('external_integrations.about.statuses_label')}</strong> {t('external_integrations.about.statuses_body')}</p>
@@ -339,7 +338,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
       </Card>
 
       {loading ? (
-        <Card shadow="sm">
+        <Card>
           <CardBody>
             <div className="flex justify-center py-12">
               <Spinner />
@@ -347,21 +346,20 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
           </CardBody>
         </Card>
       ) : items.length === 0 ? (
-        <Card shadow="sm">
+        <Card>
           <CardBody>
             <div className="flex flex-col items-center gap-4 py-10 text-center">
-              <div className="rounded-full bg-default-100 p-4 text-default-500">
+              <div className="rounded-full bg-surface-secondary p-4 text-muted">
                 <PlugZap size={32} />
               </div>
               <div className="max-w-md space-y-1">
                 <h3 className="text-base font-semibold">{t('external_integrations.empty.title')}</h3>
-                <p className="text-sm text-default-500">
+                <p className="text-sm text-muted">
                   {t('external_integrations.empty.body')}
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <Button
-                  color="primary"
                   startContent={<Sparkles size={14} />}
                   onPress={() => void handleSeed()}
                   isLoading={seeding}
@@ -369,7 +367,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
                   {t('external_integrations.actions.seed')}
                 </Button>
                 <Button
-                  variant="flat"
+                  variant="secondary"
                   startContent={<Plus size={14} />}
                   onPress={openCreate}
                 >
@@ -380,10 +378,10 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
           </CardBody>
         </Card>
       ) : (
-        <Card shadow="sm">
+        <Card>
           <CardBody>
             {lastUpdatedAt && (
-              <p className="mb-3 text-xs text-default-500">
+              <p className="mb-3 text-xs text-muted">
                 {t('external_integrations.last_updated', { date: new Date(lastUpdatedAt).toLocaleString() })}
               </p>
             )}
@@ -407,7 +405,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
                       <div className="flex flex-col">
                         <span className="font-medium">{item.name}</span>
                         {item.notes && (
-                          <span className="line-clamp-1 max-w-md text-xs text-default-500">
+                          <span className="line-clamp-1 max-w-md text-xs text-muted">
                             {item.notes}
                           </span>
                         )}
@@ -421,20 +419,20 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
                         <div className="flex flex-col">
                           <span className="text-sm">{item.owner_name}</span>
                           {item.owner_email && (
-                            <span className="text-xs text-default-500">
+                            <span className="text-xs text-muted">
                               {item.owner_email}
                             </span>
                           )}
                         </div>
                       ) : (
-                        <span className="text-default-400">—</span>
+                        <span className="text-muted">—</span>
                       )}
                     </TableCell>
                     <TableCell>
                       <Chip
                         size="sm"
                         color={STATUS_COLOR[item.status]}
-                        variant="flat"
+                        variant="soft"
                       >
                         {t(`external_integrations.statuses.${item.status}`)}
                       </Chip>
@@ -443,7 +441,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
                       <Chip
                         size="sm"
                         color={DSA_COLOR[item.dsa_status]}
-                        variant="flat"
+                        variant="soft"
                       >
                         {t(`external_integrations.dsa_statuses.${item.dsa_status}`)}
                       </Chip>
@@ -459,11 +457,11 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
                           {t('external_integrations.actions.open')}
                         </a>
                       ) : (
-                        <span className="text-default-400">—</span>
+                        <span className="text-muted">—</span>
                       )}
                     </TableCell>
                     <TableCell>
-                      <span className="text-xs text-default-500">
+                      <span className="text-xs text-muted">
                         {new Date(item.updated_at).toLocaleDateString()}
                       </span>
                     </TableCell>
@@ -471,7 +469,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
                       <div className="flex items-center gap-1">
                         <Button
                           size="sm"
-                          variant="light"
+                          variant="ghost"
                           isIconOnly
                           aria-label={t('external_integrations.actions.edit')}
                           onPress={() => openEdit(item)}
@@ -480,8 +478,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
                         </Button>
                         <Button
                           size="sm"
-                          variant="light"
-                          color="danger"
+                          variant="danger"
                           isIconOnly
                           aria-label={t('external_integrations.actions.delete')}
                           onPress={() => openDelete(item)}
@@ -513,7 +510,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
               <Input
                 label={t('external_integrations.editor.name')}
                 placeholder={t('external_integrations.editor.name_placeholder')}
-                variant="bordered"
+                variant="secondary"
                 isRequired
                 value={form.name}
                 onValueChange={(v) => setForm({ ...form, name: v })}
@@ -522,7 +519,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <Select
                   label={t('external_integrations.editor.category')}
-                  variant="bordered"
+                  variant="secondary"
                   selectedKeys={[form.category]}
                   onChange={(e) =>
                     setForm({
@@ -538,7 +535,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
 
                 <Select
                   label={t('external_integrations.editor.status')}
-                  variant="bordered"
+                  variant="secondary"
                   selectedKeys={[form.status]}
                   onChange={(e) =>
                     setForm({
@@ -557,7 +554,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
                 <Input
                   label={t('external_integrations.editor.owner_name')}
                   placeholder={t('external_integrations.editor.owner_name_placeholder')}
-                  variant="bordered"
+                  variant="secondary"
                   value={form.owner_name}
                   onValueChange={(v) => setForm({ ...form, owner_name: v })}
                 />
@@ -565,7 +562,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
                   label={t('external_integrations.editor.owner_email')}
                   type="email"
                   placeholder={t('external_integrations.editor.owner_email_placeholder')}
-                  variant="bordered"
+                  variant="secondary"
                   value={form.owner_email}
                   onValueChange={(v) => setForm({ ...form, owner_email: v })}
                 />
@@ -574,7 +571,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
               <Input
                 label={t('external_integrations.editor.interface_spec_url')}
                 placeholder={t('external_integrations.editor.interface_spec_placeholder')}
-                variant="bordered"
+                variant="secondary"
                 value={form.interface_spec_url}
                 onValueChange={(v) => setForm({ ...form, interface_spec_url: v })}
               />
@@ -582,7 +579,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <Select
                   label={t('external_integrations.editor.dsa_status')}
-                  variant="bordered"
+                  variant="secondary"
                   selectedKeys={[form.dsa_status]}
                   onChange={(e) =>
                     setForm({
@@ -599,7 +596,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
                 <Input
                   label={t('external_integrations.editor.sandbox_url')}
                   placeholder={t('external_integrations.editor.sandbox_placeholder')}
-                  variant="bordered"
+                  variant="secondary"
                   value={form.sandbox_url}
                   onValueChange={(v) => setForm({ ...form, sandbox_url: v })}
                 />
@@ -608,7 +605,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
               <Textarea
                 label={t('external_integrations.editor.notes')}
                 placeholder={t('external_integrations.editor.notes_placeholder')}
-                variant="bordered"
+                variant="secondary"
                 minRows={3}
                 value={form.notes}
                 onValueChange={(v) => setForm({ ...form, notes: v })}
@@ -616,11 +613,10 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={editModal.onClose}>
+            <Button variant="tertiary" onPress={editModal.onClose}>
               {t('external_integrations.actions.cancel')}
             </Button>
             <Button
-              color="primary"
               onPress={() => void handleSave()}
               isDisabled={!isFormValid}
               isLoading={saving}
@@ -643,18 +639,18 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
                   {t('external_integrations.delete_modal.body_suffix')}
                 </p>
                 <Separator />
-                <p className="text-xs text-default-500">
+                <p className="text-xs text-muted">
                   {t('external_integrations.delete_modal.warning')}
                 </p>
               </div>
             ) : null}
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={deleteModal.onClose}>
+            <Button variant="tertiary" onPress={deleteModal.onClose}>
               {t('external_integrations.actions.cancel')}
             </Button>
             <Button
-              color="danger"
+              variant="danger"
               onPress={() => void handleDelete()}
               isLoading={deleting}
             >

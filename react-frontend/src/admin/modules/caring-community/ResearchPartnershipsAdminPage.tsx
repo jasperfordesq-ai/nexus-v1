@@ -271,7 +271,7 @@ export default function ResearchPartnershipsAdminPage() {
               <Button
                 isIconOnly
                 size="sm"
-                variant="flat"
+                variant="ghost"
                 onPress={() => void load()}
                 isLoading={loading}
                 aria-label={t('research_partnerships.actions.refresh_aria')}
@@ -279,10 +279,10 @@ export default function ResearchPartnershipsAdminPage() {
                 <RefreshCw size={15} />
               </Button>
             </Tooltip>
-            <Button size="sm" variant="flat" startContent={<Database size={15} />} onPress={() => setExportModalOpen(true)}>
+            <Button size="sm" variant="secondary" startContent={<Database size={15} />} onPress={() => setExportModalOpen(true)}>
               {t('research_partnerships.actions.generate_export')}
             </Button>
-            <Button size="sm" color="primary" startContent={<Plus size={15} />} onPress={() => setPartnerModalOpen(true)}>
+            <Button size="sm" startContent={<Plus size={15} />} onPress={() => setPartnerModalOpen(true)}>
               {t('research_partnerships.actions.add_partner')}
             </Button>
           </div>
@@ -290,16 +290,16 @@ export default function ResearchPartnershipsAdminPage() {
       />
 
       {/* Intro card */}
-      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('research_partnerships.about.title')}</p>
-              <p className="text-default-600">
+              <p className="text-foreground">
                 {t('research_partnerships.about.body')}
               </p>
-              <div className="space-y-0.5 pt-1 text-default-500">
+              <div className="space-y-0.5 pt-1 text-muted">
                 <p>
                   <strong>{t('research_partnerships.about.data_scope_label')}</strong>{' '}
                   {t('research_partnerships.about.data_scope_body')}
@@ -336,11 +336,11 @@ export default function ResearchPartnershipsAdminPage() {
                   <TableRow key={partner.id}>
                     <TableCell>
                       <div className="font-medium">{partner.name}</div>
-                      <div className="text-xs text-default-500">{partner.institution}</div>
-                      {partner.contact_email && <div className="text-xs text-default-500">{partner.contact_email}</div>}
+                      <div className="text-xs text-muted">{partner.institution}</div>
+                      {partner.contact_email && <div className="text-xs text-muted">{partner.contact_email}</div>}
                     </TableCell>
                     <TableCell>
-                      <Chip size="sm" color={statusColors[partner.status] ?? 'default'} variant="flat">
+                      <Chip size="sm" color={statusColors[partner.status] ?? 'default'} variant="soft">
                         {t(`research_partnerships.statuses.${partner.status}`)}
                       </Chip>
                     </TableCell>
@@ -365,43 +365,42 @@ export default function ResearchPartnershipsAdminPage() {
         <CardHeader className="flex items-center gap-2">
           <FileText size={18} className="text-accent" />
           <span className="font-semibold">{t('research_partnerships.templates.title')}</span>
-          <span className="text-xs text-default-500 font-normal ml-2">
+          <span className="text-xs text-muted font-normal ml-2">
             {t('research_partnerships.templates.subtitle')}
           </span>
         </CardHeader>
         <CardBody>
           {templates.length === 0 ? (
-            <p className="text-sm text-default-500">{t('research_partnerships.templates.empty')}</p>
+            <p className="text-sm text-muted">{t('research_partnerships.templates.empty')}</p>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {templates.map((template) => (
                 <div
                   key={template.key}
-                  className="rounded-lg border border-default-200 bg-surface p-3"
+                  className="rounded-lg border border-border bg-surface p-3"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1">
                       <p className="font-medium text-sm">{template.title}</p>
-                      <p className="text-xs text-default-500 mt-1">{template.summary}</p>
+                      <p className="text-xs text-muted mt-1">{template.summary}</p>
                     </div>
                   </div>
                   {template.suitable_for.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-2">
                       {template.suitable_for.map((s) => (
-                        <Chip key={s} size="sm" variant="flat" color="default">
+                        <Chip key={s} size="sm" variant="soft" color="default">
                           {s}
                         </Chip>
                       ))}
                     </div>
                   )}
                   <div className="flex items-center justify-between mt-2.5">
-                    <span className="text-xs text-default-400">
+                    <span className="text-xs text-muted">
                       {t('research_partnerships.templates.placeholder_count', { count: template.placeholders.length })}
                     </span>
                     <Button
                       size="sm"
-                      variant="flat"
-                      color="primary"
+                      variant="secondary"
                       onPress={() => openTemplate(template)}
                     >
                       {t('research_partnerships.actions.open')}
@@ -436,11 +435,11 @@ export default function ResearchPartnershipsAdminPage() {
                     <div className="font-medium">
                       {item.partner_name || t('research_partnerships.exports.partner_fallback', { id: item.partner_id })}
                     </div>
-                    <div className="text-xs text-default-500">{item.partner_institution || item.dataset_key}</div>
+                    <div className="text-xs text-muted">{item.partner_institution || item.dataset_key}</div>
                   </TableCell>
                   <TableCell>{formatDate(item.period_start)} - {formatDate(item.period_end)}</TableCell>
                   <TableCell>
-                    <Chip size="sm" color={statusColors[item.status] ?? 'default'} variant="flat">
+                    <Chip size="sm" color={statusColors[item.status] ?? 'default'} variant="soft">
                       {t(`research_partnerships.statuses.${item.status}`)}
                     </Chip>
                   </TableCell>
@@ -451,8 +450,7 @@ export default function ResearchPartnershipsAdminPage() {
                   <TableCell>
                     <Button
                       size="sm"
-                      variant="flat"
-                      color="danger"
+                      variant="danger"
                       startContent={<ShieldOff size={13} />}
                       isDisabled={item.status === 'revoked'}
                       isLoading={workingId === item.id}
@@ -518,8 +516,8 @@ export default function ResearchPartnershipsAdminPage() {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={close}>{t('research_partnerships.actions.cancel')}</Button>
-                <Button color="primary" onPress={() => void createPartner()} isDisabled={!name.trim() || !institution.trim()}>
+                <Button variant="tertiary" onPress={close}>{t('research_partnerships.actions.cancel')}</Button>
+                <Button onPress={() => void createPartner()} isDisabled={!name.trim() || !institution.trim()}>
                   {t('research_partnerships.actions.create')}
                 </Button>
               </ModalFooter>
@@ -538,7 +536,7 @@ export default function ResearchPartnershipsAdminPage() {
               <ModalBody className="gap-4">
                 {activeTemplate && (
                   <>
-                    <p className="text-sm text-default-500">{activeTemplate.summary}</p>
+                    <p className="text-sm text-muted">{activeTemplate.summary}</p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {activeTemplate.placeholders.map((p) => (
                         <Input
@@ -553,13 +551,13 @@ export default function ResearchPartnershipsAdminPage() {
                       ))}
                     </div>
                     {renderedTemplate && (
-                      <div className="rounded-lg border border-default-200 bg-default-50 dark:bg-default-100/30 p-3">
+                      <div className="rounded-lg border border-border bg-surface-secondary p-3">
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-xs font-semibold">
                             {t('research_partnerships.templates.rendered_markdown', { count: renderedTemplate.markdown.length })}
                           </span>
                           {renderedTemplate.placeholders_missing.length > 0 && (
-                            <Chip size="sm" color="warning" variant="flat">
+                            <Chip size="sm" color="warning" variant="soft">
                               {t('research_partnerships.templates.missing_placeholder_count', {
                                 count: renderedTemplate.placeholders_missing.length,
                               })}
@@ -575,13 +573,13 @@ export default function ResearchPartnershipsAdminPage() {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={close}>{t('research_partnerships.actions.close')}</Button>
+                <Button variant="tertiary" onPress={close}>{t('research_partnerships.actions.close')}</Button>
                 {renderedTemplate && (
-                  <Button variant="flat" color="primary" onPress={downloadRendered}>
+                  <Button variant="secondary" onPress={downloadRendered}>
                     {t('research_partnerships.actions.download_markdown')}
                   </Button>
                 )}
-                <Button color="primary" onPress={() => void renderTemplate()} isLoading={renderingTemplate}>
+                <Button onPress={() => void renderTemplate()} isLoading={renderingTemplate}>
                   {renderedTemplate ? t('research_partnerships.actions.rerender') : t('research_partnerships.actions.render')}
                 </Button>
               </ModalFooter>
@@ -619,13 +617,13 @@ export default function ResearchPartnershipsAdminPage() {
                     onValueChange={setPeriodEnd}
                   />
                 </div>
-                <p className="text-xs text-default-500">
+                <p className="text-xs text-muted">
                   {t('research_partnerships.export_modal.privacy_note')}
                 </p>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={close}>{t('research_partnerships.actions.cancel')}</Button>
-                <Button color="primary" onPress={() => void generateExport()} isDisabled={!selectedPartnerId} isLoading={workingId === selectedPartnerId}>
+                <Button variant="tertiary" onPress={close}>{t('research_partnerships.actions.cancel')}</Button>
+                <Button onPress={() => void generateExport()} isDisabled={!selectedPartnerId} isLoading={workingId === selectedPartnerId}>
                   {t('research_partnerships.actions.generate')}
                 </Button>
               </ModalFooter>

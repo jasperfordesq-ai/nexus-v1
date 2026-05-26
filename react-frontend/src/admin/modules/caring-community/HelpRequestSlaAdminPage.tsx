@@ -146,7 +146,7 @@ export default function HelpRequestSlaAdminPage() {
               as={Link}
               to={tenantPath('/caring/operating-policy')}
               size="sm"
-              variant="flat"
+              variant="secondary"
               startContent={<Settings size={14} />}
             >
               {t('help_request_sla.actions.edit_policy')}
@@ -155,7 +155,7 @@ export default function HelpRequestSlaAdminPage() {
               <Button
                 isIconOnly
                 size="sm"
-                variant="flat"
+                variant="ghost"
                 onPress={load}
                 isLoading={loading}
                 aria-label={t('help_request_sla.actions.refresh_aria')}
@@ -168,30 +168,30 @@ export default function HelpRequestSlaAdminPage() {
       />
 
       {/* About card */}
-      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('help_request_sla.about.title')}</p>
-              <p className="text-default-600">
+              <p className="text-foreground">
                 {t('help_request_sla.about.body')}
               </p>
-              <div className="mt-2 grid grid-cols-1 gap-1 sm:grid-cols-2 text-default-600">
+              <div className="mt-2 grid grid-cols-1 gap-1 sm:grid-cols-2 text-foreground">
                 <p>
                   <span className="font-medium">{t('help_request_sla.about.first_response_label')}:</span>{' '}
                   {t('help_request_sla.about.first_response_prefix')}{' '}
-                  <code className="text-xs bg-default-100 px-1 rounded">pending</code>
+                  <code className="text-xs bg-surface-secondary px-1 rounded">pending</code>
                   {t('help_request_sla.about.first_response_suffix')}
                 </p>
                 <p>
                   <span className="font-medium">{t('help_request_sla.about.resolution_label')}:</span>{' '}
                   {t('help_request_sla.about.resolution_prefix')}{' '}
-                  <code className="text-xs bg-default-100 px-1 rounded">closed</code>
+                  <code className="text-xs bg-surface-secondary px-1 rounded">closed</code>
                   {t('help_request_sla.about.resolution_suffix')}
                 </p>
               </div>
-              <p className="text-default-500 text-xs mt-1">
+              <p className="text-muted text-xs mt-1">
                 {t('help_request_sla.about.note')}
               </p>
             </div>
@@ -213,17 +213,17 @@ export default function HelpRequestSlaAdminPage() {
                 <div className="space-y-1 text-sm">
                   <div>
                     <span className="font-semibold">{t('help_request_sla.about.first_response_label')}:</span>{' '}
-                    <Chip size="sm" variant="flat" color="primary">
+                    <Chip size="sm" variant="soft" color="accent">
                       {policy.first_response_hours}h
                     </Chip>{' '}
-                    <span className="text-default-500">{t('help_request_sla.policy.first_response_description')}</span>
+                    <span className="text-muted">{t('help_request_sla.policy.first_response_description')}</span>
                   </div>
                   <div>
                     <span className="font-semibold">{t('help_request_sla.about.resolution_label')}:</span>{' '}
-                    <Chip size="sm" variant="flat" color="primary">
+                    <Chip size="sm" variant="soft" color="accent">
                       {policy.resolution_hours}h
                     </Chip>{' '}
-                    <span className="text-default-500">{t('help_request_sla.policy.resolution_description')}</span>
+                    <span className="text-muted">{t('help_request_sla.policy.resolution_description')}</span>
                   </div>
                 </div>
                 <div>
@@ -244,25 +244,25 @@ export default function HelpRequestSlaAdminPage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <Card className="border border-danger-200 bg-danger-50/30 dark:bg-danger-900/10">
               <CardBody className="py-3 text-center">
-                <p className="text-xs text-default-500">{t('help_request_sla.metrics.first_response_breached')}</p>
+                <p className="text-xs text-muted">{t('help_request_sla.metrics.first_response_breached')}</p>
                 <p className="text-2xl font-bold text-danger">{summary.first_response_breached}</p>
               </CardBody>
             </Card>
             <Card className="border border-warning-200 bg-warning-50/30 dark:bg-warning-900/10">
               <CardBody className="py-3 text-center">
-                <p className="text-xs text-default-500">{t('help_request_sla.metrics.first_response_at_risk')}</p>
+                <p className="text-xs text-muted">{t('help_request_sla.metrics.first_response_at_risk')}</p>
                 <p className="text-2xl font-bold text-warning">{summary.first_response_at_risk}</p>
               </CardBody>
             </Card>
             <Card className="border border-danger-200 bg-danger-50/30 dark:bg-danger-900/10">
               <CardBody className="py-3 text-center">
-                <p className="text-xs text-default-500">{t('help_request_sla.metrics.resolution_breached')}</p>
+                <p className="text-xs text-muted">{t('help_request_sla.metrics.resolution_breached')}</p>
                 <p className="text-2xl font-bold text-danger">{summary.resolution_breached}</p>
               </CardBody>
             </Card>
             <Card className="border border-warning-200 bg-warning-50/30 dark:bg-warning-900/10">
               <CardBody className="py-3 text-center">
-                <p className="text-xs text-default-500">{t('help_request_sla.metrics.resolution_at_risk')}</p>
+                <p className="text-xs text-muted">{t('help_request_sla.metrics.resolution_at_risk')}</p>
                 <p className="text-2xl font-bold text-warning">{summary.resolution_at_risk}</p>
               </CardBody>
             </Card>
@@ -271,19 +271,19 @@ export default function HelpRequestSlaAdminPage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <Card className="border border-[var(--color-border)]">
               <CardBody className="py-3 text-center">
-                <p className="text-xs text-default-500">{t('help_request_sla.metrics.pending')}</p>
+                <p className="text-xs text-muted">{t('help_request_sla.metrics.pending')}</p>
                 <p className="text-xl font-semibold">{summary.pending}</p>
               </CardBody>
             </Card>
             <Card className="border border-[var(--color-border)]">
               <CardBody className="py-3 text-center">
-                <p className="text-xs text-default-500">{t('help_request_sla.metrics.in_progress')}</p>
+                <p className="text-xs text-muted">{t('help_request_sla.metrics.in_progress')}</p>
                 <p className="text-xl font-semibold">{summary.in_progress}</p>
               </CardBody>
             </Card>
             <Card className="border border-success-200 bg-success-50/30 dark:bg-success-900/10">
               <CardBody className="py-3 text-center">
-                <p className="text-xs text-default-500">{t('help_request_sla.metrics.resolved_24h')}</p>
+                <p className="text-xs text-muted">{t('help_request_sla.metrics.resolved_24h')}</p>
                 <p className="text-xl font-semibold text-success">
                   {summary.resolved_within_window_24h}
                 </p>
@@ -295,7 +295,7 @@ export default function HelpRequestSlaAdminPage() {
             <CardHeader className="flex flex-wrap items-center justify-between gap-2 pb-2">
               <div>
                 <p className="text-sm font-semibold">{t('help_request_sla.open.title')}</p>
-                <p className="text-xs text-default-500">
+                <p className="text-xs text-muted">
                   {t('help_request_sla.open.subtitle', { count: data.open_requests.length })}
                 </p>
               </div>
@@ -313,7 +313,7 @@ export default function HelpRequestSlaAdminPage() {
             </CardHeader>
             <CardBody className="pt-0">
               {filteredOpen.length === 0 ? (
-                <div className="flex items-center gap-2 py-6 text-default-500 text-sm">
+                <div className="flex items-center gap-2 py-6 text-muted text-sm">
                   <CheckCircle2 size={16} className="text-success" />
                   {t('help_request_sla.open.empty_bucket')}
                 </div>
@@ -332,7 +332,7 @@ export default function HelpRequestSlaAdminPage() {
                         <TableCell>
                           <div className="max-w-md">
                             <p className="text-sm line-clamp-2">{req.what}</p>
-                            <p className="text-xs text-default-500 mt-0.5">
+                            <p className="text-xs text-muted mt-0.5">
                               {t('help_request_sla.open.request_meta', {
                                 when: req.when_needed,
                                 userId: req.user_id,
@@ -344,7 +344,7 @@ export default function HelpRequestSlaAdminPage() {
                         <TableCell>
                           <div className="text-xs space-y-0.5">
                             <div className="font-medium">{dimensionLabel(req.sla_dimension)}</div>
-                            <div className="text-default-500">
+                            <div className="text-muted">
                               {t('help_request_sla.open.target_hours', { hours: req.sla_target_hours })}
                             </div>
                             {req.bucket === 'breached' ? (
@@ -352,14 +352,14 @@ export default function HelpRequestSlaAdminPage() {
                                 {t('help_request_sla.open.over_by', { duration: fmtHours(req.sla_overage_hours) })}
                               </div>
                             ) : (
-                              <div className="text-default-500">
+                              <div className="text-muted">
                                 {t('help_request_sla.open.left', { duration: fmtHours(req.sla_remaining_hours) })}
                               </div>
                             )}
                           </div>
                         </TableCell>
                         <TableCell>
-                          <Chip size="sm" variant="flat" color={BUCKET_COLORS[req.bucket]}>
+                          <Chip size="sm" variant="soft" color={BUCKET_COLORS[req.bucket]}>
                             {bucketLabel(req.bucket)}
                           </Chip>
                         </TableCell>
@@ -369,7 +369,7 @@ export default function HelpRequestSlaAdminPage() {
                           </Chip>
                         </TableCell>
                         <TableCell>
-                          <span className="text-xs text-default-500">
+                          <span className="text-xs text-muted">
                             {new Date(req.created_at).toLocaleDateString()}
                           </span>
                         </TableCell>
@@ -399,7 +399,7 @@ export default function HelpRequestSlaAdminPage() {
                       <TableRow key={req.id}>
                         <TableCell>
                           <p className="text-sm line-clamp-1 max-w-md">{req.what}</p>
-                          <p className="text-xs text-default-500 mt-0.5">{t('help_request_sla.resolved.user_id', { userId: req.user_id })}</p>
+                          <p className="text-xs text-muted mt-0.5">{t('help_request_sla.resolved.user_id', { userId: req.user_id })}</p>
                         </TableCell>
                         <TableCell>
                           <span className="text-sm">
@@ -410,19 +410,19 @@ export default function HelpRequestSlaAdminPage() {
                         </TableCell>
                         <TableCell>
                           {req.within_resolution_sla === undefined ? (
-                            <span className="text-default-400">{emptyValue}</span>
+                            <span className="text-muted">{emptyValue}</span>
                           ) : req.within_resolution_sla ? (
-                            <Chip size="sm" variant="flat" color="success">
+                            <Chip size="sm" variant="soft" color="success">
                               {t('help_request_sla.answers.yes')}
                             </Chip>
                           ) : (
-                            <Chip size="sm" variant="flat" color="danger">
+                            <Chip size="sm" variant="soft" color="danger">
                               {t('help_request_sla.answers.no')}
                             </Chip>
                           )}
                         </TableCell>
                         <TableCell>
-                          <span className="text-xs text-default-500">
+                          <span className="text-xs text-muted">
                             {req.updated_at ? new Date(req.updated_at).toLocaleString() : emptyValue}
                           </span>
                         </TableCell>
@@ -435,7 +435,7 @@ export default function HelpRequestSlaAdminPage() {
           )}
 
           <Separator />
-          <p className="text-xs text-default-500">
+          <p className="text-xs text-muted">
             {t('help_request_sla.footer.generated', { date: new Date(data.generated_at).toLocaleString() })}{' '}
             <Abbr term="SLA" /> {t('help_request_sla.footer.proxy_prefix')}{' '}
             <code>pending</code>; {t('help_request_sla.footer.proxy_middle')}{' '}

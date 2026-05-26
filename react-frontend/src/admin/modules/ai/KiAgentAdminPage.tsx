@@ -94,7 +94,7 @@ const AGENT_TYPES = [
 
 type AgentType = (typeof AGENT_TYPES)[number];
 
-function statusColor(status: string): 'success' | 'danger' | 'warning' | 'default' | 'primary' {
+function statusColor(status: string): 'success' | 'danger' | 'warning' | 'default' {
   switch (status) {
     case 'completed':
     case 'approved':
@@ -110,7 +110,7 @@ function statusColor(status: string): 'success' | 'danger' | 'warning' | 'defaul
     case 'pending':
       return 'default';
     default:
-      return 'primary';
+      return 'default';
   }
 }
 
@@ -347,16 +347,16 @@ export default function KiAgentAdminPage() {
         <Brain size={28} className="text-accent" />
         <div>
           <h1 className="text-2xl font-bold">{t('ai.ki_agents.meta.title')}</h1>
-          <p className="text-sm text-default-500">
+          <p className="text-sm text-muted">
             {t('ai.ki_agents.meta.description')}
           </p>
         </div>
         {stats && (
           <div className="ml-auto flex gap-4 text-sm">
-            <span className="text-default-500">
+            <span className="text-muted">
               <strong>{stats.total_runs}</strong> {t('ai.ki_agents.stats.total_runs')}
             </span>
-            <span className="text-default-500">
+            <span className="text-muted">
               <strong>{stats.total_proposals}</strong> {t('ai.ki_agents.stats.total_proposals')}
             </span>
             {pendingCount > 0 && (
@@ -373,10 +373,10 @@ export default function KiAgentAdminPage() {
           <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
           <div className="space-y-1 text-sm">
             <p className="font-semibold text-accent dark:text-accent">{t('ai.ki_agents.about.title')}</p>
-            <p className="text-default-600">
+            <p className="text-muted">
               {t('ai.ki_agents.about.body')}
             </p>
-            <p className="text-default-500">
+            <p className="text-muted">
               <strong>{t('ai.ki_agents.agent_types.tandem_matching')}</strong> - {t('ai.ki_agents.about.tandem_prefix')} <Abbr term="KISS">KISS</Abbr>{t('ai.ki_agents.about.tandem_suffix')}{' '}
               <strong>{t('ai.ki_agents.agent_types.nudge_dispatch')}</strong> - {t('ai.ki_agents.about.nudge')}{' '}
               <strong>{t('ai.ki_agents.agent_types.demand_forecast')}</strong> - {t('ai.ki_agents.about.demand')}{' '}
@@ -387,7 +387,7 @@ export default function KiAgentAdminPage() {
         </div>
       </div>
 
-      <Tabs aria-label={t('ai.ki_agents.tabs.aria')} variant="underlined" color="primary">
+      <Tabs aria-label={t('ai.ki_agents.tabs.aria')} variant="underlined">
         {/* ================================================================ */}
         {/* CONFIG TAB                                                        */}
         {/* ================================================================ */}
@@ -403,10 +403,10 @@ export default function KiAgentAdminPage() {
           {mergedConfig ? (
             <div className="mt-4 grid grid-cols-1 gap-6 lg:grid-cols-2">
               {/* Master switch */}
-              <div className="col-span-full flex items-center justify-between rounded-xl border border-default-200 p-4">
+              <div className="col-span-full flex items-center justify-between rounded-xl border border-border p-4">
                 <div>
                   <p className="font-semibold">{t('ai.ki_agents.config.enable_title')}</p>
-                  <p className="text-sm text-default-500">
+                  <p className="text-sm text-muted">
                     {t('ai.ki_agents.config.enable_description')}
                   </p>
                 </div>
@@ -418,8 +418,8 @@ export default function KiAgentAdminPage() {
               </div>
 
               {/* Agent toggles */}
-              <div className="rounded-xl border border-default-200 p-4 space-y-4">
-                <p className="font-semibold text-sm text-default-700">{t('ai.ki_agents.config.agent_types_title')}</p>
+              <div className="space-y-4 rounded-xl border border-border p-4">
+                <p className="text-sm font-semibold text-foreground">{t('ai.ki_agents.config.agent_types_title')}</p>
                 {(
                   [
                     ['tandem_matching_enabled', t('ai.ki_agents.agent_types.tandem_matching'), <><Abbr term="KISS">KISS</Abbr>{t('ai.ki_agents.config.tandem_description')}</>],
@@ -432,7 +432,7 @@ export default function KiAgentAdminPage() {
                   <div key={key} className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium">{label}</p>
-                      <p className="text-xs text-default-400">{desc}</p>
+                      <p className="text-xs text-muted">{desc}</p>
                     </div>
                     <Switch
                       size="sm"
@@ -445,8 +445,8 @@ export default function KiAgentAdminPage() {
               </div>
 
               {/* Thresholds */}
-              <div className="rounded-xl border border-default-200 p-4 space-y-5">
-                <p className="font-semibold text-sm text-default-700">{t('ai.ki_agents.config.thresholds_title')}</p>
+              <div className="space-y-5 rounded-xl border border-border p-4">
+                <p className="text-sm font-semibold text-foreground">{t('ai.ki_agents.config.thresholds_title')}</p>
 
                 <div>
                   <p className="text-sm mb-2">
@@ -464,7 +464,7 @@ export default function KiAgentAdminPage() {
                     aria-label={t('ai.ki_agents.config.auto_apply_threshold_aria')}
                     color="success"
                   />
-                  <p className="text-xs text-default-400 mt-1">
+                  <p className="mt-1 text-xs text-muted">
                     {t('ai.ki_agents.config.auto_apply_threshold_help')}
                   </p>
                 </div>
@@ -474,7 +474,7 @@ export default function KiAgentAdminPage() {
                   type="number"
                   value={String(mergedConfig.max_proposals_per_run)}
                   onValueChange={(v) => patchConfig('max_proposals_per_run', parseInt(v, 10) || 50)}
-                  variant="bordered"
+                  variant="secondary"
                   size="sm"
                   min={1}
                   max={500}
@@ -485,7 +485,7 @@ export default function KiAgentAdminPage() {
                   type="number"
                   value={String(mergedConfig.schedule_hour)}
                   onValueChange={(v) => patchConfig('schedule_hour', parseInt(v, 10) || 2)}
-                  variant="bordered"
+                  variant="secondary"
                   size="sm"
                   min={0}
                   max={23}
@@ -497,7 +497,7 @@ export default function KiAgentAdminPage() {
                   value={mergedConfig.notification_email ?? ''}
                   onValueChange={(v) => patchConfig('notification_email', v || null)}
                   placeholder={t('ai.ki_agents.config.notification_email_placeholder')}
-                  variant="bordered"
+                  variant="secondary"
                   size="sm"
                 />
               </div>
@@ -505,7 +505,6 @@ export default function KiAgentAdminPage() {
               {/* Save */}
               <div className="col-span-full flex justify-end">
                 <Button
-                  color="primary"
                   onPress={handleSaveConfig}
                   isLoading={savingConfig}
                   startContent={<CheckCircle size={16} />}
@@ -515,8 +514,8 @@ export default function KiAgentAdminPage() {
               </div>
             </div>
           ) : (
-            <Card className="mt-4 border border-default-200">
-              <CardBody className="flex flex-row items-center gap-3 text-sm text-default-500">
+            <Card className="mt-4 border border-border">
+              <CardBody className="flex flex-row items-center gap-3 text-sm text-muted">
                 <Spinner size="sm" />
                 {t('ai.ki_agents.empty.loading_config')}
               </CardBody>
@@ -546,8 +545,8 @@ export default function KiAgentAdminPage() {
                   (s) => (
                     <Chip
                       key={s || 'all'}
-                      color={proposalFilter === s ? 'primary' : 'default'}
-                      variant={proposalFilter === s ? 'solid' : 'bordered'}
+                      color={proposalFilter === s ? 'accent' : 'default'}
+                      variant="soft"
                       className="cursor-pointer"
                       onClick={() => setProposalFilter(s)}
                     >
@@ -566,20 +565,20 @@ export default function KiAgentAdminPage() {
                 >
                   {t('ai.ki_agents.actions.approve_all_eligible')}
                 </Button>
-                <p className="text-xs text-default-400">
+                <p className="text-xs text-muted">
                   {t('ai.ki_agents.proposals.approve_all_help')}
                 </p>
               </div>
             </div>
 
             {/* Status + confidence legend */}
-            <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 rounded-lg border border-default-200 bg-default-50 px-3 py-2 text-xs text-default-500">
-              <span className="font-medium text-default-700">{t('ai.ki_agents.legend.status')}</span>
-              <span><Chip size="sm" color="warning" variant="flat" className="mr-1">{statusText('pending_review')}</Chip>{t('ai.ki_agents.legend.awaiting_decision')}</span>
-              <span><Chip size="sm" color="success" variant="flat" className="mr-1">{statusText('approved')}</Chip>{t('ai.ki_agents.legend.human_approved')}</span>
-              <span><Chip size="sm" color="success" variant="flat" className="mr-1">{statusText('auto_applied')}</Chip>{t('ai.ki_agents.legend.auto_applied')}</span>
-              <span><Chip size="sm" color="danger" variant="flat" className="mr-1">{statusText('rejected')}</Chip>{t('ai.ki_agents.legend.rejected')}</span>
-              <span className="ml-2 font-medium text-default-700">{t('ai.ki_agents.legend.confidence')}</span>
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 rounded-lg border border-border bg-surface-secondary px-3 py-2 text-xs text-muted">
+              <span className="font-medium text-foreground">{t('ai.ki_agents.legend.status')}</span>
+              <span><Chip size="sm" color="warning" variant="soft" className="mr-1">{statusText('pending_review')}</Chip>{t('ai.ki_agents.legend.awaiting_decision')}</span>
+              <span><Chip size="sm" color="success" variant="soft" className="mr-1">{statusText('approved')}</Chip>{t('ai.ki_agents.legend.human_approved')}</span>
+              <span><Chip size="sm" color="success" variant="soft" className="mr-1">{statusText('auto_applied')}</Chip>{t('ai.ki_agents.legend.auto_applied')}</span>
+              <span><Chip size="sm" color="danger" variant="soft" className="mr-1">{statusText('rejected')}</Chip>{t('ai.ki_agents.legend.rejected')}</span>
+              <span className="ml-2 font-medium text-foreground">{t('ai.ki_agents.legend.confidence')}</span>
               <span className="text-success-600">{t('ai.ki_agents.legend.confidence_high')}</span>
               <span className="text-warning-600">{t('ai.ki_agents.legend.confidence_medium')}</span>
               <span className="text-danger-600">{t('ai.ki_agents.legend.confidence_low')}</span>
@@ -618,7 +617,7 @@ export default function KiAgentAdminPage() {
                       )}
                     </TableCell>
                     <TableCell>
-                      <span className="text-xs text-default-400 line-clamp-2 max-w-[200px] block">
+                      <span className="block max-w-[200px] text-xs text-muted line-clamp-2">
                         {JSON.stringify(p.proposal_data).slice(0, 120)}
                         {JSON.stringify(p.proposal_data).length > 120 ? '…' : ''}
                       </span>
@@ -636,8 +635,7 @@ export default function KiAgentAdminPage() {
                         <div className="flex gap-1">
                           <Button
                             size="sm"
-                            color="success"
-                            variant="flat"
+                            variant="secondary"
                             isIconOnly
                             onPress={() => handleApprove(p.id)}
                             aria-label={t('ai.ki_agents.actions.approve')}
@@ -646,8 +644,7 @@ export default function KiAgentAdminPage() {
                           </Button>
                           <Button
                             size="sm"
-                            color="danger"
-                            variant="flat"
+                            variant="danger"
                             isIconOnly
                             onPress={() => handleReject(p.id)}
                             aria-label={t('ai.ki_agents.actions.reject')}
@@ -678,7 +675,7 @@ export default function KiAgentAdminPage() {
         >
           <div className="mt-4 space-y-4">
             {/* Trigger run */}
-            <div className="flex items-center gap-3 rounded-xl border border-default-200 p-4 flex-wrap">
+            <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border p-4">
               <Bot size={20} className="text-accent" />
               <p className="font-semibold text-sm">{t('ai.ki_agents.runs.trigger_title')}</p>
               <Select
@@ -702,7 +699,6 @@ export default function KiAgentAdminPage() {
                 ))}
               </Select>
               <Button
-                color="primary"
                 size="sm"
                 startContent={<Play size={14} />}
                 onPress={handleTriggerRun}
@@ -750,7 +746,7 @@ export default function KiAgentAdminPage() {
                     <TableCell>
                       <Button
                         size="sm"
-                        variant="flat"
+                        variant="secondary"
                         onPress={() => handleOpenRunDetail(r.id)}
                       >
                         {t('ai.ki_agents.actions.details')}
@@ -786,35 +782,35 @@ export default function KiAgentAdminPage() {
                     {/* Meta */}
                     <div className="grid grid-cols-2 gap-3 text-sm">
                       <div>
-                        <span className="text-default-500">{t('ai.ki_agents.run_detail.status')} </span>
+                        <span className="text-muted">{t('ai.ki_agents.run_detail.status')} </span>
                         <Chip size="sm" color={statusColor(selectedRun.status)}>
                           {statusText(selectedRun.status)}
                         </Chip>
                       </div>
                       <div>
-                        <span className="text-default-500">{t('ai.ki_agents.run_detail.triggered_by')} </span>
+                        <span className="text-muted">{t('ai.ki_agents.run_detail.triggered_by')} </span>
                         <span className="capitalize">{triggeredByText(selectedRun.triggered_by)}</span>
                       </div>
                       <div>
-                        <span className="text-default-500">{t('ai.ki_agents.run_detail.started')} </span>
+                        <span className="text-muted">{t('ai.ki_agents.run_detail.started')} </span>
                         {fmtDate(selectedRun.started_at, empty)}
                       </div>
                       <div>
-                        <span className="text-default-500">{t('ai.ki_agents.run_detail.duration')} </span>
+                        <span className="text-muted">{t('ai.ki_agents.run_detail.duration')} </span>
                         {durationMs(selectedRun, empty)}
                       </div>
                       <div>
-                        <span className="text-default-500">{t('ai.ki_agents.run_detail.proposals_generated')} </span>
+                        <span className="text-muted">{t('ai.ki_agents.run_detail.proposals_generated')} </span>
                         {selectedRun.proposals_generated}
                       </div>
                       <div>
-                        <span className="text-default-500">{t('ai.ki_agents.run_detail.proposals_applied')} </span>
+                        <span className="text-muted">{t('ai.ki_agents.run_detail.proposals_applied')} </span>
                         {selectedRun.proposals_applied}
                       </div>
                     </div>
 
                     {selectedRun.output_summary && (
-                      <p className="text-sm text-default-600 bg-default-50 rounded-lg p-3">
+                      <p className="rounded-lg bg-surface-secondary p-3 text-sm text-muted">
                         {selectedRun.output_summary}
                       </p>
                     )}
@@ -869,7 +865,7 @@ export default function KiAgentAdminPage() {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button variant="light" onPress={onClose}>
+                <Button variant="tertiary" onPress={onClose}>
                   {t('ai.common.close')}
                 </Button>
               </ModalFooter>

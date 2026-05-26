@@ -276,7 +276,7 @@ export function AdminSettings() {
       />
 
       <div className="space-y-4">
-        <Card shadow="sm">
+        <Card>
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Settings size={20} /> {t('system.section_general')}
@@ -286,14 +286,14 @@ export function AdminSettings() {
             <Input
               label={t('system.label_site_name')}
               placeholder={t('system.placeholder_project_nexus')}
-              variant="bordered"
+              variant="secondary"
               value={form.name}
               onValueChange={(val) => setForm(prev => ({ ...prev, name: val }))}
             />
             <Textarea
               label={t('system.label_site_description')}
               placeholder={t('system.placeholder_community_timebanking_platform')}
-              variant="bordered"
+              variant="secondary"
               minRows={2}
               value={form.description}
               onValueChange={(val) => setForm(prev => ({ ...prev, description: val }))}
@@ -301,21 +301,21 @@ export function AdminSettings() {
             <Input
               label={t('system.label_support_email')}
               placeholder="support@project-nexus.ie"
-              variant="bordered"
+              variant="secondary"
               value={form.contact_email}
               onValueChange={(val) => setForm(prev => ({ ...prev, contact_email: val }))}
             />
             <Input
               label={t('system.label_contact_phone')}
               placeholder="+1 555 123 4567"
-              variant="bordered"
+              variant="secondary"
               value={form.contact_phone}
               onValueChange={(val) => setForm(prev => ({ ...prev, contact_phone: val }))}
             />
             <Select
               label={t('system.label_default_currency')}
               description={t('system.desc_default_currency')}
-              variant="bordered"
+              variant="secondary"
               selectedKeys={[form.default_currency]}
               onSelectionChange={(keys) => {
                 const val = Array.from(keys)[0] as string | undefined;
@@ -329,7 +329,7 @@ export function AdminSettings() {
           </CardBody>
         </Card>
 
-        <Card shadow="sm">
+        <Card>
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Scale size={20} /> {t('system.section_branding_legal')}
@@ -340,7 +340,7 @@ export function AdminSettings() {
               label={t('system.label_footer_legal_text')}
               description={t('system.desc_displayed_in_the_site_footer_and_legal_h')}
               placeholder={t('system.placeholder_footer_legal_text')}
-              variant="bordered"
+              variant="secondary"
               minRows={2}
               value={form.footer_text}
               onValueChange={(val) => setForm(prev => ({ ...prev, footer_text: val }))}
@@ -348,11 +348,11 @@ export function AdminSettings() {
             {/* Partner Logo Upload */}
             <div className="space-y-2">
               <p className="text-sm font-medium">Partner Logo</p>
-              <p className="text-xs text-default-500">
+              <p className="text-xs text-muted">
                 Shown in the footer left slot. PNG, JPEG, WebP or SVG — max 2 MB.
               </p>
               {form.partner_logo_url && (
-                <div className="flex items-start gap-3 p-3 rounded-lg border border-default-200 bg-default-50">
+                <div className="flex items-start gap-3 rounded-lg border border-border bg-surface-secondary p-3">
                   <img
                     src={form.partner_logo_url}
                     alt="Partner logo preview"
@@ -362,8 +362,7 @@ export function AdminSettings() {
                   <Button
                     isIconOnly
                     size="sm"
-                    variant="flat"
-                    color="danger"
+                    variant="danger"
                     aria-label="Remove partner logo"
                     onPress={() => {
                       setForm(prev => ({ ...prev, partner_logo_url: '' }));
@@ -382,8 +381,7 @@ export function AdminSettings() {
               />
               <div className="flex gap-2 flex-wrap">
                 <Button
-                  variant="flat"
-                  color="primary"
+                  variant="secondary"
                   size="sm"
                   isLoading={uploadingLogo}
                   startContent={!uploadingLogo ? <Upload size={14} /> : undefined}
@@ -407,22 +405,22 @@ export function AdminSettings() {
 
         {/* God-only: Powered By Branding (footer right slot) */}
         {isPlatformGod && (
-          <Card shadow="sm" className="border-2 border-warning/30">
+          <Card className="border-2 border-warning/30">
             <CardHeader>
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <Lock size={18} className="text-warning" />
                 {t('system.powered_by_branding_section')}
-                <Chip size="sm" color="warning" variant="flat">{t('system.god_only_chip')}</Chip>
+                <Chip size="sm" color="warning" variant="soft">{t('system.god_only_chip')}</Chip>
               </h3>
             </CardHeader>
             <CardBody className="gap-5">
-              <p className="text-sm text-default-500">{t('system.powered_by_branding_desc')}</p>
+              <p className="text-sm text-muted">{t('system.powered_by_branding_desc')}</p>
 
               <Input
                 label={t('system.label_powered_by_label')}
                 placeholder={t('system.placeholder_powered_by_label')}
                 description={t('system.desc_powered_by_label')}
-                variant="bordered"
+                variant="secondary"
                 value={form.powered_by_label}
                 onValueChange={(val) => setForm(prev => ({ ...prev, powered_by_label: val }))}
               />
@@ -430,7 +428,7 @@ export function AdminSettings() {
                 label={t('system.label_powered_by_url')}
                 placeholder={t('system.placeholder_powered_by_url')}
                 description={t('system.desc_powered_by_url')}
-                variant="bordered"
+                variant="secondary"
                 value={form.powered_by_url}
                 onValueChange={(val) => setForm(prev => ({ ...prev, powered_by_url: val }))}
               />
@@ -439,7 +437,7 @@ export function AdminSettings() {
               <div className="space-y-2">
                 <p className="text-sm font-medium">{t('system.label_powered_by_image_light')}</p>
                 {form.powered_by_image_light && (
-                  <div className="flex items-start gap-3 p-3 rounded-lg border border-default-200 bg-default-50">
+                  <div className="flex items-start gap-3 rounded-lg border border-border bg-surface-secondary p-3">
                     <img
                       src={form.powered_by_image_light}
                       alt="Light mode preview"
@@ -447,7 +445,7 @@ export function AdminSettings() {
                       onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                     />
                     <Button
-                      isIconOnly size="sm" variant="flat" color="danger"
+                      isIconOnly size="sm" variant="danger"
                       aria-label="Remove light image"
                       onPress={() => {
                         setForm(prev => ({ ...prev, powered_by_image_light: '' }));
@@ -466,7 +464,7 @@ export function AdminSettings() {
                   onChange={(e) => handlePoweredByUpload('light', e)}
                 />
                 <Button
-                  variant="flat" color="primary" size="sm"
+                  variant="secondary" size="sm"
                   isLoading={uploadingPbLight}
                   startContent={!uploadingPbLight ? <Upload size={14} /> : undefined}
                   onPress={() => pbLightInputRef.current?.click()}
@@ -479,7 +477,7 @@ export function AdminSettings() {
               <div className="space-y-2">
                 <p className="text-sm font-medium">{t('system.label_powered_by_image_dark')}</p>
                 {form.powered_by_image_dark && (
-                  <div className="flex items-start gap-3 p-3 rounded-lg border border-default-200 bg-default-50">
+                  <div className="flex items-start gap-3 rounded-lg border border-border bg-surface-secondary p-3">
                     <img
                       src={form.powered_by_image_dark}
                       alt="Dark mode preview"
@@ -487,7 +485,7 @@ export function AdminSettings() {
                       onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                     />
                     <Button
-                      isIconOnly size="sm" variant="flat" color="danger"
+                      isIconOnly size="sm" variant="danger"
                       aria-label="Remove dark image"
                       onPress={() => {
                         setForm(prev => ({ ...prev, powered_by_image_dark: '' }));
@@ -506,7 +504,7 @@ export function AdminSettings() {
                   onChange={(e) => handlePoweredByUpload('dark', e)}
                 />
                 <Button
-                  variant="flat" color="primary" size="sm"
+                  variant="secondary" size="sm"
                   isLoading={uploadingPbDark}
                   startContent={!uploadingPbDark ? <Upload size={14} /> : undefined}
                   onPress={() => pbDarkInputRef.current?.click()}
@@ -518,11 +516,11 @@ export function AdminSettings() {
           </Card>
         )}
 
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="flex items-center justify-between">
             <h3 className="text-lg font-semibold">{t('system.section_registration_access')}</h3>
             <Link to={tenantPath("/admin/settings/registration-policy")}>
-              <Button size="sm" variant="flat" color="primary" startContent={<ShieldCheck size={14} />}>
+              <Button size="sm" variant="secondary" startContent={<ShieldCheck size={14} />}>
                 {t('system.advanced_policy')}
               </Button>
             </Link>
@@ -531,7 +529,7 @@ export function AdminSettings() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{t('system.label_open_registration')}</p>
-                <p className="text-sm text-default-500">{t('system.desc_open_registration')}</p>
+                <p className="text-sm text-muted">{t('system.desc_open_registration')}</p>
               </div>
               <Switch
                 isSelected={form.registration_mode === 'open'}
@@ -545,11 +543,11 @@ export function AdminSettings() {
                   <p className="font-medium">{t('system.require_email_verification')}</p>
                   {!isGod && (
                     <Tooltip content={t('system.super_admin_only_tooltip')}>
-                      <Chip size="sm" color="warning" variant="flat" startContent={<Lock size={10} />}>{t('system.super_admin_only')}</Chip>
+                      <Chip size="sm" color="warning" variant="soft" startContent={<Lock size={10} />}>{t('system.super_admin_only')}</Chip>
                     </Tooltip>
                   )}
                 </div>
-                <p className="text-sm text-default-500">{t('system.desc_email_verification')}</p>
+                <p className="text-sm text-muted">{t('system.desc_email_verification')}</p>
               </div>
               <Switch
                 isSelected={form.email_verification}
@@ -564,11 +562,11 @@ export function AdminSettings() {
                   <p className="font-medium">{t('system.admin_approval_required')}</p>
                   {!isGod && (
                     <Tooltip content={t('system.super_admin_only_tooltip')}>
-                      <Chip size="sm" color="warning" variant="flat" startContent={<Lock size={10} />}>{t('system.super_admin_only')}</Chip>
+                      <Chip size="sm" color="warning" variant="soft" startContent={<Lock size={10} />}>{t('system.super_admin_only')}</Chip>
                     </Tooltip>
                   )}
                 </div>
-                <p className="text-sm text-default-500">{t('system.admin_approval_required_desc')}</p>
+                <p className="text-sm text-muted">{t('system.admin_approval_required_desc')}</p>
               </div>
               <Switch
                 isSelected={form.admin_approval}
@@ -579,8 +577,8 @@ export function AdminSettings() {
             </div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-default-400">{t('system.maintenance_mode_read_only')}</p>
-                <p className="text-sm text-default-500">{t('system.maintenance_mode_cli_prefix')} <code className="text-xs bg-default-100 px-1 rounded">sudo bash scripts/maintenance.sh on|off</code></p>
+                <p className="font-medium text-muted">{t('system.maintenance_mode_read_only')}</p>
+                <p className="text-sm text-muted">{t('system.maintenance_mode_cli_prefix')} <code className="rounded bg-surface-secondary px-1 text-xs">sudo bash scripts/maintenance.sh on|off</code></p>
               </div>
               <Switch
                 isSelected={form.maintenance_mode}
@@ -593,7 +591,6 @@ export function AdminSettings() {
 
         <div className="flex justify-end">
           <Button
-            color="primary"
             startContent={!saving ? <Save size={16} /> : undefined}
             onPress={handleSave}
             isLoading={saving}
@@ -606,10 +603,10 @@ export function AdminSettings() {
             config endpoint; duplicate keys handled by the cards above are
             hidden via excludeKeys. Rendered without an outer Card to avoid
             double card nesting — SystemConfig provides its own per-group Cards. */}
-        <div className="pt-6 mt-2 border-t border-default-200">
+        <div className="mt-2 border-t border-border pt-6">
           <div className="mb-4">
             <h2 className="text-lg font-semibold text-foreground">{t('system.additional_configuration')}</h2>
-            <p className="text-sm text-default-500 mt-1">
+            <p className="mt-1 text-sm text-muted">
               {t('system.additional_configuration_desc')}
             </p>
           </div>

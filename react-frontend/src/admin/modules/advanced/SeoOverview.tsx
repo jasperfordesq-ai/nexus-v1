@@ -310,16 +310,16 @@ export function SeoOverview() {
 
       <div className="space-y-4">
         {/* SEO Health Score */}
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="flex items-center justify-between">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <BarChart3 size={20} />
               {t('seo_health_check_heading')}
             </h3>
             <div className="flex items-center gap-2">
-              <Chip color="success" variant="flat" size="sm">{t('pass_count', { count: passCount })}</Chip>
-              {warnCount > 0 && <Chip color="warning" variant="flat" size="sm">{t('warning_count', { count: warnCount })}</Chip>}
-              {failCount > 0 && <Chip color="danger" variant="flat" size="sm">{t('fail_count', { count: failCount })}</Chip>}
+              <Chip color="success" variant="soft" size="sm">{t('pass_count', { count: passCount })}</Chip>
+              {warnCount > 0 && <Chip color="warning" variant="soft" size="sm">{t('warning_count', { count: warnCount })}</Chip>}
+              {failCount > 0 && <Chip color="danger" variant="soft" size="sm">{t('fail_count', { count: failCount })}</Chip>}
             </div>
           </CardHeader>
           <CardBody>
@@ -331,7 +331,7 @@ export function SeoOverview() {
                   {check.status === 'fail' && <XCircle size={18} className="text-danger mt-0.5 shrink-0" />}
                   <div className="min-w-0">
                     <p className="font-medium text-sm">{check.name}</p>
-                    <p className="text-xs text-default-500">{check.detail}</p>
+                    <p className="text-xs text-muted">{check.detail}</p>
                   </div>
                 </div>
               ))}
@@ -340,7 +340,7 @@ export function SeoOverview() {
         </Card>
 
         {/* Tenant-level meta (stored directly on tenants table) */}
-        <Card shadow="sm">
+        <Card>
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Globe size={20} />
@@ -351,7 +351,7 @@ export function SeoOverview() {
             <Input
               label={t('label_meta_title')}
               placeholder={t('placeholder_your_timebank_name')}
-              variant="bordered"
+              variant="secondary"
               value={String(formData.tenant_meta_title || '')}
               onValueChange={(v) => updateField('tenant_meta_title', v)}
               description={t('desc_meta_title')}
@@ -359,7 +359,7 @@ export function SeoOverview() {
             <Input
               label={t('label_meta_description')}
               placeholder={t('placeholder_a_short_description_of_your_timebank')}
-              variant="bordered"
+              variant="secondary"
               value={String(formData.tenant_meta_description || '')}
               onValueChange={(v) => updateField('tenant_meta_description', v)}
               description={t('meta_description_count', { count: String(formData.tenant_meta_description || '').length })}
@@ -367,7 +367,7 @@ export function SeoOverview() {
             <Input
               label={t('label_h1_headline')}
               placeholder={t('placeholder_welcome_to_our_community')}
-              variant="bordered"
+              variant="secondary"
               value={String(formData.tenant_h1_headline || '')}
               onValueChange={(v) => updateField('tenant_h1_headline', v)}
               description={t('desc_h1_headline')}
@@ -375,7 +375,7 @@ export function SeoOverview() {
             <Input
               label={t('label_hero_intro_text')}
               placeholder={t('placeholder_exchange_skills_and_time_with_your_community')}
-              variant="bordered"
+              variant="secondary"
               value={String(formData.tenant_hero_intro || '')}
               onValueChange={(v) => updateField('tenant_hero_intro', v)}
             />
@@ -383,7 +383,7 @@ export function SeoOverview() {
         </Card>
 
         {/* Default OG Image */}
-        <Card shadow="sm">
+        <Card>
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Image size={20} />
@@ -394,14 +394,14 @@ export function SeoOverview() {
             <Input
               label={t('label_og_image_url')}
               placeholder="https://your-domain.com/images/og-default.png"
-              variant="bordered"
+              variant="secondary"
               value={String(formData.seo_og_image_url || '')}
               onValueChange={(v) => updateField('seo_og_image_url', v)}
               description={t('desc_og_image_url')}
             />
             {String(formData.seo_og_image_url || '') && (
-              <div className="border border-default-200 rounded-lg p-3">
-                <p className="text-xs text-default-500 mb-2">{t('og_image_preview')}:</p>
+              <div className="rounded-lg border border-border p-3">
+                <p className="mb-2 text-xs text-muted">{t('og_image_preview')}:</p>
                 <img
                   src={String(formData.seo_og_image_url)}
                   alt={t('og_image_preview')}
@@ -414,7 +414,7 @@ export function SeoOverview() {
         </Card>
 
         {/* Global SEO settings (stored in tenant_settings) */}
-        <Card shadow="sm">
+        <Card>
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Search size={20} />
@@ -425,7 +425,7 @@ export function SeoOverview() {
             <Input
               label={t('label_default_title_suffix')}
               placeholder=" | My Timebank"
-              variant="bordered"
+              variant="secondary"
               value={String(formData.seo_title_suffix || '')}
               onValueChange={(v) => updateField('seo_title_suffix', v)}
               description={t('desc_title_suffix')}
@@ -433,7 +433,7 @@ export function SeoOverview() {
             <Input
               label={t('label_global_meta_description')}
               placeholder={t('placeholder_community_timebanking_platform')}
-              variant="bordered"
+              variant="secondary"
               value={String(formData.seo_meta_description || '')}
               onValueChange={(v) => updateField('seo_meta_description', v)}
               description={t('global_meta_description_count', { count: String(formData.seo_meta_description || '').length })}
@@ -441,7 +441,7 @@ export function SeoOverview() {
             <Input
               label={t('label_meta_keywords')}
               placeholder="timebanking, community, exchange"
-              variant="bordered"
+              variant="secondary"
               value={String(formData.seo_meta_keywords || '')}
               onValueChange={(v) => updateField('seo_meta_keywords', v)}
               description={t('desc_meta_keywords')}
@@ -450,7 +450,7 @@ export function SeoOverview() {
         </Card>
 
         {/* SEO Feature Toggles */}
-        <Card shadow="sm">
+        <Card>
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Share2 size={20} />
@@ -461,7 +461,7 @@ export function SeoOverview() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{t('auto_generate_sitemap')}</p>
-                <p className="text-sm text-default-500">{t('auto_generate_sitemap_desc')}</p>
+                <p className="text-sm text-muted">{t('auto_generate_sitemap_desc')}</p>
               </div>
               <Switch isSelected={!!formData.seo_auto_sitemap} onValueChange={(v) => updateField('seo_auto_sitemap', v)} aria-label={t('label_auto_sitemap')} />
             </div>
@@ -469,7 +469,7 @@ export function SeoOverview() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{t('canonical_urls')}</p>
-                <p className="text-sm text-default-500">{t('canonical_urls_desc')}</p>
+                <p className="text-sm text-muted">{t('canonical_urls_desc')}</p>
               </div>
               <Switch isSelected={!!formData.seo_canonical_urls} onValueChange={(v) => updateField('seo_canonical_urls', v)} aria-label={t('canonical_urls')} />
             </div>
@@ -477,7 +477,7 @@ export function SeoOverview() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{t('open_graph_tags')}</p>
-                <p className="text-sm text-default-500">{t('open_graph_tags_desc')}</p>
+                <p className="text-sm text-muted">{t('open_graph_tags_desc')}</p>
               </div>
               <Switch isSelected={!!formData.seo_open_graph} onValueChange={(v) => updateField('seo_open_graph', v)} aria-label={t('label_open_graph')} />
             </div>
@@ -485,7 +485,7 @@ export function SeoOverview() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{t('twitter_cards')}</p>
-                <p className="text-sm text-default-500">{t('twitter_cards_desc')}</p>
+                <p className="text-sm text-muted">{t('twitter_cards_desc')}</p>
               </div>
               <Switch isSelected={!!formData.seo_twitter_cards} onValueChange={(v) => updateField('seo_twitter_cards', v)} aria-label={t('twitter_cards')} />
             </div>
@@ -493,7 +493,7 @@ export function SeoOverview() {
         </Card>
 
         {/* Verification & Robots */}
-        <Card shadow="sm">
+        <Card>
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <FileText size={20} />
@@ -504,21 +504,21 @@ export function SeoOverview() {
             <Input
               label={t('label_google_search_console_verification')}
               placeholder="google-site-verification=..."
-              variant="bordered"
+              variant="secondary"
               value={String(formData.seo_google_verification || '')}
               onValueChange={(v) => updateField('seo_google_verification', v)}
             />
             <Input
               label={t('label_bing_webmaster_verification')}
               placeholder="msvalidate.01=..."
-              variant="bordered"
+              variant="secondary"
               value={String(formData.seo_bing_verification || '')}
               onValueChange={(v) => updateField('seo_bing_verification', v)}
             />
               <Textarea
                 label={t('custom_robots_txt')}
               placeholder={t('placeholder_robots_txt')}
-                variant="bordered"
+                variant="secondary"
               minRows={4}
               value={String(formData.seo_robots_txt || '')}
               onValueChange={(v) => updateField('seo_robots_txt', v)}
@@ -528,7 +528,7 @@ export function SeoOverview() {
         </Card>
 
         {/* Sitemap Stats */}
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="flex items-center justify-between">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <FileText size={20} />
@@ -537,7 +537,7 @@ export function SeoOverview() {
             <div className="flex items-center gap-2">
               <Button
                 size="sm"
-                variant="flat"
+                variant="secondary"
                 startContent={<RefreshCw size={14} />}
                 onPress={loadSitemapStats}
                 isLoading={sitemapLoading}
@@ -546,8 +546,7 @@ export function SeoOverview() {
               </Button>
               <Button
                 size="sm"
-                variant="flat"
-                color="warning"
+                variant="secondary"
                 onPress={handleClearSitemapCache}
                 isLoading={clearingCache}
               >
@@ -575,29 +574,29 @@ export function SeoOverview() {
                 <Separator />
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium">{t('sitemap_total_urls')}</span>
-                  <Chip color="primary" variant="flat">{sitemapStats.total_urls}</Chip>
+                  <Chip color="accent" variant="soft">{sitemapStats.total_urls}</Chip>
                 </div>
                 <Separator />
                 <div>
                   <p className="text-sm font-medium mb-2">{t('sitemap_urls_by_type')}</p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {Object.entries(sitemapStats.content_types).map(([type, count]) => (
-                      <div key={type} className="flex items-center justify-between bg-default-100 rounded-lg px-3 py-2">
+                      <div key={type} className="flex items-center justify-between rounded-lg bg-surface-secondary px-3 py-2">
                         <span className="text-xs capitalize">{type.replace(/_/g, ' ')}</span>
-                        <Chip size="sm" variant="flat">{count}</Chip>
+                        <Chip size="sm" variant="soft">{count}</Chip>
                       </div>
                     ))}
                   </div>
                 </div>
               </div>
             ) : (
-              <p className="text-sm text-default-500">{t('unable_to_load_sitemap_stats')}</p>
+              <p className="text-sm text-muted">{t('unable_to_load_sitemap_stats')}</p>
             )}
           </CardBody>
         </Card>
 
         {/* Server-Side SEO Audit */}
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="flex items-center justify-between">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Search size={20} />
@@ -605,14 +604,13 @@ export function SeoOverview() {
             </h3>
             <div className="flex items-center gap-2">
               {serverAudit?.last_run_at && (
-                <span className="text-xs text-default-400">
+                <span className="text-xs text-muted">
                   {t('last_run')}: {new Date(serverAudit.last_run_at).toLocaleDateString()}
                 </span>
               )}
               <Button
                 size="sm"
-                color="primary"
-                variant="flat"
+                variant="secondary"
                 onPress={handleRunAudit}
                 isLoading={auditRunning}
               >
@@ -630,14 +628,14 @@ export function SeoOverview() {
                     {check.status === 'fail' && <XCircle size={18} className="text-danger mt-0.5 shrink-0" />}
                     <div className="min-w-0">
                       <p className="font-medium text-sm">{check.name}</p>
-                      <p className="text-xs text-default-500">{check.description}</p>
-                      {check.details && <p className="text-xs text-default-400 mt-0.5">{check.details}</p>}
+                      <p className="text-xs text-muted">{check.description}</p>
+                      {check.details && <p className="mt-0.5 text-xs text-muted">{check.details}</p>}
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-default-500">
+              <p className="text-sm text-muted">
                 {auditRunning ? t('running_audit') : t('no_audit_results_prompt')}
               </p>
             )}
@@ -647,7 +645,6 @@ export function SeoOverview() {
         {/* Save Button */}
         <div className="flex justify-end">
           <Button
-            color="primary"
             size="lg"
             startContent={<Save size={18} />}
             onPress={handleSave}

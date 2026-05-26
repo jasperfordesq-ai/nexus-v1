@@ -322,7 +322,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
           <>
             <Button
               size="sm"
-              variant="flat"
+              variant="secondary"
               startContent={<RefreshCw size={14} />}
               onPress={() => void load()}
               isLoading={loading}
@@ -331,7 +331,6 @@ export default function SuccessStoryAdminPage(): JSX.Element {
             </Button>
             <Button
               size="sm"
-              color="primary"
               startContent={<Plus size={14} />}
               onPress={openCreate}
             >
@@ -341,13 +340,13 @@ export default function SuccessStoryAdminPage(): JSX.Element {
         }
       />
 
-      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('success_stories_admin.about.title')}</p>
-              <p className="text-default-600">
+              <p className="text-foreground">
                 {t('success_stories_admin.about.body')}
               </p>
             </div>
@@ -356,7 +355,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
       </Card>
 
       {loading ? (
-        <Card shadow="sm">
+        <Card>
           <CardBody>
             <div className="flex justify-center py-12">
               <Spinner />
@@ -364,21 +363,20 @@ export default function SuccessStoryAdminPage(): JSX.Element {
           </CardBody>
         </Card>
       ) : items.length === 0 ? (
-        <Card shadow="sm">
+        <Card>
           <CardBody>
             <div className="flex flex-col items-center gap-4 py-10 text-center">
-              <div className="rounded-full bg-default-100 p-4 text-default-500">
+              <div className="rounded-full bg-surface-secondary p-4 text-muted">
                 <Award size={32} />
               </div>
               <div className="max-w-md space-y-1">
                 <h3 className="text-base font-semibold">{t('success_stories_admin.empty.title')}</h3>
-                <p className="text-sm text-default-500">
+                <p className="text-sm text-muted">
                   {t('success_stories_admin.empty.body')}
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <Button
-                  color="primary"
                   startContent={<Sparkles size={14} />}
                   onPress={() => void handleSeed()}
                   isLoading={seeding}
@@ -386,7 +384,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                   {t('success_stories_admin.actions.seed_demo')}
                 </Button>
                 <Button
-                  variant="flat"
+                  variant="secondary"
                   startContent={<Plus size={14} />}
                   onPress={openCreate}
                 >
@@ -397,7 +395,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
           </CardBody>
         </Card>
       ) : (
-        <Card shadow="sm">
+        <Card>
           <CardBody>
             <Table aria-label={t('success_stories_admin.table.aria')} removeWrapper>
               <TableHeader>
@@ -416,7 +414,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                     <TableCell>
                       <div className="flex flex-col">
                         <span className="font-medium">{s.title}</span>
-                        <span className="line-clamp-1 max-w-md text-xs text-default-500">
+                        <span className="line-clamp-1 max-w-md text-xs text-muted">
                           {s.narrative}
                         </span>
                       </div>
@@ -425,7 +423,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                       <Chip
                         size="sm"
                         color={s.is_published ? 'success' : 'default'}
-                        variant="flat"
+                        variant="soft"
                       >
                         {s.is_published ? t('success_stories_admin.status.published') : t('success_stories_admin.status.unpublished')}
                       </Chip>
@@ -434,7 +432,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                       <Chip
                         size="sm"
                         color={s.is_demo ? 'warning' : 'success'}
-                        variant="flat"
+                        variant="soft"
                       >
                         {s.is_demo ? t('success_stories_admin.status.demo') : t('success_stories_admin.status.real')}
                       </Chip>
@@ -447,7 +445,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                     <TableCell>
                       <div className="flex flex-col">
                         <span className="text-sm">{formatDelta(s)}</span>
-                        <span className="text-xs text-default-500">
+                        <span className="text-xs text-muted">
                           {t(`success_stories_admin.metric_sources.${s.metric_source}`)}
                         </span>
                       </div>
@@ -458,7 +456,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                           <Tooltip content={t('success_stories_admin.actions.refresh_live')}>
                             <Button
                               size="sm"
-                              variant="light"
+                              variant="ghost"
                               isIconOnly
                               aria-label={t('success_stories_admin.actions.refresh_live')}
                               onPress={() => void handleRefresh(s)}
@@ -470,7 +468,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                         )}
                         <Button
                           size="sm"
-                          variant="light"
+                          variant="ghost"
                           isIconOnly
                           aria-label={t('success_stories_admin.actions.edit')}
                           onPress={() => openEdit(s)}
@@ -479,8 +477,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                         </Button>
                         <Button
                           size="sm"
-                          variant="light"
-                          color="danger"
+                          variant="danger"
                           isIconOnly
                           aria-label={t('success_stories_admin.actions.delete')}
                           onPress={() => openDelete(s)}
@@ -513,7 +510,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
               <Input
                 label={t('success_stories_admin.editor.title')}
                 placeholder={t('success_stories_admin.editor.title_placeholder')}
-                variant="bordered"
+                variant="secondary"
                 isRequired
                 value={form.title}
                 onValueChange={(v) => setForm({ ...form, title: v })}
@@ -522,7 +519,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
               <Textarea
                 label={t('success_stories_admin.editor.narrative')}
                 placeholder={t('success_stories_admin.editor.narrative_placeholder')}
-                variant="bordered"
+                variant="secondary"
                 isRequired
                 minRows={3}
                 value={form.narrative}
@@ -532,7 +529,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <Select
                   label={t('success_stories_admin.editor.metric_source')}
-                  variant="bordered"
+                  variant="secondary"
                   description={t('success_stories_admin.editor.metric_source_description')}
                   selectedKeys={[form.metric_source]}
                   onChange={(e) =>
@@ -551,7 +548,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                   label={t('success_stories_admin.editor.metric_key')}
                   placeholder={t('success_stories_admin.editor.metric_key_placeholder')}
                   description={t('success_stories_admin.editor.metric_key_description')}
-                  variant="bordered"
+                  variant="secondary"
                   value={form.metric_key}
                   onValueChange={(v) => setForm({ ...form, metric_key: v })}
                 />
@@ -561,21 +558,21 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                 <Input
                   label={t('success_stories_admin.editor.before_value')}
                   type="number"
-                  variant="bordered"
+                  variant="secondary"
                   value={form.before_value}
                   onValueChange={(v) => setForm({ ...form, before_value: v })}
                 />
                 <Input
                   label={t('success_stories_admin.editor.after_value')}
                   type="number"
-                  variant="bordered"
+                  variant="secondary"
                   value={form.after_value}
                   onValueChange={(v) => setForm({ ...form, after_value: v })}
                 />
                 <Input
                   label={t('success_stories_admin.editor.unit')}
                   placeholder={t('success_stories_admin.editor.unit_placeholder')}
-                  variant="bordered"
+                  variant="secondary"
                   value={form.unit}
                   onValueChange={(v) => setForm({ ...form, unit: v })}
                 />
@@ -584,7 +581,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <Select
                   label={t('success_stories_admin.editor.audience')}
-                  variant="bordered"
+                  variant="secondary"
                   selectedKeys={[form.audience]}
                   onChange={(e) =>
                     setForm({ ...form, audience: e.target.value || 'all_residents' })
@@ -598,7 +595,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                 <Input
                   label={t('success_stories_admin.editor.sub_region_id')}
                   placeholder={t('success_stories_admin.editor.sub_region_placeholder')}
-                  variant="bordered"
+                  variant="secondary"
                   value={form.sub_region_id}
                   onValueChange={(v) => setForm({ ...form, sub_region_id: v })}
                 />
@@ -608,7 +605,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                 label={t('success_stories_admin.editor.method_caveat')}
                 placeholder={t('success_stories_admin.editor.method_caveat_placeholder')}
                 description={t('success_stories_admin.editor.method_caveat_description')}
-                variant="bordered"
+                variant="secondary"
                 isRequired
                 minRows={2}
                 value={form.method_caveat}
@@ -619,7 +616,7 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                 label={t('success_stories_admin.editor.evidence_source')}
                 placeholder={t('success_stories_admin.editor.evidence_source_placeholder')}
                 description={t('success_stories_admin.editor.evidence_source_description')}
-                variant="bordered"
+                variant="secondary"
                 isRequired
                 value={form.evidence_source}
                 onValueChange={(v) => setForm({ ...form, evidence_source: v })}
@@ -628,10 +625,10 @@ export default function SuccessStoryAdminPage(): JSX.Element {
               <Separator />
 
               <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-                <div className="flex items-center justify-between rounded-lg border border-default-200 px-4 py-3">
+                <div className="flex items-center justify-between rounded-lg border border-border bg-surface-secondary px-4 py-3">
                   <div>
                     <p className="text-sm font-medium">{t('success_stories_admin.editor.demo_label')}</p>
-                    <p className="text-xs text-default-500">
+                    <p className="text-xs text-muted">
                       {t('success_stories_admin.editor.demo_description')}
                     </p>
                   </div>
@@ -640,10 +637,10 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                     onValueChange={(v) => setForm({ ...form, is_demo: v })}
                   />
                 </div>
-                <div className="flex items-center justify-between rounded-lg border border-default-200 px-4 py-3">
+                <div className="flex items-center justify-between rounded-lg border border-border bg-surface-secondary px-4 py-3">
                   <div>
                     <p className="text-sm font-medium">{t('success_stories_admin.editor.published_label')}</p>
-                    <p className="text-xs text-default-500">
+                    <p className="text-xs text-muted">
                       {t('success_stories_admin.editor.published_description')}
                     </p>
                   </div>
@@ -656,11 +653,10 @@ export default function SuccessStoryAdminPage(): JSX.Element {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={editModal.onClose}>
+            <Button variant="tertiary" onPress={editModal.onClose}>
               {t('success_stories_admin.actions.cancel')}
             </Button>
             <Button
-              color="primary"
               onPress={() => void handleSave()}
               isDisabled={!isFormValid}
               isLoading={saving}
@@ -684,16 +680,16 @@ export default function SuccessStoryAdminPage(): JSX.Element {
                   {t('success_stories_admin.delete_modal.body_suffix')}
                 </p>
                 <Separator />
-                <p className="text-xs text-default-500">{t('success_stories_admin.delete_modal.warning')}</p>
+                <p className="text-xs text-muted">{t('success_stories_admin.delete_modal.warning')}</p>
               </div>
             ) : null}
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={deleteModal.onClose}>
+            <Button variant="tertiary" onPress={deleteModal.onClose}>
               {t('success_stories_admin.actions.cancel')}
             </Button>
             <Button
-              color="danger"
+              variant="danger"
               onPress={() => void handleDelete()}
               isLoading={deleting}
             >

@@ -173,11 +173,11 @@ export function GroupEdit() {
   if (loadError) {
     return (
       <div className="max-w-3xl mx-auto px-4 pb-8">
-        <div className="flex flex-col items-center justify-center py-16 text-center gap-4 text-default-500">
+        <div className="flex flex-col items-center justify-center py-16 text-center gap-4 text-muted">
           <AlertTriangle size={40} className="text-warning" />
           <p className="text-lg font-medium">{loadError}</p>
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<ArrowLeft size={16} />}
             onPress={() => navigate(tenantPath('/admin/groups'))}
           >
@@ -195,7 +195,7 @@ export function GroupEdit() {
         description={t('groups.edit_page_desc')}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<ArrowLeft size={16} />}
             onPress={() => navigate(tenantPath('/admin/groups'))}
           >
@@ -209,14 +209,14 @@ export function GroupEdit() {
         {/* Images */}
         <Card>
           <CardHeader className="flex items-center gap-2 pb-0">
-            <Image size={18} className="text-default-500" />
+            <Image size={18} className="text-muted" />
             <h3 className="font-semibold">{t('groups.edit_section_images')}</h3>
           </CardHeader>
           <CardBody className="flex flex-col gap-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Avatar */}
               <div className="flex flex-col gap-2">
-                <p className="text-sm font-medium text-default-600">{t('groups.edit_label_avatar')}</p>
+                <p className="text-sm font-medium text-muted">{t('groups.edit_label_avatar')}</p>
                 <div className="flex items-center gap-3">
                   <Avatar
                     src={imageUrl ? resolveAssetUrl(imageUrl) : undefined}
@@ -226,7 +226,7 @@ export function GroupEdit() {
                   />
                   <Button
                     size="sm"
-                    variant="flat"
+                    variant="tertiary"
                     isLoading={uploadingAvatar}
                     onPress={() => avatarInputRef.current?.click()}
                   >
@@ -244,7 +244,7 @@ export function GroupEdit() {
 
               {/* Cover */}
               <div className="flex flex-col gap-2">
-                <p className="text-sm font-medium text-default-600">{t('groups.edit_label_cover')}</p>
+                <p className="text-sm font-medium text-muted">{t('groups.edit_label_cover')}</p>
                 <div className="flex flex-col gap-2">
                   {coverImageUrl && (
                     <img
@@ -255,7 +255,7 @@ export function GroupEdit() {
                   )}
                   <Button
                     size="sm"
-                    variant="flat"
+                    variant="tertiary"
                     isLoading={uploadingCover}
                     onPress={() => coverInputRef.current?.click()}
                   >
@@ -277,7 +277,7 @@ export function GroupEdit() {
         {/* Basic info */}
         <Card>
           <CardHeader className="flex items-center gap-2 pb-0">
-            <Users size={18} className="text-default-500" />
+            <Users size={18} className="text-muted" />
             <h3 className="font-semibold">{t('groups.edit_section_basic')}</h3>
           </CardHeader>
           <CardBody className="flex flex-col gap-4">
@@ -285,7 +285,7 @@ export function GroupEdit() {
               label={t('groups.edit_label_name')}
               value={name}
               onValueChange={setName}
-              variant="bordered"
+              variant="secondary"
               isRequired
               maxLength={255}
               description={name.length > 200 ? `${name.length}/255` : undefined}
@@ -294,7 +294,7 @@ export function GroupEdit() {
               label={t('groups.edit_label_description')}
               value={description}
               onValueChange={setDescription}
-              variant="bordered"
+              variant="secondary"
               minRows={3}
               maxRows={8}
             />
@@ -302,9 +302,9 @@ export function GroupEdit() {
               label={t('groups.edit_label_location')}
               value={location}
               onValueChange={setLocation}
-              variant="bordered"
+              variant="secondary"
               placeholder={t('groups.edit_placeholder_location')}
-              startContent={<MapPin size={14} className="text-default-400" />}
+              startContent={<MapPin size={14} className="text-muted" />}
             />
           </CardBody>
         </Card>
@@ -312,7 +312,7 @@ export function GroupEdit() {
         {/* Group Type */}
         <Card>
           <CardHeader className="flex items-center gap-2 pb-0">
-            <Settings size={18} className="text-default-500" />
+            <Settings size={18} className="text-muted" />
             <h3 className="font-semibold">{t('groups.edit_section_type')}</h3>
           </CardHeader>
           <CardBody>
@@ -323,7 +323,7 @@ export function GroupEdit() {
                 const val = Array.from(keys)[0] as string | undefined;
                 setTypeId(val ?? '');
               }}
-              variant="bordered"
+              variant="secondary"
               placeholder={t('groups.edit_placeholder_type')}
             >
               {groupTypes.map((gt) => (
@@ -336,7 +336,7 @@ export function GroupEdit() {
                       />
                     )}
                     <span>{gt.name}</span>
-                    <Chip size="sm" variant="flat" className="ml-auto text-xs">
+                    <Chip size="sm" variant="soft" className="ml-auto text-xs">
                       {gt.member_count}
                     </Chip>
                   </div>
@@ -344,7 +344,7 @@ export function GroupEdit() {
               ))}
             </Select>
             {groupTypes.length === 0 && (
-              <p className="text-xs text-default-400 mt-1">{t('groups.edit_no_types')}</p>
+              <p className="text-xs text-muted mt-1">{t('groups.edit_no_types')}</p>
             )}
           </CardBody>
         </Card>
@@ -352,7 +352,7 @@ export function GroupEdit() {
         {/* Visibility & Status */}
         <Card>
           <CardHeader className="flex items-center gap-2 pb-0">
-            <Shield size={18} className="text-default-500" />
+            <Shield size={18} className="text-muted" />
             <h3 className="font-semibold">{t('groups.edit_section_visibility')}</h3>
           </CardHeader>
           <CardBody className="flex flex-col gap-4">
@@ -360,7 +360,7 @@ export function GroupEdit() {
               label={t('groups.edit_label_visibility')}
               selectedKeys={[visibility]}
               onSelectionChange={(keys) => setVisibility(Array.from(keys)[0] as string)}
-              variant="bordered"
+              variant="secondary"
             >
               <SelectItem key="public" id="public">{t('groups.visibility_public')}</SelectItem>
               <SelectItem key="private" id="private">{t('groups.visibility_private')}</SelectItem>
@@ -369,7 +369,7 @@ export function GroupEdit() {
               label={t('groups.edit_label_status')}
               selectedKeys={[status]}
               onSelectionChange={(keys) => setStatus(Array.from(keys)[0] as string)}
-              variant="bordered"
+              variant="secondary"
             >
               <SelectItem key="active" id="active">{t('groups.status_active')}</SelectItem>
               <SelectItem key="inactive" id="inactive">{t('groups.status_inactive')}</SelectItem>
@@ -382,7 +382,7 @@ export function GroupEdit() {
         {hasFeature('federation') && (
           <Card>
             <CardHeader className="flex items-center gap-2 pb-0">
-              <Globe size={18} className="text-default-500" />
+              <Globe size={18} className="text-muted" />
               <h3 className="font-semibold">{t('groups.edit_section_federation')}</h3>
             </CardHeader>
             <CardBody>
@@ -390,7 +390,7 @@ export function GroupEdit() {
                 label={t('groups.edit_label_federated_visibility')}
                 selectedKeys={[federatedVisibility]}
                 onSelectionChange={(keys) => setFederatedVisibility(Array.from(keys)[0] as 'none' | 'listed' | 'joinable')}
-                variant="bordered"
+                variant="secondary"
                 description={t('groups.edit_federated_desc')}
               >
                 <SelectItem key="none" id="none">{t('groups.federated_none')}</SelectItem>
@@ -404,14 +404,14 @@ export function GroupEdit() {
         {/* Admin Controls */}
         <Card>
           <CardHeader className="flex items-center gap-2 pb-0">
-            <Star size={18} className="text-default-500" />
+            <Star size={18} className="text-muted" />
             <h3 className="font-semibold">{t('groups.edit_section_admin')}</h3>
           </CardHeader>
           <CardBody>
             <div className="flex items-center justify-between py-1">
               <div>
                 <p className="text-sm font-medium">{t('groups.edit_label_featured')}</p>
-                <p className="text-xs text-default-400">{t('groups.edit_featured_desc')}</p>
+                <p className="text-xs text-muted">{t('groups.edit_featured_desc')}</p>
               </div>
               <Switch
                 isSelected={isFeatured}
@@ -425,25 +425,25 @@ export function GroupEdit() {
         {/* Branding */}
         <Card>
           <CardHeader className="flex items-center gap-2 pb-0">
-            <Palette size={18} className="text-default-500" />
+            <Palette size={18} className="text-muted" />
             <h3 className="font-semibold">{t('groups.edit_section_branding')}</h3>
           </CardHeader>
           <CardBody className="flex flex-col gap-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-default-600">{t('groups.edit_label_primary_color')}</label>
+                <label className="text-sm font-medium text-muted">{t('groups.edit_label_primary_color')}</label>
                 <div className="flex items-center gap-2">
                   <input
                     type="color"
                     value={primaryColor || '#6366f1'}
                     onChange={(e) => setPrimaryColor(e.target.value)}
-                    className="w-10 h-10 rounded cursor-pointer border border-default-200"
+                    className="w-10 h-10 rounded cursor-pointer border border-border"
                     aria-label={t('groups.edit_label_primary_color')}
                   />
                   <Input
                     value={primaryColor}
                     onValueChange={(v) => setPrimaryColor(v)}
-                    variant="bordered"
+                    variant="secondary"
                     size="sm"
                     placeholder="#6366f1"
                     maxLength={7}
@@ -452,7 +452,7 @@ export function GroupEdit() {
                   {primaryColor && (
                     <Button
                       size="sm"
-                      variant="light"
+                      variant="tertiary"
                       isIconOnly
                       onPress={() => setPrimaryColor('')}
                       aria-label={t('groups.clear_primary_color')}
@@ -463,19 +463,19 @@ export function GroupEdit() {
                 </div>
               </div>
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-default-600">{t('groups.edit_label_accent_color')}</label>
+                <label className="text-sm font-medium text-muted">{t('groups.edit_label_accent_color')}</label>
                 <div className="flex items-center gap-2">
                   <input
                     type="color"
                     value={accentColor || '#8b5cf6'}
                     onChange={(e) => setAccentColor(e.target.value)}
-                    className="w-10 h-10 rounded cursor-pointer border border-default-200"
+                    className="w-10 h-10 rounded cursor-pointer border border-border"
                     aria-label={t('groups.edit_label_accent_color')}
                   />
                   <Input
                     value={accentColor}
                     onValueChange={(v) => setAccentColor(v)}
-                    variant="bordered"
+                    variant="secondary"
                     size="sm"
                     placeholder="#8b5cf6"
                     maxLength={7}
@@ -484,7 +484,7 @@ export function GroupEdit() {
                   {accentColor && (
                     <Button
                       size="sm"
-                      variant="light"
+                      variant="tertiary"
                       isIconOnly
                       onPress={() => setAccentColor('')}
                       aria-label={t('groups.clear_accent_color')}
@@ -505,15 +505,15 @@ export function GroupEdit() {
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div>
                   <p className="text-2xl font-bold">{group.member_count}</p>
-                  <p className="text-xs text-default-500">{t('groups.members')}</p>
+                  <p className="text-xs text-muted">{t('groups.members')}</p>
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{group.stats.posts_count}</p>
-                  <p className="text-xs text-default-500">{t('groups.edit_stat_posts')}</p>
+                  <p className="text-xs text-muted">{t('groups.edit_stat_posts')}</p>
                 </div>
                 <div>
                   <p className="text-2xl font-bold">{group.stats.events_count}</p>
-                  <p className="text-xs text-default-500">{t('groups.edit_stat_events')}</p>
+                  <p className="text-xs text-muted">{t('groups.edit_stat_events')}</p>
                 </div>
               </div>
             </CardBody>
@@ -523,13 +523,12 @@ export function GroupEdit() {
         {/* Actions */}
         <div className="flex justify-end gap-3">
           <Button
-            variant="flat"
+            variant="tertiary"
             onPress={() => navigate(tenantPath('/admin/groups'))}
           >
             {t('groups.edit_cancel')}
           </Button>
           <Button
-            color="primary"
             startContent={<Save size={16} />}
             onPress={handleSave}
             isLoading={submitting}

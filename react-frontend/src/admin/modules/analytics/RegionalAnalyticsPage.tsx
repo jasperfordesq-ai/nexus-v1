@@ -151,11 +151,11 @@ function PercentBar({ label, value, total, color = 'bg-accent' }: { label: strin
   const width = total > 0 ? Math.round((value / total) * 100) : 0;
   return (
     <div className="flex items-center gap-3 py-1.5">
-      <div className="w-28 shrink-0 text-right text-sm text-default-600">{label}</div>
-      <div className="flex-1 rounded-full bg-default-100" style={{ height: 12 }}>
+      <div className="w-28 shrink-0 text-right text-sm text-muted">{label}</div>
+      <div className="flex-1 rounded-full bg-surface-secondary" style={{ height: 12 }}>
         <div className={`h-full rounded-full ${color}`} style={{ width: `${width}%`, minWidth: width > 0 ? 4 : 0 }} />
       </div>
-      <div className="w-20 shrink-0 text-sm text-default-500">
+      <div className="w-20 shrink-0 text-sm text-muted">
         {value.toLocaleString()} ({width}%)
       </div>
     </div>
@@ -172,7 +172,7 @@ function HeatmapTab({ data, t }: { data: HeatmapCell[]; t: AdminT }) {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-default-500">
+      <p className="text-sm text-muted">
         {t('analytics.regional.heatmap.description')}
       </p>
       <Table aria-label={t('analytics.regional.sections.geographic_activity_density')} removeWrapper>
@@ -188,12 +188,12 @@ function HeatmapTab({ data, t }: { data: HeatmapCell[]; t: AdminT }) {
             const barWidth = Math.round((cell.count / maxCount) * 100);
             return (
               <TableRow key={`${cell.lat}-${cell.lng}-${i}`}>
-                <TableCell className="text-default-400">{i + 1}</TableCell>
+                <TableCell className="text-muted">{i + 1}</TableCell>
                 <TableCell className="font-mono">{cell.lat.toFixed(2)}</TableCell>
                 <TableCell className="font-mono">{cell.lng.toFixed(2)}</TableCell>
                 <TableCell className="font-semibold">{cell.count}</TableCell>
                 <TableCell>
-                  <div className="h-3 w-32 rounded-full bg-default-100">
+                  <div className="h-3 w-32 rounded-full bg-surface-secondary">
                     <div className="h-full rounded-full bg-accent" style={{ width: `${barWidth}%` }} />
                   </div>
                 </TableCell>
@@ -203,7 +203,7 @@ function HeatmapTab({ data, t }: { data: HeatmapCell[]; t: AdminT }) {
         </TableBody>
       </Table>
       {data.length === 0 && (
-        <p className="text-sm text-default-400">{t('analytics.regional.empty.no_geographic_data')}</p>
+        <p className="text-sm text-muted">{t('analytics.regional.empty.no_geographic_data')}</p>
       )}
     </div>
   );
@@ -216,7 +216,7 @@ function DemographicsTab({ data, t }: { data: DemographicsData; t: AdminT }) {
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       {/* Age distribution */}
-      <Card shadow="sm">
+      <Card >
         <CardHeader>
           <h3 className="text-base font-semibold">{t('analytics.regional.demographics.age_distribution')}</h3>
         </CardHeader>
@@ -233,12 +233,12 @@ function DemographicsTab({ data, t }: { data: DemographicsData; t: AdminT }) {
               />
             );
           })}
-          <p className="mt-3 text-xs text-default-400">{t('analytics.regional.demographics.total_with_data', { total: totalAge.toLocaleString() })}</p>
+          <p className="mt-3 text-xs text-muted">{t('analytics.regional.demographics.total_with_data', { total: totalAge.toLocaleString() })}</p>
         </CardBody>
       </Card>
 
       {/* Language distribution */}
-      <Card shadow="sm">
+      <Card >
         <CardHeader>
           <h3 className="text-base font-semibold">{t('analytics.regional.demographics.language_distribution')}</h3>
         </CardHeader>
@@ -252,12 +252,12 @@ function DemographicsTab({ data, t }: { data: DemographicsData; t: AdminT }) {
               color="bg-default"
             />
           ))}
-          <p className="mt-3 text-xs text-default-400">{t('analytics.regional.demographics.total_active_members', { total: totalLang.toLocaleString() })}</p>
+          <p className="mt-3 text-xs text-muted">{t('analytics.regional.demographics.total_active_members', { total: totalLang.toLocaleString() })}</p>
         </CardBody>
       </Card>
 
       {/* Monthly growth table */}
-      <Card shadow="sm" className="lg:col-span-2">
+      <Card  className="lg:col-span-2">
         <CardHeader>
           <h3 className="text-base font-semibold">{t('analytics.regional.demographics.member_growth_12m')}</h3>
         </CardHeader>
@@ -273,7 +273,7 @@ function DemographicsTab({ data, t }: { data: DemographicsData; t: AdminT }) {
                 <TableRow key={row.month}>
                   <TableCell className="font-mono">{row.month}</TableCell>
                   <TableCell className="font-semibold text-success">{row.new_members.toLocaleString()}</TableCell>
-                  <TableCell className="text-default-600">{row.cumulative.toLocaleString()}</TableCell>
+                  <TableCell className="text-muted">{row.cumulative.toLocaleString()}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -305,7 +305,7 @@ function DemandSupplyTab({ data, t }: { data: DemandSupplyRow[]; t: AdminT }) {
                 <Chip
                   size="sm"
                   color={row.ratio >= 2 ? 'danger' : row.ratio >= 1 ? 'warning' : 'success'}
-                  variant="flat"
+                  variant="tertiary"
                 >
                   {row.ratio === 999 ? t('analytics.regional.empty.infinity') : row.ratio.toFixed(2)}
                 </Chip>
@@ -316,7 +316,7 @@ function DemandSupplyTab({ data, t }: { data: DemandSupplyRow[]; t: AdminT }) {
         </TableBody>
       </Table>
       {data.length === 0 && (
-        <p className="mt-4 text-sm text-default-400">{t('analytics.regional.empty.no_listing_data')}</p>
+        <p className="mt-4 text-sm text-muted">{t('analytics.regional.empty.no_listing_data')}</p>
       )}
     </div>
   );
@@ -344,7 +344,7 @@ function EngagementTab({ data, t }: { data: EngagementRow[]; t: AdminT }) {
                 <TableCell className="font-mono">{row.month}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <div className="h-3 w-20 rounded-full bg-default-100">
+                    <div className="h-3 w-20 rounded-full bg-surface-secondary">
                       <div className="h-full rounded-full bg-accent" style={{ width: `${barWidth}%` }} />
                     </div>
                     <span className="font-semibold">{row.active_members.toLocaleString()}</span>
@@ -360,7 +360,7 @@ function EngagementTab({ data, t }: { data: EngagementRow[]; t: AdminT }) {
         </TableBody>
       </Table>
       {data.length === 0 && (
-        <p className="mt-4 text-sm text-default-400">{t('analytics.regional.empty.no_engagement_data')}</p>
+        <p className="mt-4 text-sm text-muted">{t('analytics.regional.empty.no_engagement_data')}</p>
       )}
     </div>
   );
@@ -371,32 +371,32 @@ function VolunteerTab({ data, t }: { data: VolunteerData; t: AdminT }) {
     <div className="space-y-6">
       {/* Summary stats */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-        <Card shadow="sm">
+        <Card >
           <CardBody className="p-4">
-            <p className="text-xs text-default-500">{t('analytics.regional.volunteer.total_hours')}</p>
+            <p className="text-xs text-muted">{t('analytics.regional.volunteer.total_hours')}</p>
             <p className="text-2xl font-bold text-accent">{data.total_hours.toLocaleString()}</p>
           </CardBody>
         </Card>
-        <Card shadow="sm">
+        <Card >
           <CardBody className="p-4">
-            <p className="text-xs text-default-500">{t('analytics.regional.volunteer.avg_hours_per_volunteer')}</p>
+            <p className="text-xs text-muted">{t('analytics.regional.volunteer.avg_hours_per_volunteer')}</p>
             <p className="text-2xl font-bold text-success">{data.avg_hours_per_volunteer.toLocaleString()}</p>
           </CardBody>
         </Card>
-        <Card shadow="sm">
+        <Card >
           <CardBody className="p-4">
-            <p className="text-xs text-default-500">{t('analytics.regional.volunteer.reciprocity_ratio')}</p>
+            <p className="text-xs text-muted">{t('analytics.regional.volunteer.reciprocity_ratio')}</p>
             <p className="text-2xl font-bold text-accent">
               {(data.reciprocity_ratio * 100).toFixed(1)}%
             </p>
-            <p className="text-xs text-default-400">{t('analytics.regional.volunteer.reciprocity_description')}</p>
+            <p className="text-xs text-muted">{t('analytics.regional.volunteer.reciprocity_description')}</p>
           </CardBody>
         </Card>
       </div>
 
       {/* Top orgs table */}
       <div>
-        <h3 className="mb-3 text-sm font-semibold text-default-600">{t('analytics.regional.volunteer.top_orgs_title')}</h3>
+        <h3 className="mb-3 text-sm font-semibold text-muted">{t('analytics.regional.volunteer.top_orgs_title')}</h3>
         <div>
           <Table aria-label={t('analytics.regional.volunteer.top_orgs_title')} removeWrapper>
             <TableHeader>
@@ -408,7 +408,7 @@ function VolunteerTab({ data, t }: { data: VolunteerData; t: AdminT }) {
             <TableBody>
               {data.top_orgs.map((org, i) => (
                 <TableRow key={org.org_id}>
-                  <TableCell className="text-default-400">{i + 1}</TableCell>
+                  <TableCell className="text-muted">{i + 1}</TableCell>
                   <TableCell className="font-medium">{org.org_name}</TableCell>
                   <TableCell className="font-semibold">{org.total_hours.toLocaleString()}</TableCell>
                   <TableCell>{org.volunteers.toLocaleString()}</TableCell>
@@ -417,7 +417,7 @@ function VolunteerTab({ data, t }: { data: VolunteerData; t: AdminT }) {
             </TableBody>
           </Table>
           {data.top_orgs.length === 0 && (
-            <p className="mt-4 text-sm text-default-400">{t('analytics.regional.empty.no_organisation_data')}</p>
+            <p className="mt-4 text-sm text-muted">{t('analytics.regional.empty.no_organisation_data')}</p>
           )}
         </div>
       </div>
@@ -430,7 +430,7 @@ function HelpRequestsTab({ data, t }: { data: HelpRequestData; t: AdminT }) {
     <div className="space-y-6">
       {/* By category */}
       <div>
-        <h3 className="mb-3 text-sm font-semibold text-default-600">{t('analytics.regional.help.by_category')}</h3>
+        <h3 className="mb-3 text-sm font-semibold text-muted">{t('analytics.regional.help.by_category')}</h3>
         <div>
           <Table aria-label={t('analytics.regional.help.by_category')} removeWrapper>
             <TableHeader>
@@ -450,7 +450,7 @@ function HelpRequestsTab({ data, t }: { data: HelpRequestData; t: AdminT }) {
                     <Chip
                       size="sm"
                       color={row.resolution_rate >= 70 ? 'success' : row.resolution_rate >= 40 ? 'warning' : 'danger'}
-                      variant="flat"
+                      variant="tertiary"
                     >
                       {row.resolution_rate}%
                     </Chip>
@@ -465,14 +465,14 @@ function HelpRequestsTab({ data, t }: { data: HelpRequestData; t: AdminT }) {
             </TableBody>
           </Table>
           {data.by_category.length === 0 && (
-            <p className="mt-4 text-sm text-default-400">{t('analytics.regional.empty.no_help_request_data')}</p>
+            <p className="mt-4 text-sm text-muted">{t('analytics.regional.empty.no_help_request_data')}</p>
           )}
         </div>
       </div>
 
       {/* Resolution trend */}
       <div>
-        <h3 className="mb-3 text-sm font-semibold text-default-600">{t('analytics.regional.help.resolution_trend_6m')}</h3>
+        <h3 className="mb-3 text-sm font-semibold text-muted">{t('analytics.regional.help.resolution_trend_6m')}</h3>
         <div>
           <Table aria-label={t('analytics.regional.help.resolution_trend_6m')} removeWrapper>
             <TableHeader>
@@ -491,7 +491,7 @@ function HelpRequestsTab({ data, t }: { data: HelpRequestData; t: AdminT }) {
                     <Chip
                       size="sm"
                       color={row.resolution_rate >= 70 ? 'success' : row.resolution_rate >= 40 ? 'warning' : 'danger'}
-                      variant="flat"
+                      variant="tertiary"
                     >
                       {row.resolution_rate}%
                     </Chip>
@@ -664,7 +664,7 @@ export default function RegionalAnalyticsPage() {
           }}
           className="w-44"
           size="sm"
-          variant="bordered"
+          variant="secondary"
         >
           <SelectItem key="last_30d" id="last_30d">{t('analytics.regional.periods.last_30d')}</SelectItem>
           <SelectItem key="last_90d" id="last_90d">{t('analytics.regional.periods.last_90d')}</SelectItem>
@@ -674,7 +674,7 @@ export default function RegionalAnalyticsPage() {
 
         <Button
           size="sm"
-          variant="bordered"
+          variant="secondary"
           startContent={<RefreshCw size={14} />}
           isLoading={invalidating}
           onPress={handleInvalidate}
@@ -684,8 +684,7 @@ export default function RegionalAnalyticsPage() {
 
         <Button
           size="sm"
-          color="primary"
-          variant="flat"
+          variant="tertiary"
           startContent={<Download size={14} />}
           onPress={handleExport}
         >
@@ -699,7 +698,7 @@ export default function RegionalAnalyticsPage() {
           label={t('analytics.regional.stats.active_members')}
           value={overviewData?.active_members ?? t('analytics.regional.empty_value')}
           icon={Users}
-          color="primary"
+          color="default"
           loading={overviewLoading}
           description={t('analytics.regional.stats.active_members_description')}
         />
@@ -723,7 +722,7 @@ export default function RegionalAnalyticsPage() {
           label={t('analytics.regional.stats.most_needed_category')}
           value={overviewData?.most_needed_category ?? t('analytics.regional.empty_value')}
           icon={TrendingUp}
-          color="secondary"
+          color="default"
           loading={overviewLoading}
           description={t('analytics.regional.stats.most_needed_description')}
         />
@@ -738,7 +737,7 @@ export default function RegionalAnalyticsPage() {
       )}
 
       {/* Section tabs */}
-      <Card shadow="sm">
+      <Card >
         <CardBody className="p-0">
           <Tabs
             aria-label={t('analytics.regional.tabs.aria')}
@@ -763,7 +762,7 @@ export default function RegionalAnalyticsPage() {
                     <HeatmapTab data={tabData['heatmap'] as HeatmapCell[]} t={t} />
                   )}
                   {!tabData['heatmap'] && !tabLoading['heatmap'] && !tabError['heatmap'] && (
-                    <p className="text-sm text-default-400">{t('analytics.regional.empty.select_tab_to_load')}</p>
+                    <p className="text-sm text-muted">{t('analytics.regional.empty.select_tab_to_load')}</p>
                   )}
                 </TabPanel>
               </div>
@@ -801,7 +800,7 @@ export default function RegionalAnalyticsPage() {
             >
               <div className="p-4">
                 <h2 className="mb-4 text-base font-semibold">{t('analytics.regional.sections.demand_supply_by_category')}</h2>
-                <p className="mb-4 text-sm text-default-500">
+                <p className="mb-4 text-sm text-muted">
                   {t('analytics.regional.sections.demand_supply_note')}
                 </p>
                 <TabPanel loading={!!tabLoading['demand']} error={tabError['demand'] ?? null} t={t}>

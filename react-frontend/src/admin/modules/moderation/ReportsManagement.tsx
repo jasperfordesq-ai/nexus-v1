@@ -173,7 +173,7 @@ export default function ReportsManagement() {
           />
           <div className="flex flex-col">
             <span className="text-sm font-medium">{report.reporter_name}</span>
-            <span className="text-xs text-default-400">
+            <span className="text-xs text-muted">
               {t('moderation.member_id', { id: report.reporter_id })}
             </span>
           </div>
@@ -184,7 +184,7 @@ export default function ReportsManagement() {
     if (isSuperAdmin) {
       cells.push(
         <TableCell key="tenant">
-          <Chip size="sm" variant="flat" color="secondary">
+          <Chip size="sm" variant="soft" color="default">
             {report.tenant_name}
           </Chip>
         </TableCell>
@@ -193,7 +193,7 @@ export default function ReportsManagement() {
 
     cells.push(
       <TableCell key="contentType">
-        <Chip size="sm" variant="flat">
+        <Chip size="sm" variant="soft">
           {report.content_type}
         </Chip>
       </TableCell>,
@@ -201,21 +201,21 @@ export default function ReportsManagement() {
         <span className="text-sm font-medium text-foreground">{report.reason}</span>
       </TableCell>,
       <TableCell key="description">
-        <p className="max-w-md text-sm text-default-600 line-clamp-2">{report.description}</p>
+        <p className="max-w-md text-sm text-muted line-clamp-2">{report.description}</p>
       </TableCell>,
       <TableCell key="status">
         {(report.status === 'open' || report.status === 'pending') && (
-          <Chip size="sm" color="warning" variant="flat">{t('moderation.status_pending')}</Chip>
+          <Chip size="sm" color="warning" variant="soft">{t('moderation.status_pending')}</Chip>
         )}
         {report.status === 'resolved' && (
-          <Chip size="sm" color="success" variant="flat">{t('moderation.status_resolved')}</Chip>
+          <Chip size="sm" color="success" variant="soft">{t('moderation.status_resolved')}</Chip>
         )}
         {report.status === 'dismissed' && (
-          <Chip size="sm" color="default" variant="flat">{t('moderation.status_dismissed')}</Chip>
+          <Chip size="sm" color="default" variant="soft">{t('moderation.status_dismissed')}</Chip>
         )}
       </TableCell>,
       <TableCell key="created">
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {new Date(report.created_at).toLocaleDateString()}
         </span>
       </TableCell>,
@@ -224,7 +224,7 @@ export default function ReportsManagement() {
           <div className="flex items-center gap-2">
             <Button
               size="sm"
-              variant="flat"
+              variant="tertiary"
               color="success"
               startContent={<CheckCircle2 className="w-4 h-4" />}
               onPress={() => setConfirmAction({ type: 'resolve', report })}
@@ -233,7 +233,7 @@ export default function ReportsManagement() {
             </Button>
             <Button
               size="sm"
-              variant="flat"
+              variant="tertiary"
               color="default"
               startContent={<XCircle className="w-4 h-4" />}
               onPress={() => setConfirmAction({ type: 'dismiss', report })}
@@ -243,7 +243,7 @@ export default function ReportsManagement() {
           </div>
         )}
         {report.status !== 'open' && report.status !== 'pending' && (
-          <div className="text-sm text-default-400">
+          <div className="text-sm text-muted">
             {report.resolved_by && t('moderation.resolved_by')}
           </div>
         )}
@@ -282,8 +282,7 @@ export default function ReportsManagement() {
         description={isSuperAdmin ? t('moderation.reports_desc_super') : t('moderation.reports_desc')}
         actions={
           <Button
-            color="primary"
-            variant="flat"
+            variant="tertiary"
             startContent={<RefreshCw className="w-4 h-4" />}
             onPress={() => {
               execute();
@@ -299,47 +298,47 @@ export default function ReportsManagement() {
       {/* Stats Cards */}
       {stats && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <Card shadow="sm" className="border border-default-200">
+          <Card  className="border border-border">
             <CardBody className="flex flex-row items-center gap-3 p-4">
               <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-accent-soft dark:bg-accent-soft">
                 <Flag className="w-6 h-6 text-accent" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.total ?? ((stats.reports_pending ?? 0) + (stats.reports_resolved ?? 0) + (stats.reports_dismissed ?? 0))}</p>
-                <p className="text-sm text-default-500">{t('moderation.total_reports')}</p>
+                <p className="text-sm text-muted">{t('moderation.total_reports')}</p>
               </div>
             </CardBody>
           </Card>
-          <Card shadow="sm" className="border border-default-200">
+          <Card  className="border border-border">
             <CardBody className="flex flex-row items-center gap-3 p-4">
               <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-warning-100 dark:bg-warning-900/30">
                 <AlertCircle className="w-6 h-6 text-warning" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.pending ?? stats.reports_pending ?? 0}</p>
-                <p className="text-sm text-default-500">{t('moderation.status_pending')}</p>
+                <p className="text-sm text-muted">{t('moderation.status_pending')}</p>
               </div>
             </CardBody>
           </Card>
-          <Card shadow="sm" className="border border-default-200">
+          <Card  className="border border-border">
             <CardBody className="flex flex-row items-center gap-3 p-4">
               <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-success-100 dark:bg-success-900/30">
                 <CheckCircle2 className="w-6 h-6 text-success" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.resolved ?? stats.reports_resolved ?? 0}</p>
-                <p className="text-sm text-default-500">{t('moderation.status_resolved')}</p>
+                <p className="text-sm text-muted">{t('moderation.status_resolved')}</p>
               </div>
             </CardBody>
           </Card>
-          <Card shadow="sm" className="border border-default-200">
+          <Card  className="border border-border">
             <CardBody className="flex flex-row items-center gap-3 p-4">
-              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-default-100 dark:bg-default-900/30">
-                <XCircle className="w-6 h-6 text-default-500" />
+              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-surface-secondary">
+                <XCircle className="w-6 h-6 text-muted" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.dismissed ?? stats.reports_dismissed ?? 0}</p>
-                <p className="text-sm text-default-500">{t('moderation.status_dismissed')}</p>
+                <p className="text-sm text-muted">{t('moderation.status_dismissed')}</p>
               </div>
             </CardBody>
           </Card>
@@ -347,7 +346,7 @@ export default function ReportsManagement() {
       )}
 
       {/* Filter Bar */}
-      <Card shadow="sm" className="border border-default-200">
+      <Card  className="border border-border">
         <CardBody className="flex flex-col gap-3 p-4 lg:flex-row lg:items-end">
           <Input type="search" name="admin-search" autoComplete="off"
             placeholder={t('moderation.placeholder_search_reports')}
@@ -355,7 +354,7 @@ export default function ReportsManagement() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            startContent={<Search className="w-4 h-4 text-default-400" />}
+            startContent={<Search className="w-4 h-4 text-muted" />}
             className="w-full lg:flex-1"
           />
           <Select
@@ -400,10 +399,10 @@ export default function ReportsManagement() {
             </Select>
           )}
           <div className="flex gap-2 lg:pb-0.5">
-            <Button color="primary" onPress={handleSearch}>
+            <Button onPress={handleSearch}>
               {t('moderation.apply')}
             </Button>
-            <Button variant="flat" onPress={handleClear}>
+            <Button variant="tertiary" onPress={handleClear}>
               {t('moderation.clear')}
             </Button>
           </div>
@@ -412,7 +411,7 @@ export default function ReportsManagement() {
 
       {/* Results Count */}
       {meta && (
-        <div className="text-sm text-default-500">
+        <div className="text-sm text-muted">
           {t('moderation.showing_count')}
           {isSuperAdmin && !activeTenant && ` (${t('moderation.all_tenants')})`}
         </div>
@@ -426,7 +425,7 @@ export default function ReportsManagement() {
       )}
 
       {/* Table */}
-      <Table aria-label={t('moderation.label_reports_table')} shadow="sm" isStriped>
+      <Table aria-label={t('moderation.label_reports_table')}  isStriped>
         <TableHeader>
           {columns.map((col) => (
             <TableColumn key={col}>{col}</TableColumn>
@@ -437,7 +436,7 @@ export default function ReportsManagement() {
           isLoading={isLoading}
           loadingContent={<Spinner />}
           emptyContent={
-            <div className="text-center py-8 text-default-400">
+            <div className="text-center py-8 text-muted">
               {activeSearch || activeType || activeStatus
                 ? t('moderation.no_reports_match_filters')
                 : t('moderation.no_reports_to_review')}
@@ -460,7 +459,7 @@ export default function ReportsManagement() {
             page={page}
             onChange={setPage}
             showControls
-            color="primary"
+            color="accent"
           />
         </div>
       )}

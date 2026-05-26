@@ -137,7 +137,7 @@ export function MatchDetail() {
           title={t('matching.match_detail_title')}
           actions={
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/match-approvals'))}
             >
@@ -145,13 +145,13 @@ export function MatchDetail() {
             </Button>
           }
         />
-        <Card shadow="sm">
+        <Card >
           <CardBody className="flex flex-col items-center justify-center py-16">
             <XCircle size={40} className="mb-3 text-danger" />
             <p className="text-lg font-medium text-foreground">
               {t('matching.match_not_found')}
             </p>
-            <p className="mt-1 text-sm text-default-500">
+            <p className="mt-1 text-sm text-muted">
               {error || t('matching.match_could_not_be_loaded')}
             </p>
           </CardBody>
@@ -169,7 +169,7 @@ export function MatchDetail() {
         description={t('matching.match_submitted_date')}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<ArrowLeft size={16} />}
             onPress={() => navigate(tenantPath('/admin/match-approvals'))}
           >
@@ -179,7 +179,7 @@ export function MatchDetail() {
       />
 
       {/* Match Score Card */}
-      <Card shadow="sm" className="mb-6">
+      <Card  className="mb-6">
         <CardHeader className="flex items-center gap-3 pb-0">
           <Shield size={20} className="text-accent" />
           <h3 className="text-lg font-semibold">{t('matching.match_information')}</h3>
@@ -190,8 +190,8 @@ export function MatchDetail() {
         <CardBody>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {/* Score */}
-            <div className="flex flex-col items-center justify-center rounded-xl bg-default-50 p-6">
-              <p className="mb-2 text-sm text-default-500">{t('matching.match_score')}</p>
+            <div className="flex flex-col items-center justify-center rounded-xl bg-surface-secondary p-6">
+              <p className="mb-2 text-sm text-muted">{t('matching.match_score')}</p>
               <div className="relative mb-2">
                 <Progress
                   size="lg"
@@ -206,7 +206,7 @@ export function MatchDetail() {
               </p>
               <Chip
                 size="sm"
-                variant="flat"
+                variant="soft"
                 color={scoreColor(item.match_score)}
                 className="mt-1"
               >
@@ -217,23 +217,23 @@ export function MatchDetail() {
             {/* Details */}
             <div className="space-y-3">
               <div>
-                <p className="text-xs text-default-400">{t('matching.match')}</p>
-                <Chip size="sm" variant="flat" className="mt-1 capitalize">
+                <p className="text-xs text-muted">{t('matching.match')}</p>
+                <Chip size="sm" variant="soft" className="mt-1 capitalize">
                   {(item.match_type || 'one_way').replace('_', ' ')}
                 </Chip>
               </div>
               {item.distance_km !== null && item.distance_km !== undefined && (
                 <div>
-                  <p className="text-xs text-default-400">{t('matching.distance')}</p>
+                  <p className="text-xs text-muted">{t('matching.distance')}</p>
                   <p className="flex items-center gap-1 text-sm text-foreground">
-                    <MapPin size={14} className="text-default-400" />
+                    <MapPin size={14} className="text-muted" />
                     {item.distance_km.toFixed(1)} km
                   </p>
                 </div>
               )}
               {item.category_name && (
                 <div>
-                  <p className="text-xs text-default-400">{t('matching.weight_category')}</p>
+                  <p className="text-xs text-muted">{t('matching.weight_category')}</p>
                   <p className="text-sm text-foreground">{item.category_name}</p>
                 </div>
               )}
@@ -241,17 +241,17 @@ export function MatchDetail() {
 
             {/* Match Reasons */}
             <div>
-              <p className="mb-2 text-xs text-default-400">{t('matching.match_reasons')}</p>
+              <p className="mb-2 text-xs text-muted">{t('matching.match_reasons')}</p>
               {item.match_reasons && item.match_reasons.length > 0 ? (
                 <div className="flex flex-wrap gap-1.5">
                   {item.match_reasons.map((reason, i) => (
-                    <Chip key={i} size="sm" variant="flat" color="primary">
+                    <Chip key={i} size="sm" variant="soft" color="accent">
                       {reason}
                     </Chip>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-default-400 italic">
+                <p className="text-sm text-muted italic">
                   {t('matching.no_reasons_recorded')}
                 </p>
               )}
@@ -263,7 +263,7 @@ export function MatchDetail() {
       {/* Users */}
       <div className="mb-6 grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* User 1 */}
-        <Card shadow="sm">
+        <Card >
           <CardHeader className="flex items-center gap-3 pb-0">
             <User size={18} className="text-accent" />
             <h3 className="font-semibold">{t('matching.matched_user')}</h3>
@@ -281,16 +281,16 @@ export function MatchDetail() {
                   {item.user_1_name}
                 </p>
                 {item.user_1_email && (
-                  <p className="text-sm text-default-500">{item.user_1_email}</p>
+                  <p className="text-sm text-muted">{item.user_1_email}</p>
                 )}
                 {item.user_1_location && (
-                  <p className="mt-1 flex items-center gap-1 text-sm text-default-400">
+                  <p className="mt-1 flex items-center gap-1 text-sm text-muted">
                     <MapPin size={12} />
                     {item.user_1_location}
                   </p>
                 )}
                 {item.user_1_bio && (
-                  <p className="mt-2 line-clamp-3 text-sm text-default-500">
+                  <p className="mt-2 line-clamp-3 text-sm text-muted">
                     {item.user_1_bio}
                   </p>
                 )}
@@ -300,7 +300,7 @@ export function MatchDetail() {
         </Card>
 
         {/* User 2 (Listing Owner) */}
-        <Card shadow="sm">
+        <Card >
           <CardHeader className="flex items-center gap-3 pb-0">
             <User size={18} className="text-success" />
             <h3 className="font-semibold">{t('matching.listing_owner')}</h3>
@@ -318,16 +318,16 @@ export function MatchDetail() {
                   {item.user_2_name}
                 </p>
                 {item.user_2_email && (
-                  <p className="text-sm text-default-500">{item.user_2_email}</p>
+                  <p className="text-sm text-muted">{item.user_2_email}</p>
                 )}
                 {item.user_2_location && (
-                  <p className="mt-1 flex items-center gap-1 text-sm text-default-400">
+                  <p className="mt-1 flex items-center gap-1 text-sm text-muted">
                     <MapPin size={12} />
                     {item.user_2_location}
                   </p>
                 )}
                 {item.user_2_bio && (
-                  <p className="mt-2 line-clamp-3 text-sm text-default-500">
+                  <p className="mt-2 line-clamp-3 text-sm text-muted">
                     {item.user_2_bio}
                   </p>
                 )}
@@ -339,7 +339,7 @@ export function MatchDetail() {
 
       {/* Listing Card */}
       {item.listing_title && (
-        <Card shadow="sm" className="mb-6">
+        <Card  className="mb-6">
           <CardHeader className="flex items-center gap-3 pb-0">
             <FileText size={18} className="text-accent" />
             <h3 className="font-semibold">{t('matching.associated_listing')}</h3>
@@ -351,7 +351,7 @@ export function MatchDetail() {
               </p>
               <div className="flex gap-2">
                 {item.listing_type && (
-                  <Chip size="sm" variant="flat" className="capitalize">
+                  <Chip size="sm" variant="soft" className="capitalize">
                     {item.listing_type}
                   </Chip>
                 )}
@@ -360,7 +360,7 @@ export function MatchDetail() {
                 )}
               </div>
               {item.listing_description && (
-                <p className="line-clamp-3 text-sm text-default-500">
+                <p className="line-clamp-3 text-sm text-muted">
                   {item.listing_description}
                 </p>
               )}
@@ -371,21 +371,21 @@ export function MatchDetail() {
 
       {/* Review section (if reviewed) */}
       {item.reviewed_at && (
-        <Card shadow="sm" className="mb-6">
+        <Card  className="mb-6">
           <CardHeader className="flex items-center gap-3 pb-0">
-            <Clock size={18} className="text-default-500" />
+            <Clock size={18} className="text-muted" />
             <h3 className="font-semibold">{t('matching.review_details')}</h3>
           </CardHeader>
           <CardBody>
             <div className="space-y-2">
               <div className="flex items-center gap-3">
-                <p className="text-sm text-default-400">{t('matching.reviewed_by')}</p>
+                <p className="text-sm text-muted">{t('matching.reviewed_by')}</p>
                 <p className="text-sm font-medium text-foreground">
                   {item.reviewer_name || t('matching.unknown')}
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <p className="text-sm text-default-400">{t('matching.reviewed_at')}</p>
+                <p className="text-sm text-muted">{t('matching.reviewed_at')}</p>
                 <p className="text-sm text-foreground">
                   {new Date(item.reviewed_at).toLocaleString()}
                 </p>
@@ -394,10 +394,10 @@ export function MatchDetail() {
                 <>
                   <Separator className="my-2" />
                   <div>
-                    <p className="mb-1 text-sm text-default-400">
+                    <p className="mb-1 text-sm text-muted">
                       {item.status === 'rejected' ? t('matching.rejection_reason_label') : t('matching.notes_label')}
                     </p>
-                    <p className="rounded-lg bg-default-50 p-3 text-sm text-foreground">
+                    <p className="rounded-lg bg-surface-secondary p-3 text-sm text-foreground">
                       {item.notes}
                     </p>
                   </div>
@@ -410,11 +410,11 @@ export function MatchDetail() {
 
       {/* Action buttons for pending items */}
       {isPending && (
-        <Card shadow="sm">
+        <Card >
           <CardBody className="flex flex-row items-center justify-end gap-3 p-4">
             <Button
               color="danger"
-              variant="flat"
+              variant="tertiary"
               startContent={<XCircle size={16} />}
               onPress={() => {
                 setRejectModal(true);
@@ -450,7 +450,7 @@ export function MatchDetail() {
             {t('matching.reject_match')}
           </ModalHeader>
           <ModalBody>
-            <p className="mb-3 text-sm text-default-600">
+            <p className="mb-3 text-sm text-muted">
               {t('matching.rejecting_match_between', {
                 user1: item.user_1_name,
                 user2: item.user_2_name,
@@ -461,14 +461,14 @@ export function MatchDetail() {
               placeholder={t('matching.placeholder_explain_why_this_match_is_being_rejected')}
               value={rejectReason}
               onValueChange={setRejectReason}
-              variant="bordered"
+              variant="secondary"
               minRows={3}
               isRequired
             />
           </ModalBody>
           <ModalFooter>
             <Button
-              variant="flat"
+              variant="tertiary"
               onPress={() => {
                 setRejectModal(false);
                 setRejectReason('');

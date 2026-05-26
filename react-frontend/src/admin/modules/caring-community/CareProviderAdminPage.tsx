@@ -321,13 +321,13 @@ export default function CareProviderAdminPage() {
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-xl font-semibold">{t('admin.providers.title')}</h1>
-          <p className="text-sm text-default-500 mt-0.5">
+          <p className="text-sm text-muted mt-0.5">
             {t('admin.providers.subtitle')}
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Button
-            variant="flat"
+            variant="secondary"
             startContent={<Layers className="h-4 w-4" aria-hidden="true" />}
             onPress={loadDuplicates}
             isLoading={duplicatesLoading && duplicates === null}
@@ -335,7 +335,6 @@ export default function CareProviderAdminPage() {
             {t('admin.providers.actions.find_duplicates')}
           </Button>
           <Button
-            color="primary"
             startContent={<Plus className="h-4 w-4" aria-hidden="true" />}
             onPress={openCreate}
           >
@@ -345,7 +344,7 @@ export default function CareProviderAdminPage() {
       </div>
 
       {/* Intro card */}
-      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
@@ -353,10 +352,10 @@ export default function CareProviderAdminPage() {
               <p className="font-semibold text-accent dark:text-accent">
                 {t('admin.providers.about.title')}
               </p>
-              <p className="text-default-600">
+              <p className="text-foreground">
                 {t('admin.providers.about.body')}
               </p>
-              <div className="space-y-0.5 pt-1 text-default-500">
+              <div className="space-y-0.5 pt-1 text-muted">
                 <p><strong>{t('admin.providers.about.verification_label')}:</strong> {t('admin.providers.about.verification_body')}</p>
                 <p><strong>{t('admin.providers.about.types_label')}:</strong> {t('admin.providers.about.types_body')}</p>
               </div>
@@ -367,20 +366,20 @@ export default function CareProviderAdminPage() {
 
       {/* Duplicates Panel */}
       {duplicatesOpen && (
-        <div className="rounded-xl border border-default-200 bg-default-50 dark:bg-default-100/40 p-4">
+        <div className="rounded-xl border border-border bg-surface-secondary p-4">
           <div className="flex items-center justify-between gap-3 mb-3">
             <div>
               <h2 className="text-sm font-semibold flex items-center gap-2">
                 <Layers className="h-4 w-4" aria-hidden="true" />
                 {t('admin.providers.duplicates.title')}
               </h2>
-              <p className="text-xs text-default-500 mt-0.5">
+              <p className="text-xs text-muted mt-0.5">
                 {duplicates
                   ? t('admin.providers.duplicates.summary', { scanned: duplicates.scanned, total: duplicates.total })
                   : t('admin.providers.duplicates.scanning')}
               </p>
             </div>
-            <Button size="sm" variant="light" onPress={() => setDuplicatesOpen(false)}>
+            <Button size="sm" variant="ghost" onPress={() => setDuplicatesOpen(false)}>
               {t('admin.providers.actions.close')}
             </Button>
           </div>
@@ -390,7 +389,7 @@ export default function CareProviderAdminPage() {
               <Spinner size="sm" />
             </div>
           ) : duplicates && duplicates.pairs.length === 0 ? (
-            <p className="text-sm text-default-500 py-3">
+            <p className="text-sm text-muted py-3">
               {t('admin.providers.duplicates.empty')}
             </p>
           ) : (
@@ -398,7 +397,7 @@ export default function CareProviderAdminPage() {
               {duplicates?.pairs.map((pair, idx) => (
                 <div
                   key={`${pair.provider_a.id}-${pair.provider_b.id}-${idx}`}
-                  className="rounded-lg border border-default-200 bg-surface p-3"
+                  className="rounded-lg border border-border bg-surface p-3"
                 >
                   <div className="flex items-start justify-between gap-3 flex-wrap">
                     <div className="flex-1 min-w-[260px]">
@@ -408,11 +407,11 @@ export default function CareProviderAdminPage() {
                         )}
                         {pair.provider_a.name}
                       </p>
-                      <p className="text-xs text-default-500">
+                      <p className="text-xs text-muted">
                         #{pair.provider_a.id} · {pair.provider_a.type}
                       </p>
                     </div>
-                    <div className="text-default-400 text-xs self-center">{t('admin.providers.duplicates.vs')}</div>
+                    <div className="text-muted text-xs self-center">{t('admin.providers.duplicates.vs')}</div>
                     <div className="flex-1 min-w-[260px]">
                       <p className="font-medium text-sm flex items-center gap-1.5">
                         {pair.provider_b.is_verified && (
@@ -420,21 +419,21 @@ export default function CareProviderAdminPage() {
                         )}
                         {pair.provider_b.name}
                       </p>
-                      <p className="text-xs text-default-500">
+                      <p className="text-xs text-muted">
                         #{pair.provider_b.id} · {pair.provider_b.type}
                       </p>
                     </div>
                     <Chip
                       size="sm"
                       color={pair.score >= 0.85 ? 'danger' : pair.score >= 0.75 ? 'warning' : 'default'}
-                      variant="flat"
+                      variant="soft"
                     >
                       {t('admin.providers.duplicates.match_percent', { percent: Math.round(pair.score * 100) })}
                     </Chip>
                   </div>
                   <div className="flex items-center gap-1.5 mt-2 flex-wrap">
                     {pair.signals.map((sig) => (
-                      <Chip key={sig} size="sm" variant="flat" color="primary">
+                      <Chip key={sig} size="sm" variant="soft" color="accent">
                         {PROVIDER_SIGNAL_KEYS.has(sig)
                           ? t(`admin.providers.signals.${sig}`)
                           : t('admin.providers.signals.unknown', { signal: sig })}
@@ -444,8 +443,7 @@ export default function CareProviderAdminPage() {
                   <div className="flex items-center gap-2 mt-2.5">
                     <Button
                       size="sm"
-                      variant="flat"
-                      color="danger"
+                      variant="danger"
                       onPress={() =>
                         handleDeactivateProvider(pair.provider_b.id, pair.provider_b.name)
                       }
@@ -454,8 +452,7 @@ export default function CareProviderAdminPage() {
                     </Button>
                     <Button
                       size="sm"
-                      variant="flat"
-                      color="danger"
+                      variant="danger"
                       onPress={() =>
                         handleDeactivateProvider(pair.provider_a.id, pair.provider_a.name)
                       }
@@ -500,28 +497,28 @@ export default function CareProviderAdminPage() {
                       <div>
                         <p className="font-medium">{provider.name}</p>
                         {provider.address && (
-                          <p className="text-xs text-default-500">{provider.address}</p>
+                          <p className="text-xs text-muted">{provider.address}</p>
                         )}
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Chip size="sm" color={typeColor(provider.type)} variant="flat">
+                    <Chip size="sm" color={typeColor(provider.type)} variant="soft">
                       {t(`admin.providers.types.${provider.type}`)}
                     </Chip>
                   </TableCell>
                   <TableCell>
                     {provider.is_verified ? (
-                      <Chip size="sm" color="success" variant="flat">{t('admin.providers.yes')}</Chip>
+                      <Chip size="sm" color="success" variant="soft">{t('admin.providers.yes')}</Chip>
                     ) : (
-                      <Chip size="sm" color="default" variant="flat">{t('admin.providers.no')}</Chip>
+                      <Chip size="sm" color="default" variant="soft">{t('admin.providers.no')}</Chip>
                     )}
                   </TableCell>
                   <TableCell>
                     <Chip
                       size="sm"
                       color={provider.status === 'active' ? 'success' : 'default'}
-                      variant="flat"
+                      variant="soft"
                     >
                       {t(`admin.providers.status.${provider.status}`)}
                     </Chip>
@@ -530,7 +527,7 @@ export default function CareProviderAdminPage() {
                     <div className="flex items-center gap-2">
                       <Button
                         size="sm"
-                        variant="flat"
+                        variant="ghost"
                         isIconOnly
                         onPress={() => openEdit(provider)}
                         aria-label={t('admin.providers.actions.edit_provider')}
@@ -540,8 +537,7 @@ export default function CareProviderAdminPage() {
                       {!provider.is_verified && (
                         <Button
                           size="sm"
-                          variant="flat"
-                          color="primary"
+                          variant="secondary"
                           isIconOnly
                           onPress={() => handleVerify(provider)}
                           aria-label={t('admin.providers.actions.verify_provider')}
@@ -551,8 +547,7 @@ export default function CareProviderAdminPage() {
                       )}
                       <Button
                         size="sm"
-                        variant="flat"
-                        color="danger"
+                        variant="danger"
                         isIconOnly
                         onPress={() => handleDelete(provider)}
                         aria-label={t('admin.providers.actions.delete_provider')}
@@ -566,7 +561,7 @@ export default function CareProviderAdminPage() {
             </TableBody>
           </Table>
           {total > perPage && (
-            <div className="flex items-center justify-between gap-3 border-t border-divider pt-4 text-sm text-default-500">
+            <div className="flex items-center justify-between gap-3 border-t border-divider pt-4 text-sm text-muted">
               <span>
                 {t('admin.providers.pagination.summary', {
                   page,
@@ -576,10 +571,10 @@ export default function CareProviderAdminPage() {
                 })}
               </span>
               <div className="flex items-center gap-2">
-                <Button size="sm" variant="flat" isDisabled={page <= 1} onPress={() => setPage((p) => Math.max(1, p - 1))}>
+                <Button size="sm" variant="secondary" isDisabled={page <= 1} onPress={() => setPage((p) => Math.max(1, p - 1))}>
                   {t('admin.providers.pagination.previous')}
                 </Button>
-                <Button size="sm" variant="flat" isDisabled={page * perPage >= total} onPress={() => setPage((p) => p + 1)}>
+                <Button size="sm" variant="secondary" isDisabled={page * perPage >= total} onPress={() => setPage((p) => p + 1)}>
                   {t('admin.providers.pagination.next')}
                 </Button>
               </div>
@@ -670,10 +665,10 @@ export default function CareProviderAdminPage() {
                 />
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={closeModal} isDisabled={saving}>
+                <Button variant="tertiary" onPress={closeModal} isDisabled={saving}>
                   {t('admin.providers.actions.cancel')}
                 </Button>
-                <Button color="primary" onPress={handleSave} isLoading={saving}>
+                <Button onPress={handleSave} isLoading={saving}>
                   {editTarget ? t('admin.providers.actions.save_changes') : t('admin.providers.actions.create_provider')}
                 </Button>
               </ModalFooter>
