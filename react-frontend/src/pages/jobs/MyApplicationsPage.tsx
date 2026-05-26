@@ -22,7 +22,8 @@ import Video from 'lucide-react/icons/video';
 import Download from 'lucide-react/icons/download';
 import FileDown from 'lucide-react/icons/file-down';
 import ExternalLink from 'lucide-react/icons/external-link';
-import { GlassCard, useDisclosure, Button, Chip, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab, Skeleton } from '@/components/ui';
+import { Chip } from '@heroui/react';
+import { GlassCard, useDisclosure, Button, Spinner, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Tabs, Tab, Skeleton } from '@/components/ui';
 import { useAuth, useToast, useTenant } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
@@ -107,22 +108,22 @@ interface HistoryEntry {
 // Constants
 // ---------------------------------------------------------------------------
 
-const STATUS_COLORS: Record<string, 'default' | 'primary' | 'warning' | 'secondary' | 'success' | 'danger'> = {
+const STATUS_COLORS: Record<string, 'default' | 'accent' | 'warning' | 'success' | 'danger'> = {
   applied: 'default',
   pending: 'default',
-  screening: 'primary',
-  reviewed: 'primary',
+  screening: 'accent',
+  reviewed: 'accent',
   interview: 'warning',
-  offer: 'secondary',
+  offer: 'default',
   accepted: 'success',
   rejected: 'danger',
   withdrawn: 'default',
 };
 
-const TYPE_CHIP_COLORS: Record<string, 'primary' | 'success' | 'secondary'> = {
-  paid: 'primary',
+const TYPE_CHIP_COLORS: Record<string, 'accent' | 'success' | 'default'> = {
+  paid: 'accent',
   volunteer: 'success',
-  timebank: 'secondary',
+  timebank: 'default',
 };
 
 const ACTIVE_STATUSES = new Set(['applied', 'pending', 'screening', 'reviewed', 'interview', 'offer']);
@@ -233,13 +234,13 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
             <Chip
               color={TYPE_CHIP_COLORS[vacancy.type] ?? 'default'}
               size='sm'
-              variant='flat'>
+              variant='tertiary'>
               {t(`type.${vacancy.type}`)}
             </Chip>
             <Chip
               color={STATUS_COLORS[application.status] ?? 'default'}
               size='sm'
-              variant='flat'>
+              variant='tertiary'>
               {t(`application_status.${application.status}`)}
             </Chip>
           </div>
@@ -331,7 +332,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
               </div>
               <Chip
                 size='sm'
-                variant='flat'
+                variant='tertiary'
                 color={application.interview.status === 'accepted' ? 'success' : application.interview.status === 'declined' ? 'danger' : 'warning'}
               >
                 {application.interview.status === 'accepted'
@@ -426,7 +427,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
               </div>
               <Chip
                 size='sm'
-                variant='flat'
+                variant='tertiary'
                 color={application.offer.status === 'accepted' ? 'success' : application.offer.status === 'rejected' ? 'danger' : 'warning'}
               >
                 {application.offer.status === 'accepted'
