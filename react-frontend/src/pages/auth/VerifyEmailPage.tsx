@@ -204,7 +204,7 @@ export function VerifyEmailPage() {
             {/* Resend verification — only available when authenticated */}
             {isAuthenticated ? (
               resendSuccess ? (
-                <div role="status" className="p-3 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-sm">
+                <div role="status" className="p-3 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-sm">
                   {t('verify_email.resend_success')}
                 </div>
               ) : (
