@@ -1577,7 +1577,7 @@
     "pilot_inquiries": "استفسارات الطيارين",
     "provisioning_requests": "طلبات التزويد",
     "national": "وطني",
-    "kiss": "KISS",
+    "kiss": "Caring Community",
     "regional_analytics": "التحليلات الإقليمية",
     "help": "يساعد",
     "operations": "العمليات",
@@ -10927,7 +10927,7 @@
     "label_wallet": "محفظة",
     "desc_ai_chat": "مساعد الدردشة المدعوم بالذكاء الاصطناعي للأعضاء",
     "desc_blog": "نشر المقالات وأخبار المجتمع",
-    "desc_caring_community": "مركز الرعاية المتكاملة، وسير عمل KISS، وتقارير الرعاية البلدية",
+    "desc_caring_community": "مركز الرعاية المتكاملة، وسير عمل Caring Community، وتقارير الرعاية البلدية",
     "desc_connections": "طلبات الاتصال من عضو إلى عضو",
     "desc_dashboard": "لوحة تحكم منزلية مخصصة للأعضاء",
     "desc_direct_messaging": "الرسائل الخاصة بين الأعضاء",
@@ -12046,7 +12046,7 @@
     },
     "actions": {
       "open_member_hub": "فتح مركز الأعضاء",
-      "open_workflow": "افتح سير عمل KISS",
+      "open_workflow": "افتح سير عمل Caring Community",
       "refresh": "ينعش"
     },
     "stats": {
@@ -12079,7 +12079,7 @@
       "community_analytics": "تحليلات المجتمع",
       "impact_report": "تقرير التأثير",
       "municipal_pack": "حزمة التقارير البلدية",
-      "note": "تستخدم هذه الأسطح تقارير NEXUS الحالية وهي جاهزة لعمليات التصدير الخاصة بـ KISS بعد ذلك."
+      "note": "تستخدم هذه الأسطح تقارير NEXUS الحالية وهي جاهزة لعمليات التصدير الخاصة بـ Caring Community بعد ذلك."
     },
     "messages": {
       "enabled": "تم تمكين مجتمع الرعاية",
@@ -12110,7 +12110,7 @@
   },
   "caring_workflow": {
     "meta": {
-      "title": "KISS Workflow Console",
+      "title": "Caring Community Workflow Console",
       "description": "Coordinate the operational flow behind a caring community: intake, matching, hour logging, trusted review, and member statements.",
       "page_title": "سير عمل مجتمع الرعاية"
     },
@@ -12135,7 +12135,7 @@
       "role_presets_count": "{{count}} role presets"
     },
     "toast": {
-      "load_failed": "Failed to load KISS workflow data."
+      "load_failed": "Failed to load Caring Community workflow data."
     },
     "review_queue": {
       "title": "Trusted review queue",
@@ -12180,13 +12180,13 @@
       "installing": "Installing",
       "installed_chip": "Installed",
       "not_installed_chip": "Not installed",
-      "install_success": "KISS role pack installed.",
-      "install_failed": "Failed to install KISS role pack.",
+      "install_success": "Caring Community role pack installed.",
+      "install_failed": "Failed to install Caring Community role pack.",
       "installed_count": "{{installed}} of {{total}} presets installed",
       "permissions_status": "{{installed}} of {{total}} permissions",
       "national_admin": {
         "title": "National foundation admin",
-        "description": "Cross-program oversight, reporting standards, and KISS network governance."
+        "description": "Cross-program oversight, reporting standards, and Caring Community network governance."
       },
       "canton_admin": {
         "title": "Canton admin",
@@ -12210,7 +12210,7 @@
       }
     },
     "stages": {
-      "title": "KISS operating model",
+      "title": "Caring Community operating model",
       "description": "The workflow path this module should make explicit for evaluators and coordinators.",
       "intake": {
         "title": "تناول",
@@ -12235,7 +12235,7 @@
     },
     "policy": {
       "title": "سياسة سير العمل",
-      "description": "Tenant-level defaults for KISS hour review, statements, and municipal evidence.",
+      "description": "Tenant-level defaults for Caring Community hour review, statements, and municipal evidence.",
       "save": "حفظ السياسة",
       "save_success": "تم حفظ سياسة سير العمل.",
       "save_failed": "Failed to save workflow policy.",
@@ -12267,7 +12267,7 @@
     },
     "member_statement": {
       "title": "Member statements",
-      "description": "Preview or export a KISS-style member statement with support hours, wallet movement, and municipal value assumptions.",
+      "description": "Preview or export a Caring Community member statement with support hours, wallet movement, and municipal value assumptions.",
       "member_id": "معرف العضو",
       "start_date": "From",
       "end_date": "To",
@@ -12290,7 +12290,7 @@
     },
     "support_relationships": {
       "title": "Recurring support relationships",
-      "description": "Create and monitor ongoing supporter-recipient relationships for KISS-style recurring care.",
+      "description": "Create and monitor ongoing supporter-recipient relationships for Caring Community recurring care.",
       "active": "Active",
       "paused": "Paused",
       "check_ins_due": "Check-ins due",
@@ -12359,7 +12359,7 @@
     },
     "paper_onboarding": {
       "title": "Paper Form Intake",
-      "description": "Upload a signed KISS form, review the extracted fields, then create the provisional account only after coordinator confirmation.",
+      "description": "Upload a signed Caring Community form, review the extracted fields, then create the provisional account only after coordinator confirmation.",
       "refresh": "Refresh",
       "file_label": "Scanned form",
       "name_label": "Extracted full name",
@@ -12659,7 +12659,7 @@
   "municipal_reports": {
     "meta": {
       "title": "تقارير الأثر البلدي",
-      "description": "قم بإعداد تقارير بأسلوب KISS لساعات العمل التي تم التحقق منها، والأعضاء النشطين، والمنظمات الموثوقة، ومحادثات القيمة البلدية."
+      "description": "قم بإعداد تقارير بأسلوب Caring Community لساعات العمل التي تم التحقق منها، والأعضاء النشطين، والمنظمات الموثوقة، ومحادثات القيمة البلدية."
     },
     "actions": {
       "analytics": "تحليلات المجتمع",
@@ -12799,7 +12799,7 @@
     },
     "about": {
       "body_1_after_chf": "قيمة الساعات × مضاعف المنع).",
-      "body_1_after_kiss": "/Age-Stiftung المنهجية، التكلفة المقدرة لتعويض خدمات الرعاية الرسمية (",
+      "body_1_after_kiss": " المنهجية، التكلفة المقدرة لتعويض خدمات الرعاية الرسمية (",
       "body_1_before_kiss": "تقرير الأثر البلدي هو حزمة الأدلة التي تشاركها مع شركاء البلديات والكانتونات والممولين لإثبات قيمة البرنامج. يُظهر ساعات الرعاية التي تم التحقق منها، والأعضاء النشطين، والمنظمات الشريكة، وباستخدام",
       "body_2_after_audience": "تبديل لتبديل تأطير السرد:",
       "body_2_after_canton": "يجمع بلديات متعددة ويظهر تجنب التكاليف على مستوى الكانتونات؛",
@@ -12807,7 +12807,7 @@
       "body_2_after_municipality": "يركز على السكان المحليين الذين تم الوصول إليهم والمنظمات الشريكة؛",
       "body_2_prefix": "استخدم",
       "chf_abbr": "CHF",
-      "kiss_abbr": "KISS",
+      "kiss_abbr": "Caring Community",
       "title": "حول هذا التقرير"
     },
     "audience_selector": {
@@ -12844,7 +12844,7 @@
         "description": "الصحة التعاونية الداخلية: الاحتفاظ، المعاملة بالمثل، الترادف، تحميل المنسق، تجمع الائتمان.",
         "empty_body": "قم بالتبديل إلى الوضع التعاوني لتحميل السرد التعاوني الداخلي.",
         "empty_description": "الاحتفاظ بالأعضاء، والمعاملة بالمثل على مدار الساعة، والعلاقات الترادفية، وعبء عمل المنسق، وتجمع ائتمان الرعاية المستقبلية.",
-        "empty_title": "تعاونية (KISS-Genossenschaft داخلية)",
+        "empty_title": "تعاونية (cooperative داخلية)",
         "future_care_credit_pool": "تجمع الرصيد الائتماني للرعاية المستقبلية",
         "future_care_credit_pool_desc": "مجموع أرصدة الأعضاء الإيجابية - الاحتياطي الضمني للرعاية المستقبلية للتعاونية. قاعدة الأعضاء النشطة: {{count}}.",
         "member_retention": "الاحتفاظ بالأعضاء",
@@ -13331,7 +13331,7 @@
     },
     "operating_policy": {
       "title": "سياسة التشغيل",
-      "subtitle": "ورشة عمل سياسة التشغيل KISS: لا يمكن لبرنامج القواعد تخمينها.",
+      "subtitle": "ورشة عمل سياسة التشغيل Caring Community: لا يمكن لبرنامج القواعد تخمينها.",
       "loading": "جارٍ تحميل سياسة التشغيل",
       "last_updated": "آخر تحديث لـ {{date}}",
       "meta": {
@@ -13347,7 +13347,7 @@
         "body": "تحدد سياسة التشغيل قواعد برنامج رعاية المجتمع الخاص بك: من يمكنه الموافقة على ساعات العمل، ومدى سرعة استجابة المنسقين، وكيفية حساب القيمة الاجتماعية، وكيف تبدو دورة إعداد التقارير. قم بتكوين هذا قبل إطلاق البرنامج التجريبي. تسري التغييرات على الفور ويتم تسجيلها لأغراض التدقيق.",
         "methodology_prefix": "ال",
         "methodology_middle": "تستخدم حقول معدل الأجر بالساعة ومضاعف المنع",
-        "methodology_suffix": "المنهجية (Koordination und Innovation fur Soziales، Schwyz) تم تطويرها باستخدام Age-Stiftung. إذا كنت لا تقوم بتشغيل Swiss KISS/",
+        "methodology_suffix": "المنهجية (Caring Community، Schwyz) تم تطويرها باستخدام Caring Community. إذا كنت لا تقوم بتشغيل Swiss Caring Community/",
         "methodology_tail": "تجريبي، قم بتعيين السعر على ما يعادل الرعاية الرسمية المحلية الخاصة بك بالساعة والمضاعف على 1.0."
       },
       "sections": {
@@ -13393,7 +13393,7 @@
         },
         "chf_prevention_multiplier": {
           "label": "CHF مضاعف الوقاية",
-          "help": "يتم تطبيق المضاعف على تعويض الرعاية الرسمية لمنهجية Age-Stiftung وKISS."
+          "help": "يتم تطبيق المضاعف على تعويض الرعاية الرسمية لمنهجية Caring Community وCaring Community."
         },
         "statement_cadence": {
           "label": "إيقاع بيان العضو",
@@ -14817,9 +14817,9 @@
     "about": {
       "body_middle": "يحسب التقرير القيمة الاجتماعية والاقتصادية لبرنامج الرعاية المجتمعية الخاص بك باستخدام",
       "body_prefix": "البلدية",
-      "body_suffix": "منهجية Age-Stiftung. فهو يعرض التكلفة المقدرة لتعويض خدمات الرعاية الرسمية (Spitex/Pflege)، والقيمة الاجتماعية الناتجة، وبيانات الاتجاه عبر فترات الإبلاغ. تم تصميم هذا التقرير لمشاركته مع شركاء البلديات والممولين كدليل على تأثير البرنامج.",
+      "body_suffix": "منهجية Caring Community. فهو يعرض التكلفة المقدرة لتعويض خدمات الرعاية الرسمية (Spitex/Pflege)، والقيمة الاجتماعية الناتجة، وبيانات الاتجاه عبر فترات الإبلاغ. تم تصميم هذا التقرير لمشاركته مع شركاء البلديات والممولين كدليل على تأثير البرنامج.",
       "formula_prefix": "تعويض التكلفة = إجمالي ساعات الرعاية المعتمدة x",
-      "formula_suffix": "معدل الساعة × مضاعف الوقاية. يعكس مضاعف الوقاية (الافتراضي: 2.0) أن ساعة واحدة من الرعاية غير الرسمية تمنع حوالي ساعتين من تدخل الرعاية الرسمية، بناءً على بحث Age-Stiftung.",
+      "formula_suffix": "معدل الساعة × مضاعف الوقاية. يعكس مضاعف الوقاية (الافتراضي: 2.0) أن ساعة واحدة من الرعاية غير الرسمية تمنع حوالي ساعتين من تدخل الرعاية الرسمية، بناءً على بحث Caring Community.",
       "title": "حول هذه الصفحة"
     },
     "actions": {
@@ -14850,20 +14850,20 @@
     },
     "methodology": {
       "chf_per_hour": "CHF {{amount}}/ساعة",
-      "default_prevention_prefix": "تنطبق قيمة المنع على مضاعف 2x لكل Age-Stiftung/",
+      "default_prevention_prefix": "تنطبق قيمة المنع على مضاعف 2x لكل Caring Community/",
       "default_prevention_suffix": "منهجية التقييم.",
       "default_rate": "CHF 35/ساعة",
       "default_source": "معدل مساعد الرعاية الرسمية السويسري، SECO 2024",
       "hours_are_valued_at": "الساعات تقدر ب",
       "hours_valued_at": "ساعات تقدر بـ",
-      "prevention_value_prefix": "تنطبق قيمة المنع على مضاعف {{multiplier}}x لكل Age-Stiftung/",
+      "prevention_value_prefix": "تنطبق قيمة المنع على مضاعف {{multiplier}}x لكل Caring Community/",
       "prevention_value_suffix": "منهجية التقييم.",
       "substitution_applied": "يتم ترجيح الساعات حسب معاملات الاستبدال لكل فئة.",
       "substitution_not_applied": "جميع الساعات مرجحة بـ 1.0x.",
       "tenant_setting_source": "تم تكوينه لهذا المستأجر"
     },
     "municipalities": {
-      "point_export": "يتوفر تصدير CSV - استخدم الزر الموجود في رأس الصفحة لإعداد تقارير Age-Stiftung وPro Senectute وتقارير الإدارة الاجتماعية في الكانتون.",
+      "point_export": "يتوفر تصدير CSV - استخدم الزر الموجود في رأس الصفحة لإعداد تقارير Caring Community وPro Senectute وتقارير الإدارة الاجتماعية في الكانتون.",
       "point_hour_prefix": "كل ساعة من وقت رعاية المجتمع توفر تقريبًا",
       "point_hour_suffix": "في تكاليف الرعاية الرسمية",
       "point_nexus": "يجعل هذا التأثير قابلاً للقياس والتدقيق والإبلاغ عنه بالنسبة لمشتريات الكانتونات والبلديات",
@@ -14885,7 +14885,7 @@
       "care_recipients": "متلقي الرعاية",
       "total_hours": "إجمالي الساعات",
       "weighted_hours_note": "{{hours}} الساعات المرجحة بعد معاملات الاستبدال",
-      "weighted_hours_tooltip": "يتم ترجيح الساعات بمعدلات الاستبدال الخاصة بفئة معينة (على سبيل المثال، الرفقة 0.4x، النقل 0.7x، المهمات 1.0x) لكل منهجية Age-Stiftung."
+      "weighted_hours_tooltip": "يتم ترجيح الساعات بمعدلات الاستبدال الخاصة بفئة معينة (على سبيل المثال، الرفقة 0.4x، النقل 0.7x، المهمات 1.0x) لكل منهجية Caring Community."
     },
     "toasts": {
       "export_failed": "فشل التصدير CSV",
@@ -15078,7 +15078,7 @@
   },
   "national_kiss_dashboard": {
     "about": {
-      "body_prefix": "KISS (Koordination und Innovation für Soziales) هي منهجية سويسرية لتنسيق الرعاية المجتمعية تم تطويرها بواسطة Age-Stiftung. تقوم لوحة التحكم الخاصة بالمشرف المتميز هذه بتجميع المقاييس عبر كل تعاونية NEXUS تدير برنامج Caring Community على المستوى الوطني - مما يمنح المؤسسة",
+      "body_prefix": "Caring Community (Caring Community) هي منهجية سويسرية لتنسيق الرعاية المجتمعية تم تطويرها بواسطة Caring Community. تقوم لوحة التحكم الخاصة بالمشرف المتميز هذه بتجميع المقاييس عبر كل تعاونية NEXUS تدير برنامج Caring Community على المستوى الوطني - مما يمنح المؤسسة",
       "body_suffix": "وجهة نظر تعاونية مشتركة لساعات التبادل ومشاركة الأعضاء والصحة التعاونية. يتم عرض أعداد الأعضاء كأقواس للحفاظ على الخصوصية (على سبيل المثال، \"50-99\") بدلاً من الأرقام الدقيقة.",
       "health_prefix": "استخدم محدد الفترة لمقارنة الأرباع. يصنف الجدول المقارن التعاونيات حسب ساعات العمل أو الأعضاء أو الحالة الصحية. الحالة الصحية مستمدة من اتجاهات النشاط:",
       "stable_definition": "نشاط مسطح,",
@@ -15146,9 +15146,9 @@
       "top_title": "أعلى 5 ساعات"
     },
     "meta": {
-      "description": "عرض المشرف المتميز التعاوني عبر كل تعاونية KISS على النظام الأساسي. يتم الإبلاغ عن أعداد الأعضاء بين قوسين للحفاظ على الخصوصية.",
-      "page_title": "Fondation KISS - لوحة المعلومات الوطنية",
-      "title": "Fondation KISS - لوحة المعلومات الوطنية"
+      "description": "عرض المشرف المتميز التعاوني عبر كل تعاونية Caring Community على النظام الأساسي. يتم الإبلاغ عن أعداد الأعضاء بين قوسين للحفاظ على الخصوصية.",
+      "page_title": "Caring Community - لوحة المعلومات الوطنية",
+      "title": "Caring Community - لوحة المعلومات الوطنية"
     },
     "metrics": {
       "yoy": "{{value}} سنويًا"
@@ -15600,7 +15600,7 @@
     "create_modal": {
       "base_url": "القاعدة URL",
       "base_url_description": "HTTPS URL لجهاز التحكم عن بعد NEXUS API. يتم إلحاق المسار /v2/federation/hour-transfer/inbound تلقائيًا.",
-      "base_url_placeholder": "https://api.kiss-bern.ch",
+      "base_url_placeholder": "https://api.bern-cooperative.ch",
       "display_name": "اسم العرض",
       "display_name_placeholder": "تعاونية كيس بيرن",
       "notes": "ملحوظات",
@@ -15987,7 +15987,7 @@
   },
   "pilot_inquiry_admin": {
     "about": {
-      "body_intro_after_kiss": "طيار. يتم إرسال كل استفسار عبر نموذج المصلحة العامة ويتم تسجيله تلقائيًا باستخدام خوارزمية مناسبة (حجم السكان، والتعاونية KISS الحالية، والاستعداد الرقمي، ومؤشر الميزانية، والجدول الزمني). استخدم هذه اللوحة لنقل الاستفسارات عبر المسار، وتعيينها إلى جهة اتصال المبيعات أو المجتمع، وتتبع وقت إرسال المقترحات وبدء تشغيل البرامج التجريبية.",
+      "body_intro_after_kiss": "طيار. يتم إرسال كل استفسار عبر نموذج المصلحة العامة ويتم تسجيله تلقائيًا باستخدام خوارزمية مناسبة (حجم السكان، والتعاونية Caring Community الحالية، والاستعداد الرقمي، ومؤشر الميزانية، والجدول الزمني). استخدم هذه اللوحة لنقل الاستفسارات عبر المسار، وتعيينها إلى جهة اتصال المبيعات أو المجتمع، وتتبع وقت إرسال المقترحات وبدء تشغيل البرامج التجريبية.",
       "body_intro_before_gemeinden": "هذا هو خط الأنابيب العلوي للبلديات (",
       "body_intro_before_kiss": ") والمناطق المهتمة بتشغيل NEXUS/",
       "fit_score_after": "(0-100) يتم حسابه تلقائيًا - 70+ هو تطابق قوي. انقر فوق أي بطاقة لعرض التفاصيل الكاملة أو تحديث المرحلة أو إضافة ملاحظات داخلية.",
@@ -16191,7 +16191,7 @@
   },
   "pilot_scoreboard": {
     "about": {
-      "age_stiftung": "Age-Stiftung",
+      "age_stiftung": "Caring Community",
       "age_stiftung_title": "مؤسسة للتغيير",
       "body": "تستخدم جميع المقاييس فترة متجددة مدتها 90 يومًا. احصل على خط أساس ما قبل الإصدار التجريبي قبل تأهيل المقيمين الحقيقيين، ثم قم بإجراء مراجعة ربع سنوية كل 3 أشهر. يوضح جدول المقارنة كيفية تحرك كل مقياس بالنسبة إلى خط الأساس هذا.",
       "methodology_middle": "المنهجية: ساعات الرعاية غير الرسمية x",
@@ -16333,7 +16333,7 @@
   },
   "category_coefficients": {
     "about": {
-      "body_middle": "). معامل 0.5 يعني أنه يستبدل نصف ساعة. معامل 2.0 يعني أنه يحل محل ساعتين من الرعاية الرسمية - على سبيل المثال، العناية الشخصية المكثفة أو الدعم المتخصص. Age-Stiftung/",
+      "body_middle": "). معامل 0.5 يعني أنه يستبدل نصف ساعة. معامل 2.0 يعني أنه يحل محل ساعتين من الرعاية الرسمية - على سبيل المثال، العناية الشخصية المكثفة أو الدعم المتخصص. Caring Community/",
       "body_prefix": "تتحكم معاملات الاستبدال في مقدار القيمة الاجتماعية التي تستحقها كل فئة رعاية في حساب تعويض التكلفة. معامل 1.0 يعني أن ساعة واحدة تساوي ساعة واحدة من الرعاية الرسمية Spitex/Pflege (",
       "body_suffix": "توصي المنهجية ببدء جميع الفئات عند 1.0 والتعديل بناءً على كثافة الرعاية الملحوظة.",
       "chf_amount": "35 فرنك سويسري",

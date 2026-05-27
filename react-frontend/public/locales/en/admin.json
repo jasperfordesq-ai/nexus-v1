@@ -894,7 +894,7 @@
     },
     "actions": {
       "open_member_hub": "Open member hub",
-      "open_workflow": "Open KISS workflow",
+      "open_workflow": "Open Caring Community workflow",
       "refresh": "Refresh"
     },
     "about": {
@@ -939,7 +939,7 @@
       "community_analytics": "Community analytics",
       "impact_report": "Impact report",
       "municipal_pack": "Municipal report pack",
-      "note": "These surfaces use existing NEXUS reporting today and are ready for KISS-specific exports next."
+      "note": "These surfaces use existing NEXUS reporting today and are ready for Caring Community exports next."
     },
     "messages": {
       "enabled": "Caring Community enabled",
@@ -1443,7 +1443,7 @@
   "municipal_reports": {
     "meta": {
       "title": "Municipal Impact Reports",
-      "description": "Prepare KISS-style reporting for verified hours, active members, trusted organisations, and municipal value conversations."
+      "description": "Prepare Caring Community reporting for verified hours, active members, trusted organisations, and municipal value conversations."
     },
     "export_note": {
       "pdf_label": "PDF export",
@@ -1454,9 +1454,9 @@
     "about": {
       "title": "About this report",
       "body_1_before_kiss": "The Municipal Impact Report is the evidence pack you share with municipal partners, cantons, and funders to demonstrate the programme's value. It shows verified care hours, active members, partner organisations, and, using the",
-      "body_1_after_kiss": "/Age-Stiftung methodology, an estimated cost offset to formal care services (",
+      "body_1_after_kiss": " methodology, an estimated cost offset to formal care services (",
       "body_1_after_chf": " value of hours x prevention multiplier).",
-      "kiss_abbr": "KISS",
+      "kiss_abbr": "Caring Community",
       "chf_abbr": "CHF",
       "body_2_prefix": "Use the",
       "body_2_after_audience": " toggle to switch the narrative framing:",
@@ -1634,7 +1634,7 @@
         "no_category_data": "No category data in this period."
       },
       "cooperative": {
-        "empty_title": "Cooperative (KISS-Genossenschaft internal)",
+        "empty_title": "Cooperative (cooperative internal)",
         "empty_description": "Member retention, hour reciprocity, tandem relationships, coordinator workload, future-care credit pool.",
         "empty_body": "Switch to Cooperative mode to load the cooperative-internal narrative.",
         "title": "Cooperative internal report - {{from}} to {{to}}",
@@ -3866,7 +3866,7 @@
       "title": "About this page",
       "chf_amount": "CHF 35",
       "body_prefix": "Substitution Coefficients control how much social value each care category is worth in the cost-offset calculation. A coefficient of 1.0 means one hour equals one hour of formal Spitex/Pflege care (",
-      "body_middle": "). A coefficient of 0.5 means it substitutes for half an hour. A coefficient of 2.0 means it substitutes for two hours of formal care - for example, intensive personal care or specialist support. The Age-Stiftung/",
+      "body_middle": "). A coefficient of 0.5 means it substitutes for half an hour. A coefficient of 2.0 means it substitutes for two hours of formal care - for example, intensive personal care or specialist support. The",
       "body_suffix": "methodology recommends starting all categories at 1.0 and adjusting based on observed care intensity.",
       "range_prefix": "Values range from 0.00 (no care substitution value) to 9.99. Changes take effect on the next",
       "range_suffix": "report refresh."
@@ -4144,9 +4144,9 @@
       "title": "About this page",
       "body_prefix": "The Municipal",
       "body_middle": "Report calculates the social and economic value of your community care programme using the",
-      "body_suffix": "Age-Stiftung methodology. It shows the estimated cost offset to formal care services (Spitex/Pflege), the social value generated, and trend data across reporting periods. This report is designed to be shared with municipal partners and funders as evidence of the programme's impact.",
+      "body_suffix": "Caring Community methodology. It shows the estimated cost offset to formal care services (Spitex/Pflege), the social value generated, and trend data across reporting periods. This report is designed to be shared with municipal partners and funders as evidence of the programme's impact.",
       "formula_prefix": "Cost offset = total approved care hours x",
-      "formula_suffix": "hourly rate x prevention multiplier. The prevention multiplier (default: 2.0) reflects that one hour of informal care prevents approximately two hours of formal care intervention, based on Age-Stiftung research."
+      "formula_suffix": "hourly rate x prevention multiplier. The prevention multiplier (default: 2.0) reflects that one hour of informal care prevents approximately two hours of formal care intervention, based on Caring Community research."
     },
     "filters": {
       "from": "From",
@@ -4162,9 +4162,9 @@
       "default_rate": "CHF 35/hr",
       "tenant_setting_source": "configured for this tenant",
       "default_source": "Swiss formal care assistant rate, SECO 2024",
-      "prevention_value_prefix": "Prevention value applies a {{multiplier}}x multiplier per Age-Stiftung/",
+      "prevention_value_prefix": "Prevention value applies a {{multiplier}}x multiplier per",
       "prevention_value_suffix": "evaluation methodology.",
-      "default_prevention_prefix": "Prevention value applies a 2x multiplier per Age-Stiftung/",
+      "default_prevention_prefix": "Prevention value applies a 2x multiplier per",
       "default_prevention_suffix": "evaluation methodology.",
       "substitution_applied": "Hours are weighted by per-category substitution coefficients.",
       "substitution_not_applied": "All hours weighted at 1.0x."
@@ -4174,7 +4174,7 @@
       "active_members": "Active Members",
       "active_relationships": "Active Relationships",
       "care_recipients": "Care Recipients",
-      "weighted_hours_tooltip": "Hours are weighted by category-specific substitution rates (e.g. companionship 0.4x, transport 0.7x, errands 1.0x) per Age-Stiftung methodology.",
+      "weighted_hours_tooltip": "Hours are weighted by category-specific substitution rates (e.g. companionship 0.4x, transport 0.7x, errands 1.0x) per Caring Community methodology.",
       "weighted_hours_note": "{{hours}} weighted hours after substitution coefficients"
     },
     "roi": {
@@ -4192,7 +4192,7 @@
       "point_hour_suffix": "in formal care costs",
       "point_prevention": "Preventative community support can reduce residential care needs - estimated 2x multiplier",
       "point_nexus": "makes this impact measurable, auditable, and reportable for cantonal and municipal procurement",
-      "point_export": "CSV export available - use the button in the page header for Age-Stiftung, Pro Senectute, and cantonal social department reporting."
+      "point_export": "CSV export available - use the button in the page header for Caring Community, Pro Senectute, and cantonal social department reporting."
     },
     "breakdown": {
       "title": "Breakdown by sub-region",
@@ -4211,17 +4211,17 @@
   "national_kiss_dashboard": {
     "loading": "Loading",
     "meta": {
-      "page_title": "Fondation KISS - National Dashboard",
-      "title": "Fondation KISS - National Dashboard",
-      "description": "Cross-cooperative super-admin view across every KISS cooperative on the platform. Member counts are reported in privacy-preserving brackets."
+      "page_title": "Caring Community - National Dashboard",
+      "title": "Caring Community - National Dashboard",
+      "description": "Cross-cooperative super-admin view across every Caring Community cooperative on the platform. Member counts are reported in privacy-preserving brackets."
     },
     "actions": {
       "refresh": "Refresh"
     },
     "about": {
       "title": "About this dashboard",
-      "body_prefix": "KISS (Koordination und Innovation fur Soziales) is a Swiss methodology for community-based care coordination developed with Age-Stiftung. This super-admin dashboard aggregates metrics across every NEXUS cooperative running the Caring Community programme nationally - giving the Fondation",
-      "body_suffix": "a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member counts are shown as privacy-preserving brackets (e.g. \"50-99\") rather than exact numbers.",
+      "body_prefix": "Caring Community is a methodology for community-based care coordination. This super-admin dashboard aggregates metrics across every NEXUS cooperative running the Caring Community programme nationally - giving the national",
+      "body_suffix": "foundation a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member counts are shown as privacy-preserving brackets (e.g. \"50-99\") rather than exact numbers.",
       "health_prefix": "Use the period selector to compare quarters. The comparative table ranks cooperatives by hours, members, or health status. Health status is derived from activity trends:",
       "thriving_definition": "growing fast,",
       "stable_definition": "flat activity,",
@@ -4712,12 +4712,12 @@
       "title": "Add Federation Peer",
       "peer_slug": "Peer Slug",
       "peer_slug_description": "Lowercase alphanumeric + hyphens. Used as destination cooperative slug for outbound transfers.",
-      "peer_slug_placeholder": "kiss-bern",
+      "peer_slug_placeholder": "bern-cooperative",
       "display_name": "Display Name",
-      "display_name_placeholder": "KISS Bern Cooperative",
+      "display_name_placeholder": "Bern Cooperative",
       "base_url": "Base URL",
       "base_url_description": "HTTPS URL of the remote NEXUS API. The /v2/federation/hour-transfer/inbound path is appended automatically.",
-      "base_url_placeholder": "https://api.kiss-bern.ch",
+      "base_url_placeholder": "https://api.bern-cooperative.ch",
       "notes": "Notes",
       "notes_placeholder": "Internal notes - partner contact, agreement reference...",
       "status_hint_prefix": "Status starts as",
@@ -4767,7 +4767,7 @@
       "title": "About this page",
       "body": "All metrics use a 90-day rolling window. Capture a pre-pilot baseline before onboarding real residents, then run a quarterly review snapshot every 3 months. The comparison table shows how each metric has moved relative to that baseline.",
       "methodology_prefix": "Cost offset is calculated using the",
-      "age_stiftung": "Age-Stiftung",
+      "age_stiftung": "Caring Community",
       "age_stiftung_title": "Stiftung für das Alter",
       "methodology_middle": "methodology: hours of informal care x",
       "methodology_suffix": "35/hr (Swiss formal-care assistant rate) x 2 (prevention multiplier reflecting avoided formal care costs). This methodology is recognised by Swiss cantonal social services for pilot reporting."
@@ -5262,7 +5262,7 @@
     "pilot_inquiries": "Pilot Inquiries",
     "provisioning_requests": "Provisioning Requests",
     "national": "National",
-    "kiss": "KISS",
+    "kiss": "Caring Community",
     "regional_analytics": "Regional Analytics",
     "help": "Help",
     "whitelist": "Whitelist"
@@ -5278,7 +5278,7 @@
     "categories": {
       "general_admin": "General Admin",
       "caring_community": "Caring Community",
-      "kiss_agoris": "KISS & AGORIS"
+      "kiss_agoris": "Caring Community"
     }
   },
   "provisioning_requests": {
@@ -5335,7 +5335,7 @@
       "body_intro_before_gemeinden": "This is the top-of-funnel pipeline for municipalities (",
       "gemeinden": "Gemeinden",
       "body_intro_before_kiss": ") and regions interested in running a NEXUS/",
-      "body_intro_after_kiss": " pilot. Each inquiry is submitted via the public interest form and scored automatically using a fit algorithm (population size, existing KISS cooperative, digital readiness, budget indication, and timeline). Use this board to move inquiries through the pipeline, assign them to a sales or community contact, and track when proposals are sent and pilots go live.",
+      "body_intro_after_kiss": " pilot. Each inquiry is submitted via the public interest form and scored automatically using a fit algorithm (population size, existing Caring Community cooperative, digital readiness, budget indication, and timeline). Use this board to move inquiries through the pipeline, assign them to a sales or community contact, and track when proposals are sent and pilots go live.",
       "pipeline_stages_label": "Pipeline stages:",
       "pipeline_stages": "New -> Contacted -> Qualified -> Proposal sent -> Pilot agreed -> Live -> Rejected / Withdrawn.",
       "fit_score_before": "The ",
@@ -14816,7 +14816,7 @@
     "label_wallet": "Wallet",
     "desc_ai_chat": "AI-powered chat assistant for members",
     "desc_blog": "Publish articles and community news",
-    "desc_caring_community": "Integrated care hub, KISS workflow, and municipal care reporting",
+    "desc_caring_community": "Integrated care hub, Caring Community workflow, and municipal care reporting",
     "desc_connections": "Member-to-member connection requests",
     "desc_dashboard": "Personalised home dashboard for members",
     "desc_direct_messaging": "Private messaging between members",
@@ -16212,7 +16212,7 @@
     },
     "operating_policy": {
       "title": "Operating Policy",
-      "subtitle": "KISS operating-policy workshop: rules software cannot guess.",
+      "subtitle": "Caring Community operating-policy workshop: rules software cannot guess.",
       "loading": "Loading operating policy",
       "last_updated": "Last updated {{date}}",
       "meta": {
@@ -16228,7 +16228,7 @@
         "body": "Operating Policy defines the rules of your community care programme: who can approve hours, how quickly coordinators must respond, how social value is calculated, and what the reporting cycle looks like. Configure this before launching the pilot. Changes take effect immediately and are logged for audit purposes.",
         "methodology_prefix": "The",
         "methodology_middle": "hourly rate and prevention multiplier fields use the",
-        "methodology_suffix": "methodology (Koordination und Innovation fur Soziales, Schwyz) developed with Age-Stiftung. If you are not running a Swiss KISS/",
+        "methodology_suffix": "hourly rate and prevention multiplier fields use the Caring Community methodology. If your community uses a different currency or local care economics, set the rate to your local formal-care hourly equivalent and the multiplier to 1.0.",
         "methodology_tail": "pilot, set the rate to your local formal-care hourly equivalent and the multiplier to 1.0."
       },
       "sections": {
@@ -16274,7 +16274,7 @@
         },
         "chf_prevention_multiplier": {
           "label": "CHF prevention multiplier",
-          "help": "Multiplier applied to formal-care offset for the Age-Stiftung and KISS methodology."
+          "help": "Multiplier applied to formal-care offset for the Caring Community and Caring Community methodology."
         },
         "statement_cadence": {
           "label": "Member statement cadence",

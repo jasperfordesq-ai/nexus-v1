@@ -1577,7 +1577,7 @@
     "pilot_inquiries": "Vragen van piloten",
     "provisioning_requests": "Voorzieningenverzoeken",
     "national": "Nationaal",
-    "kiss": "KISS",
+    "kiss": "Caring Community",
     "regional_analytics": "Regionale analyses",
     "help": "Hulp",
     "operations": "Operaties",
@@ -10927,7 +10927,7 @@
     "label_wallet": "Portemonnee",
     "desc_ai_chat": "AI-aangedreven chatassistent voor leden",
     "desc_blog": "Publiceer artikelen en gemeenschapsnieuws",
-    "desc_caring_community": "Geïntegreerde zorghub, KISS-workflow en gemeentelijke zorgrapportage",
+    "desc_caring_community": "Geïntegreerde zorghub, Caring Community-workflow en gemeentelijke zorgrapportage",
     "desc_connections": "Verbindingsverzoeken van lid tot lid",
     "desc_dashboard": "Gepersonaliseerd startdashboard voor leden",
     "desc_direct_messaging": "Privéberichten tussen leden",
@@ -12046,7 +12046,7 @@
     },
     "actions": {
       "open_member_hub": "Open ledenhub",
-      "open_workflow": "Open de KISS-workflow",
+      "open_workflow": "Open de Caring Community-workflow",
       "refresh": "Vernieuwen"
     },
     "stats": {
@@ -12079,7 +12079,7 @@
       "community_analytics": "Community-analyses",
       "impact_report": "Impactrapport",
       "municipal_pack": "Gemeentelijk rapportpakket",
-      "note": "Deze oppervlakken maken momenteel gebruik van bestaande NEXUS-rapportage en zijn daarna klaar voor KISS-specifieke export."
+      "note": "Deze oppervlakken maken momenteel gebruik van bestaande NEXUS-rapportage en zijn daarna klaar voor Caring Community-specifieke export."
     },
     "messages": {
       "enabled": "Zorgzame gemeenschap ingeschakeld",
@@ -12110,7 +12110,7 @@
   },
   "caring_workflow": {
     "meta": {
-      "title": "KISS Workflow Console",
+      "title": "Caring Community Workflow Console",
       "description": "Coordinate the operational flow behind a caring community: intake, matching, hour logging, trusted review, and member statements.",
       "page_title": "Zorgzame gemeenschapsworkflow"
     },
@@ -12135,7 +12135,7 @@
       "role_presets_count": "{{count}} role presets"
     },
     "toast": {
-      "load_failed": "Failed to load KISS workflow data."
+      "load_failed": "Failed to load Caring Community workflow data."
     },
     "review_queue": {
       "title": "Trusted review queue",
@@ -12180,13 +12180,13 @@
       "installing": "Installing",
       "installed_chip": "Installed",
       "not_installed_chip": "Not installed",
-      "install_success": "KISS role pack installed.",
-      "install_failed": "Failed to install KISS role pack.",
+      "install_success": "Caring Community role pack installed.",
+      "install_failed": "Failed to install Caring Community role pack.",
       "installed_count": "{{installed}} of {{total}} presets installed",
       "permissions_status": "{{installed}} of {{total}} permissions",
       "national_admin": {
         "title": "National foundation admin",
-        "description": "Cross-program oversight, reporting standards, and KISS network governance."
+        "description": "Cross-program oversight, reporting standards, and Caring Community network governance."
       },
       "canton_admin": {
         "title": "Canton admin",
@@ -12210,7 +12210,7 @@
       }
     },
     "stages": {
-      "title": "KISS operating model",
+      "title": "Caring Community operating model",
       "description": "The workflow path this module should make explicit for evaluators and coordinators.",
       "intake": {
         "title": "Inname",
@@ -12235,7 +12235,7 @@
     },
     "policy": {
       "title": "Workflow-beleid",
-      "description": "Tenant-level defaults for KISS hour review, statements, and municipal evidence.",
+      "description": "Tenant-level defaults for Caring Community hour review, statements, and municipal evidence.",
       "save": "Beleid opslaan",
       "save_success": "Workflowbeleid opgeslagen.",
       "save_failed": "Failed to save workflow policy.",
@@ -12267,7 +12267,7 @@
     },
     "member_statement": {
       "title": "Member statements",
-      "description": "Preview or export a KISS-style member statement with support hours, wallet movement, and municipal value assumptions.",
+      "description": "Preview or export a Caring Community member statement with support hours, wallet movement, and municipal value assumptions.",
       "member_id": "Lid-ID",
       "start_date": "From",
       "end_date": "To",
@@ -12290,7 +12290,7 @@
     },
     "support_relationships": {
       "title": "Recurring support relationships",
-      "description": "Create and monitor ongoing supporter-recipient relationships for KISS-style recurring care.",
+      "description": "Create and monitor ongoing supporter-recipient relationships for Caring Community recurring care.",
       "active": "Active",
       "paused": "Paused",
       "check_ins_due": "Check-ins due",
@@ -12359,7 +12359,7 @@
     },
     "paper_onboarding": {
       "title": "Paper Form Intake",
-      "description": "Upload a signed KISS form, review the extracted fields, then create the provisional account only after coordinator confirmation.",
+      "description": "Upload a signed Caring Community form, review the extracted fields, then create the provisional account only after coordinator confirmation.",
       "refresh": "Refresh",
       "file_label": "Scanned form",
       "name_label": "Extracted full name",
@@ -12659,7 +12659,7 @@
   "municipal_reports": {
     "meta": {
       "title": "Gemeentelijke Impactrapporten",
-      "description": "Bereid rapportages in KISS-stijl voor over geverifieerde uren, actieve leden, vertrouwde organisaties en gemeentelijke waardegesprekken."
+      "description": "Bereid rapportages in Caring Community-stijl voor over geverifieerde uren, actieve leden, vertrouwde organisaties en gemeentelijke waardegesprekken."
     },
     "actions": {
       "analytics": "Community-analyses",
@@ -12799,7 +12799,7 @@
     },
     "about": {
       "body_1_after_chf": "waarde van uren x preventiemultiplier).",
-      "body_1_after_kiss": "/Age-Stiftung methodologie, een geschatte kostencompensatie voor formele zorgdiensten (",
+      "body_1_after_kiss": " methodologie, een geschatte kostencompensatie voor formele zorgdiensten (",
       "body_1_before_kiss": "Het Gemeentelijk Impactrapport is het bewijspakket dat u deelt met gemeentelijke partners, kantons en financiers om de waarde van het programma aan te tonen. Het toont geverifieerde opvanguren, actieve leden, partnerorganisaties en, met behulp van de",
       "body_2_after_audience": "schakel om de verhaalkader te wijzigen:",
       "body_2_after_canton": "verzamelt meerdere gemeenten en toont kostenvermijding op kantonnale schaal;",
@@ -12807,7 +12807,7 @@
       "body_2_after_municipality": "richt zich op bereikte buurtbewoners en partnerorganisaties;",
       "body_2_prefix": "Gebruik de",
       "chf_abbr": "CHF",
-      "kiss_abbr": "KISS",
+      "kiss_abbr": "Caring Community",
       "title": "Over dit rapport"
     },
     "audience_selector": {
@@ -12844,7 +12844,7 @@
         "description": "Interne coöperatieve gezondheid: retentie, wederkerigheid, tandems, coördinatorbelasting, kredietpool.",
         "empty_body": "Schakel over naar de coöperatieve modus om het coöperatieve interne verhaal te laden.",
         "empty_description": "Ledenbehoud, wederkerigheid van uren, tandemrelaties, werklast van de coördinator, kredietpool voor toekomstige zorg.",
-        "empty_title": "Coöperatief (KISS-Genossenschaft intern)",
+        "empty_title": "Coöperatief (cooperative intern)",
         "future_care_credit_pool": "Kredietbalanspool voor toekomstige zorg",
         "future_care_credit_pool_desc": "Som van de positieve ledensaldi: de impliciete reserve voor toekomstige zorg van de coöperatie. Actief ledenbestand: {{count}}.",
         "member_retention": "Retentie van leden",
@@ -13331,7 +13331,7 @@
     },
     "operating_policy": {
       "title": "Operationeel beleid",
-      "subtitle": "KISS workshop over operationeel beleid: regels die software niet kan raden.",
+      "subtitle": "Caring Community workshop over operationeel beleid: regels die software niet kan raden.",
       "loading": "Operationeel beleid laden",
       "last_updated": "Laatst bijgewerkt {{date}}",
       "meta": {
@@ -13347,7 +13347,7 @@
         "body": "Operating Policy definieert de regels van uw wijkzorgprogramma: wie uren kan goedkeuren, hoe snel coördinatoren moeten reageren, hoe maatschappelijke waarde wordt berekend en hoe de rapportagecyclus eruit ziet. Configureer dit voordat u de pilot start. Wijzigingen worden onmiddellijk van kracht en worden geregistreerd voor auditdoeleinden.",
         "methodology_prefix": "De",
         "methodology_middle": "uurtarief en preventie-multipliervelden gebruiken de",
-        "methodology_suffix": "methodologie (Koordination und Innovation fur Soziales, Schwyz) ontwikkeld met Age-Stiftung. Als u geen Zwitserse KISS/",
+        "methodology_suffix": "methodologie (Caring Community) ontwikkeld met Caring Community. Als u geen Zwitserse Caring Community/",
         "methodology_tail": "pilot, stel het tarief in op uw lokale uuruurequivalent voor formele zorg en de vermenigvuldiger op 1.0."
       },
       "sections": {
@@ -13393,7 +13393,7 @@
         },
         "chf_prevention_multiplier": {
           "label": "CHF preventiemultiplier",
-          "help": "Multiplier toegepast op compensatie voor formele zorg voor de Age-Stiftung- en KISS-methodologie."
+          "help": "Multiplier toegepast op compensatie voor formele zorg voor de Caring Community- en Caring Community-methodologie."
         },
         "statement_cadence": {
           "label": "Cadans van ledenverklaring",
@@ -14817,9 +14817,9 @@
     "about": {
       "body_middle": "Report berekent de sociale en economische waarde van uw gemeenschapszorgprogramma met behulp van de",
       "body_prefix": "De gemeentelijke",
-      "body_suffix": "Age-Stiftung methodologie. Het toont de geschatte kosten die worden gecompenseerd voor formele zorgdiensten (Spitex/Pflege), de gegenereerde sociale waarde en trendgegevens over de rapportageperioden. Dit rapport is bedoeld om te worden gedeeld met gemeentelijke partners en financiers als bewijs van de impact van het programma.",
+      "body_suffix": "Caring Community methodologie. Het toont de geschatte kosten die worden gecompenseerd voor formele zorgdiensten (Spitex/Pflege), de gegenereerde sociale waarde en trendgegevens over de rapportageperioden. Dit rapport is bedoeld om te worden gedeeld met gemeentelijke partners en financiers als bewijs van de impact van het programma.",
       "formula_prefix": "Kostencompensatie = totaal goedgekeurde zorguren x",
-      "formula_suffix": "uurtarief x preventiemultiplier. De preventiemultiplier (standaard: 2,0) weerspiegelt dat één uur informele zorg ongeveer twee uur formele zorginterventie voorkomt, gebaseerd op Age-Stiftung onderzoek.",
+      "formula_suffix": "uurtarief x preventiemultiplier. De preventiemultiplier (standaard: 2,0) weerspiegelt dat één uur informele zorg ongeveer twee uur formele zorginterventie voorkomt, gebaseerd op Caring Community onderzoek.",
       "title": "Over deze pagina"
     },
     "actions": {
@@ -14850,20 +14850,20 @@
     },
     "methodology": {
       "chf_per_hour": "CHF {{amount}}/uur",
-      "default_prevention_prefix": "Preventiewaarde past een vermenigvuldiger van 2x toe per Age-Stiftung/",
+      "default_prevention_prefix": "Preventiewaarde past een vermenigvuldiger van 2x toe per Caring Community/",
       "default_prevention_suffix": "evaluatiemethodologie.",
       "default_rate": "CHF 35/uur",
       "default_source": "Tarief Zwitserse formele zorgassistenten, SECO 2024",
       "hours_are_valued_at": "Uren worden gewaardeerd op",
       "hours_valued_at": "Uren gewaardeerd op",
-      "prevention_value_prefix": "Preventiewaarde past een {{multiplier}}x vermenigvuldiger toe per Age-Stiftung/",
+      "prevention_value_prefix": "Preventiewaarde past een {{multiplier}}x vermenigvuldiger toe per Caring Community/",
       "prevention_value_suffix": "evaluatiemethodologie.",
       "substitution_applied": "Uren worden gewogen op basis van substitutiecoëfficiënten per categorie.",
       "substitution_not_applied": "Alle uren gewogen op 1,0x.",
       "tenant_setting_source": "geconfigureerd voor deze tenant"
     },
     "municipalities": {
-      "point_export": "CSV export beschikbaar - gebruik de knop in de paginakop voor Age-Stiftung, Pro Senectute en rapportage van de kantonnale sociale afdelingen.",
+      "point_export": "CSV export beschikbaar - gebruik de knop in de paginakop voor Caring Community, Pro Senectute en rapportage van de kantonnale sociale afdelingen.",
       "point_hour_prefix": "Elk uur zorgtijd voor de gemeenschap bespaart ongeveer",
       "point_hour_suffix": "in de formele zorgkosten",
       "point_nexus": "maakt deze impact meetbaar, controleerbaar en rapporteerbaar voor kantonnale en gemeentelijke aanbestedingen",
@@ -14885,7 +14885,7 @@
       "care_recipients": "Zorgontvangers",
       "total_hours": "Totaal aantal uren",
       "weighted_hours_note": "{{hours}} gewogen uren na vervangingscoëfficiënten",
-      "weighted_hours_tooltip": "Uren worden gewogen op basis van categoriespecifieke vervangingspercentages (bijvoorbeeld gezelschap 0,4x, vervoer 0,7x, boodschappen 1,0x) per Age-Stiftung methodologie."
+      "weighted_hours_tooltip": "Uren worden gewogen op basis van categoriespecifieke vervangingspercentages (bijvoorbeeld gezelschap 0,4x, vervoer 0,7x, boodschappen 1,0x) per Caring Community methodologie."
     },
     "toasts": {
       "export_failed": "Kan CSV niet exporteren",
@@ -15078,7 +15078,7 @@
   },
   "national_kiss_dashboard": {
     "about": {
-      "body_prefix": "KISS (Koördinatie und Innovation fur Soziales) is een Zwitserse methodologie voor zorgcoördinatie in de gemeenschap, ontwikkeld in samenwerking met Age-Stiftung. Dit superbeheerdersdashboard verzamelt statistieken van elke NEXUS coöperatie die het Caring Community-programma op nationaal niveau uitvoert, waardoor de Fondation",
+      "body_prefix": "Caring Community (Koördinatie und Innovation fur Soziales) is een Zwitserse methodologie voor zorgcoördinatie in de gemeenschap, ontwikkeld in samenwerking met Caring Community. Dit superbeheerdersdashboard verzamelt statistieken van elke NEXUS coöperatie die het Caring Community-programma op nationaal niveau uitvoert, waardoor de Fondation",
       "body_suffix": "een coöperatief beeld van uitgewisselde uren, ledenparticipatie en coöperatieve gezondheid. Het aantal leden wordt weergegeven als privacybeschermende haakjes (bijvoorbeeld '50-99') in plaats van exacte cijfers.",
       "health_prefix": "Gebruik de periodekiezer om kwartalen te vergelijken. De vergelijkende tabel rangschikt coöperaties op uren, leden of gezondheidsstatus. De gezondheidsstatus wordt afgeleid van activiteitstrends:",
       "stable_definition": "vlakke activiteit,",
@@ -15146,9 +15146,9 @@
       "top_title": "Top 5 per uur"
     },
     "meta": {
-      "description": "Cross-coöperatieve superbeheerdersweergave van elke KISS coöperatie op het platform. Ledenaantallen worden gerapporteerd tussen haakjes ter bescherming van de privacy.",
-      "page_title": "Fondation KISS - Nationaal dashboard",
-      "title": "Fondation KISS - Nationaal dashboard"
+      "description": "Cross-coöperatieve superbeheerdersweergave van elke Caring Community coöperatie op het platform. Ledenaantallen worden gerapporteerd tussen haakjes ter bescherming van de privacy.",
+      "page_title": "Caring Community - Nationaal dashboard",
+      "title": "Caring Community - Nationaal dashboard"
     },
     "metrics": {
       "yoy": "{{value}} JoJ"
@@ -15600,9 +15600,9 @@
     "create_modal": {
       "base_url": "Basis URL",
       "base_url_description": "HTTPS URL van de afstandsbediening NEXUS API. Het pad /v2/federation/hour-transfer/inbound wordt automatisch toegevoegd.",
-      "base_url_placeholder": "https://api.kiss-bern.ch",
+      "base_url_placeholder": "https://api.bern-cooperative.ch",
       "display_name": "Weergavenaam",
-      "display_name_placeholder": "KISS Bern-coöperatie",
+      "display_name_placeholder": "Caring Community Bern-coöperatie",
       "notes": "Opmerkingen",
       "notes_placeholder": "Interne opmerkingen - partnercontact, overeenkomstreferentie...",
       "peer_slug": "Peer-slak",
@@ -15987,7 +15987,7 @@
   },
   "pilot_inquiry_admin": {
     "about": {
-      "body_intro_after_kiss": "piloot. Elke aanvraag wordt ingediend via het formulier voor algemeen belang en wordt automatisch gescoord met behulp van een geschikt algoritme (populatieomvang, bestaande KISS coöperatie, digitale gereedheid, budgetindicatie en tijdlijn). Gebruik dit bord om vragen door de pijplijn te loodsen, ze toe te wijzen aan een verkoop- of gemeenschapscontactpersoon en bij te houden wanneer voorstellen worden verzonden en pilots live gaan.",
+      "body_intro_after_kiss": "piloot. Elke aanvraag wordt ingediend via het formulier voor algemeen belang en wordt automatisch gescoord met behulp van een geschikt algoritme (populatieomvang, bestaande Caring Community coöperatie, digitale gereedheid, budgetindicatie en tijdlijn). Gebruik dit bord om vragen door de pijplijn te loodsen, ze toe te wijzen aan een verkoop- of gemeenschapscontactpersoon en bij te houden wanneer voorstellen worden verzonden en pilots live gaan.",
       "body_intro_before_gemeinden": "Dit is de top-of-funnel pijplijn voor gemeenten (",
       "body_intro_before_kiss": ") en regio's die geïnteresseerd zijn in het uitvoeren van een NEXUS/",
       "fit_score_after": "(0-100) wordt automatisch berekend - 70+ is een sterke match. Klik op een kaart om de volledige details te bekijken, de fase bij te werken of interne notities toe te voegen.",
@@ -16191,7 +16191,7 @@
   },
   "pilot_scoreboard": {
     "about": {
-      "age_stiftung": "Age-Stiftung",
+      "age_stiftung": "Caring Community",
       "age_stiftung_title": "Stiftung für das Alter",
       "body": "Alle statistieken gebruiken een voortschrijdende periode van 90 dagen. Leg een pre-pilot-basislijn vast voordat u echte bewoners aan boord neemt, en voer vervolgens elke drie maanden een driemaandelijkse beoordelingsmomentopname uit. De vergelijkingstabel laat zien hoe elke metriek is verschoven ten opzichte van die basislijn.",
       "methodology_middle": "methodiek: uren mantelzorg x",
@@ -16333,7 +16333,7 @@
   },
   "category_coefficients": {
     "about": {
-      "body_middle": "). Een coëfficiënt van 0,5 betekent dat het een half uur vervangt. Een coëfficiënt van 2,0 betekent dat het twee uur formele zorg vervangt, bijvoorbeeld intensieve persoonlijke zorg of specialistische ondersteuning. De Age-Stiftung/",
+      "body_middle": "). Een coëfficiënt van 0,5 betekent dat het een half uur vervangt. Een coëfficiënt van 2,0 betekent dat het twee uur formele zorg vervangt, bijvoorbeeld intensieve persoonlijke zorg of specialistische ondersteuning. De Caring Community/",
       "body_prefix": "Substitutiecoëfficiënten bepalen hoeveel maatschappelijke waarde elke zorgcategorie waard is in de kostencompensatieberekening. Een coëfficiënt van 1,0 betekent dat één uur gelijk is aan één uur formele Spitex/Pflege zorg (",
       "body_suffix": "De methodologie beveelt aan om alle categorieën op 1,0 te starten en deze aan te passen op basis van de waargenomen zorgintensiteit.",
       "chf_amount": "CHF 35",
@@ -16948,7 +16948,7 @@
     "categories": {
       "general_admin": "Algemeen beheerder",
       "caring_community": "Zorgzame gemeenschap",
-      "kiss_agoris": "KUS & AGORIS"
+      "kiss_agoris": "KUS & Caring Community"
     }
   },
   "newsletter_segments": {

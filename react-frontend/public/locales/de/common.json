@@ -393,7 +393,7 @@
       "hour_gift": "Stunden schenken",
       "hour_gift_sub": "Schenke deine gesparten Stunden an Familie oder Freund:innen.",
       "hour_transfer": "Stunden übertragen",
-      "hour_transfer_sub": "Gesparte Stunden zu einer anderen KISS-Genossenschaft übertragen.",
+      "hour_transfer_sub": "Gesparte Stunden zu einer anderen cooperative übertragen.",
       "safeguarding_report": "Anliegen melden",
       "safeguarding_report_sub": "Sicherheitsanliegen vertraulich melden.",
       "projects": "Gemeinschaftsprojekte",
@@ -401,7 +401,7 @@
     },
     "operating_model": {
       "title": "Funktionsweise",
-      "subtitle": "Konzipiert für gegenseitige Unterstützung nach KISS-Prinzip",
+      "subtitle": "Konzipiert für gegenseitige Unterstützung nach Caring Community-Prinzip",
       "trusted_requests": {
         "title": "Vertrauensvolle Anfragen",
         "description": "Mitglieder können praktische Unterstützung über Zeitvorsorge-Inserate und koordinierte Freiwilligenarbeit anfragen."
@@ -583,20 +583,20 @@
   },
   "inter_gen": {
     "badge": "Generationenübergreifend",
-    "tooltip": "Diese Tandem-Beziehung verbindet Generationen — ein Markenzeichen des KISS-Modells."
+    "tooltip": "Diese Tandem-Beziehung verbindet Generationen — ein Markenzeichen des Caring Community-Modells."
   },
   "hour_transfer": {
     "meta": {
       "title": "Gutgeschriebene Stunden übertragen",
-      "description": "Übertrag deiner gutgeschriebenen Stunden an eine andere KISS-Genossenschaft"
+      "description": "Übertrag deiner gutgeschriebenen Stunden an eine andere cooperative"
     },
     "title": "Deine gutgeschriebenen Stunden übertragen",
     "subtitle": "Du ziehst in eine andere Gemeinde? Deine gutgeschriebenen Stunden gehen mit.",
     "success_message": "Übertragungsanfrage gesendet. Eine Koordinatorin oder ein Koordinator prüft sie vor der Stundenübertragung.",
     "form": {
       "destination_label": "Ziel-Genossenschaft",
-      "destination_placeholder": "z. B. zug-kiss",
-      "destination_help": "Der Slug der KISS-Genossenschaft oder Mandantin am neuen Wohnort",
+      "destination_placeholder": "z. B. zug-cooperative",
+      "destination_help": "Der Slug der cooperative oder Mandantin am neuen Wohnort",
       "hours_label": "Zu übertragende Stunden",
       "hours_placeholder": "z. B. 25.5",
       "reason_label": "Grund (optional)",
@@ -1760,7 +1760,7 @@
       "captcha": "Sicherheitsprüfung"
     },
     "categories": {
-      "kiss_cooperative": "KISS-Genossenschaft",
+      "kiss_cooperative": "cooperative",
       "caring_community": "Caring Community",
       "agoris_node": "Sorgegemeinschaft-Knoten",
       "community": "Allgemeine Gemeinschaft / Zeitbank"

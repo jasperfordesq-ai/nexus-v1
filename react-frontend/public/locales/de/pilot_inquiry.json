@@ -16,7 +16,7 @@
     "region": "Region / Kanton",
     "country": "Land",
     "population": "Einwohnerzahl",
-    "has_kiss": "KISS-Genossenschaft in Ihrer Region vorhanden",
+    "has_kiss": "cooperative in Ihrer Region vorhanden",
     "modules": "Interessierende Module",
     "has_existing_tool": "Bereits ein digitales Tool im Einsatz",
     "existing_tool": "Welches Tool?",

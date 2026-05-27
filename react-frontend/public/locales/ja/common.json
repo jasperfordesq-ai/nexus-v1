@@ -393,7 +393,7 @@
       "hour_gift": "時間を贈る",
       "hour_gift_sub": "貯めた時間を家族や友人に贈ります。",
       "hour_transfer": "時間を移転",
-      "hour_transfer_sub": "貯めた時間を別のKISS協同組合に移します。",
+      "hour_transfer_sub": "貯めた時間を別のCaring Community協同組合に移します。",
       "safeguarding_report": "懸念を報告",
       "safeguarding_report_sub": "セーフガーディングに関する懸念を機密で報告します。",
       "projects": "コミュニティプロジェクト",
@@ -401,7 +401,7 @@
     },
     "operating_model": {
       "title": "運営モデル",
-      "subtitle": "KISS型の互助のために設計",
+      "subtitle": "Caring Community型の互助のために設計",
       "trusted_requests": {
         "title": "信頼できるリクエスト",
         "description": "メンバーはタイムバンクの掲載やコーディネーター主導のボランティアを通じて実用的な支援を求められます。"
@@ -583,20 +583,20 @@
   },
   "inter_gen": {
     "badge": "世代間",
-    "tooltip": "この支援関係は世代を超えています — KISSモデルの特徴です。"
+    "tooltip": "この支援関係は世代を超えています — Caring Communityモデルの特徴です。"
   },
   "hour_transfer": {
     "meta": {
       "title": "貯めた時間を移行",
-      "description": "貯めた時間を別のKISS協同組合へ移行する"
+      "description": "貯めた時間を別のCaring Community協同組合へ移行する"
     },
     "title": "貯めた時間を移行する",
     "subtitle": "別のコミュニティに引っ越されますか？貯めた時間は一緒に移行できます。",
     "success_message": "移行リクエストを送信しました。コーディネーターが確認したうえで時間が移行されます。",
     "form": {
       "destination_label": "送り先の協同組合",
-      "destination_placeholder": "例: zug-kiss",
-      "destination_help": "送り先のKISS協同組合またはテナントのスラッグ",
+      "destination_placeholder": "例: zug-cooperative",
+      "destination_help": "送り先のCaring Community協同組合またはテナントのスラッグ",
       "hours_label": "移行する時間",
       "hours_placeholder": "例: 25.5",
       "reason_label": "理由（任意）",
@@ -1760,7 +1760,7 @@
       "captcha": "セキュリティチェック"
     },
     "categories": {
-      "kiss_cooperative": "KISS協同組合",
+      "kiss_cooperative": "Caring Community協同組合",
       "caring_community": "ケアリングコミュニティ",
       "agoris_node": "ケアリングコミュニティノード",
       "community": "一般コミュニティ／タイムバンク"

@@ -393,7 +393,7 @@
       "hour_gift": "Podaruj godziny",
       "hour_gift_sub": "Podaruj zgromadzone godziny rodzinie lub przyjaciołom.",
       "hour_transfer": "Przenieś godziny",
-      "hour_transfer_sub": "Przenieś zgromadzone godziny do innej spółdzielni KISS.",
+      "hour_transfer_sub": "Przenieś zgromadzone godziny do innej spółdzielni Caring Community.",
       "safeguarding_report": "Zgłoś obawy",
       "safeguarding_report_sub": "Zgłaszaj obawy dotyczące ochrony poufnie.",
       "projects": "Projekty społeczne",
@@ -401,7 +401,7 @@
     },
     "operating_model": {
       "title": "Model operacyjny",
-      "subtitle": "Zaprojektowany dla wzajemnego wsparcia w stylu KISS",
+      "subtitle": "Zaprojektowany dla wzajemnego wsparcia w stylu Caring Community",
       "trusted_requests": {
         "title": "Zaufane prośby",
         "description": "Członkowie mogą prosić o praktyczne wsparcie przez ogłoszenia banku czasu i koordynowany wolontariat."
@@ -583,20 +583,20 @@
   },
   "inter_gen": {
     "badge": "Międzypokoleniowa",
-    "tooltip": "Ta relacja wsparcia łączy pokolenia — to znak rozpoznawczy modelu KISS."
+    "tooltip": "Ta relacja wsparcia łączy pokolenia — to znak rozpoznawczy modelu Caring Community."
   },
   "hour_transfer": {
     "meta": {
       "title": "Przenieś zgromadzone godziny",
-      "description": "Przenieś zgromadzone godziny do innej spółdzielni KISS"
+      "description": "Przenieś zgromadzone godziny do innej spółdzielni Caring Community"
     },
     "title": "Przenieś swoje zgromadzone godziny",
     "subtitle": "Przenosisz się do innej społeczności? Twoje zgromadzone godziny idą z Tobą.",
     "success_message": "Wniosek o przeniesienie został wysłany. Koordynator sprawdzi go przed przeniesieniem godzin.",
     "form": {
       "destination_label": "Spółdzielnia docelowa",
-      "destination_placeholder": "np. zug-kiss",
-      "destination_help": "Slug docelowej spółdzielni KISS lub najemcy",
+      "destination_placeholder": "np. zug-cooperative",
+      "destination_help": "Slug docelowej spółdzielni Caring Community lub najemcy",
       "hours_label": "Godziny do przeniesienia",
       "hours_placeholder": "np. 25,5",
       "reason_label": "Powód (opcjonalnie)",
@@ -1760,7 +1760,7 @@
       "captcha": "Weryfikacja bezpieczeństwa"
     },
     "categories": {
-      "kiss_cooperative": "Spółdzielnia KISS",
+      "kiss_cooperative": "Spółdzielnia Caring Community",
       "caring_community": "Społeczność opiekuńcza",
       "agoris_node": "Węzeł społeczności opiekuńczej",
       "community": "Społeczność ogólna / bank czasu"

@@ -393,7 +393,7 @@
       "hour_gift": "Uren schenken",
       "hour_gift_sub": "Schenk je gespaarde uren aan familie of vrienden.",
       "hour_transfer": "Uren overdragen",
-      "hour_transfer_sub": "Verplaats gespaarde uren naar een andere KISS-coöperatie.",
+      "hour_transfer_sub": "Verplaats gespaarde uren naar een andere Caring Community-coöperatie.",
       "safeguarding_report": "Een zorg melden",
       "safeguarding_report_sub": "Meld beschermingszorgen vertrouwelijk.",
       "projects": "Gemeenschapsprojecten",
@@ -401,7 +401,7 @@
     },
     "operating_model": {
       "title": "Operationeel model",
-      "subtitle": "Ontworpen voor wederkerige ondersteuning à la KISS",
+      "subtitle": "Ontworpen voor wederkerige ondersteuning à la Caring Community",
       "trusted_requests": {
         "title": "Vertrouwde verzoeken",
         "description": "Leden kunnen om praktische ondersteuning vragen via tijdbankadvertenties en gecoördineerd vrijwilligerswerk."
@@ -583,20 +583,20 @@
   },
   "inter_gen": {
     "badge": "Intergenerationeel",
-    "tooltip": "Deze ondersteuningsrelatie overbrugt generaties — een kenmerk van het KISS-model."
+    "tooltip": "Deze ondersteuningsrelatie overbrugt generaties — een kenmerk van het Caring Community-model."
   },
   "hour_transfer": {
     "meta": {
       "title": "Opgespaarde uren overdragen",
-      "description": "Verplaats uw opgespaarde uren naar een andere KISS-coöperatie"
+      "description": "Verplaats uw opgespaarde uren naar een andere Caring Community-coöperatie"
     },
     "title": "Draag uw opgespaarde uren over",
     "subtitle": "Verhuist u naar een andere gemeenschap? Uw opgespaarde uren gaan met u mee.",
     "success_message": "Overdrachtsverzoek ingediend. Een coördinator beoordeelt het voordat de uren worden verplaatst.",
     "form": {
       "destination_label": "Doelcoöperatie",
-      "destination_placeholder": "bijv. zug-kiss",
-      "destination_help": "De slug van de doel-KISS-coöperatie of tenant",
+      "destination_placeholder": "bijv. zug-cooperative",
+      "destination_help": "De slug van de doel-Caring Community-coöperatie of tenant",
       "hours_label": "Over te dragen uren",
       "hours_placeholder": "bijv. 25,5",
       "reason_label": "Reden (optioneel)",
@@ -1760,7 +1760,7 @@
       "captcha": "Beveiligingscontrole"
     },
     "categories": {
-      "kiss_cooperative": "KISS-coöperatie",
+      "kiss_cooperative": "Caring Community-coöperatie",
       "caring_community": "Zorgzame gemeenschap",
       "agoris_node": "Caring Community knooppunt",
       "community": "Algemene gemeenschap / tijdbank"

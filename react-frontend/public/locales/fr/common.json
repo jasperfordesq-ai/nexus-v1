@@ -393,7 +393,7 @@
       "hour_gift": "Offrir des heures",
       "hour_gift_sub": "Offrez vos heures épargnées à votre famille ou vos amis.",
       "hour_transfer": "Transférer des heures",
-      "hour_transfer_sub": "Transférez vos heures épargnées vers une autre coopérative KISS.",
+      "hour_transfer_sub": "Transférez vos heures épargnées vers une autre coopérative Caring Community.",
       "safeguarding_report": "Signaler une préoccupation",
       "safeguarding_report_sub": "Signalez confidentiellement des préoccupations relatives à la protection.",
       "projects": "Projets communautaires",
@@ -401,7 +401,7 @@
     },
     "operating_model": {
       "title": "Modèle opérationnel",
-      "subtitle": "Conçu pour le soutien réciproque de type KISS",
+      "subtitle": "Conçu pour le soutien réciproque de type Caring Community",
       "trusted_requests": {
         "title": "Demandes de confiance",
         "description": "Les membres peuvent demander un soutien concret via les annonces de banque de temps et le bénévolat coordonné."
@@ -583,20 +583,20 @@
   },
   "inter_gen": {
     "badge": "Intergénérationnel",
-    "tooltip": "Cette relation de soutien réunit plusieurs générations — une signature du modèle KISS."
+    "tooltip": "Cette relation de soutien réunit plusieurs générations — une signature du modèle Caring Community."
   },
   "hour_transfer": {
     "meta": {
       "title": "Transférer les heures épargnées",
-      "description": "Transférez vos heures épargnées vers une autre coopérative KISS"
+      "description": "Transférez vos heures épargnées vers une autre coopérative Caring Community"
     },
     "title": "Transférez vos heures épargnées",
     "subtitle": "Vous rejoignez une autre communauté ? Vos heures épargnées vous suivent.",
     "success_message": "Demande de transfert envoyée. Un coordinateur l’examinera avant le transfert des heures.",
     "form": {
       "destination_label": "Coopérative de destination",
-      "destination_placeholder": "p. ex. zug-kiss",
-      "destination_help": "Le slug de la coopérative KISS ou du tenant de destination",
+      "destination_placeholder": "p. ex. zug-cooperative",
+      "destination_help": "Le slug de la coopérative Caring Community ou du tenant de destination",
       "hours_label": "Heures à transférer",
       "hours_placeholder": "p. ex. 25,5",
       "reason_label": "Motif (facultatif)",
@@ -1760,7 +1760,7 @@
       "captcha": "Contrôle de sécurité"
     },
     "categories": {
-      "kiss_cooperative": "Coopérative KISS",
+      "kiss_cooperative": "Coopérative Caring Community",
       "caring_community": "Communauté solidaire",
       "agoris_node": "Nœud de communauté solidaire",
       "community": "Communauté généraliste / banque de temps"

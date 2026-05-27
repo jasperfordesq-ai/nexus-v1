@@ -393,7 +393,7 @@
       "hour_gift": "إهداء الساعات",
       "hour_gift_sub": "أهدِ ساعاتك المدّخرة لعائلتك أو أصدقائك.",
       "hour_transfer": "تحويل الساعات",
-      "hour_transfer_sub": "انقل الساعات المدّخرة إلى تعاونية KISS أخرى.",
+      "hour_transfer_sub": "انقل الساعات المدّخرة إلى تعاونية Caring Community أخرى.",
       "safeguarding_report": "الإبلاغ عن مخاوف",
       "safeguarding_report_sub": "أبلِغ بمخاوف الحماية بسرية.",
       "projects": "مشاريع مجتمعية",
@@ -401,7 +401,7 @@
     },
     "operating_model": {
       "title": "نموذج التشغيل",
-      "subtitle": "مصمَّم للدعم المتبادل على نمط KISS",
+      "subtitle": "مصمَّم للدعم المتبادل على نمط Caring Community",
       "trusted_requests": {
         "title": "طلبات موثوقة",
         "description": "يمكن للأعضاء طلب دعم عملي عبر إعلانات بنك الوقت والتطوع الذي يديره المنسقون."
@@ -583,20 +583,20 @@
   },
   "inter_gen": {
     "badge": "بين الأجيال",
-    "tooltip": "علاقة الدعم هذه تجمع بين أجيال مختلفة — وهي سمة مميزة لنموذج KISS."
+    "tooltip": "علاقة الدعم هذه تجمع بين أجيال مختلفة — وهي سمة مميزة لنموذج Caring Community."
   },
   "hour_transfer": {
     "meta": {
       "title": "تحويل الساعات المدخرة",
-      "description": "انقل ساعاتك المدخرة إلى تعاونية KISS أخرى"
+      "description": "انقل ساعاتك المدخرة إلى تعاونية Caring Community أخرى"
     },
     "title": "حوّل ساعاتك المدخرة",
     "subtitle": "هل تنتقل إلى مجتمع آخر؟ ساعاتك المدخرة تنتقل معك.",
     "success_message": "تم إرسال طلب التحويل. سيراجعه منسّق قبل نقل الساعات.",
     "form": {
       "destination_label": "التعاونية الوجهة",
-      "destination_placeholder": "مثال: zug-kiss",
-      "destination_help": "اسم الرابط (slug) لتعاونية KISS أو المستأجر الوجهة",
+      "destination_placeholder": "مثال: zug-cooperative",
+      "destination_help": "اسم الرابط (slug) لتعاونية Caring Community أو المستأجر الوجهة",
       "hours_label": "الساعات المطلوب تحويلها",
       "hours_placeholder": "مثال: 25.5",
       "reason_label": "السبب (اختياري)",
@@ -1760,7 +1760,7 @@
       "captcha": "تحقق أمني"
     },
     "categories": {
-      "kiss_cooperative": "تعاونية KISS",
+      "kiss_cooperative": "تعاونية Caring Community",
       "caring_community": "مجتمع رعاية",
       "agoris_node": "عقدة مجتمع الرعاية",
       "community": "مجتمع عام / بنك زمني"

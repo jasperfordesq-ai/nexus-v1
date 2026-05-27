@@ -393,7 +393,7 @@
       "hour_gift": "Bronn Uaireanta",
       "hour_gift_sub": "Bronn na huaireanta atá curtha i dtaisce ar an teaghlach nó ar chairde.",
       "hour_transfer": "Aistrigh Uaireanta",
-      "hour_transfer_sub": "Aistrigh na huaireanta atá curtha i dtaisce go comharchumann KISS eile.",
+      "hour_transfer_sub": "Aistrigh na huaireanta atá curtha i dtaisce go comharchumann Caring Community eile.",
       "safeguarding_report": "Tabhair Tuairisc ar Imní",
       "safeguarding_report_sub": "Tabhair tuairisc faoi imní cosanta go rúnda.",
       "projects": "Tionscadail Phobail",
@@ -401,7 +401,7 @@
     },
     "operating_model": {
       "title": "Múnla oibríochta",
-      "subtitle": "Deartha do thacaíocht fhrithpháirteach ar stíl KISS",
+      "subtitle": "Deartha do thacaíocht fhrithpháirteach ar stíl Caring Community",
       "trusted_requests": {
         "title": "Iarratais iontaofa",
         "description": "Is féidir le baill tacaíocht phraiticiúil a iarraidh trí liostuithe banc ama agus obair dheonach faoi stiúir comhordaitheora."
@@ -583,20 +583,20 @@
   },
   "inter_gen": {
     "badge": "Idirghlúine",
-    "tooltip": "Trasnaíonn an caidreamh tacaíochta seo glúine — sainmharc ar mhúnla KISS."
+    "tooltip": "Trasnaíonn an caidreamh tacaíochta seo glúine — sainmharc ar mhúnla Caring Community."
   },
   "hour_transfer": {
     "meta": {
       "title": "Aistrigh uaireanta i dtaisce",
-      "description": "Bog na huaireanta atá curtha i dtaisce agat go comharchumann KISS eile"
+      "description": "Bog na huaireanta atá curtha i dtaisce agat go comharchumann Caring Community eile"
     },
     "title": "Aistrigh na huaireanta atá curtha i dtaisce agat",
     "subtitle": "Ag bogadh go pobal eile? Téann do chuid uaireanta i dtaisce leat.",
     "success_message": "Iarratas ar aistriú curtha isteach. Déanfaidh comhordaitheoir é a athbhreithniú sula mbogfar na huaireanta.",
     "form": {
       "destination_label": "Comharchumann sprice",
-      "destination_placeholder": "m.sh. zug-kiss",
-      "destination_help": "An slug don chomharchumann KISS sprice nó tionónta",
+      "destination_placeholder": "m.sh. zug-cooperative",
+      "destination_help": "An slug don chomharchumann Caring Community sprice nó tionónta",
       "hours_label": "Uaireanta le haistriú",
       "hours_placeholder": "m.sh. 25.5",
       "reason_label": "Cúis (roghnach)",
@@ -1760,7 +1760,7 @@
       "captcha": "Seiceáil slándála"
     },
     "categories": {
-      "kiss_cooperative": "Comharchumann KISS",
+      "kiss_cooperative": "Comharchumann Caring Community",
       "caring_community": "Pobal cúraim",
       "agoris_node": "Nód Pobal Cúraim",
       "community": "Pobal ginearálta / banc ama"

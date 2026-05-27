@@ -393,7 +393,7 @@
       "hour_gift": "Gift Hours",
       "hour_gift_sub": "Give your banked hours to family or friends.",
       "hour_transfer": "Transfer Hours",
-      "hour_transfer_sub": "Move banked hours to another KISS cooperative.",
+      "hour_transfer_sub": "Move banked hours to another Caring Community cooperative.",
       "safeguarding_report": "Report a Concern",
       "safeguarding_report_sub": "Report safeguarding concerns confidentially.",
       "projects": "Community Projects",
@@ -401,7 +401,7 @@
     },
     "operating_model": {
       "title": "Operating model",
-      "subtitle": "Designed for KISS-style reciprocal support",
+      "subtitle": "Designed for Caring Community reciprocal support",
       "trusted_requests": {
         "title": "Trusted requests",
         "description": "Members can ask for practical support through time-bank listings and coordinator-led volunteering."
@@ -583,20 +583,20 @@
   },
   "inter_gen": {
     "badge": "Intergenerational",
-    "tooltip": "This support relationship spans generations — a hallmark of the KISS model."
+    "tooltip": "This support relationship spans generations — a hallmark of the Caring Community model."
   },
   "hour_transfer": {
     "meta": {
       "title": "Transfer Banked Hours",
-      "description": "Move your banked hours to another KISS cooperative"
+      "description": "Move your banked hours to another Caring Community cooperative"
     },
     "title": "Transfer Your Banked Hours",
     "subtitle": "Moving to another community? Your banked hours go with you.",
     "success_message": "Transfer request submitted. A coordinator will review it before hours move.",
     "form": {
       "destination_label": "Destination cooperative",
-      "destination_placeholder": "e.g. zug-kiss",
-      "destination_help": "The slug of the destination KISS cooperative or tenant",
+      "destination_placeholder": "e.g. zug-cooperative",
+      "destination_help": "The slug of the destination Caring Community cooperative or tenant",
       "hours_label": "Hours to transfer",
       "hours_placeholder": "e.g. 25.5",
       "reason_label": "Reason (optional)",
@@ -1761,7 +1761,7 @@
       "captcha": "Security check"
     },
     "categories": {
-      "kiss_cooperative": "KISS cooperative",
+      "kiss_cooperative": "Caring Community cooperative",
       "caring_community": "Caring community",
       "agoris_node": "Caring Community Node",
       "community": "General community / timebank"
