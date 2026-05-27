@@ -177,9 +177,15 @@ export interface MarketplaceSellerProfile {
 
 export interface MarketplaceDashboard {
   active_listings?: number;
+  draft_listings?: number;
+  sold_listings?: number;
+  expired_listings?: number;
   total_listings?: number;
   total_sales?: number;
   pending_offers?: number;
+  total_views?: number;
+  total_revenue?: number;
+  revenue_currency?: string;
   views_30d?: number;
   saves_30d?: number;
 }
@@ -432,6 +438,7 @@ export interface MarketplaceListingFilters {
   cursor?: string | null;
   limit?: number;
   user_id?: number;
+  status?: string;
 }
 
 export interface MarketplaceListingPayload {
@@ -561,8 +568,9 @@ export async function uploadMarketplaceImages(id: number, uris: string[]): Promi
 export function getMyMarketplaceListings(
   cursor?: string | null,
   userId?: number,
+  status?: string | null,
 ): Promise<MarketplaceCollectionResponse<MarketplaceListingItem>> {
-  return getMarketplaceListings({ cursor, limit: 20, sort: 'newest', user_id: userId });
+  return getMarketplaceListings({ cursor, limit: 20, sort: 'newest', user_id: userId, status: status || undefined });
 }
 
 export function makeMarketplaceOffer(

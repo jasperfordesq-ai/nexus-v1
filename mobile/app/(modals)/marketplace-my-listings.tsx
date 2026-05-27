@@ -3,7 +3,8 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Alert, FlatList, RefreshControl, View } from 'react-native';
+import { useState } from 'react';
+import { Alert, FlatList, RefreshControl, ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -32,6 +33,10 @@ import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 
+type ListingTab = 'active' | 'draft' | 'sold' | 'expired';
+
+const LISTING_TABS: ListingTab[] = ['active', 'draft', 'sold', 'expired'];
+
 export default function MarketplaceMyListingsRoute() {
   return (
     <ModalErrorBoundary>
@@ -45,15 +50,16 @@ function MarketplaceMyListingsScreen() {
   const primary = usePrimaryColor();
   const theme = useTheme();
   const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState<ListingTab>('active');
   const dashboard = useApi(() => getMarketplaceDashboard(), [], { enabled: true });
   const list = usePaginatedApi<MarketplaceListingItem, Awaited<ReturnType<typeof getMyMarketplaceListings>>>(
-    (cursor) => getMyMarketplaceListings(cursor, user?.id),
+    (cursor) => getMyMarketplaceListings(cursor, user?.id, activeTab),
     (response) => ({
       items: response.data,
       cursor: marketplaceNextCursor(response),
       hasMore: marketplaceHasMore(response),
     }),
-    [user?.id],
+    [user?.id, activeTab],
   );
 
   const stats = dashboard.data?.data ?? {};
@@ -102,7 +108,7 @@ function MarketplaceMyListingsScreen() {
         keyExtractor={(item) => String(item.id)}
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 132 }}
         refreshControl={<RefreshControl refreshing={list.isLoading && list.items.length > 0} onRefresh={list.refresh} />}
-        ListHeaderComponent={<DashboardCard stats={stats} primary={primary} />}
+        ListHeaderComponent={<DashboardCard stats={stats} primary={primary} activeTab={activeTab} onTabChange={setActiveTab} />}
         renderItem={({ item }) => (
           <View>
             <MarketplaceListingCard item={item} onPress={() => router.push({ pathname: '/(modals)/marketplace-detail', params: { id: String(item.id) } } as unknown as Href)} />
@@ -130,10 +136,10 @@ function MarketplaceMyListingsScreen() {
           ) : (
             <EmptyState
               icon="albums-outline"
-              title={list.error ?? t('myListings.empty')}
-              subtitle={t('myListings.emptyHint')}
-              actionLabel={t('actions.sell')}
-              onAction={() => router.push('/(modals)/new-marketplace-listing' as Href)}
+              title={list.error ?? t(`myListings.emptyState.${activeTab}.title`)}
+              subtitle={t(`myListings.emptyState.${activeTab}.subtitle`)}
+              actionLabel={activeTab === 'active' || activeTab === 'draft' ? t('actions.sell') : undefined}
+              onAction={activeTab === 'active' || activeTab === 'draft' ? () => router.push('/(modals)/new-marketplace-listing' as Href) : undefined}
             />
           )
         }
@@ -153,7 +159,17 @@ function MarketplaceMyListingsScreen() {
   );
 }
 
-function DashboardCard({ stats, primary }: { stats: MarketplaceDashboard; primary: string }) {
+function DashboardCard({
+  stats,
+  primary,
+  activeTab,
+  onTabChange,
+}: {
+  stats: MarketplaceDashboard;
+  primary: string;
+  activeTab: ListingTab;
+  onTabChange: (tab: ListingTab) => void;
+}) {
   const { t } = useTranslation('marketplace');
   const theme = useTheme();
   return (
@@ -172,9 +188,23 @@ function DashboardCard({ stats, primary }: { stats: MarketplaceDashboard; primar
         </View>
         <View className="flex-row flex-wrap gap-2">
           <Chip size="sm" variant="secondary"><Chip.Label>{t('myListings.active', { count: stats.active_listings ?? 0 })}</Chip.Label></Chip>
-          <Chip size="sm" variant="secondary"><Chip.Label>{t('myListings.sales', { count: stats.total_sales ?? 0 })}</Chip.Label></Chip>
+          <Chip size="sm" variant="secondary"><Chip.Label>{t('myListings.sold', { count: stats.sold_listings ?? 0 })}</Chip.Label></Chip>
+          <Chip size="sm" variant="secondary"><Chip.Label>{t('myListings.views', { count: stats.total_views ?? stats.views_30d ?? 0 })}</Chip.Label></Chip>
           <Chip size="sm" variant="secondary"><Chip.Label>{t('myListings.offers', { count: stats.pending_offers ?? 0 })}</Chip.Label></Chip>
         </View>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+          {LISTING_TABS.map((tab) => (
+            <HeroButton
+              key={tab}
+              size="sm"
+              variant={activeTab === tab ? 'primary' : 'secondary'}
+              onPress={() => onTabChange(tab)}
+              style={activeTab === tab ? { backgroundColor: primary } : undefined}
+            >
+              <HeroButton.Label>{t(`myListings.tabs.${tab}`, { count: listingTabCount(stats, tab) })}</HeroButton.Label>
+            </HeroButton>
+          ))}
+        </ScrollView>
         <View className="flex-row gap-2">
           <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-merchant-onboarding' as Href)}>
             <Ionicons name="storefront-outline" size={16} color={primary} />
@@ -208,4 +238,11 @@ function DashboardCard({ stats, primary }: { stats: MarketplaceDashboard; primar
       </HeroCard.Body>
     </HeroCard>
   );
+}
+
+function listingTabCount(stats: MarketplaceDashboard, tab: ListingTab): number {
+  if (tab === 'active') return stats.active_listings ?? 0;
+  if (tab === 'draft') return stats.draft_listings ?? 0;
+  if (tab === 'sold') return stats.sold_listings ?? 0;
+  return stats.expired_listings ?? 0;
 }

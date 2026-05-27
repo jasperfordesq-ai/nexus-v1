@@ -174,8 +174,16 @@
     "title": "My listings",
     "subtitle": "Manage active listings, renew items, and review sales signals.",
     "active": "{{count}} active",
+    "sold": "{{count}} sold",
+    "views": "{{count}} views",
     "sales": "{{count}} sales",
     "offers": "{{count}} offers",
+    "tabs": {
+      "active": "Active ({{count}})",
+      "draft": "Draft ({{count}})",
+      "sold": "Sold ({{count}})",
+      "expired": "Expired ({{count}})"
+    },
     "onboarding": "Seller setup",
     "payments": "Payments",
     "salesOrders": "Sales orders",
@@ -183,7 +191,25 @@
     "sellerTools": "Seller tools",
     "shipping": "Shipping options",
     "empty": "No marketplace listings yet",
-    "emptyHint": "Create a listing to start selling in your community."
+    "emptyHint": "Create a listing to start selling in your community.",
+    "emptyState": {
+      "active": {
+        "title": "No active listings",
+        "subtitle": "Publish a listing to start selling in your community."
+      },
+      "draft": {
+        "title": "No draft listings",
+        "subtitle": "Draft listings you are preparing will appear here."
+      },
+      "sold": {
+        "title": "No sold listings",
+        "subtitle": "Completed marketplace sales will appear here."
+      },
+      "expired": {
+        "title": "No expired listings",
+        "subtitle": "Expired listings will appear here so you can renew them."
+      }
+    }
   },
   "offers": {
     "eyebrow": "Negotiations",
