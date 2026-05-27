@@ -136,7 +136,7 @@ const TIMELINE_DOT_COLORS: Record<string, string> = {
   screening: 'bg-accent',
   reviewed: 'bg-accent',
   interview: 'bg-warning',
-  offer: 'bg-default',
+  offer: 'bg-surface-tertiary',
   accepted: 'bg-success',
   rejected: 'bg-danger',
   withdrawn: 'bg-surface-secondary',
@@ -356,8 +356,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
                   target='_blank'
                   rel='noopener noreferrer'
                   size='sm'
-                  color='success'
-                  variant='flat'
+                  variant='primary'
                   startContent={<Video size={14} aria-hidden="true" />}
                 >
                   {t('interview.join_call')}
@@ -371,8 +370,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
                   target='_blank'
                   rel='noopener noreferrer'
                   size='sm'
-                  color='primary'
-                  variant='flat'
+                  variant='secondary'
                   startContent={<ExternalLink size={13} aria-hidden="true" />}
                 >
                   {t('interview_join')}
@@ -391,13 +389,13 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
               {application.interview.status === 'proposed' && (
                 <>
                   {onAcceptInterview && (
-                    <Button size='sm' color='success' variant='flat'
+                    <Button size='sm' variant='primary'
                       onPress={() => onAcceptInterview(application.interview!.id)}>
                       {t('interview.accept')}
                     </Button>
                   )}
                   {onDeclineInterview && (
-                    <Button size='sm' color='danger' variant='flat'
+                    <Button size='sm' variant='danger-soft'
                       onPress={() => onDeclineInterview(application.interview!.id)}>
                       {t('interview.decline')}
                     </Button>
@@ -452,12 +450,12 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
             {application.offer.status === 'pending' && (
               <div className='flex gap-2 mt-3'>
                 {onAcceptOffer && (
-                  <Button size='sm' color='success' onPress={() => onAcceptOffer(application.offer!.id)}>
+                  <Button size='sm' variant='primary' onPress={() => onAcceptOffer(application.offer!.id)}>
                     {t('offer.accept')}
                   </Button>
                 )}
                 {onRejectOffer && (
-                  <Button size='sm' color='danger' variant='flat' onPress={() => onRejectOffer(application.offer!.id)}>
+                  <Button size='sm' variant='danger-soft' onPress={() => onRejectOffer(application.offer!.id)}>
                     {t('offer.reject')}
                   </Button>
                 )}
@@ -555,7 +553,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
                             <span className='absolute left-[3px] top-3 bottom-0 w-0.5 bg-border' aria-hidden="true" />
                           )}
                           {/* Dot */}
-                          <span className={`absolute left-0 top-1 w-2 h-2 rounded-full ring-2 ring-white dark:ring-default-50 ${dotColor}`} aria-hidden="true" />
+                          <span className={`absolute left-0 top-1 w-2 h-2 rounded-full ring-2 ring-white dark:ring-surface ${dotColor}`} aria-hidden="true" />
                           <div className='min-w-0'>
                             <span className='text-xs font-medium text-foreground'>
                               {entry.from_status
@@ -943,7 +941,7 @@ export function MyApplicationsPage() {
         </div>
         <Button
           size='sm'
-          variant='flat'
+          variant='tertiary'
           className='bg-theme-elevated text-theme-muted self-start'
           startContent={<Download size={14} aria-hidden="true" />}
           isLoading={isExportingGdpr}
@@ -981,7 +979,7 @@ export function MyApplicationsPage() {
       {!isLoading && error && (
         <GlassCard className='p-8 text-center'>
           <p className='text-danger mb-4'>{error}</p>
-          <Button color='primary' variant='flat' onPress={() => loadApplications()}>
+          <Button variant='secondary' onPress={() => loadApplications()}>
             {t('try_again')}
           </Button>
         </GlassCard>
@@ -999,7 +997,7 @@ export function MyApplicationsPage() {
               ? t('my_applications.empty_all')
               : t('my_applications.empty_filtered', { filter: t(`my_applications.tab_${activeTab}`) })}
           </p>
-          <Button as={Link} to={tenantPath('/jobs')} color='primary' variant='flat'>
+          <Button as={Link} to={tenantPath('/jobs')} variant='primary'>
             {t('my_applications.browse_jobs')}
           </Button>
         </GlassCard>
@@ -1034,8 +1032,7 @@ export function MyApplicationsPage() {
           {hasMore && (
             <div className='mt-6 flex justify-center'>
               <Button
-                variant='flat'
-                color='primary'
+                variant='secondary'
                 isLoading={isLoadingMore}
                 onPress={() => loadApplications(true)}>
                 {t('load_more')}
@@ -1057,7 +1054,7 @@ export function MyApplicationsPage() {
             </p>
           </ModalBody>
           <ModalFooter>
-            <Button variant='flat' onPress={closeWithdraw} isDisabled={isWithdrawing}>
+            <Button variant='tertiary' onPress={closeWithdraw} isDisabled={isWithdrawing}>
               {t('withdraw.cancel')}
             </Button>
             <Button color='danger' onPress={confirmWithdraw} isLoading={isWithdrawing}>

@@ -100,7 +100,7 @@ export function TenantLogo({
       getInitials={() => getInitials(branding.name)}
       size={avatarSizeMap[effectiveSize]}
       classNames={{
-        base: 'ring-2 ring-offset-1 ring-offset-transparent ring-default-200 dark:ring-default-100 shrink-0 transition-all duration-200',
+        base: 'ring-2 ring-offset-1 ring-offset-transparent ring-border dark:ring-border shrink-0 transition-all duration-200',
       }}
       style={{
         backgroundColor: primaryColor,

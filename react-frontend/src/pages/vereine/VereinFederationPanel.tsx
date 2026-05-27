@@ -218,7 +218,7 @@ export default function VereinFederationPanel({ organizationId }: Props) {
           <Network className="w-5 h-5 text-accent" />
           {t('verein_federation.panel_title')}
         </h2>
-        <p className="text-sm text-default-500 mt-1">{t('verein_federation.panel_subtitle')}</p>
+        <p className="text-sm text-muted mt-1">{t('verein_federation.panel_subtitle')}</p>
       </div>
 
       {/* Consent */}
@@ -275,7 +275,7 @@ export default function VereinFederationPanel({ organizationId }: Props) {
         <Separator />
         <CardBody>
           {network.length === 0 ? (
-            <p className="text-sm text-default-500 py-4 text-center">
+            <p className="text-sm text-muted py-4 text-center">
               {t('verein_federation.network_empty')}
             </p>
           ) : (
@@ -328,7 +328,7 @@ export default function VereinFederationPanel({ organizationId }: Props) {
           <Tabs aria-label={t('verein_federation.shared_events_title')}>
             <Tab key="incoming" title={t('verein_federation.tab_incoming')}>
               {incoming.length === 0 ? (
-                <p className="text-sm text-default-500 py-6 text-center">
+                <p className="text-sm text-muted py-6 text-center">
                   {t('verein_federation.shared_events_empty_in')}
                 </p>
               ) : (
@@ -337,7 +337,7 @@ export default function VereinFederationPanel({ organizationId }: Props) {
                     <li key={s.id} className="py-3 flex items-start gap-3">
                       <div className="flex-1">
                         <p className="font-medium">{s.title}</p>
-                        <p className="text-xs text-default-500">
+                        <p className="text-xs text-muted">
                           {t('verein_federation.calendar.from_label')}: {s.source_name ?? '—'}
                           {s.start_time ? ` · ${new Date(s.start_time).toLocaleString()}` : ''}
                         </p>
@@ -349,7 +349,7 @@ export default function VereinFederationPanel({ organizationId }: Props) {
             </Tab>
             <Tab key="outgoing" title={t('verein_federation.tab_outgoing')}>
               {outgoing.length === 0 ? (
-                <p className="text-sm text-default-500 py-6 text-center">
+                <p className="text-sm text-muted py-6 text-center">
                   {t('verein_federation.shared_events_empty_out')}
                 </p>
               ) : (
@@ -358,7 +358,7 @@ export default function VereinFederationPanel({ organizationId }: Props) {
                     <li key={s.id} className="py-3 flex items-start gap-3">
                       <div className="flex-1">
                         <p className="font-medium">{s.title}</p>
-                        <p className="text-xs text-default-500">
+                        <p className="text-xs text-muted">
                           → {s.target_name ?? '—'}
                           {s.start_time ? ` · ${new Date(s.start_time).toLocaleString()}` : ''}
                         </p>

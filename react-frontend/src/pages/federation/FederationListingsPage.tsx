@@ -503,7 +503,7 @@ export function FederationListingsPage() {
                       {canNavigateToProfile ? (
                         <Button
                           variant="light"
-                          className="flex items-center gap-3 hover:opacity-80 transition-opacity h-auto min-w-0 p-0 justify-start"
+                          className="flex items-center gap-3 hover:opacity-80 transition-opacity min-h-9 min-w-0 p-0 justify-start"
                           onPress={() => {
                             setIsDetailOpen(false);
                             setSelectedListing(null);

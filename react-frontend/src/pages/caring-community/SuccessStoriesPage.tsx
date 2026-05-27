@@ -130,7 +130,7 @@ export function SuccessStoriesPage() {
         {!isLoading && !error && items.length === 0 && (
           <GlassCard className="p-6 sm:p-8">
             <div className="flex flex-col items-center gap-4 py-6 text-center">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-default/20">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-surface-tertiary">
                 <Sparkles className="h-8 w-8 text-muted" aria-hidden="true" />
               </div>
               <p className="max-w-md text-sm text-theme-muted">{t('empty_state')}</p>

@@ -126,7 +126,7 @@ export function SkillChip({
           size="sm"
           variant="light"
           onPress={onRemove}
-          className="ml-1 p-0.5 rounded-full hover:bg-red-500/20 text-theme-subtle hover:text-[var(--color-error)] transition-colors min-w-0 w-auto h-auto"
+          className="ml-1 p-0.5 rounded-full hover:bg-red-500/20 text-theme-subtle hover:text-[var(--color-error)] transition-colors min-w-0 w-auto min-h-9"
           aria-label={t('skills.remove_skill_aria', { skill: skill.skill_name })}
         >
           <X className="w-3 h-3" />
@@ -341,7 +341,7 @@ export function SkillSelector({
                       setSearchResults([]);
                       setSearchQuery(result.name);
                     }}
-                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-theme-hover transition-colors justify-start h-auto"
+                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-theme-hover transition-colors justify-start min-h-9"
                   >
                     <span className="text-sm font-medium text-theme-primary">{result.name}</span>
                     <span className="text-xs text-theme-subtle ml-2">{tc('skills.search_result_category', { category: result.category_name })}</span>

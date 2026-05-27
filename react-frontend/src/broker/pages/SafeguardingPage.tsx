@@ -435,7 +435,7 @@ export default function SafeguardingPage() {
           <AlertTriangle size={20} className="text-warning shrink-0 mt-0.5" />
           <div className="flex-1 text-sm">
             <p className="font-medium text-warning-700">{t('safeguarding.load_error_title')}</p>
-            <p className="text-default-600">{t('safeguarding.load_error_body')}</p>
+            <p className="text-foreground/70">{t('safeguarding.load_error_body')}</p>
           </div>
           <Button
             size="sm"
@@ -604,14 +604,14 @@ export default function SafeguardingPage() {
           <ModalBody>
             {reviewTarget && (
               <div className="space-y-3">
-                <div className="rounded-lg bg-default-100 p-3 text-sm text-default-700">
+                <div className="rounded-lg bg-surface-secondary p-3 text-sm text-foreground">
                   <p className="mb-1 font-medium">
                     {reviewTarget.sender?.name || reviewTarget.sender_name || '—'} &rarr; {reviewTarget.recipient?.name || reviewTarget.receiver_name || '—'}
                   </p>
-                  <p className="text-default-500">{reviewTarget.message_content || reviewTarget.message_body || ''}</p>
+                  <p className="text-muted">{reviewTarget.message_content || reviewTarget.message_body || ''}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-default-500">{t('safeguarding.severity_label')}</span>
+                  <span className="text-sm text-muted">{t('safeguarding.severity_label')}</span>
                   <SeverityChip severity={reviewTarget.severity || reviewTarget.flag_severity || 'low'} t={t} />
                 </div>
                 <Textarea

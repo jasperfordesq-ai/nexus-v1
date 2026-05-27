@@ -897,7 +897,7 @@ export function FederationMessagesPage() {
                       <motion.div key={key} variants={itemVariants}>
                         <Button
                           variant="light"
-                          className={`w-full h-auto p-3 rounded-none justify-start text-left border-b border-theme-default transition-colors ${
+                          className={`w-full min-h-9 p-3 rounded-none justify-start text-left border-b border-theme-default transition-colors ${
                             isActive
                               ? 'bg-indigo-500/10 dark:bg-indigo-500/15'
                               : 'hover:bg-theme-hover'
@@ -1375,7 +1375,7 @@ export function FederationMessagesPage() {
                         <Button
                           key={`${member.id}-${member.tenant_id}`}
                           variant="light"
-                          className="w-full h-auto p-2 justify-start"
+                          className="w-full min-h-9 p-2 justify-start"
                           onPress={() => {
                             setSelectedRecipient(member);
                             setComposeRecipientQuery('');

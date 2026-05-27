@@ -891,7 +891,7 @@ export function JobKanbanPage() {
               {auditEvents.map((event, i) => (
                 <div key={i} className="relative">
                   <div className={`absolute -left-[25px] w-3 h-3 rounded-full border-2 border-background ${
-                    event.type === 'status_change' ? 'bg-accent' : event.type === 'interview' ? 'bg-default' : 'bg-warning'
+                    event.type === 'status_change' ? 'bg-accent' : event.type === 'interview' ? 'bg-surface-tertiary' : 'bg-warning'
                   }`} />
                   <div className="bg-surface-secondary rounded-lg p-3">
                     <div className="flex items-center justify-between gap-2">

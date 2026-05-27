@@ -246,7 +246,7 @@ export function MessageReview() {
       key: 'message_body',
       label: t('messages.col_preview'),
       render: (item) => (
-        <span className="text-sm text-default-500 line-clamp-1 max-w-[200px]">
+        <span className="text-sm text-muted line-clamp-1 max-w-[200px]">
           {item.message_body ? item.message_body.substring(0, 80) + (item.message_body.length > 80 ? '…' : '') : '—'}
         </span>
       ),
@@ -259,14 +259,14 @@ export function MessageReview() {
           <Chip size="sm" variant="tertiary" color="default">
             {item.copy_reason.replace(/_/g, ' ')}
           </Chip>
-        ) : <span className="text-sm text-default-400">—</span>
+        ) : <span className="text-sm text-muted">—</span>
       ),
     },
     {
       key: 'flagged',
       label: t('messages.col_flagged'),
       render: (item) => {
-        if (!item.flagged) return <span className="text-sm text-default-400">{t('messages.flagged_no')}</span>;
+        if (!item.flagged) return <span className="text-sm text-muted">{t('messages.flagged_no')}</span>;
         const severityChipColor = {
           info: 'default' as const,
           warning: 'warning' as const,
@@ -305,7 +305,7 @@ export function MessageReview() {
       label: t('messages.col_date'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {formatServerDate(item.created_at)}
         </span>
       ),
@@ -470,29 +470,29 @@ export function MessageReview() {
 
           <ModalBody className="gap-4">
             {detailLoading && (
-              <p className="text-sm text-default-400 text-center py-8">{t('messages.loading')}</p>
+              <p className="text-sm text-muted text-center py-8">{t('messages.loading')}</p>
             )}
 
             {!detailLoading && detailItem && (
               <>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <p className="text-xs text-default-400 uppercase font-medium mb-0.5">{t('messages.detail_from')}</p>
+                    <p className="text-xs text-muted uppercase font-medium mb-0.5">{t('messages.detail_from')}</p>
                     <p className="font-medium text-foreground">{detailItem.sender_name}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-default-400 uppercase font-medium mb-0.5">{t('messages.detail_to')}</p>
+                    <p className="text-xs text-muted uppercase font-medium mb-0.5">{t('messages.detail_to')}</p>
                     <p className="font-medium text-foreground">{detailItem.receiver_name}</p>
                   </div>
                   <div>
-                    <p className="text-xs text-default-400 uppercase font-medium mb-0.5">{t('messages.detail_date')}</p>
+                    <p className="text-xs text-muted uppercase font-medium mb-0.5">{t('messages.detail_date')}</p>
                     <p className="text-foreground">
                       {formatServerDateTime(detailItem.sent_at ?? detailItem.created_at)}
                     </p>
                   </div>
                   {(detailItem.flag_reason || detailItem.copy_reason) && (
                     <div>
-                      <p className="text-xs text-default-400 uppercase font-medium mb-0.5">{t('messages.detail_reason')}</p>
+                      <p className="text-xs text-muted uppercase font-medium mb-0.5">{t('messages.detail_reason')}</p>
                       <p className="text-foreground">
                         {detailItem.flag_reason || detailItem.copy_reason}
                       </p>
@@ -500,7 +500,7 @@ export function MessageReview() {
                   )}
                   {detailItem.flag_severity && (
                     <div>
-                      <p className="text-xs text-default-400 uppercase font-medium mb-0.5">{t('messages.detail_severity')}</p>
+                      <p className="text-xs text-muted uppercase font-medium mb-0.5">{t('messages.detail_severity')}</p>
                       {(() => {
                         const { color, variant } = severityColor(detailItem.flag_severity);
                         return (
@@ -516,8 +516,8 @@ export function MessageReview() {
                 <Separator />
 
                 <div>
-                  <p className="text-xs text-default-400 uppercase font-medium mb-2">{t('messages.content_label')}</p>
-                  <div className="rounded-lg bg-default-50 p-4 text-sm text-foreground whitespace-pre-wrap leading-relaxed min-h-[80px]">
+                  <p className="text-xs text-muted uppercase font-medium mb-2">{t('messages.content_label')}</p>
+                  <div className="rounded-lg bg-surface-secondary p-4 text-sm text-foreground whitespace-pre-wrap leading-relaxed min-h-[80px]">
                     {detail?.copy?.message_body || detailItem.message_body || '--'}
                   </div>
                 </div>
@@ -526,20 +526,20 @@ export function MessageReview() {
                   <>
                     <Separator />
                     <div>
-                      <p className="text-xs text-default-400 uppercase font-medium mb-2">
+                      <p className="text-xs text-muted uppercase font-medium mb-2">
                         {t('messages.conversation_label')} ({detail.thread.length})
                       </p>
                       <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
                         {detail.thread.map((msg) => (
                           <div
                             key={msg.id}
-                            className="rounded-md bg-default-50 px-3 py-2 text-sm"
+                            className="rounded-md bg-surface-secondary px-3 py-2 text-sm"
                           >
                             <span className="font-medium text-foreground mr-2">{msg.sender_name}</span>
-                            <span className="text-default-500 text-xs">
+                            <span className="text-muted text-xs">
                               {formatServerDateTime(msg.created_at)}
                             </span>
-                            <p className="mt-1 text-default-700 whitespace-pre-wrap">{msg.body}</p>
+                            <p className="mt-1 text-foreground whitespace-pre-wrap">{msg.body}</p>
                           </div>
                         ))}
                       </div>
@@ -552,7 +552,7 @@ export function MessageReview() {
                     <Separator />
                     <div className="flex items-center gap-2 text-sm text-success">
                       <Chip size="sm" color="success" variant="tertiary">{t('messages.status_reviewed')}</Chip>
-                      <span className="text-default-500">
+                      <span className="text-muted">
                         {formatServerDateTime(detailItem.reviewed_at!)}
                       </span>
                     </div>

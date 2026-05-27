@@ -123,7 +123,7 @@ export function ReviewModal({
                   onPress={() => setRating(star)}
                   onMouseEnter={() => setHoverRating(star)}
                   onMouseLeave={() => setHoverRating(0)}
-                  className="focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded min-w-0 h-auto p-0"
+                  className="focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded min-w-0 min-h-9 p-0"
                   aria-label={t('review_modal.rate_star', { star })}
                 >
                   <Star

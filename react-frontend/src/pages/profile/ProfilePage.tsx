@@ -916,7 +916,7 @@ export function ProfilePage() {
                 base: 'w-full overflow-x-auto pb-1',
                 tabList: 'w-max max-w-full bg-theme-elevated p-1 rounded-lg gap-1',
                 cursor: 'bg-theme-hover shadow-sm',
-                tab: 'h-auto w-auto min-w-0 px-3 py-2 text-xs sm:text-sm',
+                tab: 'min-h-9 w-auto min-w-0 px-3 py-2 text-xs sm:text-sm',
                 tabContent: 'group-data-[selected=true]:text-theme-primary text-theme-muted',
               }}
             >
@@ -961,7 +961,7 @@ export function ProfilePage() {
                       size="sm"
                       variant="light"
                       color="primary"
-                      className="mt-1 h-auto min-h-0 px-0 text-xs"
+                      className="mt-1 min-h-7 px-0 text-xs"
                       onPress={() => setBioExpanded((v) => !v)}
                     >
                       {bioExpanded ? t('read_less') : t('read_more')}
@@ -1170,17 +1170,17 @@ export function ProfilePage() {
                     <GlassCard key={i} className="p-5">
                       <div className="flex items-start gap-4">
                         <Skeleton className="rounded-full flex-shrink-0">
-                          <div className="w-10 h-10 rounded-full bg-default-300" />
+                          <div className="w-10 h-10 rounded-full bg-surface-tertiary" />
                         </Skeleton>
                         <div className="flex-1 space-y-2">
                           <Skeleton className="rounded-lg">
-                            <div className="h-4 rounded-lg bg-default-300 w-1/4" />
+                            <div className="h-4 rounded-lg bg-surface-tertiary w-1/4" />
                           </Skeleton>
                           <Skeleton className="rounded-lg">
-                            <div className="h-3 rounded-lg bg-default-200 w-1/5" />
+                            <div className="h-3 rounded-lg bg-surface-tertiary w-1/5" />
                           </Skeleton>
                           <Skeleton className="rounded-lg">
-                            <div className="h-3 rounded-lg bg-default-200 w-3/4" />
+                            <div className="h-3 rounded-lg bg-surface-tertiary w-3/4" />
                           </Skeleton>
                         </div>
                       </div>

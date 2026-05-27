@@ -181,7 +181,7 @@ export function NotificationFlyout() {
                 key={notification.id}
                 variant="light"
                 onPress={() => handleNotificationClick(notification)}
-                className={`w-full flex items-start gap-3 px-4 py-3 text-start transition-colors hover:bg-theme-hover h-auto justify-start rounded-none ${
+                className={`w-full flex items-start gap-3 px-4 py-3 text-start transition-colors hover:bg-theme-hover min-h-9 justify-start rounded-none ${
                   isUnread ? 'bg-indigo-50/50 dark:bg-indigo-500/5' : ''
                 }`}
               >

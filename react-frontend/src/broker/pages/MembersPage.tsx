@@ -313,7 +313,7 @@ export default function MembersPage() {
             </Badge>
             <div className="min-w-0">
               <p className="text-sm font-medium text-foreground truncate">{user.name}</p>
-              <p className="text-xs text-default-400 truncate">{user.email}</p>
+              <p className="text-xs text-muted truncate">{user.email}</p>
             </div>
           </div>
         ),
@@ -345,11 +345,11 @@ export default function MembersPage() {
         label: t('members.col_balance'),
         render: (user: AdminUser) => (
           <div className="flex items-center gap-1.5">
-            <Coins size={14} className="text-default-400" />
+            <Coins size={14} className="text-muted" />
             <span className="text-sm font-medium">
               {typeof user.balance === 'number' ? user.balance.toLocaleString() : '0'}
             </span>
-            <span className="text-xs text-default-400">{t('members.hours_short')}</span>
+            <span className="text-xs text-muted">{t('members.hours_short')}</span>
           </div>
         ),
       },
@@ -358,7 +358,7 @@ export default function MembersPage() {
         label: t('members.col_last_active'),
         render: (user: AdminUser) => (
           <Tooltip content={user.last_active_at ? formatServerDateTime(user.last_active_at) : t('members.time_never')}>
-            <div className="flex items-center gap-1.5 text-sm text-default-500">
+            <div className="flex items-center gap-1.5 text-sm text-muted">
               <Clock size={14} />
               <span>{timeAgo(user.last_active_at)}</span>
             </div>
@@ -370,7 +370,7 @@ export default function MembersPage() {
         label: t('members.col_joined'),
         sortable: true,
         render: (user: AdminUser) => (
-          <span className="text-sm text-default-500">
+          <span className="text-sm text-muted">
             {formatServerDate(user.created_at)}
           </span>
         ),
@@ -388,7 +388,7 @@ export default function MembersPage() {
                 size="sm"
                 onPress={() => openNotes(user)}
               >
-                <StickyNote size={15} className="text-default-400" />
+                <StickyNote size={15} className="text-muted" />
               </Button>
             </Tooltip>
 
@@ -498,7 +498,7 @@ export default function MembersPage() {
         onRefresh={fetchMembers}
         emptyContent={
           <div className="flex flex-col items-center py-8">
-            <p className="text-default-400">{t('common.no_data')}</p>
+            <p className="text-muted">{t('common.no_data')}</p>
           </div>
         }
       />
@@ -547,7 +547,7 @@ export default function MembersPage() {
                 />
                 <div>
                   <p className="text-base font-semibold">{t('members.notes_for', { name: notesUser.name })}</p>
-                  <p className="text-xs text-default-400 font-normal">{notesUser.email}</p>
+                  <p className="text-xs text-muted font-normal">{notesUser.email}</p>
                 </div>
               </ModalHeader>
               <ModalBody>
@@ -575,18 +575,18 @@ export default function MembersPage() {
 
                 {/* Notes list */}
                 {notesLoading ? (
-                  <div className="py-8 text-center text-default-400">{t('common.loading')}</div>
+                  <div className="py-8 text-center text-muted">{t('common.loading')}</div>
                 ) : notes.length === 0 ? (
-                  <div className="py-8 text-center text-default-400">
+                  <div className="py-8 text-center text-muted">
                     <StickyNote size={32} className="mx-auto mb-2 opacity-30" />
                     <p>{t('members.no_notes')}</p>
                   </div>
                 ) : (
                   <div className="space-y-3 mt-2">
                     {notes.map((note) => (
-                      <div key={note.id} className="rounded-lg bg-default-50 p-3">
+                      <div key={note.id} className="rounded-lg bg-surface-secondary p-3">
                         <p className="text-sm text-foreground whitespace-pre-wrap">{note.content}</p>
-                        <div className="mt-2 flex items-center gap-2 text-xs text-default-400">
+                        <div className="mt-2 flex items-center gap-2 text-xs text-muted">
                           <span>{note.author_name || note.author?.name || t('members.note_system_author')}</span>
                           <span>&middot;</span>
                           <span>{formatServerDateTime(note.created_at)}</span>

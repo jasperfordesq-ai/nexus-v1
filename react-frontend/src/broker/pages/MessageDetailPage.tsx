@@ -231,7 +231,7 @@ export function MessageDetail() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Sender */}
             <div className="space-y-1">
-              <p className="text-sm text-default-500 flex items-center gap-1">
+              <p className="text-sm text-muted flex items-center gap-1">
                 <User className="w-3 h-3" /> {t('messages.col_sender')}
               </p>
               <p className="text-sm font-medium text-foreground">{copy.sender_name}</p>
@@ -239,7 +239,7 @@ export function MessageDetail() {
 
             {/* Receiver */}
             <div className="space-y-1">
-              <p className="text-sm text-default-500 flex items-center gap-1">
+              <p className="text-sm text-muted flex items-center gap-1">
                 <User className="w-3 h-3" /> {t('messages.col_receiver')}
               </p>
               <p className="text-sm font-medium text-foreground">{copy.receiver_name}</p>
@@ -247,15 +247,15 @@ export function MessageDetail() {
 
             {/* Listing */}
             <div className="space-y-1">
-              <p className="text-sm text-default-500">{t('messages.detail_listing')}</p>
+              <p className="text-sm text-muted">{t('messages.detail_listing')}</p>
               <p className="text-sm text-foreground">
-                {copy.listing_title || <span className="text-default-400">{t('messages.detail_none')}</span>}
+                {copy.listing_title || <span className="text-muted">{t('messages.detail_none')}</span>}
               </p>
             </div>
 
             {/* Copy Reason */}
             <div className="space-y-1">
-              <p className="text-sm text-default-500">{t('messages.detail_copy_reason')}</p>
+              <p className="text-sm text-muted">{t('messages.detail_copy_reason')}</p>
               <Chip
                 size="sm"
                 variant="tertiary"
@@ -267,7 +267,7 @@ export function MessageDetail() {
 
             {/* Sent At */}
             <div className="space-y-1">
-              <p className="text-sm text-default-500 flex items-center gap-1">
+              <p className="text-sm text-muted flex items-center gap-1">
                 <Calendar className="w-3 h-3" /> {t('messages.detail_sent')}
               </p>
               <p className="text-sm text-foreground">
@@ -277,7 +277,7 @@ export function MessageDetail() {
 
             {/* Status Chips */}
             <div className="space-y-1">
-              <p className="text-sm text-default-500">{t('messages.col_status')}</p>
+              <p className="text-sm text-muted">{t('messages.col_status')}</p>
               <div className="flex flex-wrap gap-1">
                 {isFlagged && (
                   <Chip
@@ -325,7 +325,7 @@ export function MessageDetail() {
             <>
               <Separator className="my-3" />
               <div className="space-y-1">
-                <p className="text-sm text-default-500">{t('messages.detail_flag_reason')}</p>
+                <p className="text-sm text-muted">{t('messages.detail_flag_reason')}</p>
                 <p className="text-sm text-foreground">{copy.flag_reason}</p>
               </div>
             </>
@@ -346,7 +346,7 @@ export function MessageDetail() {
         <CardBody className="p-0">
           {thread.length === 0 ? (
             <div className="p-6 text-center">
-              <p className="text-sm text-default-500">{t('messages.detail_no_thread_messages')}</p>
+              <p className="text-sm text-muted">{t('messages.detail_no_thread_messages')}</p>
             </div>
           ) : (
             <ScrollShadow className="max-h-[500px]">
@@ -375,24 +375,24 @@ export function MessageDetail() {
                             </Chip>
                           )}
                           {msg.is_edited && (
-                            <span className="text-xs text-default-400">{t('messages.detail_edited')}</span>
+                            <span className="text-xs text-muted">{t('messages.detail_edited')}</span>
                           )}
                         </div>
-                        <span className="text-xs text-default-500">
+                        <span className="text-xs text-muted">
                           {formatServerDateTime(msg.created_at)}
                         </span>
                       </div>
 
                       {/* Subject line */}
                       {msg.subject && (
-                        <p className="text-xs text-default-500 mb-1">
+                        <p className="text-xs text-muted mb-1">
                           {t('messages.detail_subject')}: {msg.subject}
                         </p>
                       )}
 
                       {/* Message body */}
                       {msg.is_deleted ? (
-                        <p className="text-sm italic text-default-400">
+                        <p className="text-sm italic text-muted">
                           {t('messages.detail_message_deleted')}
                         </p>
                       ) : (
@@ -420,7 +420,7 @@ export function MessageDetail() {
           <CardBody>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="space-y-1">
-                <p className="text-sm text-default-500">{t('messages.detail_decision')}</p>
+                <p className="text-sm text-muted">{t('messages.detail_decision')}</p>
                 <Chip
                   size="sm"
                   variant="tertiary"
@@ -431,11 +431,11 @@ export function MessageDetail() {
                 </Chip>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-default-500">{t('messages.detail_decided_by')}</p>
+                <p className="text-sm text-muted">{t('messages.detail_decided_by')}</p>
                 <p className="text-sm font-medium text-foreground">{archive.decided_by_name}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-sm text-default-500">{t('messages.detail_date')}</p>
+                <p className="text-sm text-muted">{t('messages.detail_date')}</p>
                 <p className="text-sm text-foreground">
                   {formatServerDateTime(archive.decided_at)}
                 </p>
@@ -445,7 +445,7 @@ export function MessageDetail() {
               <>
                 <Separator className="my-3" />
                 <div className="space-y-1">
-                  <p className="text-sm text-default-500">{t('messages.detail_notes')}</p>
+                  <p className="text-sm text-muted">{t('messages.detail_notes')}</p>
                   <p className="text-sm text-foreground">{archive.decision_notes}</p>
                 </div>
               </>
@@ -463,7 +463,7 @@ export function MessageDetail() {
         <Separator />
         <CardBody>
           {isArchived ? (
-            <p className="text-sm text-default-500">
+            <p className="text-sm text-muted">
               {t('messages.detail_archived_no_actions')}
             </p>
           ) : (
@@ -581,7 +581,7 @@ export function MessageDetail() {
             {t('messages.detail_approve_archive')}
           </ModalHeader>
           <ModalBody>
-            <p className="text-sm text-default-600">
+            <p className="text-sm text-foreground/70">
               {t('messages.detail_approve_warning')}
             </p>
             <Textarea

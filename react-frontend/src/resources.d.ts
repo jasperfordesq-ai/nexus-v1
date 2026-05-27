@@ -18836,7 +18836,7 @@ export default interface Resources {
         "retention": "Reviewed copies stay in the archive for 180 days then auto-purge (configurable in the Configuration sub-module).",
         "severity_heading": "Severity levels",
         "severity_high": "<b class=\"text-danger\">High</b> — flagged by the content scanner for keywords or patterns of concern.",
-        "severity_low": "<b class=\"text-default-500\">Low</b> — routine copy for audit; no automatic concerns.",
+        "severity_low": "<b class=\"text-muted\">Low</b> — routine copy for audit; no automatic concerns.",
         "severity_medium": "<b class=\"text-warning\">Medium</b> — sender or recipient is a flagged user (no content match).",
         "title": "How message review works"
       },

@@ -1136,7 +1136,7 @@ export function CreateJobPage() {
           <div className="border border-theme-default rounded-xl overflow-hidden">
             <Button
               variant="light"
-              className="w-full flex items-center justify-between p-4 text-left bg-theme-elevated hover:bg-theme-hover transition-colors h-auto min-w-0 justify-between"
+              className="w-full flex items-center justify-between p-4 text-left bg-theme-elevated hover:bg-theme-hover transition-colors min-h-9 min-w-0 justify-between"
               onPress={() => setBrandingOpen((o) => !o)}
               aria-expanded={brandingOpen}
             >
@@ -1241,7 +1241,7 @@ export function CreateJobPage() {
             <div className="border border-theme-default rounded-xl overflow-hidden">
               <Button
                 variant="light"
-                className="w-full flex items-center justify-between p-4 text-left bg-theme-elevated hover:bg-theme-hover transition-colors h-auto min-w-0 justify-between"
+                className="w-full flex items-center justify-between p-4 text-left bg-theme-elevated hover:bg-theme-hover transition-colors min-h-9 min-w-0 justify-between"
                 onPress={() => setTeamOpen((o) => !o)}
                 aria-expanded={teamOpen}
               >

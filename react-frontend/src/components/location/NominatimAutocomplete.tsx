@@ -264,7 +264,7 @@ export function NominatimAutocomplete(props: NominatimAutocompleteProps) {
               variant="light"
               isIconOnly
               onPress={handleClear}
-              className="p-0.5 rounded-full hover:bg-default-200 transition-colors min-w-0 h-auto w-auto"
+              className="p-0.5 rounded-full hover:bg-surface-tertiary transition-colors min-w-0 min-h-9 w-auto"
               aria-label={t('aria.clear_location')}
             >
               <X className="w-3.5 h-3.5 text-theme-subtle" />
@@ -294,7 +294,7 @@ export function NominatimAutocomplete(props: NominatimAutocompleteProps) {
                 className={`flex flex-col gap-0.5 px-3 py-2.5 cursor-pointer transition-colors
                   ${index === activeIndex
                     ? 'bg-accent-soft dark:bg-accent-soft'
-                    : 'hover:bg-default-100 dark:hover:bg-default-50/10'
+                    : 'hover:bg-surface-secondary dark:hover:bg-surface-secondary/10'
                   }
                   ${index < suggestions.length - 1 ? 'border-b border-glass-border/50' : ''}
                 `}

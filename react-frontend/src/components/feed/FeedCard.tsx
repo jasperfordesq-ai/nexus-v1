@@ -1489,7 +1489,7 @@ const FeedCard = React.memo(function FeedCard({
               <Button
                 variant="light"
                 size="sm"
-                className="text-xs text-theme-subtle hover:text-theme-primary p-0 min-w-0 h-auto"
+                className="text-xs text-theme-subtle hover:text-theme-primary p-0 min-w-0 min-h-9"
                 onPress={toggleComments}
               >
                 {social.commentsCount} {social.commentsCount === 1 ? t('card.comment') : t('card.comments')}

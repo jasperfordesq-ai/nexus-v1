@@ -48,7 +48,7 @@ const QUICK_ACTIONS = [
   { labelKey: 'crm.qa_member_tags', path: '/admin/crm/tags', icon: Tag, color: 'text-accent bg-accent-soft' },
   { labelKey: 'crm.qa_activity_timeline', path: '/admin/crm/timeline', icon: Activity, color: 'text-danger bg-danger/10' },
   { labelKey: 'crm.qa_onboarding_funnel', path: '/admin/crm/funnel', icon: TrendingUp, color: 'text-success bg-success/10' },
-  { labelKey: 'crm.qa_all_members', path: '/admin/users', icon: Users, color: 'text-default bg-default/10' },
+  { labelKey: 'crm.qa_all_members', path: '/admin/users', icon: Users, color: 'text-muted bg-surface-tertiary' },
 ] as const;
 
 export function CrmDashboard() {

@@ -1156,7 +1156,7 @@ export function ChallengeDetailPage() {
                       variant="flat"
                       onPress={() => handleVote(idea.id)}
                       isDisabled={!isAuthenticated || votingIds.has(idea.id)}
-                      className={`p-1.5 rounded-lg transition-colors min-w-0 w-auto h-auto ${
+                      className={`p-1.5 rounded-lg transition-colors min-w-0 w-auto min-h-9 ${
                         idea.has_voted
                           ? 'bg-accent/10 text-accent'
                           : 'hover:bg-[var(--color-surface-hover)] text-[var(--color-text-tertiary)]'

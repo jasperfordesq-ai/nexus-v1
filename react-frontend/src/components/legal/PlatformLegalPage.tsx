@@ -157,7 +157,7 @@ export function PlatformLegalPage({
                       onPress={() =>
                         document.getElementById(section.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
                       }
-                      className="text-left text-sm text-theme-muted hover:text-theme-primary transition-colors w-full px-2 py-1.5 rounded-lg hover:bg-slate-500/10 justify-start h-auto"
+                      className="text-left text-sm text-theme-muted hover:text-theme-primary transition-colors w-full px-2 py-1.5 rounded-lg hover:bg-slate-500/10 justify-start min-h-9"
                     >
                       <span className="font-medium text-theme-subtle mr-2">{idx + 1}.</span>
                       {section.title}

@@ -163,7 +163,7 @@ export function ApplicationCard({ application, onUpdateStatus, tenantPathFn, nav
           variant="light"
           size="sm"
           onPress={handleToggleHistory}
-          className="text-xs text-theme-subtle hover:text-theme-primary flex items-center gap-1 transition-colors h-auto p-0 min-w-0"
+          className="text-xs text-theme-subtle hover:text-theme-primary flex items-center gap-1 transition-colors min-h-9 p-0 min-w-0"
           startContent={<History className="w-3 h-3" aria-hidden="true" />}
         >
           {t('history.title')}

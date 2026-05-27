@@ -366,7 +366,7 @@ export function VolunteeringOverview() {
             warning: { bg: 'bg-warning/10', text: 'text-warning' },
             danger: { bg: 'bg-danger/10', text: 'text-danger' },
           };
-          const cc = colorClasses[action.color] ?? { bg: 'bg-default/10', text: 'text-default' };
+          const cc = colorClasses[action.color] ?? { bg: 'bg-surface-tertiary', text: 'text-muted' };
           return (
           <Card
             key={action.path}

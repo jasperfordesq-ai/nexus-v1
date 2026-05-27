@@ -1066,7 +1066,7 @@ export function FeedPage() {
               variant="shadow"
               size="lg"
               classNames={{
-                base: 'cursor-pointer bg-gradient-to-r from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-shadow px-4 py-2 h-auto',
+                base: 'cursor-pointer bg-gradient-to-r from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-shadow px-4 py-2 min-h-9',
                 content: 'flex items-center gap-2 text-white font-medium text-sm',
               }}
               startContent={<ArrowUp className="w-3.5 h-3.5 text-white" aria-hidden="true" />}

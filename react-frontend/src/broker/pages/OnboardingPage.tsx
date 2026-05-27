@@ -235,7 +235,7 @@ export default function OnboardingPage() {
               <Spinner size="lg" label={t('common.loading')} />
             </div>
           ) : stages.length === 0 ? (
-            <p className="text-sm text-default-400 text-center py-8">
+            <p className="text-sm text-muted text-center py-8">
               {t('common.no_data')}
             </p>
           ) : (
@@ -254,13 +254,13 @@ export default function OnboardingPage() {
                     {/* Conversion arrow between stages */}
                     {index > 0 && (
                       <div className="flex items-center justify-center gap-2 py-1">
-                        <ArrowDown size={14} className="text-default-300" />
+                        <ArrowDown size={14} className="text-muted/60" />
                         {conversionRate !== null && (
                           <Chip size="sm" variant="tertiary" color="default">
                             {conversionRate}%
                           </Chip>
                         )}
-                        <ArrowDown size={14} className="text-default-300" />
+                        <ArrowDown size={14} className="text-muted/60" />
                       </div>
                     )}
 
@@ -270,7 +270,7 @@ export default function OnboardingPage() {
                         <p className="text-sm font-medium text-foreground truncate">
                           {label}
                         </p>
-                        <p className="text-xs text-default-400">
+                        <p className="text-xs text-muted">
                           {stage.count.toLocaleString()}
                         </p>
                       </div>
@@ -313,7 +313,7 @@ export default function OnboardingPage() {
                     : '0';
                 return (
                   <div className="mt-4 pt-4 border-t border-divider text-center">
-                    <p className="text-sm text-default-500">
+                    <p className="text-sm text-muted">
                       {first.name} → {last.name}
                     </p>
                     <p className="text-2xl font-bold text-foreground mt-1">
@@ -346,7 +346,7 @@ export default function OnboardingPage() {
             onRefresh={fetchMembers}
             emptyContent={
               <div className="flex flex-col items-center py-8">
-                <p className="text-default-400">{t('onboarding.no_pending')}</p>
+                <p className="text-muted">{t('onboarding.no_pending')}</p>
               </div>
             }
           />

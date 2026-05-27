@@ -157,7 +157,7 @@ export function QuickCreateMenu({ isOpen, onClose }: QuickCreateMenuProps) {
                       >
                         <Button
                           onPress={() => handleSelect(option.href)}
-                          className="w-full h-auto flex flex-col items-center gap-2 p-4 rounded-xl bg-theme-elevated hover:bg-theme-hover border border-theme-default transition-all group"
+                          className="w-full min-h-9 flex flex-col items-center gap-2 p-4 rounded-xl bg-theme-elevated hover:bg-theme-hover border border-theme-default transition-all group"
                           variant="light"
                         >
                           <div

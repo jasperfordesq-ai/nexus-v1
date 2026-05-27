@@ -155,7 +155,7 @@ function CategoryTreeItem({
             variant="light"
             onPress={() => setExpanded(!expanded)}
             aria-label={expanded ? t('resources.collapse_category') : t('resources.expand_category')}
-            className="p-0 min-w-0 w-auto h-auto flex-shrink-0"
+            className="p-0 min-w-0 w-auto min-h-9 flex-shrink-0"
           >
             {expanded ? (
               <ChevronDown className="w-3.5 h-3.5 text-theme-subtle" aria-hidden="true" />
@@ -169,7 +169,7 @@ function CategoryTreeItem({
         <Button
           variant="light"
           onPress={() => onSelect(isSelected ? null : node.id)}
-          className="flex items-center gap-2 text-left text-sm h-auto p-0 min-w-0 flex-1 justify-start"
+          className="flex items-center gap-2 text-left text-sm min-h-9 p-0 min-w-0 flex-1 justify-start"
         >
           <Folder className={`w-3.5 h-3.5 flex-shrink-0 ${isSelected ? 'text-amber-400' : 'text-theme-subtle'}`} aria-hidden="true" />
           <span className="flex-1 truncate">{node.name}</span>
@@ -641,7 +641,7 @@ export function ResourcesPage() {
                   <Button
                     variant="light"
                     onPress={() => setSelectedCategory(null)}
-                    className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left text-sm transition-colors justify-start h-auto ${
+                    className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left text-sm transition-colors justify-start min-h-9 ${
                       !selectedCategory ? 'bg-amber-500/10 text-[var(--color-warning)] font-semibold' : 'text-theme-muted hover:bg-theme-hover'
                     }`}
                     startContent={<FolderOpen className="w-3.5 h-3.5" aria-hidden="true" />}

@@ -24,7 +24,7 @@ export function SourceRepositoryLink({
   const { t } = useTranslation('common');
 
   const buttonClasses = [
-    'group inline-flex h-auto min-h-[44px] max-w-full items-center gap-2 rounded-lg border px-3 py-2 no-underline shadow-sm transition-all duration-200',
+    'group inline-flex min-h-9 min-h-[44px] max-w-full items-center gap-2 rounded-lg border px-3 py-2 no-underline shadow-sm transition-all duration-200',
     inverse
       ? 'border-white/20 bg-white/10 text-white hover:border-white/40 hover:bg-white/15'
       : 'border-theme-default bg-theme-elevated text-theme-primary hover:border-theme-primary/60 hover:bg-theme-primary/10 hover:shadow-md',

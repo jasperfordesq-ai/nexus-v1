@@ -67,7 +67,7 @@ function mapColor(color?: SliderProps['color']): string | undefined {
     case 'primary':
       return 'bg-accent';
     case 'secondary':
-      return 'bg-default';
+      return 'bg-accent-soft';
     default:
       return undefined;
   }

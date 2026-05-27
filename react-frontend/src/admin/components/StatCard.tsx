@@ -42,7 +42,7 @@ const colorMap = {
   warning: 'text-warning bg-warning/10',
   danger: 'text-danger bg-danger/10',
   secondary: 'text-accent bg-accent-soft',
-  default: 'text-muted bg-default/20',
+  default: 'text-muted bg-surface-tertiary',
 };
 
 export function StatCard({

@@ -92,7 +92,7 @@ export function FadpConsentBanner() {
                 variant="light"
                 onPress={dismiss}
                 aria-label={t('common:common.dismiss')}
-                className="mt-0.5 flex-shrink-0 text-default-400"
+                className="mt-0.5 flex-shrink-0 text-muted"
               >
                 <X size={16} />
               </Button>

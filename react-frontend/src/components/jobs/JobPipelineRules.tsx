@@ -63,7 +63,7 @@ export function JobPipelineRules({ jobId }: JobPipelineRulesProps) {
           if (!pipelineOpen) loadPipelineRules();
         }}
         aria-expanded={pipelineOpen}
-        className="w-full flex items-center justify-between h-auto p-0 justify-between"
+        className="w-full flex items-center justify-between min-h-9 p-0 justify-between"
       >
         <span className="font-semibold flex items-center gap-2">
           <Zap size={16} aria-hidden="true" />

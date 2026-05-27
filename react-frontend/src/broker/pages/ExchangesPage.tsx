@@ -155,7 +155,7 @@ export function ExchangeManagement() {
       label: t('exchanges.col_listing'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">
+        <span className="text-sm text-foreground/70">
           {item.listing_title || '—'}
         </span>
       ),
@@ -181,7 +181,7 @@ export function ExchangeManagement() {
       label: t('exchanges.col_date'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {formatServerDate(item.created_at)}
         </span>
       ),
@@ -296,7 +296,7 @@ export function ExchangeManagement() {
               )}
             </ModalHeader>
             <ModalBody>
-              <p className="text-default-600 mb-3">
+              <p className="text-foreground/70 mb-3">
                 {actionModal.type === 'approve'
                   ? t('exchanges.approve_confirm_text')
                   : t('exchanges.reject_confirm_text')

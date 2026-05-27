@@ -101,7 +101,7 @@ export function ReviewArchive() {
       label: t('archives.col_listing'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">
+        <span className="text-sm text-foreground/70">
           {item.listing_title || '—'}
         </span>
       ),
@@ -145,7 +145,7 @@ export function ReviewArchive() {
       label: t('archives.col_date'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {formatServerDate(item.decided_at)}
         </span>
       ),
@@ -186,7 +186,7 @@ export function ReviewArchive() {
           className="w-full sm:max-w-xs"
           placeholder={t('archives.search_placeholder')}
           aria-label={t('archives.search_aria')}
-          startContent={<Search size={16} className="text-default-400" />}
+          startContent={<Search size={16} className="text-muted" />}
           value={search}
           onValueChange={handleSearchChange}
           size="sm"

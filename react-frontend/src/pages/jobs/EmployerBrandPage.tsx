@@ -90,7 +90,7 @@ function StarRating({ rating, size = 16, interactive, onChange, getStarLabel }: 
         <Star
           key={v}
           size={size}
-          className={`${v <= rating ? 'text-warning fill-warning' : 'text-default-300'} ${interactive ? 'cursor-pointer hover:scale-110 transition-transform' : ''}`}
+          className={`${v <= rating ? 'text-warning fill-warning' : 'text-muted/60'} ${interactive ? 'cursor-pointer hover:scale-110 transition-transform' : ''}`}
           onClick={interactive && onChange ? () => onChange(v) : undefined}
           aria-label={interactive && getStarLabel ? getStarLabel(v) : undefined}
         />

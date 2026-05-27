@@ -67,7 +67,7 @@ function colorClass(color?: RadioColor) {
     case 'primary':
       return 'data-[selected=true]:border-accent data-[selected=true]:bg-accent';
     case 'secondary':
-      return 'data-[selected=true]:border-default data-[selected=true]:bg-default';
+      return 'data-[selected=true]:border-accent data-[selected=true]:bg-accent-soft';
     case 'success':
       return 'data-[selected=true]:border-success data-[selected=true]:bg-success';
     case 'warning':

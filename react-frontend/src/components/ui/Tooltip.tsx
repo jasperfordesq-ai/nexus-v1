@@ -49,7 +49,7 @@ function mapColor(color?: TooltipProps['color']): string | undefined {
     case 'primary':
       return 'bg-accent text-accent-foreground';
     case 'secondary':
-      return 'bg-default text-foreground';
+      return 'bg-surface-tertiary text-foreground';
     default:
       return undefined;
   }

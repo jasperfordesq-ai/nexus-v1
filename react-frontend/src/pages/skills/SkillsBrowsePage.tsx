@@ -330,7 +330,7 @@ export function SkillsBrowsePage() {
                 size="sm"
                 variant="light"
                 onPress={() => setSearchQuery('')}
-                className="p-0.5 rounded-full hover:bg-theme-hover transition-colors min-w-0 w-auto h-auto"
+                className="p-0.5 rounded-full hover:bg-theme-hover transition-colors min-w-0 w-auto min-h-9"
                 aria-label={t('skills.aria_clear_search')}
               >
                 <X className="w-3.5 h-3.5 text-theme-subtle" />
@@ -411,7 +411,7 @@ export function SkillsBrowsePage() {
                       <Button
                         variant="light"
                         onPress={() => toggleCategory(category.id)}
-                        className="w-full flex items-center justify-between p-4 hover:bg-theme-hover transition-colors justify-between h-auto"
+                        className="w-full flex items-center justify-between p-4 hover:bg-theme-hover transition-colors justify-between min-h-9"
                         aria-expanded={isExpanded}
                       >
                         <div className="flex items-center gap-3">
@@ -505,7 +505,7 @@ export function SkillsBrowsePage() {
                                           key={skill.skill_name}
                                           variant="flat"
                                           onPress={() => selectSkill(category.id, skill.skill_name)}
-                                          className={`text-left p-3 rounded-xl border transition-all justify-start h-auto ${
+                                          className={`text-left p-3 rounded-xl border transition-all justify-start min-h-9 ${
                                             isSelected
                                               ? 'border-accent/40 bg-accent/10 shadow-sm shadow-accent/10'
                                               : 'bg-theme-elevated border-theme-default hover:border-accent/30 hover:bg-theme-hover'
@@ -577,7 +577,7 @@ export function SkillsBrowsePage() {
                                             setSelectedSkill(null);
                                             setSkillMembers([]);
                                           }}
-                                          className="p-1 rounded-lg hover:bg-theme-hover transition-colors min-w-0 w-auto h-auto"
+                                          className="p-1 rounded-lg hover:bg-theme-hover transition-colors min-w-0 w-auto min-h-9"
                                           aria-label={t('skills.aria_close_members_list')}
                                         >
                                           <X className="w-4 h-4 text-theme-subtle" />

@@ -120,19 +120,19 @@ export default function ExchangeDetail() {
       <Card shadow="sm">
         <CardBody className="flex flex-row items-center justify-between">
           <div className="space-y-1">
-            <p className="text-sm text-default-500">{t('exchanges.detail_status_label')}</p>
+            <p className="text-sm text-muted">{t('exchanges.detail_status_label')}</p>
             <Chip color={statusColor} variant="tertiary" size="sm">
               {t(`status.${exchange.status}`)}
             </Chip>
           </div>
           {exchange.final_hours !== undefined && exchange.final_hours !== null && (
             <div className="space-y-1 text-center">
-              <p className="text-sm text-default-500">{t('exchanges.detail_hours_label')}</p>
+              <p className="text-sm text-muted">{t('exchanges.detail_hours_label')}</p>
               <p className="text-sm font-semibold">{t('exchanges.detail_hours_value', { hours: exchange.final_hours })}</p>
             </div>
           )}
           <div className="space-y-1 text-right">
-            <p className="text-sm text-default-500">{t('exchanges.detail_created_label')}</p>
+            <p className="text-sm text-muted">{t('exchanges.detail_created_label')}</p>
             <p className="text-sm">{formatServerDateTime(exchange.created_at)}</p>
           </div>
         </CardBody>
@@ -149,7 +149,7 @@ export default function ExchangeDetail() {
           <CardBody>
             <p className="font-medium">{exchange.requester_name}</p>
             {exchange.requester_email && (
-              <p className="text-sm text-default-500">{exchange.requester_email}</p>
+              <p className="text-sm text-muted">{exchange.requester_email}</p>
             )}
           </CardBody>
         </Card>
@@ -162,7 +162,7 @@ export default function ExchangeDetail() {
           <CardBody>
             <p className="font-medium">{exchange.provider_name}</p>
             {exchange.provider_email && (
-              <p className="text-sm text-default-500">{exchange.provider_email}</p>
+              <p className="text-sm text-muted">{exchange.provider_email}</p>
             )}
           </CardBody>
         </Card>
@@ -188,7 +188,7 @@ export default function ExchangeDetail() {
               <span className="text-sm">{t(`risk_tags.category_${risk_tag.risk_category}`)}</span>
             </div>
             {risk_tag.risk_notes && (
-              <p className="text-sm text-default-500 mt-2">{risk_tag.risk_notes}</p>
+              <p className="text-sm text-muted mt-2">{risk_tag.risk_notes}</p>
             )}
             <div className="flex gap-3 mt-3">
               {risk_tag.requires_approval && (
@@ -245,7 +245,7 @@ export default function ExchangeDetail() {
         <Separator />
         <CardBody>
           {history.length === 0 ? (
-            <p className="text-sm text-default-500">{t('exchanges.detail_no_history')}</p>
+            <p className="text-sm text-muted">{t('exchanges.detail_no_history')}</p>
           ) : (
             <div className="space-y-3">
               {history.map((entry) => (
@@ -254,12 +254,12 @@ export default function ExchangeDetail() {
                   <div>
                     <p className="text-sm font-medium">{entry.action}</p>
                     {entry.actor_name && (
-                      <p className="text-xs text-default-500">{t('exchanges.detail_history_by', { name: entry.actor_name })}</p>
+                      <p className="text-xs text-muted">{t('exchanges.detail_history_by', { name: entry.actor_name })}</p>
                     )}
                     {entry.notes && (
-                      <p className="text-xs text-default-400 mt-1">{entry.notes}</p>
+                      <p className="text-xs text-muted mt-1">{entry.notes}</p>
                     )}
-                    <p className="text-xs text-default-300">{formatServerDateTime(entry.created_at)}</p>
+                    <p className="text-xs text-muted/60">{formatServerDateTime(entry.created_at)}</p>
                   </div>
                 </div>
               ))}

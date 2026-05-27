@@ -476,7 +476,7 @@ export function IdeaDetailPage() {
               variant="flat"
               onPress={handleVote}
               isDisabled={!isAuthenticated || isVoting}
-              className={`flex flex-col items-center gap-0.5 p-3 rounded-xl transition-colors h-auto min-w-0 ${
+              className={`flex flex-col items-center gap-0.5 p-3 rounded-xl transition-colors min-h-9 min-w-0 ${
                 idea.has_voted
                   ? 'bg-accent/10 text-accent'
                   : 'hover:bg-[var(--color-surface-hover)] text-[var(--color-text-tertiary)]'

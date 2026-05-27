@@ -292,7 +292,7 @@ export function VereinDuesManagementPage() {
             type="number"
             value={feeAmount}
             onChange={(e) => setFeeAmount(e.target.value)}
-            startContent={<span className="text-default-500">{currency}</span>}
+            startContent={<span className="text-muted">{currency}</span>}
           />
           <Select
             label={t('verein_dues.admin_currency')}
@@ -324,7 +324,7 @@ export function VereinDuesManagementPage() {
             type="number"
             value={lateFee}
             onChange={(e) => setLateFee(e.target.value)}
-            startContent={<span className="text-default-500">{currency}</span>}
+            startContent={<span className="text-muted">{currency}</span>}
           />
           <div className="md:col-span-2 flex justify-end">
             <Button color="primary" className="w-full sm:w-auto" isLoading={isSaving} onPress={onSaveConfig}>
@@ -344,7 +344,7 @@ export function VereinDuesManagementPage() {
                 <div className="font-semibold text-danger">
                   {t('verein_dues.admin_overdue_title')}
                 </div>
-                <div className="text-sm text-default-700">
+                <div className="text-sm text-foreground">
                   {t('verein_dues.admin_overdue_count', { count: overdueCount })}
                 </div>
               </div>
@@ -412,7 +412,7 @@ export function VereinDuesManagementPage() {
                   <TableRow key={row.id}>
                     <TableCell>
                       <div className="font-medium">{row.first_name} {row.last_name}</div>
-                      <div className="text-xs text-default-500">{row.email}</div>
+                      <div className="text-xs text-muted">{row.email}</div>
                     </TableCell>
                     <TableCell>
                       {new Intl.NumberFormat(undefined, { style: 'currency', currency: row.currency || 'CHF' }).format(row.amount_cents / 100)}

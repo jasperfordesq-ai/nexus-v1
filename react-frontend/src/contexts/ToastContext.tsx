@@ -238,7 +238,7 @@ const ToastItem = forwardRef<HTMLDivElement, ToastItemProps>(function ToastItem(
           variant="light"
           isIconOnly
           onPress={() => onRemove(toast.id)}
-          className="text-white/40 hover:text-white transition-colors flex-shrink-0 min-w-0 h-auto p-0"
+          className="text-white/40 hover:text-white transition-colors flex-shrink-0 min-w-0 min-h-9 p-0"
           aria-label={t('toast.aria_dismiss_notification')}
         >
           <X className="w-4 h-4" />

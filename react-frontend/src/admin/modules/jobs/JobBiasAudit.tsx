@@ -56,7 +56,7 @@ const FUNNEL_STAGES = ['applied', 'screening', 'interview', 'offer', 'accepted']
 
 const FUNNEL_COLORS: Record<string, string> = {
   applied: 'bg-accent',
-  screening: 'bg-default',
+  screening: 'bg-surface-tertiary',
   interview: 'bg-warning',
   offer: 'bg-success',
   accepted: 'bg-success',

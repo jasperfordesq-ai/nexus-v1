@@ -235,7 +235,7 @@ function FederationHero({ onOptIn, isOptingIn }: { onOptIn: () => void; isOpting
                     </span>
                   </div>
                   <h3 className="text-lg font-semibold text-foreground mb-2">{t(`hub.how_it_works_${index}_title`)}</h3>
-                  <p className="text-sm text-default-500">{t(`hub.how_it_works_${index}_description`)}</p>
+                  <p className="text-sm text-muted">{t(`hub.how_it_works_${index}_description`)}</p>
                 </GlassCard>
               </motion.div>
             );
@@ -249,21 +249,21 @@ function FederationHero({ onOptIn, isOptingIn }: { onOptIn: () => void; isOpting
           <div>
             <Shield className="w-8 h-8 text-emerald-500 mx-auto mb-2" aria-hidden="true" />
             <h4 className="font-semibold text-foreground mb-1">{t('hub.feature_privacy_title')}</h4>
-            <p className="text-sm text-default-500">
+            <p className="text-sm text-muted">
               {t('hub.feature_privacy_description')}
             </p>
           </div>
           <div>
             <Zap className="w-8 h-8 text-[var(--color-warning)] mx-auto mb-2" aria-hidden="true" />
             <h4 className="font-semibold text-foreground mb-1">{t('hub.feature_instant_title')}</h4>
-            <p className="text-sm text-default-500">
+            <p className="text-sm text-muted">
               {t('hub.feature_instant_description')}
             </p>
           </div>
           <div>
             <Handshake className="w-8 h-8 text-indigo-500 mx-auto mb-2" aria-hidden="true" />
             <h4 className="font-semibold text-foreground mb-1">{t('hub.feature_network_title')}</h4>
-            <p className="text-sm text-default-500">
+            <p className="text-sm text-muted">
               {t('hub.feature_network_description')}
             </p>
           </div>
@@ -345,7 +345,7 @@ function StatsRow({ stats, enabled }: { stats: FederationDashboardData['stats'];
                   {card.chipContent}
                 </Chip>
               )}
-              <p className="text-xs text-default-500 mt-1">{card.label}</p>
+              <p className="text-xs text-muted mt-1">{card.label}</p>
             </GlassCard>
           </motion.div>
         );
@@ -386,7 +386,7 @@ function QuickLinksSection() {
                       <h3 className="font-semibold text-foreground text-sm leading-tight mb-1 group-hover:text-accent transition-colors">
                         {t(`hub.quick_link_${index}_title`)}
                       </h3>
-                      <p className="text-xs text-default-500 line-clamp-2">{t(`hub.quick_link_${index}_description`)}</p>
+                      <p className="text-xs text-muted line-clamp-2">{t(`hub.quick_link_${index}_description`)}</p>
                     </div>
                   </div>
                 </GlassCard>
@@ -413,9 +413,9 @@ function PartnerCommunitiesSection({ partners }: { partners: FederationPartner[]
           <h2 className="text-xl font-bold text-foreground">{t('hub.partner_communities')}</h2>
         </div>
         <GlassCard className="p-8 text-center">
-          <Globe className="w-12 h-12 text-default-300 mx-auto mb-3" aria-hidden="true" />
-          <p className="text-default-500 mb-1">{t('hub.no_partners_yet')}</p>
-          <p className="text-sm text-default-400">
+          <Globe className="w-12 h-12 text-muted/60 mx-auto mb-3" aria-hidden="true" />
+          <p className="text-muted mb-1">{t('hub.no_partners_yet')}</p>
+          <p className="text-sm text-muted">
             {t('hub.no_partners_description')}
           </p>
         </GlassCard>
@@ -458,20 +458,20 @@ function PartnerCommunitiesSection({ partners }: { partners: FederationPartner[]
                 <div className="min-w-0 flex-1">
                   <h3 className="font-semibold text-foreground text-sm truncate">{partner.name}</h3>
                   {partner.location && (
-                    <p className="text-xs text-default-500 truncate">{partner.location}</p>
+                    <p className="text-xs text-muted truncate">{partner.location}</p>
                   )}
                 </div>
               </div>
 
               {partner.tagline && (
-                <p className="text-xs text-default-500 mb-3 line-clamp-2">{partner.tagline}</p>
+                <p className="text-xs text-muted mb-3 line-clamp-2">{partner.tagline}</p>
               )}
 
               <div className="flex items-center gap-2 mb-3 mt-auto">
                 <Chip size="sm" variant="flat" color={federationLevelColors[partner.federation_level] || 'default'}>
                   {partner.federation_level_name}
                 </Chip>
-                <span className="text-xs text-default-400">
+                <span className="text-xs text-muted">
                   {t('hub.member_count', { count: partner.member_count })}
                 </span>
               </div>
@@ -506,9 +506,9 @@ function RecentActivitySection({ activity }: { activity: FederationActivityItem[
       <div className="mb-8">
         <h2 className="text-xl font-bold text-foreground mb-4">{t('hub.recent_activity')}</h2>
         <GlassCard className="p-8 text-center">
-          <Activity className="w-12 h-12 text-default-300 mx-auto mb-3" aria-hidden="true" />
-          <p className="text-default-500 mb-1">{t('hub.no_activity_yet')}</p>
-          <p className="text-sm text-default-400">
+          <Activity className="w-12 h-12 text-muted/60 mx-auto mb-3" aria-hidden="true" />
+          <p className="text-muted mb-1">{t('hub.no_activity_yet')}</p>
+          <p className="text-sm text-muted">
             {t('hub.no_activity_description')}
           </p>
         </GlassCard>
@@ -531,18 +531,18 @@ function RecentActivitySection({ activity }: { activity: FederationActivityItem[
                 transition={{ delay: index * 0.05 }}
                 className="flex items-start gap-3 p-4"
               >
-                <div className="w-9 h-9 rounded-lg bg-default-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Icon className="w-[18px] h-[18px] text-default-600" aria-hidden="true" />
+                <div className="w-9 h-9 rounded-lg bg-surface-secondary flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Icon className="w-[18px] h-[18px] text-foreground/70" aria-hidden="true" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-foreground">{item.title}</p>
-                      <p className="text-xs text-default-500 mt-0.5 line-clamp-1">
+                      <p className="text-xs text-muted mt-0.5 line-clamp-1">
                         {item.description}
                       </p>
                     </div>
-                    <span className="text-xs text-default-400 whitespace-nowrap flex-shrink-0 flex items-center gap-1">
+                    <span className="text-xs text-muted whitespace-nowrap flex-shrink-0 flex items-center gap-1">
                       <Clock className="w-3 h-3" aria-hidden="true" />
                       {formatRelativeTime(item.created_at)}
                     </span>
@@ -555,10 +555,10 @@ function RecentActivitySection({ activity }: { activity: FederationActivityItem[
                         size="sm"
                         className="w-5 h-5"
                       />
-                      <span className="text-xs text-default-500">
+                      <span className="text-xs text-muted">
                         {item.actor.name}
                         {item.actor.tenant_name && (
-                          <span className="text-default-400"> {t('hub.from_community', { community: item.actor.tenant_name })}</span>
+                          <span className="text-muted"> {t('hub.from_community', { community: item.actor.tenant_name })}</span>
                         )}
                       </span>
                     </div>
@@ -733,7 +733,7 @@ export default function FederationHubPage() {
         <Breadcrumbs items={breadcrumbs} />
         <div className="flex flex-col items-center justify-center py-24">
           <Spinner size="lg" color="primary" />
-          <p className="text-default-500 mt-4">{t('hub.loading')}</p>
+          <p className="text-muted mt-4">{t('hub.loading')}</p>
         </div>
       </div>
     );
@@ -748,7 +748,7 @@ export default function FederationHubPage() {
         <GlassCard className="p-12 text-center mt-6">
           <AlertTriangle className="w-12 h-12 text-warning mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-xl font-semibold text-foreground mb-2">{t('hub.unable_to_load')}</h2>
-          <p className="text-default-500 mb-6">{error}</p>
+          <p className="text-muted mb-6">{error}</p>
           <Button
             color="primary"
             variant="flat"
@@ -769,12 +769,12 @@ export default function FederationHubPage() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         <Breadcrumbs items={breadcrumbs} />
         <GlassCard className="p-12 text-center mt-6">
-          <Network className="w-16 h-16 text-default-300 mx-auto mb-4" aria-hidden="true" />
+          <Network className="w-16 h-16 text-muted/60 mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-2xl font-bold text-foreground mb-2">{t('hub.not_available_title')}</h2>
-          <p className="text-default-500 mb-2">
+          <p className="text-muted mb-2">
             {t('hub.not_available_description', { community: tenant?.name || t('hub.your_community') })}
           </p>
-          <p className="text-sm text-default-400">
+          <p className="text-sm text-muted">
             {t('hub.not_available_contact')}
           </p>
         </GlassCard>
@@ -800,7 +800,7 @@ export default function FederationHubPage() {
           <Network className="w-7 h-7 text-accent" aria-hidden="true" />
           <h1 className="text-2xl md:text-3xl font-bold text-foreground">{t('hub.title')}</h1>
         </div>
-        <p className="text-default-500 ml-10">
+        <p className="text-muted ml-10">
           {isOptedIn
             ? t('hub.subtitle_opted_in')
             : t('hub.subtitle_opted_out')}
@@ -819,14 +819,14 @@ export default function FederationHubPage() {
           <RecentActivitySection activity={data.activity} />
 
           {/* Opt-out footer */}
-          <div className="border-t border-default-200 pt-6 mt-4 text-center">
+          <div className="border-t border-border pt-6 mt-4 text-center">
             {!showOptOutConfirm ? (
               <Button
                 variant="light"
                 color="default"
                 size="sm"
                 onPress={() => setShowOptOutConfirm(true)}
-                className="text-default-400 hover:text-danger"
+                className="text-muted hover:text-danger"
               >
                 {t('hub.disable_federation')}
               </Button>
@@ -836,7 +836,7 @@ export default function FederationHubPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="inline-flex flex-col items-center gap-3"
               >
-                <p className="text-sm text-default-500">
+                <p className="text-sm text-muted">
                   {t('hub.disable_confirm_message')}
                 </p>
                 <div className="flex items-center gap-3">

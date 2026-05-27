@@ -95,7 +95,7 @@ export function NewDiscussionModal({
                   }}
                 />
                 {newDiscussionTitle.length > Math.floor(255 * 0.8) && (
-                  <p className={`text-xs mt-0.5 text-right ${newDiscussionTitle.length >= 255 ? 'text-danger' : 'text-default-400'}`}>
+                  <p className={`text-xs mt-0.5 text-right ${newDiscussionTitle.length >= 255 ? 'text-danger' : 'text-muted'}`}>
                     {newDiscussionTitle.length}/255
                   </p>
                 )}
@@ -220,7 +220,7 @@ export function GroupSettingsModal({
                   }}
                 />
                 {settingsName.length > Math.floor(255 * 0.8) && (
-                  <p className={`text-xs mt-0.5 text-right ${settingsName.length >= 255 ? 'text-danger' : 'text-default-400'}`}>
+                  <p className={`text-xs mt-0.5 text-right ${settingsName.length >= 255 ? 'text-danger' : 'text-muted'}`}>
                     {settingsName.length}/255
                   </p>
                 )}
@@ -240,7 +240,7 @@ export function GroupSettingsModal({
                   }}
                 />
                 {settingsDescription.length > Math.floor(2000 * 0.8) && (
-                  <p className={`text-xs mt-0.5 text-right ${settingsDescription.length >= 2000 ? 'text-danger' : 'text-default-400'}`}>
+                  <p className={`text-xs mt-0.5 text-right ${settingsDescription.length >= 2000 ? 'text-danger' : 'text-muted'}`}>
                     {settingsDescription.length}/2000
                   </p>
                 )}
@@ -260,7 +260,7 @@ export function GroupSettingsModal({
                   }}
                 />
                 {settingsLocation.length > Math.floor(255 * 0.8) && (
-                  <p className={`text-xs mt-0.5 text-right ${settingsLocation.length >= 255 ? 'text-danger' : 'text-default-400'}`}>
+                  <p className={`text-xs mt-0.5 text-right ${settingsLocation.length >= 255 ? 'text-danger' : 'text-muted'}`}>
                     {settingsLocation.length}/255
                   </p>
                 )}

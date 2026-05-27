@@ -528,7 +528,7 @@ export function CreateGroupExchangePage() {
                       variant="flat"
                       onPress={() => setSplitType(card.value)}
                       className={`
-                        p-4 rounded-xl border-2 text-center transition-all cursor-pointer h-auto min-w-0 flex-col
+                        p-4 rounded-xl border-2 text-center transition-all cursor-pointer min-h-9 min-w-0 flex-col
                         ${splitType === card.value
                           ? 'border-indigo-500 bg-indigo-500/10'
                           : 'border-theme-default bg-theme-elevated hover:border-indigo-500/30 hover:bg-theme-hover'}

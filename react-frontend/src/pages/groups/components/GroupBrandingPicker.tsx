@@ -58,7 +58,7 @@ export function GroupBrandingPicker({ primaryColor, accentColor, onChange }: Gro
         <div className="space-y-2">
           <label
             htmlFor="group-primary-color"
-            className="block text-sm font-medium text-default-700"
+            className="block text-sm font-medium text-foreground"
           >
             {t('branding.primary_color')}
           </label>
@@ -68,10 +68,10 @@ export function GroupBrandingPicker({ primaryColor, accentColor, onChange }: Gro
               type="color"
               value={primary}
               onChange={(e) => handlePrimaryChange(e.target.value)}
-              className="w-10 h-10 rounded-lg border border-default-200 cursor-pointer"
+              className="w-10 h-10 rounded-lg border border-border cursor-pointer"
               aria-label={t('branding.primary_color')}
             />
-            <span className="text-sm text-default-500 font-mono uppercase">
+            <span className="text-sm text-muted font-mono uppercase">
               {primary}
             </span>
           </div>
@@ -81,7 +81,7 @@ export function GroupBrandingPicker({ primaryColor, accentColor, onChange }: Gro
         <div className="space-y-2">
           <label
             htmlFor="group-accent-color"
-            className="block text-sm font-medium text-default-700"
+            className="block text-sm font-medium text-foreground"
           >
             {t('branding.accent_color')}
           </label>
@@ -91,10 +91,10 @@ export function GroupBrandingPicker({ primaryColor, accentColor, onChange }: Gro
               type="color"
               value={accent}
               onChange={(e) => handleAccentChange(e.target.value)}
-              className="w-10 h-10 rounded-lg border border-default-200 cursor-pointer"
+              className="w-10 h-10 rounded-lg border border-border cursor-pointer"
               aria-label={t('branding.accent_color')}
             />
-            <span className="text-sm text-default-500 font-mono uppercase">
+            <span className="text-sm text-muted font-mono uppercase">
               {accent}
             </span>
           </div>
@@ -103,7 +103,7 @@ export function GroupBrandingPicker({ primaryColor, accentColor, onChange }: Gro
 
       {/* Preview swatch strip */}
       <div className="space-y-2">
-        <p className="text-xs text-default-400">
+        <p className="text-xs text-muted">
           {t('branding.preview')}
         </p>
         <div className="flex rounded-lg overflow-hidden h-8">

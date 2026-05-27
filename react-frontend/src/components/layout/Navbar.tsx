@@ -496,7 +496,7 @@ export function Navbar({ onMobileMenuOpen, externalSearchOpen, onSearchOpenChang
                     href={accessibleFrontendUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center rounded-[8px] text-theme-muted hover:text-theme-primary hover:bg-default/40 h-7 min-w-0 px-2 gap-1 text-xs shrink-0 outline-solid outline-transparent focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2"
+                    className="inline-flex items-center justify-center rounded-[8px] text-theme-muted hover:text-theme-primary hover:bg-surface-secondary h-7 min-w-0 px-2 gap-1 text-xs shrink-0 outline-solid outline-transparent focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2"
                     aria-label={t('accessibility.accessibility_alpha_new_tab')}
                   >
                     <BadgeCheck className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />

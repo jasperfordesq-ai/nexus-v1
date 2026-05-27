@@ -259,7 +259,7 @@ export function UserMonitoring() {
       key: 'monitoring_reason',
       label: t('monitoring.col_reason'),
       render: (item) => (
-        <span className="text-sm text-default-600">
+        <span className="text-sm text-foreground/70">
           {item.monitoring_reason || '—'}
         </span>
       ),
@@ -269,7 +269,7 @@ export function UserMonitoring() {
       label: t('monitoring.col_started'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {item.monitoring_started_at
             ? formatServerDate(item.monitoring_started_at)
             : '—'
@@ -284,7 +284,7 @@ export function UserMonitoring() {
       render: (item) => {
         const expiresAt = parseServerTimestamp(item.monitoring_expires_at);
         if (!expiresAt) {
-          return <span className="text-sm text-default-400">{t('monitoring.no_expiry')}</span>;
+          return <span className="text-sm text-muted">{t('monitoring.no_expiry')}</span>;
         }
         const isExpired = expiresAt <= new Date();
         return (
@@ -383,7 +383,7 @@ export function UserMonitoring() {
                 />
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-foreground truncate">{selectedUser.name}</p>
-                  <p className="text-xs text-default-500 truncate">{selectedUser.email}</p>
+                  <p className="text-xs text-muted truncate">{selectedUser.email}</p>
                 </div>
                 <Chip size="sm" variant="tertiary" color={selectedUser.status === 'active' ? 'success' : 'default'}>
                   {t(`status.${selectedUser.status}`)}
@@ -412,7 +412,7 @@ export function UserMonitoring() {
                   onFocus={() => {
                     if (userSearchResults.length > 0) setShowDropdown(true);
                   }}
-                  startContent={<Search size={16} className="text-default-400" />}
+                  startContent={<Search size={16} className="text-muted" />}
                   endContent={isSearching ? <Spinner size="sm" /> : null}
                   autoComplete="off"
                 />
@@ -429,7 +429,7 @@ export function UserMonitoring() {
                         className={`flex cursor-pointer items-center gap-3 px-3 py-2.5 transition-colors ${
                           index === highlightedIndex
                             ? 'bg-accent/10'
-                            : 'hover:bg-default-100'
+                            : 'hover:bg-surface-secondary'
                         }`}
                         onMouseEnter={() => setHighlightedIndex(index)}
                         onMouseDown={(e) => {
@@ -445,7 +445,7 @@ export function UserMonitoring() {
                         />
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium text-foreground truncate">{user.name}</p>
-                          <p className="text-xs text-default-500 truncate">{user.email}</p>
+                          <p className="text-xs text-muted truncate">{user.email}</p>
                         </div>
                         <Chip size="sm" variant="tertiary" color={user.status === 'active' ? 'success' : 'default'}>
                           {t(`status.${user.status}`)}
@@ -455,7 +455,7 @@ export function UserMonitoring() {
                   </ul>
                 )}
                 {userSearchQuery.length >= 2 && !isSearching && userSearchResults.length === 0 && (
-                  <p className="mt-1 text-xs text-default-400">{t('monitoring.no_users_found')}</p>
+                  <p className="mt-1 text-xs text-muted">{t('monitoring.no_users_found')}</p>
                 )}
               </div>
             )}
@@ -470,7 +470,7 @@ export function UserMonitoring() {
               isRequired
             />
             <div className="flex items-center justify-between py-1">
-              <span className="text-sm text-default-600">{t('monitoring.disable_messaging')}</span>
+              <span className="text-sm text-foreground/70">{t('monitoring.disable_messaging')}</span>
               <Switch
                 isSelected={messagingDisabled}
                 onValueChange={setMessagingDisabled}

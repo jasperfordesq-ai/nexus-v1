@@ -50,7 +50,7 @@ function colorClass(color?: SwitchColor) {
     case 'primary':
       return 'data-[selected=true]:bg-accent';
     case 'secondary':
-      return 'data-[selected=true]:bg-default';
+      return 'data-[selected=true]:bg-accent-soft';
     case 'success':
       return 'data-[selected=true]:bg-success';
     case 'warning':

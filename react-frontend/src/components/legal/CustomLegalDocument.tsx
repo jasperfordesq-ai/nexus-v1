@@ -271,7 +271,7 @@ export function CustomLegalDocument({ document: doc, accentColor = 'blue' }: Pro
                     key={section.id}
                     variant="light"
                     onPress={() => scrollToSection(section.id)}
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-left text-sm text-theme-muted transition-colors ${styles.tocHover} group h-auto min-w-0 w-full justify-start`}
+                    className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-left text-sm text-theme-muted transition-colors ${styles.tocHover} group min-h-9 min-w-0 w-full justify-start`}
                   >
                     <span
                       className={`inline-flex items-center justify-center w-5 h-5 rounded text-[0.65rem] font-bold ${styles.chipBg} shrink-0`}

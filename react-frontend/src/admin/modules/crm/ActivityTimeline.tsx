@@ -69,7 +69,7 @@ const ACTIVITY_DOT_COLOR_MAP: Record<string, string> = {
   signup: 'bg-success',
   listing_created: 'bg-warning',
   exchange_completed: 'bg-success',
-  note_added: 'bg-default',
+  note_added: 'bg-surface-tertiary',
   task_created: 'bg-muted',
   profile_updated: 'bg-accent',
   group_joined: 'bg-warning',

@@ -321,10 +321,10 @@ export function JobsAdmin() {
         actions={<Button variant='tertiary' startContent={<RefreshCw size={16} />} onPress={loadJobs}>{t('jobs.refresh')}</Button>}
       />
       <div className='grid grid-cols-2 md:grid-cols-4 gap-4 mb-6'>
-        <StatCard label={t('jobs.stat_total_jobs')} value={stats?.total_jobs ?? 0} icon={Briefcase} color='default' loading={statsLoading} />
+        <StatCard label={t('jobs.stat_total_jobs')} value={stats?.total_jobs ?? 0} icon={Briefcase} color='secondary' loading={statsLoading} />
         <StatCard label={t('jobs.stat_applications')} value={stats?.total_applications ?? 0} icon={Users} color='success' loading={statsLoading} />
         <StatCard label={t('jobs.stat_conversion')} value={`${stats?.conversion_rate ?? 0}%`} icon={TrendingUp} color='warning' loading={statsLoading} />
-        <StatCard label={t('jobs.stat_interviews')} value={stats?.active_interviews ?? 0} icon={Calendar} color='default' loading={statsLoading} description={stats?.pending_offers ? t('jobs.stat_pending_offers', { count: stats.pending_offers }) : undefined} />
+        <StatCard label={t('jobs.stat_interviews')} value={stats?.active_interviews ?? 0} icon={Calendar} color='secondary' loading={statsLoading} description={stats?.pending_offers ? t('jobs.stat_pending_offers', { count: stats.pending_offers }) : undefined} />
       </div>
       <div className='mb-6'>
         <Tabs selectedKey={panelTab} onSelectionChange={(key) => setPanelTab(key as 'listings' | 'applications')}

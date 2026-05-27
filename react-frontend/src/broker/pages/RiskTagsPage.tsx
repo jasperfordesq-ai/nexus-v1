@@ -300,7 +300,7 @@ export function RiskTagsPage() {
       label: t('risk_tags.col_owner'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">
+        <span className="text-sm text-foreground/70">
           {item.owner_name || '—'}
         </span>
       ),
@@ -369,7 +369,7 @@ export function RiskTagsPage() {
       label: t('risk_tags.col_tagged_by'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {item.tagged_by_name || '—'}
         </span>
       ),
@@ -379,7 +379,7 @@ export function RiskTagsPage() {
       label: t('risk_tags.col_date'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {formatServerDate(item.created_at)}
         </span>
       ),
@@ -478,10 +478,10 @@ export function RiskTagsPage() {
             {!editingTag && (
               <div className="relative">
                 {selectedListing ? (
-                  <div className="flex items-center gap-2 p-3 rounded-lg bg-default-100">
+                  <div className="flex items-center gap-2 p-3 rounded-lg bg-surface-secondary">
                     <div className="flex-1">
                       <p className="font-medium text-sm">{selectedListing.title}</p>
-                      <p className="text-xs text-default-500">
+                      <p className="text-xs text-muted">
                         {t('risk_tags.id_label', { id: selectedListing.id })}
                         {selectedListing.owner_name && ` · ${selectedListing.owner_name}`}
                       </p>
@@ -508,17 +508,17 @@ export function RiskTagsPage() {
                       startContent={searchingListings ? <Spinner size="sm" /> : <Search size={14} />}
                     />
                     {listingResults.length > 0 && (
-                      <div className="absolute z-50 w-full mt-1 bg-overlay border border-default-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                      <div className="absolute z-50 w-full mt-1 bg-overlay border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto">
                         {listingResults.map(listing => (
                           <Button
                             key={listing.id}
                             variant="light"
-                            className="w-full text-left px-3 py-2 justify-start h-auto rounded-none"
+                            className="w-full text-left px-3 py-2 justify-start min-h-9 rounded-none"
                             onPress={() => selectListing(listing)}
                           >
                             <div className="text-left">
                               <p className="text-sm font-medium">{listing.title}</p>
-                              <p className="text-xs text-default-500">
+                              <p className="text-xs text-muted">
                                 {t('risk_tags.id_label', { id: listing.id })}
                                 {listing.owner_name && ` · ${listing.owner_name}`}
                               </p>
@@ -544,7 +544,7 @@ export function RiskTagsPage() {
             )}
             {editingTag && (
               <div>
-                <p className="text-sm text-default-500">{t('risk_tags.listing_field_label')}</p>
+                <p className="text-sm text-muted">{t('risk_tags.listing_field_label')}</p>
                 <p className="font-medium">{editingTag.listing_title ?? t('risk_tags.listing_fallback', { id: editingTag.listing_id })}</p>
               </div>
             )}
@@ -600,7 +600,7 @@ export function RiskTagsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium text-sm">{t('risk_tags.requires_approval_label')}</p>
-                <p className="text-xs text-default-500">{t('risk_tags.requires_approval_description')}</p>
+                <p className="text-xs text-muted">{t('risk_tags.requires_approval_description')}</p>
               </div>
               <Switch
                 isSelected={form.requires_approval}
@@ -612,7 +612,7 @@ export function RiskTagsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium text-sm">{t('risk_tags.insurance_required_label')}</p>
-                <p className="text-xs text-default-500">{t('risk_tags.insurance_required_description')}</p>
+                <p className="text-xs text-muted">{t('risk_tags.insurance_required_description')}</p>
               </div>
               <Switch
                 isSelected={form.insurance_required}
@@ -624,7 +624,7 @@ export function RiskTagsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium text-sm">{t('risk_tags.dbs_required_label')}</p>
-                <p className="text-xs text-default-500">{t('risk_tags.dbs_required_description')}</p>
+                <p className="text-xs text-muted">{t('risk_tags.dbs_required_description')}</p>
               </div>
               <Switch
                 isSelected={form.dbs_required}

@@ -344,7 +344,7 @@ function EmptyState({ onQuestionClick, starters }: EmptyStateProps) {
               <Button
                 variant="flat"
                 onPress={() => onQuestionClick(question)}
-                className="w-full text-left px-4 py-3 rounded-xl bg-[var(--color-surface)] border border-[var(--border-default)] text-sm text-[var(--color-text)] hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/20 transition-all justify-start h-auto"
+                className="w-full text-left px-4 py-3 rounded-xl bg-[var(--color-surface)] border border-[var(--border-default)] text-sm text-[var(--color-text)] hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/20 transition-all justify-start min-h-9"
               >
                 {question}
               </Button>

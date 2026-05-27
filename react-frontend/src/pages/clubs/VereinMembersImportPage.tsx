@@ -181,8 +181,8 @@ export default function VereinMembersImportPage() {
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="max-w-3xl">
-          <h1 className="text-2xl font-bold text-default-900">{t('verein_import.title')}</h1>
-          <p className="mt-2 text-sm leading-6 text-default-600">
+          <h1 className="text-2xl font-bold text-foreground">{t('verein_import.title')}</h1>
+          <p className="mt-2 text-sm leading-6 text-foreground/70">
             {t('verein_import.subtitle')}
           </p>
         </div>
@@ -199,7 +199,7 @@ export default function VereinMembersImportPage() {
       </div>
 
       {/* Step 1: upload */}
-      <Card className="border border-default-200 shadow-sm">
+      <Card className="border border-border shadow-sm">
         <CardHeader className="flex items-center gap-2">
           <Upload className="w-5 h-5 text-accent" />
           <h2 className="text-base font-semibold">
@@ -208,7 +208,7 @@ export default function VereinMembersImportPage() {
         </CardHeader>
         <Separator />
         <CardBody className="space-y-4">
-          <p className="rounded-md border border-default-200 bg-default-50 px-3 py-2 text-sm text-default-600">
+          <p className="rounded-md border border-border bg-surface-secondary px-3 py-2 text-sm text-foreground/70">
             {t('verein_import.csv_format')}
           </p>
           <Input
@@ -247,20 +247,20 @@ export default function VereinMembersImportPage() {
       )}
 
       {preview && (
-        <Card className="border border-default-200 shadow-sm">
+        <Card className="border border-border shadow-sm">
           <CardHeader className="flex items-center gap-2 flex-wrap">
             <FileText className="w-5 h-5 text-accent" />
             <h2 className="text-base font-semibold">
               {t('verein_import.step2')}
             </h2>
-            <span className="text-sm text-default-500 ml-2">{preview.organization.name}</span>
+            <span className="text-sm text-muted ml-2">{preview.organization.name}</span>
           </CardHeader>
           <Separator />
           <CardBody className="space-y-4">
             {/* Summary */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-              <div className="rounded-lg border border-default-200 bg-default-50 p-3 text-center">
-                <p className="text-xs uppercase text-default-500">{t('verein_import.summary.total')}</p>
+              <div className="rounded-lg border border-border bg-surface-secondary p-3 text-center">
+                <p className="text-xs uppercase text-muted">{t('verein_import.summary.total')}</p>
                 <p className="text-2xl font-bold">{preview.summary.total_rows}</p>
               </div>
               <div className="rounded-lg border border-success-200 bg-success-50 p-3 text-center">
@@ -290,7 +290,7 @@ export default function VereinMembersImportPage() {
               </div>
             )}
 
-            <div className="overflow-x-auto rounded-lg border border-default-200">
+            <div className="overflow-x-auto rounded-lg border border-border">
               <Table
                 aria-label={t('verein_import.row.table_aria')}
                 removeWrapper
@@ -308,7 +308,7 @@ export default function VereinMembersImportPage() {
                 <TableBody>
                   {preview.items.map((row) => (
                     <TableRow key={row.row} className={row.errors.length ? 'bg-danger-50/40' : ''}>
-                      <TableCell className="text-default-500 tabular-nums">{row.row}</TableCell>
+                      <TableCell className="text-muted tabular-nums">{row.row}</TableCell>
                       <TableCell>{actionChip(row.action)}</TableCell>
                       <TableCell>{row.email || t('empty_dash')}</TableCell>
                       <TableCell className="hidden md:table-cell">
@@ -344,7 +344,7 @@ export default function VereinMembersImportPage() {
 
       {/* Step 3: result */}
       {importResult && (
-        <Card className="border border-default-200 shadow-sm">
+        <Card className="border border-border shadow-sm">
           <CardHeader className="flex items-center gap-2">
             <CheckCircle2 className="w-5 h-5 text-success" />
             <h2 className="text-base font-semibold">

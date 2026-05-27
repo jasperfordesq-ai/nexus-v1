@@ -363,7 +363,7 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
               key={room.id}
               onPress={() => setActiveChatroomId(room.id)}
               variant="light"
-              className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 justify-start h-auto ${
+              className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center gap-2 justify-start min-h-9 ${
                 activeChatroomId === room.id
                   ? 'bg-accent/10 text-accent font-medium'
                   : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-surface-hover)]'
@@ -488,7 +488,7 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
                               size="sm"
                               variant="light"
                               onPress={() => handleUnpinMessage(msg.id)}
-                              className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 min-w-0 w-auto h-auto"
+                              className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 min-w-0 w-auto min-h-9"
                               aria-label={tGroups('chatrooms.unpin')}
                             >
                               <PinOff className="w-3 h-3 text-[var(--color-text-tertiary)] hover:text-warning" />
@@ -551,7 +551,7 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
                                 ? handleUnpinMessage(msg.id)
                                 : handlePinMessage(msg.id)
                             }
-                            className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 min-w-0 w-auto h-auto"
+                            className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 min-w-0 w-auto min-h-9"
                             aria-label={pinnedIds.has(msg.id) ? tGroups('chatrooms.unpin') : tGroups('chatrooms.pin')}
                           >
                             {pinnedIds.has(msg.id) ? (
@@ -568,7 +568,7 @@ export function TeamChatrooms({ groupId, isGroupAdmin }: TeamChatroomsProps) {
                           size="sm"
                           variant="light"
                           onPress={() => handleDeleteMessage(msg.id)}
-                          className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 min-w-0 w-auto h-auto"
+                          className="opacity-0 group-hover:opacity-100 transition-opacity p-0.5 min-w-0 w-auto min-h-9"
                           aria-label={t('comments.delete')}
                         >
                           <Trash2 className="w-3 h-3 text-[var(--color-text-tertiary)] hover:text-danger" />

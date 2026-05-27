@@ -425,7 +425,7 @@ export function JobAnalyticsPage() {
                     >
                       <span className="text-[10px] text-theme-subtle">{count}</span>
                       <Tooltip content={t('analytics.applications_tooltip', { week: week.week, count })}>
-                        <div className={`w-full rounded-t bg-default ${getBarHeightClass(count, maxWeeklyCount)}`} />
+                        <div className={`w-full rounded-t bg-surface-tertiary ${getBarHeightClass(count, maxWeeklyCount)}`} />
                       </Tooltip>
                       <span className="text-[9px] text-theme-subtle rotate-[-45deg] origin-top-left whitespace-nowrap">
                         {week.week}

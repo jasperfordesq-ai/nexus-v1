@@ -249,7 +249,7 @@ function DemographicsTab({ data, t }: { data: DemographicsData; t: AdminT }) {
               label={l.language.toUpperCase()}
               value={l.count}
               total={totalLang}
-              color="bg-default"
+              color="bg-surface-tertiary"
             />
           ))}
           <p className="mt-3 text-xs text-muted">{t('analytics.regional.demographics.total_active_members', { total: totalLang.toLocaleString() })}</p>

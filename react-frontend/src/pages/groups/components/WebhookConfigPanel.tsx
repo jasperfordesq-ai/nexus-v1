@@ -182,7 +182,7 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
           <Spinner size="md" />
         </div>
       ) : webhooks.length === 0 ? (
-        <p className="text-sm text-default-400 text-center py-6">
+        <p className="text-sm text-muted text-center py-6">
           {t('webhooks.empty')}
         </p>
       ) : (
@@ -190,7 +190,7 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
           {webhooks.map((wh) => (
             <div
               key={wh.id}
-              className="flex flex-col gap-3 rounded-lg border border-default-200 bg-surface p-3 shadow-sm sm:flex-row sm:items-start"
+              className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-3 shadow-sm sm:flex-row sm:items-start"
             >
               <div className="flex-1 min-w-0 space-y-1">
                 <p className="text-sm font-medium text-foreground truncate" title={wh.url}>
@@ -219,7 +219,7 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
                     </Chip>
                   )}
                   {wh.last_fired_at && (
-                    <span className="text-xs text-default-400">
+                    <span className="text-xs text-muted">
                       {t('webhooks.last_fired')}{' '}
                       {formatDateValue(wh.last_fired_at)}
                     </span>
@@ -271,7 +271,7 @@ export function WebhookConfigPanel({ groupId, isAdmin }: WebhookConfigPanelProps
               />
 
               <div className="space-y-2">
-                <p className="text-sm font-medium text-default-700">
+                <p className="text-sm font-medium text-foreground">
                   {t('webhooks.events_label')}
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">

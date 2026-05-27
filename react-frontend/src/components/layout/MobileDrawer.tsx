@@ -125,7 +125,7 @@ function IdentityVerificationCTA({ userId, tenantPath, onClose }: { userId: numb
     <Button
       variant="flat"
       onPress={() => { onClose(); setTimeout(() => navigate(tenantPath('/verify-identity-optional')), 150); }}
-      className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-3.5 min-h-[48px] rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-base font-semibold hover:bg-emerald-500/20 h-auto min-w-0"
+      className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-3.5 min-h-[48px] rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 text-base font-semibold hover:bg-emerald-500/20 min-h-9 min-w-0"
     >
       <Fingerprint className="w-5 h-5 shrink-0" />
       <span className="min-w-0 truncate">{t('nav.verify_identity')}</span>
@@ -285,7 +285,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
         variant="light"
         onPress={() => navigateAndClose(item.href)}
         style={{ minHeight: 'var(--nav-row-min-h, 48px)', paddingTop: 'var(--nav-row-py, 0.875rem)', paddingBottom: 'var(--nav-row-py, 0.875rem)' }}
-        className={`flex items-center gap-3 px-4 rounded-xl text-base font-medium transition-all w-full text-start h-auto justify-start min-w-0 ${
+        className={`flex items-center gap-3 px-4 rounded-xl text-base font-medium transition-all w-full text-start min-h-9 justify-start min-w-0 ${
           isActive
             ? 'bg-theme-active text-theme-primary'
             : 'text-theme-muted hover:text-theme-primary hover:bg-theme-hover'
@@ -347,7 +347,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                 <Button
                   variant="flat"
                   fullWidth
-                  className="flex h-auto min-h-[48px] min-w-0 items-center justify-start gap-3 rounded-xl border border-accent/30 bg-accent/10 px-4 py-3.5 text-accent hover:bg-accent/20"
+                  className="flex min-h-9 min-h-[48px] min-w-0 items-center justify-start gap-3 rounded-xl border border-accent/30 bg-accent/10 px-4 py-3.5 text-accent hover:bg-accent/20"
                   onPress={() => { onClose(); setTimeout(onClick, DRAWER_CLOSE_MS); }}
                 >
                   <Download className="w-5 h-5 shrink-0" aria-hidden="true" />
@@ -366,7 +366,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               <Button
                 variant="flat"
                 fullWidth
-                className="flex items-center justify-start gap-3 px-4 py-3.5 min-h-[48px] rounded-xl bg-theme-elevated hover:bg-theme-hover border border-theme-default text-base text-theme-muted h-auto min-w-0"
+                className="flex items-center justify-start gap-3 px-4 py-3.5 min-h-[48px] rounded-xl bg-theme-elevated hover:bg-theme-hover border border-theme-default text-base text-theme-muted min-h-9 min-w-0"
                 onPress={() => { onClose(); onSearchOpen(); }}
                 aria-label={t('aria.open_search')}
               >
@@ -382,7 +382,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
               <Button
                 variant="light"
                 onPress={() => navigateAndClose('/profile')}
-                className="flex items-center gap-3 w-full text-start h-auto p-2 min-h-[56px] justify-start rounded-xl hover:bg-theme-hover"
+                className="flex items-center gap-3 w-full text-start min-h-9 p-2 min-h-[56px] justify-start rounded-xl hover:bg-theme-hover"
               >
                 <Avatar
                   name={`${user.first_name} ${user.last_name}`}
@@ -408,7 +408,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                 <Button
                   variant="flat"
                   onPress={() => navigateAndClose('/wallet')}
-                  className="text-center p-2 sm:p-3 min-h-[64px] rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors h-auto flex-col min-w-0"
+                  className="text-center p-2 sm:p-3 min-h-[64px] rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors min-h-9 flex-col min-w-0"
                 >
                   <p className="text-lg font-bold text-theme-primary">
                     {user.balance ?? 0}
@@ -418,7 +418,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                 <Button
                   variant="flat"
                   onPress={() => navigateAndClose('/messages')}
-                  className="text-center p-2 sm:p-3 min-h-[64px] rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors relative h-auto flex-col min-w-0"
+                  className="text-center p-2 sm:p-3 min-h-[64px] rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors relative min-h-9 flex-col min-w-0"
                 >
                   <p className="text-lg font-bold text-theme-primary">
                     {counts.messages > 0 ? counts.messages : 0}
@@ -431,7 +431,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                 <Button
                   variant="flat"
                   onPress={() => navigateAndClose('/notifications')}
-                  className="text-center p-2 sm:p-3 min-h-[64px] rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors relative h-auto flex-col min-w-0"
+                  className="text-center p-2 sm:p-3 min-h-[64px] rounded-xl bg-theme-elevated hover:bg-theme-hover transition-colors relative min-h-9 flex-col min-w-0"
                 >
                   <p className="text-lg font-bold text-theme-primary">
                     {unreadCount > 0 ? unreadCount : 0}
@@ -541,7 +541,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                   <Button
                     variant="light"
                     onPress={() => { resetConsent(); onClose(); }}
-                    className="flex items-center gap-3 px-4 py-3.5 min-h-[48px] rounded-xl text-base font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover transition-all w-full justify-start h-auto"
+                    className="flex items-center gap-3 px-4 py-3.5 min-h-[48px] rounded-xl text-base font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover transition-all w-full justify-start min-h-9"
                   >
                     <Settings className="w-5 h-5" aria-hidden="true" />
                     <span>{t('cookie_consent.manage')}</span>
@@ -572,7 +572,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                       href={accessibleFrontendUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center rounded-[8px] text-theme-muted hover:text-theme-primary hover:bg-default/40 h-11 min-h-[44px] min-w-0 px-3 gap-2 text-sm outline-solid outline-transparent focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2"
+                      className="inline-flex items-center justify-center rounded-[8px] text-theme-muted hover:text-theme-primary hover:bg-surface-secondary h-11 min-h-[44px] min-w-0 px-3 gap-2 text-sm outline-solid outline-transparent focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2"
                       aria-label={t('accessibility.accessibility_alpha_new_tab')}
                       onClick={onClose}
                     >
@@ -635,7 +635,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                   <Button
                     variant="light"
                     onPress={() => navigateAndClose('/settings')}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-3 min-h-[48px] rounded-xl text-base font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover border border-[var(--border-default)] transition-all h-auto"
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-3 min-h-[48px] rounded-xl text-base font-medium text-theme-muted hover:text-theme-primary hover:bg-theme-hover border border-[var(--border-default)] transition-all min-h-9"
                   >
                     <Settings className="w-5 h-5" aria-hidden="true" />
                     <span>{t('account.settings')}</span>
@@ -643,7 +643,7 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                   <Button
                     variant="light"
                     onPress={handleLogout}
-                    className="flex-1 flex items-center justify-center gap-2 px-3 py-3 min-h-[48px] rounded-xl text-base font-medium text-[var(--color-error)] hover:bg-red-500/10 transition-all h-auto border border-red-500/20"
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-3 min-h-[48px] rounded-xl text-base font-medium text-[var(--color-error)] hover:bg-red-500/10 transition-all min-h-9 border border-red-500/20"
                   >
                     <LogOut className="w-5 h-5" aria-hidden="true" />
                     <span>{t('account.log_out')}</span>

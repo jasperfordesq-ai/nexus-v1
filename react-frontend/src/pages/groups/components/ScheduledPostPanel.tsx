@@ -179,7 +179,7 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
           <Spinner size="md" />
         </div>
       ) : posts.length === 0 ? (
-        <p className="text-sm text-default-400 text-center py-6">
+        <p className="text-sm text-muted text-center py-6">
           {t('scheduled.empty')}
         </p>
       ) : (
@@ -187,7 +187,7 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
           {posts.map((post) => (
             <div
               key={post.id}
-              className="flex items-start gap-3 rounded-lg border border-default-200 bg-surface p-3 shadow-sm transition-colors hover:bg-default-50 dark:hover:bg-default-100/5"
+              className="flex items-start gap-3 rounded-lg border border-border bg-surface p-3 shadow-sm transition-colors hover:bg-surface-secondary dark:hover:bg-surface-secondary/5"
             >
               <div className="flex-1 min-w-0 space-y-1">
                 <p className="text-sm font-medium text-foreground">{post.title}</p>
@@ -199,7 +199,7 @@ export function ScheduledPostPanel({ groupId, isAdmin }: ScheduledPostPanelProps
                   >
                     {t(getPostTypeKey(post.post_type))}
                   </Chip>
-                  <span className="text-xs text-default-400">
+                  <span className="text-xs text-muted">
                     {formatDateTime(post.scheduled_at)}
                   </span>
                   {post.is_recurring && post.recurrence_pattern && (
