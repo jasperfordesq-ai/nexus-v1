@@ -239,7 +239,7 @@ export const ModalContent = forwardRef(function ModalContent(
 
 export const ModalHeader = forwardRef(function ModalHeader(
   { children, className, ...props }: ModalSectionProps,
-  ref: Ref<HTMLElement>,
+  ref: Ref<HTMLHeadingElement>,
 ) {
   const { classNames } = useContext(ModalContext);
 
