@@ -633,7 +633,8 @@
     "load_more": "Laad meer",
     "aria_select_all": "Selecteer alle zichtbare aanvragen die in behandeling zijn",
     "aria_select_application": "Selecteer een applicatie uit {{name}}",
-    "aria_search_volunteers": "Zoek vrijwilligers op naam"
+    "aria_search_volunteers": "Zoek vrijwilligers op naam",
+    "filter_label": "Filter applications"
   },
   "org_wallet_balance": "Wallet-saldo:",
   "auto_pay_on": "Automatisch betalen AAN",

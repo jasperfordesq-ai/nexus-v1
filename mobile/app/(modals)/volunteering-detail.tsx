@@ -3,45 +3,212 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import {
-  View,
-  Text,
-  ScrollView,
-  RefreshControl,
-  Pressable,
   Alert,
+  RefreshControl,
+  ScrollView,
   Share,
+  Text,
+  TextInput,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, router, useNavigation } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 
-import { getOpportunity, expressInterest } from '@/lib/api/volunteering';
+import {
+  expressInterest,
+  getOpportunity,
+  getOpportunities,
+  signUpForShift,
+  type VolunteerOpportunity,
+  type VolunteerShift,
+  type VolunteeringOrganisation,
+} from '@/lib/api/volunteering';
+import { useAuth } from '@/lib/hooks/useAuth';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
+import { withAlpha } from '@/lib/utils/color';
+import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 const WEB_URL = 'https://app.project-nexus.ie';
 
-export default function VolunteeringDetailScreen() {
+type ApiOpportunity = VolunteerOpportunity & {
+  organization?: VolunteeringOrganisation | null;
+};
+
+function formatDate(value?: string | null, mode: 'short' | 'long' = 'long') {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return new Intl.DateTimeFormat(undefined, mode === 'short'
+    ? { weekday: 'short', month: 'short', day: 'numeric' }
+    : { day: 'numeric', month: 'long', year: 'numeric' }).format(date);
+}
+
+function formatTime(value?: string | null) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' }).format(date);
+}
+
+function stripHtml(value?: string | null) {
+  return (value ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function organizationFor(opportunity: ApiOpportunity) {
+  return opportunity.organisation ?? opportunity.organization ?? null;
+}
+
+function normalizedSkills(skills: VolunteerOpportunity['skills_needed']): string[] {
+  if (Array.isArray(skills)) return skills;
+  if (typeof skills === 'string') return skills.split(',').map((skill) => skill.trim()).filter(Boolean);
+  return [];
+}
+
+function isOpenOpportunity(opportunity: ApiOpportunity) {
+  if (typeof opportunity.is_active === 'boolean') return opportunity.is_active;
+  return opportunity.status !== 'closed' && opportunity.status !== 'filled';
+}
+
+function statusLabelKey(opportunity: ApiOpportunity) {
+  if (!isOpenOpportunity(opportunity)) {
+    return opportunity.status === 'filled' ? 'status.filled' : 'status.closed';
+  }
+  return 'status.open';
+}
+
+function StateMessage({
+  title,
+  action,
+  primary,
+}: {
+  title: string;
+  action: string;
+  primary: string;
+}) {
+  return (
+    <SafeAreaView className="flex-1 bg-background">
+      <AppTopBar title={title} backLabel={action} fallbackHref="/(modals)/volunteering" />
+      <View className="flex-1 items-center justify-center px-6">
+        <Surface variant="secondary" className="items-center gap-4 rounded-panel p-8">
+          <View className="size-12 items-center justify-center rounded-full" style={{ backgroundColor: withAlpha(primary, 0.12) }}>
+            <Ionicons name="heart-outline" size={24} color={primary} />
+          </View>
+          <Text className="text-center text-sm" style={{ color: '#6b7280' }}>{title}</Text>
+          <HeroButton variant="secondary" onPress={() => router.back()}>
+            <HeroButton.Label>{action}</HeroButton.Label>
+          </HeroButton>
+        </Surface>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+function MetaRow({
+  icon,
+  label,
+  value,
+  tint,
+}: {
+  icon: React.ComponentProps<typeof Ionicons>['name'];
+  label: string;
+  value: string;
+  tint?: string;
+}) {
+  const theme = useTheme();
+  return (
+    <Surface variant="secondary" className="flex-row items-center gap-3 rounded-panel-inner p-3">
+      <View className="size-9 items-center justify-center rounded-full" style={{ backgroundColor: withAlpha(tint ?? theme.textMuted, 0.12) }}>
+        <Ionicons name={icon} size={17} color={tint ?? theme.textSecondary} />
+      </View>
+      <View className="min-w-0 flex-1">
+        <Text className="text-[11px] font-semibold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>
+          {label}
+        </Text>
+        <Text className="mt-0.5 text-sm font-semibold" style={{ color: theme.text }} numberOfLines={2}>
+          {value}
+        </Text>
+      </View>
+    </Surface>
+  );
+}
+
+function ShiftCard({
+  shift,
+  onSignUp,
+  signingUp,
+}: {
+  shift: VolunteerShift;
+  onSignUp: () => void;
+  signingUp: boolean;
+}) {
   const { t } = useTranslation('volunteering');
-  const navigation = useNavigation();
+  const theme = useTheme();
+  const primary = usePrimaryColor();
+  const date = formatDate(shift.start_time, 'short');
+  const start = formatTime(shift.start_time);
+  const end = formatTime(shift.end_time);
+
+  return (
+    <HeroCard className="rounded-panel p-0">
+      <HeroCard.Body className="gap-3 p-4" style={{ minHeight: 128 }}>
+        <View className="flex-row items-start gap-3">
+          <View className="size-12 items-center justify-center rounded-panel-inner" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+            <Ionicons name="calendar-outline" size={22} color={primary} />
+          </View>
+          <View className="min-w-0 flex-1">
+            <Text className="text-base font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+              {date ?? t('shiftDateUnavailable')}
+            </Text>
+            <Text className="mt-1 text-sm" style={{ color: theme.textSecondary }} numberOfLines={1}>
+              {[start, end].filter(Boolean).join(' - ')}
+            </Text>
+            <Text className="mt-1 text-xs" style={{ color: theme.textMuted }} numberOfLines={1}>
+              {shift.spots_available === null
+                ? t('shiftCapacity', { count: shift.signup_count })
+                : t('shiftSpots', { count: shift.spots_available })}
+            </Text>
+          </View>
+        </View>
+        <HeroButton size="sm" variant="secondary" isDisabled={signingUp} onPress={onSignUp}>
+          {signingUp ? <Spinner size="sm" /> : <HeroButton.Label>{t('signUpForShift')}</HeroButton.Label>}
+        </HeroButton>
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+export default function VolunteeringDetailScreen() {
+  return (
+    <ModalErrorBoundary>
+      <VolunteeringDetailScreenInner />
+    </ModalErrorBoundary>
+  );
+}
+
+function VolunteeringDetailScreenInner() {
+  const { t } = useTranslation(['volunteering', 'common']);
+  const { isAuthenticated } = useAuth();
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
-
-  useEffect(() => {
-    navigation.setOptions({ title: t('detail.title') });
-  }, [navigation, t]);
+  const [interestSent, setInterestSent] = useState(false);
+  const [interestLoading, setInterestLoading] = useState(false);
+  const [applyMessage, setApplyMessage] = useState('');
+  const [signingShiftId, setSigningShiftId] = useState<number | null>(null);
 
   const opportunityId = Number(id);
-  const safeId = isNaN(opportunityId) || opportunityId <= 0 ? 0 : opportunityId;
+  const safeId = Number.isFinite(opportunityId) && opportunityId > 0 ? opportunityId : 0;
 
   const { data, isLoading, refresh } = useApi(
     () => getOpportunity(safeId),
@@ -49,233 +216,281 @@ export default function VolunteeringDetailScreen() {
     { enabled: safeId > 0 },
   );
 
-  const opportunity = data?.data ?? null;
+  const fallbackList = useApi(
+    () => getOpportunities(null),
+    [safeId],
+    { enabled: safeId > 0 },
+  );
 
-  const [interestSent, setInterestSent] = useState(false);
-  const [interestLoading, setInterestLoading] = useState(false);
+  const opportunity = (data?.data ?? fallbackList.data?.data?.find((item) => item.id === safeId) ?? null) as ApiOpportunity | null;
+
+  const org = opportunity ? organizationFor(opportunity) : null;
+  const skills = useMemo(() => normalizedSkills(opportunity?.skills_needed ?? null), [opportunity?.skills_needed]);
+  const shifts = opportunity?.shifts ?? [];
+  const hasApplied = interestSent || Boolean(opportunity?.has_applied || opportunity?.application);
+  const open = opportunity ? isOpenOpportunity(opportunity) : false;
 
   async function handleShare() {
     if (!opportunity) return;
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     try {
       await Share.share({
-        message: `${opportunity.title} — ${WEB_URL}/volunteering/${opportunity.id}`,
+        message: `${opportunity.title} - ${WEB_URL}/volunteering/opportunities/${opportunity.id}`,
       });
-    } catch { /* ignore */ }
+    } catch {
+      // Native share can be cancelled.
+    }
   }
 
-  if (isNaN(opportunityId) || opportunityId <= 0) {
-    return (
-      <SafeAreaView className="flex-1 items-center justify-center" edges={['bottom']}>
-        <Text className="text-sm text-muted-foreground">{t('detail.invalidId')}</Text>
-        <Pressable onPress={() => router.back()} className="mt-3">
-          <Text style={{ color: primary }} className="text-[15px] font-semibold">{t('detail.goBack')}</Text>
-        </Pressable>
-      </SafeAreaView>
-    );
-  }
+  async function handleApply() {
+    if (!opportunity || interestLoading || hasApplied) return;
+    if (!isAuthenticated) {
+      Alert.alert(t('signInRequiredTitle'), t('signInRequiredMessage'));
+      return;
+    }
 
-  async function handleExpressInterest() {
-    if (!opportunity || interestSent || interestLoading) return;
-    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setInterestLoading(true);
     try {
-      await expressInterest(opportunity.id);
-      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      await expressInterest(opportunity.id, applyMessage.trim() || undefined);
       setInterestSent(true);
+      setApplyMessage('');
+      refresh();
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert(t('interestSentTitle'), t('interestSentMessage'));
     } catch {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       Alert.alert(t('common:errors.alertTitle'), t('interestError'));
     } finally {
       setInterestLoading(false);
     }
   }
 
+  async function handleSignUpForShift(shiftId: number) {
+    if (!isAuthenticated) {
+      Alert.alert(t('signInRequiredTitle'), t('signInRequiredMessage'));
+      return;
+    }
+
+    setSigningShiftId(shiftId);
+    try {
+      await signUpForShift(shiftId);
+      refresh();
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      Alert.alert(t('shiftSignupTitle'), t('shiftSignupMessage'));
+    } catch {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(t('common:errors.alertTitle'), t('shiftSignupError'));
+    } finally {
+      setSigningShiftId(null);
+    }
+  }
+
+  if (!safeId) {
+    return <StateMessage title={t('detail.invalidId')} action={t('detail.goBack')} primary={primary} />;
+  }
+
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center" edges={['bottom']}>
-        <LoadingSpinner />
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('detail.title')} backLabel={t('common:back')} fallbackHref="/(modals)/volunteering" />
+        <View className="flex-1 items-center justify-center">
+          <LoadingSpinner />
+        </View>
       </SafeAreaView>
     );
   }
 
   if (!opportunity) {
-    return (
-      <SafeAreaView className="flex-1 items-center justify-center" edges={['bottom']}>
-        <Text className="text-sm text-muted-foreground">{t('detail.notFound')}</Text>
-        <Pressable onPress={() => router.back()} className="mt-3">
-          <Text style={{ color: primary }} className="text-[15px] font-semibold">{t('detail.goBack')}</Text>
-        </Pressable>
-      </SafeAreaView>
-    );
+    return <StateMessage title={t('detail.notFound')} action={t('detail.goBack')} primary={primary} />;
   }
 
-  const statusColor =
-    opportunity.status === 'open'
-      ? theme.success
-      : opportunity.status === 'filled'
-        ? theme.warning
-        : theme.textMuted;
-
-  const deadlineStr = opportunity.deadline
-    ? t('deadline', {
-        date: new Date(opportunity.deadline).toLocaleDateString('default', {
-          month: 'long',
-          day: 'numeric',
-          year: 'numeric',
-        }),
-      })
-    : null;
+  const statusTone = open ? theme.success : opportunity.status === 'filled' ? theme.warning : theme.textMuted;
+  const startDate = formatDate(opportunity.start_date);
+  const endDate = formatDate(opportunity.end_date);
+  const createdDate = formatDate(opportunity.created_at);
 
   return (
-    <ModalErrorBoundary>
-    <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-background">
+      <AppTopBar
+        title={t('detail.title')}
+        backLabel={t('common:back')}
+        fallbackHref="/(modals)/volunteering"
+        rightAction={{
+          accessibilityLabel: t('share'),
+          icon: 'share-outline',
+          onPress: handleShare,
+        }}
+      />
+
       <ScrollView
-        contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
-        refreshControl={
-          <RefreshControl refreshing={isLoading} onRefresh={refresh} tintColor={primary} colors={[primary]} />
-        }
+        className="flex-1"
+        contentContainerClassName="gap-4 px-4 pb-10"
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={refresh} tintColor={primary} colors={[primary]} />}
       >
-        {/* Title + share + status */}
-        <View className="flex-row items-start gap-2.5 mb-4">
-          <Text className="flex-1 text-xl font-bold text-foreground">{opportunity.title}</Text>
-          <Pressable
-            onPress={() => void handleShare()}
-            className="p-1"
-            accessibilityLabel={t('detail.share')}
-            accessibilityRole="button"
-          >
-            <Ionicons name="share-outline" size={22} color={primary} />
-          </Pressable>
-          <View style={{ backgroundColor: statusColor + '22' }} className="rounded px-2 py-0.5 self-start">
-            <Text style={{ color: statusColor }} className="text-[11px] font-semibold">
-              {t(`status.${opportunity.status}`)}
-            </Text>
-          </View>
-        </View>
-
-        {/* Organisation */}
-        {opportunity.organisation ? (
-          <View className="mb-5">
-            <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
-              {t('detail.organisation')}
-            </Text>
-            <View className="flex-row items-center gap-4">
-              <Avatar
-                uri={opportunity.organisation.avatar}
-                name={opportunity.organisation.name}
-                size={36}
-              />
-              <Text className="text-sm font-semibold text-foreground">{opportunity.organisation.name}</Text>
+        <HeroCard className="overflow-hidden rounded-panel p-0">
+          <View className="h-1.5" style={{ backgroundColor: '#e11d48' }} />
+          <HeroCard.Body className="gap-5 p-5">
+            <View className="flex-row items-start justify-between gap-3">
+              <View className="min-w-0 flex-1">
+                <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>
+                  {t('opportunityEyebrow')}
+                </Text>
+                <Text className="mt-1 text-2xl font-bold" style={{ color: theme.text }} numberOfLines={3}>
+                  {opportunity.title}
+                </Text>
+              </View>
+              <Chip size="sm" variant="secondary" color="default">
+                <Ionicons name="radio-button-on-outline" size={12} color={statusTone} />
+                <Chip.Label>{t(statusLabelKey(opportunity))}</Chip.Label>
+              </Chip>
             </View>
-          </View>
-        ) : null}
 
-        {/* Meta card */}
-        <View className="bg-surface rounded-2xl p-4 gap-2.5 border border-border/50 mb-5">
-          {opportunity.is_remote ? (
-            <MetaRow icon="wifi-outline" text={t('remote')} theme={theme} tint={primary} />
-          ) : opportunity.location ? (
-            <MetaRow icon="location-outline" text={opportunity.location} theme={theme} />
-          ) : null}
-
-          {opportunity.hours_per_week !== null ? (
-            <MetaRow
-              icon="time-outline"
-              text={t('hoursPerWeek', { hours: opportunity.hours_per_week })}
-              theme={theme}
-            />
-          ) : null}
-
-          {opportunity.commitment ? (
-            <MetaRow icon="repeat-outline" text={opportunity.commitment} theme={theme} />
-          ) : null}
-
-          {deadlineStr ? (
-            <MetaRow icon="calendar-outline" text={deadlineStr} theme={theme} />
-          ) : null}
-
-          {opportunity.spots_available !== null ? (
-            <MetaRow
-              icon="people-outline"
-              text={t('spots', { count: opportunity.spots_available })}
-              theme={theme}
-            />
-          ) : null}
-        </View>
-
-        {/* Skills */}
-        {(opportunity.skills_needed ?? []).length > 0 ? (
-          <View className="mb-5">
-            <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
-              {t('skills')}
-            </Text>
-            <View className="flex-row flex-wrap gap-2">
-              {(opportunity.skills_needed ?? []).map((skill) => (
-                <View key={skill} className="rounded-lg px-2.5 py-1 border border-border bg-surface">
-                  <Text className="text-xs text-foreground">{skill}</Text>
+            {org ? (
+              <View className="flex-row items-center gap-3">
+                <Avatar uri={org.avatar ?? org.logo_url ?? undefined} name={org.name} size={46} />
+                <View className="min-w-0 flex-1">
+                  <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+                    {org.name}
+                  </Text>
+                  <Text className="text-xs" style={{ color: theme.textSecondary }} numberOfLines={1}>
+                    {t('detail.organisation')}
+                  </Text>
                 </View>
-              ))}
-            </View>
-          </View>
-        ) : null}
+              </View>
+            ) : null}
 
-        {/* Description */}
-        {opportunity.description ? (
-          <View className="mb-5">
-            <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
+            <View className="flex-row flex-wrap gap-2">
+              {opportunity.is_remote ? (
+                <Chip size="sm" variant="secondary" color="default">
+                  <Ionicons name="wifi-outline" size={12} color={primary} />
+                  <Chip.Label>{t('remote')}</Chip.Label>
+                </Chip>
+              ) : null}
+              {opportunity.category ? (
+                <Chip size="sm" variant="secondary" color="default">
+                  <Chip.Label>{opportunity.category}</Chip.Label>
+                </Chip>
+              ) : null}
+              {hasApplied ? (
+                <Chip size="sm" variant="secondary" color="success">
+                  <Ionicons name="checkmark-circle-outline" size={12} color={theme.success} />
+                  <Chip.Label>{t('interestSent')}</Chip.Label>
+                </Chip>
+              ) : null}
+            </View>
+          </HeroCard.Body>
+        </HeroCard>
+
+        <HeroCard className="rounded-panel p-0">
+          <HeroCard.Body className="gap-3 p-4">
+            {opportunity.is_remote ? (
+              <MetaRow icon="wifi-outline" label={t('meta.location')} value={t('remote')} tint={primary} />
+            ) : opportunity.location ? (
+              <MetaRow icon="location-outline" label={t('meta.location')} value={opportunity.location} />
+            ) : null}
+            {opportunity.commitment ? (
+              <MetaRow icon="repeat-outline" label={t('meta.commitment')} value={opportunity.commitment} />
+            ) : null}
+            {startDate ? (
+              <MetaRow icon="calendar-outline" label={t('meta.starts')} value={startDate} />
+            ) : null}
+            {endDate ? (
+              <MetaRow icon="calendar-outline" label={t('meta.ends')} value={endDate} />
+            ) : null}
+            {typeof opportunity.spots_available === 'number' ? (
+              <MetaRow icon="people-outline" label={t('meta.spots')} value={t('spots', { count: opportunity.spots_available })} />
+            ) : null}
+            {createdDate ? (
+              <MetaRow icon="briefcase-outline" label={t('meta.posted')} value={createdDate} />
+            ) : null}
+          </HeroCard.Body>
+        </HeroCard>
+
+        <HeroCard className="rounded-panel p-0">
+          <HeroCard.Body className="gap-3 p-4">
+            <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>
               {t('detail.about')}
             </Text>
-            <Text className="text-sm text-foreground">{opportunity.description}</Text>
-          </View>
+            <Text className="text-sm leading-6" style={{ color: theme.text }}>
+              {stripHtml(opportunity.description) || t('noDescription')}
+            </Text>
+          </HeroCard.Body>
+        </HeroCard>
+
+        {skills.length > 0 ? (
+          <HeroCard className="rounded-panel p-0">
+            <HeroCard.Body className="gap-3 p-4">
+              <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>
+                {t('skills')}
+              </Text>
+              <View className="flex-row flex-wrap gap-2">
+                {skills.map((skill) => (
+                  <Chip key={skill} size="sm" variant="secondary" color="default">
+                    <Chip.Label>{skill}</Chip.Label>
+                  </Chip>
+                ))}
+              </View>
+            </HeroCard.Body>
+          </HeroCard>
         ) : null}
 
-        {/* Express Interest button */}
-        <Pressable
-          className="flex-row items-center justify-center gap-2 rounded-xl py-4 mt-2"
-          style={{
-            backgroundColor: interestSent ? theme.success : primary,
-            opacity: interestLoading || interestSent ? 0.75 : 1,
-          }}
-          onPress={() => void handleExpressInterest()}
-          disabled={interestLoading || interestSent}
-          accessibilityRole="button"
-          accessibilityLabel={interestSent ? t('interestSent') : t('expressInterest')}
-        >
-          {interestSent ? (
-            <Ionicons name="checkmark-circle" size={18} color="#fff" />
-          ) : (
-            <Ionicons name="hand-left-outline" size={18} color="#fff" />
-          )}
-          <Text className="text-base font-bold text-white">
-            {interestSent ? t('interestSent') : t('expressInterest')}
-          </Text>
-        </Pressable>
+        {shifts.length > 0 ? (
+          <HeroCard className="rounded-panel p-0">
+            <HeroCard.Body className="gap-3 p-4">
+              <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>
+                {t('shifts')}
+              </Text>
+              {shifts.map((shift) => (
+                <ShiftCard
+                  key={shift.id}
+                  shift={shift}
+                  signingUp={signingShiftId === shift.id}
+                  onSignUp={() => void handleSignUpForShift(shift.id)}
+                />
+              ))}
+            </HeroCard.Body>
+          </HeroCard>
+        ) : null}
+
+        <HeroCard className="rounded-panel p-0">
+          <HeroCard.Body className="gap-4 p-4">
+            <View>
+              <Text className="text-base font-semibold" style={{ color: theme.text }}>
+                {hasApplied ? t('applicationSubmitted') : t('applyToVolunteer')}
+              </Text>
+              <Text className="mt-1 text-sm" style={{ color: theme.textSecondary }}>
+                {hasApplied ? t('applicationSubmittedHint') : t('coverMessageHint')}
+              </Text>
+            </View>
+            {!hasApplied ? (
+              <TextInput
+                value={applyMessage}
+                onChangeText={setApplyMessage}
+                placeholder={t('coverMessagePlaceholder')}
+                placeholderTextColor={theme.textMuted}
+                multiline
+                className="min-h-[104px] rounded-panel-inner px-4 py-3 text-base"
+                style={{ backgroundColor: theme.surface, color: theme.text, borderColor: theme.border, borderWidth: 1, textAlignVertical: 'top' }}
+              />
+            ) : null}
+            <HeroButton
+              isDisabled={!open || hasApplied || interestLoading}
+              onPress={() => void handleApply()}
+            >
+              {interestLoading ? (
+                <Spinner size="sm" />
+              ) : (
+                <>
+                  <Ionicons name={hasApplied ? 'checkmark-circle-outline' : 'send-outline'} size={18} color="#fff" />
+                  <HeroButton.Label>
+                    {hasApplied ? t('interestSent') : open ? t('expressInterest') : t('status.closed')}
+                  </HeroButton.Label>
+                </>
+              )}
+            </HeroButton>
+          </HeroCard.Body>
+        </HeroCard>
       </ScrollView>
     </SafeAreaView>
-    </ModalErrorBoundary>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-function MetaRow({
-  icon,
-  text,
-  theme,
-  tint,
-}: {
-  icon: React.ComponentProps<typeof Ionicons>['name'];
-  text: string;
-  theme: ReturnType<typeof useTheme>;
-  tint?: string;
-}) {
-  return (
-    <View className="flex-row items-center gap-2.5">
-      <Ionicons name={icon} size={16} color={tint ?? theme.textSecondary} />
-      <Text style={{ color: tint ?? theme.text }} className="flex-1 text-sm">{text}</Text>
-    </View>
   );
 }

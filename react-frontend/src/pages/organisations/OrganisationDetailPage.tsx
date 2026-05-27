@@ -222,7 +222,7 @@ export function OrganisationDetailPage() {
         <GlassCard className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('organisation_detail.unable_to_load')}</h2>
-          <p className="text-theme-muted mb-4">{error}</p>
+          <p className="text-theme-muted mb-4" role="alert">{error}</p>
           <div className="flex gap-3 justify-center">
             <Button
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
@@ -339,36 +339,44 @@ export function OrganisationDetailPage() {
           <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-rose-500/10 mx-auto mb-2">
             <Heart className="w-5 h-5 text-rose-400" aria-hidden="true" />
           </div>
-          <p className="text-xl font-bold text-theme-primary">{organisation.opportunity_count}</p>
-          <p className="text-xs text-theme-muted">{t('organisation_detail.opportunities')}</p>
+          <dl>
+            <dd className="text-xl font-bold text-theme-primary">{organisation.opportunity_count}</dd>
+            <dt className="text-xs text-theme-muted">{t('organisation_detail.opportunities')}</dt>
+          </dl>
         </GlassCard>
 
         <GlassCard className="p-4 text-center">
           <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-indigo-500/10 mx-auto mb-2">
             <Users className="w-5 h-5 text-indigo-400" aria-hidden="true" />
           </div>
-          <p className="text-xl font-bold text-theme-primary">{organisation.volunteer_count}</p>
-          <p className="text-xs text-theme-muted">{t('organisation_detail.volunteers')}</p>
+          <dl>
+            <dd className="text-xl font-bold text-theme-primary">{organisation.volunteer_count}</dd>
+            <dt className="text-xs text-theme-muted">{t('organisation_detail.volunteers')}</dt>
+          </dl>
         </GlassCard>
 
         <GlassCard className="p-4 text-center">
           <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-500/10 mx-auto mb-2">
             <Clock className="w-5 h-5 text-emerald-400" aria-hidden="true" />
           </div>
-          <p className="text-xl font-bold text-theme-primary">{organisation.total_hours}</p>
-          <p className="text-xs text-theme-muted">{t('organisation_detail.hours_logged')}</p>
+          <dl>
+            <dd className="text-xl font-bold text-theme-primary">{organisation.total_hours}</dd>
+            <dt className="text-xs text-theme-muted">{t('organisation_detail.hours_logged')}</dt>
+          </dl>
         </GlassCard>
 
         <GlassCard className="p-4 text-center">
           <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-amber-500/10 mx-auto mb-2">
             <Star className="w-5 h-5 text-amber-400" aria-hidden="true" />
           </div>
-          <p className="text-xl font-bold text-theme-primary">
-            {organisation.average_rating ? organisation.average_rating.toFixed(1) : '—'}
-          </p>
-          <p className="text-xs text-theme-muted">
-            {organisation.review_count > 0 ? t('organisation_detail.review_count', { count: organisation.review_count }) : t('organisation_detail.no_reviews')}
-          </p>
+          <dl>
+            <dd className="text-xl font-bold text-theme-primary">
+              {organisation.average_rating ? organisation.average_rating.toFixed(1) : '—'}
+            </dd>
+            <dt className="text-xs text-theme-muted">
+              {organisation.review_count > 0 ? t('organisation_detail.review_count', { count: organisation.review_count }) : t('organisation_detail.no_reviews')}
+            </dt>
+          </dl>
         </GlassCard>
       </div>
 
@@ -411,7 +419,7 @@ export function OrganisationDetailPage() {
                         </span>
                       )}
                       {opp.is_remote && (
-                        <Chip size="sm" variant="soft" color="accent" startContent={<Globe className="w-3 h-3" />}>
+                        <Chip size="sm" variant="soft" color="accent" startContent={<Globe className="w-3 h-3" aria-hidden="true" />}>
                           {t('organisation_detail.remote')}
                         </Chip>
                       )}
@@ -526,6 +534,7 @@ export function OrganisationDetailPage() {
                         {review.author.name}
                       </Link>
                       <div className="flex items-center gap-0.5">
+                        <span className="sr-only">{t('organisation_detail.rating_sr', { n: review.rating })}</span>
                         {Array.from({ length: 5 }, (_, i) => (
                           <Star
                             key={i}

@@ -641,7 +641,7 @@ export function CreateJobPage() {
   if (isLoading) {
     return (
       <div className="space-y-6 max-w-2xl mx-auto">
-        <GlassCard className="p-6 animate-pulse">
+        <GlassCard className="p-6 animate-pulse" role="status" aria-label={t('loading')}>
           <div className="h-8 bg-theme-hover rounded w-1/2 mb-6" />
           <div className="space-y-4">
             {[1, 2, 3, 4].map((i) => (
@@ -759,7 +759,6 @@ export function CreateJobPage() {
           {/* Description with AI Generate Button (Agent A) */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-theme-primary">{t('form.description_label')}</span>
               <Tooltip content={t('ai_generate.tooltip')}>
                 <Button
                   size="sm"
@@ -775,6 +774,7 @@ export function CreateJobPage() {
               </Tooltip>
             </div>
             <Textarea
+              label={t('form.description_label')}
               placeholder={t('form.description_placeholder')}
               value={form.description}
               onValueChange={(v) => updateField('description', v.slice(0, 5000))}
@@ -811,7 +811,7 @@ export function CreateJobPage() {
                   onPress={() => setDuplicatesDismissed(true)}
                   aria-label={t('duplicate.dismiss')}
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-4 h-4" aria-hidden="true" />
                 </Button>
               </div>
             </div>
@@ -1040,7 +1040,7 @@ export function CreateJobPage() {
                   />
                 </div>
                 {errors.salary_range && (
-                  <p className="text-xs text-danger">{errors.salary_range}</p>
+                  <p className="text-xs text-danger" role="alert">{errors.salary_range}</p>
                 )}
                 {/* EU Pay Transparency info chip */}
                 <Chip

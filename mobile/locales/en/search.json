@@ -1,8 +1,16 @@
 {
   "title": "Search",
+  "heroEyebrow": "Global search",
+  "subtitle": "Find members, listings, events, groups, and community stories in one place.",
   "placeholder": "Search people, listings, events…",
+  "clearSearch": "Clear search",
   "empty": "No results found.",
+  "emptyHint": "No matches for \"{{query}}\". Try a broader search or another filter.",
+  "initialTitle": "Search your community",
   "startTyping": "Start typing to search…",
+  "searching": "Searching...",
+  "resultsCount": "{{count}} result",
+  "resultsCount_other": "{{count}} results",
   "types": {
     "user": "People",
     "listing": "Listings",
@@ -11,5 +19,6 @@
     "blog_post": "Blog"
   },
   "filterAll": "All",
+  "errorTitle": "Search failed",
   "error": "Search failed. Please try again."
 }

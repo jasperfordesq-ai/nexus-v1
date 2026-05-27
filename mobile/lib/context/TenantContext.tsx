@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
 import { getTenantConfig, type TenantConfig } from '@/lib/api/tenant';
 import { DEFAULT_TENANT, STORAGE_KEYS } from '@/lib/constants';
@@ -36,8 +36,14 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
   const [tenantSlug, setSlug] = useState<string | null>(null);
   const [tenant, setTenant] = useState<TenantConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const isMountedRef = useRef(true);
+
+  useEffect(() => () => {
+    isMountedRef.current = false;
+  }, []);
 
   const loadTenantConfig = useCallback(async (slug: string, skipCache = false) => {
+    if (!isMountedRef.current) return;
     setIsLoading(true);
     try {
       // Write the slug so the API client's X-Tenant-Slug header is correct.
@@ -47,6 +53,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
       // in the background. Mirrors AuthContext's session restore pattern.
       if (!skipCache) {
         const cached = await storage.getJson<TenantConfig>(TENANT_CONFIG_CACHE_KEY);
+        if (!isMountedRef.current) return;
         if (cached) {
           setTenant(cached);
           setIsLoading(false);
@@ -55,6 +62,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
           // On network failure, keep the cached config (offline resilience).
           getTenantConfig()
             .then(async (response) => {
+              if (!isMountedRef.current) return;
               setTenant(response.data);
               await storage.setJson(TENANT_CONFIG_CACHE_KEY, response.data);
             })
@@ -65,13 +73,14 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
 
       // No cache (first launch or explicit refresh) — must wait for network
       const response = await getTenantConfig();
+      if (!isMountedRef.current) return;
       setTenant(response.data);
       await storage.setJson(TENANT_CONFIG_CACHE_KEY, response.data);
     } catch {
       // Tenant config failed — app still works with null tenant (graceful degradation)
-      setTenant(null);
+      if (isMountedRef.current) setTenant(null);
     } finally {
-      setIsLoading(false);
+      if (isMountedRef.current) setIsLoading(false);
     }
   }, []);
 
@@ -81,6 +90,7 @@ export function TenantProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     async function init() {
       const stored = await storage.get(STORAGE_KEYS.TENANT_SLUG);
+      if (!isMountedRef.current) return;
       const slug = stored ?? DEFAULT_TENANT;
       setSlug(slug);
       await loadTenantConfig(slug);

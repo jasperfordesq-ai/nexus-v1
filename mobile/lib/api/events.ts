@@ -54,6 +54,18 @@ export interface EventsResponse {
   };
 }
 
+export interface CreateEventPayload {
+  title: string;
+  description: string;
+  start_time: string;
+  end_time?: string | null;
+  location?: string | null;
+  is_online?: boolean;
+  online_link?: string | null;
+  max_attendees?: number | null;
+  federated_visibility?: 'none' | 'listed' | 'bookable';
+}
+
 /**
  * GET /api/v2/events — list upcoming events for the current tenant.
  * Supports cursor-based pagination.
@@ -99,4 +111,11 @@ export function removeRsvp(eventId: number): Promise<void> {
  */
 export function getEvent(eventId: number): Promise<{ data: Event }> {
   return api.get<{ data: Event }>(`${API_V2}/events/${eventId}`);
+}
+
+/**
+ * POST /api/v2/events — create a community event.
+ */
+export function createEvent(payload: CreateEventPayload): Promise<{ data: Event }> {
+  return api.post<{ data: Event }>(`${API_V2}/events`, payload);
 }

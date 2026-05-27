@@ -95,5 +95,9 @@
   },
   "page_meta": {
     "title": "Ankiety"
-  }
+  },
+  "loading": "Loading polls...",
+  "vote_now": "Vote Now",
+  "vote_now_for": "Vote now on: {{question}}",
+  "vote_for_option": "Vote for {{option}} in: {{question}}"
 }

@@ -202,7 +202,9 @@ function ShiftCheckinPanel({ shifts }: ShiftCheckinPanelProps) {
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
         <GlassCard className="p-6">
           <div className="flex justify-center py-6">
-            <Spinner size="md" />
+            <div role="status" aria-label={t('loading')}>
+              <Spinner size="md" />
+            </div>
           </div>
         </GlassCard>
       </motion.div>
@@ -431,7 +433,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
           )}
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2" role="group" aria-label={t('applications.filter_label')}>
           {filters.map((f) => (
             <Button
               key={f.key}
@@ -453,7 +455,7 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
           placeholder={t('opportunity.search_placeholder')}
           value={nameSearch}
           onValueChange={setNameSearch}
-          startContent={<Search className="w-3.5 h-3.5 text-theme-subtle" />}
+          startContent={<Search className="w-3.5 h-3.5 text-theme-subtle" aria-hidden="true" />}
           aria-label={t('applications.aria_search_volunteers')}
           classNames={{ base: 'w-full sm:max-w-xs', inputWrapper: 'bg-theme-elevated' }}
         />
@@ -486,7 +488,9 @@ function ApplicationsPanel({ opportunityId }: ApplicationsPanelProps) {
 
         {isLoading ? (
           <div className="flex justify-center py-8">
-            <Spinner size="md" />
+            <div role="status" aria-label={t('loading')}>
+              <Spinner size="md" />
+            </div>
           </div>
         ) : filteredApplications.length === 0 ? (
           <div className="text-center py-8">
@@ -789,22 +793,22 @@ export function OpportunityDetailPage() {
               {opp.is_active ? t('opportunity.status_active') : t('opportunity.status_closed')}
             </Chip>
             {opp.is_remote && (
-              <Chip size="sm" variant="soft" color="default" startContent={<Wifi className="w-3 h-3" />}>
+              <Chip size="sm" variant="soft" color="default" startContent={<Wifi className="w-3 h-3" aria-hidden="true" />}>
                 {t('opportunity.remote')}
               </Chip>
             )}
             {opp.category && (
-              <Chip size="sm" variant="soft" color="accent" startContent={<Tag className="w-3 h-3" />}>
+              <Chip size="sm" variant="soft" color="accent" startContent={<Tag className="w-3 h-3" aria-hidden="true" />}>
                 {opp.category}
               </Chip>
             )}
             {opp.has_applied && (
-              <Chip size="sm" variant="soft" color="success" startContent={<CheckCircle className="w-3 h-3" />}>
+              <Chip size="sm" variant="soft" color="success" startContent={<CheckCircle className="w-3 h-3" aria-hidden="true" />}>
                 {t('opportunity.applied')}
               </Chip>
             )}
             {opp.is_owner && (
-              <Chip size="sm" variant="soft" color="default" startContent={<ClipboardList className="w-3 h-3" />}>
+              <Chip size="sm" variant="soft" color="default" startContent={<ClipboardList className="w-3 h-3" aria-hidden="true" />}>
                 {t('opportunity.your_opportunity')}
               </Chip>
             )}
@@ -945,7 +949,8 @@ export function OpportunityDetailPage() {
                 />
                 {upcomingShifts.length > 0 && (
                   <div className="space-y-2">
-                    <p className="text-sm font-medium text-theme-muted">{t('opportunity.select_shift')}</p>
+                    <p id="shift-select-label" className="text-sm font-medium text-theme-muted">{t('opportunity.select_shift')}</p>
+                    <div aria-labelledby="shift-select-label">
                     {upcomingShifts.filter((s) => s.spots_available === null || s.spots_available > 0).map((shift) => (
                       <Button
                         key={shift.id}
@@ -962,6 +967,7 @@ export function OpportunityDetailPage() {
                         {formatShortDate(shift.start_time)} &middot; {formatTime(shift.start_time)} — {formatTime(shift.end_time)}
                       </Button>
                     ))}
+                    </div>
                   </div>
                 )}
               </ModalBody>

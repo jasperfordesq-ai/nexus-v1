@@ -218,7 +218,8 @@
     "cover_message_placeholder": "ボランティアをしたい理由を組織に伝えてください...",
     "cancel": "キャンセル",
     "submit_application": "申請書の提出",
-    "job_openings": "求人情報"
+    "job_openings": "求人情報",
+    "rating_sr": "{{n}} out of 5 stars"
   },
   "emergency_alerts": {
     "heading": "緊急アラート",

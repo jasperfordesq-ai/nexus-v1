@@ -29,7 +29,8 @@
     "title": "المجموعات النشطة",
     "subtitle": "تواصل مع أعضاء ذوي اهتمامات مشابهة",
     "members": "{{count}} أعضاء",
-    "view_group": "عرض المجموعة"
+    "view_group": "عرض المجموعة",
+    "view_group_named": "View group: {{name}}"
   },
   "top_contributors": {
     "title": "أفضل المساهمين",
@@ -100,7 +101,8 @@
     "votes": "{{count}} أصوات",
     "options": "{{count}} خيارات",
     "vote_now": "صوت الآن",
-    "closes": "يغلق {{date}}"
+    "closes": "يغلق {{date}}",
+    "vote_now_for": "Vote now on: {{question}}"
   },
   "in_demand_skills": {
     "title": "المهارات المطلوبة",

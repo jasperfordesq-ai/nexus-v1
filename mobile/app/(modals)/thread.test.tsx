@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 // --- Mocks ---
 
@@ -24,6 +24,8 @@ jest.mock('react-i18next', () => ({
         'thread.send': 'Send',
         'thread.voiceMessage': 'Voice message',
         'thread.sendFailed': 'Message not sent.',
+        'thread.goBack': 'Go back',
+        'thread.messageCount': '2 messages',
         'messages:send': 'Send',
         'errors.sendFailed': 'Send failed',
         'common:buttons.retry': 'Retry',
@@ -89,6 +91,7 @@ jest.mock('@/components/VoiceMessageBubble', () => 'View');
 // --- Tests ---
 
 import ThreadScreen from './thread';
+import { sendMessage } from '@/lib/api/messages';
 
 const mockMessages = [
   {
@@ -140,9 +143,9 @@ describe('ThreadScreen', () => {
       refresh: jest.fn(),
     });
 
-    const { getByPlaceholderText, getByText } = render(<ThreadScreen />);
+    const { getByLabelText, getByPlaceholderText } = render(<ThreadScreen />);
     expect(getByPlaceholderText('Type a message...')).toBeTruthy();
-    expect(getByText('Send')).toBeTruthy();
+    expect(getByLabelText('Send')).toBeTruthy();
   });
 
   it('renders message bubbles when messages are loaded', () => {
@@ -170,5 +173,30 @@ describe('ThreadScreen', () => {
     const { getByText } = render(<ThreadScreen />);
     expect(getByText('Failed to load messages.')).toBeTruthy();
     expect(getByText('Retry')).toBeTruthy();
+  });
+
+  it('sends replies to the other user from conversation metadata', async () => {
+    mockUseApi.mockReturnValue({
+      data: {
+        data: mockMessages,
+        meta: {
+          conversation: {
+            other_user: { id: 42, name: 'Alice' },
+          },
+        },
+      },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByLabelText, getByPlaceholderText } = render(<ThreadScreen />);
+
+    fireEvent.changeText(getByPlaceholderText('Type a message...'), 'Thanks Alice');
+    fireEvent.press(getByLabelText('Send'));
+
+    await waitFor(() => {
+      expect(sendMessage).toHaveBeenCalledWith(42, 'Thanks Alice');
+    });
   });
 });

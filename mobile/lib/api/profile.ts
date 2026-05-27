@@ -6,6 +6,7 @@
 import { api } from '@/lib/api/client';
 import { API_V2 } from '@/lib/constants';
 import { type User } from '@/lib/api/auth';
+import { Platform } from 'react-native';
 
 export interface UpdateProfilePayload {
   first_name?: string;
@@ -42,13 +43,60 @@ export function updatePassword(payload: UpdatePasswordPayload): Promise<void> {
  * tenant slug, error formatting, and the upload timeout (60s).
  * Returns the updated avatar URL.
  */
-export function updateAvatar(uri: string): Promise<{ data: { avatar_url: string } }> {
-  const formData = new FormData();
-  const filename = uri.split('/').pop() ?? 'avatar.jpg';
-  const match = /\.(\w+)$/.exec(filename);
-  const type = match ? `image/${match[1]}` : 'image/jpeg';
-  // FormData accepts this shape in React Native
-  formData.append('avatar', { uri, name: filename, type } as unknown as Blob);
+type AvatarUploadResponse = {
+  data?: { avatar_url?: string | null } | null;
+  avatar_url?: string | null;
+  message?: string;
+};
 
-  return api.upload<{ data: { avatar_url: string } }>(`${API_V2}/users/me/avatar`, formData);
+function getUploadFilename(uri: string): string {
+  const cleanUri = uri.split('?')[0] ?? uri;
+  const lastSegment = cleanUri.split('/').pop();
+  return lastSegment && lastSegment.includes('.') ? lastSegment : 'avatar.jpg';
+}
+
+function getMimeType(filename: string, fallback?: string | null): string {
+  if (fallback?.startsWith('image/')) return fallback;
+  const extension = filename.split('.').pop()?.toLowerCase();
+  if (extension === 'jpg' || extension === 'jpeg') return 'image/jpeg';
+  if (extension === 'png') return 'image/png';
+  if (extension === 'webp') return 'image/webp';
+  if (extension === 'gif') return 'image/gif';
+  return 'image/jpeg';
+}
+
+async function appendAvatarFile(formData: FormData, uri: string): Promise<void> {
+  const filename = getUploadFilename(uri);
+
+  if (Platform.OS === 'web') {
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    const type = getMimeType(filename, blob.type);
+
+    if (typeof File !== 'undefined') {
+      formData.append('avatar', new File([blob], filename, { type }));
+      return;
+    }
+
+    formData.append('avatar', blob, filename);
+    return;
+  }
+
+  const type = getMimeType(filename);
+  // FormData accepts this shape in React Native.
+  formData.append('avatar', { uri, name: filename, type } as unknown as Blob);
+}
+
+export async function updateAvatar(uri: string): Promise<{ data: { avatar_url: string } }> {
+  const formData = new FormData();
+  await appendAvatarFile(formData, uri);
+
+  const response = await api.upload<AvatarUploadResponse>(`${API_V2}/users/me/avatar`, formData);
+  const avatarUrl = response.data?.avatar_url ?? response.avatar_url ?? null;
+
+  if (!avatarUrl) {
+    throw new Error(response.message ?? 'Avatar upload did not return an image URL.');
+  }
+
+  return { data: { avatar_url: avatarUrl } };
 }

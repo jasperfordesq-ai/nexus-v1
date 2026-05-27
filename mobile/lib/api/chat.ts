@@ -13,13 +13,47 @@ export interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   created_at: string;
+  is_error?: boolean;
+  sources?: ChatSource[];
+  trace_id?: number | null;
+  message_id?: number | null;
+}
+
+export interface ChatSource {
+  type: string;
+  id: number | string;
+  title: string;
+  url?: string;
+  audience?: string;
 }
 
 export interface ChatResponse {
   data: {
     message: ChatMessage;
     conversation_id: string;
+    limits?: {
+      daily_remaining: number;
+      monthly_remaining: number;
+    };
   };
+}
+
+interface RawChatResponse {
+  data?: {
+    message?: ChatMessage;
+    conversation_id?: string | number;
+    limits?: ChatResponse['data']['limits'];
+  };
+  message?: ChatMessage;
+  conversation_id?: string | number;
+  limits?: ChatResponse['data']['limits'];
+  sources?: ChatSource[];
+  trace_id?: number | null;
+  error?: string;
+}
+
+export interface ChatStartersResponse {
+  starters: string[];
 }
 
 // ─── API Functions ────────────────────────────────────────────────────────────
@@ -34,9 +68,28 @@ export function sendChatMessage(
   message: string,
   conversationId: string | null,
 ): Promise<ChatResponse> {
-  return api.post<ChatResponse>(`${API_V2}/ai/chat`, {
+  return api.post<RawChatResponse>(`${API_V2}/ai/chat`, {
     message,
     conversation_id: conversationId,
+  }).then((response) => {
+    const body = response.data?.message ? response.data : response;
+    const reply = body.message;
+    if (!reply) {
+      throw new Error(response.error ?? 'Missing AI response');
+    }
+
+    return {
+      data: {
+        message: {
+          ...reply,
+          id: String(reply.id),
+          sources: reply.sources ?? response.sources,
+          trace_id: reply.trace_id ?? response.trace_id ?? null,
+        },
+        conversation_id: String(body.conversation_id ?? ''),
+        limits: body.limits ?? response.limits,
+      },
+    };
   });
 }
 
@@ -46,4 +99,8 @@ export function sendChatMessage(
  */
 export function getChatHistory(conversationId: string): Promise<{ data: ChatMessage[] }> {
   return api.get<{ data: ChatMessage[] }>(`${API_V2}/ai/chat/${conversationId}`);
+}
+
+export function getChatStarters(): Promise<ChatStartersResponse> {
+  return api.get<ChatStartersResponse>(`${API_V2}/ai/chat/starters`);
 }

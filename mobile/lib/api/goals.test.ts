@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 jest.mock('@/lib/api/client', () => ({
-  api: { get: jest.fn(), post: jest.fn(), delete: jest.fn(), patch: jest.fn() },
+  api: { get: jest.fn(), post: jest.fn(), put: jest.fn(), delete: jest.fn(), patch: jest.fn() },
   ApiResponseError: class ApiResponseError extends Error {
     status!: number;
     constructor(status: number, message: string) { super(message); this.status = status; this.name = 'ApiResponseError'; }
@@ -101,18 +101,18 @@ describe('createGoal', () => {
 describe('updateGoalStatus', () => {
   beforeEach(() => { jest.clearAllMocks(); });
 
-  it('sends PATCH to the correct endpoint with completed status', async () => {
+  it('sends PUT to the correct endpoint with completed status', async () => {
     const completedGoal: Goal = { ...mockGoal, status: 'completed' };
-    (api.patch as jest.Mock).mockResolvedValue({ data: completedGoal });
+    (api.put as jest.Mock).mockResolvedValue({ data: completedGoal });
     const result = await updateGoalStatus(1, 'completed');
-    expect(api.patch).toHaveBeenCalledWith('/api/v2/goals/1', { status: 'completed' });
+    expect(api.put).toHaveBeenCalledWith('/api/v2/goals/1', { status: 'completed' });
     expect(result.data.status).toBe('completed');
   });
 
-  it('sends PATCH to the correct endpoint with abandoned status', async () => {
+  it('sends PUT to the correct endpoint with abandoned status', async () => {
     const abandonedGoal: Goal = { ...mockGoal, status: 'abandoned' };
-    (api.patch as jest.Mock).mockResolvedValue({ data: abandonedGoal });
+    (api.put as jest.Mock).mockResolvedValue({ data: abandonedGoal });
     await updateGoalStatus(7, 'abandoned');
-    expect(api.patch).toHaveBeenCalledWith('/api/v2/goals/7', { status: 'abandoned' });
+    expect(api.put).toHaveBeenCalledWith('/api/v2/goals/7', { status: 'abandoned' });
   });
 });

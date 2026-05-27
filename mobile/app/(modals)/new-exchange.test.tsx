@@ -4,142 +4,243 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
-// --- Mocks ---
+const mockUseApi = jest.fn();
+const mockBack = jest.fn();
+const mockReplace = jest.fn();
+const mockCreateExchange = jest.fn();
+const mockSetExchangeTags = jest.fn();
+const mockUploadExchangeImage = jest.fn();
+const mockGenerateExchangeDescription = jest.fn();
+const mockLaunchImageLibraryAsync = jest.fn();
 
 jest.mock('expo-router', () => ({
-  router: { push: jest.fn(), back: jest.fn() },
-  useNavigation: () => ({ setOptions: jest.fn() }),
+  router: {
+    back: (...args: unknown[]) => mockBack(...args),
+    replace: (...args: unknown[]) => mockReplace(...args),
+    canGoBack: jest.fn(() => false),
+  },
 }));
 
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string, opts?: Record<string, unknown>) => {
-      const map: Record<string, string> = {
-        'newExchange': 'New Exchange',
-        'type': 'Type',
-        'offer': 'Offer',
-        'request': 'Request',
-        'typeLabel': opts ? `Type: ${String(opts.type ?? '')}` : 'Type',
-        'titleLabel': 'Title',
-        'offerPlaceholder': 'What are you offering?',
-        'requestPlaceholder': 'What do you need?',
-        'description': 'Description',
-        'descriptionPlaceholder': 'Add more details...',
-        'timeCredits': 'Time Credits',
-        'category': 'Category',
-        'categoryLabel': opts ? String(opts.name ?? '') : '',
-        'postOffer': 'Post Offer',
-        'postRequest': 'Post Request',
-        'createError': 'Failed to create exchange.',
-        'validation.titleRequired': 'Title is required.',
-        'validation.invalidCredits': 'Enter a valid number of credits.',
-      };
-      return map[key] ?? key;
-    },
-    i18n: { language: 'en' },
+    t: (key: string, opts?: Record<string, unknown>) => ({
+      newExchange: 'New Listing',
+      'detail.goBack': 'Go Back',
+      'detail.cancel': 'Cancel',
+      'detail.actionFailedTitle': 'Action failed',
+      'detail.aiGenerateFailed': 'AI failed',
+      titleLabel: 'Title',
+      description: 'Description',
+      category: 'Category',
+      timeCredits: 'Time Credits',
+      offer: 'Offer',
+      request: 'Request',
+      offerPlaceholder: 'What are you offering?',
+      requestPlaceholder: 'What do you need?',
+      descriptionPlaceholder: 'Add more details...',
+      postOffer: 'Post Offer',
+      postRequest: 'Post Request',
+      categoryLabel: String(opts?.name ?? ''),
+      createError: 'Failed to create exchange.',
+      'form.createIntro': 'Create a clear offer or request.',
+      'form.basicsTitle': 'Listing basics',
+      'form.deliveryTitle': 'Where and how',
+      'form.extraDetails': 'Optional service details',
+      'form.organiseTitle': 'Category and credits',
+      'form.mediaSection': 'Listing image',
+      'form.mediaHint': 'Add or replace the image.',
+      'form.summaryType': 'Type',
+      'form.summaryCategory': 'Category',
+      'form.summaryNotSet': 'Not set',
+      'form.offerTitle': 'Offer',
+      'form.requestTitle': 'Request',
+      'form.serviceType': 'Service format',
+      'form.location': 'Location',
+      'form.locationPlaceholder': 'Where this can happen',
+      'form.locationFromProfile': 'From your profile',
+      'form.skills': 'Skills',
+      'form.skillsPlaceholder': 'gardening, mentoring',
+      'form.serviceDetailsToggle': 'Optional service details',
+      'form.extraDetailsHint': 'Optional details.',
+      'form.experienceLabel': 'Experience',
+      'form.equipmentLabel': 'Equipment',
+      'form.accessibilityLabel': 'Accessibility',
+      'form.accessibilityPlaceholder': 'Accessibility notes',
+      'form.experienceBeginner': 'Beginner-friendly',
+      'form.experienceSome': 'Some experience helpful',
+      'form.experienceExperienced': 'Experienced practitioner',
+      'form.experienceProfessional': 'Professional / certified',
+      'form.equipmentProvidedOption': "I'll provide everything needed",
+      'form.equipmentPartial': 'Some things needed from you',
+      'form.equipmentBringOwn': "You'll need to provide your own",
+      'form.equipmentNa': 'Not applicable',
+      'form.addImage': 'Add image',
+      'form.replaceImage': 'Replace',
+      'form.removeImage': 'Remove',
+      'form.aiHelpWrite': 'Help write description',
+      'form.aiGenerating': 'Writing...',
+      'form.aiEnterTitleFirst': 'Enter a title first',
+      'form.titleTooGenericHint': 'Use a more specific title.',
+      'form.hoursHint': 'Estimate the time involved.',
+      'serviceType.hybrid': 'Hybrid',
+      'serviceType.physical_only': 'In person',
+      'serviceType.remote_only': 'Remote',
+      'serviceType.location_dependent': 'Location dependent',
+      'validation.titleRequired': 'Title is required.',
+      'validation.descriptionRequired': 'Description is required.',
+      'validation.categoryRequired': 'Please choose a category.',
+      'validation.invalidCredits': 'Enter a valid number of credits.',
+    }[key] ?? key),
   }),
+}));
+
+jest.mock('@/lib/hooks/useApi', () => ({
+  useApi: (...args: unknown[]) => mockUseApi(...args),
 }));
 
 jest.mock('@/lib/hooks/useTenant', () => ({
   usePrimaryColor: () => '#6366f1',
 }));
 
+jest.mock('@/lib/hooks/useAuth', () => ({
+  useAuth: () => ({ user: { id: 1, location: 'Dublin' } }),
+}));
+
 jest.mock('@/lib/hooks/useTheme', () => ({
   useTheme: () => ({
-    bg: '#ffffff',
-    surface: '#f8f9fa',
-    text: '#000000',
-    textSecondary: '#666666',
-    textMuted: '#999999',
-    border: '#dddddd',
-    borderSubtle: '#eeeeee',
-    error: '#e53e3e',
-    errorBg: '#fff5f5',
-    success: '#22c55e',
-    infoBg: '#ebf8ff',
-    info: '#3182ce',
-    successBg: '#f0fff4',
+    text: '#000',
+    textMuted: '#777',
+    textSecondary: '#666',
+    error: '#dc2626',
+    warning: '#f59e0b',
+    surface: '#fff',
+    border: '#ddd',
   }),
 }));
 
-const mockUseApi = jest.fn();
-jest.mock('@/lib/hooks/useApi', () => ({
-  useApi: (...args: unknown[]) => mockUseApi(...args),
-}));
-
 jest.mock('@/lib/api/exchanges', () => ({
-  createExchange: jest.fn().mockResolvedValue({ data: { id: 1 } }),
+  createExchange: (...args: unknown[]) => mockCreateExchange(...args),
+  generateExchangeDescription: (...args: unknown[]) => mockGenerateExchangeDescription(...args),
+  getExchangeCategories: jest.fn(),
+  setExchangeTags: (...args: unknown[]) => mockSetExchangeTags(...args),
+  uploadExchangeImage: (...args: unknown[]) => mockUploadExchangeImage(...args),
 }));
 
 jest.mock('@/lib/api/client', () => ({
-  api: { get: jest.fn().mockResolvedValue({ data: [] }) },
-  ApiResponseError: class ApiResponseError extends Error {
-    constructor(msg: string) { super(msg); }
-  },
+  ApiResponseError: class ApiResponseError extends Error {},
 }));
 
-jest.mock('@/lib/constants', () => ({ API_V2: '/api/v2' }));
-
-jest.mock('expo-haptics', () => ({
-  impactAsync: jest.fn().mockResolvedValue(undefined),
-  notificationAsync: jest.fn().mockResolvedValue(undefined),
-  ImpactFeedbackStyle: { Light: 'light' },
+jest.mock('@/lib/haptics', () => ({
+  notificationAsync: jest.fn(),
   NotificationFeedbackType: { Success: 'success', Error: 'error' },
 }));
 
+jest.mock('expo-image-picker', () => ({
+  MediaTypeOptions: { Images: 'Images' },
+  launchImageLibraryAsync: (...args: unknown[]) => mockLaunchImageLibraryAsync(...args),
+}));
+
 jest.mock('@expo/vector-icons', () => ({ Ionicons: 'View' }));
-
+jest.mock('expo-image', () => ({ Image: 'View' }));
 jest.mock('@/components/OfflineBanner', () => () => null);
-
-// --- Tests ---
 
 import NewExchangeModal from './new-exchange';
 
 beforeEach(() => {
-  mockUseApi.mockReturnValue({ data: null, isLoading: false, error: null, refresh: jest.fn() });
+  mockUseApi.mockReset().mockReturnValue({
+    data: { data: [{ id: 1, name: 'Gardening' }, { id: 2, name: 'Teaching' }] },
+    isLoading: false,
+    error: null,
+  });
+  mockBack.mockReset();
+  mockReplace.mockReset();
+  mockCreateExchange.mockReset().mockResolvedValue({ data: { id: 9 } });
+  mockSetExchangeTags.mockReset().mockResolvedValue({ data: {} });
+  mockUploadExchangeImage.mockReset().mockResolvedValue({ data: { image_url: '/uploads/listing.jpg' } });
+  mockGenerateExchangeDescription.mockReset().mockResolvedValue({ data: { description: 'Generated listing body' } });
+  mockLaunchImageLibraryAsync.mockReset().mockResolvedValue({ canceled: false, assets: [{ uri: 'file:///tmp/listing.jpg' }] });
 });
 
 describe('NewExchangeModal', () => {
-  it('renders without crashing', () => {
-    const { toJSON } = render(<NewExchangeModal />);
-    expect(toJSON()).toBeTruthy();
-  });
-
-  it('renders the type toggle with Offer and Request options', () => {
-    const { getByText } = render(<NewExchangeModal />);
-    expect(getByText('Offer')).toBeTruthy();
-    expect(getByText('Request')).toBeTruthy();
-  });
-
-  it('renders the title and description inputs', () => {
-    const { getByPlaceholderText } = render(<NewExchangeModal />);
+  it('renders the polished create form', () => {
+    const { getAllByText, getByPlaceholderText } = render(<NewExchangeModal />);
+    expect(getAllByText('New Listing').length).toBeGreaterThan(0);
     expect(getByPlaceholderText('What are you offering?')).toBeTruthy();
     expect(getByPlaceholderText('Add more details...')).toBeTruthy();
+    expect(getAllByText('Category').length).toBeGreaterThan(0);
   });
 
-  it('renders the Post Offer submit button by default', () => {
+  it('requires title, description, category, and valid credits', async () => {
     const { getByText } = render(<NewExchangeModal />);
-    expect(getByText('Post Offer')).toBeTruthy();
+    fireEvent.press(getByText('Post Offer'));
+
+    await waitFor(() => expect(getByText('Title is required.')).toBeTruthy());
+    expect(getByText('Description is required.')).toBeTruthy();
+    expect(getByText('Please choose a category.')).toBeTruthy();
+    expect(mockCreateExchange).not.toHaveBeenCalled();
   });
 
-  it('switches to Request mode when Request is pressed', () => {
-    const { getByText } = render(<NewExchangeModal />);
-    fireEvent.press(getByText('Request'));
-    expect(getByText('Post Request')).toBeTruthy();
+  it('creates a listing, saves tags, uploads an image, and opens the detail page', async () => {
+    const { getByPlaceholderText, getByText } = render(<NewExchangeModal />);
+    fireEvent.changeText(getByPlaceholderText('What are you offering?'), 'Gardening help');
+    fireEvent.changeText(getByPlaceholderText('Add more details...'), 'I can help with weeding and pruning.');
+    fireEvent.changeText(getByPlaceholderText('gardening, mentoring'), 'gardening, pruning');
+    fireEvent.press(getByText('Teaching'));
+    fireEvent.press(getByText('Add image'));
+    await waitFor(() => expect(mockLaunchImageLibraryAsync).toHaveBeenCalled());
+    fireEvent.press(getByText('Post Offer'));
+
+    await waitFor(() => expect(mockCreateExchange).toHaveBeenCalledWith(expect.objectContaining({
+      title: 'Gardening help',
+      description: 'I can help with weeding and pruning.',
+      type: 'offer',
+      hours_estimate: 1,
+      category_id: 2,
+      location: 'Dublin',
+      service_type: 'hybrid',
+    })));
+    expect(mockSetExchangeTags).toHaveBeenCalledWith(9, ['gardening', 'pruning']);
+    expect(mockUploadExchangeImage).toHaveBeenCalledWith(9, 'file:///tmp/listing.jpg');
+    expect(mockReplace).toHaveBeenCalledWith({ pathname: '/(modals)/exchange-detail', params: { id: '9' } });
   });
 
-  it('shows category chips when categories are loaded', () => {
-    mockUseApi.mockReturnValue({
-      data: { data: [{ id: 1, name: 'Gardening' }, { id: 2, name: 'Teaching' }] },
-      isLoading: false,
-      error: null,
-      refresh: jest.fn(),
-    });
+  it('generates a description from the listing context', async () => {
+    const { getByPlaceholderText, getByText } = render(<NewExchangeModal />);
+    fireEvent.changeText(getByPlaceholderText('What are you offering?'), 'Gardening help');
+    fireEvent.press(getByText('Teaching'));
+    fireEvent.press(getByText('Help write description'));
 
-    const { getByText } = render(<NewExchangeModal />);
-    expect(getByText('Gardening')).toBeTruthy();
-    expect(getByText('Teaching')).toBeTruthy();
+    await waitFor(() => expect(mockGenerateExchangeDescription).toHaveBeenCalledWith({
+      title: 'Gardening help',
+      category: 'Teaching',
+      type: 'offer',
+      notes: '',
+    }));
+    expect(getByPlaceholderText('Add more details...').props.value).toBe('Generated listing body');
+  });
+
+  it('adds optional service details into the saved description', async () => {
+    const { getAllByText, getByPlaceholderText, getByText } = render(<NewExchangeModal />);
+    fireEvent.changeText(getByPlaceholderText('What are you offering?'), 'Music lesson');
+    fireEvent.changeText(getByPlaceholderText('Add more details...'), 'I can help with beginner guitar.');
+    fireEvent.press(getByText('Gardening'));
+    fireEvent.press(getAllByText('Optional service details')[1]);
+    fireEvent.press(getByText('Beginner-friendly'));
+    fireEvent.press(getByText("I'll provide everything needed"));
+    fireEvent.changeText(getByPlaceholderText('Accessibility notes'), 'Ground floor room');
+    fireEvent.press(getByText('Post Offer'));
+
+    await waitFor(() => expect(mockCreateExchange).toHaveBeenCalledWith(expect.objectContaining({
+      description: [
+        'I can help with beginner guitar.',
+        '',
+        '---',
+        'Experience: Beginner-friendly',
+        "Equipment: I'll provide everything needed",
+        'Accessibility: Ground floor room',
+      ].join('\n'),
+    })));
   });
 });

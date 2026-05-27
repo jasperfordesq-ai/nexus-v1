@@ -1,15 +1,31 @@
 {
   "title": "Notifications",
+  "eyebrow": "Activity inbox",
   "confirmMarkAllRead": "Mark all notifications as read?",
   "markAllRead": "Mark all read",
   "marking": "Marking\u2026",
   "markError": "Could not mark notifications as read.",
   "allCaughtUp": "You're all caught up!",
   "allCaughtUpSub": "You have no new notifications.",
+  "unreadCount": "{{count}} unread",
+  "unreadSummary": "You have {{count}} unread notification.",
+  "unreadSummary_other": "You have {{count}} unread notifications.",
   "unreadItem": "Unread: {{label}}",
   "itemHint": "Tap to view",
   "justNow": "just now",
   "minutesAgo": "{{count}}m ago",
   "hoursAgo": "{{count}}h ago",
-  "daysAgo": "{{count}}d ago"
+  "daysAgo": "{{count}}d ago",
+  "category": {
+    "message": "Message",
+    "transaction": "Transaction",
+    "social": "Social",
+    "system": "System",
+    "event": "Event",
+    "group": "Group",
+    "listing": "Listing",
+    "connection": "Connection",
+    "mention": "Mention",
+    "other": "Notification"
+  }
 }

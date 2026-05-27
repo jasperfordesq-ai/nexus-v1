@@ -11,15 +11,378 @@
     "exchanges": "{{count}} cross-community exchange",
     "exchanges_other": "{{count}} cross-community exchanges"
   },
+  "hub": {
+    "eyebrow": "Partner communities",
+    "heroTitle": "Federation Hub",
+    "heroDescription": "Connect with trusted timebanks, discover federated members, and share exchanges across partner communities.",
+    "statusActive": "Federation active",
+    "statusInactive": "Federation inactive",
+    "shortActive": "Active",
+    "shortInactive": "Inactive",
+    "statPartners": "Partners",
+    "statMessages": "Messages",
+    "statExchanges": "Exchanges",
+    "statStatus": "Status",
+    "exploreNetwork": "Explore network",
+    "partnerCommunities": "Partner communities",
+    "recentActivity": "Recent activity",
+    "noPartnersYet": "No partner communities yet",
+    "noPartnersDescription": "Approved federation partners will appear here once your community connects.",
+    "noActivityYet": "No activity yet",
+    "noActivityDescription": "Cross-community messages, partnerships, and exchanges will appear here.",
+    "memberCount": "{{count}} member",
+    "memberCount_other": "{{count}} members",
+    "viewCommunity": "View community",
+    "quick": {
+      "partners": {
+        "title": "Partners",
+        "description": "Browse connected communities"
+      },
+      "members": {
+        "title": "Members",
+        "description": "Find federated members"
+      },
+      "connections": {
+        "title": "Connections",
+        "description": "Manage cross-community contacts"
+      },
+      "messages": {
+        "title": "Messages",
+        "description": "Coordinate across timebanks"
+      },
+      "listings": {
+        "title": "Listings",
+        "description": "See shared offers and requests"
+      },
+      "groups": {
+        "title": "Groups",
+        "description": "Join partner community spaces"
+      },
+      "events": {
+        "title": "Events",
+        "description": "Join partner community events"
+      },
+      "setup": {
+        "title": "Setup",
+        "description": "Configure federation access"
+      },
+      "settings": {
+        "title": "Settings",
+        "description": "Manage federation visibility"
+      }
+    }
+  },
   "partners": "Partner Communities",
   "connectedSince": "Connected since {{date}}",
   "visitWebsite": "Visit website",
   "empty": "No federation partners yet.",
+  "relative": {
+    "today": "today",
+    "daysAgo": "{{count}} day ago",
+    "daysAgo_other": "{{count}} days ago",
+    "monthsAgo": "{{count}} month ago",
+    "monthsAgo_other": "{{count}} months ago"
+  },
   "detail": {
     "title": "Partner Community",
+    "eyebrow": "Federated timebank",
     "about": "About",
     "members": "members",
+    "memberTotal": "Member count",
+    "memberCount": "{{count}} member",
+    "memberCount_other": "{{count}} members",
+    "partnerSince": "Partner since {{date}}",
+    "partnerSinceLabel": "Partner since",
+    "connectedDate": "Connected {{date}}",
+    "level": "Federation level",
+    "levelUnknown": "Federation partner",
+    "levelDiscovery": "Discovery",
+    "levelSocial": "Social",
+    "levelEconomic": "Economic",
+    "levelIntegrated": "Integrated",
+    "availableFeatures": "Available features",
+    "externalPartner": "External partner",
+    "integratedPartner": "Integrated partner",
+    "website": "Website",
+    "share": "Share partner",
+    "shareMessage": "{{name}} — {{url}}",
+    "noDescription": "This partner has not added a public description yet.",
+    "explorePartner": "Explore this partner",
+    "browseMembers": "Browse members",
+    "browseListings": "Browse listings",
+    "browseGroups": "Browse groups",
+    "browseEvents": "Browse events",
+    "openMessages": "Open messages",
+    "federationSettings": "Federation settings",
+    "browseNetwork": "Back to federation",
+    "retry": "Retry",
+    "permissionProfiles": "Profiles",
+    "permissionMessaging": "Messaging",
+    "permissionTransactions": "Transactions",
+    "permissionListings": "Listings",
+    "permissionEvents": "Events",
+    "permissionGroups": "Groups",
     "notFound": "Partner not found.",
     "goBack": "Go back"
+  },
+  "directory": {
+    "tryAgain": "Try again",
+    "backToHub": "Back to federation hub",
+    "resultsCount": "{{count}} result",
+    "resultsCount_other": "{{count}} results",
+    "memberCount": "{{count}} member",
+    "memberCount_other": "{{count}} members",
+    "external": "External",
+    "unknownCommunity": "Partner community",
+    "filters": {
+      "allCommunities": "All communities"
+    },
+    "partners": {
+      "eyebrow": "Partner communities",
+      "title": "Federation Partners",
+      "subtitle": "Browse connected timebanks and open their federation profiles.",
+      "emptyTitle": "No partner communities yet",
+      "emptyDescription": "Approved federation partners will appear here.",
+      "loadMore": "Load more partners"
+    },
+    "members": {
+      "eyebrow": "Federated directory",
+      "title": "Federated Members",
+      "subtitle": "Find members from partner communities and start cross-community conversations.",
+      "search": "Search members...",
+      "skillsSearch": "Filter by skills...",
+      "emptyTitle": "No federated members found",
+      "emptyDescription": "Try another search or check back when more partners share their directories.",
+      "unavailableTitle": "Federated member directory is not enabled",
+      "unavailableDescription": "Federation is active for this tenant, but the cross-community profiles capability is disabled. A community administrator needs to enable federated profiles before members can be listed.",
+      "memberFallback": "Member",
+      "viewProfile": "View profile",
+      "message": "Message",
+      "loadMore": "Load more members",
+      "reach": {
+        "all": "All reach",
+        "local_only": "Local only",
+        "remote_ok": "Remote ok",
+        "travel_ok": "Can travel"
+      }
+    },
+    "connections": {
+      "eyebrow": "Cross-community contacts",
+      "title": "Federation Connections",
+      "subtitle": "Manage members you are connected with across partner timebanks.",
+      "tabs": {
+        "accepted": "Connected",
+        "pending_received": "Received",
+        "pending_sent": "Sent"
+      },
+      "empty": {
+        "accepted": {
+          "title": "No connected members yet",
+          "description": "Browse federated members and send connection requests."
+        },
+        "pending_received": {
+          "title": "No requests waiting",
+          "description": "Incoming federation connection requests will appear here."
+        },
+        "pending_sent": {
+          "title": "No sent requests",
+          "description": "Requests you send to partner members will appear here."
+        }
+      },
+      "status": {
+        "pending": "Pending",
+        "accepted": "Connected",
+        "rejected": "Rejected"
+      },
+      "message": "Message",
+      "browseMembers": "Browse federated members",
+      "viewProfile": "View profile for {{name}}",
+      "remove": "Remove",
+      "accept": "Accept",
+      "reject": "Reject",
+      "cancel": "Cancel request",
+      "actionFailedTitle": "Connection not updated",
+      "actionFailedDescription": "Please check federation profiles are enabled and try again."
+    },
+    "messages": {
+      "eyebrow": "Cross-community inbox",
+      "title": "Federated Messages",
+      "subtitle": "Review conversations with members from partner communities.",
+      "emptyTitle": "No federated messages yet",
+      "emptyDescription": "Messages with partner communities will appear here.",
+      "unavailableTitle": "Federated messaging is not enabled",
+      "unavailableDescription": "Federation is active for this tenant, but cross-community messaging is disabled. A community administrator needs to enable federated messaging before conversations can be used.",
+      "unknownSender": "Community member",
+      "delivered": "delivered",
+      "composeEyebrow": "New federated message",
+      "loadingRecipient": "Loading recipient...",
+      "recipientFallback": "Federated member",
+      "federated": "Federated",
+      "noRecipient": "Choose a federated member before sending a message.",
+      "subject": "Subject",
+      "subjectPlaceholder": "Add a short subject",
+      "body": "Message",
+      "bodyPlaceholder": "Write your message...",
+      "send": "Send message",
+      "sentTitle": "Message sent",
+      "sentDescription": "Your message to {{name}} has been delivered.",
+      "sendFailedTitle": "Message not sent",
+      "sendFailedDescription": "Please check federation messaging is enabled and try again.",
+      "openThread": "Open conversation with {{name}}",
+      "unreadCount": "{{count}} unread",
+      "threadEyebrow": "Federated conversation",
+      "backToInbox": "Back to inbox",
+      "reply": "Reply",
+      "replyPlaceholder": "Write a reply...",
+      "sendReply": "Send reply"
+    },
+    "listings": {
+      "eyebrow": "Shared offers and requests",
+      "title": "Federated Listings",
+      "subtitle": "Browse offers and requests shared across trusted timebanks.",
+      "search": "Search listings...",
+      "emptyTitle": "No federated listings found",
+      "emptyDescription": "Shared partner listings will appear here.",
+      "unavailableTitle": "Federated listings are not enabled",
+      "unavailableDescription": "Federation is active for this tenant, but shared offers and requests are disabled. A community administrator needs to enable federated listings.",
+      "offer": "Offer",
+      "request": "Request",
+      "hours": "{{hours}} hours",
+      "anonymousUser": "Community member",
+      "viewDetails": "View details",
+      "openDetails": "Open details for {{title}}",
+      "backToListings": "Back to listings",
+      "loadMore": "Load more listings",
+      "noDescription": "This shared listing does not have a description yet.",
+      "details": "Listing details",
+      "postedBy": "Posted by",
+      "viewProfile": "View profile",
+      "contactAuthor": "Message author",
+      "type": {
+        "all": "All listings",
+        "offer": "Offers",
+        "request": "Requests"
+      }
+    },
+    "groups": {
+      "eyebrow": "Partner groups",
+      "title": "Federated Groups",
+      "subtitle": "Discover shared community spaces from partner timebanks.",
+      "search": "Search groups...",
+      "emptyTitle": "No federated groups found",
+      "emptyDescription": "Partner groups will appear here when communities share them.",
+      "unavailableTitle": "Federated groups are not enabled",
+      "unavailableDescription": "Federation is active for this tenant, but partner groups are disabled. A community administrator needs to enable federated groups.",
+      "memberCount": "{{count}} member",
+      "memberCount_other": "{{count}} members",
+      "loadMore": "Load more groups",
+      "openDetails": "Open details for {{name}}",
+      "backToGroups": "Back to groups",
+      "detailEyebrow": "Federated group",
+      "noDescription": "This shared group does not have a description yet.",
+      "privacy": {
+        "public": "Public",
+        "private": "Private",
+        "closed": "Closed"
+      }
+    },
+    "events": {
+      "eyebrow": "Partner calendar",
+      "title": "Federated Events",
+      "subtitle": "Discover partner workshops, socials, and online gatherings.",
+      "search": "Search events...",
+      "emptyTitle": "No federated events found",
+      "emptyDescription": "Upcoming partner events will appear here.",
+      "unavailableTitle": "Federated events are not enabled",
+      "unavailableDescription": "Federation is active for this tenant, but partner events are disabled. A community administrator needs to enable federated events.",
+      "online": "Online",
+      "upcomingOnly": "Upcoming only",
+      "loadMore": "Load more events",
+      "openDetails": "Open details for {{title}}",
+      "backToEvents": "Back to events",
+      "detailEyebrow": "Federated event",
+      "noDescription": "This shared event does not have a description yet.",
+      "ends": "Ends {{date}}",
+      "attendeeCount": "{{count}} attendee",
+      "attendeeCount_other": "{{count}} attendees"
+    },
+    "onboarding": {
+      "eyebrow": "Federation setup",
+      "title": "Federation Setup",
+      "subtitle": "Choose what you share with partner communities and enable cross-timebank discovery.",
+      "privacy": "Profile visibility",
+      "communication": "Communication",
+      "reach": "Service reach",
+      "next": "Next",
+      "finish": "Enable federation",
+      "review": "Review your federation setup",
+      "reviewDescription": "Confirm what partner communities can see and how members can contact you.",
+      "doLater": "Do this later",
+      "ready": "Ready to enable federation",
+      "on": "On",
+      "off": "Off",
+      "failedTitle": "Setup failed",
+      "failedDescription": "We could not save your federation setup. Please try again.",
+      "benefits": {
+        "discover": {
+          "title": "Discover partner members",
+          "description": "Appear in federated search and find people across trusted timebanks."
+        },
+        "message": {
+          "title": "Coordinate safely",
+          "description": "Use cross-community messaging without leaving your own timebank account."
+        },
+        "exchange": {
+          "title": "Share time-credit activity",
+          "description": "Enable partner exchanges where your community allows them."
+        }
+      }
+    },
+    "settings": {
+      "eyebrow": "Federation controls",
+      "title": "Federation Settings",
+      "subtitle": "Control your profile visibility, messaging, and service reach across the network.",
+      "active": "Federation active",
+      "inactive": "Federation inactive",
+      "statusDescription": "These controls decide what partner communities can see and use.",
+      "save": "Save settings",
+      "reach": {
+        "local_only": "Local only",
+        "remote_ok": "Remote ok",
+        "travel_ok": "Can travel"
+      },
+      "profile_visible_federated": {
+        "label": "Show my profile",
+        "description": "Let partner communities see your basic member profile."
+      },
+      "appear_in_federated_search": {
+        "label": "Appear in search",
+        "description": "Allow partner members to discover you in federated search."
+      },
+      "show_skills_federated": {
+        "label": "Share skills",
+        "description": "Include your listed skills in federation results."
+      },
+      "show_location_federated": {
+        "label": "Share location",
+        "description": "Show your general location to partner communities."
+      },
+      "show_reviews_federated": {
+        "label": "Share reviews",
+        "description": "Include reputation and reviews in federation trust signals."
+      },
+      "messaging_enabled_federated": {
+        "label": "Allow federation messaging",
+        "description": "Let partner members send you cross-community messages."
+      },
+      "transactions_enabled_federated": {
+        "label": "Allow federation exchanges",
+        "description": "Let partner members arrange time-credit exchanges with you."
+      },
+      "email_notifications": {
+        "label": "Email notifications",
+        "description": "Receive email updates for federation activity."
+      }
+    }
   }
 }

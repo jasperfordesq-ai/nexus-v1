@@ -13,10 +13,7 @@ export default function AuthLayout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="login" />
       <Stack.Screen name="register" />
-      <Stack.Screen
-        name="select-tenant"
-        options={{ headerShown: true, title: t('selectTenant.title') }}
-      />
+      <Stack.Screen name="select-tenant" />
     </Stack>
   );
 }

@@ -23,6 +23,8 @@ jest.mock('react-i18next', () => ({
     t: (key: string, opts?: Record<string, unknown>) => {
       const map: Record<string, string> = {
         'title': 'Groups',
+        'subtitle': 'Find community spaces, join discussions, and collaborate with members.',
+        'heroEyebrow': 'Community spaces',
         'empty': 'No groups found.',
         'searchPlaceholder': 'Search groups…',
         'newGroup': 'New Group',
@@ -31,7 +33,15 @@ jest.mock('react-i18next', () => ({
         'filter.private': 'Private',
         'featured': 'Featured',
         'joined': 'Joined',
+        'stats.groups': 'Groups',
+        'stats.featured': 'Featured',
+        'stats.members': 'Members',
+        'stats.joined': 'Joined',
         'members': opts ? `${String(opts.count ?? 0)} members` : '0 members',
+        'posts': opts ? `${String(opts.count ?? 0)} posts` : '0 posts',
+        'public': 'Public',
+        'private': 'Private',
+        'common:back': 'Back',
         'common:buttons.retry': 'Retry',
       };
       return map[key] ?? key;
@@ -123,8 +133,8 @@ const mockGroup = {
 
 describe('GroupsScreen', () => {
   it('renders the screen title', () => {
-    const { getByText } = render(<GroupsScreen />);
-    expect(getByText('Groups')).toBeTruthy();
+    const { getAllByText } = render(<GroupsScreen />);
+    expect(getAllByText('Groups').length).toBeGreaterThan(0);
   });
 
   it('renders empty state when no items and not loading', () => {

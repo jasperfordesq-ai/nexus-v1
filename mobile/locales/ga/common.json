@@ -26,6 +26,7 @@
     "retry": "Bain triail eile as"
   },
   "errors": {
+    "boundaryTitle": "Chuaigh rud éigin mícheart",
     "generic": "Chuaigh rud éigin mícheart. Déan iarracht arís.",
     "network": "Earráid líonra. Seiceáil do nasc.",
     "unauthorized": "Tá do sheisiún imithe in éag. Logáil isteach arís.",
@@ -44,5 +45,20 @@
     "friend": "ansin",
     "you": "Tú"
   },
-  "endOfList": "Tá tú ag an deireadh"
+  "endOfList": "Tá tú ag an deireadh",
+  "aria": {
+    "actionButton": "Cnaipe gnímh",
+    "verification_badges": "Lip?id f?oraithe"
+  },
+  "verification": {
+    "not_id_verified": "N?l ID f?oraithe",
+    "badge": {
+      "email_verified": "R?omhphost f?oraithe",
+      "phone_verified": "F?n f?oraithe",
+      "id_verified": "ID f?oraithe",
+      "dbs_checked": "DBS seice?ilte",
+      "admin_verified": "F?oraithe ag riarth?ir",
+      "unknown": "F?oraithe"
+    }
+  }
 }

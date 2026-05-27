@@ -86,6 +86,22 @@ export interface ApplicationsResponse {
   meta: { has_more: boolean; cursor: string | null };
 }
 
+export interface CreateJobPayload {
+  title: string;
+  description: string;
+  type: 'paid' | 'volunteer' | 'timebank';
+  commitment: 'full_time' | 'part_time' | 'flexible' | 'one_off';
+  location?: string | null;
+  is_remote?: boolean;
+  category?: string | null;
+  skills_required?: string[];
+  hours_per_week?: number | null;
+  time_credits?: number | null;
+  deadline?: string | null;
+  status?: 'open' | 'draft';
+  salary_negotiable?: boolean;
+}
+
 /**
  * GET /api/v2/jobs — list job vacancies for the current tenant.
  * Supports cursor-based pagination, full-text search, and filters.
@@ -102,6 +118,10 @@ export function getJobs(params: {
   if (params.type) query.type = params.type;
   if (params.commitment) query.commitment = params.commitment;
   return api.get<JobsResponse>(`${API_V2}/jobs`, query);
+}
+
+export function createJob(payload: CreateJobPayload): Promise<{ data: JobVacancy }> {
+  return api.post<{ data: JobVacancy }>(`${API_V2}/jobs`, payload);
 }
 
 /**

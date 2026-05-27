@@ -351,7 +351,7 @@ function EmptyState({ icon: Icon, message, cta, onAction }: {
   return (
     <div className="flex flex-col items-center justify-center py-12 text-center">
       <div className="w-16 h-16 rounded-full bg-[var(--surface-elevated)] flex items-center justify-center mb-4">
-        <Icon className="w-8 h-8 text-[var(--text-subtle)]" />
+        <Icon className="w-8 h-8 text-[var(--text-subtle)]" aria-hidden="true" />
       </div>
       <p className="text-sm text-[var(--text-muted)] max-w-xs">{message}</p>
       {cta && onAction && (
@@ -592,15 +592,15 @@ export default function ExplorePage() {
         {effectiveCategories && effectiveCategories.length > 0 && (
           <div className="flex flex-wrap justify-center gap-2">
             {effectiveCategories.slice(0, 8).map((cat) => (
-              <Chip
+              <Button
                 key={cat.id}
-                variant="soft"
+                variant="flat"
                 size="sm"
                 className="cursor-pointer hover:bg-[var(--surface-hover)] transition-colors"
-                onClick={() => navigate(tenantPath(`/listings?category=${cat.slug}`))}
+                onPress={() => navigate(tenantPath(`/listings?category=${cat.slug}`))}
               >
                 {cat.name}
-              </Chip>
+              </Button>
             ))}
           </div>
         )}
@@ -632,10 +632,10 @@ export default function ExplorePage() {
 
       {/* ─── API Error Banner ─────────────────────────────────────────────── */}
       {error && !isLoading && (
-        <div className="mb-6 flex items-center gap-3 rounded-xl border border-danger bg-danger-soft px-4 py-3 text-danger">
+        <div className="mb-6 flex items-center gap-3 rounded-xl border border-danger bg-danger-soft px-4 py-3 text-danger" role="alert">
           <AlertCircle className="w-5 h-5 shrink-0" aria-hidden="true" />
           <span className="text-sm flex-1">{t('error_loading')}</span>
-          <Button size="sm" variant="danger-soft" onPress={() => retry()} startContent={<RefreshCw className="w-4 h-4" />}>
+          <Button size="sm" variant="danger-soft" onPress={() => retry()} startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}>
             {t('retry')}
           </Button>
         </div>
@@ -809,11 +809,11 @@ export default function ExplorePage() {
                       </p>
                       <div className="flex items-center gap-3 text-xs text-[var(--text-muted)]">
                         <span className="flex items-center gap-1">
-                          <Heart className="w-3.5 h-3.5" />
+                          <Heart className="w-3.5 h-3.5" aria-hidden="true" />
                           {post.likes_count}
                         </span>
                         <span className="flex items-center gap-1">
-                          <MessageSquare className="w-3.5 h-3.5" />
+                          <MessageSquare className="w-3.5 h-3.5" aria-hidden="true" />
                           {post.comments_count}
                         </span>
                       </div>
@@ -861,9 +861,9 @@ export default function ExplorePage() {
                       ) : (
                         <div className="w-full h-32 rounded-lg bg-gradient-to-br from-[var(--surface-elevated)] to-[var(--glass-bg)] flex flex-col items-center justify-center gap-1.5">
                           {listing.type === 'offer' ? (
-                            <HandHeart className="w-7 h-7 text-accent opacity-40" />
+                            <HandHeart className="w-7 h-7 text-accent opacity-40" aria-hidden="true" />
                           ) : (
-                            <Search className="w-7 h-7 text-accent opacity-40" />
+                            <Search className="w-7 h-7 text-accent opacity-40" aria-hidden="true" />
                           )}
                           <span className="text-[10px] font-medium uppercase tracking-wider text-[var(--text-subtle)]">
                             {listing.type}
@@ -891,16 +891,16 @@ export default function ExplorePage() {
                       </div>
                       <div className="flex items-center justify-between text-xs text-[var(--text-muted)]">
                         <span className="flex items-center gap-1">
-                          <Eye className="w-3.5 h-3.5" />
+                          <Eye className="w-3.5 h-3.5" aria-hidden="true" />
                           {listing.view_count}
                         </span>
                         <span className="flex items-center gap-1">
-                          <Bookmark className="w-3.5 h-3.5" />
+                          <Bookmark className="w-3.5 h-3.5" aria-hidden="true" />
                           {listing.save_count}
                         </span>
                         {listing.location && (
                           <span className="flex items-center gap-1 truncate max-w-[80px]">
-                            <MapPin className="w-3.5 h-3.5 shrink-0" />
+                            <MapPin className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                             <span className="truncate">{listing.location}</span>
                           </span>
                         )}
@@ -952,7 +952,7 @@ export default function ExplorePage() {
                         />
                       ) : (
                         <div className="w-full h-28 rounded-lg bg-accent-soft flex items-center justify-center">
-                          <Calendar className="w-8 h-8 text-accent" />
+                          <Calendar className="w-8 h-8 text-accent" aria-hidden="true" />
                         </div>
                       )}
                       <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-2">
@@ -960,17 +960,17 @@ export default function ExplorePage() {
                       </h3>
                       <div className="flex flex-col gap-1 text-xs text-[var(--text-muted)]">
                         <span className="flex items-center gap-1">
-                          <Calendar className="w-3.5 h-3.5 text-accent" />
+                          <Calendar className="w-3.5 h-3.5 text-accent" aria-hidden="true" />
                           {formatDateTime(event.start_at)}
                         </span>
                         {event.location && (
                           <span className="flex items-center gap-1 truncate">
-                            <MapPin className="w-3.5 h-3.5 shrink-0" />
+                            <MapPin className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                             <span className="truncate">{event.is_online ? t('upcoming_events.online') : event.location}</span>
                           </span>
                         )}
                         <span className="flex items-center gap-1">
-                          <Users className="w-3.5 h-3.5" />
+                          <Users className="w-3.5 h-3.5" aria-hidden="true" />
                           {t('upcoming_events.attending', { count: event.rsvp_count })}
                           {event.max_attendees && ` / ${event.max_attendees}`}
                         </span>
@@ -1021,7 +1021,7 @@ export default function ExplorePage() {
                             {group.name}
                           </h3>
                           <p className="text-xs text-[var(--text-muted)] flex items-center gap-1">
-                            <Users className="w-3 h-3" />
+                            <Users className="w-3 h-3" aria-hidden="true" />
                             {t('active_groups.members', { count: group.member_count })}
                           </p>
                         </div>
@@ -1035,6 +1035,7 @@ export default function ExplorePage() {
                         size="sm"
                         variant="secondary"
                         className="w-full"
+                        aria-label={t('active_groups.view_group_named', { name: group.name })}
                       >
                         {t('active_groups.view_group')}
                       </Button>
@@ -1079,7 +1080,7 @@ export default function ExplorePage() {
                       className="w-16 h-16"
                     />
                     {index === 0 && (
-                      <Crown className="w-5 h-5 text-amber-400 absolute -top-1.5 -right-1.5 drop-shadow" />
+                      <Crown className="w-5 h-5 text-amber-400 absolute -top-1.5 -right-1.5 drop-shadow" aria-hidden="true" />
                     )}
                     <div className="absolute -bottom-1 left-1/2 -translate-x-1/2">
                       <Chip size="sm" variant="solid" color="primary" className="text-[10px] px-1.5 h-5 min-h-5">
@@ -1091,7 +1092,7 @@ export default function ExplorePage() {
                     {user.name}
                   </span>
                   <span className="text-[10px] text-[var(--text-muted)] flex items-center gap-0.5">
-                    <Trophy className="w-3 h-3" />
+                    <Trophy className="w-3 h-3" aria-hidden="true" />
                     {user.xp.toLocaleString()} XP
                   </span>
                 </Link>
@@ -1121,7 +1122,7 @@ export default function ExplorePage() {
                   <Chip
                     variant="soft"
                     size="md"
-                    startContent={<Hash className="w-3.5 h-3.5" />}
+                    startContent={<Hash className="w-3.5 h-3.5" aria-hidden="true" />}
                     className="cursor-pointer hover:bg-[var(--surface-hover)] transition-colors"
                   >
                     {hashtag.tag}
@@ -1158,7 +1159,7 @@ export default function ExplorePage() {
                       <div className="flex items-center gap-2">
                         {listing.match_reason && (
                           <Chip size="sm" variant="soft" color="secondary" className="text-xs">
-                            <TrendingUp className="w-3 h-3 mr-1 inline" />
+                            <TrendingUp className="w-3 h-3 mr-1 inline" aria-hidden="true" />
                             {listing.match_reason}
                           </Chip>
                         )}
@@ -1190,7 +1191,7 @@ export default function ExplorePage() {
                             )}
                             {listing.distance_km != null && (
                               <span className="text-[10px] text-[var(--text-muted)] flex items-center gap-0.5">
-                                <Navigation className="w-2.5 h-2.5" />
+                                <Navigation className="w-2.5 h-2.5" aria-hidden="true" />
                                 {t('near_you.distance', { distance: listing.distance_km })}
                               </span>
                             )}
@@ -1207,10 +1208,10 @@ export default function ExplorePage() {
                   variant="tertiary"
                   radius="full"
                   className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity min-w-6 w-6 h-6 bg-[var(--surface-elevated)] hover:bg-[var(--surface-hover)]"
-                  onClick={(e) => { e.preventDefault(); handleDismiss('listing', listing.id, 'not_relevant'); }}
+                  onPress={() => handleDismiss('listing', listing.id, 'not_relevant')}
                   aria-label={t('dismiss')}
                 >
-                  <X className="w-3.5 h-3.5 text-[var(--text-muted)]" />
+                  <X className="w-3.5 h-3.5 text-[var(--text-muted)]" aria-hidden="true" />
                 </Button>
               </div>
             ))}
@@ -1236,7 +1237,7 @@ export default function ExplorePage() {
                 <Card className="h-full border border-[var(--card-border)] bg-[var(--card-bg)] hover:bg-[var(--card-hover-bg)] transition-colors">
                   <CardBody className="p-4 gap-3">
                     <div className="flex items-center gap-2 text-xs text-accent font-medium">
-                      <Navigation className="w-3.5 h-3.5" />
+                      <Navigation className="w-3.5 h-3.5" aria-hidden="true" />
                       {t('near_you.distance', { distance: listing.distance_km })}
                     </div>
                     <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-2">
@@ -1300,7 +1301,7 @@ export default function ExplorePage() {
                   size="sm"
                   variant="secondary"
                   className="text-xs h-7 px-3"
-                  startContent={<UserPlus className="w-3 h-3" />}
+                  startContent={<UserPlus className="w-3 h-3" aria-hidden="true" />}
                   onPress={() => navigate(tenantPath(`/messages/new/${member.id}`))}
                 >
                   {t('suggested_connections.connect')}
@@ -1336,7 +1337,7 @@ export default function ExplorePage() {
                       />
                     ) : (
                       <div className="w-full h-28 rounded-lg bg-accent-soft flex items-center justify-center">
-                        <BookOpen className="w-8 h-8 text-accent" />
+                        <BookOpen className="w-8 h-8 text-accent" aria-hidden="true" />
                       </div>
                     )}
                     <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-2">
@@ -1344,11 +1345,11 @@ export default function ExplorePage() {
                     </h3>
                     <div className="flex items-center gap-3 text-xs text-[var(--text-muted)]">
                       <span className="flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5" />
+                        <Clock className="w-3.5 h-3.5" aria-hidden="true" />
                         {t('blog_posts.read_time', { count: post.reading_time || 3 })}
                       </span>
                       <span className="flex items-center gap-1">
-                        <Eye className="w-3.5 h-3.5" />
+                        <Eye className="w-3.5 h-3.5" aria-hidden="true" />
                         {t('blog_posts.views', { count: post.view_count })}
                       </span>
                     </div>
@@ -1374,7 +1375,7 @@ export default function ExplorePage() {
                   <CardBody className="p-4 gap-3">
                     <div className="flex items-start gap-3">
                       <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-[var(--color-success)]/10 shrink-0">
-                        <HandHeart className="w-5 h-5 text-[var(--color-success)]" />
+                        <HandHeart className="w-5 h-5 text-[var(--color-success)]" aria-hidden="true" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-1">
@@ -1391,12 +1392,12 @@ export default function ExplorePage() {
                         <div className="flex items-center gap-3 mt-2 text-xs text-[var(--text-muted)]">
                           {opp.location && (
                             <span className="flex items-center gap-1">
-                              <MapPin className="w-3 h-3" />
+                              <MapPin className="w-3 h-3" aria-hidden="true" />
                               <span className="truncate max-w-[100px]">{opp.location}</span>
                             </span>
                           )}
                           <span className="flex items-center gap-1">
-                            <Users className="w-3 h-3" />
+                            <Users className="w-3 h-3" aria-hidden="true" />
                             {t('volunteering.applications', { count: opp.application_count })}
                           </span>
                         </div>
@@ -1427,7 +1428,7 @@ export default function ExplorePage() {
                 <Card className="h-full border border-[var(--card-border)] bg-[var(--card-bg)] hover:bg-[var(--card-hover-bg)] transition-colors">
                   <CardBody className="p-4 gap-3">
                     <div className="flex items-center gap-2">
-                      <BarChart3 className="w-4 h-4 text-accent" />
+                      <BarChart3 className="w-4 h-4 text-accent" aria-hidden="true" />
                       <span className="text-xs text-[var(--text-muted)]">
                         {t('polls.options', { count: poll.option_count })}
                       </span>
@@ -1441,7 +1442,7 @@ export default function ExplorePage() {
                         <span>{t('polls.closes', { date: formatDate(poll.closes_at) })}</span>
                       )}
                     </div>
-                    <Button size="sm" variant="secondary" className="w-full">
+                    <Button size="sm" variant="secondary" className="w-full" aria-label={t('polls.vote_now_for', { question: poll.question })}>
                       {t('polls.vote_now')}
                     </Button>
                   </CardBody>
@@ -1461,19 +1462,19 @@ export default function ExplorePage() {
         >
           <div className="flex flex-wrap gap-2">
             {data.in_demand_skills.map((skill) => (
-              <Chip
+              <Button
                 key={skill.skill_name}
-                variant="soft"
-                size="md"
-                startContent={<Wrench className="w-3.5 h-3.5" />}
+                variant="flat"
+                size="sm"
+                startContent={<Wrench className="w-3.5 h-3.5" aria-hidden="true" />}
                 className="cursor-pointer hover:bg-[var(--surface-hover)] transition-colors"
-                onClick={() => navigate(tenantPath(`/search?q=${encodeURIComponent(skill.skill_name)}`))}
+                onPress={() => navigate(tenantPath(`/search?q=${encodeURIComponent(skill.skill_name)}`))}
               >
                 {skill.skill_name}
                 <span className="ml-1 text-[var(--text-muted)] text-xs">
                   ({t('in_demand_skills.requested', { count: skill.request_count })})
                 </span>
-              </Chip>
+              </Button>
             ))}
           </div>
         </ExploreSection>
@@ -1500,7 +1501,7 @@ export default function ExplorePage() {
                       name={org.name}
                       size="lg"
                       className="w-14 h-14"
-                      fallback={<Building2 className="w-6 h-6" />}
+                      fallback={<Building2 className="w-6 h-6" aria-hidden="true" />}
                     />
                     <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-1">
                       {org.name}
@@ -1533,7 +1534,7 @@ export default function ExplorePage() {
                   <CardBody className="p-4 gap-2">
                     <div className="flex items-start gap-3">
                       <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-accent-soft shrink-0">
-                        <Briefcase className="w-5 h-5 text-accent" />
+                        <Briefcase className="w-5 h-5 text-accent" aria-hidden="true" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-1">
@@ -1545,7 +1546,7 @@ export default function ExplorePage() {
                         <div className="flex items-center gap-3 mt-1 text-xs text-[var(--text-muted)]">
                           {job.location && (
                             <span className="flex items-center gap-1">
-                              <MapPin className="w-3 h-3" />
+                              <MapPin className="w-3 h-3" aria-hidden="true" />
                               <span className="truncate max-w-[80px]">{job.location}</span>
                             </span>
                           )}
@@ -1579,7 +1580,7 @@ export default function ExplorePage() {
               >
                 <Card className="h-full border border-[var(--card-border)] bg-[var(--card-bg)] hover:bg-[var(--card-hover-bg)] transition-colors">
                   <CardBody className="p-4 gap-3">
-                    <FolderOpen className="w-6 h-6 text-accent" />
+                    <FolderOpen className="w-6 h-6 text-accent" aria-hidden="true" />
                     <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-2">
                       {resource.title}
                     </h3>
@@ -1607,7 +1608,7 @@ export default function ExplorePage() {
             <Button
               size="sm"
               variant="danger-soft"
-              startContent={<Trash2 className="w-3.5 h-3.5" />}
+              startContent={<Trash2 className="w-3.5 h-3.5" aria-hidden="true" />}
               onPress={handleClearRecentlyViewed}
             >
               {t('recently_viewed.clear')}
@@ -1631,7 +1632,7 @@ export default function ExplorePage() {
                       />
                     ) : (
                       <div className="w-full h-24 rounded-lg bg-[var(--surface-elevated)] flex items-center justify-center">
-                        <History className="w-6 h-6 text-[var(--text-subtle)]" />
+                        <History className="w-6 h-6 text-[var(--text-subtle)]" aria-hidden="true" />
                       </div>
                     )}
                     <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-2">
@@ -1695,7 +1696,7 @@ export default function ExplorePage() {
                       size="sm"
                       variant="secondary"
                       className="text-xs h-7 px-3"
-                      startContent={<UserPlus className="w-3 h-3" />}
+                      startContent={<UserPlus className="w-3 h-3" aria-hidden="true" />}
                       onPress={() => navigate(tenantPath(`/messages/new/${member.id}`))}
                     >
                       {t('new_members.connect')}
@@ -1722,7 +1723,7 @@ export default function ExplorePage() {
                   <CardBody className="p-4 gap-3">
                     <div className="flex items-start gap-3">
                       <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-accent-soft shrink-0">
-                        <Lightbulb className="w-5 h-5 text-accent" />
+                        <Lightbulb className="w-5 h-5 text-accent" aria-hidden="true" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-1">
@@ -1735,7 +1736,7 @@ export default function ExplorePage() {
                         )}
                         <div className="flex items-center gap-3 mt-2 text-xs text-[var(--text-muted)]">
                           <span className="flex items-center gap-1">
-                            <Lightbulb className="w-3 h-3" />
+                            <Lightbulb className="w-3 h-3" aria-hidden="true" />
                             {t('featured_challenges.ideas_count', { count: challenge.idea_count })}
                           </span>
                           {challenge.end_date && (

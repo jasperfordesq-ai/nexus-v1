@@ -1,5 +1,13 @@
 {
   "editTitle": "Editar perfil",
+  "changePhoto": "Cambiar foto de perfil",
+  "permissionNeeded": "Permiso necesario",
+  "permissionMessage": "Permite el acceso a tu biblioteca de fotos para cambiar tu avatar.",
+  "uploadFailed": "Error al subir",
+  "uploadFailedMessage": "No se pudo actualizar tu avatar. Inténtalo de nuevo.",
+  "edit": {
+    "uploadingPhoto": "Subiendo foto..."
+  },
   "myProfile": "Mi Perfil",
   "mySpace": "Mi Espacio",
   "discover": "Descubrir",

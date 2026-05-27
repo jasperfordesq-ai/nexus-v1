@@ -8,6 +8,10 @@ import { useApi } from './useApi';
 import { ApiResponseError } from '@/lib/api/client';
 
 describe('useApi', () => {
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it('starts in loading state with null data and no error', () => {
     const fetchFn = jest.fn(() => new Promise<never>(() => {})); // never resolves
     const { result } = renderHook(() => useApi(fetchFn));
@@ -39,11 +43,19 @@ describe('useApi', () => {
   });
 
   it('sets generic message on unexpected error', async () => {
+    jest.useFakeTimers();
     const fetchFn = jest.fn().mockRejectedValue(new Error('Network error'));
     const { result } = renderHook(() => useApi(fetchFn));
 
+    await waitFor(() => expect(fetchFn).toHaveBeenCalledTimes(1));
+
+    await act(async () => {
+      jest.advanceTimersByTime(2000);
+    });
+
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.error).toBe('An unexpected error occurred.');
+    expect(fetchFn).toHaveBeenCalledTimes(2);
   });
 
   it('refresh() re-triggers the fetch and updates data', async () => {

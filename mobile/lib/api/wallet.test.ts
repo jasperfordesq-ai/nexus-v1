@@ -20,7 +20,7 @@ jest.mock('@/lib/constants', () => ({
 }));
 
 import { api } from '@/lib/api/client';
-import { getWalletBalance, getWalletTransactions } from './wallet';
+import { donateWalletCredits, getWalletBalance, getWalletTransactions, searchWalletUsers, transferWalletCredits } from './wallet';
 import type { WalletBalanceResponse, WalletTransactionsResponse } from './wallet';
 
 const mockBalanceResponse: WalletBalanceResponse = {
@@ -125,5 +125,32 @@ describe('getWalletTransactions', () => {
       type: 'received',
       cursor: 'next-cursor',
     });
+  });
+});
+
+describe('wallet mutations and search', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('searches wallet recipients with query and limit params', async () => {
+    (api.get as jest.Mock).mockResolvedValue({ data: { users: [] } });
+    await searchWalletUsers('jasper', 5);
+    expect(api.get).toHaveBeenCalledWith('/api/v2/wallet/user-search', {
+      q: 'jasper',
+      limit: '5',
+    });
+  });
+
+  it('posts transfer payload to the v2 wallet transfer endpoint', async () => {
+    const payload = { recipient: 12, amount: 2, description: 'Garden help' };
+    (api.post as jest.Mock).mockResolvedValue({ success: true });
+    await transferWalletCredits(payload);
+    expect(api.post).toHaveBeenCalledWith('/api/v2/wallet/transfer', payload);
+  });
+
+  it('posts donation payload to the v2 wallet donation endpoint', async () => {
+    const payload = { recipient_type: 'community_fund' as const, amount: 1.5, message: 'Thank you' };
+    (api.post as jest.Mock).mockResolvedValue({ success: true });
+    await donateWalletCredits(payload);
+    expect(api.post).toHaveBeenCalledWith('/api/v2/wallet/donate', payload);
   });
 });

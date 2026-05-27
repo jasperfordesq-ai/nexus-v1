@@ -7,7 +7,7 @@ import '@/global.css'; // Tailwind v4 + HeroUI Native styles — must be first
 
 import { useEffect, useRef } from 'react';
 import { LogBox } from 'react-native';
-import { Stack, router } from 'expo-router';
+import { Stack, router, usePathname } from 'expo-router';
 import * as Notifications from 'expo-notifications';
 import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -78,6 +78,15 @@ export default Sentry.wrap(RootLayout);
 function RootNavigator() {
   const { t } = useTranslation();
   const { isLoading, isAuthenticated } = useAuthContext();
+  const pathname = usePathname();
+  const isTenantSelectionPath =
+    pathname === '/select-tenant' || pathname.startsWith('/select-tenant/');
+  const isPublicAuthPath =
+    pathname === '/login' ||
+    pathname.startsWith('/login/') ||
+    pathname === '/register' ||
+    pathname.startsWith('/register/') ||
+    isTenantSelectionPath;
 
   // Queue deep link from push notification taps — only navigate once auth resolves.
   const pendingDeepLinkRef = useRef<string | null>(null);
@@ -102,13 +111,19 @@ function RootNavigator() {
       if (pendingLink) {
         pendingDeepLinkRef.current = null;
         navigateToLink(pendingLink);
-      } else {
+      } else if (pathname === '/' || (isPublicAuthPath && !isTenantSelectionPath)) {
         router.replace('/(tabs)/home');
+      } else {
+        // Preserve direct/deep-linked routes after auth, such as /members or /messages.
+        // Expo Router already has the current path in state; replacing here would
+        // make every refreshed authenticated page look like Home.
       }
     } else {
-      router.replace('/(auth)/login');
+      if (!isPublicAuthPath) {
+        router.replace('/(auth)/login');
+      }
     }
-  }, [isLoading, isAuthenticated]);
+  }, [isLoading, isAuthenticated, isPublicAuthPath, pathname]);
 
   // Shared options for regular modal screens: slide up from bottom, swipe-to-dismiss
   const modalOptions = {
@@ -127,19 +142,39 @@ function RootNavigator() {
       <Stack.Screen name="(tabs)" />
       <Stack.Screen
         name="(modals)/new-exchange"
-        options={{ ...modalOptions, title: t('exchanges:newTitle') }}
+        options={{ ...modalOptions, headerShown: false, title: t('exchanges:newTitle') }}
+      />
+      <Stack.Screen
+        name="(modals)/edit-exchange"
+        options={{ ...modalOptions, headerShown: false, title: t('exchanges:editTitle') }}
+      />
+      <Stack.Screen
+        name="(modals)/new-event"
+        options={{ ...modalOptions, headerShown: false, title: t('events:create.title') }}
+      />
+      <Stack.Screen
+        name="(modals)/new-group"
+        options={{ ...modalOptions, headerShown: false, title: t('groups:create.title') }}
+      />
+      <Stack.Screen
+        name="(modals)/new-volunteering"
+        options={{ ...modalOptions, headerShown: false, title: t('volunteering:create.title') }}
+      />
+      <Stack.Screen
+        name="(modals)/new-job"
+        options={{ ...modalOptions, headerShown: false, title: t('jobs:create.title') }}
       />
       <Stack.Screen
         name="(modals)/exchange-detail"
-        options={{ ...modalOptions, title: t('exchanges:detailTitle') }}
+        options={{ ...modalOptions, headerShown: false, title: t('exchanges:detailTitle') }}
       />
       <Stack.Screen
         name="(modals)/thread"
-        options={{ ...modalOptions, title: t('messages:threadTitle') }}
+        options={{ ...modalOptions, headerShown: false, title: t('messages:threadTitle') }}
       />
       <Stack.Screen
         name="(modals)/member-profile"
-        options={{ ...modalOptions, title: t('members:profileTitle') }}
+        options={{ ...modalOptions, headerShown: false, title: t('members:profileTitle') }}
       />
       <Stack.Screen
         name="(modals)/notifications"
@@ -147,31 +182,35 @@ function RootNavigator() {
       />
       <Stack.Screen
         name="(modals)/wallet"
-        options={{ ...modalOptions, title: t('wallet:title') }}
+        options={{ ...modalOptions, headerShown: false, title: t('wallet:title') }}
       />
       <Stack.Screen
         name="(modals)/settings"
-        options={{ ...modalOptions, title: t('settings:title') }}
+        options={{ ...modalOptions, headerShown: false, title: t('settings:title') }}
       />
       <Stack.Screen
         name="(modals)/edit-profile"
-        options={{ ...modalOptions, title: t('profile:editTitle') }}
+        options={{ ...modalOptions, headerShown: false, title: t('profile:editTitle') }}
       />
       <Stack.Screen
         name="(modals)/event-detail"
-        options={{ ...modalOptions, title: t('events:detailTitle') }}
+        options={{ ...modalOptions, headerShown: false, title: t('events:detailTitle') }}
       />
       <Stack.Screen
         name="(modals)/members"
-        options={{ ...modalOptions, title: t('members:title') }}
+        options={{ ...modalOptions, headerShown: false, title: t('members:title') }}
       />
       <Stack.Screen
         name="(modals)/change-password"
         options={{ ...modalOptions, title: t('settings:changePasswordTitle') }}
       />
       <Stack.Screen
+        name="(modals)/verify-identity"
+        options={{ ...modalOptions, headerShown: false, title: t('settings:identity.page_title') }}
+      />
+      <Stack.Screen
         name="(modals)/group-detail"
-        options={{ ...modalOptions, title: t('groups:detailTitle') }}
+        options={{ ...modalOptions, headerShown: false, title: t('groups:detailTitle') }}
       />
       <Stack.Screen
         name="(modals)/blog"
@@ -183,23 +222,23 @@ function RootNavigator() {
       />
       <Stack.Screen
         name="(modals)/gamification"
-        options={{ ...modalOptions, title: t('gamification:title') }}
+        options={{ ...modalOptions, headerShown: false, title: t('gamification:title') }}
       />
       <Stack.Screen
         name="(modals)/goals"
-        options={{ ...modalOptions, title: t('goals:title') }}
+        options={{ ...modalOptions, headerShown: false, title: t('goals:title') }}
       />
       <Stack.Screen
         name="(modals)/chat"
-        options={{ ...modalOptions, title: t('chat:title') }}
+        options={{ ...modalOptions, headerShown: false, title: t('chat:title') }}
       />
       <Stack.Screen
         name="(modals)/volunteering"
-        options={{ ...modalOptions, title: t('volunteering:title') }}
+        options={{ ...modalOptions, headerShown: false, title: t('volunteering:title') }}
       />
       <Stack.Screen
         name="(modals)/volunteering-detail"
-        options={{ ...modalOptions, title: t('volunteering:detailTitle') }}
+        options={{ ...modalOptions, headerShown: false, title: t('volunteering:detailTitle') }}
       />
       <Stack.Screen
         name="(modals)/jobs"
@@ -211,7 +250,7 @@ function RootNavigator() {
       />
       <Stack.Screen
         name="(modals)/organisations"
-        options={{ ...modalOptions, title: t('organisations:title') }}
+        options={{ ...modalOptions, headerShown: false, title: t('organisations:title') }}
       />
       <Stack.Screen
         name="(modals)/organisation-detail"
@@ -223,15 +262,51 @@ function RootNavigator() {
       />
       <Stack.Screen
         name="(modals)/federation"
-        options={{ ...modalOptions, title: t('federation:title') }}
+        options={{ ...modalOptions, headerShown: false, title: t('federation:title') }}
       />
       <Stack.Screen
         name="(modals)/federation-partner"
-        options={{ ...modalOptions, title: t('federation:partnerTitle') }}
+        options={{ ...modalOptions, headerShown: false, title: t('federation:partnerTitle') }}
       />
       <Stack.Screen
+        name="(modals)/federation-partners"
+        options={{ ...modalOptions, headerShown: false, title: t('federation:directory.partners.title') }}
+      />
+        <Stack.Screen
+          name="(modals)/federation-members"
+          options={{ ...modalOptions, headerShown: false, title: t('federation:directory.members.title') }}
+        />
+        <Stack.Screen
+          name="(modals)/federation-connections"
+          options={{ ...modalOptions, headerShown: false, title: t('federation:directory.connections.title') }}
+        />
+        <Stack.Screen
+          name="(modals)/federation-messages"
+          options={{ ...modalOptions, headerShown: false, title: t('federation:directory.messages.title') }}
+        />
+        <Stack.Screen
+          name="(modals)/federation-listings"
+          options={{ ...modalOptions, headerShown: false, title: t('federation:directory.listings.title') }}
+        />
+        <Stack.Screen
+          name="(modals)/federation-groups"
+          options={{ ...modalOptions, headerShown: false, title: t('federation:directory.groups.title') }}
+        />
+        <Stack.Screen
+          name="(modals)/federation-events"
+          options={{ ...modalOptions, headerShown: false, title: t('federation:directory.events.title') }}
+        />
+        <Stack.Screen
+          name="(modals)/federation-onboarding"
+          options={{ ...modalOptions, headerShown: false, title: t('federation:directory.onboarding.title') }}
+        />
+        <Stack.Screen
+          name="(modals)/federation-settings"
+          options={{ ...modalOptions, headerShown: false, title: t('federation:directory.settings.title') }}
+        />
+      <Stack.Screen
         name="(modals)/groups"
-        options={{ ...modalOptions, title: t('groups:title') }}
+        options={{ ...modalOptions, headerShown: false, title: t('groups:title') }}
       />
       <Stack.Screen
         name="(modals)/search"

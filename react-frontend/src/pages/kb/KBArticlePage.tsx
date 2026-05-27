@@ -204,7 +204,7 @@ export function KBArticlePage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-20">
+      <div className="flex items-center justify-center py-20" role="status" aria-label={t('loading')} aria-busy="true">
         <PageMeta title={t('title')} noIndex />
         <Spinner size="lg" color="primary" />
       </div>
@@ -215,7 +215,7 @@ export function KBArticlePage() {
     return (
       <div className="space-y-6">
         <PageMeta title={t('error.article_title')} noIndex />
-        <GlassCard className="p-8 text-center">
+        <GlassCard className="p-8 text-center" role="alert">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('error.article_title')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>

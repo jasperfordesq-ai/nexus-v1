@@ -10,7 +10,7 @@ import { render } from '@testing-library/react-native';
 
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }),
-  router: { push: jest.fn(), replace: jest.fn(), back: jest.fn() },
+  router: { push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
   useLocalSearchParams: () => ({}),
   useNavigation: () => ({ setOptions: jest.fn() }),
 }));
@@ -20,9 +20,22 @@ jest.mock('react-i18next', () => ({
     t: (key: string, opts?: Record<string, unknown>) => {
       const map: Record<string, string> = {
         'title': 'Blog',
+        'heroEyebrow': 'Community journal',
+        'subtitle': 'Stories, guides, and updates from the timebank community.',
+        'searchPlaceholder': 'Search articles...',
+        'searchAction': 'Search',
+        'clearSearch': 'Clear search',
         'empty': 'No posts yet.',
+        'emptyHint': 'Community stories and updates will appear here.',
+        'emptyFiltered': 'No matching articles',
+        'emptyFilteredHint': 'Try a different search.',
+        'loadMore': 'Load more',
+        'postsCount': opts ? `${String(opts.count ?? 0)} posts` : '0 posts',
+        'publishedOn': opts ? String(opts.date ?? '') : '',
         'readingTime': opts ? `${String(opts.minutes ?? 0)} min read` : '0 min read',
+        'by': opts ? `By ${String(opts.name ?? '')}` : 'By',
         'common:buttons.retry': 'Retry',
+        'common:back': 'Back',
       };
       return map[key] ?? key;
     },
@@ -45,6 +58,7 @@ jest.mock('@/lib/hooks/useTheme', () => ({
     border: '#dddddd',
     borderSubtle: '#eeeeee',
     error: '#e53e3e',
+    info: '#3b82f6',
   }),
 }));
 
@@ -151,7 +165,7 @@ describe('BlogScreen', () => {
     });
 
     const { getByText } = render(<BlogScreen />);
-    expect(getByText('Editor Team')).toBeTruthy();
+    expect(getByText('By Editor Team')).toBeTruthy();
   });
 
   it('renders reading time when provided', () => {

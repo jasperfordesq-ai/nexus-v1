@@ -147,7 +147,8 @@
     "collection_description": "Descrição (opcional)",
     "cancel": "Cancelar",
     "save": "Guardar",
-    "create": "Criar"
+    "create": "Criar",
+    "loading": "Loading bookmarks..."
   },
   "verified": "Verificado",
   "hover_card": {

@@ -33,6 +33,10 @@ function extractor(r: FakeResponse) {
 // ---------------------------------------------------------------------------
 
 describe('usePaginatedApi', () => {
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it('starts loading and calls fetchFn with null cursor on mount', async () => {
     const fetchFn = jest.fn().mockResolvedValue(makeResponse(['a', 'b'], null, false));
     const { result } = renderHook(() => usePaginatedApi(fetchFn, extractor));
@@ -89,7 +93,7 @@ describe('usePaginatedApi', () => {
   });
 
   it('sets ApiResponseError message on API failure', async () => {
-    const fetchFn = jest.fn().mockRejectedValue(new ApiResponseError(500, 'Server error'));
+    const fetchFn = jest.fn().mockRejectedValue(new ApiResponseError(422, 'Server error'));
     const { result } = renderHook(() => usePaginatedApi(fetchFn, extractor));
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
@@ -98,11 +102,41 @@ describe('usePaginatedApi', () => {
   });
 
   it('sets generic error message on unexpected failure', async () => {
+    jest.useFakeTimers();
     const fetchFn = jest.fn().mockRejectedValue(new Error('Network error'));
     const { result } = renderHook(() => usePaginatedApi(fetchFn, extractor));
 
+    await waitFor(() => expect(fetchFn).toHaveBeenCalledTimes(1));
+    expect(result.current.isLoading).toBe(true);
+
+    await act(async () => {
+      jest.advanceTimersByTime(2000);
+    });
+
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.error).toBe('An unexpected error occurred.');
+    expect(fetchFn).toHaveBeenCalledTimes(2);
+  });
+
+  it('keeps initial loading active while a transient retry is pending', async () => {
+    jest.useFakeTimers();
+    const fetchFn = jest.fn()
+      .mockRejectedValueOnce(new ApiResponseError(500, 'Server error'))
+      .mockResolvedValueOnce(makeResponse(['recovered'], null, false));
+    const { result } = renderHook(() => usePaginatedApi(fetchFn, extractor));
+
+    await waitFor(() => expect(fetchFn).toHaveBeenCalledTimes(1));
+    expect(result.current.isLoading).toBe(true);
+    expect(result.current.error).toBeNull();
+
+    await act(async () => {
+      jest.advanceTimersByTime(2000);
+    });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.items).toEqual(['recovered']);
+    expect(result.current.error).toBeNull();
+    expect(fetchFn).toHaveBeenCalledTimes(2);
   });
 
   it('loadMore is a no-op when hasMore is false', async () => {

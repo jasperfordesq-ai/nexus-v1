@@ -218,7 +218,8 @@
     "cover_message_placeholder": "Expliquez à l'organisation pourquoi vous souhaitez faire du bénévolat...",
     "cancel": "Annuler",
     "submit_application": "Envoyer la candidature",
-    "job_openings": "Offres d'emploi"
+    "job_openings": "Offres d'emploi",
+    "rating_sr": "{{n}} out of 5 stars"
   },
   "emergency_alerts": {
     "heading": "Alertes d'urgence",

@@ -197,7 +197,8 @@
     "feed_load_more": "Carica Altro",
     "member_actions_aria": "Azioni membro",
     "feed_loading": "Loading group feed...",
-    "events_loading": "Loading group events..."
+    "events_loading": "Loading group events...",
+    "loading_replies": "Loading replies..."
   },
   "form": {
     "create_title": "Crea nuovo gruppo",
@@ -284,7 +285,8 @@
     "pinned_success": "Fissato",
     "update_failed": "Impossibile aggiornare l'annuncio",
     "deleted": "Annuncio eliminato",
-    "delete_failed": "Impossibile eliminare l'annuncio"
+    "delete_failed": "Impossibile eliminare l'annuncio",
+    "loading": "Loading announcements..."
   },
   "challenges": {
     "heading": "Sfide",
@@ -549,7 +551,8 @@
     "answer_posted_success": "Risposta pubblicata!",
     "answer_posted_error": "Impossibile pubblicare la risposta",
     "vote_error": "Impossibile votare",
-    "accept_error": "Impossibile accettare la risposta"
+    "accept_error": "Impossibile accettare la risposta",
+    "loading_detail": "Loading question details..."
   },
   "wiki": {
     "load_failed": "Impossibile caricare le pagine wiki",
@@ -597,7 +600,8 @@
     "content_label": "Contenuto",
     "create": "Crea pagina",
     "delete_title": "Elimina pagina wiki",
-    "delete_confirm": "Vuoi davvero eliminare \"{{name}}\"? Questa azione non può essere annullata."
+    "delete_confirm": "Vuoi davvero eliminare \"{{name}}\"? Questa azione non può essere annullata.",
+    "loading_page": "Loading wiki page..."
   },
   "page_meta": {
     "create": {

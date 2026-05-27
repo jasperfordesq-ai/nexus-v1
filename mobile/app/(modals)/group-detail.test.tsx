@@ -25,6 +25,34 @@ jest.mock('react-i18next', () => ({
         'detail.notFound': 'Group not found.',
         'detail.about': 'About',
         'detail.members': 'Members',
+        'detail.admin': 'Group admin',
+        'detail.groupAdmin': 'Group admin',
+        'detail.emptyAbout': 'No description.',
+        'detail.emptyDiscussions': 'No discussions.',
+        'detail.emptyMembers': 'No members.',
+        'detail.emptyAnnouncements': 'No announcements.',
+        'detail.joinToDiscuss': 'Join to discuss.',
+        'detail.joinToSeeMembers': 'Join to see members.',
+        'detail.joinToSeeAnnouncements': 'Join to see announcements.',
+        'detail.pinned': 'Pinned',
+        'detail.startDiscussion': 'Start a discussion',
+        'detail.startDiscussionHint': 'Ask a question.',
+        'detail.newDiscussion': 'New',
+        'detail.discussionTitlePlaceholder': 'Discussion title',
+        'detail.discussionContentPlaceholder': 'Write a message',
+        'detail.publishDiscussion': 'Publish discussion',
+        'detail.discussionRequired': 'Add a title and message.',
+        'detail.discussionCreateError': 'Could not create discussion.',
+        'detail.replies': opts ? `${String(opts.count ?? 0)} replies` : '0 replies',
+        'detail.tabs.overview': 'Overview',
+        'detail.tabs.discussion': 'Discussions',
+        'detail.tabs.members': 'Members',
+        'detail.tabs.announcements': 'Announcements',
+        'detail.roles.owner': 'Owner',
+        'detail.roles.admin': 'Admin',
+        'detail.roles.member': 'Member',
+        'detail.stats.members': 'Members',
+        'detail.stats.posts': 'Posts',
         'featured': 'Featured',
         'private': 'Private',
         'public': 'Public',
@@ -61,6 +89,7 @@ jest.mock('@/lib/hooks/useTheme', () => ({
     border: '#dddddd',
     borderSubtle: '#eeeeee',
     error: '#e53e3e',
+    success: '#16a34a',
   }),
 }));
 
@@ -80,6 +109,10 @@ jest.mock('@expo/vector-icons', () => ({
 
 jest.mock('@/lib/api/groups', () => ({
   getGroup: jest.fn(),
+  createGroupDiscussion: jest.fn().mockResolvedValue({ data: {} }),
+  getGroupMembers: jest.fn(),
+  getGroupDiscussions: jest.fn(),
+  getGroupAnnouncements: jest.fn(),
   joinGroup: jest.fn().mockResolvedValue({}),
   leaveGroup: jest.fn().mockResolvedValue({}),
 }));
@@ -132,8 +165,8 @@ describe('GroupDetailScreen', () => {
       refresh: jest.fn(),
     });
 
-    const { getByText } = render(<GroupDetailScreen />);
-    expect(getByText('Group not found.')).toBeTruthy();
+    const { getAllByText } = render(<GroupDetailScreen />);
+    expect(getAllByText('Group not found.').length).toBeGreaterThan(0);
   });
 
   it('renders group name when data is loaded', () => {

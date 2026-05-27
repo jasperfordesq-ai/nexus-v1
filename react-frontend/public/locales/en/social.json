@@ -110,6 +110,7 @@
     "collection_name": "Collection name"
   },
   "bookmarks": {
+    "loading": "Loading bookmarks...",
     "page_title": "Saved",
     "meta_description": "Review and organize your saved posts, listings, events, jobs, blog posts, and discussions.",
     "title": "Saved Items",

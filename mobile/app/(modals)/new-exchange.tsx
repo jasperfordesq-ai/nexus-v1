@@ -3,103 +3,197 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  Pressable,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
+import { useRef, useState, type ReactNode } from 'react';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router, useNavigation } from 'expo-router';
+import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
+import * as ImagePicker from 'expo-image-picker';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
-import { Spinner } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, Spinner } from 'heroui-native';
 
-import { createExchange, type ExchangeType } from '@/lib/api/exchanges';
-import { ApiResponseError, api } from '@/lib/api/client';
+import {
+  createExchange,
+  generateExchangeDescription,
+  getExchangeCategories,
+  setExchangeTags,
+  uploadExchangeImage,
+  type ExchangeCategory,
+  type ExchangeType,
+} from '@/lib/api/exchanges';
+import { ApiResponseError } from '@/lib/api/client';
+import { useApi } from '@/lib/hooks/useApi';
+import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
-import { useApi } from '@/lib/hooks/useApi';
-import { API_V2 } from '@/lib/constants';
+import AppTopBar from '@/components/ui/AppTopBar';
 import OfflineBanner from '@/components/OfflineBanner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
-interface Category {
-  id: number;
-  name: string;
-}
-
-function getCategories(): Promise<{ data: Category[] }> {
-  return api.get<{ data: Category[] }>(`${API_V2}/categories`, { type: 'listing' });
-}
+type ServiceType = 'physical_only' | 'remote_only' | 'hybrid' | 'location_dependent';
+type ExperienceOption = (typeof experienceOptions)[number];
+type EquipmentOption = (typeof equipmentOptions)[number];
 
 interface FieldErrors {
   title?: string;
-  timeCredits?: string;
+  description?: string;
+  category?: string;
+  hours?: string;
 }
 
+const serviceTypes: ServiceType[] = ['hybrid', 'physical_only', 'remote_only', 'location_dependent'];
+const experienceOptions = ['beginner_friendly', 'some_experience', 'experienced', 'professional'] as const;
+const equipmentOptions = ['provided', 'partial', 'bring_own', 'not_applicable'] as const;
+const experienceLabelKeys: Record<ExperienceOption, string> = {
+  beginner_friendly: 'experienceBeginner',
+  some_experience: 'experienceSome',
+  experienced: 'experienceExperienced',
+  professional: 'experienceProfessional',
+};
+const equipmentLabelKeys: Record<EquipmentOption, string> = {
+  provided: 'equipmentProvidedOption',
+  partial: 'equipmentPartial',
+  bring_own: 'equipmentBringOwn',
+  not_applicable: 'equipmentNa',
+};
+
 export default function NewExchangeModal() {
+  return (
+    <ModalErrorBoundary>
+      <NewExchangeModalInner />
+    </ModalErrorBoundary>
+  );
+}
+
+function NewExchangeModalInner() {
   const { t } = useTranslation('exchanges');
-  const navigation = useNavigation();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { user } = useAuth();
+  const profileLocation = getProfileLocation(user);
+  const descriptionRef = useRef<TextInput>(null);
+  const hoursRef = useRef<TextInput>(null);
 
-  useEffect(() => {
-    navigation.setOptions({ title: t('newExchange') });
-  }, [navigation, t]);
-
-  const { data: catData } = useApi(() => getCategories());
-  const categories = catData?.data ?? [];
+  const { data: categoriesData } = useApi(() => getExchangeCategories());
+  const categories: ExchangeCategory[] = categoriesData?.data ?? [];
 
   const [type, setType] = useState<ExchangeType>('offer');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [timeCredits, setTimeCredits] = useState('1');
+  const [hours, setHours] = useState('1');
   const [categoryId, setCategoryId] = useState<number | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [serviceType, setServiceType] = useState<ServiceType>('hybrid');
+  const [skillTags, setSkillTags] = useState('');
+  const [experienceLevel, setExperienceLevel] = useState<ExperienceOption | ''>('');
+  const [equipmentProvided, setEquipmentProvided] = useState<EquipmentOption | ''>('');
+  const [accessibilityNotes, setAccessibilityNotes] = useState('');
+  const [showServiceDetails, setShowServiceDetails] = useState(false);
+  const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [error, setError] = useState<string | null>(null);
+  const [generatingDescription, setGeneratingDescription] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  // Refs for returnKeyType focus chaining
-  const descriptionRef = useRef<TextInput>(null);
-  const creditsRef = useRef<TextInput>(null);
+  const selectedCategoryName = categories.find((category) => category.id === categoryId)?.name ?? t('form.summaryNotSet');
+  const isGenericTitle = isGenericListingTitle(title, selectedCategoryName);
+
+  async function handlePickImage() {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 0.85,
+        allowsMultipleSelection: false,
+      });
+      if (result.canceled || !result.assets?.[0]?.uri) return;
+      setSelectedImageUri(result.assets[0].uri);
+    } catch {
+      setError(t('detail.imagePickFailed'));
+    }
+  }
+
+  async function handleGenerateDescription() {
+    const trimmedTitle = title.trim();
+    if (!trimmedTitle || generatingDescription) return;
+    setGeneratingDescription(true);
+    try {
+      const response = await generateExchangeDescription({
+        title: trimmedTitle,
+        category: selectedCategoryName === t('form.summaryNotSet') ? '' : selectedCategoryName,
+        type,
+        notes: description.trim(),
+      });
+      const generated = response.data?.description?.trim();
+      if (generated) {
+        setDescription(generated);
+        if (fieldErrors.description) setFieldErrors((current) => ({ ...current, description: undefined }));
+        void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
+    } catch {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(t('detail.actionFailedTitle'), t('detail.aiGenerateFailed'));
+    } finally {
+      setGeneratingDescription(false);
+    }
+  }
 
   async function handleSubmit() {
-    const errors: FieldErrors = {};
+    const trimmedTitle = title.trim();
+    const trimmedDescription = description.trim();
+    const parsedHours = Number(hours);
+    const nextErrors: FieldErrors = {};
 
-    if (!title.trim()) {
-      errors.title = t('validation.titleRequired');
-    }
+    if (!trimmedTitle) nextErrors.title = t('validation.titleRequired');
+    if (!trimmedDescription) nextErrors.description = t('validation.descriptionRequired');
+    if (!categoryId) nextErrors.category = t('validation.categoryRequired');
+    if (!Number.isFinite(parsedHours) || parsedHours <= 0) nextErrors.hours = t('validation.invalidCredits');
 
-    const credits = parseFloat(timeCredits);
-    if (isNaN(credits) || credits <= 0) {
-      errors.timeCredits = t('validation.invalidCredits');
-    }
-
-    if (Object.keys(errors).length > 0) {
+    if (Object.keys(nextErrors).length > 0) {
+      setFieldErrors(nextErrors);
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      setFieldErrors(errors);
+      return;
+    }
+
+    const selectedCategoryId = categoryId;
+    if (selectedCategoryId === null) {
+      setFieldErrors({ category: t('validation.categoryRequired') });
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       return;
     }
 
     setFieldErrors({});
-    setSubmitting(true);
     setError(null);
+    setSubmitting(true);
     try {
-      await createExchange({
-        title: title.trim(),
-        description: description.trim(),
+      const created = await createExchange({
+        title: trimmedTitle,
+        description: buildEnrichedDescription(trimmedDescription, {
+          experience: experienceLevel,
+          equipment: equipmentProvided,
+          accessibility: accessibilityNotes,
+        }, t),
         type,
-        hours_estimate: credits,
-        category_id: categoryId ?? (categories[0]?.id ?? 1),
+        hours_estimate: parsedHours,
+        category_id: selectedCategoryId,
+        location: profileLocation,
+        service_type: serviceType,
       });
+      const listingId = created.data?.id;
+      const tags = skillTags.split(',').map((tag) => tag.trim()).filter(Boolean);
+      if (listingId) {
+        await setExchangeTags(listingId, tags).catch(() => null);
+        if (selectedImageUri) {
+          await uploadExchangeImage(listingId, selectedImageUri).catch(() => null);
+        }
+      }
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      router.back();
+      if (listingId) {
+        router.replace({ pathname: '/(modals)/exchange-detail', params: { id: String(listingId) } });
+      } else {
+        router.back();
+      }
     } catch (err) {
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       setError(err instanceof ApiResponseError ? err.message : t('createError'));
@@ -109,145 +203,408 @@ export default function NewExchangeModal() {
   }
 
   return (
-    <ModalErrorBoundary>
-    <SafeAreaView className="flex-1 bg-surface" edges={['bottom']}>
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView contentContainerStyle={{ padding: 24 }} keyboardShouldPersistTaps="handled">
-        <OfflineBanner />
-        {/* Type toggle */}
-        <Text className="text-sm font-semibold text-foreground mb-1.5 mt-4">{t('type')}</Text>
-        <View className="flex-row gap-2">
-          {(['offer', 'request'] as ExchangeType[]).map((tp) => (
-            <Pressable
-              key={tp}
-              style={[
-                { flex: 1, borderWidth: 1, borderColor: theme.border, borderRadius: 8, paddingVertical: 10, alignItems: 'center' },
-                type === tp && { backgroundColor: primary, borderColor: primary },
-              ]}
-              onPress={() => setType(tp)}
-              accessibilityLabel={t('typeLabel', { type: t(tp) })}
-              accessibilityRole="button"
-            >
-              <Text style={[{ fontSize: 14, fontWeight: '600', color: theme.textSecondary }, type === tp && { color: '#fff' }]}>
-                {t(tp)}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
+    <SafeAreaView className="flex-1 bg-background">
+      <AppTopBar title={t('newExchange')} backLabel={t('detail.goBack')} fallbackHref="/(tabs)/exchanges" />
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+        <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 120, gap: 14 }} keyboardShouldPersistTaps="handled">
+          <OfflineBanner />
 
-        {error && (
-          <View className="bg-danger/10 rounded-lg p-3 mt-3">
-            <Text className="text-danger text-sm">{error}</Text>
-          </View>
-        )}
+          <HeroCard variant="default" className="overflow-hidden">
+            <View style={{ height: 4, backgroundColor: primary }} />
+            <HeroCard.Body className="gap-3 p-4">
+              <View className="flex-row items-center gap-3">
+                <View className="h-11 w-11 items-center justify-center rounded-full" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+                  <Ionicons name="add-circle-outline" size={23} color={primary} />
+                </View>
+                <View className="flex-1">
+                  <Text style={{ color: theme.text }} className="text-xl font-bold">{t('newExchange')}</Text>
+                  <Text style={{ color: theme.textMuted }} className="mt-1 text-sm leading-5">{t('form.createIntro')}</Text>
+                </View>
+              </View>
+              <View className="mt-2 flex-row gap-2">
+                <SummaryTile label={t('form.summaryType')} value={type === 'offer' ? t('form.offerTitle') : t('form.requestTitle')} theme={theme} />
+                <SummaryTile label={t('form.summaryCategory')} value={selectedCategoryName} theme={theme} />
+              </View>
+            </HeroCard.Body>
+          </HeroCard>
 
-        <Text className="text-sm font-semibold text-foreground mb-1.5 mt-4">{t('titleLabel')}</Text>
-        <TextInput
-          style={[
-            { borderWidth: 1, borderColor: fieldErrors.title ? theme.error : theme.border, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12, fontSize: 16, color: theme.text, backgroundColor: theme.surface },
-          ]}
-          value={title}
-          onChangeText={(v) => {
-            setTitle(v);
-            if (fieldErrors.title) setFieldErrors((e) => ({ ...e, title: undefined }));
-          }}
-          placeholder={type === 'offer' ? t('offerPlaceholder') : t('requestPlaceholder')}
-          placeholderTextColor={theme.textMuted}
-          returnKeyType="next"
-          maxLength={100}
-          onSubmitEditing={() => descriptionRef.current?.focus()}
-          blurOnSubmit={false}
-        />
-        {fieldErrors.title && (
-          <Text className="text-xs text-danger mt-1">{fieldErrors.title}</Text>
-        )}
+          {error ? (
+            <HeroCard variant="secondary">
+              <HeroCard.Body className="p-4">
+                <Text style={{ color: theme.error }} className="text-sm font-medium">{error}</Text>
+              </HeroCard.Body>
+            </HeroCard>
+          ) : null}
 
-        <Text className="text-sm font-semibold text-foreground mb-1.5 mt-4">{t('description')}</Text>
-        <TextInput
-          ref={descriptionRef}
-          style={{ borderWidth: 1, borderColor: theme.border, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12, fontSize: 16, color: theme.text, backgroundColor: theme.surface, height: 100 }}
-          value={description}
-          onChangeText={setDescription}
-          placeholder={t('descriptionPlaceholder')}
-          placeholderTextColor={theme.textMuted}
-          multiline
-          numberOfLines={4}
-          textAlignVertical="top"
-          maxLength={500}
-          returnKeyType="next"
-          blurOnSubmit={true}
-          onSubmitEditing={() => creditsRef.current?.focus()}
-        />
-
-        <Text className="text-sm font-semibold text-foreground mb-1.5 mt-4">{t('timeCredits')}</Text>
-        <TextInput
-          ref={creditsRef}
-          style={[
-            { borderWidth: 1, borderColor: fieldErrors.timeCredits ? theme.error : theme.border, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12, fontSize: 16, color: theme.text, backgroundColor: theme.surface },
-          ]}
-          value={timeCredits}
-          onChangeText={(v) => {
-            setTimeCredits(v);
-            if (fieldErrors.timeCredits) setFieldErrors((e) => ({ ...e, timeCredits: undefined }));
-          }}
-          placeholder="1"
-          placeholderTextColor={theme.textMuted}
-          keyboardType="decimal-pad"
-          returnKeyType="done"
-        />
-        {fieldErrors.timeCredits && (
-          <Text className="text-xs text-danger mt-1">{fieldErrors.timeCredits}</Text>
-        )}
-
-        {/* Category picker */}
-        {categories.length > 0 && (
-          <>
-            <Text className="text-sm font-semibold text-foreground mb-1.5 mt-4">{t('category')}</Text>
-            <View className="flex-row flex-wrap gap-2">
-              {categories.map((cat) => {
-                const selected = categoryId === cat.id || (categoryId === null && categories[0]?.id === cat.id);
-                return (
-                  <Pressable
-                    key={cat.id}
-                    style={[
-                      { borderWidth: 1, borderColor: theme.border, borderRadius: 20, paddingHorizontal: 14, paddingVertical: 7, backgroundColor: theme.surface },
-                      selected && { backgroundColor: withAlpha(primary, 0.09), borderColor: primary },
-                    ]}
-                    onPress={() => setCategoryId(cat.id)}
-                    accessibilityLabel={t('categoryLabel', { name: cat.name })}
-                    accessibilityRole="button"
-                  >
-                    <Text style={[{ fontSize: 13, color: theme.textMuted }, selected && { color: primary, fontWeight: '600' }]}>
-                      {cat.name}
-                    </Text>
-                  </Pressable>
-                );
-              })}
+          <FormSection title={t('form.basicsTitle')} icon="document-text-outline" primary={primary} theme={theme}>
+            <View className="flex-row gap-2">
+              {(['offer', 'request'] as ExchangeType[]).map((value) => (
+                <HeroButton
+                  key={value}
+                  className="flex-1"
+                  variant={type === value ? 'primary' : 'secondary'}
+                  style={type === value ? { backgroundColor: primary } : undefined}
+                  onPress={() => setType(value)}
+                  accessibilityState={{ selected: type === value }}
+                >
+                  <HeroButton.Label>{t(value)}</HeroButton.Label>
+                </HeroButton>
+              ))}
             </View>
-          </>
-        )}
 
-        <Pressable
-          style={[{ borderRadius: 10, paddingVertical: 14, alignItems: 'center', marginTop: 32, backgroundColor: primary }, submitting && { opacity: 0.6 }]}
-          onPress={() => void handleSubmit()}
-          disabled={submitting}
-          accessibilityLabel={type === 'offer' ? t('postOffer') : t('postRequest')}
-          accessibilityRole="button"
-        >
-          {submitting ? (
-            <Spinner size="sm" />
-          ) : (
-            <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>
-              {type === 'offer' ? t('postOffer') : t('postRequest')}
-            </Text>
-          )}
-        </Pressable>
-      </ScrollView>
-    </KeyboardAvoidingView>
+            <FieldLabel label={t('titleLabel')} theme={theme} />
+            <TextInput
+              value={title}
+              onChangeText={(value) => {
+                setTitle(value);
+                if (fieldErrors.title) setFieldErrors((current) => ({ ...current, title: undefined }));
+              }}
+              placeholder={type === 'offer' ? t('offerPlaceholder') : t('requestPlaceholder')}
+              placeholderTextColor={theme.textMuted}
+              returnKeyType="next"
+              maxLength={255}
+              onSubmitEditing={() => descriptionRef.current?.focus()}
+              blurOnSubmit={false}
+              style={inputStyle(theme, Boolean(fieldErrors.title))}
+            />
+            {fieldErrors.title ? <ErrorText message={fieldErrors.title} theme={theme} /> : null}
+            {isGenericTitle ? (
+              <Text className="rounded-2xl px-3 py-2 text-xs leading-5" style={{ color: theme.warning ?? '#d97706', backgroundColor: withAlpha(theme.warning ?? '#f59e0b', 0.12) }}>
+                {t('form.titleTooGenericHint')}
+              </Text>
+            ) : null}
+
+            <FieldLabel label={t('description')} theme={theme} />
+            <TextInput
+              ref={descriptionRef}
+              value={description}
+              onChangeText={(value) => {
+                setDescription(value);
+                if (fieldErrors.description) setFieldErrors((current) => ({ ...current, description: undefined }));
+              }}
+              placeholder={t('descriptionPlaceholder')}
+              placeholderTextColor={theme.textMuted}
+              multiline
+              textAlignVertical="top"
+              maxLength={10000}
+              returnKeyType="next"
+              onSubmitEditing={() => hoursRef.current?.focus()}
+              style={[inputStyle(theme, Boolean(fieldErrors.description)), { minHeight: 132, paddingTop: 14 }]}
+            />
+            {fieldErrors.description ? <ErrorText message={fieldErrors.description} theme={theme} /> : null}
+            <View className="gap-2">
+              <HeroButton variant="secondary" isDisabled={!title.trim() || generatingDescription} onPress={() => void handleGenerateDescription()}>
+                {generatingDescription ? <Spinner size="sm" /> : <Ionicons name="sparkles-outline" size={17} color={primary} />}
+                <HeroButton.Label>{generatingDescription ? t('form.aiGenerating') : t('form.aiHelpWrite')}</HeroButton.Label>
+              </HeroButton>
+              {!title.trim() ? (
+                <Text style={{ color: theme.textMuted }} className="text-xs leading-5">{t('form.aiEnterTitleFirst')}</Text>
+              ) : null}
+            </View>
+          </FormSection>
+
+          <FormSection title={t('form.deliveryTitle')} icon="location-outline" primary={primary} theme={theme}>
+            <ChoiceGroup
+              label={t('form.serviceType')}
+              values={serviceTypes}
+              selected={serviceType}
+              onSelect={(value) => value && setServiceType(value)}
+              labelFor={(value) => t(`serviceType.${value}`)}
+              primary={primary}
+              theme={theme}
+            />
+
+            <FieldLabel label={t('form.location')} theme={theme} />
+            <TextInput
+              value={profileLocation}
+              editable={false}
+              placeholder={t('form.locationPlaceholder')}
+              placeholderTextColor={theme.textMuted}
+              style={inputStyle(theme)}
+            />
+            <Text style={{ color: theme.textMuted }} className="-mt-2 text-xs leading-5">{t('form.locationFromProfile')}</Text>
+
+            <FieldLabel label={t('form.skills')} theme={theme} />
+            <TextInput
+              value={skillTags}
+              onChangeText={setSkillTags}
+              placeholder={t('form.skillsPlaceholder')}
+              placeholderTextColor={theme.textMuted}
+              style={inputStyle(theme)}
+            />
+          </FormSection>
+
+          <FormSection title={t('form.serviceDetailsToggle')} icon="information-circle-outline" primary={primary} theme={theme}>
+            <HeroButton variant="secondary" onPress={() => setShowServiceDetails((value) => !value)}>
+              <Ionicons name={showServiceDetails ? 'chevron-up-outline' : 'chevron-down-outline'} size={17} color={primary} />
+              <HeroButton.Label>{t('form.serviceDetailsToggle')}</HeroButton.Label>
+            </HeroButton>
+            <Text style={{ color: theme.textMuted }} className="text-sm leading-5">{t('form.extraDetailsHint')}</Text>
+            {showServiceDetails ? (
+              <>
+                <ChoiceGroup
+                  label={t('form.experienceLabel')}
+                  values={experienceOptions}
+                  selected={experienceLevel}
+                  onSelect={setExperienceLevel}
+                  labelFor={(value) => t(`form.${experienceLabelKeys[value]}`)}
+                  primary={primary}
+                  theme={theme}
+                />
+                <ChoiceGroup
+                  label={t('form.equipmentLabel')}
+                  values={equipmentOptions}
+                  selected={equipmentProvided}
+                  onSelect={setEquipmentProvided}
+                  labelFor={(value) => t(`form.${equipmentLabelKeys[value]}`)}
+                  primary={primary}
+                  theme={theme}
+                />
+                <FieldLabel label={t('form.accessibilityLabel')} theme={theme} />
+                <TextInput
+                  value={accessibilityNotes}
+                  onChangeText={setAccessibilityNotes}
+                  placeholder={t('form.accessibilityPlaceholder')}
+                  placeholderTextColor={theme.textMuted}
+                  multiline
+                  textAlignVertical="top"
+                  maxLength={200}
+                  style={[inputStyle(theme), { minHeight: 92, paddingTop: 14 }]}
+                />
+              </>
+            ) : null}
+          </FormSection>
+
+          <FormSection title={t('form.mediaSection')} icon="image-outline" primary={primary} theme={theme}>
+            <Text style={{ color: theme.textMuted }} className="text-sm leading-5">{t('form.mediaHint')}</Text>
+            {selectedImageUri ? (
+              <View className="overflow-hidden rounded-2xl border" style={{ borderColor: theme.border }}>
+                <Image source={{ uri: selectedImageUri }} style={{ width: '100%', height: 180, backgroundColor: theme.surface }} contentFit="cover" />
+                <View className="flex-row gap-2 p-3" style={{ backgroundColor: theme.surface }}>
+                  <HeroButton className="flex-1" variant="secondary" onPress={() => void handlePickImage()}>
+                    <Ionicons name="image-outline" size={17} color={primary} />
+                    <HeroButton.Label>{t('form.replaceImage')}</HeroButton.Label>
+                  </HeroButton>
+                  <HeroButton className="flex-1" variant="danger-soft" onPress={() => setSelectedImageUri(null)}>
+                    <Ionicons name="trash-outline" size={17} color={theme.error} />
+                    <HeroButton.Label>{t('form.removeImage')}</HeroButton.Label>
+                  </HeroButton>
+                </View>
+              </View>
+            ) : (
+              <HeroButton variant="secondary" onPress={() => void handlePickImage()}>
+                <Ionicons name="image-outline" size={18} color={primary} />
+                <HeroButton.Label>{t('form.addImage')}</HeroButton.Label>
+              </HeroButton>
+            )}
+          </FormSection>
+
+          <FormSection title={t('form.organiseTitle')} icon="albums-outline" primary={primary} theme={theme}>
+            {categories.length > 0 ? (
+              <>
+                <FieldLabel label={t('category')} theme={theme} />
+                <View className="flex-row flex-wrap gap-2">
+                  {categories.map((category) => {
+                    const selected = categoryId === category.id;
+                    return (
+                      <HeroButton
+                        key={category.id}
+                        size="sm"
+                        variant={selected ? 'primary' : 'secondary'}
+                        style={selected ? { backgroundColor: primary } : undefined}
+                        onPress={() => {
+                          setCategoryId(category.id);
+                          if (fieldErrors.category) setFieldErrors((current) => ({ ...current, category: undefined }));
+                        }}
+                        accessibilityLabel={t('categoryLabel', { name: category.name })}
+                        accessibilityState={{ selected }}
+                      >
+                        <HeroButton.Label>{category.name}</HeroButton.Label>
+                      </HeroButton>
+                    );
+                  })}
+                </View>
+                {fieldErrors.category ? <ErrorText message={fieldErrors.category} theme={theme} /> : null}
+              </>
+            ) : null}
+
+            <FieldLabel label={t('timeCredits')} theme={theme} />
+            <TextInput
+              ref={hoursRef}
+              value={hours}
+              onChangeText={(value) => {
+                setHours(value);
+                if (fieldErrors.hours) setFieldErrors((current) => ({ ...current, hours: undefined }));
+              }}
+              keyboardType="decimal-pad"
+              placeholder="1"
+              placeholderTextColor={theme.textMuted}
+              style={inputStyle(theme, Boolean(fieldErrors.hours))}
+            />
+            {fieldErrors.hours ? <ErrorText message={fieldErrors.hours} theme={theme} /> : null}
+
+            <Chip color="default" size="sm" variant="soft">
+              <Ionicons name="time-outline" size={12} color={theme.textMuted} />
+              <Chip.Label>{t('form.hoursHint')}</Chip.Label>
+            </Chip>
+          </FormSection>
+        </ScrollView>
+
+        <View className="border-t px-4 py-3" style={{ backgroundColor: theme.surface, borderColor: theme.border }}>
+          <View className="flex-row gap-3">
+            <HeroButton className="flex-1" variant="secondary" isDisabled={submitting} onPress={() => router.back()}>
+              <HeroButton.Label>{t('detail.cancel')}</HeroButton.Label>
+            </HeroButton>
+            <HeroButton className="flex-1" variant="primary" isDisabled={submitting} style={{ backgroundColor: primary }} onPress={() => void handleSubmit()}>
+              {submitting ? <Spinner size="sm" /> : <Ionicons name="checkmark-outline" size={18} color="#fff" />}
+              <HeroButton.Label>{type === 'offer' ? t('postOffer') : t('postRequest')}</HeroButton.Label>
+            </HeroButton>
+          </View>
+        </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
-    </ModalErrorBoundary>
   );
+}
+
+function FormSection({
+  title,
+  icon,
+  primary,
+  theme,
+  children,
+}: {
+  title: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+  children: ReactNode;
+}) {
+  return (
+    <HeroCard variant="default">
+      <HeroCard.Body className="gap-4 p-4">
+        <View className="flex-row items-center gap-2">
+          <View className="h-8 w-8 items-center justify-center rounded-full" style={{ backgroundColor: withAlpha(primary, 0.12) }}>
+            <Ionicons name={icon} size={17} color={primary} />
+          </View>
+          <Text style={{ color: theme.text }} className="text-base font-bold">{title}</Text>
+        </View>
+        {children}
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function SummaryTile({ label, value, theme }: { label: string; value: string; theme: ReturnType<typeof useTheme> }) {
+  return (
+    <View className="flex-1 rounded-2xl border px-3 py-3" style={{ backgroundColor: theme.surface, borderColor: theme.border }}>
+      <Text style={{ color: theme.textMuted }} className="text-xs font-semibold uppercase">{label}</Text>
+      <Text style={{ color: theme.text }} className="mt-1 text-sm font-semibold" numberOfLines={1}>{value}</Text>
+    </View>
+  );
+}
+
+function FieldLabel({ label, theme }: { label: string; theme: ReturnType<typeof useTheme> }) {
+  return <Text style={{ color: theme.textMuted }} className="text-xs font-semibold uppercase">{label}</Text>;
+}
+
+function ErrorText({ message, theme }: { message: string; theme: ReturnType<typeof useTheme> }) {
+  return <Text style={{ color: theme.error }} className="-mt-2 text-xs font-medium">{message}</Text>;
+}
+
+function ChoiceGroup<T extends string>({
+  label,
+  values,
+  selected,
+  onSelect,
+  labelFor,
+  primary,
+  theme,
+}: {
+  label: string;
+  values: readonly T[];
+  selected: string;
+  onSelect: (value: T | '') => void;
+  labelFor: (value: T) => string;
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+}) {
+  return (
+    <View className="gap-2">
+      <FieldLabel label={label} theme={theme} />
+      <View className="flex-row flex-wrap gap-2">
+        {values.map((value) => {
+          const selectedValue = selected === value;
+          return (
+            <HeroButton
+              key={value}
+              size="sm"
+              variant={selectedValue ? 'primary' : 'secondary'}
+              style={selectedValue ? { backgroundColor: primary } : undefined}
+              onPress={() => onSelect(selectedValue ? '' : value)}
+              accessibilityState={{ selected: selectedValue }}
+            >
+              <HeroButton.Label>{labelFor(value)}</HeroButton.Label>
+            </HeroButton>
+          );
+        })}
+      </View>
+    </View>
+  );
+}
+
+function inputStyle(theme: ReturnType<typeof useTheme>, invalid = false) {
+  return {
+    backgroundColor: theme.surface,
+    borderColor: invalid ? theme.error : theme.border,
+    borderRadius: 14,
+    borderWidth: 1,
+    color: theme.text,
+    fontSize: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 13,
+  };
+}
+
+function buildEnrichedDescription(
+  baseDescription: string,
+  details: { experience: string; equipment: string; accessibility: string },
+  t: (key: string) => string,
+) {
+  const detailLines = [
+    details.experience.trim() ? `${t('form.experienceLabel')}: ${formatExperienceDetail(details.experience.trim(), t)}` : '',
+    details.equipment.trim() ? `${t('form.equipmentLabel')}: ${formatEquipmentDetail(details.equipment.trim(), t)}` : '',
+    details.accessibility.trim() ? `${t('form.accessibilityLabel')}: ${details.accessibility.trim()}` : '',
+  ].filter(Boolean);
+
+  if (detailLines.length === 0) return baseDescription;
+  return `${baseDescription}\n\n---\n${detailLines.join('\n')}`.trim();
+}
+
+function formatExperienceDetail(value: string, t: (key: string) => string): string {
+  return experienceOptions.includes(value as ExperienceOption)
+    ? t(`form.${experienceLabelKeys[value as ExperienceOption]}`)
+    : value;
+}
+
+function formatEquipmentDetail(value: string, t: (key: string) => string): string {
+  return equipmentOptions.includes(value as EquipmentOption)
+    ? t(`form.${equipmentLabelKeys[value as EquipmentOption]}`)
+    : value;
+}
+
+function isGenericListingTitle(title: string, categoryName: string): boolean {
+  const normalizedTitle = title.trim().toLowerCase();
+  const normalizedCategory = categoryName.trim().toLowerCase();
+  if (!normalizedTitle || normalizedTitle.length < 3 || !normalizedCategory) return false;
+  const stripped = normalizedTitle
+    .replace(/^(i can help with|help with|looking for help with|need help with)\s+/i, '')
+    .trim();
+  return normalizedTitle === normalizedCategory || stripped === normalizedCategory;
+}
+
+function getProfileLocation(user: unknown): string {
+  if (user && typeof user === 'object' && 'location' in user) {
+    return String((user as { location?: string | null }).location ?? '');
+  }
+  return '';
 }

@@ -9,18 +9,19 @@ import { render, fireEvent, waitFor } from '@testing-library/react-native';
 // --- Mocks ---
 
 const mockLogin = jest.fn();
+const mockRouterPush = jest.fn();
 
 // Override expo-router mock so Link renders children as a Text node (queryable by text)
 jest.mock('expo-router', () => {
   const React = require('react');
   const { Text } = require('react-native');
   return {
-    useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }),
+    useRouter: () => ({ push: mockRouterPush, replace: jest.fn(), back: jest.fn() }),
     useSegments: () => ['(auth)'],
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Link: ({ children, style }: { children: React.ReactNode; style?: any }) =>
       React.createElement(Text, { style }, children),
-    router: { push: jest.fn(), replace: jest.fn(), back: jest.fn() },
+    router: { push: mockRouterPush, replace: jest.fn(), back: jest.fn() },
   };
 });
 
@@ -110,7 +111,7 @@ describe('LoginScreen', () => {
 
     // Note: Zod validates before onSubmit trims; use a valid email, verify lowercase normalisation
     fireEvent.changeText(getByPlaceholderText('you@example.com'), 'User@Example.COM');
-    fireEvent.changeText(getByPlaceholderText('••••••••'), 'mypassword');
+    fireEvent.changeText(getByPlaceholderText('Your password'), 'mypassword');
     fireEvent.press(getByText('Sign in'));
 
     await waitFor(() => expect(mockLogin).toHaveBeenCalledTimes(1));
@@ -125,7 +126,7 @@ describe('LoginScreen', () => {
     const { getByText, getByPlaceholderText, findByText } = render(<LoginScreen />);
 
     fireEvent.changeText(getByPlaceholderText('you@example.com'), 'user@example.com');
-    fireEvent.changeText(getByPlaceholderText('••••••••'), 'wrongpassword');
+    fireEvent.changeText(getByPlaceholderText('Your password'), 'wrongpassword');
     fireEvent.press(getByText('Sign in'));
 
     expect(await findByText('Invalid credentials')).toBeTruthy();
@@ -136,9 +137,25 @@ describe('LoginScreen', () => {
     const { getByText, getByPlaceholderText, findByText } = render(<LoginScreen />);
 
     fireEvent.changeText(getByPlaceholderText('you@example.com'), 'user@example.com');
-    fireEvent.changeText(getByPlaceholderText('••••••••'), 'somepassword');
+    fireEvent.changeText(getByPlaceholderText('Your password'), 'somepassword');
     fireEvent.press(getByText('Sign in'));
 
     expect(await findByText('Unable to sign in. Please try again.')).toBeTruthy();
+  });
+
+  it('opens the registration route from the create account action', () => {
+    const { getByLabelText } = render(<LoginScreen />);
+
+    fireEvent.press(getByLabelText('Create account'));
+
+    expect(mockRouterPush).toHaveBeenCalledWith('/register');
+  });
+
+  it('opens the community switcher from the switch community action', () => {
+    const { getByLabelText } = render(<LoginScreen />);
+
+    fireEvent.press(getByLabelText('Switch community'));
+
+    expect(mockRouterPush).toHaveBeenCalledWith('/select-tenant');
   });
 });

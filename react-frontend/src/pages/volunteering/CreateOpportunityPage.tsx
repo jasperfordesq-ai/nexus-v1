@@ -246,7 +246,7 @@ export default function CreateOpportunityPage() {
               onSelectionChange={(keys) => { const val = Array.from(keys)[0] as string; if (val) updateField('organization_id', val); }}
               isInvalid={!!errors.organization_id}
               errorMessage={errors.organization_id}
-              startContent={<Building2 className="w-4 h-4 text-theme-subtle" />}
+              startContent={<Building2 className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
               classNames={{
                 trigger: 'bg-theme-elevated border-theme-default',
                 label: 'text-theme-muted',
@@ -264,7 +264,7 @@ export default function CreateOpportunityPage() {
               label={t('form_org_label')}
               value={approvedOrgs[0]?.name ?? ''}
               isReadOnly
-              startContent={<Building2 className="w-4 h-4 text-theme-subtle" />}
+              startContent={<Building2 className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
               classNames={{
                 input: 'bg-transparent text-theme-primary',
                 inputWrapper: 'bg-theme-elevated border-theme-default',
@@ -280,7 +280,7 @@ export default function CreateOpportunityPage() {
             onChange={(e) => updateField('title', e.target.value)}
             isInvalid={!!errors.title}
             errorMessage={errors.title}
-            startContent={<Briefcase className="w-4 h-4 text-theme-subtle" />}
+            startContent={<Briefcase className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
             classNames={{
               input: 'bg-transparent text-theme-primary',
               inputWrapper: 'bg-theme-elevated border-theme-default',
@@ -333,7 +333,7 @@ export default function CreateOpportunityPage() {
             placeholder={t('form_skills_placeholder')}
             value={formData.skills_needed}
             onChange={(e) => updateField('skills_needed', e.target.value)}
-            startContent={<Wrench className="w-4 h-4 text-theme-subtle" />}
+            startContent={<Wrench className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
             classNames={{
               input: 'bg-transparent text-theme-primary',
               inputWrapper: 'bg-theme-elevated border-theme-default',
@@ -374,7 +374,7 @@ export default function CreateOpportunityPage() {
             <Button
               type="submit"
               className="flex-1 bg-gradient-to-r from-rose-500 to-pink-600 text-white"
-              startContent={<Save className="w-4 h-4" />}
+              startContent={<Save className="w-4 h-4" aria-hidden="true" />}
               isLoading={isSubmitting}
             >
               {t('form_submit_opportunity')}

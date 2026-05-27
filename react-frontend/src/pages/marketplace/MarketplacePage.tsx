@@ -341,7 +341,9 @@ export function MarketplacePage() {
 
             {/* All listings */}
             {isLoading ? (
-              <MarketplaceListingGridSkeleton />
+              <div role="status" aria-label={t('common.loading')} aria-busy="true">
+                <MarketplaceListingGridSkeleton />
+              </div>
             ) : error ? (
               <GlassCard className="p-8 text-center">
                 <p role="alert" className="text-danger mb-4">{error}</p>

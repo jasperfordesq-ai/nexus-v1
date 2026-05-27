@@ -26,6 +26,7 @@
     "retry": "Riprova"
   },
   "errors": {
+    "boundaryTitle": "Qualcosa è andato storto",
     "generic": "Qualcosa è andato storto. Riprova.",
     "network": "Errore di rete. Controlla la connessione.",
     "unauthorized": "La sessione è scaduta. Accedi di nuovo.",
@@ -44,5 +45,20 @@
     "friend": "lì",
     "you": "Tu"
   },
-  "endOfList": "Hai raggiunto la fine"
+  "endOfList": "Hai raggiunto la fine",
+  "aria": {
+    "actionButton": "Pulsante azione",
+    "verification_badges": "Etichette di verifica"
+  },
+  "verification": {
+    "not_id_verified": "ID non verificata",
+    "badge": {
+      "email_verified": "Email verificata",
+      "phone_verified": "Telefono verificato",
+      "id_verified": "ID verificata",
+      "dbs_checked": "DBS controllato",
+      "admin_verified": "Verificato dall'amministrazione",
+      "unknown": "Verificato"
+    }
+  }
 }

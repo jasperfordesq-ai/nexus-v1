@@ -8,6 +8,7 @@ import { Pressable, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from '@/lib/haptics';
 import Animated, { useSharedValue, useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import { useTranslation } from 'react-i18next';
 
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 
@@ -18,11 +19,13 @@ interface FABProps {
   onPress: () => void;
   color?: string;
   position?: 'bottom-right' | 'bottom-center';
+  accessibilityLabel?: string;
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-export default function FAB({ icon = 'add', onPress, color, position = 'bottom-right' }: FABProps) {
+export default function FAB({ icon = 'add', onPress, color, position = 'bottom-right', accessibilityLabel }: FABProps) {
+  const { t } = useTranslation('common');
   const primary = usePrimaryColor();
   const bgColor = color ?? primary;
   const scale = useSharedValue(1);
@@ -55,7 +58,7 @@ export default function FAB({ icon = 'add', onPress, color, position = 'bottom-r
         onPressOut={handlePressOut}
         onPress={handlePress}
         accessibilityRole="button"
-        accessibilityLabel="Action button"
+        accessibilityLabel={accessibilityLabel ?? t('aria.actionButton')}
         className="w-14 h-14 rounded-full items-center justify-center"
         style={[
           { backgroundColor: bgColor, elevation: 6, shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.27, shadowRadius: 4.65 },

@@ -6,6 +6,7 @@
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import * as Sentry from '@sentry/react-native';
+import i18n from 'i18next';
 
 interface Props {
   children: React.ReactNode;
@@ -23,6 +24,9 @@ interface State {
  * Uses hardcoded colors to guarantee it always renders.
  */
 function ErrorFallback({ onReset }: { onReset: () => void }) {
+  const title = i18n.t('errors.boundaryTitle', { ns: 'common' });
+  const retry = i18n.t('buttons.retry', { ns: 'common' });
+
   return (
     <View
       style={{
@@ -42,7 +46,7 @@ function ErrorFallback({ onReset }: { onReset: () => void }) {
           textAlign: 'center',
         }}
       >
-        Something went wrong
+        {title}
       </Text>
       <Pressable
         style={{
@@ -53,9 +57,9 @@ function ErrorFallback({ onReset }: { onReset: () => void }) {
         }}
         onPress={onReset}
         accessibilityRole="button"
-        accessibilityLabel="Retry"
+        accessibilityLabel={retry}
       >
-        <Text style={{ fontSize: 14, fontWeight: '600', color: '#fff' }}>Retry</Text>
+        <Text style={{ fontSize: 14, fontWeight: '600', color: '#fff' }}>{retry}</Text>
       </Pressable>
     </View>
   );

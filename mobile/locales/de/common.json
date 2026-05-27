@@ -26,6 +26,7 @@
     "retry": "Erneut versuchen"
   },
   "errors": {
+    "boundaryTitle": "Etwas ist schiefgelaufen",
     "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
     "network": "Netzwerkfehler. Bitte überprüfe deine Verbindung.",
     "unauthorized": "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.",
@@ -44,5 +45,20 @@
     "friend": "dort",
     "you": "Du"
   },
-  "endOfList": "Du hast das Ende erreicht"
+  "endOfList": "Du hast das Ende erreicht",
+  "aria": {
+    "actionButton": "Aktionsschaltfläche",
+    "verification_badges": "Verifizierungslabels"
+  },
+  "verification": {
+    "not_id_verified": "Ausweis nicht verifiziert",
+    "badge": {
+      "email_verified": "E-Mail verifiziert",
+      "phone_verified": "Telefon verifiziert",
+      "id_verified": "Ausweis verifiziert",
+      "dbs_checked": "DBS gepr?ft",
+      "admin_verified": "Von Admin verifiziert",
+      "unknown": "Verifiziert"
+    }
+  }
 }

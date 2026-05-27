@@ -633,7 +633,8 @@
     "load_more": "Carica altro",
     "aria_select_all": "Seleziona tutte le candidature in sospeso visibili",
     "aria_select_application": "Seleziona l'applicazione da {{name}}",
-    "aria_search_volunteers": "Cerca volontari per nome"
+    "aria_search_volunteers": "Cerca volontari per nome",
+    "filter_label": "Filter applications"
   },
   "org_wallet_balance": "Saldo del portafoglio:",
   "auto_pay_on": "Pagamento automatico attivato",

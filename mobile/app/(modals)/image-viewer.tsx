@@ -3,18 +3,13 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  Dimensions,
-  Pressable,
-  ScrollView,
-  Share,
-  StatusBar,
-  View,
-} from 'react-native';
+import { useEffect } from 'react';
+import { Dimensions, ScrollView, Share, StatusBar, View } from 'react-native';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Button as HeroButton, Surface } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 export default function ImageViewerScreen() {
@@ -33,8 +28,13 @@ export default function ImageViewerScreen() {
     router.back();
   }
 
+  useEffect(() => {
+    if (!uri) {
+      router.back();
+    }
+  }, [uri]);
+
   if (!uri) {
-    handleClose();
     return null;
   }
 
@@ -42,26 +42,30 @@ export default function ImageViewerScreen() {
     <View style={{ flex: 1, backgroundColor: '#000' }}>
       <StatusBar barStyle="light-content" />
       <SafeAreaView style={{ flex: 1 }}>
-        {/* Close button */}
-        <Pressable
-          style={{
-            position: 'absolute',
-            top: 8,
-            right: 16,
-            zIndex: 10,
-            width: 40,
-            height: 40,
-            borderRadius: 20,
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-          onPress={handleClose}
-          accessibilityLabel={t('imageViewer.close')}
-          accessibilityRole="button"
+        <Surface
+          variant="default"
+          className="absolute left-4 right-4 top-2 z-10 flex-row items-center justify-between rounded-panel-inner px-2 py-2"
+          style={{ backgroundColor: 'rgba(0,0,0,0.52)' }}
         >
-          <Ionicons name="close" size={28} color="#FFFFFF" />
-        </Pressable>
+          <HeroButton
+            isIconOnly
+            variant="secondary"
+            onPress={handleClose}
+            accessibilityLabel={t('imageViewer.close')}
+            style={{ backgroundColor: 'rgba(255,255,255,0.14)' }}
+          >
+            <Ionicons name="close" size={22} color="#FFFFFF" />
+          </HeroButton>
+          <HeroButton
+            isIconOnly
+            variant="secondary"
+            onPress={() => void handleShare()}
+            accessibilityLabel={t('imageViewer.share')}
+            style={{ backgroundColor: 'rgba(255,255,255,0.14)' }}
+          >
+            <Ionicons name="share-outline" size={20} color="#FFFFFF" />
+          </HeroButton>
+        </Surface>
 
         {/*
           Pinch-to-zoom via ScrollView:
@@ -95,24 +99,7 @@ export default function ImageViewerScreen() {
           />
         </ScrollView>
 
-        {/* Share button */}
-        <Pressable
-          style={{
-            alignSelf: 'center',
-            marginBottom: 16,
-            width: 48,
-            height: 48,
-            borderRadius: 24,
-            backgroundColor: 'rgba(255,255,255,0.2)',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-          onPress={handleShare}
-          accessibilityLabel={t('imageViewer.share')}
-          accessibilityRole="button"
-        >
-          <Ionicons name="share-outline" size={24} color="#FFFFFF" />
-        </Pressable>
+        <View className="pb-3" />
       </SafeAreaView>
     </View>
   );

@@ -29,7 +29,8 @@
     "title": "Gruppi Attivi",
     "subtitle": "Connettiti con membri affini",
     "members": "{{count}} membri",
-    "view_group": "Vedi Gruppo"
+    "view_group": "Vedi Gruppo",
+    "view_group_named": "View group: {{name}}"
   },
   "top_contributors": {
     "title": "Migliori Contributori",
@@ -100,7 +101,8 @@
     "votes": "{{count}} voti",
     "options": "{{count}} opzioni",
     "vote_now": "Vota Ora",
-    "closes": "Chiude il {{date}}"
+    "closes": "Chiude il {{date}}",
+    "vote_now_for": "Vote now on: {{question}}"
   },
   "in_demand_skills": {
     "title": "Competenze Richieste",

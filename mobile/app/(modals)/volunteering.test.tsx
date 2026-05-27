@@ -20,8 +20,46 @@ jest.mock('react-i18next', () => ({
     t: (key: string, opts?: Record<string, unknown>) => {
       const map: Record<string, string> = {
         'title': 'Volunteering',
+        'subtitle': 'Find opportunities and track your hours.',
+        'heroEyebrow': 'Community action',
         'searchPlaceholder': 'Search opportunities…',
+        'clearSearch': 'Clear search',
         'empty': 'No opportunities found.',
+        'stats.opportunities': 'Opportunities',
+        'stats.applications': 'Applications',
+        'stats.hours': 'Verified hours',
+        'tabs.opportunities': 'Opportunities',
+        'tabs.applications': 'My Applications',
+        'tabs.hours': 'My Hours',
+        'browseOrganisations': 'Browse organisations',
+        'viewOpportunity': 'View',
+        'apply': 'Apply',
+        'applyError': 'Could not apply.',
+        'signInRequiredTitle': 'Sign in required',
+        'signInRequiredMessage': 'Sign in to apply.',
+        'noDescription': 'No description.',
+        'deadlineShort': opts ? String(opts.date ?? '') : 'Deadline',
+        'tryAgain': 'Try again',
+        'noApplications': 'No applications yet.',
+        'withdraw': 'Withdraw',
+        'withdrawError': 'Could not withdraw.',
+        'appliedOn': opts ? `Applied ${String(opts.date ?? '')}` : 'Applied',
+        'applicationStatus.pending': 'Pending',
+        'applicationStatus.approved': 'Approved',
+        'applicationStatus.declined': 'Declined',
+        'logHours': 'Log hours',
+        'logHoursHint': 'Log your hours.',
+        'noLoggableOrganisations': 'No organisations.',
+        'hoursPlaceholder': 'Hours',
+        'hoursDescriptionPlaceholder': 'Description',
+        'submitHours': 'Submit hours',
+        'hoursRequired': 'Enter hours.',
+        'hoursLogError': 'Could not log hours.',
+        'byOrganisation': 'By organisation',
+        'hoursValue': opts ? `${String(opts.count ?? 0)}h` : '0h',
+        'hoursStats.verified': 'Verified',
+        'hoursStats.pending': 'Pending',
+        'hoursStats.declined': 'Declined',
         'remote': 'Remote',
         'status.open': 'Open',
         'status.filled': 'Filled',
@@ -29,6 +67,8 @@ jest.mock('react-i18next', () => ({
         'deadline': opts ? `Deadline: ${String(opts.date ?? '')}` : 'Deadline',
         'hoursPerWeek': opts ? `${String(opts.hours ?? 0)} hrs/week` : '0 hrs/week',
         'common:actions.retry': 'Retry',
+        'common:back': 'Back',
+        'common:errors.alertTitle': 'Error',
       };
       return map[key] ?? key;
     },
@@ -51,7 +91,18 @@ jest.mock('@/lib/hooks/useTheme', () => ({
     border: '#dddddd',
     borderSubtle: '#eeeeee',
     error: '#e53e3e',
+    success: '#16a34a',
+    warning: '#f59e0b',
   }),
+}));
+
+jest.mock('@/lib/hooks/useAuth', () => ({
+  useAuth: () => ({ isAuthenticated: true }),
+}));
+
+const mockUseApi = jest.fn();
+jest.mock('@/lib/hooks/useApi', () => ({
+  useApi: (...args: unknown[]) => mockUseApi(...args),
 }));
 
 const mockUsePaginatedApi = jest.fn();
@@ -70,9 +121,16 @@ jest.mock('@expo/vector-icons', () => ({
 
 jest.mock('@/lib/api/volunteering', () => ({
   getOpportunities: jest.fn(),
+  getMyApplications: jest.fn(),
+  getHoursSummary: jest.fn(),
+  getMyOrganisations: jest.fn(),
+  expressInterest: jest.fn().mockResolvedValue({}),
+  withdrawApplication: jest.fn().mockResolvedValue({}),
+  logVolunteerHours: jest.fn().mockResolvedValue({ data: {} }),
 }));
 
 jest.mock('@/components/ui/LoadingSpinner', () => () => null);
+jest.mock('@/components/ui/Avatar', () => 'View');
 
 // --- Tests ---
 
@@ -90,6 +148,12 @@ const defaultPaginatedState = {
 
 beforeEach(() => {
   mockUsePaginatedApi.mockReturnValue(defaultPaginatedState);
+  mockUseApi.mockReturnValue({
+    data: null,
+    isLoading: false,
+    error: null,
+    refresh: jest.fn(),
+  });
 });
 
 const mockOpportunity = {

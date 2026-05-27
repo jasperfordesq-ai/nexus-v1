@@ -3,55 +3,110 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
-  View,
-  Text,
-  ScrollView,
-  Pressable,
-  RefreshControl,
-  Share,
-  Alert,
-} from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Alert, Pressable, RefreshControl, ScrollView, Share, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, useNavigation, router } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
 import * as Haptics from '@/lib/haptics';
-import { Spinner } from 'heroui-native';
+import { Accordion, Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
 
-import { getMember } from '@/lib/api/members';
 import {
-  getConnectionStatus,
-  sendConnectionRequest,
+  getFederationConnectionStatus,
+  getFederationMember,
+  sendFederationConnectionRequest,
+  type FederatedConnectionStatus,
+} from '@/lib/api/federation';
+import {
   acceptConnection,
+  getConnectionStatus,
   removeConnection,
+  sendConnectionRequest,
   type ConnectionStatusType,
 } from '@/lib/api/connections';
 import { useApi } from '@/lib/hooks/useApi';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme } from '@/lib/hooks/useTheme';
+import { useTheme, type Theme } from '@/lib/hooks/useTheme';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
+import AppTopBar from '@/components/ui/AppTopBar';
 import { APP_URL } from '@/lib/constants';
+import VerificationBadgeRow from '@/components/verification/VerificationBadgeRow';
+import {
+  getMember,
+  getMemberListings,
+  getMemberReviews,
+  type MemberReview,
+} from '@/lib/api/members';
+import type { Exchange } from '@/lib/api/exchanges';
+import {
+  getBadges,
+  getGamificationProfile,
+  type Badge,
+  type GamificationProfile,
+} from '@/lib/api/gamification';
 
-/** Extended member shape returned by the single-member endpoint */
 interface MemberProfile {
-  id: number;
-  name: string;
-  bio: string | null;
-  avatar_url: string | null;
+  id: number | string;
+  name?: string;
+  first_name?: string;
+  last_name?: string;
+  bio?: string | null;
+  avatar?: string | null;
+  avatar_url?: string | null;
   location: string | null;
-  time_balance: number;
-  skills: string[];
-  joined_at: string;
-  last_active_at: string | null;
+  time_balance?: number;
+  skills?: string[];
+  joined_at?: string;
+  last_active_at?: string | null;
   total_hours_given?: number;
   total_hours_received?: number;
+  groups_count?: number;
+  events_attended?: number;
+  stats?: {
+    listings_count?: number;
+  };
   rating?: number | null;
   is_verified?: boolean;
+  tenant_id?: number | string;
+  tenant_name?: string;
+  timebank?: {
+    id: number | string;
+    name: string;
+  };
+  service_reach?: string | null;
+  messaging_enabled?: boolean;
+  transactions_enabled?: boolean;
+  reputation_score?: number;
+  reputation_count?: number;
+  connection_status?: FederatedConnectionStatus;
+  listings?: Array<{
+    id: number | string;
+    title: string;
+    type?: string | null;
+    category_name?: string | null;
+    description?: string | null;
+    image_url?: string | null;
+    hours_estimate?: number | null;
+    estimated_hours?: number | null;
+  }>;
+  reviews?: MemberReview[];
+  achievements?: MemberAchievements;
+}
+
+type TFunction = (key: string, options?: Record<string, unknown>) => string;
+type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
+type MemberBadge = Badge & {
+  badge_key?: string;
+  earned?: boolean;
+};
+
+interface MemberAchievements {
+  profile: GamificationProfile | null;
+  badges: MemberBadge[];
 }
 
 export default function MemberProfileScreen() {
@@ -63,26 +118,29 @@ export default function MemberProfileScreen() {
 }
 
 function MemberProfileScreenInner() {
-  const { t } = useTranslation('members');
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { t } = useTranslation(['members', 'federation', 'common']);
+  const { id, tenant_id: tenantIdParam } = useLocalSearchParams<{ id?: string; tenant_id?: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
-  const navigation = useNavigation();
   const { user } = useAuth();
 
-  const memberId = Number(id);
-  const safeMemberId = isNaN(memberId) || memberId <= 0 ? 0 : memberId;
-  const isOwnProfile = user?.id === safeMemberId;
+  const routeMemberId = Number(id);
+  const authMemberId = Number(user?.id);
+  const memberId = Number.isFinite(routeMemberId) && routeMemberId > 0 ? routeMemberId : authMemberId;
+  const safeMemberId = Number.isFinite(memberId) && memberId > 0 ? memberId : 0;
+  const routeTenantId = Number(tenantIdParam);
+  const authTenantId = Number(user?.tenant_id);
+  const safeTenantId = Number.isFinite(routeTenantId) && routeTenantId > 0 ? routeTenantId : null;
+  const isFederatedProfile = safeTenantId !== null && (!Number.isFinite(authTenantId) || safeTenantId !== authTenantId);
+  const isOwnProfile = !isFederatedProfile && user?.id === safeMemberId;
 
   const { data, isLoading, error, refresh } = useApi(
-    () => getMember(safeMemberId),
-    [safeMemberId],
+    () => loadMemberProfileData(safeMemberId, safeTenantId, isFederatedProfile),
+    [safeMemberId, safeTenantId, isFederatedProfile],
     { enabled: safeMemberId > 0 },
   );
 
-  const member = data?.data as MemberProfile | undefined;
-
-  // Connection status
+  const member = useMemo(() => normalizeMember(data?.data as MemberProfile | undefined), [data]);
   const [connStatus, setConnStatus] = useState<ConnectionStatusType>('none');
   const [connId, setConnId] = useState<number | null>(null);
   const [connLoading, setConnLoading] = useState(false);
@@ -92,29 +150,45 @@ function MemberProfileScreenInner() {
     if (!safeMemberId || isOwnProfile) return;
     setConnLoading(true);
     try {
-      const res = await getConnectionStatus(safeMemberId);
-      setConnStatus(res.data.status);
-      setConnId(res.data.connection_id);
+      if (isFederatedProfile && safeTenantId) {
+        const res = await getFederationConnectionStatus(safeMemberId, safeTenantId);
+        setConnStatus(mapFederatedConnectionStatus(res.data));
+        setConnId(res.data.connection_id);
+      } else {
+        const res = await getConnectionStatus(safeMemberId);
+        setConnStatus(res.data.status);
+        setConnId(res.data.connection_id);
+      }
     } catch {
-      // Silently fail — connection status is non-critical
+      // Non-critical; the profile itself should remain usable.
     } finally {
       setConnLoading(false);
     }
-  }, [safeMemberId, isOwnProfile]);
+  }, [safeMemberId, safeTenantId, isOwnProfile, isFederatedProfile]);
 
   useEffect(() => {
     if (member) {
+      if (isFederatedProfile && member.connection_status) {
+        setConnStatus(mapFederatedConnectionStatus(member.connection_status));
+        setConnId(member.connection_status.connection_id);
+        return;
+      }
       void loadConnectionStatus();
     }
-  }, [member, loadConnectionStatus]);
+  }, [member, isFederatedProfile, loadConnectionStatus]);
 
   async function handleConnect() {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setConnActionLoading(true);
     try {
-      const res = await sendConnectionRequest(safeMemberId);
+      if (isFederatedProfile && safeTenantId) {
+        const res = await sendFederationConnectionRequest(safeMemberId, safeTenantId);
+        setConnId(res.data.connection_id ?? null);
+      } else {
+        const res = await sendConnectionRequest(safeMemberId);
+        setConnId(res.data.connection_id);
+      }
       setConnStatus('pending_sent');
-      setConnId(res.data.connection_id);
     } catch {
       Alert.alert(t('profile.connectionError'));
     } finally {
@@ -179,258 +253,946 @@ function MemberProfileScreenInner() {
     );
   }
 
-  useEffect(() => {
-    if (member?.name) {
-      navigation.setOptions({ title: member.name });
-    }
-  }, [member?.name, navigation]);
-
   async function handleShare() {
     if (!member) return;
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     try {
       await Share.share({
-        message: `${member.name} — ${APP_URL}/members/${member.id}`,
+        message: t('profile.shareMessage', { name: getMemberDisplayName(member), url: `${APP_URL}/members/${member.id}` }),
       });
-    } catch { /* ignore */ }
+    } catch {
+      // Native share cancellation is not an error state.
+    }
   }
 
-  if (isNaN(memberId) || memberId <= 0) {
+  if (safeMemberId <= 0) {
     return (
-      <SafeAreaView className="flex-1 justify-center items-center px-10">
-        <Text className="text-sm font-medium text-danger text-center">{t('common:errors.notFound')}</Text>
-        <Pressable onPress={() => router.back()} style={{ marginTop: 12 }}>
-          <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>{t('common:buttons.back')}</Text>
-        </Pressable>
-      </SafeAreaView>
+      <ScreenShell t={t} title={t('profileTitle')}>
+        <CenteredState icon="alert-circle-outline" color={theme.error} text={t('profile.signInRequired')} />
+      </ScreenShell>
     );
   }
 
   if (isLoading && !data) {
     return (
-      <SafeAreaView className="flex-1 justify-center items-center px-10">
-        <LoadingSpinner />
-      </SafeAreaView>
+      <ScreenShell t={t} title={t('profileTitle')}>
+        <View className="flex-1 items-center justify-center">
+          <LoadingSpinner />
+        </View>
+      </ScreenShell>
     );
   }
 
   if (error || !member) {
     return (
-      <SafeAreaView className="flex-1 justify-center items-center px-10">
-        <Text className="text-sm font-medium text-danger text-center">{t('profile.loadError')}</Text>
-        <Pressable onPress={() => router.back()} style={{ marginTop: 12 }}>
-          <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>{t('common:buttons.back')}</Text>
-        </Pressable>
-      </SafeAreaView>
+      <ScreenShell t={t} title={t('profileTitle')}>
+        <CenteredState icon="warning-outline" color={theme.error} text={t('profile.loadError')}>
+          <HeroButton variant="primary" onPress={() => void refresh()} style={{ backgroundColor: primary }}>
+            <HeroButton.Label>{t('common:buttons.retry')}</HeroButton.Label>
+          </HeroButton>
+        </CenteredState>
+      </ScreenShell>
     );
   }
 
+  const bio = stripHtml(member.bio);
+  const displayName = getMemberDisplayName(member) || t('federation:directory.members.memberFallback');
+  const communityName = member.timebank?.name ?? member.tenant_name;
+  const totalGiven = member.total_hours_given ?? member.time_balance ?? 0;
+  const totalReceived = member.total_hours_received ?? 0;
+  const totalExchanged = totalGiven + totalReceived;
+  const activeListings = member.stats?.listings_count ?? member.listings?.length ?? 0;
+  const groupsCount = member.groups_count ?? 0;
+  const eventsAttended = member.events_attended ?? 0;
+
   return (
-    <SafeAreaView className="flex-1 bg-surface">
+    <SafeAreaView className="flex-1 bg-background">
+      <AppTopBar
+        title={isOwnProfile ? t('profile.myProfile') : isFederatedProfile ? t('federation:directory.members.title') : t('profileTitle')}
+        backLabel={t('common:buttons.back')}
+        fallbackHref={(isFederatedProfile ? '/(modals)/federation-members' : '/(modals)/members') as Href}
+        rightAction={
+          isOwnProfile
+            ? { accessibilityLabel: t('profile.editProfile'), icon: 'create-outline', onPress: openEditProfile }
+            : { accessibilityLabel: t('share'), icon: 'share-outline', onPress: handleShare }
+        }
+      />
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 24 }}
-        refreshControl={
-          <RefreshControl refreshing={isLoading} onRefresh={() => void refresh()} tintColor={primary} colors={[primary]} />
-        }
+        contentContainerStyle={{ paddingBottom: 96 }}
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={() => void refresh()} tintColor={primary} colors={[primary]} />}
       >
-
-        {/* Avatar + identity */}
-        <View className="items-center pt-6 px-6 pb-4 gap-2">
-          <Avatar uri={member.avatar_url} name={member.name} size={80} />
-
-          <Pressable
-            onPress={() => void handleShare()}
-            style={{ position: 'absolute', top: 24, right: 24, padding: 4 }}
-            accessibilityLabel={t('profile.share')}
-            accessibilityRole="button"
-          >
-            <Ionicons name="share-outline" size={22} color={primary} />
-          </Pressable>
-
-          <View className="flex-row items-center gap-2 flex-wrap justify-center">
-            <Text className="text-xl font-bold text-foreground text-center">{member.name}</Text>
-            {member.is_verified && (
-              <View className="bg-success/10 rounded-xl px-[10px] py-[3px]">
-                <Text className="text-xs text-success font-semibold">{t('profile.verified')}</Text>
-              </View>
-            )}
-          </View>
-
-          {member.rating != null && (
-            <Text style={{ fontSize: 16, color: theme.warning, fontWeight: '600' }}>{member.rating.toFixed(1)} ★</Text>
-          )}
-
-          {member.bio && (
-            <Text className="text-sm font-medium text-muted-foreground text-center">{member.bio}</Text>
-          )}
-
-          {member.location && (
-            <Text className="text-xs text-muted-foreground">{member.location}</Text>
-          )}
-        </View>
-
-        {/* Stats row */}
-        <View className="flex-row mx-6 mt-2 mb-4 border border-border rounded-xl overflow-hidden">
-          <View className="flex-1 items-center py-4">
-            <Text className="text-2xl font-bold" style={{ color: primary }}>
-              {(member.total_hours_given ?? member.time_balance ?? 0).toFixed(0)}
-            </Text>
-            <Text className="text-xs text-muted-foreground mt-0.5">{t('profile.hoursGiven')}</Text>
-          </View>
-          <View className="w-px bg-border" />
-          <View className="flex-1 items-center py-4">
-            <Text className="text-2xl font-bold" style={{ color: primary }}>
-              {(member.total_hours_received ?? 0).toFixed(0)}
-            </Text>
-            <Text className="text-xs text-muted-foreground mt-0.5">{t('profile.hoursReceived')}</Text>
-          </View>
-        </View>
-
-        {/* Connection actions */}
-        {!isOwnProfile && !connLoading && (
-          <View className="flex-row justify-center items-center px-6 mb-4">
-            {connStatus === 'none' && (
-              <Pressable
-                className="flex-row items-center justify-center gap-2 border-[1.5px] rounded-xl py-[10px] px-6"
-                style={{ borderColor: primary }}
-                disabled={connActionLoading}
-                accessibilityLabel={t('profile.connect')}
-                accessibilityRole="button"
-                onPress={() => void handleConnect()}
-              >
-                {connActionLoading ? (
-                  <Spinner size="sm" />
-                ) : (
-                  <>
-                    <Ionicons name="person-add-outline" size={18} color={primary} />
-                    <Text className="text-sm font-semibold" style={{ color: primary }}>{t('profile.connect')}</Text>
-                  </>
-                )}
-              </Pressable>
-            )}
-
-            {connStatus === 'pending_sent' && (
-              <View className="flex-row items-center gap-2 bg-border/50 rounded-xl py-3 px-5">
-                <Ionicons name="time-outline" size={16} color={theme.textMuted} />
-                <Text className="text-sm font-medium text-muted-foreground">{t('profile.pendingSent')}</Text>
-              </View>
-            )}
-
-            {connStatus === 'pending_received' && (
-              <View className="flex-row gap-3">
-                <Pressable
-                  className="rounded-xl py-[10px] px-6 justify-center items-center"
-                  style={{ backgroundColor: primary }}
-                  disabled={connActionLoading}
-                  accessibilityLabel={t('profile.accept')}
-                  accessibilityRole="button"
-                  onPress={() => void handleAccept()}
-                >
-                  {connActionLoading ? (
-                    <Spinner size="sm" />
-                  ) : (
-                    <Text className="text-sm font-semibold text-white">{t('profile.accept')}</Text>
-                  )}
-                </Pressable>
-                <Pressable
-                  className="border-[1.5px] border-border rounded-xl py-[10px] px-6 justify-center items-center"
-                  disabled={connActionLoading}
-                  accessibilityLabel={t('profile.decline')}
-                  accessibilityRole="button"
-                  onPress={() => void handleDecline()}
-                >
-                  <Text className="text-sm font-semibold text-muted-foreground">{t('profile.decline')}</Text>
-                </Pressable>
-              </View>
-            )}
-
-            {connStatus === 'connected' && (
-              <Pressable
-                className="flex-row items-center gap-[6px] bg-success/10 rounded-xl py-[10px] px-5"
-                accessibilityLabel={t('profile.connected')}
-                accessibilityRole="button"
-                onPress={handleDisconnect}
-              >
-                <Ionicons name="checkmark-circle" size={18} color={theme.success} />
-                <Text className="text-sm font-semibold text-success">{t('profile.connected')}</Text>
-              </Pressable>
-            )}
-          </View>
-        )}
-
-        {/* Skills */}
-        <View className="px-6 mb-4">
-          <Text className="text-sm font-semibold text-foreground mb-[10px]">{t('profile.skills')}</Text>
-          {(member.skills?.length ?? 0) > 0 ? (
-            <View className="flex-row flex-wrap gap-2">
-              {member.skills.map((skill) => (
-                <View key={skill} className="border rounded-lg px-3 py-1" style={{ borderColor: primary }}>
-                  <Text className="text-xs font-medium" style={{ color: primary }}>{skill}</Text>
+        <View className="px-4">
+          <HeroCard variant="default" className="overflow-hidden">
+            <View className="h-1 w-full" style={{ backgroundColor: primary }} />
+            <HeroCard.Body className="items-center gap-4 px-5 py-6">
+              <Avatar uri={member.avatar_url ?? member.avatar ?? null} name={displayName} size={96} />
+              {isFederatedProfile ? (
+                <Chip size="sm" variant="soft" color="accent">
+                  <Ionicons name="globe-outline" size={12} color={primary} />
+                  <Chip.Label>{t('profile.federatedMember')}</Chip.Label>
+                </Chip>
+              ) : null}
+              <View className="items-center gap-2">
+                <View className="flex-row flex-wrap items-center justify-center gap-2">
+                  <Text className="text-center text-2xl font-bold leading-8" style={{ color: theme.text }}>
+                    {displayName}
+                  </Text>
                 </View>
-              ))}
+                <VerificationBadgeRow userId={member.id} showUnverified disabled={isFederatedProfile} />
+
+                <View className="flex-row flex-wrap justify-center gap-2">
+                  {member.rating != null ? (
+                    <Chip size="sm" variant="soft" color="warning">
+                      <Ionicons name="star" size={12} color={theme.warning} />
+                      <Chip.Label>{member.rating.toFixed(1)}</Chip.Label>
+                    </Chip>
+                  ) : null}
+                  {member.location ? (
+                    <Chip size="sm" variant="soft" color="default">
+                      <Ionicons name="location-outline" size={12} color={theme.textMuted} />
+                      <Chip.Label>{member.location}</Chip.Label>
+                    </Chip>
+                  ) : null}
+                  {communityName ? (
+                    <Chip size="sm" variant="soft" color="accent">
+                      <Ionicons name="business-outline" size={12} color={primary} />
+                      <Chip.Label>{communityName}</Chip.Label>
+                    </Chip>
+                  ) : null}
+                </View>
+              </View>
+
+              {bio ? (
+                <Text className="text-center text-sm leading-5" style={{ color: theme.textSecondary }}>
+                  {bio}
+                </Text>
+              ) : (
+                <Text className="text-center text-sm italic leading-5" style={{ color: theme.textSecondary }}>
+                  {isOwnProfile ? t('profile.noBioOwn') : t('profile.noBio')}
+                </Text>
+              )}
+            </HeroCard.Body>
+          </HeroCard>
+
+          {isOwnProfile ? (
+            <HeroCard variant="secondary" className="mt-3">
+              <HeroCard.Body className="gap-3 px-4 py-4">
+                <SectionTitle icon="person-circle-outline" title={t('profile.myProfile')} primary={primary} theme={theme} />
+                <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+                  {t('profile.ownProfileHint')}
+                </Text>
+                <View className="flex-row gap-2">
+                  <HeroButton className="flex-1" variant="primary" style={{ backgroundColor: primary }} onPress={openEditProfile}>
+                    <Ionicons name="create-outline" size={18} color="#fff" />
+                    <HeroButton.Label>{t('profile.editProfile')}</HeroButton.Label>
+                  </HeroButton>
+                  <HeroButton className="flex-1" variant="secondary" onPress={handleShare}>
+                    <Ionicons name="share-outline" size={18} color={primary} />
+                    <HeroButton.Label>{t('share')}</HeroButton.Label>
+                  </HeroButton>
+                </View>
+              </HeroCard.Body>
+            </HeroCard>
+          ) : null}
+
+          {isFederatedProfile ? (
+            <HeroCard variant="secondary" className="mt-3">
+              <HeroCard.Body className="gap-3 px-4 py-4">
+                <SectionTitle icon="globe-outline" title={t('profile.federatedProfile')} primary={primary} theme={theme} />
+                <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+                  {t('profile.federatedProfileHint', { community: communityName ?? t('federation:directory.unknownCommunity') })}
+                </Text>
+                <View className="flex-row flex-wrap gap-2">
+                  {member.service_reach ? (
+                    <Chip size="sm" variant="soft" color="accent">
+                      <Ionicons name={reachIcon(member.service_reach)} size={12} color={primary} />
+                      <Chip.Label>{t(`federation:directory.members.reach.${member.service_reach}`)}</Chip.Label>
+                    </Chip>
+                  ) : null}
+                  {member.messaging_enabled ? (
+                    <Chip size="sm" variant="soft" color="success">
+                      <Ionicons name="chatbubble-outline" size={12} color={theme.success} />
+                      <Chip.Label>{t('profile.federatedMessaging')}</Chip.Label>
+                    </Chip>
+                  ) : null}
+                  {member.transactions_enabled ? (
+                    <Chip size="sm" variant="soft" color="warning">
+                      <Ionicons name="swap-horizontal-outline" size={12} color={theme.warning} />
+                      <Chip.Label>{t('profile.federatedExchanges')}</Chip.Label>
+                    </Chip>
+                  ) : null}
+                </View>
+              </HeroCard.Body>
+            </HeroCard>
+          ) : null}
+
+          <View className="mt-3 gap-3">
+            <View className="flex-row gap-3">
+              <StatCard value={Math.round(totalGiven)} label={t('profile.hoursGiven')} icon="arrow-up-outline" primary={primary} theme={theme} />
+              <StatCard value={Math.round(totalReceived)} label={t('profile.hoursReceived')} icon="arrow-down-outline" primary={primary} theme={theme} />
+              <StatCard value={Math.round(totalExchanged)} label={t('profile.totalHours')} icon="swap-horizontal-outline" primary={primary} theme={theme} />
             </View>
-          ) : (
-            <Text className="text-xs text-muted-foreground italic">{t('profile.noSkills')}</Text>
-          )}
+            <View className="flex-row gap-3">
+              <StatCard value={activeListings} label={t('profile.activeListings')} icon="list-outline" primary={primary} theme={theme} />
+              <StatCard value={groupsCount} label={t('profile.groups')} icon="people-outline" primary={primary} theme={theme} />
+              <StatCard value={eventsAttended} label={t('profile.events')} icon="calendar-outline" primary={primary} theme={theme} />
+            </View>
+          </View>
+
+          {!isOwnProfile && !connLoading && connStatus !== 'none' ? (
+            <ConnectionActions
+              t={t}
+              primary={primary}
+              theme={theme}
+              status={connStatus}
+              isLoading={connActionLoading}
+              onConnect={handleConnect}
+              onAccept={handleAccept}
+              onDecline={handleDecline}
+              onDisconnect={handleDisconnect}
+            />
+          ) : null}
+
+          <HeroCard variant="secondary" className="mt-3">
+            <HeroCard.Body className="gap-3 px-4 py-4">
+              <SectionTitle icon="sparkles-outline" title={t('profile.skills')} primary={primary} theme={theme} />
+              {(member.skills?.length ?? 0) > 0 ? (
+                <View className="flex-row flex-wrap gap-2">
+                  {(member.skills ?? []).map((skill) => (
+                    <Chip key={skill} size="sm" variant="soft" color="accent">
+                      <Chip.Label>{skill}</Chip.Label>
+                    </Chip>
+                  ))}
+                </View>
+              ) : (
+                <Text className="text-sm italic" style={{ color: theme.textSecondary }}>{t('profile.noSkills')}</Text>
+              )}
+            </HeroCard.Body>
+          </HeroCard>
+
+          <TrustSummaryCard memberId={member.id} isFederatedProfile={isFederatedProfile} primary={primary} theme={theme} t={t} />
+
+          <AchievementsAccordion
+            achievements={member.achievements}
+            isOwnProfile={isOwnProfile}
+            isFederatedProfile={isFederatedProfile}
+            primary={primary}
+            theme={theme}
+            t={t}
+          />
+
+          <ListingsSection
+            listings={member.listings ?? []}
+            isFederatedProfile={isFederatedProfile}
+            primary={primary}
+            theme={theme}
+            t={t}
+          />
+
+          <ReviewsSection reviews={member.reviews ?? []} rating={member.rating} primary={primary} theme={theme} t={t} />
+
+          <HeroCard variant="secondary" className="mt-3">
+            <HeroCard.Body className="gap-3 px-4 py-4">
+              <SectionTitle icon="information-circle-outline" title={t('profile.about')} primary={primary} theme={theme} />
+              {member.joined_at ? (
+                <InfoRow icon="calendar-outline" label={t('profile.memberSince', { date: formatDate(member.joined_at) })} theme={theme} />
+              ) : null}
+              {member.last_active_at ? (
+                <InfoRow icon="pulse-outline" label={t('profile.lastActive', { date: formatDate(member.last_active_at) })} theme={theme} />
+              ) : null}
+              {member.location ? <InfoRow icon="location-outline" label={member.location} theme={theme} /> : null}
+            </HeroCard.Body>
+          </HeroCard>
         </View>
-
-        {/* Member since */}
-        {member.joined_at ? (
-          <Text className="text-xs text-muted-foreground text-center px-6">
-            {t('profile.memberSince', { date: formatDate(member.joined_at) })}
-          </Text>
-        ) : null}
-
       </ScrollView>
 
-      {/* Footer actions */}
-      <View className="p-4 border-t border-border bg-surface">
-        <View className="flex-row gap-3 items-center">
-          {!isOwnProfile && connStatus !== 'connected' && connStatus !== 'pending_sent' && (
-            <Pressable
-              className="flex-row items-center justify-center gap-[6px] h-12 border-[1.5px] rounded-xl px-4"
-              style={{ borderColor: primary }}
-              disabled={connActionLoading}
-              accessibilityLabel={t('profile.connect')}
-              accessibilityRole="button"
-              onPress={() => void handleConnect()}
+      <Surface variant="default" className="absolute bottom-0 left-0 right-0 border-t border-border p-4">
+        <View className="flex-row items-center gap-3">
+          {isOwnProfile ? (
+            <HeroButton
+              className="flex-1"
+              variant="primary"
+              style={{ backgroundColor: primary }}
+              accessibilityLabel={t('profile.editProfile')}
+              onPress={openEditProfile}
             >
-              {connActionLoading ? (
-                <Spinner size="sm" />
-              ) : (
-                <>
-                  <Ionicons name="person-add-outline" size={18} color={primary} />
-                  <Text className="text-sm font-semibold" style={{ color: primary }}>{t('profile.connect')}</Text>
-                </>
-              )}
-            </Pressable>
-          )}
-          <Pressable
-            className="flex-1 h-12 rounded-xl justify-center items-center"
-            style={{ backgroundColor: primary }}
-            accessibilityLabel={t('profile.sendMessage')}
-            accessibilityRole="button"
-            onPress={() => {
-              void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              router.push({
-                pathname: '/(modals)/thread',
-                params: { recipientId: String(member.id), name: member.name },
-              });
-            }}
-          >
-            <Text className="text-base font-semibold text-white">{t('profile.sendMessage')}</Text>
-          </Pressable>
+              <Ionicons name="create-outline" size={18} color="#fff" />
+              <HeroButton.Label>{t('profile.editProfile')}</HeroButton.Label>
+            </HeroButton>
+          ) : null}
+          {!isOwnProfile && connStatus !== 'connected' && connStatus !== 'pending_sent' ? (
+            <HeroButton variant="secondary" isDisabled={connActionLoading} accessibilityLabel={t('profile.connect')} onPress={() => void handleConnect()}>
+              {connActionLoading ? <Spinner size="sm" /> : <Ionicons name="person-add-outline" size={18} color={primary} />}
+              <HeroButton.Label>{t('profile.connect')}</HeroButton.Label>
+            </HeroButton>
+          ) : null}
+          {!isOwnProfile ? (
+            <HeroButton
+              className="flex-1"
+              variant="primary"
+              style={{ backgroundColor: primary }}
+              accessibilityLabel={t('profile.sendMessage')}
+              onPress={() => {
+                void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                if (isFederatedProfile) {
+                  router.push({
+                    pathname: '/(modals)/federation-messages',
+                    params: { compose: 'true', to_user: String(member.id), to_tenant: String(member.timebank?.id ?? member.tenant_id ?? '') },
+                  } as unknown as Href);
+                  return;
+                }
+                router.push({ pathname: '/(modals)/thread', params: { recipientId: String(member.id), name: displayName } });
+              }}
+            >
+              <Ionicons name="chatbubble-outline" size={18} color="#fff" />
+              <HeroButton.Label>{t('profile.sendMessage')}</HeroButton.Label>
+            </HeroButton>
+          ) : null}
         </View>
+      </Surface>
+    </SafeAreaView>
+  );
+}
+
+async function loadMemberProfileData(
+  memberId: number,
+  tenantId: number | null,
+  isFederatedProfile: boolean,
+): Promise<{ data: MemberProfile }> {
+  if (isFederatedProfile) {
+    return getFederationMember(memberId, tenantId ?? undefined) as Promise<{ data: MemberProfile }>;
+  }
+
+  const [profileRes, listingsRes, reviewsRes, achievementsRes, badgesRes] = await Promise.all([
+    getMember(memberId) as Promise<{ data: MemberProfile }>,
+    getMemberListings(memberId, 6).catch(() => ({ data: [] as Exchange[] })),
+    getMemberReviews(memberId, 6).catch(() => ({ data: [] as MemberReview[] })),
+    getGamificationProfile(memberId).catch(() => ({ data: null as GamificationProfile | null })),
+    getBadges(memberId).catch(() => ({ data: [] as MemberBadge[] })),
+  ]);
+
+  return {
+    data: {
+      ...profileRes.data,
+      listings: listingsRes.data ?? [],
+      reviews: reviewsRes.data ?? [],
+      achievements: {
+        profile: achievementsRes.data,
+        badges: badgesRes.data ?? [],
+      },
+    },
+  };
+}
+
+function openEditProfile() {
+  void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  router.push('/(modals)/edit-profile');
+}
+
+function normalizeMember(member: MemberProfile | undefined): MemberProfile | undefined {
+  if (!member) return undefined;
+  const name = getMemberDisplayName(member);
+  return {
+    ...member,
+    name,
+    avatar_url: member.avatar_url ?? member.avatar ?? null,
+    skills: Array.isArray(member.skills) ? member.skills.filter(Boolean) : [],
+  };
+}
+
+function getMemberDisplayName(member: MemberProfile): string {
+  return (
+    member.name?.trim() ||
+    `${member.first_name ?? ''} ${member.last_name ?? ''}`.trim() ||
+    ''
+  );
+}
+
+function mapFederatedConnectionStatus(status: FederatedConnectionStatus): ConnectionStatusType {
+  if (status.status === 'accepted') return 'connected';
+  if (status.status === 'pending') {
+    return status.direction === 'incoming' ? 'pending_received' : 'pending_sent';
+  }
+  return 'none';
+}
+
+function reachIcon(reach: string): IoniconName {
+  if (reach === 'remote_ok') return 'wifi-outline';
+  if (reach === 'travel_ok') return 'car-outline';
+  return 'home-outline';
+}
+
+function ScreenShell({ t, title, children }: { t: TFunction; title: string; children: React.ReactNode }) {
+  return (
+    <SafeAreaView className="flex-1 bg-background">
+      <AppTopBar title={title} backLabel={t('common:buttons.back')} fallbackHref="/(modals)/members" />
+      <View className="px-4">
+      {children}
       </View>
     </SafeAreaView>
   );
 }
 
+function CenteredState({ icon, color, text, children }: { icon: IoniconName; color: string; text: string; children?: React.ReactNode }) {
+  return (
+    <HeroCard variant="secondary" className="my-8">
+      <HeroCard.Body className="items-center gap-4">
+        <Ionicons name={icon} size={34} color={color} />
+        <Text className="text-center text-sm font-medium text-muted-foreground">{text}</Text>
+        {children}
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function SectionTitle({ icon, title, primary, theme }: { icon: IoniconName; title: string; primary: string; theme: Theme }) {
+  return (
+    <View className="flex-row items-center gap-2">
+      <Ionicons name={icon} size={18} color={primary} />
+      <Text className="text-base font-semibold" style={{ color: theme.text }}>{title}</Text>
+    </View>
+  );
+}
+
+function StatCard({ value, label, icon, primary, theme }: { value: number; label: string; icon: IoniconName; primary: string; theme: Theme }) {
+  return (
+    <HeroCard variant="secondary" className="flex-1">
+      <HeroCard.Body className="items-center gap-1 px-2 py-3">
+        <Ionicons name={icon} size={16} color={primary} />
+        <Text className="text-xl font-bold" style={{ color: primary }}>{value}</Text>
+        <Text className="text-center text-[11px] leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>{label}</Text>
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function ConnectionActions({
+  t,
+  primary,
+  theme,
+  status,
+  isLoading,
+  onConnect,
+  onAccept,
+  onDecline,
+  onDisconnect,
+}: {
+  t: TFunction;
+  primary: string;
+  theme: Theme;
+  status: ConnectionStatusType;
+  isLoading: boolean;
+  onConnect: () => Promise<void>;
+  onAccept: () => Promise<void>;
+  onDecline: () => Promise<void>;
+  onDisconnect: () => void;
+}) {
+  if (status === 'none') {
+    return (
+      <HeroCard variant="secondary" className="mt-3">
+        <HeroCard.Body className="gap-3 px-4 py-4">
+          <SectionTitle icon="person-add-outline" title={t('profile.connect')} primary={primary} theme={theme} />
+          <HeroButton variant="secondary" isDisabled={isLoading} onPress={() => void onConnect()}>
+            {isLoading ? <Spinner size="sm" /> : <Ionicons name="person-add-outline" size={18} color={primary} />}
+            <HeroButton.Label>{t('profile.connect')}</HeroButton.Label>
+          </HeroButton>
+        </HeroCard.Body>
+      </HeroCard>
+    );
+  }
+
+  if (status === 'pending_sent') {
+    return (
+      <Surface variant="secondary" className="mt-3 flex-row items-center gap-2 rounded-panel-inner px-4 py-3">
+        <Ionicons name="time-outline" size={18} color={theme.textMuted} />
+        <Text className="text-sm font-medium" style={{ color: theme.textSecondary }}>{t('profile.pendingSent')}</Text>
+      </Surface>
+    );
+  }
+
+  if (status === 'pending_received') {
+    return (
+      <HeroCard variant="secondary" className="mt-3">
+        <HeroCard.Body className="gap-3 px-4 py-4">
+          <SectionTitle icon="person-add-outline" title={t('profile.pendingReceived')} primary={primary} theme={theme} />
+          <View className="flex-row gap-2">
+            <HeroButton className="flex-1" variant="primary" isDisabled={isLoading} onPress={() => void onAccept()} style={{ backgroundColor: primary }}>
+              <HeroButton.Label>{t('profile.accept')}</HeroButton.Label>
+            </HeroButton>
+            <HeroButton className="flex-1" variant="secondary" isDisabled={isLoading} onPress={() => void onDecline()}>
+              <HeroButton.Label>{t('profile.decline')}</HeroButton.Label>
+            </HeroButton>
+          </View>
+        </HeroCard.Body>
+      </HeroCard>
+    );
+  }
+
+  return (
+    <Surface variant="secondary" className="mt-3 flex-row items-center justify-between gap-3 rounded-panel-inner px-4 py-3">
+      <View className="flex-row items-center gap-2">
+        <Ionicons name="checkmark-circle" size={18} color={theme.success} />
+        <Text className="text-sm font-semibold" style={{ color: theme.success }}>{t('profile.connected')}</Text>
+      </View>
+      <HeroButton size="sm" variant="ghost" onPress={onDisconnect}>
+        <HeroButton.Label>{t('profile.disconnect')}</HeroButton.Label>
+      </HeroButton>
+    </Surface>
+  );
+}
+
+const BADGE_ICON_MAP: Record<string, IoniconName> = {
+  achievement: 'trophy-outline',
+  achievements: 'trophy-outline',
+  badge: 'ribbon-outline',
+  badges: 'ribbon-outline',
+  calendar: 'calendar-outline',
+  community: 'people-outline',
+  event: 'calendar-outline',
+  events: 'calendar-outline',
+  exchange: 'swap-horizontal-outline',
+  exchanges: 'swap-horizontal-outline',
+  fire: 'flame-outline',
+  first_exchange: 'swap-horizontal-outline',
+  gift: 'gift-outline',
+  heart: 'heart-outline',
+  level: 'flash-outline',
+  listing: 'list-outline',
+  medal: 'medal-outline',
+  message: 'chatbubble-ellipses-outline',
+  offer: 'gift-outline',
+  profile: 'person-circle-outline',
+  request: 'hand-left-outline',
+  review: 'star-outline',
+  ribbon: 'ribbon-outline',
+  shield: 'shield-checkmark-outline',
+  star: 'star-outline',
+  streak: 'flame-outline',
+  time: 'time-outline',
+  trophy: 'trophy-outline',
+  volunteer: 'heart-outline',
+  wallet: 'wallet-outline',
+  xp: 'sparkles-outline',
+};
+
+function AchievementsAccordion({
+  achievements,
+  isOwnProfile,
+  isFederatedProfile,
+  primary,
+  theme,
+  t,
+}: {
+  achievements?: MemberAchievements;
+  isOwnProfile: boolean;
+  isFederatedProfile: boolean;
+  primary: string;
+  theme: Theme;
+  t: TFunction;
+}) {
+  if (isFederatedProfile || (!achievements?.profile && (achievements?.badges.length ?? 0) === 0)) {
+    return null;
+  }
+
+  const safeAchievements = achievements ?? { profile: null, badges: [] };
+  const profile = safeAchievements.profile;
+  const badges = safeAchievements.badges ?? [];
+  const showcasedBadges = profile?.showcased_badges ?? [];
+  const visibleBadges = (showcasedBadges.length > 0 ? showcasedBadges : badges).slice(0, 6) as MemberBadge[];
+  const earnedCount = profile?.badges_count ?? badges.length;
+  const level = profile?.level ?? 1;
+  const xp = profile?.xp ?? 0;
+  const nextLevelXp = profile?.next_level_xp ?? profile?.level_progress?.xp_for_next_level ?? xp;
+  const remainingXp = Math.max(0, nextLevelXp - xp);
+
+  return (
+    <Accordion
+      selectionMode="single"
+      variant="surface"
+      hideSeparator
+      defaultValue="achievements"
+      className="mt-3 overflow-hidden rounded-panel"
+    >
+      <Accordion.Item value="achievements">
+        <Accordion.Trigger className="px-4 py-4">
+          <View className="min-w-0 flex-1 flex-row items-center gap-3">
+            <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withColorAlpha(primary, 0.14) }}>
+              <Ionicons name="trophy-outline" size={20} color={primary} />
+            </View>
+            <View className="min-w-0 flex-1">
+              <Text className="text-base font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+                {t('profile.achievements')}
+              </Text>
+              <Text className="text-xs" style={{ color: theme.textSecondary }} numberOfLines={1}>
+                {t('profile.achievementsSummary', { level, count: earnedCount })}
+              </Text>
+            </View>
+            <Chip size="sm" variant="soft" color="warning">
+              <Ionicons name="flash-outline" size={12} color={theme.warning} />
+              <Chip.Label>{t('profile.level', { level })}</Chip.Label>
+            </Chip>
+          </View>
+          <Accordion.Indicator iconProps={{ color: theme.textSecondary }} />
+        </Accordion.Trigger>
+        <Accordion.Content className="px-4 pb-4">
+          <View className="gap-3">
+            <View className="flex-row gap-3">
+              <MiniMetric icon="sparkles-outline" label={t('profile.xp')} value={String(xp)} primary={primary} theme={theme} />
+              <MiniMetric icon="ribbon-outline" label={t('profile.badges')} value={String(earnedCount)} primary={primary} theme={theme} />
+              <MiniMetric icon="trending-up-outline" label={t('profile.nextLevel')} value={String(remainingXp)} primary={primary} theme={theme} />
+            </View>
+
+            {visibleBadges.length > 0 ? (
+              <View className="flex-row flex-wrap gap-2">
+                {visibleBadges.map((badge) => (
+                  <BadgePill key={getBadgeKey(badge)} badge={badge} primary={primary} theme={theme} />
+                ))}
+              </View>
+            ) : (
+              <Text className="text-sm italic" style={{ color: theme.textSecondary }}>
+                {t('profile.noBadges')}
+              </Text>
+            )}
+
+            {isOwnProfile ? (
+              <HeroButton
+                variant="secondary"
+                onPress={() => router.push('/(modals)/gamification')}
+                accessibilityLabel={t('profile.viewAllAchievements')}
+              >
+                <Ionicons name="trophy-outline" size={18} color={primary} />
+                <HeroButton.Label>{t('profile.viewAllAchievements')}</HeroButton.Label>
+              </HeroButton>
+            ) : null}
+          </View>
+        </Accordion.Content>
+      </Accordion.Item>
+    </Accordion>
+  );
+}
+
+function MiniMetric({
+  icon,
+  label,
+  value,
+  primary,
+  theme,
+}: {
+  icon: IoniconName;
+  label: string;
+  value: string;
+  primary: string;
+  theme: Theme;
+}) {
+  return (
+    <Surface variant="secondary" className="flex-1 rounded-panel-inner px-2 py-3">
+      <View className="items-center gap-1">
+        <Ionicons name={icon} size={16} color={primary} />
+        <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={1}>
+          {value}
+        </Text>
+        <Text className="text-center text-[11px]" style={{ color: theme.textSecondary }} numberOfLines={1}>
+          {label}
+        </Text>
+      </View>
+    </Surface>
+  );
+}
+
+function BadgePill({ badge, primary, theme }: { badge: MemberBadge; primary: string; theme: Theme }) {
+  return (
+    <Surface variant="secondary" className="min-w-[47%] flex-1 rounded-panel-inner px-3 py-3">
+      <View className="flex-row items-center gap-2">
+        <View className="size-9 items-center justify-center rounded-xl" style={{ backgroundColor: withColorAlpha(primary, 0.13) }}>
+          <Ionicons name={normalizeBadgeIcon(badge.icon ?? badge.badge_key)} size={18} color={primary} />
+        </View>
+        <View className="min-w-0 flex-1">
+          <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+            {badge.name}
+          </Text>
+          {badge.description ? (
+            <Text className="text-xs" style={{ color: theme.textSecondary }} numberOfLines={1}>
+              {badge.description}
+            </Text>
+          ) : null}
+        </View>
+      </View>
+    </Surface>
+  );
+}
+
+function getBadgeKey(badge: MemberBadge) {
+  return String(badge.id ?? badge.badge_key ?? badge.name);
+}
+
+function normalizeBadgeIcon(icon: string | null | undefined): IoniconName {
+  const raw = (icon ?? '').trim();
+  const key = raw
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+  const glyphMap = (Ionicons as unknown as { glyphMap?: Record<string, number> }).glyphMap;
+
+  if (key && BADGE_ICON_MAP[key]) {
+    return BADGE_ICON_MAP[key];
+  }
+
+  const candidates = [
+    raw,
+    raw ? `${raw}-outline` : '',
+    key.replace(/_/g, '-'),
+    key ? `${key.replace(/_/g, '-')}-outline` : '',
+  ].filter(Boolean);
+
+  for (const candidate of candidates) {
+    if (glyphMap?.[candidate]) {
+      return candidate as IoniconName;
+    }
+  }
+
+  const firstToken = key.split('_')[0];
+  return BADGE_ICON_MAP[firstToken] ?? 'ribbon-outline';
+}
+
+function withColorAlpha(hex: string, alpha: number): string {
+  const cleaned = hex.replace('#', '');
+  if (cleaned.length !== 6) return hex;
+  const r = parseInt(cleaned.slice(0, 2), 16);
+  const g = parseInt(cleaned.slice(2, 4), 16);
+  const b = parseInt(cleaned.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function TrustSummaryCard({
+  memberId,
+  isFederatedProfile,
+  primary,
+  theme,
+  t,
+}: {
+  memberId: number | string;
+  isFederatedProfile: boolean;
+  primary: string;
+  theme: Theme;
+  t: TFunction;
+}) {
+  return (
+    <HeroCard variant="secondary" className="mt-3">
+      <HeroCard.Body className="gap-3 px-4 py-4">
+        <SectionTitle icon="shield-checkmark-outline" title={t('profile.trustStatus')} primary={primary} theme={theme} />
+        <VerificationBadgeRow userId={memberId} showUnverified disabled={isFederatedProfile} />
+        <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+          {isFederatedProfile ? t('profile.federatedTrustHint') : t('profile.trustStatusHint')}
+        </Text>
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function ListingsSection({
+  listings,
+  isFederatedProfile,
+  primary,
+  theme,
+  t,
+}: {
+  listings: NonNullable<MemberProfile['listings']>;
+  isFederatedProfile: boolean;
+  primary: string;
+  theme: Theme;
+  t: TFunction;
+}) {
+  return (
+    <HeroCard variant="secondary" className="mt-3">
+      <HeroCard.Body className="gap-3 px-4 py-4">
+        <SectionTitle
+          icon="list-outline"
+          title={isFederatedProfile ? t('profile.sharedListings') : t('profile.memberListings')}
+          primary={primary}
+          theme={theme}
+        />
+        {listings.length > 0 ? (
+          listings.map((listing) => {
+            const isOffer = listing.type === 'offer';
+            return (
+              <Pressable
+                key={String(listing.id)}
+                accessibilityRole={isFederatedProfile ? undefined : 'button'}
+                accessibilityLabel={t('profile.viewListing', { title: listing.title })}
+                disabled={isFederatedProfile}
+                onPress={
+                  isFederatedProfile
+                    ? undefined
+                    : () => router.push({ pathname: '/(modals)/exchange-detail', params: { id: String(listing.id) } })
+                }
+              >
+                <Surface variant="secondary" className="rounded-panel-inner px-3 py-3">
+                <View className="flex-row items-start justify-between gap-3">
+                  <View className="min-w-0 flex-1 gap-1">
+                    <View className="flex-row flex-wrap items-center gap-2">
+                      {listing.type ? (
+                        <Chip size="sm" variant="soft" color={isOffer ? 'success' : 'warning'}>
+                          <Chip.Label>{isOffer ? t('profile.offer') : t('profile.request')}</Chip.Label>
+                        </Chip>
+                      ) : null}
+                      {listing.category_name ? (
+                        <Text className="min-w-0 flex-1 text-xs" numberOfLines={1} style={{ color: theme.textSecondary }}>
+                          {listing.category_name}
+                        </Text>
+                      ) : null}
+                    </View>
+                    <Text className="text-sm font-semibold" numberOfLines={2} style={{ color: theme.text }}>
+                      {listing.title}
+                    </Text>
+                    {listing.description ? (
+                      <Text className="text-xs leading-4" numberOfLines={2} style={{ color: theme.textSecondary }}>
+                        {stripHtml(listing.description)}
+                      </Text>
+                    ) : null}
+                    {listing.hours_estimate != null || listing.estimated_hours != null ? (
+                      <View className="mt-1 flex-row items-center gap-1">
+                        <Ionicons name="time-outline" size={13} color={theme.textMuted} />
+                        <Text className="text-xs" style={{ color: theme.textSecondary }}>
+                          {t('profile.hoursEstimate', { hours: listing.hours_estimate ?? listing.estimated_hours })}
+                        </Text>
+                      </View>
+                    ) : null}
+                  </View>
+                  {!isFederatedProfile ? <Ionicons name="chevron-forward" size={18} color={primary} /> : null}
+                </View>
+                </Surface>
+              </Pressable>
+            );
+          })
+        ) : (
+          <Text className="text-sm italic" style={{ color: theme.textSecondary }}>
+            {t('profile.noListings')}
+          </Text>
+        )}
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function ReviewsSection({
+  reviews,
+  rating,
+  primary,
+  theme,
+  t,
+}: {
+  reviews: MemberReview[];
+  rating?: number | null;
+  primary: string;
+  theme: Theme;
+  t: TFunction;
+}) {
+  return (
+    <HeroCard variant="secondary" className="mt-3">
+      <HeroCard.Body className="gap-3 px-4 py-4">
+        <SectionTitle icon="star-outline" title={t('profile.reviews')} primary={primary} theme={theme} />
+        {reviews.length > 0 ? (
+          <>
+            {typeof rating === 'number' && rating > 0 ? (
+              <Surface variant="secondary" className="rounded-panel-inner px-3 py-3">
+                <View className="flex-row items-center gap-3">
+                  <Text className="text-3xl font-bold" style={{ color: theme.text }}>
+                    {rating.toFixed(1)}
+                  </Text>
+                  <View>
+                    <View className="flex-row gap-0.5">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Ionicons key={star} name={star <= Math.round(rating) ? 'star' : 'star-outline'} size={14} color={theme.warning} />
+                      ))}
+                    </View>
+                    <Text className="text-xs" style={{ color: theme.textSecondary }}>
+                      {t('profile.reviewCount', { count: reviews.length })}
+                    </Text>
+                  </View>
+                </View>
+              </Surface>
+            ) : null}
+            {reviews.map((review) => (
+              <Surface key={review.id} variant="secondary" className="rounded-panel-inner px-3 py-3">
+                <View className="flex-row items-start gap-3">
+                  <Avatar
+                    uri={review.reviewer?.avatar_url ?? review.reviewer?.avatar ?? null}
+                    name={getReviewerName(review, t)}
+                    size={36}
+                  />
+                  <View className="min-w-0 flex-1 gap-1">
+                    <View className="flex-row items-center justify-between gap-2">
+                      <Text className="min-w-0 flex-1 text-sm font-semibold" numberOfLines={1} style={{ color: theme.text }}>
+                        {getReviewerName(review, t)}
+                      </Text>
+                      <View className="flex-row gap-0.5">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Ionicons key={star} name={star <= Math.round(review.rating) ? 'star' : 'star-outline'} size={12} color={theme.warning} />
+                        ))}
+                      </View>
+                    </View>
+                    {review.comment ? (
+                      <Text className="text-xs leading-4" style={{ color: theme.textSecondary }}>
+                        {stripHtml(review.comment)}
+                      </Text>
+                    ) : null}
+                    {review.listing_title ? (
+                      <Text className="text-xs" numberOfLines={1} style={{ color: theme.textMuted }}>
+                        {review.listing_title}
+                      </Text>
+                    ) : null}
+                  </View>
+                </View>
+              </Surface>
+            ))}
+          </>
+        ) : (
+          <Text className="text-sm italic" style={{ color: theme.textSecondary }}>
+            {t('profile.noReviews')}
+          </Text>
+        )}
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function getReviewerName(review: MemberReview, t: TFunction): string {
+  return (
+    review.reviewer?.name?.trim() ||
+    `${review.reviewer?.first_name ?? ''} ${review.reviewer?.last_name ?? ''}`.trim() ||
+    t('profile.anonymousReviewer')
+  );
+}
+
+function InfoRow({ icon, label, theme }: { icon: IoniconName; label: string; theme: Theme }) {
+  return (
+    <View className="flex-row items-center gap-2">
+      <Ionicons name={icon} size={16} color={theme.textMuted} />
+      <Text className="min-w-0 flex-1 text-sm" style={{ color: theme.textSecondary }}>{label}</Text>
+    </View>
+  );
+}
+
+function stripHtml(value: string | null | undefined): string {
+  if (!value) return '';
+  return decodeHtmlEntities(value.replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim();
+}
+
+function decodeHtmlEntities(value: string): string {
+  return value
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+}
+
 function formatDate(iso: string): string {
   try {
     const d = new Date(iso);
-    if (isNaN(d.getTime())) return iso;
+    if (Number.isNaN(d.getTime())) return iso;
     return d.toLocaleDateString(undefined, {
       year: 'numeric',
       month: 'long',

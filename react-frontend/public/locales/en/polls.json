@@ -88,6 +88,10 @@
   "view_ranked_results": "View Ranked Results",
   "winner_label": "Winner: {{name}}",
   "submit_rankings": "Submit Rankings",
+  "loading": "Loading polls...",
+  "vote_now": "Vote Now",
+  "vote_now_for": "Vote now on: {{question}}",
+  "vote_for_option": "Vote for {{option}} in: {{question}}",
   "aria": {
     "export_csv": "Export results as CSV",
     "move_rank_down": "Move {{option}} down",

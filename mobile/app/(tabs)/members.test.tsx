@@ -92,8 +92,8 @@ describe('MembersScreen (tab)', () => {
   });
 
   it('renders the title and search input', () => {
-    const { getByText, getByPlaceholderText } = render(<MembersScreen />);
-    expect(getByText('Members')).toBeTruthy();
+    const { getAllByText, getByPlaceholderText } = render(<MembersScreen />);
+    expect(getAllByText('Members').length).toBeGreaterThan(0);
     expect(getByPlaceholderText('Search members...')).toBeTruthy();
   });
 

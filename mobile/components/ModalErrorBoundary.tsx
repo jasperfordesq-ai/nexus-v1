@@ -6,6 +6,7 @@
 import React from 'react';
 import { Appearance, Pressable, Text, View } from 'react-native';
 import { router } from 'expo-router';
+import i18n from 'i18next';
 
 interface Props {
   children: React.ReactNode;
@@ -33,7 +34,7 @@ function getErrorColors() {
 /**
  * Lightweight error boundary for modal screens.
  * Uses Appearance API for dark mode support since class components cannot use hooks.
- * On error, shows a "Something went wrong" message with a "Go Back" button.
+ * On error, shows a translated recovery message with a translated back action.
  */
 export default class ModalErrorBoundary extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -52,6 +53,8 @@ export default class ModalErrorBoundary extends React.Component<Props, State> {
   render(): React.ReactNode {
     if (this.state.hasError) {
       const colors = getErrorColors();
+      const title = i18n.t('errors.boundaryTitle', { ns: 'common' });
+      const goBack = i18n.t('buttons.back', { ns: 'common' });
       return (
         <View
           style={{
@@ -71,7 +74,7 @@ export default class ModalErrorBoundary extends React.Component<Props, State> {
               textAlign: 'center',
             }}
           >
-            Something went wrong
+            {title}
           </Text>
           <Pressable
             style={{
@@ -82,9 +85,9 @@ export default class ModalErrorBoundary extends React.Component<Props, State> {
             }}
             onPress={() => router.back()}
             accessibilityRole="button"
-            accessibilityLabel="Go Back"
+            accessibilityLabel={goBack}
           >
-            <Text style={{ fontSize: 14, fontWeight: '600', color: colors.buttonText }}>Go Back</Text>
+            <Text style={{ fontSize: 14, fontWeight: '600', color: colors.buttonText }}>{goBack}</Text>
           </Pressable>
         </View>
       );

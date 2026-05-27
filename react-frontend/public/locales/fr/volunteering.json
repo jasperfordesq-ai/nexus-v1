@@ -633,7 +633,8 @@
     "load_more": "Charger plus",
     "aria_select_all": "Sélectionner toutes les candidatures en attente visibles",
     "aria_select_application": "Sélectionnez une application sur {{name}}",
-    "aria_search_volunteers": "Rechercher des bénévoles par nom"
+    "aria_search_volunteers": "Rechercher des bénévoles par nom",
+    "filter_label": "Filter applications"
   },
   "org_wallet_balance": "Solde du portefeuille :",
   "auto_pay_on": "Paiement automatique activé",

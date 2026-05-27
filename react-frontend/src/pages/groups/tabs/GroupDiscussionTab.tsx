@@ -141,7 +141,7 @@ export function GroupDiscussionTab({
 
         {/* Discussions List */}
         {discussionsLoading && discussions.length === 0 ? (
-          <div className="flex justify-center py-8">
+          <div className="flex justify-center py-8" role="status" aria-busy="true" aria-label={t('detail.loading')}>
             <Spinner size="lg" />
           </div>
         ) : discussions.length === 0 ? (
@@ -218,7 +218,7 @@ export function GroupDiscussionTab({
                     >
                       <div className="ml-3 sm:ml-6 pl-3 sm:pl-6 border-l-2 border-theme-default space-y-4 pb-2">
                         {expandedLoading ? (
-                          <div className="flex justify-center py-4">
+                          <div className="flex justify-center py-4" role="status" aria-busy="true" aria-label={t('detail.loading_replies')}>
                             <Spinner size="sm" />
                           </div>
                         ) : expandedDiscussion ? (
@@ -290,7 +290,7 @@ export function GroupDiscussionTab({
                                 isDisabled={!replyContent.trim()}
                                 onPress={onSendReply}
                               >
-                                <Send className="w-4 h-4" />
+                                <Send className="w-4 h-4" aria-hidden="true" />
                               </Button>
                             </div>
                           </>

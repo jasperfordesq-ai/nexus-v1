@@ -11,11 +11,18 @@ export interface Organisation {
   name: string;
   description: string | null;
   logo: string | null;
+  logo_url?: string | null;
   website: string | null;
+  contact_email?: string | null;
   location: string | null;
-  members_count: number;
-  listings_count: number;
-  verified: boolean;
+  members_count?: number;
+  listings_count?: number;
+  opportunity_count?: number;
+  total_hours?: number;
+  volunteer_count?: number;
+  average_rating?: number | null;
+  verified?: boolean;
+  status?: string | null;
   created_at: string;
 }
 

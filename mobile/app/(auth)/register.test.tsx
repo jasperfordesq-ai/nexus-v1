@@ -236,4 +236,12 @@ describe('RegisterScreen', () => {
 
     expect(await findByText('Unable to register. Please try again.')).toBeTruthy();
   });
+
+  it('opens the login route from the sign in action', () => {
+    const { getByLabelText } = render(<RegisterScreen />);
+
+    fireEvent.press(getByLabelText('Sign in'));
+
+    expect(mockRouter.push).toHaveBeenCalledWith('/login');
+  });
 });

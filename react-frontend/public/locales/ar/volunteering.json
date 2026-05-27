@@ -633,7 +633,8 @@
     "load_more": "تحميل المزيد",
     "aria_select_all": "حدد جميع التطبيقات المعلقة المرئية",
     "aria_select_application": "حدد التطبيق من {{name}}",
-    "aria_search_volunteers": "بحث المتطوعين بالاسم"
+    "aria_search_volunteers": "بحث المتطوعين بالاسم",
+    "filter_label": "Filter applications"
   },
   "org_wallet_balance": "رصيد المحفظة:",
   "auto_pay_on": "تشغيل الدفع التلقائي",

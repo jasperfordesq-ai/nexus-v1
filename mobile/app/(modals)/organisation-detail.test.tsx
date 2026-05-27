@@ -9,7 +9,7 @@ import { render } from '@testing-library/react-native';
 // --- Mocks ---
 
 jest.mock('expo-router', () => ({
-  router: { push: jest.fn(), back: jest.fn() },
+  router: { push: jest.fn(), back: jest.fn(), replace: jest.fn(), canGoBack: jest.fn(() => false) },
   useLocalSearchParams: () => ({ id: '3' }),
   useNavigation: () => ({ setOptions: jest.fn() }),
 }));
@@ -19,15 +19,23 @@ jest.mock('react-i18next', () => ({
     t: (key: string, opts?: Record<string, unknown>) => {
       const map: Record<string, string> = {
         'detail.title': 'Organisation',
+        'detailTitle': 'Organisation Details',
         'detail.about': 'About',
+        'detail.contact': 'Contact',
+        'detail.share': 'Share',
         'detail.invalidId': 'Invalid organisation ID.',
         'detail.notFound': 'Organisation not found.',
+        'detail.notFoundHint': 'This organisation may have been removed.',
+        'detail.browseOrganisations': 'Browse organisations',
         'detail.goBack': 'Go Back',
         'verified': 'Verified',
         'website': 'Visit Website',
         'members': opts ? `${String(opts.count ?? 0)} members` : '0 members',
         'listings': opts ? `${String(opts.count ?? 0)} listings` : '0 listings',
+        'opportunities': opts ? `${String(opts.count ?? 0)} opportunities` : '0 opportunities',
+        'hoursLogged': opts ? `${String(opts.hours ?? 0)}h logged` : '0h logged',
         'common:errors.alertTitle': 'Error',
+        'common:back': 'Back',
       };
       return map[key] ?? key;
     },
@@ -130,8 +138,8 @@ describe('OrganisationDetailScreen', () => {
       refresh: jest.fn(),
     });
 
-    const { getByText } = render(<OrganisationDetailScreen />);
-    expect(getByText('A vibrant hub for community services in Dublin.')).toBeTruthy();
+    const { getAllByText } = render(<OrganisationDetailScreen />);
+    expect(getAllByText('A vibrant hub for community services in Dublin.').length).toBeGreaterThan(0);
   });
 
   it('renders loading state without crashing', () => {
@@ -145,6 +153,6 @@ describe('OrganisationDetailScreen', () => {
 
     const { getByText } = render(<OrganisationDetailScreen />);
     expect(getByText('Organisation not found.')).toBeTruthy();
-    expect(getByText('Go Back')).toBeTruthy();
+    expect(getByText('Browse organisations')).toBeTruthy();
   });
 });

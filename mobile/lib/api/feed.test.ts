@@ -20,7 +20,7 @@ jest.mock('@/lib/constants', () => ({
 }));
 
 import { api } from '@/lib/api/client';
-import { getFeed, toggleLike } from './feed';
+import { getFeed, getFeedAuthor, toggleLike } from './feed';
 import type { FeedResponse, FeedItem, LikeResult } from './feed';
 
 const mockFeedItem: FeedItem = {
@@ -56,7 +56,12 @@ describe('getFeed', () => {
   it('calls /api/v2/feed with page=1 and no cursor by default', async () => {
     (api.get as jest.Mock).mockResolvedValue(mockFeedResponse);
     const result = await getFeed();
-    expect(api.get).toHaveBeenCalledWith('/api/v2/feed', { page: '1' });
+    expect(api.get).toHaveBeenCalledWith('/api/v2/feed', expect.objectContaining({
+      page: '1',
+      per_page: '20',
+      mode: 'ranked',
+      personalised: 'true',
+    }));
     expect(result.data).toHaveLength(1);
     expect(result.meta.has_more).toBe(true);
   });
@@ -64,16 +69,16 @@ describe('getFeed', () => {
   it('passes custom page number', async () => {
     (api.get as jest.Mock).mockResolvedValue(mockFeedResponse);
     await getFeed(3);
-    expect(api.get).toHaveBeenCalledWith('/api/v2/feed', { page: '3' });
+    expect(api.get).toHaveBeenCalledWith('/api/v2/feed', expect.objectContaining({ page: '3' }));
   });
 
   it('includes cursor param when provided, alongside page', async () => {
     (api.get as jest.Mock).mockResolvedValue(mockFeedResponse);
     await getFeed(1, 'next-cursor');
-    expect(api.get).toHaveBeenCalledWith('/api/v2/feed', {
+    expect(api.get).toHaveBeenCalledWith('/api/v2/feed', expect.objectContaining({
       page: '1',
       cursor: 'next-cursor',
-    });
+    }));
   });
 
   it('omits cursor param when null is passed', async () => {
@@ -92,6 +97,48 @@ describe('getFeed', () => {
   it('propagates errors from the API', async () => {
     (api.get as jest.Mock).mockRejectedValue(new Error('Unauthorized'));
     await expect(getFeed()).rejects.toThrow('Unauthorized');
+  });
+});
+
+describe('getFeedAuthor', () => {
+  it('prefers flat author fields when present', () => {
+    expect(getFeedAuthor(mockFeedItem, 'Member')).toEqual({
+      id: 5,
+      name: 'Dave',
+      avatar: null,
+    });
+  });
+
+  it('falls back to nested author fields from the web feed shape', () => {
+    const item: FeedItem = {
+      ...mockFeedItem,
+      user_id: undefined,
+      author_name: null,
+      author_avatar: null,
+      author: { id: 9, name: 'Alice Smith', avatar_url: '/avatars/alice.png' },
+    };
+
+    expect(getFeedAuthor(item, 'Member')).toEqual({
+      id: 9,
+      name: 'Alice Smith',
+      avatar: '/avatars/alice.png',
+    });
+  });
+
+  it('falls back to user fields before the generic label', () => {
+    const item: FeedItem = {
+      ...mockFeedItem,
+      user_id: undefined,
+      author_name: null,
+      author_avatar: null,
+      user: { id: 11, name: 'Nora Blake', avatar: '/avatars/nora.png' },
+    };
+
+    expect(getFeedAuthor(item, 'Member')).toEqual({
+      id: 11,
+      name: 'Nora Blake',
+      avatar: '/avatars/nora.png',
+    });
   });
 });
 

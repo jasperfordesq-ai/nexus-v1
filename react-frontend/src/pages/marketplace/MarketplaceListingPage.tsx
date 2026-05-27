@@ -206,7 +206,7 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
   if (images.length === 0 && !videoUrl) {
     return (
       <div className="aspect-video bg-surface-secondary rounded-xl flex items-center justify-center">
-        <ShoppingBag className="w-16 h-16 text-muted" />
+        <ShoppingBag className="w-16 h-16 text-muted" aria-hidden="true" />
       </div>
     );
   }
@@ -478,7 +478,9 @@ export function MarketplaceListingPage() {
     return (
       <>
         <PageMeta title={t('page_title')} noIndex />
-        <MarketplaceListingDetailSkeleton />
+        <div role="status" aria-label={t('common.loading')} aria-busy="true">
+          <MarketplaceListingDetailSkeleton />
+        </div>
       </>
     );
   }
@@ -779,7 +781,7 @@ export function MarketplaceListingPage() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-foreground flex items-center gap-2">
-                <User className="w-5 h-5 text-muted" />
+                <User className="w-5 h-5 text-muted" aria-hidden="true" />
                 {t('listing.more_from_seller', { name: listing.user?.name ?? '' })}
               </h2>
               <Button
@@ -812,7 +814,7 @@ export function MarketplaceListingPage() {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <ShoppingBag className="w-8 h-8 text-muted" />
+                          <ShoppingBag className="w-8 h-8 text-muted" aria-hidden="true" />
                         </div>
                       )}
                     </div>

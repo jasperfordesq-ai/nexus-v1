@@ -218,7 +218,8 @@
     "cover_message_placeholder": "Erzählen Sie der Organisation, warum Sie sich freiwillig engagieren möchten...",
     "cancel": "Abbrechen",
     "submit_application": "Bewerbung absenden",
-    "job_openings": "Stellenangebote"
+    "job_openings": "Stellenangebote",
+    "rating_sr": "{{n}} out of 5 stars"
   },
   "emergency_alerts": {
     "heading": "Notfallwarnungen",

@@ -14,7 +14,39 @@
     "greeting": "Hello, {{name}}",
     "subtitle": "Here's what's happening in your timebank",
     "emptyTitle": "No activity yet. Say hello to your community!",
-    "emptySubtitle": "Start connecting with your community to see posts here."
+    "emptySubtitle": "Start connecting with your community to see posts here.",
+    "currentView": "{{filter}} view"
+  },
+  "mode": {
+    "forYou": "For You",
+    "recent": "Recent"
+  },
+  "filter": {
+    "all": "All",
+    "following": "Following",
+    "saved": "Saved",
+    "posts": "Posts",
+    "listings": "Exchanges",
+    "events": "Events",
+    "polls": "Polls",
+    "goals": "Goals",
+    "jobs": "Jobs",
+    "challenges": "Challenges",
+    "volunteering": "Volunteering",
+    "blogs": "Blogs",
+    "discussions": "Discussions",
+    "more": "More",
+    "clear": "Clear feed controls"
+  },
+  "subFilter": {
+    "offer": "Offers",
+    "request": "Requests"
+  },
+  "composer": {
+    "title": "Share something with your community",
+    "subtitle": "Create an exchange, browse polls, or add to the feed.",
+    "exchange": "New exchange",
+    "polls": "Polls"
   },
   "listings": {
     "title": "Listings",
@@ -52,6 +84,14 @@
     "allCaughtUp": "You're all caught up!",
     "justNow": "just now"
   },
+  "tenant": {
+    "logoLabel": "{{name}} logo"
+  },
+  "stories": {
+    "you": "You",
+    "member": "Member",
+    "memberInitial": "?"
+  },
   "feedTypes": {
     "post": "Post",
     "listing": "Exchange",
@@ -62,6 +102,11 @@
     "challenge": "Challenge",
     "volunteer": "Volunteer",
     "review": "Review",
+    "blog": "Blog",
+    "discussion": "Discussion",
+    "resource": "Resource",
+    "level_up": "Level up",
+    "badge_earned": "Badge",
     "unlike": "Unlike",
     "like": "Like"
   },
@@ -77,5 +122,36 @@
   },
   "likePost": "Like this post",
   "unlikePost": "Unlike this post",
-  "readMore": "Read more"
+  "readMore": "Read more",
+  "moreOptions": "More options",
+  "share": "Share",
+  "save": "Save",
+  "unsave": "Unsave",
+  "comment": "Comment",
+  "official": "Official",
+  "detail": {
+    "listing": "View exchange",
+    "event": "View event",
+    "job": "View job",
+    "volunteer": "View opportunity",
+    "goal": "View goal",
+    "profile": "View profile",
+    "blog": "Read post"
+  },
+  "stats": {
+    "reactions": "{{count}} reactions",
+    "comments": "{{count}} comments",
+    "views": "{{count}} views",
+    "shares": "{{count}} shares"
+  },
+  "milestone": {
+    "badgeUnlocked": "Badge unlocked",
+    "levelReached": "Level reached",
+    "badgeMessage": "{{name}} earned {{badge}}",
+    "levelMessage": "{{name}} reached {{level}}"
+  },
+  "media": {
+    "video": "Video",
+    "videoDescription": "Open this item to view the video."
+  }
 }

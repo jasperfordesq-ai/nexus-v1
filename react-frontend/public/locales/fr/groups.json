@@ -197,7 +197,8 @@
     "feed_load_more": "Charger plus",
     "member_actions_aria": "Actions sur le membre",
     "feed_loading": "Loading group feed...",
-    "events_loading": "Loading group events..."
+    "events_loading": "Loading group events...",
+    "loading_replies": "Loading replies..."
   },
   "form": {
     "create_title": "Créer un nouveau groupe",
@@ -284,7 +285,8 @@
     "pinned_success": "Épinglée",
     "update_failed": "Impossible de mettre à jour l’annonce",
     "deleted": "Annonce supprimée",
-    "delete_failed": "Impossible de supprimer l’annonce"
+    "delete_failed": "Impossible de supprimer l’annonce",
+    "loading": "Loading announcements..."
   },
   "challenges": {
     "heading": "Défis",
@@ -549,7 +551,8 @@
     "answer_posted_success": "Réponse postée !",
     "answer_posted_error": "Échec de la publication de la réponse",
     "vote_error": "Je n'ai pas réussi à voter",
-    "accept_error": "Échec de l'acceptation de la réponse"
+    "accept_error": "Échec de l'acceptation de la réponse",
+    "loading_detail": "Loading question details..."
   },
   "wiki": {
     "load_failed": "Échec du chargement des pages wiki",
@@ -597,7 +600,8 @@
     "content_label": "Contenu",
     "create": "Créer la page",
     "delete_title": "Supprimer la page wiki",
-    "delete_confirm": "Voulez-vous vraiment supprimer \"{{name}}\" ? Cette action est irréversible."
+    "delete_confirm": "Voulez-vous vraiment supprimer \"{{name}}\" ? Cette action est irréversible.",
+    "loading_page": "Loading wiki page..."
   },
   "page_meta": {
     "create": {

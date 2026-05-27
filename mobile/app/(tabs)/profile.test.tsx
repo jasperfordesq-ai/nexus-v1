@@ -16,9 +16,11 @@ jest.mock('expo-router', () => ({
 
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string) => {
+    t: (key: string, opts?: Record<string, unknown>) => {
       const map: Record<string, string> = {
         'timeBalance': 'Time balance',
+        'hubEyebrow': 'Your timebank space',
+        'balanceLabel': `${String(opts?.balance ?? '')} hrs · Time balance`,
         'viewWallet': 'View wallet',
         'editProfile': 'Edit profile',
         'browseMembers': 'Browse Members',
@@ -28,6 +30,7 @@ jest.mock('react-i18next', () => ({
         'signOutConfirmMessage': 'Are you sure you want to sign out?',
         'hrs': 'hrs',
         'groups': 'Groups',
+        'events': 'Events',
         'aiChat': 'AI Assistant',
         'achievements': 'Achievements',
         'myGoals': 'My Goals',
@@ -38,6 +41,22 @@ jest.mock('react-i18next', () => ({
         'mySpace': 'My Space',
         'discover': 'Discover',
         'account': 'Account',
+        'quickStats.trust': 'Trust status',
+        'quickStats.network': 'Network areas',
+        'quickStats.account': 'Account',
+        'quickStats.active': 'Active',
+        'quickStats.ready': 'Ready',
+        'navDescriptions.myProfile': 'View your public profile and federation visibility.',
+        'navDescriptions.achievements': 'Badges, levels, streaks, and community progress.',
+        'navDescriptions.myGoals': 'Track personal goals and timebank milestones.',
+        'navDescriptions.groups': 'Your community spaces and group conversations.',
+        'navDescriptions.events': 'Browse workshops, meetups, and community gatherings.',
+        'navDescriptions.browseMembers': 'Find neighbours by name, profile, or shared interests.',
+        'navDescriptions.volunteering': 'Discover opportunities, hours, and applications.',
+        'navDescriptions.organisations': 'Browse local partners and community organisations.',
+        'navDescriptions.aiChat': 'Ask the assistant for help finding your way around.',
+        'navDescriptions.federation': 'Explore partner communities and cross-timebank tools.',
+        'navDescriptions.settings': 'Security, notifications, preferences, and account controls.',
         'common:buttons.cancel': 'Cancel',
         'common:attribution': 'Project NEXUS is open-source software licensed under AGPL-3.0-or-later.',
       };
@@ -140,14 +159,15 @@ describe('MoreScreen (More tab)', () => {
   it('renders Discover section with community navigation items', () => {
     const { getByText } = render(<MoreScreen />);
     expect(getByText('Discover')).toBeTruthy();
+    expect(getByText('Events')).toBeTruthy();
     expect(getByText('Browse Members')).toBeTruthy();
     expect(getByText('Volunteering')).toBeTruthy();
     expect(getByText('AI Assistant')).toBeTruthy();
   });
 
   it('renders Settings in the Account section', () => {
-    const { getByText } = render(<MoreScreen />);
-    expect(getByText('Account')).toBeTruthy();
+    const { getAllByText, getByText } = render(<MoreScreen />);
+    expect(getAllByText('Account').length).toBeGreaterThanOrEqual(1);
     expect(getByText('Settings')).toBeTruthy();
   });
 

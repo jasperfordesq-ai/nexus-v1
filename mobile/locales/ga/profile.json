@@ -1,5 +1,13 @@
 {
   "editTitle": "Cuir próifíl in eagar",
+  "changePhoto": "Change profile photo",
+  "permissionNeeded": "Permission needed",
+  "permissionMessage": "Please allow access to your photo library to change your avatar.",
+  "uploadFailed": "Upload failed",
+  "uploadFailedMessage": "Could not update your avatar. Please try again.",
+  "edit": {
+    "uploadingPhoto": "Uploading photo..."
+  },
   "myProfile": "My Profile",
   "mySpace": "My Space",
   "discover": "Discover",

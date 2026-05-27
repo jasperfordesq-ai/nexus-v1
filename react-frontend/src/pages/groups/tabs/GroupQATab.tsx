@@ -385,9 +385,10 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
           isDisabled={isVoting || !isMember}
           aria-label={t('qa.upvote_aria')}
         >
-          <ArrowUp className="w-4 h-4" />
+          <ArrowUp className="w-4 h-4" aria-hidden="true" />
         </Button>
         <span
+          role="img"
           className={`text-sm font-semibold ${
             voteCount > 0
               ? 'text-success'
@@ -408,7 +409,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
           isDisabled={isVoting || !isMember}
           aria-label={t('qa.downvote_aria')}
         >
-          <ArrowDown className="w-4 h-4" />
+          <ArrowDown className="w-4 h-4" aria-hidden="true" />
         </Button>
       </div>
     );
@@ -422,6 +423,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
     return (
       <div
         className="flex justify-center py-12"
+        role="status"
         aria-label={t('qa.loading')}
         aria-busy="true"
       >
@@ -558,7 +560,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
               {expandedId === question.id && (
                 <div className="border-t border-border p-4 space-y-4">
                   {loadingDetail ? (
-                    <div className="flex justify-center py-6" aria-busy="true">
+                    <div className="flex justify-center py-6" role="status" aria-busy="true" aria-label={t('qa.loading_detail')}>
                       <Spinner size="sm" />
                     </div>
                   ) : expandedDetail ? (
@@ -625,7 +627,7 @@ export function GroupQATab({ groupId, isAdmin, isMember = true }: GroupQATabProp
                                     aria-label={t('qa.accept_aria')}
                                     className="flex-shrink-0"
                                   >
-                                    <Check className="w-4 h-4" />
+                                    <Check className="w-4 h-4" aria-hidden="true" />
                                   </Button>
                                 )}
                             </div>

@@ -285,7 +285,7 @@ export function KnowledgeBasePage() {
 
       {/* Error */}
       {error && !isLoading && (
-        <GlassCard className="p-8 text-center">
+        <GlassCard className="p-8 text-center" role="alert">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('error.title')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
@@ -303,7 +303,7 @@ export function KnowledgeBasePage() {
       {!error && (
         <>
           {isLoading ? (
-            <div className="space-y-4">
+            <div role="status" aria-label={t('loading')} aria-busy="true" className="space-y-4">
               {[1, 2, 3].map((i) => (
                 <GlassCard key={i} className="p-5 animate-pulse">
                   <div className="h-4 bg-theme-hover rounded w-1/4 mb-4" />
@@ -337,7 +337,7 @@ export function KnowledgeBasePage() {
                         <Folder className="w-4 h-4 text-blue-400" aria-hidden="true" />
                         {category}
                         <Chip size="sm" variant="flat" className="text-[10px] bg-theme-elevated text-theme-subtle">
-                          {catArticles.length} {catArticles.length === 1 ? 'article' : 'articles'}
+                          {t('article_count', { count: catArticles.length })}
                         </Chip>
                       </h2>
                     </div>
@@ -404,12 +404,12 @@ export function KnowledgeBasePage() {
         <div className="flex items-center justify-center gap-4 text-xs text-theme-subtle py-2">
           <span className="flex items-center gap-1">
             <File className="w-3 h-3" aria-hidden="true" />
-            {articles.length} {articles.length === 1 ? 'article' : 'articles'}
+            {t('article_count', { count: articles.length })}
           </span>
           {categories.length > 0 && (
             <span className="flex items-center gap-1">
               <Folder className="w-3 h-3" aria-hidden="true" />
-              {categories.length} {categories.length === 1 ? 'category' : 'categories'}
+              {t('category_count', { count: categories.length })}
             </span>
           )}
         </div>

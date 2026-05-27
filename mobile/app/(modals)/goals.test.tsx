@@ -20,28 +20,68 @@ jest.mock('react-i18next', () => ({
     t: (key: string, opts?: Record<string, unknown>) => {
       const map: Record<string, string> = {
         'goals:title': 'My Goals',
+        title: 'My Goals',
+        subtitle: 'Set personal milestones, track progress, and keep your momentum visible.',
+        heroEyebrow: 'Personal progress',
         'goals:addGoal': 'Add Goal',
+        addGoal: 'Add Goal',
         'goals:empty': 'No goals yet. Add one to get started!',
         'goals:noGoals': 'No goals yet',
+        noGoals: 'No goals yet',
         'goals:noGoalsHint': 'Create your first goal to start tracking your progress.',
+        noGoalsHint: 'Create your first goal to start tracking your progress.',
         'goals:abandonTitle': 'Abandon goal?',
+        abandonTitle: 'Abandon goal?',
         'goals:abandonMessage': 'This cannot be undone.',
+        abandonMessage: 'This cannot be undone.',
+        percent: opts ? `${String(opts.percent ?? 0)}%` : '0%',
+        momentumOn: 'Building',
+        momentumEmpty: 'Ready',
+        'stats.active': 'Active',
+        'stats.completed': 'Completed',
+        'stats.total': 'Total',
+        'stats.momentum': 'Momentum',
+        'stats.averageProgress': 'Average progress',
         'goals:create.title': 'New Goal',
+        'create.title': 'New Goal',
+        'create.subtitle': 'Give yourself a clear target to work toward.',
+        'create.close': 'Close goal form',
         'goals:create.titleLabel': 'Title',
+        'create.titleLabel': 'Title',
         'goals:create.titlePlaceholder': 'What do you want to achieve?',
+        'create.titlePlaceholder': 'What do you want to achieve?',
         'goals:create.targetHoursLabel': 'Target Hours',
+        'create.targetHoursLabel': 'Target Hours',
+        'create.descriptionLabel': 'Description',
+        'create.descriptionPlaceholder': 'Add a little context or a first step.',
+        'create.targetPlaceholder': 'e.g. 10',
         'goals:create.submit': 'Create Goal',
+        'create.submit': 'Create Goal',
         'goals:create.error': 'Failed to create goal.',
+        'create.error': 'Failed to create goal.',
         'goals:complete': 'Mark complete',
+        complete: 'Mark complete',
         'goals:abandon': 'Abandon',
+        abandon: 'Abandon',
         'goals:updateError': 'Failed to update goal.',
+        updateError: 'Failed to update goal.',
         'goals:progress': opts ? `${String(opts.current ?? 0)} / ${String(opts.target ?? 0)} hrs` : '0 / 0 hrs',
+        progress: opts ? `${String(opts.current ?? 0)} / ${String(opts.target ?? 0)} hrs` : '0 / 0 hrs',
         'goals:noTarget': opts ? `${String(opts.current ?? 0)} hrs` : '0 hrs',
+        noTarget: opts ? `${String(opts.current ?? 0)} hrs` : '0 hrs',
         'goals:due': opts ? `Due ${String(opts.date ?? '')}` : 'Due',
+        due: opts ? `Due ${String(opts.date ?? '')}` : 'Due',
         'goals:status.active': 'Active',
+        'status.active': 'Active',
         'goals:status.completed': 'Completed',
+        'status.completed': 'Completed',
         'goals:status.abandoned': 'Abandoned',
+        'status.abandoned': 'Abandoned',
+        'visibility.public': 'Public',
+        buddy: opts ? `Buddy: ${String(opts.name ?? '')}` : 'Buddy',
         'common:cancel': 'Cancel',
+        'common:back': 'Back',
+        'common:buttons.cancel': 'Cancel',
         'common:errors.alertTitle': 'Error',
       };
       return map[key] ?? key;
@@ -144,8 +184,8 @@ describe('GoalsScreen', () => {
   it('renders active status badge on an active goal', () => {
     mockUseApi.mockReturnValue({ data: { data: [mockGoal] }, isLoading: false, error: null, refresh: jest.fn() });
 
-    const { getByText } = render(<GoalsScreen />);
-    expect(getByText('Active')).toBeTruthy();
+    const { getAllByText } = render(<GoalsScreen />);
+    expect(getAllByText('Active').length).toBeGreaterThan(0);
   });
 
   it('renders Complete and Abandon action buttons on active goal cards', () => {
@@ -159,8 +199,8 @@ describe('GoalsScreen', () => {
   it('renders Completed status badge and no action buttons on completed goals', () => {
     mockUseApi.mockReturnValue({ data: { data: [mockCompletedGoal] }, isLoading: false, error: null, refresh: jest.fn() });
 
-    const { getByText, queryByText } = render(<GoalsScreen />);
-    expect(getByText('Completed')).toBeTruthy();
+    const { getAllByText, queryByText } = render(<GoalsScreen />);
+    expect(getAllByText('Completed').length).toBeGreaterThan(0);
     expect(queryByText('Mark complete')).toBeNull();
     expect(queryByText('Abandon')).toBeNull();
   });

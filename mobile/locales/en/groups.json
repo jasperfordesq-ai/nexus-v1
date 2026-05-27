@@ -2,6 +2,8 @@
   "detailTitle": "Group Details",
   "share": "Share group",
   "title": "Groups",
+  "subtitle": "Find community spaces, join discussions, and collaborate with members.",
+  "heroEyebrow": "Community spaces",
   "searchPlaceholder": "Search groups…",
   "newGroup": "New group",
   "empty": "No groups found.",
@@ -19,10 +21,52 @@
   "leaveConfirmMessage": "Are you sure you want to leave this group?",
   "joinError": "Could not join group.",
   "leaveError": "Could not leave group.",
+  "stats": {
+    "groups": "Groups",
+    "featured": "Featured",
+    "members": "Members",
+    "joined": "Joined"
+  },
   "detail": {
     "title": "Group",
     "about": "About",
     "members": "Members",
+    "admin": "Group admin",
+    "groupAdmin": "Group admin",
+    "tags": "Tags",
+    "emptyAbout": "This group has not added a description yet.",
+    "emptyDiscussions": "No discussions have been started yet.",
+    "emptyMembers": "No active members are listed yet.",
+    "emptyAnnouncements": "No announcements have been posted yet.",
+    "joinToDiscuss": "Join this group to view and take part in discussions.",
+    "joinToSeeMembers": "Join this group to see the member directory.",
+    "joinToSeeAnnouncements": "Join this group to see announcements.",
+    "pinned": "Pinned",
+    "startDiscussion": "Start a discussion",
+    "startDiscussionHint": "Ask a question, share an update, or get the group moving.",
+    "newDiscussion": "New",
+    "discussionTitlePlaceholder": "Discussion title",
+    "discussionContentPlaceholder": "Write the first message…",
+    "publishDiscussion": "Publish discussion",
+    "discussionRequired": "Add a title and message before publishing.",
+    "discussionCreateError": "Could not create the discussion.",
+    "replies": "{{count}} reply",
+    "replies_other": "{{count}} replies",
+    "tabs": {
+      "overview": "Overview",
+      "discussion": "Discussions",
+      "members": "Members",
+      "announcements": "Announcements"
+    },
+    "roles": {
+      "owner": "Owner",
+      "admin": "Admin",
+      "member": "Member"
+    },
+    "stats": {
+      "members": "Members",
+      "posts": "Posts"
+    },
     "notFound": "Group not found.",
     "invalidId": "Invalid group ID.",
     "goBack": "Go back"
@@ -32,5 +76,25 @@
     "public": "Public",
     "private": "Private",
     "joined": "My Groups"
+  },
+  "create": {
+    "eyebrow": "New group",
+    "title": "Create Group",
+    "subtitle": "Start a community space for discussions, updates, and shared activity.",
+    "nameLabel": "Group name",
+    "namePlaceholder": "Name your group",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "What is this group for?",
+    "locationLabel": "Location",
+    "locationPlaceholder": "Optional place or area",
+    "visibilityLabel": "Visibility",
+    "federated": "List in federation",
+    "reviewTitle": "Ready to publish?",
+    "reviewSubtitle": "Check the group name, visibility, location, and federation listing before creating it.",
+    "submit": "Create group",
+    "validationTitle": "Check group details",
+    "validationRequired": "Add a group name before continuing.",
+    "failedTitle": "Group not created",
+    "failedDescription": "We could not create the group. Please try again."
   }
 }

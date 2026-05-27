@@ -1,11 +1,21 @@
 {
   "title": "Achievements",
+  "subtitle": "Track your level, badges, streak, and community standing.",
+  "heroEyebrow": "Community progress",
   "xp": "{{xp}} XP",
   "level": "Level {{level}}",
   "rank": "Rank #{{rank}}",
   "unranked": "Unranked",
   "streak": "{{days}}-day streak",
+  "streakNone": "No active streak",
   "nextLevel": "{{xp}} XP to next level",
+  "stats": {
+    "totalXp": "Total XP",
+    "earnedBadges": "Earned badges",
+    "lockedBadges": "Locked badges",
+    "rank": "Current rank",
+    "streak": "Streak"
+  },
   "badges": {
     "title": "Badges",
     "earned": "Earned",

@@ -29,7 +29,8 @@
     "title": "Grupos Ativos",
     "subtitle": "Conecte-se com membros com interesses semelhantes",
     "members": "{{count}} membros",
-    "view_group": "Ver Grupo"
+    "view_group": "Ver Grupo",
+    "view_group_named": "View group: {{name}}"
   },
   "top_contributors": {
     "title": "Principais Contribuidores",
@@ -100,7 +101,8 @@
     "votes": "{{count}} votos",
     "options": "{{count}} opções",
     "vote_now": "Votar Agora",
-    "closes": "Encerra em {{date}}"
+    "closes": "Encerra em {{date}}",
+    "vote_now_for": "Vote now on: {{question}}"
   },
   "in_demand_skills": {
     "title": "Competências em Procura",

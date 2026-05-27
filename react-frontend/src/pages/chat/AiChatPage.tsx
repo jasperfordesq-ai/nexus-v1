@@ -117,7 +117,7 @@ function TypingIndicator() {
         }}
       />
       <div className="bg-[var(--color-surface)] border border-[var(--border-default)] rounded-2xl rounded-bl-sm px-4 py-3">
-        <div className="flex items-center gap-1" aria-label={t('typing_aria')}>
+        <div className="flex items-center gap-1" role="status" aria-label={t('typing_aria')}>
           {[0, 1, 2].map((i) => (
             <motion.span
               key={i}
@@ -233,7 +233,7 @@ function MessageBubble({ message, userName, userAvatar, onFeedback }: MessageBub
         </div>
         {toolInvocations.length > 0 && <ToolResultCards invocations={toolInvocations} />}
         {sources.length > 0 && (
-          <div className="flex flex-wrap items-center gap-1.5 px-1" aria-label={t('sources_label')}>
+          <div className="flex flex-wrap items-center gap-1.5 px-1" role="group" aria-label={t('sources_label')}>
             {sources.map((source) => {
               const chip = (
                 <Chip
@@ -532,6 +532,7 @@ export default function AiChatPage() {
   return (
     <div
       className="flex flex-col h-[calc(100dvh-4rem)]"
+      role="region"
       aria-label={t('aria_chat')}
     >
       <PageMeta title={t('page_meta.title')} noIndex />
@@ -584,7 +585,7 @@ export default function AiChatPage() {
           {!hasMessages ? (
             <EmptyState onQuestionClick={(q) => void sendMessage(q)} starters={starters} />
           ) : (
-            <div className="max-w-2xl mx-auto" aria-live="polite" aria-label={t('messages_region')}>
+            <div className="max-w-2xl mx-auto" role="log" aria-live="polite" aria-label={t('messages_region')}>
               <AnimatePresence initial={false}>
                 {messages.map((msg) => (
                   <MessageBubble

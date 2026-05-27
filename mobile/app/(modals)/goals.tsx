@@ -3,39 +3,211 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
-  View,
-  Text,
-  FlatList,
-  Pressable,
-  TextInput,
   Alert,
+  FlatList,
   KeyboardAvoidingView,
   Platform,
   RefreshControl,
+  Text,
+  TextInput,
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
-import { Spinner } from 'heroui-native';
 
 import {
-  getGoals,
   createGoal,
+  getGoals,
   updateGoalStatus,
   type Goal,
 } from '@/lib/api/goals';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
+import { withAlpha } from '@/lib/utils/color';
+import AppTopBar from '@/components/ui/AppTopBar';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
-// ─── Goal Card ────────────────────────────────────────────────────────────────
+type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
+type ApiGoal = Goal & {
+  target_value?: number | string | null;
+  current_value?: number | string | null;
+  deadline?: string | null;
+  progress_percentage?: number | string | null;
+  is_public?: boolean;
+  is_owner?: boolean;
+  buddy_name?: string | null;
+  streak_count?: number | null;
+};
+
+function numberOrFallback(value: unknown, fallback = 0) {
+  const numeric = typeof value === 'number' ? value : typeof value === 'string' ? Number(value) : NaN;
+  return Number.isFinite(numeric) ? numeric : fallback;
+}
+
+function getGoalTarget(goal: ApiGoal) {
+  return numberOrFallback(goal.target_hours, numberOrFallback(goal.target_value));
+}
+
+function getGoalProgress(goal: ApiGoal) {
+  return numberOrFallback(goal.progress_hours, numberOrFallback(goal.current_value));
+}
+
+function getGoalProgressPercent(goal: ApiGoal) {
+  const explicit = numberOrFallback(goal.progress_percentage, NaN);
+  if (Number.isFinite(explicit)) {
+    return Math.max(0, Math.min(100, Math.round(explicit)));
+  }
+  const target = getGoalTarget(goal);
+  return target > 0 ? Math.max(0, Math.min(100, Math.round((getGoalProgress(goal) / target) * 100))) : 0;
+}
+
+function getGoalDueDate(goal: ApiGoal) {
+  return goal.due_date ?? goal.deadline ?? null;
+}
+
+function statusTone(goal: ApiGoal, primary: string, theme: ReturnType<typeof useTheme>) {
+  if (goal.status === 'completed') return theme.success;
+  if (goal.status === 'abandoned') return theme.textMuted;
+  return primary;
+}
+
+function StatusChip({
+  goal,
+  primary,
+  theme,
+  t,
+}: {
+  goal: ApiGoal;
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: string) => string;
+}) {
+  const tone = statusTone(goal, primary, theme);
+  const icon: IoniconName =
+    goal.status === 'completed' ? 'checkmark-circle-outline' :
+    goal.status === 'abandoned' ? 'close-circle-outline' :
+    'flag-outline';
+
+  return (
+    <Chip size="sm" variant="secondary" color={goal.status === 'completed' ? 'success' : 'default'}>
+      <Ionicons name={icon} size={12} color={tone} />
+      <Chip.Label>{t(`status.${goal.status}`)}</Chip.Label>
+    </Chip>
+  );
+}
+
+function ProgressBar({
+  percent,
+  color,
+}: {
+  percent: number;
+  color: string;
+}) {
+  return (
+    <View className="h-2.5 overflow-hidden rounded-full bg-default-200">
+      <View className="h-2.5 rounded-full" style={{ width: `${percent}%`, backgroundColor: color }} />
+    </View>
+  );
+}
+
+function StatTile({
+  icon,
+  label,
+  value,
+  tone,
+  theme,
+}: {
+  icon: IoniconName;
+  label: string;
+  value: string;
+  tone: string;
+  theme: ReturnType<typeof useTheme>;
+}) {
+  return (
+    <Surface variant="secondary" className="min-w-[46%] flex-1 gap-2 rounded-panel-inner p-3">
+      <View className="flex-row items-center gap-2">
+        <View className="size-8 items-center justify-center rounded-full" style={{ backgroundColor: withAlpha(tone, 0.14) }}>
+          <Ionicons name={icon} size={16} color={tone} />
+        </View>
+        <Text className="flex-1 text-[11px] font-semibold uppercase text-muted-foreground" numberOfLines={1}>
+          {label}
+        </Text>
+      </View>
+      <Text className="text-lg font-bold" style={{ color: theme.text }} numberOfLines={1}>
+        {value}
+      </Text>
+    </Surface>
+  );
+}
+
+function GoalsHero({
+  goals,
+  primary,
+  theme,
+  t,
+}: {
+  goals: ApiGoal[];
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+}) {
+  const activeGoals = goals.filter((goal) => goal.status === 'active').length;
+  const completedGoals = goals.filter((goal) => goal.status === 'completed').length;
+  const totalProgress = goals.length > 0
+    ? Math.round(goals.reduce((sum, goal) => sum + getGoalProgressPercent(goal), 0) / goals.length)
+    : 0;
+
+  return (
+    <HeroCard className="gap-5 overflow-hidden rounded-panel p-0">
+      <View className="h-1.5" style={{ backgroundColor: primary }} />
+      <HeroCard.Body className="gap-5 p-4 pt-0">
+        <View className="flex-row items-start gap-3">
+          <View className="size-12 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+            <Ionicons name="flag-outline" size={24} color={primary} />
+          </View>
+          <View className="min-w-0 flex-1 gap-1">
+            <Text className="text-xs font-semibold uppercase text-muted-foreground">
+              {t('heroEyebrow')}
+            </Text>
+            <Text className="text-2xl font-bold text-foreground" numberOfLines={1}>
+              {t('title')}
+            </Text>
+            <Text className="text-sm text-muted-foreground">
+              {t('subtitle')}
+            </Text>
+          </View>
+        </View>
+
+        <View className="gap-2">
+          <View className="flex-row items-center justify-between">
+            <Text className="text-xs font-semibold uppercase text-muted-foreground">
+              {t('stats.averageProgress')}
+            </Text>
+            <Text className="text-sm font-bold" style={{ color: primary }}>
+              {t('percent', { percent: totalProgress })}
+            </Text>
+          </View>
+          <ProgressBar percent={totalProgress} color={primary} />
+        </View>
+
+        <View className="flex-row flex-wrap gap-3">
+          <StatTile icon="flag-outline" label={t('stats.active')} value={String(activeGoals)} tone={primary} theme={theme} />
+          <StatTile icon="checkmark-circle-outline" label={t('stats.completed')} value={String(completedGoals)} tone={theme.success} theme={theme} />
+          <StatTile icon="layers-outline" label={t('stats.total')} value={String(goals.length)} tone="#f59e0b" theme={theme} />
+          <StatTile icon="sparkles-outline" label={t('stats.momentum')} value={goals.length > 0 ? t('momentumOn') : t('momentumEmpty')} tone="#8b5cf6" theme={theme} />
+        </View>
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
 
 function GoalCard({
   goal,
@@ -45,238 +217,249 @@ function GoalCard({
   onComplete,
   onAbandon,
 }: {
-  goal: Goal;
+  goal: ApiGoal;
   primary: string;
   theme: ReturnType<typeof useTheme>;
   t: (key: string, opts?: Record<string, unknown>) => string;
   onComplete: (id: number) => void;
   onAbandon: (id: number) => void;
 }) {
-  const statusColor =
-    goal.status === 'active' ? primary :
-    goal.status === 'completed' ? theme.success :
-    theme.textMuted;
-
-  const progressPercent =
-    goal.target_hours && goal.target_hours > 0
-      ? Math.min(100, Math.round((goal.progress_hours / goal.target_hours) * 100))
-      : 0;
-
-  const dueDateStr = goal.due_date
-    ? new Date(goal.due_date).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
+  const target = getGoalTarget(goal);
+  const current = getGoalProgress(goal);
+  const percent = getGoalProgressPercent(goal);
+  const tone = statusTone(goal, primary, theme);
+  const dueDate = getGoalDueDate(goal);
+  const dueDateStr = dueDate
+    ? new Date(dueDate).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
     : null;
 
   function handleAbandon() {
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     Alert.alert(
-      t('goals:abandonTitle'),
-      t('goals:abandonMessage'),
+      t('abandonTitle'),
+      t('abandonMessage'),
       [
         { text: t('common:buttons.cancel'), style: 'cancel' },
-        { text: t('goals:abandon'), style: 'destructive', onPress: () => void onAbandon(goal.id) },
+        { text: t('abandon'), style: 'destructive', onPress: () => void onAbandon(goal.id) },
       ],
     );
   }
 
   return (
-    <View
-      className="bg-surface rounded-xl px-4 py-3 border border-border/50"
-      accessible={true}
-      accessibilityLabel={goal.title}
-    >
-      <View className="flex-row items-start justify-between gap-2 mb-2">
-        <Text className="flex-1 text-sm font-semibold text-foreground" numberOfLines={2}>{goal.title}</Text>
-        <View
-          className="border rounded px-2 py-0.5"
-          style={{ backgroundColor: statusColor + '20', borderColor: statusColor }}
-        >
-          <Text className="text-[11px] font-semibold" style={{ color: statusColor }}>
-            {t(`goals:status.${goal.status}`)}
-          </Text>
+    <HeroCard className="rounded-panel p-0" accessible accessibilityLabel={goal.title}>
+      <HeroCard.Body className="gap-4 p-4">
+        <View className="flex-row items-start gap-3">
+          <View className="size-11 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(tone, 0.14) }}>
+            <Ionicons name={goal.status === 'completed' ? 'checkmark-outline' : 'flag-outline'} size={22} color={tone} />
+          </View>
+          <View className="min-w-0 flex-1 gap-1">
+            <View className="flex-row items-start justify-between gap-2">
+              <Text className="min-w-0 flex-1 text-base font-semibold text-foreground" numberOfLines={2}>
+                {goal.title}
+              </Text>
+              <StatusChip goal={goal} primary={primary} theme={theme} t={t} />
+            </View>
+            {goal.description ? (
+              <Text className="text-sm text-muted-foreground" numberOfLines={3}>
+                {goal.description}
+              </Text>
+            ) : null}
+          </View>
         </View>
-      </View>
 
-      {/* Progress */}
-      <View className="mb-2">
-        <View className="h-1.5 rounded-full bg-border/50 overflow-hidden mb-1">
-          <View
-            className="h-1.5 rounded-full"
-            style={{
-              width: `${progressPercent}%`,
-              backgroundColor: goal.status === 'completed' ? theme.success : primary,
-            }}
-          />
+        <View className="gap-2">
+          <View className="flex-row items-center justify-between">
+            <Text className="text-xs font-semibold uppercase text-muted-foreground">
+              {target > 0 ? t('progress', { current, target }) : t('noTarget', { current })}
+            </Text>
+            <Text className="text-xs font-bold" style={{ color: tone }}>
+              {t('percent', { percent })}
+            </Text>
+          </View>
+          <ProgressBar percent={percent} color={tone} />
         </View>
-        <Text className="text-xs text-muted-foreground">
-          {goal.target_hours
-            ? t('goals:progress', { current: goal.progress_hours, target: goal.target_hours })
-            : t('goals:noTarget', { current: goal.progress_hours })}
-        </Text>
-      </View>
 
-      {/* Due date */}
-      {dueDateStr && (
-        <View className="flex-row items-center gap-1 mb-2">
-          <Ionicons name="calendar-outline" size={13} color={theme.textMuted} />
-          <Text className="text-xs text-muted-foreground">{t('goals:due', { date: dueDateStr })}</Text>
+        <View className="flex-row flex-wrap gap-2">
+          {dueDateStr ? (
+            <Chip size="sm" variant="secondary" color="default">
+              <Ionicons name="calendar-outline" size={12} color={theme.textMuted} />
+              <Chip.Label>{t('due', { date: dueDateStr })}</Chip.Label>
+            </Chip>
+          ) : null}
+          {goal.buddy_name ? (
+            <Chip size="sm" variant="secondary" color="default">
+              <Ionicons name="people-outline" size={12} color={theme.textMuted} />
+              <Chip.Label>{t('buddy', { name: goal.buddy_name })}</Chip.Label>
+            </Chip>
+          ) : null}
+          {goal.is_public ? (
+            <Chip size="sm" variant="secondary" color="default">
+              <Ionicons name="globe-outline" size={12} color={theme.textMuted} />
+              <Chip.Label>{t('visibility.public')}</Chip.Label>
+            </Chip>
+          ) : null}
         </View>
-      )}
 
-      {/* Actions for active goals only */}
-      {goal.status === 'active' && (
-        <View className="flex-row gap-2 mt-1">
-          <Pressable
-            className="flex-1 flex-row items-center justify-center gap-1 border rounded-lg py-1.5"
-            style={{ borderColor: theme.success }}
-            onPress={() => { void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); onComplete(goal.id); }}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <Ionicons name="checkmark-outline" size={14} color={theme.success} />
-            <Text className="text-xs font-semibold" style={{ color: theme.success }}>{t('goals:complete')}</Text>
-          </Pressable>
-          <Pressable
-            className="flex-1 flex-row items-center justify-center gap-1 border rounded-lg py-1.5"
-            style={{ borderColor: theme.textMuted }}
-            onPress={handleAbandon}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-          >
-            <Ionicons name="close-outline" size={14} color={theme.textMuted} />
-            <Text className="text-xs font-semibold" style={{ color: theme.textMuted }}>{t('goals:abandon')}</Text>
-          </Pressable>
-        </View>
-      )}
-    </View>
+        {goal.status === 'active' ? (
+          <HeroCard.Footer className="gap-2 p-0 pt-1">
+            <HeroButton
+              className="flex-1"
+              size="sm"
+              variant="secondary"
+              onPress={() => {
+                void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                onComplete(goal.id);
+              }}
+            >
+              <Ionicons name="checkmark-outline" size={15} color={theme.success} />
+              <HeroButton.Label>{t('complete')}</HeroButton.Label>
+            </HeroButton>
+            <HeroButton className="flex-1" size="sm" variant="tertiary" onPress={handleAbandon}>
+              <Ionicons name="close-outline" size={15} color={theme.textMuted} />
+              <HeroButton.Label>{t('abandon')}</HeroButton.Label>
+            </HeroButton>
+          </HeroCard.Footer>
+        ) : null}
+      </HeroCard.Body>
+    </HeroCard>
   );
 }
 
-// ─── Create Goal Form ─────────────────────────────────────────────────────────
-
 function CreateGoalForm({
-  primary,
   theme,
   t,
   onCreated,
   onCancel,
 }: {
-  primary: string;
   theme: ReturnType<typeof useTheme>;
   t: (key: string) => string;
   onCreated: (goal: Goal) => void;
   onCancel: () => void;
 }) {
   const [title, setTitle] = useState('');
-  const [targetHours, setTargetHours] = useState('');
+  const [description, setDescription] = useState('');
+  const [targetValue, setTargetValue] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit() {
-    const trimmed = title.trim();
-    if (!trimmed) return;
+    const trimmedTitle = title.trim();
+    if (!trimmedTitle) return;
+
     setSubmitting(true);
     try {
-      const parsed = targetHours.trim() !== '' ? parseFloat(targetHours) : undefined;
+      const parsed = targetValue.trim() !== '' ? Number(targetValue) : undefined;
       const result = await createGoal({
-        title: trimmed,
-        ...(parsed !== undefined && !isNaN(parsed) ? { target_hours: parsed } : {}),
+        title: trimmedTitle,
+        ...(description.trim() ? { description: description.trim() } : {}),
+        ...(parsed !== undefined && Number.isFinite(parsed) ? { target_value: parsed } : {}),
       });
       onCreated(result.data);
+      setTitle('');
+      setDescription('');
+      setTargetValue('');
     } catch {
-      Alert.alert(t('common:errors.alertTitle'), t('goals:create.error'));
+      Alert.alert(t('common:errors.alertTitle'), t('create.error'));
     } finally {
       setSubmitting(false);
     }
   }
 
   return (
-    <View className="bg-surface rounded-xl p-4 mb-4 border border-border">
-      <Text className="text-base font-bold text-foreground mb-3">{t('goals:create.title')}</Text>
+    <HeroCard className="rounded-panel p-0">
+      <HeroCard.Body className="gap-4 p-4">
+        <View className="flex-row items-center gap-3">
+          <View className="size-10 items-center justify-center rounded-2xl bg-default-200">
+            <Ionicons name="add-outline" size={22} color={theme.text} />
+          </View>
+          <View className="min-w-0 flex-1">
+            <Text className="text-base font-bold text-foreground">{t('create.title')}</Text>
+            <Text className="text-xs text-muted-foreground">{t('create.subtitle')}</Text>
+          </View>
+        </View>
 
-      <Text className="text-xs font-semibold text-muted-foreground mb-1">{t('goals:create.titleLabel')}</Text>
-      <TextInput
-        className="border rounded-lg px-3 py-2 text-sm bg-background mb-3"
-        style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg }}
-        placeholder={t('goals:create.titlePlaceholder')}
-        placeholderTextColor={theme.textMuted}
-        value={title}
-        onChangeText={setTitle}
-        returnKeyType="next"
-        autoFocus
-      />
+        <View className="gap-2">
+          <Text className="text-xs font-semibold uppercase text-muted-foreground">{t('create.titleLabel')}</Text>
+          <TextInput
+            className="rounded-panel-inner border px-3 py-3 text-sm"
+            style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg }}
+            placeholder={t('create.titlePlaceholder')}
+            placeholderTextColor={theme.textMuted}
+            value={title}
+            onChangeText={setTitle}
+            returnKeyType="next"
+            autoFocus
+          />
+        </View>
 
-      <Text className="text-xs font-semibold text-muted-foreground mb-1">{t('goals:create.targetHoursLabel')}</Text>
-      <TextInput
-        className="border rounded-lg px-3 py-2 text-sm bg-background mb-3"
-        style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg }}
-        placeholder="e.g. 10"
-        placeholderTextColor={theme.textMuted}
-        value={targetHours}
-        onChangeText={setTargetHours}
-        keyboardType="decimal-pad"
-        returnKeyType="done"
-      />
+        <View className="gap-2">
+          <Text className="text-xs font-semibold uppercase text-muted-foreground">{t('create.descriptionLabel')}</Text>
+          <TextInput
+            className="min-h-[82px] rounded-panel-inner border px-3 py-3 text-sm"
+            style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg, textAlignVertical: 'top' }}
+            placeholder={t('create.descriptionPlaceholder')}
+            placeholderTextColor={theme.textMuted}
+            value={description}
+            onChangeText={setDescription}
+            multiline
+          />
+        </View>
 
-      <View className="flex-row gap-2 mt-1">
-        <Pressable
-          className="flex-1 items-center py-3 rounded-lg border border-border"
-          onPress={onCancel}
-        >
-          <Text className="text-xs font-semibold text-muted-foreground">
-            {t('common:cancel')}
-          </Text>
-        </Pressable>
-        <Pressable
-          className="flex-[2] items-center justify-center py-3 rounded-lg"
-          style={{ backgroundColor: primary, opacity: submitting || !title.trim() ? 0.6 : 1 }}
-          onPress={() => void handleSubmit()}
-          disabled={submitting || !title.trim()}
-        >
-          {submitting ? (
-            <Spinner size="sm" />
-          ) : (
-            <Text className="text-xs font-bold text-white">{t('goals:create.submit')}</Text>
-          )}
-        </Pressable>
-      </View>
-    </View>
+        <View className="gap-2">
+          <Text className="text-xs font-semibold uppercase text-muted-foreground">{t('create.targetHoursLabel')}</Text>
+          <TextInput
+            className="rounded-panel-inner border px-3 py-3 text-sm"
+            style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg }}
+            placeholder={t('create.targetPlaceholder')}
+            placeholderTextColor={theme.textMuted}
+            value={targetValue}
+            onChangeText={setTargetValue}
+            keyboardType="decimal-pad"
+            returnKeyType="done"
+          />
+        </View>
+
+        <HeroCard.Footer className="gap-2 p-0">
+          <HeroButton className="flex-1" variant="tertiary" onPress={onCancel}>
+            <HeroButton.Label>{t('common:cancel')}</HeroButton.Label>
+          </HeroButton>
+          <HeroButton
+            className="flex-[2]"
+            variant="primary"
+            onPress={() => void handleSubmit()}
+            isDisabled={submitting || !title.trim()}
+          >
+            {submitting ? <Spinner size="sm" /> : <HeroButton.Label>{t('create.submit')}</HeroButton.Label>}
+          </HeroButton>
+        </HeroCard.Footer>
+      </HeroCard.Body>
+    </HeroCard>
   );
 }
 
-// ─── Screen ───────────────────────────────────────────────────────────────────
-
 export default function GoalsScreen() {
   const { t } = useTranslation(['goals', 'common']);
-  const navigation = useNavigation();
   const primary = usePrimaryColor();
   const theme = useTheme();
 
   const [showForm, setShowForm] = useState(false);
-  const [goals, setGoals] = useState<Goal[]>([]);
+  const [goals, setGoals] = useState<ApiGoal[]>([]);
   const [initialized, setInitialized] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-
-  useEffect(() => {
-    navigation.setOptions({
-      title: t('goals:title'),
-      headerRight: () => (
-        <Pressable
-          onPress={() => setShowForm((v) => !v)}
-          style={{ marginRight: 16 }}
-          accessibilityLabel={t('goals:addGoal')}
-        >
-          <Ionicons name={showForm ? 'close-outline' : 'add-outline'} size={24} color={primary} />
-        </Pressable>
-      ),
-    });
-  }, [navigation, t, primary, showForm]);
 
   const { data, isLoading, error, refresh } = useApi(() => getGoals(null), []);
 
   useEffect(() => {
     if (data) {
-      setGoals(data.data);
+      setGoals((data.data ?? []) as ApiGoal[]);
       setInitialized(true);
       setRefreshing(false);
     }
   }, [data]);
+
+  const sortedGoals = useMemo(() => {
+    const rank = { active: 0, completed: 1, abandoned: 2 };
+    return [...goals].sort((a, b) => rank[a.status] - rank[b.status]);
+  }, [goals]);
 
   function handleRefresh() {
     setRefreshing(true);
@@ -286,85 +469,96 @@ export default function GoalsScreen() {
   async function handleUpdateStatus(id: number, status: 'completed' | 'abandoned') {
     try {
       const result = await updateGoalStatus(id, status);
-      setGoals((prev) => prev.map((g) => (g.id === id ? result.data : g)));
+      setGoals((prev) => prev.map((goal) => (goal.id === id ? result.data as ApiGoal : goal)));
     } catch {
       Alert.alert(t('common:errors.alertTitle'), t('goals:updateError'));
     }
   }
 
   function handleGoalCreated(goal: Goal) {
-    setGoals((prev) => [goal, ...prev]);
+    setGoals((prev) => [goal as ApiGoal, ...prev]);
     setShowForm(false);
   }
 
-  if (isLoading && !initialized) {
-    return (
-      <SafeAreaView className="flex-1 items-center justify-center bg-background">
-        <LoadingSpinner />
-      </SafeAreaView>
-    );
-  }
+  const topAction = {
+    accessibilityLabel: showForm ? t('goals:create.close') : t('goals:addGoal'),
+    icon: (showForm ? 'close-outline' : 'add-outline') as IoniconName,
+    onPress: () => {
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      setShowForm((visible) => !visible);
+    },
+  };
 
   return (
     <ModalErrorBoundary>
-    <SafeAreaView className="flex-1 bg-background">
-      <KeyboardAvoidingView
-        className="flex-1"
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        <FlatList<Goal>
-          data={goals}
-          keyExtractor={(item) => String(item.id)}
-          contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={() => void handleRefresh()}
-              tintColor={primary}
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('goals:title')} backLabel={t('common:back')} fallbackHref="/(tabs)/home" rightAction={topAction} />
+
+        {isLoading && !initialized ? (
+          <View className="flex-1 items-center justify-center">
+            <LoadingSpinner />
+          </View>
+        ) : (
+          <KeyboardAvoidingView className="flex-1" behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+            <FlatList<ApiGoal>
+              data={sortedGoals}
+              keyExtractor={(item) => String(item.id)}
+              contentContainerClassName="gap-4 px-4 pb-10"
+              refreshControl={
+                <RefreshControl
+                  refreshing={refreshing}
+                  onRefresh={() => void handleRefresh()}
+                  tintColor={primary}
+                  colors={[primary]}
+                />
+              }
+              ListHeaderComponent={
+                <View className="gap-4">
+                  <GoalsHero goals={goals} primary={primary} theme={theme} t={t} />
+                  {showForm ? (
+                    <CreateGoalForm
+                      theme={theme}
+                      t={t}
+                      onCreated={handleGoalCreated}
+                      onCancel={() => setShowForm(false)}
+                    />
+                  ) : null}
+                </View>
+              }
+              ListEmptyComponent={
+                !isLoading && !showForm ? (
+                  <View className="pt-4">
+                    {error ? (
+                      <Surface variant="secondary" className="items-center gap-3 rounded-panel p-6">
+                        <Ionicons name="alert-circle-outline" size={28} color={theme.error} />
+                        <Text className="text-center text-sm text-danger">{error}</Text>
+                      </Surface>
+                    ) : (
+                      <EmptyState
+                        icon="flag-outline"
+                        title={t('goals:noGoals')}
+                        subtitle={t('goals:noGoalsHint')}
+                        actionLabel={t('goals:addGoal')}
+                        onAction={() => setShowForm(true)}
+                      />
+                    )}
+                  </View>
+                ) : null
+              }
+              renderItem={({ item }) => (
+                <GoalCard
+                  goal={item}
+                  primary={primary}
+                  theme={theme}
+                  t={t}
+                  onComplete={(id) => void handleUpdateStatus(id, 'completed')}
+                  onAbandon={(id) => void handleUpdateStatus(id, 'abandoned')}
+                />
+              )}
             />
-          }
-          ListHeaderComponent={
-            showForm ? (
-              <CreateGoalForm
-                primary={primary}
-                theme={theme}
-                t={t}
-                onCreated={handleGoalCreated}
-                onCancel={() => setShowForm(false)}
-              />
-            ) : null
-          }
-          ListEmptyComponent={
-            !isLoading && !showForm ? (
-              <View className="pt-10 items-center">
-                {error ? (
-                  <Text className="text-xs text-danger text-center">{error}</Text>
-                ) : (
-                  <EmptyState
-                    icon="flag-outline"
-                    title={t('goals:noGoals')}
-                    subtitle={t('goals:noGoalsHint')}
-                    actionLabel={t('goals:addGoal')}
-                    onAction={() => setShowForm(true)}
-                  />
-                )}
-              </View>
-            ) : null
-          }
-          renderItem={({ item }) => (
-            <GoalCard
-              goal={item}
-              primary={primary}
-              theme={theme}
-              t={t}
-              onComplete={(id) => void handleUpdateStatus(id, 'completed')}
-              onAbandon={(id) => void handleUpdateStatus(id, 'abandoned')}
-            />
-          )}
-          ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
-        />
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+          </KeyboardAvoidingView>
+        )}
+      </SafeAreaView>
     </ModalErrorBoundary>
   );
 }

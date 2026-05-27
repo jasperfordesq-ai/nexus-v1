@@ -197,7 +197,8 @@
     "feed_load_more": "Laad meer",
     "member_actions_aria": "Acties van leden",
     "feed_loading": "Loading group feed...",
-    "events_loading": "Loading group events..."
+    "events_loading": "Loading group events...",
+    "loading_replies": "Loading replies..."
   },
   "form": {
     "create_title": "Nieuwe groep aanmaken",
@@ -284,7 +285,8 @@
     "pinned_success": "Vastgezet",
     "update_failed": "Mislukt om aankondiging bij te werken",
     "deleted": "Aankondiging verwijderd",
-    "delete_failed": "Mislukt om aankondiging te verwijderen"
+    "delete_failed": "Mislukt om aankondiging te verwijderen",
+    "loading": "Loading announcements..."
   },
   "challenges": {
     "heading": "Uitdagingen",
@@ -549,7 +551,8 @@
     "answer_posted_success": "Antwoord geplaatst!",
     "answer_posted_error": "Het plaatsen van het antwoord is mislukt",
     "vote_error": "Stemmen is mislukt",
-    "accept_error": "Accepteren van het antwoord is mislukt"
+    "accept_error": "Accepteren van het antwoord is mislukt",
+    "loading_detail": "Loading question details..."
   },
   "wiki": {
     "load_failed": "Wikipagina's konden niet worden geladen",
@@ -597,7 +600,8 @@
     "content_label": "Inhoud",
     "create": "Pagina maken",
     "delete_title": "Wikipagina verwijderen",
-    "delete_confirm": "Weet je zeker dat je \"{{name}}\" wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt."
+    "delete_confirm": "Weet je zeker dat je \"{{name}}\" wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.",
+    "loading_page": "Loading wiki page..."
   },
   "page_meta": {
     "create": {

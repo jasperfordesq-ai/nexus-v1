@@ -9,21 +9,27 @@ import { render } from '@testing-library/react-native';
 // --- Mocks ---
 
 jest.mock('expo-router', () => ({
-  router: { push: jest.fn(), back: jest.fn() },
+  router: { push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
   useLocalSearchParams: () => ({ id: '7' }),
-  useNavigation: () => ({ setOptions: jest.fn() }),
 }));
 
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, opts?: Record<string, unknown>) => {
       const map: Record<string, string> = {
+        'common:back': 'Back',
         'detail.title': 'Blog Post',
         'detail.invalidId': 'Invalid post ID.',
+        'detail.invalidIdHint': 'We could not identify which article to open.',
         'detail.notFound': 'Post not found.',
+        'detail.notFoundHint': 'This article may have been removed.',
         'detail.goBack': 'Go Back',
+        'detail.backToBlog': 'Back to blog',
         'detail.share': 'Share post',
         'detail.readFull': 'Read the full post on the web.',
+        'detail.tags': 'Topics',
+        'detail.article': 'Article',
+        'publishedOn': opts ? String(opts.date ?? '') : '',
         'by': opts ? `By ${String(opts.name ?? '')}` : 'By',
         'readingTime': opts ? `${String(opts.minutes ?? 0)} min read` : '0 min read',
       };
@@ -147,6 +153,6 @@ describe('BlogPostScreen', () => {
 
     const { getByText } = render(<BlogPostScreen />);
     expect(getByText('Post not found.')).toBeTruthy();
-    expect(getByText('Go Back')).toBeTruthy();
+    expect(getByText('Back to blog')).toBeTruthy();
   });
 });

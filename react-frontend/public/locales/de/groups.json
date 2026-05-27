@@ -197,7 +197,8 @@
     "feed_load_more": "Mehr laden",
     "member_actions_aria": "Mitglieder-Aktionen",
     "feed_loading": "Loading group feed...",
-    "events_loading": "Loading group events..."
+    "events_loading": "Loading group events...",
+    "loading_replies": "Loading replies..."
   },
   "form": {
     "create_title": "Neue Gruppe erstellen",
@@ -284,7 +285,8 @@
     "pinned_success": "Angepinnt",
     "update_failed": "Ankündigung konnte nicht aktualisiert werden",
     "deleted": "Ankündigung gelöscht",
-    "delete_failed": "Ankündigung konnte nicht gelöscht werden"
+    "delete_failed": "Ankündigung konnte nicht gelöscht werden",
+    "loading": "Loading announcements..."
   },
   "challenges": {
     "heading": "Herausforderungen",
@@ -549,7 +551,8 @@
     "answer_posted_success": "Antwort gepostet!",
     "answer_posted_error": "Fehler beim Posten der Antwort",
     "vote_error": "Fehler beim Abstimmen",
-    "accept_error": "Fehler beim Akzeptieren der Antwort"
+    "accept_error": "Fehler beim Akzeptieren der Antwort",
+    "loading_detail": "Loading question details..."
   },
   "wiki": {
     "load_failed": "Wiki-Seiten konnten nicht geladen werden",
@@ -597,7 +600,8 @@
     "content_label": "Inhalt",
     "create": "Seite erstellen",
     "delete_title": "Wiki-Seite löschen",
-    "delete_confirm": "Möchtest du \"{{name}}\" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden."
+    "delete_confirm": "Möchtest du \"{{name}}\" wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "loading_page": "Loading wiki page..."
   },
   "page_meta": {
     "create": {

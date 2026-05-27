@@ -3,27 +3,33 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useState } from 'react';
-import { FlatList, Pressable, RefreshControl, Text, TextInput, View } from 'react-native';
+import { useCallback, useMemo, useState } from 'react';
+import { FlatList, RefreshControl, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { Spinner } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import { getMembers, type Member, type MemberListResponse } from '@/lib/api/members';
 import { useDebounce } from '@/lib/hooks/useDebounce';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
+import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { withAlpha } from '@/lib/utils/color';
 import MemberCard from '@/components/MemberCard';
 import { SkeletonBox } from '@/components/ui/Skeleton';
+import AppTopBar from '@/components/ui/AppTopBar';
 
 function MemberCardSkeleton() {
   return (
-    <View className="flex-row items-center px-4 py-3 bg-surface">
-      <SkeletonBox width={48} height={48} borderRadius={24} />
-      <View className="flex-1 ml-3 gap-1.5">
-        <SkeletonBox width="60%" height={14} />
-        <SkeletonBox width="40%" height={11} />
+    <View className="mx-4 my-2 rounded-2xl bg-surface p-4">
+      <View className="flex-row items-center gap-3">
+        <SkeletonBox width={56} height={56} borderRadius={28} />
+        <View className="flex-1 gap-2">
+          <SkeletonBox width="62%" height={16} />
+          <SkeletonBox width="82%" height={12} />
+          <SkeletonBox width="46%" height={12} />
+        </View>
       </View>
     </View>
   );
@@ -41,13 +47,17 @@ function extractMembersPage(response: MemberListResponse) {
 export default function MembersScreen() {
   const { t } = useTranslation('members');
   const primary = usePrimaryColor();
+  const theme = useTheme();
   const [search, setSearch] = useState('');
+  const [totalMembers, setTotalMembers] = useState<number | null>(null);
   const debouncedSearch = useDebounce(search, 400);
 
   const fetchMembers = useCallback(
-    (cursor: string | null) => {
+    async (cursor: string | null) => {
       const offset = cursor ? Number(cursor) : 0;
-      return getMembers(Number.isFinite(offset) ? offset : 0, debouncedSearch || undefined);
+      const response = await getMembers(Number.isFinite(offset) ? offset : 0, debouncedSearch || undefined);
+      setTotalMembers(response.meta.total_items ?? null);
+      return response;
     },
     [debouncedSearch],
   );
@@ -55,30 +65,27 @@ export default function MembersScreen() {
   const { items, isLoading, isLoadingMore, error, hasMore, loadMore, refresh } =
     usePaginatedApi<Member, MemberListResponse>(fetchMembers, extractMembersPage, [debouncedSearch]);
 
+  const hasSearch = search.trim().length > 0;
+
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <View className="px-4 pt-4 pb-2">
-        <Text className="text-xl font-bold text-foreground">{t('title')}</Text>
-      </View>
-
-      {/* Search bar */}
-      <View className="flex-row items-center bg-surface mx-4 mb-2 rounded-xl border border-border px-3">
-        <Ionicons name="search-outline" size={18} className="text-muted-foreground mr-2" />
-        <TextInput
-          className="flex-1 py-2.5 text-base text-foreground"
-          value={search}
-          onChangeText={setSearch}
-          placeholder={t('search.placeholder')}
-          returnKeyType="search"
-          clearButtonMode="while-editing"
-          accessibilityLabel={t('search.placeholder')}
-        />
-      </View>
-
+      <AppTopBar title={t('title')} backLabel={t('back')} fallbackHref="/(tabs)/home" />
       <FlatList<Member>
         data={items}
         keyExtractor={(item) => String(item.id)}
         renderItem={({ item }) => <MemberCard member={item} />}
+        ListHeaderComponent={
+          <MembersHeader
+            t={t}
+            primary={primary}
+            theme={theme}
+            search={search}
+            setSearch={setSearch}
+            totalCount={totalMembers ?? items.length}
+            loadedCount={items.length}
+            isLoading={isLoading}
+          />
+        }
         refreshControl={
           <RefreshControl
             refreshing={isLoading && items.length > 0}
@@ -87,7 +94,7 @@ export default function MembersScreen() {
             colors={[primary]}
           />
         }
-        onEndReached={() => { if (hasMore) loadMore(); }}
+        onEndReached={() => { if (hasMore) void loadMore(); }}
         onEndReachedThreshold={0.3}
         ListEmptyComponent={
           isLoading ? (
@@ -99,17 +106,33 @@ export default function MembersScreen() {
               <MemberCardSkeleton />
             </>
           ) : error ? (
-            <View className="flex-1 items-center justify-center p-8">
-              <Text className="text-danger text-sm text-center mb-3">{error}</Text>
-              <Pressable onPress={() => void refresh()} className="px-5 py-2.5">
-                <Text className="font-semibold" style={{ color: primary }}>{t('common:buttons.retry')}</Text>
-              </Pressable>
-            </View>
+            <HeroCard variant="secondary" className="mx-4 my-8">
+              <HeroCard.Body className="items-center gap-4">
+                <Ionicons name="warning-outline" size={30} color={primary} />
+                <Text className="text-center text-sm leading-5" style={{ color: theme.textSecondary }}>{error}</Text>
+                <HeroButton variant="primary" onPress={() => void refresh()} style={{ backgroundColor: primary }}>
+                  <HeroButton.Label>{t('common:buttons.retry')}</HeroButton.Label>
+                </HeroButton>
+              </HeroCard.Body>
+            </HeroCard>
           ) : (
-            <View className="flex-1 items-center justify-center p-8">
-              <Text className="text-muted-foreground text-sm text-center">{t('empty.title')}</Text>
-              <Text className="text-muted-foreground text-[13px] text-center mt-1">{t('empty.subtitle')}</Text>
-            </View>
+            <HeroCard variant="secondary" className="mx-4 my-8">
+              <HeroCard.Body className="items-center gap-3">
+                <Ionicons name={hasSearch ? 'search-outline' : 'people-outline'} size={34} color={primary} />
+                <Text className="text-center text-[17px] font-semibold" style={{ color: theme.text }}>
+                  {hasSearch ? t('empty.noResults', { query: debouncedSearch }) : t('empty.title')}
+                </Text>
+                <Text className="text-center text-sm leading-5" style={{ color: theme.textSecondary }}>
+                  {t('empty.subtitle')}
+                </Text>
+                {hasSearch ? (
+                  <HeroButton variant="secondary" size="sm" onPress={() => setSearch('')}>
+                    <Ionicons name="close-circle-outline" size={16} color={theme.textSecondary} />
+                    <HeroButton.Label>{t('clearSearch')}</HeroButton.Label>
+                  </HeroButton>
+                ) : null}
+              </HeroCard.Body>
+            </HeroCard>
           )
         }
         ListFooterComponent={
@@ -117,12 +140,104 @@ export default function MembersScreen() {
             <View className="py-4 items-center"><Spinner size="sm" /></View>
           ) : !hasMore && items.length > 0 && !isLoading ? (
             <View className="py-4 items-center">
-              <Text className="text-xs text-muted-foreground">{t('common:endOfList')}</Text>
+              <Text className="text-xs" style={{ color: theme.textSecondary }}>{t('common:endOfList')}</Text>
             </View>
           ) : null
         }
-        contentContainerStyle={{ paddingBottom: 24 }}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 24 }}
       />
     </SafeAreaView>
+  );
+}
+
+type TFunction = (key: string, options?: Record<string, unknown>) => string;
+
+function MembersHeader({
+  t,
+  primary,
+  theme,
+  search,
+  setSearch,
+  totalCount,
+  loadedCount,
+  isLoading,
+}: {
+  t: TFunction;
+  primary: string;
+  theme: Theme;
+  search: string;
+  setSearch: (value: string) => void;
+  totalCount: number;
+  loadedCount: number;
+  isLoading: boolean;
+}) {
+  return (
+    <View className="gap-3 pb-2">
+      <HeroCard variant="default" className="mx-4 mt-4 overflow-hidden">
+        <View className="h-1 w-full" style={{ backgroundColor: primary }} />
+        <HeroCard.Body className="gap-4 px-4 py-4">
+          <View className="flex-row items-start justify-between gap-4">
+            <View className="min-w-0 flex-1">
+              <View className="mb-2 flex-row items-center gap-2">
+                <View className="h-8 w-8 items-center justify-center rounded-full" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+                  <Ionicons name="people-outline" size={18} color={primary} />
+                </View>
+                <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>
+                  {t('heroEyebrow')}
+                </Text>
+              </View>
+              <Text className="text-2xl font-bold leading-8" style={{ color: theme.text }}>
+                {t('title')}
+              </Text>
+              <Text className="mt-1 text-sm leading-5" style={{ color: theme.textSecondary }}>
+                {t('subtitle')}
+              </Text>
+            </View>
+          </View>
+
+          <View className="flex-row flex-wrap gap-2">
+            <Chip size="sm" variant="soft" color="accent">
+              <Ionicons name="people-outline" size={12} color={primary} />
+              <Chip.Label>{isLoading ? t('resultsLoading') : t('memberCount', { count: totalCount })}</Chip.Label>
+            </Chip>
+            <Chip size="sm" variant="soft" color="default">
+              <Ionicons name="download-outline" size={12} color={theme.textMuted} />
+              <Chip.Label>{t('loadedCount', { count: loadedCount })}</Chip.Label>
+            </Chip>
+          </View>
+        </HeroCard.Body>
+      </HeroCard>
+
+      <Surface variant="default" className="mx-4 gap-3 rounded-panel-inner p-3">
+        <View className="min-w-0">
+          <Text className="text-base font-semibold" style={{ color: theme.text }}>
+            {t('directory')}
+          </Text>
+          <Text className="mt-0.5 text-sm" style={{ color: theme.textSecondary }} numberOfLines={2}>
+            {t('filtersIntro')}
+          </Text>
+        </View>
+
+        <Surface variant="secondary" className="flex-row items-center gap-2 rounded-full px-3 py-2">
+          <Ionicons name="search-outline" size={18} color={theme.textMuted} />
+          <TextInput
+            className="min-h-[34px] flex-1 text-sm"
+            style={{ color: theme.text }}
+            value={search}
+            onChangeText={setSearch}
+            placeholder={t('search.placeholder')}
+            placeholderTextColor={theme.textMuted}
+            returnKeyType="search"
+            clearButtonMode="while-editing"
+            accessibilityLabel={t('search.placeholder')}
+          />
+          {search ? (
+            <HeroButton isIconOnly size="sm" variant="ghost" accessibilityLabel={t('clearSearch')} onPress={() => setSearch('')}>
+              <Ionicons name="close-circle" size={18} color={theme.textMuted} />
+            </HeroButton>
+          ) : null}
+        </Surface>
+      </Surface>
+    </View>
   );
 }

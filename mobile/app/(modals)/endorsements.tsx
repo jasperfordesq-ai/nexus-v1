@@ -3,20 +3,19 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useRef, useState, type RefObject } from 'react';
 import {
   Alert,
   FlatList,
   RefreshControl,
   Text,
   TextInput,
-  Pressable,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from '@/lib/haptics';
+import { Button as HeroButton, Card as HeroCard, Chip, Surface, Tabs } from 'heroui-native';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -32,16 +31,17 @@ import { useAuth } from '@/lib/hooks/useAuth';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
+import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 type Tab = 'skills' | 'endorsements';
+type ListItem = Skill | Endorsement;
 
 export default function EndorsementsScreen() {
   const { t } = useTranslation('endorsements');
-  const navigation = useNavigation();
   const primary = usePrimaryColor();
   const theme = useTheme();
   const { user } = useAuth();
@@ -52,10 +52,6 @@ export default function EndorsementsScreen() {
   const [submitting, setSubmitting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const skillInputRef = useRef<TextInput>(null);
-
-  useEffect(() => {
-    navigation.setOptions({ title: t('title') });
-  }, [navigation, t]);
 
   const userId = user?.id ?? 0;
 
@@ -99,7 +95,7 @@ export default function EndorsementsScreen() {
 
   async function handleRemoveSkill(skillId: number) {
     Alert.alert('', t('removeSkillConfirm'), [
-      { text: t('common:cancel', { defaultValue: 'Cancel' }), style: 'cancel' },
+      { text: t('common:cancel'), style: 'cancel' },
       {
         text: t('removeSkill'),
         style: 'destructive',
@@ -122,31 +118,37 @@ export default function EndorsementsScreen() {
     ({ item }: { item: Skill }) => {
       const endorseCount = endorsements.filter((e) => e.skill.id === item.id).length;
       return (
-        <View className="flex-row items-center bg-surface rounded-xl px-4 py-3 border border-border/50">
-          <View className="flex-1 gap-0.5">
-            <Text className="text-sm font-semibold text-foreground">{item.name}</Text>
+        <HeroCard variant="default" className="mx-4 my-2 overflow-hidden rounded-panel p-0">
+          <View className="h-1 w-full" style={{ backgroundColor: primary }} />
+          <HeroCard.Body className="flex-row items-center gap-3 p-4">
+            <View className="size-11 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+              <Ionicons name="construct-outline" size={20} color={primary} />
+            </View>
+            <View className="min-w-0 flex-1 gap-1">
+              <Text className="text-base font-semibold" style={{ color: theme.text }} numberOfLines={2}>{item.name}</Text>
             {item.category ? (
-              <Text className="text-xs text-muted-foreground">{item.category}</Text>
+                <Text className="text-xs" style={{ color: theme.textSecondary }}>{item.category}</Text>
             ) : null}
             {endorseCount > 0 ? (
-              <Text className="text-xs text-muted-foreground mt-0.5">
-                {t('endorsedBy', { count: endorseCount })}
-              </Text>
+                <Chip size="sm" variant="soft" color="success" className="self-start">
+                  <Ionicons name="ribbon-outline" size={12} color={theme.success} />
+                  <Chip.Label>{t('endorsedBy', { count: endorseCount })}</Chip.Label>
+                </Chip>
             ) : null}
-          </View>
-          <Pressable
+            </View>
+            <HeroButton
+              isIconOnly
+              variant="danger-soft"
             onPress={() => void handleRemoveSkill(item.id)}
-            className="p-1.5"
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             accessibilityLabel={t('removeSkill')}
-            accessibilityRole="button"
           >
             <Ionicons name="trash-outline" size={18} color={theme.error} />
-          </Pressable>
-        </View>
+            </HeroButton>
+          </HeroCard.Body>
+        </HeroCard>
       );
     },
-    [endorsements, t, theme.error],
+    [endorsements, primary, t, theme.error, theme.success, theme.text, theme.textSecondary],
   );
 
   const renderEndorsement = useCallback(
@@ -157,163 +159,233 @@ export default function EndorsementsScreen() {
         year: 'numeric',
       });
       return (
-        <View className="flex-row gap-3 bg-surface rounded-xl px-4 py-3 border border-border/50">
-          <Avatar uri={item.endorsed_by.avatar} name={item.endorsed_by.name} size={40} />
-          <View className="flex-1 gap-1">
-            <Text className="text-xs font-semibold text-foreground">{item.endorsed_by.name}</Text>
-            <View
-              className="self-start rounded px-2 py-0.5"
-              style={{ backgroundColor: withAlpha(primary, 0.13) }}
-            >
-              <Text className="text-xs font-semibold" style={{ color: primary }}>{item.skill.name}</Text>
+        <HeroCard variant="default" className="mx-4 my-2 rounded-panel p-0">
+          <HeroCard.Body className="flex-row gap-3 p-4">
+            <Avatar uri={item.endorsed_by.avatar} name={item.endorsed_by.name} size={44} />
+            <View className="min-w-0 flex-1 gap-2">
+              <View className="flex-row items-start justify-between gap-2">
+                <View className="min-w-0 flex-1">
+                  <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={1}>{item.endorsed_by.name}</Text>
+                  <Text className="text-[11px]" style={{ color: theme.textMuted }}>{date}</Text>
+                </View>
+                <Chip size="sm" variant="secondary">
+                  <Ionicons name="ribbon-outline" size={12} color={primary} />
+                  <Chip.Label>{item.skill.name}</Chip.Label>
+                </Chip>
+              </View>
+              {item.message ? (
+                <Surface variant="secondary" className="rounded-panel-inner px-3 py-2">
+                  <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{item.message}</Text>
+                </Surface>
+              ) : null}
             </View>
-            {item.message ? (
-              <Text className="text-xs text-muted-foreground">{item.message}</Text>
-            ) : null}
-            <Text className="text-[11px] text-muted-foreground">{date}</Text>
-          </View>
-        </View>
+          </HeroCard.Body>
+        </HeroCard>
       );
     },
-    [primary],
+    [primary, theme.text, theme.textMuted, theme.textSecondary],
   );
 
   const isLoading = activeTab === 'skills' ? skillsLoading : endorsementsLoading;
+  const listData: ListItem[] = activeTab === 'skills' ? skills : endorsements;
 
   return (
     <ModalErrorBoundary>
-    <SafeAreaView className="flex-1 bg-background">
-      {/* Tab toggle */}
-      <View className="flex-row gap-2 px-4 pt-4 pb-2">
-        <Pressable
-          className={`flex-1 rounded-full py-2 items-center border border-border ${activeTab === 'skills' ? '' : 'bg-surface'}`}
-          style={activeTab === 'skills' ? { backgroundColor: primary } : undefined}
-          onPress={() => { void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setActiveTab('skills'); }}
-          accessibilityRole="tab"
-          accessibilityState={{ selected: activeTab === 'skills' }}
-        >
-          <Text className={`text-xs font-semibold ${activeTab === 'skills' ? 'text-white' : 'text-muted-foreground'}`}>
-            {t('mySkills')}
-          </Text>
-        </Pressable>
-        <Pressable
-          className={`flex-1 rounded-full py-2 items-center border border-border ${activeTab === 'endorsements' ? '' : 'bg-surface'}`}
-          style={activeTab === 'endorsements' ? { backgroundColor: primary } : undefined}
-          onPress={() => { void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); setActiveTab('endorsements'); }}
-          accessibilityRole="tab"
-          accessibilityState={{ selected: activeTab === 'endorsements' }}
-        >
-          <Text className={`text-xs font-semibold ${activeTab === 'endorsements' ? 'text-white' : 'text-muted-foreground'}`}>
-            {t('endorsements')}
-          </Text>
-        </Pressable>
-      </View>
-
-      {isLoading ? (
-        <View className="flex-1 items-center justify-center">
-          <LoadingSpinner />
-        </View>
-      ) : activeTab === 'skills' ? (
-        <FlatList
-          data={skills}
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('title')} backLabel={t('common:back')} fallbackHref="/(tabs)/profile" />
+        <FlatList<ListItem>
+          data={listData}
           keyExtractor={(item) => String(item.id)}
-          renderItem={renderSkill}
-          contentContainerStyle={{ padding: 16, paddingTop: 8, paddingBottom: 40 }}
-          ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
+          renderItem={({ item }) => (
+            activeTab === 'skills'
+              ? renderSkill({ item: item as unknown as Skill })
+              : renderEndorsement({ item: item as Endorsement })
+          )}
+          contentContainerStyle={{ paddingBottom: 40 }}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
               onRefresh={() => void handleRefresh()}
               tintColor={primary}
+              colors={[primary]}
             />
           }
           ListHeaderComponent={
-            <View className="mb-3">
-              {addingSkill ? (
-                <View className="flex-row items-center gap-2">
-                  <TextInput
-                    ref={skillInputRef}
-                    className="flex-1 border rounded-lg px-3 py-2 text-xs bg-surface text-foreground"
-                    style={{ borderColor: primary, color: theme.text, backgroundColor: theme.surface }}
-                    placeholder={t('skillPlaceholder')}
-                    placeholderTextColor={theme.textMuted}
-                    value={skillInput}
-                    onChangeText={setSkillInput}
-                    autoFocus
-                    returnKeyType="done"
-                    onSubmitEditing={() => void handleAddSkill()}
-                  />
-                  <Pressable
-                    className="rounded-lg px-4 py-2"
-                    style={{ backgroundColor: primary }}
-                    onPress={() => void handleAddSkill()}
-                    disabled={submitting || !skillInput.trim()}
-                    accessibilityLabel={t('addSkill')}
-                    accessibilityRole="button"
-                  >
-                    <Text className="text-xs font-semibold text-white">{t('addSkill')}</Text>
-                  </Pressable>
-                  <Pressable
-                    className="p-1"
-                    onPress={() => {
-                      setAddingSkill(false);
-                      setSkillInput('');
-                    }}
-                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                    accessibilityRole="button"
-                  >
-                    <Ionicons name="close" size={20} color={theme.textSecondary} />
-                  </Pressable>
-                </View>
-              ) : (
-                <Pressable
-                  className="flex-row items-center gap-1.5 border rounded-lg py-2.5 px-4 self-start"
-                  style={{ borderColor: primary }}
-                  onPress={() => {
-                    setAddingSkill(true);
-                    setTimeout(() => skillInputRef.current?.focus(), 50);
-                  }}
-                  accessibilityLabel={t('addSkill')}
-                  accessibilityRole="button"
-                >
-                  <Ionicons name="add-circle-outline" size={18} color={primary} />
-                  <Text className="text-xs font-semibold" style={{ color: primary }}>
-                    {t('addSkill')}
-                  </Text>
-                </Pressable>
-              )}
-            </View>
-          }
-          ListEmptyComponent={
-            <EmptyState
-              icon="construct-outline"
-              title={t('noSkills')}
-            />
-          }
-        />
-      ) : (
-        <FlatList
-          data={endorsements}
-          keyExtractor={(item) => String(item.id)}
-          renderItem={renderEndorsement}
-          contentContainerStyle={{ padding: 16, paddingTop: 8, paddingBottom: 40 }}
-          ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={() => void handleRefresh()}
-              tintColor={primary}
+            <EndorsementsHeader
+              activeTab={activeTab}
+              setActiveTab={setActiveTab}
+              addingSkill={addingSkill}
+              setAddingSkill={setAddingSkill}
+              skillInput={skillInput}
+              setSkillInput={setSkillInput}
+              skillInputRef={skillInputRef}
+              submitting={submitting}
+              handleAddSkill={handleAddSkill}
+              skillsCount={skills.length}
+              endorsementsCount={endorsements.length}
+              primary={primary}
+              theme={theme}
+              t={t}
             />
           }
           ListEmptyComponent={
-            <EmptyState
-              icon="ribbon-outline"
-              title={t('noEndorsements')}
-            />
+            isLoading ? (
+              <View className="items-center justify-center py-14">
+                <LoadingSpinner />
+              </View>
+            ) : (
+              <View className="px-4 py-8">
+                <EmptyState
+                  icon={activeTab === 'skills' ? 'construct-outline' : 'ribbon-outline'}
+                  title={activeTab === 'skills' ? t('noSkills') : t('noEndorsements')}
+                  subtitle={activeTab === 'skills' ? t('noSkillsHint') : t('noEndorsementsHint')}
+                />
+              </View>
+            )
           }
         />
-      )}
-    </SafeAreaView>
+      </SafeAreaView>
     </ModalErrorBoundary>
+  );
+}
+
+function EndorsementsHeader({
+  activeTab,
+  setActiveTab,
+  addingSkill,
+  setAddingSkill,
+  skillInput,
+  setSkillInput,
+  skillInputRef,
+  submitting,
+  handleAddSkill,
+  skillsCount,
+  endorsementsCount,
+  primary,
+  theme,
+  t,
+}: {
+  activeTab: Tab;
+  setActiveTab: (tab: Tab) => void;
+  addingSkill: boolean;
+  setAddingSkill: (value: boolean) => void;
+  skillInput: string;
+  setSkillInput: (value: string) => void;
+  skillInputRef: RefObject<TextInput | null>;
+  submitting: boolean;
+  handleAddSkill: () => Promise<void>;
+  skillsCount: number;
+  endorsementsCount: number;
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: string, options?: Record<string, unknown>) => string;
+}) {
+  function selectTab(tab: Tab) {
+    if (tab !== activeTab) {
+      void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      setActiveTab(tab);
+    }
+  }
+
+  return (
+    <View className="gap-3 pb-2">
+      <HeroCard variant="default" className="mx-4 overflow-hidden rounded-panel p-0">
+        <View className="h-1 w-full" style={{ backgroundColor: primary }} />
+        <HeroCard.Body className="gap-4 p-4">
+          <View className="flex-row items-start gap-3">
+            <View className="size-13 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+              <Ionicons name="ribbon-outline" size={24} color={primary} />
+            </View>
+            <View className="min-w-0 flex-1">
+              <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('heroEyebrow')}</Text>
+              <Text className="mt-1 text-2xl font-bold leading-8" style={{ color: theme.text }}>{t('title')}</Text>
+              <Text className="mt-1 text-sm leading-5" style={{ color: theme.textSecondary }}>{t('subtitle')}</Text>
+            </View>
+          </View>
+          <View className="flex-row flex-wrap gap-2">
+            <Chip size="sm" variant="secondary">
+              <Ionicons name="construct-outline" size={12} color={primary} />
+              <Chip.Label>{t('skillsCount', { count: skillsCount })}</Chip.Label>
+            </Chip>
+            <Chip size="sm" variant="soft" color="success">
+              <Ionicons name="ribbon-outline" size={12} color={theme.success} />
+              <Chip.Label>{t('endorsementsCount', { count: endorsementsCount })}</Chip.Label>
+            </Chip>
+          </View>
+        </HeroCard.Body>
+      </HeroCard>
+
+      <Surface variant="default" className="mx-4 gap-3 rounded-panel-inner p-3">
+        <Tabs value={activeTab} onValueChange={(value) => selectTab(value as Tab)} variant="secondary">
+          <Tabs.List>
+            <Tabs.Indicator />
+            <Tabs.Trigger value="skills">
+              <Ionicons name="construct-outline" size={15} color={activeTab === 'skills' ? primary : theme.textMuted} />
+              <Tabs.Label>{t('mySkills')}</Tabs.Label>
+            </Tabs.Trigger>
+            <Tabs.Trigger value="endorsements">
+              <Ionicons name="ribbon-outline" size={15} color={activeTab === 'endorsements' ? primary : theme.textMuted} />
+              <Tabs.Label>{t('endorsements')}</Tabs.Label>
+            </Tabs.Trigger>
+          </Tabs.List>
+        </Tabs>
+        <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+          {activeTab === 'skills' ? t('skillsIntro') : t('endorsementsIntro')}
+        </Text>
+      </Surface>
+
+      {activeTab === 'skills' ? (
+        <Surface variant="default" className="mx-4 gap-3 rounded-panel-inner p-3">
+          {addingSkill ? (
+            <>
+              <View className="flex-row items-center gap-2 rounded-panel-inner border px-3 py-2" style={{ borderColor: withAlpha(primary, 0.34), backgroundColor: theme.surface }}>
+                <Ionicons name="add-circle-outline" size={18} color={primary} />
+                <TextInput
+                  ref={skillInputRef}
+                  className="min-h-10 flex-1 text-sm"
+                  style={{ color: theme.text }}
+                  placeholder={t('skillPlaceholder')}
+                  placeholderTextColor={theme.textMuted}
+                  value={skillInput}
+                  onChangeText={setSkillInput}
+                  autoFocus
+                  returnKeyType="done"
+                  onSubmitEditing={() => void handleAddSkill()}
+                />
+              </View>
+              <View className="flex-row gap-2">
+                <HeroButton className="flex-1" variant="secondary" onPress={() => { setAddingSkill(false); setSkillInput(''); }}>
+                  <HeroButton.Label>{t('common:cancel')}</HeroButton.Label>
+                </HeroButton>
+                <HeroButton
+                  className="flex-1"
+                  variant="primary"
+                  isDisabled={submitting || !skillInput.trim()}
+                  style={{ backgroundColor: submitting || !skillInput.trim() ? theme.border : primary }}
+                  onPress={() => void handleAddSkill()}
+                  accessibilityLabel={t('addSkill')}
+                >
+                  <Ionicons name="checkmark-outline" size={18} color={theme.onPrimary} />
+                  <HeroButton.Label>{t('addSkill')}</HeroButton.Label>
+                </HeroButton>
+              </View>
+            </>
+          ) : (
+            <HeroButton
+              variant="primary"
+              style={{ backgroundColor: primary }}
+              onPress={() => {
+                setAddingSkill(true);
+                setTimeout(() => skillInputRef.current?.focus(), 50);
+              }}
+              accessibilityLabel={t('addSkill')}
+            >
+              <Ionicons name="add-circle-outline" size={18} color={theme.onPrimary} />
+              <HeroButton.Label>{t('addSkill')}</HeroButton.Label>
+            </HeroButton>
+          )}
+        </Surface>
+      ) : null}
+    </View>
   );
 }

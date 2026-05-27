@@ -633,7 +633,8 @@
     "load_more": "もっと読み込む",
     "aria_select_all": "表示されている保留中の申請をすべて選択",
     "aria_select_application": "{{name}} からアプリケーションを選択します",
-    "aria_search_volunteers": "名前でボランティアを検索"
+    "aria_search_volunteers": "名前でボランティアを検索",
+    "filter_label": "Filter applications"
   },
   "org_wallet_balance": "ウォレット残高:",
   "auto_pay_on": "自動支払いON",

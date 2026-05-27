@@ -126,7 +126,8 @@
     "delete_collection_title": "حذف المجموعة",
     "delete_collection_body": "حذف \"{{name}}\"؟ سيتم الاحتفاظ بالعلامات المرجعية في هذه المجموعة.",
     "delete_collection_action": "حذف المجموعة",
-    "collection_actions_named": "إجراءات مجموعة {{name}}"
+    "collection_actions_named": "إجراءات مجموعة {{name}}",
+    "loading": "Loading bookmarks..."
   },
   "verified": "موثق",
   "hover_card": {

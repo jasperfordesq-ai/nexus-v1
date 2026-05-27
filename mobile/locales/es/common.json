@@ -26,6 +26,7 @@
     "retry": "Reintentar"
   },
   "errors": {
+    "boundaryTitle": "Algo salió mal",
     "generic": "Algo salió mal. Por favor, inténtalo de nuevo.",
     "network": "Error de red. Comprueba tu conexión.",
     "unauthorized": "Tu sesión ha caducado. Inicia sesión de nuevo.",
@@ -44,5 +45,20 @@
     "friend": "ahí",
     "you": "Tú"
   },
-  "endOfList": "Has llegado al final"
+  "endOfList": "Has llegado al final",
+  "aria": {
+    "actionButton": "Botón de acción",
+    "verification_badges": "Etiquetas de verificaci?n"
+  },
+  "verification": {
+    "not_id_verified": "ID no verificada",
+    "badge": {
+      "email_verified": "Correo verificado",
+      "phone_verified": "Tel?fono verificado",
+      "id_verified": "ID verificada",
+      "dbs_checked": "DBS comprobado",
+      "admin_verified": "Verificado por administraci?n",
+      "unknown": "Verificado"
+    }
+  }
 }

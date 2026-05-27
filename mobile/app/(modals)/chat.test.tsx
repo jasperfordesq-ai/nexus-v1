@@ -6,26 +6,42 @@
 import React from 'react';
 import { render } from '@testing-library/react-native';
 
-// --- Mocks ---
-
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }),
-  router: { push: jest.fn(), replace: jest.fn(), back: jest.fn() },
+  router: { push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
   useLocalSearchParams: () => ({}),
   useNavigation: () => ({ setOptions: jest.fn() }),
 }));
 
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string) => {
+    t: (key: string, opts?: Record<string, unknown>) => {
       const map: Record<string, string> = {
-        'chat:title': 'AI Chat',
-        'chat:placeholder': 'Ask me anything…',
-        'chat:send': 'Send',
-        'chat:empty': 'Start a conversation! Ask me anything about your community.',
-        'chat:thinking': 'Thinking…',
-        'chat:error': 'Sorry, something went wrong. Please try again.',
-        'chat:disclaimer': 'AI responses may be inaccurate. Do not share personal data.',
+        title: 'AI Chat',
+        page_title: 'AI Assistant',
+        header_title: 'AI Assistant',
+        header_subtitle: 'Powered by AI',
+        input_placeholder: 'Ask me anything...',
+        input_aria: 'Message',
+        send_aria: 'Send message',
+        empty_title: 'AI Assistant',
+        empty_description: 'Ask me anything about timebanking, your account, or this community.',
+        try_asking: 'Try asking...',
+        starter_q1: 'What time credits do I have and how can I use them?',
+        starter_q2: 'What skills are community members currently offering?',
+        starter_q3: 'How does timebanking work?',
+        starter_q4: 'What upcoming events are happening?',
+        starter_q5: 'How do I create a listing to offer my skills?',
+        error_connection: 'Failed to connect to the AI service. Please check your connection and try again.',
+        error_label: 'Error',
+        typing_aria: 'AI is typing',
+        timeout: 'The response is taking too long. Please try again.',
+        disclaimer: 'AI responses may not always be accurate. Verify important information.',
+        new_conversation_aria: 'Start new conversation',
+        limits_left_today: opts ? `${String(opts.count ?? 0)} left today` : '0 left today',
+        messages_region: 'Messages',
+        you: 'You',
+        'common:back': 'Back',
       };
       return map[key] ?? key;
     },
@@ -51,16 +67,51 @@ jest.mock('@/lib/hooks/useTheme', () => ({
   }),
 }));
 
-jest.mock('expo-haptics', () => ({
-  impactAsync: jest.fn().mockResolvedValue(undefined),
-  ImpactFeedbackStyle: { Light: 'light' },
+jest.mock('@/lib/hooks/useAuth', () => ({
+  useAuth: () => ({
+    user: { first_name: 'Jasper', last_name: 'Ford', avatar_url: null },
+    displayName: 'Jasper Ford',
+  }),
 }));
 
 jest.mock('@expo/vector-icons', () => ({
   Ionicons: 'View',
 }));
 
+jest.mock('heroui-native', () => {
+  const React = require('react');
+  const { Text, View } = require('react-native');
+
+  const Button = ({
+    accessibilityLabel,
+    children,
+    onPress,
+  }: {
+    accessibilityLabel?: string;
+    children: React.ReactNode;
+    onPress?: () => void;
+  }) => (
+    <Text accessibilityLabel={accessibilityLabel} onPress={onPress}>{children}</Text>
+  );
+  Button.Label = ({ children }: { children: React.ReactNode }) => <Text>{children}</Text>;
+
+  const Card = ({ children }: { children: React.ReactNode }) => <View>{children}</View>;
+  Card.Body = ({ children }: { children: React.ReactNode }) => <View>{children}</View>;
+
+  const Chip = ({ children }: { children: React.ReactNode }) => <View>{children}</View>;
+  Chip.Label = ({ children }: { children: React.ReactNode }) => <Text>{children}</Text>;
+
+  return {
+    Button,
+    Card,
+    Chip,
+    Spinner: () => null,
+    Surface: ({ children }: { children?: React.ReactNode }) => <View>{children}</View>,
+  };
+});
+
 jest.mock('@/lib/api/chat', () => ({
+  getChatStarters: jest.fn().mockResolvedValue({ starters: [] }),
   sendChatMessage: jest.fn().mockResolvedValue({
     data: {
       conversation_id: 'conv-1',
@@ -69,7 +120,8 @@ jest.mock('@/lib/api/chat', () => ({
   }),
 }));
 
-// --- Tests ---
+jest.mock('@/components/ui/AppTopBar', () => 'View');
+jest.mock('@/components/ui/Avatar', () => 'View');
 
 import ChatScreen from './chat';
 
@@ -81,22 +133,25 @@ describe('ChatScreen', () => {
 
   it('renders the message text input', () => {
     const { getByPlaceholderText } = render(<ChatScreen />);
-    expect(getByPlaceholderText('Ask me anything…')).toBeTruthy();
+    expect(getByPlaceholderText('Ask me anything...')).toBeTruthy();
   });
 
   it('renders the send button', () => {
-    const { getByAccessibilityHint, getByLabelText } = render(<ChatScreen />);
-    // Send button has accessibilityLabel="Send"
-    expect(getByLabelText('Send')).toBeTruthy();
+    const { getByLabelText } = render(<ChatScreen />);
+    expect(getByLabelText('Send message')).toBeTruthy();
   });
 
-  it('renders the disclaimer text', () => {
-    const { getByText } = render(<ChatScreen />);
-    expect(getByText('AI responses may be inaccurate. Do not share personal data.')).toBeTruthy();
+  it('renders the assistant header and disclaimer text', () => {
+    const { getAllByText, getByText } = render(<ChatScreen />);
+    expect(getAllByText('AI Assistant').length).toBeGreaterThanOrEqual(1);
+    expect(getByText('Powered by AI')).toBeTruthy();
+    expect(getByText('AI responses may not always be accurate. Verify important information.')).toBeTruthy();
   });
 
-  it('renders the empty state message when no messages exist', () => {
+  it('renders the empty state and starter prompts when no messages exist', () => {
     const { getByText } = render(<ChatScreen />);
-    expect(getByText('Start a conversation! Ask me anything about your community.')).toBeTruthy();
+    expect(getByText('Ask me anything about timebanking, your account, or this community.')).toBeTruthy();
+    expect(getByText('Try asking...')).toBeTruthy();
+    expect(getByText('How does timebanking work?')).toBeTruthy();
   });
 });

@@ -72,6 +72,12 @@ describe('getGamificationProfile', () => {
     expect(result.data.badges).toHaveLength(1);
     expect(result.data.badges[0].name).toBe('First Exchange');
   });
+
+  it('passes a target user id when loading another member profile', async () => {
+    (api.get as jest.Mock).mockResolvedValue({ data: mockProfile });
+    await getGamificationProfile(195);
+    expect(api.get).toHaveBeenCalledWith('/api/v2/gamification/profile', { user_id: '195' });
+  });
 });
 
 describe('getBadges', () => {
@@ -84,6 +90,12 @@ describe('getBadges', () => {
     expect(result.data).toHaveLength(1);
     expect(result.data[0].is_earned).toBe(true);
   });
+
+  it('passes a target user id when loading another member badges', async () => {
+    (api.get as jest.Mock).mockResolvedValue({ data: [mockBadge] });
+    await getBadges(195);
+    expect(api.get).toHaveBeenCalledWith('/api/v2/gamification/badges', { user_id: '195' });
+  });
 });
 
 describe('getLeaderboard', () => {
@@ -92,7 +104,7 @@ describe('getLeaderboard', () => {
   it('calls the correct endpoint with default period (monthly)', async () => {
     (api.get as jest.Mock).mockResolvedValue(mockLeaderboardResponse);
     const result = await getLeaderboard();
-    expect(api.get).toHaveBeenCalledWith('/api/v2/gamification/leaderboard', { period: 'monthly' });
+    expect(api.get).toHaveBeenCalledWith('/api/v2/gamification/leaderboard', { period: 'month' });
     expect(result.data).toHaveLength(1);
     expect(result.meta.user_rank).toBe(12);
   });
@@ -100,12 +112,12 @@ describe('getLeaderboard', () => {
   it('passes weekly period when specified', async () => {
     (api.get as jest.Mock).mockResolvedValue(mockLeaderboardResponse);
     await getLeaderboard('weekly');
-    expect(api.get).toHaveBeenCalledWith('/api/v2/gamification/leaderboard', { period: 'weekly' });
+    expect(api.get).toHaveBeenCalledWith('/api/v2/gamification/leaderboard', { period: 'week' });
   });
 
   it('passes all_time period when specified', async () => {
     (api.get as jest.Mock).mockResolvedValue(mockLeaderboardResponse);
     await getLeaderboard('all_time');
-    expect(api.get).toHaveBeenCalledWith('/api/v2/gamification/leaderboard', { period: 'all_time' });
+    expect(api.get).toHaveBeenCalledWith('/api/v2/gamification/leaderboard', { period: 'all' });
   });
 });

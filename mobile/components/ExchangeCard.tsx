@@ -3,14 +3,19 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Pressable, View, Text } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
+import { Ionicons } from '@expo/vector-icons';
+import { Button as HeroButton, Card as HeroCard, Chip, Separator, Surface } from 'heroui-native';
 
 import { type Exchange } from '@/lib/api/exchanges';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
+import { useTheme } from '@/lib/hooks/useTheme';
+import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
+import { formatRelativeTime } from '@/lib/utils/formatRelativeTime';
 import Avatar from '@/components/ui/Avatar';
-import Card from '@/components/ui/Card';
 
 interface ExchangeCardProps {
   exchange: Exchange;
@@ -19,6 +24,7 @@ interface ExchangeCardProps {
 export default function ExchangeCard({ exchange }: ExchangeCardProps) {
   const { t } = useTranslation('exchanges');
   const primary = usePrimaryColor();
+  const theme = useTheme();
 
   function openDetail() {
     router.push({ pathname: '/(modals)/exchange-detail', params: { id: String(exchange.id) } });
@@ -26,49 +32,92 @@ export default function ExchangeCard({ exchange }: ExchangeCardProps) {
 
   const hours = exchange.hours_estimate ?? 0;
   const user = exchange.user ?? { id: 0, name: '?', avatar_url: null };
+  const imageUrl = resolveImageUrl(exchange.image_url);
+  const isOffer = exchange.type === 'offer';
+  const accent = isOffer ? '#10B981' : '#F59E0B';
+  const accentSoft = isOffer ? 'rgba(16, 185, 129, 0.14)' : 'rgba(245, 158, 11, 0.14)';
 
   return (
     <Pressable
-      className="mx-4 my-1.5"
+      className="mx-4 my-2"
       onPress={openDetail}
       accessibilityRole="button"
       accessibilityLabel={exchange.title ?? ''}
     >
-      <Card className="gap-2">
-        {/* Header row */}
-        <View className="flex-row items-center justify-between">
-          <View
-            className={exchange.type === 'offer' ? 'rounded-md px-2 py-[3px] bg-success/10' : 'rounded-md px-2 py-[3px] bg-primary/10'}
-          >
-            <Text className="text-[11px] font-semibold text-muted-foreground">
-              {exchange.type === 'offer' ? t('offering') : t('requesting')}
+      <HeroCard variant="default" className="overflow-hidden">
+        <View className="h-1 w-full" style={{ backgroundColor: accent }} />
+        {imageUrl ? (
+          <Image source={{ uri: imageUrl }} style={{ width: '100%', height: 150 }} contentFit="cover" />
+        ) : null}
+
+        <HeroCard.Header className="flex-row items-start justify-between gap-3 px-4 pb-2 pt-4">
+          <View className="min-w-0 flex-1 gap-2">
+            <View className="flex-row flex-wrap items-center gap-2">
+              <Chip size="sm" variant="soft" color={isOffer ? 'success' : 'warning'}>
+                <Ionicons name={isOffer ? 'gift-outline' : 'hand-left-outline'} size={12} color={accent} />
+                <Chip.Label>{isOffer ? t('offering') : t('requesting')}</Chip.Label>
+              </Chip>
+              {exchange.category_name ? (
+                <Chip size="sm" variant="soft" color="default">
+                  <Chip.Label>{exchange.category_name}</Chip.Label>
+                </Chip>
+              ) : null}
+            </View>
+            <Text className="text-lg font-bold leading-6" style={{ color: theme.text }} numberOfLines={2}>
+              {exchange.title ?? ''}
             </Text>
           </View>
-          {hours > 0 && (
-            <Text className="text-[15px] font-bold" style={{ color: primary }}>
-              {t('detail.hours', { count: hours })}
-            </Text>
-          )}
-        </View>
+          <HeroButton isIconOnly size="sm" variant="ghost" onPress={openDetail} accessibilityLabel={t('viewDetails')}>
+            <Ionicons name="arrow-forward" size={18} color={primary} />
+          </HeroButton>
+        </HeroCard.Header>
 
-        {/* Title */}
-        <Text className="text-base font-semibold text-foreground" numberOfLines={2}>
-          {exchange.title ?? ''}
-        </Text>
-
-        {/* Footer: user info + category */}
-        <View className="flex-row items-center gap-2">
-          <Avatar uri={user.avatar_url} name={user.name} size={24} />
-          <Text className="text-[13px] flex-1 text-muted-foreground" numberOfLines={1}>
-            {user.name}
-          </Text>
-          {exchange.category_name ? (
-            <Text className="text-xs text-muted-foreground">
-              {exchange.category_name}
+        <HeroCard.Body className="gap-3 px-4 pb-4 pt-0">
+          {exchange.description ? (
+            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>
+              {exchange.description}
             </Text>
           ) : null}
+
+          <View className="flex-row flex-wrap gap-2">
+            {hours > 0 ? (
+              <Surface variant="secondary" className="flex-row items-center gap-1 rounded-full px-3 py-1.5" style={{ backgroundColor: accentSoft }}>
+                <Ionicons name="time-outline" size={14} color={accent} />
+                <Text className="text-xs font-semibold" style={{ color: accent }}>
+                  {t('detail.hours', { count: hours })}
+                </Text>
+              </Surface>
+            ) : null}
+            {exchange.location ? (
+              <Surface variant="secondary" className="flex-row max-w-full items-center gap-1 rounded-full px-3 py-1.5">
+                <Ionicons name="location-outline" size={14} color={theme.textMuted} />
+                <Text className="max-w-[210px] text-xs" style={{ color: theme.textSecondary }} numberOfLines={1}>
+                  {exchange.location}
+                </Text>
+              </Surface>
+            ) : null}
+          </View>
+        </HeroCard.Body>
+
+        <View className="mx-4">
+          <Separator />
         </View>
-      </Card>
+
+        <HeroCard.Footer className="flex-row items-center gap-3 px-4 py-3">
+          <Avatar uri={user.avatar_url} name={user.name} size={28} />
+          <View className="min-w-0 flex-1">
+            <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+              {user.name}
+            </Text>
+            <Text className="text-xs" style={{ color: theme.textSecondary }} numberOfLines={1}>
+              {formatRelativeTime(exchange.created_at)}
+            </Text>
+          </View>
+          <HeroButton size="sm" variant="secondary" onPress={openDetail}>
+            <HeroButton.Label>{t('viewDetails')}</HeroButton.Label>
+          </HeroButton>
+        </HeroCard.Footer>
+      </HeroCard>
     </Pressable>
   );
 }

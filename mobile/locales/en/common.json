@@ -5,6 +5,7 @@
     "home": "Home",
     "listings": "Listings",
     "events": "Events",
+    "groups": "Groups",
     "messages": "Messages",
     "profile": "Profile",
     "more": "More"
@@ -26,6 +27,7 @@
     "retry": "Retry"
   },
   "errors": {
+    "boundaryTitle": "Something went wrong",
     "generic": "Something went wrong. Please try again.",
     "network": "Network error. Please check your connection.",
     "unauthorized": "Your session has expired. Please log in again.",
@@ -54,5 +56,20 @@
   "search": "Search",
   "filter": "Filter",
   "clear": "Clear",
-  "endOfList": "You've reached the end"
+  "endOfList": "You've reached the end",
+  "aria": {
+    "actionButton": "Action button",
+    "verification_badges": "Verification badges"
+  },
+  "verification": {
+    "not_id_verified": "Not ID verified",
+    "badge": {
+      "email_verified": "Email verified",
+      "phone_verified": "Phone verified",
+      "id_verified": "ID verified",
+      "dbs_checked": "DBS checked",
+      "admin_verified": "Admin verified",
+      "unknown": "Verified"
+    }
+  }
 }

@@ -165,7 +165,7 @@ export default function RegisterOrganisationPage() {
             onChange={(e) => updateField('name', e.target.value)}
             isInvalid={!!errors.name}
             errorMessage={errors.name}
-            startContent={<Building2 className="w-4 h-4 text-theme-subtle" />}
+            startContent={<Building2 className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
             classNames={{
               input: 'bg-transparent text-theme-primary',
               inputWrapper: 'bg-theme-elevated border-theme-default',
@@ -196,7 +196,7 @@ export default function RegisterOrganisationPage() {
             onChange={(e) => updateField('contact_email', e.target.value)}
             isInvalid={!!errors.contact_email}
             errorMessage={errors.contact_email}
-            startContent={<Mail className="w-4 h-4 text-theme-subtle" />}
+            startContent={<Mail className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
             classNames={{
               input: 'bg-transparent text-theme-primary',
               inputWrapper: 'bg-theme-elevated border-theme-default',
@@ -211,7 +211,7 @@ export default function RegisterOrganisationPage() {
             onChange={(e) => updateField('website', e.target.value)}
             isInvalid={!!errors.website}
             errorMessage={errors.website}
-            startContent={<Globe className="w-4 h-4 text-theme-subtle" />}
+            startContent={<Globe className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
             classNames={{
               input: 'bg-transparent text-theme-primary',
               inputWrapper: 'bg-theme-elevated border-theme-default',
@@ -241,6 +241,7 @@ export default function RegisterOrganisationPage() {
                   if (val) setTermsError(null);
                 }}
                 size="sm"
+                aria-describedby={termsError ? 'terms-error' : undefined}
                 classNames={{
                   label: 'text-theme-muted text-sm',
                 }}
@@ -248,7 +249,7 @@ export default function RegisterOrganisationPage() {
                 {t('organisations.terms_agreement')}
               </Checkbox>
               {termsError && (
-                <p className="text-xs text-danger mt-1">{termsError}</p>
+                <p id="terms-error" className="text-xs text-danger mt-1" role="alert">{termsError}</p>
               )}
             </div>
           </div>
@@ -265,7 +266,7 @@ export default function RegisterOrganisationPage() {
             <Button
               type="submit"
               className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-              startContent={<Save className="w-4 h-4" />}
+              startContent={<Save className="w-4 h-4" aria-hidden="true" />}
               isLoading={isSubmitting}
             >
               {t('organisations.form_submit')}

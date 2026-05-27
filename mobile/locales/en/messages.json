@@ -1,5 +1,18 @@
 {
   "title": "Messages",
+  "heroEyebrow": "Private messages",
+  "subtitle": "Keep track of your conversations with members across the timebank.",
+  "inbox": "Inbox",
+  "filtersIntro": "Search conversations by member or recent message.",
+  "searchPlaceholder": "Search messages",
+  "resultsLoading": "Loading",
+  "conversationCount": "{{count}} conversation",
+  "conversationCount_other": "{{count}} conversations",
+  "visibleCount": "{{count}} shown",
+  "unreadCount": "{{count}} unread",
+  "clearSearch": "Clear search",
+  "readStatus": "No unread messages",
+  "openThread": "Open",
   "threadTitle": "Conversation",
   "thread": {
     "inputPlaceholder": "Type a message…",
@@ -12,7 +25,10 @@
     "loadError": "Could not load conversation.",
     "voiceMessage": "Voice message",
     "sendFailed": "Message could not be sent. Please try again.",
-    "you": "You: "
+    "you": "You: ",
+    "goBack": "Go back",
+    "messageCount": "{{count}} message",
+    "messageCount_other": "{{count}} messages"
   },
   "voice": {
     "label": "Voice",
@@ -23,10 +39,13 @@
     "tapToRecord": "Hold to record"
   },
   "newMessage": "New message",
+  "newGroup": "New group",
   "deleteConfirm": "Delete conversation with {{name}}?",
   "empty": {
     "title": "No conversations yet",
-    "subtitle": "Connect with members to start messaging"
+    "subtitle": "Connect with members to start messaging",
+    "searchTitle": "No matching conversations",
+    "searchSubtitle": "Try a different member name or message keyword."
   },
   "errors": {
     "sendFailed": "Message failed to send. Tap to retry.",

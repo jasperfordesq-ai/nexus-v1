@@ -218,7 +218,8 @@
     "cover_message_placeholder": "Vertel de organisatie waarom je vrijwilligerswerk wilt doen...",
     "cancel": "Annuleren",
     "submit_application": "Aanvraag indienen",
-    "job_openings": "Vacatures"
+    "job_openings": "Vacatures",
+    "rating_sr": "{{n}} out of 5 stars"
   },
   "emergency_alerts": {
     "heading": "Noodmeldingen",

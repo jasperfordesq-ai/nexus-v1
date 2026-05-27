@@ -249,7 +249,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
         {/* Meta row */}
         <div className='flex flex-wrap items-center gap-3 mb-3 text-xs text-theme-muted'>
           <span className='flex items-center gap-1'>
-            <Clock size={12} />
+            <Clock size={12} aria-hidden="true" />
             {t(`commitment.${vacancy.commitment}`)}
           </span>
           {vacancy.is_remote ? (
@@ -259,7 +259,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
             </span>
           ) : vacancy.location ? (
             <span className='flex items-center gap-1'>
-              <MapPin size={12} />
+              <MapPin size={12} aria-hidden="true" />
               {vacancy.location}
             </span>
           ) : null}
@@ -282,7 +282,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
               size="sm"
               onPress={() => setMessageExpanded((v) => !v)}
               className="mb-1 flex min-h-[28px] items-center gap-1 px-0 py-0 text-xs text-theme-muted transition-colors hover:text-theme-primary"
-              startContent={messageExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+              startContent={messageExpanded ? <ChevronUp size={14} aria-hidden="true" /> : <ChevronDown size={14} aria-hidden="true" />}
             >
               {messageExpanded
                 ? t('my_applications.hide_cover_message')
@@ -496,7 +496,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
           <Button
             size='sm'
             variant='tertiary'
-            startContent={<History size={13} />}
+            startContent={<History size={13} aria-hidden="true" />}
             onPress={() => {
               setHistoryOpen((v) => !v);
               if (!historyOpen && history.length === 0) {
@@ -536,7 +536,7 @@ function ApplicationCard({ application, onWithdraw, tenantPath, onMessageEmploye
               className='overflow-hidden'>
               <div className='mt-3 pt-3 border-t border-divider'>
                 <p className='text-xs font-semibold text-muted uppercase tracking-wide mb-3'>{t('history.status_history')}</p>
-                {historyLoading && <div className='flex justify-center py-3'><Spinner size='sm' /></div>}
+                {historyLoading && <div className='flex justify-center py-3'><div role="status" aria-label={t('loading')}><Spinner size='sm' /></div></div>}
                 {!historyLoading && history.length === 0 && (
                   <p className='text-xs text-muted'>{t('history.empty')}</p>
                 )}
@@ -603,7 +603,7 @@ function CalendarLinks({ interviewId }: { interviewId: number }) {
 
   if (!links) {
     return (
-      <Button size="sm" variant="flat" startContent={<CalendarPlus size={14} />} onPress={fetchLinks} isLoading={loading}>
+      <Button size="sm" variant="flat" startContent={<CalendarPlus size={14} aria-hidden="true" />} onPress={fetchLinks} isLoading={loading}>
         {t('interview.add_to_calendar')}
       </Button>
     );
@@ -612,12 +612,12 @@ function CalendarLinks({ interviewId }: { interviewId: number }) {
   return (
     <div className="flex items-center gap-1.5">
       {links.google && (
-        <Button size="sm" variant="flat" as="a" href={links.google} target="_blank" rel="noopener noreferrer" startContent={<CalendarPlus size={12} />}>
+        <Button size="sm" variant="flat" as="a" href={links.google} target="_blank" rel="noopener noreferrer" startContent={<CalendarPlus size={12} aria-hidden="true" />}>
           {t('interview.calendar_google')}
         </Button>
       )}
       {links.outlook && (
-        <Button size="sm" variant="flat" as="a" href={links.outlook} target="_blank" rel="noopener noreferrer" startContent={<CalendarPlus size={12} />}>
+        <Button size="sm" variant="flat" as="a" href={links.outlook} target="_blank" rel="noopener noreferrer" startContent={<CalendarPlus size={12} aria-hidden="true" />}>
           {t('interview.calendar_outlook')}
         </Button>
       )}
@@ -968,7 +968,7 @@ export function MyApplicationsPage() {
 
       {/* Loading skeleton */}
       {isLoading && (
-        <div className='space-y-4'>
+        <div className='space-y-4' role="status" aria-label={t('loading')} aria-busy="true">
           <ApplicationSkeleton />
           <ApplicationSkeleton />
           <ApplicationSkeleton />
@@ -978,7 +978,7 @@ export function MyApplicationsPage() {
       {/* Error state */}
       {!isLoading && error && (
         <GlassCard className='p-8 text-center'>
-          <p className='text-danger mb-4'>{error}</p>
+          <p className='text-danger mb-4' role="alert">{error}</p>
           <Button variant='secondary' onPress={() => loadApplications()}>
             {t('try_again')}
           </Button>
@@ -988,7 +988,7 @@ export function MyApplicationsPage() {
       {/* Empty state */}
       {!isLoading && !error && applications.length === 0 && (
         <GlassCard className='p-12 text-center'>
-          <Briefcase size={48} className='mx-auto mb-4 text-theme-muted/50' />
+          <Briefcase size={48} className='mx-auto mb-4 text-theme-muted/50' aria-hidden="true" />
           <h3 className='text-lg font-semibold text-theme-primary mb-2'>
             {t('my_applications.empty_title')}
           </h3>

@@ -32,12 +32,65 @@ export interface GroupDetail extends Group {
   tags?: string[];
 }
 
+export interface GroupMemberListItem extends GroupMember {
+  role: 'owner' | 'admin' | 'member' | string;
+  joined_at: string | null;
+}
+
+export interface GroupDiscussion {
+  id: number;
+  title: string;
+  author: GroupMember;
+  reply_count: number;
+  is_pinned: boolean;
+  created_at: string | null;
+  last_reply_at: string | null;
+}
+
+export interface GroupAnnouncement {
+  id: number;
+  title: string;
+  content: string;
+  is_pinned: boolean;
+  priority: number;
+  is_expired: boolean;
+  author: GroupMember;
+  created_at: string | null;
+  updated_at: string | null;
+  expires_at: string | null;
+}
+
 export interface GroupsResponse {
   data: Group[];
   meta: {
     has_more: boolean;
     cursor: string | null;
   };
+}
+
+export interface GroupCollectionResponse<T> {
+  data: T[];
+  meta: {
+    has_more: boolean;
+    cursor: string | null;
+    per_page?: number;
+  };
+}
+
+export interface GroupAnnouncementsResponse {
+  data: {
+    items: GroupAnnouncement[];
+    cursor: string | null;
+    has_more: boolean;
+  };
+}
+
+export interface CreateGroupPayload {
+  name: string;
+  description?: string;
+  visibility?: 'public' | 'private';
+  location?: string | null;
+  federated_visibility?: 'none' | 'listed' | 'joinable';
 }
 
 /**
@@ -50,7 +103,7 @@ export function getGroups(
 ): Promise<GroupsResponse> {
   const query: Record<string, string> = { per_page: '20' };
   if (cursor) query['cursor'] = cursor;
-  if (params?.search) query['search'] = params.search;
+  if (params?.search) query['q'] = params.search;
   if (params?.visibility) query['visibility'] = params.visibility;
   return api.get<GroupsResponse>(`${API_V2}/groups`, query);
 }
@@ -60,6 +113,59 @@ export function getGroups(
  */
 export function getGroup(id: number): Promise<{ data: GroupDetail }> {
   return api.get<{ data: GroupDetail }>(`${API_V2}/groups/${id}`);
+}
+
+/**
+ * POST /api/v2/groups — create a community group.
+ */
+export function createGroup(payload: CreateGroupPayload): Promise<{ data: GroupDetail }> {
+  return api.post<{ data: GroupDetail }>(`${API_V2}/groups`, payload);
+}
+
+/**
+ * GET /api/v2/groups/{id}/members — list active group members.
+ */
+export function getGroupMembers(
+  id: number,
+  cursor: string | null = null,
+): Promise<GroupCollectionResponse<GroupMemberListItem>> {
+  const query: Record<string, string> = { per_page: '20' };
+  if (cursor) query['cursor'] = cursor;
+  return api.get<GroupCollectionResponse<GroupMemberListItem>>(`${API_V2}/groups/${id}/members`, query);
+}
+
+/**
+ * GET /api/v2/groups/{id}/discussions — list member-only discussions.
+ */
+export function getGroupDiscussions(
+  id: number,
+  cursor: string | null = null,
+): Promise<GroupCollectionResponse<GroupDiscussion>> {
+  const query: Record<string, string> = { per_page: '20' };
+  if (cursor) query['cursor'] = cursor;
+  return api.get<GroupCollectionResponse<GroupDiscussion>>(`${API_V2}/groups/${id}/discussions`, query);
+}
+
+/**
+ * GET /api/v2/groups/{id}/announcements — list member-only announcements.
+ */
+export function getGroupAnnouncements(
+  id: number,
+  cursor: string | null = null,
+): Promise<GroupAnnouncementsResponse> {
+  const query: Record<string, string> = { limit: '20' };
+  if (cursor) query['cursor'] = cursor;
+  return api.get<GroupAnnouncementsResponse>(`${API_V2}/groups/${id}/announcements`, query);
+}
+
+/**
+ * POST /api/v2/groups/{id}/discussions — start a new member discussion.
+ */
+export function createGroupDiscussion(
+  id: number,
+  payload: { title: string; content: string },
+): Promise<{ data: GroupDiscussion }> {
+  return api.post<{ data: GroupDiscussion }>(`${API_V2}/groups/${id}/discussions`, payload);
 }
 
 /**

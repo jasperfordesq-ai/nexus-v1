@@ -51,6 +51,7 @@
   "posts_count_label": "{{count}} posts",
   "detail": {
     "loading": "Loading group...",
+    "loading_replies": "Loading replies...",
     "unable_to_load": "Unable to Load Group",
     "not_found_desc": "The group you are looking for does not exist",
     "error_load_failed": "Failed to load group. Please try again.",
@@ -258,6 +259,7 @@
     "template_label": "Start from a template (optional)"
   },
   "announcements": {
+    "loading": "Loading announcements...",
     "heading": "Announcements",
     "new": "New Announcement",
     "no_announcements_title": "No announcements",
@@ -513,6 +515,7 @@
     "downvote_aria": "Downvote",
     "vote_count_aria": "{{count}} votes",
     "loading": "Loading questions",
+    "loading_detail": "Loading question details...",
     "search_placeholder": "Search questions...",
     "search_aria": "Search questions",
     "sort_aria": "Sort questions",
@@ -563,6 +566,7 @@
     "delete_failed": "Failed to delete page",
     "revisions_failed": "Failed to load revision history",
     "loading": "Loading wiki",
+    "loading_page": "Loading wiki page...",
     "heading": "Wiki",
     "new_page": "New Page",
     "pages": "Pages",

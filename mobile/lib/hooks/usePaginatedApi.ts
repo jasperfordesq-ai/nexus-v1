@@ -101,6 +101,7 @@ export function usePaginatedApi<TItem, TResponse>(
     async (cursor: string | null, isInitial: boolean) => {
       if (isFetchingRef.current) return;
       isFetchingRef.current = true;
+      let retryScheduled = false;
 
       if (isInitial) {
         setIsLoading(true);
@@ -137,6 +138,7 @@ export function usePaginatedApi<TItem, TResponse>(
 
           if (isTransient) {
             retryCountRef.current += 1;
+            retryScheduled = true;
             isFetchingRef.current = false; // allow the retry fetch to proceed
             retryTimerRef.current = setTimeout(() => {
               if (isMountedRef.current) {
@@ -153,14 +155,16 @@ export function usePaginatedApi<TItem, TResponse>(
           setError('An unexpected error occurred.');
         }
       } finally {
-        if (isMountedRef.current) {
+        if (isMountedRef.current && !retryScheduled) {
           if (isInitial) {
             setIsLoading(false);
           } else {
             setIsLoadingMore(false);
           }
         }
-        isFetchingRef.current = false;
+        if (!retryScheduled) {
+          isFetchingRef.current = false;
+        }
       }
     },
     // fetchFn and extractor are treated as stable references (callers should

@@ -299,13 +299,13 @@ export default function BookmarksPage() {
                     className="min-w-0 w-6 h-6"
                     aria-label={t('bookmarks.collection_actions_named', { name: coll.name })}
                   >
-                    <MoreHorizontal className="w-3 h-3" />
+                    <MoreHorizontal className="w-3 h-3" aria-hidden="true" />
                   </Button>
                 </DropdownTrigger>
                 <DropdownMenu>
                   <DropdownItem
                     key="edit" id="edit"
-                    startContent={<Pencil className="w-3.5 h-3.5" />}
+                    startContent={<Pencil className="w-3.5 h-3.5" aria-hidden="true" />}
                     onPress={() => {
                       setEditingColl(coll);
                       setNewCollName(coll.name);
@@ -317,7 +317,7 @@ export default function BookmarksPage() {
                   </DropdownItem>
                   <DropdownItem
                     key="delete" id="delete"
-                    startContent={<Trash2 className="w-3.5 h-3.5" />}
+                    startContent={<Trash2 className="w-3.5 h-3.5" aria-hidden="true" />}
                     className="text-danger"
                     color="danger"
                     onPress={() => openDeleteCollection(coll)}
@@ -365,7 +365,7 @@ export default function BookmarksPage() {
 
       {/* Bookmarks List */}
       {loading && bookmarks.length === 0 ? (
-        <div className="flex justify-center py-16">
+        <div className="flex justify-center py-16" role="status" aria-busy="true" aria-label={t('bookmarks.loading')}>
           <Spinner size="lg" />
         </div>
       ) : bookmarks.length === 0 ? (
@@ -406,7 +406,7 @@ export default function BookmarksPage() {
                     onPress={() => handleRemoveBookmark(bookmark)}
                     aria-label={t('bookmarks.remove')}
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-4 h-4" aria-hidden="true" />
                   </Button>
                 </div>
               </CardBody>

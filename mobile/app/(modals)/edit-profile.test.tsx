@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 // --- Mocks ---
 
@@ -36,9 +36,15 @@ jest.mock('react-i18next', () => ({
         'edit.saveError': 'Failed to save profile.',
         'edit.firstNameRequired': 'First name is required.',
         'edit.phoneInvalid': 'Enter a valid phone number.',
+        'edit.uploadingPhoto': 'Uploading photo...',
         'edit.unsavedTitle': 'Unsaved Changes',
         'edit.unsavedMessage': 'You have unsaved changes. Discard them?',
         'edit.discard': 'Discard',
+        'changePhoto': 'Change profile photo',
+        'permissionNeeded': 'Permission needed',
+        'permissionMessage': 'Please allow access to your photo library to change your avatar.',
+        'uploadFailed': 'Upload failed',
+        'uploadFailedMessage': 'Could not update your avatar. Please try again.',
         'common:buttons.cancel': 'Cancel',
         'common:buttons.done': 'Done',
         'common:errors.generic': 'Error',
@@ -66,6 +72,7 @@ jest.mock('@/lib/hooks/useTenant', () => ({
   usePrimaryColor: () => '#6366f1',
 }));
 
+const mockRefreshUser = jest.fn();
 jest.mock('@/lib/hooks/useAuth', () => ({
   useAuth: () => ({
     user: {
@@ -75,8 +82,9 @@ jest.mock('@/lib/hooks/useAuth', () => ({
       bio: 'Community builder',
       location: 'Dublin',
       phone: '+353 87 123 4567',
+      avatar_url: null,
     },
-    refreshUser: jest.fn(),
+    refreshUser: mockRefreshUser,
   }),
 }));
 
@@ -90,11 +98,35 @@ jest.mock('@/lib/constants', () => ({
 
 jest.mock('@/lib/api/profile', () => ({
   updateProfile: jest.fn().mockResolvedValue({ data: {} }),
+  updateAvatar: jest.fn().mockResolvedValue({ data: { avatar_url: '/uploads/avatars/jane.jpg' } }),
 }));
 
-jest.mock('expo-haptics', () => ({
+jest.mock('@/lib/api/auth', () => ({
+  getMe: jest.fn().mockResolvedValue({
+    data: {
+      id: 1,
+      first_name: 'Jane',
+      last_name: 'Doe',
+      bio: 'Community builder',
+      location: 'Dublin',
+      phone: '+353 87 123 4567',
+      avatar_url: null,
+    },
+  }),
+}));
+
+jest.mock('@/lib/haptics', () => ({
   notificationAsync: jest.fn().mockResolvedValue(undefined),
   NotificationFeedbackType: { Success: 'success', Error: 'error' },
+}));
+
+jest.mock('expo-image-picker', () => ({
+  MediaTypeOptions: { Images: 'Images' },
+  requestMediaLibraryPermissionsAsync: jest.fn().mockResolvedValue({ granted: true }),
+  launchImageLibraryAsync: jest.fn().mockResolvedValue({
+    canceled: false,
+    assets: [{ uri: 'file:///tmp/jane.jpg' }],
+  }),
 }));
 
 jest.mock('@/components/OfflineBanner', () => () => null);
@@ -128,8 +160,13 @@ jest.mock('@/components/ui/Button', () => {
 // --- Tests ---
 
 import EditProfileScreen from './edit-profile';
+import { updateAvatar } from '@/lib/api/profile';
 
 describe('EditProfileScreen', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('renders without crashing', () => {
     const { toJSON } = render(<EditProfileScreen />);
     expect(toJSON()).toBeTruthy();
@@ -147,6 +184,17 @@ describe('EditProfileScreen', () => {
   it('renders the Save Changes button', () => {
     const { getByText } = render(<EditProfileScreen />);
     expect(getByText('Save Changes')).toBeTruthy();
+  });
+
+  it('uploads a new avatar from the photo library', async () => {
+    const { getByLabelText } = render(<EditProfileScreen />);
+
+    fireEvent.press(getByLabelText('Change profile photo'));
+
+    await waitFor(() => expect(updateAvatar).toHaveBeenCalledWith('file:///tmp/jane.jpg'));
+    await waitFor(() => expect(mockRefreshUser).toHaveBeenCalledWith(expect.objectContaining({
+      avatar_url: expect.stringContaining('/uploads/avatars/jane.jpg?v='),
+    })));
   });
 
   it('pre-fills form fields with user data', () => {

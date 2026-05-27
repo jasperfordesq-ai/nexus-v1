@@ -78,7 +78,7 @@ describe('getGroups', () => {
   it('includes search param when provided', async () => {
     (api.get as jest.Mock).mockResolvedValue(mockGroupsResponse);
     await getGroups(null, { search: 'gardening' });
-    expect(api.get).toHaveBeenCalledWith('/api/v2/groups', { per_page: '20', search: 'gardening' });
+    expect(api.get).toHaveBeenCalledWith('/api/v2/groups', { per_page: '20', q: 'gardening' });
   });
 
   it('includes visibility param when provided', async () => {
@@ -93,7 +93,7 @@ describe('getGroups', () => {
     expect(api.get).toHaveBeenCalledWith('/api/v2/groups', {
       per_page: '20',
       cursor: 'next-cursor',
-      search: 'sport',
+      q: 'sport',
       visibility: 'private',
     });
   });

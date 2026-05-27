@@ -3,103 +3,73 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect, useState } from 'react';
-import { useNavigation } from 'expo-router';
-import {
-  View,
-  Text,
-  FlatList,
-  RefreshControl,
-  Pressable,
-} from 'react-native';
+import { useMemo, useState } from 'react';
+import { Alert, Platform, Pressable, RefreshControl, ScrollView, Share, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useLocalSearchParams } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
-import { Spinner } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface, Text } from 'heroui-native';
 
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme } from '@/lib/hooks/useTheme';
-import { getWalletBalance, getWalletTransactions, type TransactionItem } from '@/lib/api/wallet';
+import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { withAlpha } from '@/lib/utils/color';
+import {
+  getCommunityFundBalance,
+  getWalletBalance,
+  getWalletTransactions,
+  donateWalletCredits,
+  searchWalletUsers,
+  transferWalletCredits,
+  type CommunityFundBalance,
+  type TransactionItem,
+  type WalletBalance,
+  type WalletUserSearchResult,
+} from '@/lib/api/wallet';
+import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
-// Helpers
+type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
+type TransactionFilter = 'all' | 'earned' | 'spent' | 'pending';
+type WalletAction = 'transfer' | 'donate' | null;
+type DonationTarget = 'community_fund' | 'user';
 
-function formatDate(iso: string): string {
-  try {
-    return new Date(iso).toLocaleDateString(undefined, {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    });
-  } catch {
-    return iso;
-  }
+const filters: TransactionFilter[] = ['all', 'earned', 'spent', 'pending'];
+
+function formatDate(iso?: string | null): string {
+  if (!iso) return '';
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+  return date.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-// Transaction Row
-
-function TransactionRow({
-  item,
-  primary,
-  theme,
-  t,
-}: {
-  item: TransactionItem;
-  primary: string;
-  theme: ReturnType<typeof useTheme>;
-  t: (key: string, opts?: Record<string, unknown>) => string;
-}) {
-  const isCredit = item.type === 'credit';
-  const sign = isCredit ? '+' : '−';
-  const amountColor = isCredit ? theme.success : theme.error;
-  const otherName = item.other_user?.name ?? t('system');
-  const otherAvatar = item.other_user?.avatar_url ?? null;
-
-  return (
-    <Pressable
-      className="flex-row items-start py-4 px-1 bg-surface rounded-xl"
-      onPress={() => void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
-      accessibilityRole="button"
-      accessibilityLabel={`${otherName}, ${sign}${(item.amount ?? 0).toFixed(1)} ${t('hrs')}`}
-    >
-      <Avatar
-        uri={otherAvatar}
-        name={otherName}
-        size={44}
-      />
-
-      <View className="flex-1 ml-3 mr-2">
-        <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
-          {otherName}
-        </Text>
-        {item.description ? (
-          <Text className="text-xs text-muted-foreground mt-0.5" numberOfLines={2}>
-            {item.description}
-          </Text>
-        ) : null}
-        <Text className="text-[11px] text-muted-foreground mt-1">{formatDate(item.created_at)}</Text>
-      </View>
-
-      <View className="items-end justify-center min-w-[72px]">
-        <Text style={{ color: amountColor }} className="text-base font-bold">
-          {sign}{(item.amount ?? 0).toFixed(1)} {t('hrs')}
-        </Text>
-        {item.status !== 'completed' && (
-          <View style={{ borderColor: primary }} className="border rounded px-1 py-0.5 mt-1">
-            <Text style={{ color: primary }} className="text-[11px] font-semibold capitalize">
-              {t(`status.${item.status}`, { defaultValue: item.status })}
-            </Text>
-          </View>
-        )}
-      </View>
-    </Pressable>
-  );
+function formatHours(value: number | null | undefined): string {
+  const amount = typeof value === 'number' && Number.isFinite(value) ? value : 0;
+  return Number.isInteger(amount) ? String(amount) : amount.toFixed(1);
 }
 
-// Screen
+function unwrap<T>(response: { data?: T } | T | null | undefined): T | null {
+  if (!response) return null;
+  if (typeof response === 'object' && 'data' in response) return (response as { data?: T }).data ?? null;
+  return response as T;
+}
+
+function getOtherName(transaction: TransactionItem, fallback: string) {
+  return transaction.other_user?.name ?? transaction.other_party?.name ?? fallback;
+}
+
+function normaliseAmount(value: string): number {
+  return Number(value.replace(',', '.').trim());
+}
+
+function csvCell(value: string | number | null | undefined): string {
+  const text = String(value ?? '');
+  return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+}
 
 export default function WalletModal() {
   return (
@@ -111,99 +81,673 @@ export default function WalletModal() {
 
 function WalletModalInner() {
   const { t } = useTranslation('wallet');
-  const navigation = useNavigation();
+  const params = useLocalSearchParams<{ to?: string; name?: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
-
-  useEffect(() => {
-    navigation.setOptions({ title: t('title') });
-  }, [navigation, t]);
-
-  const Separator = useCallback(() => <View className="h-2" />, []);
+  const [filter, setFilter] = useState<TransactionFilter>('all');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [activeAction, setActiveAction] = useState<WalletAction>(params.to ? 'transfer' : null);
+  const [extraTransactions, setExtraTransactions] = useState<TransactionItem[]>([]);
+  const [extraCursor, setExtraCursor] = useState<string | null>(null);
+  const [extraHasMore, setExtraHasMore] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  const {
-    data: balanceData,
-    isLoading: balanceLoading,
-    refresh: refreshBalance,
-  } = useApi(() => getWalletBalance(), []);
+  const balanceQuery = useApi(() => getWalletBalance(), []);
+  const transactionsQuery = useApi(() => getWalletTransactions(undefined, 50, 'all'), []);
+  const fundQuery = useApi(() => getCommunityFundBalance(), []);
 
-  const {
-    data: txData,
-    isLoading: txLoading,
-    error: txError,
-    refresh: refreshTx,
-  } = useApi(() => getWalletTransactions(undefined, 50, 'all'), []);
+  const balance = unwrap<WalletBalance>(balanceQuery.data)?.balance ?? null;
+  const wallet = unwrap<WalletBalance>(balanceQuery.data);
+  const transactionsPayload = transactionsQuery.data as { data?: TransactionItem[]; meta?: { cursor?: string | null; next_cursor?: string | null; has_more?: boolean } } | TransactionItem[] | null | undefined;
+  const firstPageTransactions = unwrap<TransactionItem[]>(transactionsQuery.data) ?? [];
+  const initialCursor = !Array.isArray(transactionsPayload) ? (transactionsPayload?.meta?.cursor ?? transactionsPayload?.meta?.next_cursor ?? null) : null;
+  const initialHasMore = !Array.isArray(transactionsPayload) ? Boolean(transactionsPayload?.meta?.has_more) : firstPageTransactions.length >= 50;
+  const transactions = useMemo(() => [...firstPageTransactions, ...extraTransactions], [extraTransactions, firstPageTransactions]);
+  const nextCursor = extraCursor ?? initialCursor;
+  const hasMoreTransactions = extraTransactions.length > 0 ? extraHasMore : initialHasMore;
+  const fund = unwrap<CommunityFundBalance>(fundQuery.data);
+  const isLoading = balanceQuery.isLoading || transactionsQuery.isLoading;
+  const error = balanceQuery.error || transactionsQuery.error;
 
-  const balance = balanceData?.data?.balance ?? null;
-  const transactions = txData?.data ?? [];
-  const isLoading = balanceLoading || txLoading;
+  const stats = useMemo(() => {
+    const earned = wallet?.total_earned ?? wallet?.total_credits ?? transactions.filter((tx) => tx.type === 'credit').reduce((total, tx) => total + tx.amount, 0);
+    const spent = wallet?.total_spent ?? wallet?.total_debits ?? transactions.filter((tx) => tx.type === 'debit').reduce((total, tx) => total + tx.amount, 0);
+    const pending = (wallet?.pending_in ?? wallet?.pending_incoming ?? 0) + (wallet?.pending_out ?? wallet?.pending_outgoing ?? 0);
+    return { earned, spent, pending };
+  }, [transactions, wallet]);
 
-  // Turn off manual refresh indicator once both API calls finish
-  useEffect(() => {
-    if (isRefreshing && !balanceLoading && !txLoading) {
-      setIsRefreshing(false);
-    }
-  }, [isRefreshing, balanceLoading, txLoading]);
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter((tx) => {
+      if (filter === 'all') return true;
+      if (filter === 'earned') return tx.type === 'credit';
+      if (filter === 'spent') return tx.type === 'debit';
+      return tx.status === 'pending';
+    });
+  }, [filter, transactions]);
 
-  const handleRefresh = useCallback(() => {
+  function refresh() {
     setIsRefreshing(true);
-    refreshBalance();
-    refreshTx();
-  }, [refreshBalance, refreshTx]);
+    setExtraTransactions([]);
+    setExtraCursor(null);
+    setExtraHasMore(false);
+    balanceQuery.refresh();
+    transactionsQuery.refresh();
+    fundQuery.refresh();
+    setTimeout(() => setIsRefreshing(false), 650);
+  }
 
-  const ListHeader = (
-    <View
-      className="border-2 rounded-2xl py-7 px-6 items-center bg-surface mt-5 mb-5"
-      style={{ borderColor: primary }}
-    >
-      {balanceLoading && balance === null ? (
-        <Spinner size="sm" />
-      ) : (
-        <>
-          <Text style={{ color: primary }} className="text-5xl font-bold leading-[56px]">
-            {balance !== null ? (Number(balance) || 0).toFixed(1) : '—'}
-          </Text>
-          <Text className="text-sm text-muted-foreground mt-1">{t('timeCredits')}</Text>
-        </>
-      )}
-    </View>
-  );
+  async function loadMoreTransactions() {
+    if (!nextCursor || isLoadingMore) return;
+    setIsLoadingMore(true);
+    try {
+      const response = await getWalletTransactions(nextCursor, 50, 'all');
+      setExtraTransactions((current) => [...current, ...(response.data ?? [])]);
+      setExtraCursor(response.meta?.cursor ?? null);
+      setExtraHasMore(Boolean(response.meta?.has_more));
+    } catch {
+      Alert.alert(t('actions.loadMoreFailedTitle'), t('actions.loadMoreFailedMessage'));
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }
 
-  const ListEmpty = txLoading ? null : (
-    <View className="pt-16 items-center">
-      {txError ? (
-        <Text className="text-sm text-danger text-center">{txError}</Text>
-      ) : (
-        <EmptyState
-          icon="wallet-outline"
-          title={t('noTransactions')}
-        />
-      )}
-    </View>
-  );
+  async function handleExport() {
+    if (transactions.length === 0) {
+      Alert.alert(t('actions.exportNoDataTitle'), t('actions.exportNoDataMessage'));
+      return;
+    }
+
+    const rows = [
+      ['date', 'type', 'status', 'amount', 'member', 'description'],
+      ...transactions.map((tx) => [
+        formatDate(tx.created_at),
+        tx.type,
+        tx.status,
+        formatHours(tx.type === 'credit' ? tx.amount : -Math.abs(tx.amount)),
+        getOtherName(tx, t('system')),
+        tx.description ?? '',
+      ]),
+    ];
+    const csv = rows.map((row) => row.map(csvCell).join(',')).join('\n');
+
+    if (Platform.OS === 'web' && typeof document !== 'undefined') {
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `wallet-transactions-${new Date().toISOString().slice(0, 10)}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+      Alert.alert(t('actions.exportSuccessTitle'), t('actions.exportSuccessMessage'));
+      return;
+    }
+
+    await Share.share({ message: csv });
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-background">
-      <FlatList<TransactionItem>
-        data={transactions}
-        keyExtractor={(item) => String(item.id)}
-        renderItem={({ item }) => (
-          <TransactionRow item={item} primary={primary} theme={theme} t={t} />
+      <AppTopBar title={t('title')} backLabel={t('back')} />
+      <ScrollView
+        contentContainerStyle={{ padding: 16, paddingBottom: 40 }}
+        refreshControl={<RefreshControl refreshing={isRefreshing || isLoading} onRefresh={refresh} tintColor={primary} colors={[primary]} />}
+        showsVerticalScrollIndicator={false}
+      >
+        <HeaderCard t={t} theme={theme} primary={primary} onRefresh={refresh} isLoading={isLoading} />
+
+        {error ? (
+          <ErrorCard error={error} t={t} theme={theme} primary={primary} onRetry={refresh} />
+        ) : (
+          <View className="gap-4">
+            <BalanceCard
+              balance={balance}
+              pending={stats.pending}
+              isLoading={balanceQuery.isLoading}
+              primary={primary}
+              theme={theme}
+              t={t}
+              onSend={() => setActiveAction(activeAction === 'transfer' ? null : 'transfer')}
+              onDonate={() => setActiveAction(activeAction === 'donate' ? null : 'donate')}
+            />
+
+            {activeAction ? (
+              <WalletActionPanel
+                action={activeAction}
+                balance={balance ?? 0}
+                theme={theme}
+                primary={primary}
+                t={t}
+                onClose={() => setActiveAction(null)}
+                onComplete={() => {
+                  setActiveAction(null);
+                  refresh();
+                }}
+                initialRecipientId={params.to}
+                initialRecipientName={params.name}
+              />
+            ) : null}
+
+            <CommunityFundCard fund={fund} isLoading={fundQuery.isLoading} theme={theme} primary={primary} t={t} onDonate={() => setActiveAction('donate')} />
+
+            <View className="flex-row gap-3">
+              <StatCard icon="arrow-down-outline" label={t('stats.earned')} value={t('signedHours', { sign: '+', count: stats.earned })} tone="#22c55e" theme={theme} />
+              <StatCard icon="arrow-up-outline" label={t('stats.spent')} value={t('signedHours', { sign: '-', count: stats.spent })} tone="#f43f5e" theme={theme} />
+              <StatCard icon="time-outline" label={t('stats.pending')} value={t('hoursValue', { count: stats.pending })} tone="#f59e0b" theme={theme} />
+            </View>
+
+            <HeroCard className="rounded-panel p-0">
+              <HeroCard.Body className="gap-4 p-4">
+                <View className="flex-row items-center justify-between gap-3">
+                  <View className="min-w-0 flex-1">
+                    <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('history')}</Text>
+                    <Text className="text-sm" style={{ color: theme.textSecondary }}>{t('historySubtitle')}</Text>
+                  </View>
+                  <HeroButton size="sm" variant="secondary" onPress={handleExport}>
+                    <Ionicons name="download-outline" size={14} color={primary} />
+                    <HeroButton.Label>{t('export')}</HeroButton.Label>
+                  </HeroButton>
+                </View>
+
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+                  {filters.map((item) => (
+                    <FilterChip key={item} label={t(`filter.${item}`)} selected={filter === item} onPress={() => setFilter(item)} tone={primary} />
+                  ))}
+                </ScrollView>
+
+                {transactionsQuery.isLoading ? (
+                  <View className="items-center py-8"><Spinner size="lg" /></View>
+                ) : filteredTransactions.length === 0 ? (
+                  <Surface variant="secondary" className="rounded-panel-inner p-5">
+                    <EmptyState
+                      icon="wallet-outline"
+                      title={filter === 'all' ? t('noTransactions') : t('noFilteredTransactions')}
+                      subtitle={filter === 'all' ? t('noTransactionsDesc') : t('noFilteredTransactionsDesc')}
+                    />
+                  </Surface>
+                ) : (
+                  <View className="gap-3">
+                    {filteredTransactions.map((transaction) => (
+                      <TransactionCard key={String(transaction.id)} transaction={transaction} theme={theme} primary={primary} t={t} />
+                    ))}
+                    {filter === 'all' && hasMoreTransactions ? (
+                      <HeroButton variant="secondary" onPress={loadMoreTransactions} isDisabled={isLoadingMore}>
+                        {isLoadingMore ? <Spinner size="sm" /> : <Ionicons name="chevron-down-outline" size={16} color={primary} />}
+                        <HeroButton.Label>{t('loadMore')}</HeroButton.Label>
+                      </HeroButton>
+                    ) : null}
+                  </View>
+                )}
+              </HeroCard.Body>
+            </HeroCard>
+          </View>
         )}
-        ListHeaderComponent={ListHeader}
-        ListEmptyComponent={ListEmpty}
-        ItemSeparatorComponent={Separator}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32 }}
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing || isLoading}
-            onRefresh={() => void handleRefresh()}
-            tintColor={primary}
-            colors={[primary]}
-          />
-        }
-      />
+      </ScrollView>
     </SafeAreaView>
+  );
+}
+
+function WalletActionPanel({
+  action,
+  balance,
+  theme,
+  primary,
+  t,
+  onClose,
+  onComplete,
+  initialRecipientId,
+  initialRecipientName,
+}: {
+  action: Exclude<WalletAction, null>;
+  balance: number;
+  theme: Theme;
+  primary: string;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+  onClose: () => void;
+  onComplete: () => void;
+  initialRecipientId?: string | string[];
+  initialRecipientName?: string | string[];
+}) {
+  const initialRecipient = useMemo<WalletUserSearchResult | null>(() => {
+    const id = Array.isArray(initialRecipientId) ? initialRecipientId[0] : initialRecipientId;
+    if (!id) return null;
+    const name = Array.isArray(initialRecipientName) ? initialRecipientName[0] : initialRecipientName;
+    return {
+      id,
+      name: name || t('actions.memberFallback'),
+      avatar_url: null,
+    };
+  }, [initialRecipientId, initialRecipientName, t]);
+  const [donationTarget, setDonationTarget] = useState<DonationTarget>('community_fund');
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState<WalletUserSearchResult[]>([]);
+  const [selectedUser, setSelectedUser] = useState<WalletUserSearchResult | null>(initialRecipient);
+  const [amount, setAmount] = useState('');
+  const [note, setNote] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const needsRecipient = action === 'transfer' || donationTarget === 'user';
+
+  async function runSearch() {
+    if (query.trim().length < 2) return;
+    setIsSearching(true);
+    try {
+      const response = await searchWalletUsers(query.trim(), 10);
+      setResults(response.data?.users ?? []);
+    } catch {
+      Alert.alert(t('actions.searchFailedTitle'), t('actions.searchFailedMessage'));
+    } finally {
+      setIsSearching(false);
+    }
+  }
+
+  async function submit() {
+    const parsedAmount = normaliseAmount(amount);
+    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
+      Alert.alert(t('actions.validationTitle'), t('actions.validationAmount'));
+      return;
+    }
+    if (parsedAmount > balance) {
+      Alert.alert(t('actions.validationTitle'), t('actions.validationInsufficient'));
+      return;
+    }
+    if (needsRecipient && !selectedUser) {
+      Alert.alert(t('actions.validationTitle'), t('actions.validationRecipient'));
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      if (action === 'transfer') {
+        await transferWalletCredits({
+          recipient: selectedUser?.id ?? '',
+          amount: parsedAmount,
+          description: note.trim() || t('actions.defaultTransferDescription'),
+        });
+        await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        Alert.alert(t('actions.transferSuccessTitle'), t('actions.transferSuccessMessage'));
+      } else {
+        await donateWalletCredits({
+          recipient_type: donationTarget,
+          recipient_id: donationTarget === 'user' ? selectedUser?.id : undefined,
+          amount: parsedAmount,
+          message: note.trim(),
+        });
+        await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        Alert.alert(t('actions.donationSuccessTitle'), t('actions.donationSuccessMessage'));
+      }
+      onComplete();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : t('actions.mutationFailedMessage');
+      Alert.alert(t('actions.mutationFailedTitle'), message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  return (
+    <HeroCard className="overflow-hidden rounded-panel p-0">
+      <View className="h-1.5" style={{ backgroundColor: action === 'transfer' ? primary : '#ec4899' }} />
+      <HeroCard.Body className="gap-4 p-4">
+        <View className="flex-row items-start justify-between gap-3">
+          <View className="min-w-0 flex-1">
+            <Text className="text-lg font-bold" style={{ color: theme.text }}>{t(action === 'transfer' ? 'actions.transferTitle' : 'actions.donateTitle')}</Text>
+            <Text className="text-sm" style={{ color: theme.textSecondary }}>{t(action === 'transfer' ? 'actions.transferSubtitle' : 'actions.donateSubtitle')}</Text>
+          </View>
+          <HeroButton size="sm" variant="secondary" isIconOnly onPress={onClose} accessibilityLabel={t('actions.closeAction')}>
+            <Ionicons name="close-outline" size={18} color={primary} />
+          </HeroButton>
+        </View>
+
+        {action === 'donate' ? (
+          <View className="gap-2">
+            <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>{t('actions.donateTo')}</Text>
+            <View className="flex-row gap-2">
+              <HeroButton className="flex-1" variant={donationTarget === 'community_fund' ? 'primary' : 'secondary'} onPress={() => { setDonationTarget('community_fund'); setSelectedUser(null); }} style={donationTarget === 'community_fund' ? { backgroundColor: primary } : undefined}>
+                <HeroButton.Label>{t('actions.communityFundOption')}</HeroButton.Label>
+              </HeroButton>
+              <HeroButton className="flex-1" variant={donationTarget === 'user' ? 'primary' : 'secondary'} onPress={() => setDonationTarget('user')} style={donationTarget === 'user' ? { backgroundColor: primary } : undefined}>
+                <HeroButton.Label>{t('actions.memberOption')}</HeroButton.Label>
+              </HeroButton>
+            </View>
+          </View>
+        ) : null}
+
+        {needsRecipient ? (
+          <View className="gap-3">
+            <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>{t('actions.recipientSearch')}</Text>
+            <View className="flex-row gap-2">
+              <TextInput
+                className="min-h-12 flex-1 rounded-panel-inner border px-3 text-sm"
+                style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg }}
+                placeholder={t('actions.recipientSearchPlaceholder')}
+                placeholderTextColor={theme.textMuted}
+                value={query}
+                onChangeText={(value) => {
+                  setQuery(value);
+                  setSelectedUser(null);
+                }}
+                returnKeyType="search"
+                onSubmitEditing={runSearch}
+              />
+              <HeroButton variant="secondary" onPress={runSearch} isDisabled={query.trim().length < 2 || isSearching}>
+                {isSearching ? <Spinner size="sm" /> : <Ionicons name="search-outline" size={16} color={primary} />}
+                <HeroButton.Label>{t('actions.searchMembers')}</HeroButton.Label>
+              </HeroButton>
+            </View>
+            {selectedUser ? (
+              <Surface variant="secondary" className="flex-row items-center gap-3 rounded-panel-inner p-3">
+                <Avatar uri={selectedUser.avatar_url ?? null} name={selectedUser.name} size={36} />
+                <View className="min-w-0 flex-1">
+                  <Text className="text-sm font-bold" style={{ color: theme.text }} numberOfLines={1}>{selectedUser.name}</Text>
+                  <Text className="text-xs" style={{ color: theme.textSecondary }}>{t('actions.selectedRecipient')}</Text>
+                </View>
+              </Surface>
+            ) : null}
+            {results.length > 0 ? (
+              <View className="gap-2">
+                {results.map((user) => (
+                  <Pressable key={String(user.id)} accessibilityRole="button" onPress={() => setSelectedUser(user)}>
+                    <Surface variant="secondary" className="flex-row items-center gap-3 rounded-panel-inner p-3">
+                      <Avatar uri={user.avatar_url ?? null} name={user.name} size={36} />
+                      <View className="min-w-0 flex-1">
+                        <Text className="text-sm font-bold" style={{ color: theme.text }} numberOfLines={1}>{user.name}</Text>
+                        <Text className="text-xs" style={{ color: theme.textSecondary }} numberOfLines={1}>{user.location ?? user.email ?? t('actions.memberFallback')}</Text>
+                      </View>
+                      <Ionicons name={selectedUser?.id === user.id ? 'checkmark-circle' : 'chevron-forward'} size={18} color={primary} />
+                    </Surface>
+                  </Pressable>
+                ))}
+              </View>
+            ) : null}
+          </View>
+        ) : null}
+
+        <View className="gap-2">
+          <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>{t('actions.amount')}</Text>
+          <TextInput
+            className="min-h-12 rounded-panel-inner border px-3 text-sm"
+            style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg }}
+            placeholder={t('actions.amountPlaceholder')}
+            placeholderTextColor={theme.textMuted}
+            value={amount}
+            onChangeText={setAmount}
+            keyboardType="decimal-pad"
+          />
+        </View>
+
+        <View className="gap-2">
+          <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>{t(action === 'transfer' ? 'actions.description' : 'actions.message')}</Text>
+          <TextInput
+            className="min-h-20 rounded-panel-inner border px-3 py-3 text-sm"
+            style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg, textAlignVertical: 'top' }}
+            placeholder={t(action === 'transfer' ? 'actions.descriptionPlaceholder' : 'actions.messagePlaceholder')}
+            placeholderTextColor={theme.textMuted}
+            value={note}
+            onChangeText={setNote}
+            multiline
+          />
+        </View>
+
+        <HeroButton variant="primary" onPress={submit} isDisabled={isSubmitting} style={{ backgroundColor: primary }}>
+          {isSubmitting ? <Spinner size="sm" /> : <Ionicons name={action === 'transfer' ? 'send-outline' : 'heart-outline'} size={16} color="#fff" />}
+          <HeroButton.Label>{t(action === 'transfer' ? 'actions.sendNow' : 'actions.donateNow')}</HeroButton.Label>
+        </HeroButton>
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function HeaderCard({
+  t,
+  theme,
+  primary,
+  onRefresh,
+  isLoading,
+}: {
+  t: (key: string, opts?: Record<string, unknown>) => string;
+  theme: Theme;
+  primary: string;
+  onRefresh: () => void;
+  isLoading: boolean;
+}) {
+  return (
+    <HeroCard className="mb-4 overflow-hidden rounded-panel p-0">
+      <View className="h-1.5" style={{ backgroundColor: '#f59e0b' }} />
+      <HeroCard.Body className="gap-4 p-4">
+        <View className="flex-row items-start gap-3">
+          <View className="size-13 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha('#f59e0b', 0.16) }}>
+            <Ionicons name="wallet-outline" size={25} color="#f59e0b" />
+          </View>
+          <View className="min-w-0 flex-1 gap-1">
+            <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('eyebrow')}</Text>
+            <Text className="text-2xl font-bold" style={{ color: theme.text }}>{t('title')}</Text>
+            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('subtitle')}</Text>
+          </View>
+          <HeroButton size="sm" variant="secondary" isIconOnly onPress={onRefresh} isDisabled={isLoading} accessibilityLabel={t('refresh')}>
+            <Ionicons name="refresh-outline" size={17} color={primary} />
+          </HeroButton>
+        </View>
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function BalanceCard({
+  balance,
+  pending,
+  isLoading,
+  primary,
+  theme,
+  t,
+  onSend,
+  onDonate,
+}: {
+  balance: number | null;
+  pending: number;
+  isLoading: boolean;
+  primary: string;
+  theme: Theme;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+  onSend: () => void;
+  onDonate: () => void;
+}) {
+  const canSpend = (balance ?? 0) > 0 && !isLoading;
+  return (
+    <HeroCard className="overflow-hidden rounded-panel p-0">
+      <View className="h-1.5" style={{ backgroundColor: primary }} />
+      <HeroCard.Body className="gap-5 p-5">
+        <View className="gap-2">
+          <Text className="text-sm font-semibold" style={{ color: theme.textSecondary }}>{t('yourBalance')}</Text>
+          {isLoading ? (
+            <Spinner size="lg" />
+          ) : (
+            <View className="flex-row items-baseline gap-2">
+              <Text className="text-5xl font-bold leading-[58px]" style={{ color: theme.text }}>{formatHours(balance)}</Text>
+              <Text className="text-lg font-semibold" style={{ color: theme.textSecondary }}>{t('hours')}</Text>
+            </View>
+          )}
+          <View className="flex-row flex-wrap gap-2">
+            <Chip size="sm" variant="secondary" color={pending > 0 ? 'warning' : 'default'}>
+              <Ionicons name="time-outline" size={12} color={pending > 0 ? '#f59e0b' : primary} />
+              <Chip.Label>{pending > 0 ? t('pendingIn', { count: formatHours(pending) }) : t('noPending')}</Chip.Label>
+            </Chip>
+          </View>
+        </View>
+        <View className="flex-row gap-3">
+          <HeroButton className="flex-1" variant="primary" onPress={onSend} isDisabled={!canSpend} style={{ backgroundColor: canSpend ? primary : theme.border }}>
+            <Ionicons name="send-outline" size={16} color="#fff" />
+            <HeroButton.Label>{t('sendCredits')}</HeroButton.Label>
+          </HeroButton>
+          <HeroButton className="flex-1" variant="secondary" onPress={onDonate} isDisabled={!canSpend}>
+            <Ionicons name="heart-outline" size={16} color={primary} />
+            <HeroButton.Label>{t('donate')}</HeroButton.Label>
+          </HeroButton>
+        </View>
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function CommunityFundCard({
+  fund,
+  isLoading,
+  theme,
+  primary,
+  t,
+  onDonate,
+}: {
+  fund: CommunityFundBalance | null;
+  isLoading: boolean;
+  theme: Theme;
+  primary: string;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+  onDonate: () => void;
+}) {
+  return (
+    <HeroCard className="rounded-panel p-0">
+      <HeroCard.Body className="gap-4 p-4">
+        <View className="flex-row items-center gap-3">
+          <View className="size-11 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha('#f59e0b', 0.14) }}>
+            <Ionicons name="business-outline" size={21} color="#f59e0b" />
+          </View>
+          <View className="min-w-0 flex-1">
+            <Text className="text-base font-bold" style={{ color: theme.text }}>{t('communityFund')}</Text>
+            <Text className="text-sm" style={{ color: theme.textSecondary }}>{t('communityFundDesc')}</Text>
+          </View>
+          <HeroButton size="sm" variant="secondary" onPress={onDonate}>
+            <Ionicons name="heart-outline" size={14} color={primary} />
+            <HeroButton.Label>{t('donate')}</HeroButton.Label>
+          </HeroButton>
+        </View>
+        {isLoading ? (
+          <View className="items-center py-3"><Spinner size="sm" /></View>
+        ) : (
+          <View className="flex-row gap-3">
+            <MiniMetric label={t('fund.balance')} value={t('hoursValue', { count: fund?.balance ?? 0 })} tone="#f59e0b" theme={theme} />
+            <MiniMetric label={t('fund.deposited')} value={t('hoursValue', { count: fund?.total_deposited ?? 0 })} tone="#22c55e" theme={theme} />
+            <MiniMetric label={t('fund.donated')} value={t('hoursValue', { count: fund?.total_donated ?? 0 })} tone="#ec4899" theme={theme} />
+          </View>
+        )}
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function StatCard({ icon, label, value, tone, theme }: { icon: IoniconName; label: string; value: string; tone: string; theme: Theme }) {
+  return (
+    <HeroCard className="flex-1 rounded-panel p-0">
+      <HeroCard.Body className="gap-2 p-3">
+        <View className="size-9 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(tone, 0.14) }}>
+          <Ionicons name={icon} size={18} color={tone} />
+        </View>
+        <Text className="text-[11px] font-semibold uppercase" style={{ color: theme.textSecondary }} numberOfLines={2}>{label}</Text>
+        <Text className="text-lg font-bold" style={{ color: theme.text }} numberOfLines={1}>{value}</Text>
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function MiniMetric({ label, value, tone, theme }: { label: string; value: string; tone: string; theme: Theme }) {
+  return (
+    <Surface variant="secondary" className="flex-1 gap-1 rounded-panel-inner p-3">
+      <View className="size-2 rounded-full" style={{ backgroundColor: tone }} />
+      <Text className="text-[11px] font-semibold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>{label}</Text>
+      <Text className="text-sm font-bold" style={{ color: theme.text }} numberOfLines={1}>{value}</Text>
+    </Surface>
+  );
+}
+
+function FilterChip({ label, selected, onPress, tone }: { label: string; selected: boolean; onPress: () => void; tone: string }) {
+  return (
+    <HeroButton size="sm" variant={selected ? 'primary' : 'secondary'} onPress={onPress} style={selected ? { backgroundColor: tone } : undefined}>
+      <HeroButton.Label>{label}</HeroButton.Label>
+    </HeroButton>
+  );
+}
+
+function TransactionCard({
+  transaction,
+  theme,
+  primary,
+  t,
+}: {
+  transaction: TransactionItem;
+  theme: Theme;
+  primary: string;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+}) {
+  const isCredit = transaction.type === 'credit';
+  const tone = isCredit ? '#22c55e' : '#f43f5e';
+  const name = getOtherName(transaction, t('system'));
+  const signedAmount = transaction.amount < 0 ? '-' : (isCredit ? '+' : '-');
+  const amount = t('signedHours', { sign: signedAmount, count: Math.abs(transaction.amount) });
+  const description = transaction.description?.trim() || t('transactionFallback');
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={t('transactionLabel', { name, amount })}
+      onPress={() => void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)}
+    >
+      <Surface variant="secondary" className="flex-row items-start gap-3 rounded-panel-inner p-3">
+        <Avatar uri={transaction.other_user?.avatar_url ?? null} name={name} size={44} />
+        <View className="min-w-0 flex-1 gap-1">
+          <View className="flex-row items-start gap-2">
+            <View className="min-w-0 flex-1">
+              <Text className="text-sm font-bold" style={{ color: theme.text }} numberOfLines={1}>{description}</Text>
+              <Text className="text-xs" style={{ color: theme.textSecondary }} numberOfLines={1}>{name}</Text>
+            </View>
+            <Text className="text-base font-bold" style={{ color: tone }}>{amount}</Text>
+          </View>
+          <View className="flex-row flex-wrap gap-2">
+            <Chip size="sm" variant="secondary">
+              <Ionicons name={isCredit ? 'arrow-down-outline' : 'arrow-up-outline'} size={12} color={tone} />
+              <Chip.Label>{isCredit ? t('filter.earned') : t('filter.spent')}</Chip.Label>
+            </Chip>
+            <Chip size="sm" variant="secondary">
+              <Ionicons name="calendar-outline" size={12} color={primary} />
+              <Chip.Label>{formatDate(transaction.created_at)}</Chip.Label>
+            </Chip>
+            {transaction.status !== 'completed' ? (
+              <Chip size="sm" variant="secondary" color="warning">
+                <Chip.Label>{t(`status.${transaction.status}`)}</Chip.Label>
+              </Chip>
+            ) : null}
+          </View>
+        </View>
+      </Surface>
+    </Pressable>
+  );
+}
+
+function ErrorCard({
+  error,
+  t,
+  theme,
+  primary,
+  onRetry,
+}: {
+  error: string;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+  theme: Theme;
+  primary: string;
+  onRetry: () => void;
+}) {
+  return (
+    <HeroCard className="rounded-panel p-0">
+      <HeroCard.Body className="items-center gap-4 p-6">
+        <View className="size-14 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha('#f59e0b', 0.14) }}>
+          <Ionicons name="alert-circle-outline" size={28} color="#f59e0b" />
+        </View>
+        <View className="gap-2">
+          <Text className="text-center text-lg font-bold" style={{ color: theme.text }}>{t('unableToLoad')}</Text>
+          <Text className="text-center text-sm leading-5" style={{ color: theme.textSecondary }}>{error}</Text>
+        </View>
+        <HeroButton variant="secondary" onPress={onRetry}>
+          <Ionicons name="refresh-outline" size={16} color={primary} />
+          <HeroButton.Label>{t('tryAgain')}</HeroButton.Label>
+        </HeroButton>
+      </HeroCard.Body>
+    </HeroCard>
   );
 }

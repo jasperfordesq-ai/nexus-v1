@@ -1,8 +1,24 @@
 {
   "title": "Goals",
+  "subtitle": "Set personal milestones, track progress, and keep your momentum visible.",
+  "heroEyebrow": "Personal progress",
   "confirmAbandon": "Are you sure you want to abandon this goal?",
   "empty": "No goals yet.",
   "addGoal": "Add goal",
+  "percent": "{{percent}}%",
+  "momentumOn": "Building",
+  "momentumEmpty": "Ready",
+  "buddy": "Buddy: {{name}}",
+  "visibility": {
+    "public": "Public"
+  },
+  "stats": {
+    "active": "Active",
+    "completed": "Completed",
+    "total": "Total",
+    "momentum": "Momentum",
+    "averageProgress": "Average progress"
+  },
   "status": {
     "active": "Active",
     "completed": "Completed",
@@ -19,10 +35,14 @@
   "noGoalsHint": "Create your first goal to start tracking your progress.",
   "create": {
     "title": "New Goal",
+    "subtitle": "Give yourself a clear target to work toward.",
+    "close": "Close goal form",
     "titleLabel": "Goal title",
     "titlePlaceholder": "e.g. Help 5 neighbours",
     "descriptionLabel": "Description (optional)",
+    "descriptionPlaceholder": "Add a little context or a first step.",
     "targetHoursLabel": "Target hours (optional)",
+    "targetPlaceholder": "e.g. 10",
     "dueDateLabel": "Due date (optional)",
     "submit": "Create goal",
     "error": "Could not create goal."

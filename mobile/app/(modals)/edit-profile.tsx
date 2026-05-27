@@ -11,20 +11,27 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useNavigation } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import * as Haptics from '@/lib/haptics';
+import { Button as HeroButton, Card as HeroCard, Spinner } from 'heroui-native';
 
 import { useTranslation } from 'react-i18next';
 
-import { updateProfile, type UpdateProfilePayload } from '@/lib/api/profile';
-import { type User } from '@/lib/api/auth';
+import { updateAvatar, updateProfile, type UpdateProfilePayload } from '@/lib/api/profile';
+import { getMe, type User } from '@/lib/api/auth';
 import { useAuth } from '@/lib/hooks/useAuth';
+import { usePrimaryColor } from '@/lib/hooks/useTenant';
+import { useTheme } from '@/lib/hooks/useTheme';
 import { storage } from '@/lib/storage';
 import { STORAGE_KEYS } from '@/lib/constants';
-import Input from '@/components/ui/Input';
-import Button from '@/components/ui/Button';
+import AppTopBar from '@/components/ui/AppTopBar';
+import Avatar from '@/components/ui/Avatar';
+import FormActionFooter from '@/components/ui/FormActionFooter';
 import OfflineBanner from '@/components/OfflineBanner';
 
 // E.164-ish: optional + then digits, spaces, dashes — at least 7 digits total
@@ -39,10 +46,8 @@ export default function EditProfileScreen() {
   const { t } = useTranslation('profile');
   const navigation = useNavigation();
   const { user, refreshUser } = useAuth();
-
-  useEffect(() => {
-    navigation.setOptions({ title: t('edit.title') });
-  }, [navigation, t]);
+  const primary = usePrimaryColor();
+  const theme = useTheme();
 
   const fullUser = user as User | null;
 
@@ -51,16 +56,111 @@ export default function EditProfileScreen() {
   const [bio, setBio] = useState(fullUser?.bio ?? '');
   const [location, setLocation] = useState(fullUser?.location ?? '');
   const [phone, setPhone] = useState(fullUser?.phone ?? '');
+  const [baselineProfile, setBaselineProfile] = useState({
+    firstName: fullUser?.first_name ?? '',
+    lastName: fullUser?.last_name ?? '',
+    bio: fullUser?.bio ?? '',
+    location: fullUser?.location ?? '',
+    phone: fullUser?.phone ?? '',
+  });
   const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [avatarUri, setAvatarUri] = useState(fullUser?.avatar_url ?? null);
+  const [hydrating, setHydrating] = useState(false);
+  const [hasHydratedFullProfile, setHasHydratedFullProfile] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
   // Track whether the form has unsaved changes
   const isDirty =
-    firstName !== (fullUser?.first_name ?? '') ||
-    lastName !== (fullUser?.last_name ?? '') ||
-    bio !== (fullUser?.bio ?? '') ||
-    location !== (fullUser?.location ?? '') ||
-    phone !== (fullUser?.phone ?? '');
+    firstName !== baselineProfile.firstName ||
+    lastName !== baselineProfile.lastName ||
+    bio !== baselineProfile.bio ||
+    location !== baselineProfile.location ||
+    phone !== baselineProfile.phone;
+
+  function applyProfileData(profile: Partial<User>) {
+    const nextProfile = {
+      firstName: profile.first_name ?? '',
+      lastName: profile.last_name ?? '',
+      bio: decodeHtmlEntities(profile.bio ?? ''),
+      location: profile.location ?? '',
+      phone: profile.phone ?? '',
+    };
+    setFirstName(nextProfile.firstName);
+    setLastName(nextProfile.lastName);
+    setBio(nextProfile.bio);
+    setLocation(nextProfile.location);
+    setPhone(nextProfile.phone);
+    setBaselineProfile(nextProfile);
+    setAvatarUri(profile.avatar_url ?? null);
+  }
+
+  async function handlePickAvatar() {
+    if (uploadingAvatar) return;
+
+    try {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) {
+        Alert.alert(t('permissionNeeded'), t('permissionMessage'));
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 0.85,
+        allowsMultipleSelection: false,
+      });
+
+      if (result.canceled || !result.assets?.[0]?.uri) return;
+
+      setUploadingAvatar(true);
+      const response = await updateAvatar(result.assets[0].uri);
+      const nextAvatarUrl = withImageVersion(response.data.avatar_url);
+      setAvatarUri(nextAvatarUrl);
+
+      if (fullUser) {
+        const updatedUser = { ...fullUser, avatar_url: nextAvatarUrl };
+        refreshUser(updatedUser);
+        await storage.setJson(STORAGE_KEYS.USER_DATA, updatedUser);
+      }
+
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } catch {
+      void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(t('uploadFailed'), t('uploadFailedMessage'));
+    } finally {
+      setUploadingAvatar(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!user || hasHydratedFullProfile) return;
+    let isMounted = true;
+
+    async function hydrateProfile() {
+      setHydrating(true);
+      try {
+        const response = await getMe();
+        if (!isMounted) return;
+        applyProfileData(response.data);
+        refreshUser(response.data);
+        await storage.setJson(STORAGE_KEYS.USER_DATA, response.data);
+      } catch {
+        if (!isMounted) return;
+        applyProfileData(user as Partial<User>);
+      } finally {
+        if (isMounted) {
+          setHasHydratedFullProfile(true);
+          setHydrating(false);
+        }
+      }
+    }
+
+    void hydrateProfile();
+    return () => {
+      isMounted = false;
+    };
+  }, [hasHydratedFullProfile, refreshUser, user]);
 
   // Warn the user before navigating away with unsaved changes
   useEffect(() => {
@@ -118,6 +218,13 @@ export default function EditProfileScreen() {
       // Update cached user data
       await storage.setJson(STORAGE_KEYS.USER_DATA, response.data);
       refreshUser(response.data);
+      setBaselineProfile({
+        firstName: response.data.first_name ?? '',
+        lastName: response.data.last_name ?? '',
+        bio: response.data.bio ?? '',
+        location: response.data.location ?? '',
+        phone: response.data.phone ?? '',
+      });
 
       void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert(t('edit.saved'), t('edit.savedMessage'), [
@@ -134,97 +241,213 @@ export default function EditProfileScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
+      <AppTopBar title={t('edit.title')} backLabel={t('common:buttons.back')} fallbackHref="/(modals)/member-profile" />
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
+        <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 116, gap: 12 }} keyboardShouldPersistTaps="handled">
           <OfflineBanner />
 
-          <View className="mb-[18px]">
-            <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
-              {t('edit.firstName')}
-            </Text>
-            <Input
-              value={firstName}
-              onChangeText={(v) => {
-                setFirstName(v);
-                if (fieldErrors.firstName) setFieldErrors((e) => ({ ...e, firstName: undefined }));
-              }}
-              placeholder={t('edit.firstName')}
-              autoCapitalize="words"
-              maxLength={50}
-              error={fieldErrors.firstName}
-            />
-          </View>
+          <HeroCard variant="default" className="overflow-hidden">
+            <View className="h-1 w-full" style={{ backgroundColor: primary }} />
+            <HeroCard.Body className="gap-4 px-4 py-5">
+              <View className="flex-row items-center gap-3">
+                <Avatar
+                  uri={avatarUri}
+                  name={`${firstName} ${lastName}`.trim() || t('myProfile')}
+                  size={58}
+                />
+                <View className="min-w-0 flex-1">
+                  <Text className="text-xl font-bold" style={{ color: theme.text }} numberOfLines={1}>
+                    {hydrating ? t('edit.loadingProfile') : t('edit.title')}
+                  </Text>
+                  <Text className="mt-1 text-sm leading-5" style={{ color: theme.textSecondary }}>
+                    {t('edit.subtitle')}
+                  </Text>
+                </View>
+              </View>
+              <View className="flex-row gap-2">
+                <HeroButton
+                  className="flex-1"
+                  variant="secondary"
+                  onPress={() => void handlePickAvatar()}
+                  isDisabled={uploadingAvatar}
+                  accessibilityLabel={t('changePhoto')}
+                >
+                  {uploadingAvatar ? (
+                    <Spinner size="sm" />
+                  ) : (
+                    <Ionicons name="camera-outline" size={17} color={primary} />
+                  )}
+                  <HeroButton.Label>
+                    {uploadingAvatar ? t('edit.uploadingPhoto') : t('changePhoto')}
+                  </HeroButton.Label>
+                </HeroButton>
+              </View>
+            </HeroCard.Body>
+          </HeroCard>
 
-          <View className="mb-[18px]">
-            <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
-              {t('edit.lastName')}
-            </Text>
-            <Input
-              value={lastName}
-              onChangeText={setLastName}
-              placeholder={t('edit.lastName')}
-              autoCapitalize="words"
-              maxLength={50}
-            />
-          </View>
+          <HeroCard variant="secondary">
+            <HeroCard.Body className="gap-4 px-4 py-4">
+              <SectionTitle icon="person-outline" title={t('edit.identity')} primary={primary} />
+              <View className="flex-row gap-3">
+                <ProfileField
+                  label={t('edit.firstName')}
+                  value={firstName}
+                  onChangeText={(v) => {
+                    setFirstName(v);
+                    if (fieldErrors.firstName) setFieldErrors((e) => ({ ...e, firstName: undefined }));
+                  }}
+                  placeholder={t('edit.firstName')}
+                  error={fieldErrors.firstName}
+                  autoCapitalize="words"
+                  maxLength={50}
+                  theme={theme}
+                  className="flex-1"
+                />
+                <ProfileField
+                  label={t('edit.lastName')}
+                  value={lastName}
+                  onChangeText={setLastName}
+                  placeholder={t('edit.lastName')}
+                  autoCapitalize="words"
+                  maxLength={50}
+                  theme={theme}
+                  className="flex-1"
+                />
+              </View>
+            </HeroCard.Body>
+          </HeroCard>
 
-          <View className="mb-[18px]">
-            <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
-              {t('edit.aboutYou')}
-            </Text>
-            <Input
-              value={bio}
-              onChangeText={setBio}
-              placeholder={t('edit.aboutPlaceholder')}
-              multiline
-              numberOfLines={4}
-              style={{ height: 100, textAlignVertical: 'top' }}
-              maxLength={500}
-            />
-          </View>
+          <HeroCard variant="secondary">
+            <HeroCard.Body className="gap-4 px-4 py-4">
+              <SectionTitle icon="reader-outline" title={t('edit.profileStory')} primary={primary} />
+              <ProfileField
+                label={t('edit.aboutYou')}
+                value={bio}
+                onChangeText={setBio}
+                placeholder={t('edit.aboutPlaceholder')}
+                multiline
+                numberOfLines={5}
+                maxLength={500}
+                theme={theme}
+                inputClassName="min-h-[124px] pt-3"
+                helper={t('edit.bioHint', { count: Math.max(0, 500 - bio.length) })}
+              />
+            </HeroCard.Body>
+          </HeroCard>
 
-          <View className="mb-[18px]">
-            <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
-              {t('edit.location')}
-            </Text>
-            <Input
-              value={location}
-              onChangeText={setLocation}
-              placeholder={t('edit.locationPlaceholder')}
-              autoCapitalize="words"
-            />
-          </View>
-
-          <View className="mb-[18px]">
-            <Text className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1">
-              {t('edit.phoneOptional')}
-            </Text>
-            <Input
-              value={phone}
-              onChangeText={(v) => {
-                setPhone(v);
-                if (fieldErrors.phone) setFieldErrors((e) => ({ ...e, phone: undefined }));
-              }}
-              placeholder={t('edit.phonePlaceholder')}
-              keyboardType="phone-pad"
-              error={fieldErrors.phone}
-            />
-          </View>
-
-          <Button
-            onPress={() => void handleSave()}
-            disabled={saving}
-            isLoading={saving}
-            className="mt-2 rounded-lg"
-            accessibilityLabel={t('edit.saveChanges')}
-          >
-            {t('edit.saveChanges')}
-          </Button>
+          <HeroCard variant="secondary">
+            <HeroCard.Body className="gap-4 px-4 py-4">
+              <SectionTitle icon="location-outline" title={t('edit.contactDetails')} primary={primary} />
+              <ProfileField
+                label={t('edit.location')}
+                value={location}
+                onChangeText={setLocation}
+                placeholder={t('edit.locationPlaceholder')}
+                autoCapitalize="words"
+                theme={theme}
+              />
+              <ProfileField
+                label={t('edit.phoneOptional')}
+                value={phone}
+                onChangeText={(v) => {
+                  setPhone(v);
+                  if (fieldErrors.phone) setFieldErrors((e) => ({ ...e, phone: undefined }));
+                }}
+                placeholder={t('edit.phonePlaceholder')}
+                keyboardType="phone-pad"
+                error={fieldErrors.phone}
+                theme={theme}
+              />
+            </HeroCard.Body>
+          </HeroCard>
         </ScrollView>
+
+        <FormActionFooter
+          title={t('edit.reviewTitle')}
+          subtitle={isDirty ? t('edit.reviewSubtitleDirty') : t('edit.reviewSubtitleClean')}
+          submitLabel={saving ? t('edit.saving') : t('edit.saveChanges')}
+          secondaryLabel={t('edit.cancel')}
+          primary={primary}
+          isSubmitting={saving}
+          isDisabled={!isDirty}
+          onSubmit={() => void handleSave()}
+          onSecondary={() => router.back()}
+        />
       </KeyboardAvoidingView>
     </SafeAreaView>
+  );
+}
+
+function decodeHtmlEntities(value: string): string {
+  return value
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+}
+
+function withImageVersion(url: string): string {
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}v=${Date.now()}`;
+}
+
+type ProfileFieldProps = React.ComponentProps<typeof TextInput> & {
+  label: string;
+  value: string;
+  error?: string;
+  helper?: string;
+  theme: ReturnType<typeof useTheme>;
+  className?: string;
+  inputClassName?: string;
+};
+
+function ProfileField({
+  label,
+  value,
+  error,
+  helper,
+  theme,
+  className,
+  inputClassName,
+  multiline,
+  ...inputProps
+}: ProfileFieldProps) {
+  return (
+    <View className={`gap-1.5 ${className ?? ''}`}>
+      <Text className="text-xs font-semibold uppercase text-muted-foreground">{label}</Text>
+      <TextInput
+        {...inputProps}
+        value={value}
+        multiline={multiline}
+        className={`min-h-[46px] rounded-2xl border px-4 py-3 text-sm ${inputClassName ?? ''}`}
+        style={{
+          color: theme.text,
+          backgroundColor: theme.bg,
+          borderColor: error ? theme.error : theme.border,
+          textAlignVertical: multiline ? 'top' : 'center',
+        }}
+        placeholderTextColor={theme.textMuted}
+        accessibilityLabel={label}
+      />
+      {error ? (
+        <Text className="text-xs font-medium" style={{ color: theme.error }}>{error}</Text>
+      ) : helper ? (
+        <Text className="text-xs" style={{ color: theme.textMuted }}>{helper}</Text>
+      ) : null}
+    </View>
+  );
+}
+
+function SectionTitle({ icon, title, primary }: { icon: React.ComponentProps<typeof Ionicons>['name']; title: string; primary: string }) {
+  return (
+    <View className="flex-row items-center gap-2">
+      <Ionicons name={icon} size={18} color={primary} />
+      <Text className="text-base font-semibold text-foreground">{title}</Text>
+    </View>
   );
 }

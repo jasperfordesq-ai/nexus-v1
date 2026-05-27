@@ -218,7 +218,8 @@
     "cover_message_placeholder": "أخبر المنظمة عن سبب رغبتك في التطوع...",
     "cancel": "يلغي",
     "submit_application": "تقديم الطلب",
-    "job_openings": "الوظائف الشاغرة"
+    "job_openings": "الوظائف الشاغرة",
+    "rating_sr": "{{n}} out of 5 stars"
   },
   "emergency_alerts": {
     "heading": "التنبيهات الطارئة",

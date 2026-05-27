@@ -20,6 +20,8 @@ jest.mock('react-i18next', () => ({
     t: (key: string, opts?: Record<string, unknown>) => {
       const map: Record<string, string> = {
         'title': 'Jobs',
+        'eyebrow': 'Community roles',
+        'subtitle': 'Browse paid, volunteer, and time-credit roles from the community.',
         'tabs.browse': 'Browse',
         'tabs.myApplications': 'My Applications',
         'search.placeholder': 'Search jobs...',
@@ -64,6 +66,9 @@ jest.mock('@/lib/hooks/useTheme', () => ({
     border: '#dddddd',
     borderSubtle: '#eeeeee',
     error: '#e53e3e',
+    success: '#22c55e',
+    warning: '#f59e0b',
+    info: '#3b82f6',
   }),
 }));
 
@@ -170,14 +175,21 @@ describe('JobsScreen', () => {
   });
 
   it('renders job cards when items are provided', () => {
-    mockUsePaginatedApi.mockReturnValueOnce({
-      items: [mockJob],
-      isLoading: false,
-      isLoadingMore: false,
-      error: null,
-      hasMore: false,
-      loadMore: jest.fn(),
-      refresh: jest.fn(),
+    let callCount = 0;
+    mockUsePaginatedApi.mockImplementation(() => {
+      callCount += 1;
+      if (callCount % 2 === 1) {
+        return {
+          items: [mockJob],
+          isLoading: false,
+          isLoadingMore: false,
+          error: null,
+          hasMore: false,
+          loadMore: jest.fn(),
+          refresh: jest.fn(),
+        };
+      }
+      return defaultPaginatedState;
     });
 
     const { getByText } = render(<JobsScreen />);
@@ -209,14 +221,21 @@ describe('JobsScreen', () => {
   });
 
   it('renders type badge on job card', () => {
-    mockUsePaginatedApi.mockReturnValueOnce({
-      items: [mockJob],
-      isLoading: false,
-      isLoadingMore: false,
-      error: null,
-      hasMore: false,
-      loadMore: jest.fn(),
-      refresh: jest.fn(),
+    let callCount = 0;
+    mockUsePaginatedApi.mockImplementation(() => {
+      callCount += 1;
+      if (callCount % 2 === 1) {
+        return {
+          items: [mockJob],
+          isLoading: false,
+          isLoadingMore: false,
+          error: null,
+          hasMore: false,
+          loadMore: jest.fn(),
+          refresh: jest.fn(),
+        };
+      }
+      return defaultPaginatedState;
     });
 
     const { getAllByText } = render(<JobsScreen />);

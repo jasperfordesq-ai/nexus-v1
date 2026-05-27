@@ -218,7 +218,8 @@
     "cover_message_placeholder": "Inis don eagras cén fáth ar mhaith leat obair dheonach a dhéanamh...",
     "cancel": "Cealaigh",
     "submit_application": "Cuir Iarratas Isteach",
-    "job_openings": "Oscailtí Poist"
+    "job_openings": "Oscailtí Poist",
+    "rating_sr": "{{n}} out of 5 stars"
   },
   "emergency_alerts": {
     "heading": "Foláirimh Éigeandála",

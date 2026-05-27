@@ -1,12 +1,21 @@
 {
   "title": "Jobs",
+  "eyebrow": "Community roles",
+  "subtitle": "Browse paid, volunteer, and time-credit roles from the community.",
   "detailTitle": "Job Details",
+  "createJob": "Create job",
   "tabs": {
     "browse": "Browse",
     "myApplications": "My Applications"
   },
   "search": {
-    "placeholder": "Search jobs..."
+    "placeholder": "Search jobs...",
+    "advanced": "Advanced Search",
+    "boolean_hint": "e.g. \"developer | engineer\", \"react -junior\"",
+    "salary_min": "Min salary",
+    "salary_max": "Max salary",
+    "company_size_filter": "Company size",
+    "benefits_filter": "Benefits keyword"
   },
   "filters": {
     "type": {
@@ -45,13 +54,19 @@
     "closesIn": "Closes in {{count}} days",
     "goBack": "Go Back",
     "notFound": "Job not found.",
+    "notFoundHint": "This role may have been removed, closed, or moved.",
     "invalidId": "Invalid job ID.",
+    "invalidIdHint": "We could not identify which role to open.",
+    "browseJobs": "Browse jobs",
     "saveError": "Could not update saved state.",
     "timeCredits": "{{count}} time credits",
     "salaryAnnual": "year",
     "salaryMonthly": "month",
     "salaryHourly": "hour",
     "share": "Share",
+    "postedBy": "Posted by",
+    "keyDetails": "Role details",
+    "views": "{{count}} views",
     "closesIn_one": "Closes in {{count}} day",
     "timeCredits_one": "{{count}} time credit"
   },
@@ -88,14 +103,6 @@
     "decline_offer": "Decline",
     "offer_accepted": "Offer Accepted"
   },
-  "search": {
-    "advanced": "Advanced Search",
-    "boolean_hint": "e.g. \"developer | engineer\", \"react -junior\"",
-    "salary_min": "Min salary",
-    "salary_max": "Max salary",
-    "company_size_filter": "Company size",
-    "benefits_filter": "Benefits keyword"
-  },
   "template": {
     "start_from": "Start from template (optional)",
     "no_templates": "No templates yet",
@@ -118,5 +125,36 @@
   "loadMore": "Load More",
   "loading": "Loading jobs...",
   "error": "Failed to load jobs",
-  "retry": "Retry"
+  "retry": "Retry",
+  "create": {
+    "eyebrow": "New role",
+    "title": "Create Job",
+    "subtitle": "Post a paid, volunteer, or time-credit role for members to discover.",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Role title",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Describe the role, expectations, and next steps.",
+    "typeLabel": "Type",
+    "commitmentLabel": "Commitment",
+    "locationLabel": "Location",
+    "locationPlaceholder": "Where is the role based?",
+    "categoryLabel": "Category",
+    "categoryPlaceholder": "Optional category",
+    "skillsLabel": "Skills",
+    "skillsPlaceholder": "Comma-separated skills",
+    "hoursLabel": "Hours per week",
+    "hoursPlaceholder": "Optional hours",
+    "creditsLabel": "Time credits",
+    "creditsPlaceholder": "Optional credits",
+    "deadlineLabel": "Deadline",
+    "deadlinePlaceholder": "YYYY-MM-DD",
+    "remote": "Remote role",
+    "reviewTitle": "Ready to publish?",
+    "reviewSubtitle": "Check the role type, commitment, skills, and deadline before posting.",
+    "submit": "Create job",
+    "validationTitle": "Check job details",
+    "validationRequired": "Add a title and description before continuing.",
+    "failedTitle": "Job not created",
+    "failedDescription": "We could not create the job. Please try again."
+  }
 }

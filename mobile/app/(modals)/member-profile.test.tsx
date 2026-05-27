@@ -8,10 +8,12 @@ import { render } from '@testing-library/react-native';
 
 // --- Mocks ---
 
+let mockParams: Record<string, string | undefined> = { id: '7' };
+
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }),
   router: { push: jest.fn(), replace: jest.fn(), back: jest.fn() },
-  useLocalSearchParams: () => ({ id: '7' }),
+  useLocalSearchParams: () => mockParams,
   useNavigation: () => ({ setOptions: jest.fn() }),
 }));
 
@@ -21,12 +23,42 @@ jest.mock('react-i18next', () => ({
       const map: Record<string, string> = {
         'profile.loadError': 'Failed to load member profile.',
         'profile.verified': 'Verified',
+        'profile.federatedMember': 'Federated member',
+        'profile.federatedProfile': 'Federated profile',
+        'profile.federatedProfileHint': opts ? `This profile is shared from ${String(opts.community ?? '')}.` : 'This profile is federated.',
         'profile.hoursGiven': 'Hours Given',
         'profile.hoursReceived': 'Hours Received',
+        'profile.totalHours': 'Total Hours',
+        'profile.activeListings': 'Active Listings',
+        'profile.groups': 'Groups',
+        'profile.events': 'Events',
         'profile.skills': 'Skills',
         'profile.noSkills': 'No skills listed.',
+        'profile.trustStatus': 'Trust status',
+        'profile.trustStatusHint': 'Verification labels are loaded from the member verification system.',
+        'profile.achievements': 'Achievements',
+        'profile.achievementsSummary': opts ? `Level ${String(opts.level ?? 1)} · ${String(opts.count ?? 0)} badges` : 'Achievements summary',
+        'profile.level': opts ? `Level ${String(opts.level ?? 1)}` : 'Level 1',
+        'profile.xp': 'XP',
+        'profile.badges': 'Badges',
+        'profile.nextLevel': 'To next level',
+        'profile.noBadges': 'No badges earned yet.',
+        'profile.viewAllAchievements': 'View all achievements',
+        'profile.memberListings': 'Member listings',
+        'profile.noListings': 'No public listings yet.',
+        'profile.offer': 'Offer',
+        'profile.request': 'Request',
+        'profile.viewListing': opts ? `View ${String(opts.title ?? '')}` : 'View listing',
+        'profile.hoursEstimate': opts ? `${String(opts.hours ?? '')} hrs` : 'hrs',
+        'profile.reviews': 'Reviews',
+        'profile.noReviews': 'No reviews yet.',
+        'profile.reviewCount': opts ? `${String(opts.count ?? '')} reviews` : 'reviews',
+        'profile.anonymousReviewer': 'Community member',
         'profile.sendMessage': 'Send Message',
         'profile.memberSince': opts ? `Member since ${String(opts.date ?? '')}` : 'Member since',
+        'federation:directory.members.title': 'Federated Members',
+        'federation:directory.members.memberFallback': 'Member',
+        'federation:directory.unknownCommunity': 'Partner community',
         'common:errors.notFound': 'Member not found.',
         'common:buttons.back': 'Go Back',
       };
@@ -77,10 +109,34 @@ jest.mock('@expo/vector-icons', () => ({
 
 jest.mock('@/lib/api/members', () => ({
   getMember: jest.fn(),
+  getMemberListings: jest.fn().mockResolvedValue({ data: [] }),
+  getMemberReviews: jest.fn().mockResolvedValue({ data: [] }),
+}));
+
+jest.mock('@/lib/api/federation', () => ({
+  getFederationMember: jest.fn(),
+  getFederationConnectionStatus: jest.fn().mockResolvedValue({ data: { status: 'none', connection_id: null } }),
+  sendFederationConnectionRequest: jest.fn().mockResolvedValue({ data: { connection_id: 20 } }),
+}));
+
+jest.mock('@/lib/api/connections', () => ({
+  getConnectionStatus: jest.fn().mockResolvedValue({ data: { status: 'none', connection_id: null } }),
+  sendConnectionRequest: jest.fn().mockResolvedValue({ data: { connection_id: 10 } }),
+  acceptConnection: jest.fn().mockResolvedValue({}),
+  removeConnection: jest.fn().mockResolvedValue({}),
+}));
+
+jest.mock('@/lib/api/verification', () => ({
+  getUserVerificationBadges: jest.fn().mockResolvedValue([]),
+}));
+
+jest.mock('@/lib/api/gamification', () => ({
+  getGamificationProfile: jest.fn().mockResolvedValue({ data: null }),
+  getBadges: jest.fn().mockResolvedValue({ data: [] }),
 }));
 
 jest.mock('@/lib/hooks/useAuth', () => ({
-  useAuth: () => ({ user: { id: 1, name: 'Test User' }, isAuthenticated: true }),
+  useAuth: () => ({ user: { id: 1, name: 'Test User', tenant_id: 2 }, isAuthenticated: true }),
 }));
 
 jest.mock('@/components/ui/Avatar', () => 'View');
@@ -89,10 +145,14 @@ jest.mock('@/components/ui/LoadingSpinner', () => () => null);
 // --- Tests ---
 
 import MemberProfileScreen from './member-profile';
+import { getFederationMember } from '@/lib/api/federation';
+import { getMember } from '@/lib/api/members';
 
 const defaultApiState = { data: null, isLoading: false, error: null, refresh: jest.fn() };
 
 beforeEach(() => {
+  mockParams = { id: '7' };
+  jest.clearAllMocks();
   mockUseApi.mockReturnValue(defaultApiState);
 });
 
@@ -110,6 +170,49 @@ const mockMember = {
   total_hours_received: 8,
   rating: 4.7,
   is_verified: false,
+  stats: { listings_count: 1 },
+  groups_count: 2,
+  events_attended: 3,
+  listings: [
+    {
+      id: 55,
+      title: 'Garden help',
+      type: 'offer',
+      category_name: 'Gardening',
+      description: 'Help with raised beds.',
+      hours_estimate: 2,
+    },
+  ],
+  reviews: [
+    {
+      id: 91,
+      rating: 5,
+      comment: 'Lovely exchange.',
+      created_at: '2026-03-22T10:00:00Z',
+      reviewer: { id: 8, first_name: 'Nora', last_name: 'Walsh' },
+    },
+  ],
+  achievements: {
+    profile: {
+      xp: 250,
+      level: 3,
+      next_level_xp: 500,
+      badges: [],
+      badges_count: 2,
+      rank: null,
+      streak_days: 0,
+    },
+    badges: [
+      {
+        id: 1,
+        name: 'First Exchange',
+        description: 'Completed an exchange.',
+        icon: 'exchange',
+        earned_at: '2026-01-01T00:00:00Z',
+        is_earned: true,
+      },
+    ],
+  },
 };
 
 describe('MemberProfileScreen', () => {
@@ -147,5 +250,37 @@ describe('MemberProfileScreen', () => {
 
     const { getByText } = render(<MemberProfileScreen />);
     expect(getByText('Send Message')).toBeTruthy();
+  });
+
+  it('renders profile parity sections for stats, achievements, listings, reviews, and trust status', () => {
+    mockUseApi.mockReturnValue({ data: { data: mockMember }, isLoading: false, error: null, refresh: jest.fn() });
+
+    const { getByText } = render(<MemberProfileScreen />);
+    expect(getByText('Active Listings')).toBeTruthy();
+    expect(getByText('Trust status')).toBeTruthy();
+    expect(getByText('Achievements')).toBeTruthy();
+    expect(getByText('Level 3')).toBeTruthy();
+    expect(getByText('Member listings')).toBeTruthy();
+    expect(getByText('Garden help')).toBeTruthy();
+    expect(getByText('Reviews')).toBeTruthy();
+    expect(getByText('Lovely exchange.')).toBeTruthy();
+  });
+
+  it('uses the federation member endpoint when a partner tenant_id is present', async () => {
+    mockParams = { id: '272', tenant_id: '5' };
+    mockUseApi.mockImplementation((loader: () => Promise<unknown>) => ({
+      data: { data: { ...mockMember, id: 272, tenant_id: 5, timebank: { id: 5, name: 'Partner Demo' } } },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+      __loader: loader,
+    }));
+
+    render(<MemberProfileScreen />);
+    const loader = mockUseApi.mock.calls[0][0] as () => Promise<unknown>;
+    await loader();
+
+    expect(getFederationMember).toHaveBeenCalledWith(272, 5);
+    expect(getMember).not.toHaveBeenCalled();
   });
 });

@@ -29,7 +29,8 @@
     "title": "Aktywne grupy",
     "subtitle": "Połącz się z podobnie myślącymi członkami",
     "members": "{{count}} członków",
-    "view_group": "Zobacz grupę"
+    "view_group": "Zobacz grupę",
+    "view_group_named": "View group: {{name}}"
   },
   "top_contributors": {
     "title": "Najlepsi współpracownicy",
@@ -100,7 +101,8 @@
     "votes": "{{count}} głosów",
     "options": "{{count}} opcji",
     "vote_now": "Głosuj teraz",
-    "closes": "Zamknięcie {{date}}"
+    "closes": "Zamknięcie {{date}}",
+    "vote_now_for": "Vote now on: {{question}}"
   },
   "in_demand_skills": {
     "title": "Umiejętności w popycie",

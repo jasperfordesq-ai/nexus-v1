@@ -93,10 +93,10 @@ function normalizeAdminEvent(item: RawAdminEvent): AdminEvent {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function EventsAdmin() {
+  const { t } = useTranslation('admin');
   useAdminPageMeta({ title: t('events.events_admin_title') });
   const { tenantPath } = useTenant();
   const toast = useToast();
-  const { t } = useTranslation('admin');
 
   const [items, setItems] = useState<AdminEvent[]>([]);
   const [total, setTotal] = useState(0);

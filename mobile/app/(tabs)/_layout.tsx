@@ -11,6 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
+import { useTheme } from '@/lib/hooks/useTheme';
 import { useRealtimeContext } from '@/lib/context/RealtimeContext';
 
 type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
@@ -58,7 +59,7 @@ interface TabConfig {
 const TABS_CONFIG: TabConfig[] = [
   { name: 'home',      i18nKey: 'common:tabs.home',      icon: 'home-outline',    iconFocused: 'home' },
   { name: 'exchanges', i18nKey: 'common:tabs.listings',   icon: 'storefront-outline', iconFocused: 'storefront' },
-  { name: 'events',    i18nKey: 'common:tabs.events',     icon: 'calendar-outline', iconFocused: 'calendar' },
+  { name: 'groups',    i18nKey: 'common:tabs.groups',     icon: 'people-outline', iconFocused: 'people' },
   { name: 'messages',  i18nKey: 'common:tabs.messages',   icon: 'chatbubble-outline', iconFocused: 'chatbubble' },
   { name: 'profile',   i18nKey: 'common:tabs.more',       icon: 'menu-outline',    iconFocused: 'menu' },
 ];
@@ -66,6 +67,7 @@ const TABS_CONFIG: TabConfig[] = [
 export default function TabsLayout() {
   const { t } = useTranslation();
   const primary = usePrimaryColor();
+  const theme = useTheme();
   const { unreadMessages, resetUnread } = useRealtimeContext();
   const pathname = usePathname();
   const insets = useSafeAreaInsets();
@@ -85,18 +87,23 @@ export default function TabsLayout() {
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: primary,
-        tabBarInactiveTintColor: '#9ca3af',
+        tabBarInactiveTintColor: theme.textSecondary,
         tabBarStyle: {
-          backgroundColor: '#ffffff',
-          borderTopColor: '#e5e7eb',
+          backgroundColor: theme.surface,
+          borderTopColor: theme.border,
           borderTopWidth: 1,
           paddingBottom: (insets.bottom || 0) + 4,
           paddingTop: 4,
           height: 60 + (insets.bottom || 0),
+          shadowColor: '#000',
+          shadowOpacity: 0.14,
+          shadowRadius: 16,
+          shadowOffset: { width: 0, height: -4 },
+          elevation: 16,
         },
         tabBarLabelStyle: {
           fontSize: 11,
-          fontWeight: '500',
+          fontWeight: '600',
         },
       }}
     >
@@ -123,7 +130,7 @@ export default function TabsLayout() {
       ))}
       {/* Hide auxiliary tabs from the tab bar — navigated to programmatically */}
       <Tabs.Screen name="members" options={{ href: null }} />
-      <Tabs.Screen name="groups" options={{ href: null }} />
+      <Tabs.Screen name="events" options={{ href: null }} />
       <Tabs.Screen name="search" options={{ href: null }} />
     </Tabs>
   );

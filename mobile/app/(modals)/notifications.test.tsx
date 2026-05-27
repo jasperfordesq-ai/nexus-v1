@@ -4,29 +4,44 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
-
-// --- Mocks ---
+import { render } from '@testing-library/react-native';
 
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }),
-  router: { push: jest.fn(), replace: jest.fn(), back: jest.fn() },
+  router: { push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
   useLocalSearchParams: () => ({}),
   useNavigation: () => ({ setOptions: jest.fn() }),
 }));
 
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string) => {
+    t: (key: string, opts?: Record<string, unknown>) => {
       const map: Record<string, string> = {
         'title': 'Notifications',
+        'eyebrow': 'Activity inbox',
         'allCaughtUp': 'You are all caught up!',
+        'allCaughtUpSub': 'You have no new notifications.',
+        'unreadCount': opts ? `${String(opts.count ?? 0)} unread` : '0 unread',
+        'unreadSummary': opts ? `You have ${String(opts.count ?? 0)} unread notifications.` : 'You have unread notifications.',
         'markAllRead': 'Mark all read',
-        'marking': 'Marking…',
+        'marking': 'Marking...',
         'markError': 'Failed to mark as read.',
         'justNow': 'Just now',
+        'itemHint': 'Tap to view',
+        'unreadItem': opts ? `Unread: ${String(opts.label ?? '')}` : 'Unread',
+        'category.message': 'Message',
+        'category.transaction': 'Transaction',
+        'category.social': 'Social',
+        'category.system': 'System',
+        'category.event': 'Event',
+        'category.group': 'Group',
+        'category.listing': 'Listing',
+        'category.connection': 'Connection',
+        'category.mention': 'Mention',
+        'category.other': 'Notification',
         'common:errors.alertTitle': 'Error',
         'common:buttons.retry': 'Retry',
+        'common:back': 'Back',
       };
       return map[key] ?? key;
     },
@@ -50,6 +65,8 @@ jest.mock('@/lib/hooks/useTheme', () => ({
     borderSubtle: '#eeeeee',
     error: '#e53e3e',
     success: '#22c55e',
+    warning: '#f59e0b',
+    info: '#3b82f6',
   }),
 }));
 
@@ -86,8 +103,6 @@ jest.mock('@/lib/utils/formatRelativeTime', () => ({
   formatRelativeTime: jest.fn(() => '5 min ago'),
 }));
 
-// --- Tests ---
-
 import NotificationsScreen from './notifications';
 
 const defaultApiState = { data: null, isLoading: false, error: null, refresh: jest.fn() };
@@ -114,8 +129,8 @@ describe('NotificationsScreen', () => {
   });
 
   it('renders the Notifications heading', () => {
-    const { getByText } = render(<NotificationsScreen />);
-    expect(getByText('Notifications')).toBeTruthy();
+    const { getAllByText } = render(<NotificationsScreen />);
+    expect(getAllByText('Notifications').length).toBeGreaterThan(0);
   });
 
   it('renders the empty state when there are no notifications', () => {
@@ -131,7 +146,6 @@ describe('NotificationsScreen', () => {
       refresh: jest.fn(),
     });
 
-    // LoadingSpinner is rendered in the ListEmptyComponent when isLoading=true
     const { toJSON } = render(<NotificationsScreen />);
     expect(toJSON()).toBeTruthy();
   });

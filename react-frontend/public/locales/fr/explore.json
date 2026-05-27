@@ -29,7 +29,8 @@
     "title": "Groupes actifs",
     "subtitle": "Connectez-vous avec des membres partageant les mêmes idées",
     "members": "{{count}} membres",
-    "view_group": "Voir le groupe"
+    "view_group": "Voir le groupe",
+    "view_group_named": "View group: {{name}}"
   },
   "top_contributors": {
     "title": "Meilleurs contributeurs",
@@ -100,7 +101,8 @@
     "votes": "Votes {{count}}",
     "options": "Options de {{count}}",
     "vote_now": "Voter Maintenant",
-    "closes": "Se termine le {{date}}"
+    "closes": "Se termine le {{date}}",
+    "vote_now_for": "Vote now on: {{question}}"
   },
   "in_demand_skills": {
     "title": "Compétences Recherchées",

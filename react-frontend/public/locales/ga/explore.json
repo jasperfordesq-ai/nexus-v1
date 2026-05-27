@@ -29,7 +29,8 @@
     "title": "Grúpaí Gníomhacha",
     "subtitle": "Ceangail le baill den tuairim chéanna",
     "members": "{{count}} ball",
-    "view_group": "Féach ar Ghrúpa"
+    "view_group": "Féach ar Ghrúpa",
+    "view_group_named": "View group: {{name}}"
   },
   "top_contributors": {
     "title": "Barrannpháirtithe",
@@ -100,7 +101,8 @@
     "votes": "{{count}} vóta",
     "options": "{{count}} rogha",
     "vote_now": "Vótáil Anois",
-    "closes": "Ag dúnadh {{date}}"
+    "closes": "Ag dúnadh {{date}}",
+    "vote_now_for": "Vote now on: {{question}}"
   },
   "in_demand_skills": {
     "title": "Scileanna atá ag Teastáil",

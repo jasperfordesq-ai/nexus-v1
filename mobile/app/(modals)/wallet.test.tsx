@@ -4,25 +4,80 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 // --- Mocks ---
+
+const mockSearchParams = jest.fn(() => ({}));
+const mockGetWalletTransactions = jest.fn();
 
 jest.mock('expo-router', () => ({
   useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }),
   router: { push: jest.fn(), replace: jest.fn(), back: jest.fn() },
-  useLocalSearchParams: () => ({}),
+  useLocalSearchParams: () => mockSearchParams(),
   useNavigation: () => ({ setOptions: jest.fn() }),
 }));
 
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string) => {
+    t: (key: string, opts?: Record<string, unknown>) => {
       const map: Record<string, string> = {
         'title': 'Wallet',
+        'back': 'Back',
+        'eyebrow': 'Time credit wallet',
+        'subtitle': 'Track your balance, giving, spending, and time-credit activity.',
+        'refresh': 'Refresh wallet',
+        'yourBalance': 'Your balance',
+        'hours': 'hours',
         'timeCredits': 'Time Credits',
         'noTransactions': 'No transactions yet.',
+        'noTransactionsDesc': 'Your earned and spent time credits will appear here.',
+        'noFilteredTransactions': 'No matching transactions',
+        'noFilteredTransactionsDesc': 'Try another filter to see more wallet activity.',
         'hrs': 'hrs',
+        'sendCredits': 'Send credits',
+        'donate': 'Donate',
+        'noPending': 'No pending credits',
+        'pendingIn': `${String(opts?.count ?? '')} pending`,
+        'communityFund': 'Community fund',
+        'communityFundDesc': 'Shared credits available for community support.',
+        'history': 'Transaction history',
+        'historySubtitle': 'Review earned, spent, and pending activity.',
+        'export': 'Export',
+        'loadMore': 'Load more transactions',
+        'system': 'System',
+        'transactionFallback': 'Time credit transaction',
+        'transactionLabel': `${String(opts?.name ?? '')}, ${String(opts?.amount ?? '')}`,
+        'hoursValue': `${String(opts?.count ?? '')}h`,
+        'signedHours': `${String(opts?.sign ?? '')}${String(opts?.count ?? '')}h`,
+        'unableToLoad': 'Unable to load wallet',
+        'tryAgain': 'Try again',
+        'stats.earned': 'Earned',
+        'stats.spent': 'Spent',
+        'stats.pending': 'Pending',
+        'filter.all': 'All',
+        'filter.earned': 'Earned',
+        'filter.spent': 'Spent',
+        'filter.pending': 'Pending',
+        'fund.balance': 'Fund',
+        'fund.deposited': 'Deposited',
+        'fund.donated': 'Donated',
+        'actions.transferTitle': 'Send credits',
+        'actions.transferSubtitle': 'Search for a member, choose an amount, and send time credits securely.',
+        'actions.donateTitle': 'Donate credits',
+        'actions.donateSubtitle': 'Support the community fund or send a donation to another member.',
+        'actions.closeAction': 'Close wallet action',
+        'actions.selectedRecipient': 'Selected recipient',
+        'actions.memberFallback': 'Community member',
+        'actions.amount': 'Amount',
+        'actions.amountPlaceholder': 'Hours to send',
+        'actions.description': 'Description',
+        'actions.descriptionPlaceholder': 'What is this transfer for?',
+        'actions.sendNow': 'Send credits',
+        'actions.loadMoreFailedTitle': 'Could not load more',
+        'actions.loadMoreFailedMessage': 'We could not load more transactions right now.',
+        'status.completed': 'Completed',
+        'status.pending': 'Pending',
       };
       return map[key] ?? key;
     },
@@ -59,11 +114,16 @@ jest.mock('@expo/vector-icons', () => ({
 }));
 
 jest.mock('@/lib/api/wallet', () => ({
+  getCommunityFundBalance: jest.fn(),
   getWalletBalance: jest.fn(),
-  getWalletTransactions: jest.fn(),
+  getWalletTransactions: (...args: unknown[]) => mockGetWalletTransactions(...args),
+  donateWalletCredits: jest.fn(),
+  searchWalletUsers: jest.fn(),
+  transferWalletCredits: jest.fn(),
 }));
 
 jest.mock('@/components/ui/Avatar', () => 'View');
+jest.mock('@/components/ui/AppTopBar', () => 'View');
 
 // --- Tests ---
 
@@ -72,7 +132,13 @@ import WalletModal from './wallet';
 const defaultApiState = { data: null, isLoading: false, error: null, refresh: jest.fn() };
 
 beforeEach(() => {
-  mockUseApi.mockReturnValue(defaultApiState);
+  mockSearchParams.mockReturnValue({});
+  mockGetWalletTransactions.mockReset();
+  mockUseApi
+    .mockReset()
+    .mockReturnValueOnce(defaultApiState)
+    .mockReturnValueOnce(defaultApiState)
+    .mockReturnValueOnce(defaultApiState);
 });
 
 const mockTransaction = {
@@ -103,17 +169,21 @@ describe('WalletModal', () => {
 
   it('renders the Time Credits label', () => {
     mockUseApi
-      .mockReturnValueOnce({ data: { data: { balance: 12.5 } }, isLoading: false, error: null, refresh: jest.fn() })
-      .mockReturnValueOnce({ data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() });
+      .mockReset()
+      .mockReturnValueOnce({ data: { data: { balance: 12.5, total_credits: 20, total_debits: 7.5, currency: 'hours' } }, isLoading: false, error: null, refresh: jest.fn() })
+      .mockReturnValueOnce({ data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() })
+      .mockReturnValueOnce({ data: { data: { balance: 3, total_deposited: 5, total_donated: 2 } }, isLoading: false, error: null, refresh: jest.fn() });
 
     const { getByText } = render(<WalletModal />);
-    expect(getByText('Time Credits')).toBeTruthy();
+    expect(getByText('Your balance')).toBeTruthy();
   });
 
   it('renders the balance value when loaded', () => {
     mockUseApi
-      .mockReturnValueOnce({ data: { data: { balance: 12.5 } }, isLoading: false, error: null, refresh: jest.fn() })
-      .mockReturnValueOnce({ data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() });
+      .mockReset()
+      .mockReturnValueOnce({ data: { data: { balance: 12.5, total_credits: 20, total_debits: 7.5, currency: 'hours' } }, isLoading: false, error: null, refresh: jest.fn() })
+      .mockReturnValueOnce({ data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() })
+      .mockReturnValueOnce({ data: { data: { balance: 3, total_deposited: 5, total_donated: 2 } }, isLoading: false, error: null, refresh: jest.fn() });
 
     const { getByText } = render(<WalletModal />);
     expect(getByText('12.5')).toBeTruthy();
@@ -121,8 +191,10 @@ describe('WalletModal', () => {
 
   it('renders empty state when there are no transactions', () => {
     mockUseApi
-      .mockReturnValueOnce({ data: { data: { balance: 0.0 } }, isLoading: false, error: null, refresh: jest.fn() })
-      .mockReturnValueOnce({ data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() });
+      .mockReset()
+      .mockReturnValueOnce({ data: { data: { balance: 0.0, total_credits: 0, total_debits: 0, currency: 'hours' } }, isLoading: false, error: null, refresh: jest.fn() })
+      .mockReturnValueOnce({ data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() })
+      .mockReturnValueOnce({ data: { data: { balance: 0 } }, isLoading: false, error: null, refresh: jest.fn() });
 
     const { getByText } = render(<WalletModal />);
     expect(getByText('No transactions yet.')).toBeTruthy();
@@ -130,30 +202,74 @@ describe('WalletModal', () => {
 
   it('renders transaction rows when transactions are available', () => {
     mockUseApi
-      .mockReturnValueOnce({ data: { data: { balance: 12.5 } }, isLoading: false, error: null, refresh: jest.fn() })
-      .mockReturnValueOnce({ data: { data: [mockTransaction] }, isLoading: false, error: null, refresh: jest.fn() });
+      .mockReset()
+      .mockReturnValueOnce({ data: { data: { balance: 12.5, total_credits: 20, total_debits: 7.5, currency: 'hours' } }, isLoading: false, error: null, refresh: jest.fn() })
+      .mockReturnValueOnce({ data: { data: [mockTransaction] }, isLoading: false, error: null, refresh: jest.fn() })
+      .mockReturnValueOnce({ data: { data: { balance: 3, total_deposited: 5, total_donated: 2 } }, isLoading: false, error: null, refresh: jest.fn() });
 
     const { getByText } = render(<WalletModal />);
-    expect(getByText('Bob Smith')).toBeTruthy();
     expect(getByText('Tutoring session')).toBeTruthy();
+    expect(getByText('Bob Smith')).toBeTruthy();
   });
 
   it('renders credit amount with + sign', () => {
     mockUseApi
-      .mockReturnValueOnce({ data: { data: { balance: 12.5 } }, isLoading: false, error: null, refresh: jest.fn() })
-      .mockReturnValueOnce({ data: { data: [mockTransaction] }, isLoading: false, error: null, refresh: jest.fn() });
+      .mockReset()
+      .mockReturnValueOnce({ data: { data: { balance: 12.5, total_credits: 20, total_debits: 7.5, currency: 'hours' } }, isLoading: false, error: null, refresh: jest.fn() })
+      .mockReturnValueOnce({ data: { data: [mockTransaction] }, isLoading: false, error: null, refresh: jest.fn() })
+      .mockReturnValueOnce({ data: { data: { balance: 3, total_deposited: 5, total_donated: 2 } }, isLoading: false, error: null, refresh: jest.fn() });
 
     const { getByText } = render(<WalletModal />);
-    expect(getByText('+2.5 hrs')).toBeTruthy();
+    expect(getByText('+2.5h')).toBeTruthy();
   });
 
   it('renders debit transaction row', () => {
     mockUseApi
-      .mockReturnValueOnce({ data: { data: { balance: 12.5 } }, isLoading: false, error: null, refresh: jest.fn() })
-      .mockReturnValueOnce({ data: { data: [mockDebitTransaction] }, isLoading: false, error: null, refresh: jest.fn() });
+      .mockReset()
+      .mockReturnValueOnce({ data: { data: { balance: 12.5, total_credits: 20, total_debits: 7.5, currency: 'hours' } }, isLoading: false, error: null, refresh: jest.fn() })
+      .mockReturnValueOnce({ data: { data: [mockDebitTransaction] }, isLoading: false, error: null, refresh: jest.fn() })
+      .mockReturnValueOnce({ data: { data: { balance: 3, total_deposited: 5, total_donated: 2 } }, isLoading: false, error: null, refresh: jest.fn() });
 
     const { getByText } = render(<WalletModal />);
     expect(getByText('Carol Jones')).toBeTruthy();
     expect(getByText('Garden help')).toBeTruthy();
+  });
+
+  it('opens the transfer panel with a recipient from query params', () => {
+    mockSearchParams.mockReturnValue({ to: '260', name: 'Jasper Ford' });
+    mockUseApi
+      .mockReset()
+      .mockReturnValueOnce({ data: { data: { balance: 12.5, total_credits: 20, total_debits: 7.5, currency: 'hours' } }, isLoading: false, error: null, refresh: jest.fn() })
+      .mockReturnValueOnce({ data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() })
+      .mockReturnValueOnce({ data: { data: { balance: 3, total_deposited: 5, total_donated: 2 } }, isLoading: false, error: null, refresh: jest.fn() });
+
+    const { getByText } = render(<WalletModal />);
+    expect(getByText('Jasper Ford')).toBeTruthy();
+    expect(getByText('Selected recipient')).toBeTruthy();
+  });
+
+  it('loads the next transaction page when more history is available', async () => {
+    const walletState = { data: { data: { balance: 12.5, total_credits: 20, total_debits: 7.5, currency: 'hours' } }, isLoading: false, error: null, refresh: jest.fn() };
+    const transactionsState = { data: { data: [mockTransaction], meta: { cursor: 'next-page', has_more: true } }, isLoading: false, error: null, refresh: jest.fn() };
+    const fundState = { data: { data: { balance: 3, total_deposited: 5, total_donated: 2 } }, isLoading: false, error: null, refresh: jest.fn() };
+    let apiCall = 0;
+    mockGetWalletTransactions.mockResolvedValueOnce({
+      data: [mockDebitTransaction],
+      meta: { per_page: 50, has_more: false, cursor: null },
+    });
+    mockUseApi
+      .mockReset()
+      .mockImplementation(() => {
+        const states = [walletState, transactionsState, fundState];
+        const state = states[apiCall % states.length];
+        apiCall += 1;
+        return state;
+      });
+
+    const { getByText } = render(<WalletModal />);
+    fireEvent.press(getByText('Load more transactions'));
+
+    await waitFor(() => expect(mockGetWalletTransactions).toHaveBeenCalledWith('next-page', 50, 'all'));
+    await waitFor(() => expect(getByText('Garden help')).toBeTruthy());
   });
 });

@@ -15,6 +15,9 @@ export interface Goal {
   status: 'active' | 'completed' | 'abandoned';
   target_hours: number | null;
   progress_hours: number;
+  target_value?: number | string | null;
+  current_value?: number | string | null;
+  deadline?: string | null;
   due_date: string | null;
   created_at: string;
 }
@@ -49,7 +52,9 @@ export function createGoal(data: {
   title: string;
   description?: string;
   target_hours?: number;
+  target_value?: number;
   due_date?: string;
+  deadline?: string;
 }): Promise<{ data: Goal }> {
   return api.post<{ data: Goal }>(`${API_V2}/goals`, data);
 }
@@ -62,5 +67,5 @@ export function updateGoalStatus(
   id: number,
   status: 'completed' | 'abandoned',
 ): Promise<{ data: Goal }> {
-  return api.patch<{ data: Goal }>(`${API_V2}/goals/${id}`, { status });
+  return api.put<{ data: Goal }>(`${API_V2}/goals/${id}`, { status });
 }

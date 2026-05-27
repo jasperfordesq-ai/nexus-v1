@@ -3,64 +3,359 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useCallback, useEffect } from 'react';
-import {
-  FlatList,
-  Text,
-  Pressable,
-  View,
-} from 'react-native';
+import { useCallback, useMemo, type ReactNode } from 'react';
+import { FlatList, Pressable, RefreshControl, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router, useNavigation } from 'expo-router';
+import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
-import { Spinner } from 'heroui-native';
 
 import {
+  getFederationActivity,
   getFederationPartners,
   getFederationStats,
+  getFederationStatus,
   type FederatedTenant,
+  type FederationActivityItem,
+  type FederationStats,
+  type FederationStatus,
 } from '@/lib/api/federation';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
+import { withAlpha } from '@/lib/utils/color';
+import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
-import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
+type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
+
+const quickLinks: { key: string; icon: IoniconName; tone: string; href: '/(modals)/federation-partners' | '/(modals)/federation-members' | '/(modals)/federation-connections' | '/(modals)/federation-messages' | '/(modals)/federation-listings' | '/(modals)/federation-groups' | '/(modals)/federation-events' | '/(modals)/federation-onboarding' | '/(modals)/federation-settings' }[] = [
+  { key: 'partners', icon: 'globe-outline', tone: '#6366f1', href: '/(modals)/federation-partners' },
+  { key: 'members', icon: 'people-outline', tone: '#a855f7', href: '/(modals)/federation-members' },
+  { key: 'connections', icon: 'person-add-outline', tone: '#14b8a6', href: '/(modals)/federation-connections' },
+  { key: 'messages', icon: 'chatbubbles-outline', tone: '#06b6d4', href: '/(modals)/federation-messages' },
+  { key: 'listings', icon: 'list-outline', tone: '#f59e0b', href: '/(modals)/federation-listings' },
+  { key: 'groups', icon: 'people-circle-outline', tone: '#8b5cf6', href: '/(modals)/federation-groups' },
+  { key: 'events', icon: 'calendar-outline', tone: '#f43f5e', href: '/(modals)/federation-events' },
+  { key: 'setup', icon: 'rocket-outline', tone: '#22c55e', href: '/(modals)/federation-onboarding' },
+  { key: 'settings', icon: 'settings-outline', tone: '#64748b', href: '/(modals)/federation-settings' },
+];
+
+function unwrapData<T>(response: { data?: T } | T | null | undefined, fallback: T): T {
+  if (!response) return fallback;
+  if (typeof response === 'object' && 'data' in response && response.data !== undefined) {
+    return response.data as T;
+  }
+  return response as T;
+}
+
+function formatDate(value?: string | null) {
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleDateString('default', { month: 'long', year: 'numeric' });
+}
+
+function relativeTime(value: string, t: (key: string, opts?: Record<string, unknown>) => string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  const diffMs = Date.now() - date.getTime();
+  const diffDays = Math.max(0, Math.floor(diffMs / 86_400_000));
+  if (diffDays === 0) return t('relative.today');
+  if (diffDays < 30) return t('relative.daysAgo', { count: diffDays });
+  const diffMonths = Math.floor(diffDays / 30);
+  return t('relative.monthsAgo', { count: diffMonths });
+}
+
+function federationEnabled(status: FederationStatus | null) {
+  return status?.enabled === true || status?.tenant_federation_enabled === true || status?.federation_optin === true;
+}
+
+function StatTile({
+  icon,
+  label,
+  value,
+  tone,
+  theme,
+}: {
+  icon: IoniconName;
+  label: string;
+  value: string;
+  tone: string;
+  theme: ReturnType<typeof useTheme>;
+}) {
+  return (
+    <Surface variant="secondary" className="min-w-[46%] flex-1 gap-2 rounded-panel-inner p-4">
+      <View className="size-9 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(tone, 0.14) }}>
+        <Ionicons name={icon} size={18} color={tone} />
+      </View>
+      <Text className="text-2xl font-bold" style={{ color: theme.text }} numberOfLines={1}>
+        {value}
+      </Text>
+      <Text className="text-[11px] font-semibold uppercase" style={{ color: theme.textSecondary }} numberOfLines={1}>
+        {label}
+      </Text>
+    </Surface>
+  );
+}
+
+function FederationHero({
+  status,
+  stats,
+  primary,
+  theme,
+  t,
+}: {
+  status: FederationStatus | null;
+  stats: FederationStats | null;
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+}) {
+  const enabled = federationEnabled(status);
+  const partnerCount = stats?.partner_count ?? status?.partnerships_count ?? 0;
+  const messages = stats?.messages_count ?? status?.messages_count ?? 0;
+  const transactions = stats?.transactions_count ?? status?.transactions_count ?? stats?.cross_community_exchanges ?? 0;
+
+  return (
+    <HeroCard className="mb-4 overflow-hidden rounded-panel p-0">
+      <View className="h-1.5" style={{ backgroundColor: primary }} />
+      <HeroCard.Body className="gap-5 p-4 pt-0">
+        <View className="flex-row items-start gap-3">
+          <View className="size-14 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+            <Ionicons name="git-network-outline" size={27} color={primary} />
+          </View>
+          <View className="min-w-0 flex-1 gap-2">
+            <Text className="text-xs font-semibold uppercase" style={{ color: theme.textSecondary }}>
+              {t('hub.eyebrow')}
+            </Text>
+            <Text className="text-2xl font-bold" style={{ color: theme.text }} numberOfLines={2}>
+              {t('hub.heroTitle')}
+            </Text>
+            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+              {t('hub.heroDescription')}
+            </Text>
+            <Chip size="sm" variant="secondary" color={enabled ? 'success' : 'warning'}>
+              <Ionicons name={enabled ? 'checkmark-circle-outline' : 'pause-circle-outline'} size={13} color={enabled ? '#22c55e' : '#f59e0b'} />
+              <Chip.Label>{enabled ? t('hub.statusActive') : t('hub.statusInactive')}</Chip.Label>
+            </Chip>
+          </View>
+        </View>
+
+        <View className="flex-row flex-wrap gap-3">
+          <StatTile icon="globe-outline" label={t('hub.statPartners')} value={String(partnerCount)} tone={primary} theme={theme} />
+          <StatTile icon="chatbubbles-outline" label={t('hub.statMessages')} value={String(messages)} tone="#a855f7" theme={theme} />
+          <StatTile icon="swap-horizontal-outline" label={t('hub.statExchanges')} value={String(transactions)} tone="#06b6d4" theme={theme} />
+          <StatTile icon="pulse-outline" label={t('hub.statStatus')} value={enabled ? t('hub.shortActive') : t('hub.shortInactive')} tone="#22c55e" theme={theme} />
+        </View>
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function QuickLinksSection({
+  theme,
+  t,
+}: {
+  theme: ReturnType<typeof useTheme>;
+  t: (key: string) => string;
+}) {
+  return (
+    <View className="mb-4 gap-3">
+      <Text className="text-lg font-bold" style={{ color: theme.text }}>
+        {t('hub.exploreNetwork')}
+      </Text>
+      <View className="flex-row flex-wrap gap-3">
+        {quickLinks.map((link) => (
+          <Pressable
+            key={link.key}
+            className="min-w-[46%] flex-1"
+            accessibilityRole="button"
+            accessibilityLabel={t(`hub.quick.${link.key}.title`)}
+            onPress={() => {
+              void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              router.push(link.href as Href);
+            }}
+          >
+            <Surface variant="secondary" className="gap-2 rounded-panel-inner p-4">
+              <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(link.tone, 0.14) }}>
+                <Ionicons name={link.icon} size={20} color={link.tone} />
+              </View>
+              <View className="flex-row items-center gap-1">
+                <Text className="min-w-0 flex-1 text-sm font-bold" style={{ color: theme.text }} numberOfLines={1}>
+                  {t(`hub.quick.${link.key}.title`)}
+                </Text>
+                <Ionicons name="chevron-forward-outline" size={14} color={theme.textSecondary} />
+              </View>
+              <Text className="text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>
+                {t(`hub.quick.${link.key}.description`)}
+              </Text>
+            </Surface>
+          </Pressable>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+function PartnerCard({
+  item,
+  primary,
+  theme,
+  t,
+}: {
+  item: FederatedTenant;
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+}) {
+  const connectedDate = formatDate(item.connected_since ?? item.partnership_since);
+
+  return (
+    <Pressable
+      className="mx-4 my-2"
+      onPress={() => {
+        void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        router.push({ pathname: '/(modals)/federation-partner', params: { id: String(item.id) } });
+      }}
+      accessibilityRole="button"
+      accessibilityLabel={item.name}
+    >
+      <HeroCard className="min-h-[156px] rounded-panel p-0">
+        <HeroCard.Body className="gap-4 p-4">
+          <View className="flex-row items-start gap-3">
+            <Avatar uri={item.logo} name={item.name} size={56} />
+            <View className="min-w-0 flex-1 gap-1">
+              <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={2}>
+                {item.name}
+              </Text>
+              {item.location ? (
+                <View className="flex-row items-center gap-1">
+                  <Ionicons name="location-outline" size={13} color={theme.textSecondary} />
+                  <Text className="min-w-0 flex-1 text-xs" style={{ color: theme.textSecondary }} numberOfLines={1}>
+                    {item.location}
+                  </Text>
+                </View>
+              ) : null}
+              {item.tagline || item.description ? (
+                <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={2}>
+                  {item.tagline || item.description}
+                </Text>
+              ) : null}
+            </View>
+          </View>
+
+          <View className="flex-row flex-wrap items-center gap-2">
+            {item.federation_level_name ? (
+              <Chip size="sm" variant="secondary">
+                <Chip.Label>{item.federation_level_name}</Chip.Label>
+              </Chip>
+            ) : null}
+            <Chip size="sm" variant="secondary">
+              <Ionicons name="people-outline" size={12} color={primary} />
+              <Chip.Label>{t('hub.memberCount', { count: item.member_count ?? 0 })}</Chip.Label>
+            </Chip>
+            {connectedDate ? (
+              <Chip size="sm" variant="secondary">
+                <Ionicons name="time-outline" size={12} color={theme.textSecondary} />
+                <Chip.Label>{t('connectedSince', { date: connectedDate })}</Chip.Label>
+              </Chip>
+            ) : null}
+          </View>
+
+          <HeroButton size="sm" variant="secondary" onPress={() => router.push({ pathname: '/(modals)/federation-partner', params: { id: String(item.id) } })}>
+            <HeroButton.Label>{t('hub.viewCommunity')}</HeroButton.Label>
+            <Ionicons name="chevron-forward-outline" size={15} color={primary} />
+          </HeroButton>
+        </HeroCard.Body>
+      </HeroCard>
+    </Pressable>
+  );
+}
+
+function ActivityCard({
+  item,
+  theme,
+  t,
+}: {
+  item: FederationActivityItem;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+}) {
+  const iconByType: Record<FederationActivityItem['type'], IoniconName> = {
+    message_received: 'chatbubble-ellipses-outline',
+    message_sent: 'send-outline',
+    transaction_received: 'swap-horizontal-outline',
+    transaction_sent: 'swap-horizontal-outline',
+    partnership_approved: 'hand-left-outline',
+    member_joined: 'person-add-outline',
+  };
+
+  return (
+    <Surface variant="secondary" className="gap-2 rounded-panel-inner p-3">
+      <View className="flex-row items-start gap-3">
+        <View className="size-9 items-center justify-center rounded-2xl bg-background">
+          <Ionicons name={iconByType[item.type] ?? 'pulse-outline'} size={18} color={theme.textSecondary} />
+        </View>
+        <View className="min-w-0 flex-1 gap-1">
+          <Text className="text-sm font-semibold" style={{ color: theme.text }} numberOfLines={2}>
+            {item.title}
+          </Text>
+          <Text className="text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>
+            {item.description}
+          </Text>
+          <Text className="text-[11px]" style={{ color: theme.textMuted }}>
+            {relativeTime(item.created_at, t)}
+          </Text>
+        </View>
+      </View>
+    </Surface>
+  );
+}
+
+function SectionCard({
+  title,
+  children,
+  theme,
+}: {
+  title: string;
+  children: ReactNode;
+  theme: ReturnType<typeof useTheme>;
+}) {
+  return (
+    <View className="mb-4 gap-3">
+      <Text className="text-lg font-bold" style={{ color: theme.text }}>
+        {title}
+      </Text>
+      {children}
+    </View>
+  );
+}
+
 export default function FederationScreen() {
-  const { t } = useTranslation('federation');
-  const navigation = useNavigation();
+  const { t } = useTranslation(['federation', 'common']);
   const primary = usePrimaryColor();
   const theme = useTheme();
 
-  useEffect(() => {
-    navigation.setOptions({ title: t('title') });
-  }, [navigation, t]);
+  const { data: statsResponse, refresh: refreshStats } = useApi(() => getFederationStats(), []);
+  const { data: statusResponse, refresh: refreshStatus } = useApi(() => getFederationStatus(), []);
+  const { data: activityResponse, refresh: refreshActivity } = useApi(() => getFederationActivity(), []);
 
-  const { data: statsData, isLoading: statsLoading } = useApi(
-    () => getFederationStats(),
-    [],
-  );
+  const stats = unwrapData<FederationStats | null>(statsResponse, null);
+  const status = unwrapData<FederationStatus | null>(statusResponse, null);
+  const activity = unwrapData<FederationActivityItem[]>(activityResponse, []);
 
-  const stats = statsData?.data ?? null;
-
-  const fetchPartners = useCallback(
-    (cursor: string | null) => getFederationPartners(cursor),
-    [],
-  );
-
-  const extractPartners = useCallback(
-    (response: Awaited<ReturnType<typeof getFederationPartners>>) => ({
-      items: response.data,
-      cursor: response.meta.cursor,
-      hasMore: response.meta.has_more,
-    }),
-    [],
-  );
+  const fetchPartners = useCallback((cursor: string | null) => getFederationPartners(cursor), []);
+  const extractPartners = useCallback((response: Awaited<ReturnType<typeof getFederationPartners>>) => ({
+    items: response.data,
+    cursor: response.meta.cursor,
+    hasMore: response.meta.has_more,
+  }), []);
 
   const {
     items: partners,
@@ -71,159 +366,86 @@ export default function FederationScreen() {
     refresh,
   } = usePaginatedApi(fetchPartners, extractPartners);
 
-  const renderPartner = useCallback(
-    ({ item }: { item: FederatedTenant }) => {
-      const connectedDate = new Date(item.connected_since).toLocaleDateString('default', {
-        month: 'long',
-        year: 'numeric',
-      });
-      return (
-        <Pressable
-          className="flex-row items-center bg-surface rounded-xl p-4 mb-2.5 border border-border/50 gap-3.5"
-          onPress={() => {
-            void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            router.push({
-              pathname: '/(modals)/federation-partner',
-              params: { id: String(item.id) },
-            });
-          }}
-          accessibilityRole="button"
-          accessibilityLabel={item.name}
-        >
-          <Avatar uri={item.logo} name={item.name} size={48} />
-          <View className="flex-1 gap-0.5">
-            <Text className="text-sm font-semibold text-foreground" numberOfLines={1}>
-              {item.name}
-            </Text>
-            {item.location ? (
-              <View className="flex-row items-center gap-1">
-                <Ionicons name="location-outline" size={13} color={theme.textSecondary} />
-                <Text className="text-xs text-muted-foreground flex-1" numberOfLines={1}>
-                  {item.location}
-                </Text>
-              </View>
-            ) : null}
-            <View className="flex-row items-center gap-1">
-              <Ionicons name="people-outline" size={13} color={theme.textSecondary} />
-              <Text className="text-xs text-muted-foreground">
-                {(item.member_count ?? 0).toLocaleString()}
-              </Text>
-            </View>
-            <Text style={{ fontSize: 11, color: theme.textMuted, marginTop: 2 }}>
-              {t('connectedSince', { date: connectedDate })}
-            </Text>
-          </View>
-          <Ionicons name="chevron-forward" size={18} color={theme.textMuted} />
-        </Pressable>
-      );
-    },
-    [t, theme.textSecondary, theme.textMuted],
-  );
+  const initialLoading = partnersLoading && partners.length === 0;
+  const partnerPreview = useMemo(() => partners.slice(0, 4), [partners]);
 
-  const listHeader = (() => {
-    if (statsLoading) {
-      return (
-        <View className="flex-row items-center bg-surface rounded-xl p-4 mb-4 border border-border/50 justify-center">
-          <Spinner size="sm" />
-        </View>
-      );
-    }
-    if (!stats) return null;
-    return (
-      <View className="flex-row items-center bg-surface rounded-xl p-4 mb-4 border border-border/50">
-        <StatColumn
-          value={stats.partner_count ?? 0}
-          label={t('stats.partners', { count: stats.partner_count ?? 0 })}
-          primary={primary}
-          theme={theme}
-        />
-        <View style={{ width: 1, height: 40, backgroundColor: theme.border, marginHorizontal: 8 }} />
-        <StatColumn
-          value={stats.federated_members ?? 0}
-          label={t('stats.members', { count: stats.federated_members ?? 0 })}
-          primary={primary}
-          theme={theme}
-        />
-        <View style={{ width: 1, height: 40, backgroundColor: theme.border, marginHorizontal: 8 }} />
-        <StatColumn
-          value={stats.cross_community_exchanges ?? 0}
-          label={t('stats.exchanges', { count: stats.cross_community_exchanges ?? 0 })}
-          primary={primary}
-          theme={theme}
-        />
-      </View>
-    );
-  })();
-
-  if (partnersLoading) {
-    return (
-      <SafeAreaView className="flex-1 items-center justify-center" edges={['bottom']}>
-        <LoadingSpinner />
-      </SafeAreaView>
-    );
-  }
+  const refreshAll = useCallback(() => {
+    refreshStats();
+    refreshStatus();
+    refreshActivity();
+    refresh();
+  }, [refresh, refreshActivity, refreshStats, refreshStatus]);
 
   return (
     <ModalErrorBoundary>
-    <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
-      <FlatList
-        data={partners}
-        keyExtractor={(item) => String(item.id)}
-        renderItem={renderPartner}
-        contentContainerStyle={{ padding: 16, paddingBottom: 48 }}
-        ListHeaderComponent={
-          <>
-            {listHeader}
-            <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">
-              {t('partners')}
-            </Text>
-          </>
-        }
-        ListEmptyComponent={
-          <EmptyState
-            icon="globe-outline"
-            title={t('empty')}
-          />
-        }
-        ListFooterComponent={
-          isLoadingMore ? (
-            <View style={{ marginVertical: 16, alignItems: 'center' }}>
-              <Spinner size="sm" />
-            </View>
-          ) : null
-        }
-        onEndReached={hasMore ? loadMore : undefined}
-        onEndReachedThreshold={0.3}
-        onRefresh={refresh}
-        refreshing={partnersLoading && partners.length > 0}
-      />
-    </SafeAreaView>
-    </ModalErrorBoundary>
-  );
-}
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('title')} backLabel={t('common:back')} fallbackHref="/(tabs)/home" />
 
-function StatColumn({
-  value,
-  label,
-  primary,
-  theme,
-}: {
-  value: number;
-  label: string;
-  primary: string;
-  theme: ReturnType<typeof useTheme>;
-}) {
-  return (
-    <View style={{ flex: 1, alignItems: 'center', gap: 4 }}>
-      <Text style={{ fontSize: 20, fontWeight: '700', color: primary }}>
-        {value.toLocaleString()}
-      </Text>
-      <Text
-        style={{ fontSize: 11, color: theme.textSecondary, textAlign: 'center' }}
-        numberOfLines={2}
-      >
-        {label}
-      </Text>
-    </View>
+        <FlatList<FederatedTenant>
+          data={partners}
+          keyExtractor={(item) => String(item.id)}
+          renderItem={({ item }) => <PartnerCard item={item} primary={primary} theme={theme} t={t} />}
+          refreshControl={
+            <RefreshControl
+              refreshing={partnersLoading && partners.length > 0}
+              onRefresh={refreshAll}
+              tintColor={primary}
+              colors={[primary]}
+            />
+          }
+          ListHeaderComponent={
+            <View className="px-4 pb-2">
+              <FederationHero status={status} stats={stats} primary={primary} theme={theme} t={t} />
+
+              <QuickLinksSection theme={theme} t={t} />
+
+              <SectionCard title={t('hub.partnerCommunities')} theme={theme}>
+                {initialLoading ? (
+                  <Surface variant="secondary" className="items-center rounded-panel p-5">
+                    <Spinner size="sm" />
+                  </Surface>
+                ) : partnerPreview.length === 0 ? (
+                  <Surface variant="secondary" className="rounded-panel p-5">
+                    <EmptyState icon="globe-outline" title={t('hub.noPartnersYet')} subtitle={t('hub.noPartnersDescription')} />
+                  </Surface>
+                ) : null}
+              </SectionCard>
+            </View>
+          }
+          ListFooterComponent={
+            <View className="px-4 pb-8 pt-2">
+              {isLoadingMore ? (
+                <View className="items-center py-4">
+                  <Spinner size="sm" />
+                </View>
+              ) : null}
+
+              <SectionCard title={t('hub.recentActivity')} theme={theme}>
+                {activity.length === 0 ? (
+                  <Surface variant="secondary" className="items-center gap-2 rounded-panel p-5">
+                    <Ionicons name="pulse-outline" size={30} color={theme.textMuted} />
+                    <Text className="text-center text-sm font-semibold" style={{ color: theme.text }}>
+                      {t('hub.noActivityYet')}
+                    </Text>
+                    <Text className="text-center text-xs leading-4" style={{ color: theme.textSecondary }}>
+                      {t('hub.noActivityDescription')}
+                    </Text>
+                  </Surface>
+                ) : (
+                  <View className="gap-2">
+                    {activity.slice(0, 5).map((item) => (
+                      <ActivityCard key={item.id} item={item} theme={theme} t={t} />
+                    ))}
+                  </View>
+                )}
+              </SectionCard>
+            </View>
+          }
+          onEndReached={() => { if (hasMore) loadMore(); }}
+          onEndReachedThreshold={0.3}
+          contentContainerStyle={{ paddingBottom: 8 }}
+        />
+      </SafeAreaView>
+    </ModalErrorBoundary>
   );
 }

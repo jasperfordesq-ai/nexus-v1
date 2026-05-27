@@ -147,7 +147,8 @@
     "collection_description": "Cur síos (roghnach)",
     "cancel": "Cealaigh",
     "save": "Sábháil",
-    "create": "Cruthaigh"
+    "create": "Cruthaigh",
+    "loading": "Loading bookmarks..."
   },
   "verified": "Fíoraithe",
   "hover_card": {

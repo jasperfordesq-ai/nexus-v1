@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { API_BASE_URL, STORAGE_KEYS, TIMEOUTS } from '@/lib/constants';
+import { API_BASE_URL, DEFAULT_TENANT, STORAGE_KEYS, TIMEOUTS } from '@/lib/constants';
 import { storage } from '@/lib/storage';
 
 /**
@@ -96,7 +96,7 @@ export async function attemptTokenRefresh(): Promise<string | null> {
         'Content-Type': 'application/json',
         Accept: 'application/json',
       };
-      if (tenantSlug) headers['X-Tenant-Slug'] = tenantSlug;
+      headers['X-Tenant-Slug'] = tenantSlug || DEFAULT_TENANT;
 
       const res = await fetch(`${API_BASE_URL}/api/auth/refresh-token`, {
         method: 'POST',
@@ -190,9 +190,10 @@ async function request<T>(
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  if (tenantSlug && tenantSlug.trim()) {
+  const resolvedTenantSlug = tenantSlug?.trim() || DEFAULT_TENANT;
+  if (resolvedTenantSlug) {
     // The PHP API resolves the tenant from this header on non-subdomain routes
-    headers['X-Tenant-Slug'] = tenantSlug;
+    headers['X-Tenant-Slug'] = resolvedTenantSlug;
   }
 
   // Abort controller for timeout support

@@ -5,6 +5,7 @@
 
 import { Pressable, ScrollView, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Surface } from 'heroui-native';
 
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -28,54 +29,42 @@ export default function StoryCircles({ members, onPress }: StoryCirclesProps) {
   const primary = usePrimaryColor();
 
   return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      contentContainerClassName="px-4 py-2 gap-3"
-    >
-      {/* "You" circle */}
-      {user && (
+    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerClassName="gap-3 px-4 py-1">
+      {user ? (
         <Pressable
-          className="items-center w-16"
+          className="w-16 items-center"
           onPress={() => onPress(user.id)}
-          accessibilityLabel={t('stories.you', { defaultValue: 'You' })}
+          accessibilityLabel={t('stories.you')}
           accessibilityRole="button"
         >
-          <View
-            className="w-16 h-16 rounded-full justify-center items-center relative"
-            style={{ borderWidth: 2, borderColor: primary }}
-          >
+          <Surface variant="default" className="relative h-16 w-16 items-center justify-center rounded-full p-1">
             <Avatar uri={user.avatar_url ?? null} name={displayName || null} size={56} />
             <View
-              className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full justify-center items-center border-2 border-background"
+              className="absolute -bottom-0.5 -right-0.5 h-5 w-5 items-center justify-center rounded-full border-2 border-background"
               style={{ backgroundColor: primary }}
             >
               <Ionicons name="add" size={14} color="#fff" />
             </View>
-          </View>
-          <Text className="text-[11px] text-muted-foreground text-center mt-1 max-w-[60px]" numberOfLines={1}>
-            {t('stories.you', { defaultValue: 'You' })}
+          </Surface>
+          <Text className="mt-1 max-w-[60px] text-center text-[11px] text-muted-foreground" numberOfLines={1}>
+            {t('stories.you')}
           </Text>
         </Pressable>
-      )}
+      ) : null}
 
-      {/* Member circles */}
       {members.map((member) => (
         <Pressable
           key={member.id}
-          className="items-center w-16"
+          className="w-16 items-center"
           onPress={() => onPress(member.id)}
-          accessibilityLabel={member.name || 'Member'}
+          accessibilityLabel={member.name || t('stories.member')}
           accessibilityRole="button"
         >
-          <View
-            className="w-16 h-16 rounded-full justify-center items-center"
-            style={{ borderWidth: 2, borderColor: primary }}
-          >
+          <Surface variant="default" className="h-16 w-16 items-center justify-center rounded-full p-1">
             <Avatar uri={member.avatar ?? null} name={member.name || null} size={56} />
-          </View>
-          <Text className="text-[11px] text-muted-foreground text-center mt-1 max-w-[60px]" numberOfLines={1}>
-            {(member.name || '').split(' ')[0] || '?'}
+          </Surface>
+          <Text className="mt-1 max-w-[60px] text-center text-[11px] text-muted-foreground" numberOfLines={1}>
+            {(member.name || '').split(' ')[0] || t('stories.memberInitial')}
           </Text>
         </Pressable>
       ))}

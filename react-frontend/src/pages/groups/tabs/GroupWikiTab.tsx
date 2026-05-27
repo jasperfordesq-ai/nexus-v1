@@ -297,6 +297,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
     return (
       <div
         className="flex justify-center py-12"
+        role="status"
         aria-label={t('wiki.loading')}
         aria-busy="true"
       >
@@ -370,7 +371,7 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
         <div className="flex-1 min-w-0">
           {pageLoading ? (
             <GlassCard className="p-6">
-              <div className="flex justify-center py-8" aria-busy="true">
+              <div className="flex justify-center py-8" role="status" aria-busy="true" aria-label={t('wiki.loading_page')}>
                 <Spinner size="lg" />
               </div>
             </GlassCard>
@@ -630,24 +631,26 @@ export function GroupWikiTab({ groupId, isAdmin, isMember = true }: GroupWikiTab
                       {t('wiki.parent_label')}
                     </label>
                     <div className="flex flex-wrap gap-2">
-                      <Chip
-                        variant={newParentId === null ? 'solid' : 'bordered'}
+                      <Button
+                        variant={newParentId === null ? 'solid' : 'flat'}
+                        size="sm"
                         color="primary"
-                        className="cursor-pointer"
-                        onClick={() => setNewParentId(null)}
+                        onPress={() => setNewParentId(null)}
+                        aria-pressed={newParentId === null}
                       >
                         {t('wiki.no_parent')}
-                      </Chip>
+                      </Button>
                       {pages.map((page) => (
-                        <Chip
+                        <Button
                           key={page.id}
-                          variant={newParentId === page.id ? 'solid' : 'bordered'}
+                          variant={newParentId === page.id ? 'solid' : 'flat'}
+                          size="sm"
                           color="primary"
-                          className="cursor-pointer"
-                          onClick={() => setNewParentId(page.id)}
+                          onPress={() => setNewParentId(page.id)}
+                          aria-pressed={newParentId === page.id}
                         >
                           {page.title}
-                        </Chip>
+                        </Button>
                       ))}
                     </div>
                   </div>

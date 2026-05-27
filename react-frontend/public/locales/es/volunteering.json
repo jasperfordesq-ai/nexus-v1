@@ -633,7 +633,8 @@
     "load_more": "Cargar más",
     "aria_select_all": "Seleccionar todas las solicitudes pendientes visibles",
     "aria_select_application": "Seleccione la aplicación de {{name}}",
-    "aria_search_volunteers": "Buscar voluntarios por nombre"
+    "aria_search_volunteers": "Buscar voluntarios por nombre",
+    "filter_label": "Filter applications"
   },
   "org_wallet_balance": "Saldo de la billetera:",
   "auto_pay_on": "Pago automático activado",

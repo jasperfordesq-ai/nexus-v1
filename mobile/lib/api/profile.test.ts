@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 jest.mock('@/lib/api/client', () => ({
-  api: { get: jest.fn(), post: jest.fn(), put: jest.fn(), patch: jest.fn(), delete: jest.fn() },
+  api: { get: jest.fn(), post: jest.fn(), put: jest.fn(), patch: jest.fn(), delete: jest.fn(), upload: jest.fn() },
   ApiResponseError: class ApiResponseError extends Error {
     status!: number;
     constructor(status: number, message: string) { super(message); this.status = status; this.name = 'ApiResponseError'; }
@@ -99,65 +99,34 @@ describe('updateAvatar', () => {
   });
 
   it('uses fetch to POST multipart form data to /api/v2/users/me/avatar', async () => {
-    const mockFetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({ data: { avatar_url: 'https://cdn.example.com/avatar.jpg' } }),
-    });
-    global.fetch = mockFetch;
+    (api.upload as jest.Mock).mockResolvedValue({ data: { avatar_url: 'https://cdn.example.com/avatar.jpg' } });
 
     const result = await updateAvatar('file:///local/path/avatar.jpg');
 
-    expect(mockFetch).toHaveBeenCalledWith(
-      'https://test.api/api/v2/users/me/avatar',
-      expect.objectContaining({
-        method: 'POST',
-        headers: expect.objectContaining({ Authorization: 'Bearer test-token' }),
-      }),
-    );
+    expect(api.upload).toHaveBeenCalledWith('/api/v2/users/me/avatar', expect.any(FormData));
     expect(result.data.avatar_url).toBe('https://cdn.example.com/avatar.jpg');
   });
 
-  it('throws ApiResponseError with 413 message when image is too large', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: false,
-      status: 413,
-      json: () => Promise.resolve({}),
-    });
+  it('normalizes a flat avatar upload response', async () => {
+    (api.upload as jest.Mock).mockResolvedValue({ avatar_url: '/uploads/avatars/new.webp' });
 
-    await expect(updateAvatar('file:///large.jpg')).rejects.toMatchObject({
-      status: 413,
-      message: 'Image is too large. Please choose a smaller photo.',
-    });
+    const result = await updateAvatar('file:///local/path/avatar.jpg');
+
+    expect(result.data.avatar_url).toBe('/uploads/avatars/new.webp');
   });
 
-  it('throws ApiResponseError with server message on non-413 failure', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: false,
-      status: 422,
-      json: () => Promise.resolve({ message: 'Invalid file type' }),
-    });
+  it('throws when the upload response has no avatar URL', async () => {
+    (api.upload as jest.Mock).mockResolvedValue({ success: true, data: {} });
 
-    await expect(updateAvatar('file:///bad.gif')).rejects.toMatchObject({
+    await expect(updateAvatar('file:///any.jpg')).rejects.toThrow('Avatar upload did not return an image URL.');
+  });
+
+  it('propagates upload failures from the API client', async () => {
+    (api.upload as jest.Mock).mockRejectedValue(new ApiResponseError(422, 'Invalid file type'));
+
+    await expect(updateAvatar('file:///any.jpg')).rejects.toMatchObject({
       status: 422,
       message: 'Invalid file type',
-    });
-  });
-
-  it('throws ApiResponseError on AbortError (timeout)', async () => {
-    const abortErr = new Error('The operation was aborted');
-    abortErr.name = 'AbortError';
-    global.fetch = jest.fn().mockRejectedValue(abortErr);
-
-    await expect(updateAvatar('file:///any.jpg')).rejects.toMatchObject({
-      message: 'Upload timed out. Please try again.',
-    });
-  });
-
-  it('throws ApiResponseError on network failure', async () => {
-    global.fetch = jest.fn().mockRejectedValue(new Error('Failed to fetch'));
-
-    await expect(updateAvatar('file:///any.jpg')).rejects.toMatchObject({
-      message: 'Network error. Please check your connection.',
     });
   });
 });

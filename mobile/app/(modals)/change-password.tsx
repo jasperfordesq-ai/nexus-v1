@@ -3,35 +3,35 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Text,
+  TextInput,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router, useNavigation } from 'expo-router';
+import { router } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from '@/lib/haptics';
+import { Card as HeroCard, Text } from 'heroui-native';
 
 import { useTranslation } from 'react-i18next';
 
 import { updatePassword } from '@/lib/api/profile';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import Input from '@/components/ui/Input';
-import Button from '@/components/ui/Button';
+import { useTheme } from '@/lib/hooks/useTheme';
+import { withAlpha } from '@/lib/utils/color';
+import AppTopBar from '@/components/ui/AppTopBar';
+import FormActionFooter from '@/components/ui/FormActionFooter';
 import OfflineBanner from '@/components/OfflineBanner';
 
 export default function ChangePasswordScreen() {
   const { t } = useTranslation('settings');
-  const navigation = useNavigation();
   const primary = usePrimaryColor();
-
-  useEffect(() => {
-    navigation.setOptions({ title: t('password.title') });
-  }, [navigation, t]);
+  const theme = useTheme();
 
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -85,70 +85,116 @@ export default function ChangePasswordScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-background">
+      <AppTopBar title={t('password.title')} backLabel={t('common:buttons.back')} fallbackHref="/(modals)/settings" />
       <KeyboardAvoidingView
         className="flex-1"
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
       >
         <ScrollView
-          contentContainerStyle={{ padding: 20, paddingBottom: 40 }}
+          contentContainerStyle={{ padding: 16, paddingBottom: 120, gap: 12 }}
           keyboardShouldPersistTaps="handled"
         >
           <OfflineBanner />
-          <Text className="text-sm text-muted-foreground mb-5 leading-5">
-            {t('password.hint')}
-          </Text>
 
-          <View className="mb-5">
-            <Input
-              label={t('password.currentLabel')}
-              placeholder={t('password.currentPlaceholder')}
-              secureTextEntry
-              autoCapitalize="none"
-              autoCorrect={false}
-              value={currentPassword}
-              onChangeText={(v) => { setCurrentPassword(v); setFieldErrors((e) => ({ ...e, currentPassword: undefined })); }}
-            />
-            {fieldErrors.currentPassword ? (
-              <Text className="text-danger text-[12px] mt-1 mb-1">{fieldErrors.currentPassword}</Text>
-            ) : null}
-            <Input
-              label={t('password.newLabel')}
-              placeholder={t('password.newPlaceholder')}
-              secureTextEntry
-              autoCapitalize="none"
-              autoCorrect={false}
-              value={newPassword}
-              onChangeText={(v) => { setNewPassword(v); setFieldErrors((e) => ({ ...e, newPassword: undefined })); }}
-            />
-            {fieldErrors.newPassword ? (
-              <Text className="text-danger text-[12px] mt-1 mb-1">{fieldErrors.newPassword}</Text>
-            ) : null}
-            <Input
-              label={t('password.confirmLabel')}
-              placeholder={t('password.confirmPlaceholder')}
-              secureTextEntry
-              autoCapitalize="none"
-              autoCorrect={false}
-              value={confirmPassword}
-              onChangeText={(v) => { setConfirmPassword(v); setFieldErrors((e) => ({ ...e, confirmPassword: undefined })); }}
-            />
-            {fieldErrors.confirmPassword ? (
-              <Text className="text-danger text-[12px] mt-1 mb-1">{fieldErrors.confirmPassword}</Text>
-            ) : null}
-          </View>
+          <HeroCard className="overflow-hidden rounded-panel p-0">
+            <View className="h-1.5" style={{ backgroundColor: primary }} />
+            <HeroCard.Body className="gap-4 p-4">
+              <View className="flex-row items-start gap-3">
+                <View className="size-13 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+                  <Ionicons name="shield-checkmark-outline" size={25} color={primary} />
+                </View>
+                <View className="min-w-0 flex-1">
+                  <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('password.eyebrow')}</Text>
+                  <Text className="text-2xl font-bold" style={{ color: theme.text }}>{t('password.title')}</Text>
+                  <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('password.hint')}</Text>
+                </View>
+              </View>
+            </HeroCard.Body>
+          </HeroCard>
 
-          <Button
-            onPress={() => void handleSubmit()}
-            isLoading={isLoading}
-            disabled={isLoading}
-            color={primary}
-            style={{ marginTop: 4 }}
-          >
-            {t('password.save')}
-          </Button>
+          <HeroCard className="rounded-panel p-0">
+            <HeroCard.Body className="gap-4 p-4">
+              <PasswordField
+                label={t('password.currentLabel')}
+                placeholder={t('password.currentPlaceholder')}
+                value={currentPassword}
+                onChangeText={(v) => { setCurrentPassword(v); setFieldErrors((e) => ({ ...e, currentPassword: undefined })); }}
+                error={fieldErrors.currentPassword}
+                theme={theme}
+              />
+              <PasswordField
+                label={t('password.newLabel')}
+                placeholder={t('password.newPlaceholder')}
+                value={newPassword}
+                onChangeText={(v) => { setNewPassword(v); setFieldErrors((e) => ({ ...e, newPassword: undefined })); }}
+                error={fieldErrors.newPassword}
+                helper={t('password.newHint')}
+                theme={theme}
+              />
+              <PasswordField
+                label={t('password.confirmLabel')}
+                placeholder={t('password.confirmPlaceholder')}
+                value={confirmPassword}
+                onChangeText={(v) => { setConfirmPassword(v); setFieldErrors((e) => ({ ...e, confirmPassword: undefined })); }}
+                error={fieldErrors.confirmPassword}
+                theme={theme}
+              />
+            </HeroCard.Body>
+          </HeroCard>
         </ScrollView>
+        <FormActionFooter
+          title={t('password.reviewTitle')}
+          subtitle={t('password.reviewSubtitle')}
+          submitLabel={isLoading ? t('password.saving') : t('password.save')}
+          secondaryLabel={t('common:buttons.cancel')}
+          primary={primary}
+          isSubmitting={isLoading}
+          onSubmit={() => void handleSubmit()}
+          onSecondary={() => router.back()}
+        />
       </KeyboardAvoidingView>
     </SafeAreaView>
+  );
+}
+
+function PasswordField({
+  label,
+  value,
+  placeholder,
+  onChangeText,
+  error,
+  helper,
+  theme,
+}: {
+  label: string;
+  value: string;
+  placeholder: string;
+  onChangeText: (value: string) => void;
+  error?: string;
+  helper?: string;
+  theme: ReturnType<typeof useTheme>;
+}) {
+  return (
+    <View className="gap-1.5">
+      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{label}</Text>
+      <TextInput
+        className="min-h-12 rounded-panel-inner border px-3 text-sm"
+        style={{ borderColor: error ? theme.error : theme.border, color: theme.text, backgroundColor: theme.bg }}
+        placeholder={placeholder}
+        placeholderTextColor={theme.textMuted}
+        secureTextEntry
+        autoCapitalize="none"
+        autoCorrect={false}
+        value={value}
+        onChangeText={onChangeText}
+        accessibilityLabel={label}
+      />
+      {error ? (
+        <Text className="text-xs font-medium" style={{ color: theme.error }}>{error}</Text>
+      ) : helper ? (
+        <Text className="text-xs" style={{ color: theme.textMuted }}>{helper}</Text>
+      ) : null}
+    </View>
   );
 }

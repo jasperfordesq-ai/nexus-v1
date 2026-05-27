@@ -3,33 +3,29 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  Pressable,
-  Alert,
-  Linking,
-  RefreshControl,
-  Share,
-} from 'react-native';
+import { useState } from 'react';
+import { Alert, Linking, RefreshControl, ScrollView, Share, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, router, useNavigation } from 'expo-router';
+import { Image } from 'expo-image';
+import { useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
-import { Spinner } from 'heroui-native';
+import { Button as HeroButton, Card as HeroCard, Chip, Spinner, Surface } from 'heroui-native';
 
-import { getEvent, rsvpEvent, removeRsvp } from '@/lib/api/events';
+import { getEvent, removeRsvp, rsvpEvent } from '@/lib/api/events';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
-import { useTheme } from '@/lib/hooks/useTheme';
+import { useTheme, type Theme } from '@/lib/hooks/useTheme';
+import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 import Avatar from '@/components/ui/Avatar';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
+import AppTopBar from '@/components/ui/AppTopBar';
 
 const WEB_URL = 'https://app.project-nexus.ie';
+
+type IoniconName = React.ComponentProps<typeof Ionicons>['name'];
 
 export default function EventDetailScreen() {
   return (
@@ -41,60 +37,78 @@ export default function EventDetailScreen() {
 
 function EventDetailScreenInner() {
   const { t } = useTranslation('events');
-  const navigation = useNavigation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
 
-  useEffect(() => {
-    navigation.setOptions({ title: t('detail.title') });
-  }, [navigation, t]);
-
   const eventId = Number(id);
-  const safeEventId = isNaN(eventId) || eventId <= 0 ? 0 : eventId;
-
+  const safeEventId = Number.isFinite(eventId) && eventId > 0 ? eventId : 0;
   const { data, isLoading, refresh } = useApi(() => getEvent(safeEventId), [safeEventId], { enabled: safeEventId > 0 });
-
   const event = data?.data ?? null;
 
   const [rsvp, setRsvp] = useState<'going' | 'interested' | 'not_going' | null>(null);
   const [rsvpCounts, setRsvpCounts] = useState<{ going: number; interested: number } | null>(null);
   const [updating, setUpdating] = useState(false);
 
-  if (isNaN(eventId) || eventId <= 0) {
+  if (safeEventId <= 0) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center" edges={['bottom']}>
-        <Text className="text-sm text-muted-foreground">{t('detail.invalidId')}</Text>
-        <Pressable onPress={() => router.back()} className="mt-3">
-          <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>{t('detail.goBack')}</Text>
-        </Pressable>
-      </SafeAreaView>
+      <ScreenShell title={t('detailTitle')} backLabel={t('detail.goBack')}>
+        <CenteredState text={t('detail.invalidId')} />
+      </ScreenShell>
     );
   }
 
-  // Use server data as initial RSVP state once loaded
-  const currentRsvp = rsvp ?? event?.user_rsvp ?? null;
-  const counts = rsvpCounts ?? event?.rsvp_counts ?? { going: 0, interested: 0 };
+  if (isLoading && !event) {
+    return (
+      <ScreenShell title={t('detailTitle')} backLabel={t('detail.goBack')}>
+        <View className="flex-1 items-center justify-center">
+          <LoadingSpinner />
+        </View>
+      </ScreenShell>
+    );
+  }
+
+  if (!event) {
+    return (
+      <ScreenShell title={t('detailTitle')} backLabel={t('detail.goBack')}>
+        <CenteredState text={t('detail.notFound')} />
+      </ScreenShell>
+    );
+  }
+
+  const currentRsvp = rsvp ?? event.user_rsvp ?? null;
+  const counts = rsvpCounts ?? event.rsvp_counts ?? { going: 0, interested: 0 };
+  const start = event.start_date ? new Date(event.start_date) : null;
+  const isValidDate = start && !Number.isNaN(start.getTime());
+  const dateStr = isValidDate
+    ? start.toLocaleDateString('default', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
+    : '-';
+  const timeStr = isValidDate
+    ? start.toLocaleTimeString('default', { hour: '2-digit', minute: '2-digit' })
+    : '-';
+  const accent = event.category?.color ?? '#F59E0B';
+  const coverImage = resolveImageUrl(event.cover_image);
 
   async function handleShare() {
     if (!event) return;
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     try {
       await Share.share({
-        message: `${event.title} — ${WEB_URL}/events/${event.id}`,
+        message: t('detail.shareMessage', { title: event.title, url: `${WEB_URL}/events/${event.id}` }),
       });
-    } catch { /* ignore */ }
+    } catch {
+      // User cancelled native share.
+    }
   }
 
   async function handleRsvp(status: 'going' | 'interested') {
     if (!event) return;
     void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
-    // Toggle off if already selected — confirm cancellation
     if (currentRsvp === status) {
       Alert.alert(
         t('common:buttons.confirm'),
-        t('rsvpCancelConfirm'),
+        t('confirmCancelRsvp'),
         [
           { text: t('common:no'), style: 'cancel' },
           {
@@ -120,12 +134,8 @@ function EventDetailScreenInner() {
     setUpdating(true);
     try {
       const result = await rsvpEvent(event.id, status);
-      if (result?.data?.rsvp) {
-        setRsvp(result.data.rsvp);
-      }
-      if (result?.data?.rsvp_counts) {
-        setRsvpCounts(result.data.rsvp_counts);
-      }
+      if (result?.data?.rsvp) setRsvp(result.data.rsvp);
+      if (result?.data?.rsvp_counts) setRsvpCounts(result.data.rsvp_counts);
     } catch {
       Alert.alert(t('common:errors.alertTitle'), t('rsvpError'));
     } finally {
@@ -133,94 +143,103 @@ function EventDetailScreenInner() {
     }
   }
 
-  if (isLoading) {
-    return (
-      <SafeAreaView className="flex-1 items-center justify-center" edges={['bottom']}>
-        <LoadingSpinner />
-      </SafeAreaView>
-    );
-  }
-
-  if (!event) {
-    return (
-      <SafeAreaView className="flex-1 items-center justify-center" edges={['bottom']}>
-        <Text className="text-sm text-muted-foreground">{t('detail.notFound')}</Text>
-        <Pressable onPress={() => router.back()} className="mt-3">
-          <Text style={{ color: primary, fontSize: 15, fontWeight: '600' }}>{t('detail.goBack')}</Text>
-        </Pressable>
-      </SafeAreaView>
-    );
-  }
-
-  const start = event.start_date ? new Date(event.start_date) : null;
-  const isValidDate = start && !isNaN(start.getTime());
-  const dateStr = isValidDate
-    ? start.toLocaleDateString('default', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
-    : '—';
-  const timeStr = isValidDate
-    ? start.toLocaleTimeString('default', { hour: '2-digit', minute: '2-digit' })
-    : '—';
-
   return (
-    <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
+    <SafeAreaView className="flex-1 bg-background">
+      <AppTopBar
+        title={t('detailTitle')}
+        backLabel={t('detail.goBack')}
+        fallbackHref="/(tabs)/events"
+        rightAction={{ accessibilityLabel: t('share'), icon: 'share-outline', onPress: handleShare }}
+      />
+
       <ScrollView
-        contentContainerStyle={{ padding: 20, paddingBottom: 48 }}
-        refreshControl={
-          <RefreshControl refreshing={isLoading} onRefresh={() => void refresh()} tintColor={primary} colors={[primary]} />
-        }
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 116, gap: 12 }}
+        refreshControl={<RefreshControl refreshing={isLoading} onRefresh={() => void refresh()} tintColor={primary} colors={[primary]} />}
       >
-        {/* Title + share */}
-        <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 10 }}>
-          <Text className="text-xl font-bold text-foreground mb-2.5" style={{ flex: 1 }}>{event.title}</Text>
-          <Pressable
-            onPress={() => void handleShare()}
-            style={{ padding: 4 }}
-            accessibilityLabel={t('detail.share')}
-            accessibilityRole="button"
-          >
-            <Ionicons name="share-outline" size={22} color={primary} />
-          </Pressable>
-        </View>
-        {event.category && (
-          <View style={{ alignSelf: 'flex-start', borderRadius: 6, paddingHorizontal: 10, paddingVertical: 4, marginBottom: 16, backgroundColor: (event.category.color ?? primary) + '20' }}>
-            <Text style={{ fontSize: 11, fontWeight: '600', color: event.category.color ?? primary }}>
-              {event.category.name}
-            </Text>
-          </View>
-        )}
-
-        {/* Date + time */}
-        <View className="bg-surface rounded-xl p-4 gap-2.5 border border-border/50 mb-4">
-          <MetaRow icon="calendar-outline" text={dateStr} theme={theme} />
-          <MetaRow icon="time-outline" text={timeStr} theme={theme} />
-          {event.is_online ? (
-            <MetaRow
-              icon="videocam-outline"
-              text={event.online_url ? t('onlineTapToJoin') : t('onlineEvent')}
-              onPress={event.online_url ? () => void Linking.openURL(event.online_url!) : undefined}
-              tint={event.online_url ? primary : undefined}
-              theme={theme}
-            />
-          ) : event.location ? (
-            <MetaRow icon="location-outline" text={event.location} theme={theme} />
-          ) : null}
-        </View>
-
-        {/* Attendees */}
-        <View className="flex-row items-center gap-1.5 mb-4">
-          <Ionicons name="people-outline" size={16} color={theme.textSecondary} />
-          <Text className="text-xs text-muted-foreground flex-1">
-            {t('attendees', { going: counts.going, interested: counts.interested })}
-          </Text>
-          {event.is_full && (
-            <View className="bg-danger/10 rounded px-2 py-0.5">
-              <Text className="text-xs font-semibold text-danger">{t('full')}</Text>
+        <HeroCard variant="default" className="overflow-hidden">
+          <View className="h-1 w-full" style={{ backgroundColor: accent }} />
+          {coverImage ? <Image source={{ uri: coverImage }} style={{ width: '100%', height: 180 }} contentFit="cover" /> : null}
+          <HeroCard.Body className="gap-4 px-4 py-4">
+            <View className="flex-row flex-wrap gap-2">
+              {event.category ? (
+                <Chip size="sm" variant="soft" color="warning">
+                  <Ionicons name="pricetag-outline" size={12} color={accent} />
+                  <Chip.Label>{event.category.name}</Chip.Label>
+                </Chip>
+              ) : null}
+              {event.is_full ? (
+                <Chip size="sm" variant="soft" color="danger">
+                  <Chip.Label>{t('full')}</Chip.Label>
+                </Chip>
+              ) : null}
+              {currentRsvp ? (
+                <Chip size="sm" variant="soft" color="success">
+                  <Ionicons name="checkmark-circle-outline" size={12} color={theme.success} />
+                  <Chip.Label>{currentRsvp === 'going' ? t('going') : t('interested')}</Chip.Label>
+                </Chip>
+              ) : null}
             </View>
-          )}
+
+            <HeroCard.Title className="text-2xl leading-8">{event.title}</HeroCard.Title>
+            {event.description ? (
+              <HeroCard.Description className="text-sm leading-6">
+                {stripHtml(event.description)}
+              </HeroCard.Description>
+            ) : null}
+          </HeroCard.Body>
+        </HeroCard>
+
+        <View className="flex-row gap-3">
+          <DetailMetric icon="calendar-outline" label={t('detail.date')} value={dateStr} primary={primary} />
+          <DetailMetric icon="time-outline" label={t('detail.time')} value={timeStr} primary={primary} />
         </View>
 
-        {/* RSVP buttons */}
-        <View className="flex-row gap-3 mb-6">
+        {event.is_online ? (
+          <HeroCard variant="secondary">
+            <HeroCard.Body className="gap-3 px-4 py-4">
+              <SectionTitle icon="videocam-outline" title={event.online_url ? t('onlineTapToJoin') : t('onlineEvent')} primary={primary} theme={theme} />
+              {event.online_url ? (
+                <HeroButton variant="secondary" onPress={() => void Linking.openURL(event.online_url!)}>
+                  <Ionicons name="open-outline" size={18} color={primary} />
+                  <HeroButton.Label>{t('detail.joinOnline')}</HeroButton.Label>
+                </HeroButton>
+              ) : null}
+            </HeroCard.Body>
+          </HeroCard>
+        ) : event.location ? (
+          <HeroCard variant="secondary">
+            <HeroCard.Body className="gap-3 px-4 py-4">
+              <SectionTitle icon="location-outline" title={t('detail.location')} primary={primary} theme={theme} />
+              <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{event.location}</Text>
+            </HeroCard.Body>
+          </HeroCard>
+        ) : null}
+
+        <HeroCard variant="secondary">
+          <HeroCard.Body className="gap-3 px-4 py-4">
+            <SectionTitle icon="people-outline" title={t('detail.attendees')} primary={primary} theme={theme} />
+            <Text className="text-sm" style={{ color: theme.textSecondary }}>
+              {t('attendees', { going: counts.going, interested: counts.interested })}
+            </Text>
+          </HeroCard.Body>
+        </HeroCard>
+
+        {event.organizer ? (
+          <HeroCard variant="secondary">
+            <HeroCard.Body className="gap-3 px-4 py-4">
+              <SectionTitle icon="person-circle-outline" title={t('detail.organizer')} primary={primary} theme={theme} />
+              <View className="flex-row items-center gap-3">
+                <Avatar uri={event.organizer.avatar ?? undefined} name={event.organizer.name ?? '?'} size={44} />
+                <Text className="text-sm font-semibold" style={{ color: theme.text }}>{event.organizer.name ?? t('common:unknown')}</Text>
+              </View>
+            </HeroCard.Body>
+          </HeroCard>
+        ) : null}
+      </ScrollView>
+
+      <Surface variant="default" className="absolute bottom-0 left-0 right-0 border-t border-border p-4">
+        <View className="flex-row gap-3">
           <RsvpButton
             label={t('going')}
             icon="checkmark-circle"
@@ -240,52 +259,49 @@ function EventDetailScreenInner() {
             onPress={() => void handleRsvp('interested')}
           />
         </View>
-
-        {/* Description */}
-        {event.description ? (
-          <View className="mb-6">
-            <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2.5">{t('detail.about')}</Text>
-            <Text className="text-sm text-foreground">{event.description}</Text>
-          </View>
-        ) : null}
-
-        {/* Organizer */}
-        {event.organizer ? (
-          <View className="mb-6">
-            <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2.5">{t('detail.organizer')}</Text>
-            <View className="flex-row items-center gap-3">
-              <Avatar uri={event.organizer.avatar ?? undefined} name={event.organizer.name ?? '?'} size={36} />
-              <Text className="text-sm font-semibold text-foreground">{event.organizer.name ?? t('common:unknown')}</Text>
-            </View>
-          </View>
-        ) : null}
-      </ScrollView>
+      </Surface>
     </SafeAreaView>
   );
 }
 
-function MetaRow({
-  icon,
-  text,
-  onPress,
-  tint,
-  theme,
-}: {
-  icon: React.ComponentProps<typeof Ionicons>['name'];
-  text: string;
-  onPress?: () => void;
-  tint?: string;
-  theme: ReturnType<typeof useTheme>;
-}) {
+function ScreenShell({ title, backLabel, children }: { title: string; backLabel: string; children: React.ReactNode }) {
   return (
-    <Pressable
-      style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}
-      onPress={onPress}
-      disabled={!onPress}
-    >
-      <Ionicons name={icon} size={16} color={tint ?? theme.textSecondary} />
-      <Text style={{ fontSize: 13, color: tint ?? theme.text, flex: 1 }}>{text}</Text>
-    </Pressable>
+    <SafeAreaView className="flex-1 bg-background">
+      <AppTopBar title={title} backLabel={backLabel} fallbackHref="/(tabs)/events" />
+      <View className="flex-1 px-4">{children}</View>
+    </SafeAreaView>
+  );
+}
+
+function CenteredState({ text }: { text: string }) {
+  return (
+    <HeroCard variant="secondary" className="my-8">
+      <HeroCard.Body className="items-center gap-4">
+        <Ionicons name="alert-circle-outline" size={34} color="#F59E0B" />
+        <Text className="text-center text-sm text-muted-foreground">{text}</Text>
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function DetailMetric({ icon, label, value, primary }: { icon: IoniconName; label: string; value: string; primary: string }) {
+  return (
+    <HeroCard variant="secondary" className="flex-1">
+      <HeroCard.Body className="gap-1 px-3 py-3">
+        <Ionicons name={icon} size={18} color={primary} />
+        <Text className="text-[11px] font-semibold uppercase text-muted-foreground">{label}</Text>
+        <Text className="text-sm font-bold text-foreground" numberOfLines={3}>{value}</Text>
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function SectionTitle({ icon, title, primary, theme }: { icon: IoniconName; title: string; primary: string; theme: Theme }) {
+  return (
+    <View className="flex-row items-center gap-2">
+      <Ionicons name={icon} size={18} color={primary} />
+      <Text className="text-base font-semibold" style={{ color: theme.text }}>{title}</Text>
+    </View>
   );
 }
 
@@ -299,44 +315,29 @@ function RsvpButton({
   onPress,
 }: {
   label: string;
-  icon: React.ComponentProps<typeof Ionicons>['name'];
+  icon: IoniconName;
   selected: boolean;
   primary: string;
   loading: boolean;
   disabled: boolean;
   onPress: () => void;
 }) {
-  const iconColor = selected ? '#fff' : '#8E8E93'; // contrast on primary
   return (
-    <Pressable
-      style={[
-        {
-          flex: 1,
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 6,
-          borderWidth: 1,
-          borderRadius: 10,
-          paddingVertical: 12,
-        },
-        selected
-          ? { backgroundColor: primary, borderColor: primary }
-          : { borderColor: '#C6C6C8' },
-        disabled && { opacity: 0.4 },
-      ]}
+    <HeroButton
+      className="flex-1"
+      variant={selected ? 'primary' : 'secondary'}
+      isDisabled={disabled}
+      style={selected ? { backgroundColor: primary } : undefined}
       onPress={onPress}
-      disabled={disabled}
       accessibilityLabel={label}
-      accessibilityRole="button"
       accessibilityState={{ busy: loading, selected }}
     >
-      {loading ? (
-        <Spinner size="sm" />
-      ) : (
-        <Ionicons name={icon} size={16} color={iconColor} />
-      )}
-      <Text style={{ fontSize: 13, fontWeight: '600', color: selected ? '#fff' : '#8E8E93' }}>{label}</Text>
-    </Pressable>
+      {loading ? <Spinner size="sm" /> : <Ionicons name={icon} size={16} color={selected ? '#fff' : primary} />}
+      <HeroButton.Label>{label}</HeroButton.Label>
+    </HeroButton>
   );
+}
+
+function stripHtml(value: string): string {
+  return value.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
 }

@@ -14,8 +14,9 @@ import {
   ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router, useNavigation } from 'expo-router';
+import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { Button as HeroButton, Card as HeroCard, Chip, Surface } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 
@@ -35,6 +36,7 @@ import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
+import AppTopBar from '@/components/ui/AppTopBar';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
@@ -63,12 +65,14 @@ function JobCard({
   t: (key: string, opts?: Record<string, unknown>) => string;
   onPress: () => void;
 }) {
+  const successColor = theme.success ?? '#22c55e';
+  const warningColor = theme.warning ?? '#f59e0b';
   const typeColor =
     item.type === 'paid'
-      ? theme.success
+      ? successColor
       : item.type === 'volunteer'
         ? primary
-        : theme.warning;
+        : warningColor;
 
   const deadlineStr = item.deadline
     ? t('card.deadline', {
@@ -102,92 +106,143 @@ function JobCard({
 
   return (
     <Pressable
-      className="bg-surface rounded-2xl p-4 mb-3 border border-border/50 gap-2"
       onPress={onPress}
       accessibilityRole="button"
       accessibilityLabel={item.title}
     >
-      {/* Featured badge */}
-      {item.is_featured ? (
-        <View className="self-start rounded bg-warning/20 px-2 py-0.5">
-          <Text className="text-[11px] font-bold text-warning uppercase tracking-[0.4px]">
-            {t('card.featured')}
-          </Text>
-        </View>
-      ) : null}
-
-      {/* Title row */}
-      <View className="flex-row items-start gap-2">
-        <Text className="flex-1 text-sm font-semibold text-foreground" numberOfLines={2}>
-          {item.title}
-        </Text>
-        <View style={{ backgroundColor: typeColor + '22' }} className="rounded px-2 py-0.5 self-start">
-          <Text style={{ color: typeColor }} className="text-[11px] font-semibold">
-            {t(`filters.type.${item.type}`)}
-          </Text>
-        </View>
-      </View>
-
-      {/* Organisation / creator */}
-      <Text className="text-xs text-muted-foreground" numberOfLines={1}>
-        {displayName}
-      </Text>
-
-      {/* Meta row */}
-      <View className="flex-row flex-wrap gap-2 items-center">
-        {item.is_remote ? (
-          <View style={{ backgroundColor: withAlpha(primary, 0.10) }} className="rounded px-2 py-0.5">
-            <Text style={{ color: primary }} className="text-[11px] font-semibold">
-              {t('card.remote')}
-            </Text>
-          </View>
-        ) : item.location ? (
-          <View className="flex-row items-center gap-1">
-            <Ionicons name="location-outline" size={13} color={theme.textMuted} />
-            <Text className="text-[11px] text-muted-foreground" numberOfLines={1}>
-              {item.location}
-            </Text>
-          </View>
-        ) : null}
-
-        {salaryStr ? (
-          <View className="flex-row items-center gap-1">
-            <Ionicons name="cash-outline" size={13} color={theme.textMuted} />
-            <Text className="text-[11px] text-muted-foreground">{salaryStr}</Text>
-          </View>
-        ) : null}
-
-        {deadlineStr ? (
-          <View className="flex-row items-center gap-1">
-            <Ionicons name="calendar-outline" size={13} color={theme.textMuted} />
-            <Text className="text-[11px] text-muted-foreground">{deadlineStr}</Text>
-          </View>
-        ) : null}
-
-        <View className="flex-row items-center gap-1">
-          <Ionicons name="people-outline" size={13} color={theme.textMuted} />
-          <Text className="text-[11px] text-muted-foreground">
-            {t('card.applications', { count: item.applications_count })}
-          </Text>
-        </View>
-      </View>
-
-      {/* Skills */}
-      {visibleSkills.length > 0 ? (
-        <View className="flex-row flex-wrap gap-1.5">
-          {visibleSkills.map((skill) => (
-            <View key={skill} className="rounded px-2 py-0.5 border border-border bg-background">
-              <Text className="text-[11px] text-muted-foreground">{skill}</Text>
+      <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
+        <View className="h-1.5" style={{ backgroundColor: item.is_featured ? warningColor : typeColor }} />
+        <HeroCard.Body className="gap-3 p-4">
+          <View className="flex-row items-start gap-3">
+            <View className="size-12 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(typeColor, 0.14) }}>
+              <Ionicons name="briefcase-outline" size={23} color={typeColor} />
             </View>
-          ))}
-          {(item.skills_required ?? []).length > 3 ? (
-            <View className="rounded px-2 py-0.5 border border-border bg-background">
-              <Text className="text-[11px] text-muted-foreground">+{item.skills_required.length - 3}</Text>
+            <View className="min-w-0 flex-1 gap-1">
+              <View className="flex-row flex-wrap gap-2">
+                {item.is_featured ? (
+                  <Chip size="sm" variant="secondary" color="warning">
+                    <Ionicons name="star-outline" size={12} color={warningColor} />
+                    <Chip.Label>{t('card.featured')}</Chip.Label>
+                  </Chip>
+                ) : null}
+                <Chip size="sm" variant="secondary">
+                  <Chip.Label>{t(`filters.type.${item.type}`)}</Chip.Label>
+                </Chip>
+              </View>
+              <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={2}>
+                {item.title}
+              </Text>
+              <Text className="text-sm" style={{ color: theme.textSecondary }} numberOfLines={1}>
+                {displayName}
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward-outline" size={18} color={primary} />
+          </View>
+
+          <View className="flex-row flex-wrap gap-2">
+            {item.is_remote ? (
+              <Chip size="sm" variant="secondary">
+                <Ionicons name="wifi-outline" size={12} color={primary} />
+                <Chip.Label>{t('card.remote')}</Chip.Label>
+              </Chip>
+            ) : item.location ? (
+              <Chip size="sm" variant="secondary">
+                <Ionicons name="location-outline" size={12} color={primary} />
+                <Chip.Label>{item.location}</Chip.Label>
+              </Chip>
+            ) : null}
+
+            {salaryStr ? (
+              <Chip size="sm" variant="secondary">
+                <Ionicons name="cash-outline" size={12} color={successColor} />
+                <Chip.Label>{salaryStr}</Chip.Label>
+              </Chip>
+            ) : null}
+
+            {deadlineStr ? (
+              <Chip size="sm" variant="secondary">
+                <Ionicons name="calendar-outline" size={12} color={theme.textSecondary} />
+                <Chip.Label>{deadlineStr}</Chip.Label>
+              </Chip>
+            ) : null}
+
+            <Chip size="sm" variant="secondary">
+              <Ionicons name="people-outline" size={12} color={theme.textSecondary} />
+              <Chip.Label>{t('card.applications', { count: item.applications_count })}</Chip.Label>
+            </Chip>
+          </View>
+
+          {visibleSkills.length > 0 ? (
+            <View className="flex-row flex-wrap gap-1.5">
+              {visibleSkills.map((skill) => (
+                <Chip key={skill} size="sm" variant="secondary">
+                  <Chip.Label>{skill}</Chip.Label>
+                </Chip>
+              ))}
+              {(item.skills_required ?? []).length > 3 ? (
+                <Chip size="sm" variant="secondary">
+                  <Chip.Label>+{item.skills_required.length - 3}</Chip.Label>
+                </Chip>
+              ) : null}
             </View>
           ) : null}
-        </View>
-      ) : null}
+        </HeroCard.Body>
+      </HeroCard>
     </Pressable>
+  );
+}
+
+function JobsHero({
+  primary,
+  theme,
+  t,
+}: {
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: string) => string;
+}) {
+  return (
+    <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
+      <View className="h-1.5" style={{ backgroundColor: primary }} />
+      <HeroCard.Body className="gap-4 p-4 pt-0">
+        <View className="flex-row items-start gap-3">
+          <View className="size-13 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+            <Ionicons name="briefcase-outline" size={25} color={primary} />
+          </View>
+          <View className="min-w-0 flex-1 gap-1">
+            <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('eyebrow')}</Text>
+            <Text className="text-2xl font-bold" style={{ color: theme.text }}>{t('title')}</Text>
+            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('subtitle')}</Text>
+          </View>
+        </View>
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function FilterPill({
+  label,
+  selected,
+  onPress,
+  primary,
+  theme,
+}: {
+  label: string;
+  selected: boolean;
+  onPress: () => void;
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+}) {
+  return (
+    <HeroButton
+      size="sm"
+      variant={selected ? 'primary' : 'secondary'}
+      onPress={onPress}
+      style={selected ? { backgroundColor: primary } : undefined}
+    >
+      <HeroButton.Label>{label}</HeroButton.Label>
+      {selected ? <Ionicons name="checkmark-outline" size={13} color="#fff" /> : <Ionicons name="add-outline" size={13} color={theme.textSecondary} />}
+    </HeroButton>
   );
 }
 
@@ -377,13 +432,8 @@ function ApplicationCard({
 
 export default function JobsScreen() {
   const { t } = useTranslation('jobs');
-  const navigation = useNavigation();
   const primary = usePrimaryColor();
   const theme = useTheme();
-
-  useEffect(() => {
-    navigation.setOptions({ title: t('title') });
-  }, [navigation, t]);
 
   const [activeTab, setActiveTab] = useState<'browse' | 'myApplications'>('browse');
   const [search, setSearch] = useState('');
@@ -532,12 +582,28 @@ export default function JobsScreen() {
 
   return (
     <ModalErrorBoundary>
-    <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
-      {/* Tab bar */}
-      <View className="flex-row border-b border-border/50 bg-surface">
+    <SafeAreaView className="flex-1 bg-background">
+      <AppTopBar
+        title={t('title')}
+        backLabel={t('common:back')}
+        fallbackHref="/(tabs)/profile"
+        rightAction={{
+          accessibilityLabel: t('createJob'),
+          icon: 'add-outline',
+          onPress: () => router.push('/(modals)/new-job' as Href),
+        }}
+      />
+
+      <View className="px-4">
+        <JobsHero primary={primary} theme={theme} t={t} />
+      </View>
+
+      <Surface variant="secondary" className="mx-4 mb-3 rounded-panel-inner p-1">
+        {/* Tab bar */}
+        <View className="min-w-0 flex-row">
         <Pressable
-          className="flex-1 py-3 items-center border-b-2"
-          style={{ borderBottomColor: activeTab === 'browse' ? primary : 'transparent' }}
+          className="flex-1 items-center rounded-panel-inner py-2.5"
+          style={{ backgroundColor: activeTab === 'browse' ? primary : 'transparent' }}
           onPress={() => setActiveTab('browse')}
           accessibilityRole="tab"
           accessibilityState={{ selected: activeTab === 'browse' }}
@@ -545,14 +611,14 @@ export default function JobsScreen() {
         >
           <Text
             className="text-sm font-semibold"
-            style={{ color: activeTab === 'browse' ? primary : theme.textSecondary }}
+            style={{ color: activeTab === 'browse' ? '#fff' : theme.textSecondary }}
           >
             {t('tabs.browse')}
           </Text>
         </Pressable>
         <Pressable
-          className="flex-1 py-3 items-center border-b-2"
-          style={{ borderBottomColor: activeTab === 'myApplications' ? primary : 'transparent' }}
+          className="flex-1 items-center rounded-panel-inner py-2.5"
+          style={{ backgroundColor: activeTab === 'myApplications' ? primary : 'transparent' }}
           onPress={() => setActiveTab('myApplications')}
           accessibilityRole="tab"
           accessibilityState={{ selected: activeTab === 'myApplications' }}
@@ -560,17 +626,18 @@ export default function JobsScreen() {
         >
           <Text
             className="text-sm font-semibold"
-            style={{ color: activeTab === 'myApplications' ? primary : theme.textSecondary }}
+            style={{ color: activeTab === 'myApplications' ? '#fff' : theme.textSecondary }}
           >
             {t('tabs.myApplications')}
           </Text>
         </Pressable>
-      </View>
+        </View>
+      </Surface>
 
       {activeTab === 'browse' ? (
         <>
           {/* Search bar */}
-          <View className="flex-row items-center mx-4 my-3 px-3 h-[42px] bg-surface rounded-xl gap-2">
+          <Surface variant="secondary" className="mx-4 mb-3 flex-row items-center gap-2 rounded-panel-inner px-3 py-2.5">
             <Ionicons name="search-outline" size={18} color={theme.textMuted} />
             <TextInput
               className="flex-1 text-sm text-foreground py-0"
@@ -595,7 +662,7 @@ export default function JobsScreen() {
                 <Ionicons name="close-circle" size={18} color={theme.textMuted} />
               </Pressable>
             )}
-          </View>
+          </Surface>
 
           {/* Filter row */}
           <ScrollView
@@ -604,45 +671,29 @@ export default function JobsScreen() {
             contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 8, gap: 8, flexDirection: 'row', alignItems: 'center' }}
           >
             {JOB_TYPES.map((type) => (
-              <Pressable
+              <FilterPill
                 key={type || 'all-type'}
-                className="px-3 py-1 rounded-full border"
-                style={{
-                  backgroundColor: typeFilter === type ? primary : theme.surface,
-                  borderColor: typeFilter === type ? primary : theme.border,
-                }}
+                label={t(type ? `filters.type.${type}` : 'filters.type.all')}
+                selected={typeFilter === type}
                 onPress={() => setTypeFilter(type)}
-              >
-                <Text
-                  className="text-xs font-semibold"
-                  style={{ color: typeFilter === type ? '#fff' : theme.textSecondary }} // contrast on primary
-                >
-                  {t(type ? `filters.type.${type}` : 'filters.type.all')}
-                </Text>
-              </Pressable>
+                primary={primary}
+                theme={theme}
+              />
             ))}
             <View className="w-px h-5 bg-border mx-1" />
             {COMMITMENT_TYPES.map((commitment) => (
-              <Pressable
+              <FilterPill
                 key={commitment || 'all-commitment'}
-                className="px-3 py-1 rounded-full border"
-                style={{
-                  backgroundColor: commitmentFilter === commitment ? primary : theme.surface,
-                  borderColor: commitmentFilter === commitment ? primary : theme.border,
-                }}
-                onPress={() => setCommitmentFilter(commitment)}
-              >
-                <Text
-                  className="text-xs font-semibold"
-                  style={{ color: commitmentFilter === commitment ? '#fff' : theme.textSecondary }} // contrast on primary
-                >
-                  {t(
+                label={t(
                     commitment
                       ? `filters.commitment.${commitment}`
                       : 'filters.commitment.all',
-                  )}
-                </Text>
-              </Pressable>
+                )}
+                selected={commitmentFilter === commitment}
+                onPress={() => setCommitmentFilter(commitment)}
+                primary={primary}
+                theme={theme}
+              />
             ))}
           </ScrollView>
 

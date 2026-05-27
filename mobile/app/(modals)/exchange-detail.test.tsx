@@ -27,6 +27,12 @@ jest.mock('react-i18next', () => ({
         'detail.timeEstimate': 'Time Estimate',
         'detail.requestService': 'Request this Service',
         'detail.offerHelp': 'Offer Help',
+        'detail.communityActions': 'Community actions',
+        'detail.like': 'Like',
+        'detail.comment': 'Comment',
+        'detail.share': 'Share',
+        'detail.report': 'Report',
+        'detail.ownerTools': 'Listing tools',
         'offering': 'Offering',
         'requesting': 'Requesting',
         'common:errors.alertTitle': 'Error',
@@ -83,6 +89,21 @@ jest.mock('@expo/vector-icons', () => ({
 
 jest.mock('@/lib/api/exchanges', () => ({
   getExchange: jest.fn(),
+  getExchangeWorkflowConfig: jest.fn().mockResolvedValue({ data: { exchange_workflow_enabled: true } }),
+  checkActiveExchange: jest.fn().mockResolvedValue({ data: null }),
+  getExchangeComments: jest.fn().mockResolvedValue({ data: { comments: [], count: 0 } }),
+  createExchangeRequest: jest.fn(),
+  deleteExchange: jest.fn(),
+  renewExchange: jest.fn(),
+  saveExchange: jest.fn(),
+  unsaveExchange: jest.fn(),
+  submitExchangeComment: jest.fn(),
+  toggleExchangeLike: jest.fn(),
+  reportExchange: jest.fn(),
+}));
+
+jest.mock('@/lib/api/verification', () => ({
+  getUserVerificationBadges: jest.fn().mockResolvedValue([]),
 }));
 
 jest.mock('@/components/ui/Avatar', () => 'View');
@@ -135,9 +156,9 @@ describe('ExchangeDetailModal', () => {
   it('renders the not found state when data is null after loading', () => {
     mockUseApi.mockReturnValue({ data: null, isLoading: false, error: null, refresh: jest.fn() });
 
-    const { getByText } = render(<ExchangeDetailModal />);
+    const { getAllByText, getByText } = render(<ExchangeDetailModal />);
     expect(getByText('Exchange not found.')).toBeTruthy();
-    expect(getByText('Go Back')).toBeTruthy();
+    expect(getAllByText('Go Back').length).toBeGreaterThan(0);
   });
 
   it('renders the exchange type (offer/request) badge', () => {

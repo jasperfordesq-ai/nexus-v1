@@ -26,6 +26,7 @@
     "retry": "Réessayer"
   },
   "errors": {
+    "boundaryTitle": "Une erreur s'est produite",
     "generic": "Une erreur s'est produite. Veuillez réessayer.",
     "network": "Erreur réseau. Vérifiez votre connexion.",
     "unauthorized": "Votre session a expiré. Veuillez vous reconnecter.",
@@ -44,5 +45,20 @@
     "friend": "là",
     "you": "Vous"
   },
-  "endOfList": "Vous avez atteint la fin"
+  "endOfList": "Vous avez atteint la fin",
+  "aria": {
+    "actionButton": "Bouton d'action",
+    "verification_badges": "Labels de v?rification"
+  },
+  "verification": {
+    "not_id_verified": "Identit? non v?rifi?e",
+    "badge": {
+      "email_verified": "E-mail v?rifi?",
+      "phone_verified": "T?l?phone v?rifi?",
+      "id_verified": "Identit? v?rifi?e",
+      "dbs_checked": "DBS v?rifi?",
+      "admin_verified": "V?rifi? par l'administration",
+      "unknown": "V?rifi?"
+    }
+  }
 }

@@ -218,7 +218,8 @@
     "cancel": "Annulla",
     "submit_application": "Invia candidatura",
     "job_openings": "Posizioni aperte",
-    "meta_description_fallback": "Esplora {{name}} e {{count}} opportunità di volontariato attive su questa banca del tempo comunitaria."
+    "meta_description_fallback": "Esplora {{name}} e {{count}} opportunità di volontariato attive su questa banca del tempo comunitaria.",
+    "rating_sr": "{{n}} out of 5 stars"
   },
   "emergency_alerts": {
     "heading": "Avvisi di Emergenza",

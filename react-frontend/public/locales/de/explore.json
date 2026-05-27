@@ -29,7 +29,8 @@
     "title": "Aktive Gruppen",
     "subtitle": "Mit Gleichgesinnten vernetzen",
     "members": "{{count}} Mitglieder",
-    "view_group": "Gruppe ansehen"
+    "view_group": "Gruppe ansehen",
+    "view_group_named": "View group: {{name}}"
   },
   "top_contributors": {
     "title": "Top-Beitragende",
@@ -100,7 +101,8 @@
     "votes": "{{count}} Stimmen",
     "options": "{{count}} Optionen",
     "vote_now": "Jetzt abstimmen",
-    "closes": "Endet am {{date}}"
+    "closes": "Endet am {{date}}",
+    "vote_now_for": "Vote now on: {{question}}"
   },
   "in_demand_skills": {
     "title": "Gefragte Fähigkeiten",

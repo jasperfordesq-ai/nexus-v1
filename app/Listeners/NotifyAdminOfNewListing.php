@@ -51,6 +51,8 @@ class NotifyAdminOfNewListing implements ShouldQueue
                 return;
             }
 
+            $skipEmailFanout = $this->shouldSkipEmailFanoutInLocalDevelopment();
+
             foreach ($admins as $admin) {
                 $adminEmail = $admin->email ?? null;
                 if (!$adminEmail) {
@@ -66,6 +68,10 @@ class NotifyAdminOfNewListing implements ShouldQueue
                         'poster' => $posterName,
                     ]);
                     Notification::createNotification((int) $admin->id, $bellContent, '/listings/' . $listing->id, 'new_listing_created');
+
+                    if ($skipEmailFanout) {
+                        return;
+                    }
 
                     $subject = __('emails_misc.admin_notify.new_listing_subject', ['community' => $tenantName]);
 
@@ -98,5 +104,41 @@ class NotifyAdminOfNewListing implements ShouldQueue
         } finally {
             TenantContext::restoreAfterScopedListener($previousTenantId);
         }
+    }
+
+    private function shouldSkipEmailFanoutInLocalDevelopment(): bool
+    {
+        if (!app()->environment(['local', 'development', 'testing'])) {
+            return false;
+        }
+
+        if ((string) config('mail.default') !== 'smtp') {
+            return false;
+        }
+
+        $host = (string) config('mail.mailers.smtp.host');
+        if (!in_array($host, ['127.0.0.1', 'localhost', '::1'], true)) {
+            return false;
+        }
+
+        $port = (int) config('mail.mailers.smtp.port');
+        if ($port <= 0) {
+            return false;
+        }
+
+        $connection = @fsockopen($host, $port, $errorCode, $errorMessage, 0.2);
+        if (is_resource($connection)) {
+            fclose($connection);
+            return false;
+        }
+
+        Log::warning('NotifyAdminOfNewListing: skipped local SMTP email fanout because the configured SMTP server is not reachable', [
+            'host' => $host,
+            'port' => $port,
+            'error_code' => $errorCode ?? null,
+            'error' => $errorMessage ?? null,
+        ]);
+
+        return true;
     }
 }

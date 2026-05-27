@@ -633,7 +633,8 @@
     "load_more": "Luchtaigh Níos mó",
     "aria_select_all": "Roghnaigh gach iarratas ar feitheamh infheicthe",
     "aria_select_application": "Roghnaigh feidhmchlár ó {{name}}",
-    "aria_search_volunteers": "Cuardaigh oibrí deonacha de réir ainm"
+    "aria_search_volunteers": "Cuardaigh oibrí deonacha de réir ainm",
+    "filter_label": "Filter applications"
   },
   "org_wallet_balance": "Iarmhéid sparán:",
   "auto_pay_on": "Uath-íoc AR",

@@ -8,11 +8,16 @@ import { render, fireEvent } from '@testing-library/react-native';
 
 // --- Mocks ---
 
+const mockRouterPush = jest.fn();
+const mockRouterReplace = jest.fn();
+const mockSearchParams = jest.fn(() => ({}));
+
 jest.mock('expo-router', () => ({
-  useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }),
+  __esModule: true,
+  useRouter: () => ({ push: mockRouterPush, replace: mockRouterReplace, back: jest.fn() }),
   useSegments: () => ['(tabs)'],
-  router: { push: jest.fn(), replace: jest.fn(), back: jest.fn() },
-  useLocalSearchParams: () => ({}),
+  router: { push: mockRouterPush, replace: mockRouterReplace, back: jest.fn() },
+  useLocalSearchParams: () => mockSearchParams(),
   useNavigation: () => ({ setOptions: jest.fn() }),
 }));
 
@@ -22,6 +27,7 @@ jest.mock('react-i18next', () => ({
       const map: Record<string, string> = {
         'title': 'Messages',
         'newMessage': 'New message',
+        'newGroup': 'New group',
         'empty.title': 'No conversations yet',
         'thread.you': 'You',
         'thread.noMessages': 'No messages yet. Say hello!',
@@ -113,6 +119,9 @@ const defaultPaginatedState = {
 };
 
 beforeEach(() => {
+  mockRouterPush.mockReset();
+  mockRouterReplace.mockReset();
+  mockSearchParams.mockReturnValue({});
   mockUsePaginatedApi.mockReturnValue(defaultPaginatedState);
 });
 
@@ -201,5 +210,28 @@ describe('MessagesScreen', () => {
 
     const { getByText } = render(<MessagesScreen />);
     expect(getByText('2h ago')).toBeTruthy();
+  });
+
+  it('routes deep-linked recipients to the native thread composer', () => {
+    mockSearchParams.mockReturnValue({ to: '260', name: 'Jasper Ford', listing: '90624' });
+
+    render(<MessagesScreen />);
+
+    expect(mockRouterPush).toHaveBeenCalledWith({
+      pathname: '/(modals)/thread',
+      params: {
+        recipientId: '260',
+        name: 'Jasper Ford',
+        listing: '90624',
+      },
+    });
+  });
+
+  it('opens the new group route from the header action', () => {
+    const { getByLabelText } = render(<MessagesScreen />);
+
+    fireEvent.press(getByLabelText('New group'));
+
+    expect(mockRouterPush).toHaveBeenCalledWith({ pathname: '/(modals)/new-group' });
   });
 });

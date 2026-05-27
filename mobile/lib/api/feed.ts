@@ -15,7 +15,29 @@ export type FeedItemType =
   | 'job'
   | 'challenge'
   | 'volunteer'
-  | 'review';
+  | 'review'
+  | 'blog'
+  | 'discussion'
+  | 'resource'
+  | 'badge_earned'
+  | 'level_up';
+
+export type FeedFilter =
+  | 'all'
+  | 'following'
+  | 'saved'
+  | 'posts'
+  | 'listings'
+  | 'events'
+  | 'polls'
+  | 'goals'
+  | 'jobs'
+  | 'challenges'
+  | 'volunteering'
+  | 'blogs'
+  | 'discussions';
+
+export type FeedMode = 'ranking' | 'recent';
 
 export interface PollOption {
   id: number;
@@ -39,20 +61,58 @@ export interface FeedItem {
   title: string;
   content: string | null;
   image_url: string | null;
-  user_id: number;
-  author_name: string;
-  author_avatar: string | null;
+  user_id?: number;
+  author_id?: number;
+  author_name?: string | null;
+  author_avatar?: string | null;
+  author?: {
+    id: number;
+    name: string;
+    avatar_url?: string | null;
+  } | null;
+  user?: {
+    id: number;
+    name: string;
+    avatar_url?: string | null;
+    avatar?: string | null;
+  } | null;
   is_liked?: boolean;
   likes_count: number;
   comments_count: number;
   created_at: string;
   location: string | null;
   rating: number | null;
+  views_count?: number;
+  share_count?: number;
+  is_bookmarked?: boolean;
+  is_shared?: boolean;
+  is_official?: boolean;
+  content_truncated?: boolean;
+  slug?: string | null;
   start_date: string | null;
   job_type: string | null;
   commitment: string | null;
   submission_deadline: string | null;
   receiver: { id: number; name: string } | null;
+  organization?: string | null;
+  credits_offered?: number | null;
+  ideas_count?: number | null;
+  badge_name?: string | null;
+  badge_icon?: string | null;
+  new_level?: number | null;
+  reactions?: {
+    counts: Record<string, number>;
+    total: number;
+    user_reaction: string | null;
+  };
+  link_previews?: Array<{
+    url: string;
+    title?: string | null;
+    description?: string | null;
+    image_url?: string | null;
+    site_name?: string | null;
+    domain?: string | null;
+  }>;
   poll_data?: PollData | null;
   media?: Array<{
     id: number;
@@ -64,6 +124,22 @@ export interface FeedItem {
     height: number | null;
     display_order: number;
   }>;
+}
+
+export function getFeedAuthor(item: FeedItem, fallbackName: string) {
+  return {
+    id: item.user_id ?? item.author_id ?? item.author?.id ?? item.user?.id ?? 0,
+    name: item.author_name ?? item.author?.name ?? item.user?.name ?? fallbackName,
+    avatar: item.author_avatar ?? item.author?.avatar_url ?? item.user?.avatar_url ?? item.user?.avatar ?? null,
+  };
+}
+
+export interface FeedQueryOptions {
+  cursor?: string | null;
+  filter?: FeedFilter;
+  mode?: FeedMode;
+  subtype?: string | null;
+  perPage?: number;
 }
 
 export interface FeedResponse {
@@ -82,8 +158,21 @@ export interface FeedResponse {
  * Pass `cursor` for cursor-based pagination (preferred). If `cursor` is
  * provided it takes precedence and `page` is ignored by the server.
  */
-export function getFeed(page = 1, cursor?: string | null): Promise<FeedResponse> {
-  const params: Record<string, string> = { page: String(page) };
+export function getFeed(page = 1, cursor?: string | null, options: Omit<FeedQueryOptions, 'cursor'> = {}): Promise<FeedResponse> {
+  const params: Record<string, string> = {
+    page: String(page),
+    per_page: String(options.perPage ?? 20),
+    mode: options.mode === 'recent' ? 'chronological' : 'ranked',
+    personalised: options.mode === 'recent' ? 'false' : 'true',
+    tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  };
+  const filter = options.filter ?? 'all';
+  if (filter !== 'all') {
+    params['type'] = filter;
+  }
+  if (options.subtype) {
+    params['subtype'] = options.subtype;
+  }
   if (cursor) {
     params['cursor'] = cursor;
   }

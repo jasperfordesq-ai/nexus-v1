@@ -218,7 +218,8 @@
     "cover_message_placeholder": "Cuéntale a la organización por qué te gustaría ser voluntario...",
     "cancel": "Cancelar",
     "submit_application": "Enviar Solicitud",
-    "job_openings": "Ofertas de empleo"
+    "job_openings": "Ofertas de empleo",
+    "rating_sr": "{{n}} out of 5 stars"
   },
   "emergency_alerts": {
     "heading": "Alertas de Emergencia",

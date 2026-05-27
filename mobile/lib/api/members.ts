@@ -5,6 +5,7 @@
 
 import { api } from '@/lib/api/client';
 import { API_V2 } from '@/lib/constants';
+import type { Exchange } from '@/lib/api/exchanges';
 
 export interface Member {
   id: number;
@@ -36,6 +37,23 @@ export interface MemberListResponse {
   };
 }
 
+export interface MemberReview {
+  id: number;
+  reviewer?: {
+    id: number;
+    first_name?: string;
+    last_name?: string;
+    name?: string;
+    avatar?: string | null;
+    avatar_url?: string | null;
+  } | null;
+  rating: number;
+  comment?: string | null;
+  listing_id?: number | null;
+  listing_title?: string | null;
+  created_at: string;
+}
+
 /** GET /api/v2/users — paginated member directory for the current tenant */
 export function getMembers(
   offset = 0,
@@ -49,4 +67,14 @@ export function getMembers(
 /** GET /api/v2/users/:id */
 export function getMember(id: number): Promise<{ data: Member }> {
   return api.get<{ data: Member }>(`${API_V2}/users/${id}`);
+}
+
+/** GET /api/v2/users/:id/listings */
+export function getMemberListings(id: number, limit = 6): Promise<{ data: Exchange[] }> {
+  return api.get<{ data: Exchange[] }>(`${API_V2}/users/${id}/listings`, { limit: String(limit) });
+}
+
+/** GET /api/v2/reviews/user/:id */
+export function getMemberReviews(id: number, perPage = 6): Promise<{ data: MemberReview[] }> {
+  return api.get<{ data: MemberReview[] }>(`${API_V2}/reviews/user/${id}`, { per_page: String(perPage) });
 }

@@ -9,7 +9,7 @@ import { render } from '@testing-library/react-native';
 // --- Mocks ---
 
 jest.mock('expo-router', () => ({
-  router: { push: jest.fn(), back: jest.fn() },
+  router: { push: jest.fn(), back: jest.fn(), replace: jest.fn(), canGoBack: jest.fn(() => false) },
   useLocalSearchParams: () => ({ id: '1' }),
   useNavigation: () => ({ setOptions: jest.fn() }),
 }));
@@ -19,9 +19,12 @@ jest.mock('react-i18next', () => ({
     t: (key: string, opts?: Record<string, unknown>) => {
       const map: Record<string, string> = {
         'title': 'Jobs',
+        'detailTitle': 'Job Details',
         'detail.invalidId': 'Invalid job ID.',
         'detail.notFound': 'Job not found.',
+        'detail.notFoundHint': 'This role may have been removed.',
         'detail.goBack': 'Go back',
+        'detail.browseJobs': 'Browse jobs',
         'detail.share': 'Share',
         'detail.save': 'Save',
         'detail.saved': 'Saved',
@@ -32,6 +35,9 @@ jest.mock('react-i18next', () => ({
         'detail.skills': 'Skills Required',
         'detail.description': 'Description',
         'detail.about': 'About',
+        'detail.postedBy': 'Posted by',
+        'detail.keyDetails': 'Role details',
+        'detail.views': opts ? `${String(opts.count ?? 0)} views` : '0 views',
         'detail.matchPercentage': opts ? `${String(opts.percentage ?? 0)}% match` : '0% match',
         'detail.closesIn': opts ? `Closes in ${String(opts.count ?? 0)} days` : 'Closes in 0 days',
         'detail.timeCredits': opts ? `${String(opts.count ?? 0)} time credits` : '0 time credits',
@@ -57,6 +63,8 @@ jest.mock('react-i18next', () => ({
         'filters.commitment.one_off': 'One-off',
         'saved_profile.use': 'Use Saved Cover Letter',
         'common:errors.alertTitle': 'Error',
+        'common:back': 'Back',
+        'common:close': 'Close',
       };
       return map[key] ?? key;
     },
@@ -216,6 +224,6 @@ describe('JobDetailScreen', () => {
 
     const { getByText } = render(<JobDetailScreen />);
     expect(getByText('Job not found.')).toBeTruthy();
-    expect(getByText('Go back')).toBeTruthy();
+    expect(getByText('Browse jobs')).toBeTruthy();
   });
 });

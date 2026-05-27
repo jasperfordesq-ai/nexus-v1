@@ -633,7 +633,8 @@
     "load_more": "Mehr laden",
     "aria_select_all": "Alle sichtbaren ausstehenden Bewerbungen auswählen",
     "aria_select_application": "Bewerbung von {{name}} auswählen",
-    "aria_search_volunteers": "Freiwillige nach Name suchen"
+    "aria_search_volunteers": "Freiwillige nach Name suchen",
+    "filter_label": "Filter applications"
   },
   "org_wallet_balance": "Wallet-Guthaben:",
   "auto_pay_on": "Automatische Zahlung EIN",

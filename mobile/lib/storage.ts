@@ -8,13 +8,14 @@ import * as Sentry from '@sentry/react-native';
 import { Platform } from 'react-native';
 
 const memoryStorage = new Map<string, string>();
+const platformOS = Platform.OS;
 
 function canUseWebStorage(): boolean {
-  return Platform.OS === 'web' && typeof window !== 'undefined' && !!window.localStorage;
+  return platformOS === 'web' && typeof window !== 'undefined' && !!window.localStorage;
 }
 
 function isWeb(): boolean {
-  return Platform.OS === 'web';
+  return platformOS === 'web';
 }
 
 /**

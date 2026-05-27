@@ -66,20 +66,20 @@ describe('getMembers', () => {
   it('includes search param when provided', async () => {
     (api.get as jest.Mock).mockResolvedValue(mockMemberListResponse);
     await getMembers(0, 'carol');
-    expect(api.get).toHaveBeenCalledWith('/api/v2/users', { offset: '0', search: 'carol' });
+    expect(api.get).toHaveBeenCalledWith('/api/v2/users', { offset: '0', q: 'carol' });
   });
 
   it('omits search param when not provided', async () => {
     (api.get as jest.Mock).mockResolvedValue(mockMemberListResponse);
     await getMembers(0);
     const params = (api.get as jest.Mock).mock.calls[0][1] as Record<string, string>;
-    expect(params).not.toHaveProperty('search');
+    expect(params).not.toHaveProperty('q');
   });
 
   it('passes offset and search together', async () => {
     (api.get as jest.Mock).mockResolvedValue(mockMemberListResponse);
     await getMembers(40, 'gardening');
-    expect(api.get).toHaveBeenCalledWith('/api/v2/users', { offset: '40', search: 'gardening' });
+    expect(api.get).toHaveBeenCalledWith('/api/v2/users', { offset: '40', q: 'gardening' });
   });
 
   it('propagates errors from the API', async () => {

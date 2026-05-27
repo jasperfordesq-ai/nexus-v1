@@ -218,7 +218,8 @@
     "cover_message_placeholder": "Tell the organisation why you'd like to volunteer...",
     "cancel": "Cancel",
     "submit_application": "Submit Application",
-    "job_openings": "Job Openings"
+    "job_openings": "Job Openings",
+    "rating_sr": "{{n}} out of 5 stars"
   },
   "emergency_alerts": {
     "heading": "Emergency Alerts",

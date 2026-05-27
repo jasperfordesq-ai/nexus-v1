@@ -82,6 +82,11 @@ jest.mock('@expo/vector-icons', () => ({
 
 jest.mock('@/lib/api/feed', () => ({
   getFeed: jest.fn(),
+  getFeedAuthor: (item: { user_id?: number; author_name?: string | null; author_avatar?: string | null; author?: { id: number; name: string; avatar_url?: string | null }; user?: { id: number; name: string; avatar_url?: string | null; avatar?: string | null } }, fallbackName: string) => ({
+    id: item.user_id ?? item.author?.id ?? item.user?.id ?? 0,
+    name: item.author_name ?? item.author?.name ?? item.user?.name ?? fallbackName,
+    avatar: item.author_avatar ?? item.author?.avatar_url ?? item.user?.avatar_url ?? item.user?.avatar ?? null,
+  }),
 }));
 
 jest.mock('@/components/FeedItem', () => {
@@ -201,10 +206,17 @@ describe('HomeScreen', () => {
     expect(getByText('3')).toBeTruthy();
   });
 
-  it('shows 9+ badge when unread notification count exceeds 9', () => {
+  it('shows the unread count when notification count is two digits', () => {
     mockRealtimeContext.unreadNotifications = 14;
 
     const { getByText } = render(<HomeScreen />);
-    expect(getByText('9+')).toBeTruthy();
+    expect(getByText('14')).toBeTruthy();
+  });
+
+  it('caps the unread notification badge at 99+', () => {
+    mockRealtimeContext.unreadNotifications = 124;
+
+    const { getByText } = render(<HomeScreen />);
+    expect(getByText('99+')).toBeTruthy();
   });
 });

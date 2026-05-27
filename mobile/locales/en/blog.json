@@ -1,16 +1,32 @@
 {
   "title": "Blog",
   "postTitle": "Blog Post",
-  "searchPlaceholder": "Search articles…",
+  "heroEyebrow": "Community journal",
+  "subtitle": "Stories, guides, and updates from the timebank community.",
+  "searchPlaceholder": "Search articles...",
+  "searchAction": "Search",
+  "clearSearch": "Clear search",
   "empty": "No articles yet.",
+  "emptyHint": "Community stories and updates will appear here.",
+  "emptyFiltered": "No matching articles",
+  "emptyFilteredHint": "Try a different search.",
+  "loadMore": "Load more",
+  "postsCount": "{{count}} post",
+  "postsCount_other": "{{count}} posts",
+  "publishedOn": "{{date}}",
   "readingTime": "{{minutes}} min read",
   "by": "By {{name}}",
   "detail": {
     "title": "Article",
     "notFound": "Article not found.",
+    "notFoundHint": "This article may have been removed or is no longer available.",
     "invalidId": "Invalid article ID.",
+    "invalidIdHint": "We could not identify which article to open.",
     "goBack": "Go back",
+    "backToBlog": "Back to blog",
     "readFull": "Read full article",
-    "share": "Share post"
+    "share": "Share post",
+    "tags": "Topics",
+    "article": "Article"
   }
 }

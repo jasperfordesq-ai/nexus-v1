@@ -8,7 +8,6 @@ import {
   View,
   Text,
   ScrollView,
-  Pressable,
   Alert,
   Modal,
   TextInput,
@@ -17,8 +16,9 @@ import {
   Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, router, useNavigation } from 'expo-router';
+import { useLocalSearchParams, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { Button as HeroButton, Card as HeroCard, Chip, Surface } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 
@@ -28,7 +28,9 @@ import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
+import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
+import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
@@ -36,14 +38,9 @@ const WEB_URL = 'https://app.project-nexus.ie';
 
 export default function JobDetailScreen() {
   const { t } = useTranslation('jobs');
-  const navigation = useNavigation();
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
-
-  useEffect(() => {
-    navigation.setOptions({ title: t('title') });
-  }, [navigation, t]);
 
   const jobId = Number(id);
   const safeId = isNaN(jobId) || jobId <= 0 ? 0 : jobId;
@@ -87,34 +84,41 @@ export default function JobDetailScreen() {
 
   if (safeId === 0) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center" edges={['bottom']}>
-        <Text className="text-sm text-muted-foreground">{t('detail.invalidId', 'Invalid job ID.')}</Text>
-        <Pressable onPress={() => router.back()} className="mt-3">
-          <Text style={{ color: primary }} className="text-[15px] font-semibold">
-            {t('detail.goBack', 'Go Back')}
-          </Text>
-        </Pressable>
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('detailTitle')} backLabel={t('common:back')} fallbackHref="/(modals)/jobs" />
+        <EmptyState
+          icon="briefcase-outline"
+          title={t('detail.invalidId')}
+          subtitle={t('detail.invalidIdHint')}
+          actionLabel={t('detail.browseJobs')}
+          onAction={() => router.replace('/(modals)/jobs')}
+        />
       </SafeAreaView>
     );
   }
 
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center" edges={['bottom']}>
-        <LoadingSpinner />
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('detailTitle')} backLabel={t('common:back')} fallbackHref="/(modals)/jobs" />
+        <View className="flex-1 items-center justify-center">
+          <LoadingSpinner />
+        </View>
       </SafeAreaView>
     );
   }
 
   if (!job) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center" edges={['bottom']}>
-        <Text className="text-sm text-muted-foreground">{t('detail.notFound', 'Job not found.')}</Text>
-        <Pressable onPress={() => router.back()} className="mt-3">
-          <Text style={{ color: primary }} className="text-[15px] font-semibold">
-            {t('detail.goBack', 'Go Back')}
-          </Text>
-        </Pressable>
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('detailTitle')} backLabel={t('common:back')} fallbackHref="/(modals)/jobs" />
+        <EmptyState
+          icon="briefcase-outline"
+          title={t('detail.notFound')}
+          subtitle={t('detail.notFoundHint')}
+          actionLabel={t('detail.browseJobs')}
+          onAction={() => router.replace('/(modals)/jobs')}
+        />
       </SafeAreaView>
     );
   }
@@ -132,7 +136,7 @@ export default function JobDetailScreen() {
         setIsSaved(true);
       }
     } catch {
-      Alert.alert(t('common:errors.alertTitle', 'Error'), t('detail.saveError', 'Could not update saved state.'));
+      Alert.alert(t('common:errors.alertTitle'), t('detail.saveError'));
     } finally {
       setSaveLoading(false);
     }
@@ -146,7 +150,7 @@ export default function JobDetailScreen() {
       setApplySuccess(true);
       setHasApplied(true);
     } catch {
-      Alert.alert(t('common:errors.alertTitle', 'Error'), t('apply.error'));
+      Alert.alert(t('common:errors.alertTitle'), t('apply.error'));
     } finally {
       setApplyLoading(false);
     }
@@ -172,10 +176,12 @@ export default function JobDetailScreen() {
     }
   }
 
+  const successColor = theme.success ?? '#22c55e';
+  const warningColor = theme.warning ?? '#f59e0b';
   const typeColor: Record<JobVacancy['type'], string> = {
-    paid: theme.success,
+    paid: successColor,
     volunteer: primary,
-    timebank: theme.warning,
+    timebank: warningColor,
   };
 
   const deadlineDaysLeft = (() => {
@@ -189,8 +195,8 @@ export default function JobDetailScreen() {
   const deadlineLabel = (() => {
     if (deadlineDaysLeft === null) return null;
     if (deadlineDaysLeft < 0) return t('detail.closedBadge');
-    if (deadlineDaysLeft === 0) return t('detail.closesToday', 'Closes today');
-    return t('detail.closesIn', 'Closes in {{count}} days', { count: deadlineDaysLeft });
+    if (deadlineDaysLeft === 0) return t('detail.closesToday');
+    return t('detail.closesIn', { count: deadlineDaysLeft });
   })();
 
   const isClosed = job.status !== 'open';
@@ -199,9 +205,9 @@ export default function JobDetailScreen() {
   const matchColor =
     matchPct !== null
       ? matchPct >= 70
-        ? theme.success
+        ? successColor
         : matchPct >= 40
-          ? theme.warning
+          ? warningColor
           : theme.error
       : primary;
 
@@ -215,186 +221,188 @@ export default function JobDetailScreen() {
       const fmt = (n: number) => `${currency}${n.toLocaleString()}`;
       const typeLabel =
         job.salary_type === 'annual'
-          ? t('detail.salaryAnnual', 'year')
+          ? t('detail.salaryAnnual')
           : job.salary_type === 'monthly'
-            ? t('detail.salaryMonthly', 'month')
-            : t('detail.salaryHourly', 'hour');
+            ? t('detail.salaryMonthly')
+            : t('detail.salaryHourly');
       return `${fmt(job.salary_min)} – ${fmt(job.salary_max)} / ${typeLabel}`;
     }
     return null;
   })();
+  const displayName = job.organization?.name ?? job.creator.name;
+  const displayAvatar = job.organization?.logo_url ?? job.creator.avatar_url;
+  const compensationLabel = salaryLabel
+    ?? (job.time_credits !== null ? t('detail.timeCredits', { count: job.time_credits }) : null);
 
   return (
     <ModalErrorBoundary>
-    <SafeAreaView className="flex-1 bg-background" edges={['bottom']}>
-      <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 48 }}>
-        {/* Title */}
-        <View className="flex-row items-start gap-2.5 mb-4">
-          <Text className="flex-1 text-xl font-bold text-foreground">{job.title}</Text>
-          {matchPct !== null ? (
-            <View style={{ backgroundColor: matchColor + '22', borderColor: matchColor }} className="rounded-lg px-2 py-1 self-start border">
-              <Text style={{ color: matchColor }} className="text-xs font-bold">
-                {t('detail.matchPercentage', { percentage: matchPct })}
-              </Text>
-            </View>
-          ) : null}
-        </View>
+    <SafeAreaView className="flex-1 bg-background">
+      <AppTopBar
+        title={t('detailTitle')}
+        backLabel={t('common:back')}
+        fallbackHref="/(modals)/jobs"
+        rightAction={{
+          accessibilityLabel: t('detail.share'),
+          icon: 'share-outline',
+          onPress: handleShare,
+        }}
+      />
 
-        {/* Organisation / creator */}
-        <View className="mb-5">
-          <View className="flex-row items-center gap-3">
-            <Avatar
-              uri={job.organization?.logo_url ?? job.creator.avatar_url}
-              name={job.organization?.name ?? job.creator.name}
-              size={36}
-            />
-            <View>
-              <Text className="text-sm font-semibold text-foreground">
-                {job.organization?.name ?? job.creator.name}
-              </Text>
-              {isClosed ? (
-                <View className="rounded bg-danger/10 px-2 py-0.5 self-start mt-1">
-                  <Text className="text-[11px] font-semibold text-danger">
-                    {t('detail.closedBadge')}
-                  </Text>
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 132 }}>
+        <HeroCard className="mb-4 overflow-hidden rounded-panel p-0">
+          <View className="h-1.5" style={{ backgroundColor: isClosed ? theme.textMuted : typeColor[job.type] }} />
+          <HeroCard.Body className="gap-4 p-4">
+            <View className="flex-row items-start gap-3">
+              <View className="size-14 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(typeColor[job.type], 0.14) }}>
+                <Ionicons name="briefcase-outline" size={27} color={typeColor[job.type]} />
+              </View>
+              <View className="min-w-0 flex-1 gap-2">
+                <View className="flex-row flex-wrap gap-2">
+                  <Chip size="sm" variant="secondary">
+                    <Chip.Label>{t(`filters.type.${job.type}`)}</Chip.Label>
+                  </Chip>
+                  <Chip size="sm" variant="secondary">
+                    <Chip.Label>{t(`filters.commitment.${job.commitment}`)}</Chip.Label>
+                  </Chip>
+                  {job.is_featured ? (
+                    <Chip size="sm" variant="secondary" color="warning">
+                      <Ionicons name="star-outline" size={12} color={warningColor} />
+                      <Chip.Label>{t('card.featured')}</Chip.Label>
+                    </Chip>
+                  ) : null}
+                  {isClosed ? (
+                    <Chip size="sm" variant="secondary" color="danger">
+                      <Chip.Label>{t('detail.closedBadge')}</Chip.Label>
+                    </Chip>
+                  ) : null}
                 </View>
-              ) : null}
+                <Text className="text-2xl font-bold leading-8" style={{ color: theme.text }}>
+                  {job.title}
+                </Text>
+              </View>
             </View>
-          </View>
-        </View>
 
-        {/* Meta card */}
-        <View className="bg-surface rounded-2xl p-4 gap-2.5 border border-border/50 mb-5">
-          {/* Type chip */}
-          <MetaRow
-            icon="briefcase-outline"
-            text={t(`filters.type.${job.type}`)}
-            tint={typeColor[job.type]}
-            theme={theme}
-          />
+            <Surface variant="secondary" className="flex-row items-center gap-3 rounded-panel-inner p-3">
+              <Avatar uri={displayAvatar} name={displayName} size={40} />
+              <View className="min-w-0 flex-1">
+                <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>
+                  {t('detail.postedBy')}
+                </Text>
+                <Text className="text-base font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+                  {displayName}
+                </Text>
+              </View>
+            </Surface>
 
-          {/* Commitment */}
-          <MetaRow
-            icon="repeat-outline"
-            text={t(`filters.commitment.${job.commitment}`)}
-            theme={theme}
-          />
+            <View className="flex-row flex-wrap gap-2">
+              {matchPct !== null ? (
+                <Chip size="sm" variant="secondary">
+                  <Ionicons name="sparkles-outline" size={12} color={matchColor} />
+                  <Chip.Label>{t('detail.matchPercentage', { percentage: matchPct })}</Chip.Label>
+                </Chip>
+              ) : null}
+              <Chip size="sm" variant="secondary">
+                <Ionicons name="people-outline" size={12} color={theme.textSecondary} />
+                <Chip.Label>{t('card.applications', { count: job.applications_count })}</Chip.Label>
+              </Chip>
+              <Chip size="sm" variant="secondary">
+                <Ionicons name="eye-outline" size={12} color={theme.textSecondary} />
+                <Chip.Label>{t('detail.views', { count: job.views_count })}</Chip.Label>
+              </Chip>
+            </View>
+          </HeroCard.Body>
+        </HeroCard>
 
-          {/* Location */}
-          {job.is_remote ? (
-            <MetaRow icon="wifi-outline" text={t('card.remote')} theme={theme} tint={primary} />
-          ) : job.location ? (
-            <MetaRow icon="location-outline" text={job.location} theme={theme} />
-          ) : null}
-
-          {/* Salary */}
-          {salaryLabel ? (
-            <MetaRow icon="cash-outline" text={salaryLabel} theme={theme} tint={theme.success} />
-          ) : job.time_credits !== null ? (
-            <MetaRow
-              icon="time-outline"
-              text={t('detail.timeCredits', '{{count}} time credits', { count: job.time_credits })}
-              theme={theme}
-              tint={theme.warning}
-            />
-          ) : null}
-
-          {/* Deadline */}
-          {deadlineLabel ? (
-            <MetaRow
-              icon="calendar-outline"
-              text={deadlineLabel}
-              theme={theme}
-              tint={deadlineDaysLeft !== null && deadlineDaysLeft < 7 ? theme.error : undefined}
-            />
-          ) : null}
-
-          {/* Applications count */}
-          <MetaRow
-            icon="people-outline"
-            text={t('card.applications', { count: job.applications_count })}
-            theme={theme}
-          />
-        </View>
-
-        {/* Skills */}
-        {(job.skills_required ?? []).length > 0 ? (
-          <View className="mb-5">
-            <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
-              {t('detail.skills')}
+        <HeroCard className="mb-4 rounded-panel p-0">
+          <HeroCard.Body className="gap-3 p-4">
+            <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>
+              {t('detail.keyDetails')}
             </Text>
+            <MetaRow icon="briefcase-outline" text={t(`filters.type.${job.type}`)} tint={typeColor[job.type]} theme={theme} />
+            <MetaRow icon="repeat-outline" text={t(`filters.commitment.${job.commitment}`)} theme={theme} />
+            {job.is_remote ? (
+              <MetaRow icon="wifi-outline" text={t('card.remote')} theme={theme} tint={primary} />
+            ) : job.location ? (
+              <MetaRow icon="location-outline" text={job.location} theme={theme} />
+            ) : null}
+            {compensationLabel ? (
+              <MetaRow
+                icon={salaryLabel ? 'cash-outline' : 'time-outline'}
+                text={compensationLabel}
+                theme={theme}
+                tint={salaryLabel ? successColor : warningColor}
+              />
+            ) : null}
+            {deadlineLabel ? (
+              <MetaRow
+                icon="calendar-outline"
+                text={deadlineLabel}
+                theme={theme}
+                tint={deadlineDaysLeft !== null && deadlineDaysLeft < 7 ? theme.error : undefined}
+              />
+            ) : null}
+            {job.category ? (
+              <MetaRow icon="folder-open-outline" text={job.category} theme={theme} />
+            ) : null}
+          </HeroCard.Body>
+        </HeroCard>
+
+        {(job.skills_required ?? []).length > 0 ? (
+          <DetailSection title={t('detail.skills')} theme={theme}>
             <View className="flex-row flex-wrap gap-2">
               {(job.skills_required ?? []).map((skill) => (
-                <View
-                  key={skill}
-                  className="rounded-lg px-2.5 py-1 border border-border bg-surface"
-                >
-                  <Text className="text-xs text-foreground">{skill}</Text>
-                </View>
+                <Chip key={skill} size="sm" variant="secondary">
+                  <Chip.Label>{skill}</Chip.Label>
+                </Chip>
               ))}
             </View>
-          </View>
+          </DetailSection>
         ) : null}
 
-        {/* Description */}
         {job.description ? (
-          <View className="mb-5">
-            <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
-              {t('detail.description')}
+          <DetailSection title={t('detail.description')} theme={theme}>
+            <Text className="text-sm leading-6" style={{ color: theme.text }}>
+              {job.description}
             </Text>
-            <Text className="text-sm text-foreground">{job.description}</Text>
-          </View>
+          </DetailSection>
         ) : null}
-
-        {/* Footer action buttons */}
-        <View className="flex-row gap-3 mt-2">
-          <Pressable
-            className="flex-1 flex-row items-center justify-center gap-2 rounded-xl py-3.5 border border-border"
-            onPress={() => void handleShare()}
-            accessibilityRole="button"
-            accessibilityLabel={t('detail.share', 'Share')}
-          >
-            <Ionicons name="share-outline" size={18} color={theme.textSecondary} />
-          </Pressable>
-          <Pressable
-            className="flex-1 flex-row items-center justify-center gap-2 rounded-xl py-3.5 border"
-            style={{ borderColor: primary }}
-            onPress={() => void handleToggleSave()}
-            disabled={saveLoading}
-            accessibilityRole="button"
-            accessibilityLabel={isSaved ? t('detail.saved') : t('detail.save')}
-          >
-            <Ionicons
-              name={isSaved ? 'bookmark' : 'bookmark-outline'}
-              size={18}
-              color={primary}
-            />
-            <Text style={{ color: primary }} className="text-sm font-semibold">
-              {isSaved ? t('detail.saved') : t('detail.save')}
-            </Text>
-          </Pressable>
-
-          <Pressable
-            className="flex-[2] flex-row items-center justify-center gap-2 rounded-xl py-3.5"
-            style={{ backgroundColor: hasApplied || isClosed ? theme.textMuted : primary }}
-            onPress={() => {
-              if (!hasApplied && !isClosed) setApplyModalVisible(true);
-            }}
-            disabled={hasApplied || isClosed}
-            accessibilityRole="button"
-            accessibilityLabel={hasApplied ? t('detail.applied') : t('detail.apply')}
-          >
-            <Ionicons
-              name={hasApplied ? 'checkmark-circle' : 'send-outline'}
-              size={18}
-              color="#fff" // contrast on primary
-            />
-            <Text className="text-base font-bold text-white">
-              {hasApplied ? t('detail.applied') : t('detail.apply')}
-            </Text>
-          </Pressable>
-        </View>
       </ScrollView>
+
+      <Surface variant="default" className="absolute bottom-0 left-0 right-0 gap-3 border-t border-border px-4 pb-5 pt-3">
+        <View className="flex-row gap-2">
+          <HeroButton
+            className="flex-1"
+            variant="secondary"
+            accessibilityLabel={t('detail.share')}
+            onPress={() => void handleShare()}
+          >
+            <Ionicons name="share-outline" size={17} color={theme.textSecondary} />
+            <HeroButton.Label>{t('detail.share')}</HeroButton.Label>
+          </HeroButton>
+          <HeroButton
+            className="flex-1"
+            variant="secondary"
+            accessibilityLabel={isSaved ? t('detail.saved') : t('detail.save')}
+            isDisabled={saveLoading}
+            onPress={() => void handleToggleSave()}
+          >
+            <Ionicons name={isSaved ? 'bookmark' : 'bookmark-outline'} size={17} color={primary} />
+            <HeroButton.Label>{isSaved ? t('detail.saved') : t('detail.save')}</HeroButton.Label>
+          </HeroButton>
+        </View>
+        <HeroButton
+          variant="primary"
+          accessibilityLabel={hasApplied ? t('detail.applied') : t('detail.apply')}
+          isDisabled={hasApplied || isClosed}
+          onPress={() => {
+            if (!hasApplied && !isClosed) setApplyModalVisible(true);
+          }}
+          style={hasApplied || isClosed ? { backgroundColor: theme.textMuted } : { backgroundColor: primary }}
+        >
+          <Ionicons name={hasApplied ? 'checkmark-circle' : 'send-outline'} size={18} color="#fff" />
+          <HeroButton.Label>{hasApplied ? t('detail.applied') : t('detail.apply')}</HeroButton.Label>
+        </HeroButton>
+      </Surface>
 
       {/* Apply Modal */}
       <Modal
@@ -409,27 +417,28 @@ export default function JobDetailScreen() {
         >
           <SafeAreaView className="flex-1">
             <View className="flex-row items-center justify-between px-5 py-3 border-b border-border/50">
-              <Pressable onPress={handleCloseModal} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <HeroButton isIconOnly variant="secondary" onPress={handleCloseModal} accessibilityLabel={t('common:close')}>
                 <Ionicons name="close" size={24} color={theme.text} />
-              </Pressable>
+              </HeroButton>
               <Text className="text-base font-bold text-foreground flex-1 text-center mx-2">
                 {t('apply.title', { jobTitle: job.title })}
               </Text>
-              <View style={{ width: 24 }} />
+              <View style={{ width: 44 }} />
             </View>
 
             {applySuccess ? (
               <View className="flex-1 items-center justify-center p-10">
-                <Ionicons name="checkmark-circle" size={64} color={theme.success} />
+                <Ionicons name="checkmark-circle" size={64} color={successColor} />
                 <Text className="text-xl font-bold text-foreground mt-5">{t('apply.success')}</Text>
                 <Text className="text-sm text-muted-foreground text-center mt-2">{t('apply.successMessage')}</Text>
-                <Pressable
-                  className="flex-row items-center justify-center gap-2 rounded-xl py-3.5 mt-6 w-full"
+                <HeroButton
+                  className="mt-6 w-full"
+                  variant="primary"
                   style={{ backgroundColor: primary }}
                   onPress={handleCloseModal}
                 >
-                  <Text className="text-base font-bold text-white">{t('detail.goBack', 'Go Back')}</Text>
-                </Pressable>
+                  <HeroButton.Label>{t('detail.goBack')}</HeroButton.Label>
+                </HeroButton>
               </View>
             ) : (
               <ScrollView
@@ -438,14 +447,9 @@ export default function JobDetailScreen() {
               >
                 {/* Saved profile one-click apply */}
                 {savedProfile?.cover_text ? (
-                  <Pressable
+                  <HeroButton
+                    variant="secondary"
                     style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      gap: 8,
-                      paddingHorizontal: 12,
-                      paddingVertical: 8,
-                      borderRadius: 20,
                       backgroundColor: withAlpha(primary, 0.10),
                       alignSelf: 'flex-start',
                       marginBottom: 12,
@@ -453,10 +457,8 @@ export default function JobDetailScreen() {
                     onPress={() => setCoverMessage(savedProfile.cover_text ?? '')}
                   >
                     <Ionicons name="flash-outline" size={14} color={primary} />
-                    <Text style={{ fontSize: 13, fontWeight: '600', color: primary }}>
-                      {t('saved_profile.use', 'Use Saved Cover Letter')}
-                    </Text>
-                  </Pressable>
+                    <HeroButton.Label>{t('saved_profile.use')}</HeroButton.Label>
+                  </HeroButton>
                 ) : null}
 
                 <Text className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">
@@ -475,8 +477,9 @@ export default function JobDetailScreen() {
                   autoFocus
                 />
 
-                <Pressable
-                  className="flex-row items-center justify-center gap-2 rounded-xl py-3.5 mt-5"
+                <HeroButton
+                  className="mt-5"
+                  variant="primary"
                   style={{
                     backgroundColor:
                       coverMessage.trim().length === 0 || applyLoading
@@ -484,14 +487,14 @@ export default function JobDetailScreen() {
                         : primary,
                   }}
                   onPress={() => void handleSubmitApplication()}
-                  disabled={coverMessage.trim().length === 0 || applyLoading}
+                  isDisabled={coverMessage.trim().length === 0 || applyLoading}
                 >
                   {applyLoading ? (
                     <LoadingSpinner />
                   ) : (
-                    <Text className="text-base font-bold text-white">{t('apply.submit')}</Text>
+                    <HeroButton.Label>{t('apply.submit')}</HeroButton.Label>
                   )}
-                </Pressable>
+                </HeroButton>
               </ScrollView>
             )}
           </SafeAreaView>
@@ -522,5 +525,26 @@ function MetaRow({
       <Ionicons name={icon} size={16} color={tint ?? theme.textSecondary} />
       <Text style={{ color: tint ?? theme.text }} className="flex-1 text-sm">{text}</Text>
     </View>
+  );
+}
+
+function DetailSection({
+  title,
+  children,
+  theme,
+}: {
+  title: string;
+  children: React.ReactNode;
+  theme: ReturnType<typeof useTheme>;
+}) {
+  return (
+    <HeroCard className="mb-4 rounded-panel p-0">
+      <HeroCard.Body className="gap-3 p-4">
+        <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>
+          {title}
+        </Text>
+        {children}
+      </HeroCard.Body>
+    </HeroCard>
   );
 }

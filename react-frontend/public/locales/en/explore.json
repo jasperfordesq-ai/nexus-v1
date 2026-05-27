@@ -29,7 +29,8 @@
     "title": "Active Groups",
     "subtitle": "Connect with like-minded members",
     "members": "{{count}} members",
-    "view_group": "View Group"
+    "view_group": "View Group",
+    "view_group_named": "View group: {{name}}"
   },
   "top_contributors": {
     "title": "Top Contributors",
@@ -100,6 +101,7 @@
     "votes": "{{count}} votes",
     "options": "{{count}} options",
     "vote_now": "Vote Now",
+    "vote_now_for": "Vote now on: {{question}}",
     "closes": "Closes {{date}}"
   },
   "in_demand_skills": {

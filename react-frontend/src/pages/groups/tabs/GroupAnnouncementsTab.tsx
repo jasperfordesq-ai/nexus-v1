@@ -174,7 +174,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
               color="primary"
               className="w-full sm:w-auto"
               size="sm"
-              startContent={<Plus className="w-4 h-4" />}
+              startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
               onPress={onOpen}
             >
               {t('announcements.new')}
@@ -183,12 +183,12 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
         </div>
 
         {loading ? (
-          <div className="flex justify-center py-8">
+          <div className="flex justify-center py-8" role="status" aria-busy="true" aria-label={t('announcements.loading')}>
             <Spinner size="lg" />
           </div>
         ) : announcements.length === 0 ? (
           <EmptyState
-            icon={<Megaphone className="w-12 h-12" />}
+            icon={<Megaphone className="w-12 h-12" aria-hidden="true" />}
             title={t('announcements.no_announcements_title')}
             description={isAdmin ? t('announcements.no_announcements_admin_desc') : t('announcements.no_announcements_desc')}
           />
@@ -207,7 +207,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       {announcement.is_pinned && (
-                        <Pin className="w-3.5 h-3.5 text-accent flex-shrink-0" />
+                        <Pin className="w-3.5 h-3.5 text-accent flex-shrink-0" aria-hidden="true" />
                       )}
                       <h3 className="font-semibold text-theme-primary truncate">
                         {announcement.title}
@@ -236,14 +236,14 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
                       <DropdownMenu aria-label={t('announcements.dropdown_aria')}>
                         <DropdownItem
                           key="pin" id="pin"
-                          startContent={announcement.is_pinned ? <PinOff className="w-4 h-4" /> : <Pin className="w-4 h-4" />}
+                          startContent={announcement.is_pinned ? <PinOff className="w-4 h-4" aria-hidden="true" /> : <Pin className="w-4 h-4" aria-hidden="true" />}
                           onPress={() => handleTogglePin(announcement)}
                         >
                           {announcement.is_pinned ? t('announcements.unpin') : t('announcements.pin')}
                         </DropdownItem>
                         <DropdownItem
                           key="delete" id="delete"
-                          startContent={<Trash2 className="w-4 h-4" />}
+                          startContent={<Trash2 className="w-4 h-4" aria-hidden="true" />}
                           className="text-danger"
                           color="danger"
                           onPress={() => setDeleteTarget(announcement)}
@@ -274,7 +274,7 @@ export function GroupAnnouncementsTab({ groupId, isAdmin }: GroupAnnouncementsTa
           {(onModalClose) => (
             <>
               <ModalHeader className="text-theme-primary flex items-center gap-2">
-                <Megaphone className="w-5 h-5 text-accent" />
+                <Megaphone className="w-5 h-5 text-accent" aria-hidden="true" />
                 {t('announcements.new')}
               </ModalHeader>
               <ModalBody className="gap-4">

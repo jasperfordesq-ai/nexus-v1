@@ -21,7 +21,15 @@ export interface GamificationProfile {
   xp: number;
   level: number;
   next_level_xp: number;
+  level_progress?: {
+    current_xp?: number;
+    xp_for_current_level?: number;
+    xp_for_next_level?: number;
+    progress_percentage?: number;
+  };
   badges: Badge[];
+  badges_count?: number;
+  showcased_badges?: Badge[];
   rank: number | null;
   streak_days: number;
 }
@@ -43,6 +51,7 @@ export interface LeaderboardResponse {
   meta: {
     total: number;
     user_rank: number | null;
+    your_position?: number | null;
   };
 }
 
@@ -52,7 +61,10 @@ export interface LeaderboardResponse {
  * GET /api/v2/gamification/profile
  * Returns the current user's XP, level, rank, streak, and earned badges.
  */
-export function getGamificationProfile(): Promise<{ data: GamificationProfile }> {
+export function getGamificationProfile(userId?: number): Promise<{ data: GamificationProfile }> {
+  if (userId) {
+    return api.get<{ data: GamificationProfile }>(`${API_V2}/gamification/profile`, { user_id: String(userId) });
+  }
   return api.get<{ data: GamificationProfile }>(`${API_V2}/gamification/profile`);
 }
 
@@ -60,7 +72,10 @@ export function getGamificationProfile(): Promise<{ data: GamificationProfile }>
  * GET /api/v2/gamification/badges
  * Returns all badges (earned and locked) for the current user.
  */
-export function getBadges(): Promise<{ data: Badge[] }> {
+export function getBadges(userId?: number): Promise<{ data: Badge[] }> {
+  if (userId) {
+    return api.get<{ data: Badge[] }>(`${API_V2}/gamification/badges`, { user_id: String(userId) });
+  }
   return api.get<{ data: Badge[] }>(`${API_V2}/gamification/badges`);
 }
 
@@ -73,5 +88,6 @@ export function getBadges(): Promise<{ data: Badge[] }> {
 export function getLeaderboard(
   period: 'weekly' | 'monthly' | 'all_time' = 'monthly',
 ): Promise<LeaderboardResponse> {
-  return api.get<LeaderboardResponse>(`${API_V2}/gamification/leaderboard`, { period });
+  const apiPeriod = period === 'weekly' ? 'week' : period === 'monthly' ? 'month' : 'all';
+  return api.get<LeaderboardResponse>(`${API_V2}/gamification/leaderboard`, { period: apiPeriod });
 }

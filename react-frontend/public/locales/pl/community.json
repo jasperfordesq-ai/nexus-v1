@@ -218,7 +218,8 @@
     "cover_message_placeholder": "Powiedz organizacji, dlaczego chcesz zostać wolontariuszem...",
     "cancel": "Anulować",
     "submit_application": "Prześlij wniosek",
-    "job_openings": "Oferty pracy"
+    "job_openings": "Oferty pracy",
+    "rating_sr": "{{n}} out of 5 stars"
   },
   "emergency_alerts": {
     "heading": "Alerty awaryjne",

@@ -634,7 +634,8 @@
     "load_more": "Load More",
     "aria_select_all": "Select all visible pending applications",
     "aria_select_application": "Select application from {{name}}",
-    "aria_search_volunteers": "Search volunteers by name"
+    "aria_search_volunteers": "Search volunteers by name",
+    "filter_label": "Filter applications"
   },
   "org_wallet_balance": "Wallet balance:",
   "auto_pay_on": "Auto-pay ON",

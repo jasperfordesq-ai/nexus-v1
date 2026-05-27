@@ -9,21 +9,29 @@ import { render, fireEvent } from '@testing-library/react-native';
 // --- Mocks ---
 
 jest.mock('expo-router', () => ({
-  useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn() }),
-  router: { push: jest.fn(), replace: jest.fn(), back: jest.fn() },
+  useRouter: () => ({ push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) }),
+  router: { push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
   useLocalSearchParams: () => ({}),
-  useNavigation: () => ({ setOptions: jest.fn() }),
 }));
 
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, opts?: Record<string, unknown>) => {
       const map: Record<string, string> = {
+        'common:back': 'Back',
         'title': 'Skills & Endorsements',
+        'heroEyebrow': 'Trust network',
+        'subtitle': 'Show the skills you can offer.',
         'mySkills': 'My Skills',
+        'skillsIntro': 'Keep your profile skills current.',
+        'endorsementsIntro': 'Endorsements from other members.',
+        'skillsCount': opts ? `${String(opts.count ?? 0)} skills` : '0 skills',
+        'endorsementsCount': opts ? `${String(opts.count ?? 0)} endorsements` : '0 endorsements',
         'endorsements': 'Endorsements',
         'noSkills': 'No skills added yet.',
+        'noSkillsHint': 'Add skills you can share.',
         'noEndorsements': 'No endorsements yet.',
+        'noEndorsementsHint': 'When members endorse your skills, they will appear here.',
         'addSkill': 'Add Skill',
         'removeSkill': 'Remove',
         'skillPlaceholder': 'Enter skill name…',
@@ -31,6 +39,8 @@ jest.mock('react-i18next', () => ({
         'removeSkillConfirm': 'Remove this skill?',
         'endorsedBy': opts ? `Endorsed by ${String(opts.count ?? 0)}` : 'Endorsed by 0',
         'common:cancel': 'Cancel',
+        'skillRemoved': 'Skill removed.',
+        'removeSkillError': 'Could not remove skill.',
       };
       return map[key] ?? key;
     },

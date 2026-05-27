@@ -147,7 +147,8 @@
     "collection_description": "Beschrijving (optioneel)",
     "cancel": "Annuleren",
     "save": "Opslaan",
-    "create": "Aanmaken"
+    "create": "Aanmaken",
+    "loading": "Loading bookmarks..."
   },
   "verified": "Geverifieerd",
   "hover_card": {

@@ -20,6 +20,11 @@ jest.mock('react-i18next', () => ({
     t: (key: string) => {
       const map: Record<string, string> = {
         'title': 'Settings',
+        'account': 'Account',
+        'accountHint': 'Account settings.',
+        'notifications': 'Notifications',
+        'editProfile': 'Edit profile',
+        'editProfileHint': 'Edit profile details.',
         'pushNotifications': 'Push Notifications',
         'emailNotifications': 'Email Notifications',
         'push.messages': 'Messages',
@@ -34,6 +39,9 @@ jest.mock('react-i18next', () => ({
         'license': 'License',
         'security': 'Security',
         'changePassword': 'Change Password',
+        'changePasswordHint': 'Change password.',
+        'identity.page_title': 'Verify Identity',
+        'identity.hint': 'Verify identity.',
         'saveError': 'Failed to save.',
         'common:errors.generic': 'Error',
       };
@@ -135,9 +143,10 @@ describe('SettingsScreen', () => {
   });
 
   it('renders the Security section with Change Password button', () => {
-    const { getByText } = render(<SettingsScreen />);
-    expect(getByText('Security')).toBeTruthy();
+    const { getAllByText, getByText } = render(<SettingsScreen />);
+    expect(getAllByText('Account').length).toBeGreaterThan(0);
     expect(getByText('Change Password')).toBeTruthy();
+    expect(getByText('Verify Identity')).toBeTruthy();
   });
 
   it('navigates to change-password when Change Password is pressed', () => {
@@ -145,5 +154,12 @@ describe('SettingsScreen', () => {
     const { getByText } = render(<SettingsScreen />);
     fireEvent.press(getByText('Change Password'));
     expect(router.push).toHaveBeenCalledWith('/(modals)/change-password');
+  });
+
+  it('navigates to verify identity when Verify Identity is pressed', () => {
+    const { router } = require('expo-router');
+    const { getByText } = render(<SettingsScreen />);
+    fireEvent.press(getByText('Verify Identity'));
+    expect(router.push).toHaveBeenCalledWith('/(modals)/verify-identity');
   });
 });

@@ -182,6 +182,7 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
     return (
       <div
         className="flex justify-center py-12"
+        role="status"
         aria-label={t('analytics.loading')}
         aria-busy="true"
       >

@@ -126,7 +126,8 @@
     "delete_collection_title": "コレクションを削除",
     "delete_collection_body": "「{{name}}」を削除しますか？このコレクション内のブックマークは残ります。",
     "delete_collection_action": "コレクションを削除",
-    "collection_actions_named": "{{name}} コレクションの操作"
+    "collection_actions_named": "{{name}} コレクションの操作",
+    "loading": "Loading bookmarks..."
   },
   "verified": "認証済み",
   "hover_card": {

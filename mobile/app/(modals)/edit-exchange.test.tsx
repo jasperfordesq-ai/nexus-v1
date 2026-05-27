@@ -1,0 +1,201 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import React from 'react';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import { Alert } from 'react-native';
+
+const mockUseApi = jest.fn();
+const mockBack = jest.fn();
+const mockReplace = jest.fn();
+const mockUpdateExchange = jest.fn();
+const mockSetExchangeTags = jest.fn();
+const mockUploadExchangeImage = jest.fn();
+const mockDeleteExchangeImage = jest.fn();
+const mockGenerateExchangeDescription = jest.fn();
+let mockListingCategoryId: number | null = 2;
+
+jest.mock('expo-router', () => ({
+  router: { back: (...args: unknown[]) => mockBack(...args), replace: (...args: unknown[]) => mockReplace(...args), canGoBack: jest.fn(() => false) },
+  useLocalSearchParams: () => ({ id: '5' }),
+}));
+
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => ({
+      editTitle: 'Edit Listing',
+      'detail.goBack': 'Go Back',
+      titleLabel: 'Title',
+      description: 'Description',
+      'form.serviceType': 'Service format',
+      'form.location': 'Location',
+      'form.locationFromProfile': 'From your profile',
+      'form.skills': 'Skills',
+      'form.serviceDetailsToggle': 'Optional service details',
+      'form.aiHelpWrite': 'Help write description',
+      'form.aiGenerating': 'Writing...',
+      'form.aiEnterTitleFirst': 'Enter a title first',
+      'validation.categoryRequired': 'Please choose a category.',
+      category: 'Category',
+      timeCredits: 'Time Credits',
+      offer: 'Offer',
+      request: 'Request',
+      'detail.cancel': 'Cancel',
+      'detail.saveChanges': 'Save changes',
+    }[key] ?? key),
+  }),
+}));
+
+jest.mock('@/lib/hooks/useApi', () => ({
+  useApi: (...args: unknown[]) => mockUseApi(...args),
+}));
+
+jest.mock('@/lib/hooks/useTenant', () => ({
+  usePrimaryColor: () => '#6366f1',
+}));
+
+jest.mock('@/lib/hooks/useAuth', () => ({
+  useAuth: () => ({ user: { id: 1, location: 'Dublin' } }),
+}));
+
+jest.mock('@/lib/hooks/useTheme', () => ({
+  useTheme: () => ({
+    text: '#000',
+    textMuted: '#777',
+    error: '#dc2626',
+    warning: '#f59e0b',
+    background: '#f8fafc',
+    surface: '#fff',
+    border: '#ddd',
+  }),
+}));
+
+jest.mock('@/lib/api/exchanges', () => ({
+  getExchange: jest.fn(),
+  getExchangeCategories: jest.fn(),
+  setExchangeTags: (...args: unknown[]) => mockSetExchangeTags(...args),
+  updateExchange: (...args: unknown[]) => mockUpdateExchange(...args),
+  uploadExchangeImage: (...args: unknown[]) => mockUploadExchangeImage(...args),
+  deleteExchangeImage: (...args: unknown[]) => mockDeleteExchangeImage(...args),
+  generateExchangeDescription: (...args: unknown[]) => mockGenerateExchangeDescription(...args),
+}));
+
+jest.mock('@/lib/haptics', () => ({
+  notificationAsync: jest.fn(),
+  NotificationFeedbackType: { Success: 'success', Error: 'error' },
+}));
+
+jest.spyOn(Alert, 'alert').mockImplementation((_title, _message, buttons?: Array<{ onPress?: () => void }>) => {
+  buttons?.[0]?.onPress?.();
+});
+
+jest.mock('@expo/vector-icons', () => ({ Ionicons: 'View' }));
+jest.mock('expo-image', () => ({ Image: 'View' }));
+jest.mock('expo-image-picker', () => ({
+  MediaTypeOptions: { Images: 'Images' },
+  launchImageLibraryAsync: jest.fn(),
+}));
+jest.mock('@/components/ui/LoadingSpinner', () => () => null);
+
+import EditExchangeModal from './edit-exchange';
+
+beforeEach(() => {
+  mockUseApi.mockReset();
+  mockBack.mockReset();
+  mockReplace.mockReset();
+  mockUpdateExchange.mockReset().mockResolvedValue({ data: { id: 5 } });
+  mockSetExchangeTags.mockReset().mockResolvedValue({ data: {} });
+  mockUploadExchangeImage.mockReset().mockResolvedValue({ data: { image_url: '/uploads/listing.jpg' } });
+  mockDeleteExchangeImage.mockReset().mockResolvedValue(undefined);
+  mockGenerateExchangeDescription.mockReset().mockResolvedValue({ data: { description: 'Generated listing body' } });
+  mockListingCategoryId = 2;
+  const listingData = {
+    id: 5,
+    title: 'Edit me',
+    description: 'Listing body',
+    type: 'offer',
+    hours_estimate: 2,
+    get category_id() { return mockListingCategoryId; },
+    location: 'Skibbereen',
+    service_type: 'hybrid',
+    skill_tags: ['gardening'],
+    status: 'active',
+  };
+  const listingState = {
+      data: {
+        data: listingData,
+      },
+      isLoading: false,
+      error: null,
+    };
+  const categoriesState = {
+    data: { data: [{ id: 1, name: 'Gardening' }, { id: 2, name: 'Teaching' }] },
+    isLoading: false,
+    error: null,
+  };
+
+  mockUseApi.mockImplementation((...args: unknown[]) => (
+    args.length > 1 ? listingState : categoriesState
+  ));
+});
+
+describe('EditExchangeModal', () => {
+  it('renders the editable listing fields', () => {
+    const { getAllByText, getByDisplayValue, getByText } = render(<EditExchangeModal />);
+    expect(getAllByText('Edit Listing').length).toBeGreaterThan(0);
+    expect(getByDisplayValue('Edit me')).toBeTruthy();
+    expect(getByDisplayValue('Listing body')).toBeTruthy();
+    expect(getByDisplayValue('Dublin')).toBeTruthy();
+    expect(getByDisplayValue('gardening')).toBeTruthy();
+    expect(getAllByText('Teaching').length).toBeGreaterThan(0);
+    expect(getAllByText('Optional service details').length).toBeGreaterThan(0);
+  });
+
+  it('saves listing changes and tags', async () => {
+    const { getByDisplayValue, getByText } = render(<EditExchangeModal />);
+    fireEvent.changeText(getByDisplayValue('Edit me'), 'Updated title');
+    fireEvent.changeText(getByDisplayValue('gardening'), 'gardening, mentoring');
+    fireEvent.press(getByText('Save changes'));
+
+    await waitFor(() => expect(mockUpdateExchange).toHaveBeenCalledWith(5, expect.objectContaining({
+      title: 'Updated title',
+      description: 'Listing body',
+      type: 'offer',
+      hours_estimate: 2,
+      category_id: 2,
+      location: 'Dublin',
+      service_type: 'hybrid',
+    })));
+    expect(mockSetExchangeTags).toHaveBeenCalledWith(5, ['gardening', 'mentoring']);
+  });
+
+  it('generates a replacement description from the listing context', async () => {
+    const { getByDisplayValue, getByText } = render(<EditExchangeModal />);
+    fireEvent.press(getByText('Help write description'));
+
+    await waitFor(() => expect(mockGenerateExchangeDescription).toHaveBeenCalledWith({
+      title: 'Edit me',
+      category: 'Teaching',
+      type: 'offer',
+      notes: 'Listing body',
+    }));
+    expect(getByDisplayValue('Generated listing body')).toBeTruthy();
+  });
+
+  it('goes back when cancel is pressed', () => {
+    const { getByText } = render(<EditExchangeModal />);
+    fireEvent.press(getByText('Cancel'));
+    expect(mockBack).toHaveBeenCalled();
+  });
+
+  it('requires an explicit category when the listing has none', async () => {
+    mockListingCategoryId = null;
+    const { getByText } = render(<EditExchangeModal />);
+    fireEvent.press(getByText('Save changes'));
+
+    await waitFor(() => expect(getByText('Please choose a category.')).toBeTruthy());
+    expect(mockUpdateExchange).not.toHaveBeenCalled();
+  });
+});

@@ -197,7 +197,8 @@
     "feed_load_more": "Załaduj więcej",
     "member_actions_aria": "Akcje członków",
     "feed_loading": "Loading group feed...",
-    "events_loading": "Loading group events..."
+    "events_loading": "Loading group events...",
+    "loading_replies": "Loading replies..."
   },
   "form": {
     "create_title": "Utwórz nową grupę",
@@ -284,7 +285,8 @@
     "pinned_success": "Przypięto",
     "update_failed": "Nie udało się zaktualizować ogłoszenia",
     "deleted": "Ogłoszenie usunięte",
-    "delete_failed": "Nie udało się usunąć ogłoszenia"
+    "delete_failed": "Nie udało się usunąć ogłoszenia",
+    "loading": "Loading announcements..."
   },
   "challenges": {
     "heading": "Wyzwania",
@@ -549,7 +551,8 @@
     "answer_posted_success": "Odpowiedź opublikowana!",
     "answer_posted_error": "Nie udało się opublikować odpowiedzi",
     "vote_error": "Nie udało się zagłosować",
-    "accept_error": "Nie udało się zaakceptować odpowiedzi"
+    "accept_error": "Nie udało się zaakceptować odpowiedzi",
+    "loading_detail": "Loading question details..."
   },
   "wiki": {
     "load_failed": "Nie udało się załadować stron wiki",
@@ -597,7 +600,8 @@
     "content_label": "Treść",
     "create": "Utwórz stronę",
     "delete_title": "Usuń stronę wiki",
-    "delete_confirm": "Czy na pewno chcesz usunąć \"{{name}}\"? Tej akcji nie można cofnąć."
+    "delete_confirm": "Czy na pewno chcesz usunąć \"{{name}}\"? Tej akcji nie można cofnąć.",
+    "loading_page": "Loading wiki page..."
   },
   "page_meta": {
     "create": {

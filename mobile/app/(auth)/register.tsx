@@ -3,25 +3,26 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useMemo } from 'react';
-import { useForm, Controller, type Resolver } from 'react-hook-form';
+import { useMemo, useState } from 'react';
+import { Controller, useForm, type Resolver } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import {
-  View,
-  Text,
-  Pressable,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   ScrollView,
+  Text,
+  View,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
-import { Link, router } from 'expo-router';
+import { router, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Card as HeroCard } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 
-import { register as apiRegister, extractToken } from '@/lib/api/auth';
+import { extractToken, register as apiRegister } from '@/lib/api/auth';
 import { ApiResponseError } from '@/lib/api/client';
 import { STORAGE_KEYS } from '@/lib/constants';
 import { storage } from '@/lib/storage';
@@ -61,6 +62,7 @@ type RegisterFormValues = {
 export default function RegisterScreen() {
   const { t } = useTranslation('auth');
   const { setSession } = useAuth();
+  const authRouter = useRouter();
   const primary = usePrimaryColor();
   const insets = useSafeAreaInsets();
 
@@ -118,7 +120,7 @@ export default function RegisterScreen() {
   const EyeToggle = ({ show, onToggle }: { show: boolean; onToggle: () => void }) => (
     <Pressable
       onPress={onToggle}
-      accessibilityLabel={t('login.togglePassword')}
+      accessibilityLabel={t('register.togglePassword')}
       accessibilityRole="button"
       hitSlop={8}
     >
@@ -141,139 +143,164 @@ export default function RegisterScreen() {
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="on-drag"
       >
-        <View className="px-6 py-12">
-          <View className="mb-8">
-            <Text className="text-2xl font-bold text-foreground mb-1">{t('register.title')}</Text>
-            <Text className="text-sm text-muted-foreground">{t('register.subtitle')}</Text>
-          </View>
+        <View className="px-5 py-10">
+          <HeroCard className="overflow-hidden">
+            <HeroCard.Header className="items-center px-6 pt-8 pb-4">
+              <View
+                className="w-[72px] h-[72px] rounded-2xl items-center justify-center mb-4"
+                style={{ backgroundColor: primary }}
+                accessibilityRole="image"
+                accessibilityLabel={t('common:appName')}
+              >
+                <Ionicons name="person-add-outline" size={30} color="#fff" />
+              </View>
+              <HeroCard.Title className="text-2xl font-bold text-center">
+                {t('register.title')}
+              </HeroCard.Title>
+              <HeroCard.Description className="text-center mt-1">
+                {t('register.subtitle')}
+              </HeroCard.Description>
+            </HeroCard.Header>
 
-          {globalError ? (
-            <View
-              className="bg-danger/10 rounded-lg p-3 mb-4"
-              accessibilityRole="alert"
-              accessibilityLiveRegion="polite"
-            >
-              <Text className="text-danger text-sm">{globalError}</Text>
-            </View>
-          ) : null}
+            <HeroCard.Body className="px-6 pb-6">
+              {globalError ? (
+                <View
+                  className="bg-danger/10 rounded-lg p-3 mb-4"
+                  accessibilityRole="alert"
+                  accessibilityLiveRegion="polite"
+                >
+                  <Text className="text-danger text-sm">{globalError}</Text>
+                </View>
+              ) : null}
 
-          <View className="gap-1">
-            <Controller
-              control={control}
-              name="firstName"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  label={t('register.firstName')}
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  error={errors.firstName?.message}
-                  placeholder={t('register.firstNamePlaceholder')}
-                  autoCapitalize="words"
-                  returnKeyType="next"
-                />
-              )}
-            />
-
-            <Controller
-              control={control}
-              name="lastName"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  label={t('register.lastName')}
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  placeholder={t('register.lastNamePlaceholder')}
-                  autoCapitalize="words"
-                  returnKeyType="next"
-                />
-              )}
-            />
-
-            <Controller
-              control={control}
-              name="email"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  label={t('register.email')}
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  error={errors.email?.message}
-                  placeholder={t('register.emailPlaceholder')}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoComplete="email"
-                  returnKeyType="next"
-                />
-              )}
-            />
-
-            <Controller
-              control={control}
-              name="password"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  label={t('register.password')}
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  error={errors.password?.message}
-                  placeholder={t('register.passwordPlaceholder')}
-                  secureTextEntry={!showPassword}
-                  autoComplete="new-password"
-                  textContentType="newPassword"
-                  returnKeyType="next"
-                  rightIcon={
-                    <EyeToggle
-                      show={showPassword}
-                      onToggle={() => setShowPassword((p) => !p)}
+              <View className="gap-1">
+                <Controller
+                  control={control}
+                  name="firstName"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <Input
+                      label={t('register.firstName')}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      error={errors.firstName?.message}
+                      placeholder={t('register.firstNamePlaceholder')}
+                      autoCapitalize="words"
+                      returnKeyType="next"
                     />
-                  }
+                  )}
                 />
-              )}
-            />
 
-            <Controller
-              control={control}
-              name="passwordConfirm"
-              render={({ field: { onChange, onBlur, value } }) => (
-                <Input
-                  label={t('register.confirmPassword')}
-                  value={value}
-                  onChangeText={onChange}
-                  onBlur={onBlur}
-                  error={errors.passwordConfirm?.message}
-                  placeholder={t('register.confirmPasswordPlaceholder')}
-                  secureTextEntry={!showConfirmPassword}
-                  autoComplete="new-password"
-                  textContentType="newPassword"
-                  returnKeyType="done"
-                  onSubmitEditing={handleSubmit(onSubmit)}
-                  rightIcon={
-                    <EyeToggle
-                      show={showConfirmPassword}
-                      onToggle={() => setShowConfirmPassword((p) => !p)}
+                <Controller
+                  control={control}
+                  name="lastName"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <Input
+                      label={t('register.lastName')}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      placeholder={t('register.lastNamePlaceholder')}
+                      autoCapitalize="words"
+                      returnKeyType="next"
                     />
-                  }
+                  )}
                 />
-              )}
-            />
 
-            <View className="mt-6">
-              <Button onPress={handleSubmit(onSubmit)} isLoading={isLoading} fullWidth>
-                {t('register.submit')}
-              </Button>
-            </View>
-          </View>
+                <Controller
+                  control={control}
+                  name="email"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <Input
+                      label={t('register.email')}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      error={errors.email?.message}
+                      placeholder={t('register.emailPlaceholder')}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      autoComplete="email"
+                      returnKeyType="next"
+                    />
+                  )}
+                />
 
-          <View className="flex-row justify-center mt-8">
-            <Text className="text-muted-foreground text-sm">{t('register.hasAccount')} </Text>
-            <Link href="/(auth)/login" style={{ color: primary }}>
-              <Text className="text-sm font-semibold">{t('register.signIn')}</Text>
-            </Link>
-          </View>
+                <Controller
+                  control={control}
+                  name="password"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <Input
+                      label={t('register.password')}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      error={errors.password?.message}
+                      placeholder={t('register.passwordPlaceholder')}
+                      secureTextEntry={!showPassword}
+                      autoComplete="new-password"
+                      textContentType="newPassword"
+                      returnKeyType="next"
+                      rightIcon={
+                        <EyeToggle
+                          show={showPassword}
+                          onToggle={() => setShowPassword((p) => !p)}
+                        />
+                      }
+                    />
+                  )}
+                />
+
+                <Controller
+                  control={control}
+                  name="passwordConfirm"
+                  render={({ field: { onChange, onBlur, value } }) => (
+                    <Input
+                      label={t('register.confirmPassword')}
+                      value={value}
+                      onChangeText={onChange}
+                      onBlur={onBlur}
+                      error={errors.passwordConfirm?.message}
+                      placeholder={t('register.confirmPasswordPlaceholder')}
+                      secureTextEntry={!showConfirmPassword}
+                      autoComplete="new-password"
+                      textContentType="newPassword"
+                      returnKeyType="done"
+                      onSubmitEditing={handleSubmit(onSubmit)}
+                      rightIcon={
+                        <EyeToggle
+                          show={showConfirmPassword}
+                          onToggle={() => setShowConfirmPassword((p) => !p)}
+                        />
+                      }
+                    />
+                  )}
+                />
+
+                <View className="mt-6">
+                  <Button onPress={handleSubmit(onSubmit)} isLoading={isLoading} fullWidth>
+                    {t('register.submit')}
+                  </Button>
+                </View>
+              </View>
+            </HeroCard.Body>
+
+            <HeroCard.Footer className="px-6 pb-6 pt-0">
+              <View className="w-full items-center gap-2">
+                <Text className="text-muted-foreground text-sm text-center">
+                  {t('register.hasAccount')}
+                </Text>
+                <Button
+                  variant="outline"
+                  fullWidth
+                  onPress={() => authRouter.push('/login')}
+                  accessibilityLabel={t('register.signIn')}
+                >
+                  {t('register.signIn')}
+                </Button>
+              </View>
+            </HeroCard.Footer>
+          </HeroCard>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
