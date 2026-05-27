@@ -114,7 +114,7 @@ interface StatusConfig {
 }
 
 const STATUS_CONFIGS: Record<GroupExchangeStatus, StatusConfig> = {
-  draft: { color: 'default', bgClass: 'bg-gray-500/20 text-gray-400' },
+  draft: { color: 'default', bgClass: 'bg-gray-500/20 text-gray-600 dark:text-gray-400' },
   pending_participants: { color: 'warning', bgClass: 'bg-amber-500/20 text-amber-400' },
   pending_broker: { color: 'secondary', bgClass: 'bg-purple-500/20 text-purple-400' },
   active: { color: 'primary', bgClass: 'bg-indigo-500/20 text-indigo-400' },

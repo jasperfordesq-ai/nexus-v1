@@ -182,7 +182,7 @@ const PollCard = memo(function PollCard({ poll, currentUserId, onVote, onDelete,
                   <Chip
                     size="sm"
                     variant="soft"
-                    className="text-[10px] h-5 bg-gray-500/10 text-gray-400"
+                    className="text-[10px] h-5 bg-gray-500/10 text-gray-600 dark:text-gray-400"
                     startContent={<EyeOff className="w-3 h-3" aria-hidden="true" />}
                   >
                     {t('badges.anonymous')}

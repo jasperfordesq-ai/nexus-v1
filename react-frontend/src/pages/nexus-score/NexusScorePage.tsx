@@ -67,15 +67,16 @@ interface NexusScoreData {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const TIERS = [
-  { name: 'Novice',        key: 'novice',       min: 0,   color: 'text-slate-400',   bar: 'bg-slate-400'   },
-  { name: 'Beginner',      key: 'beginner',     min: 200, color: 'text-amber-400',   bar: 'bg-amber-400'   },
-  { name: 'Developing',    key: 'developing',   min: 300, color: 'text-emerald-400', bar: 'bg-emerald-400' },
-  { name: 'Intermediate',  key: 'intermediate', min: 400, color: 'text-cyan-400',    bar: 'bg-cyan-400'    },
-  { name: 'Proficient',    key: 'proficient',   min: 500, color: 'text-violet-400',  bar: 'bg-violet-400'  },
-  { name: 'Advanced',      key: 'advanced',     min: 600, color: 'text-indigo-400',  bar: 'bg-indigo-400'  },
-  { name: 'Expert',        key: 'expert',       min: 700, color: 'text-orange-400',  bar: 'bg-orange-400'  },
-  { name: 'Elite',         key: 'elite',        min: 800, color: 'text-pink-400',    bar: 'bg-pink-400'    },
-  { name: 'Legendary',     key: 'legendary',    min: 900, color: 'text-yellow-400',  bar: 'bg-yellow-400'  },
+  // color: light-mode uses -600 (≥4.5:1 on white), dark-mode uses -400 (≥4.5:1 on dark bg)
+  { name: 'Novice',        key: 'novice',       min: 0,   color: 'text-slate-600   dark:text-slate-400',   bar: 'bg-slate-400'   },
+  { name: 'Beginner',      key: 'beginner',     min: 200, color: 'text-amber-600   dark:text-amber-400',   bar: 'bg-amber-400'   },
+  { name: 'Developing',    key: 'developing',   min: 300, color: 'text-emerald-600 dark:text-emerald-400', bar: 'bg-emerald-400' },
+  { name: 'Intermediate',  key: 'intermediate', min: 400, color: 'text-cyan-600    dark:text-cyan-400',    bar: 'bg-cyan-400'    },
+  { name: 'Proficient',    key: 'proficient',   min: 500, color: 'text-violet-600  dark:text-violet-400',  bar: 'bg-violet-400'  },
+  { name: 'Advanced',      key: 'advanced',     min: 600, color: 'text-indigo-600  dark:text-indigo-400',  bar: 'bg-indigo-400'  },
+  { name: 'Expert',        key: 'expert',       min: 700, color: 'text-orange-600  dark:text-orange-400',  bar: 'bg-orange-400'  },
+  { name: 'Elite',         key: 'elite',        min: 800, color: 'text-pink-600    dark:text-pink-400',    bar: 'bg-pink-400'    },
+  { name: 'Legendary',     key: 'legendary',    min: 900, color: 'text-yellow-600  dark:text-yellow-400',  bar: 'bg-yellow-400'  },
 ] as const;
 
 function getTierConfig(name: string) {

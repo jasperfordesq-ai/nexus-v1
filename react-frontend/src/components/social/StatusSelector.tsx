@@ -109,7 +109,7 @@ export function StatusSelector({ children }: StatusSelectorProps) {
         ? 'fill-yellow-500 text-yellow-500'
         : currentStatusKey === 'dnd'
           ? 'fill-red-500 text-[var(--color-error)]'
-          : 'fill-gray-400 text-gray-400';
+          : 'fill-gray-400 text-gray-600 dark:text-gray-400';
   const statusLabel =
     currentStatusKey === 'online'
       ? t('status.online')
