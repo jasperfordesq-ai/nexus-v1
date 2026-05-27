@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import {
+import React, {
   forwardRef,
   type ElementType,
   type HTMLAttributes,
@@ -169,7 +169,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(
     }
 
     return (
-      <HeroUICard ref={ref} {...(sharedProps as HeroUICardProps)}>
+      <HeroUICard ref={ref as React.Ref<HTMLDivElement>} {...(sharedProps as unknown as HeroUICardProps)}>
         {children}
       </HeroUICard>
     );
