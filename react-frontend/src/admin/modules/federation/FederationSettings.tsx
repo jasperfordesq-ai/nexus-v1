@@ -111,7 +111,7 @@ export function FederationSettings() {
           title={t('federation_settings_title')}
           description={t('federation_settings_desc')}
         />
-        <div className="space-y-6">
+        <div role="status" aria-label={t('loading')} aria-busy="true" className="space-y-6">
           <Card >
             <CardHeader><Skeleton className="h-5 w-40 rounded-lg" /></CardHeader>
             <CardBody className="space-y-4">
@@ -149,14 +149,14 @@ export function FederationSettings() {
           title={t('federation_settings_title')}
           description={t('federation_settings_desc')}
           actions={
-            <Button variant="tertiary" startContent={<RefreshCw size={16} />} onPress={loadData}>
+            <Button variant="tertiary" startContent={<RefreshCw aria-hidden="true" size={16} />} onPress={loadData}>
               {t('refresh')}
             </Button>
           }
         />
         <Card >
           <CardBody className="flex flex-col items-center py-8 text-muted">
-            <Network size={40} className="mb-2" />
+            <Network aria-hidden="true" size={40} className="mb-2" />
             <p>{t('not_enabled_for_tenant')}</p>
             <p className="text-xs">{t('enable_from_tenant_features')}</p>
           </CardBody>
@@ -174,14 +174,14 @@ export function FederationSettings() {
           <div className="flex items-center gap-2">
             <Button
               variant="tertiary"
-              startContent={<RefreshCw size={16} />}
+              startContent={<RefreshCw aria-hidden="true" size={16} />}
               onPress={loadData}
               size="sm"
             >
               {t('refresh')}
             </Button>
             <Button
-              startContent={<Save size={16} />}
+              startContent={<Save aria-hidden="true" size={16} />}
               onPress={handleSave}
               isLoading={saving}
               isDisabled={!dirty}
@@ -200,7 +200,7 @@ export function FederationSettings() {
             JWT-based auth has trouble. */}
         <Card  className="border border-border">
           <CardBody className="flex flex-row items-start gap-3 text-sm">
-            <KeyRound size={18} className="text-muted mt-0.5 shrink-0" />
+            <KeyRound aria-hidden="true" size={18} className="text-muted mt-0.5 shrink-0" />
             <div>
               <p className="font-medium">{t('jwt_federation_auth_platform_title')}</p>
               <p className="text-muted mt-1">

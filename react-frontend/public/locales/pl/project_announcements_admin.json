@@ -72,5 +72,6 @@
     "update": "Nie udało się zapisać aktualizacji.",
     "publish": "Nie udało się opublikować projektu.",
     "status": "Nie można zmienić stanu projektu."
-  }
+  },
+  "loading": "Loading"
 }

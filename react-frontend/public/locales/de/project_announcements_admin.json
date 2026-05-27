@@ -72,5 +72,6 @@
     "update": "Das Update konnte nicht gespeichert werden.",
     "publish": "Das Projekt konnte nicht veröffentlicht werden.",
     "status": "Der Projektstatus konnte nicht geändert werden."
-  }
+  },
+  "loading": "Loading"
 }

@@ -231,7 +231,7 @@ export function BlogAdmin() {
         description={t('blog.blog_admin_desc')}
         actions={
           <Button
-            startContent={<Plus size={16} />}
+            startContent={<Plus aria-hidden="true" size={16} />}
             onPress={() => navigate(tenantPath('/admin/blog/create'))}
           >
             {t('blog.page_title_create')}

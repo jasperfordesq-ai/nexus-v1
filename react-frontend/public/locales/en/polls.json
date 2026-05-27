@@ -99,5 +99,6 @@
   },
   "page_meta": {
     "title": "Polls"
-  }
+  },
+  "category_filter_label": "Filter by category"
 }

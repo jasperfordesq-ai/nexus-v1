@@ -72,5 +72,6 @@
     "update": "Kan de update niet opslaan.",
     "publish": "Kan het project niet publiceren.",
     "status": "Kan de projectstatus niet wijzigen."
-  }
+  },
+  "loading": "Loading"
 }

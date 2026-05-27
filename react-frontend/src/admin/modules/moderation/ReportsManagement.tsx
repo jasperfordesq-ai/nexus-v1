@@ -226,7 +226,7 @@ export default function ReportsManagement() {
               size="sm"
               variant="tertiary"
               color="success"
-              startContent={<CheckCircle2 className="w-4 h-4" />}
+              startContent={<CheckCircle2 aria-hidden="true" className="w-4 h-4" />}
               onPress={() => setConfirmAction({ type: 'resolve', report })}
             >
               {t('moderation.resolve')}
@@ -235,7 +235,7 @@ export default function ReportsManagement() {
               size="sm"
               variant="tertiary"
               color="default"
-              startContent={<XCircle className="w-4 h-4" />}
+              startContent={<XCircle aria-hidden="true" className="w-4 h-4" />}
               onPress={() => setConfirmAction({ type: 'dismiss', report })}
             >
               {t('moderation.dismiss')}
@@ -283,7 +283,7 @@ export default function ReportsManagement() {
         actions={
           <Button
             variant="tertiary"
-            startContent={<RefreshCw className="w-4 h-4" />}
+            startContent={<RefreshCw aria-hidden="true" className="w-4 h-4" />}
             onPress={() => {
               execute();
               refetchStats();
@@ -301,7 +301,7 @@ export default function ReportsManagement() {
           <Card  className="border border-border">
             <CardBody className="flex flex-row items-center gap-3 p-4">
               <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-accent-soft dark:bg-accent-soft">
-                <Flag className="w-6 h-6 text-accent" />
+                <Flag aria-hidden="true" className="w-6 h-6 text-accent" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.total ?? ((stats.reports_pending ?? 0) + (stats.reports_resolved ?? 0) + (stats.reports_dismissed ?? 0))}</p>
@@ -312,7 +312,7 @@ export default function ReportsManagement() {
           <Card  className="border border-border">
             <CardBody className="flex flex-row items-center gap-3 p-4">
               <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-warning-100 dark:bg-warning-900/30">
-                <AlertCircle className="w-6 h-6 text-warning" />
+                <AlertCircle aria-hidden="true" className="w-6 h-6 text-warning" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.pending ?? stats.reports_pending ?? 0}</p>
@@ -323,7 +323,7 @@ export default function ReportsManagement() {
           <Card  className="border border-border">
             <CardBody className="flex flex-row items-center gap-3 p-4">
               <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-success-100 dark:bg-success-900/30">
-                <CheckCircle2 className="w-6 h-6 text-success" />
+                <CheckCircle2 aria-hidden="true" className="w-6 h-6 text-success" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.resolved ?? stats.reports_resolved ?? 0}</p>
@@ -334,7 +334,7 @@ export default function ReportsManagement() {
           <Card  className="border border-border">
             <CardBody className="flex flex-row items-center gap-3 p-4">
               <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-surface-secondary">
-                <XCircle className="w-6 h-6 text-muted" />
+                <XCircle aria-hidden="true" className="w-6 h-6 text-muted" />
               </div>
               <div>
                 <p className="text-2xl font-bold">{stats.dismissed ?? stats.reports_dismissed ?? 0}</p>
@@ -354,7 +354,7 @@ export default function ReportsManagement() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            startContent={<Search className="w-4 h-4 text-muted" />}
+            startContent={<Search aria-hidden="true" className="w-4 h-4 text-muted" />}
             className="w-full lg:flex-1"
           />
           <Select
@@ -419,7 +419,7 @@ export default function ReportsManagement() {
 
       {/* Error State */}
       {error && (
-        <div className="bg-danger-50 dark:bg-danger-950 text-danger border border-danger rounded-lg p-4">
+        <div role="alert" className="bg-danger-50 dark:bg-danger-950 text-danger border border-danger rounded-lg p-4">
           {t('moderation.failed_to_load_reports')}
         </div>
       )}

@@ -256,7 +256,7 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
               className="absolute left-2 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm"
               aria-label={t('listing.previous_image')}
             >
-              <ChevronLeft className="w-5 h-5" />
+              <ChevronLeft className="w-5 h-5" aria-hidden="true" />
             </Button>
             <Button
               isIconOnly
@@ -266,7 +266,7 @@ function ImageGallery({ images, videoUrl }: { images: ListingDetail['images']; v
               className="absolute right-2 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm"
               aria-label={t('listing.next_image')}
             >
-              <ChevronRight className="w-5 h-5" />
+              <ChevronRight className="w-5 h-5" aria-hidden="true" />
             </Button>
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5">
               {images.map((_, idx) => (
@@ -530,7 +530,7 @@ export function MarketplaceListingPage() {
             to={tenantPath('/marketplace')}
             variant="tertiary"
             size="sm"
-            startContent={<ArrowLeft className="w-4 h-4" />}
+            startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
           >
             {t('listing.marketplace')}
           </Button>
@@ -607,12 +607,12 @@ export function MarketplaceListingPage() {
                   </Chip>
                 )}
                 {listing.quantity > 1 && (
-                  <Chip size="sm" variant="soft" startContent={<Package className="w-3 h-3" />}>
+                  <Chip size="sm" variant="soft" startContent={<Package className="w-3 h-3" aria-hidden="true" />}>
                     {t('listing.available_count', { count: listing.quantity })}
                   </Chip>
                 )}
                 {listing.is_promoted && (
-                  <Chip size="sm" color="warning" variant="soft" startContent={<Star className="w-3 h-3" />}>
+                  <Chip size="sm" color="warning" variant="soft" startContent={<Star className="w-3 h-3" aria-hidden="true" />}>
                     {t('listing.featured')}
                   </Chip>
                 )}
@@ -621,16 +621,16 @@ export function MarketplaceListingPage() {
               <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted">
                 {listing.location && (
                   <span className="flex items-center gap-1">
-                    <MapPin className="w-3 h-3" />
+                    <MapPin className="w-3 h-3" aria-hidden="true" />
                     {listing.location}
                   </span>
                 )}
                 <span className="flex items-center gap-1">
-                  <Eye className="w-3 h-3" />
+                  <Eye className="w-3 h-3" aria-hidden="true" />
                   {t('listing.views_count', { count: listing.views_count })}
                 </span>
                 <span className="flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
+                  <Clock className="w-3 h-3" aria-hidden="true" />
                   {new Date(listing.created_at).toLocaleDateString()}
                 </span>
               </div>
@@ -661,7 +661,7 @@ export function MarketplaceListingPage() {
                   {listing.price_type !== 'free' && (
                     <Button
                       fullWidth
-                      startContent={<DollarSign className="w-4 h-4" />}
+                      startContent={<DollarSign className="w-4 h-4" aria-hidden="true" />}
                       onPress={offerModal.onOpen}
                       isDisabled={!isAuthenticated}
                     >
@@ -671,7 +671,7 @@ export function MarketplaceListingPage() {
                   <Button
                     variant="secondary"
                     fullWidth
-                    startContent={<MessageCircle className="w-4 h-4" />}
+                    startContent={<MessageCircle className="w-4 h-4" aria-hidden="true" />}
                     as={listing.user ? Link : undefined}
                     to={listing.user ? tenantPath(`/messages?to=${listing.user.id}&ref=marketplace&listing_id=${listing.id}&listing_title=${encodeURIComponent(listing.title)}&body=${encodeURIComponent(t('listing.message_template', { title: listing.title }))}`) : undefined}
                     isDisabled={!isAuthenticated || !listing.user}
@@ -729,7 +729,7 @@ export function MarketplaceListingPage() {
                 variant="tertiary"
                 fullWidth
                 size="sm"
-                endContent={<ExternalLink className="w-3.5 h-3.5" />}
+                endContent={<ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />}
               >
                 {t('listing.view_profile')}
               </Button>
@@ -789,7 +789,7 @@ export function MarketplaceListingPage() {
                 to={tenantPath(`/marketplace/seller/${listing.user?.id}`)}
                 variant="tertiary"
                 size="sm"
-                endContent={<ChevronRight className="w-4 h-4" />}
+                endContent={<ChevronRight className="w-4 h-4" aria-hidden="true" />}
               >
                 {t('listing.view_all')}
               </Button>
@@ -838,7 +838,7 @@ export function MarketplaceListingPage() {
           <Button
             variant="danger-soft"
             size="sm"
-            startContent={<Flag className="w-3.5 h-3.5" />}
+            startContent={<Flag className="w-3.5 h-3.5" aria-hidden="true" />}
             onPress={() => {
               if (!isAuthenticated) { toast.error(t('listing.sign_in_to_report')); return; }
               setReportModalOpen(true);

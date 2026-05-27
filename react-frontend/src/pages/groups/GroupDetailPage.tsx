@@ -1031,7 +1031,7 @@ export function GroupDetailPage() {
     return (
       <div className="max-w-4xl mx-auto">
         <PageMeta title={t('detail.unable_to_load')} noIndex />
-        <GlassCard className="p-8 text-center">
+        <GlassCard className="p-8 text-center" role="alert">
           <AlertCircle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('detail.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error || t('detail.not_found_desc')}</p>

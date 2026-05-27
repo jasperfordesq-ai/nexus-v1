@@ -284,12 +284,12 @@ export default function ProjectAnnouncementsAdminPage() {
           </div>
 
           {loading && (
-            <div className="flex justify-center py-10">
+            <div role="status" aria-label={t('loading')} className="flex justify-center py-10">
               <Spinner size="lg" />
             </div>
           )}
 
-          {!loading && error && <p className="text-sm text-danger">{error}</p>}
+          {!loading && error && <p role="alert" className="text-sm text-danger">{error}</p>}
 
           {!loading && !error && projects.length === 0 && (
             <EmptyState

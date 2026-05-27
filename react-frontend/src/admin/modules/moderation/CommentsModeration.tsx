@@ -188,7 +188,7 @@ export default function CommentsModeration() {
             size="sm"
             variant="tertiary"
             color="warning"
-            startContent={<EyeOff className="w-4 h-4" />}
+            startContent={<EyeOff aria-hidden="true" className="w-4 h-4" />}
             onPress={() => setConfirmAction({ type: 'hide', comment })}
           >
             {t('moderation.hide')}
@@ -196,7 +196,7 @@ export default function CommentsModeration() {
           <Button
             size="sm"
             variant="danger"
-            startContent={<Trash2 className="w-4 h-4" />}
+            startContent={<Trash2 aria-hidden="true" className="w-4 h-4" />}
             onPress={() => setConfirmAction({ type: 'delete', comment })}
           >
             {t('moderation.delete')}
@@ -234,7 +234,7 @@ export default function CommentsModeration() {
         actions={
           <Button
             variant="tertiary"
-            startContent={<RefreshCw className="w-4 h-4" />}
+            startContent={<RefreshCw aria-hidden="true" className="w-4 h-4" />}
             onPress={() => execute()}
             isLoading={isLoading}
           >
@@ -251,7 +251,7 @@ export default function CommentsModeration() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-          startContent={<Search className="w-4 h-4 text-muted" />}
+          startContent={<Search aria-hidden="true" className="w-4 h-4 text-muted" />}
           className="flex-1"
         />
         <Select
@@ -303,7 +303,7 @@ export default function CommentsModeration() {
 
       {/* Error State */}
       {error && (
-        <div className="bg-danger-50 dark:bg-danger-950 text-danger border border-danger rounded-lg p-4">
+        <div role="alert" className="bg-danger-50 dark:bg-danger-950 text-danger border border-danger rounded-lg p-4">
           {t('moderation.failed_to_load_comments')}
         </div>
       )}

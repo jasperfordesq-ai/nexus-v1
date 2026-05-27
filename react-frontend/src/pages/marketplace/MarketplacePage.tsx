@@ -253,7 +253,7 @@ export function MarketplacePage() {
     return (
       <div className="max-w-5xl mx-auto px-4 py-12">
         <EmptyState
-          icon={<ShoppingBag className="w-8 h-8" />}
+          icon={<ShoppingBag className="w-8 h-8" aria-hidden="true" />}
           title={t('hub_feature_gate.title')}
           description={t('hub_feature_gate.description')}
         />
@@ -313,11 +313,13 @@ export function MarketplacePage() {
 
         {/* Category pills -- shared CategoryChips component */}
         {categories.length > 0 && (
-          <CategoryChips
-            categories={categories}
-            activeId={selectedCategoryId}
-            onSelect={(id) => setSelectedCategoryId(id ?? undefined)}
-          />
+          <div role="group" aria-label={t('category_filter_label')}>
+            <CategoryChips
+              categories={categories}
+              activeId={selectedCategoryId}
+              onSelect={(id) => setSelectedCategoryId(id ?? undefined)}
+            />
+          </div>
         )}
 
         {/* Main content layout */}
@@ -353,7 +355,7 @@ export function MarketplacePage() {
               </GlassCard>
             ) : listings.length === 0 ? (
               <EmptyState
-                icon={<ShoppingBag className="w-8 h-8" />}
+                icon={<ShoppingBag className="w-8 h-8" aria-hidden="true" />}
                 title={t('hub.no_listings_title')}
                 description={
                   debouncedQuery || selectedCategoryId != null

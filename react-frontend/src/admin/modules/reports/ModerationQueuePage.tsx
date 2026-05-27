@@ -334,7 +334,7 @@ export function ModerationQueuePage() {
           <div className="flex items-center gap-2">
             <Button
               variant="tertiary"
-              startContent={<Settings size={16} />}
+              startContent={<Settings aria-hidden="true" size={16} />}
               onPress={() => {
                 setLocalSettings(settings ? { ...settings } : null);
                 onSettingsOpen();
@@ -345,7 +345,7 @@ export function ModerationQueuePage() {
             </Button>
             <Button
               variant="tertiary"
-              startContent={<RefreshCw size={16} />}
+              startContent={<RefreshCw aria-hidden="true" size={16} />}
               onPress={() => { loadQueue(); loadStats(); }}
               isLoading={loading}
               isDisabled={loading}
@@ -400,7 +400,7 @@ export function ModerationQueuePage() {
       {stats?.by_type && Object.keys(stats.by_type).length > 0 && (
         <Card className="mb-6">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <Filter size={18} className="text-accent" />
+            <Filter aria-hidden="true" size={18} className="text-accent" />
             <h3 className="font-semibold">{t('reports.by_content_type')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">

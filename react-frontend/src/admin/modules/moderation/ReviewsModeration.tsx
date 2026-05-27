@@ -145,10 +145,11 @@ export default function ReviewsModeration() {
 
   const renderStars = (rating: number) => {
     return (
-      <div className="flex gap-0.5">
+      <div aria-label={t('moderation.rating_aria', { n: rating })} className="flex gap-0.5">
         {[1, 2, 3, 4, 5].map((star) => (
           <Star
             key={star}
+            aria-hidden="true"
             className={`w-4 h-4 ${
               star <= rating
                 ? 'fill-warning text-warning'
@@ -227,7 +228,7 @@ export default function ReviewsModeration() {
             <Button
               size="sm"
               variant="secondary"
-              startContent={<Flag className="w-4 h-4" />}
+              startContent={<Flag aria-hidden="true" className="w-4 h-4" />}
               onPress={() => setConfirmAction({ type: 'flag', review })}
             >
               {t('moderation.flag')}
@@ -237,7 +238,7 @@ export default function ReviewsModeration() {
             <Button
               size="sm"
               variant="secondary"
-              startContent={<EyeOff className="w-4 h-4" />}
+              startContent={<EyeOff aria-hidden="true" className="w-4 h-4" />}
               onPress={() => setConfirmAction({ type: 'hide', review })}
             >
               {t('moderation.hide')}
@@ -246,7 +247,7 @@ export default function ReviewsModeration() {
           <Button
             size="sm"
             variant="danger"
-            startContent={<Trash2 className="w-4 h-4" />}
+            startContent={<Trash2 aria-hidden="true" className="w-4 h-4" />}
             onPress={() => setConfirmAction({ type: 'delete', review })}
           >
             {t('moderation.delete')}
@@ -288,7 +289,7 @@ export default function ReviewsModeration() {
         actions={
           <Button
             variant="secondary"
-            startContent={<RefreshCw className="w-4 h-4" />}
+            startContent={<RefreshCw aria-hidden="true" className="w-4 h-4" />}
             onPress={() => execute()}
             isLoading={isLoading}
           >
@@ -305,7 +306,7 @@ export default function ReviewsModeration() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-          startContent={<Search className="w-4 h-4 text-muted" />}
+          startContent={<Search aria-hidden="true" className="w-4 h-4 text-muted" />}
           className="flex-1"
         />
         <Select
@@ -357,7 +358,7 @@ export default function ReviewsModeration() {
 
       {/* Error State */}
       {error && (
-        <div className="bg-danger-50 dark:bg-danger-950 text-danger border border-danger rounded-lg p-4">
+        <div role="alert" className="bg-danger-50 dark:bg-danger-950 text-danger border border-danger rounded-lg p-4">
           {t('moderation.failed_to_load_reviews')}
         </div>
       )}

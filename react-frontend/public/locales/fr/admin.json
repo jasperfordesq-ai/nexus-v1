@@ -6639,7 +6639,8 @@
     "post_type_review": "Revoir",
     "reports_meta_description": "Examinez, résolvez et rejetez les rapports de modération soumis par les membres.",
     "unknown_tenant": "Locataire inconnu",
-    "member_id": "ID:{{id}}"
+    "member_id": "ID:{{id}}",
+    "rating_aria": "{{n}} out of 5 stars"
   },
   "new": "NEW",
   "newsletters": {
@@ -7312,7 +7313,10 @@
     "unknown_content_type": "Type inconnu:{{type}}",
     "unknown_status": "Statut inconnu:{{status}}",
     "hours_tabs_aria": "Hours report view",
-    "members_tabs_aria": "Member report type"
+    "members_tabs_aria": "Member report type",
+    "hours_by_category_aria": "Bar chart showing hours exchanged by category",
+    "hours_distribution_aria": "Pie chart showing distribution of time exchange hours",
+    "hours_trend_aria": "Area chart showing hours exchanged over time"
   },
   "resources": {
     "an_unexpected_error_occurred": "Une erreur inattendue s'est produite",
@@ -7393,7 +7397,14 @@
     "sort_order_placeholder": "0",
     "video_url_placeholder": "https://www.youtube.com/watch?v=...",
     "kb_mode_tabs_aria": "Knowledge base article content mode",
-    "status_tabs_aria": "Resource status filter"
+    "status_tabs_aria": "Resource status filter",
+    "resources_admin_name": "Name",
+    "resources_admin_author": "Author",
+    "resources_admin_status": "Status",
+    "resources_admin_actions": "Actions",
+    "resources_admin_empty": "No resources found",
+    "resources_admin_delete_title": "Delete Resource",
+    "resources_admin_delete_message": "Are you sure you want to delete \"{{title}}\"? This action cannot be undone."
   },
   "review": "Examen",
   "safeguarding": {

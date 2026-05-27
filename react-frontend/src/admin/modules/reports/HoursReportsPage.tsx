@@ -253,22 +253,24 @@ export function HoursReportsPage() {
         {/* Bar Chart */}
         <Card >
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <BarChart3 size={18} className="text-accent" />
+            <BarChart3 aria-hidden="true" size={18} className="text-accent" />
             <h3 className="font-semibold">{t('reports.chart_hours_by_category')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
               <div className="flex h-[350px] items-center justify-center"><Spinner /></div>
             ) : categories.length > 0 ? (
-              <ResponsiveContainer width="100%" height={350}>
-                <BarChart data={categories} layout="vertical" margin={{ left: 80 }}>
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                  <XAxis type="number" tick={{ fontSize: 12 }} />
-                  <YAxis type="category" dataKey="category" tick={{ fontSize: 11 }} width={80} />
-                  <Tooltip contentStyle={tooltipStyle} />
-                  <Bar dataKey="total_hours" name={t('reports.hours')} fill={CHART_COLOR_MAP.primary} radius={[0, 4, 4, 0]} fillOpacity={0.8} />
-                </BarChart>
-              </ResponsiveContainer>
+              <div role="img" aria-label={t('reports.hours_by_category_aria')}>
+                <ResponsiveContainer width="100%" height={350}>
+                  <BarChart data={categories} layout="vertical" margin={{ left: 80 }}>
+                    <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                    <XAxis type="number" tick={{ fontSize: 12 }} />
+                    <YAxis type="category" dataKey="category" tick={{ fontSize: 11 }} width={80} />
+                    <Tooltip contentStyle={tooltipStyle} />
+                    <Bar dataKey="total_hours" name={t('reports.hours')} fill={CHART_COLOR_MAP.primary} radius={[0, 4, 4, 0]} fillOpacity={0.8} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
             ) : (
               <p className="flex h-[350px] items-center justify-center text-sm text-muted">
                 {t('reports.no_category_data')}
@@ -280,43 +282,45 @@ export function HoursReportsPage() {
         {/* Pie Chart */}
         <Card >
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <PieChartIcon size={18} className="text-accent" />
+            <PieChartIcon aria-hidden="true" size={18} className="text-accent" />
             <h3 className="font-semibold">{t('reports.chart_category_distribution')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
               <div className="flex h-[350px] items-center justify-center"><Spinner /></div>
             ) : categories.length > 0 ? (
-              <ResponsiveContainer width="100%" height={350}>
-                <PieChart>
-                  <Pie
-                    data={categories.filter((c) => c.total_hours > 0)}
-                    dataKey="total_hours"
-                    nameKey="category"
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={110}
-                    innerRadius={50}
-                    paddingAngle={2}
-                    label={({ name, percent }) =>
-                      `${name} (${((percent ?? 0) * 100).toFixed(0)}%)`
-                    }
-                    labelLine={{ strokeWidth: 1 }}
-                  >
-                    {categories
-                      .filter((c) => c.total_hours > 0)
-                      .map((_, index) => (
-                        <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} fillOpacity={0.85} />
-                      ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={tooltipStyle}
-                    formatter={(value, name) =>
-                      [t('reports.hours_value', { value: Number(value ?? 0).toFixed(1) }), String(name ?? '')] as [string, string]
-                    }
-                  />
-                </PieChart>
-              </ResponsiveContainer>
+              <div role="img" aria-label={t('reports.hours_distribution_aria')}>
+                <ResponsiveContainer width="100%" height={350}>
+                  <PieChart>
+                    <Pie
+                      data={categories.filter((c) => c.total_hours > 0)}
+                      dataKey="total_hours"
+                      nameKey="category"
+                      cx="50%"
+                      cy="50%"
+                      outerRadius={110}
+                      innerRadius={50}
+                      paddingAngle={2}
+                      label={({ name, percent }) =>
+                        `${name} (${((percent ?? 0) * 100).toFixed(0)}%)`
+                      }
+                      labelLine={{ strokeWidth: 1 }}
+                    >
+                      {categories
+                        .filter((c) => c.total_hours > 0)
+                        .map((_, index) => (
+                          <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} fillOpacity={0.85} />
+                        ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={tooltipStyle}
+                      formatter={(value, name) =>
+                        [t('reports.hours_value', { value: Number(value ?? 0).toFixed(1) }), String(name ?? '')] as [string, string]
+                      }
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
             ) : (
               <p className="flex h-[350px] items-center justify-center text-sm text-muted">
                 {t('reports.no_category_data')}
@@ -408,48 +412,50 @@ export function HoursReportsPage() {
     return (
       <Card >
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-          <TrendingUp size={18} className="text-accent" />
+          <TrendingUp aria-hidden="true" size={18} className="text-accent" />
           <h3 className="font-semibold">{t('reports.chart_monthly_hours_trend')}</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">
           {loading ? (
             <div className="flex h-[350px] items-center justify-center"><Spinner /></div>
           ) : periods.length > 0 ? (
-            <ResponsiveContainer width="100%" height={350}>
-              <AreaChart data={periods} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="hrTotalGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={CHART_COLOR_MAP.primary} stopOpacity={0.3} />
-                    <stop offset="95%" stopColor={CHART_COLOR_MAP.primary} stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="hrTxGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={CHART_COLOR_MAP.success} stopOpacity={0.3} />
-                    <stop offset="95%" stopColor={CHART_COLOR_MAP.success} stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
-                <XAxis dataKey="month" tick={{ fontSize: 11 }} tickLine={false} />
-                <YAxis tick={{ fontSize: 12 }} tickLine={false} />
-                <Tooltip contentStyle={tooltipStyle} labelStyle={{ fontWeight: 600 }} />
-                <Legend />
-                <Area
-                  type="monotone"
-                  dataKey="total_hours"
-                  name={t('reports.sort_total_hours')}
-                  stroke={CHART_COLOR_MAP.primary}
-                  fill="url(#hrTotalGrad)"
-                  strokeWidth={2}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="transaction_count"
-                  name={t('reports.label_transactions')}
-                  stroke={CHART_COLOR_MAP.success}
-                  fill="url(#hrTxGrad)"
-                  strokeWidth={2}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+            <div role="img" aria-label={t('reports.hours_trend_aria')}>
+              <ResponsiveContainer width="100%" height={350}>
+                <AreaChart data={periods} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="hrTotalGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={CHART_COLOR_MAP.primary} stopOpacity={0.3} />
+                      <stop offset="95%" stopColor={CHART_COLOR_MAP.primary} stopOpacity={0} />
+                    </linearGradient>
+                    <linearGradient id="hrTxGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={CHART_COLOR_MAP.success} stopOpacity={0.3} />
+                      <stop offset="95%" stopColor={CHART_COLOR_MAP.success} stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                  <XAxis dataKey="month" tick={{ fontSize: 11 }} tickLine={false} />
+                  <YAxis tick={{ fontSize: 12 }} tickLine={false} />
+                  <Tooltip contentStyle={tooltipStyle} labelStyle={{ fontWeight: 600 }} />
+                  <Legend />
+                  <Area
+                    type="monotone"
+                    dataKey="total_hours"
+                    name={t('reports.sort_total_hours')}
+                    stroke={CHART_COLOR_MAP.primary}
+                    fill="url(#hrTotalGrad)"
+                    strokeWidth={2}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="transaction_count"
+                    name={t('reports.label_transactions')}
+                    stroke={CHART_COLOR_MAP.success}
+                    fill="url(#hrTxGrad)"
+                    strokeWidth={2}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           ) : (
             <p className="flex h-[350px] items-center justify-center text-sm text-muted">
               {t('reports.no_period_data')}
@@ -522,9 +528,9 @@ export function HoursReportsPage() {
         variant="underlined"
         classNames={{ tabList: 'mb-4' }}
       >
-        <Tab key="category" title={<span className="flex items-center gap-1.5"><PieChartIcon size={14} /> {t('reports.tab_by_category')}</span>} />
-        <Tab key="member" title={<span className="flex items-center gap-1.5"><Users size={14} /> {t('reports.tab_by_member')}</span>} />
-        <Tab key="period" title={<span className="flex items-center gap-1.5"><TrendingUp size={14} /> {t('reports.tab_monthly_trend')}</span>} />
+        <Tab key="category" title={<span className="flex items-center gap-1.5"><PieChartIcon aria-hidden="true" size={14} /> {t('reports.tab_by_category')}</span>} />
+        <Tab key="member" title={<span className="flex items-center gap-1.5"><Users aria-hidden="true" size={14} /> {t('reports.tab_by_member')}</span>} />
+        <Tab key="period" title={<span className="flex items-center gap-1.5"><TrendingUp aria-hidden="true" size={14} /> {t('reports.tab_monthly_trend')}</span>} />
       </Tabs>
 
       {groupBy === 'category' && renderCategory()}

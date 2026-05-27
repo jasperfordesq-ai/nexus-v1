@@ -731,7 +731,7 @@ export default function FederationHubPage() {
     return (
       <div className="max-w-6xl mx-auto px-4 py-8">
         <Breadcrumbs items={breadcrumbs} />
-        <div className="flex flex-col items-center justify-center py-24">
+        <div role="status" aria-label={t('hub.loading')} className="flex flex-col items-center justify-center py-24">
           <Spinner size="lg" color="primary" />
           <p className="text-muted mt-4">{t('hub.loading')}</p>
         </div>
@@ -745,7 +745,7 @@ export default function FederationHubPage() {
     return (
       <div className="max-w-6xl mx-auto px-4 py-8">
         <Breadcrumbs items={breadcrumbs} />
-        <GlassCard className="p-12 text-center mt-6">
+        <GlassCard role="alert" className="p-12 text-center mt-6">
           <AlertTriangle className="w-12 h-12 text-warning mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-xl font-semibold text-foreground mb-2">{t('hub.unable_to_load')}</h2>
           <p className="text-muted mb-6">{error}</p>

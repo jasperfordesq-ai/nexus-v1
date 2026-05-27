@@ -58,5 +58,6 @@
   "article_count_other": "{{count}} articles",
   "category_count_one": "{{count}} category",
   "category_count_other": "{{count}} categories",
-  "search_results": "{{count}} results for \"{{query}}\""
+  "search_results": "{{count}} results for \"{{query}}\"",
+  "searching": "Searching..."
 }

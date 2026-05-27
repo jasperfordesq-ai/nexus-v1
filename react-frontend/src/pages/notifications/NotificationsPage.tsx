@@ -392,7 +392,7 @@ export function NotificationsPage() {
 
       {/* Notifications List */}
       {!loadError && isLoading ? (
-        <div aria-label={t('loading_aria')} aria-busy="true" className="space-y-3">
+        <div role="status" aria-label={t('loading_aria')} aria-busy="true" className="space-y-3">
           {Array.from({ length: 6 }).map((_, i) => (
             <GlassCard key={i} className="p-4">
               <div className="flex items-start gap-4">
@@ -474,19 +474,19 @@ const NotificationCard = memo(function NotificationCard({ notification, onMarkRe
   }
 
   const iconMap: Record<string, { icon: React.ReactNode; color: string }> = {
-    message: { icon: <MessageSquare className="w-5 h-5" />, color: 'indigo' },
-    listing: { icon: <ListTodo className="w-5 h-5" />, color: 'emerald' },
-    transaction: { icon: <Wallet className="w-5 h-5" />, color: 'amber' },
-    connection: { icon: <User className="w-5 h-5" />, color: 'purple' },
-    event: { icon: <Calendar className="w-5 h-5" />, color: 'rose' },
-    group: { icon: <Users className="w-5 h-5" />, color: 'teal' },
-    achievement: { icon: <Award className="w-5 h-5" />, color: 'orange' },
-    safeguarding_flag: { icon: <ShieldAlert className="w-5 h-5" />, color: 'red' },
-    safeguarding_assignment: { icon: <Shield className="w-5 h-5" />, color: 'blue' },
-    broker_review: { icon: <Eye className="w-5 h-5" />, color: 'amber' },
+    message: { icon: <MessageSquare className="w-5 h-5" aria-hidden="true" />, color: 'indigo' },
+    listing: { icon: <ListTodo className="w-5 h-5" aria-hidden="true" />, color: 'emerald' },
+    transaction: { icon: <Wallet className="w-5 h-5" aria-hidden="true" />, color: 'amber' },
+    connection: { icon: <User className="w-5 h-5" aria-hidden="true" />, color: 'purple' },
+    event: { icon: <Calendar className="w-5 h-5" aria-hidden="true" />, color: 'rose' },
+    group: { icon: <Users className="w-5 h-5" aria-hidden="true" />, color: 'teal' },
+    achievement: { icon: <Award className="w-5 h-5" aria-hidden="true" />, color: 'orange' },
+    safeguarding_flag: { icon: <ShieldAlert className="w-5 h-5" aria-hidden="true" />, color: 'red' },
+    safeguarding_assignment: { icon: <Shield className="w-5 h-5" aria-hidden="true" />, color: 'blue' },
+    broker_review: { icon: <Eye className="w-5 h-5" aria-hidden="true" />, color: 'amber' },
   };
 
-  const { icon, color } = iconMap[notification.type] || { icon: <Bell className="w-5 h-5" />, color: 'gray' };
+  const { icon, color } = iconMap[notification.type] || { icon: <Bell className="w-5 h-5" aria-hidden="true" />, color: 'gray' };
 
   const colorClasses: Record<string, string> = {
     indigo: 'bg-indigo-500/20 text-indigo-600 dark:text-indigo-400',

@@ -1017,7 +1017,7 @@ export function PollsPage() {
 
       {/* P2 - Category Filter */}
       {categories.length > 0 && (
-        <div className="flex gap-2 flex-wrap">
+        <div role="group" aria-label={t('category_filter_label')} className="flex gap-2 flex-wrap">
           <Button
             size="sm"
             variant={!selectedCategory ? 'solid' : 'flat'}
@@ -1189,7 +1189,7 @@ export function PollsPage() {
                             isDisabled={index === 0}
                             aria-label={t('aria.move_rank_up', { option: option.label })}
                           >
-                            <ChevronUp className="w-4 h-4" />
+                            <ChevronUp className="w-4 h-4" aria-hidden="true" />
                           </Button>
                           <Button
                             isIconOnly
@@ -1200,7 +1200,7 @@ export function PollsPage() {
                             isDisabled={index === rankOrder.length - 1}
                             aria-label={t('aria.move_rank_down', { option: option.label })}
                           >
-                            <ChevronUp className="w-4 h-4" />
+                            <ChevronUp className="w-4 h-4" aria-hidden="true" />
                           </Button>
                         </div>
                       </div>

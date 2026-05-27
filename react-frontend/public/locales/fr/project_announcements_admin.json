@@ -72,5 +72,6 @@
     "update": "Impossible d'enregistrer la mise à jour.",
     "publish": "Impossible de publier le projet.",
     "status": "Impossible de modifier le statut du projet."
-  }
+  },
+  "loading": "Loading"
 }

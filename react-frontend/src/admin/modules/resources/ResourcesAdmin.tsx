@@ -61,7 +61,7 @@ const PAGE_SIZE = 50;
 
 export function ResourcesAdmin() {
   const { t } = useTranslation('admin');
-  useAdminPageMeta({ title: "Resources" });
+  useAdminPageMeta({ title: t('resources.resources_admin_title') });
   const toast = useToast();
   const { tenantPath } = useTenant();
   const navigate = useNavigate();
@@ -94,7 +94,7 @@ export function ResourcesAdmin() {
         setTotal(payload.meta?.total || 0);
       }
     } catch {
-      toast.error("Failed to load resources");
+      toast.error(t('resources.failed_to_load_resources'));
     } finally {
       setLoading(false);
     }
@@ -114,13 +114,13 @@ export function ResourcesAdmin() {
     try {
       const res = await api.delete(`/v2/admin/resources/${confirmDelete.id}`);
       if (res?.success) {
-        toast.success("Resource deleted successfully");
+        toast.success(t('resources.resource_deleted_successfully'));
         loadItems();
       } else {
-        toast.error(res?.error || "An unexpected error occurred");
+        toast.error(res?.error || t('resources.an_unexpected_error_occurred'));
       }
     } catch {
-      toast.error("An unexpected error occurred");
+      toast.error(t('resources.an_unexpected_error_occurred'));
     } finally {
       setActionLoading(false);
       setConfirmDelete(null);
@@ -132,7 +132,7 @@ export function ResourcesAdmin() {
   const columns: Column<Resource>[] = [
     {
       key: 'title',
-      label: "Name",
+      label: t('resources.resources_admin_name'),
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">{item.title}</span>
@@ -140,7 +140,7 @@ export function ResourcesAdmin() {
     },
     {
       key: 'category',
-      label: "Categories",
+      label: t('resources.categories'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">{item.category || '--'}</span>
@@ -148,7 +148,7 @@ export function ResourcesAdmin() {
     },
     {
       key: 'author_name',
-      label: "Author",
+      label: t('resources.resources_admin_author'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">{item.author_name || t('resources.unknown')}</span>
@@ -160,7 +160,7 @@ export function ResourcesAdmin() {
       sortable: true,
       render: (item) => (
         <div className="flex items-center gap-1 text-sm text-muted">
-          <Eye size={14} className="text-muted" />
+          <Eye aria-hidden="true" size={14} className="text-muted" />
           {(item.views ?? 0).toLocaleString()}
         </div>
       ),
@@ -171,14 +171,14 @@ export function ResourcesAdmin() {
       sortable: true,
       render: (item) => (
         <div className="flex items-center gap-1 text-sm text-muted">
-          <ThumbsUp size={14} className="text-muted" />
+          <ThumbsUp aria-hidden="true" size={14} className="text-muted" />
           {(item.helpful_votes ?? 0).toLocaleString()}
         </div>
       ),
     },
     {
       key: 'status',
-      label: "Status",
+      label: t('resources.resources_admin_status'),
       sortable: true,
       render: (item) => (
         <Chip
@@ -203,7 +203,7 @@ export function ResourcesAdmin() {
     },
     {
       key: 'actions',
-      label: "Actions",
+      label: t('resources.resources_admin_actions'),
       render: (item) => (
         <div className="flex gap-1">
           <Button
@@ -223,7 +223,7 @@ export function ResourcesAdmin() {
             href={tenantPath(`/kb/${item.id}`)}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={"View Resource"}
+            aria-label={t('resources.label_view_resource')}
           >
             <Eye size={14} />
           </Button>
@@ -232,7 +232,7 @@ export function ResourcesAdmin() {
             size="sm"
             variant="danger"
             onPress={() => setConfirmDelete(item)}
-            aria-label={"Delete Resource"}
+            aria-label={t('resources.label_delete_resource')}
           >
             <Trash2 size={14} />
           </Button>
@@ -246,19 +246,19 @@ export function ResourcesAdmin() {
   return (
     <div>
       <PageHeader
-        title={"Resources Admin"}
-        description={"View and manage resource listings shared by community members"}
+        title={t('resources.resources_admin_title')}
+        description={t('resources.resources_admin_desc')}
         actions={
           <div className="flex items-center gap-2">
             <Button
               variant="tertiary"
-              startContent={<FolderTree size={16} />}
+              startContent={<FolderTree aria-hidden="true" size={16} />}
               onPress={() => navigate(tenantPath('/admin/resources/categories'))}
             >
               {t('resources.manage_categories')}
             </Button>
             <Button
-              startContent={<Plus size={16} />}
+              startContent={<Plus aria-hidden="true" size={16} />}
               onPress={() => navigate(tenantPath('/admin/resources/create'))}
             >
               {t('resources.new_article')}
@@ -275,7 +275,7 @@ export function ResourcesAdmin() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title={"All"} />
+          <Tab key="all" title={t('common.all')} />
           <Tab key="published" title={t('content.published')} />
           <Tab key="draft" title={t('content.draft')} />
         </Tabs>
@@ -295,8 +295,8 @@ export function ResourcesAdmin() {
         emptyContent={
           <EmptyState
             icon={BookOpen}
-            title={"No data available"}
-            description={"View and manage resource listings shared by community members"}
+            title={t('resources.resources_admin_empty')}
+            description={t('resources.resources_admin_desc')}
           />
         }
       />
@@ -306,9 +306,9 @@ export function ResourcesAdmin() {
           isOpen={!!confirmDelete}
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
-          title={`${"Delete"} ${"Resources"}`}
-          message={`Delete Campaign`}
-          confirmLabel={"Delete"}
+          title={t('resources.resources_admin_delete_title')}
+          message={t('resources.resources_admin_delete_message', { title: confirmDelete.title })}
+          confirmLabel={t('common.delete')}
           confirmColor="danger"
           isLoading={actionLoading}
         />

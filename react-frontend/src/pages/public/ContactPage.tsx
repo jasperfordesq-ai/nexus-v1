@@ -149,7 +149,7 @@ export function ContactPage() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
               {error && (
-                <div className="p-3 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 text-sm">
+                <div role="alert" className="p-3 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400 text-sm">
                   {error}
                 </div>
               )}

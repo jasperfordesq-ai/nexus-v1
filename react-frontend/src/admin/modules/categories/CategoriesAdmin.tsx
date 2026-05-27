@@ -310,7 +310,7 @@ export function CategoriesAdmin() {
         description={t('categories.categories_admin_desc')}
         actions={
           <Button
-            startContent={<Plus size={16} />}
+            startContent={<Plus aria-hidden="true" size={16} />}
             onPress={openCreateModal}
           >
             {t('categories.add_category')}
@@ -336,9 +336,9 @@ export function CategoriesAdmin() {
       </div>
 
       {loadError && !loading ? (
-        <Card >
+        <Card role="alert">
           <CardBody className="flex flex-col items-center gap-3 py-10 text-center">
-            <AlertTriangle size={32} className="text-danger" />
+            <AlertTriangle aria-hidden="true" size={32} className="text-danger" />
             <div className="text-base font-semibold">{t('common.error_loading_data')}</div>
             <div className="text-sm text-muted">{loadError}</div>
             <Button variant="tertiary" onPress={loadCategories}>{t('common.retry')}</Button>
@@ -367,7 +367,7 @@ export function CategoriesAdmin() {
       <Modal isOpen={modalOpen} onClose={closeModal} size="md">
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <Tag size={20} />
+            <Tag aria-hidden="true" size={20} />
             {editingCategory ? t('categories.edit_category') : t('categories.create_category')}
           </ModalHeader>
           <ModalBody className="gap-4">
