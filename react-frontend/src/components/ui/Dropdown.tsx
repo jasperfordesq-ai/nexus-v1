@@ -47,6 +47,11 @@ interface DropdownContextValue {
 
 const DropdownContext = createContext<DropdownContextValue>({});
 
+// Propagates the menu's selectionMode down to items so they only render a
+// selection indicator (checkmark) when the menu is actually selectable.
+// Action menus must NOT show an indicator gutter (matches v3 demos).
+const DropdownSelectionContext = createContext<'none' | 'single' | 'multiple' | undefined>(undefined);
+
 export interface DropdownProps extends Omit<HeroDropdownProps, 'children'> {
   children: ReactNode;
   placement?: LegacyPlacement;
@@ -103,17 +108,20 @@ export function DropdownMenu<T extends object = object>({
   const popoverProps = shouldBlockScroll === undefined
     ? {}
     : ({ shouldBlockScroll } as Partial<HeroDropdownPopoverProps>);
+  const selectionMode = (props as { selectionMode?: 'none' | 'single' | 'multiple' }).selectionMode;
 
   return (
-    <HeroDropdown.Popover
-      className={classNames?.base}
-      placement={normalizePlacement(placement)}
-      {...popoverProps}
-    >
-      <HeroDropdown.Menu {...props} className={cn(classNames?.list, className)}>
-        {children}
-      </HeroDropdown.Menu>
-    </HeroDropdown.Popover>
+    <DropdownSelectionContext.Provider value={selectionMode}>
+      <HeroDropdown.Popover
+        className={classNames?.base}
+        placement={normalizePlacement(placement)}
+        {...popoverProps}
+      >
+        <HeroDropdown.Menu {...props} className={cn(classNames?.list, className)}>
+          {children}
+        </HeroDropdown.Menu>
+      </HeroDropdown.Popover>
+    </DropdownSelectionContext.Provider>
   );
 }
 
@@ -147,6 +155,8 @@ export function DropdownItem({
 }: DropdownItemProps) {
   const danger = color === 'danger' || variant === 'danger';
   const resolvedTextValue = textValue ?? inferTextValue(children);
+  const selectionMode = useContext(DropdownSelectionContext);
+  const isSelectable = selectionMode === 'single' || selectionMode === 'multiple';
 
   return (
     <HeroDropdown.Item
@@ -156,6 +166,7 @@ export function DropdownItem({
       textValue={resolvedTextValue}
       variant={danger ? 'danger' : 'default'}
     >
+      {isSelectable && <HeroDropdown.ItemIndicator />}
       {startContent}
       {renderLabel(children)}
       {description && <Description>{description}</Description>}

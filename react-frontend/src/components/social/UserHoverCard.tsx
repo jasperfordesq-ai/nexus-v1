@@ -103,39 +103,68 @@ export const UserHoverCard = memo(function UserHoverCard({
     }
   }, [userId]);
 
-  const handleMouseEnter = useCallback(() => {
+  const clearTimers = useCallback(() => {
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current);
+      hoverTimeoutRef.current = undefined;
+    }
     if (leaveTimeoutRef.current) {
       clearTimeout(leaveTimeoutRef.current);
       leaveTimeoutRef.current = undefined;
     }
+  }, []);
+
+  // Open after a short hover delay. Hover intent is the SOLE opener — the
+  // controlled Popover never opens itself (see handleOpenChange).
+  const scheduleOpen = useCallback(() => {
+    if (leaveTimeoutRef.current) {
+      clearTimeout(leaveTimeoutRef.current);
+      leaveTimeoutRef.current = undefined;
+    }
+    if (hoverTimeoutRef.current) return; // open already scheduled
     hoverTimeoutRef.current = setTimeout(() => {
+      hoverTimeoutRef.current = undefined;
       setIsOpen(true);
       fetchUserData();
     }, 300);
   }, [fetchUserData]);
 
-  const handleMouseLeave = useCallback(() => {
+  // Close after a short grace period so the pointer can travel across the
+  // gap between the trigger and the popover content without dismissing it.
+  const scheduleClose = useCallback(() => {
     if (hoverTimeoutRef.current) {
       clearTimeout(hoverTimeoutRef.current);
       hoverTimeoutRef.current = undefined;
     }
+    if (leaveTimeoutRef.current) return; // close already scheduled
     leaveTimeoutRef.current = setTimeout(() => {
+      leaveTimeoutRef.current = undefined;
       setIsOpen(false);
     }, 200);
   }, []);
 
+  const handleMouseEnter = scheduleOpen;
+  const handleMouseLeave = scheduleClose;
   const handlePopoverMouseEnter = useCallback(() => {
     if (leaveTimeoutRef.current) {
       clearTimeout(leaveTimeoutRef.current);
       leaveTimeoutRef.current = undefined;
     }
   }, []);
+  const handlePopoverMouseLeave = scheduleClose;
 
-  const handlePopoverMouseLeave = useCallback(() => {
-    leaveTimeoutRef.current = setTimeout(() => {
+  // React Aria drives this as a CONTROLLED popover. It must apply the
+  // requested state synchronously, or react-aria's internal trigger state
+  // diverges from `isOpen` and the overlay oscillates open/closed (flicker).
+  // We honor close requests immediately (Esc / interact-outside) and ignore
+  // open requests — opening is hover-driven only, so a click on the wrapped
+  // profile link navigates instead of flashing the card.
+  const handleOpenChange = useCallback((open: boolean) => {
+    if (!open) {
+      clearTimers();
       setIsOpen(false);
-    }, 200);
-  }, []);
+    }
+  }, [clearTimers]);
 
   useEffect(() => {
     return () => {
@@ -183,11 +212,7 @@ export const UserHoverCard = memo(function UserHoverCard({
     <Popover
       placement="bottom-start"
       isOpen={isOpen}
-      onOpenChange={(open) => {
-        if (!open) {
-          leaveTimeoutRef.current = setTimeout(() => setIsOpen(false), 200);
-        }
-      }}
+      onOpenChange={handleOpenChange}
       shouldBlockScroll={false}
       backdrop="transparent"
       offset={8}

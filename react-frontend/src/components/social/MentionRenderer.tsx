@@ -11,7 +11,7 @@
  * for resolving user IDs (enabling profile links).
  */
 
-import { Fragment, useState } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui';
 import { useTenant } from '@/contexts';
@@ -68,6 +68,48 @@ function MentionLink({
 }) {
   const { tenantPath } = useTenant();
   const [isOpen, setIsOpen] = useState(false);
+  const hoverTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const leaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  useEffect(() => () => {
+    if (hoverTimeoutRef.current) clearTimeout(hoverTimeoutRef.current);
+    if (leaveTimeoutRef.current) clearTimeout(leaveTimeoutRef.current);
+  }, []);
+
+  // Hover intent is the SOLE opener. A controlled HeroUI v3 Popover (React
+  // Aria) must not be driven by raw onMouseEnter/onMouseLeave that flip
+  // isOpen instantly — that fights React Aria's trigger state and flickers.
+  const scheduleOpen = useCallback(() => {
+    if (leaveTimeoutRef.current) { clearTimeout(leaveTimeoutRef.current); leaveTimeoutRef.current = undefined; }
+    if (hoverTimeoutRef.current) return;
+    hoverTimeoutRef.current = setTimeout(() => {
+      hoverTimeoutRef.current = undefined;
+      setIsOpen(true);
+    }, 300);
+  }, []);
+
+  const scheduleClose = useCallback(() => {
+    if (hoverTimeoutRef.current) { clearTimeout(hoverTimeoutRef.current); hoverTimeoutRef.current = undefined; }
+    if (leaveTimeoutRef.current) return;
+    leaveTimeoutRef.current = setTimeout(() => {
+      leaveTimeoutRef.current = undefined;
+      setIsOpen(false);
+    }, 200);
+  }, []);
+
+  const cancelClose = useCallback(() => {
+    if (leaveTimeoutRef.current) { clearTimeout(leaveTimeoutRef.current); leaveTimeoutRef.current = undefined; }
+  }, []);
+
+  // Apply React Aria's close requests (Esc / interact-outside) immediately so
+  // the controlled state never diverges. Opening stays hover-driven only.
+  const handleOpenChange = useCallback((open: boolean) => {
+    if (!open) {
+      if (hoverTimeoutRef.current) { clearTimeout(hoverTimeoutRef.current); hoverTimeoutRef.current = undefined; }
+      if (leaveTimeoutRef.current) { clearTimeout(leaveTimeoutRef.current); leaveTimeoutRef.current = undefined; }
+      setIsOpen(false);
+    }
+  }, []);
 
   const profilePath = user?.user_id ? tenantPath(`/profile/${user.user_id}`) : undefined;
   const displayName = user?.name || user?.first_name || username;
@@ -92,7 +134,7 @@ function MentionLink({
   return (
     <Popover
       isOpen={isOpen}
-      onOpenChange={setIsOpen}
+      onOpenChange={handleOpenChange}
       placement="top"
       offset={8}
       showArrow
@@ -102,15 +144,19 @@ function MentionLink({
     >
       <PopoverTrigger>
         <span
-          onMouseEnter={() => setIsOpen(true)}
-          onMouseLeave={() => setIsOpen(false)}
+          onMouseEnter={scheduleOpen}
+          onMouseLeave={scheduleClose}
           className="inline"
         >
           {linkContent}
         </span>
       </PopoverTrigger>
       <PopoverContent className="bg-[var(--surface-dropdown)] border border-[var(--border-default)]">
-        <div className="p-3 flex items-center gap-3 max-w-[200px]">
+        <div
+          className="p-3 flex items-center gap-3 max-w-[200px]"
+          onMouseEnter={cancelClose}
+          onMouseLeave={scheduleClose}
+        >
           <Avatar
             name={displayName}
             src={resolveAvatarUrl(user.avatar_url)}
