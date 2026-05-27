@@ -68,10 +68,14 @@ describe('marketplace api', () => {
     await getMarketplaceListings({
       q: 'bike',
       category_id: 3,
+      price_min: 10,
+      price_max: 100,
       price_type: 'free',
-      condition: 'good',
+      condition: 'good,fair',
+      seller_type: 'business',
       delivery_method: 'pickup',
       sort: 'newest',
+      posted_within: 7,
       cursor: 'abc',
       limit: 24,
     });
@@ -79,10 +83,14 @@ describe('marketplace api', () => {
     expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/listings', {
       q: 'bike',
       category_id: '3',
+      price_min: '10',
+      price_max: '100',
       price_type: 'free',
-      condition: 'good',
+      condition: 'good,fair',
+      seller_type: 'business',
       delivery_method: 'pickup',
       sort: 'newest',
+      posted_within: '7',
       cursor: 'abc',
       limit: '24',
     });

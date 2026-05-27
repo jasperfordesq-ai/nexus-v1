@@ -328,10 +328,14 @@ async function appendMarketplaceImageFile(formData: FormData, uri: string, index
 export interface MarketplaceListingFilters {
   q?: string;
   category_id?: number;
+  price_min?: number | string;
+  price_max?: number | string;
   price_type?: MarketplacePriceType | '';
-  condition?: MarketplaceCondition | '';
+  condition?: MarketplaceCondition | string | '';
+  seller_type?: 'private' | 'business' | '';
   delivery_method?: MarketplaceDeliveryMethod | '';
   sort?: 'newest' | 'price_asc' | 'price_desc' | 'popular';
+  posted_within?: number | string;
   cursor?: string | null;
   limit?: number;
   user_id?: number;
@@ -371,10 +375,14 @@ export function getMarketplaceListings(
   const query: Record<string, string> = {};
   addQueryValue(query, 'q', params.q);
   addQueryValue(query, 'category_id', params.category_id);
+  addQueryValue(query, 'price_min', params.price_min);
+  addQueryValue(query, 'price_max', params.price_max);
   addQueryValue(query, 'price_type', params.price_type);
   addQueryValue(query, 'condition', params.condition);
+  addQueryValue(query, 'seller_type', params.seller_type);
   addQueryValue(query, 'delivery_method', params.delivery_method);
   addQueryValue(query, 'sort', params.sort);
+  addQueryValue(query, 'posted_within', params.posted_within);
   addQueryValue(query, 'cursor', params.cursor);
   addQueryValue(query, 'limit', params.limit ?? 20);
   addQueryValue(query, 'user_id', params.user_id);

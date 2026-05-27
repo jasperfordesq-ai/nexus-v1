@@ -16,6 +16,7 @@
     "freeItems": "Free items",
     "collections": "Collections",
     "nearby": "Nearby marketplace",
+    "search": "Advanced search",
     "browse": "Browse marketplace",
     "view": "View"
   },
@@ -413,6 +414,39 @@
     "startSubtitle": "Search by coordinates to browse nearby marketplace listings.",
     "emptyTitle": "No nearby listings found",
     "emptySubtitle": "Try a wider radius or another location."
+  },
+  "advancedSearch": {
+    "eyebrow": "Faceted marketplace search",
+    "title": "Advanced search",
+    "subtitle": "Use the same marketplace filters as the web app to narrow results quickly.",
+    "placeholder": "Search by title, keyword, or seller...",
+    "priceMin": "Min price",
+    "priceMax": "Max price",
+    "minPlaceholder": "0",
+    "maxPlaceholder": "100",
+    "category": "Category",
+    "condition": "Condition",
+    "sellerType": "Seller type",
+    "allSellers": "All sellers",
+    "delivery": "Delivery",
+    "anyDelivery": "Any delivery",
+    "sort": "Sort",
+    "postedWithin": "Posted within",
+    "anyTime": "Any time",
+    "days": "{{count}} days",
+    "reset": "Reset {{count}} filters",
+    "results": "{{count}} results",
+    "loadFailed": "Could not search marketplace listings.",
+    "loadMoreFailed": "Could not load more search results.",
+    "emptyTitle": "No matching listings",
+    "emptySubtitle": "Try fewer filters or a different search term.",
+    "clearFilters": "Clear filters",
+    "sortOptions": {
+      "newest": "Newest",
+      "price_asc": "Price low to high",
+      "price_desc": "Price high to low",
+      "popular": "Popular"
+    }
   },
   "shipping": {
     "eyebrow": "Seller fulfilment",

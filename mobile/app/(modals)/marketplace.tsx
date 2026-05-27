@@ -233,10 +233,16 @@ function MarketplaceScreen() {
                     <HeroButton.Label>{t('actions.collections')}</HeroButton.Label>
                   </HeroButton>
                 </View>
-                <HeroButton variant="secondary" onPress={() => router.push('/(modals)/marketplace-map' as Href)}>
-                  <Ionicons name="map-outline" size={16} color={primary} />
-                  <HeroButton.Label>{t('actions.nearby')}</HeroButton.Label>
-                </HeroButton>
+                <View className="flex-row gap-2">
+                  <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-search' as Href)}>
+                    <Ionicons name="options-outline" size={16} color={primary} />
+                    <HeroButton.Label>{t('actions.search')}</HeroButton.Label>
+                  </HeroButton>
+                  <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-map' as Href)}>
+                    <Ionicons name="map-outline" size={16} color={primary} />
+                    <HeroButton.Label>{t('actions.nearby')}</HeroButton.Label>
+                  </HeroButton>
+                </View>
               </HeroCard.Body>
             </HeroCard>
 
