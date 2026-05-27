@@ -132,7 +132,7 @@ export function MarketplaceAdmin() {
         description={t('marketplace.description')}
         actions={
           <Button
-            variant="flat"
+            variant="secondary"
             startContent={<RefreshCw size={16} />}
             onPress={loadDashboard}
           >
@@ -147,7 +147,7 @@ export function MarketplaceAdmin() {
           label={t('marketplace.stat_total_listings')}
           value={stats?.total_listings ?? 0}
           icon={ShoppingBag}
-          color="primary"
+          color="default"
           loading={loading}
         />
         <StatCard
@@ -161,7 +161,7 @@ export function MarketplaceAdmin() {
           label={t('marketplace.stat_total_sellers')}
           value={stats?.total_sellers ?? 0}
           icon={Store}
-          color="secondary"
+          color="default"
           loading={loading}
         />
         <StatCard
@@ -183,45 +183,45 @@ export function MarketplaceAdmin() {
       {/* Quick Actions */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Link to={tenantPath('/admin/marketplace/moderation')}>
-          <Card shadow="sm" isPressable className="w-full border border-divider/70 bg-surface shadow-sm shadow-black/[0.03] transition-transform hover:-translate-y-0.5">
+          <Card isPressable className="w-full border border-divider/70 bg-surface transition-transform hover:-translate-y-0.5">
             <CardBody className="flex flex-row items-center gap-4 p-4">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-warning bg-warning/10">
                 <Shield size={24} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-foreground">{t('marketplace.moderation_queue')}</p>
-                <p className="text-sm text-default-500">
+                <p className="text-sm text-muted">
                   {t('marketplace.moderation_queue_desc')}
                 </p>
               </div>
-              <ChevronRight size={20} className="text-default-400" />
+              <ChevronRight size={20} className="text-muted" />
             </CardBody>
           </Card>
         </Link>
         <Link to={tenantPath('/admin/marketplace/sellers')}>
-          <Card shadow="sm" isPressable className="w-full border border-divider/70 bg-surface shadow-sm shadow-black/[0.03] transition-transform hover:-translate-y-0.5">
+          <Card isPressable className="w-full border border-divider/70 bg-surface transition-transform hover:-translate-y-0.5">
             <CardBody className="flex flex-row items-center gap-4 p-4">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-accent bg-accent/10">
                 <Users size={24} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-foreground">{t('marketplace.seller_management')}</p>
-                <p className="text-sm text-default-500">
+                <p className="text-sm text-muted">
                   {t('marketplace.seller_management_desc')}
                 </p>
               </div>
-              <ChevronRight size={20} className="text-default-400" />
+              <ChevronRight size={20} className="text-muted" />
             </CardBody>
           </Card>
         </Link>
       </div>
 
       {/* Recent Listings Table */}
-      <Card shadow="sm" className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
+      <Card className="border border-divider/70 bg-surface">
         <CardHeader className="flex items-center justify-between px-4 pt-4">
           <h3 className="text-lg font-semibold text-foreground">{t('marketplace.recent_listings')}</h3>
           <Link to={tenantPath('/admin/marketplace/moderation')}>
-            <Button size="sm" variant="flat" color="primary">
+            <Button size="sm" variant="secondary">
               {t('marketplace.view_all')}
             </Button>
           </Link>
@@ -233,8 +233,8 @@ export function MarketplaceAdmin() {
             </div>
           ) : recentListings.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
-              <ShoppingBag size={32} className="text-default-300 mb-2" />
-              <p className="text-sm text-default-500">{t('marketplace.no_listings_yet')}</p>
+              <ShoppingBag size={32} className="text-muted mb-2" />
+              <p className="text-sm text-muted">{t('marketplace.no_listings_yet')}</p>
             </div>
           ) : (
             <Table aria-label={t('marketplace.recent_listings')} removeWrapper>
@@ -252,14 +252,14 @@ export function MarketplaceAdmin() {
                     <TableCell>
                       <span className="font-medium text-foreground">{listing.title}</span>
                     </TableCell>
-                    <TableCell className="text-default-600">{listing.user?.name ?? '--'}</TableCell>
-                    <TableCell className="text-default-600">
+                    <TableCell className="text-muted">{listing.user?.name ?? '--'}</TableCell>
+                    <TableCell className="text-muted">
                       {listing.price_currency ?? ''}{(parseFloat(String(listing.price)) || 0).toFixed(2)}
                     </TableCell>
                     <TableCell>
                       <Chip
                         size="sm"
-                        variant="flat"
+                        variant="soft"
                         color={statusColors[listing.status] || 'default'}
                         className="capitalize"
                       >
@@ -269,14 +269,14 @@ export function MarketplaceAdmin() {
                     <TableCell>
                       <Chip
                         size="sm"
-                        variant="flat"
+                        variant="soft"
                         color={moderationColors[listing.moderation_status] || 'default'}
                         className="capitalize"
                       >
                         {listing.moderation_status}
                       </Chip>
                     </TableCell>
-                    <TableCell className="text-default-500">
+                    <TableCell className="text-muted">
                       {new Date(listing.created_at).toLocaleDateString()}
                     </TableCell>
                   </TableRow>

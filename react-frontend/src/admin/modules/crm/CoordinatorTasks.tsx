@@ -310,7 +310,7 @@ export default function CoordinatorTasks() {
         title={t('crm.coordinator_tasks_title')}
         description={t('crm.tasks_total_count', { count: total })}
         actions={
-          <Button color="primary" startContent={<Plus className="w-4 h-4" />} onPress={openCreate}>
+          <Button startContent={<Plus className="w-4 h-4" />} onPress={openCreate}>
             {t('crm.create_task')}
           </Button>
         }
@@ -319,13 +319,12 @@ export default function CoordinatorTasks() {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4 flex-wrap items-end">
         {/* Status tabs */}
-        <div className="flex gap-1 p-1 bg-default-100 dark:bg-default-50 rounded-lg">
+        <div className="flex gap-1 p-1 bg-surface-secondary rounded-lg">
           {STATUS_TABS.map((tab) => (
             <Button
               key={tab.key}
               size="sm"
-              variant={statusFilter === tab.key ? 'solid' : 'light'}
-              color={statusFilter === tab.key ? 'primary' : 'default'}
+              variant={statusFilter === tab.key ? 'primary' : 'ghost'}
               onPress={() => setStatusFilter(tab.key)}
             >
               {t(tab.labelKey)}
@@ -371,9 +370,9 @@ export default function CoordinatorTasks() {
       {!loading && tasks.length === 0 && (
         <Card>
           <CardBody className="py-12 text-center">
-            <ClipboardList className="w-12 h-12 mx-auto text-default-300 mb-4" />
-            <p className="text-default-500 text-lg font-medium">{t('crm.no_tasks_found')}</p>
-            <p className="text-default-400 text-sm mt-1">
+            <ClipboardList className="w-12 h-12 mx-auto text-muted mb-4" />
+            <p className="text-muted text-lg font-medium">{t('crm.no_tasks_found')}</p>
+            <p className="text-muted text-sm mt-1">
               {statusFilter !== 'all' || priorityFilter !== 'all'
                 ? t('crm.no_tasks_hint_filtered')
                 : t('crm.no_tasks_hint_default')}
@@ -414,13 +413,13 @@ export default function CoordinatorTasks() {
                         <div className="flex-1 min-w-0">
                           <h3
                             className={`font-semibold text-base ${
-                              task.status === 'completed' ? 'line-through text-default-400' : ''
+                              task.status === 'completed' ? 'line-through text-muted' : ''
                             }`}
                           >
                             {task.title}
                           </h3>
                           {task.description && (
-                            <p className="text-sm text-default-500 mt-1 line-clamp-2">
+                            <p className="text-sm text-muted mt-1 line-clamp-2">
                               {task.description}
                             </p>
                           )}
@@ -429,7 +428,7 @@ export default function CoordinatorTasks() {
                         {/* Actions dropdown */}
                         <Dropdown>
                           <DropdownTrigger>
-                            <Button isIconOnly size="sm" variant="light" aria-label={t('crm.label_task_actions')}>
+                            <Button isIconOnly size="sm" variant="ghost" aria-label={t('crm.label_task_actions')}>
                               <MoreVertical className="w-4 h-4" />
                             </Button>
                           </DropdownTrigger>
@@ -477,17 +476,17 @@ export default function CoordinatorTasks() {
 
                       {/* Metadata row */}
                       <div className="flex flex-wrap items-center gap-2 mt-3">
-                        <Chip size="sm" color={PRIORITY_COLOR_MAP[task.priority]} variant="flat">
+                        <Chip size="sm" color={PRIORITY_COLOR_MAP[task.priority]} variant="soft">
                           {getPriorityLabel(task.priority)}
                         </Chip>
-                        <Chip size="sm" color={STATUS_COLOR_MAP[task.status] || 'default'} variant="flat">
+                        <Chip size="sm" color={STATUS_COLOR_MAP[task.status] || 'default'} variant="soft">
                           {getStatusLabel(task.status)}
                         </Chip>
 
                         {task.due_date && (
                           <span
                             className={`inline-flex items-center gap-1 text-xs ${
-                              overdue ? 'text-danger font-semibold' : 'text-default-500'
+                              overdue ? 'text-danger font-semibold' : 'text-muted'
                             }`}
                           >
                             <Calendar className="w-3 h-3" />
@@ -496,7 +495,7 @@ export default function CoordinatorTasks() {
                           </span>
                         )}
 
-                        <span className="inline-flex items-center gap-1 text-xs text-default-400">
+                        <span className="inline-flex items-center gap-1 text-xs text-muted">
                           <User className="w-3 h-3" />
                           {task.assigned_to_name}
                         </span>
@@ -507,7 +506,7 @@ export default function CoordinatorTasks() {
                         {task.user_name && (
                           <Link
                             to={tenantPath(`/admin/users/${task.user_id}/edit`)}
-                            className="flex items-center gap-2 text-xs text-default-500 hover:text-accent transition-colors"
+                            className="flex items-center gap-2 text-xs text-muted hover:text-accent transition-colors"
                           >
                             <Avatar
                               src={task.user_avatar || undefined}
@@ -518,7 +517,7 @@ export default function CoordinatorTasks() {
                             <span>{t('crm.related_prefix')} {task.user_name}</span>
                           </Link>
                         )}
-                        <span className="text-xs text-default-400">
+                        <span className="text-xs text-muted">
                           {t('crm.created_by_prefix')} {task.created_by_name} &middot; {formatDateTime(task.created_at)}
                         </span>
                       </div>
@@ -612,10 +611,10 @@ export default function CoordinatorTasks() {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose} isDisabled={saving}>
+                <Button variant="tertiary" onPress={onClose} isDisabled={saving}>
                   {t('crm.action_cancel')}
                 </Button>
-                <Button color="primary" onPress={handleSave} isLoading={saving} isDisabled={saving}>
+                <Button onPress={handleSave} isLoading={saving} isDisabled={saving}>
                   {editingTask ? t('crm.update_task') : t('crm.create_task')}
                 </Button>
               </ModalFooter>
@@ -640,10 +639,10 @@ export default function CoordinatorTasks() {
                 </p>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose} isDisabled={deleting}>
+                <Button variant="tertiary" onPress={onClose} isDisabled={deleting}>
                   {t('crm.action_cancel')}
                 </Button>
-                <Button color="danger" onPress={handleDelete} isLoading={deleting} isDisabled={deleting}>
+                <Button variant="danger" onPress={handleDelete} isLoading={deleting} isDisabled={deleting}>
                   {t('crm.action_delete')}
                 </Button>
               </ModalFooter>

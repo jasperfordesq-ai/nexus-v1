@@ -282,7 +282,7 @@ export function AiSettings() {
 
       <div className="space-y-4">
         {/* Master Enable + Provider Selection */}
-        <Card shadow="sm">
+        <Card >
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Bot size={20} /> {t('ai_integration_heading')}
@@ -292,7 +292,7 @@ export function AiSettings() {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0">
                 <p className="font-medium">{t('enable_ai_features')}</p>
-                <p className="text-sm text-default-500">{t('enable_ai_features_desc')}</p>
+                <p className="text-sm text-muted">{t('enable_ai_features_desc')}</p>
               </div>
               <Switch
                 className="shrink-0"
@@ -309,7 +309,7 @@ export function AiSettings() {
                 const v = Array.from(keys)[0];
                 if (v) updateField('ai_provider', String(v));
               }}
-              variant="bordered"
+              variant="secondary"
               description={t('desc_select_ai_provider')}
             >
               {PROVIDERS.map(p => (
@@ -320,7 +320,7 @@ export function AiSettings() {
         </Card>
 
         {/* Provider Configuration */}
-        <Card shadow="sm">
+        <Card >
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Key size={20} /> {t('provider_configuration_heading')}
@@ -339,9 +339,9 @@ export function AiSettings() {
                 <div key={provider.key} className={`space-y-3 ${isActive ? '' : 'opacity-75'}`}>
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="font-medium">{t(provider.labelKey)}</p>
-                    {isActive && <Chip size="sm" color="primary" variant="flat">{t('chip_active')}</Chip>}
+                    {isActive && <Chip size="sm" variant="soft">{t('chip_active')}</Chip>}
                     {!isOllama && hasKeySet && !userTyped && (
-                      <Chip size="sm" color="success" variant="flat">{t('chip_key_configured')}</Chip>
+                      <Chip size="sm" color="success" variant="soft">{t('chip_key_configured')}</Chip>
                     )}
                   </div>
 
@@ -350,7 +350,7 @@ export function AiSettings() {
                       label={t('label_a_p_i_key')}
                       type="password"
                       placeholder={hasKeySet ? t('placeholder_current_key', { masked }) : t('placeholder_enter_api_key')}
-                      variant="bordered"
+                      variant="secondary"
                       description={
                         hasKeySet
                           ? t('desc_api_key_replace')
@@ -363,7 +363,7 @@ export function AiSettings() {
                     <Input
                       label={t('label_ollama_host_url')}
                       placeholder="http://localhost:11434"
-                      variant="bordered"
+                      variant="secondary"
                       description={t('desc_ollama_host')}
                       value={form.ollama_host}
                       onValueChange={(v) => updateField('ollama_host', v)}
@@ -377,7 +377,7 @@ export function AiSettings() {
                       const v = Array.from(keys)[0];
                       if (v) updateField(provider.modelField, String(v));
                     }}
-                    variant="bordered"
+                    variant="secondary"
                     description={t('desc_select_model')}
                   >
                     {MODEL_SUGGESTIONS[provider.key].map(m => (
@@ -393,7 +393,7 @@ export function AiSettings() {
         </Card>
 
         {/* Feature Toggles */}
-        <Card shadow="sm">
+        <Card >
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Cpu size={20} /> {t('ai_features_heading')}
@@ -404,7 +404,7 @@ export function AiSettings() {
               <div key={feat.key} className="flex flex-col gap-3 py-1 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
                   <p className="text-sm font-medium">{t(feat.labelKey)}</p>
-                  <p className="text-xs text-default-400">{t(feat.descKey)}</p>
+                  <p className="text-xs text-muted">{t(feat.descKey)}</p>
                 </div>
                 <Switch
                   className="shrink-0"
@@ -419,7 +419,7 @@ export function AiSettings() {
         </Card>
 
         {/* Usage Limits */}
-        <Card shadow="sm" className="border border-warning-200/60 bg-warning-50/70 dark:border-warning-900/40 dark:bg-warning-950/20">
+        <Card  className="border border-warning-200/60 bg-warning-50/70 dark:border-warning-900/40 dark:bg-warning-950/20">
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Sliders size={20} /> {t('usage_limits_heading')}
@@ -430,7 +430,7 @@ export function AiSettings() {
               label={t('label_default_daily_limit')}
               type="number"
               placeholder="50"
-              variant="bordered"
+              variant="secondary"
               description={t('desc_default_daily_limit')}
               value={form.default_daily_limit}
               onValueChange={(v) => updateField('default_daily_limit', v)}
@@ -439,7 +439,7 @@ export function AiSettings() {
               label={t('label_default_monthly_limit')}
               type="number"
               placeholder="1000"
-              variant="bordered"
+              variant="secondary"
               description={t('desc_default_monthly_limit')}
               value={form.default_monthly_limit}
               onValueChange={(v) => updateField('default_monthly_limit', v)}
@@ -448,13 +448,13 @@ export function AiSettings() {
         </Card>
 
         {/* Security Note */}
-        <Card shadow="sm">
+        <Card >
           <CardBody>
             <div className="flex items-start gap-3">
-              <Shield size={20} className="text-default-400 mt-0.5 shrink-0" />
+              <Shield size={20} className="text-muted mt-0.5 shrink-0" />
               <div>
                 <p className="text-sm font-medium">{t('security_heading')}</p>
-                <p className="text-xs text-default-400">
+                <p className="text-xs text-muted">
                   {t('security_note')}
                 </p>
               </div>
@@ -465,7 +465,6 @@ export function AiSettings() {
         {/* Save Button */}
         <div className="flex justify-end">
           <Button
-            color="primary"
             startContent={<Save size={16} />}
             onPress={handleSave}
             isLoading={saving}

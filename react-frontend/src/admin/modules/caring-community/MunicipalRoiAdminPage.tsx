@@ -226,8 +226,6 @@ export default function MunicipalRoiAdminPage() {
           <div className="flex items-center gap-2 flex-wrap">
             <Button
               size="sm"
-              variant="flat"
-              color="primary"
               startContent={<Download size={15} />}
               onPress={handleExport}
               isLoading={exporting}
@@ -238,7 +236,7 @@ export default function MunicipalRoiAdminPage() {
               <Button
                 isIconOnly
                 size="sm"
-                variant="flat"
+                variant="ghost"
                 onPress={load}
                 isLoading={loading}
                 aria-label={t('municipal_roi_page.actions.refresh_aria')}
@@ -251,17 +249,17 @@ export default function MunicipalRoiAdminPage() {
       />
 
       {/* Intro card */}
-      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info size={16} className="mt-0.5 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('municipal_roi_page.about.title')}</p>
-              <p className="text-default-600">
+              <p className="text-muted">
                 {t('municipal_roi_page.about.body_prefix')} <Abbr term="ROI" /> {t('municipal_roi_page.about.body_middle')}{' '}
                 <Abbr term="KISS" />/{t('municipal_roi_page.about.body_suffix')}
               </p>
-              <p className="text-default-500">
+              <p className="text-muted">
                 {t('municipal_roi_page.about.formula_prefix')} <Abbr term="CHF" /> {t('municipal_roi_page.about.formula_suffix')}
               </p>
             </div>
@@ -280,7 +278,7 @@ export default function MunicipalRoiAdminPage() {
             value={from}
             onValueChange={setFrom}
             className="w-44"
-            variant="bordered"
+            variant="secondary"
           />
           <Input
             type="date"
@@ -290,7 +288,7 @@ export default function MunicipalRoiAdminPage() {
             value={to}
             onValueChange={setTo}
             className="w-44"
-            variant="bordered"
+            variant="secondary"
           />
           {subRegions.length > 0 && (
             <Select
@@ -304,7 +302,7 @@ export default function MunicipalRoiAdminPage() {
                 setSubRegionId(arr.length ? String(arr[0]) : '');
               }}
               className="w-56"
-              variant="bordered"
+              variant="secondary"
             >
               <>
                 <SelectItem key="" id="">{t('municipal_roi_page.filters.all_sub_regions')}</SelectItem>
@@ -314,7 +312,7 @@ export default function MunicipalRoiAdminPage() {
               </>
             </Select>
           )}
-          <div className="ml-auto text-xs text-default-500">
+          <div className="ml-auto text-xs text-muted">
             {data?.period
               ? t('municipal_roi_page.filters.period', { from: data.period.from, to: data.period.to })
               : t('municipal_roi_page.filters.period', { from, to })}
@@ -325,8 +323,8 @@ export default function MunicipalRoiAdminPage() {
       {/* Methodology note */}
       <Card className="border border-[var(--color-border)] bg-[var(--color-surface-alt)]">
         <CardBody className="flex flex-row items-start gap-3 py-3">
-          <Info size={16} className="mt-0.5 shrink-0 text-default-500" />
-          <p className="text-sm text-default-600">
+          <Info size={16} className="mt-0.5 shrink-0 text-muted" />
+          <p className="text-sm text-muted">
             {data?.methodology ? (
               <>
                 {t('municipal_roi_page.methodology.hours_valued_at')}{' '}
@@ -376,13 +374,13 @@ export default function MunicipalRoiAdminPage() {
                 label={t('municipal_roi_page.stats.total_hours')}
                 value={data.total_hours.toLocaleString()}
                 icon={Clock}
-                color="primary"
+                color="default"
               />
               {showWeightedAnnotation && typeof data.weighted_hours === 'number' && (
                 <Tooltip
                   content={t('municipal_roi_page.stats.weighted_hours_tooltip')}
                 >
-                  <p className="mt-1 text-xs text-default-500 cursor-help">
+                  <p className="mt-1 text-xs text-muted cursor-help">
                     {t('municipal_roi_page.stats.weighted_hours_note', {
                       hours: NUM.format(data.weighted_hours),
                     })}
@@ -400,7 +398,7 @@ export default function MunicipalRoiAdminPage() {
               label={t('municipal_roi_page.stats.active_relationships')}
               value={data.active_relationships.toLocaleString()}
               icon={Heart}
-              color="secondary"
+              color="default"
             />
             <StatCard
               label={t('municipal_roi_page.stats.care_recipients')}
@@ -424,7 +422,7 @@ export default function MunicipalRoiAdminPage() {
                 {yoyPct !== null && (
                   <Chip
                     color={yoyPct >= 0 ? 'success' : 'danger'}
-                    variant="flat"
+                    variant="soft"
                     size="sm"
                     startContent={
                       yoyPct >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />
@@ -436,13 +434,13 @@ export default function MunicipalRoiAdminPage() {
                   </Chip>
                 )}
               </div>
-              <p className="text-sm text-default-500">{t('municipal_roi_page.roi.prevented_this_period')}</p>
+              <p className="text-sm text-muted">{t('municipal_roi_page.roi.prevented_this_period')}</p>
 
               <Separator />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-                  <p className="text-xs text-default-500 mb-1">
+                  <p className="text-xs text-muted mb-1">
                     {t('municipal_roi_page.roi.prevention_value')}
                     {data.methodology
                       ? t('municipal_roi_page.roi.multiplier_note', {
@@ -453,7 +451,7 @@ export default function MunicipalRoiAdminPage() {
                   <p className="text-2xl font-bold">{CHF.format(data.roi.prevention_value_chf)}</p>
                 </div>
                 <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-4">
-                  <p className="text-xs text-default-500 mb-1">
+                  <p className="text-xs text-muted mb-1">
                     {t('municipal_roi_page.roi.social_isolation_supported')}
                   </p>
                   <p className="text-2xl font-bold">
@@ -477,7 +475,7 @@ export default function MunicipalRoiAdminPage() {
                   <><Abbr term="NEXUS" /> {t('municipal_roi_page.municipalities.point_nexus')}</>,
                   <>{t('municipal_roi_page.municipalities.point_export')}</>,
                 ] as React.ReactNode[]).map((point, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-default-700">
+                  <li key={i} className="flex items-start gap-2 text-sm text-foreground">
                     <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
                     {point}
                   </li>
@@ -492,7 +490,7 @@ export default function MunicipalRoiAdminPage() {
               <CardHeader className="pb-2">
                 <div className="space-y-0.5">
                   <span className="font-semibold text-sm">{t('municipal_roi_page.breakdown.title')}</span>
-                  <p className="text-xs text-default-500">
+                  <p className="text-xs text-muted">
                     {t('municipal_roi_page.breakdown.description')}
                   </p>
                 </div>

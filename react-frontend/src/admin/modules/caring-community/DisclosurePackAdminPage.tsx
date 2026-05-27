@@ -162,7 +162,7 @@ export default function DisclosurePackAdminPage() {
               <Button
                 isIconOnly
                 size="sm"
-                variant="flat"
+                variant="tertiary"
                 onPress={load}
                 isLoading={loading}
                 aria-label={t('disclosure_pack.actions.refresh_aria')}
@@ -172,7 +172,7 @@ export default function DisclosurePackAdminPage() {
             </Tooltip>
             <Button
               size="sm"
-              variant="flat"
+              variant="secondary"
               startContent={<Download size={14} />}
               onPress={exportMarkdown}
               isLoading={exporting}
@@ -181,7 +181,6 @@ export default function DisclosurePackAdminPage() {
             </Button>
             <Button
               size="sm"
-              color="primary"
               startContent={<Save size={14} />}
               onPress={save}
               isLoading={saving}
@@ -193,7 +192,7 @@ export default function DisclosurePackAdminPage() {
         }
       />
 
-      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
@@ -201,12 +200,12 @@ export default function DisclosurePackAdminPage() {
               <p className="font-semibold text-accent dark:text-accent">
                 {t('disclosure_pack.about.title')}
               </p>
-              <p className="text-default-600">
+              <p className="text-muted">
                 {t('disclosure_pack.about.body_prefix')}{' '}
                 <Abbr term="FADP" />/<Abbr term="nDSG" />{' '}
                 {t('disclosure_pack.about.body_suffix')}
               </p>
-              <p className="text-default-600">
+              <p className="text-muted">
                 {t('disclosure_pack.about.review_prefix')}{' '}
                 <Abbr term="FADP" />/<Abbr term="nDSG" />{' '}
                 {t('disclosure_pack.about.review_middle')}{' '}
@@ -273,7 +272,7 @@ export default function DisclosurePackAdminPage() {
                   {Object.entries(draft.data_categories).map(([cat, fields]) => (
                     <p key={cat} className="text-sm">
                       <span className="font-mono text-xs text-accent">{cat}</span>:{' '}
-                      <span className="text-default-600">{(fields as string[]).join(', ')}</span>
+                      <span className="text-muted">{(fields as string[]).join(', ')}</span>
                     </p>
                   ))}
                 </CardBody>
@@ -285,7 +284,7 @@ export default function DisclosurePackAdminPage() {
                   {Object.entries(draft.lawful_basis).map(([cat, basis]) => (
                     <p key={cat} className="text-sm">
                       <span className="font-mono text-xs text-accent">{cat}</span>:{' '}
-                      <span className="text-default-600">{basis as string}</span>
+                      <span className="text-muted">{basis as string}</span>
                     </p>
                   ))}
                 </CardBody>
@@ -298,7 +297,7 @@ export default function DisclosurePackAdminPage() {
                     {Object.entries(draft.retention_defaults).map(([k, v]) => (
                       <p key={k} className="text-sm">
                         <span className="font-mono text-xs text-accent">{k}</span>:{' '}
-                        <span className="text-default-600">{v as string}</span>
+                        <span className="text-muted">{v as string}</span>
                       </p>
                     ))}
                   </div>
@@ -314,11 +313,11 @@ export default function DisclosurePackAdminPage() {
                   <p key={k} className="text-sm">
                     <span className="font-mono text-xs text-accent">{k}</span>:{' '}
                     {typeof v === 'boolean' ? (
-                      <Chip size="sm" color={v ? 'success' : 'default'} variant="flat">
+                      <Chip size="sm" color={v ? 'success' : 'default'} variant="soft">
                         {v ? t('disclosure_pack.status.enabled_lower') : t('disclosure_pack.status.disabled_lower')}
                       </Chip>
                     ) : (
-                      <span className="text-default-600">{v as string}</span>
+                      <span className="text-muted">{v as string}</span>
                     )}
                   </p>
                 ))}
@@ -334,10 +333,10 @@ export default function DisclosurePackAdminPage() {
                   <p className="text-sm">
                     {t('disclosure_pack.labels.aggregate_policy')}: <span className="font-mono text-xs">{draft.federation.aggregate_policy}</span>
                   </p>
-                  <Chip size="sm" color={draft.federation.enabled ? 'success' : 'default'} variant="flat">
+                  <Chip size="sm" color={draft.federation.enabled ? 'success' : 'default'} variant="soft">
                     {draft.federation.enabled ? t('disclosure_pack.status.enabled') : t('disclosure_pack.status.disabled')}
                   </Chip>
-                  <Chip size="sm" variant="flat">
+                  <Chip size="sm" variant="soft">
                     {draft.federation.opt_out ? t('disclosure_pack.status.members_can_opt_out') : t('disclosure_pack.status.no_member_opt_out')}
                   </Chip>
                 </CardBody>
@@ -346,7 +345,7 @@ export default function DisclosurePackAdminPage() {
               <Card>
                 <CardHeader className="pb-2"><span className="font-semibold text-sm">{t('disclosure_pack.sections.isolated_node_configuration')}</span></CardHeader>
                 <CardBody className="pt-0 space-y-3">
-                  <p className="text-xs text-default-500">
+                  <p className="text-xs text-muted">
                     {t('disclosure_pack.isolated_node.description_prefix')}{' '}
                     <Abbr term="FADP" />/<Abbr term="nDSG" />{' '}
                     {t('disclosure_pack.isolated_node.description_suffix')}
@@ -397,19 +396,19 @@ export default function DisclosurePackAdminPage() {
             <Card className="mt-4">
               <CardBody className="py-4 space-y-3">
                 <p className="text-sm">
-                  <Chip size="sm" color={draft.cross_border_transfers.occurs ? 'warning' : 'success'} variant="flat">
+                  <Chip size="sm" color={draft.cross_border_transfers.occurs ? 'warning' : 'success'} variant="soft">
                     {draft.cross_border_transfers.occurs ? t('disclosure_pack.status.cross_border_occurs') : t('disclosure_pack.status.no_cross_border_transfers')}
                   </Chip>
                 </p>
                 <div>
                   <p className="text-sm font-semibold mb-1">{t('disclosure_pack.sections.destinations')}</p>
-                  <ul className="list-disc pl-6 text-sm text-default-600">
+                  <ul className="list-disc pl-6 text-sm text-muted">
                     {draft.cross_border_transfers.destinations.map((d) => <li key={d}>{d}</li>)}
                   </ul>
                 </div>
                 <div>
                   <p className="text-sm font-semibold mb-1">{t('disclosure_pack.sections.safeguards')}</p>
-                  <ul className="list-disc pl-6 text-sm text-default-600">
+                  <ul className="list-disc pl-6 text-sm text-muted">
                     {draft.cross_border_transfers.safeguards.map((s) => <li key={s}>{s}</li>)}
                   </ul>
                 </div>
@@ -422,11 +421,11 @@ export default function DisclosurePackAdminPage() {
       {!loading && data?.last_updated_at && (
         <>
           <Separator />
-          <p className="text-xs text-default-500 flex items-center gap-2">
+          <p className="text-xs text-muted flex items-center gap-2">
             <FileText size={12} />
             {t('disclosure_pack.footer.last_saved', { date: new Date(data.last_updated_at).toLocaleString() })}
             {data.is_customised && (
-              <Chip size="sm" variant="flat" color="primary">{t('disclosure_pack.footer.customised')}</Chip>
+              <Chip size="sm" variant="soft" color="accent">{t('disclosure_pack.footer.customised')}</Chip>
             )}
           </p>
         </>

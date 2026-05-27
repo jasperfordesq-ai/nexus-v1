@@ -107,7 +107,7 @@ export function WarmthPassAdminPage() {
       />
 
       {/* About card */}
-      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
@@ -115,7 +115,7 @@ export function WarmthPassAdminPage() {
               <p className="font-semibold text-accent dark:text-accent">
                 {t('admin.warmth_pass.about.title')}
               </p>
-              <p className="text-default-600">
+              <p className="text-muted">
                 {t('admin.warmth_pass.about.body')}
               </p>
             </div>
@@ -136,15 +136,14 @@ export function WarmthPassAdminPage() {
               placeholder={t('admin.warmth_pass.lookup.placeholder')}
               value={userId}
               onValueChange={setUserId}
-              variant="bordered"
+              variant="secondary"
               className="max-w-xs"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') void handleLookup();
               }}
-              startContent={<User className="h-4 w-4 text-default-400" aria-hidden="true" />}
+              startContent={<User className="h-4 w-4 text-muted" aria-hidden="true" />}
             />
             <Button
-              color="primary"
               onPress={() => void handleLookup()}
               isLoading={loading}
               isDisabled={!userId.trim() || loading}
@@ -181,15 +180,15 @@ export function WarmthPassAdminPage() {
           <CardHeader>
             <div className="flex w-full flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <User className="h-5 w-5 text-default-500" aria-hidden="true" />
+                <User className="h-5 w-5 text-muted" aria-hidden="true" />
                 <div>
                   <p className="font-bold text-base">{result.member_name}</p>
-                  <p className="text-xs text-default-500">{result.tenant_name}</p>
+                  <p className="text-xs text-muted">{result.tenant_name}</p>
                 </div>
               </div>
               <Chip
                 color={result.eligible ? 'success' : 'default'}
-                variant="flat"
+                variant="soft"
                 size="sm"
               >
                 {result.eligible ? t('admin.warmth_pass.eligible') : t('admin.warmth_pass.not_eligible')}
@@ -213,7 +212,7 @@ export function WarmthPassAdminPage() {
             {/* Tier */}
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-default-400 mb-1">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted mb-1">
                   {t('admin.warmth_pass.fields.trust_tier')}
                 </p>
                 <Chip
@@ -222,17 +221,17 @@ export function WarmthPassAdminPage() {
                     result.tier >= 4 ? 'warning'
                     : result.tier === 3 ? 'success'
                     : result.tier === 2 ? 'warning'
-                    : result.tier === 1 ? 'primary'
+                    : result.tier === 1 ? 'accent'
                     : 'default'
                   }
-                  variant="flat"
+                  variant="soft"
                   className="capitalize font-semibold"
                 >
                   {t('admin.warmth_pass.tier_chip', { label: result.tier_label, tier: result.tier })}
                 </Chip>
               </div>
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-default-400 mb-1">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted mb-1">
                   {t('admin.warmth_pass.fields.identity_verified')}
                 </p>
                 {result.identity_verified ? (
@@ -241,7 +240,7 @@ export function WarmthPassAdminPage() {
                     <span className="text-sm font-semibold">{t('admin.warmth_pass.verified')}</span>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-1.5 text-default-400">
+                  <div className="flex items-center gap-1.5 text-muted">
                     <XCircle className="h-4 w-4" aria-hidden="true" />
                     <span className="text-sm">{t('admin.warmth_pass.not_verified')}</span>
                   </div>
@@ -256,14 +255,14 @@ export function WarmthPassAdminPage() {
               <div className="rounded-lg border border-divider p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <Clock className="h-4 w-4 text-accent" aria-hidden="true" />
-                  <p className="text-xs text-default-500">{t('admin.warmth_pass.fields.hours_logged')}</p>
+                  <p className="text-xs text-muted">{t('admin.warmth_pass.fields.hours_logged')}</p>
                 </div>
                 <p className="text-2xl font-bold">{result.hours_logged}</p>
               </div>
               <div className="rounded-lg border border-divider p-4">
                 <div className="flex items-center gap-2 mb-1">
                   <Star className="h-4 w-4 text-warning" aria-hidden="true" />
-                  <p className="text-xs text-default-500">{t('admin.warmth_pass.fields.reviews_received')}</p>
+                  <p className="text-xs text-muted">{t('admin.warmth_pass.fields.reviews_received')}</p>
                 </div>
                 <p className="text-2xl font-bold">{result.reviews_received}</p>
               </div>
@@ -273,19 +272,19 @@ export function WarmthPassAdminPage() {
 
             {/* Categories */}
             <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-default-400 mb-2">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted mb-2">
                 {t('admin.warmth_pass.fields.help_categories')}
               </p>
               {result.categories.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {result.categories.map((cat) => (
-                    <Chip key={cat} size="sm" variant="flat" color="primary">
+                    <Chip key={cat} size="sm" variant="soft" color="accent">
                       {cat}
                     </Chip>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-default-400">{t('admin.warmth_pass.no_categories')}</p>
+                <p className="text-sm text-muted">{t('admin.warmth_pass.no_categories')}</p>
               )}
             </div>
 
@@ -294,7 +293,7 @@ export function WarmthPassAdminPage() {
             {/* Dates */}
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-default-400 mb-1">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted mb-1">
                   {t('admin.warmth_pass.fields.member_since')}
                 </p>
                 <p className="text-sm font-semibold">
@@ -302,7 +301,7 @@ export function WarmthPassAdminPage() {
                 </p>
               </div>
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-default-400 mb-1">
+                <p className="text-xs font-semibold uppercase tracking-wide text-muted mb-1">
                   {t('admin.warmth_pass.fields.pass_active_since')}
                 </p>
                 <p className="text-sm font-semibold">

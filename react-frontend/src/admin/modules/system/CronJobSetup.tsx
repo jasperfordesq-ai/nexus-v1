@@ -66,15 +66,15 @@ export function CronJobSetup() {
       />
 
       {/* Important Notice */}
-      <Card shadow="sm" className="mb-6">
+      <Card className="mb-6">
         <CardBody>
           <div className="bg-warning/10 border border-warning/20 rounded-lg p-3 flex items-start gap-2">
             <AlertTriangle size={16} className="text-warning mt-0.5 shrink-0" />
-            <div className="text-sm text-default-700 dark:text-default-300">
+            <div className="text-sm text-foreground">
               <p className="font-medium mb-1">
                 {t('system.cron_notice_title')}
               </p>
-              <p className="text-xs text-default-500">
+              <p className="text-xs text-muted">
                 {t('system.cron_notice_body_prefix')} <Code className="text-xs">artisan schedule:run</Code>{' '}
                 {t('system.cron_notice_body_middle')} <Code className="text-xs">/cron/*</Code>{' '}
                 {t('system.cron_notice_body_suffix')}
@@ -85,17 +85,16 @@ export function CronJobSetup() {
       </Card>
 
       {/* Test Connection */}
-      <Card shadow="sm" className="mb-6">
+      <Card className="mb-6">
         <CardBody className="flex flex-row items-center justify-between gap-4">
           <div>
             <p className="font-medium">{t('system.test_cron_api')}</p>
-            <p className="text-sm text-default-500">
+            <p className="text-sm text-muted">
               {t('system.test_cron_api_desc')}
             </p>
           </div>
           <Button
-            color="success"
-            variant="flat"
+            variant="secondary"
             startContent={<PlayCircle size={16} />}
             onPress={handleTestConnection}
             isLoading={testing}
@@ -106,7 +105,7 @@ export function CronJobSetup() {
       </Card>
 
       {/* Platform-specific instructions */}
-      <Card shadow="sm">
+      <Card>
         <CardBody className="p-0">
           <Tabs
             aria-label={t('system.label_platform_setup_instructions')}
@@ -118,13 +117,13 @@ export function CronJobSetup() {
             }}
           >
             {/* Docker (Primary) */}
-            <Tab key="docker" title={<div className="flex items-center gap-1.5"><Server size={14} /> {t('system.platform_docker')} <Chip size="sm" color="success" variant="flat">{t('system.recommended')}</Chip></div>}>
+            <Tab key="docker" title={<div className="flex items-center gap-1.5"><Server size={14} /> {t('system.platform_docker')} <Chip size="sm" color="success" variant="soft">{t('system.recommended')}</Chip></div>}>
               <div className="space-y-4 pt-4">
                 <div>
                   <h3 className="text-base font-semibold mb-2">
                     {t('system.cron_docker_step_1_title')}
                   </h3>
-                  <p className="text-sm text-default-600 mb-2">
+                  <p className="text-sm text-muted mb-2">
                     {t('system.cron_docker_step_1_desc')}
                   </p>
                   <div className="flex items-center gap-2">
@@ -133,7 +132,7 @@ export function CronJobSetup() {
                     </Code>
                     <Button
                         size="sm"
-                        variant="flat"
+                        variant="ghost"
                         isIconOnly
                         aria-label={t('system.label_copy_crontab_entry')}
                         onPress={() =>
@@ -152,7 +151,7 @@ export function CronJobSetup() {
 
                 <div className="bg-success/10 border border-success/20 rounded-lg p-3 flex items-start gap-2">
                   <CheckCircle size={16} className="text-success mt-0.5 shrink-0" />
-                  <p className="text-xs text-default-600">
+                  <p className="text-xs text-muted">
                     <strong>{t('system.cron_success_title')}</strong> {t('system.cron_success_body_prefix')}{' '}
                     <Code className="text-xs">{cronRunnerMethod}</Code> {t('system.cron_success_body_suffix')}
                   </p>
@@ -176,7 +175,7 @@ export function CronJobSetup() {
                     </Code>
                     <Button
                         size="sm"
-                        variant="flat"
+                        variant="ghost"
                         isIconOnly
                         aria-label={t('system.label_copy_crontab_entry')}
                         onPress={() =>
@@ -186,7 +185,7 @@ export function CronJobSetup() {
                       <Copy size={14} />
                     </Button>
                   </div>
-                  <p className="text-xs text-default-500 mt-1">
+                  <p className="text-xs text-muted mt-1">
                     {t('system.replace')} <Code className="text-xs">/path/to/your/project</Code>{' '}
                     {t('system.with_actual_project_root')}
                   </p>
@@ -204,14 +203,14 @@ export function CronJobSetup() {
               <div className="space-y-4 pt-4">
                 <div>
                   <h3 className="text-base font-semibold mb-2">{t('system.cron_cpanel_step_1_title')}</h3>
-                  <p className="text-sm text-default-600">
+                  <p className="text-sm text-muted">
                     {t('system.cron_cpanel_step_1_desc')}
                   </p>
                 </div>
 
                 <div>
                   <h3 className="text-base font-semibold mb-2">{t('system.cron_cpanel_step_2_title')}</h3>
-                  <p className="text-sm text-default-600 mb-2">
+                  <p className="text-sm text-muted mb-2">
                     {t('system.cron_cpanel_step_2_desc_prefix')} <Code className="text-xs">* * * * *</Code>{' '}
                     {t('system.cron_cpanel_step_2_desc_suffix')}
                   </p>
@@ -221,7 +220,7 @@ export function CronJobSetup() {
                     </Code>
                     <Button
                       size="sm"
-                      variant="flat"
+                      variant="ghost"
                       isIconOnly
                       aria-label={t('system.label_copy_code')}
                       onPress={() =>
@@ -231,7 +230,7 @@ export function CronJobSetup() {
                       <Copy size={14} />
                     </Button>
                   </div>
-                  <p className="text-xs text-default-500 mt-1">
+                  <p className="text-xs text-muted mt-1">
                     {t('system.replace')} <Code className="text-xs">/home/username/public_html</Code>{' '}
                     {t('system.with_absolute_project_path')}
                   </p>
@@ -255,7 +254,7 @@ export function CronJobSetup() {
                     </Code>
                     <Button
                       size="sm"
-                      variant="flat"
+                      variant="ghost"
                       isIconOnly
                       aria-label={t('system.label_copy_crontab_entry')}
                       onPress={() =>
@@ -294,7 +293,7 @@ export function CronJobSetup() {
                     </Code>
                     <Button
                       size="sm"
-                      variant="flat"
+                      variant="ghost"
                       isIconOnly
                       aria-label={t('system.label_copy_crontab_entry')}
                       onPress={() =>
@@ -321,7 +320,7 @@ export function CronJobSetup() {
       </Card>
 
       {/* Verification Checklist */}
-      <Card shadow="sm" className="mt-6">
+      <Card className="mt-6">
         <CardHeader className="flex items-center gap-2">
           <Info size={18} className="text-accent" />
           <h3 className="text-lg font-semibold">{t('system.verification_checklist')}</h3>

@@ -152,7 +152,7 @@ export default function ReviewsModeration() {
             className={`w-4 h-4 ${
               star <= rating
                 ? 'fill-warning text-warning'
-                : 'fill-default-200 text-default-200'
+                : 'fill-muted text-muted opacity-40'
             }`}
           />
         ))}
@@ -190,7 +190,7 @@ export default function ReviewsModeration() {
     if (isSuperAdmin) {
       cells.push(
         <TableCell key="tenant">
-          <Chip size="sm" variant="flat" color="secondary">
+          <Chip size="sm" variant="soft" color="default">
             {review.tenant_name}
           </Chip>
         </TableCell>
@@ -203,7 +203,7 @@ export default function ReviewsModeration() {
         <div className="max-w-md">
           <p className="text-sm line-clamp-2">{review.content}</p>
           {review.is_flagged && (
-            <Chip size="sm" color="warning" variant="flat" className="mt-1">
+            <Chip size="sm" color="warning" variant="soft" className="mt-1">
               {t('moderation.flagged')}
             </Chip>
           )}
@@ -211,13 +211,13 @@ export default function ReviewsModeration() {
       </TableCell>,
       <TableCell key="status">
         {review.is_hidden ? (
-          <Chip size="sm" color="warning" variant="flat">{t('moderation.hidden')}</Chip>
+          <Chip size="sm" color="warning" variant="soft">{t('moderation.hidden')}</Chip>
         ) : (
-          <Chip size="sm" color="success" variant="flat">{t('moderation.visible')}</Chip>
+          <Chip size="sm" color="success" variant="soft">{t('moderation.visible')}</Chip>
         )}
       </TableCell>,
       <TableCell key="created">
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {new Date(review.created_at).toLocaleDateString()}
         </span>
       </TableCell>,
@@ -226,8 +226,7 @@ export default function ReviewsModeration() {
           {!review.is_flagged && (
             <Button
               size="sm"
-              variant="flat"
-              color="warning"
+              variant="secondary"
               startContent={<Flag className="w-4 h-4" />}
               onPress={() => setConfirmAction({ type: 'flag', review })}
             >
@@ -237,8 +236,7 @@ export default function ReviewsModeration() {
           {!review.is_hidden && (
             <Button
               size="sm"
-              variant="flat"
-              color="warning"
+              variant="secondary"
               startContent={<EyeOff className="w-4 h-4" />}
               onPress={() => setConfirmAction({ type: 'hide', review })}
             >
@@ -247,8 +245,7 @@ export default function ReviewsModeration() {
           )}
           <Button
             size="sm"
-            variant="flat"
-            color="danger"
+            variant="danger"
             startContent={<Trash2 className="w-4 h-4" />}
             onPress={() => setConfirmAction({ type: 'delete', review })}
           >
@@ -290,8 +287,7 @@ export default function ReviewsModeration() {
         description={isSuperAdmin ? t('moderation.reviews_desc_super') : t('moderation.reviews_desc')}
         actions={
           <Button
-            color="primary"
-            variant="flat"
+            variant="secondary"
             startContent={<RefreshCw className="w-4 h-4" />}
             onPress={() => execute()}
             isLoading={isLoading}
@@ -309,7 +305,7 @@ export default function ReviewsModeration() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-          startContent={<Search className="w-4 h-4 text-default-400" />}
+          startContent={<Search className="w-4 h-4 text-muted" />}
           className="flex-1"
         />
         <Select
@@ -342,10 +338,10 @@ export default function ReviewsModeration() {
           </Select>
         )}
         <div className="flex gap-2">
-          <Button color="primary" onPress={handleSearch}>
+          <Button onPress={handleSearch}>
             {t('moderation.apply')}
           </Button>
-          <Button variant="flat" onPress={handleClear}>
+          <Button variant="tertiary" onPress={handleClear}>
             {t('moderation.clear')}
           </Button>
         </div>
@@ -353,7 +349,7 @@ export default function ReviewsModeration() {
 
       {/* Stats */}
       {meta && (
-        <div className="text-sm text-default-500">
+        <div className="text-sm text-muted">
           {t('moderation.showing_count')}
           {isSuperAdmin && !activeTenant && ` (${t('moderation.filter_all_tenants')})`}
         </div>
@@ -378,7 +374,7 @@ export default function ReviewsModeration() {
           isLoading={isLoading}
           loadingContent={<Spinner />}
           emptyContent={
-            <div className="text-center py-8 text-default-400">
+            <div className="text-center py-8 text-muted">
               {activeSearch || activeRating
                 ? t('moderation.no_reviews_match_filters')
                 : t('moderation.no_reviews_to_moderate')}
@@ -401,7 +397,6 @@ export default function ReviewsModeration() {
             page={page}
             onChange={setPage}
             showControls
-            color="primary"
           />
         </div>
       )}

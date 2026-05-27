@@ -153,7 +153,7 @@ function FeaturedListingsPanel() {
       label: t('listings.type'),
       sortable: true,
       render: (item) => (
-        <Chip size="sm" variant="flat" color={typeColors[item.type] || 'default'} className="capitalize">
+        <Chip size="sm" variant="soft" color={typeColors[item.type] || 'default'} className="capitalize">
           {item.type}
         </Chip>
       ),
@@ -168,7 +168,7 @@ function FeaturedListingsPanel() {
       label: t('listings.featured_date'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {new Date(item.featured_at).toLocaleDateString()}
         </span>
       ),
@@ -177,7 +177,7 @@ function FeaturedListingsPanel() {
       key: 'featured_by',
       label: t('listings.featured_by'),
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {item.featured_by || '—'}
         </span>
       ),
@@ -188,7 +188,7 @@ function FeaturedListingsPanel() {
       render: (item) => (
         <Button
           size="sm"
-          variant="flat"
+          variant="tertiary"
           color="warning"
           startContent={<StarOff size={14} />}
           onPress={() => setUnfeatureConfirm(item)}
@@ -202,7 +202,7 @@ function FeaturedListingsPanel() {
   return (
     <div className="space-y-6">
       {/* Feature new listing search */}
-      <Card shadow="sm" className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
+      <Card  className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
         <CardBody className="p-4">
           <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
             <Plus size={16} />
@@ -211,11 +211,11 @@ function FeaturedListingsPanel() {
           <Input type="search" name="admin-search" autoComplete="off"
             placeholder={t('listings.placeholder_search_active_listings_to_feature')}
             aria-label={t('listings.label_search_listings')}
-            startContent={<Search size={16} className="text-default-400" />}
+            startContent={<Search size={16} className="text-muted" />}
             value={searchQuery}
             onValueChange={handleSearch}
             size="sm"
-            variant="bordered"
+            variant="secondary"
             className="mb-3"
           />
           {searching && (
@@ -228,13 +228,13 @@ function FeaturedListingsPanel() {
               {filteredResults.map((listing) => (
                 <div
                   key={listing.id}
-                  className="flex items-center justify-between rounded-xl border border-divider/70 bg-surface-secondary/30 p-3 transition-colors hover:bg-default-100"
+                  className="flex items-center justify-between rounded-xl border border-divider/70 bg-surface-secondary/30 p-3 transition-colors hover:bg-surface-secondary"
                 >
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-foreground truncate">
                       {listing.title}
                     </p>
-                    <p className="text-xs text-default-500">
+                    <p className="text-xs text-muted">
                       {t('listings.by_author')} &middot;{' '}
                       <span className="capitalize">{listing.type}</span>
                     </p>
@@ -242,7 +242,7 @@ function FeaturedListingsPanel() {
                   <Button
                     size="sm"
                     color="warning"
-                    variant="flat"
+                    variant="tertiary"
                     startContent={<Star size={14} />}
                     isLoading={featureLoading === listing.id}
                     onPress={() => handleFeature(listing.id)}
@@ -254,7 +254,7 @@ function FeaturedListingsPanel() {
             </div>
           )}
           {searchQuery.length >= 2 && !searching && filteredResults.length === 0 && searchResults.length === 0 && (
-            <p className="text-sm text-default-400 text-center py-2">
+            <p className="text-sm text-muted text-center py-2">
               {t('listings.no_active_listings_found')}
             </p>
           )}
@@ -419,7 +419,7 @@ export function ListingsAdmin() {
       label: t('listings.type'),
       sortable: true,
       render: (item) => (
-        <Chip size="sm" variant="flat" color={typeColors[item.type] || 'default'} className="capitalize">
+        <Chip size="sm" variant="soft" color={typeColors[item.type] || 'default'} className="capitalize">
           {item.type}
         </Chip>
       ),
@@ -440,7 +440,7 @@ export function ListingsAdmin() {
       label: t('listings.created'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {new Date(item.created_at).toLocaleDateString()}
         </span>
       ),
@@ -455,7 +455,7 @@ export function ListingsAdmin() {
               <Button
                 isIconOnly
                 size="sm"
-                variant="flat"
+                variant="tertiary"
                 color="success"
                 onPress={() => setConfirmAction({ type: 'approve', item })}
                 aria-label={t('listings.label_approve')}
@@ -465,8 +465,7 @@ export function ListingsAdmin() {
               <Button
                 isIconOnly
                 size="sm"
-                variant="flat"
-                color="danger"
+                variant="danger"
                 onPress={() => setConfirmAction({ type: 'reject', item })}
                 aria-label={t('listings.label_reject')}
               >
@@ -478,7 +477,7 @@ export function ListingsAdmin() {
             <Button
               isIconOnly
               size="sm"
-              variant="flat"
+              variant="tertiary"
               color="warning"
               onPress={() => handleFeatureToggle(item)}
               isLoading={featureToggleLoading === item.id}
@@ -490,8 +489,7 @@ export function ListingsAdmin() {
           <Button
             isIconOnly
             size="sm"
-            variant="flat"
-            color="danger"
+            variant="danger"
             onPress={() => setConfirmAction({ type: 'delete', item })}
             aria-label={t('listings.label_delete')}
           >
@@ -514,8 +512,7 @@ export function ListingsAdmin() {
         <Tabs
           selectedKey={activeTab}
           onSelectionChange={(key) => setActiveTab(key as string)}
-          variant="solid"
-          color="primary"
+          variant="primary"
           size="sm"
           classNames={{ tabList: 'mb-4' }}
         >

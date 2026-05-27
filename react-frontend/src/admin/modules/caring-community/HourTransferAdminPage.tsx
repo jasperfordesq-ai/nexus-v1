@@ -205,7 +205,7 @@ export default function HourTransferAdminPage() {
         actions={
           <Button
             size="sm"
-            variant="bordered"
+            variant="outline"
             startContent={<RefreshCw className="w-4 h-4" />}
             onPress={() => {
               void loadPending();
@@ -228,7 +228,7 @@ export default function HourTransferAdminPage() {
             <div className="flex items-center gap-2">
               <ArrowRightLeft className="w-4 h-4" />
               <span>{t('admin.hour_transfers.tabs.pending')}</span>
-              <Chip size="sm" variant="flat" color="warning">
+              <Chip size="sm" variant="soft" color="warning">
                 {pending.length}
               </Chip>
             </div>
@@ -237,7 +237,7 @@ export default function HourTransferAdminPage() {
           <Card className="mt-4">
             <CardHeader className="flex flex-col items-start gap-1">
               <span className="text-base font-semibold">{t('admin.hour_transfers.pending.title')}</span>
-              <p className="text-sm text-default-500">
+              <p className="text-sm text-muted">
                 {t('admin.hour_transfers.pending.description')}
               </p>
             </CardHeader>
@@ -248,7 +248,7 @@ export default function HourTransferAdminPage() {
                   <Spinner size="md" />
                 </div>
               ) : pending.length === 0 ? (
-                <div className="py-12 text-center text-sm text-default-500">
+                <div className="py-12 text-center text-sm text-muted">
                   {t('admin.hour_transfers.pending.empty')}
                 </div>
               ) : (
@@ -264,23 +264,23 @@ export default function HourTransferAdminPage() {
                   <TableBody>
                     {pending.map((row) => (
                       <TableRow key={row.id}>
-                        <TableCell className="whitespace-nowrap text-default-500">
+                        <TableCell className="whitespace-nowrap text-muted">
                           {formatAdminDate(row.created_at)}
                         </TableCell>
                         <TableCell>
                           <div className="font-medium">{row.member_name || t('admin.common.empty_dash')}</div>
-                          <div className="text-xs text-default-500">{row.member_email}</div>
+                          <div className="text-xs text-muted">{row.member_email}</div>
                         </TableCell>
                         <TableCell>
                           <div className="font-medium">{row.destination_tenant_slug}</div>
-                          <div className="text-xs text-default-500">
+                          <div className="text-xs text-muted">
                             {row.destination_member_email}
                           </div>
                         </TableCell>
                         <TableCell className="text-right tabular-nums">
                           {row.hours.toFixed(2)}
                         </TableCell>
-                        <TableCell className="text-default-600">
+                        <TableCell className="text-foreground">
                           {row.reason || t('admin.common.empty_dash')}
                         </TableCell>
                         <TableCell>
@@ -288,8 +288,7 @@ export default function HourTransferAdminPage() {
                             <div className="flex justify-end gap-2">
                               <Button
                                 size="sm"
-                                color="success"
-                                variant="flat"
+                                variant="secondary"
                                 startContent={<Check className="w-4 h-4" />}
                                 isLoading={actingId === row.id}
                                 onPress={() => void handleApprove(row.id)}
@@ -298,8 +297,7 @@ export default function HourTransferAdminPage() {
                               </Button>
                               <Button
                                 size="sm"
-                                color="danger"
-                                variant="flat"
+                                variant="danger"
                                 startContent={<X className="w-4 h-4" />}
                                 isLoading={actingId === row.id}
                                 onPress={() => setRejectTargetId(row.id)}
@@ -308,7 +306,7 @@ export default function HourTransferAdminPage() {
                               </Button>
                             </div>
                           ) : (
-                            <span className="block text-right text-default-400">{t('admin.common.empty_dash')}</span>
+                            <span className="block text-right text-muted">{t('admin.common.empty_dash')}</span>
                           )}
                         </TableCell>
                       </TableRow>
@@ -326,7 +324,7 @@ export default function HourTransferAdminPage() {
             <div className="flex items-center gap-2">
               <Inbox className="w-4 h-4" />
               <span>{t('admin.hour_transfers.tabs.inbound')}</span>
-              <Chip size="sm" variant="flat" color="primary">
+              <Chip size="sm" variant="soft" color="accent">
                 {inbound.length}
               </Chip>
             </div>
@@ -335,7 +333,7 @@ export default function HourTransferAdminPage() {
           <Card className="mt-4">
             <CardHeader className="flex flex-col items-start gap-1">
               <span className="text-base font-semibold">{t('admin.hour_transfers.inbound.title')}</span>
-              <p className="text-sm text-default-500">
+              <p className="text-sm text-muted">
                 {t('admin.hour_transfers.inbound.description')}
               </p>
             </CardHeader>
@@ -346,7 +344,7 @@ export default function HourTransferAdminPage() {
                   <Spinner size="md" />
                 </div>
               ) : inbound.length === 0 ? (
-                <div className="py-12 text-center text-sm text-default-500">
+                <div className="py-12 text-center text-sm text-muted">
                   {t('admin.hour_transfers.inbound.empty')}
                 </div>
               ) : (
@@ -362,7 +360,7 @@ export default function HourTransferAdminPage() {
                   <TableBody>
                     {inbound.map((row) => (
                       <TableRow key={row.id}>
-                        <TableCell className="whitespace-nowrap text-default-500">
+                        <TableCell className="whitespace-nowrap text-muted">
                           {formatAdminDate(row.created_at)}
                         </TableCell>
                         <TableCell className="font-medium">
@@ -370,17 +368,17 @@ export default function HourTransferAdminPage() {
                         </TableCell>
                         <TableCell>
                           <div className="font-medium">{row.member_name || t('admin.common.empty_dash')}</div>
-                          <div className="text-xs text-default-500">{row.member_email}</div>
+                          <div className="text-xs text-muted">{row.member_email}</div>
                         </TableCell>
                         <TableCell className="text-right tabular-nums">
                           {row.hours.toFixed(2)}
                         </TableCell>
                         <TableCell>
-                          <Chip size="sm" variant="flat" color={STATUS_COLOR[row.status] ?? 'default'}>
+                          <Chip size="sm" variant="soft" color={STATUS_COLOR[row.status] ?? 'default'}>
                             {t(`admin.hour_transfers.status.${row.status}`)}
                           </Chip>
                         </TableCell>
-                        <TableCell className="text-default-600">
+                        <TableCell className="text-foreground">
                           {row.reason || t('admin.common.empty_dash')}
                         </TableCell>
                       </TableRow>
@@ -410,13 +408,13 @@ export default function HourTransferAdminPage() {
               placeholder={t('admin.hour_transfers.reject_modal.reason_placeholder')}
               value={rejectReason}
               onValueChange={setRejectReason}
-              variant="bordered"
+              variant="secondary"
               minRows={3}
             />
           </ModalBody>
           <ModalFooter>
             <Button
-              variant="flat"
+              variant="tertiary"
               onPress={() => {
                 setRejectTargetId(null);
                 setRejectReason('');
@@ -426,7 +424,7 @@ export default function HourTransferAdminPage() {
               {t('admin.common.cancel')}
             </Button>
             <Button
-              color="danger"
+              variant="danger"
               isLoading={actingId === rejectTargetId}
               onPress={() => void handleReject()}
             >

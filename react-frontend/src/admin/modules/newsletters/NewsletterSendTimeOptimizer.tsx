@@ -77,7 +77,7 @@ export function NewsletterSendTimeOptimizer() {
 
   const getHeatCellClass = (score: number) => {
     if (score === 0) {
-      return 'border-default-300 bg-default-100 text-default-700 dark:border-default-500 dark:bg-default-200 dark:text-default-900';
+      return 'border-border bg-surface-secondary text-foreground dark:border-border dark:bg-surface-secondary dark:text-foreground';
     }
 
     const intensity = Math.min(score / maxScore, 1);
@@ -113,7 +113,7 @@ export function NewsletterSendTimeOptimizer() {
               <SelectItem key="90" id="90">{t('newsletter_send_time.days', { count: 90 })}</SelectItem>
             </Select>
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<RefreshCw size={16} />}
               onPress={loadData}
               isLoading={loading}
@@ -141,14 +141,14 @@ export function NewsletterSendTimeOptimizer() {
                   >
                     <div className="space-y-2">
                       <div className="flex items-center gap-2">
-                        <Chip size="sm" color="success" variant="flat">
+                        <Chip size="sm" color="success" variant="soft">
                           #{idx + 1}
                         </Chip>
                         <span className="text-sm font-medium">{rec.description}</span>
                       </div>
                       <div className="flex items-baseline gap-2">
                         <span className="text-2xl font-bold text-success">{rec.score}</span>
-                        <span className="text-sm text-default-500">{t('newsletter_send_time.engagements')}</span>
+                        <span className="text-sm text-muted">{t('newsletter_send_time.engagements')}</span>
                       </div>
                     </div>
                   </div>
@@ -167,7 +167,7 @@ export function NewsletterSendTimeOptimizer() {
           <CardBody>
             {loading ? (
               <div className="flex items-center justify-center py-12">
-                <div className="text-default-400">{t('newsletter_send_time.loading_heatmap')}</div>
+                <div className="text-muted">{t('newsletter_send_time.loading_heatmap')}</div>
               </div>
             ) : data && data.heatmap.length > 0 ? (
               <div className="overflow-x-auto">
@@ -181,7 +181,7 @@ export function NewsletterSendTimeOptimizer() {
                     {/* Header row - hours */}
                     <div></div>
                     {hours.map(h => (
-                      <div key={h} role="columnheader" className="text-center text-xs text-default-500 font-medium py-1">
+                      <div key={h} role="columnheader" className="text-center text-xs text-muted font-medium py-1">
                         {formatHour(h)}
                       </div>
                     ))}
@@ -189,7 +189,7 @@ export function NewsletterSendTimeOptimizer() {
                     {/* Data rows - days */}
                     {[1, 2, 3, 4, 5, 6, 7].map(day => (
                       <div key={day} role="row" className="contents">
-                        <div role="rowheader" className="flex items-center justify-end pr-2 text-sm font-medium text-default-600">
+                        <div role="rowheader" className="flex items-center justify-end pr-2 text-sm font-medium text-muted">
                           {dayNames[day - 1]}
                         </div>
                         {hours.map(hour => {
@@ -218,20 +218,20 @@ export function NewsletterSendTimeOptimizer() {
 
                   {/* Legend */}
                   <div className="flex items-center gap-2 mt-6 justify-center">
-                    <span className="text-sm text-default-500">{t('newsletter_send_time.low')}</span>
+                    <span className="text-sm text-muted">{t('newsletter_send_time.low')}</span>
                     <div className="flex gap-1">
-                      <div className="w-4 h-4 rounded border border-default-300 bg-default-100 dark:border-default-500 dark:bg-default-200"></div>
+                      <div className="w-4 h-4 rounded border border-border bg-surface-secondary dark:border-border dark:bg-surface-secondary"></div>
                       <div className="w-4 h-4 rounded border border-success-300 bg-success-100"></div>
                       <div className="w-4 h-4 rounded border border-success-400 bg-success-200"></div>
                       <div className="w-4 h-4 rounded border border-success-500 bg-success-300"></div>
                       <div className="w-4 h-4 rounded border border-success-700 bg-success-500"></div>
                     </div>
-                    <span className="text-sm text-default-500">{t('newsletter_send_time.high')}</span>
+                    <span className="text-sm text-muted">{t('newsletter_send_time.high')}</span>
                   </div>
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col items-center gap-2 py-12 text-default-400">
+              <div className="flex flex-col items-center gap-2 py-12 text-muted">
                 <Clock size={40} />
                 <p>{data?.insights || t('newsletter_send_time.not_enough_data')}</p>
                 <p className="text-xs">{t('newsletter_send_time.empty_hint')}</p>

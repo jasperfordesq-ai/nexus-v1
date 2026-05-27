@@ -47,9 +47,9 @@ function levelColorClass(level: string | null): string {
     case 'INFO':
       return 'text-accent';
     case 'DEBUG':
-      return 'text-default-400';
+      return 'text-muted';
     default:
-      return 'text-default-300';
+      return 'text-muted/70';
   }
 }
 
@@ -154,7 +154,7 @@ export function LogFileViewer() {
         description={headerDescription}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<ArrowLeft size={16} />}
             onPress={() => navigate(tenantPath('/admin/enterprise/monitoring/log-files'))}
             size="sm"
@@ -165,7 +165,7 @@ export function LogFileViewer() {
       />
 
       {/* Controls Bar */}
-      <Card shadow="sm" className="mb-4">
+      <Card className="mb-4">
         <CardBody className="flex flex-wrap items-center gap-4 p-4">
           <Select
             label={t('enterprise.label_lines')}
@@ -175,7 +175,7 @@ export function LogFileViewer() {
               if (val) setLines(Number(val));
             }}
             size="sm"
-            variant="bordered"
+            variant="secondary"
             className="w-36"
           >
             {LINE_OPTION_KEYS.map((key) => (
@@ -191,7 +191,7 @@ export function LogFileViewer() {
               if (val) setLevel(String(val));
             }}
             size="sm"
-            variant="bordered"
+            variant="secondary"
             className="w-40"
           >
             {LEVEL_OPTION_KEYS.map((key) => (
@@ -205,13 +205,13 @@ export function LogFileViewer() {
               isSelected={autoRefresh}
               onValueChange={setAutoRefresh}
             />
-            <span className="text-sm text-default-600">{t('enterprise.auto_refresh_label')}</span>
+            <span className="text-sm text-muted">{t('enterprise.auto_refresh_label')}</span>
           </div>
 
           <div className="flex-1" />
 
           <Button
-            variant="flat"
+            variant="secondary"
             startContent={<RefreshCw size={14} />}
             onPress={loadData}
             size="sm"
@@ -219,7 +219,7 @@ export function LogFileViewer() {
             {t('enterprise.refresh')}
           </Button>
           <Button
-            variant="flat"
+            variant="secondary"
             startContent={<Download size={14} />}
             size="sm"
             isDisabled={!content}
@@ -228,8 +228,7 @@ export function LogFileViewer() {
             {t('log_files_labels.download')}
           </Button>
           <Button
-            color="danger"
-            variant="flat"
+            variant="danger"
             startContent={<Trash2 size={14} />}
             onPress={() => setClearModalOpen(true)}
             size="sm"
@@ -245,15 +244,15 @@ export function LogFileViewer() {
           <Spinner size="lg" />
         </div>
       ) : content && content.content.length > 0 ? (
-        <Card shadow="sm" className="bg-default-50 dark:bg-default-100/10">
+        <Card className="bg-surface-secondary">
           <CardBody className="p-0 overflow-x-auto">
             <pre className="text-xs font-mono leading-relaxed p-4">
               {content.content.map((line) => {
                 const detectedLevel = line.level?.toUpperCase() || detectLevel(line.text);
                 const colorClass = levelColorClass(detectedLevel);
                 return (
-                  <div key={line.line} className="flex hover:bg-default-100/50">
-                    <span className="inline-block w-12 text-right pr-3 text-default-400 select-none shrink-0">
+                  <div key={line.line} className="flex hover:bg-surface">
+                    <span className="inline-block w-12 text-right pr-3 text-muted select-none shrink-0">
                       {line.line}
                     </span>
                     <span className={colorClass}>{line.text}</span>
@@ -264,9 +263,9 @@ export function LogFileViewer() {
           </CardBody>
         </Card>
       ) : (
-        <Card shadow="sm">
+        <Card>
           <CardBody className="py-16 text-center">
-            <p className="text-default-500">{t('enterprise.no_log_file_found')}</p>
+            <p className="text-muted">{t('enterprise.no_log_file_found')}</p>
           </CardBody>
         </Card>
       )}
@@ -276,15 +275,15 @@ export function LogFileViewer() {
         <ModalContent>
           <ModalHeader>{t('enterprise.clear_log_file')}</ModalHeader>
           <ModalBody>
-            <p className="text-default-600">
+            <p className="text-muted">
               {t('enterprise.clear_log_confirm')}
             </p>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={() => setClearModalOpen(false)}>
+            <Button variant="tertiary" onPress={() => setClearModalOpen(false)}>
               {t('enterprise.btn_cancel_modal')}
             </Button>
-            <Button color="danger" onPress={handleClear} isLoading={clearing}>
+            <Button variant="danger" onPress={handleClear} isLoading={clearing}>
               {t('enterprise.btn_clear_file')}
             </Button>
           </ModalFooter>

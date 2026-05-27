@@ -128,7 +128,7 @@ export function BulkOperations() {
 
   return (
     <div>
-      <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-default-500 mb-1">
+      <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-muted mb-1">
         <Link to={tenantPath('/admin/super')} className="hover:text-accent">{t('super.breadcrumb_super_admin')}</Link>
         <span>/</span>
         <span className="text-foreground">{t('super.bulk_operations_title')}</span>
@@ -142,7 +142,7 @@ export function BulkOperations() {
             <div className="flex gap-2 items-center">
               <Users size={20} /> <h3 className="text-lg font-semibold">{t('super.bulk_move_users')}</h3>
             </div>
-            <p className="text-xs text-default-400">
+            <p className="text-xs text-muted">
               {t('super.bulk_move_users_desc')}{' '}
               <Link to={tenantPath('/admin/super/users')} className="text-accent hover:underline">{t('super.manage_individual_users')}</Link>
             </p>
@@ -163,12 +163,12 @@ export function BulkOperations() {
                 {users.map(u => (
                   <Checkbox key={u.id} isSelected={selectedUserIds.has(u.id)}
                     onValueChange={() => toggleUser(u.id)} className="w-full py-1">
-                    {u.name} <span className="text-default-400 text-xs">({u.email})</span>
+                    {u.name} <span className="text-muted text-xs">({u.email})</span>
                   </Checkbox>
                 ))}
               </div>
             )}
-            {loading && <p className="text-center text-default-400 text-sm">{t('super.loading_users')}</p>}
+            {loading && <p className="text-center text-muted text-sm">{t('super.loading_users')}</p>}
 
             <Separator />
             <Select label={t('super.label_target_tenant')} selectedKeys={targetTenant ? [targetTenant] : []}
@@ -177,7 +177,7 @@ export function BulkOperations() {
                 <SelectItem key={String(t.id)} id={String(t.id)}>{t.name}</SelectItem>)}
             </Select>
 
-            <div className="bg-default border border-accent text-accent rounded-[12px] p-3">
+            <div className="bg-surface-secondary border border-accent text-accent rounded-[12px] p-3">
               <Switch
                 isSelected={grantSA}
                 onValueChange={setGrantSA}
@@ -187,12 +187,12 @@ export function BulkOperations() {
               >
                 <div>
                   <p className="text-sm font-medium">{t('super.grant_sa_on_arrival')}</p>
-                  <p className="text-xs text-default-500 mt-0.5">{t('super.grant_sa_on_arrival_desc')}</p>
+                  <p className="text-xs text-muted mt-0.5">{t('super.grant_sa_on_arrival_desc')}</p>
                 </div>
               </Switch>
             </div>
 
-            <Button color="primary" startContent={<ArrowRight size={16} />}
+            <Button startContent={<ArrowRight size={16} />}
               isDisabled={selectedUserIds.size === 0 || !targetTenant}
               onPress={() => setMoveConfirm(true)}>
               {t('super.move_n_users', { count: selectedUserIds.size })}
@@ -206,7 +206,7 @@ export function BulkOperations() {
             <div className="flex gap-2 items-center">
               <Building2 size={20} /> <h3 className="text-lg font-semibold">{t('super.bulk_update_tenants')}</h3>
             </div>
-            <p className="text-xs text-default-400">
+            <p className="text-xs text-muted">
               {t('super.bulk_update_tenants_desc')}{' '}
               <Link to={tenantPath('/admin/super/tenants')} className="text-accent hover:underline">{t('super.manage_individual_tenants')}</Link>
             </p>
@@ -217,8 +217,7 @@ export function BulkOperations() {
               <div className="flex gap-2">
                 <Button
                   size="sm"
-                  variant="flat"
-                  color="primary"
+                  variant="secondary"
                   startContent={<CheckCheck size={14} />}
                   onPress={selectAllTenants}
                 >
@@ -226,8 +225,7 @@ export function BulkOperations() {
                 </Button>
                 <Button
                   size="sm"
-                  variant="flat"
-                  color="default"
+                  variant="tertiary"
                   startContent={<XCircle size={14} />}
                   onPress={deselectAllTenants}
                 >
@@ -239,7 +237,7 @@ export function BulkOperations() {
               {availableTenants.map(tenant => (
                 <Checkbox key={tenant.id} isSelected={selectedTenantIds.has(tenant.id)}
                   onValueChange={() => toggleTenant(tenant.id)} className="w-full py-1">
-                  {tenant.name} <Chip size="sm" variant="flat" color={tenant.is_active ? 'success' : 'default'} className="ml-2">
+                  {tenant.name} <Chip size="sm" variant="soft" color={tenant.is_active ? 'success' : 'default'} className="ml-2">
                     {tenant.is_active ? t('super.status_active_label') : t('super.status_inactive_label')}
                   </Chip>
                 </Checkbox>
@@ -255,13 +253,13 @@ export function BulkOperations() {
                     className={`cursor-pointer border-2 rounded-lg p-3 transition-all ${
                       bulkAction === 'activate'
                         ? 'border-success bg-success/10'
-                        : 'border-default-200 hover:border-success/50'
+                        : 'border-border hover:border-success/50'
                     }`}
                   >
                     <Radio value="activate" classNames={{ wrapper: 'hidden' }}>
                       <div className="flex flex-col gap-1">
                         <p className="text-sm font-semibold text-success">{t('super.activate_tenants')}</p>
-                        <p className="text-xs text-default-500">{t('super.activate_tenants_desc')}</p>
+                        <p className="text-xs text-muted">{t('super.activate_tenants_desc')}</p>
                       </div>
                     </Radio>
                   </div>
@@ -270,13 +268,13 @@ export function BulkOperations() {
                     className={`cursor-pointer border-2 rounded-lg p-3 transition-all ${
                       bulkAction === 'deactivate'
                         ? 'border-danger bg-danger/10'
-                        : 'border-default-200 hover:border-danger/50'
+                        : 'border-border hover:border-danger/50'
                     }`}
                   >
                     <Radio value="deactivate" classNames={{ wrapper: 'hidden' }}>
                       <div className="flex flex-col gap-1">
                         <p className="text-sm font-semibold text-danger">{t('super.deactivate_tenants')}</p>
-                        <p className="text-xs text-default-500">{t('super.deactivate_tenants_desc')}</p>
+                        <p className="text-xs text-muted">{t('super.deactivate_tenants_desc')}</p>
                       </div>
                     </Radio>
                   </div>
@@ -285,13 +283,13 @@ export function BulkOperations() {
                     className={`cursor-pointer border-2 rounded-lg p-3 transition-all ${
                       bulkAction === 'enable_hub'
                         ? 'border-accent bg-accent/10'
-                        : 'border-default-200 hover:border-accent/50'
+                        : 'border-border hover:border-accent/50'
                     }`}
                   >
                     <Radio value="enable_hub" classNames={{ wrapper: 'hidden' }}>
                       <div className="flex flex-col gap-1">
                         <p className="text-sm font-semibold text-accent">{t('super.enable_hub')}</p>
-                        <p className="text-xs text-default-500">{t('super.enable_hub_desc')}</p>
+                        <p className="text-xs text-muted">{t('super.enable_hub_desc')}</p>
                       </div>
                     </Radio>
                   </div>
@@ -300,13 +298,13 @@ export function BulkOperations() {
                     className={`cursor-pointer border-2 rounded-lg p-3 transition-all ${
                       bulkAction === 'disable_hub'
                         ? 'border-warning bg-warning/10'
-                        : 'border-default-200 hover:border-warning/50'
+                        : 'border-border hover:border-warning/50'
                     }`}
                   >
                     <Radio value="disable_hub" classNames={{ wrapper: 'hidden' }}>
                       <div className="flex flex-col gap-1">
                         <p className="text-sm font-semibold text-warning-600 dark:text-warning">{t('super.disable_hub')}</p>
-                        <p className="text-xs text-default-500">{t('super.disable_hub_desc')}</p>
+                        <p className="text-xs text-muted">{t('super.disable_hub_desc')}</p>
                       </div>
                     </Radio>
                   </div>
@@ -314,13 +312,7 @@ export function BulkOperations() {
               </RadioGroup>
             </div>
             <Button
-              color={
-                bulkAction === 'activate' ? 'success' :
-                bulkAction === 'deactivate' ? 'danger' :
-                bulkAction === 'enable_hub' ? 'primary' :
-                bulkAction === 'disable_hub' ? 'warning' :
-                'default'
-              }
+              variant={bulkAction === 'deactivate' ? 'danger' : 'secondary'}
               isDisabled={selectedTenantIds.size === 0 || !bulkAction}
               onPress={() => setTenantConfirm(true)}
             >

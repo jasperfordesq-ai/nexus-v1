@@ -110,7 +110,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
   };
 
   return (
-    <Card shadow="sm">
+    <Card >
       <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
         <Plus size={18} className="text-accent" />
         <h3 className="font-semibold">{t('timebanking.grant_starting_credits')}</h3>
@@ -122,11 +122,11 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
             <Input type="search" name="admin-search" autoComplete="off"
               label={t('timebanking.label_search_member')}
               placeholder={t('timebanking.placeholder_search_by_name_or_email')}
-              startContent={<Search size={16} className="text-default-400" />}
+              startContent={<Search size={16} className="text-muted" />}
               value={searchQuery}
               onValueChange={handleSearch}
               size="sm"
-              variant="bordered"
+              variant="secondary"
             />
             {searching && (
               <div className="flex items-center justify-center py-4">
@@ -138,20 +138,20 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
                 {searchResults.map((user) => (
                   <Button
                     key={user.id}
-                    variant="light"
-                    className="flex items-center justify-between w-full px-3 py-2 h-auto rounded-none"
+                    variant="tertiary"
+                    className="flex items-center justify-between w-full px-3 py-2 min-h-12 rounded-none"
                     onPress={() => handleSelectUser(user)}
                   >
                     <div className="flex-1 min-w-0 text-left">
                       <p className="text-sm font-medium text-foreground truncate">
                         {user.name}
                       </p>
-                      <p className="text-xs text-default-500 truncate">
+                      <p className="text-xs text-muted truncate">
                         {user.email}
                       </p>
                     </div>
                     <div className="text-right shrink-0 ml-3">
-                      <p className="text-xs text-default-500">{t('timebanking.col_balance')}</p>
+                      <p className="text-xs text-muted">{t('timebanking.col_balance')}</p>
                       <p className="text-sm font-semibold text-foreground">
                         {user.balance}h
                       </p>
@@ -161,7 +161,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
               </div>
             )}
             {searchQuery.length >= 2 && !searching && searchResults.length === 0 && (
-              <p className="text-sm text-default-400 text-center py-2 mt-2">
+              <p className="text-sm text-muted text-center py-2 mt-2">
                 {t('timebanking.no_members_found')}
               </p>
             )}
@@ -176,14 +176,14 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
                 <p className="text-sm font-medium text-foreground">
                   {selectedUser.name}
                 </p>
-                <p className="text-xs text-default-500">
+                <p className="text-xs text-muted">
                   {selectedUser.email} &middot; {t('timebanking.current_balance')}: {selectedUser.balance}h
                 </p>
               </div>
             </div>
             <Button
               size="sm"
-              variant="flat"
+              variant="tertiary"
               onPress={() => setSelectedUser(null)}
             >
               {t('timebanking.change')}
@@ -201,9 +201,9 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
           value={amount}
           onValueChange={setAmount}
           size="sm"
-          variant="bordered"
+          variant="secondary"
           startContent={
-            <Wallet size={16} className="text-default-400" />
+            <Wallet size={16} className="text-muted" />
           }
           description={t('timebanking.desc_amount_of_time_credits_to_grant_in_hours')}
         />
@@ -215,7 +215,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
           value={reason}
           onValueChange={setReason}
           size="sm"
-          variant="bordered"
+          variant="secondary"
           minRows={2}
           maxRows={4}
           description={t('timebanking.desc_required_this_will_be_recorded_in_the_g')}
@@ -223,7 +223,6 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
 
         {/* Submit */}
         <Button
-          color="primary"
           startContent={<Plus size={16} />}
           onPress={handleGrant}
           isLoading={granting}
@@ -290,7 +289,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
       render: (item) => (
         <div>
           <p className="text-sm font-medium text-foreground">{item.user_name}</p>
-          <p className="text-xs text-default-500">{item.user_email}</p>
+          <p className="text-xs text-muted">{item.user_email}</p>
         </div>
       ),
     },
@@ -299,7 +298,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
       label: t('timebanking.col_amount'),
       sortable: true,
       render: (item) => (
-        <Chip size="sm" variant="flat" color="success">
+        <Chip size="sm" variant="soft" color="success">
           +{item.amount}h
         </Chip>
       ),
@@ -308,7 +307,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
       key: 'reason',
       label: t('timebanking.label_reason'),
       render: (item) => (
-        <span className="text-sm text-default-600 line-clamp-2">
+        <span className="text-sm text-muted line-clamp-2">
           {item.reason}
         </span>
       ),
@@ -318,7 +317,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
       label: t('timebanking.col_granted_by'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {item.granted_by || '—'}
         </span>
       ),
@@ -328,7 +327,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
       label: t('timebanking.col_date'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {new Date(item.created_at).toLocaleDateString()}
         </span>
       ),

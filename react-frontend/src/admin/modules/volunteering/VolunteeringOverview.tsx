@@ -234,7 +234,7 @@ export function VolunteeringOverview() {
       <PageHeader
         title={t('volunteering.volunteering_overview_title')}
         description={t('volunteering.volunteering_overview_desc')}
-        actions={<Button variant="flat" startContent={<RefreshCw size={16} />} onPress={handleRefresh} isLoading={loading}>{t('volunteering.refresh')}</Button>}
+        actions={<Button variant="tertiary" startContent={<RefreshCw size={16} />} onPress={handleRefresh} isLoading={loading}>{t('volunteering.refresh')}</Button>}
       />
 
       {/* Alert Banners */}
@@ -258,22 +258,22 @@ export function VolunteeringOverview() {
       )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <StatCard label={t('volunteering.label_active_opportunities')} value={stats?.active_opportunities ?? 0} icon={Briefcase} color="primary" loading={loading} />
+        <StatCard label={t('volunteering.label_active_opportunities')} value={stats?.active_opportunities ?? 0} icon={Briefcase} loading={loading} />
         <StatCard label={t('volunteering.label_pending_applications')} value={stats?.pending_applications ?? 0} icon={Users} color="warning" loading={loading} />
         <StatCard label={t('volunteering.label_total_hours_logged')} value={stats?.total_hours_logged ?? 0} icon={Clock} color="success" loading={loading} />
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard label={t('volunteering.label_total_opportunities')} value={stats?.total_opportunities ?? 0} icon={Heart} color="secondary" loading={loading} />
-        <StatCard label={t('volunteering.label_total_applications')} value={stats?.total_applications ?? 0} icon={Users} color="primary" loading={loading} />
+        <StatCard label={t('volunteering.label_total_opportunities')} value={stats?.total_opportunities ?? 0} icon={Heart} color="default" loading={loading} />
+        <StatCard label={t('volunteering.label_total_applications')} value={stats?.total_applications ?? 0} icon={Users} loading={loading} />
         <StatCard label={t('volunteering.label_active_volunteers')} value={stats?.active_volunteers ?? 0} icon={Users} color="success" loading={loading} />
       </div>
 
       {/* Trends Chart */}
-      <Card shadow="sm" className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
+      <Card  className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
         <CardHeader className="flex flex-row items-center justify-between">
           <h3 className="text-lg font-semibold">{t('volunteering.trends_title')}</h3>
-          <ButtonGroup size="sm" variant="flat">
+          <ButtonGroup size="sm" variant="tertiary">
             <Button
               color={trendPeriod === 'week' ? 'primary' : 'default'}
               onPress={() => setTrendPeriod('week')}
@@ -294,7 +294,7 @@ export function VolunteeringOverview() {
               <Skeleton className="h-[300px] w-full rounded-lg" />
             </div>
           ) : chartData.length === 0 ? (
-            <div className="flex flex-col items-center py-8 text-default-400">
+            <div className="flex flex-col items-center py-8 text-muted">
               <Activity size={40} className="mb-2" />
               <p>{t('volunteering.no_trend_data')}</p>
             </div>
@@ -370,7 +370,7 @@ export function VolunteeringOverview() {
           return (
           <Card
             key={action.path}
-            shadow="sm"
+
             isPressable
             onPress={() => navigate(action.path)}
             className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03] transition-transform hover:-translate-y-0.5"
@@ -381,9 +381,9 @@ export function VolunteeringOverview() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-sm">{action.label}</p>
-                <p className="text-xs text-default-400 truncate">{action.description}</p>
+                <p className="text-xs text-muted truncate">{action.description}</p>
               </div>
-              <ChevronRight size={16} className="text-default-300 shrink-0" />
+              <ChevronRight size={16} className="text-muted shrink-0" />
             </CardBody>
           </Card>
           );
@@ -391,11 +391,11 @@ export function VolunteeringOverview() {
       </div>
 
       {/* Recent Opportunities */}
-      <Card shadow="sm" className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
+      <Card  className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
         <CardHeader><h3 className="text-lg font-semibold">{t('volunteering.recent_opportunities')}</h3></CardHeader>
         <CardBody>
           {opportunities.length === 0 ? (
-            <div className="flex flex-col items-center py-8 text-default-400">
+            <div className="flex flex-col items-center py-8 text-muted">
               <Heart size={40} className="mb-2" />
               <p>{t('volunteering.no_opportunities_yet')}</p>
             </div>
@@ -405,11 +405,11 @@ export function VolunteeringOverview() {
                 <div key={opp.id} className="flex items-center justify-between rounded-xl border border-divider/70 bg-surface-secondary/30 p-3">
                   <div>
                     <p className="font-medium">{opp.title}</p>
-                      <p className="text-xs text-default-400">
+                      <p className="text-xs text-muted">
                         {t('volunteering.by_name', { name: [opp.first_name, opp.last_name].filter(Boolean).join(' ') || t('volunteering.unknown_org') })}
                       </p>
                   </div>
-                  <Chip size="sm" variant="flat" color={['active', 'open'].includes(opp.status) ? 'success' : 'default'} className="capitalize">{opp.status}</Chip>
+                  <Chip size="sm" variant="soft" color={['active', 'open'].includes(opp.status) ? 'success' : 'default'} className="capitalize">{opp.status}</Chip>
                 </div>
               ))}
             </div>
@@ -418,7 +418,7 @@ export function VolunteeringOverview() {
       </Card>
 
       {/* Activity Feed */}
-      <Card shadow="sm" className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
+      <Card  className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
         <CardHeader><h3 className="text-lg font-semibold">{t('volunteering.activity_feed')}</h3></CardHeader>
         <CardBody>
           {activitiesLoading ? (
@@ -434,7 +434,7 @@ export function VolunteeringOverview() {
               ))}
             </div>
           ) : activities.length === 0 ? (
-            <div className="flex flex-col items-center py-8 text-default-400">
+            <div className="flex flex-col items-center py-8 text-muted">
               <Clock size={40} className="mb-2" />
               <p>{t('volunteering.no_recent_activity')}</p>
             </div>
@@ -453,12 +453,12 @@ export function VolunteeringOverview() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-sm font-medium">{item.user_name}</span>
-                        <Chip size="sm" variant="flat" color={typeColor} className="capitalize">
+                        <Chip size="sm" variant="soft" color={typeColor} className="capitalize">
                           {formatActivityType(item.type)}
                         </Chip>
                       </div>
-                      <p className="text-sm text-default-500 mt-0.5">{item.description}</p>
-                      <p className="text-xs text-default-400 mt-1">{formatTimestamp(item.timestamp, t)}</p>
+                      <p className="text-sm text-muted mt-0.5">{item.description}</p>
+                      <p className="text-xs text-muted mt-1">{formatTimestamp(item.timestamp, t)}</p>
                     </div>
                   </div>
                 );

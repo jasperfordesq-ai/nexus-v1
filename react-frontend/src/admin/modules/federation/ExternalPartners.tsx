@@ -393,10 +393,10 @@ export function ExternalPartners() {
         description={t('federation.external_partners_desc')}
         actions={
           <div className="flex items-center gap-2">
-            <Button variant="flat" size="sm" startContent={<RefreshCw size={16} />} onPress={() => loadData()} isLoading={loading}>
+            <Button variant="secondary" size="sm" startContent={<RefreshCw size={16} />} onPress={() => loadData()} isLoading={loading}>
               {t('federation.refresh')}
             </Button>
-            <Button color="primary" size="sm" startContent={<Plus size={16} />} onPress={openCreate}>
+            <Button size="sm" startContent={<Plus size={16} />} onPress={openCreate}>
               {t('federation.add_partner')}
             </Button>
           </div>
@@ -422,46 +422,46 @@ export function ExternalPartners() {
                 <div>
                   <p className="font-medium text-sm">{partner.name}</p>
                   {partner.description && (
-                    <p className="text-xs text-default-400 truncate max-w-[200px]">{partner.description}</p>
+                    <p className="text-xs text-muted truncate max-w-[200px]">{partner.description}</p>
                   )}
                 </div>
               </TableCell>
               <TableCell>
-                <code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">{partner.base_url}</code>
+                <code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">{partner.base_url}</code>
               </TableCell>
               <TableCell>
-                <Chip size="sm" variant="flat">
+                <Chip size="sm" variant="soft">
                   {t(`federation.auth_method_${partner.auth_method}`, partner.auth_method)}
                 </Chip>
               </TableCell>
               <TableCell>
-                <Chip size="sm" variant="flat" color="secondary">
+                <Chip size="sm" variant="soft" color="accent">
                   {t(PROTOCOL_TYPES.find((p) => p.key === partner.protocol_type)?.i18nKey ?? 'federation.protocol_nexus')}
                 </Chip>
               </TableCell>
               <TableCell>
                 <Chip
                   size="sm"
-                  variant="flat"
+                  variant="soft"
                   color={STATUS_COLORS[partner.status] ?? 'default'}
                 >
                   {t(`federation.status_${partner.status}`)}
                 </Chip>
               </TableCell>
               <TableCell>
-                <span className="text-sm text-default-500">
+                <span className="text-sm text-muted">
                   {partner.last_sync_at ? formatRelativeTime(partner.last_sync_at) : t('federation.never')}
                 </span>
               </TableCell>
               <TableCell>
-                <span className="text-sm text-default-400">
+                <span className="text-sm text-muted">
                   {partner.created_at ? formatRelativeTime(partner.created_at) : '--'}
                 </span>
               </TableCell>
               <TableCell>
                 <Dropdown>
                   <DropdownTrigger>
-                    <Button isIconOnly size="sm" variant="light" aria-label={t('federation.label_actions')}>
+                    <Button isIconOnly size="sm" variant="ghost" aria-label={t('federation.label_actions')}>
                       <MoreVertical size={16} />
                     </Button>
                   </DropdownTrigger>
@@ -637,7 +637,7 @@ export function ExternalPartners() {
 
                 {/* Feature toggles */}
                 <div className="space-y-3 pt-2">
-                  <p className="text-sm font-semibold text-default-700">
+                  <p className="text-sm font-semibold text-foreground">
                     {t('federation.feature_toggles')}
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -687,9 +687,8 @@ export function ExternalPartners() {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('federation.cancel')}</Button>
+                <Button variant="tertiary" onPress={onClose}>{t('federation.cancel')}</Button>
                 <Button
-                  color="primary"
                   isLoading={saving}
                   isDisabled={!form.name.trim() || !form.base_url.trim()}
                   onPress={handleSave}
@@ -717,7 +716,7 @@ export function ExternalPartners() {
                     <Spinner size="lg" />
                   </div>
                 ) : logs.length === 0 ? (
-                  <div className="flex h-48 items-center justify-center text-default-400">
+                  <div className="flex h-48 items-center justify-center text-muted">
                     {t('federation.no_logs')}
                   </div>
                 ) : (
@@ -734,10 +733,10 @@ export function ExternalPartners() {
                       {logs.map((log) => (
                         <TableRow key={log.id}>
                           <TableCell>
-                            <code className="text-xs bg-default-100 px-1 py-0.5 rounded">{log.endpoint}</code>
+                            <code className="text-xs bg-surface-secondary px-1 py-0.5 rounded">{log.endpoint}</code>
                           </TableCell>
                           <TableCell>
-                            <Chip size="sm" variant="flat">{log.method}</Chip>
+                            <Chip size="sm" variant="soft">{log.method}</Chip>
                           </TableCell>
                           <TableCell>
                             <span className="text-sm">{log.response_code ?? '--'}</span>
@@ -750,12 +749,12 @@ export function ExternalPartners() {
                             )}
                           </TableCell>
                           <TableCell>
-                            <span className="text-sm text-default-500">
+                            <span className="text-sm text-muted">
                               {log.response_time_ms != null ? `${log.response_time_ms}ms` : '--'}
                             </span>
                           </TableCell>
                           <TableCell>
-                            <span className="text-sm text-default-400">
+                            <span className="text-sm text-muted">
                               {log.created_at ? formatRelativeTime(log.created_at) : '--'}
                             </span>
                           </TableCell>
@@ -766,7 +765,7 @@ export function ExternalPartners() {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('federation.close')}</Button>
+                <Button variant="tertiary" onPress={onClose}>{t('federation.close')}</Button>
               </ModalFooter>
             </>
           )}

@@ -112,7 +112,7 @@ export function FederationSettings() {
           description={t('federation_settings_desc')}
         />
         <div className="space-y-6">
-          <Card shadow="sm">
+          <Card >
             <CardHeader><Skeleton className="h-5 w-40 rounded-lg" /></CardHeader>
             <CardBody className="space-y-4">
               {[1, 2, 3].map((i) => (
@@ -126,7 +126,7 @@ export function FederationSettings() {
               ))}
             </CardBody>
           </Card>
-          <Card shadow="sm">
+          <Card >
             <CardHeader><Skeleton className="h-5 w-48 rounded-lg" /></CardHeader>
             <CardBody className="space-y-4">
               {[1, 2].map((i) => (
@@ -149,13 +149,13 @@ export function FederationSettings() {
           title={t('federation_settings_title')}
           description={t('federation_settings_desc')}
           actions={
-            <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData}>
+            <Button variant="tertiary" startContent={<RefreshCw size={16} />} onPress={loadData}>
               {t('refresh')}
             </Button>
           }
         />
-        <Card shadow="sm">
-          <CardBody className="flex flex-col items-center py-8 text-default-400">
+        <Card >
+          <CardBody className="flex flex-col items-center py-8 text-muted">
             <Network size={40} className="mb-2" />
             <p>{t('not_enabled_for_tenant')}</p>
             <p className="text-xs">{t('enable_from_tenant_features')}</p>
@@ -173,7 +173,7 @@ export function FederationSettings() {
         actions={
           <div className="flex items-center gap-2">
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<RefreshCw size={16} />}
               onPress={loadData}
               size="sm"
@@ -181,7 +181,6 @@ export function FederationSettings() {
               {t('refresh')}
             </Button>
             <Button
-              color="primary"
               startContent={<Save size={16} />}
               onPress={handleSave}
               isLoading={saving}
@@ -199,16 +198,16 @@ export function FederationSettings() {
             Controls. Tenant admins see this pointer so they know where to
             look (and can ask the platform operator) when a partner using
             JWT-based auth has trouble. */}
-        <Card shadow="sm" className="border border-default-200">
+        <Card  className="border border-border">
           <CardBody className="flex flex-row items-start gap-3 text-sm">
-            <KeyRound size={18} className="text-default-500 mt-0.5 shrink-0" />
+            <KeyRound size={18} className="text-muted mt-0.5 shrink-0" />
             <div>
               <p className="font-medium">{t('jwt_federation_auth_platform_title')}</p>
-              <p className="text-default-500 mt-1">
+              <p className="text-muted mt-1">
                 {t('jwt_federation_auth_platform_intro')}{' '}
                 <strong>{t('external_partners')}</strong>{' '}
                 {t('jwt_federation_auth_platform_middle')}{' '}
-                <code className="text-xs bg-default-100 px-1 rounded">FEDERATION_JWT_SECRET</code>{' '}
+                <code className="text-xs bg-surface-secondary px-1 rounded">FEDERATION_JWT_SECRET</code>{' '}
                 {t('jwt_federation_auth_platform_suffix')}{' '}
                 <strong>{t('label_super_admin')} / {t('federation_controls')}</strong>.
               </p>
@@ -216,13 +215,13 @@ export function FederationSettings() {
           </CardBody>
         </Card>
 
-        <Card shadow="sm">
+        <Card >
           <CardHeader><h3 className="text-lg font-semibold">{t('federation_status')}</h3></CardHeader>
           <CardBody>
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{t('federation_enabled')}</p>
-                <p className="text-sm text-default-500">{t('federation_enabled_desc')}</p>
+                <p className="text-sm text-muted">{t('federation_enabled_desc')}</p>
               </div>
               <Switch
                 isSelected={data.federation_enabled}
@@ -233,13 +232,13 @@ export function FederationSettings() {
           </CardBody>
         </Card>
 
-        <Card shadow="sm">
+        <Card >
           <CardHeader><h3 className="text-lg font-semibold">{t('partnership_preferences')}</h3></CardHeader>
           <CardBody className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{t('allow_inbound_partnerships')}</p>
-                <p className="text-sm text-default-500">{t('allow_inbound_partnerships_desc')}</p>
+                <p className="text-sm text-muted">{t('allow_inbound_partnerships_desc')}</p>
               </div>
               <Switch
                 isSelected={data.settings?.allow_inbound_partnerships ?? true}
@@ -251,7 +250,7 @@ export function FederationSettings() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">{t('auto_approve_partners')}</p>
-                <p className="text-sm text-default-500">{t('auto_approve_partners_desc')}</p>
+                <p className="text-sm text-muted">{t('auto_approve_partners_desc')}</p>
               </div>
               <Switch
                 isSelected={data.settings?.auto_approve_partners ?? false}
@@ -263,13 +262,13 @@ export function FederationSettings() {
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="font-medium">{t('max_partnerships')}</p>
-                <p className="text-sm text-default-500">{t('max_partnerships_desc')}</p>
+                <p className="text-sm text-muted">{t('max_partnerships_desc')}</p>
               </div>
               <Input
                 type="number"
                 value={String(data.settings?.max_partnerships ?? 10)}
                 onValueChange={(val) => updateField('max_partnerships', parseInt(val) || 1)}
-                variant="bordered"
+                variant="secondary"
                 size="sm"
                 className="w-24"
                 min={1}

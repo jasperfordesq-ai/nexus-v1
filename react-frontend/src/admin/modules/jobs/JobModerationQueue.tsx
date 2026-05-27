@@ -209,7 +209,7 @@ export function JobModerationQueue() {
         description={t('moderation.description')}
         actions={
           <Button
-            variant="flat"
+            variant="secondary"
             startContent={<RefreshCw size={16} />}
             onPress={() => { loadPendingJobs(); loadStats(); }}
           >
@@ -252,14 +252,14 @@ export function JobModerationQueue() {
           label={t('moderation.stats.total_reviewed')}
           value={stats?.total_reviewed ?? 0}
           icon={BarChart3}
-          color="primary"
+          color="default"
           loading={statsLoading}
         />
       </div>
 
       {/* Spam Stats Summary */}
       {spamStats && spamStats.total_analyzed > 0 && (
-        <Card className="mb-6" shadow="sm">
+        <Card className="mb-6">
           <CardHeader className="flex items-center gap-2 pb-2">
             <ShieldAlert size={18} className="text-warning" />
             <h3 className="text-sm font-semibold text-foreground">
@@ -269,26 +269,26 @@ export function JobModerationQueue() {
           <CardBody className="pt-0">
             <div className="flex flex-wrap gap-6 text-sm">
               <div>
-                <span className="text-default-500">{t('spam.total_analyzed')}:</span>{' '}
+                <span className="text-muted">{t('spam.total_analyzed')}:</span>{' '}
                 <span className="font-medium">{spamStats.total_analyzed}</span>
               </div>
               <div>
-                <span className="text-default-500">{t('spam.blocked_count')}:</span>{' '}
+                <span className="text-muted">{t('spam.blocked_count')}:</span>{' '}
                 <span className="font-medium text-danger">{spamStats.blocked}</span>
               </div>
               <div>
-                <span className="text-default-500">{t('spam.flagged_count')}:</span>{' '}
+                <span className="text-muted">{t('spam.flagged_count')}:</span>{' '}
                 <span className="font-medium text-warning">{spamStats.flagged}</span>
               </div>
               <div>
-                <span className="text-default-500">{t('spam.avg_score')}:</span>{' '}
+                <span className="text-muted">{t('spam.avg_score')}:</span>{' '}
                 <span className="font-medium">{spamStats.avg_score}</span>
               </div>
             </div>
             {Object.keys(spamStats.top_flags).length > 0 && (
               <div className="mt-3 flex flex-wrap gap-2">
                 {Object.entries(spamStats.top_flags).map(([flag, count]) => (
-                  <Chip key={flag} size="sm" variant="flat" color="default">
+                  <Chip key={flag} size="sm" variant="soft" color="default">
                     {getFlagLabel(flag)}: {count}
                   </Chip>
                 ))}
@@ -312,7 +312,7 @@ export function JobModerationQueue() {
       ) : (
         <div className="flex flex-col gap-4">
           {pendingJobs.map((job) => (
-            <Card key={job.id} shadow="sm">
+            <Card key={job.id}>
               <CardBody className="p-5">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   {/* Job Info */}
@@ -328,7 +328,7 @@ export function JobModerationQueue() {
                         <h3 className="text-base font-semibold text-foreground truncate">
                           {job.title}
                         </h3>
-                        <p className="text-xs text-default-500">
+                        <p className="text-xs text-muted">
                           {job.poster_name
                             ? t('moderation.posted_by', { name: job.poster_name })
                             : t('moderation.user_fallback', { id: job.user_id })}
@@ -345,24 +345,24 @@ export function JobModerationQueue() {
                     </div>
 
                     {/* Description preview */}
-                    <p className="text-sm text-default-600 line-clamp-3 mb-2">
+                    <p className="text-sm text-muted line-clamp-3 mb-2">
                       {job.description || t('moderation.no_description')}
                     </p>
 
                     {/* Meta chips */}
                     <div className="flex flex-wrap gap-2">
                       {job.type && (
-                        <Chip size="sm" variant="flat" color="primary" className="capitalize">
+                        <Chip size="sm" variant="soft" color="accent" className="capitalize">
                           {job.type}
                         </Chip>
                       )}
                       {job.category && (
-                        <Chip size="sm" variant="flat" color="default">
+                        <Chip size="sm" variant="soft" color="default">
                           {job.category}
                         </Chip>
                       )}
                       {job.location && (
-                        <Chip size="sm" variant="flat" color="default">
+                        <Chip size="sm" variant="soft" color="default">
                           {job.location}
                         </Chip>
                       )}
@@ -376,7 +376,7 @@ export function JobModerationQueue() {
                         }>
                           <Chip
                             size="sm"
-                            variant="flat"
+                            variant="soft"
                             color={getSpamScoreColor(job.spam_score)}
                             startContent={<AlertTriangle size={12} />}
                           >
@@ -393,8 +393,7 @@ export function JobModerationQueue() {
                   <div className="flex gap-2 shrink-0 sm:flex-col sm:items-end">
                     <Button
                       size="sm"
-                      color="success"
-                      variant="flat"
+                      variant="secondary"
                       startContent={<CheckCircle2 size={14} />}
                       onPress={() => openActionModal('approve', job)}
                     >
@@ -402,8 +401,7 @@ export function JobModerationQueue() {
                     </Button>
                     <Button
                       size="sm"
-                      color="danger"
-                      variant="flat"
+                      variant="danger"
                       startContent={<XCircle size={14} />}
                       onPress={() => openActionModal('reject', job)}
                     >
@@ -411,8 +409,7 @@ export function JobModerationQueue() {
                     </Button>
                     <Button
                       size="sm"
-                      color="warning"
-                      variant="flat"
+                      variant="outline"
                       startContent={<Flag size={14} />}
                       onPress={() => openActionModal('flag', job)}
                     >
@@ -456,7 +453,7 @@ export function JobModerationQueue() {
                   {config.label}: {actionModal.job.title}
                 </ModalHeader>
                 <ModalBody>
-                  <p className="text-sm text-default-600 mb-3">
+                  <p className="text-sm text-muted mb-3">
                     {actionModal.action === 'approve' && t('moderation.confirm_approve')}
                     {actionModal.action === 'reject' && t('moderation.confirm_reject')}
                     {actionModal.action === 'flag' && t('moderation.confirm_flag')}
@@ -479,13 +476,13 @@ export function JobModerationQueue() {
                 </ModalBody>
                 <ModalFooter>
                   <Button
-                    variant="flat"
+                    variant="tertiary"
                     onPress={() => setActionModal({ isOpen: false, action: 'approve', job: null })}
                   >
                     {t('moderation.cancel')}
                   </Button>
                   <Button
-                    color={config.color}
+                    variant={actionModal.action === 'reject' ? 'danger' : 'secondary'}
                     isLoading={actionLoading}
                     isDisabled={requiresReason && !actionReason.trim()}
                     onPress={executeAction}

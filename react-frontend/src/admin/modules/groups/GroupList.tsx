@@ -208,7 +208,7 @@ export function GroupList() {
           <div className="min-w-0">
             <p className="font-medium text-foreground truncate">{item.name}</p>
             {item.description && (
-              <p className="text-xs text-default-400 truncate max-w-xs">
+              <p className="text-xs text-muted truncate max-w-xs">
                 {item.description}
               </p>
             )}
@@ -223,7 +223,7 @@ export function GroupList() {
       render: (item) => (
         <Chip
           size="sm"
-          variant="flat"
+          variant="soft"
           color={statusColors[item.status] || 'default'}
           className="capitalize"
         >
@@ -239,8 +239,8 @@ export function GroupList() {
         const Icon = visibilityIcons[item.visibility] || Eye;
         return (
           <div className="flex items-center gap-1.5">
-            <Icon size={14} className="text-default-400" />
-            <span className="text-sm text-default-600 capitalize">{t(`groups.visibility_${item.visibility}`)}</span>
+            <Icon size={14} className="text-muted" />
+            <span className="text-sm text-muted capitalize">{t(`groups.visibility_${item.visibility}`)}</span>
           </div>
         );
       },
@@ -251,8 +251,8 @@ export function GroupList() {
       sortable: true,
       render: (item) => (
         <div className="flex items-center gap-1.5">
-          <Users size={14} className="text-default-400" />
-          <span className="text-sm text-default-600">{item.member_count}</span>
+          <Users size={14} className="text-muted" />
+          <span className="text-sm text-muted">{item.member_count}</span>
         </div>
       ),
     },
@@ -261,7 +261,7 @@ export function GroupList() {
       label: t('groups.col_creator'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-600">{item.creator_name || t('common.unknown')}</span>
+        <span className="text-sm text-muted">{item.creator_name || t('common.unknown')}</span>
       ),
     },
     {
@@ -269,7 +269,7 @@ export function GroupList() {
       label: t('groups.col_created'),
       sortable: true,
       render: (item) => (
-        <span className="text-sm text-default-500">
+        <span className="text-sm text-muted">
           {new Date(item.created_at).toLocaleDateString()}
         </span>
       ),
@@ -280,7 +280,7 @@ export function GroupList() {
       render: (item) => (
         <Dropdown>
           <DropdownTrigger>
-            <Button isIconOnly size="sm" variant="light" aria-label={t('groups.actions')}>
+            <Button isIconOnly size="sm" variant="tertiary" aria-label={t('groups.actions')}>
               <MoreVertical size={16} />
             </Button>
           </DropdownTrigger>
@@ -321,7 +321,7 @@ export function GroupList() {
             <DropdownItem key="audit" id="audit" startContent={<Eye size={14} />}>
               {t('groups.audit_log_title')}
             </DropdownItem>
-            <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" color="danger">
+            <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" variant="danger">
               {t('groups.delete')}
             </DropdownItem>
           </DropdownMenu>
@@ -338,14 +338,14 @@ export function GroupList() {
         actions={
           <div className="flex gap-2">
             <Button
-              variant="flat"
+              variant="tertiary"
               size="sm"
               onPress={() => navigate(tenantPath('/admin/groups/analytics'))}
             >
               {t('groups.analytics')}
             </Button>
             <Button
-              variant="flat"
+              variant="tertiary"
               size="sm"
               onPress={() => navigate(tenantPath('/admin/groups/approvals'))}
             >
@@ -373,9 +373,9 @@ export function GroupList() {
       {selectedIds.size > 0 && (
         <div className="flex items-center gap-3 p-3 mb-4 bg-accent/10 rounded-lg">
           <span className="text-sm font-medium">{t('groups.selected_count', { count: selectedIds.size })}</span>
-          <Button size="sm" variant="flat" onPress={handleBulkArchive}>{t('groups.archive')}</Button>
-          <Button size="sm" variant="flat" color="danger" onPress={handleBulkDelete}>{t('groups.delete')}</Button>
-          <Button size="sm" variant="flat" onPress={() => setSelectedIds(new Set())}>{t('common.clear')}</Button>
+          <Button size="sm" variant="tertiary" onPress={handleBulkArchive}>{t('groups.archive')}</Button>
+              <Button size="sm" variant="danger" onPress={handleBulkDelete}>{t('groups.delete')}</Button>
+          <Button size="sm" variant="tertiary" onPress={() => setSelectedIds(new Set())}>{t('common.clear')}</Button>
         </div>
       )}
 
@@ -421,15 +421,15 @@ export function GroupList() {
               label={t('groups.clone_group_name_label')}
               value={cloneName}
               onValueChange={setCloneName}
-              variant="bordered"
+              variant="secondary"
               autoFocus
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={() => { setCloneTarget(null); setCloneName(''); }} isDisabled={cloneLoading}>
+            <Button variant="tertiary" onPress={() => { setCloneTarget(null); setCloneName(''); }} isDisabled={cloneLoading}>
               {t('groups.edit_cancel')}
             </Button>
-            <Button color="primary" onPress={handleCloneConfirm} isLoading={cloneLoading} isDisabled={!cloneName.trim()}>
+            <Button onPress={handleCloneConfirm} isLoading={cloneLoading} isDisabled={!cloneName.trim()}>
               {t('groups.clone_group_confirm')}
             </Button>
           </ModalFooter>

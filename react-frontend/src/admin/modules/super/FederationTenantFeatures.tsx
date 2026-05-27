@@ -195,7 +195,7 @@ export function FederationTenantFeatures() {
 
   if (!tenant) {
     return (
-      <div className="p-8 text-center text-default-400">
+      <div className="p-8 text-center text-muted">
         {t('super.tenant_not_found')}
       </div>
     );
@@ -217,23 +217,23 @@ export function FederationTenantFeatures() {
           </CardHeader>
           <CardBody className="flex flex-col gap-3">
             <div className="flex justify-between items-center">
-              <span className="text-default-500">{t('super.label_name')}</span>
+              <span className="text-muted">{t('super.label_name')}</span>
               <span className="font-medium">{tenant.name}</span>
             </div>
             <Separator />
             <div className="flex justify-between items-center">
-              <span className="text-default-500">{t('super.label_slug')}</span>
-              <Chip size="sm" variant="flat">{tenant.slug}</Chip>
+              <span className="text-muted">{t('super.label_slug')}</span>
+              <Chip size="sm" variant="soft">{tenant.slug}</Chip>
             </div>
             <Separator />
             <div className="flex justify-between items-center">
-              <span className="text-default-500">{t('super.label_domain')}</span>
+              <span className="text-muted">{t('super.label_domain')}</span>
               <span className="text-sm">{tenant.domain || t('super.not_applicable')}</span>
             </div>
             <Separator />
             <div className="flex justify-between items-center">
-              <span className="text-default-500">{t('super.label_tenant_id')}</span>
-              <Chip size="sm" variant="flat" color="primary">{tenant.id}</Chip>
+              <span className="text-muted">{t('super.label_tenant_id')}</span>
+              <Chip size="sm" variant="soft" color="accent">{tenant.id}</Chip>
             </div>
           </CardBody>
         </Card>
@@ -249,20 +249,19 @@ export function FederationTenantFeatures() {
               <span>{t('super.federation_whitelist_label')}</span>
               <Chip
                 color={whitelisted ? 'success' : 'default'}
-                variant="flat"
+                variant="soft"
                 size="lg"
               >
                 {whitelisted ? t('super.whitelisted') : t('super.not_whitelisted')}
               </Chip>
             </div>
-            <p className="text-sm text-default-400">
+            <p className="text-sm text-muted">
               {whitelisted
                 ? t('super.whitelisted_desc')
                 : t('super.not_whitelisted_desc')}
             </p>
             <Button
-              color={whitelisted ? 'danger' : 'success'}
-              variant="flat"
+              variant={whitelisted ? 'danger' : 'secondary'}
               startContent={whitelisted ? <Minus size={16} /> : <Plus size={16} />}
               isLoading={saving === 'whitelist'}
               onPress={toggleWhitelist}
@@ -283,7 +282,7 @@ export function FederationTenantFeatures() {
               {features && FEATURE_TOGGLE_KEYS.map(({ key, labelKey, descKey, icon: Icon }) => (
                 <div
                   key={key}
-                  className="flex items-center justify-between p-3 rounded-lg bg-default-50 dark:bg-default-100/50"
+                  className="flex items-center justify-between p-3 rounded-lg bg-surface-secondary"
                 >
                   <div className="flex items-center gap-3 min-w-0 flex-1">
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
@@ -291,7 +290,7 @@ export function FederationTenantFeatures() {
                     </div>
                     <div className="min-w-0">
                       <p className="font-medium text-sm">{t(labelKey)}</p>
-                      <p className="text-xs text-default-400 truncate">{t(descKey)}</p>
+                      <p className="text-xs text-muted truncate">{t(descKey)}</p>
                     </div>
                   </div>
                   <Switch
@@ -316,7 +315,7 @@ export function FederationTenantFeatures() {
           </CardHeader>
           <CardBody>
             {partnerships.length === 0 ? (
-              <p className="text-default-400 text-sm text-center py-4">
+              <p className="text-muted text-sm text-center py-4">
                 {t('super.no_partnerships_for_tenant')}
               </p>
             ) : (
@@ -332,7 +331,7 @@ export function FederationTenantFeatures() {
                       <div className="flex items-center gap-3">
                         <span className="font-medium">{partnerName}</span>
                         <StatusBadge status={p.status} />
-                        <span className="text-xs text-default-400">
+                        <span className="text-xs text-muted">
                           {t('super.since_date')}
                         </span>
                       </div>
@@ -340,16 +339,14 @@ export function FederationTenantFeatures() {
                         <div className="flex gap-2">
                           <Button
                             size="sm"
-                            variant="flat"
-                            color="warning"
+                            variant="secondary"
                             onPress={() => setPartnerAction({ type: 'suspend', id: p.id })}
                           >
                             {t('super.suspend_btn')}
                           </Button>
                           <Button
                             size="sm"
-                            variant="flat"
-                            color="danger"
+                            variant="danger"
                             onPress={() => setPartnerAction({ type: 'terminate', id: p.id })}
                           >
                             {t('super.terminate_btn')}
@@ -357,10 +354,10 @@ export function FederationTenantFeatures() {
                         </div>
                       )}
                       {p.status === 'suspended' && (
-                        <Chip size="sm" variant="flat" color="warning">{t('super.partnership_suspended')}</Chip>
+                        <Chip size="sm" variant="soft" color="warning">{t('super.partnership_suspended')}</Chip>
                       )}
                       {p.status === 'terminated' && (
-                        <Chip size="sm" variant="flat" color="danger">{t('super.partnership_terminated')}</Chip>
+                        <Chip size="sm" variant="soft" color="danger">{t('super.partnership_terminated')}</Chip>
                       )}
                     </div>
                   );

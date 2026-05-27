@@ -220,14 +220,14 @@ export default function CommercialBoundaryAdminPage() {
         actions={
           <div className="flex items-center gap-2">
             {matrix && matrix.overrides_count > 0 && (
-              <Chip color="warning" variant="flat" size="sm">
+              <Chip color="warning" variant="soft" size="sm">
                 {t('commercial_boundary.overrides_count', { count: matrix.overrides_count })}
               </Chip>
             )}
             <Tooltip content={t('commercial_boundary.actions.export_markdown')}>
               <Button
                 size="sm"
-                variant="flat"
+                variant="secondary"
                 startContent={<Download size={14} />}
                 onPress={exportMarkdown}
                 isDisabled={loading}
@@ -239,7 +239,7 @@ export default function CommercialBoundaryAdminPage() {
               <Button
                 isIconOnly
                 size="sm"
-                variant="flat"
+                variant="tertiary"
                 onPress={load}
                 isLoading={loading}
                 aria-label={t('commercial_boundary.actions.refresh_aria')}
@@ -251,17 +251,17 @@ export default function CommercialBoundaryAdminPage() {
         }
       />
 
-      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('commercial_boundary.about.title')}</p>
-              <p className="text-default-600">
+              <p className="text-muted">
                 {t('commercial_boundary.about.body_prefix')}{' '}
                 <Abbr term="KISS" />/<Abbr term="AGORIS" /> {t('commercial_boundary.about.body_suffix')}
               </p>
-              <p className="text-default-600">
+              <p className="text-muted">
                 {t('commercial_boundary.about.override_prefix')}{' '}
                 <Abbr term="AGPL" /> {t('commercial_boundary.about.override_suffix')}
               </p>
@@ -294,12 +294,12 @@ export default function CommercialBoundaryAdminPage() {
                   className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-3"
                 >
                   <div className="flex items-center gap-2 mb-1">
-                    <Chip color={CLASSIFICATION_COLOR[c.key]} variant="flat" size="sm">
+                    <Chip color={CLASSIFICATION_COLOR[c.key]} variant="soft" size="sm">
                       {c.label}
                     </Chip>
-                    <code className="text-xs text-default-500">{c.key}</code>
+                    <code className="text-xs text-muted">{c.key}</code>
                   </div>
-                  <p className="text-sm text-default-600">{c.description}</p>
+                  <p className="text-sm text-muted">{c.description}</p>
                 </div>
               ))}
             </div>
@@ -320,9 +320,9 @@ export default function CommercialBoundaryAdminPage() {
               aria-label={group.category.label}
               title={
                 <div className="flex items-center gap-3">
-                  <Building size={16} className="text-default-500" />
+                  <Building size={16} className="text-muted" />
                   <span className="font-semibold">{group.category.label}</span>
-                  <Chip variant="flat" size="sm" color="default">
+                  <Chip variant="soft" size="sm" color="default">
                     {group.items.length}
                   </Chip>
                 </div>
@@ -369,11 +369,11 @@ function CapabilityRow({ capability, saving, onChange, onReset, t }: CapabilityR
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2 mb-1">
             <span className="font-semibold text-sm text-foreground">{capability.label}</span>
-            <Chip color={CLASSIFICATION_COLOR[effective]} variant="flat" size="sm">
+            <Chip color={CLASSIFICATION_COLOR[effective]} variant="soft" size="sm">
               {t(`commercial_boundary.classification.${effective}`)}
             </Chip>
             {capability.is_overridden && (
-              <Chip color="warning" variant="flat" size="sm">
+              <Chip color="warning" variant="soft" size="sm">
                 {t('commercial_boundary.labels.overridden')}
               </Chip>
             )}
@@ -387,16 +387,16 @@ function CapabilityRow({ capability, saving, onChange, onReset, t }: CapabilityR
                 <Abbr term="AGPL" /> {t('commercial_boundary.labels.module')}
               </Chip>
             ) : (
-              <Chip color="secondary" variant="dot" size="sm" startContent={<Wrench size={10} />}>
+              <Chip color="default" variant="dot" size="sm" startContent={<Wrench size={10} />}>
                 {t('commercial_boundary.labels.out_of_tree')}
               </Chip>
             )}
           </div>
-          <p className="text-sm text-default-600">{capability.description}</p>
+          <p className="text-sm text-muted">{capability.description}</p>
           {capability.notes && (
-            <p className="mt-1 text-xs text-default-500 italic">{capability.notes}</p>
+            <p className="mt-1 text-xs text-muted italic">{capability.notes}</p>
           )}
-          <p className="mt-2 text-xs text-default-500">
+          <p className="mt-2 text-xs text-muted">
             {t('commercial_boundary.labels.canonical_default')}{' '}
             <span className="font-medium">
               {t(`commercial_boundary.classification.${capability.default_classification}`)}
@@ -430,8 +430,7 @@ function CapabilityRow({ capability, saving, onChange, onReset, t }: CapabilityR
             <Tooltip content={t('commercial_boundary.actions.reset_default')}>
               <Button
                 size="sm"
-                variant="flat"
-                color="warning"
+                variant="secondary"
                 isIconOnly
                 onPress={onReset}
                 isLoading={saving}
@@ -445,7 +444,7 @@ function CapabilityRow({ capability, saving, onChange, onReset, t }: CapabilityR
       </div>
 
       <Separator className="mt-3" />
-      <p className="mt-2 text-[10px] uppercase tracking-wide text-default-400">
+      <p className="mt-2 text-[10px] uppercase tracking-wide text-muted">
         {t('commercial_boundary.labels.key')}: <code>{capability.key}</code>
       </p>
     </div>
