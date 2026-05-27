@@ -472,15 +472,55 @@
     "coupons": {
       "title": "Seller coupons",
       "subtitle": "Create and manage merchant coupons for marketplace checkout.",
+      "code": "Coupon code",
+      "codePlaceholder": "COMMUNITY10",
       "name": "Coupon title",
       "namePlaceholder": "June community discount",
+      "description": "Description",
+      "descriptionPlaceholder": "Optional customer-facing note",
+      "discountType": "Discount type",
       "value": "Discount percent",
       "valuePlaceholder": "10",
+      "maxUses": "Max uses",
+      "maxUsesPlaceholder": "100",
+      "perMember": "Per member",
+      "perMemberPlaceholder": "1",
+      "validFrom": "Valid from",
+      "validUntil": "Valid until",
+      "datePlaceholder": "2026-06-01 10:00",
+      "status": "Status",
+      "appliesTo": "Applies to",
       "create": "Create coupon",
+      "update": "Update coupon",
+      "edit": "Edit",
+      "cancelEdit": "Cancel editing",
+      "redemptions": "Redemptions",
+      "redemptionsTitle": "Coupon redemptions",
+      "redemptionsFailed": "Could not load coupon redemptions.",
+      "noRedemptions": "No redemptions yet",
+      "redemptionOrder": "Order {{order}}",
+      "redemptionValue": "Discount {{value}} - {{date}}",
+      "dateUnknown": "Date unavailable",
       "empty": "No seller coupons yet",
-      "discount": "{{value}}% · {{status}}",
+      "discount": "{{value}} · {{status}}",
       "saveFailed": "Could not create this coupon.",
-      "deleteFailed": "Could not delete this coupon."
+      "deleteFailed": "Could not delete this coupon.",
+      "discountTypes": {
+        "percent": "Percent",
+        "fixed": "Fixed",
+        "bogo": "BOGO"
+      },
+      "statuses": {
+        "draft": "Draft",
+        "active": "Active",
+        "paused": "Paused",
+        "expired": "Expired"
+      },
+      "applies": {
+        "all_listings": "All listings",
+        "listing_ids": "Specific listings",
+        "category_ids": "Specific categories"
+      }
     }
   },
   "map": {

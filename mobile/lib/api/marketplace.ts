@@ -941,7 +941,7 @@ export function createMerchantCoupon(payload: {
   max_uses_per_member?: number | null;
   valid_from?: string | null;
   valid_until?: string | null;
-  status?: 'draft' | 'active' | 'paused';
+  status?: 'draft' | 'active' | 'paused' | 'expired';
   applies_to?: 'all_listings' | 'listing_ids' | 'category_ids';
 }): Promise<MarketplaceDataResponse<MerchantCoupon>> {
   return api.post<MarketplaceDataResponse<MerchantCoupon>>(`${API_V2}/marketplace/seller/coupons`, payload);
