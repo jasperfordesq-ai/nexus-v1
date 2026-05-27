@@ -133,7 +133,9 @@
     "aria_move_down": "Déplacer vers le bas",
     "aria_upload_progress": "Progression de la mise en ligne",
     "download": "Télécharger",
-    "download_failed": "Téléchargement échoué"
+    "download_failed": "Téléchargement échoué",
+    "filter_by_category": "Filter by category",
+    "loading": "Loading resources"
   },
   "not_found": {
     "page_title": "Page non trouvée",

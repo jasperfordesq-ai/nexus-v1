@@ -836,5 +836,6 @@
   "my_organisations_none": "لا توجد منظمات حتى الآن",
   "my_organisations_none_desc": "قم بتسجيل منظمة تطوعية لبدء نشر الفرص وإدارة المتطوعين ومنح الاعتمادات الزمنية.",
   "my_organisations_pending": "في انتظار الموافقة",
-  "my_organisations_pending_desc": "في انتظار موافقة المشرف"
+  "my_organisations_pending_desc": "في انتظار موافقة المشرف",
+  "filter_by_status": "Filter by status"
 }

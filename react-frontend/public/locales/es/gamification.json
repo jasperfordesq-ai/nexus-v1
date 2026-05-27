@@ -341,7 +341,8 @@
     "session_expired": "Tu sesión ha expirado. Inicia sesión de nuevo.",
     "load_error": "Error al cargar la clasificación. Inténtalo de nuevo.",
     "type_nexus_score": "Puntuación Nexus",
-    "load_more": "Cargar más"
+    "load_more": "Cargar más",
+    "retry": "Retry loading leaderboard"
   },
   "community": {
     "total_hours": "Total de horas intercambiadas",

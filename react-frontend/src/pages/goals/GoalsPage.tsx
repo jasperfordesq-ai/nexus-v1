@@ -536,7 +536,7 @@ export function GoalsPage() {
 
       {/* Error State */}
       {error && !isLoading && (
-        <GlassCard className="p-8 text-center">
+        <GlassCard role="alert" className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('goals.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
@@ -694,6 +694,7 @@ export function GoalsPage() {
               <Switch
                 isSelected={newGoal.is_public}
                 onValueChange={(val) => setNewGoal((prev) => ({ ...prev, is_public: val }))}
+                aria-label={t('goals.modal.make_public')}
               />
             </div>
           </ModalBody>
@@ -768,6 +769,7 @@ export function GoalsPage() {
               <Switch
                 isSelected={editForm.is_public}
                 onValueChange={(val) => setEditForm((prev) => ({ ...prev, is_public: val }))}
+                aria-label={t('goals.modal.make_public')}
               />
             </div>
           </ModalBody>
@@ -851,18 +853,18 @@ export function GoalsPage() {
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
                   {detailGoal.status === 'completed' ? (
-                    <Chip size="sm" color="success" variant="flat" startContent={<CheckCircle className="w-3 h-3" />}>
+                    <Chip size="sm" color="success" variant="flat" startContent={<CheckCircle className="w-3 h-3" aria-hidden="true" />}>
                       {t('goals.status.completed')}
                     </Chip>
                   ) : (
                     <Chip size="sm" color="primary" variant="flat">{t('goals.status.active')}</Chip>
                   )}
                   {detailGoal.is_public ? (
-                    <Chip size="sm" variant="flat" className="text-theme-subtle" startContent={<Globe className="w-3 h-3" />}>
+                    <Chip size="sm" variant="flat" className="text-theme-subtle" startContent={<Globe className="w-3 h-3" aria-hidden="true" />}>
                       {t('goals.visibility.public')}
                     </Chip>
                   ) : (
-                    <Chip size="sm" variant="flat" className="text-theme-subtle" startContent={<Lock className="w-3 h-3" />}>
+                    <Chip size="sm" variant="flat" className="text-theme-subtle" startContent={<Lock className="w-3 h-3" aria-hidden="true" />}>
                       {t('goals.visibility.private')}
                     </Chip>
                   )}
@@ -1083,16 +1085,16 @@ function GoalCard({
               {goal.title}
             </Button>
             {isCompleted && (
-              <Chip size="sm" color="success" variant="soft" startContent={<CheckCircle className="w-3 h-3" />}>
+              <Chip size="sm" color="success" variant="soft" startContent={<CheckCircle className="w-3 h-3" aria-hidden="true" />}>
                 {t('goals.status.completed')}
               </Chip>
             )}
             {goal.is_public ? (
-              <Chip size="sm" variant="flat" className="text-theme-subtle" startContent={<Globe className="w-3 h-3" />}>
+              <Chip size="sm" variant="flat" className="text-theme-subtle" startContent={<Globe className="w-3 h-3" aria-hidden="true" />}>
                 {t('goals.visibility.public')}
               </Chip>
             ) : (
-              <Chip size="sm" variant="flat" className="text-theme-subtle" startContent={<Lock className="w-3 h-3" />}>
+              <Chip size="sm" variant="flat" className="text-theme-subtle" startContent={<Lock className="w-3 h-3" aria-hidden="true" />}>
                 {t('goals.visibility.private')}
               </Chip>
             )}

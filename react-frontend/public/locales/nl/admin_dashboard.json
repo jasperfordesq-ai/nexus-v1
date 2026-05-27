@@ -120,5 +120,6 @@
     "cache": "Cache",
     "queue": "Cron-banen",
     "api": "E-mail-API"
-  }
+  },
+  "loading": "Loading"
 }

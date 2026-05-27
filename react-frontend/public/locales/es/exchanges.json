@@ -5,6 +5,7 @@
   "browse_listings": "Explorar Anuncios",
   "load_more": "Cargar Más",
   "try_again": "Intentar de Nuevo",
+  "loading": "Loading exchanges...",
   "service_exchange": "Intercambio de Servicios",
   "unknown": "Desconocido",
   "hours_count": "{{count}} hora",

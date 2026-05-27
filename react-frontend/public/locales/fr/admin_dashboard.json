@@ -120,5 +120,6 @@
     "cache": "Cache",
     "queue": "Emplois Cron",
     "api": "API de messagerie"
-  }
+  },
+  "loading": "Loading"
 }

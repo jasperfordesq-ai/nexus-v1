@@ -341,7 +341,8 @@
     "session_expired": "セッションの有効期限が切れました。再度ログインしてください。",
     "load_error": "リーダーボードの読み込みに失敗しました。もう一度試してください。",
     "type_nexus_score": "ネクサススコア",
-    "load_more": "もっと読み込む"
+    "load_more": "もっと読み込む",
+    "retry": "Retry loading leaderboard"
   },
   "community": {
     "total_hours": "合計交換時間数",

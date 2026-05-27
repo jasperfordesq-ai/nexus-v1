@@ -1033,5 +1033,6 @@
   "jobs": {
     "view_details": "Voir les détails du poste"
   },
-  "tabs_aria": "Jobs view"
+  "tabs_aria": "Jobs view",
+  "loading": "Loading vacancies..."
 }

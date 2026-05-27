@@ -836,5 +836,6 @@
   "my_organisations_none": "Nie ma jeszcze organizacji",
   "my_organisations_none_desc": "Zarejestruj organizację wolontariacką, aby rozpocząć publikowanie ofert pracy, zarządzanie wolontariuszami i przyznawanie punktów czasowych.",
   "my_organisations_pending": "Oczekujące na zatwierdzenie",
-  "my_organisations_pending_desc": "Oczekiwanie na zgodę administratora"
+  "my_organisations_pending_desc": "Oczekiwanie na zgodę administratora",
+  "filter_by_status": "Filter by status"
 }

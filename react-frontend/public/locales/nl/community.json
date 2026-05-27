@@ -184,7 +184,8 @@
     "terms_agreement": "Ik heb de bovenstaande registratievoorwaarden voor de organisatie gelezen en ga ermee akkoord.",
     "terms_required": "Om uw organisatie te kunnen registreren, moet u akkoord gaan met de voorwaarden.",
     "opportunity_count_one": "{{count}} mogelijkheid",
-    "opportunity_count_other": "{{count}} mogelijkheden"
+    "opportunity_count_other": "{{count}} mogelijkheden",
+    "loading": "Loading organisations"
   },
   "organisation_detail": {
     "page_title": "Organisatie",

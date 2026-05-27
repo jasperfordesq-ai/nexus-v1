@@ -93,7 +93,7 @@ function normalizeAdminEvent(item: RawAdminEvent): AdminEvent {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function EventsAdmin() {
-  useAdminPageMeta({ title: "Events" });
+  useAdminPageMeta({ title: t('events.events_admin_title') });
   const { tenantPath } = useTenant();
   const toast = useToast();
   const { t } = useTranslation('admin');
@@ -130,7 +130,7 @@ export function EventsAdmin() {
         setTotal(res.meta?.total ?? 0);
       }
     } catch {
-      toast.error("Failed to load events");
+      toast.error(t('events.failed_to_load_events'));
     } finally {
       setLoading(false);
     }
@@ -149,13 +149,13 @@ export function EventsAdmin() {
     try {
       const res = await api.delete(`/v2/admin/events/${confirmDelete.id}`);
       if (res?.success) {
-        toast.success("Event deleted successfully");
+        toast.success(t('events.event_deleted_successfully'));
         loadItems();
       } else {
-        toast.error(res?.error || "Failed to delete event");
+        toast.error(res?.error || t('events.failed_to_delete_event'));
       }
     } catch {
-      toast.error("An unexpected error occurred");
+      toast.error(t('events.an_unexpected_error_occurred'));
     } finally {
       setActionLoading(false);
       setConfirmDelete(null);
@@ -170,13 +170,13 @@ export function EventsAdmin() {
     try {
       const res = await api.post(`/v2/admin/events/${confirmCancel.id}/cancel`);
       if (res?.success) {
-        toast.success("Event cancelled successfully");
+        toast.success(t('events.event_cancelled_successfully'));
         loadItems();
       } else {
-        toast.error(res?.error || "Failed to cancel event");
+        toast.error(res?.error || t('events.failed_to_cancel_event'));
       }
     } catch {
-      toast.error("An unexpected error occurred");
+      toast.error(t('events.an_unexpected_error_occurred'));
     } finally {
       setActionLoading(false);
       setConfirmCancel(null);
@@ -201,7 +201,7 @@ export function EventsAdmin() {
   const columns: Column<AdminEvent>[] = [
     {
       key: 'title',
-      label: "Title",
+      label: t('events.col_title'),
       sortable: true,
       render: (item) => (
         <span className="font-medium text-foreground">{item.title}</span>
@@ -209,7 +209,7 @@ export function EventsAdmin() {
     },
     {
       key: 'start_date',
-      label: "Date Time",
+      label: t('events.col_date_time'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">
@@ -219,12 +219,12 @@ export function EventsAdmin() {
     },
     {
       key: 'location',
-      label: "Location",
+      label: t('events.col_location'),
       render: (item) => (
         <span className="flex items-center gap-1 text-sm text-muted">
           {item.location ? (
             <>
-              <MapPin size={12} className="shrink-0" />
+              <MapPin size={12} className="shrink-0" aria-hidden="true" />
               <span className="truncate max-w-[180px]">{item.location}</span>
             </>
           ) : (
@@ -235,17 +235,17 @@ export function EventsAdmin() {
     },
     {
       key: 'organizer_name',
-      label: "Organizer",
+      label: t('events.col_organizer'),
       sortable: true,
       render: (item) => (
         <span className="text-sm text-muted">
-          {item.organizer_name || "Unknown"}
+          {item.organizer_name || t('events.unknown')}
         </span>
       ),
     },
     {
       key: 'status',
-      label: "Status",
+      label: t('events.col_status'),
       sortable: true,
       render: (item) => (
         <Chip
@@ -260,11 +260,11 @@ export function EventsAdmin() {
     },
     {
       key: 'attendees_count',
-      label: "Attendees",
+      label: t('events.col_attendees'),
       sortable: true,
       render: (item) => (
         <span className="flex items-center gap-1 text-sm text-muted">
-          <Users size={12} />
+          <Users size={12} aria-hidden="true" />
           {item.attendees_count ?? 0}
           {item.max_attendees ? ` / ${item.max_attendees}` : ''}
         </span>
@@ -272,7 +272,7 @@ export function EventsAdmin() {
     },
     {
       key: 'actions',
-      label: "Actions",
+      label: t('events.col_actions'),
       render: (item) => (
         <div className="flex gap-1">
           <Button
@@ -283,7 +283,7 @@ export function EventsAdmin() {
             isIconOnly
             size="sm"
             variant="tertiary"
-            aria-label={"View Event"}
+            aria-label={t('events.label_view_event')}
           >
             <Eye size={14} />
           </Button>
@@ -294,7 +294,7 @@ export function EventsAdmin() {
               variant="tertiary"
               color="warning"
               onPress={() => setConfirmCancel(item)}
-              aria-label={"Cancel Event"}
+              aria-label={t('events.label_cancel_event')}
             >
               <XCircle size={14} />
             </Button>
@@ -304,7 +304,7 @@ export function EventsAdmin() {
             size="sm"
             variant="danger"
             onPress={() => setConfirmDelete(item)}
-            aria-label={"Delete Event"}
+            aria-label={t('events.label_delete_event')}
           >
             <Trash2 size={14} />
           </Button>
@@ -318,8 +318,8 @@ export function EventsAdmin() {
   return (
     <div>
       <PageHeader
-        title={"Events Admin"}
-        description={"View, manage, and moderate community events"}
+        title={t('events.events_admin_title')}
+        description={t('events.events_admin_desc')}
       />
 
       <div className="mb-4">
@@ -333,21 +333,21 @@ export function EventsAdmin() {
           variant="underlined"
           size="sm"
         >
-          <Tab key="all" title={"All"} />
-          <Tab key="published" title={"Published"} />
-          <Tab key="cancelled" title={"Cancelled"} />
-          <Tab key="draft" title={"Draft"} />
+          <Tab key="all" title={t('events.tab_all')} />
+          <Tab key="published" title={t('events.tab_published')} />
+          <Tab key="cancelled" title={t('events.tab_cancelled')} />
+          <Tab key="draft" title={t('events.tab_draft')} />
         </Tabs>
       </div>
 
       {!loading && items.length === 0 && !search ? (
         <EmptyState
           icon={Calendar}
-          title={"No events found"}
+          title={t('events.no_events_found')}
           description={
             status === 'all'
-              ? "No events match your current filters"
-              : `No status events`
+              ? t('events.no_events_desc')
+              : t('events.no_status_events')
           }
         />
       ) : (
@@ -355,7 +355,7 @@ export function EventsAdmin() {
           columns={columns}
           data={items}
           isLoading={loading}
-          searchPlaceholder={"Search events..."}
+          searchPlaceholder={t('events.search_events_placeholder')}
           onSearch={(q) => {
             setSearch(q);
             setPage(1);
@@ -374,9 +374,9 @@ export function EventsAdmin() {
           isOpen={!!confirmDelete}
           onClose={() => setConfirmDelete(null)}
           onConfirm={handleDelete}
-          title={"Delete Event"}
-          message={`Delete Event`}
-          confirmLabel={"Delete"}
+          title={t('events.delete_event')}
+          message={t('events.confirm_delete_event')}
+          confirmLabel={t('events.delete_event')}
           confirmColor="danger"
           isLoading={actionLoading}
         />
@@ -388,9 +388,9 @@ export function EventsAdmin() {
           isOpen={!!confirmCancel}
           onClose={() => setConfirmCancel(null)}
           onConfirm={handleCancel}
-          title={"Cancel Event"}
-          message={`Cancel Event`}
-          confirmLabel={"Cancel Event"}
+          title={t('events.cancel_event')}
+          message={t('events.confirm_cancel_event')}
+          confirmLabel={t('events.cancel_event')}
           confirmColor="warning"
           isLoading={actionLoading}
         />

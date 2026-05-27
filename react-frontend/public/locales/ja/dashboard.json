@@ -130,5 +130,7 @@
     "none_pending_description": "フィードバックが必要な完了済みの交換がここに表示されます。",
     "pending_subtitle": "このレビューリクエストを開く",
     "view_all_pending": "保留中をすべて表示"
-  }
+  },
+  "likes_count": "{{count}} likes",
+  "comments_count": "{{count}} comments"
 }

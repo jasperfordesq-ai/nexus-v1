@@ -1,5 +1,6 @@
 {
   "page_title": "المدونة",
+  "loading_post": "Loading blog post...",
   "title": "المدونة والأخبار",
   "subtitle": "قصص المجتمع والتحديثات والإعلانات",
   "search_placeholder": "البحث في التدوينات...",
@@ -61,5 +62,7 @@
   "hero_posts_label": "المنشورات المعروضة",
   "empty_tip_stories": "قصص الأعضاء",
   "empty_tip_guides": "الأدلة",
-  "empty_tip_updates": "التحديثات"
+  "empty_tip_updates": "التحديثات",
+  "filter_by_category": "Filter by category",
+  "loading_posts": "Loading blog posts"
 }

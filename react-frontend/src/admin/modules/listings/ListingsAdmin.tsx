@@ -205,7 +205,7 @@ function FeaturedListingsPanel() {
       <Card  className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
         <CardBody className="p-4">
           <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-            <Plus size={16} />
+            <Plus size={16} aria-hidden="true" />
             {t('listings.feature_listing')}
           </h3>
           <Input type="search" name="admin-search" autoComplete="off"
@@ -264,7 +264,7 @@ function FeaturedListingsPanel() {
       {/* Currently featured listings table */}
       <div>
         <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-          <Star size={16} className="text-warning" />
+          <Star size={16} className="text-warning" aria-hidden="true" />
           {t('listings.currently_featured')}
         </h3>
         <DataTable
@@ -522,7 +522,7 @@ export function ListingsAdmin() {
             key="featured"
             title={
               <div className="flex items-center gap-1.5">
-                <Star size={14} />
+                <Star size={14} aria-hidden="true" />
                 {t('listings.tab_featured')}
               </div>
             }

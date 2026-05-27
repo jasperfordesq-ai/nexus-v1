@@ -184,7 +184,8 @@
     "terms_agreement": "Li e concordo com os termos de registo de organização acima.",
     "terms_required": "Deve concordar com os termos para registar a sua organização.",
     "opportunity_count_one": "{{count}} oportunidade",
-    "opportunity_count_other": "{{count}} oportunidades"
+    "opportunity_count_other": "{{count}} oportunidades",
+    "loading": "Loading organisations"
   },
   "organisation_detail": {
     "page_title": "Organização",

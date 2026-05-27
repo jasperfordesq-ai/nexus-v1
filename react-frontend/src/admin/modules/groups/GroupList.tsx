@@ -108,7 +108,7 @@ export function GroupList() {
     try {
       const res = await adminGroups.delete(confirmDelete.id);
       if (res?.success) {
-        toast.success("Group deleted successfully");
+        toast.success(t('groups.group_deleted_successfully'));
         loadItems();
       } else {
         toast.error(res?.error || t('groups.failed_to_delete_group'));

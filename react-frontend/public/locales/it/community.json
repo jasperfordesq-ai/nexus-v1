@@ -184,7 +184,8 @@
     "hero_partners_label": "Partner mostrati",
     "empty_tip_volunteer": "Gruppi di volontariato",
     "empty_tip_partner": "Partner comunitari",
-    "empty_tip_register": "Registra un'organizzazione"
+    "empty_tip_register": "Registra un'organizzazione",
+    "loading": "Loading organisations"
   },
   "organisation_detail": {
     "page_title": "Organizzazione",

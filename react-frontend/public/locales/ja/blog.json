@@ -1,5 +1,6 @@
 {
   "page_title": "ブログ",
+  "loading_post": "Loading blog post...",
   "title": "ブログ＆ニュース",
   "subtitle": "コミュニティのストーリー、最新情報、お知らせ",
   "search_placeholder": "記事を検索...",
@@ -61,5 +62,7 @@
   "hero_posts_label": "表示中の投稿",
   "empty_tip_stories": "メンバーの体験談",
   "empty_tip_guides": "ガイド",
-  "empty_tip_updates": "アップデート"
+  "empty_tip_updates": "アップデート",
+  "filter_by_category": "Filter by category",
+  "loading_posts": "Loading blog posts"
 }

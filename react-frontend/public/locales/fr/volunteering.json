@@ -836,5 +836,6 @@
   "my_organisations_none": "Aucune organisation pour l'instant",
   "my_organisations_none_desc": "Enregistrez une organisation bénévole pour commencer à publier des opportunités, à gérer des bénévoles et à attribuer des crédits de temps.",
   "my_organisations_pending": "En attente d'approbation",
-  "my_organisations_pending_desc": "En attente de l'approbation de l'administrateur"
+  "my_organisations_pending_desc": "En attente de l'approbation de l'administrateur",
+  "filter_by_status": "Filter by status"
 }

@@ -86,7 +86,7 @@ export function ConfirmModal({
     >
       <ModalContent>
         <ModalHeader className="flex items-center gap-2">
-          <AlertTriangle size={20} className="text-warning" />
+          <AlertTriangle size={20} className="text-warning" aria-hidden="true" />
           {title}
         </ModalHeader>
         <ModalBody>

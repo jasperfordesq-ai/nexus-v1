@@ -248,15 +248,16 @@ export function CommunityAnalytics() {
       {/* Exchange Trends (12 months) */}
       <Card  className="mb-6">
         <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-          <BarChart3 size={18} className="text-accent" />
+          <BarChart3 size={18} className="text-accent" aria-hidden="true" />
           <h3 className="font-semibold">{t('analytics.exchange_trends_title')}</h3>
         </CardHeader>
         <CardBody className="px-4 pb-4">
           {loading ? (
-            <div className="flex h-[350px] items-center justify-center">
+            <div role="status" aria-busy="true" aria-label={t('analytics.loading')} className="flex h-[350px] items-center justify-center">
               <Spinner label={t('analytics.loading')} />
             </div>
           ) : data && data.monthly_trends.length > 0 ? (
+            <div role="img" aria-label={t('analytics.exchange_trends_title')}>
             <ResponsiveContainer width="100%" height={350}>
               <AreaChart
                 data={data.monthly_trends}
@@ -339,6 +340,7 @@ export function CommunityAnalytics() {
                 />
               </AreaChart>
             </ResponsiveContainer>
+            </div>
           ) : (
             <p className="flex h-[350px] items-center justify-center text-sm text-muted">
               {error ?? t('analytics.no_exchange_trend_data')}
@@ -352,15 +354,16 @@ export function CommunityAnalytics() {
         {/* Member Growth */}
         <Card >
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <Users size={18} className="text-success" />
+            <Users size={18} className="text-success" aria-hidden="true" />
             <h3 className="font-semibold">{t('analytics.member_growth_title')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
-              <div className="flex h-[300px] items-center justify-center">
+              <div role="status" aria-busy="true" aria-label={t('analytics.loading')} className="flex h-[300px] items-center justify-center">
                 <Spinner label={t('analytics.loading')} />
               </div>
             ) : data && data.monthly_trends.length > 0 ? (
+              <div role="img" aria-label={t('analytics.member_growth_title')}>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart
                   data={data.monthly_trends}
@@ -398,6 +401,7 @@ export function CommunityAnalytics() {
                   />
                 </BarChart>
               </ResponsiveContainer>
+              </div>
             ) : (
               <p className="flex h-[300px] items-center justify-center text-sm text-muted">
                 {error ?? t('analytics.no_member_growth_data')}
@@ -409,15 +413,16 @@ export function CommunityAnalytics() {
         {/* Category Demand */}
         <Card >
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <PieChartIcon size={18} className="text-accent" />
+            <PieChartIcon size={18} className="text-accent" aria-hidden="true" />
             <h3 className="font-semibold">{t('analytics.category_demand_title')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
-              <div className="flex h-[300px] items-center justify-center">
+              <div role="status" aria-busy="true" aria-label={t('analytics.loading')} className="flex h-[300px] items-center justify-center">
                 <Spinner label={t('analytics.loading')} />
               </div>
             ) : data && data.category_demand.length > 0 ? (
+              <div role="img" aria-label={t('analytics.category_demand_title')}>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
@@ -459,6 +464,7 @@ export function CommunityAnalytics() {
                   />
                 </PieChart>
               </ResponsiveContainer>
+              </div>
             ) : (
               <p className="flex h-[300px] items-center justify-center text-sm text-muted">
                 {error ?? t('analytics.no_category_data')}
@@ -473,7 +479,7 @@ export function CommunityAnalytics() {
         {/* Top Earners */}
         <Card >
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <TrendingUp size={18} className="text-success" />
+            <TrendingUp size={18} className="text-success" aria-hidden="true" />
             <h3 className="font-semibold">{t('analytics.top_earners_title')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
@@ -503,7 +509,7 @@ export function CommunityAnalytics() {
         {/* Top Spenders */}
         <Card >
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <Clock size={18} className="text-warning" />
+            <Clock size={18} className="text-warning" aria-hidden="true" />
             <h3 className="font-semibold">{t('analytics.top_spenders_title')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
@@ -535,12 +541,12 @@ export function CommunityAnalytics() {
       {MAPS_ENABLED && (
         <Card  className="mt-6">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <Globe size={18} className="text-accent" />
+            <Globe size={18} className="text-accent" aria-hidden="true" />
             <h3 className="font-semibold">{t('analytics.geographic_distribution_title')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {geoLoading ? (
-              <div className="flex h-[400px] items-center justify-center">
+              <div role="status" aria-busy="true" aria-label={t('analytics.loading')} className="flex h-[400px] items-center justify-center">
                 <Spinner label={t('analytics.loading')} />
               </div>
             ) : geoData ? (

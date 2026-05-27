@@ -341,7 +341,8 @@
     "session_expired": "Twoja sesja wygasła. Proszę zalogować się ponownie.",
     "load_error": "Nie udało się załadować tabeli liderów. Spróbuj ponownie.",
     "type_nexus_score": "Wynik Nexusa",
-    "load_more": "Załaduj więcej"
+    "load_more": "Załaduj więcej",
+    "retry": "Retry loading leaderboard"
   },
   "community": {
     "total_hours": "Łączna liczba zamienionych godzin",

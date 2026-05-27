@@ -3,6 +3,7 @@
   "page_title": "Job Vacancies",
   "page_description": "Browse job opportunities, volunteering roles, and timebank positions offered by community members and partner organisations near you.",
   "subtitle": "Find opportunities in your community",
+  "loading": "Loading vacancies...",
   "create_vacancy": "Post Vacancy",
   "edit_vacancy": "Edit Vacancy",
   "my_postings": {

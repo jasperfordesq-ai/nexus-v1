@@ -341,7 +341,8 @@
     "session_expired": "Tá do sheisiún éagtha. Logáil isteach arís le do thoil.",
     "load_error": "Theip ar lódáil an chláir ceannais. Bain triail eile as le do thoil.",
     "type_nexus_score": "NexusScór",
-    "load_more": "Luchtaigh Níos mó"
+    "load_more": "Luchtaigh Níos mó",
+    "retry": "Retry loading leaderboard"
   },
   "community": {
     "total_hours": "Uaireanta Iomlána Malartaithe",

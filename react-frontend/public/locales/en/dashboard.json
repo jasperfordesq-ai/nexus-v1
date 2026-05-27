@@ -130,5 +130,7 @@
     "none_pending_description": "Completed exchanges that need feedback will appear here.",
     "pending_subtitle": "Open this review request",
     "view_all_pending": "View All Pending"
-  }
+  },
+  "likes_count": "{{count}} likes",
+  "comments_count": "{{count}} comments"
 }

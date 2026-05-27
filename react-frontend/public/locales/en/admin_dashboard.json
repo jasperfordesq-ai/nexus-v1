@@ -3,6 +3,7 @@
   "subtitle": "Real-time platform overview and command center",
   "tour_btn": "Tour",
   "refresh": "Refresh",
+  "loading": "Loading",
   "view_all_activity": "View All Activity",
   "tour": {
     "welcome_title": "Welcome to Mission Control!",

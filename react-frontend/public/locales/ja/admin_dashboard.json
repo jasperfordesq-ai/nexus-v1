@@ -120,5 +120,6 @@
     "cache": "キャッシュ",
     "queue": "クロンジョブ",
     "api": "メールAPI"
-  }
+  },
+  "loading": "Loading"
 }

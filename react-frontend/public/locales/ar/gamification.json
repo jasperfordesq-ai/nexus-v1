@@ -341,7 +341,8 @@
     "session_expired": "لقد انتهت صلاحية جلستك. الرجاء تسجيل الدخول مرة أخرى.",
     "load_error": "فشل تحميل لوحة الصدارة. يرجى المحاولة مرة أخرى.",
     "type_nexus_score": "NexusScore",
-    "load_more": "تحميل المزيد"
+    "load_more": "تحميل المزيد",
+    "retry": "Retry loading leaderboard"
   },
   "community": {
     "total_hours": "إجمالي الساعات المتبادلة",

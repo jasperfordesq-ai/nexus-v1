@@ -120,5 +120,6 @@
     "cache": "Kryjówka",
     "queue": "Praca Crona",
     "api": "API poczty e-mail"
-  }
+  },
+  "loading": "Loading"
 }

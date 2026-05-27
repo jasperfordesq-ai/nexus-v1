@@ -130,5 +130,7 @@
     "none_pending_description": "Abgeschlossene Tausche, die noch eine Bewertung benötigen, erscheinen hier.",
     "pending_subtitle": "Diese Rezensionsanfrage öffnen",
     "view_all_pending": "Alle ausstehenden anzeigen"
-  }
+  },
+  "likes_count": "{{count}} likes",
+  "comments_count": "{{count}} comments"
 }

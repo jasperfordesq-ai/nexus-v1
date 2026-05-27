@@ -133,7 +133,9 @@
     "delete_confirm_message": "هل أنت متأكد من رغبتك في حذف \"{{title}}\"؟ لا يمكن التراجع عن هذا الإجراء.",
     "aria_move_up": "تحريك لأعلى",
     "aria_move_down": "تحريك لأسفل",
-    "aria_upload_progress": "تقدم الرفع"
+    "aria_upload_progress": "تقدم الرفع",
+    "filter_by_category": "Filter by category",
+    "loading": "Loading resources"
   },
   "not_found": {
     "search": "بحث",

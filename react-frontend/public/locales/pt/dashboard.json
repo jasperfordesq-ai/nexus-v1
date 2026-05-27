@@ -130,5 +130,7 @@
     "none_pending_description": "As trocas concluídas que precisam de feedback aparecerão aqui.",
     "pending_subtitle": "Abrir este pedido de avaliação",
     "view_all_pending": "Ver todos os pendentes"
-  }
+  },
+  "likes_count": "{{count}} likes",
+  "comments_count": "{{count}} comments"
 }

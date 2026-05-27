@@ -569,7 +569,7 @@ export function LeaderboardPage() {
           key="competitive"
           title={
             <div className="flex items-center gap-2">
-              <Trophy className="w-4 h-4" />
+              <Trophy className="w-4 h-4" aria-hidden="true" />
               <span>{t('leaderboard.tab.competitive')}</span>
             </div>
           }
@@ -605,7 +605,7 @@ export function LeaderboardPage() {
           key="community"
           title={
             <div className="flex items-center gap-2">
-              <BarChart3 className="w-4 h-4" />
+              <BarChart3 className="w-4 h-4" aria-hidden="true" />
               <span>{t('leaderboard.tab.community')}</span>
             </div>
           }
@@ -619,7 +619,7 @@ export function LeaderboardPage() {
           key="journey"
           title={
             <div className="flex items-center gap-2">
-              <Route className="w-4 h-4" />
+              <Route className="w-4 h-4" aria-hidden="true" />
               <span>{t('leaderboard.tab.journey')}</span>
             </div>
           }
@@ -633,7 +633,7 @@ export function LeaderboardPage() {
           key="spotlight"
           title={
             <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4" />
+              <Sparkles className="w-4 h-4" aria-hidden="true" />
               <span>{t('leaderboard.tab.spotlight')}</span>
             </div>
           }
@@ -771,12 +771,13 @@ function CompetitiveLeaderboard(props: CompetitiveLeaderboardProps) {
 
       {/* Error State */}
       {error && !isLoading && (
-        <GlassCard className="p-8 text-center">
+        <GlassCard className="p-8 text-center" role="alert">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('leaderboard.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
           <Button
             color="primary"
+            aria-label={t('leaderboard.retry')}
             startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
             onPress={loadLeaderboard}
           >

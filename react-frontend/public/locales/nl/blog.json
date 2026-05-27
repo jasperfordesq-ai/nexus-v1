@@ -1,5 +1,6 @@
 {
   "page_title": "Bloggen",
+  "loading_post": "Loading blog post...",
   "hero_eyebrow": "Communityverhalen",
   "hero_posts_label": "Getoonde berichten",
   "title": "Blog & Nieuws",
@@ -61,5 +62,7 @@
     "reaction_sad": "Verdrietig",
     "reaction_celebrate": "Vieren"
   },
-  "page_description": "Verhalen, gidsen en updates van de tijdbank-gemeenschap — uitwisselingen die werkten, geleerde lessen en het laatste nieuws van lokale groepen en partners."
+  "page_description": "Verhalen, gidsen en updates van de tijdbank-gemeenschap — uitwisselingen die werkten, geleerde lessen en het laatste nieuws van lokale groepen en partners.",
+  "filter_by_category": "Filter by category",
+  "loading_posts": "Loading blog posts"
 }

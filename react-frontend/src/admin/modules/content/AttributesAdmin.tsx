@@ -312,7 +312,7 @@ export function AttributesAdmin() {
       <Modal isOpen={modalOpen} onClose={closeModal} size="md">
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <Tags size={20} />
+            <Tags size={20} aria-hidden="true" />
             {editingItem ? t('content.edit_attributes') : t('content.create_attributes')}
           </ModalHeader>
           <ModalBody className="gap-4">

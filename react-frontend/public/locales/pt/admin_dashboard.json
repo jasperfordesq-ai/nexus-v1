@@ -120,5 +120,6 @@
     "cache": "Cache",
     "queue": "Cron Jobs",
     "api": "API de e-mail"
-  }
+  },
+  "loading": "Loading"
 }

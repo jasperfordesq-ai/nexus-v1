@@ -1,5 +1,6 @@
 {
   "page_title": "Blog",
+  "loading_post": "Loading blog post...",
   "hero_eyebrow": "Historias de la comunidad",
   "hero_posts_label": "Publicaciones mostradas",
   "title": "Blog y Noticias",
@@ -61,5 +62,7 @@
     "reaction_sad": "Triste",
     "reaction_celebrate": "Celebrar"
   },
-  "page_description": "Historias, guías y actualizaciones de la comunidad de banco de tiempo — intercambios que funcionaron, lecciones aprendidas y las últimas noticias de grupos locales y socios."
+  "page_description": "Historias, guías y actualizaciones de la comunidad de banco de tiempo — intercambios que funcionaron, lecciones aprendidas y las últimas noticias de grupos locales y socios.",
+  "filter_by_category": "Filter by category",
+  "loading_posts": "Loading blog posts"
 }

@@ -120,5 +120,6 @@
     "cache": "Cache",
     "queue": "Lavori Cron",
     "api": "API di posta elettronica"
-  }
+  },
+  "loading": "Loading"
 }

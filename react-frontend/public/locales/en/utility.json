@@ -133,7 +133,9 @@
     "aria_move_down": "Move down",
     "aria_upload_progress": "Upload progress",
     "download": "Download",
-    "download_failed": "Download failed"
+    "download_failed": "Download failed",
+    "filter_by_category": "Filter by category",
+    "loading": "Loading resources"
   },
   "not_found": {
     "page_title": "Page Not Found",

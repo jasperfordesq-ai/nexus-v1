@@ -3138,7 +3138,14 @@
     "not_synced_to_stripe": "Nie zsynchronizowane ze Stripe — kliknij Synchronizuj",
     "unsynced": "Niezsynchronizowane",
     "yearly_price_suffix": "{{price}}/rok",
-    "sync_to_stripe": "Synchronizuj z Stripe"
+    "sync_to_stripe": "Synchronizuj z Stripe",
+    "create_page": "Create Page",
+    "delete_page_title": "Delete Page",
+    "delete_page_confirm": "Are you sure you want to delete this page? This cannot be undone.",
+    "filter_by_location": "Filter by location",
+    "label_created": "Created",
+    "label_no": "No",
+    "location_about": "About"
   },
   "crm": {
     "action_cancel": "Anuluj",
@@ -11679,7 +11686,8 @@
     "data_table": "Dane",
     "total_count": "Łącznie{{count}}",
     "select_all_rows": "Select all rows",
-    "select_row": "Select row {{id}}"
+    "select_row": "Select row {{id}}",
+    "loading": "Loading"
   },
   "subtitle": "Podtytuł",
   "super_controls": {

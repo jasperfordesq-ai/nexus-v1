@@ -184,7 +184,8 @@
     "terms_agreement": "Przeczytałem i zgadzam się z powyższymi warunkami rejestracji organizacji.",
     "terms_required": "Aby zarejestrować swoją organizację, musisz zaakceptować warunki.",
     "opportunity_count_one": "Możliwość {{count}}",
-    "opportunity_count_other": "{{count}} możliwości"
+    "opportunity_count_other": "{{count}} możliwości",
+    "loading": "Loading organisations"
   },
   "organisation_detail": {
     "page_title": "Organizacja",

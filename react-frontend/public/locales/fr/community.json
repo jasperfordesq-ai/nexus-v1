@@ -184,7 +184,8 @@
     "terms_agreement": "J'ai lu et j'accepte les conditions d'enregistrement d'organisation ci-dessus.",
     "terms_required": "Vous devez accepter les conditions pour enregistrer votre organisation.",
     "opportunity_count_one": "{{count}} opportunité",
-    "opportunity_count_other": "{{count}} opportunités"
+    "opportunity_count_other": "{{count}} opportunités",
+    "loading": "Loading organisations"
   },
   "organisation_detail": {
     "page_title": "Organisation",

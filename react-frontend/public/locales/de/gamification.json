@@ -341,7 +341,8 @@
     "session_expired": "Ihre Sitzung ist abgelaufen. Bitte melden Sie sich erneut an.",
     "load_error": "Rangliste konnte nicht geladen werden. Bitte versuchen Sie es erneut.",
     "type_nexus_score": "NexusScore",
-    "load_more": "Mehr laden"
+    "load_more": "Mehr laden",
+    "retry": "Retry loading leaderboard"
   },
   "community": {
     "total_hours": "Insgesamt getauschte Stunden",

@@ -220,7 +220,11 @@ export function DataTable<T extends Record<string, any>>({
       </TableHeader>
       <TableBody
         isLoading={isLoading}
-        loadingContent={<Spinner size="lg" />}
+        loadingContent={
+          <div role="status" aria-busy="true" aria-label={t('shared.loading')}>
+            <Spinner size="lg" />
+          </div>
+        }
         emptyContent={
           emptyContent || (
             <span>

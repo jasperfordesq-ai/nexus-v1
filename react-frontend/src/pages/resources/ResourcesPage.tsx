@@ -583,7 +583,7 @@ export function ResourcesPage() {
 
           {/* Category quick-filter chips (fallback if tree not available) */}
           {categoryTree.length === 0 && categories.length > 0 && (
-            <>
+            <div role="group" aria-label={t('resources.filter_by_category')}>
               <Button
                 size="sm"
                 variant={!selectedCategory ? 'solid' : 'flat'}
@@ -609,7 +609,7 @@ export function ResourcesPage() {
                   {cat.name}
                 </Button>
               ))}
-            </>
+            </div>
           )}
         </div>
       </div>
@@ -686,7 +686,7 @@ export function ResourcesPage() {
       {!error && (
         <>
           {isLoading ? (
-            <div className="space-y-3">
+            <div className="space-y-3" aria-busy="true" aria-label={t('resources.loading')}>
               {[1, 2, 3, 4, 5].map((i) => (
                 <GlassCard key={i} className="p-4 animate-pulse">
                   <div className="flex items-center gap-4">

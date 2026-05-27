@@ -468,6 +468,7 @@
   "aria": {
     "volunteering_sections": "Volunteering sections"
   },
+  "filter_by_status": "Filter by status",
   "credentials": {
     "heading": "Credential Verification",
     "upload_new": "Upload New Credential",

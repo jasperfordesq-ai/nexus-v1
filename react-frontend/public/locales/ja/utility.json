@@ -133,7 +133,9 @@
     "aria_move_down": "下に移動",
     "aria_upload_progress": "アップロードの進捗",
     "download": "ダウンロード",
-    "download_failed": "ダウンロード失敗"
+    "download_failed": "ダウンロード失敗",
+    "filter_by_category": "Filter by category",
+    "loading": "Loading resources"
   },
   "not_found": {
     "page_title": "ページが見つかりません",

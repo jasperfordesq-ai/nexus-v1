@@ -1033,5 +1033,6 @@
   "jobs": {
     "view_details": "求人詳細を見る"
   },
-  "tabs_aria": "Jobs view"
+  "tabs_aria": "Jobs view",
+  "loading": "Loading vacancies..."
 }

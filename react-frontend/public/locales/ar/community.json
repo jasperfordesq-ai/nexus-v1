@@ -184,7 +184,8 @@
     "terms_agreement": "لقد قرأت ووافقت على شروط تسجيل المنظمة المذكورة أعلاه.",
     "terms_required": "يجب عليك الموافقة على الشروط لتسجيل مؤسستك.",
     "opportunity_count_one": "فرصة {{count}}",
-    "opportunity_count_other": "{{count}} الفرص"
+    "opportunity_count_other": "{{count}} الفرص",
+    "loading": "Loading organisations"
   },
   "organisation_detail": {
     "page_title": "منظمة",

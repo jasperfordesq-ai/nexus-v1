@@ -184,7 +184,8 @@
     "terms_agreement": "Léigh mé agus aontaím leis na téarmaí cláraithe eagrais thuas.",
     "terms_required": "Ní mór duit aontú leis na téarmaí chun d'eagras a chlárú.",
     "opportunity_count_one": "{{count}} deis",
-    "opportunity_count_other": "{{count}} deiseanna"
+    "opportunity_count_other": "{{count}} deiseanna",
+    "loading": "Loading organisations"
   },
   "organisation_detail": {
     "page_title": "Eagras",

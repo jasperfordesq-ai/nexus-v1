@@ -1033,5 +1033,6 @@
   "jobs": {
     "view_details": "Féach ar shonraí an phoist"
   },
-  "tabs_aria": "Jobs view"
+  "tabs_aria": "Jobs view",
+  "loading": "Loading vacancies..."
 }

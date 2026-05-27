@@ -130,5 +130,7 @@
     "none_pending_description": "Los intercambios completados que necesitan valoración aparecerán aquí.",
     "pending_subtitle": "Abrir esta solicitud de reseña",
     "view_all_pending": "Ver todos los pendientes"
-  }
+  },
+  "likes_count": "{{count}} likes",
+  "comments_count": "{{count}} comments"
 }

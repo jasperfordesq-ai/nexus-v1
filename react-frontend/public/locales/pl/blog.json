@@ -1,5 +1,6 @@
 {
   "page_title": "Bloga",
+  "loading_post": "Loading blog post...",
   "hero_eyebrow": "Historie społeczności",
   "hero_posts_label": "Wyświetlone wpisy",
   "title": "Blog i aktualności",
@@ -61,5 +62,7 @@
     "reaction_sad": "Smutny",
     "reaction_celebrate": "Świętuj"
   },
-  "page_description": "Historie, przewodniki i aktualizacje ze społeczności banku czasu — udane wymiany, zdobyte doświadczenia i najnowsze wiadomości z lokalnych grup i od partnerów."
+  "page_description": "Historie, przewodniki i aktualizacje ze społeczności banku czasu — udane wymiany, zdobyte doświadczenia i najnowsze wiadomości z lokalnych grup i od partnerów.",
+  "filter_by_category": "Filter by category",
+  "loading_posts": "Loading blog posts"
 }

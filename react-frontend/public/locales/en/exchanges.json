@@ -5,6 +5,7 @@
   "browse_listings": "Browse Listings",
   "load_more": "Load More",
   "try_again": "Try Again",
+  "loading": "Loading exchanges...",
   "service_exchange": "Service Exchange",
   "unknown": "Unknown",
   "hours_count": "{{count}} hour",

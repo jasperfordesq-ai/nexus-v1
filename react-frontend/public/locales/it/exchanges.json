@@ -5,6 +5,7 @@
   "browse_listings": "Sfoglia annunci",
   "load_more": "Carica altri",
   "try_again": "Riprova",
+  "loading": "Loading exchanges...",
   "service_exchange": "Scambio di servizio",
   "unknown": "Sconosciuto",
   "hours_count": "{{count}} ora",

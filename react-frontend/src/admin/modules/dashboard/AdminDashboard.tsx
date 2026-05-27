@@ -282,7 +282,7 @@ export function AdminDashboard() {
         {/* Quick Actions (matches legacy sidebar) */}
         <Card className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <Rocket size={18} className="text-accent" />
+            <Rocket size={18} className="text-accent" aria-hidden="true" />
             <h3 className="font-semibold">{t('quick_actions.card_title')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
@@ -321,12 +321,12 @@ export function AdminDashboard() {
         {/* Monthly Trends */}
         <Card className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <TrendingUp size={18} className="text-accent" />
+            <TrendingUp size={18} className="text-accent" aria-hidden="true" />
             <h3 className="font-semibold">{t('trends.card_title')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
-              <div className="flex h-48 items-center justify-center">
+              <div role="status" aria-busy="true" aria-label={t('loading')} className="flex h-48 items-center justify-center">
                 <Spinner />
               </div>
             ) : trends.length > 0 ? (
@@ -356,7 +356,7 @@ export function AdminDashboard() {
         <Card className="border border-divider/70 bg-surface shadow-sm shadow-black/[0.03]">
           <CardHeader className="flex items-center justify-between px-4 pt-4 pb-0">
             <div className="flex items-center gap-2">
-              <Activity size={18} className="text-accent" />
+              <Activity size={18} className="text-accent" aria-hidden="true" />
               <h3 className="font-semibold">{t('activity.card_title')}</h3>
             </div>
             <Button
@@ -370,7 +370,7 @@ export function AdminDashboard() {
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
-              <div className="flex h-48 items-center justify-center">
+              <div role="status" aria-busy="true" aria-label={t('loading')} className="flex h-48 items-center justify-center">
                 <Spinner />
               </div>
             ) : activity.length > 0 ? (

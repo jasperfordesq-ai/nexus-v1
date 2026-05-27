@@ -133,7 +133,9 @@
     "aria_move_down": "Sposta giù",
     "aria_upload_progress": "Avanzamento caricamento",
     "download": "Scarica",
-    "download_failed": "Download non riuscito"
+    "download_failed": "Download non riuscito",
+    "filter_by_category": "Filter by category",
+    "loading": "Loading resources"
   },
   "not_found": {
     "page_title": "Pagina non trovata",

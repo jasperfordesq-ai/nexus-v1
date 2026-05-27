@@ -130,5 +130,7 @@
     "none_pending_description": "ستظهر هنا التبادلات المكتملة التي تحتاج إلى تقييم.",
     "pending_subtitle": "افتح هذا الطلب",
     "view_all_pending": "عرض جميع المعلقة"
-  }
+  },
+  "likes_count": "{{count}} likes",
+  "comments_count": "{{count}} comments"
 }

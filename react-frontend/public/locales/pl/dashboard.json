@@ -130,5 +130,7 @@
     "none_pending_description": "Zakończone wymiany wymagające oceny pojawią się tutaj.",
     "pending_subtitle": "Otwórz to żądanie recenzji",
     "view_all_pending": "Zobacz wszystkie oczekujące"
-  }
+  },
+  "likes_count": "{{count}} likes",
+  "comments_count": "{{count}} comments"
 }

@@ -1,5 +1,6 @@
 {
   "page_title": "Blag",
+  "loading_post": "Loading blog post...",
   "title": "Blag agus Nuacht",
   "subtitle": "Scéalta pobail, nuashonruithe agus fógraí",
   "search_placeholder": "Cuardaigh postálacha...",
@@ -61,5 +62,7 @@
   "hero_posts_label": "Postálacha ar taispeáint",
   "empty_tip_stories": "Scéalta na mball",
   "empty_tip_guides": "Treoracha",
-  "empty_tip_updates": "Nuashonruithe"
+  "empty_tip_updates": "Nuashonruithe",
+  "filter_by_category": "Filter by category",
+  "loading_posts": "Loading blog posts"
 }

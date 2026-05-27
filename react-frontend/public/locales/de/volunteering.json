@@ -836,5 +836,6 @@
   "my_organisations_none": "Noch keine Organisationen",
   "my_organisations_none_desc": "Registrieren Sie eine Freiwilligenorganisation, um Einsätze zu veröffentlichen, Freiwillige zu verwalten und Zeitguthaben zu vergeben.",
   "my_organisations_pending": "Genehmigung ausstehend",
-  "my_organisations_pending_desc": "Wartet auf Admin-Genehmigung"
+  "my_organisations_pending_desc": "Wartet auf Admin-Genehmigung",
+  "filter_by_status": "Filter by status"
 }

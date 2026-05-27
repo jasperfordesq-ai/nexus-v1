@@ -341,7 +341,8 @@
     "session_expired": "Votre session a expiré. Veuillez vous reconnecter.",
     "load_error": "Échec du chargement du classement. Veuillez réessayer.",
     "type_nexus_score": "NexusScore",
-    "load_more": "Charger plus"
+    "load_more": "Charger plus",
+    "retry": "Retry loading leaderboard"
   },
   "community": {
     "total_hours": "Total d'heures échangées",

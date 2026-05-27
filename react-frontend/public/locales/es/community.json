@@ -184,7 +184,8 @@
     "terms_agreement": "He leído y acepto los términos de registro de organización anteriores.",
     "terms_required": "Debes aceptar los términos para registrar tu organización.",
     "opportunity_count_one": "{{count}} oportunidad",
-    "opportunity_count_other": "{{count}} oportunidades"
+    "opportunity_count_other": "{{count}} oportunidades",
+    "loading": "Loading organisations"
   },
   "organisation_detail": {
     "page_title": "Organización",

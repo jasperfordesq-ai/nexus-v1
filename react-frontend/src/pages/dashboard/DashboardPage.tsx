@@ -438,8 +438,8 @@ export function DashboardPage() {
                           <p className="text-xs text-theme-subtle line-clamp-1">{stripHtml(item.content)}</p>
                         </div>
                         <div className="flex items-center gap-3 shrink-0 text-theme-subtle text-xs">
-                          {item.likes_count > 0 && (<span className="hidden sm:flex items-center gap-1"><Heart className="w-3 h-3" aria-hidden="true" />{item.likes_count}</span>)}
-                          {item.comments_count > 0 && (<span className="hidden sm:flex items-center gap-1"><MessageCircle className="w-3 h-3" aria-hidden="true" />{item.comments_count}</span>)}
+                          {item.likes_count > 0 && (<span className="hidden sm:flex items-center gap-1"><Heart className="w-3 h-3" aria-hidden="true" />{item.likes_count}<span className="sr-only">{t('likes_count', { count: item.likes_count })}</span></span>)}
+                          {item.comments_count > 0 && (<span className="hidden sm:flex items-center gap-1"><MessageCircle className="w-3 h-3" aria-hidden="true" />{item.comments_count}<span className="sr-only">{t('comments_count', { count: item.comments_count })}</span></span>)}
                           <span className="whitespace-nowrap">{formatRelativeTime(item.created_at)}</span>
                         </div>
                       </Link>

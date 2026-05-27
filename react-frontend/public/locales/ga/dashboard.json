@@ -130,5 +130,7 @@
     "none_pending_description": "Taispeánfar malartuithe críochnaithe a bhfuil aiseolas de dhíth orthu anseo.",
     "pending_subtitle": "Oscail an t-iarratas athbhreithniúcháin seo",
     "view_all_pending": "Féach ar Gach Ceann Ar Feitheamh"
-  }
+  },
+  "likes_count": "{{count}} likes",
+  "comments_count": "{{count}} comments"
 }

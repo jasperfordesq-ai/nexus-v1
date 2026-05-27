@@ -836,5 +836,6 @@
   "my_organisations_none": "Gan Eagraíochtaí fós",
   "my_organisations_none_desc": "Cláraigh eagraíocht dheonach chun tús a chur le deiseanna postála, oibrithe deonacha a bhainistiú, agus creidmheasanna ama a bhronnadh.",
   "my_organisations_pending": "Ceadú ar Feitheamh",
-  "my_organisations_pending_desc": "Ag feitheamh le ceadú riarthóir"
+  "my_organisations_pending_desc": "Ag feitheamh le ceadú riarthóir",
+  "filter_by_status": "Filter by status"
 }

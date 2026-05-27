@@ -831,7 +831,7 @@ export function OnboardingPage() {
                         variant="secondary"
                         size="sm"
                         className="mb-2"
-                        startContent={<Upload className="w-4 h-4" />}
+                        startContent={<Upload className="w-4 h-4" aria-hidden="true" />}
                         onPress={() => fileInputRef.current?.click()}
                       >
                         {t('choose_photo')}

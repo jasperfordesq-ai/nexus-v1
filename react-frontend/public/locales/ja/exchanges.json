@@ -5,6 +5,7 @@
   "browse_listings": "リストをブラウズ",
   "load_more": "もっと読み込む",
   "try_again": "再試行",
+  "loading": "Loading exchanges...",
   "service_exchange": "サービス交換",
   "unknown": "不明",
   "hours_count": "{{count}} 時間",

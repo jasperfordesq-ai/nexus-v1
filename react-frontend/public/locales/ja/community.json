@@ -184,7 +184,8 @@
     "terms_agreement": "上記の組織登録規約を読み、同意します。",
     "terms_required": "組織を登録するには、規約に同意する必要があります。",
     "opportunity_count_one": "{{count}} の機会",
-    "opportunity_count_other": "{{count}} の機会"
+    "opportunity_count_other": "{{count}} の機会",
+    "loading": "Loading organisations"
   },
   "organisation_detail": {
     "page_title": "組織",

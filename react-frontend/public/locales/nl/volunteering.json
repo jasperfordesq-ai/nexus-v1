@@ -836,5 +836,6 @@
   "my_organisations_none": "Nog geen organisaties",
   "my_organisations_none_desc": "Registreer een vrijwilligersorganisatie om vacatures te plaatsen, vrijwilligers te beheren en tijdskredieten toe te kennen.",
   "my_organisations_pending": "In afwachting van goedkeuring",
-  "my_organisations_pending_desc": "In afwachting van goedkeuring door de beheerder"
+  "my_organisations_pending_desc": "In afwachting van goedkeuring door de beheerder",
+  "filter_by_status": "Filter by status"
 }

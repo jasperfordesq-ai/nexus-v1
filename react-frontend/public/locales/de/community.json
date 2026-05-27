@@ -184,7 +184,8 @@
     "terms_agreement": "Ich habe die oben genannten Registrierungsbedingungen für Organisationen gelesen und stimme ihnen zu.",
     "terms_required": "Sie müssen den Bedingungen zustimmen, um Ihre Organisation zu registrieren.",
     "opportunity_count_one": "{{count}} Einsatz",
-    "opportunity_count_other": "{{count}} Einsätze"
+    "opportunity_count_other": "{{count}} Einsätze",
+    "loading": "Loading organisations"
   },
   "organisation_detail": {
     "page_title": "Organisation",

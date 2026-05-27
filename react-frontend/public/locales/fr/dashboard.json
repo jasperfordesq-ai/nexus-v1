@@ -130,5 +130,7 @@
     "none_pending_description": "Les échanges terminés qui nécessitent un retour apparaîtront ici.",
     "pending_subtitle": "Ouvrir cette demande d'évaluation",
     "view_all_pending": "Voir tous les en attente"
-  }
+  },
+  "likes_count": "{{count}} likes",
+  "comments_count": "{{count}} comments"
 }

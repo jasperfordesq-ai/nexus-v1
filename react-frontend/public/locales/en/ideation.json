@@ -3,6 +3,8 @@
   "title": "Ideation Challenges",
   "subtitle": "Share ideas, vote, and help shape your community",
   "page_description": "Browse community challenges, submit ideas, and vote on solutions. Help shape the future of your community.",
+  "loading": "Loading...",
+  "tabs_filter_aria": "Filter challenges",
   "actions": {
     "retry": "Retry"
   },

@@ -1344,18 +1344,7 @@ function ShowcaseModal({ isOpen, onClose, badges, onSave, isSaving }: ShowcaseMo
                           ? 'border-white/5 bg-theme-hover opacity-50 cursor-not-allowed'
                           : 'border-white/10 bg-theme-elevated hover:bg-theme-hover'
                     }`}
-                    onClick={() => !isDisabled && toggleBadge(badge.badge_key)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if ((e.key === 'Enter' || e.key === ' ') && !isDisabled) {
-                        e.preventDefault();
-                        toggleBadge(badge.badge_key);
-                      }
-                    }}
-                    aria-pressed={isSelected}
                     aria-disabled={isDisabled}
-                    aria-label={t('achievements.showcase.showcase_badge', { name: badge.name })}
                   >
                     <Checkbox
                       isSelected={isSelected}
@@ -1528,7 +1517,7 @@ export function AchievementsPage() {
 
       {/* Error State */}
       {error && !isLoading && (
-        <GlassCard className="p-8 text-center">
+        <GlassCard className="p-8 text-center" role="alert">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('achievements.unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>

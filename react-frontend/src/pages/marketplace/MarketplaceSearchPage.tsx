@@ -305,7 +305,7 @@ export function MarketplaceSearchPage() {
 
       {/* Price range */}
       <div>
-        <label className="text-sm font-medium text-foreground mb-2 block">{t('search.price_range')}</label>
+        <p className="text-sm font-medium text-foreground mb-2">{t('search.price_range')}</p>
         <div className="flex gap-2 items-center">
           <Input
             size="sm"
@@ -557,7 +557,7 @@ export function MarketplaceSearchPage() {
           <aside className="hidden lg:block w-64 shrink-0" role="complementary" aria-label={t('aria.filter_panel')}>
             <GlassCard className="p-5 sticky top-24">
               <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                <SlidersHorizontal className="w-4 h-4 text-accent" />
+                <SlidersHorizontal className="w-4 h-4 text-accent" aria-hidden="true" />
                 {t('search.filters_title')}
               </h3>
               {filterContent}

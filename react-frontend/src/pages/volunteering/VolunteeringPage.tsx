@@ -547,7 +547,7 @@ function OpportunitiesTab() {
       {!error && (
         <>
           {isLoading ? (
-            <div className="space-y-4">
+            <div className="space-y-4" aria-busy="true" aria-label={t('loading')}>
               {[1, 2, 3].map((i) => (
                 <GlassCard key={i} className="p-5 animate-pulse">
                   <div className="h-5 bg-theme-hover rounded w-1/3 mb-3" />
@@ -695,7 +695,7 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
               </span>
             )}
             {opportunity.is_remote && (
-              <Chip size="sm" variant="soft" color="accent" startContent={<Globe className="w-3 h-3" />}>
+              <Chip size="sm" variant="soft" color="accent" startContent={<Globe className="w-3 h-3" aria-hidden="true" />}>
                 {t('remote')}
               </Chip>
             )}
@@ -720,7 +720,7 @@ function OpportunityCard({ opportunity, onApply }: OpportunityCardProps) {
           </div>
 
           {opportunity.has_applied && (
-            <Chip size="sm" color="success" variant="soft" className="mt-2" startContent={<CheckCircle className="w-3 h-3" />}>
+            <Chip size="sm" color="success" variant="soft" className="mt-2" startContent={<CheckCircle className="w-3 h-3" aria-hidden="true" />}>
               {t('applied')}
             </Chip>
           )}
@@ -853,16 +853,16 @@ function ApplicationsTab() {
 
   const statusIcon = (status: string) => {
     switch (status) {
-      case 'approved': return <CheckCircle className="w-3 h-3" />;
-      case 'declined': return <XCircle className="w-3 h-3" />;
-      default: return <Hourglass className="w-3 h-3" />;
+      case 'approved': return <CheckCircle className="w-3 h-3" aria-hidden="true" />;
+      case 'declined': return <XCircle className="w-3 h-3" aria-hidden="true" />;
+      default: return <Hourglass className="w-3 h-3" aria-hidden="true" />;
     }
   };
 
   return (
     <>
       {/* Status Filter */}
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex gap-2 flex-wrap" role="group" aria-label={t('filter_by_status')}>
         {['', 'pending', 'approved', 'declined'].map((s) => (
           <Button
             key={s}
@@ -901,7 +901,7 @@ function ApplicationsTab() {
       {!error && (
         <>
           {isLoading ? (
-            <div className="space-y-4">
+            <div className="space-y-4" aria-busy="true" aria-label={t('loading')}>
               {[1, 2, 3].map((i) => (
                 <GlassCard key={i} className="p-5 animate-pulse">
                   <div className="h-5 bg-theme-hover rounded w-1/3 mb-3" />

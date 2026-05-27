@@ -120,5 +120,6 @@
     "cache": "Taisce",
     "queue": "Cron Jobs",
     "api": "Ríomhphost API"
-  }
+  },
+  "loading": "Loading"
 }

@@ -836,5 +836,6 @@
   "my_organisations_none": "Nenhuma organização ainda",
   "my_organisations_none_desc": "Registre uma organização voluntária para começar a publicar oportunidades, gerenciar voluntários e conceder créditos de tempo.",
   "my_organisations_pending": "Aprovação pendente",
-  "my_organisations_pending_desc": "Aguardando aprovação do administrador"
+  "my_organisations_pending_desc": "Aguardando aprovação do administrador",
+  "filter_by_status": "Filter by status"
 }

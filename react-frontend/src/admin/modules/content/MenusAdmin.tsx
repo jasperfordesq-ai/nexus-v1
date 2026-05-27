@@ -181,7 +181,11 @@ export function MenusAdmin() {
     return (
       <div>
         <PageHeader title={t('content.menus_admin_title')} description={t('content.menus_admin_desc')} />
-        <div className="flex justify-center py-12"><Spinner size="lg" /></div>
+        <div className="flex justify-center py-12">
+          <div role="status" aria-busy="true" aria-label={t('shared.loading')}>
+            <Spinner size="lg" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -203,7 +207,7 @@ export function MenusAdmin() {
 
       {/* How it works notice */}
       <div className="flex items-start gap-3 p-4 mb-4 rounded-lg bg-accent-soft dark:bg-accent-soft border border-accent dark:border-accent">
-        <Info size={16} className="text-accent0 shrink-0 mt-0.5" />
+        <Info size={16} className="text-accent0 shrink-0 mt-0.5" aria-hidden="true" />
         <div className="text-sm">
           <p className="font-medium text-theme-primary">{t('content.menus_how_it_works_title')}</p>
           <p className="mt-0.5 text-theme-muted">{t('content.menus_how_it_works_desc')}</p>
@@ -213,35 +217,35 @@ export function MenusAdmin() {
       {/* Info notice when no custom menus exist */}
       {data.length === 0 && (
         <div className="flex items-start gap-3 p-4 mb-4 rounded-[12px] bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300">
-          <Info size={16} className="shrink-0 mt-0.5" />
+          <Info size={16} className="shrink-0 mt-0.5" aria-hidden="true" />
           <p className="text-sm">{t('content.menus_using_defaults_desc')}</p>
         </div>
       )}
 
       {/* Location filter chips */}
       {data.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-4">
-          <Chip
-            variant={locationFilter === null ? 'solid' : 'flat'}
-            color={locationFilter === null ? 'primary' : 'default'}
-            className="cursor-pointer"
-            onClick={() => setLocationFilter(null)}
+        <div className="flex flex-wrap gap-2 mb-4" role="group" aria-label={t('content.filter_by_location')}>
+          <Button
+            variant={locationFilter === null ? 'primary' : 'flat'}
+            size="sm"
+            onPress={() => setLocationFilter(null)}
+            aria-pressed={locationFilter === null}
           >
             {t('content.filter_all', { count: data.length })}
-          </Chip>
+          </Button>
           {LOCATIONS.map((loc) => {
             const count = data.filter((m) => m.location === loc).length;
             if (count === 0) return null;
             return (
-              <Chip
+              <Button
                 key={loc}
-                variant={locationFilter === loc ? 'solid' : 'flat'}
-                color={locationFilter === loc ? 'primary' : 'default'}
-                className="cursor-pointer"
-                onClick={() => setLocationFilter(locationFilter === loc ? null : loc)}
+                variant={locationFilter === loc ? 'primary' : 'flat'}
+                size="sm"
+                onPress={() => setLocationFilter(locationFilter === loc ? null : loc)}
+                aria-pressed={locationFilter === loc}
               >
                 {LOCATION_LABELS[loc] ?? loc} ({count})
-              </Chip>
+              </Button>
             );
           })}
         </div>

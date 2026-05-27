@@ -133,7 +133,9 @@
     "aria_move_down": "Omlaag verplaatsen",
     "aria_upload_progress": "Uploadvoortgang",
     "download": "Downloaden",
-    "download_failed": "Downloaden mislukt"
+    "download_failed": "Downloaden mislukt",
+    "filter_by_category": "Filter by category",
+    "loading": "Loading resources"
   },
   "not_found": {
     "page_title": "Pagina niet gevonden",

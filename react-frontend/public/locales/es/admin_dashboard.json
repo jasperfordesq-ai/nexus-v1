@@ -120,5 +120,6 @@
     "cache": "caché",
     "queue": "Trabajos cronificados",
     "api": "API de correo electrónico"
-  }
+  },
+  "loading": "Loading"
 }

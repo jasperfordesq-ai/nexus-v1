@@ -420,5 +420,7 @@
   },
   "challenge_detail": {
     "actions": "إجراءات التحدي"
-  }
+  },
+  "loading": "Loading...",
+  "tabs_filter_aria": "Filter challenges"
 }

@@ -336,7 +336,7 @@ export function IdeationPage() {
           <Button
             variant="flat"
             size="sm"
-            startContent={<Layers className="w-4 h-4" />}
+            startContent={<Layers className="w-4 h-4" aria-hidden="true" />}
             onPress={() => navigate(tenantPath('/ideation/campaigns'))}
           >
             {t('campaigns.title')}
@@ -346,7 +346,7 @@ export function IdeationPage() {
           <Button
             variant="flat"
             size="sm"
-            startContent={<BarChart3 className="w-4 h-4" />}
+            startContent={<BarChart3 className="w-4 h-4" aria-hidden="true" />}
             onPress={() => navigate(tenantPath('/ideation/outcomes'))}
           >
             {t('outcomes.dashboard')}
@@ -355,7 +355,7 @@ export function IdeationPage() {
           {isAdmin && (
             <Button
               color="primary"
-              startContent={<Plus className="w-4 h-4" />}
+              startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
               onPress={() => navigate(tenantPath('/ideation/create'))}
             >
               {t('challenges.create')}
@@ -372,7 +372,7 @@ export function IdeationPage() {
             onSelectionChange={handleTabChange}
             variant="underlined"
             color="primary"
-            aria-label={t('tabs.all')}
+            aria-label={t('tabs_filter_aria')}
           >
             <Tab key="all" title={t('tabs.all')} />
             <Tab key="open" title={t('tabs.open')} />
@@ -432,37 +432,40 @@ export function IdeationPage() {
           className="max-w-md"
         />
 
-        {/* Tag Filter Chips */}
+        {/* Tag Filter Buttons */}
         {availableTags.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {availableTags.slice(0, 15).map(({ tag, count }) => (
-              <Chip
+              <Button
                 key={tag}
                 size="sm"
-                variant={selectedTags.includes(tag) ? 'solid' : 'bordered'}
-                color={selectedTags.includes(tag) ? 'primary' : 'default'}
-                className="cursor-pointer"
-                onClick={() => {
+                variant="flat"
+                aria-pressed={selectedTags.includes(tag)}
+                onPress={() => {
                   setSelectedTags(prev =>
                     prev.includes(tag)
                       ? prev.filter(t => t !== tag)
                       : [...prev, tag]
                   );
                 }}
+                className={
+                  selectedTags.includes(tag)
+                    ? 'bg-primary text-white'
+                    : 'border border-default bg-transparent text-[var(--color-text-secondary)]'
+                }
               >
                 {tag} ({count})
-              </Chip>
+              </Button>
             ))}
             {selectedTags.length > 0 && (
-              <Chip
+              <Button
                 size="sm"
                 variant="flat"
                 color="danger"
-                className="cursor-pointer"
-                onClick={() => setSelectedTags([])}
+                onPress={() => setSelectedTags([])}
               >
                 {t('search.clear_tags')}
-              </Chip>
+              </Button>
             )}
           </div>
         )}
@@ -470,28 +473,30 @@ export function IdeationPage() {
 
       {/* Loading */}
       {isLoading && (
-        <div className="flex justify-center py-12">
+        <div role="status" aria-label={t('loading')} className="flex justify-center py-12">
           <Spinner size="lg" />
         </div>
       )}
 
       {/* Error */}
       {error && !isLoading && (
-        <EmptyState
-          icon={<AlertTriangle className="w-10 h-10 text-theme-subtle" />}
-          title={t('challenges.load_error')}
-          description={error}
-          action={
-            <Button
-              color="primary"
-              variant="flat"
-              startContent={<RefreshCw className="w-4 h-4" />}
-              onPress={() => fetchChallenges(activeTab, false, selectedCategory, debouncedSearch, selectedTags)}
-            >
-              {t('actions.retry')}
-            </Button>
-          }
-        />
+        <div role="alert">
+          <EmptyState
+            icon={<AlertTriangle className="w-10 h-10 text-theme-subtle" />}
+            title={t('challenges.load_error')}
+            description={error}
+            action={
+              <Button
+                color="primary"
+                variant="flat"
+                startContent={<RefreshCw className="w-4 h-4" />}
+                onPress={() => fetchChallenges(activeTab, false, selectedCategory, debouncedSearch, selectedTags)}
+              >
+                {t('actions.retry')}
+              </Button>
+            }
+          />
+        </div>
       )}
 
       {/* Empty State */}
@@ -601,26 +606,26 @@ export function IdeationPage() {
                     <div className="flex flex-wrap items-center gap-3 text-xs text-[var(--color-text-tertiary)]">
                       {/* Ideas count */}
                       <span className="flex items-center gap-1">
-                        <MessageSquarePlus className="w-3.5 h-3.5" />
+                        <MessageSquarePlus className="w-3.5 h-3.5" aria-hidden="true" />
                         {t('challenge.ideas_count', { count: challenge.ideas_count })}
                       </span>
 
                       {/* Views count */}
                       <span className="flex items-center gap-1">
-                        <Eye className="w-3.5 h-3.5" />
+                        <Eye className="w-3.5 h-3.5" aria-hidden="true" />
                         {challenge.views_count} {t('views')}
                       </span>
 
                       {/* Favorites count */}
                       <span className="flex items-center gap-1">
-                        <Heart className="w-3.5 h-3.5" />
+                        <Heart className="w-3.5 h-3.5" aria-hidden="true" />
                         {challenge.favorites_count}
                       </span>
 
                       {/* Submission deadline */}
                       {challenge.submission_deadline && (
                         <span className="flex items-center gap-1">
-                          <Calendar className="w-3.5 h-3.5" />
+                          <Calendar className="w-3.5 h-3.5" aria-hidden="true" />
                           {t('challenge.submission_deadline', { date: formatDate(challenge.submission_deadline) })}
                         </span>
                       )}
@@ -628,7 +633,7 @@ export function IdeationPage() {
                       {/* Prize indicator */}
                       {challenge.prize_description && (
                         <span className="flex items-center gap-1">
-                          <Trophy className="w-3.5 h-3.5 text-[var(--color-warning)]" />
+                          <Trophy className="w-3.5 h-3.5 text-[var(--color-warning)]" aria-hidden="true" />
                           {t('challenge.prize')}
                         </span>
                       )}

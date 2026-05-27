@@ -133,7 +133,9 @@
     "aria_move_down": "Bog síos",
     "aria_upload_progress": "Dul chun cinn uasluchtála",
     "download": "Íoslódáil",
-    "download_failed": "Theip ar íoslódáil"
+    "download_failed": "Theip ar íoslódáil",
+    "filter_by_category": "Filter by category",
+    "loading": "Loading resources"
   },
   "not_found": {
     "page_title": "Leathanach Gan Aimsiú",

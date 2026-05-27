@@ -5,6 +5,7 @@
   "browse_listings": "Parcourir les annonces",
   "load_more": "Charger plus",
   "try_again": "Réessayer",
+  "loading": "Loading exchanges...",
   "service_exchange": "Échange de service",
   "unknown": "Inconnu",
   "hours_count": "{{count}} heure",
