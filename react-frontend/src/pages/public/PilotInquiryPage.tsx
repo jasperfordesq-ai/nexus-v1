@@ -12,7 +12,7 @@ import { Select, SelectItem, GlassCard, Button, Input, Textarea, Switch, Checkbo
  * werden!" CTA into a real intake pipeline.
  *
  * Steps:
- *   1. Your Municipality — basic details + KISS cooperative presence
+ *   1. Your Municipality — basic details + Caring Community cooperative presence
  *   2. Your Needs       — modules, timeline, budget, existing tool
  *   3. Contact Details  — name, email, phone, role, notes
  *

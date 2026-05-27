@@ -169,7 +169,7 @@ export default function FederationAggregatesPage() {
         <CardBody className="space-y-4">
           {loading ? (
             <div className="flex items-center gap-2">
-              <Spinner size="sm" /> {t('federation_aggregates.consent.loading')}
+              <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" /> {t('federation_aggregates.consent.loading')}</div>
             </div>
           ) : (
             <>
@@ -260,7 +260,7 @@ export default function FederationAggregatesPage() {
           <ModalBody>
             {auditLoading ? (
               <div className="flex items-center gap-2">
-                <Spinner size="sm" /> {t('federation_aggregates.audit.loading')}
+                <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" /> {t('federation_aggregates.audit.loading')}</div>
               </div>
             ) : auditEntries.length === 0 ? (
               <div className="text-muted">{t('federation_aggregates.audit.empty')}</div>
@@ -310,7 +310,7 @@ export default function FederationAggregatesPage() {
           <ModalBody>
             {previewLoading ? (
               <div className="flex items-center gap-2">
-                <Spinner size="sm" /> {t('federation_aggregates.preview.loading')}
+                <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" /> {t('federation_aggregates.preview.loading')}</div>
               </div>
             ) : previewData ? (
               <pre className="bg-surface-secondary rounded p-4 text-xs overflow-x-auto whitespace-pre-wrap">

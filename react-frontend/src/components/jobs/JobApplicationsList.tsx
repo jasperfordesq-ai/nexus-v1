@@ -49,7 +49,7 @@ export function JobApplicationsList({
         {showApplications && (
           <div className="mt-4 space-y-4">
             {isLoadingApps ? (
-              <div className="space-y-3">
+              <div role="status" aria-busy="true" aria-label="Loading" className="space-y-3">
                 {[1, 2].map((i) => (
                   <div key={i} className="p-4 rounded-lg bg-theme-elevated animate-pulse">
                     <div className="h-4 bg-theme-hover rounded w-1/3 mb-2" />

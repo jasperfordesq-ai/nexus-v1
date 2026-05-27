@@ -386,7 +386,7 @@ export default function CareProviderAdminPage() {
 
           {duplicatesLoading ? (
             <div className="flex justify-center py-6">
-              <Spinner size="sm" />
+              <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" /></div>
             </div>
           ) : duplicates && duplicates.pairs.length === 0 ? (
             <p className="text-sm text-muted py-3">
@@ -470,7 +470,7 @@ export default function CareProviderAdminPage() {
       {/* Table */}
       {loading ? (
         <div className="flex justify-center py-12">
-          <Spinner size="lg" />
+          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" /></div>
         </div>
       ) : error ? (
         <div className="rounded-xl border border-danger/30 bg-danger/5 p-6 text-center text-danger">

@@ -192,7 +192,7 @@ export default function AiModuleDocsAdminPage() {
         <TableBody
           emptyContent={loading ? (
             <span className="inline-flex items-center gap-2">
-              <Spinner size="sm" />
+              <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" /></div>
               {t('ai.common.loading')}
             </span>
           ) : t('ai.module_docs.empty.no_docs')}

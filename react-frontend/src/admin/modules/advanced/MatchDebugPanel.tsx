@@ -234,7 +234,7 @@ export function MatchDebugPanel() {
               aria-label={t('label_search_users')}
               startContent={
                 searchLoading
-                  ? <Spinner size="sm" />
+                  ? <span role="status" aria-busy="true" aria-label="Loading" className="inline-flex"><Spinner size="sm" /></span>
                   : <Search className="w-4 h-4 text-muted" />
               }
               isClearable

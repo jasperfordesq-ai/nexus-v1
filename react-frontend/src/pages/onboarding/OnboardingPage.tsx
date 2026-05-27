@@ -569,7 +569,7 @@ export function OnboardingPage() {
             animate={{ opacity: 1 }}
             transition={{ delay: 1.0 }}
           >
-            <Spinner size="sm" color="success" />
+            <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" color="success" /></div>
             <p className="text-sm text-theme-subtle mt-2">{t('complete_redirecting')}</p>
           </motion.div>
         </motion.div>

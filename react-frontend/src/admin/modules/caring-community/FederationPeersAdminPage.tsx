@@ -252,7 +252,7 @@ export default function FederationPeersAdminPage() {
         </CardHeader>
         <CardBody className="p-0">
           {loading ? (
-            <div className="flex justify-center py-10"><Spinner /></div>
+            <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-10"><Spinner /></div>
           ) : (
             <Table aria-label={t('federation_peers_admin.peers.table_aria')} removeWrapper>
               <TableHeader>

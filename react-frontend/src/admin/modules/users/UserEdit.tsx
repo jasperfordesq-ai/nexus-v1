@@ -436,7 +436,7 @@ export function UserEdit() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Spinner size="lg" label={t('loading.user')} />
+        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" label={t('loading.user')} /></div>
       </div>
     );
   }
@@ -803,7 +803,7 @@ export function UserEdit() {
           </CardHeader>
           <CardBody className="p-6">
             {consentsLoading ? (
-              <Spinner size="sm" label={t('loading.consents')} />
+              <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" label={t('loading.consents')} /></div>
             ) : consents.length > 0 ? (
               <div className="flex flex-col gap-3">
                 {consents.map((consent) => (
@@ -859,7 +859,7 @@ export function UserEdit() {
           </CardHeader>
           <CardBody className="p-6">
             {complianceLoading ? (
-              <Spinner size="sm" label={t('loading.compliance')} />
+              <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" label={t('loading.compliance')} /></div>
             ) : (
               <div className="flex flex-col gap-6">
                 {/* Vetting Status */}

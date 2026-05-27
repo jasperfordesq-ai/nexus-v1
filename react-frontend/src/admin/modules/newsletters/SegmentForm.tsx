@@ -348,7 +348,7 @@ export function SegmentForm() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Spinner size="lg" label={t('segment_form.loading_segment')} />
+        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" label={t('segment_form.loading_segment')} /></div>
       </div>
     );
   }
@@ -549,7 +549,7 @@ export function SegmentForm() {
           <CardBody>
             {loadingSuggestions ? (
               <div className="flex items-center gap-2 py-4">
-                <Spinner size="sm" />
+                <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" /></div>
                 <span className="text-sm text-muted">{t('segment_form.analyzing_member_data')}</span>
               </div>
             ) : suggestions.length === 0 ? (

@@ -29,11 +29,11 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
   '/caring': {
     title: 'Caring Community — Module Hub',
     summary:
-      'The Caring Community module is the top-level entry point for all KISS/AGORIS cooperative features. From here you can navigate to every sub-section: member trust tiers, safeguarding, ROI reporting, pilot readiness, and more.',
+      'The Caring Community module is the top-level entry point for all Caring Community cooperative features. From here you can navigate to every sub-section: member trust tiers, safeguarding, ROI reporting, pilot readiness, and more.',
     steps: [
       { label: 'Review module health at a glance', detail: 'The hub shows live counts for active members, open help requests, pending safeguarding reports, and SLA compliance rate.' },
       { label: 'Use the quick-links grid', detail: 'Each card links directly to its functional area. Cards with a red badge need immediate attention (e.g. overdue SLA, critical safeguarding report).' },
-      { label: 'Check the announcement bar', detail: 'If your cantonal partner or the KISS national office has posted a notice, it appears pinned at the top of the hub.' },
+      { label: 'Check the announcement bar', detail: 'If your cantonal partner or the Caring Community national office has posted a notice, it appears pinned at the top of the hub.' },
     ],
     tips: [
       'Bookmark this page — it is the fastest way to spot issues that need your attention without navigating deep menus.',
@@ -107,7 +107,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
       'Coordinator tier (4) should be rare and given only to people handling safeguarding or high-value exchanges.',
     ],
     caution:
-      'Demoting a Trusted member (tier 2→1) immediately invalidates their Warmth Pass at all KISS cooperative sites. Notify the member before demoting.',
+      'Demoting a Trusted member (tier 2→1) immediately invalidates their Warmth Pass at all Caring Community cooperative sites. Notify the member before demoting.',
     relatedPaths: [
       { label: 'Warmth Pass', path: '/caring/warmth-pass' },
       { label: 'Safeguarding', path: '/caring/safeguarding' },
@@ -117,11 +117,11 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
   '/caring/warmth-pass': {
     title: 'Warmth Pass — Portable Trust Credential',
     summary:
-      'The Warmth Pass is a cryptographically signed credential that lets a Trusted+ member (tier 2+) demonstrate their reputation at any affiliated KISS cooperative, not just their home community. It is issued here and can be revoked at any time.',
+      'The Warmth Pass is a cryptographically signed credential that lets a Trusted+ member (tier 2+) demonstrate their reputation at any affiliated Caring Community cooperative, not just their home community. It is issued here and can be revoked at any time.',
     steps: [
       { label: 'Issue a Warmth Pass', detail: 'Find the member (must be Tier 2+), click "Issue Warmth Pass". The system generates a signed QR code token with a 12-month expiry.' },
       { label: 'Set the validity period', detail: 'Default is 12 months. You can shorten to 3 or 6 months for members on a trial promotion.' },
-      { label: 'Revoke a pass', detail: 'Click the active pass, then "Revoke". Revocation propagates to all KISS federation peers within minutes via the federation sync.' },
+      { label: 'Revoke a pass', detail: 'Click the active pass, then "Revoke". Revocation propagates to all Caring Community federation peers within minutes via the federation sync.' },
       { label: 'Review pass usage', detail: 'The audit log shows when and at which cooperative a pass was scanned. Unusual location patterns should trigger a coordinator review.' },
     ],
     tips: [
@@ -185,7 +185,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
   },
 
   '/caring/operating-policy': {
-    title: 'Operating Policy — KISS/AGORIS Parameters',
+    title: 'Operating Policy — Caring Community Parameters',
     summary:
       'The Operating Policy stores the core economic parameters for your cooperative deployment: the formal-care hourly rate in CHF, the cost-offset multiplier, maximum exchange duration limits, and other global constraints. These values flow through to all ROI and impact calculations.',
     steps: [
@@ -210,7 +210,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
   '/caring/isolated-node': {
     title: 'Isolated Node — Data Sovereignty Mode',
     summary:
-      'Isolated Node mode configures this deployment to store all personal data within a defined geographic boundary and disables federation data sync with external KISS cooperatives. This is required for deployments that must comply with Switzerland\'s FADP/nDSG (Federal Act on Data Protection).',
+      'Isolated Node mode configures this deployment to store all personal data within a defined geographic boundary and disables federation data sync with external Caring Community cooperatives. This is required for deployments that must comply with Switzerland\'s FADP/nDSG (Federal Act on Data Protection).',
     steps: [
       { label: 'Enable Isolated Node mode', detail: 'Toggle the master switch on. You will be asked to confirm the geographic boundary (e.g. "Kanton Bern") and the legal basis for the restriction.' },
       { label: 'Configure allowed data flows', detail: 'Some data flows (e.g. anonymised aggregate statistics for the national dashboard) can be whitelisted. Review each flow and approve or block it.' },
@@ -219,7 +219,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
     ],
     tips: [
       'Isolated Node mode does not affect local operations — members can still exchange hours, earn badges, and use all features within the cooperative.',
-      'If you are unsure whether your deployment needs Isolated Node mode, consult the AGORIS technical team before enabling it.',
+      'If you are unsure whether your deployment needs Isolated Node mode, consult the Caring Community technical team before enabling it.',
     ],
     caution:
       'Enabling Isolated Node mode severs Warmth Pass portability for all members immediately. Notify members before switching on.',
@@ -241,7 +241,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
     ],
     tips: [
       'AGPL Public features must remain publicly available under AGPL-3.0 — you cannot restrict access to them in any deployment.',
-      'Commercial features require a separate written agreement with Fondation KISS or the NEXUS platform operator.',
+      'Commercial features require a separate written agreement with Caring Community or the NEXUS platform operator.',
     ],
     relatedPaths: [
       { label: 'Isolated Node', path: '/caring/isolated-node' },
@@ -389,12 +389,12 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
       { label: 'Review the four readiness signals', detail: 'Municipal Value, Participation, Partner Network, and Local Exchange are each scored 0–100. All four must reach their configured threshold (default 70) before the gate opens.' },
       { label: 'Drill into failing signals', detail: 'Click any amber or red signal card to see the specific sub-criteria that are not yet met, with actionable guidance on how to address each.' },
       { label: 'Upload supporting evidence', detail: 'Some criteria require evidence upload (e.g. a signed municipal partnership letter, or a completed baseline survey). Use the upload button on the relevant criterion.' },
-      { label: 'Request a coordinator review', detail: 'Once you believe all criteria are met, use "Request Review" to notify a senior coordinator or KISS national representative to validate the readiness gate.' },
+      { label: 'Request a coordinator review', detail: 'Once you believe all criteria are met, use "Request Review" to notify a senior coordinator or Caring Community national representative to validate the readiness gate.' },
       { label: 'Unlock the live deployment', detail: 'When the review approves all criteria, the "Go Live" button becomes available. This enables the Caring Community module for members.' },
     ],
     tips: [
       'You can work on criteria in any order — there is no required sequence.',
-      'Evidence documents are stored securely and are accessible to KISS national for their records.',
+      'Evidence documents are stored securely and are accessible to Caring Community national for their records.',
       'The readiness gate can be re-evaluated at any time — if circumstances change (e.g. a municipal partner withdraws), the gate status is updated automatically.',
     ],
     caution:
@@ -407,17 +407,17 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
   },
 
   '/caring/pilot-scoreboard': {
-    title: 'KISS Pilot Scoreboard',
+    title: 'Caring Community Pilot Scoreboard',
     summary:
-      'The live scorecard for your KISS pilot, tracking progress against the KISS methodology metrics. Metrics include exchange volume, member retention, reciprocity ratio (helpers who are also recipients), coordinator response time, and safeguarding compliance rate.',
+      'The live scorecard for your Caring Community pilot, tracking progress against the Caring Community methodology metrics. Metrics include exchange volume, member retention, reciprocity ratio (helpers who are also recipients), coordinator response time, and safeguarding compliance rate.',
     steps: [
-      { label: 'Review the top-line score', detail: 'The overall pilot score (0–100) is a composite of all methodology metrics. Aim for 75+ to qualify for the KISS "Established Cooperative" recognition.' },
+      { label: 'Review the top-line score', detail: 'The overall pilot score (0–100) is a composite of all methodology metrics. Aim for 75+ to qualify for the Caring Community "Established Cooperative" recognition.' },
       { label: 'Understand individual metric scores', detail: 'Each metric has a target range defined in the Operating Policy. Green = on target; amber = within 10% of target; red = below threshold.' },
-      { label: 'Compare to KISS benchmark', detail: 'Toggle "Show KISS Benchmark" to overlay the anonymised median scores from all KISS cooperatives. This shows how you compare to peers.' },
-      { label: 'Download the methodology report', detail: 'Generate a KISS-formatted methodology report for submission to Fondation KISS at your quarterly review.' },
+      { label: 'Compare to Caring Community benchmark', detail: 'Toggle "Show Caring Community Benchmark" to overlay the anonymised median scores from all Caring Community cooperatives. This shows how you compare to peers.' },
+      { label: 'Download the methodology report', detail: 'Generate a Caring Community-formatted methodology report for submission to Caring Community at your quarterly review.' },
     ],
     tips: [
-      'Reciprocity ratio (the proportion of members who give AND receive) is the most important single metric for KISS accreditation — aim for 60%+.',
+      'Reciprocity ratio (the proportion of members who give AND receive) is the most important single metric for Caring Community accreditation — aim for 60%+.',
       'A low coordinator response time score almost always reflects SLA breaches — check the SLA Dashboard for the root cause.',
     ],
     relatedPaths: [
@@ -496,7 +496,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
   '/caring/copilot': {
     title: 'Communication Copilot — AI-Assisted Drafting',
     summary:
-      'An AI writing assistant trained on KISS community communication standards. Paste a rough idea and the Copilot returns a polished draft in a warm, inclusive tone appropriate for timebanking communities. You review and edit before sending.',
+      'An AI writing assistant trained on Caring Community community communication standards. Paste a rough idea and the Copilot returns a polished draft in a warm, inclusive tone appropriate for timebanking communities. You review and edit before sending.',
     steps: [
       { label: 'Choose the communication type', detail: 'Select from: Member Announcement, Welcome Email, Impact Report Summary, Municipal Partner Update, or Free-form Draft.' },
       { label: 'Describe what you want to say', detail: 'Write 1–3 sentences describing the key points. For example: "We held 120 exchanges in March. Loneliness scores improved by 12%. Thank members for their contribution."' },
@@ -591,7 +591,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
       { label: 'Assign to a coordinator', detail: 'Use "Assign" to allocate the item to the coordinator best placed to respond. They will receive an in-app notification.' },
       { label: 'Draft a response', detail: 'Use the "Reply" panel to draft your response. For Critical items, use the Communication Copilot to ensure the tone is appropriate.' },
       { label: 'Send and log', detail: 'Sending the response logs the full thread in the item history. The municipal contact receives your reply by email.' },
-      { label: 'Close or escalate', detail: 'Mark as Resolved once the matter is concluded, or use "Escalate to KISS National" if the issue is beyond your cooperative\'s authority to address.' },
+      { label: 'Close or escalate', detail: 'Mark as Resolved once the matter is concluded, or use "Escalate to Caring Community National" if the issue is beyond your cooperative\'s authority to address.' },
     ],
     tips: [
       'Aim to acknowledge Critical feedback within 4 hours even if a full resolution takes longer. Acknowledgement alone prevents escalation.',
@@ -711,18 +711,18 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
   },
 
   '/caring/federation-peers': {
-    title: 'KISS Federation Peer Connections',
+    title: 'Caring Community Federation Peer Connections',
     summary:
-      'Manage the federated connections between your cooperative and other KISS cooperatives. Federation enables Warmth Pass portability and cross-cooperative referrals. Each peer connection is governed by a bilateral trust agreement.',
+      'Manage the federated connections between your cooperative and other Caring Community cooperatives. Federation enables Warmth Pass portability and cross-cooperative referrals. Each peer connection is governed by a bilateral trust agreement.',
     steps: [
-      { label: 'View active peer connections', detail: 'The connections table shows all currently federated KISS cooperatives, their location, connection status, and when the link was last verified.' },
+      { label: 'View active peer connections', detail: 'The connections table shows all currently federated Caring Community cooperatives, their location, connection status, and when the link was last verified.' },
       { label: 'Invite a new peer', detail: 'Click "Invite Peer Cooperative". Enter their NEXUS instance URL. They receive an invitation to accept and sign the bilateral trust agreement.' },
       { label: 'Accept an incoming invitation', detail: 'Pending invitations appear in the "Incoming" tab. Review the requesting cooperative\'s profile before accepting.' },
-      { label: 'Configure data sharing rules', detail: 'For each peer, choose which data you share: Warmth Pass validation only, or also aggregate exchange statistics for the KISS national dashboard.' },
+      { label: 'Configure data sharing rules', detail: 'For each peer, choose which data you share: Warmth Pass validation only, or also aggregate exchange statistics for the Caring Community national dashboard.' },
       { label: 'Suspend a peer connection', detail: 'If a cooperative is no longer active or has had a safeguarding issue, use "Suspend" to pause the federation link without permanently removing it.' },
     ],
     tips: [
-      'Only connect with cooperatives you have verified in person or through the KISS national network — automated spam invitations can occur.',
+      'Only connect with cooperatives you have verified in person or through the Caring Community national network — automated spam invitations can occur.',
       'When Isolated Node mode is active, all federation peer data sync is automatically paused. Re-enable individually after reviewing FADP compliance.',
     ],
     relatedPaths: [
@@ -837,22 +837,22 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
     ],
   },
 
-  // ─── KISS / AGORIS national / super-admin pages ────────────────────────────
+  // ─── Caring Community national / super-admin pages ────────────────────────────
 
   '/admin/national/kiss': {
-    title: 'Fondation KISS — National Cross-Cooperative Dashboard',
+    title: 'Caring Community — National Cross-Cooperative Dashboard',
     summary:
-      'A national-level aggregate dashboard visible only to KISS national staff and super-administrators. Aggregates key metrics across all active KISS cooperatives: total exchange hours, combined CHF cost-avoidance, cross-cooperative Warmth Pass usage, and federation health.',
+      'A national-level aggregate dashboard visible only to Caring Community national staff and super-administrators. Aggregates key metrics across all active Caring Community cooperatives: total exchange hours, combined CHF cost-avoidance, cross-cooperative Warmth Pass usage, and federation health.',
     steps: [
       { label: 'Review the national summary cards', detail: 'The top row shows: total cooperatives active, total exchange hours (month/year), combined CHF cost-avoidance, and total unique members across all cooperatives.' },
       { label: 'Drill into a specific cooperative', detail: 'Click any cooperative\'s row in the table to open their detailed dashboard. You have read-only access to their data.' },
       { label: 'Review federation health', detail: 'The federation health map shows which cooperatives are connected via Warmth Pass federation and which have recently sync-failed.' },
-      { label: 'Export the national report', detail: 'Use "Export National Report" to produce an aggregated PDF for Fondation KISS board meetings or federal health authority submissions.' },
+      { label: 'Export the national report', detail: 'Use "Export National Report" to produce an aggregated PDF for Caring Community board meetings or federal health authority submissions.' },
       { label: 'Raise a national alert', detail: 'Use the "National Announcement" to send a message to all cooperative coordinators simultaneously — for example, a methodology update or a system maintenance notice.' },
     ],
     tips: [
       'The national dashboard does not contain any individually identifiable member data — only cooperative-level aggregates.',
-      'Use the "Benchmark View" to show each cooperative\'s KISS pilot score alongside the national median.',
+      'Use the "Benchmark View" to show each cooperative\'s Caring Community pilot score alongside the national median.',
     ],
     relatedPaths: [
       { label: 'KI Agents', path: '/admin/ki-agents' },
@@ -879,19 +879,19 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
       'Never raise the auto-apply threshold for agents that can initiate financial transfers, safeguarding escalations, or member tier changes. These must always require human review.',
     relatedPaths: [
       { label: 'Smart Nudges', path: '/caring/nudges' },
-      { label: 'National KISS Dashboard', path: '/admin/national/kiss' },
+      { label: 'National Caring Community Dashboard', path: '/admin/national/kiss' },
     ],
   },
 
   '/admin/pilot-inquiries': {
     title: 'Pilot Inquiries — Gemeinde Onboarding Pipeline',
     summary:
-      'Manages the end-to-end pipeline for municipalities (Gemeinde) expressing interest in piloting NEXUS/AGORIS. Each inquiry is tracked from initial contact through to pilot agreement and cooperative launch. This is the starting point for all new cooperative onboarding.',
+      'Manages the end-to-end pipeline for municipalities (Gemeinde) expressing interest in piloting NEXUS/Caring Community. Each inquiry is tracked from initial contact through to pilot agreement and cooperative launch. This is the starting point for all new cooperative onboarding.',
     steps: [
-      { label: 'Review new inquiries', detail: 'New inquiries arrive from the public-facing contact form, KISS national referrals, or manual entry. Each shows the municipality name, canton, contact person, and initial inquiry notes.' },
+      { label: 'Review new inquiries', detail: 'New inquiries arrive from the public-facing contact form, Caring Community national referrals, or manual entry. Each shows the municipality name, canton, contact person, and initial inquiry notes.' },
       { label: 'Qualify the inquiry', detail: 'Use the qualification checklist to assess readiness: Is there a designated coordinator? Is there municipal council support? Is there a suitable existing community network? Score each factor.' },
       { label: 'Move through the pipeline', detail: 'Drag or advance the inquiry through stages: New → Qualifying → Proposal Sent → Pilot Agreement → Onboarding → Active. Each stage has required actions documented.' },
-      { label: 'Generate a pilot proposal', detail: 'At the Proposal Sent stage, use "Generate Proposal" to produce a customised PDF proposal using the municipality\'s details, their canton\'s care rate, and standard KISS methodology terms.' },
+      { label: 'Generate a pilot proposal', detail: 'At the Proposal Sent stage, use "Generate Proposal" to produce a customised PDF proposal using the municipality\'s details, their canton\'s care rate, and standard Caring Community methodology terms.' },
       { label: 'Trigger tenant creation', detail: 'Once a pilot agreement is signed and uploaded, use "Create Cooperative Tenant" to provision a new NEXUS tenant for them. This links the inquiry to the Live Launch Readiness gate.' },
     ],
     tips: [
@@ -901,7 +901,7 @@ export const HELP_CONTENT: Record<string, HelpArticle> = {
     relatedPaths: [
       { label: 'Lead Nurture', path: '/caring/lead-nurture' },
       { label: 'Launch Readiness', path: '/caring/launch-readiness' },
-      { label: 'National KISS Dashboard', path: '/admin/national/kiss' },
+      { label: 'National Caring Community Dashboard', path: '/admin/national/kiss' },
     ],
   },
 };

@@ -36,7 +36,7 @@ import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
-import { StatCard, PageHeader, Abbr } from '../../components';
+import { StatCard, PageHeader } from '../../components';
 
 // â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
@@ -242,7 +242,7 @@ function InquiryDetailModal({
               <p>{inquiry.population?.toLocaleString() ?? t('values.empty')}</p>
             </div>
             <div>
-              <p className="text-muted text-xs uppercase tracking-wide mb-0.5"><Abbr term="KISS">KISS</Abbr> {t('fields.cooperative')}</p>
+              <p className="text-muted text-xs uppercase tracking-wide mb-0.5">Caring Community {t('fields.cooperative')}</p>
               <p>{inquiry.has_kiss_cooperative ? t('values.yes') : t('values.no')}</p>
             </div>
             <div>
@@ -466,7 +466,7 @@ export function PilotInquiryAdminPage() {
               <p className="font-semibold text-accent dark:text-accent">{t('about.title')}</p>
               <p className="text-foreground">
                 {t('about.body_intro_before_gemeinden')}<em>{t('about.gemeinden')}</em>{t('about.body_intro_before_kiss')}
-                <Abbr term="KISS">KISS</Abbr>{t('about.body_intro_after_kiss')}
+                Caring Community{t('about.body_intro_after_kiss')}
               </p>
               <p className="text-muted">
                 <strong>{t('about.pipeline_stages_label')}</strong> {t('about.pipeline_stages')}{' '}
@@ -483,7 +483,7 @@ export function PilotInquiryAdminPage() {
         <span className="flex items-center gap-1.5"><Chip size="sm" color="success" variant="soft">60-100</Chip>{t('fit_scale.good')}</span>
         <span className="flex items-center gap-1.5"><Chip size="sm" color="warning" variant="soft">40-59</Chip>{t('fit_scale.potential')}</span>
         <span className="flex items-center gap-1.5"><Chip size="sm" color="default" variant="soft">0-39</Chip>{t('fit_scale.weak')}</span>
-        <span className="ml-3 text-muted">{t('fit_scale.factors_before_kiss')}<Abbr term="KISS">KISS</Abbr>{t('fit_scale.factors_after_kiss')}</span>
+        <span className="ml-3 text-muted">{t('fit_scale.factors_before_kiss')}Caring Community{t('fit_scale.factors_after_kiss')}</span>
       </div>
 
       {/* Stats row */}
@@ -562,7 +562,7 @@ export function PilotInquiryAdminPage() {
       {/* Inquiry grid */}
       {loading ? (
         <div className="flex justify-center py-12">
-          <Spinner size="lg" />
+          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" /></div>
         </div>
       ) : inquiries.length === 0 ? (
         <div className="text-center py-16 text-muted">

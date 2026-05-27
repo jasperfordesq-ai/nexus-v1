@@ -389,7 +389,7 @@ export function JobPipelineOverview() {
 
               {interviewsLoading && interviews.length === 0 ? (
                 <div className="flex justify-center py-16">
-                  <Spinner label={t('jobs.pipeline_loading')} />
+                  <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner label={t('jobs.pipeline_loading')} /></div>
                 </div>
               ) : interviews.length === 0 ? (
                 <EmptyState
@@ -453,7 +453,7 @@ export function JobPipelineOverview() {
 
               {offersLoading && offers.length === 0 ? (
                 <div className="flex justify-center py-16">
-                  <Spinner label={t('jobs.pipeline_loading')} />
+                  <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner label={t('jobs.pipeline_loading')} /></div>
                 </div>
               ) : offers.length === 0 ? (
                 <EmptyState

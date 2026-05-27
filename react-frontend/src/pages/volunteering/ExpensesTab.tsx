@@ -241,7 +241,7 @@ export function ExpensesTab() {
 
       {/* Loading */}
       {!error && isLoading && (
-        <div className="space-y-4">
+        <div role="status" aria-busy="true" aria-label="Loading" className="space-y-4">
           {[1, 2, 3].map((i) => (
             <GlassCard key={i} className="p-5 animate-pulse">
               <div className="h-5 bg-theme-hover rounded w-1/3 mb-3" />

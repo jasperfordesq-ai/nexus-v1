@@ -261,7 +261,7 @@ export function CommunityDeliveryCard({
 
           {loading && (
             <div className="flex justify-center py-4">
-              <Spinner size="sm" />
+              <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" /></div>
             </div>
           )}
 

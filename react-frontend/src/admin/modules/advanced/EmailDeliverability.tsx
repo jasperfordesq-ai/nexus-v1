@@ -427,7 +427,7 @@ export default function EmailDeliverability() {
                   <div className="text-xs font-semibold uppercase text-theme-subtle">{metric.label}</div>
                   <Icon aria-hidden="true" className={`h-4 w-4 ${metric.color}`} />
                 </div>
-                <div className={`text-2xl font-bold ${metric.color}`}>{loadingSummary ? <Spinner size="sm" /> : metric.value}</div>
+                <div className={`text-2xl font-bold ${metric.color}`}>{loadingSummary ? <span role="status" aria-busy="true" aria-label="Loading" className="inline-flex"><Spinner size="sm" /></span>: metric.value}</div>
                 <div className="text-xs text-theme-secondary">{metric.detail}</div>
               </CardBody>
             </Card>
@@ -537,7 +537,7 @@ export default function EmailDeliverability() {
         </CardHeader>
         <Separator />
         <CardBody>
-          {loadingQueues ? <Spinner /> : (
+          {loadingQueues ? <span role="status" aria-busy="true" aria-label="Loading" className="inline-flex"><Spinner /></span>: (
             <Table aria-label={t('email_deliverability.queues.table_label')} removeWrapper>
               <TableHeader>
                 <TableColumn>{t('email_deliverability.queues.columns.source')}</TableColumn>
@@ -616,7 +616,7 @@ export default function EmailDeliverability() {
           </div>
         </CardHeader>
         <CardBody className="gap-4">
-          {loadingLogs ? <Spinner /> : (
+          {loadingLogs ? <span role="status" aria-busy="true" aria-label="Loading" className="inline-flex"><Spinner /></span>: (
             <Table aria-label={t('email_deliverability.logs.table_label')} removeWrapper>
               <TableHeader>
                 <TableColumn>{t('email_deliverability.logs.columns.recipient')}</TableColumn>
@@ -705,7 +705,7 @@ export default function EmailDeliverability() {
           </div>
         </CardHeader>
         <CardBody className="gap-4">
-          {loadingSupp ? <Spinner /> : (
+          {loadingSupp ? <span role="status" aria-busy="true" aria-label="Loading" className="inline-flex"><Spinner /></span>: (
             <Table aria-label={t('email_deliverability.suppressions.table_label')} removeWrapper>
               <TableHeader>
                 <TableColumn>{t('email_deliverability.suppressions.columns.email')}</TableColumn>

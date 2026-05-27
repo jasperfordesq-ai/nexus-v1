@@ -259,7 +259,7 @@ export default function CommercialBoundaryAdminPage() {
               <p className="font-semibold text-accent dark:text-accent">{t('commercial_boundary.about.title')}</p>
               <p className="text-muted">
                 {t('commercial_boundary.about.body_prefix')}{' '}
-                <Abbr term="KISS" />/<Abbr term="AGORIS" /> {t('commercial_boundary.about.body_suffix')}
+                Caring Community {t('commercial_boundary.about.body_suffix')}
               </p>
               <p className="text-muted">
                 {t('commercial_boundary.about.override_prefix')}{' '}
@@ -273,7 +273,7 @@ export default function CommercialBoundaryAdminPage() {
       {/* Loading */}
       {loading && !matrix && (
         <div className="flex justify-center py-16">
-          <Spinner size="lg" />
+          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" /></div>
         </div>
       )}
 

@@ -338,7 +338,7 @@ export default function SubRegionsAdminPage() {
 
       {/* Table */}
       {loading ? (
-        <div className="flex justify-center py-12">
+        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-12">
           <Spinner size="lg" />
         </div>
       ) : error ? (

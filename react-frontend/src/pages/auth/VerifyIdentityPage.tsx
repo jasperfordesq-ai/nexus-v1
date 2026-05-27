@@ -388,7 +388,7 @@ export function VerifyIdentityPage() {
               className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-accent/10 mb-4"
             >
               {pageState === 'in_progress' ? (
-                <Spinner size="lg" color="secondary" />
+                <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" color="secondary" /></div>
               ) : (
                 <ShieldAlert className="w-8 h-8 text-accent" />
               )}

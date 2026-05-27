@@ -136,7 +136,7 @@ export function Error404Tracking() {
       <div>
         <PageHeader title={t('error404_tracking_title')} description={t('error404_tracking_desc')} />
         <div className="flex justify-center py-16">
-          <Spinner size="lg" />
+          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" /></div>
         </div>
       </div>
     );

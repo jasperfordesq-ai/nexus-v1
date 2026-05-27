@@ -247,7 +247,7 @@ export default function PilotScoreboardAdminPage() {
                 {t('pilot_scoreboard.about.body')}
               </p>
               <p className="text-muted">
-                {t('pilot_scoreboard.about.methodology_prefix')} <Abbr term="KISS" />/<abbr title={t('pilot_scoreboard.about.age_stiftung_title')}>{t('pilot_scoreboard.about.age_stiftung')}</abbr>{' '}
+                {t('pilot_scoreboard.about.methodology_prefix')} Caring Community{' '}
                 {t('pilot_scoreboard.about.methodology_middle')} <Abbr term="CHF">{t('pilot_scoreboard.currency.chf')}</Abbr>{' '}
                 {t('pilot_scoreboard.about.methodology_suffix')}
               </p>
@@ -278,7 +278,7 @@ export default function PilotScoreboardAdminPage() {
       )}
 
       {loading && (
-        <div className="flex justify-center py-16">
+        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
       )}

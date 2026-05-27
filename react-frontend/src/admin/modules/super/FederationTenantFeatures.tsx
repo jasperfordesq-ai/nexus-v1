@@ -188,7 +188,7 @@ export function FederationTenantFeatures() {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-16">
-        <Spinner size="lg" label={t('super.loading_tenant_features')} />
+        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" label={t('super.loading_tenant_features')} /></div>
       </div>
     );
   }

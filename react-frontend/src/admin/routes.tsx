@@ -294,7 +294,7 @@ const MemberReportsPage = lazy(() => import('./modules/reports/MemberReportsPage
 const HoursReportsPage = lazy(() => import('./modules/reports/HoursReportsPage'));
 const InactiveMembersPage = lazy(() => import('./modules/reports/InactiveMembersPage'));
 const ModerationQueuePage = lazy(() => import('./modules/reports/ModerationQueuePage'));
-// National (KISS Foundation) module
+// National (Caring Community Foundation) module
 const NationalKissDashboardPage = lazy(() => import('./modules/national/NationalKissDashboardPage'));
 
 // Help Centre
@@ -751,7 +751,7 @@ export function AdminRoutes() {
         <Route path="billing/revenue" element={<Lazy><RevenueDashboard /></Lazy>} />
       </Route>
 
-      {/* ─── NATIONAL KISS FOUNDATION DASHBOARD (super-admin / national_admin) ─── */}
+      {/* ─── NATIONAL CARING COMMUNITY FOUNDATION DASHBOARD (super-admin / national_admin) ─── */}
       <Route path="national/kiss" element={<Lazy><NationalKissDashboardPage /></Lazy>} />
 
       {/* ─── ANALYTICS & REPORTING ─── */}

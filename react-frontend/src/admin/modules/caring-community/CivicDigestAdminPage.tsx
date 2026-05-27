@@ -137,7 +137,7 @@ export default function CivicDigestAdminPage() {
 
       {loading && (
         <div className="flex justify-center py-16">
-          <Spinner size="lg" />
+          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" /></div>
         </div>
       )}
 

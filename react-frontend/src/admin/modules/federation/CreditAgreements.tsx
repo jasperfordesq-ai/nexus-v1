@@ -723,7 +723,7 @@ export function CreditAgreements() {
                       <CardBody>
                         {detailLoading ? (
                           <div className="flex h-24 items-center justify-center">
-                            <Spinner size="sm" />
+                            <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" /></div>
                           </div>
                         ) : detailTransactions.length === 0 ? (
                           <p className="text-sm text-muted text-center py-4">

@@ -24,17 +24,17 @@ import { useTranslation } from 'react-i18next';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { PageHeader, StatCard, Abbr } from '../../components';
+import { PageHeader, StatCard } from '../../components';
 // Copyright © 2024–2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * National KISS Foundation Dashboard
+ * National Caring Community Dashboard
  *
- * Cross-cooperative super-admin dashboard. Designed for the national KISS
- * foundation administrator (think: what Martin Villiger himself would use).
+ * Cross-cooperative super-admin dashboard. Designed for the national
+ * foundation administrator overseeing every cooperative on the platform.
  *
  * Backend endpoints (all require `national.kiss_dashboard.view` permission):
  *   GET /api/v2/admin/national/kiss/summary
@@ -261,7 +261,7 @@ export function NationalKissDashboardPage() {
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('national_kiss_dashboard.about.title')}</p>
               <p className="text-muted">
-                {t('national_kiss_dashboard.about.body_prefix')} <Abbr term="KISS" /> {t('national_kiss_dashboard.about.body_suffix')}
+                {t('national_kiss_dashboard.about.body_prefix')} Caring Community {t('national_kiss_dashboard.about.body_suffix')}
               </p>
               <p className="text-muted">
                 {t('national_kiss_dashboard.about.health_prefix')} <strong>{t('national_kiss_dashboard.status.thriving')}</strong> =
@@ -452,8 +452,8 @@ export function NationalKissDashboardPage() {
             </div>
           ) : sortedRows.length === 0 ? (
             <p className="text-sm text-muted">
-              {t('national_kiss_dashboard.comparative.empty_prefix')} <Abbr term="KISS" /> {t('national_kiss_dashboard.comparative.empty_middle')} <strong>{t('national_kiss_dashboard.comparative.super_admin_tenants')}</strong> {t('national_kiss_dashboard.comparative.empty_suffix')}{' '}
-              <strong>{'kiss_cooperative'}</strong> {t('national_kiss_dashboard.comparative.empty_tail')}
+              {t('national_kiss_dashboard.comparative.empty_prefix')} Caring Community {t('national_kiss_dashboard.comparative.empty_middle')} <strong>{t('national_kiss_dashboard.comparative.super_admin_tenants')}</strong> {t('national_kiss_dashboard.comparative.empty_suffix')}{' '}
+              {t('national_kiss_dashboard.comparative.empty_tail')}
             </p>
           ) : (
             <Table

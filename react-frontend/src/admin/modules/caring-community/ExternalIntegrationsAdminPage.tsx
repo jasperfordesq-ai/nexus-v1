@@ -341,7 +341,7 @@ export default function ExternalIntegrationsAdminPage(): JSX.Element {
         <Card>
           <CardBody>
             <div className="flex justify-center py-12">
-              <Spinner />
+              <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner /></div>
             </div>
           </CardBody>
         </Card>

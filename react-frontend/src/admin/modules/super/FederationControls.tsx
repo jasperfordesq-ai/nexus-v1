@@ -158,7 +158,7 @@ export function FederationControls() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <Spinner size="lg" label={t('super.loading_federation_controls')} />
+        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" label={t('super.loading_federation_controls')} /></div>
       </div>
     );
   }

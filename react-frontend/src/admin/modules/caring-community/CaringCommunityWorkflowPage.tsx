@@ -584,7 +584,7 @@ function PredictiveInsightsCard({ forecast, loading, error, onRefresh, t }: Pred
       <CardBody className="gap-4">
         {isInitialLoading ? (
           <div className="flex items-center justify-center py-10">
-            <Spinner size="md" />
+            <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="md" /></div>
           </div>
         ) : error ? (
           <div className="rounded-lg bg-danger-50 p-4 text-sm text-danger-700 flex items-center justify-between gap-3">
@@ -1498,7 +1498,7 @@ export default function CaringCommunityWorkflowPage() {
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
-        <Spinner size="lg" label={t('caring_workflow.loading.workflow')} />
+        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" label={t('caring_workflow.loading.workflow')} /></div>
       </div>
     );
   }
@@ -1827,7 +1827,7 @@ export default function CaringCommunityWorkflowPage() {
             <CardBody className="space-y-4">
               {loadingSafeguarding && !safeguardingSummary ? (
                 <div className="flex justify-center py-6">
-                  <Spinner size="sm" />
+                  <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" /></div>
                 </div>
               ) : !safeguardingSummary ? (
                 <p className="text-sm text-muted py-4 text-center">{t('caring_workflow.safeguarding.no_data')}</p>
@@ -1970,7 +1970,7 @@ export default function CaringCommunityWorkflowPage() {
             <CardBody className="gap-3">
               {loadingTandems && tandemSuggestions.length === 0 ? (
                 <div className="flex items-center justify-center py-8">
-                  <Spinner size="md" />
+                  <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="md" /></div>
                 </div>
               ) : tandemError ? (
                 <div className="rounded-lg bg-danger-50 p-4 text-sm text-danger-700">

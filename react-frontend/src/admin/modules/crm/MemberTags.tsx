@@ -274,7 +274,7 @@ export function MemberTags() {
       {/* Tag Grid */}
       {summaryLoading ? (
         <div className="flex justify-center py-16">
-          <Spinner size="lg" label={t('crm.loading_tags')} />
+          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" label={t('crm.loading_tags')} /></div>
         </div>
       ) : filteredSummaries.length === 0 ? (
         <Card>
@@ -354,7 +354,7 @@ export function MemberTags() {
 
       {membersLoading ? (
         <div className="flex justify-center py-16">
-          <Spinner size="lg" label={t('crm.loading_members')} />
+          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" label={t('crm.loading_members')} /></div>
         </div>
       ) : memberTags.length === 0 ? (
         <Card>

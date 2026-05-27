@@ -1140,7 +1140,7 @@ export function LandingPageBuilder() {
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
-        <Spinner size="lg" label={t('content.landing_loading')} />
+        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" label={t('content.landing_loading')} /></div>
       </div>
     );
   }

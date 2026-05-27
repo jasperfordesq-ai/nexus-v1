@@ -433,6 +433,7 @@ export default interface Resources {
     "chart": {
       "given": "Given",
       "monthly_activity": "Monthly Activity",
+      "monthly_activity_aria": "Bar chart showing monthly hours given and received",
       "no_data": "No chart data available",
       "received": "Received"
     },
@@ -623,7 +624,7 @@ export default interface Resources {
           "body": "Operating Policy defines the rules of your community care programme: who can approve hours, how quickly coordinators must respond, how social value is calculated, and what the reporting cycle looks like. Configure this before launching the pilot. Changes take effect immediately and are logged for audit purposes.",
           "methodology_middle": "hourly rate and prevention multiplier fields use the",
           "methodology_prefix": "The",
-          "methodology_suffix": "methodology (Koordination und Innovation fur Soziales, Schwyz) developed with Age-Stiftung. If you are not running a Swiss KISS/",
+          "methodology_suffix": "hourly rate and prevention multiplier fields use the Caring Community methodology. If your community uses a different currency or local care economics, set the rate to your local formal-care hourly equivalent and the multiplier to 1.0.",
           "methodology_tail": "pilot, set the rate to your local formal-care hourly equivalent and the multiplier to 1.0.",
           "title": "About this page"
         },
@@ -662,7 +663,7 @@ export default interface Resources {
             "label": "CHF social value per hour"
           },
           "chf_prevention_multiplier": {
-            "help": "Multiplier applied to formal-care offset for the Age-Stiftung and KISS methodology.",
+            "help": "Multiplier applied to formal-care offset for the Caring Community and Caring Community methodology.",
             "label": "CHF prevention multiplier"
           },
           "legacy_hour_settlement": {
@@ -718,7 +719,7 @@ export default interface Resources {
           "sla": "SLA windows",
           "social_value": "social-value methodology"
         },
-        "subtitle": "KISS operating-policy workshop: rules software cannot guess.",
+        "subtitle": "Caring Community operating-policy workshop: rules software cannot guess.",
         "title": "Operating Policy"
       },
       "providers": {
@@ -959,7 +960,7 @@ export default interface Resources {
       "categories": {
         "caring_community": "Caring Community",
         "general_admin": "General Admin",
-        "kiss_agoris": "KISS & AGORIS"
+        "kiss_agoris": "Caring Community"
       },
       "description": "Find guidance for every page in the admin panel. Click any article to go to that page - a ? button will open contextual help.",
       "no_matches": "No articles match your search.",
@@ -974,6 +975,14 @@ export default interface Resources {
       "description": "The page you are looking for does not exist",
       "heading": "Page Not Found",
       "title": "Not Found"
+    },
+    "admin_settings": {
+      "logo_uploaded": "Partner logo uploaded",
+      "partner_logo_hint": "Shown in the footer left slot. PNG, JPEG, WebP or SVG — max 2 MB.",
+      "partner_logo_label": "Partner Logo",
+      "replace_image": "Replace image",
+      "upload_failed": "Upload failed",
+      "upload_image": "Upload image"
     },
     "advanced": {
       "404_entry_dismissed": "404 entry dismissed",
@@ -1127,6 +1136,7 @@ export default interface Resources {
       "health_homepage_h1": "Homepage H1",
       "health_homepage_h1_missing": "Not set — homepage may be missing an H1 tag",
       "health_homepage_h1_set": "Set: \"{{headline}}\"",
+      "health_loading": "Loading algorithm health...",
       "health_meta_description": "Meta description",
       "health_meta_description_length": "{{count}} characters (ideal: 150–160)",
       "health_meta_description_missing": "No default meta description set",
@@ -1202,6 +1212,7 @@ export default interface Resources {
       "last_run": "Last Run",
       "last_run_label": "Last Run",
       "listing_saves": "Listing Saves",
+      "loading": "Loading",
       "loading_match_scores": "Loading match scores...",
       "match_count_one": "{{count}} match",
       "match_count_other": "{{count}} matches",
@@ -2141,7 +2152,8 @@ export default interface Resources {
         "scheduled": "Scheduled",
         "sending": "Sending",
         "sent": "Sent"
-      }
+      },
+      "tabs_aria": "Ad campaign status filter"
     },
     "agents": {
       "actions": {
@@ -2286,7 +2298,9 @@ export default interface Resources {
       "status": {
         "disabled": "Disabled",
         "enabled": "Enabled"
-      }
+      },
+      "tabs_aria": "Agent proposal status filter",
+      "toggle": "Enable or disable {{name}}"
     },
     "ai": {
       "common": {
@@ -3061,6 +3075,7 @@ export default interface Resources {
       "seo_override": "SEO override (optional)",
       "slug_desc_create": "Auto-generated from title, or type a custom slug.",
       "slug_desc_edit": "Edit to customize the URL. Leave as-is to keep current slug.",
+      "tabs_aria": "Blog post status filter",
       "title_required": "Title is required",
       "unknown": "Unknown",
       "unpublish": "Unpublish"
@@ -3169,7 +3184,7 @@ export default interface Resources {
       "isolated_node": "Isolated Node Gate",
       "jobs": "Jobs",
       "ki_agents": "KI Agents",
-      "kiss": "KISS",
+      "kiss": "Caring Community",
       "kpi_baselines": "KPI Baselines",
       "landing_page": "Landing Page",
       "launch_readiness": "Launch Readiness",
@@ -3883,7 +3898,7 @@ export default interface Resources {
       },
       "actions": {
         "open_member_hub": "Open member hub",
-        "open_workflow": "Open KISS workflow",
+        "open_workflow": "Open Caring Community workflow",
         "refresh": "Refresh"
       },
       "capabilities": {
@@ -3924,7 +3939,7 @@ export default interface Resources {
         "description": "Jump into the reporting surfaces needed for canton, municipality, and cooperative conversations.",
         "impact_report": "Impact report",
         "municipal_pack": "Municipal report pack",
-        "note": "These surfaces use existing NEXUS reporting today and are ready for KISS-specific exports next.",
+        "note": "These surfaces use existing NEXUS reporting today and are ready for Caring Community exports next.",
         "title": "Municipal reporting"
       },
       "stats": {
@@ -4457,6 +4472,7 @@ export default interface Resources {
       "placeholder_name": "e.g. Arts & Crafts",
       "save_changes": "Save changes",
       "search_placeholder": "Search categories...",
+      "tabs_aria": "Category type filter",
       "type_blog": "Blog",
       "type_event": "Event",
       "type_listing": "Listing",
@@ -4466,7 +4482,7 @@ export default interface Resources {
     },
     "category_coefficients": {
       "about": {
-        "body_middle": "). A coefficient of 0.5 means it substitutes for half an hour. A coefficient of 2.0 means it substitutes for two hours of formal care - for example, intensive personal care or specialist support. The Age-Stiftung/",
+        "body_middle": "). A coefficient of 0.5 means it substitutes for half an hour. A coefficient of 2.0 means it substitutes for two hours of formal care - for example, intensive personal care or specialist support. The",
         "body_prefix": "Substitution Coefficients control how much social value each care category is worth in the cost-offset calculation. A coefficient of 1.0 means one hour equals one hour of formal Spitex/Pflege care (",
         "body_suffix": "methodology recommends starting all categories at 1.0 and adjusting based on observed care intensity.",
         "chf_amount": "CHF 35",
@@ -4715,6 +4731,7 @@ export default interface Resources {
       "filter_all": "All",
       "filter_core": "Core",
       "filter_features": "Features",
+      "filter_modules": "Filter modules",
       "job_triggered_successfully": "Job triggered successfully",
       "label_default_language": "Default Language",
       "language_settings_saved": "Language settings saved",
@@ -4782,7 +4799,7 @@ export default interface Resources {
       "module_name_ai_agents": "AI Agents",
       "module_name_ai_chat": "AI Assistant",
       "module_name_blog": "Blog",
-      "module_name_caring_community": "Caring Community",
+      "module_name_caring_community": "Caring Community Alpha",
       "module_name_connections": "Connections",
       "module_name_dashboard": "Dashboard",
       "module_name_direct_messaging": "Direct Messaging",
@@ -5309,6 +5326,8 @@ export default interface Resources {
       "refresh": "Refresh",
       "save_changes": "Save Changes",
       "search_modules": "Search modules",
+      "stage_alpha": "Alpha",
+      "stage_beta": "Beta",
       "tenant_features_desc": "Enable or disable platform features and modules for this tenant",
       "tenant_features_title": "Tenant Features",
       "toggle_module": "Toggle {{name}}",
@@ -5378,6 +5397,7 @@ export default interface Resources {
       "confirm_delete_plan_named": "Delete plan \"{{name}}\"? This cannot be undone.",
       "create_attributes": "Create Attributes",
       "create_menu_title": "Create Menu",
+      "create_page": "Create Page",
       "create_pages": "Create Pages",
       "delete": "Delete",
       "delete_attribute_confirm": "Delete attribute \"{{name}}\"?",
@@ -5386,6 +5406,8 @@ export default interface Resources {
       "delete_item_title": "Delete Item",
       "delete_menu_confirm": "Delete menu \"{{name}}\"? This cannot be undone.",
       "delete_menu_title": "Delete Menu",
+      "delete_page_confirm": "Are you sure you want to delete this page? This cannot be undone.",
+      "delete_page_title": "Delete Page",
       "delete_plan": "Delete plan",
       "desc_create_custom_attributes_to_add_extra_fi": "Create custom attributes to add extra fields to your content",
       "desc_create_custom_navigation_menus_for_your_": "Create custom navigation menus to replace or extend the default platform navigation",
@@ -5420,6 +5442,7 @@ export default interface Resources {
       "features_description": "One feature per line. These are displayed as bullet points on the pricing page.",
       "features_placeholder": "Up to 500 community members\nFull listings, wallet and exchanges\nEvents and group coordination",
       "filter_all": "All ({{count}})",
+      "filter_by_location": "Filter by location",
       "footer": "Footer",
       "free": "Free",
       "hide_preview": "Hide Preview",
@@ -5436,6 +5459,7 @@ export default interface Resources {
       "label_categories": "Categories",
       "label_categories_optional": "Categories (Optional)",
       "label_content": "Content",
+      "label_created": "Created",
       "label_delete_item": "Delete Item",
       "label_delete_menu": "Delete Menu",
       "label_delete_page": "Delete Page",
@@ -5453,6 +5477,7 @@ export default interface Resources {
       "label_menu_name": "Menu Name",
       "label_meta_description": "Meta Description",
       "label_name": "Name",
+      "label_no": "No",
       "label_open_in": "Open in",
       "label_parent_item": "Parent Item",
       "label_route_name": "Route Name",
@@ -5542,6 +5567,7 @@ export default interface Resources {
       "load_defaults": "Load Defaults",
       "load_defaults_desc": "Load the default menu structure as a starting point",
       "loading_pages": "Loading pages...",
+      "location_about": "About",
       "location_header_main": "Main Header",
       "location_header_secondary": "Secondary Header",
       "location_mobile": "Mobile",
@@ -7543,6 +7569,7 @@ export default interface Resources {
       "tab_cancelled": "Cancelled",
       "tab_draft": "Draft",
       "tab_published": "Published",
+      "tabs_aria": "Event status filter",
       "unknown": "Unknown"
     },
     "external_integrations": {
@@ -7989,6 +8016,7 @@ export default interface Resources {
       "api_docs_errors": "Error Codes",
       "api_docs_examples": "Examples",
       "api_docs_overview": "Overview",
+      "api_docs_tabs_aria": "API example language selector",
       "api_docs_title": "Federation API Documentation",
       "api_docs_webhooks": "Webhooks",
       "api_keys_desc": "Manage API keys for federation integration with external systems",
@@ -8437,6 +8465,7 @@ export default interface Resources {
       "partnership_action_confirm": "Partnership Action Confirm",
       "partnership_approved": "Partnership Approved",
       "partnership_detail": "Partnership Detail",
+      "partnership_detail_tabs_aria": "Partnership detail sections",
       "partnership_message_placeholder": "Optional message to the partner community...",
       "partnership_not_found": "Partnership not Found",
       "partnership_preferences": "Partnership Preferences",
@@ -8733,14 +8762,14 @@ export default interface Resources {
       "create_modal": {
         "base_url": "Base URL",
         "base_url_description": "HTTPS URL of the remote NEXUS API. The /v2/federation/hour-transfer/inbound path is appended automatically.",
-        "base_url_placeholder": "https://api.kiss-bern.ch",
+        "base_url_placeholder": "https://api.bern-cooperative.ch",
         "display_name": "Display Name",
-        "display_name_placeholder": "KISS Bern Cooperative",
+        "display_name_placeholder": "Bern Cooperative",
         "notes": "Notes",
         "notes_placeholder": "Internal notes - partner contact, agreement reference...",
         "peer_slug": "Peer Slug",
         "peer_slug_description": "Lowercase alphanumeric + hyphens. Used as destination cooperative slug for outbound transfers.",
-        "peer_slug_placeholder": "kiss-bern",
+        "peer_slug_placeholder": "bern-cooperative",
         "status_hint_middle": "After the remote side has registered the same shared secret, set both sides to",
         "status_hint_prefix": "Status starts as",
         "title": "Add Federation Peer"
@@ -9167,6 +9196,7 @@ export default interface Resources {
       "desc_all_membership_requests_have_been_review": "All membership requests have been reviewed",
       "desc_there_are_no_groups_with_reported_or_fla": "There are no groups with reported or flagged content",
       "description": "Description",
+      "detail_tabs_aria": "Group detail sections",
       "edit": "Edit",
       "edit_cancel": "Cancel",
       "edit_featured_desc": "Feature this group in admin and discovery views.",
@@ -9367,6 +9397,7 @@ export default interface Resources {
       "status_inactive": "Inactive",
       "status_pending": "Pending",
       "status_suspended": "Suspended",
+      "status_tabs_aria": "Group status filter",
       "tab_active": "Active",
       "tab_all": "All",
       "tab_archived": "Archived",
@@ -9557,6 +9588,7 @@ export default interface Resources {
       "tab_evaluating": "Evaluating",
       "tab_open": "Open",
       "tab_voting": "Voting",
+      "tabs_aria": "Challenge status filter",
       "title": "Ideation",
       "top_matches_for_user_one": "Top {{count}} match for {{name}}",
       "top_matches_for_user_other": "Top {{count}} matches for {{name}}",
@@ -10191,6 +10223,7 @@ export default interface Resources {
       "filter_all": "All",
       "filter_inactive": "Inactive",
       "filter_pending": "Pending",
+      "filter_tabs_aria": "Listing status filter",
       "label_approve": "Approve",
       "label_delete": "Delete",
       "label_reject": "Reject",
@@ -10209,6 +10242,7 @@ export default interface Resources {
       "remove_from_featured_message": "Are you sure you want to remove this listing from featured?",
       "removed_from_featured": "Removed from Featured",
       "search_content": "Search Content",
+      "section_tabs_aria": "Listings management sections",
       "status": "Status",
       "tab_content": "Content",
       "tab_featured": "Featured",
@@ -10328,6 +10362,7 @@ export default interface Resources {
       "moderation_page_title": "Listing Moderation",
       "moderation_queue": "Moderation Queue",
       "moderation_queue_desc": "Listings awaiting review",
+      "moderation_tabs_aria": "Marketplace moderation status filter",
       "moderation_title": "Moderation Queue",
       "no_listings_created_yet": "No listings have been created yet",
       "no_listings_found": "No listings found",
@@ -10351,6 +10386,7 @@ export default interface Resources {
       "seller_management": "Seller Management",
       "seller_management_desc": "Manage and verify marketplace sellers",
       "seller_suspended": "Seller suspended",
+      "seller_tabs_aria": "Seller status filter",
       "seller_verified": "Seller verified",
       "sellers_description": "Manage registered marketplace sellers",
       "sellers_page_title": "Marketplace Sellers",
@@ -10562,6 +10598,7 @@ export default interface Resources {
       "tab_approved": "Approved",
       "tab_pending": "Pending",
       "tab_rejected": "Rejected",
+      "tabs_aria": "Match approval status filter",
       "this_month": "This Month",
       "this_week": "This Week",
       "total": "Total",
@@ -10925,6 +10962,7 @@ export default interface Resources {
       "rating_3_stars": "3 Stars",
       "rating_4_stars": "4 Stars",
       "rating_5_stars": "5 Stars",
+      "rating_aria": "{{n}} out of 5 stars",
       "reason_label": "Reason",
       "reason_placeholder": "Enter reason...",
       "reason_required": "A reason is required",
@@ -11070,7 +11108,7 @@ export default interface Resources {
     "municipal_reports": {
       "about": {
         "body_1_after_chf": " value of hours x prevention multiplier).",
-        "body_1_after_kiss": "/Age-Stiftung methodology, an estimated cost offset to formal care services (",
+        "body_1_after_kiss": " methodology, an estimated cost offset to formal care services (",
         "body_1_before_kiss": "The Municipal Impact Report is the evidence pack you share with municipal partners, cantons, and funders to demonstrate the programme's value. It shows verified care hours, active members, partner organisations, and, using the",
         "body_2_after_audience": " toggle to switch the narrative framing:",
         "body_2_after_canton": " aggregates multiple municipalities and shows cost-avoidance at cantonal scale;",
@@ -11078,7 +11116,7 @@ export default interface Resources {
         "body_2_after_municipality": " focuses on local residents reached and partner organisations;",
         "body_2_prefix": "Use the",
         "chf_abbr": "CHF",
-        "kiss_abbr": "KISS",
+        "kiss_abbr": "Caring Community",
         "title": "About this report"
       },
       "actions": {
@@ -11144,7 +11182,7 @@ export default interface Resources {
       "hour_value": "Hour value",
       "loading": "Loading municipal impact data",
       "meta": {
-        "description": "Prepare KISS-style reporting for verified hours, active members, trusted organisations, and municipal value conversations.",
+        "description": "Prepare Caring Community reporting for verified hours, active members, trusted organisations, and municipal value conversations.",
         "title": "Municipal Impact Reports"
       },
       "multiplier": "Social multiplier",
@@ -11172,7 +11210,7 @@ export default interface Resources {
           "description": "Internal cooperative health: retention, reciprocity, tandems, coordinator load, credit pool.",
           "empty_body": "Switch to Cooperative mode to load the cooperative-internal narrative.",
           "empty_description": "Member retention, hour reciprocity, tandem relationships, coordinator workload, future-care credit pool.",
-          "empty_title": "Cooperative (KISS-Genossenschaft internal)",
+          "empty_title": "Cooperative (cooperative internal)",
           "future_care_credit_pool": "Future-care credit balance pool",
           "future_care_credit_pool_desc": "Sum of positive member balances - the cooperative's implicit future-care reserve. Active member base: {{count}}.",
           "member_retention": "Member retention",
@@ -11313,9 +11351,9 @@ export default interface Resources {
       "about": {
         "body_middle": "Report calculates the social and economic value of your community care programme using the",
         "body_prefix": "The Municipal",
-        "body_suffix": "Age-Stiftung methodology. It shows the estimated cost offset to formal care services (Spitex/Pflege), the social value generated, and trend data across reporting periods. This report is designed to be shared with municipal partners and funders as evidence of the programme's impact.",
+        "body_suffix": "Caring Community methodology. It shows the estimated cost offset to formal care services (Spitex/Pflege), the social value generated, and trend data across reporting periods. This report is designed to be shared with municipal partners and funders as evidence of the programme's impact.",
         "formula_prefix": "Cost offset = total approved care hours x",
-        "formula_suffix": "hourly rate x prevention multiplier. The prevention multiplier (default: 2.0) reflects that one hour of informal care prevents approximately two hours of formal care intervention, based on Age-Stiftung research.",
+        "formula_suffix": "hourly rate x prevention multiplier. The prevention multiplier (default: 2.0) reflects that one hour of informal care prevents approximately two hours of formal care intervention, based on Caring Community research.",
         "title": "About this page"
       },
       "actions": {
@@ -11346,20 +11384,20 @@ export default interface Resources {
       },
       "methodology": {
         "chf_per_hour": "CHF {{amount}}/hr",
-        "default_prevention_prefix": "Prevention value applies a 2x multiplier per Age-Stiftung/",
+        "default_prevention_prefix": "Prevention value applies a 2x multiplier per",
         "default_prevention_suffix": "evaluation methodology.",
         "default_rate": "CHF 35/hr",
         "default_source": "Swiss formal care assistant rate, SECO 2024",
         "hours_are_valued_at": "Hours are valued at",
         "hours_valued_at": "Hours valued at",
-        "prevention_value_prefix": "Prevention value applies a {{multiplier}}x multiplier per Age-Stiftung/",
+        "prevention_value_prefix": "Prevention value applies a {{multiplier}}x multiplier per",
         "prevention_value_suffix": "evaluation methodology.",
         "substitution_applied": "Hours are weighted by per-category substitution coefficients.",
         "substitution_not_applied": "All hours weighted at 1.0x.",
         "tenant_setting_source": "configured for this tenant"
       },
       "municipalities": {
-        "point_export": "CSV export available - use the button in the page header for Age-Stiftung, Pro Senectute, and cantonal social department reporting.",
+        "point_export": "CSV export available - use the button in the page header for Caring Community, Pro Senectute, and cantonal social department reporting.",
         "point_hour_prefix": "Every hour of community caring time saves approximately",
         "point_hour_suffix": "in formal care costs",
         "point_nexus": "makes this impact measurable, auditable, and reportable for cantonal and municipal procurement",
@@ -11381,7 +11419,7 @@ export default interface Resources {
         "care_recipients": "Care Recipients",
         "total_hours": "Total Hours",
         "weighted_hours_note": "{{hours}} weighted hours after substitution coefficients",
-        "weighted_hours_tooltip": "Hours are weighted by category-specific substitution rates (e.g. companionship 0.4x, transport 0.7x, errands 1.0x) per Age-Stiftung methodology."
+        "weighted_hours_tooltip": "Hours are weighted by category-specific substitution rates (e.g. companionship 0.4x, transport 0.7x, errands 1.0x) per Caring Community methodology."
       },
       "toasts": {
         "export_failed": "Failed to export CSV",
@@ -11466,10 +11504,13 @@ export default interface Resources {
         "domain_required": "Enter a domain"
       }
     },
+    "national": {
+      "trend_chart_aria": "Chart showing community activity trends over time"
+    },
     "national_kiss_dashboard": {
       "about": {
-        "body_prefix": "KISS (Koordination und Innovation fur Soziales) is a Swiss methodology for community-based care coordination developed with Age-Stiftung. This super-admin dashboard aggregates metrics across every NEXUS cooperative running the Caring Community programme nationally - giving the Fondation",
-        "body_suffix": "a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member counts are shown as privacy-preserving brackets (e.g. \"50-99\") rather than exact numbers.",
+        "body_prefix": "Caring Community is a methodology for community-based care coordination. This super-admin dashboard aggregates metrics across every NEXUS cooperative running the Caring Community programme nationally - giving the national",
+        "body_suffix": "foundation a cross-cooperative view of hours exchanged, member participation, and cooperative health. Member counts are shown as privacy-preserving brackets (e.g. \"50-99\") rather than exact numbers.",
         "health_prefix": "Use the period selector to compare quarters. The comparative table ranks cooperatives by hours, members, or health status. Health status is derived from activity trends:",
         "stable_definition": "flat activity,",
         "struggling_definition": "declining activity or very low engagement.",
@@ -11535,10 +11576,11 @@ export default interface Resources {
         "bottom_title": "Bottom 5 (active only)",
         "top_title": "Top 5 by hours"
       },
+      "loading": "Loading",
       "meta": {
-        "description": "Cross-cooperative super-admin view across every KISS cooperative on the platform. Member counts are reported in privacy-preserving brackets.",
-        "page_title": "Fondation KISS - National Dashboard",
-        "title": "Fondation KISS - National Dashboard"
+        "description": "Cross-cooperative super-admin view across every Caring Community cooperative on the platform. Member counts are reported in privacy-preserving brackets.",
+        "page_title": "Caring Community - National Dashboard",
+        "title": "Caring Community - National Dashboard"
       },
       "metrics": {
         "yoy": "{{value}} YoY"
@@ -12246,6 +12288,7 @@ export default interface Resources {
       "template_duplicated_as": "Template Duplicated as",
       "template_not_found": "Template not found",
       "template_preview_title": "Template Preview",
+      "template_tabs_aria": "Newsletter template category filter",
       "template_updated": "Template updated",
       "templates_desc": "Create and manage reusable email templates",
       "templates_title": "Templates",
@@ -12321,7 +12364,7 @@ export default interface Resources {
     },
     "pilot_inquiry_admin": {
       "about": {
-        "body_intro_after_kiss": " pilot. Each inquiry is submitted via the public interest form and scored automatically using a fit algorithm (population size, existing KISS cooperative, digital readiness, budget indication, and timeline). Use this board to move inquiries through the pipeline, assign them to a sales or community contact, and track when proposals are sent and pilots go live.",
+        "body_intro_after_kiss": " pilot. Each inquiry is submitted via the public interest form and scored automatically using a fit algorithm (population size, existing Caring Community cooperative, digital readiness, budget indication, and timeline). Use this board to move inquiries through the pipeline, assign them to a sales or community contact, and track when proposals are sent and pilots go live.",
         "body_intro_before_gemeinden": "This is the top-of-funnel pipeline for municipalities (",
         "body_intro_before_kiss": ") and regions interested in running a NEXUS/",
         "fit_score_after": " (0-100) is calculated automatically - 70+ is a strong match. Click any card to view full details, update the stage, or add internal notes.",
@@ -12525,7 +12568,7 @@ export default interface Resources {
     },
     "pilot_scoreboard": {
       "about": {
-        "age_stiftung": "Age-Stiftung",
+        "age_stiftung": "Caring Community",
         "age_stiftung_title": "Stiftung für das Alter",
         "body": "All metrics use a 90-day rolling window. Capture a pre-pilot baseline before onboarding real residents, then run a quarterly review snapshot every 3 months. The comparison table shows how each metric has moved relative to that baseline.",
         "methodology_middle": "methodology: hours of informal care x",
@@ -12881,8 +12924,12 @@ export default interface Resources {
       "group_by_monthly": "Group by Monthly",
       "group_by_weekly": "Group by Weekly",
       "hours": "Hours",
+      "hours_by_category_aria": "Bar chart showing hours exchanged by category",
+      "hours_distribution_aria": "Pie chart showing distribution of time exchange hours",
       "hours_reports_page_desc": "Analyse time credit exchange volume, member balances, and category trends.",
       "hours_reports_page_title": "Hours reports",
+      "hours_tabs_aria": "Hours report view",
+      "hours_trend_aria": "Area chart showing hours exchanged over time",
       "hours_value": "{{value}} hours",
       "inactive_members_page_desc": "Identify members at risk of disengaging and manage follow-up notifications.",
       "inactive_members_page_title": "Inactive members",
@@ -12941,6 +12988,7 @@ export default interface Resources {
       "members_marked_notified": "Members marked as notified",
       "members_selected": "Members Selected",
       "members_selected_count": "{{count}} selected",
+      "members_tabs_aria": "Member report type",
       "moderation_pending": "Pending",
       "moderation_queue_page_desc": "Review pending and flagged content before it appears in the community.",
       "moderation_queue_page_title": "Moderation queue",
@@ -13141,6 +13189,7 @@ export default interface Resources {
       "icon_desc": "Icon.",
       "icon_label": "Icon",
       "icon_placeholder": "Enter icon...",
+      "kb_mode_tabs_aria": "Knowledge base article content mode",
       "label_delete_category": "Delete Category",
       "label_delete_resource": "Delete Resource",
       "label_edit_category": "Edit Category",
@@ -13170,13 +13219,21 @@ export default interface Resources {
       "published": "Published",
       "remove_file": "Remove file",
       "resource_deleted_successfully": "Resource deleted successfully",
+      "resources_admin_actions": "Actions",
+      "resources_admin_author": "Author",
+      "resources_admin_delete_message": "Are you sure you want to delete \"{{title}}\"? This action cannot be undone.",
+      "resources_admin_delete_title": "Delete Resource",
       "resources_admin_desc": "View and manage resource listings shared by community members",
+      "resources_admin_empty": "No resources found",
+      "resources_admin_name": "Name",
+      "resources_admin_status": "Status",
       "resources_admin_title": "Resources Admin",
       "save_changes": "Save Changes",
       "slug": "Slug",
       "sort_order": "Sort Order",
       "sort_order_desc": "Lower numbers appear first. Default is 0.",
       "sort_order_placeholder": "0",
+      "status_tabs_aria": "Resource status filter",
       "supported_formats": "Supported: Markdown (.md), PDF, Word (.doc, .docx), Text (.txt)",
       "unknown": "Unknown",
       "updated": "Updated",
@@ -13500,6 +13557,7 @@ export default interface Resources {
       "tab_flagged_messages": "Flagged Messages",
       "tab_guardian_assignments": "Guardian Assignments",
       "tab_member_preferences": "Member Preferences",
+      "tabs_aria": "Safeguarding sections",
       "to": "To",
       "type_checkbox": "Checkbox",
       "type_info": "Info",
@@ -13620,6 +13678,7 @@ export default interface Resources {
       "document_details": "Document Details",
       "help": "Help",
       "history": "History",
+      "loading": "Loading",
       "log_file_empty": "No log file found",
       "no": "No",
       "no_data": "No data",
@@ -13633,6 +13692,8 @@ export default interface Resources {
       "recent_activity": "Recent Activity",
       "refresh": "Refresh",
       "search": "Search...",
+      "select_all_rows": "Select all rows",
+      "select_row": "Select row {{id}}",
       "total_count": "{{count}} total"
     },
     "smart_nudges": {
@@ -13967,6 +14028,7 @@ export default interface Resources {
       "breadcrumb_create": "Create",
       "breadcrumb_edit": "Edit",
       "breadcrumb_federation_controls": "Federation Controls",
+      "breadcrumb_nav_aria": "Breadcrumb",
       "breadcrumb_super_admin": "Super Admin",
       "breadcrumb_tenants": "Tenants",
       "breadcrumb_users": "Breadcrumb Users",
@@ -14454,6 +14516,7 @@ export default interface Resources {
       "partnership_terminated": "Partnership Terminated",
       "partnerships": "Partnerships",
       "partnerships_heading": "Partnerships",
+      "partnerships_tabs_aria": "Federation partnership status filter",
       "placeholder_add_notes_about_why_this_tenant_is_being_whitelist": "Add Notes About Why This Tenant is Being Whitelist...",
       "placeholder_describe_reason_for_emergency_lockdown": "Describe Reason for Emergency Lockdown...",
       "placeholder_enter_reason_for_emergency_lockdown": "Enter Reason for Emergency Lockdown...",
@@ -14580,6 +14643,7 @@ export default interface Resources {
       "tenant_id_value": "Tenant ID: {{id}}",
       "tenant_information": "Tenant Information",
       "tenant_list_desc": "View and manage all tenants on the platform",
+      "tenant_list_tabs_aria": "Tenant status filter",
       "tenant_list_title": "Tenant List",
       "tenant_moved_successfully": "Tenant moved successfully",
       "tenant_not_found": "Tenant Not Found",
@@ -14939,6 +15003,8 @@ export default interface Resources {
       "desc_notify_on_failure": "Send an email notification when this job fails.",
       "desc_number_of_times_to_retry_failed_jobs": "Number of times to retry failed jobs before giving up",
       "desc_open_registration": "Allow anyone to register an account",
+      "desc_powered_by_label": "Short label shown above the image (leave blank to use the default 'Powered by' text)",
+      "desc_powered_by_url": "Makes the image clickable. Leave blank for no link.",
       "desc_used_to_verify_incoming_webhook_payloads": "Used to verify the authenticity of incoming webhook payloads",
       "do_word": "Do",
       "enable_push_notifications": "Enable Push Notifications",
@@ -14976,6 +15042,7 @@ export default interface Resources {
       "generate_thumbnails_desc": "Generate smaller thumbnail variants for listings, profiles, and cards.",
       "generated_data_for": "Generated data for {{count}} selected data types",
       "global_settings_saved_successfully": "Global settings saved successfully",
+      "god_only_chip": "God only",
       "health_check_complete": "Health Check Complete",
       "health_check_failed": "Health Check failed",
       "health_check_unreachable": "Health Check Unreachable",
@@ -15047,6 +15114,10 @@ export default interface Resources {
       "label_open_registration": "Open Registration",
       "label_package_name": "Package Name",
       "label_platform_setup_instructions": "Platform Setup Instructions",
+      "label_powered_by_image_dark": "Dark mode image (optional — falls back to light image if not set)",
+      "label_powered_by_image_light": "Light mode image",
+      "label_powered_by_label": "Label text",
+      "label_powered_by_url": "Link URL",
       "label_push_notifications": "Push Notifications",
       "label_registration_method": "Registration Method",
       "label_require_email_verification": "Require Email Verification",
@@ -15285,6 +15356,8 @@ export default interface Resources {
       "overall_status": "Overall Status",
       "overdue_jobs": "Overdue Jobs",
       "page_title": "System",
+      "partner_logo_link_url": "Partner Logo Link URL",
+      "partner_logo_link_url_description": "Optional website link for the partner logo in the footer.",
       "passed_count": "{{count}} passed",
       "pending_conversion": "Pending Conversion",
       "php_extensions": "Php Extensions",
@@ -15301,6 +15374,8 @@ export default interface Resources {
       "placeholder_max_concurrent_jobs": "Enter max concurrent jobs...",
       "placeholder_max_retries": "Enter max retries...",
       "placeholder_notification_emails": "Enter notification emails...",
+      "placeholder_powered_by_label": "Powered by",
+      "placeholder_powered_by_url": "https://example.com",
       "placeholder_project_n_e_x_u_s": "Project NEXUS...",
       "placeholder_project_nexus": "Project NEXUS...",
       "placeholder_timeout_seconds": "Enter timeout seconds...",
@@ -15310,6 +15385,9 @@ export default interface Resources {
       "platform_gcp": "GCP",
       "platform_linux_vps": "Linux / VPS",
       "please_select_a_date": "Please Select a Date",
+      "powered_by_branding_desc": "Configure the footer's right-hand 'Powered By' slot. Changes take effect immediately. God-only.",
+      "powered_by_branding_section": "Powered By Branding",
+      "powered_by_image_uploaded": "Image uploaded",
       "processing_heading": "Processing",
       "provider_available": "Provider Available",
       "provider_health_title": "Provider Health",
@@ -15468,6 +15546,7 @@ export default interface Resources {
       "registration_policy_saved_successfully": "Registration policy saved successfully",
       "registration_policy_settings_title": "Registration & Identity Verification",
       "replace": "Replace",
+      "replace_image": "Replace image",
       "require_email_verification": "Require email verification",
       "restore": "Restore",
       "restore_backup": "Restore Backup",
@@ -15536,6 +15615,8 @@ export default interface Resources {
       "total_jobs": "Total Jobs",
       "try_filters_or_run_cron": "Try adjusting your filters or run a cron job",
       "twenty_four_h_failures": "24h Failures",
+      "upload_failed": "Upload failed",
+      "upload_image": "Upload image",
       "upload_limits": "Upload Limits",
       "use_with_caution": "Use With Caution",
       "user_approved_activated": "User Approved Activated",
@@ -15627,7 +15708,7 @@ export default interface Resources {
       "desc_ai_agents": "Autonomous AI agents that propose actions and assist with platform operations",
       "desc_ai_chat": "AI-powered chat assistant for members",
       "desc_blog": "Publish articles and community news",
-      "desc_caring_community": "Integrated care hub, KISS workflow, and municipal care reporting",
+      "desc_caring_community": "Integrated care hub, Caring Community workflow, and municipal care reporting",
       "desc_connections": "Member-to-member connection requests",
       "desc_dashboard": "Personalised home dashboard for members",
       "desc_direct_messaging": "Private messaging between members",
@@ -15921,6 +16002,7 @@ export default interface Resources {
       "tab_location": "Location",
       "tab_seo": "SEO",
       "tab_social": "Social",
+      "tabs_aria": "Tenant form sections",
       "tagline_label": "Tagline",
       "tagline_placeholder": "Enter tagline...",
       "tenant_created": "Tenant created",
@@ -16159,6 +16241,7 @@ export default interface Resources {
         "set_password": "Set Password"
       },
       "aria": {
+        "edit_user_form": "Edit user",
         "remove_badge": "Remove badge: {{name}}",
         "toggle_global_super_admin": "Toggle global super admin",
         "toggle_municipal_announcer": "Toggle municipal announcer role",
@@ -16455,6 +16538,7 @@ export default interface Resources {
       "send_welcome_email": "Send Welcome Email",
       "send_welcome_email_description": "Send a welcome email with login instructions to the new user",
       "suspended": "Suspended",
+      "tabs_aria": "User status filter",
       "title": "Users",
       "user_action_failed": "User action failed",
       "user_action_success": "User Action successfully",
@@ -16590,6 +16674,7 @@ export default interface Resources {
       "applies_to_opportunity": "Opportunity",
       "applies_to_profile": "Profile",
       "applies_to_shift": "Shift",
+      "approvals_tabs_aria": "Volunteer approval status filter",
       "approve": "Approve",
       "approved_abbr": "approved",
       "approved_projects": "Approved Projects",
@@ -16689,6 +16774,7 @@ export default interface Resources {
       "col_volunteers": "Volunteers",
       "completed_projects": "Completed Projects",
       "config_desc": "Tune custom intake fields, reminders, and webhook delivery for the volunteering module.",
+      "config_tabs_aria": "Volunteer configuration sections",
       "config_title": "Volunteering settings",
       "confirm_run_reminders": "Run reminders",
       "confirm_send_test": "Are you sure you want to send test?",
@@ -16846,10 +16932,12 @@ export default interface Resources {
       "giving_day_deactivated": "Giving day deactivated",
       "giving_day_updated": "Giving day updated",
       "giving_days_desc": "Manage giving day campaigns and review donation progress.",
+      "giving_days_tabs_aria": "Giving days donor and donation sections",
       "giving_days_title": "Giving days and donations",
       "guest_donor": "Guest Donor",
       "hours_approved": "Hours approved",
       "hours_audit_desc": "Audit logged hours, approve or decline pending entries, and review payments.",
+      "hours_audit_tabs_aria": "Volunteer hours audit sections",
       "hours_audit_title": "Volunteer hours audit",
       "hours_declined": "Hours declined",
       "hours_progress_aria": "Hours progress",
@@ -17193,6 +17281,7 @@ export default interface Resources {
       "system_health": "System Health"
     },
     "load_error": "Failed to load dashboard data",
+    "loading": "Loading",
     "modules": {
       "ai_assistant": "AI Assistant",
       "ai_assistant_desc": "Configure AI providers",
@@ -17289,6 +17378,7 @@ export default interface Resources {
     "admin": "Admin",
     "admin_menu": "Admin menu",
     "admin_meta_description": "Private admin tools for managing this community.",
+    "admin_navigation": "Admin navigation",
     "advanced": "Advanced",
     "advertising": "Advertising",
     "agent_proposals": "Agent Proposals",
@@ -17349,9 +17439,10 @@ export default interface Resources {
     "caring_smart_nudges": "Smart Nudges",
     "caring_sub_regions": "Sub-Regions",
     "caring_success_stories": "Success Stories",
-    "caring_workflow": "KISS Workflow",
+    "caring_workflow": "Caring Community Workflow",
     "categories": "Categories",
     "clear_search": "Clear search",
+    "close_sidebar": "Close sidebar",
     "collapse_sidebar": "Collapse sidebar",
     "comments": "Comments",
     "communications": "Communications",
@@ -17451,7 +17542,7 @@ export default interface Resources {
     "municipal_roi": "Municipal ROI",
     "municipal_surveys": "Municipal Surveys",
     "my_profile": "My Profile",
-    "national_kiss_dashboard": "National KISS Dashboard",
+    "national_kiss_dashboard": "National Caring Community Dashboard",
     "needs_attention": "Needs Attention",
     "newsletters": "Newsletters",
     "no_results": "No results found",
@@ -17499,6 +17590,7 @@ export default interface Resources {
       "expand_sidebar": "Expand sidebar"
     },
     "sign_out": "Sign Out",
+    "skip_to_main": "Skip to main content",
     "smart_matching": "Smart Matching",
     "social_value": "Social Value",
     "starting_balances": "Starting Balances",
@@ -18229,6 +18321,13 @@ export default interface Resources {
       "profile_type_label": "Profile Type",
       "profile_type_placeholder": "Select profile type",
       "progress_aria": "Registration progress: step {{step}} of {{total}}",
+      "registration_closed_body": "This community is not accepting new registrations right now. Contact a community administrator if you need an account or were given an invitation.",
+      "registration_closed_login": "Already have an account? Sign in instead.",
+      "registration_closed_title": "Registration is closed",
+      "registration_status_checking_body": "Please wait while we confirm whether this community is open to registration.",
+      "registration_status_checking_title": "Checking registration status",
+      "registration_status_unavailable_body": "We cannot confirm whether this community is open to registration right now. Please try again later or contact a community administrator.",
+      "registration_status_unavailable_title": "Registration status unavailable",
       "show_password": "Show password",
       "sign_in_link": "Sign in",
       "step_account": "Account",
@@ -18370,9 +18469,12 @@ export default interface Resources {
     "error_load_posts": "Failed to load blog posts.",
     "error_load_posts_retry": "Failed to load blog posts. Please try again.",
     "filter_all": "All",
+    "filter_by_category": "Filter by category",
     "hero_eyebrow": "Community stories",
     "hero_posts_label": "Posts shown",
     "load_more": "Load More Posts",
+    "loading_post": "Loading blog post...",
+    "loading_posts": "Loading blog posts",
     "min_read": "{{count}} min read",
     "min_read_short": "{{count}}m",
     "page_description": "Stories, guides, and updates from the timebanking community — exchanges that worked, lessons learned, and the latest from local groups and partners.",
@@ -18482,6 +18584,7 @@ export default interface Resources {
       "tab_all": "All",
       "tab_approved": "Approved",
       "tab_flagged": "Flagged",
+      "tabs_aria": "Review archive filter",
       "title": "Review Archive"
     },
     "breadcrumbs": {
@@ -18772,6 +18875,7 @@ export default interface Resources {
       "tab_in_progress": "In Progress",
       "tab_pending": "Pending",
       "tab_pending_broker": "Pending",
+      "tabs_aria": "Exchange status filter",
       "title": "Exchange Management",
       "view_details_aria": "View Exchange Details"
     },
@@ -18836,7 +18940,7 @@ export default interface Resources {
         "retention": "Reviewed copies stay in the archive for 180 days then auto-purge (configurable in the Configuration sub-module).",
         "severity_heading": "Severity levels",
         "severity_high": "<b class=\"text-danger\">High</b> — flagged by the content scanner for keywords or patterns of concern.",
-        "severity_low": "<b class=\"text-muted\">Low</b> — routine copy for audit; no automatic concerns.",
+        "severity_low": "<b class=\"text-default-500\">Low</b> — routine copy for audit; no automatic concerns.",
         "severity_medium": "<b class=\"text-warning\">Medium</b> — sender or recipient is a flagged user (no content match).",
         "title": "How message review works"
       },
@@ -18988,6 +19092,7 @@ export default interface Resources {
       "tab_rejected": "Rejected",
       "tab_submitted": "Submitted",
       "tab_verified": "Verified",
+      "tabs_aria": "Insurance certificate status filter",
       "title": "Insurance Certificates",
       "update_failed": "Failed to update insurance certificate.",
       "update_success": "Insurance certificate updated.",
@@ -19033,6 +19138,7 @@ export default interface Resources {
       "tab_all": "All",
       "tab_pending": "Pending",
       "tab_suspended": "Suspended",
+      "tabs_aria": "Member status filter",
       "time_days_ago": "{{count}}d ago",
       "time_hours_ago": "{{count}}h ago",
       "time_just_now": "Just now",
@@ -19134,6 +19240,7 @@ export default interface Resources {
       "review_failed": "Failed to review message.",
       "review_notes_label": "Review Notes",
       "review_notes_placeholder": "Add review notes...",
+      "review_tabs_aria": "Message review filter",
       "reviewed_success": "Message marked as reviewed.",
       "severity_concern": "Concern",
       "severity_info": "Info",
@@ -19283,6 +19390,7 @@ export default interface Resources {
       "search_listing_placeholder": "Type a listing title...",
       "select_listing_error": "Please select a listing.",
       "tab_all": "All",
+      "tabs_aria": "Risk level filter",
       "tag_listing": "Tag Listing",
       "title": "Risk Tags",
       "update_tag": "Update Tag",
@@ -19332,6 +19440,7 @@ export default interface Resources {
       "collapse": "Collapse sidebar",
       "expand": "Expand sidebar",
       "full_admin": "Full Admin Panel",
+      "nav_label": "Broker navigation",
       "section_compliance": "Compliance & Oversight",
       "section_daily": "Daily Workflow",
       "section_overview": "Overview",
@@ -19467,7 +19576,7 @@ export default interface Resources {
       "tab_rejected": "Rejected",
       "tab_submitted": "Submitted",
       "tab_verified": "Verified",
-      "tabs_aria": "Vetting status tabs",
+      "tabs_aria": "Vetting status filter",
       "title": "Vetting & DBS",
       "toast_bulk_failed": "Bulk action failed.",
       "toast_bulk_failed_suffix": " ({{count}} failed)",
@@ -20449,6 +20558,7 @@ export default interface Resources {
       "selected_label": "Selected:",
       "title": "Browse federated communities"
     },
+    "loading": "Loading...",
     "onboarding": {
       "change_answer": "Change answer",
       "choice_browse": "Show me everything",
@@ -20566,6 +20676,7 @@ export default interface Resources {
           "warmth_pass": "Warmth Pass",
           "workflow": "Caring Workflow"
         },
+        "nav_label": "Caring community navigation",
         "no_search_results": "No matching pages",
         "search_aria": "Search caring admin pages",
         "search_placeholder": "Search pages",
@@ -20702,6 +20813,7 @@ export default interface Resources {
     "input_aria": "Message",
     "input_placeholder": "Ask me anything... (Enter to send, Shift+Enter for new line)",
     "limits_left_today": "{{count}} left today",
+    "messages_region": "Chat messages",
     "new_conversation_aria": "Start new conversation",
     "page_meta": {
       "title": "AI Chat"
@@ -20743,6 +20855,7 @@ export default interface Resources {
     "error_loading": "Couldn't load your digest. Please try again.",
     "intro_body": "A personalised feed of announcements, projects, events, services and alerts in your community — filtered by your sub-region, language and interests.",
     "intro_title": "What's happening near you",
+    "loading": "Loading...",
     "open_link": "Open",
     "page_title": "Your civic digest",
     "prefs_cadence_daily": "Daily summary",
@@ -20788,7 +20901,7 @@ export default interface Resources {
   },
   "common": {
     "accessibility": {
-      "accessibility_alpha_new_tab": "Open Accessibility (alpha) in a new tab",
+      "accessibility_alpha_new_tab": "Open WCAG 2.2 AA accessible version in a new tab",
       "breadcrumb": "Breadcrumb",
       "close": "Close",
       "close_menu": "Close menu",
@@ -20944,6 +21057,8 @@ export default interface Resources {
       "engage_navigation": "Engage navigation",
       "explore_navigation": "Explore navigation",
       "federation_navigation": "Federation navigation",
+      "feed_sidebar": "Community sidebar",
+      "filter_panel": "Filter panel",
       "grid_view": "Grid view",
       "italic": "Italic",
       "legal_navigation": "Legal navigation",
@@ -20959,6 +21074,7 @@ export default interface Resources {
       "open_search": "Open search",
       "partner_communities_navigation": "Partner communities navigation",
       "post_content_editor": "Post content editor",
+      "remove": "Remove",
       "scroll_left": "Scroll left",
       "scroll_right": "Scroll right",
       "search_skills": "Search skills",
@@ -20967,6 +21083,7 @@ export default interface Resources {
       "timebanking_navigation": "Timebanking navigation",
       "underline": "Underline",
       "user_actions": "User actions",
+      "user_menu_trigger": "User menu for {{name}}",
       "verification_badges": "Verification badges",
       "view_mode": "View mode"
     },
@@ -20989,7 +21106,7 @@ export default interface Resources {
         "hour_gift": "Gift Hours",
         "hour_gift_sub": "Give your banked hours to family or friends.",
         "hour_transfer": "Transfer Hours",
-        "hour_transfer_sub": "Move banked hours to another KISS cooperative.",
+        "hour_transfer_sub": "Move banked hours to another Caring Community cooperative.",
         "log_hours": "Log hours",
         "log_hours_sub": "Record volunteering time for approval",
         "loyalty_history": "My Time Credit Redemptions",
@@ -21086,7 +21203,7 @@ export default interface Resources {
           "description": "The module prepares the surface for canton, municipality, and cooperative impact reporting.",
           "title": "Municipal value"
         },
-        "subtitle": "Designed for KISS-style reciprocal support",
+        "subtitle": "Designed for Caring Community reciprocal support",
         "title": "Operating model",
         "trusted_requests": {
           "description": "Members can ask for practical support through time-bank listings and coordinator-led volunteering.",
@@ -21163,6 +21280,7 @@ export default interface Resources {
       "placeholder_hours": "1",
       "placeholder_url": "https://example.com"
     },
+    "confirm": "Confirm",
     "cookie_consent": {
       "accept_all": "Accept all",
       "always_on": "Always on",
@@ -21342,6 +21460,10 @@ export default interface Resources {
       "request_access_body": "Partner API access is provisioned by your community administrator. Contact them to get a client_id / client_secret pair.",
       "request_access_cta": "Request access",
       "scope_label": "Scope",
+      "tabs": {
+        "code_examples": "Code examples",
+        "verification_examples": "Verification examples"
+      },
       "webhook_create_body": "POST /api/partner/v1/webhooks/subscriptions with event_types (array) and target_url (https only). The response includes a one-time secret — store it.",
       "webhook_create_title": "Create a subscription",
       "webhook_event_wallet_credited": "wallet.credited — fires when a partner credits time hours via /wallet/credit",
@@ -21535,9 +21657,9 @@ export default interface Resources {
         "submit_failed": "Could not request the transfer. Please try again."
       },
       "form": {
-        "destination_help": "The slug of the destination KISS cooperative or tenant",
+        "destination_help": "The slug of the destination Caring Community cooperative or tenant",
         "destination_label": "Destination cooperative",
-        "destination_placeholder": "e.g. zug-kiss",
+        "destination_placeholder": "e.g. zug-cooperative",
         "hours_label": "Hours to transfer",
         "hours_placeholder": "e.g. 25.5",
         "reason_label": "Reason (optional)",
@@ -21556,7 +21678,7 @@ export default interface Resources {
         "title": "Your transfer history"
       },
       "meta": {
-        "description": "Move your banked hours to another KISS cooperative",
+        "description": "Move your banked hours to another Caring Community cooperative",
         "title": "Transfer Banked Hours"
       },
       "status": {
@@ -21631,7 +21753,7 @@ export default interface Resources {
     },
     "inter_gen": {
       "badge": "Intergenerational",
-      "tooltip": "This support relationship spans generations — a hallmark of the KISS model."
+      "tooltip": "This support relationship spans generations — a hallmark of the Caring Community model."
     },
     "invite": {
       "error": {
@@ -21920,7 +22042,8 @@ export default interface Resources {
     },
     "nav": {
       "about": "About",
-      "accessibility_alpha": "Accessibility (alpha)",
+      "accessibility_alpha": "WCAG 2.2 AA",
+      "accessibility_alpha_tooltip": "Enhanced accessible version — WCAG 2.2 AA compliant. Opens in a new tab.",
       "achievements": "Achievements",
       "activity": "Activity",
       "ai_chat": "AI Assistant",
@@ -21985,7 +22108,7 @@ export default interface Resources {
     },
     "nav_desc": {
       "about": "About this community",
-      "accessibility_alpha": "Open the accessibility-first alpha frontend",
+      "accessibility_alpha": "Open the WCAG 2.2 AA accessible version",
       "achievements": "Badges & milestones",
       "activity": "Your recent activity log",
       "ai_chat": "AI-powered community assistant",
@@ -22108,6 +22231,8 @@ export default interface Resources {
     },
     "partner_analytics": {
       "age_distribution": "Age distribution",
+      "area_chart_aria": "Area chart showing partner trends over time",
+      "bar_chart_aria": "Bar chart showing partner performance metrics",
       "category_short": "cat",
       "distinct_visitors": "Distinct visitors",
       "download_pdf": "Download PDF",
@@ -22118,6 +22243,7 @@ export default interface Resources {
       "error_unauthorized": "Your subscription token is invalid or expired.",
       "footfall_by_area": "Page views by area",
       "gender_distribution": "Gender distribution",
+      "line_chart_aria": "Line chart showing partner activity over time",
       "match_heatmap": "Match-rate cells",
       "metric_active_members": "Active members",
       "metric_categories": "Categories",
@@ -22134,6 +22260,7 @@ export default interface Resources {
       "period_90d": "Last 90 days",
       "period_label": "Period",
       "period_year": "Last year",
+      "pie_chart_aria": "Pie chart showing distribution of partner data",
       "privacy_footer": "All metrics are bucketed and anonymised. Segments with N<10 are suppressed.",
       "reports_title": "Monthly reports",
       "requests": "Requests",
@@ -22228,7 +22355,7 @@ export default interface Resources {
         "agoris_node": "Caring Community Node",
         "caring_community": "Caring community",
         "community": "General community / timebank",
-        "kiss_cooperative": "KISS cooperative"
+        "kiss_cooperative": "Caring Community cooperative"
       },
       "errors": {
         "captcha_failed": "Please answer the security question correctly.",
@@ -22509,6 +22636,7 @@ export default interface Resources {
         "title": "Regional points are not enabled here"
       }
     },
+    "release_stage": "Generally Available (v1.5.1)",
     "release_status": {
       "changelog_link": "Changelog",
       "features_link": "Features",
@@ -22747,6 +22875,7 @@ export default interface Resources {
       "translated_label": "Translated",
       "translating": "Translating…"
     },
+    "user_fallback": "User",
     "user_menu": {
       "admin": "Admin",
       "admin_panel": "Admin Panel",
@@ -22960,6 +23089,13 @@ export default interface Resources {
       "title": "Import club members"
     },
     "verification": {
+      "badge": {
+        "admin_verified": "Admin Verified",
+        "dbs_checked": "DBS Checked",
+        "email_verified": "Email Verified",
+        "id_verified": "ID Verified",
+        "phone_verified": "Phone Verified"
+      },
       "not_id_verified": "Not ID Verified"
     },
     "verification_status": "Verification Status",
@@ -23098,6 +23234,7 @@ export default interface Resources {
       "not_found": "Organisation not found.",
       "opportunities": "Opportunities",
       "page_title": "Organisation",
+      "rating_sr": "{{n}} out of 5 stars",
       "remote": "Remote",
       "review_count": "{{count}} reviews",
       "reviews": "Reviews",
@@ -23140,6 +23277,7 @@ export default interface Resources {
       "hero_partners_label": "Partners shown",
       "hours_logged": "{{hours}}h logged",
       "load_more": "Load More",
+      "loading": "Loading organisations",
       "no_organisations_available": "No volunteer organisations available yet",
       "no_organisations_found": "No organisations found",
       "opportunity_count_one": "{{count}} opportunity",
@@ -23285,6 +23423,7 @@ export default interface Resources {
     "empty_no_sent_title": "No sent requests",
     "find_members": "Find Members",
     "load_more": "Load more",
+    "loading": "Loading connections...",
     "message": "Message",
     "page_meta": {
       "title": "Connections"
@@ -23347,6 +23486,7 @@ export default interface Resources {
       "subtitle": "Coordinate help requests, time offers, verified volunteering hours, and trusted support from one place.",
       "title": "Caring Community"
     },
+    "comments_count": "{{count}} comments",
     "common": {
       "loading": "Loading"
     },
@@ -23374,6 +23514,7 @@ export default interface Resources {
       "empty_description": "Groups help you follow shared interests, projects, and local circles.",
       "members_count": "{{count}} members"
     },
+    "likes_count": "{{count}} likes",
     "listings": {
       "create_first": "Create your first listing",
       "empty": "No recent listings",
@@ -25115,20 +25256,22 @@ export default interface Resources {
       "attendees": "Attendees",
       "browse_events": "Browse Events",
       "cancel": "Cancel",
-      "cancel_confirm": "Are you sure you want to cancel “{{title}}”? This will notify all attendees.",
+      "cancel_confirm": "Are you sure you want to cancel \"{{title}}\"? This will notify all attendees.",
       "cancel_event": "Cancel Event",
       "cancel_event_aria": "Cancel {{title}}",
       "cancel_modal_title": "Cancel Event",
+      "cancel_reason_label": "Reason for cancellation",
       "cancel_reason_placeholder": "Reason for cancellation (optional)",
       "cancellation_reason": "Reason: {{reason}}",
       "capacity_label": "Capacity",
       "check_in": "Check in",
       "checkin_progress": "Check-in Progress",
+      "checkin_progress_chart_aria": "Check-in progress: {{percent}}% of capacity",
       "community_member": "Community Member",
       "cover_alt": "Cover for {{title}}",
       "date_label": "Date",
       "delete": "Delete",
-      "delete_confirm": "Are you sure you want to delete “{{title}}”? This action cannot be undone.",
+      "delete_confirm": "Are you sure you want to delete \"{{title}}\"? This action cannot be undone.",
       "delete_confirm_btn": "Delete Event",
       "delete_event_aria": "Delete {{title}}",
       "delete_modal_title": "Delete Event",
@@ -25186,6 +25329,7 @@ export default interface Resources {
       "tab_attendees": "Attendees",
       "tab_checkin": "Check-in",
       "tab_details": "Details",
+      "tabs_aria": "Event detail sections",
       "time_label": "Time",
       "try_again": "Try Again",
       "unable_to_load": "Unable to Load Event",
@@ -25314,6 +25458,7 @@ export default interface Resources {
     "load_more": "Load More Events",
     "load_more_count": "Load more ({{remaining}} remaining)",
     "loading_aria": "Loading events",
+    "loading_more_aria": "Loading more events",
     "near_me": "Near me",
     "near_me_no_location": "Set your location in your profile to use Near me",
     "nearby_error": "Unable to load nearby events",
@@ -25330,6 +25475,7 @@ export default interface Resources {
     },
     "page_title": "Events",
     "polls": {
+      "loading": "Loading polls...",
       "status_closed": "Closed",
       "status_open": "Open",
       "title": "Event Polls",
@@ -25420,6 +25566,7 @@ export default interface Resources {
       "proposed_hours": "Proposed Hours",
       "provider": "Provider",
       "rate_exchange": "Rate This Exchange",
+      "rating_value": "Rating: {{rating}} out of 5",
       "ratings": "Ratings",
       "requester": "Requester",
       "service": "Service",
@@ -25453,6 +25600,7 @@ export default interface Resources {
     "hours_count": "{{count}} hour",
     "hours_count_other": "{{count}} hours",
     "load_more": "Load More",
+    "loading": "Loading exchanges...",
     "modal": {
       "cancel": "Cancel",
       "cancel_description": "Are you sure you want to cancel this exchange? This action cannot be undone.",
@@ -25561,7 +25709,8 @@ export default interface Resources {
       "members": "{{count}} members",
       "subtitle": "Connect with like-minded members",
       "title": "Active Groups",
-      "view_group": "View Group"
+      "view_group": "View Group",
+      "view_group_named": "View group: {{name}}"
     },
     "aria": {
       "content_tabs": "Explore content tabs"
@@ -25634,6 +25783,7 @@ export default interface Resources {
       "subtitle": "Have your say on community topics",
       "title": "Active Polls",
       "vote_now": "Vote Now",
+      "vote_now_for": "Vote now on: {{question}}",
       "votes": "{{count}} votes"
     },
     "popular_listings": {
@@ -25740,6 +25890,7 @@ export default interface Resources {
       "tab_connected": "Connected",
       "tab_received": "Received",
       "tab_sent": "Sent",
+      "tabs_aria": "Federation connection status",
       "title": "Federation Connections",
       "try_again": "Try Again",
       "unknown_member": "Unknown Member"
@@ -26024,6 +26175,9 @@ export default interface Resources {
       "subject_placeholder": "What is this message about?",
       "subtitle": "Send and receive messages with members from partner communities.",
       "the_recipient": "the recipient",
+      "thread_aria_no_unread": "Conversation with {{name}} from {{tenant}}",
+      "thread_aria_unread": "Conversation with {{name}} from {{tenant}}, {{count}} unread message",
+      "thread_aria_unread_plural": "Conversation with {{name}} from {{tenant}}, {{count}} unread messages",
       "title": "Federation Messages",
       "toast_compose_sent": "Message sent to {{name}}",
       "toast_error": "Error",
@@ -26466,6 +26620,7 @@ export default interface Resources {
       "listing_preview_alt": "Listing preview",
       "listing_title_label": "Title",
       "listing_title_placeholder": "What are you offering or looking for?",
+      "listing_type_label": "Listing type",
       "location_from_profile": "From your profile — update in Settings",
       "location_label": "Location",
       "location_placeholder": "Search for a location...",
@@ -26527,6 +26682,7 @@ export default interface Resources {
       "template_post_achievement": "Share an achievement",
       "template_post_help": "Ask for help",
       "template_post_recommend": "Recommend someone",
+      "type_tabs_aria": "Compose content type",
       "underline": "Underline",
       "upload_preview_alt": "Upload preview {{number}}",
       "video": "Video",
@@ -26537,6 +26693,7 @@ export default interface Resources {
       "voice_stop": "Stop recording",
       "voice_unsupported": "Voice input not supported in this browser"
     },
+    "controls_region_label": "Feed controls",
     "create_poll_aria": "Create poll",
     "create_post": "Create Post",
     "empty_desc": "Be the first to share something with your community!",
@@ -27195,6 +27352,7 @@ export default interface Resources {
       },
       "period_aria": "Leaderboard period",
       "period_placeholder": "Period",
+      "retry": "Retry loading leaderboard",
       "score_unit": {
         "credits": "cr",
         "hours": "h",
@@ -27252,6 +27410,7 @@ export default interface Resources {
       "category_progress_aria": "{{category}}: {{score}} of {{max}}",
       "insights_title": "How to improve",
       "load_error": "Could not load your NexusScore. Please try again.",
+      "loading": "Loading your NexusScore...",
       "max_score_label": "/ {{max}}",
       "max_tier": "You have reached the highest tier!",
       "my_profile": "My Profile",
@@ -27572,6 +27731,8 @@ export default interface Resources {
     "participants_count_other": "{{count}} participants",
     "role_organizer": "You organized",
     "role_participant": "Participant",
+    "role_provider": "Provider",
+    "role_receiver": "Receiver",
     "split_type": {
       "custom": "Custom split",
       "equal": "Equal split",
@@ -27695,6 +27856,7 @@ export default interface Resources {
       "dropdown_aria": "Announcement actions",
       "heading": "Announcements",
       "load_failed": "Failed to load announcements",
+      "loading": "Loading announcements...",
       "new": "New Announcement",
       "no_announcements_admin_desc": "Create an announcement to share with the group",
       "no_announcements_desc": "No announcements have been posted yet",
@@ -27797,11 +27959,13 @@ export default interface Resources {
       "discussion_title_placeholder": "What do you want to discuss?",
       "discussions_heading": "Discussions",
       "error_load_failed": "Failed to load group. Please try again.",
+      "events_loading": "Loading group events...",
       "feed_create_post": "Create Post",
       "feed_create_post_aria": "Create a group post",
       "feed_empty_desc": "Be the first to share something with this group!",
       "feed_empty_title": "No posts yet",
       "feed_load_more": "Load More",
+      "feed_loading": "Loading group feed...",
       "feed_whats_on_your_mind": "What's on your mind?",
       "generate_link": "Generate Invite Link",
       "group_events_heading": "Group Events",
@@ -27833,6 +27997,7 @@ export default interface Resources {
       "link_copied": "Link copied!",
       "load_more_discussions": "Load More Discussions",
       "loading": "Loading group...",
+      "loading_replies": "Loading replies...",
       "location_title": "Group Location",
       "make_private_aria": "Make group private",
       "make_public_aria": "Make group public",
@@ -28089,6 +28254,7 @@ export default interface Resources {
       "video_thumbnail": "Video thumbnail",
       "videos": "videos"
     },
+    "member_fallback": "User",
     "member_status": "Member",
     "members": "{{count}} members",
     "members_count_label": "{{count}} members",
@@ -28148,6 +28314,7 @@ export default interface Resources {
       "load_error": "Failed to load question",
       "load_more": "Load More",
       "loading": "Loading questions",
+      "loading_detail": "Loading question details...",
       "no_results": "No questions match your search",
       "post_answer": "Post Answer",
       "question_asked_error": "Failed to post question",
@@ -28311,6 +28478,7 @@ export default interface Resources {
       "history_aria": "View revision history",
       "load_failed": "Failed to load wiki pages",
       "loading": "Loading wiki",
+      "loading_page": "Loading wiki page...",
       "new_page": "New Page",
       "no_pages_sidebar": "No pages yet",
       "no_parent": "Top Level",
@@ -28407,6 +28575,7 @@ export default interface Resources {
       "empty_title": "No Challenges Yet",
       "load_error": "Unable to load challenges",
       "load_more": "Load More",
+      "loading": "Loading challenge...",
       "title": "Challenges"
     },
     "chatrooms": {
@@ -28422,6 +28591,7 @@ export default interface Resources {
     },
     "comments": {
       "add_button": "Post Comment",
+      "add_label": "Add a comment",
       "add_placeholder": "Share your thoughts...",
       "delete": "Delete",
       "delete_confirm": "Are you sure you want to delete this comment?",
@@ -28429,6 +28599,7 @@ export default interface Resources {
       "empty_title": "No Comments Yet",
       "load_error": "Unable to load comments",
       "load_more": "Load More Comments",
+      "loading": "Loading comments...",
       "title": "Comments"
     },
     "convert_to_group": {
@@ -28576,6 +28747,7 @@ export default interface Resources {
       "empty_title": "No Ideas Yet",
       "load_error": "Unable to load ideas",
       "load_more": "Load More Ideas",
+      "loading": "Loading ideas...",
       "new_idea": "New Idea",
       "publish_draft": "Publish Idea",
       "save_draft": "Save Draft",
@@ -28593,6 +28765,7 @@ export default interface Resources {
       "your_drafts": "Your Drafts",
       "your_ideas": "Your ideas: {{count}}/{{max}}"
     },
+    "loading": "Loading...",
     "media": {
       "add": "Add Attachment",
       "add_image": "Add Image",
@@ -28669,6 +28842,7 @@ export default interface Resources {
       "open": "Open",
       "voting": "Voting"
     },
+    "tabs_filter_aria": "Filter challenges",
     "tags": {
       "general": "General Tags",
       "helper": "Add skills or topics relevant to this challenge",
@@ -29247,9 +29421,11 @@ export default interface Resources {
       "salary_monthly": "Monthly",
       "select_applicant": "Select {{name}}",
       "tab_activity": "Activity Log",
-      "tab_pipeline": "Pipeline"
+      "tab_pipeline": "Pipeline",
+      "tabs_aria": "Job pipeline sections"
     },
     "load_more": "Load More",
+    "loading": "Loading vacancies...",
     "location_not_specified": "Location not specified",
     "match": {
       "ai_summary_label": "AI Assessment",
@@ -29682,6 +29858,7 @@ export default interface Resources {
       "open": "Open"
     },
     "subtitle": "Find opportunities in your community",
+    "tabs_aria": "Jobs view",
     "talent_search": {
       "clear_filters": "Clear Filters",
       "days_ago": "{{count}} days ago",
@@ -29790,9 +29967,15 @@ export default interface Resources {
   },
   "kb": {
     "all_categories": "All",
+    "article_count_one": "{{count}} article",
+    "article_count_other": "{{count}} articles",
     "attachments": "Attachments",
     "author_by": "by {{name}}",
     "back_to_kb": "Back to Knowledge Base",
+    "breadcrumb": "Breadcrumb",
+    "category_count_one": "{{count}} category",
+    "category_count_other": "{{count}} categories",
+    "category_tabs_aria": "Knowledge base categories",
     "description": "Find answers, guides, and helpful resources",
     "empty": {
       "no_articles": "No knowledge base articles have been published yet.",
@@ -29824,13 +30007,16 @@ export default interface Resources {
     "feedback_failed": "Failed to submit feedback.",
     "feedback_thanks": "Thank you for your feedback!",
     "general_category": "General",
+    "loading": "Loading knowledge base...",
     "page_description": "Articles, guides, and tutorials for the community.",
     "page_title": "Knowledge Base",
     "related_articles": "Related Articles",
     "search_aria": "Search the knowledge base",
     "search_placeholder": "Search the knowledge base...",
+    "search_results": "{{count}} results for \"{{query}}\"",
     "search_results_one": "{{count}} result for “{{query}}”",
     "search_results_other": "{{count}} results for “{{query}}”",
+    "searching": "Searching...",
     "sub_articles_one": "{{count}} sub-article",
     "sub_articles_other": "{{count}} sub-articles",
     "title": "Knowledge Base",
@@ -30752,6 +30938,7 @@ export default interface Resources {
     "filter_any_mode": "Any mode",
     "filter_any_time": "Any time",
     "filter_category_label": "Category",
+    "filter_form_label": "Filter listings",
     "filter_full_day": "Full day (6h+)",
     "filter_half_day": "Half day (3-6h)",
     "filter_hours": "Duration",
@@ -30881,6 +31068,7 @@ export default interface Resources {
     "load_more_error": "Failed to load more listings",
     "load_more_error_persistent": "Failed to load more listings. Please try again.",
     "loading": "Loading listing...",
+    "loading_progress": "Loading listings",
     "map_empty": "No listings with location data",
     "map_view_listing": "View listing",
     "more_filters": "More filters",
@@ -30986,6 +31174,8 @@ export default interface Resources {
       "suggested_reply": "AI Suggested Reply",
       "use_reply": "Use This Reply"
     },
+    "breadcrumb": "Breadcrumb",
+    "buyer_orders_tabs_aria": "Buyer order status filter",
     "categories": {
       "all": "All",
       "label": "Filter by category"
@@ -31018,6 +31208,7 @@ export default interface Resources {
       "search_placeholder": "Search in {{name}}...",
       "sell_something": "Sell Something"
     },
+    "category_filter_label": "Filter by category",
     "checkout": {
       "cancel": "Cancel",
       "close": "Close",
@@ -31068,6 +31259,7 @@ export default interface Resources {
       "subtitle": "Organize and track your favorite marketplace items",
       "tab_collections": "Collections"
     },
+    "collections_tabs_aria": "Marketplace collections sections",
     "common": {
       "cancel": "Cancel",
       "dismiss": "Dismiss",
@@ -31436,6 +31628,7 @@ export default interface Resources {
       "title": "My Listings",
       "views_count_aria": "{{count}} views"
     },
+    "my_listings_tabs_aria": "My listings status filter",
     "my_offers": {
       "accepted_success": "Offer accepted",
       "action_error": "Action failed",
@@ -31460,6 +31653,7 @@ export default interface Resources {
       "title": "My Offers",
       "withdrawn_success": "Offer withdrawn"
     },
+    "my_offers_tabs_aria": "My offers sections",
     "offer": {
       "above_price": "{{percent}}% above the listing price",
       "accept": "Accept",
@@ -31692,6 +31886,7 @@ export default interface Resources {
       "meta_description": "Search and filter items in the community marketplace.",
       "no_results_description": "Try adjusting your search or filters to find what you're looking for.",
       "no_results_title": "No Results Found",
+      "page_heading": "Search Marketplace",
       "page_title": "Search Marketplace",
       "posted_within": "Posted Within",
       "price_from": "From {{min}}",
@@ -31738,6 +31933,8 @@ export default interface Resources {
       "view_listings": "View {{name}}'s marketplace listings.",
       "view_profile": "View Profile"
     },
+    "seller_orders_tabs_aria": "Seller order status filter",
+    "seller_profile_tabs_aria": "Seller profile sections",
     "shipping": {
       "add_error": "Failed to add shipping option",
       "add_option": "Add Shipping Option",
@@ -31792,8 +31989,10 @@ export default interface Resources {
     "empty_title_all": "No matches yet",
     "empty_title_filtered": "No {{source}} matches",
     "filter_all": "All",
+    "filter_tabs_aria": "Match source filter",
     "heading": "Your Matches",
     "load_failed": "Failed to load matches",
+    "loading": "Loading matches...",
     "match_hidden": "Match hidden — we'll show you fewer like this",
     "not_interested": "Not interested",
     "page_meta": {
@@ -31986,6 +32185,7 @@ export default interface Resources {
     "load_failed": "Failed to load conversations",
     "load_older_hint": "Scroll up or tap to load older messages",
     "loading": "Loading conversation...",
+    "loading_older": "Loading older messages",
     "member_search_empty": "No members found",
     "member_search_hint": "Start typing to search for members",
     "member_search_placeholder": "Search for a member...",
@@ -32097,6 +32297,7 @@ export default interface Resources {
     "form_title": "Submit feedback",
     "intro_body": "Send a question, suggest an idea, report an issue, or share how you're feeling about life in our community. Your municipality coordinators read every submission.",
     "intro_title": "Two-way feedback inbox",
+    "loading": "Loading...",
     "my_submissions_empty": "You haven't sent any feedback yet.",
     "my_submissions_title": "My recent submissions",
     "page_title": "Municipality Feedback",
@@ -32246,6 +32447,7 @@ export default interface Resources {
     "aria_completed": " (completed)",
     "aria_current": " (current)",
     "aria_step": "Step {{step}}: {{label}}{{status}}",
+    "aria_step_progress": "Step {{step}} of {{total}}",
     "aria_upload_photo": "Upload profile photo",
     "back": "Back",
     "benefit_community_desc": "Connect with neighbours and strengthen local bonds",
@@ -32395,7 +32597,7 @@ export default interface Resources {
       "country": "Country",
       "existing_tool": "Which tool?",
       "has_existing_tool": "Already using a digital tool",
-      "has_kiss": "KISS cooperative present in your area",
+      "has_kiss": "Caring Community cooperative present in your area",
       "modules": "Modules of interest",
       "municipality_name": "Municipality name",
       "notes": "Additional notes",
@@ -32452,6 +32654,7 @@ export default interface Resources {
       "anonymous": "Anonymous",
       "ranked": "Ranked"
     },
+    "category_filter_label": "Filter by category",
     "category_label": "Category (optional)",
     "category_placeholder": "e.g. Community, Events, Feedback",
     "collapse": "Collapse",
@@ -32483,6 +32686,7 @@ export default interface Resources {
     "expired": "Expired",
     "expires_at": "End date (optional)",
     "load_more": "Load More",
+    "loading": "Loading polls...",
     "no_deadline": "Leave blank for no deadline",
     "option_placeholder": "Option {{number}}",
     "options": "Options",
@@ -32532,6 +32736,9 @@ export default interface Resources {
     "try_again": "Try Again",
     "view_ranked_results": "View Ranked Results",
     "vote": "Vote",
+    "vote_for_option": "Vote for {{option}} in: {{question}}",
+    "vote_now": "Vote Now",
+    "vote_now_for": "Vote now on: {{question}}",
     "voted": "You voted",
     "votes": "votes",
     "votes_one": "vote",
@@ -32818,6 +33025,7 @@ export default interface Resources {
       "subtitle": "Publish initiatives and milestone updates that members can subscribe to.",
       "title": "Project announcements"
     },
+    "loading": "Loading",
     "meta_title": "Project Announcements",
     "progress_value": "{{value}}%",
     "status": {
@@ -33675,7 +33883,9 @@ export default interface Resources {
       "maintenance": {
         "title": "Maintenance"
       }
-    }
+    },
+    "release_stage": "Generally Available (v1.5.1)",
+    "unknown_error": "Unknown error"
   },
   "reviews": {
     "given": {
@@ -33690,6 +33900,7 @@ export default interface Resources {
       "empty_subtitle": "You're all caught up! Reviews for your completed exchanges will appear here.",
       "write_review": "Write Review"
     },
+    "rating_aria": "{{n}} out of 5 stars",
     "received": {
       "empty": "No reviews received yet",
       "empty_subtitle": "Complete exchanges with community members to start earning reviews."
@@ -33748,6 +33959,7 @@ export default interface Resources {
     "filter_skills_placeholder": "Add a skill tag...",
     "filter_sort_by": "Sort By",
     "filter_to_date": "To Date",
+    "form_aria": "Search",
     "hero_eyebrow": "Search across the community",
     "hours_estimate": "{{hours}}h",
     "hours_unknown": "Time not set",
@@ -33756,6 +33968,7 @@ export default interface Resources {
     "initial_tip_people": "People",
     "initial_tip_services": "Services",
     "initial_title": "Start searching",
+    "listing_image_alt": "Listing image",
     "listing_offering": "Offering",
     "listing_requesting": "Requesting",
     "members_count": "{{count}} members",
@@ -33767,6 +33980,7 @@ export default interface Resources {
       "title": "Search"
     },
     "page_title": "Search",
+    "results_count_announcement": "{{count}} results found",
     "results_label": "Results found",
     "run_search": "Run search",
     "save": "Save",
@@ -33787,6 +34001,7 @@ export default interface Resources {
     "tab_groups": "Groups ({{count}})",
     "tab_listings": "Listings ({{count}})",
     "tab_members": "Members ({{count}})",
+    "tabs_aria": "Search result type filter",
     "title": "Search",
     "toast": {
       "search_failed": "Search failed"
@@ -34229,6 +34444,7 @@ export default interface Resources {
     "sessions_coming_soon": "Session management coming soon",
     "skills": {
       "description": "Add skills to your profile so other members can find you. Community members can endorse your skills.",
+      "loading": "Loading skills...",
       "title": "Your Skills"
     },
     "sub_accounts": {
@@ -34288,6 +34504,7 @@ export default interface Resources {
       "skills": "Skills",
       "translation": "Translation"
     },
+    "tabs_aria": "Settings sections",
     "theme": {
       "dark": "Dark",
       "light": "Light",
@@ -34390,6 +34607,7 @@ export default interface Resources {
     "twofa_enable": "Enable",
     "twofa_enabled": "Enabled",
     "twofa_enter_code": "Enter 6-digit code",
+    "twofa_loading_setup": "Loading two-factor setup...",
     "twofa_manual_key": "Manual entry key:",
     "twofa_not_enabled": "Not enabled",
     "twofa_qr_alt": "2FA QR Code",
@@ -34448,6 +34666,7 @@ export default interface Resources {
       "empty_desc": "Tap the bookmark icon on posts, listings, events, and more to save them here.",
       "empty_title": "No saved items yet",
       "load_more": "Load More",
+      "loading": "Loading bookmarks...",
       "meta_description": "Review and organize your saved posts, listings, events, jobs, blog posts, and discussions.",
       "new_collection": "New Collection",
       "page_title": "Saved",
@@ -34469,9 +34688,13 @@ export default interface Resources {
     "cannot_share_own_content": "You cannot share your own content to feed",
     "close_comments": "Close comments",
     "comment_action": "Comment",
+    "comments": {
+      "edit_label": "Edit comment"
+    },
     "comments_count_one": "{{count}} comment",
     "comments_count_other": "{{count}} comments",
     "comments_title": "Comments",
+    "content_type_tabs_aria": "Bookmark content type filter",
     "copy_failed": "Failed to copy link",
     "copy_link": "Copy Link",
     "delete": "Delete",
@@ -34536,6 +34759,7 @@ export default interface Resources {
       "sad": "Sad",
       "wow": "Wow"
     },
+    "reactions_tabs_aria": "Reaction type filter",
     "reply": "Reply",
     "save": "Save",
     "send_comment": "Send comment",
@@ -34562,6 +34786,7 @@ export default interface Resources {
       "set_custom_desc": "Set a custom status message",
       "set_custom_title": "Set Custom Status",
       "set_status": "Set status",
+      "set_status_current": "Set status (currently: {{status}})",
       "status_label": "Status",
       "status_placeholder": "In a meeting"
     },
@@ -35738,6 +35963,31 @@ export default interface Resources {
     "coming_soon": {
       "dashboard": "Dashboard",
       "description": "{{feature}} is currently under development. Check back soon!",
+      "features": {
+        "achievements": "Achievements",
+        "ai_assistant": "AI Assistant",
+        "caring_community": "Caring Community",
+        "connections": "Connections",
+        "coupons": "Coupons",
+        "events": "Events",
+        "exchanges": "Exchanges",
+        "federation": "Federation",
+        "goals": "Goals",
+        "group_exchanges": "Group Exchanges",
+        "groups": "Groups",
+        "ideation_challenges": "Ideation Challenges",
+        "job_vacancies": "Job Vacancies",
+        "knowledge_base": "Knowledge Base",
+        "leaderboard": "Leaderboard",
+        "marketplace": "Marketplace",
+        "members_directory": "Members Directory",
+        "nexus_score": "NexusScore",
+        "organisations": "Organisations",
+        "polls": "Polls",
+        "regional_points": "Regional Points",
+        "resources": "Resources",
+        "volunteering": "Volunteering"
+      },
       "go_back": "Go Back",
       "heading": "Coming Soon",
       "page_title": "Coming Soon"
@@ -35877,12 +36127,14 @@ export default interface Resources {
       "file_too_large": "File is too large ({{size}}). Maximum size is 10MB.",
       "file_type_not_allowed": "File type .{{ext}} is not allowed. Supported: {{supported}}",
       "filter_all": "All",
+      "filter_by_category": "Filter by category",
       "heading": "Resources",
       "hero_eyebrow": "Community knowledge library",
       "hero_resources_label": "Resources shown",
       "hide_categories": "Hide categories",
       "invalid_file": "Invalid file",
       "load_more": "Load More",
+      "loading": "Loading resources",
       "no_file_selected": "No file selected",
       "no_resources_found": "No resources found",
       "no_resources_shared": "No resources have been shared yet",
@@ -35967,6 +36219,7 @@ export default interface Resources {
       "filter_all": "All",
       "filter_approved": "Approved",
       "filter_declined": "Declined",
+      "filter_label": "Filter applications",
       "filter_pending": "Pending",
       "for_opportunity": "For: {{title}}",
       "heading": "Applications",
@@ -36296,6 +36549,7 @@ export default interface Resources {
     "feature_not_available_desc": "The volunteering feature is not enabled for this community.",
     "filter_all": "All",
     "filter_approved": "Approved",
+    "filter_by_status": "Filter by status",
     "filter_declined": "Declined",
     "filter_pending": "Pending",
     "form_cancel": "Cancel",

@@ -217,11 +217,7 @@ export default function OperatingPolicyAdminPage() {
               <p className="text-muted">
                 {t('admin.operating_policy.about.methodology_prefix')}
                 {' '}<Abbr term="CHF" />{' '}
-                {t('admin.operating_policy.about.methodology_middle')}
-                {' '}<Abbr term="KISS">KISS</Abbr>{' '}
                 {t('admin.operating_policy.about.methodology_suffix')}
-                {' '}<Abbr term="AGORIS">AGORIS</Abbr>{' '}
-                {t('admin.operating_policy.about.methodology_tail')}
               </p>
             </div>
           </div>
@@ -230,7 +226,7 @@ export default function OperatingPolicyAdminPage() {
 
       {loading && (
         <div className="flex justify-center py-16">
-          <Spinner size="lg" label={t('admin.operating_policy.loading')} />
+          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" label={t('admin.operating_policy.loading')} /></div>
         </div>
       )}
 

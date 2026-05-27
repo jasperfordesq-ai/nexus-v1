@@ -20,7 +20,6 @@ import BarChart3 from 'lucide-react/icons/bar-chart-3';
 import { usePageTitle } from '@/hooks';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { Abbr } from '../../components';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -377,7 +376,7 @@ export default function KiAgentAdminPage() {
               {t('ai.ki_agents.about.body')}
             </p>
             <p className="text-muted">
-              <strong>{t('ai.ki_agents.agent_types.tandem_matching')}</strong> - {t('ai.ki_agents.about.tandem_prefix')} <Abbr term="KISS">KISS</Abbr>{t('ai.ki_agents.about.tandem_suffix')}{' '}
+              <strong>{t('ai.ki_agents.agent_types.tandem_matching')}</strong> - {t('ai.ki_agents.about.tandem_prefix')} Caring Community{t('ai.ki_agents.about.tandem_suffix')}{' '}
               <strong>{t('ai.ki_agents.agent_types.nudge_dispatch')}</strong> - {t('ai.ki_agents.about.nudge')}{' '}
               <strong>{t('ai.ki_agents.agent_types.demand_forecast')}</strong> - {t('ai.ki_agents.about.demand')}{' '}
               <strong>{t('ai.ki_agents.agent_types.help_routing')}</strong> - {t('ai.ki_agents.about.help')}{' '}
@@ -422,7 +421,7 @@ export default function KiAgentAdminPage() {
                 <p className="text-sm font-semibold text-foreground">{t('ai.ki_agents.config.agent_types_title')}</p>
                 {(
                   [
-                    ['tandem_matching_enabled', t('ai.ki_agents.agent_types.tandem_matching'), <><Abbr term="KISS">KISS</Abbr>{t('ai.ki_agents.config.tandem_description')}</>],
+                    ['tandem_matching_enabled', t('ai.ki_agents.agent_types.tandem_matching'), <>Caring Community{t('ai.ki_agents.config.tandem_description')}</>],
                     ['nudge_dispatch_enabled', t('ai.ki_agents.agent_types.nudge_dispatch'), t('ai.ki_agents.config.nudge_description')],
                     ['activity_summary_enabled', t('ai.ki_agents.agent_types.activity_summary'), t('ai.ki_agents.config.activity_description')],
                     ['demand_forecast_enabled', t('ai.ki_agents.agent_types.demand_forecast'), t('ai.ki_agents.config.demand_description')],

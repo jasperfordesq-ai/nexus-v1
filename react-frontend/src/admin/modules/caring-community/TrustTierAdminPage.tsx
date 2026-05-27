@@ -197,7 +197,7 @@ export function TrustTierAdminPage() {
 
       {isLoading && (
         <div className="flex justify-center py-12">
-          <Spinner size="lg" label={t('admin.trust_tier.loading')} />
+          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" label={t('admin.trust_tier.loading')} /></div>
         </div>
       )}
 

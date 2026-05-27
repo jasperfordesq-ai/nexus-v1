@@ -431,7 +431,7 @@ export function OrgWalletTab({ orgId, balance, autoPay, onBalanceChange }: OrgWa
                   variant="tertiary"
                   startContent={
                     isLoadingMore ? (
-                      <Spinner size="sm" />
+                      <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" /></div>
                     ) : (
                       <ChevronDown className="w-4 h-4" aria-hidden="true" />
                     )

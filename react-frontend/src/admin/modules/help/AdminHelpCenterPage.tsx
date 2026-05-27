@@ -19,38 +19,32 @@ import { HELP_CONTENT, type HelpArticle } from '../../data/helpContent';
 // Category detection
 // ─────────────────────────────────────────────────────────────────────────────
 
-type Category = 'Caring Community' | 'KISS & AGORIS' | 'General Admin';
+type Category = 'Caring Community' | 'General Admin';
 
-const KISS_PATHS = new Set([
+const CARING_PATHS = new Set([
   '/admin/national/kiss',
   '/admin/ki-agents',
   '/admin/pilot-inquiries',
 ]);
 
 function getCategory(path: string): Category {
-  if (path.startsWith('/caring/') || path === '/caring') {
+  if (path.startsWith('/caring/') || path === '/caring' || CARING_PATHS.has(path)) {
     return 'Caring Community';
-  }
-  if (KISS_PATHS.has(path)) {
-    return 'KISS & AGORIS';
   }
   return 'General Admin';
 }
 
-const CATEGORY_ORDER: Category[] = ['General Admin', 'Caring Community', 'KISS & AGORIS'];
+const CATEGORY_ORDER: Category[] = ['General Admin', 'Caring Community'];
 
-const CATEGORY_CHIP_COLOR: Record<Category, 'default' | 'secondary' | 'warning'> = {
+const CATEGORY_CHIP_COLOR: Record<Category, 'default' | 'secondary'> = {
   'General Admin': 'default',
   'Caring Community': 'secondary',
-  'KISS & AGORIS': 'warning',
 };
 
 function categoryKey(category: Category): string {
   switch (category) {
     case 'Caring Community':
       return 'admin_help.categories.caring_community';
-    case 'KISS & AGORIS':
-      return 'admin_help.categories.kiss_agoris';
     case 'General Admin':
     default:
       return 'admin_help.categories.general_admin';

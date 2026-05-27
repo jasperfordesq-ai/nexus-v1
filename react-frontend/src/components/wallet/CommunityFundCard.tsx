@@ -54,7 +54,7 @@ export function CommunityFundCard({ onDonateClick, compact = false }: CommunityF
 
   if (isLoading) {
     return (
-      <GlassCard className="p-4 animate-pulse">
+      <GlassCard role="status" aria-busy="true" aria-label="Loading" className="p-4 animate-pulse">
         <div className="h-8 bg-theme-hover rounded w-1/3 mb-2" />
         <div className="h-6 bg-theme-hover rounded w-1/2" />
       </GlassCard>

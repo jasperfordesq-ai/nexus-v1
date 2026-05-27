@@ -223,7 +223,7 @@ export function OnboardingSettings() {
   if (loading || !config) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Spinner size="lg" />
+        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" /></div>
       </div>
     );
   }

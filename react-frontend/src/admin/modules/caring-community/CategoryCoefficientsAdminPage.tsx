@@ -176,7 +176,7 @@ export default function CategoryCoefficientsAdminPage() {
                 {t('category_coefficients.about.body_prefix')}{' '}
                 <Abbr term="CHF">{t('category_coefficients.about.chf_amount')}</Abbr>
                 {t('category_coefficients.about.body_middle')}{' '}
-                <Abbr term="KISS" /> {t('category_coefficients.about.body_suffix')}
+                Caring Community {t('category_coefficients.about.body_suffix')}
               </p>
               <p className="text-muted">
                 {t('category_coefficients.about.range_prefix')} <Abbr term="ROI" /> {t('category_coefficients.about.range_suffix')}
@@ -213,7 +213,7 @@ export default function CategoryCoefficientsAdminPage() {
       {/* Loading state */}
       {loading && (
         <div className="flex justify-center py-16">
-          <Spinner size="lg" />
+          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" /></div>
         </div>
       )}
 

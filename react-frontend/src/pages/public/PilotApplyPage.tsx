@@ -29,7 +29,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 
 const COUNTRIES = ['CH', 'DE', 'AT', 'FR', 'IT', 'IE', 'GB', 'US', 'NL', 'BE', 'LU', 'ES', 'PT', 'PL'];
-const CATEGORIES = ['kiss_cooperative', 'caring_community', 'agoris_node', 'community'] as const;
+const CATEGORIES = ['kiss_cooperative', 'caring_community', 'community'] as const;
 const BUCKETS = ['under_50', '50_250', '250_1000', '1000_5000', '5000_plus'] as const;
 const LANGUAGES = ['en', 'de', 'fr', 'it', 'es', 'pt', 'nl', 'pl', 'ja', 'ar', 'ga'] as const;
 

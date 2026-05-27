@@ -73,6 +73,9 @@ export function EntityMapView<T>({
   if (isLoading) {
     return (
       <div
+        role="status"
+        aria-busy="true"
+        aria-label="Loading"
         className={`rounded-xl bg-theme-surface/50 animate-pulse ${className}`}
         style={{ height }}
       />

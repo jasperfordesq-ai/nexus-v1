@@ -158,7 +158,7 @@ export function WarmthPassAdminPage() {
       {/* Loading */}
       {loading && (
         <div className="flex justify-center py-10">
-          <Spinner size="lg" label={t('admin.warmth_pass.loading')} />
+          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" label={t('admin.warmth_pass.loading')} /></div>
         </div>
       )}
 

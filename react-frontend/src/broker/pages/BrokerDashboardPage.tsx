@@ -248,7 +248,7 @@ export function BrokerDashboard() {
       <h2 className="text-lg font-semibold text-foreground mb-4 mt-8">{t('dashboard.recent_activity')}</h2>
       {loading && !stats ? (
         <div className="flex items-center justify-center py-12">
-          <Spinner size="lg" />
+          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" /></div>
         </div>
       ) : loadError && !stats ? (
         // Distinct error state — without this, a load failure rendered as

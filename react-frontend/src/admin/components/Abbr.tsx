@@ -12,9 +12,7 @@
 
 
 export const ABBR_TERMS: Record<string, string> = {
-  KISS: 'Koordination und Innovation für Soziales — Swiss methodology for community-based care coordination, developed with Age-Stiftung',
-  AGORIS: 'Vision-stage Swiss deployment of NEXUS under the KISS methodology',
-  CHF: 'Swiss Franc — the currency used for formal-care cost-offset calculations in KISS deployments',
+  CHF: 'Swiss Franc — the currency used for formal-care cost-offset calculations in Caring Community deployments',
   FADP: 'Federal Act on Data Protection — revised Swiss data protection law (in force since Sep 2023)',
   nDSG: 'neues Datenschutzgesetz — the revised Swiss Federal Data Protection Act (synonym for FADP)',
   DSG: 'Datenschutzgesetz — see nDSG / FADP',
@@ -43,7 +41,6 @@ interface AbbrProps {
 
 /**
  * Usage:
- *   <Abbr term="KISS" />                  → renders "KISS" with tooltip
  *   <Abbr term="CHF">CHF 35/hr</Abbr>     → renders "CHF 35/hr" with CHF tooltip
  */
 export function Abbr({ term, children, className }: AbbrProps) {

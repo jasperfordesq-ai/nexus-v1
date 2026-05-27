@@ -231,7 +231,7 @@ export function TranslationConfig() {
   if (loading) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <Spinner size="lg" />
+        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" /></div>
       </div>
     );
   }
@@ -438,7 +438,7 @@ export function TranslationConfig() {
               {/* Glossary table */}
               {glossaryLoading ? (
                 <div className="flex h-32 items-center justify-center">
-                  <Spinner size="sm" />
+                  <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" /></div>
                 </div>
               ) : glossary.length === 0 ? (
                 <p className="py-4 text-center text-sm text-muted">

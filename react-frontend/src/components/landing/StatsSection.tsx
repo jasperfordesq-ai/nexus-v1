@@ -92,6 +92,9 @@ export function StatsSection({ content }: StatsSectionProps) {
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
       className="mt-16 sm:mt-24 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8"
+      role={isLoading ? 'status' : undefined}
+      aria-busy={isLoading}
+      aria-label={isLoading ? 'Loading' : undefined}
     >
       {stats.map((stat, index) => (
         <div key={`stat-${index}`} className="text-center">

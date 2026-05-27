@@ -171,7 +171,7 @@ export function ApplicationCard({ application, onUpdateStatus, tenantPathFn, nav
         {showHistory && (
           <div className="mt-2 pl-4 border-l-2 border-theme-default space-y-2">
             {isLoadingHistory ? (
-              <div className="h-4 bg-theme-hover rounded w-3/4 animate-pulse" />
+              <div role="status" aria-busy="true" aria-label="Loading" className="h-4 bg-theme-hover rounded w-3/4 animate-pulse" />
             ) : history.length === 0 ? (
               <p className="text-xs text-theme-subtle">{t('history.empty')}</p>
             ) : (

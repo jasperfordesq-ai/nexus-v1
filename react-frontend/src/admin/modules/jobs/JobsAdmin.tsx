@@ -241,7 +241,7 @@ export function JobsAdmin() {
         <div className='w-64 shrink-0 flex flex-col gap-1 border-r border-divider pr-4'>
           <p className='text-xs font-semibold text-muted uppercase tracking-wide mb-2 px-1'>{t('jobs.jobs_count', { count: items.length })}</p>
           {loading ? (
-            <div className='flex justify-center pt-8'><Spinner size='sm' /></div>
+            <div role="status" aria-busy="true" aria-label="Loading" className='flex justify-center pt-8'><Spinner size='sm' /></div>
           ) : items.length === 0 ? (
             <p className='text-sm text-muted/80 px-1'>{t('jobs.no_jobs_in_list')}</p>
           ) : (
@@ -287,7 +287,7 @@ export function JobsAdmin() {
                 </div>
                 <Button size='sm' variant='tertiary' startContent={<RefreshCw aria-hidden="true" size={13} />} onPress={() => loadApplications(selectedJob)} isDisabled={appsLoading}>{t('jobs.refresh')}</Button>
               </div>
-              {appsLoading && <div className='flex justify-center py-12'><Spinner label={t('jobs.loading_applications')} /></div>}
+              {appsLoading && <div role="status" aria-busy="true" aria-label="Loading" className='flex justify-center py-12'><Spinner label={t('jobs.loading_applications')} /></div>}
               {!appsLoading && appsError && (
                 <div className='flex flex-col items-center gap-3 py-12 text-center'>
                   <p className='text-sm text-danger'>{appsError}</p>

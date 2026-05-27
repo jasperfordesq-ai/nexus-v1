@@ -448,7 +448,7 @@ export function VerifyIdentityOptionalPage() {
               className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-emerald-500/20 mb-4"
             >
               {pageState === 'in_progress' ? (
-                <Spinner size="lg" color="accent" />
+                <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" color="accent" /></div>
               ) : (
                 <Fingerprint className="w-8 h-8 text-emerald-600 dark:text-emerald-400" />
               )}

@@ -343,7 +343,7 @@ export default function OnboardingFunnel() {
   if (loading) {
     return (
       <div className="flex min-h-[420px] items-center justify-center">
-        <Spinner size="lg" label={t('crm.loading_funnel')} />
+        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" label={t('crm.loading_funnel')} /></div>
       </div>
     );
   }

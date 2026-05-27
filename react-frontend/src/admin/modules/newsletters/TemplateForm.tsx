@@ -209,7 +209,7 @@ export function TemplateForm() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Spinner size="lg" label={t('newsletters.loading_template')} />
+        <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" label={t('newsletters.loading_template')} /></div>
       </div>
     );
   }
@@ -352,7 +352,7 @@ export function TemplateForm() {
                 <h3 className="text-lg font-semibold">{t('newsletters.label_content')}</h3>
               </CardHeader>
               <CardBody className="gap-4">
-                <Suspense fallback={<Spinner size="sm" className="m-4" />}>
+                <Suspense fallback={<div role="status" aria-busy="true" aria-label="Loading"><Spinner size="sm" className="m-4" /></div>}>
                   <RichTextEditor
                     label={t('newsletters.template_content')}
                     placeholder={t('newsletters.placeholder_design_your_email_template_content')}

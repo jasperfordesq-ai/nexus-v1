@@ -95,7 +95,7 @@ export function CustomBadges() {
           {[1, 2, 3].map((i) => (
             <Card key={i} >
               <CardBody className="p-4">
-                <div className="animate-pulse space-y-3">
+                <div role="status" aria-busy="true" aria-label="Loading" className="animate-pulse space-y-3">
                   <div className="flex items-center gap-3">
                     <div className="h-12 w-12 rounded-xl bg-surface-secondary" />
                     <div className="flex-1 space-y-2">

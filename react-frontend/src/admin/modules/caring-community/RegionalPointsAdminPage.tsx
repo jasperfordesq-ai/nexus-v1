@@ -208,7 +208,7 @@ export default function RegionalPointsAdminPage() {
 
   if (loading || !config) {
     return (
-      <div className="flex items-center justify-center py-16">
+      <div role="status" aria-busy="true" aria-label="Loading" className="flex items-center justify-center py-16">
         <Spinner size="lg" />
       </div>
     );

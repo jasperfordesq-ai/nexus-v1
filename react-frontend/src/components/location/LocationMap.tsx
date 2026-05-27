@@ -557,9 +557,11 @@ export function LocationMap(props: LocationMapProps) {
       <Suspense
         fallback={
           <div
+            role="status"
+            aria-busy="true"
+            aria-label="Loading"
             className={`rounded-xl bg-theme-surface/50 animate-pulse ${props.className ?? ''}`}
             style={{ height: props.height ?? '400px' }}
-            aria-hidden="true"
           />
         }
       >

@@ -506,7 +506,7 @@ export default function PushCampaignAdminPage() {
 
           {loading && (
             <div className="flex justify-center py-10">
-              <Spinner size="lg" />
+              <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" /></div>
             </div>
           )}
 
@@ -651,7 +651,7 @@ export default function PushCampaignAdminPage() {
           <ModalBody>
             {detailLoading && (
               <div className="flex justify-center py-8">
-                <Spinner />
+                <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner /></div>
               </div>
             )}
             {detailCampaign && !detailLoading && (

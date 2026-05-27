@@ -301,7 +301,7 @@ export function JobModerationQueue() {
       {/* Pending Jobs List */}
       {loading ? (
         <div className="flex justify-center py-16">
-          <Spinner label={t('moderation.loading')} />
+          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner label={t('moderation.loading')} /></div>
         </div>
       ) : pendingJobs.length === 0 ? (
         <EmptyState

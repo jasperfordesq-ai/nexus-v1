@@ -229,7 +229,7 @@ export function MarketplaceAdmin() {
         <CardBody className="px-4 pb-4">
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <Spinner label={t('marketplace.loading_recent_listings')} />
+              <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner label={t('marketplace.loading_recent_listings')} /></div>
             </div>
           ) : recentListings.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">

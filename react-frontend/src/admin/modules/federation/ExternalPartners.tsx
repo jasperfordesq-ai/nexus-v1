@@ -380,7 +380,7 @@ export function ExternalPartners() {
           description={t('federation.external_partners_desc')}
         />
         <div className="flex h-64 items-center justify-center">
-          <Spinner size="lg" />
+          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" /></div>
         </div>
       </div>
     );
@@ -713,7 +713,7 @@ export function ExternalPartners() {
               <ModalBody>
                 {logsLoading ? (
                   <div className="flex h-48 items-center justify-center">
-                    <Spinner size="lg" />
+                    <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="lg" /></div>
                   </div>
                 ) : logs.length === 0 ? (
                   <div className="flex h-48 items-center justify-center text-muted">

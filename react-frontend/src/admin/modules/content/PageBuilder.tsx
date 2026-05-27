@@ -230,7 +230,7 @@ export function PageBuilder() {
                 handleChange('slug', toSlug(v));
               }}
             />
-            <Suspense fallback={<Spinner size="sm" className="m-4" />}>
+            <Suspense fallback={<div role="status" aria-busy="true" aria-label="Loading"><Spinner size="sm" className="m-4" /></div>}>
               <RichTextEditor
                 label={t('content.label_content')}
                 placeholder={t('content.placeholder_content')}

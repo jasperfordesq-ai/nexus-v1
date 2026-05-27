@@ -284,7 +284,7 @@ export default function ProjectAnnouncementsAdminPage() {
           </div>
 
           {loading && (
-            <div role="status" aria-label={t('loading')} className="flex justify-center py-10">
+            <div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-10">
               <Spinner size="lg" />
             </div>
           )}

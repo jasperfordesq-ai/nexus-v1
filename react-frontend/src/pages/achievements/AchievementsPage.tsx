@@ -305,7 +305,7 @@ function DailyRewardWidget() {
                   className="bg-gradient-to-r from-amber-400 to-orange-500 text-white font-semibold shadow-lg"
                   startContent={
                     isClaiming ? (
-                      <Spinner size="sm" color="white" />
+                      <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" color="white" /></div>
                     ) : (
                       <Sparkles className="w-4 h-4" aria-hidden="true" />
                     )
@@ -536,7 +536,7 @@ function ChallengesTab() {
                             className="bg-gradient-to-r from-emerald-500 to-green-600 text-white"
                             startContent={
                               claimingId === challenge.id ? (
-                                <Spinner size="sm" color="white" />
+                                <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" color="white" /></div>
                               ) : (
                                 <Gift className="w-3 h-3" aria-hidden="true" />
                               )
@@ -1050,7 +1050,7 @@ function XpShopTab({ userXp }: { userXp: number }) {
                       }
                       startContent={
                         purchasingId === item.id ? (
-                          <Spinner size="sm" color="white" />
+                          <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" color="white" /></div>
                         ) : (
                           <ShoppingBag className="w-3 h-3" aria-hidden="true" />
                         )
@@ -1381,7 +1381,7 @@ function ShowcaseModal({ isOpen, onClose, badges, onSave, isSaving }: ShowcaseMo
             className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
             startContent={
               isSaving ? (
-                <Spinner size="sm" color="white" />
+                <div role="status" aria-busy="true" aria-label="Loading" className="flex justify-center py-4"><Spinner size="sm" color="white" /></div>
               ) : (
                 <Star className="w-4 h-4" aria-hidden="true" />
               )

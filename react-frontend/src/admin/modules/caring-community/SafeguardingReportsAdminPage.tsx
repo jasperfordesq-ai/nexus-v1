@@ -358,7 +358,7 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
         <Separator />
         <CardBody>
           {loading ? (
-            <div className="flex justify-center py-12">
+            <div role="status" aria-busy="true" aria-label={t('admin.safeguarding_reports.loading')} className="flex justify-center py-12">
               <Spinner label={t('admin.safeguarding_reports.loading')} />
             </div>
           ) : reports.length === 0 ? (
@@ -431,7 +431,7 @@ export default function SafeguardingReportsAdminPage(): JSX.Element {
           </ModalHeader>
           <ModalBody>
             {detailLoading || !detail ? (
-              <div className="flex justify-center py-12">
+              <div role="status" aria-busy="true" aria-label={t('admin.safeguarding_reports.loading_detail')} className="flex justify-center py-12">
                 <Spinner label={t('admin.safeguarding_reports.loading_detail')} />
               </div>
             ) : (
