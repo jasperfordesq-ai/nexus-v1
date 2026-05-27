@@ -61,7 +61,7 @@ class SupportReportNotificationService
             LocaleContext::withLocale($admin, function () use ($admin, $report, $adminPath, $adminUrl): void {
                 self::createBellNotification($admin, $report, $adminPath);
 
-                if (empty($admin->email)) {
+                if (empty($admin->email) || !self::shouldSendImmediateEmail((string) $report->impact)) {
                     return;
                 }
 
@@ -113,6 +113,11 @@ class SupportReportNotificationService
                 'error' => $e->getMessage(),
             ]);
         }
+    }
+
+    private static function shouldSendImmediateEmail(string $impact): bool
+    {
+        return in_array($impact, ['blocked', 'major'], true);
     }
 
     private static function createBellNotification(User $admin, SupportReport $report, string $adminPath): void

@@ -9,6 +9,7 @@ import { ReportProblemButton } from './ReportProblemButton';
 
 const mocks = vi.hoisted(() => ({
   apiPost: vi.fn(),
+  captureSentryFeedback: vi.fn(),
   captureSentryMessage: vi.fn(),
   toast: {
     success: vi.fn(),
@@ -37,6 +38,7 @@ vi.mock('@/lib/supportDiagnostics', () => ({
 }));
 
 vi.mock('@/lib/sentry', () => ({
+  captureSentryFeedback: (...args: unknown[]) => mocks.captureSentryFeedback(...args),
   captureSentryMessage: (...args: unknown[]) => mocks.captureSentryMessage(...args),
 }));
 
@@ -81,6 +83,15 @@ describe('ReportProblemButton', () => {
     expect(mocks.captureSentryMessage).toHaveBeenCalledWith('Support report submitted', 'info', expect.objectContaining({
       impact: 'minor',
       has_diagnostics: true,
+    }));
+    expect(mocks.captureSentryFeedback).toHaveBeenCalledWith(expect.objectContaining({
+      message: 'NXR-260527-ABC123: Checkout broken',
+      source: 'support_report',
+      associatedEventId: 'sentry-event-123',
+      tags: expect.objectContaining({
+        support_report_reference: 'NXR-260527-ABC123',
+        impact: 'minor',
+      }),
     }));
     expect(await screen.findByText('Reference NXR-260527-ABC123 has been created.')).toBeInTheDocument();
   });

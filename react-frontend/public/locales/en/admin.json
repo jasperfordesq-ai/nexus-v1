@@ -5286,6 +5286,7 @@
       "open_page": "Open page",
       "open_sentry": "Open Sentry",
       "copy_diagnostics": "Copy diagnostics",
+      "copy_handoff": "Copy engineering handoff",
       "close": "Close",
       "save": "Save triage"
     },
@@ -5345,13 +5346,15 @@
     },
     "messages": {
       "saved": "Support report updated.",
-      "copied": "Diagnostics copied."
+      "copied": "Diagnostics copied.",
+      "handoff_copied": "Engineering handoff copied."
     },
     "errors": {
       "load": "Failed to load support reports.",
       "load_detail": "Failed to load the support report.",
       "save": "Failed to save the support report.",
-      "copy": "Could not copy diagnostics."
+      "copy": "Could not copy diagnostics.",
+      "copy_handoff": "Could not copy the engineering handoff."
     }
   },
   "admin_help": {

@@ -140,6 +140,36 @@ class SupportReportApiTest extends TestCase
         ]);
     }
 
+    public function test_low_priority_support_reports_create_bell_notification_without_immediate_email(): void
+    {
+        $tenantId = $this->useIsolatedTenant();
+        $admin = User::factory()->admin()->forTenant($tenantId)->create([
+            'email' => 'support-admin-' . uniqid('', true) . '@example.test',
+            'preferred_language' => 'en',
+        ]);
+        $member = User::factory()->forTenant($tenantId)->create();
+        $mailer = $this->fakeSupportReportMailer();
+        Sanctum::actingAs($member, ['*']);
+
+        $response = $this->apiPost('/v2/support/reports', [
+            'summary' => 'A label wraps awkwardly on mobile',
+            'description' => 'The profile settings label wraps over two lines on my phone.',
+            'impact' => 'cosmetic',
+            'include_diagnostics' => false,
+        ]);
+
+        $response->assertCreated();
+        $reportId = (int) $response->json('data.report.id');
+
+        $this->assertCount(0, $mailer->calls);
+        $this->assertDatabaseHas('notifications', [
+            'tenant_id' => $tenantId,
+            'user_id' => $admin->id,
+            'type' => 'support_report',
+            'link' => '/admin/support-reports?report=' . $reportId,
+        ]);
+    }
+
     public function test_admin_can_list_and_view_only_tenant_support_reports(): void
     {
         $tenantId = $this->useIsolatedTenant();

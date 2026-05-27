@@ -13,9 +13,11 @@ vi.mock('@sentry/react', () => ({
   setContext: vi.fn(),
   addBreadcrumb: vi.fn(),
   captureException: vi.fn(),
+  captureFeedback: vi.fn(),
   captureMessage: vi.fn(),
   startInactiveSpan: vi.fn(),
   browserTracingIntegration: vi.fn(() => ({})),
+  replayIntegration: vi.fn(() => ({ name: 'Replay' })),
   ErrorBoundary: vi.fn(),
   withProfiler: vi.fn((fn) => fn),
 }));
@@ -141,6 +143,58 @@ describe('sentry analytics consent checks', () => {
     expect(Sentry.captureMessage).toHaveBeenCalledWith('Support report submitted', expect.objectContaining({
       level: 'info',
       contexts: { additional: { route: '/messages' } },
+    }));
+  });
+
+  it('sends user feedback when enabled by consent and DSN', async () => {
+    vi.resetModules();
+    vi.stubEnv('VITE_SENTRY_DSN', 'https://public@example.sentry.io/1');
+    mockReadStoredConsent.mockReturnValue({ analytics: true });
+    const Sentry = await import('@sentry/react');
+    vi.mocked(Sentry.captureFeedback).mockReturnValue('feedback-id-123');
+
+    const { initSentry, captureSentryFeedback } = await import('./sentry');
+    initSentry();
+
+    const feedbackId = captureSentryFeedback({
+      message: 'NXR-260527-RAASDS: Checkout button does not respond',
+      source: 'support_report',
+      associatedEventId: 'event-id-123',
+      tags: {
+        support_report_reference: 'NXR-260527-RAASDS',
+        impact: 'major',
+      },
+    });
+
+    expect(feedbackId).toBe('feedback-id-123');
+    expect(Sentry.captureFeedback).toHaveBeenCalledWith(expect.objectContaining({
+      message: 'NXR-260527-RAASDS: Checkout button does not respond',
+      source: 'support_report',
+      associatedEventId: 'event-id-123',
+      tags: expect.objectContaining({
+        support_report_reference: 'NXR-260527-RAASDS',
+        impact: 'major',
+      }),
+    }), expect.objectContaining({ includeReplay: false }));
+  });
+
+  it('adds masked on-error replay only when the explicit env sample rate is set', async () => {
+    vi.resetModules();
+    vi.stubEnv('VITE_SENTRY_DSN', 'https://public@example.sentry.io/1');
+    vi.stubEnv('VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE', '1');
+    mockReadStoredConsent.mockReturnValue({ analytics: true });
+    const Sentry = await import('@sentry/react');
+
+    const { initSentry } = await import('./sentry');
+    initSentry();
+
+    expect(Sentry.replayIntegration).toHaveBeenCalledWith(expect.objectContaining({
+      maskAllText: true,
+      blockAllMedia: true,
+    }));
+    expect(Sentry.init).toHaveBeenCalledWith(expect.objectContaining({
+      replaysSessionSampleRate: 0,
+      replaysOnErrorSampleRate: 1,
     }));
   });
 });

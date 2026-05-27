@@ -62,6 +62,42 @@ interface DraftState {
   sentryIssueUrl: string;
 }
 
+export function buildSupportReportHandoff(report: AdminSupportReport): string {
+  const reporter = report.reporter
+    ? `${report.reporter.name}${report.reporter.email ? ` <${report.reporter.email}>` : ''} (user ${report.reporter.id})`
+    : 'Unknown reporter';
+  const diagnostics = report.diagnostics
+    ? JSON.stringify(report.diagnostics, null, 2)
+    : 'No diagnostics were included.';
+
+  return [
+    `Support report ${report.reference}`,
+    '',
+    `Tenant: ${report.tenant_name ?? report.tenant_id}`,
+    `Impact: ${report.impact}`,
+    `Status: ${report.status}`,
+    `Created: ${report.created_at}`,
+    `Reporter: ${reporter}`,
+    `Route: ${report.route ?? 'Not provided'}`,
+    `Page URL: ${report.page_url ?? 'Not provided'}`,
+    `User agent: ${report.user_agent ?? 'Not provided'}`,
+    `Sentry event: ${report.sentry_event_id ?? 'Not provided'}`,
+    `Sentry issue: ${report.sentry_issue_url ?? 'Not provided'}`,
+    '',
+    'Summary:',
+    report.summary,
+    '',
+    'User description:',
+    report.description,
+    '',
+    'Triage notes:',
+    report.triage_notes ?? 'None yet.',
+    '',
+    'Diagnostics:',
+    diagnostics,
+  ].join('\n');
+}
+
 export default function SupportReportsPage() {
   const { t } = useTranslation('admin');
   const toast = useToast();
@@ -217,6 +253,19 @@ export default function SupportReportsPage() {
       toast.success(t('support_reports.messages.copied'));
     } catch {
       toast.error(t('support_reports.errors.copy'));
+    }
+  };
+
+  const copyEngineeringHandoff = async () => {
+    if (!selectedReport) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(buildSupportReportHandoff(selectedReport));
+      toast.success(t('support_reports.messages.handoff_copied'));
+    } catch {
+      toast.error(t('support_reports.errors.copy_handoff'));
     }
   };
 
@@ -463,6 +512,13 @@ export default function SupportReportsPage() {
                       {t('support_reports.actions.copy_diagnostics')}
                     </Button>
                   ) : null}
+                  <Button
+                    variant="tertiary"
+                    startContent={<Copy className="h-4 w-4" aria-hidden="true" />}
+                    onPress={copyEngineeringHandoff}
+                  >
+                    {t('support_reports.actions.copy_handoff')}
+                  </Button>
                 </div>
 
                 {selectedReport.diagnostics ? (

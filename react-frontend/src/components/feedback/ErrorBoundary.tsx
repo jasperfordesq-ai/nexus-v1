@@ -12,7 +12,10 @@ import { Component, type ReactNode, type ErrorInfo } from 'react';
 import { motion } from '@/lib/motion';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
-import Home from 'lucide-react/icons/house';import { GlassCard, Button } from '@/components/ui';
+import Home from 'lucide-react/icons/house';
+
+import { GlassCard, Button } from '@/components/ui';
+import { ReportProblemButton } from '@/components/feedback/ReportProblemButton';
 import { logError } from '@/lib/logger';
 import { captureSentryException } from '@/lib/sentry';
 import i18n from 'i18next';
@@ -140,23 +143,27 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                   </div>
                 )}
 
-                <div className="flex flex-col sm:flex-row gap-3">
+                <div className="flex flex-col gap-3">
                   <Button
                     onPress={this.handleTryAgain}
-                    className="flex-1 bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
+                    className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
                     startContent={<RefreshCw className="w-4 h-4" aria-hidden="true" />}
                   >
                     {i18n.t('error_boundary.try_again', { ns: 'common' })}
                   </Button>
 
-                  <Button
-                    onPress={this.handleGoHome}
-                    variant="flat"
-                    className="flex-1 bg-theme-elevated text-theme-muted"
-                    startContent={<Home className="w-4 h-4" aria-hidden="true" />}
-                  >
-                    {i18n.t('error_boundary.go_home', { ns: 'common' })}
-                  </Button>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <ReportProblemButton className="w-full" />
+
+                    <Button
+                      onPress={this.handleGoHome}
+                      variant="flat"
+                      className="w-full bg-theme-elevated text-theme-muted"
+                      startContent={<Home className="w-4 h-4" aria-hidden="true" />}
+                    >
+                      {i18n.t('error_boundary.go_home', { ns: 'common' })}
+                    </Button>
+                  </div>
                 </div>
               </div>
             </GlassCard>

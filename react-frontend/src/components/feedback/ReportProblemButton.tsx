@@ -24,7 +24,7 @@ import {
 } from '@/components/ui';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
-import { captureSentryMessage } from '@/lib/sentry';
+import { captureSentryFeedback, captureSentryMessage } from '@/lib/sentry';
 import { getSupportDiagnosticsSnapshot } from '@/lib/supportDiagnostics';
 
 type Impact = 'blocked' | 'major' | 'minor' | 'cosmetic';
@@ -111,6 +111,16 @@ export function ReportProblemButton({ className, mode = 'button' }: ReportProble
     }
 
     setReference(response.data.report.reference);
+    captureSentryFeedback({
+      message: `${response.data.report.reference}: ${response.data.report.summary}`,
+      source: 'support_report',
+      associatedEventId: sentryEventId,
+      url: pageUrl,
+      tags: {
+        support_report_reference: response.data.report.reference,
+        impact: response.data.report.impact,
+      },
+    });
     toast.success(t('report_problem.submit_success'));
   };
 

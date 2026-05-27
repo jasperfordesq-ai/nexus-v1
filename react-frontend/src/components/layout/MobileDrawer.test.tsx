@@ -137,6 +137,7 @@ vi.mock('@/components/feedback/ReportProblemButton', () => ({
 
 vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: (url: string | undefined) => url || '/default-avatar.png',
+  cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
 }));
 
 vi.mock('@/lib/api', () => ({

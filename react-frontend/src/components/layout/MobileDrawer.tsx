@@ -60,6 +60,7 @@ import BadgeCheck from 'lucide-react/icons/badge-check';
 import ExternalLink from 'lucide-react/icons/external-link';
 import Download from 'lucide-react/icons/download';
 import { InstallAppButton } from '@/components/pwa/InstallAppButton';
+import { ReportProblemButton } from '@/components/feedback/ReportProblemButton';
 import { TenantLogo } from '@/components/branding';
 import { VerificationBadgeRow } from '@/components/verification/VerificationBadge';
 import { SourceRepositoryLink } from './SourceRepositoryLink';
@@ -566,6 +567,9 @@ export function MobileDrawer({ isOpen, onClose, onSearchOpen }: MobileDrawerProp
                       <HelpCircle className="w-4 h-4" aria-hidden="true" />
                       {t('user_menu.help_center')}
                     </Button>
+                  )}
+                  {isAuthenticated && (
+                    <ReportProblemButton className="h-11 min-h-[44px] min-w-0 px-3 gap-2 text-sm" />
                   )}
                   {accessibleFrontendUrl && (
                     <a

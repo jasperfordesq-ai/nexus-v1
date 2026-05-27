@@ -173,8 +173,8 @@ Core admin actions:
 - Test: component tests for each entry point where coverage exists.
 
 - [x] Replace the footer Canny bug link with a native Nexus report action.
-- [ ] Add `Report a problem` to visible support/profile navigation.
-- [ ] Add a report action to the error boundary fallback.
+- [x] Add `Report a problem` to visible support/profile navigation.
+- [x] Add a report action to the error boundary fallback.
 - [ ] Keep Canny linked separately as product feedback or roadmap if desired.
 
 ### Task 6: Admin Triage Dashboard
@@ -201,7 +201,7 @@ Core admin actions:
 - [x] Notify tenant admins when new reports arrive.
 - [x] Send all user-facing email text through translations.
 - [x] Wrap per-recipient email rendering in `LocaleContext::withLocale`.
-- [ ] Add digest/low-priority routing for P2/P3 to avoid alert fatigue.
+- [x] Add digest/low-priority routing for P2/P3 to avoid alert fatigue.
 
 ### Task 8: Sentry Feedback, Replay, And Issue Links
 
@@ -211,11 +211,16 @@ Core admin actions:
 - Test: Sentry helper unit tests where practical.
 
 - [x] Capture a Sentry message/event ID when frontend Sentry is enabled and consent allows it.
-- [ ] Add Sentry user feedback integration behind consent/config.
+- [x] Add Sentry user feedback integration behind consent/config.
 - [ ] Enable masked on-error replay only after privacy copy is updated.
 - [ ] Upload source maps in CI/deploy so stack traces are readable.
 - [ ] Configure Sentry alerts for new P0/P1 issues.
-- [ ] Add a copyable engineering handoff summary in Nexus if report volume needs it.
+- [x] Add a copyable engineering handoff summary in Nexus if report volume needs it.
+
+**Coding status notes (2026-05-27):**
+- Canny/product-roadmap placement remains unchecked because no suitable Canny integration/location exists in the current React app.
+- Masked on-error replay is now implemented as an analytics-consent-gated, env-controlled Sentry option (`VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE`) and remains off by default until legal/privacy copy and production env are explicitly updated.
+- Source-map upload and P0/P1 Sentry alert rules remain unchecked because the current repo has no Sentry upload plugin/token configuration or alert-as-code infrastructure.
 
 ## Verification Commands
 

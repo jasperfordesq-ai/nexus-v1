@@ -25,6 +25,9 @@ interface TenantInfo {
 type SeverityLevel = 'fatal' | 'error' | 'warning' | 'log' | 'info' | 'debug';
 
 const DSN = import.meta.env.VITE_SENTRY_DSN as string | undefined;
+const REPLAY_ON_ERROR_SAMPLE_RATE = Number.parseFloat(
+  (import.meta.env.VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE as string | undefined) || '0',
+);
 
 /**
  * Sentry is enabled only if DSN is set AND the user has granted analytics consent.
@@ -57,6 +60,20 @@ export function initSentry(): void {
     return;
   }
 
+  const replayOnErrorSampleRate = Number.isFinite(REPLAY_ON_ERROR_SAMPLE_RATE)
+    ? Math.max(0, Math.min(1, REPLAY_ON_ERROR_SAMPLE_RATE))
+    : 0;
+  const integrations = [
+    Sentry.browserTracingIntegration(),
+  ];
+
+  if (replayOnErrorSampleRate > 0) {
+    integrations.push(Sentry.replayIntegration({
+      maskAllText: true,
+      blockAllMedia: true,
+    }));
+  }
+
   Sentry.init({
     dsn: DSN,
     environment: (import.meta.env.VITE_SENTRY_ENVIRONMENT as string) || 'production',
@@ -76,7 +93,7 @@ export function initSentry(): void {
 
     // Session replay (disabled by default — enable if needed)
     replaysSessionSampleRate: 0,
-    replaysOnErrorSampleRate: 0,
+    replaysOnErrorSampleRate: replayOnErrorSampleRate,
 
     // Breadcrumbs
     maxBreadcrumbs: 50,
@@ -85,9 +102,7 @@ export function initSentry(): void {
     sendDefaultPii: false,
 
     // Integration config
-    integrations: [
-      Sentry.browserTracingIntegration(),
-    ],
+    integrations,
 
     // Filter sensitive data before sending
     beforeSend(event) {
@@ -209,6 +224,28 @@ export function captureSentryMessage(
   return Sentry.captureMessage(message, {
     level,
     contexts: context ? { additional: context } : undefined,
+  });
+}
+
+export function captureSentryFeedback(params: {
+  message: string;
+  source?: string;
+  associatedEventId?: string | null;
+  url?: string;
+  tags?: Record<string, string | number | boolean | null>;
+}, options: { includeReplay?: boolean } = {}): string | null {
+  if (!IS_ENABLED) return null;
+
+  return Sentry.captureFeedback({
+    message: params.message,
+    source: params.source,
+    associatedEventId: params.associatedEventId ?? undefined,
+    url: params.url,
+    tags: Object.fromEntries(
+      Object.entries(params.tags ?? {}).filter(([, value]) => value !== null),
+    ) as Record<string, string | number | boolean>,
+  }, {
+    includeReplay: options.includeReplay === true,
   });
 }
 

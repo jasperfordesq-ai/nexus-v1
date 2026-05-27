@@ -12,6 +12,7 @@ interface ImportMetaEnv {
   readonly VITE_GOOGLE_MAPS_API_KEY?: string;
   readonly VITE_GOOGLE_MAPS_ENABLED?: string;
   readonly VITE_SENTRY_DSN?: string;
+  readonly VITE_SENTRY_REPLAY_ON_ERROR_SAMPLE_RATE?: string;
   readonly VITE_STRIPE_PUBLISHABLE_KEY?: string;
   readonly DEV: boolean;
   readonly PROD: boolean;
