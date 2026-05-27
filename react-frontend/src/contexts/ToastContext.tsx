@@ -155,19 +155,47 @@ interface ToastContainerProps {
 
 function ToastContainer({ toasts, onRemove }: ToastContainerProps) {
   const { t } = useTranslation('common');
+
+  // Split toasts into two groups so each live region can use the correct
+  // politeness setting.  Nesting role="alert" (assertive) inside an
+  // aria-live="polite" parent produces inconsistent AT behaviour — some
+  // screen readers honour the parent's politeness for all descendants.
+  // Keeping the two regions separate gives reliable cross-AT semantics.
+  const urgentToasts = toasts.filter((t) => t.type === 'error' || t.type === 'warning');
+  const politeToasts = toasts.filter((t) => t.type === 'success' || t.type === 'info');
+
   return (
     <div
       className="fixed bottom-4 right-4 z-[9999] flex flex-col gap-2 max-w-sm w-full pointer-events-none"
-      role="region"
-      aria-label={t('toast.aria_notifications')}
-      aria-live="polite"
-      aria-atomic="false"
     >
-      <AnimatePresence mode="popLayout">
-        {toasts.map((toast) => (
-          <ToastItem key={toast.id} toast={toast} onRemove={onRemove} />
-        ))}
-      </AnimatePresence>
+      {/* Assertive region — errors and warnings that must interrupt the user */}
+      <div
+        role="alert"
+        aria-label={t('toast.aria_urgent_notifications')}
+        aria-atomic="false"
+        className="flex flex-col gap-2"
+      >
+        <AnimatePresence mode="popLayout">
+          {urgentToasts.map((toast) => (
+            <ToastItem key={toast.id} toast={toast} onRemove={onRemove} />
+          ))}
+        </AnimatePresence>
+      </div>
+
+      {/* Polite region — success and info that announce after current speech finishes */}
+      <div
+        role="status"
+        aria-label={t('toast.aria_notifications')}
+        aria-live="polite"
+        aria-atomic="false"
+        className="flex flex-col gap-2"
+      >
+        <AnimatePresence mode="popLayout">
+          {politeToasts.map((toast) => (
+            <ToastItem key={toast.id} toast={toast} onRemove={onRemove} />
+          ))}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }
@@ -224,7 +252,6 @@ const ToastItem = forwardRef<HTMLDivElement, ToastItemProps>(function ToastItem(
         backdrop-blur-xl border rounded-lg
         p-4 shadow-lg
       `}
-      role={toast.type === "error" || toast.type === "warning" ? "alert" : "status"}
     >
       <div className="flex items-start gap-3">
         <Icon className={`w-5 h-5 ${iconColor} flex-shrink-0 mt-0.5`} aria-hidden="true" />

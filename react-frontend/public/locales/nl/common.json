@@ -280,6 +280,28 @@
     "agpl_short": "Vrije en opensourcesoftware. Gelicentieerd onder AGPL-3.0.",
     "nexus_link_label": "Bezoek de Project NEXUS-website"
   },
+  "report_problem": {
+    "trigger": "Probleem melden",
+    "title": "Probleem melden",
+    "auth_title": "Inloggen vereist",
+    "auth_description": "Log in voordat je een technisch supportrapport verstuurt.",
+    "summary_label": "Korte samenvatting",
+    "description_label": "Wat is er gebeurd?",
+    "impact_label": "Impact",
+    "include_diagnostics": "Technische diagnostiek van deze pagina toevoegen",
+    "cancel": "Annuleren",
+    "submit": "Rapport verzenden",
+    "submit_success": "Probleemrapport verzonden.",
+    "submit_failed": "We konden het rapport niet verzenden. Probeer het opnieuw.",
+    "success_title": "Rapport verzonden",
+    "success_description": "Referentie {{reference}} is aangemaakt.",
+    "impact": {
+      "blocked": "Ik kan niet doorgaan",
+      "major": "Een kerntaak werkt niet",
+      "minor": "Er klopt iets niet, maar ik kan doorgaan",
+      "cosmetic": "Visueel probleem of tekstprobleem"
+    }
+  },
   "mobile_tab": {
     "create": "Aanmaken",
     "menu": "Menu",
@@ -850,7 +872,8 @@
   },
   "toast": {
     "aria_notifications": "Meldingen",
-    "aria_dismiss_notification": "Melding negeren"
+    "aria_dismiss_notification": "Melding negeren",
+    "aria_urgent_notifications": "Urgent notifications"
   },
   "verified": "Geverifieerd",
   "map_unavailable": "Kaartweergave is niet beschikbaar",

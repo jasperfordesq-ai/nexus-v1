@@ -280,6 +280,28 @@
     "agpl_short": "Bogearraí saor agus foinse oscailte. Faoi cheadúnas AGPL-3.0.",
     "nexus_link_label": "Tabhair cuairt ar shuíomh Project NEXUS"
   },
+  "report_problem": {
+    "trigger": "Tuairiscigh fadhb",
+    "title": "Tuairiscigh fadhb",
+    "auth_title": "Log?il isteach riachtanach",
+    "auth_description": "Log?il isteach sula seolann t? tuairisc taca?ochta theicni?il.",
+    "summary_label": "Achoimre ghearr",
+    "description_label": "Cad a tharla?",
+    "impact_label": "Tionchar",
+    "include_diagnostics": "Cuir diagn?isic theicni?il ?n leathanach seo san ?ireamh",
+    "cancel": "Cealaigh",
+    "submit": "Seol tuairisc",
+    "submit_success": "Seoladh an tuairisc fhadhbe.",
+    "submit_failed": "N?orbh fh?idir an tuairisc a sheoladh. Bain triail eile as.",
+    "success_title": "Tuairisc seolta",
+    "success_description": "Crutha?odh tagairt {{reference}}.",
+    "impact": {
+      "blocked": "N? f?idir liom lean?int ar aghaidh",
+      "major": "T? tasc l?rnach briste",
+      "minor": "T? rud ?igin m?cheart ach is f?idir liom lean?int ar aghaidh",
+      "cosmetic": "Fadhb amhairc n? focla?ochta"
+    }
+  },
   "mobile_tab": {
     "create": "Cruthaigh",
     "menu": "Roghchlár",
@@ -850,7 +872,8 @@
   },
   "toast": {
     "aria_notifications": "Fógraí",
-    "aria_dismiss_notification": "Díbir fógra"
+    "aria_dismiss_notification": "Díbir fógra",
+    "aria_urgent_notifications": "Urgent notifications"
   },
   "verified": "Fíoraithe",
   "map_unavailable": "Níl an radharc léarscáile ar fáil",

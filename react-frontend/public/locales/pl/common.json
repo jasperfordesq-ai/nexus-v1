@@ -280,6 +280,28 @@
     "agpl_short": "Wolne i otwarte oprogramowanie. Licencja AGPL-3.0.",
     "nexus_link_label": "Odwiedź stronę Project NEXUS"
   },
+  "report_problem": {
+    "trigger": "Zg?o? problem",
+    "title": "Zg?o? problem",
+    "auth_title": "Wymagane logowanie",
+    "auth_description": "Zaloguj si? przed wys?aniem technicznego zg?oszenia do pomocy.",
+    "summary_label": "Kr?tki opis",
+    "description_label": "Co si? sta?o?",
+    "impact_label": "Wp?yw",
+    "include_diagnostics": "Do??cz diagnostyk? techniczn? z tej strony",
+    "cancel": "Anuluj",
+    "submit": "Wy?lij zg?oszenie",
+    "submit_success": "Zg?oszenie problemu zosta?o wys?ane.",
+    "submit_failed": "Nie mogli?my wys?a? zg?oszenia. Spr?buj ponownie.",
+    "success_title": "Zg?oszenie wys?ane",
+    "success_description": "Utworzono numer referencyjny {{reference}}.",
+    "impact": {
+      "blocked": "Nie mog? kontynuowa?",
+      "major": "Podstawowe zadanie nie dzia?a",
+      "minor": "Co? jest nie tak, ale mog? kontynuowa?",
+      "cosmetic": "Problem wizualny lub tekstowy"
+    }
+  },
   "mobile_tab": {
     "create": "Utwórz",
     "menu": "Menu",
@@ -850,7 +872,8 @@
   },
   "toast": {
     "aria_notifications": "Powiadomienia",
-    "aria_dismiss_notification": "Odrzuć powiadomienie"
+    "aria_dismiss_notification": "Odrzuć powiadomienie",
+    "aria_urgent_notifications": "Urgent notifications"
   },
   "verified": "Zweryfikowany",
   "map_unavailable": "Widok mapy jest niedostępny",

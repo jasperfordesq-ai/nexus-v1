@@ -280,6 +280,28 @@
     "agpl_short": "Logiciel libre et open source. Sous licence AGPL-3.0.",
     "nexus_link_label": "Visiter le site Project NEXUS"
   },
+  "report_problem": {
+    "trigger": "Signaler un probl?me",
+    "title": "Signaler un probl?me",
+    "auth_title": "Connexion requise",
+    "auth_description": "Veuillez vous connecter avant d?envoyer un rapport technique au support.",
+    "summary_label": "Court r?sum?",
+    "description_label": "Que s?est-il pass? ?",
+    "impact_label": "Impact",
+    "include_diagnostics": "Inclure les diagnostics techniques de cette page",
+    "cancel": "Annuler",
+    "submit": "Envoyer le rapport",
+    "submit_success": "Rapport de probl?me envoy?.",
+    "submit_failed": "Nous n?avons pas pu envoyer le rapport. Veuillez r?essayer.",
+    "success_title": "Rapport envoy?",
+    "success_description": "La r?f?rence {{reference}} a ?t? cr??e.",
+    "impact": {
+      "blocked": "Je ne peux pas continuer",
+      "major": "Une t?che essentielle est bloqu?e",
+      "minor": "Quelque chose ne va pas, mais je peux continuer",
+      "cosmetic": "Probl?me visuel ou de texte"
+    }
+  },
   "mobile_tab": {
     "create": "Créer",
     "menu": "Menu",
@@ -850,7 +872,8 @@
   },
   "toast": {
     "aria_notifications": "Notifications",
-    "aria_dismiss_notification": "Fermer la notification"
+    "aria_dismiss_notification": "Fermer la notification",
+    "aria_urgent_notifications": "Urgent notifications"
   },
   "verified": "Vérifié",
   "map_unavailable": "La vue carte n’est pas disponible",

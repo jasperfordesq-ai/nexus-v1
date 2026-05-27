@@ -280,6 +280,28 @@
     "agpl_short": "Software libre y de código abierto. Licenciado bajo AGPL-3.0.",
     "nexus_link_label": "Visita la web de Project NEXUS"
   },
+  "report_problem": {
+    "trigger": "Informar de un problema",
+    "title": "Informar de un problema",
+    "auth_title": "Inicio de sesi?n requerido",
+    "auth_description": "Inicia sesi?n antes de enviar un informe t?cnico de soporte.",
+    "summary_label": "Resumen breve",
+    "description_label": "?Qu? ocurri??",
+    "impact_label": "Impacto",
+    "include_diagnostics": "Incluir diagn?sticos t?cnicos de esta p?gina",
+    "cancel": "Cancelar",
+    "submit": "Enviar informe",
+    "submit_success": "Informe de problema enviado.",
+    "submit_failed": "No pudimos enviar el informe. Int?ntalo de nuevo.",
+    "success_title": "Informe enviado",
+    "success_description": "Se ha creado la referencia {{reference}}.",
+    "impact": {
+      "blocked": "No puedo continuar",
+      "major": "Una tarea principal no funciona",
+      "minor": "Algo va mal, pero puedo continuar",
+      "cosmetic": "Problema visual o de texto"
+    }
+  },
   "mobile_tab": {
     "create": "Crear",
     "menu": "Menú",
@@ -850,7 +872,8 @@
   },
   "toast": {
     "aria_notifications": "Notificaciones",
-    "aria_dismiss_notification": "Descartar notificación"
+    "aria_dismiss_notification": "Descartar notificación",
+    "aria_urgent_notifications": "Urgent notifications"
   },
   "verified": "Verificado",
   "map_unavailable": "La vista de mapa no está disponible",
