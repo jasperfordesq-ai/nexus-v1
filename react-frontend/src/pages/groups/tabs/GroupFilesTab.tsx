@@ -8,7 +8,7 @@
  * File upload, download, folder organization within a group.
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 import FolderOpen from 'lucide-react/icons/folder-open';
 import Upload from 'lucide-react/icons/upload';
@@ -284,8 +284,10 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
             color="primary"
             className="cursor-pointer"
             role="button"
+            tabIndex={0}
             aria-pressed={activeFolder === null}
             onClick={() => setActiveFolder(null)}
+            onKeyDown={(e: React.KeyboardEvent<HTMLElement>) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveFolder(null); } }}
           >
             {t('files.all_files')}
           </Chip>
@@ -296,8 +298,10 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
               color="primary"
               className="cursor-pointer"
               role="button"
+              tabIndex={0}
               aria-pressed={activeFolder === folder.folder}
               onClick={() => setActiveFolder(folder.folder)}
+              onKeyDown={(e: React.KeyboardEvent<HTMLElement>) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveFolder(folder.folder); } }}
             >
               <FolderOpen className="w-3 h-3 mr-1 inline" aria-hidden="true" />
               {t('files.folder_chip', { name: folder.folder, count: folder.file_count })}

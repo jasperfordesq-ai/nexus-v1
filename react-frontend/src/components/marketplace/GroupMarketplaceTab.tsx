@@ -11,7 +11,7 @@
  * added as a tab within GroupDetailPage.
  */
 
-import { useState, useEffect, useCallback } from 'react';import ShoppingBag from 'lucide-react/icons/shopping-bag';
+import React, { useState, useEffect, useCallback } from 'react';import ShoppingBag from 'lucide-react/icons/shopping-bag';
 import Plus from 'lucide-react/icons/plus';
 import Package from 'lucide-react/icons/package';
 import Users from 'lucide-react/icons/users';
@@ -176,7 +176,11 @@ export function GroupMarketplaceTab({ groupId }: GroupMarketplaceTabProps) {
             variant={selectedCategory === null ? 'solid' : 'flat'}
             color={selectedCategory === null ? 'primary' : 'default'}
             className="cursor-pointer"
+            role="button"
+            tabIndex={0}
+            aria-pressed={selectedCategory === null}
             onClick={() => handleCategoryFilter(null)}
+            onKeyDown={(e: React.KeyboardEvent<HTMLElement>) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCategoryFilter(null); } }}
           >
             {t('categories.all')}
           </Chip>
@@ -186,7 +190,11 @@ export function GroupMarketplaceTab({ groupId }: GroupMarketplaceTabProps) {
               variant={selectedCategory === cat.id ? 'solid' : 'flat'}
               color={selectedCategory === cat.id ? 'primary' : 'default'}
               className="cursor-pointer"
+              role="button"
+              tabIndex={0}
+              aria-pressed={selectedCategory === cat.id}
               onClick={() => handleCategoryFilter(cat.id)}
+              onKeyDown={(e: React.KeyboardEvent<HTMLElement>) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCategoryFilter(cat.id); } }}
             >
               {cat.name} ({cat.listing_count})
             </Chip>

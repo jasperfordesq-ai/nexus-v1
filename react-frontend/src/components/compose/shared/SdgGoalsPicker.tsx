@@ -1,3 +1,4 @@
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { SDG_GOALS } from '@/data/sdg-goals';
 import { Chip } from '@/components/ui';
@@ -37,7 +38,11 @@ export function SdgGoalsPicker({ selected, onChange }: SdgGoalsPickerProps) {
                   : 'bg-[var(--surface-elevated)] text-[var(--text-muted)] hover:bg-[var(--surface-hover)]'
               }`}
               style={isActive ? { backgroundColor: goal.color } : undefined}
+              role="button"
+              tabIndex={0}
+              aria-pressed={isActive}
               onClick={() => toggle(goal.id)}
+              onKeyDown={(e: React.KeyboardEvent<HTMLElement>) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(goal.id); } }}
             >
               <span className="mr-0.5">{goal.icon}</span>
               {goal.label}

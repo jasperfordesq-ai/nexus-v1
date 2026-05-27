@@ -1344,7 +1344,12 @@ function ShowcaseModal({ isOpen, onClose, badges, onSave, isSaving }: ShowcaseMo
                           ? 'border-white/5 bg-theme-hover opacity-50 cursor-not-allowed'
                           : 'border-white/10 bg-theme-elevated hover:bg-theme-hover'
                     }`}
+                    role="checkbox"
+                    tabIndex={isDisabled ? -1 : 0}
+                    aria-checked={isSelected}
                     aria-disabled={isDisabled}
+                    onClick={() => { if (!isDisabled) toggleBadge(badge.badge_key); }}
+                    onKeyDown={(e) => { if (!isDisabled && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggleBadge(badge.badge_key); } }}
                   >
                     <Checkbox
                       isSelected={isSelected}

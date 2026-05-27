@@ -8,7 +8,7 @@
  * Photo/video gallery with grid layout, lightbox modal, upload, and delete.
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 
 import Camera from 'lucide-react/icons/camera';
 import Film from 'lucide-react/icons/film';
@@ -241,7 +241,10 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
               variant={filter === chip.key ? 'solid' : 'bordered'}
               color="primary"
               className="cursor-pointer"
+              role="button"
+              tabIndex={0}
               onClick={() => setFilter(chip.key)}
+              onKeyDown={(e: React.KeyboardEvent<HTMLElement>) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setFilter(chip.key); } }}
               aria-pressed={filter === chip.key}
             >
               {chip.icon && (
