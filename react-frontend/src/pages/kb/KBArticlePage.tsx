@@ -324,7 +324,7 @@ export function KBArticlePage() {
               <div className="relative w-full rounded-xl overflow-hidden" style={{ paddingBottom: '56.25%' }}>
                 <iframe
                   className="absolute inset-0 w-full h-full"
-                  src={`https://www.youtube-nocookie.com/embed/${extractYouTubeId(article.video_url)}`}
+                  src={`https://www.youtube-nocookie.com/embed/${extractYouTubeId(article.video_url)}?cc_load_policy=1`}
                   title={article.title}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen

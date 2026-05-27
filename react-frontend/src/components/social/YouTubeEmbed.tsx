@@ -66,10 +66,11 @@ export function YouTubeEmbed({ embedUrl, thumbnailUrl, title }: YouTubeEmbedProp
     setIsPlaying(true);
   }, []);
 
-  // Build the embed src with autoplay when played
+  // Build the embed src with autoplay when played.
+  // cc_load_policy=1 forces captions on by default (WCAG 1.2.2).
   const embedSrc = isPlaying
-    ? `${embedUrl}?autoplay=1&rel=0`
-    : embedUrl;
+    ? `${embedUrl}?autoplay=1&rel=0&cc_load_policy=1`
+    : `${embedUrl}?cc_load_policy=1`;
 
   return (
     <Card

@@ -111,9 +111,12 @@ export function JobDescriptionCard({
           {vacancy.video_url && (
             <div className="aspect-video rounded-lg overflow-hidden mb-3">
               <iframe
-                src={vacancy.video_url
-                  .replace('watch?v=', 'embed/')
-                  .replace('youtu.be/', 'youtube.com/embed/')}
+                src={(() => {
+                  const base = vacancy.video_url
+                    .replace('watch?v=', 'embed/')
+                    .replace('youtu.be/', 'youtube.com/embed/');
+                  return base.includes('?') ? `${base}&cc_load_policy=1` : `${base}?cc_load_policy=1`;
+                })()}
                 className="w-full h-full"
                 allowFullScreen
                 title={t('branding.video_label')}
