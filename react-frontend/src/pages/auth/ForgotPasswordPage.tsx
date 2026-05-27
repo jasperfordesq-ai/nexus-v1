@@ -148,6 +148,7 @@ export function ForgotPasswordPage() {
                 label: 'text-theme-muted',
               }}
               isRequired
+              autoComplete="email"
             />
 
             <Button

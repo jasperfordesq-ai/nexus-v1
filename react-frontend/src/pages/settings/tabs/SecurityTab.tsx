@@ -612,6 +612,7 @@ export function SecurityTab({
                 label={t('twofa_confirm_password')}
                 value={twoFactorDisablePassword}
                 onChange={(e) => onTwoFactorDisablePasswordChange(e.target.value)}
+                autoComplete="current-password"
                 classNames={inputClassNames}
               />
             </div>

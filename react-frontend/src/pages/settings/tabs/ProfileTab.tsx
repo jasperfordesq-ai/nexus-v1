@@ -147,6 +147,7 @@ export function ProfileTab({
               onChange={(e) => onProfileDataChange((prev) => ({ ...prev, first_name: e.target.value }))}
               classNames={inputClassNames}
               isReadOnly={isIdVerified}
+              autoComplete="given-name"
               endContent={isIdVerified ? <Lock className="w-4 h-4 text-theme-subtle" aria-hidden="true" /> : undefined}
             />
             <Input
@@ -156,6 +157,7 @@ export function ProfileTab({
               onChange={(e) => onProfileDataChange((prev) => ({ ...prev, last_name: e.target.value }))}
               classNames={inputClassNames}
               isReadOnly={isIdVerified}
+              autoComplete="family-name"
               endContent={isIdVerified ? <Lock className="w-4 h-4 text-theme-subtle" aria-hidden="true" /> : undefined}
             />
           </div>
@@ -195,6 +197,7 @@ export function ProfileTab({
               setPhoneError(isPhoneValid(profileData.phone) ? null : t('profile.phone_invalid'));
             }}
             startContent={<Phone className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
+            autoComplete="tel"
             classNames={inputClassNames}
             isInvalid={!!phoneError}
             errorMessage={phoneError ?? undefined}

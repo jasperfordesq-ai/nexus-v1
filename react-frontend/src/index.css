@@ -539,3 +539,51 @@
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
 }
+
+/* ─────────────────────────────────────────────
+   WCAG 2.3.3 — REDUCED MOTION
+   Tailwind's animate-* utilities and custom
+   shimmer/spin animations must respect the
+   OS-level "Reduce Motion" preference.
+   The motion shim (src/lib/motion/) already
+   sets transition-duration:0ms via useReducedMotion().
+   These rules cover CSS-only animations that the
+   JS shim cannot reach.
+   ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  /* Stop all CSS animations and transitions globally */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Shimmer skeleton loader */
+  .shimmer::after,
+  [class*="shimmer"] {
+    animation: none !important;
+  }
+
+  /* Tailwind spin (Loader2, etc.) */
+  .animate-spin {
+    animation: none !important;
+  }
+
+  /* Tailwind pulse (skeleton states) */
+  .animate-pulse {
+    animation: none !important;
+  }
+
+  /* Tailwind bounce */
+  .animate-bounce {
+    animation: none !important;
+  }
+
+  /* Tailwind ping (notification dots) */
+  .animate-ping {
+    animation: none !important;
+  }
+}

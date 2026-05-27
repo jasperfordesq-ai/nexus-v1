@@ -520,7 +520,7 @@ export function LoginPage() {
                       onChange={(e) => { setEmail(e.target.value); setLoginErrorCode(undefined); setLoginRetryAfter(null); }}
                       startContent={<Mail className="w-4 h-4 text-theme-subtle" />}
                       isRequired
-                      autoComplete="username webauthn"
+                      autoComplete="email webauthn"
                       classNames={{
                         inputWrapper: 'glass-card min-h-11 backdrop-blur-lg',
                         label: 'text-theme-muted',

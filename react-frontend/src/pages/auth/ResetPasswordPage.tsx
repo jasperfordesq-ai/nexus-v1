@@ -190,6 +190,7 @@ export function ResetPasswordPage() {
                   label: 'text-theme-muted',
                 }}
                 isRequired
+                autoComplete="new-password"
               />
               {/* Password strength — length + HIBP breach check */}
               <div className="mt-2">
@@ -213,6 +214,7 @@ export function ResetPasswordPage() {
                 label: 'text-theme-muted',
               }}
               isRequired
+              autoComplete="new-password"
             />
 
             <Button
