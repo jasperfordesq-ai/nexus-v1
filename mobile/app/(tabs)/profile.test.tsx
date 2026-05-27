@@ -29,6 +29,8 @@ jest.mock('react-i18next', () => ({
         'signOutConfirmTitle': 'Sign out',
         'signOutConfirmMessage': 'Are you sure you want to sign out?',
         'hrs': 'hrs',
+        'search': 'Search',
+        'jobs': 'Jobs',
         'groups': 'Groups',
         'events': 'Events',
         'aiChat': 'AI Assistant',
@@ -36,6 +38,8 @@ jest.mock('react-i18next', () => ({
         'myGoals': 'My Goals',
         'volunteering': 'Volunteering',
         'organisations': 'Organisations',
+        'blog': 'Blog',
+        'skills': 'Skills & Endorsements',
         'federation': 'Federation',
         'myProfile': 'My Profile',
         'mySpace': 'My Space',
@@ -50,10 +54,14 @@ jest.mock('react-i18next', () => ({
         'navDescriptions.achievements': 'Badges, levels, streaks, and community progress.',
         'navDescriptions.myGoals': 'Track personal goals and timebank milestones.',
         'navDescriptions.groups': 'Your community spaces and group conversations.',
+        'navDescriptions.search': 'Search listings, members, events, groups, and posts.',
+        'navDescriptions.jobs': 'Browse job vacancies, applications, and your own postings.',
         'navDescriptions.events': 'Browse workshops, meetups, and community gatherings.',
         'navDescriptions.browseMembers': 'Find neighbours by name, profile, or shared interests.',
         'navDescriptions.volunteering': 'Discover opportunities, hours, and applications.',
         'navDescriptions.organisations': 'Browse local partners and community organisations.',
+        'navDescriptions.blog': 'Read community news, stories, and platform updates.',
+        'navDescriptions.skills': 'Manage your skills and member endorsements.',
         'navDescriptions.aiChat': 'Ask the assistant for help finding your way around.',
         'navDescriptions.federation': 'Explore partner communities and cross-timebank tools.',
         'navDescriptions.settings': 'Security, notifications, preferences, and account controls.',
@@ -159,9 +167,13 @@ describe('MoreScreen (More tab)', () => {
   it('renders Discover section with community navigation items', () => {
     const { getByText } = render(<MoreScreen />);
     expect(getByText('Discover')).toBeTruthy();
+    expect(getByText('Search')).toBeTruthy();
+    expect(getByText('Jobs')).toBeTruthy();
     expect(getByText('Events')).toBeTruthy();
     expect(getByText('Browse Members')).toBeTruthy();
     expect(getByText('Volunteering')).toBeTruthy();
+    expect(getByText('Blog')).toBeTruthy();
+    expect(getByText('Skills & Endorsements')).toBeTruthy();
     expect(getByText('AI Assistant')).toBeTruthy();
   });
 

@@ -2,15 +2,37 @@
   "editTitle": "Modifier le profil",
   "changePhoto": "Changer la photo de profil",
   "permissionNeeded": "Autorisation requise",
-  "permissionMessage": "Autorisez l'accès à votre photothèque pour modifier votre avatar.",
-  "uploadFailed": "Échec du téléversement",
-  "uploadFailedMessage": "Votre avatar n'a pas pu être mis à jour. Veuillez réessayer.",
+  "permissionMessage": "Autorisez l'acces a votre phototheque pour modifier votre avatar.",
+  "uploadFailed": "Echec du televersement",
+  "uploadFailedMessage": "Votre avatar n'a pas pu etre mis a jour. Veuillez reessayer.",
   "edit": {
-    "uploadingPhoto": "Téléversement de la photo..."
+    "uploadingPhoto": "Televersement de la photo..."
   },
   "myProfile": "Mon Profil",
   "mySpace": "Mon Espace",
-  "discover": "Découvrir",
+  "discover": "Decouvrir",
   "account": "Compte",
-  "actions": "Actions"
+  "actions": "Actions",
+  "search": "Search",
+  "jobs": "Jobs",
+  "events": "Events",
+  "browseMembers": "Browse Members",
+  "volunteering": "Volunteering",
+  "organisations": "Organisations",
+  "blog": "Blog",
+  "skills": "Skills & Endorsements",
+  "aiChat": "AI Assistant",
+  "federation": "Federation",
+  "navDescriptions": {
+    "search": "Search listings, members, events, groups, and posts.",
+    "jobs": "Browse job vacancies, applications, and your own postings.",
+    "events": "Browse workshops, meetups, and community gatherings.",
+    "browseMembers": "Find neighbours by name, profile, or shared interests.",
+    "volunteering": "Discover opportunities, hours, and applications.",
+    "organisations": "Browse local partners and community organisations.",
+    "blog": "Read community news, stories, and platform updates.",
+    "skills": "Manage your skills and member endorsements.",
+    "aiChat": "Ask the assistant for help finding your way around.",
+    "federation": "Explore partner communities and cross-timebank tools."
+  }
 }

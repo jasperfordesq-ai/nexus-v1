@@ -37,10 +37,14 @@ const MY_SPACE: MenuItem[] = [
 ];
 
 const DISCOVER: MenuItem[] = [
+  { labelKey: 'search', descriptionKey: 'navDescriptions.search', icon: 'search-outline', route: '/(modals)/search', tone: '#64748b' },
+  { labelKey: 'jobs', descriptionKey: 'navDescriptions.jobs', icon: 'briefcase-outline', route: '/(modals)/jobs', tone: '#2563eb', featureGate: 'job_vacancies' },
   { labelKey: 'events', descriptionKey: 'navDescriptions.events', icon: 'calendar-outline', route: '/(tabs)/events', tone: '#f43f5e' },
   { labelKey: 'browseMembers', descriptionKey: 'navDescriptions.browseMembers', icon: 'people-outline', route: '/(modals)/members', tone: '#14b8a6' },
   { labelKey: 'volunteering', descriptionKey: 'navDescriptions.volunteering', icon: 'heart-outline', route: '/(modals)/volunteering', tone: '#e11d48' },
   { labelKey: 'organisations', descriptionKey: 'navDescriptions.organisations', icon: 'business-outline', route: '/(modals)/organisations', tone: '#6366f1' },
+  { labelKey: 'blog', descriptionKey: 'navDescriptions.blog', icon: 'newspaper-outline', route: '/(modals)/blog', tone: '#f97316' },
+  { labelKey: 'skills', descriptionKey: 'navDescriptions.skills', icon: 'ribbon-outline', route: '/(modals)/endorsements', tone: '#10b981' },
   { labelKey: 'aiChat', descriptionKey: 'navDescriptions.aiChat', icon: 'sparkles-outline', route: '/(modals)/chat', tone: '#a855f7' },
   { labelKey: 'federation', descriptionKey: 'navDescriptions.federation', icon: 'globe-outline', route: '/(modals)/federation', tone: '#0ea5e9', featureGate: 'federation' },
 ];
