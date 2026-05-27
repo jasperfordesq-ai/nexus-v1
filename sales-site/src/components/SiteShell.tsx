@@ -173,7 +173,7 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
             ]}
             onNavigate={handleInternalNav}
           />
-          <FooterColumn title="Legal" links={legalPages.map((page): [string, string] => [page.label, page.path])} onNavigate={handleInternalNav} />
+          <FooterColumn title="Legal" links={legalPages.map((page): [string, string] => [page.label, page.path])} nativeInternalLinks onNavigate={handleInternalNav} />
           <FooterColumn
             title="Contact"
             links={[
@@ -192,10 +192,12 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
 function FooterColumn({
   title,
   links,
+  nativeInternalLinks = false,
   onNavigate,
 }: {
   title: string;
   links: [string, string][];
+  nativeInternalLinks?: boolean;
   onNavigate: (href: string) => void;
 }) {
   const handleInternalLink = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -213,7 +215,12 @@ function FooterColumn({
       <div className="flex flex-col gap-3 text-sm text-white/70">
         {links.map(([label, href]) =>
           href.startsWith('/') ? (
-            <a key={href} href={href} className="text-left hover:text-white" onClick={(event) => handleInternalLink(event, href)}>
+            <a
+              key={href}
+              href={href}
+              className="text-left hover:text-white"
+              onClick={nativeInternalLinks ? undefined : (event) => handleInternalLink(event, href)}
+            >
               {label}
             </a>
           ) : (

@@ -100,7 +100,9 @@ if (fs.existsSync(localesDir)) {
   for (const file of fs.readdirSync(localesDir)) {
     if (file.endsWith('.json')) {
       const ns = file.replace('.json', '');
-      resources[ns] = JSON.parse(fs.readFileSync(path.join(localesDir, file), 'utf-8'));
+      resources[ns] = JSON.parse(
+        fs.readFileSync(path.join(localesDir, file), 'utf-8').replace(/^\uFEFF/, '')
+      );
     }
   }
 }

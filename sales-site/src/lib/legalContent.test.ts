@@ -26,6 +26,8 @@ describe('sales legal content', () => {
 
     expect(siteShell).toContain('title="Legal"');
     expect(siteShell).toContain('legalPages.map');
+    expect(siteShell).toContain('nativeInternalLinks onNavigate={handleInternalNav}');
+    expect(siteShell).toContain('onClick={nativeInternalLinks ? undefined : (event) => handleInternalLink(event, href)}');
   });
 
   it('renders internal sales-site navigation as real links with hrefs', () => {
@@ -33,7 +35,8 @@ describe('sales legal content', () => {
     const legalPage = readFileSync(resolve(__dirname, '..', 'components', 'LegalPage.tsx'), 'utf8');
 
     expect(siteShell).toContain('href={href}');
-    expect(siteShell).toContain('onClick={(event) => handleInternalLink(event, href)}');
+    expect(siteShell).toContain('nativeInternalLinks');
+    expect(siteShell).toContain('onClick={nativeInternalLinks ? undefined : (event) => handleInternalLink(event, href)}');
     expect(legalPage).toContain('href={item.path}');
     expect(legalPage).toContain('onClick={(event) => handleInternalLink(event, item.path)}');
     expect(siteShell).not.toContain('<button key={href} type="button" className="text-left hover:text-white" onClick={() => onNavigate(href)}>');

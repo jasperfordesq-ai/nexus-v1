@@ -94,7 +94,9 @@ export default function LegalPage({ path, onNavigate }: LegalPageProps) {
                   key={item.path}
                   href={item.path}
                   className={`rounded-lg px-3 py-2 text-left text-sm font-bold transition ${
-                    item.path === page.path ? 'bg-white text-[var(--text-inverse)]' : 'text-white/62 hover:bg-white/8 hover:text-white'
+                    item.path === page.path
+                      ? 'border border-[color:var(--color-accent)]/45 bg-[color:var(--color-accent)]/14 text-white shadow-[inset_3px_0_0_var(--color-accent)]'
+                      : 'border border-transparent text-white/62 hover:bg-white/8 hover:text-white'
                   }`}
                   onClick={(event) => handleInternalLink(event, item.path)}
                 >

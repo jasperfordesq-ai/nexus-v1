@@ -342,10 +342,26 @@ export interface MerchantCoupon {
   description?: string | null;
   discount_type: 'percent' | 'fixed' | 'bogo';
   discount_value?: number | null;
+  min_order_cents?: number | null;
   status: 'draft' | 'active' | 'paused' | 'expired';
   max_uses?: number | null;
+  max_uses_per_member?: number | null;
   used_count?: number;
+  usage_count?: number;
+  valid_from?: string | null;
   valid_until?: string | null;
+  applies_to?: 'all_listings' | 'listing_ids' | 'category_ids';
+  applies_to_ids?: number[] | null;
+}
+
+export interface MerchantCouponRedemption {
+  id: number;
+  coupon_id: number;
+  user_id: number;
+  order_id?: number | null;
+  discount_applied_cents: number;
+  redeemed_at?: string | null;
+  redemption_method?: string | null;
 }
 
 export interface MarketplaceCollectionResponse<T> {
@@ -920,13 +936,42 @@ export function createMerchantCoupon(payload: {
   description?: string | null;
   discount_type: 'percent' | 'fixed' | 'bogo';
   discount_value?: number | null;
+  min_order_cents?: number | null;
+  max_uses?: number | null;
+  max_uses_per_member?: number | null;
+  valid_from?: string | null;
+  valid_until?: string | null;
   status?: 'draft' | 'active' | 'paused';
+  applies_to?: 'all_listings' | 'listing_ids' | 'category_ids';
 }): Promise<MarketplaceDataResponse<MerchantCoupon>> {
   return api.post<MarketplaceDataResponse<MerchantCoupon>>(`${API_V2}/marketplace/seller/coupons`, payload);
 }
 
+export function updateMerchantCoupon(
+  id: number,
+  payload: Partial<{
+    title: string;
+    description: string | null;
+    discount_type: 'percent' | 'fixed' | 'bogo';
+    discount_value: number | null;
+    min_order_cents: number | null;
+    max_uses: number | null;
+    max_uses_per_member: number | null;
+    valid_from: string | null;
+    valid_until: string | null;
+    status: 'draft' | 'active' | 'paused' | 'expired';
+    applies_to: 'all_listings' | 'listing_ids' | 'category_ids';
+  }>,
+): Promise<MarketplaceDataResponse<MerchantCoupon>> {
+  return api.put<MarketplaceDataResponse<MerchantCoupon>>(`${API_V2}/marketplace/seller/coupons/${id}`, payload);
+}
+
 export function deleteMerchantCoupon(id: number): Promise<MarketplaceDataResponse<{ deleted: boolean }>> {
   return api.delete<MarketplaceDataResponse<{ deleted: boolean }>>(`${API_V2}/marketplace/seller/coupons/${id}`);
+}
+
+export function getMerchantCouponRedemptions(id: number): Promise<MarketplaceDataResponse<{ items: MerchantCouponRedemption[] }>> {
+  return api.get<MarketplaceDataResponse<{ items: MerchantCouponRedemption[] }>>(`${API_V2}/marketplace/seller/coupons/${id}/redemptions`);
 }
 
 export function marketplaceNextCursor<T>(response: MarketplaceCollectionResponse<T>): string | null {

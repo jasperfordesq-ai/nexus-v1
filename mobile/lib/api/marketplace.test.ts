@@ -47,6 +47,7 @@ import {
   getMarketplaceSellerBalance,
   getMarketplaceSellerPayouts,
   getMarketplaceStripeOnboardingStatus,
+  getMerchantCouponRedemptions,
   getMerchantOnboardingStatus,
   getNearbyMarketplaceListings,
   getMyMarketplaceListings,
@@ -69,6 +70,7 @@ import {
   shipMarketplaceOrder,
   updateMarketplaceShippingOption,
   updateMarketplaceListing,
+  updateMerchantCoupon,
   uploadMarketplaceImages,
   validateMarketplaceCoupon,
 } from './marketplace';
@@ -316,6 +318,16 @@ describe('marketplace api', () => {
       discount_value: 10,
       status: 'active',
     });
+
+    await updateMerchantCoupon(5, { title: 'July discount', status: 'paused', max_uses: 20 });
+    expect(api.put).toHaveBeenCalledWith('/api/v2/marketplace/seller/coupons/5', {
+      title: 'July discount',
+      status: 'paused',
+      max_uses: 20,
+    });
+
+    await getMerchantCouponRedemptions(5);
+    expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/seller/coupons/5/redemptions');
   });
 
   it('wires checkout payment, pickup reservation, and coupon validation', async () => {

@@ -93,6 +93,7 @@ import Languages from 'lucide-react/icons/languages';
 import Landmark from 'lucide-react/icons/landmark';
 import X from 'lucide-react/icons/x';
 import BellRing from 'lucide-react/icons/bell-ring';
+import Bug from 'lucide-react/icons/bug';
 import type { LucideIcon } from 'lucide-react';
 
 import { Accordion, AccordionItem, Button, Input, Tooltip } from '@/components/ui';
@@ -473,6 +474,7 @@ function useAdminNav(safeguardingFlagCount: number): NavSection[] {
           { label: t('onboarding_settings'), href: '/admin/onboarding-settings', icon: Heart },
           { label: t('module_configuration'), href: '/admin/module-configuration', icon: Puzzle },
           { label: t('operations'), href: '/admin/operations', icon: Activity },
+          { label: t('support_reports'), href: '/admin/support-reports', icon: Bug, keywords: keyword('bugs', 'feedback', 'diagnostics', 'sentry') },
           { label: t('translation_config'), href: '/admin/translation-config', icon: Languages },
           { label: t('activity_log'), href: '/admin/activity-log', icon: Activity },
           { label: t('cron_jobs'), href: '/admin/cron-jobs', icon: Timer },

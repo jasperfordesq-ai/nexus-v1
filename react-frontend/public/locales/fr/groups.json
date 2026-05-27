@@ -702,7 +702,8 @@
     "percentile_value": "{{pct}} % supérieurs",
     "excellent": "Excellent",
     "good": "Bien",
-    "below_average": "En dessous de la moyenne"
+    "below_average": "En dessous de la moyenne",
+    "section_heading": "Analyses"
   },
   "branding": {
     "title": "Image du groupe",

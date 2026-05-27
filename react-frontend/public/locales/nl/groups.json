@@ -702,7 +702,8 @@
     "percentile_value": "Bovenste {{pct}}%",
     "excellent": "Uitstekend",
     "good": "Goed",
-    "below_average": "Onder gemiddeld"
+    "below_average": "Onder gemiddeld",
+    "section_heading": "Analyses"
   },
   "branding": {
     "title": "Groepsbranding",

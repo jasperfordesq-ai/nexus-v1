@@ -68,7 +68,7 @@ describe('sentry (disabled - no DSN)', () => {
   it('captureSentryMessage is a no-op when disabled', async () => {
     const { captureSentryMessage } = await import('./sentry');
     const Sentry = await import('@sentry/react');
-    expect(() => captureSentryMessage('test message')).not.toThrow();
+    expect(captureSentryMessage('test message')).toBeNull();
     expect(Sentry.captureMessage).not.toHaveBeenCalled();
   });
 
@@ -121,5 +121,26 @@ describe('sentry analytics consent checks', () => {
     mockReadStoredConsent.mockReturnValue({ analytics: false });
     const { initSentry } = await import('./sentry');
     expect(() => initSentry()).not.toThrow();
+  });
+
+  it('returns the Sentry event id for captured messages when enabled', async () => {
+    vi.resetModules();
+    vi.stubEnv('VITE_SENTRY_DSN', 'https://public@example.sentry.io/1');
+    mockReadStoredConsent.mockReturnValue({ analytics: true });
+    const Sentry = await import('@sentry/react');
+    vi.mocked(Sentry.captureMessage).mockReturnValue('event-id-123');
+
+    const { initSentry, captureSentryMessage } = await import('./sentry');
+    initSentry();
+
+    const eventId = captureSentryMessage('Support report submitted', 'info', {
+      route: '/messages',
+    });
+
+    expect(eventId).toBe('event-id-123');
+    expect(Sentry.captureMessage).toHaveBeenCalledWith('Support report submitted', expect.objectContaining({
+      level: 'info',
+      contexts: { additional: { route: '/messages' } },
+    }));
   });
 });

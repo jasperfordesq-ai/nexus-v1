@@ -75,7 +75,8 @@ describe('sales-site public content policy', () => {
     const siteShell = readFileSync(resolve(__dirname, '..', 'components', 'SiteShell.tsx'), 'utf8');
 
     expect(siteShell).toContain('href={href}');
-    expect(siteShell).toContain('onClick={(event) => handleInternalLink(event, href)}');
+    expect(siteShell).toContain('nativeInternalLinks');
+    expect(siteShell).toContain('onClick={nativeInternalLinks ? undefined : (event) => handleInternalLink(event, href)}');
     expect(siteShell).not.toContain('<button key={href} type="button" className="text-left hover:text-white" onClick={() => onNavigate(href)}>');
   });
 

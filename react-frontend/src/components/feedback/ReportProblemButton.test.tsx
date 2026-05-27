@@ -9,6 +9,7 @@ import { ReportProblemButton } from './ReportProblemButton';
 
 const mocks = vi.hoisted(() => ({
   apiPost: vi.fn(),
+  captureSentryMessage: vi.fn(),
   toast: {
     success: vi.fn(),
     error: vi.fn(),
@@ -35,9 +36,14 @@ vi.mock('@/lib/supportDiagnostics', () => ({
   }),
 }));
 
+vi.mock('@/lib/sentry', () => ({
+  captureSentryMessage: (...args: unknown[]) => mocks.captureSentryMessage(...args),
+}));
+
 describe('ReportProblemButton', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.captureSentryMessage.mockReturnValue('sentry-event-123');
     mocks.apiPost.mockResolvedValue({
       success: true,
       data: {
@@ -66,10 +72,15 @@ describe('ReportProblemButton', () => {
       summary: 'Checkout broken',
       description: 'The checkout button does not respond.',
       impact: 'minor',
+      sentry_event_id: 'sentry-event-123',
       include_diagnostics: true,
       diagnostics: expect.objectContaining({
         entries: [expect.objectContaining({ message: 'Captured error' })],
       }),
+    }));
+    expect(mocks.captureSentryMessage).toHaveBeenCalledWith('Support report submitted', 'info', expect.objectContaining({
+      impact: 'minor',
+      has_diagnostics: true,
     }));
     expect(await screen.findByText('Reference NXR-260527-ABC123 has been created.')).toBeInTheDocument();
   });

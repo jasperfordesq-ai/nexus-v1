@@ -702,7 +702,8 @@
     "percentile_value": "Barr {{pct}}%",
     "excellent": "Sár-mhaith",
     "good": "Maith",
-    "below_average": "Faoin meán"
+    "below_average": "Faoin meán",
+    "section_heading": "Anailísíocht"
   },
   "branding": {
     "title": "Branda Grúpa",

@@ -702,7 +702,8 @@
     "percentile_value": "Top {{pct}} %",
     "excellent": "Hervorragend",
     "good": "Gut",
-    "below_average": "Unterdurchschnittlich"
+    "below_average": "Unterdurchschnittlich",
+    "section_heading": "Analysen"
   },
   "branding": {
     "title": "Gruppenbranding",

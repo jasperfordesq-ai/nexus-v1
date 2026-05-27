@@ -211,6 +211,8 @@ export function GroupAnalyticsTab({ groupId, isAdmin }: GroupAnalyticsTabProps) 
 
   return (
     <div className="space-y-6">
+      {/* sr-only section heading so chart h3s are valid sub-headings (WCAG 1.3.1 / 2.4.6) */}
+      <h2 className="sr-only">{t('analytics.section_heading')}</h2>
       {/* Header: Date Range + Export Buttons */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         {/* Date range selector */}

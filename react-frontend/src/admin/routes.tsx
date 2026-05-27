@@ -308,6 +308,7 @@ const FeedModeration = lazy(() => import('./modules/moderation/FeedModeration'))
 const CommentsModeration = lazy(() => import('./modules/moderation/CommentsModeration'));
 const ReviewsModeration = lazy(() => import('./modules/moderation/ReviewsModeration'));
 const ReportsManagement = lazy(() => import('./modules/moderation/ReportsManagement'));
+const SupportReportsPage = lazy(() => import('./modules/support/SupportReportsPage'));
 
 // Super Admin module — all implementations live in modules/super/
 const SuperDashboard = lazy(() => import('./modules/super/SuperDashboard'));
@@ -568,6 +569,7 @@ export function AdminRoutes() {
       <Route path="tenant-features" element={<TenantRedirect to="/admin/module-configuration" />} />
       <Route path="module-configuration" element={<Lazy><ModuleConfiguration /></Lazy>} />
       <Route path="operations" element={<Lazy><Operations /></Lazy>} />
+      <Route path="support-reports" element={<Lazy><SupportReportsPage /></Lazy>} />
       <Route path="translation-config" element={<Lazy><TranslationConfig /></Lazy>} />
       <Route path="cron-jobs" element={<Lazy><CronJobs /></Lazy>} />
       <Route path="cron-jobs/logs" element={<Lazy><CronJobLogs /></Lazy>} />

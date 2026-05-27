@@ -153,6 +153,7 @@ const SEGMENT_LABEL_KEYS: Record<string, string> = {
   'tenant-features': 'breadcrumbs.module_configuration',
   'module-configuration': 'breadcrumbs.module_configuration',
   operations: 'breadcrumbs.operations',
+  'support-reports': 'breadcrumbs.support_reports',
   'translation-config': 'breadcrumbs.translation_config',
   'cron-jobs': 'breadcrumbs.cron_jobs',
   setup: 'breadcrumbs.setup',

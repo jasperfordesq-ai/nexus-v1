@@ -1930,6 +1930,65 @@ export interface AdminReport {
   resolved_by?: string | null;
 }
 
+export type AdminSupportReportStatus = 'open' | 'triaged' | 'resolved' | 'closed';
+export type AdminSupportReportImpact = 'blocked' | 'major' | 'minor' | 'cosmetic';
+
+export interface AdminSupportReportUser {
+  id: number;
+  name: string;
+  email?: string | null;
+  avatar_url?: string | null;
+  role?: string | null;
+}
+
+export interface AdminSupportReport {
+  id: number;
+  tenant_id: number;
+  tenant_name?: string | null;
+  user_id: number | null;
+  assigned_user_id: number | null;
+  reference: string;
+  source: string;
+  summary: string;
+  description: string;
+  impact: AdminSupportReportImpact;
+  status: AdminSupportReportStatus;
+  module?: string | null;
+  route?: string | null;
+  page_url?: string | null;
+  sentry_event_id?: string | null;
+  sentry_issue_url?: string | null;
+  diagnostics?: Record<string, unknown> | null;
+  user_agent?: string | null;
+  triage_notes?: string | null;
+  triaged_at?: string | null;
+  resolved_at?: string | null;
+  closed_at?: string | null;
+  created_at: string;
+  updated_at?: string | null;
+  reporter?: AdminSupportReportUser | null;
+  assignee?: AdminSupportReportUser | null;
+}
+
+export interface AdminSupportReportStats {
+  total: number;
+  open: number;
+  triaged: number;
+  resolved: number;
+  closed: number;
+  blocked: number;
+  major: number;
+  unassigned: number;
+}
+
+export interface AdminSupportReportUpdatePayload {
+  status?: AdminSupportReportStatus;
+  assigned_user_id?: number | null;
+  triage_notes?: string | null;
+  sentry_event_id?: string | null;
+  sentry_issue_url?: string | null;
+}
+
 export interface ModerationStats {
   feed_posts_total: number;
   feed_posts_hidden: number;

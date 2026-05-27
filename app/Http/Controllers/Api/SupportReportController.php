@@ -7,8 +7,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\SupportReport;
+use App\Services\SupportReportNotificationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -86,6 +88,16 @@ class SupportReportController extends BaseApiController
             'user_agent' => $this->nullableString($request->userAgent(), 512),
             'ip_hash' => $this->hashIpAddress($request->ip()),
         ]);
+
+        try {
+            SupportReportNotificationService::notifyCreated($report);
+        } catch (\Throwable $e) {
+            Log::warning('[SupportReportController] support report notification failed', [
+                'report_id' => $report->id,
+                'tenant_id' => $tenantId,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return $this->respondWithData([
             'report' => [

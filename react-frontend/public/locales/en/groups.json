@@ -703,7 +703,8 @@
     "percentile_value": "Top {{pct}}%",
     "excellent": "Excellent",
     "good": "Good",
-    "below_average": "Below Average"
+    "below_average": "Below Average",
+    "section_heading": "Analytics"
   },
   "branding": {
     "title": "Group Branding",

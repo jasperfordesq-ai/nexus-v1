@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, FlatList, ScrollView, TextInput, View } from 'react-native';
+import { Alert, FlatList, Modal, ScrollView, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -28,6 +28,7 @@ import {
   getMarketplacePickupSlots,
   getMarketplaceSavedSearches,
   getMerchantCoupons,
+  getMerchantCouponRedemptions,
   getMyMarketplacePickups,
   getMyMarketplacePromotions,
   getMyMarketplaceListings,
@@ -35,6 +36,7 @@ import {
   marketplaceNextCursor,
   promoteMarketplaceListing,
   scanMarketplacePickup,
+  updateMerchantCoupon,
   type MarketplaceCollection,
   type MarketplaceListingItem,
   type MarketplacePickupReservation,
@@ -42,6 +44,7 @@ import {
   type MarketplacePromotion,
   type MarketplaceSavedSearch,
   type MerchantCoupon,
+  type MerchantCouponRedemption,
 } from '@/lib/api/marketplace';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
@@ -51,8 +54,44 @@ import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 
 type ToolTab = 'collections' | 'savedSearches' | 'promotions' | 'pickups' | 'coupons';
+type CouponDiscountType = 'percent' | 'fixed' | 'bogo';
+type CouponStatus = 'draft' | 'active' | 'paused' | 'expired';
+type CouponAppliesTo = 'all_listings' | 'listing_ids' | 'category_ids';
+
+interface CouponFormState {
+  code: string;
+  title: string;
+  description: string;
+  discountType: CouponDiscountType;
+  discountValue: string;
+  minOrderCents: string;
+  maxUses: string;
+  maxUsesPerMember: string;
+  validFrom: string;
+  validUntil: string;
+  status: CouponStatus;
+  appliesTo: CouponAppliesTo;
+}
 
 const TABS: ToolTab[] = ['collections', 'savedSearches', 'promotions', 'pickups', 'coupons'];
+const COUPON_DISCOUNT_TYPES: CouponDiscountType[] = ['percent', 'fixed', 'bogo'];
+const COUPON_STATUSES: CouponStatus[] = ['draft', 'active', 'paused', 'expired'];
+const COUPON_APPLIES_TO: CouponAppliesTo[] = ['all_listings', 'listing_ids', 'category_ids'];
+
+const emptyCouponForm: CouponFormState = {
+  code: '',
+  title: '',
+  description: '',
+  discountType: 'percent',
+  discountValue: '10',
+  minOrderCents: '',
+  maxUses: '',
+  maxUsesPerMember: '1',
+  validFrom: '',
+  validUntil: '',
+  status: 'active',
+  appliesTo: 'all_listings',
+};
 
 export default function MarketplaceToolsRoute() {
   return (
@@ -388,16 +427,48 @@ function PickupsPanel() {
 
 function CouponsPanel() {
   const { t } = useTranslation(['marketplace', 'common']);
-  const [title, setTitle] = useState('');
-  const [value, setValue] = useState('');
+  const primary = usePrimaryColor();
+  const theme = useTheme();
+  const [form, setForm] = useState<CouponFormState>(emptyCouponForm);
+  const [editingCoupon, setEditingCoupon] = useState<MerchantCoupon | null>(null);
+  const [redemptionCoupon, setRedemptionCoupon] = useState<MerchantCoupon | null>(null);
+  const [redemptions, setRedemptions] = useState<MerchantCouponRedemption[]>([]);
+  const [isLoadingRedemptions, setIsLoadingRedemptions] = useState(false);
   const coupons = useApi(() => getMerchantCoupons(), [], { enabled: true });
 
-  async function create() {
-    if (!title.trim()) return;
+  function updateForm(key: keyof CouponFormState, value: string) {
+    setForm((current) => ({ ...current, [key]: value }));
+  }
+
+  function openEdit(coupon?: MerchantCoupon) {
+    setEditingCoupon(coupon ?? null);
+    setForm(coupon ? {
+      code: coupon.code ?? '',
+      title: coupon.title ?? '',
+      description: coupon.description ?? '',
+      discountType: coupon.discount_type ?? 'percent',
+      discountValue: coupon.discount_value != null ? String(coupon.discount_value) : '',
+      minOrderCents: coupon.min_order_cents != null ? String(coupon.min_order_cents) : '',
+      maxUses: coupon.max_uses != null ? String(coupon.max_uses) : '',
+      maxUsesPerMember: coupon.max_uses_per_member != null ? String(coupon.max_uses_per_member) : '1',
+      validFrom: coupon.valid_from ? String(coupon.valid_from).slice(0, 16) : '',
+      validUntil: coupon.valid_until ? String(coupon.valid_until).slice(0, 16) : '',
+      status: coupon.status ?? 'active',
+      appliesTo: coupon.applies_to ?? 'all_listings',
+    } : emptyCouponForm);
+  }
+
+  async function save() {
+    if (!form.title.trim()) return;
+    const payload = couponPayload(form);
     try {
-      await createMerchantCoupon({ title: title.trim(), discount_type: 'percent', discount_value: Number(value) || 10, status: 'active' });
-      setTitle('');
-      setValue('');
+      if (editingCoupon) {
+        await updateMerchantCoupon(editingCoupon.id, payload);
+      } else {
+        await createMerchantCoupon(payload);
+      }
+      setEditingCoupon(null);
+      setForm(emptyCouponForm);
       coupons.refresh();
     } catch (err) {
       Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.coupons.saveFailed'));
@@ -413,14 +484,81 @@ function CouponsPanel() {
     }
   }
 
+  async function openRedemptions(item: MerchantCoupon) {
+    setRedemptionCoupon(item);
+    setRedemptions([]);
+    setIsLoadingRedemptions(true);
+    try {
+      const response = await getMerchantCouponRedemptions(item.id);
+      setRedemptions(response.data.items);
+    } catch (err) {
+      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('tools.coupons.redemptionsFailed'));
+    } finally {
+      setIsLoadingRedemptions(false);
+    }
+  }
+
   return (
     <PanelCard icon="ticket-outline" title={t('tools.coupons.title')} subtitle={t('tools.coupons.subtitle')}>
       <View className="gap-3">
-        <FormInput label={t('tools.coupons.name')} value={title} onChangeText={setTitle} placeholder={t('tools.coupons.namePlaceholder')} />
-        <FormInput label={t('tools.coupons.value')} value={value} onChangeText={setValue} placeholder={t('tools.coupons.valuePlaceholder')} keyboardType="decimal-pad" />
-        <HeroButton variant="primary" onPress={create} isDisabled={!title.trim()}>
-          <HeroButton.Label>{t('tools.coupons.create')}</HeroButton.Label>
+        <FormInput label={t('tools.coupons.code')} value={form.code} onChangeText={(value) => updateForm('code', value.toUpperCase())} placeholder={t('tools.coupons.codePlaceholder')} />
+        <FormInput label={t('tools.coupons.name')} value={form.title} onChangeText={(value) => updateForm('title', value)} placeholder={t('tools.coupons.namePlaceholder')} />
+        <FormInput label={t('tools.coupons.description')} value={form.description} onChangeText={(value) => updateForm('description', value)} placeholder={t('tools.coupons.descriptionPlaceholder')} multiline />
+        <View className="gap-2">
+          <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('tools.coupons.discountType')}</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+            {COUPON_DISCOUNT_TYPES.map((type) => (
+              <HeroButton key={type} size="sm" variant={form.discountType === type ? 'primary' : 'secondary'} onPress={() => updateForm('discountType', type)} style={form.discountType === type ? { backgroundColor: primary } : undefined}>
+                <HeroButton.Label>{t(`tools.coupons.discountTypes.${type}`)}</HeroButton.Label>
+              </HeroButton>
+            ))}
+          </ScrollView>
+        </View>
+        <FormInput label={t('tools.coupons.value')} value={form.discountValue} onChangeText={(value) => updateForm('discountValue', value)} placeholder={t('tools.coupons.valuePlaceholder')} keyboardType="decimal-pad" />
+        <View className="flex-row gap-2">
+          <View className="min-w-0 flex-1">
+            <FormInput label={t('tools.coupons.maxUses')} value={form.maxUses} onChangeText={(value) => updateForm('maxUses', value)} placeholder={t('tools.coupons.maxUsesPlaceholder')} keyboardType="decimal-pad" />
+          </View>
+          <View className="min-w-0 flex-1">
+            <FormInput label={t('tools.coupons.perMember')} value={form.maxUsesPerMember} onChangeText={(value) => updateForm('maxUsesPerMember', value)} placeholder={t('tools.coupons.perMemberPlaceholder')} keyboardType="decimal-pad" />
+          </View>
+        </View>
+        <View className="flex-row gap-2">
+          <View className="min-w-0 flex-1">
+            <FormInput label={t('tools.coupons.validFrom')} value={form.validFrom} onChangeText={(value) => updateForm('validFrom', value)} placeholder={t('tools.coupons.datePlaceholder')} />
+          </View>
+          <View className="min-w-0 flex-1">
+            <FormInput label={t('tools.coupons.validUntil')} value={form.validUntil} onChangeText={(value) => updateForm('validUntil', value)} placeholder={t('tools.coupons.datePlaceholder')} />
+          </View>
+        </View>
+        <View className="gap-2">
+          <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('tools.coupons.status')}</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+            {COUPON_STATUSES.map((status) => (
+              <HeroButton key={status} size="sm" variant={form.status === status ? 'primary' : 'secondary'} onPress={() => updateForm('status', status)} style={form.status === status ? { backgroundColor: primary } : undefined}>
+                <HeroButton.Label>{t(`tools.coupons.statuses.${status}`)}</HeroButton.Label>
+              </HeroButton>
+            ))}
+          </ScrollView>
+        </View>
+        <View className="gap-2">
+          <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('tools.coupons.appliesTo')}</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+            {COUPON_APPLIES_TO.map((scope) => (
+              <HeroButton key={scope} size="sm" variant={form.appliesTo === scope ? 'primary' : 'secondary'} onPress={() => updateForm('appliesTo', scope)} style={form.appliesTo === scope ? { backgroundColor: primary } : undefined}>
+                <HeroButton.Label>{t(`tools.coupons.applies.${scope}`)}</HeroButton.Label>
+              </HeroButton>
+            ))}
+          </ScrollView>
+        </View>
+        <HeroButton variant="primary" onPress={save} isDisabled={!form.title.trim()}>
+          <HeroButton.Label>{editingCoupon ? t('tools.coupons.update') : t('tools.coupons.create')}</HeroButton.Label>
         </HeroButton>
+        {editingCoupon ? (
+          <HeroButton variant="secondary" onPress={() => openEdit()}>
+            <HeroButton.Label>{t('tools.coupons.cancelEdit')}</HeroButton.Label>
+          </HeroButton>
+        ) : null}
       </View>
       <PanelList
         isLoading={coupons.isLoading}
@@ -431,14 +569,87 @@ function CouponsPanel() {
             key={item.id}
             icon="ticket-outline"
             title={item.title}
-            subtitle={t('tools.coupons.discount', { value: item.discount_value ?? 0, status: item.status })}
-            trailing={t('tools.delete')}
-            onPress={() => void remove(item)}
+            subtitle={t('tools.coupons.discount', { value: couponDiscountLabel(item), status: t(`tools.coupons.statuses.${item.status}`, { defaultValue: item.status }), count: item.usage_count ?? item.used_count ?? 0 })}
+            trailing={t('tools.coupons.edit')}
+            onPress={() => openEdit(item)}
           />
         )}
       />
+      <PanelList
+        isLoading={false}
+        items={coupons.data?.data.items ?? []}
+        emptyTitle={t('tools.coupons.empty')}
+        renderItem={(item: MerchantCoupon) => (
+          <View key={`actions-${item.id}`} className="flex-row gap-2">
+            <HeroButton className="flex-1" size="sm" variant="secondary" onPress={() => void openRedemptions(item)}>
+              <HeroButton.Label>{t('tools.coupons.redemptions')}</HeroButton.Label>
+            </HeroButton>
+            <HeroButton className="flex-1" size="sm" variant="danger-soft" onPress={() => void remove(item)}>
+              <HeroButton.Label>{t('tools.delete')}</HeroButton.Label>
+            </HeroButton>
+          </View>
+        )}
+      />
+
+      <Modal visible={Boolean(redemptionCoupon)} transparent animationType="slide" onRequestClose={() => setRedemptionCoupon(null)}>
+        <View className="flex-1 justify-end bg-black/40">
+          <Surface variant="default" className="max-h-[78%] rounded-t-[28px] p-4">
+            <View className="mb-4 flex-row items-center justify-between">
+              <View className="min-w-0 flex-1">
+                <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('tools.coupons.redemptionsTitle')}</Text>
+                <Text className="text-xs" style={{ color: theme.textSecondary }}>{redemptionCoupon?.title ?? ''}</Text>
+              </View>
+              <HeroButton isIconOnly variant="secondary" onPress={() => setRedemptionCoupon(null)}>
+                <Ionicons name="close-outline" size={20} color={primary} />
+              </HeroButton>
+            </View>
+            {isLoadingRedemptions ? (
+              <View className="py-10"><LoadingSpinner /></View>
+            ) : redemptions.length === 0 ? (
+              <EmptyState icon="receipt-outline" title={t('tools.coupons.noRedemptions')} />
+            ) : (
+              <ScrollView contentContainerStyle={{ gap: 10 }}>
+                {redemptions.map((redemption) => (
+                  <ToolRow
+                    key={redemption.id}
+                    icon="receipt-outline"
+                    title={t('tools.coupons.redemptionOrder', { order: redemption.order_id ?? '-' })}
+                    subtitle={t('tools.coupons.redemptionValue', {
+                      value: (redemption.discount_applied_cents / 100).toFixed(2),
+                      date: redemption.redeemed_at ? new Date(redemption.redeemed_at).toLocaleDateString() : t('tools.coupons.dateUnknown'),
+                    })}
+                  />
+                ))}
+              </ScrollView>
+            )}
+          </Surface>
+        </View>
+      </Modal>
     </PanelCard>
   );
+}
+
+function couponPayload(form: CouponFormState) {
+  return {
+    code: form.code.trim() || null,
+    title: form.title.trim(),
+    description: form.description.trim() || null,
+    discount_type: form.discountType,
+    discount_value: form.discountType === 'bogo' ? null : Number(form.discountValue) || 0,
+    min_order_cents: form.minOrderCents ? Number(form.minOrderCents) : null,
+    max_uses: form.maxUses ? Number(form.maxUses) : null,
+    max_uses_per_member: form.maxUsesPerMember ? Number(form.maxUsesPerMember) : 1,
+    valid_from: form.validFrom.trim() || null,
+    valid_until: form.validUntil.trim() || null,
+    status: form.status,
+    applies_to: form.appliesTo,
+  };
+}
+
+function couponDiscountLabel(coupon: MerchantCoupon): string {
+  if (coupon.discount_type === 'percent') return `${coupon.discount_value ?? 0}%`;
+  if (coupon.discount_type === 'fixed') return `${coupon.discount_value ?? 0}`;
+  return 'BOGO';
 }
 
 function PanelCard({
@@ -531,25 +742,28 @@ function FormInput({
   onChangeText,
   placeholder,
   keyboardType = 'default',
+  multiline = false,
 }: {
   label: string;
   value: string;
   onChangeText: (value: string) => void;
   placeholder: string;
   keyboardType?: 'default' | 'decimal-pad';
+  multiline?: boolean;
 }) {
   const theme = useTheme();
   return (
     <View className="gap-2">
       <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{label}</Text>
       <TextInput
-        className="min-h-12 rounded-panel-inner border px-3 text-sm"
-        style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg }}
+        className={`${multiline ? 'min-h-24 py-3' : 'min-h-12'} rounded-panel-inner border px-3 text-sm`}
+        style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg, textAlignVertical: multiline ? 'top' : 'center' }}
         placeholder={placeholder}
         placeholderTextColor={theme.textMuted}
         value={value}
         onChangeText={onChangeText}
         keyboardType={keyboardType}
+        multiline={multiline}
       />
     </View>
   );

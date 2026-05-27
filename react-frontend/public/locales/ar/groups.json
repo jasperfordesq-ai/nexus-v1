@@ -702,7 +702,8 @@
     "percentile_value": "ضمن أعلى {{pct}}%",
     "excellent": "ممتاز",
     "good": "جيد",
-    "below_average": "أقل من المتوسط"
+    "below_average": "أقل من المتوسط",
+    "section_heading": "التحليلات"
   },
   "branding": {
     "title": "هوية المجموعة البصرية",

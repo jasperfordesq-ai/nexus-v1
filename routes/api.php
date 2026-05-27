@@ -1260,6 +1260,12 @@ Route::get('/v2/admin/reviews/{id}', [\App\Http\Controllers\Api\AdminReviewsCont
 Route::post('/v2/admin/reviews/{id}/flag', [\App\Http\Controllers\Api\AdminReviewsController::class, 'flag']);
 Route::post('/v2/admin/reviews/{id}/hide', [\App\Http\Controllers\Api\AdminReviewsController::class, 'hide']);
 Route::delete('/v2/admin/reviews/{id}', [\App\Http\Controllers\Api\AdminReviewsController::class, 'destroy']);
+Route::get('/v2/admin/support-reports', [\App\Http\Controllers\Api\AdminSupportReportController::class, 'index']);
+Route::get('/v2/admin/support-reports/stats', [\App\Http\Controllers\Api\AdminSupportReportController::class, 'stats']);
+Route::get('/v2/admin/support-reports/assignees', [\App\Http\Controllers\Api\AdminSupportReportController::class, 'assignees']);
+Route::get('/v2/admin/support-reports/{id}', [\App\Http\Controllers\Api\AdminSupportReportController::class, 'show'])->whereNumber('id');
+Route::put('/v2/admin/support-reports/{id}', [\App\Http\Controllers\Api\AdminSupportReportController::class, 'update'])->whereNumber('id');
+Route::patch('/v2/admin/support-reports/{id}', [\App\Http\Controllers\Api\AdminSupportReportController::class, 'update'])->whereNumber('id');
 
 // Public caring community endpoint — no auth required (invite lookup)
 Route::get('/v2/caring-community/invite/{code}', [\App\Http\Controllers\Api\CaringCommunityApiController::class, 'lookupInvite'])

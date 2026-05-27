@@ -203,10 +203,10 @@ export function captureSentryMessage(
   message: string,
   level: SeverityLevel = 'error',
   context?: Record<string, unknown>
-): void {
-  if (!IS_ENABLED) return;
+): string | null {
+  if (!IS_ENABLED) return null;
 
-  Sentry.captureMessage(message, {
+  return Sentry.captureMessage(message, {
     level,
     contexts: context ? { additional: context } : undefined,
   });

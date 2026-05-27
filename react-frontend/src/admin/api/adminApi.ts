@@ -130,6 +130,10 @@ import type {
   AdminComment,
   AdminReview,
   AdminReport,
+  AdminSupportReport,
+  AdminSupportReportStats,
+  AdminSupportReportUpdatePayload,
+  AdminSupportReportUser,
   ModerationStats,
   CrmDashboardStats,
   CrmFunnelData,
@@ -2388,6 +2392,32 @@ export const adminModeration = {
 // ─────────────────────────────────────────────────────────────────────────────
 // CRM (Member Notes, Coordinator Tasks, Tags, Funnel)
 // ─────────────────────────────────────────────────────────────────────────────
+
+export const adminSupportReports = {
+  list: (params?: {
+    status?: string;
+    impact?: string;
+    search?: string;
+    tenant_id?: number | string;
+    page?: number;
+    limit?: number;
+  }) =>
+    api.get<AdminSupportReport[]>(
+      `/v2/admin/support-reports${buildQuery(params || {})}`
+    ),
+
+  stats: () =>
+    api.get<AdminSupportReportStats>('/v2/admin/support-reports/stats'),
+
+  assignees: () =>
+    api.get<{ assignees: AdminSupportReportUser[] }>('/v2/admin/support-reports/assignees'),
+
+  get: (id: number) =>
+    api.get<AdminSupportReport>(`/v2/admin/support-reports/${id}`),
+
+  update: (id: number, payload: AdminSupportReportUpdatePayload) =>
+    api.put<AdminSupportReport>(`/v2/admin/support-reports/${id}`, payload),
+};
 
 export const adminCrm = {
   // Dashboard

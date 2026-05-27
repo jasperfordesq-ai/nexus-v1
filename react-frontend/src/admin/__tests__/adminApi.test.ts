@@ -58,6 +58,7 @@ import {
   adminVetting,
   adminCron,
   adminModeration,
+  adminSupportReports,
 } from '../api/adminApi';
 
 describe('adminApi', () => {
@@ -670,6 +671,30 @@ describe('adminApi', () => {
     it('resolveReport calls POST', async () => {
       await adminModeration.resolveReport(5);
       expect(mockPost).toHaveBeenCalledWith('/v2/admin/reports/5/resolve');
+    });
+  });
+
+  describe('adminSupportReports', () => {
+    it('list calls support report endpoint with filters', async () => {
+      await adminSupportReports.list({ status: 'open', impact: 'blocked', search: 'checkout', page: 2 });
+      expect(mockGet).toHaveBeenCalledWith('/v2/admin/support-reports?status=open&impact=blocked&search=checkout&page=2');
+    });
+
+    it('get calls support report detail endpoint', async () => {
+      await adminSupportReports.get(9);
+      expect(mockGet).toHaveBeenCalledWith('/v2/admin/support-reports/9');
+    });
+
+    it('update calls PUT with triage payload', async () => {
+      await adminSupportReports.update(9, { status: 'triaged', triage_notes: 'Reproduced' });
+      expect(mockPut).toHaveBeenCalledWith('/v2/admin/support-reports/9', { status: 'triaged', triage_notes: 'Reproduced' });
+    });
+
+    it('stats and assignees call their endpoints', async () => {
+      await adminSupportReports.stats();
+      await adminSupportReports.assignees();
+      expect(mockGet).toHaveBeenCalledWith('/v2/admin/support-reports/stats');
+      expect(mockGet).toHaveBeenCalledWith('/v2/admin/support-reports/assignees');
     });
   });
 

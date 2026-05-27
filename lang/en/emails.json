@@ -453,6 +453,23 @@
     "received_cta": "View Your Wallet",
     "no_message": "(none)"
   },
+  "support_report": {
+    "created_subject": "New support report :reference",
+    "created_title": "New Support Report",
+    "created_preview": ":reference needs triage. Impact: :impact.",
+    "created_body": "A member has submitted a new technical support report. Review it while the page context and diagnostics are still fresh.",
+    "created_bell": "New support report :reference: :summary",
+    "reference_label": "Reference",
+    "impact_label": "Impact",
+    "summary_label": "Summary",
+    "route_label": "Page route",
+    "not_provided": "Not provided",
+    "review_cta": "Review Report",
+    "impact_blocked": "Blocked",
+    "impact_major": "Major",
+    "impact_minor": "Minor",
+    "impact_cosmetic": "Cosmetic"
+  },
   "identity_verification": {
     "passed_subject": "Your identity has been verified",
     "passed_title": "Identity Verified",

@@ -702,7 +702,8 @@
     "percentile_value": "{{pct}}% superior",
     "excellent": "Excelente",
     "good": "Bueno",
-    "below_average": "Por debajo de la media"
+    "below_average": "Por debajo de la media",
+    "section_heading": "Análisis"
   },
   "branding": {
     "title": "Marca del grupo",

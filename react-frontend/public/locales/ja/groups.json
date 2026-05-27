@@ -702,7 +702,8 @@
     "percentile_value": "上位 {{pct}}%",
     "excellent": "優秀",
     "good": "良好",
-    "below_average": "平均以下"
+    "below_average": "平均以下",
+    "section_heading": "分析"
   },
   "branding": {
     "title": "グループブランディング",

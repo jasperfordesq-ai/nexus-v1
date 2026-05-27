@@ -24,6 +24,7 @@ import {
 } from '@/components/ui';
 import { useAuth, useToast } from '@/contexts';
 import { api } from '@/lib/api';
+import { captureSentryMessage } from '@/lib/sentry';
 import { getSupportDiagnosticsSnapshot } from '@/lib/supportDiagnostics';
 
 type Impact = 'blocked' | 'major' | 'minor' | 'cosmetic';
@@ -84,12 +85,21 @@ export function ReportProblemButton({ className, mode = 'button' }: ReportProble
 
     setIsSubmitting(true);
     const diagnostics = includeDiagnostics ? getSupportDiagnosticsSnapshot() : undefined;
+    const pageUrl = typeof window === 'undefined' ? undefined : window.location.href;
+    const route = typeof window === 'undefined' ? undefined : `${window.location.pathname}${window.location.search}${window.location.hash}`;
+    const sentryEventId = captureSentryMessage('Support report submitted', 'info', {
+      impact,
+      route,
+      page_url: pageUrl,
+      has_diagnostics: includeDiagnostics,
+    });
     const response = await api.post<ReportProblemResponse>('/v2/support/reports', {
       summary: summary.trim(),
       description: description.trim(),
       impact,
-      page_url: typeof window === 'undefined' ? undefined : window.location.href,
-      route: typeof window === 'undefined' ? undefined : `${window.location.pathname}${window.location.search}${window.location.hash}`,
+      page_url: pageUrl,
+      route,
+      sentry_event_id: sentryEventId ?? undefined,
       include_diagnostics: includeDiagnostics,
       diagnostics,
     });
