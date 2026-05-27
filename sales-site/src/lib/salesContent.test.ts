@@ -13,7 +13,9 @@ const publicSalesFiles = [
   'src/components/FeaturesPage.tsx',
   'src/components/HostingPage.tsx',
   'src/components/QuoteBuilder.tsx',
+  'src/components/LegalPage.tsx',
   'src/data/pricing.ts',
+  'src/data/legal.ts',
 ].map((path) => resolve(__dirname, '..', '..', path));
 
 describe('sales-site public content policy', () => {
@@ -26,14 +28,55 @@ describe('sales-site public content policy', () => {
   });
 
   it('uses the hOUR Timebank address for hosting enquiries', () => {
-    const pricingEngine = readFileSync(resolve(__dirname, 'pricingEngine.ts'), 'utf8');
     const siteShell = readFileSync(resolve(__dirname, '..', 'components', 'SiteShell.tsx'), 'utf8');
     const orderForm = readFileSync(resolve(__dirname, '..', 'components', 'OrderForm.tsx'), 'utf8');
 
-    expect(pricingEngine).toContain('mailto:jasper@hour-timebank.ie');
     expect(siteShell).toContain('mailto:jasper@hour-timebank.ie');
-    expect(orderForm).toContain('jasper@hour-timebank.ie');
-    expect(`${pricingEngine}\n${siteShell}\n${orderForm}`).not.toContain('mailto:hello@project-nexus.ie');
+    expect(orderForm).not.toContain('mailto:jasper@hour-timebank.ie');
+    expect(`${siteShell}\n${orderForm}`).not.toContain('mailto:hello@project-nexus.ie');
+  });
+
+  it('submits sales orders through the backend instead of a mailto order button', () => {
+    const orderForm = readFileSync(resolve(__dirname, '..', 'components', 'OrderForm.tsx'), 'utf8');
+    const salesOrderApi = readFileSync(resolve(__dirname, 'salesOrderApi.ts'), 'utf8');
+
+    expect(orderForm).toContain('submitSalesOrder');
+    expect(orderForm).toContain('Message received');
+    expect(orderForm).toContain('Send order enquiry');
+    expect(orderForm).not.toContain('window.location.assign');
+    expect(orderForm).not.toContain('Open email order');
+    expect(salesOrderApi).toContain('/v2/sales/orders');
+    expect(salesOrderApi).toContain('https://api.project-nexus.ie/api');
+  });
+
+  it('identifies the registered hosting partner in the footer', () => {
+    const siteShell = readFileSync(resolve(__dirname, '..', 'components', 'SiteShell.tsx'), 'utf8');
+
+    expect(siteShell).toContain('Managed hosting in association with PROJECT NEXUS PLATFORM IRELAND LTD');
+    expect(siteShell).toContain('Reg. Number 812763');
+  });
+
+  it('links detailed legal pages in the footer and separates creator licensing from hosting company terms', () => {
+    const siteShell = readFileSync(resolve(__dirname, '..', 'components', 'SiteShell.tsx'), 'utf8');
+    const legalContent = readFileSync(resolve(__dirname, '..', 'data', 'legal.ts'), 'utf8');
+
+    expect(siteShell).toContain('title="Legal"');
+    expect(legalContent).toContain("path: '/legal/terms'");
+    expect(legalContent).toContain("path: '/legal/privacy'");
+    expect(legalContent).toContain("path: '/legal/cookies'");
+    expect(legalContent).toContain("path: '/legal/acceptable-use'");
+    expect(legalContent).toContain("path: '/legal/data-processing'");
+    expect(legalContent).toContain('Jasper Ford is the creator, copyright holder, and licensor');
+    expect(legalContent).toContain("const company = 'PROJECT NEXUS PLATFORM IRELAND LTD'");
+    expect(legalContent).toContain('registered number 812763');
+  });
+
+  it('renders internal footer navigation as real links, not button-only pseudo-links', () => {
+    const siteShell = readFileSync(resolve(__dirname, '..', 'components', 'SiteShell.tsx'), 'utf8');
+
+    expect(siteShell).toContain('href={href}');
+    expect(siteShell).toContain('onClick={(event) => handleInternalLink(event, href)}');
+    expect(siteShell).not.toContain('<button key={href} type="button" className="text-left hover:text-white" onClick={() => onNavigate(href)}>');
   });
 
   it('uses an immersive product hero and keeps the detailed platform map visible', () => {

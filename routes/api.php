@@ -38,6 +38,8 @@ Route::get('/laravel/health', function () {
     ]);
 });
 Route::get('/v2/health', fn () => response()->json(['status' => 'ok']));
+Route::post('/v2/sales/orders', [\App\Http\Controllers\Api\SalesOrderController::class, 'submit'])
+    ->middleware('throttle:5,1');
 
 // ============================================
 // MIGRATED ROUTES — Tenant Bootstrap

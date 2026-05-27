@@ -31,8 +31,12 @@ class CorsHelper
         'https://www.timebank.global',
         'http://staging.timebank.local',
         'http://localhost:5173',
+        'http://localhost:5176',
+        'http://localhost:4176',
         'http://localhost:8090',
         'http://127.0.0.1:5173',
+        'http://127.0.0.1:5176',
+        'http://127.0.0.1:4176',
     ];
 
     /** Cached tenant domain origins (null = not loaded yet) */

@@ -6,7 +6,6 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  buildOrderEmail,
   estimateQuote,
   formatCurrency,
   recommendCommunityTimebankPlan,
@@ -119,39 +118,7 @@ describe('pricingEngine', () => {
     expect(formatCurrency(8999)).toBe('€8,999');
   });
 
-  it('builds a prefilled order email from the quote summary', () => {
-    const quote = estimateQuote({
-      activeMembers: 12000,
-      billingCycle: 'annual',
-      supportTierId: 'managed',
-      maintenancePlanId: 'custom-fork',
-      onboardingPackageId: 'enterprise-launch',
-      addOns: {
-        'compliance-pack': 1,
-      },
-      oneOffServices: {
-        'data-migration': 1,
-      },
-    });
-
-    const href = buildOrderEmail({
-      contactName: 'Ava Murphy',
-      organisation: 'Civic Network',
-      email: 'ava@example.org',
-      region: 'Ireland and UK',
-      note: 'We need a multi-tenant launch.',
-      quote,
-    });
-
-    expect(href).toContain('mailto:jasper@hour-timebank.ie');
-    expect(decodeURIComponent(href)).toContain('Ava Murphy');
-    expect(decodeURIComponent(href)).toContain('Scale');
-    expect(decodeURIComponent(href)).toContain('Full Platform Hosting');
-    expect(decodeURIComponent(href)).toContain('Managed support');
-    expect(decodeURIComponent(href)).toContain('We need a multi-tenant launch.');
-  });
-
-  it('labels enterprise custom enquiries as custom quotes in the order email', () => {
+  it('keeps enterprise custom quote totals as custom labels for downstream order payloads', () => {
     const quote = estimateQuote({
       activeMembers: 100001,
       billingCycle: 'annual',
@@ -162,19 +129,8 @@ describe('pricingEngine', () => {
       oneOffServices: {},
     });
 
-    const href = buildOrderEmail({
-      contactName: 'Ava Murphy',
-      organisation: 'National Network',
-      email: 'ava@example.org',
-      region: 'Global',
-      note: 'We may reach a million users.',
-      quote,
-    });
-
-    const body = decodeURIComponent(href);
-
-    expect(body).toContain('Pricing mode: Bespoke enterprise discovery required');
-    expect(body).toContain('Estimated monthly recurring: Custom quote');
-    expect(body).toContain('Enterprise Custom');
+    expect(quote.pricingMode).toBe('custom');
+    expect(quote.hostingPlan.name).toBe('Enterprise Custom');
+    expect(quote.lineItems.map((item) => item.label).join(' ')).toContain('Bespoke architecture');
   });
 });

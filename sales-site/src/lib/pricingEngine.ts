@@ -54,15 +54,6 @@ export interface QuoteEstimate {
   lineItems: QuoteLineItem[];
 }
 
-export interface OrderEmailInput {
-  contactName: string;
-  organisation: string;
-  email: string;
-  region: string;
-  note: string;
-  quote: QuoteEstimate;
-}
-
 export function recommendHostingPlan(activeMembers: number): HostingPlan {
   const normalisedMembers = Math.max(0, Math.ceil(activeMembers));
 
@@ -101,52 +92,6 @@ export function formatCurrency(amount: number): string {
 
 export function formatQuoteAmount(quote: QuoteEstimate, amount: number): string {
   return quote.pricingMode === 'custom' ? 'Custom quote' : formatCurrency(amount);
-}
-
-export function buildOrderEmail(input: OrderEmailInput): string {
-  const formatLineAmount = (item: QuoteLineItem) =>
-    input.quote.pricingMode === 'custom' && item.amountEur === 0 ? 'Custom quote' : formatCurrency(item.amountEur);
-  const monthlyLines = input.quote.lineItems
-    .filter((item) => item.cadence === 'monthly')
-    .map((item) => `- ${item.label}: ${formatLineAmount(item)}${input.quote.pricingMode === 'custom' ? '' : '/mo'}${item.quantity > 1 ? ` x${item.quantity}` : ''}`)
-    .join('\n');
-
-  const oneOffLines = input.quote.lineItems
-    .filter((item) => item.cadence === 'one-off')
-    .map((item) => `- ${item.label}: ${formatLineAmount(item)}${item.quantity > 1 ? ` x${item.quantity}` : ''}`)
-    .join('\n');
-
-  const subject = `Project NEXUS hosting order enquiry - ${input.organisation || input.quote.hostingPlan.name}`;
-  const body = [
-    'Hello Project NEXUS,',
-    '',
-    'I would like to discuss this managed hosting order.',
-    '',
-    `Contact: ${input.contactName}`,
-    `Organisation: ${input.organisation}`,
-    `Email: ${input.email}`,
-    `Region: ${input.region}`,
-    '',
-    `Product line: ${input.quote.productLineLabel}`,
-    `Recommended plan: ${input.quote.hostingPlan.name}`,
-    `Pricing mode: ${input.quote.pricingMode === 'custom' ? 'Bespoke enterprise discovery required' : 'Published calculator estimate'}`,
-    `Billing preference: ${input.quote.billingCycle}`,
-    `Estimated monthly recurring: ${formatQuoteAmount(input.quote, input.quote.monthlyRecurring)}`,
-    `Estimated annual recurring: ${formatQuoteAmount(input.quote, input.quote.annualRecurring)}`,
-    `Estimated one-off total: ${formatQuoteAmount(input.quote, input.quote.oneOffTotal)}`,
-    `Estimated first-year total: ${formatQuoteAmount(input.quote, input.quote.firstYearTotal)}`,
-    '',
-    'Recurring items:',
-    monthlyLines || '- None selected',
-    '',
-    'One-off items:',
-    oneOffLines || '- None selected',
-    '',
-    'Notes:',
-    input.note || 'No extra notes added.',
-  ].join('\n');
-
-  return `mailto:jasper@hour-timebank.ie?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
 function estimateCommunityQuote(input: QuoteInput): QuoteEstimate {

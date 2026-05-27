@@ -20,6 +20,7 @@ class ResolveTenant
     private const EXEMPT_PATHS = [
         '/up',
         '/api/laravel/health',
+        '/api/v2/sales/orders',
         '/api/v2/federation/external/webhooks/receive',
     ];
 
