@@ -15,6 +15,7 @@ import { api } from '@/lib/api/client';
 import {
   createMarketplaceListing,
   createMarketplaceCollection,
+  createMarketplacePaymentIntent,
   createMarketplacePickupSlot,
   createMarketplaceSavedSearch,
   createMerchantCoupon,
@@ -22,6 +23,7 @@ import {
   getMarketplaceCollectionItems,
   getMarketplaceCollections,
   getMarketplaceListing,
+  getMarketplaceListingPickupSlots,
   getMarketplaceListings,
   getMarketplaceOffers,
   getMarketplacePickupSlots,
@@ -34,9 +36,11 @@ import {
   marketplaceNextCursor,
   promoteMarketplaceListing,
   removeMarketplaceCollectionItem,
+  reserveMarketplacePickup,
   scanMarketplacePickup,
   updateMarketplaceListing,
   uploadMarketplaceImages,
+  validateMarketplaceCoupon,
 } from './marketplace';
 
 describe('marketplace api', () => {
@@ -204,6 +208,31 @@ describe('marketplace api', () => {
       discount_type: 'percent',
       discount_value: 10,
       status: 'active',
+    });
+  });
+
+  it('wires checkout payment, pickup reservation, and coupon validation', async () => {
+    (api.get as jest.Mock).mockResolvedValue({ data: [] });
+    (api.post as jest.Mock).mockResolvedValue({ data: { checkout_url: 'https://checkout.test' } });
+
+    await getMarketplaceListingPickupSlots(9);
+    expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/listings/9/pickup-slots');
+
+    await reserveMarketplacePickup(14, 3);
+    expect(api.post).toHaveBeenCalledWith('/api/v2/marketplace/orders/14/pickup-reservation', {
+      slot_id: 3,
+    });
+
+    await createMarketplacePaymentIntent(14);
+    expect(api.post).toHaveBeenCalledWith('/api/v2/marketplace/payments/create-intent', {
+      order_id: 14,
+    });
+
+    await validateMarketplaceCoupon({ code: 'SAVE10', order_total_cents: 2500, listing_id: 9 });
+    expect(api.post).toHaveBeenCalledWith('/api/v2/coupons/validate', {
+      code: 'SAVE10',
+      order_total_cents: 2500,
+      listing_id: 9,
     });
   });
 });

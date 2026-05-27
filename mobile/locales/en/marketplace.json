@@ -207,6 +207,22 @@
       "disputed": "Disputed"
     }
   },
+  "checkout": {
+    "title": "Checkout",
+    "coupon": "Coupon code",
+    "couponPlaceholder": "COMMUNITY10",
+    "apply": "Apply",
+    "applied": "Applied",
+    "couponAppliedTitle": "Coupon applied",
+    "couponAppliedHint": "The coupon will be included when you buy this item.",
+    "invalidCoupon": "This coupon code could not be applied.",
+    "openedTitle": "Checkout started",
+    "clientSecretHint": "The order was created. Complete payment from the web checkout if the payment sheet does not open on this device."
+  },
+  "pickup": {
+    "chooseSlot": "Pickup slot",
+    "slotFallback": "Slot {{id}}"
+  },
   "seller": {
     "eyebrow": "Seller profile",
     "title": "Seller profile",

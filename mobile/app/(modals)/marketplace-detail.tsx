@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useState } from 'react';
-import { Alert, Image, Modal, ScrollView, Share, TextInput, View } from 'react-native';
+import { Alert, Image, Linking, Modal, ScrollView, Share, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,13 +21,18 @@ import { formatMarketplacePrice } from '@/components/marketplace/MarketplaceList
 import {
   addMarketplaceCollectionItem,
   createMarketplaceOrder,
+  createMarketplacePaymentIntent,
+  getMarketplaceListingPickupSlots,
   getMarketplaceCollections,
   getMarketplaceListing,
   makeMarketplaceOffer,
+  reserveMarketplacePickup,
   saveMarketplaceListing,
   unsaveMarketplaceListing,
+  validateMarketplaceCoupon,
   type MarketplaceCollection,
   type MarketplaceListingDetail,
+  type MarketplacePickupSlotOption,
 } from '@/lib/api/marketplace';
 import { APP_URL } from '@/lib/constants';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
@@ -60,6 +65,10 @@ function MarketplaceDetailScreen() {
   const [collectionOpen, setCollectionOpen] = useState(false);
   const [collections, setCollections] = useState<MarketplaceCollection[]>([]);
   const [isCollectionLoading, setIsCollectionLoading] = useState(false);
+  const [pickupSlots, setPickupSlots] = useState<MarketplacePickupSlotOption[]>([]);
+  const [selectedSlotId, setSelectedSlotId] = useState<number | null>(null);
+  const [couponCode, setCouponCode] = useState('');
+  const [couponApplied, setCouponApplied] = useState(false);
   const [offerAmount, setOfferAmount] = useState('');
   const [offerMessage, setOfferMessage] = useState('');
 
@@ -67,6 +76,21 @@ function MarketplaceDetailScreen() {
     void loadListing();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [safeId]);
+
+  useEffect(() => {
+    if (!listing || listing.is_own || (user?.id && listing.user?.id === user.id)) return;
+    let mounted = true;
+    getMarketplaceListingPickupSlots(listing.id)
+      .then((response) => {
+        if (mounted) setPickupSlots(response.data);
+      })
+      .catch(() => {
+        if (mounted) setPickupSlots([]);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, [listing, user?.id]);
 
   async function loadListing() {
     if (!safeId) {
@@ -144,11 +168,47 @@ function MarketplaceDetailScreen() {
     if (!listing || isActionLoading) return;
     setIsActionLoading(true);
     try {
-      const response = await createMarketplaceOrder({ listing_id: listing.id, quantity: 1 });
+      const response = await createMarketplaceOrder({
+        listing_id: listing.id,
+        quantity: 1,
+        coupon_code: couponApplied && couponCode.trim() ? couponCode.trim().toUpperCase() : undefined,
+      });
+      const orderId = response.data.id;
+      if (selectedSlotId) {
+        await reserveMarketplacePickup(orderId, selectedSlotId);
+      }
+      const payment = await createMarketplacePaymentIntent(orderId);
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      if (payment.data.checkout_url) {
+        await Linking.openURL(payment.data.checkout_url);
+        return;
+      }
+      if (payment.data.client_secret) {
+        Alert.alert(t('checkout.openedTitle'), t('checkout.clientSecretHint'));
+        return;
+      }
       Alert.alert(t('detail.orderCreated'), t('detail.orderCreatedHint', { order: response.data.order_number }));
     } catch (err) {
       Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('detail.orderFailed'));
+    } finally {
+      setIsActionLoading(false);
+    }
+  }
+
+  async function applyCoupon() {
+    if (!listing || !couponCode.trim()) return;
+    setIsActionLoading(true);
+    try {
+      await validateMarketplaceCoupon({
+        code: couponCode.trim().toUpperCase(),
+        order_total_cents: Math.round(Number(listing.price ?? 0) * 100),
+        listing_id: listing.id,
+      });
+      setCouponApplied(true);
+      Alert.alert(t('checkout.couponAppliedTitle'), t('checkout.couponAppliedHint'));
+    } catch {
+      setCouponApplied(false);
+      Alert.alert(t('common:errors.alertTitle'), t('checkout.invalidCoupon'));
     } finally {
       setIsActionLoading(false);
     }
@@ -349,6 +409,40 @@ function MarketplaceDetailScreen() {
             </HeroCard.Body>
           </HeroCard>
         ) : null}
+
+        {canBuy ? (
+          <HeroCard className="mb-3 rounded-panel p-0">
+            <HeroCard.Body className="gap-3 p-4">
+              <Text className="text-base font-bold" style={{ color: theme.text }}>{t('checkout.title')}</Text>
+              {pickupSlots.length > 0 ? (
+                <View className="gap-2">
+                  <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('pickup.chooseSlot')}</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+                    {pickupSlots.map((slot) => (
+                      <HeroButton
+                        key={slot.id}
+                        size="sm"
+                        variant={selectedSlotId === slot.id ? 'primary' : 'secondary'}
+                        onPress={() => setSelectedSlotId(selectedSlotId === slot.id ? null : slot.id)}
+                        style={selectedSlotId === slot.id ? { backgroundColor: primary } : undefined}
+                      >
+                        <HeroButton.Label>{formatPickupSlot(slot, t('pickup.slotFallback', { id: slot.id }))}</HeroButton.Label>
+                      </HeroButton>
+                    ))}
+                  </ScrollView>
+                </View>
+              ) : null}
+              <View className="flex-row gap-2">
+                <View className="min-w-0 flex-1">
+                  <FormInput label={t('checkout.coupon')} value={couponCode} onChangeText={(value) => { setCouponCode(value); setCouponApplied(false); }} placeholder={t('checkout.couponPlaceholder')} />
+                </View>
+                <HeroButton className="self-end" variant={couponApplied ? 'primary' : 'secondary'} onPress={() => void applyCoupon()} isDisabled={isActionLoading || !couponCode.trim()} style={couponApplied ? { backgroundColor: theme.success } : undefined}>
+                  <HeroButton.Label>{couponApplied ? t('checkout.applied') : t('checkout.apply')}</HeroButton.Label>
+                </HeroButton>
+              </View>
+            </HeroCard.Body>
+          </HeroCard>
+        ) : null}
       </ScrollView>
 
       {!isOwner ? (
@@ -435,6 +529,16 @@ function MarketplaceDetailScreen() {
       </Modal>
     </SafeAreaView>
   );
+}
+
+function formatPickupSlot(slot: MarketplacePickupSlotOption, fallback: string) {
+  try {
+    if (!slot.slot_start) return fallback;
+    const remaining = Number.isFinite(Number(slot.remaining)) ? ` (${slot.remaining})` : '';
+    return `${new Date(slot.slot_start).toLocaleString()}${remaining}`;
+  } catch {
+    return fallback;
+  }
 }
 
 function FormInput({

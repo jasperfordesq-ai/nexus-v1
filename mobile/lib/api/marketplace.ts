@@ -211,6 +211,18 @@ export interface MarketplacePickupReservation {
   picked_up_at?: string | null;
 }
 
+export interface MarketplacePickupSlotOption {
+  id: number;
+  slot_start: string | null;
+  slot_end: string | null;
+  remaining: number;
+}
+
+export interface MarketplacePaymentIntent {
+  checkout_url?: string;
+  client_secret?: string;
+}
+
 export interface MerchantCoupon {
   id: number;
   code: string;
@@ -430,8 +442,33 @@ export function createMarketplaceOrder(payload: {
   offer_id?: number;
   quantity?: number;
   shipping_method?: string | null;
+  coupon_code?: string;
 }): Promise<MarketplaceDataResponse<MarketplaceOrder>> {
   return api.post<MarketplaceDataResponse<MarketplaceOrder>>(`${API_V2}/marketplace/orders`, payload);
+}
+
+export function createMarketplacePaymentIntent(orderId: number): Promise<MarketplaceDataResponse<MarketplacePaymentIntent>> {
+  return api.post<MarketplaceDataResponse<MarketplacePaymentIntent>>(`${API_V2}/marketplace/payments/create-intent`, {
+    order_id: orderId,
+  });
+}
+
+export function getMarketplaceListingPickupSlots(listingId: number): Promise<MarketplaceDataResponse<MarketplacePickupSlotOption[]>> {
+  return api.get<MarketplaceDataResponse<MarketplacePickupSlotOption[]>>(`${API_V2}/marketplace/listings/${listingId}/pickup-slots`);
+}
+
+export function reserveMarketplacePickup(orderId: number, slotId: number): Promise<MarketplaceDataResponse<MarketplacePickupReservation>> {
+  return api.post<MarketplaceDataResponse<MarketplacePickupReservation>>(`${API_V2}/marketplace/orders/${orderId}/pickup-reservation`, {
+    slot_id: slotId,
+  });
+}
+
+export function validateMarketplaceCoupon(payload: {
+  code: string;
+  order_total_cents: number;
+  listing_id: number;
+}): Promise<MarketplaceDataResponse<{ discount_cents: number }>> {
+  return api.post<MarketplaceDataResponse<{ discount_cents: number }>>(`${API_V2}/coupons/validate`, payload);
 }
 
 export function getMarketplaceSeller(id: number): Promise<MarketplaceDataResponse<MarketplaceSellerProfile>> {
