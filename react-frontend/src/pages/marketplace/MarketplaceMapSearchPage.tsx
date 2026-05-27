@@ -238,6 +238,8 @@ export function MarketplaceMapSearchPage() {
         title={t('map.page_title')}
         description={t('map.meta_description')}
       />
+      {/* Visually-hidden h1 for WCAG 2.4.6 — screen readers need a page heading */}
+      <h1 className="sr-only">{t('map.page_title')}</h1>
 
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-4">
         {/* Header / Breadcrumb */}

@@ -388,6 +388,8 @@ export function ExchangeDetailPage() {
       className="max-w-3xl mx-auto space-y-6"
     >
       <PageMeta title={t('page_meta.detail.title')} noIndex />
+      {/* Visually-hidden h1 for WCAG 2.4.6 — screen readers need a page heading */}
+      <h1 className="sr-only">{exchange?.listing?.title || t('detail.page_title')}</h1>
       {/* Breadcrumbs */}
       <Breadcrumbs items={[
         { label: t('breadcrumb.exchanges'), href: '/exchanges' },

@@ -260,6 +260,8 @@ export function PostDetailPage() {
         description={item?.content?.substring(0, 160)}
         noIndex
       />
+      {/* Visually-hidden h1 for WCAG 2.4.6 — screen readers need a page heading */}
+      <h1 className="sr-only">{t('post_detail.title')}</h1>
       <div className="space-y-4 max-w-2xl mx-auto">
         <div>
           <Link to={tenantPath('/feed')}>
