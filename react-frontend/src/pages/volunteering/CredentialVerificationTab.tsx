@@ -415,7 +415,7 @@ export function CredentialVerificationTab() {
 
                     {credential.status === 'rejected' && credential.rejection_reason && (
                       <div className="mt-2 p-2 rounded-lg bg-rose-500/10">
-                        <p className="text-xs text-rose-400">
+                        <p className="text-xs text-rose-600 dark:text-rose-400">
                           <strong>{t('credentials.reason')}:</strong> {credential.rejection_reason}
                         </p>
                       </div>
@@ -482,7 +482,7 @@ export function CredentialVerificationTab() {
             {/* File Upload */}
             <div>
               <label className="block text-sm font-medium text-theme-primary mb-2">
-                {t('credentials.document_label')} <span className="text-rose-400">*</span>
+                {t('credentials.document_label')} <span className="text-rose-600 dark:text-rose-400">*</span>
               </label>
               <div
                 className={`relative overflow-hidden border-2 border-dashed rounded-xl p-6 text-center transition-colors ${
@@ -548,7 +548,7 @@ export function CredentialVerificationTab() {
             {/* Upload Error */}
             {uploadError && (
               <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30">
-                <p className="text-sm text-rose-400">{uploadError}</p>
+                <p className="text-sm text-rose-600 dark:text-rose-400">{uploadError}</p>
               </div>
             )}
           </ModalBody>

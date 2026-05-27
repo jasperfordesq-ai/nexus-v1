@@ -91,7 +91,7 @@ export function GroupEventsTab({
                 <div className={`flex min-w-0 items-center gap-3 rounded-lg bg-theme-elevated p-3 transition-colors hover:bg-theme-hover sm:gap-4 sm:p-4 ${isPast ? 'opacity-60' : ''}`}>
                   {/* Date Badge */}
                   <div className="flex h-14 w-14 flex-shrink-0 flex-col items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 text-center">
-                    <span className="text-xs font-medium text-indigo-400 uppercase">
+                    <span className="text-xs font-medium text-indigo-700 dark:text-indigo-400 uppercase">
                       {monthLabel}
                     </span>
                     <span className="text-lg font-bold text-theme-primary leading-none">

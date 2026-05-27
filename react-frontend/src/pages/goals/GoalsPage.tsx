@@ -1131,13 +1131,13 @@ function GoalCard({
           {/* Meta info */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-theme-subtle">
             {(goal.streak_count ?? 0) > 0 && (
-              <span className="flex items-center gap-1 text-orange-400">
+              <span className="flex items-center gap-1 text-orange-700 dark:text-orange-400">
                 <Sparkles className="w-3 h-3" aria-hidden="true" />
                 {t('goals.streak_label', { count: goal.streak_count })}
               </span>
             )}
             {deadlineDate && (
-              <span className={`flex items-center gap-1 ${isOverdue ? 'text-red-400' : ''}`}>
+              <span className={`flex items-center gap-1 ${isOverdue ? 'text-red-600 dark:text-red-400' : ''}`}>
                 <Calendar className="w-3 h-3" aria-hidden="true" />
                 {isOverdue ? t('goals.overdue') : t('goals.due')}{deadlineDate.toLocaleDateString()}
               </span>
@@ -1216,7 +1216,7 @@ function GoalCard({
             <Button
               size="sm"
               variant="flat"
-              className="bg-indigo-500/10 text-indigo-400"
+              className="bg-indigo-500/10 text-indigo-700 dark:text-indigo-400"
               startContent={<ClipboardCheck className="w-4 h-4" aria-hidden="true" />}
               onPress={() => onCheckin(goal)}
             >
@@ -1229,7 +1229,7 @@ function GoalCard({
             <Button
               size="sm"
               variant="flat"
-              className="bg-emerald-500/10 text-emerald-400"
+              className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
               onPress={() => onProgressUpdate(goal.id, 1)}
             >
               <TrendingUp className="w-4 h-4" aria-hidden="true" />
@@ -1254,7 +1254,7 @@ function GoalCard({
             <Button
               size="sm"
               variant="flat"
-              className="bg-purple-500/10 text-purple-400"
+              className="bg-purple-500/10 text-purple-700 dark:text-purple-400"
               startContent={<UserPlus className="w-4 h-4" aria-hidden="true" />}
               onPress={() => onBecomeBuddy(goal)}
             >
@@ -1266,7 +1266,7 @@ function GoalCard({
             <Button
               size="sm"
               variant="flat"
-              className="bg-purple-500/10 text-purple-400"
+              className="bg-purple-500/10 text-purple-700 dark:text-purple-400"
               startContent={<MessageCircle className="w-4 h-4" aria-hidden="true" />}
               onPress={() => onBuddyAction(goal, 'nudge')}
             >

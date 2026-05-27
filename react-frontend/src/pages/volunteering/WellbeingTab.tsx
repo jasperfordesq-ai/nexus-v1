@@ -73,9 +73,9 @@ function getMoodLabel(value: number, t: TranslateFn): string {
 /* ───────────────────────── Score Color ───────────────────────── */
 
 function getScoreColor(score: number): { text: string; bg: string; indicator: string } {
-  if (score >= 70) return { text: 'text-emerald-400', bg: 'bg-emerald-500/10', indicator: 'bg-gradient-to-r from-emerald-500 to-green-400' };
-  if (score >= 40) return { text: 'text-amber-400', bg: 'bg-amber-500/10', indicator: 'bg-gradient-to-r from-amber-500 to-yellow-400' };
-  return { text: 'text-rose-400', bg: 'bg-rose-500/10', indicator: 'bg-gradient-to-r from-rose-500 to-red-400' };
+  if (score >= 70) return { text: 'text-emerald-700 dark:text-emerald-400', bg: 'bg-emerald-500/10', indicator: 'bg-gradient-to-r from-emerald-500 to-green-400' };
+  if (score >= 40) return { text: 'text-amber-700 dark:text-amber-400', bg: 'bg-amber-500/10', indicator: 'bg-gradient-to-r from-amber-500 to-yellow-400' };
+  return { text: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-500/10', indicator: 'bg-gradient-to-r from-rose-500 to-red-400' };
 }
 
 function getScoreLabel(score: number, t: TranslateFn): string {

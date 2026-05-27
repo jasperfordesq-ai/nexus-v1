@@ -137,7 +137,7 @@ export default function MyOrganisationsPage() {
           {/* Pending orgs */}
           {pendingOrgs.length > 0 && (
             <GlassCard className="p-4 border-amber-500/30">
-              <p className="text-sm text-amber-400 font-medium mb-2">
+              <p className="text-sm text-amber-700 dark:text-amber-400 font-medium mb-2">
                 {t('my_organisations_pending')}
               </p>
               {pendingOrgs.map((org) => (

@@ -286,7 +286,7 @@ export function GoalDetailPage() {
                 <Calendar className="w-3.5 h-3.5" aria-hidden="true" />
                 {t('goals.detail.deadline')}
               </div>
-              <p className={`text-sm font-medium ${isOverdue ? 'text-red-400' : 'text-theme-primary'}`}>
+              <p className={`text-sm font-medium ${isOverdue ? 'text-red-600 dark:text-red-400' : 'text-theme-primary'}`}>
                 {deadlineDate.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })}
               </p>
             </div>

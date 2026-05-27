@@ -859,7 +859,7 @@ export function OpportunityDetailPage() {
             <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
               <CheckCircle className="w-5 h-5 text-emerald-400" aria-hidden="true" />
               <div>
-                <p className="text-sm font-medium text-emerald-400">
+                <p className="text-sm font-medium text-emerald-700 dark:text-emerald-400">
                   {t('opportunity.you_have_applied')}
                 </p>
                 <p className="text-xs text-theme-subtle">

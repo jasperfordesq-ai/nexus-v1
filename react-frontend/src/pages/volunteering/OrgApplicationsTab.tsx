@@ -283,7 +283,7 @@ function OrgApplicationsTab({ orgId }: OrgApplicationsTabProps) {
       {/* Bulk action bar */}
       {selected.size > 0 && (
         <div className="flex flex-col gap-3 p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/30 sm:flex-row sm:items-center">
-          <span className="text-sm text-indigo-400 font-medium">
+          <span className="text-sm text-indigo-700 dark:text-indigo-400 font-medium">
             {t('applications.selected_count', { count: selected.size })}
           </span>
           <Button
