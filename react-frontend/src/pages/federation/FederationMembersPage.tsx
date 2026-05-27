@@ -398,7 +398,7 @@ export function FederationMembersPage() {
 
       {/* Error State */}
       {error && !isLoading && (
-        <GlassCard className="p-8 text-center">
+        <GlassCard role="alert" className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h3 className="text-lg font-semibold text-theme-primary mb-2">
             {t('members.unable_to_load')}
@@ -416,7 +416,7 @@ export function FederationMembersPage() {
 
       {/* Loading State */}
       {isLoading && (
-        <div className="flex items-center justify-center py-20">
+        <div role="status" aria-busy="true" aria-label={t('members.loading')} className="flex items-center justify-center py-20">
           <Spinner size="lg" label={t('members.loading')} />
         </div>
       )}
@@ -551,7 +551,7 @@ const FederatedMemberCard = memo(function FederatedMemberCard({
                 size="sm"
                 variant="flat"
                 className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
-                startContent={<Globe className="w-3 h-3" />}
+                startContent={<Globe className="w-3 h-3" aria-hidden="true" />}
               >
                 {t('external')}
               </Chip>

@@ -215,7 +215,10 @@
     "message_label": "メッセージ",
     "message_placeholder": "メッセージを書いてください...",
     "cancel": "キャンセル",
-    "send_message": "メッセージを送信する"
+    "send_message": "メッセージを送信する",
+    "thread_aria_no_unread": "Conversation with {{name}} from {{tenant}}",
+    "thread_aria_unread": "Conversation with {{name}} from {{tenant}}, {{count}} unread message",
+    "thread_aria_unread_plural": "Conversation with {{name}} from {{tenant}}, {{count}} unread messages"
   },
   "listings": {
     "page_title": "フェデレーションのリスト",

@@ -215,7 +215,10 @@
     "message_label": "Message",
     "message_placeholder": "Écrivez votre message...",
     "cancel": "Annuler",
-    "send_message": "Envoyer un message"
+    "send_message": "Envoyer un message",
+    "thread_aria_no_unread": "Conversation with {{name}} from {{tenant}}",
+    "thread_aria_unread": "Conversation with {{name}} from {{tenant}}, {{count}} unread message",
+    "thread_aria_unread_plural": "Conversation with {{name}} from {{tenant}}, {{count}} unread messages"
   },
   "listings": {
     "page_title": "Listes de la Fédération",

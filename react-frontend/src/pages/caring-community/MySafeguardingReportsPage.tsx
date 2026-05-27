@@ -130,7 +130,7 @@ export default function MySafeguardingReportsPage(): JSX.Element {
           )}
 
           {loading ? (
-            <div className="flex justify-center py-12">
+            <div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-12">
               <Spinner />
             </div>
           ) : reports.length === 0 && !error ? (

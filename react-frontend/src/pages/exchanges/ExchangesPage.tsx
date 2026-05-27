@@ -267,7 +267,7 @@ export function ExchangesPage() {
       {!error && (
         <>
           {isLoading ? (
-            <div className="space-y-4" aria-busy="true" aria-label={t('loading')}>
+            <div role="status" className="space-y-4" aria-busy="true" aria-label={t('loading')}>
               {[1, 2, 3, 4].map((i) => (
                 <ExchangeCardSkeleton key={i} />
               ))}

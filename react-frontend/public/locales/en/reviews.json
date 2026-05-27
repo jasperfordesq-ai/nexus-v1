@@ -33,5 +33,6 @@
   "load_error": "Failed to load reviews. Please try again.",
   "load_more": "Load more",
   "stars": "{{count}} star",
-  "stars_plural": "{{count}} stars"
+  "stars_plural": "{{count}} stars",
+  "rating_aria": "{{n}} out of 5 stars"
 }

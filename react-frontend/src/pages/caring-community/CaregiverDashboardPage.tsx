@@ -371,7 +371,7 @@ export function CaregiverDashboardPage() {
 
           {/* Loading state */}
           {isLoading && (
-            <div className="space-y-3">
+            <div role="status" aria-busy="true" aria-label={t('loading')} className="space-y-3">
               <LinkCardSkeleton />
               <LinkCardSkeleton />
             </div>
@@ -379,7 +379,7 @@ export function CaregiverDashboardPage() {
 
           {/* Error state */}
           {linksError && !linksLoading && (
-            <GlassCard className="p-6 text-center text-danger">
+            <GlassCard role="alert" className="p-6 text-center text-danger">
               <p className="font-medium">{t('caregiver.no_care_receivers')}</p>
             </GlassCard>
           )}

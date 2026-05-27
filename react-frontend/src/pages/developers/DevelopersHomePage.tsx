@@ -46,7 +46,7 @@ export default function DevelopersHomePage() {
       <div className="max-w-5xl mx-auto px-4 py-10">
       <header className="mb-10">
         <div className="flex items-center gap-3 text-[var(--color-text-muted)] mb-3">
-          <Code size={20} />
+          <Code size={20} aria-hidden="true" />
           <span className="uppercase tracking-wide text-xs font-semibold">
             {t('developers.page_title')}
           </span>
@@ -64,7 +64,7 @@ export default function DevelopersHomePage() {
           <Card key={titleKey}>
             <CardBody className="p-5">
               <div className="flex items-start gap-3">
-                <Icon size={22} className="text-[var(--color-primary)] mt-0.5 shrink-0" />
+                <Icon size={22} className="text-[var(--color-primary)] mt-0.5 shrink-0" aria-hidden="true" />
                 <div>
                   <h3 className="font-semibold text-[var(--color-text)] mb-1">
                     {t(titleKey)}
@@ -86,7 +86,7 @@ export default function DevelopersHomePage() {
             <p className="text-[var(--color-text-muted)] mb-4">
               {t('developers.request_access_body')}
             </p>
-            <Button as={Link} to="/contact" variant="primary" endContent={<ArrowRight size={16} />}>
+            <Button as={Link} to="/contact" variant="primary" endContent={<ArrowRight size={16} aria-hidden="true" />}>
               {t('developers.request_access_cta')}
             </Button>
           </CardBody>
@@ -101,9 +101,9 @@ export default function DevelopersHomePage() {
           {navLinks.map(({ to, icon: Icon, key }) => (
             <Card key={to} as={Link} to={to} isPressable className="block">
               <CardBody className="p-4 flex flex-row items-center gap-3">
-                <Icon size={20} className="text-[var(--color-primary)]" />
+                <Icon size={20} className="text-[var(--color-primary)]" aria-hidden="true" />
                 <span className="font-medium text-[var(--color-text)]">{t(key)}</span>
-                <ArrowRight size={16} className="ml-auto text-[var(--color-text-muted)]" />
+                <ArrowRight size={16} className="ml-auto text-[var(--color-text-muted)]" aria-hidden="true" />
               </CardBody>
             </Card>
           ))}

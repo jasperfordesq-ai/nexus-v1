@@ -1727,7 +1727,11 @@
     "page_views": "Paginaweergaven",
     "distinct_visitors": "Unieke bezoekers",
     "suppressed_value": "Onderdrukt",
-    "suppressed_short": "--"
+    "suppressed_short": "--",
+    "line_chart_aria": "Line chart showing partner activity over time",
+    "bar_chart_aria": "Bar chart showing partner performance metrics",
+    "pie_chart_aria": "Pie chart showing distribution of partner data",
+    "area_chart_aria": "Area chart showing partner trends over time"
   },
   "provisioning": {
     "meta": {

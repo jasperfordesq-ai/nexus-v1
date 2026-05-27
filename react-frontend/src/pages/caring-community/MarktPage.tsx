@@ -405,6 +405,7 @@ export function MarktPage() {
         {/* Loading skeleton */}
         {isLoading && items.length === 0 ? (
           <div
+            role="status"
             className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
             aria-busy="true"
           >
@@ -413,7 +414,7 @@ export function MarktPage() {
             ))}
           </div>
         ) : loadError ? (
-          <GlassCard className="p-8 text-center">
+          <GlassCard role="alert" className="p-8 text-center">
             <AlertTriangle className="w-12 h-12 text-warning mx-auto mb-4" aria-hidden="true" />
             <p className="text-theme-muted mb-4">{loadError}</p>
             <Button
@@ -426,7 +427,7 @@ export function MarktPage() {
           </GlassCard>
         ) : items.length === 0 && !showMarketplaceNotice ? (
           <EmptyState
-            icon={<Store className="w-12 h-12" />}
+            icon={<Store className="w-12 h-12" aria-hidden="true" />}
             title={t(emptyKey)}
           />
         ) : (

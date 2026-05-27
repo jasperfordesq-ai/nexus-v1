@@ -33,5 +33,6 @@
   "load_error": "Theip ar lódáil léirmheasanna. Déan iarracht eile le do thoil.",
   "load_more": "Luchtaigh níos mó",
   "stars": "{{count}} réalta",
-  "stars_plural": "{{count}} réalta"
+  "stars_plural": "{{count}} réalta",
+  "rating_aria": "{{n}} out of 5 stars"
 }

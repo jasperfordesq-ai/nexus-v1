@@ -686,7 +686,7 @@ export function ResourcesPage() {
       {!error && (
         <>
           {isLoading ? (
-            <div className="space-y-3" aria-busy="true" aria-label={t('resources.loading')}>
+            <div role="status" className="space-y-3" aria-busy="true" aria-label={t('resources.loading')}>
               {[1, 2, 3, 4, 5].map((i) => (
                 <GlassCard key={i} className="p-4 animate-pulse">
                   <div className="flex items-center gap-4">

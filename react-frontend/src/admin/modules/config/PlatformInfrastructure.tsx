@@ -193,7 +193,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
 
   if (loading) {
     return (
-      <div className="flex h-32 items-center justify-center">
+      <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex h-32 items-center justify-center">
         <Spinner size="sm" />
       </div>
     );
@@ -206,7 +206,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
         {/* Languages */}
         <Card>
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <Globe size={18} className="text-accent" />
+            <Globe size={18} className="text-accent" aria-hidden="true" />
             <h3 className="font-semibold">{t('tenant_features.language_localisation_heading')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4 space-y-4">
@@ -270,7 +270,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
         {/* Maps & Location */}
         <Card>
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <MapPin size={18} className="text-warning" />
+            <MapPin size={18} className="text-warning" aria-hidden="true" />
             <h3 className="font-semibold">{t('tenant_features.maps_card_title')}</h3>
             <span className="text-sm text-muted">
               {t('tenant_features.maps_card_subtitle')}
@@ -306,7 +306,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
                     {t('tenant_features.maps_kill_switch_label')}
                   </p>
                   <span className="inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded-full bg-surface text-muted">
-                    <Lock size={10} />
+                    <Lock size={10} aria-hidden="true" />
                     {t('tenant_features.maps_policy_locked')}
                   </span>
                 </div>
@@ -385,7 +385,7 @@ export default function PlatformInfrastructure({ config: _config, onConfigChange
         {/* API Keys */}
         <Card>
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <KeyRound size={18} className="text-accent" />
+            <KeyRound size={18} className="text-accent" aria-hidden="true" />
             <h3 className="font-semibold">
               {t('tenant_features.api_keys_card_title')}
             </h3>

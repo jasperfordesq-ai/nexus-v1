@@ -58,5 +58,6 @@
     "reason_announcement": "公式アナウンス",
     "no_reasons": "デフォルト順"
   },
-  "prefs_cadence_monthly": "月次サマリー"
+  "prefs_cadence_monthly": "月次サマリー",
+  "loading": "Loading..."
 }

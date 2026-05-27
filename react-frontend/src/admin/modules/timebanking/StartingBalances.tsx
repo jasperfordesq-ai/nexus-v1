@@ -112,7 +112,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
   return (
     <Card >
       <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-        <Plus size={18} className="text-accent" />
+        <Plus size={18} className="text-accent" aria-hidden="true" />
         <h3 className="font-semibold">{t('timebanking.grant_starting_credits')}</h3>
       </CardHeader>
       <CardBody className="px-4 pb-4 space-y-4">
@@ -122,7 +122,7 @@ function GrantCreditsForm({ onGranted }: { onGranted: () => void }) {
             <Input type="search" name="admin-search" autoComplete="off"
               label={t('timebanking.label_search_member')}
               placeholder={t('timebanking.placeholder_search_by_name_or_email')}
-              startContent={<Search size={16} className="text-muted" />}
+              startContent={<Search size={16} className="text-muted" aria-hidden="true" />}
               value={searchQuery}
               onValueChange={handleSearch}
               size="sm"
@@ -337,7 +337,7 @@ function GrantHistory({ refreshKey }: { refreshKey: number }) {
   return (
     <div>
       <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
-        <History size={16} className="text-accent" />
+        <History size={16} className="text-accent" aria-hidden="true" />
         {t('timebanking.grant_history')}
       </h3>
       <DataTable

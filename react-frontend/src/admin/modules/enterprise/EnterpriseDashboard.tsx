@@ -70,7 +70,7 @@ export function EnterpriseDashboard() {
         actions={
           <Button
             variant="tertiary"
-            startContent={<RefreshCw size={16} />}
+            startContent={<RefreshCw aria-hidden="true" size={16} />}
             onPress={loadData}
             isLoading={loading}
             size="sm"
@@ -116,10 +116,10 @@ export function EnterpriseDashboard() {
           <CardBody className="p-4">
             <p className="text-sm font-semibold text-foreground mb-3">{t('enterprise.label_system_health')}</p>
             <div className="flex flex-wrap gap-3">
-              <Chip color={stats.db_connected ? 'success' : 'danger'} variant="soft" size="sm" startContent={<Database size={12} />}>
+              <Chip color={stats.db_connected ? 'success' : 'danger'} variant="soft" size="sm" startContent={<Database aria-hidden="true" size={12} />}>
                 {t('enterprise.database')} {stats.db_connected ? t('enterprise.connected') : t('enterprise.disconnected')}
               </Chip>
-              <Chip color={stats.redis_connected ? 'success' : 'danger'} variant="soft" size="sm" startContent={<Cpu size={12} />}>
+              <Chip color={stats.redis_connected ? 'success' : 'danger'} variant="soft" size="sm" startContent={<Cpu aria-hidden="true" size={12} />}>
                 {t('enterprise.redis')} {stats.redis_connected ? t('enterprise.connected') : t('enterprise.disconnected')}
               </Chip>
               <Chip color={stats.memory_percent > 90 ? 'danger' : stats.memory_percent > 70 ? 'warning' : 'success'} variant="tertiary" size="sm">
@@ -150,8 +150,8 @@ export function EnterpriseDashboard() {
                   to={link.href}
                   variant="secondary"
                   className="min-h-11 justify-between px-4 py-3"
-                  endContent={<ArrowRight size={16} />}
-                  startContent={<link.icon size={18} />}
+                  endContent={<ArrowRight aria-hidden="true" size={16} />}
+                  startContent={<link.icon aria-hidden="true" size={18} />}
                 >
                   {link.label}
                 </Button>

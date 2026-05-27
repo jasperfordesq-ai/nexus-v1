@@ -114,7 +114,7 @@ export function SystemMonitoring() {
               to={tenantPath('/admin/enterprise/monitoring/health')}
               variant="tertiary"
               size="sm"
-              endContent={<ArrowRight size={14} />}
+              endContent={<ArrowRight aria-hidden="true" size={14} />}
             >
               {t('enterprise.health_check')}
             </Button>
@@ -123,7 +123,7 @@ export function SystemMonitoring() {
               to={tenantPath('/admin/enterprise/monitoring/logs')}
               variant="tertiary"
               size="sm"
-              endContent={<ArrowRight size={14} />}
+              endContent={<ArrowRight aria-hidden="true" size={14} />}
             >
               {t('enterprise.error_logs')}
             </Button>
@@ -132,7 +132,7 @@ export function SystemMonitoring() {
               to={tenantPath('/admin/enterprise/monitoring/log-files')}
               variant="tertiary"
               size="sm"
-              endContent={<ArrowRight size={14} />}
+              endContent={<ArrowRight aria-hidden="true" size={14} />}
             >
               {t('enterprise.log_files')}
             </Button>
@@ -141,7 +141,7 @@ export function SystemMonitoring() {
               to={tenantPath('/admin/enterprise/monitoring/requirements')}
               variant="tertiary"
               size="sm"
-              endContent={<ArrowRight size={14} />}
+              endContent={<ArrowRight aria-hidden="true" size={14} />}
             >
               {t('enterprise.requirements')}
             </Button>
@@ -150,13 +150,13 @@ export function SystemMonitoring() {
               to={tenantPath('/admin/module-configuration')}
               variant="tertiary"
               size="sm"
-              endContent={<ToggleLeft size={14} />}
+              endContent={<ToggleLeft aria-hidden="true" size={14} />}
             >
               {t('enterprise.module_configuration')}
             </Button>
             <Button
               variant="tertiary"
-              startContent={<RefreshCw size={16} />}
+              startContent={<RefreshCw aria-hidden="true" size={16} />}
               onPress={loadData}
               isLoading={loading}
               size="sm"
@@ -186,7 +186,7 @@ export function SystemMonitoring() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-16">
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
       ) : (
@@ -199,7 +199,7 @@ export function SystemMonitoring() {
                 <CardBody className="p-4">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <Server size={18} className="text-warning" />
+                      <Server aria-hidden="true" size={18} className="text-warning" />
                       <span className="text-sm font-semibold text-foreground">
                         {t('enterprise.php_process_memory')}
                       </span>
@@ -226,7 +226,7 @@ export function SystemMonitoring() {
                 <CardBody className="p-4">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <Cpu size={18} className="text-accent" />
+                      <Cpu aria-hidden="true" size={18} className="text-accent" />
                       <span className="text-sm font-semibold text-foreground">
                         {t('enterprise.vm_memory')}
                       </span>
@@ -257,7 +257,7 @@ export function SystemMonitoring() {
               <Card key={metric.label} >
                 <CardBody className="flex flex-row items-center gap-3 p-4">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-secondary">
-                    <metric.icon size={20} className="text-muted" />
+                    <metric.icon aria-hidden="true" size={20} className="text-muted" />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-xs text-muted">{metric.label}</p>
@@ -272,7 +272,7 @@ export function SystemMonitoring() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <Card  isPressable as={Link} to={tenantPath('/admin/enterprise/monitoring/log-files')}>
               <CardBody className="flex flex-row items-center gap-3 p-4">
-                <FileText size={20} className="text-accent" />
+                <FileText aria-hidden="true" size={20} className="text-accent" />
                 <div>
                   <p className="text-sm font-semibold text-foreground">{t('enterprise.log_files')}</p>
                   <p className="text-xs text-muted">{t('enterprise.log_files_desc')}</p>
@@ -281,7 +281,7 @@ export function SystemMonitoring() {
             </Card>
             <Card  isPressable as={Link} to={tenantPath('/admin/enterprise/monitoring/requirements')}>
               <CardBody className="flex flex-row items-center gap-3 p-4">
-                <Settings size={20} className="text-warning" />
+                <Settings aria-hidden="true" size={20} className="text-warning" />
                 <div>
                   <p className="text-sm font-semibold text-foreground">{t('enterprise.system_requirements')}</p>
                   <p className="text-xs text-muted">{t('enterprise.system_requirements_desc')}</p>
@@ -290,7 +290,7 @@ export function SystemMonitoring() {
             </Card>
             <Card  isPressable as={Link} to={tenantPath('/admin/module-configuration')}>
               <CardBody className="flex flex-row items-center gap-3 p-4">
-                <ToggleLeft size={20} className="text-success" />
+                <ToggleLeft aria-hidden="true" size={20} className="text-success" />
                 <div>
                   <p className="text-sm font-semibold text-foreground">{t('enterprise.module_configuration')}</p>
                   <p className="text-xs text-muted">{t('enterprise.module_configuration_desc')}</p>

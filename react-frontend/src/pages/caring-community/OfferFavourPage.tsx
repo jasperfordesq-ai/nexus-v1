@@ -93,7 +93,7 @@ export function OfferFavourPage() {
                 color="primary"
                 variant="flat"
                 size="lg"
-                startContent={<ArrowLeft className="h-4 w-4" />}
+                startContent={<ArrowLeft className="h-4 w-4" aria-hidden="true" />}
               >
                 {t('offer_favour.success.back')}
               </Button>

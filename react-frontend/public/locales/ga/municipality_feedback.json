@@ -28,5 +28,6 @@
   "status_triaging": "Ag triage",
   "status_in_progress": "Ar siúl",
   "status_resolved": "Réitithe",
-  "status_closed": "Dúnta"
+  "status_closed": "Dúnta",
+  "loading": "Loading..."
 }

@@ -164,7 +164,7 @@ export function GroupEdit() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
+      <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center items-center min-h-[400px]">
         <Spinner size="lg" />
       </div>
     );
@@ -209,7 +209,7 @@ export function GroupEdit() {
         {/* Images */}
         <Card>
           <CardHeader className="flex items-center gap-2 pb-0">
-            <Image size={18} className="text-muted" />
+            <Image size={18} className="text-muted" aria-hidden="true" />
             <h3 className="font-semibold">{t('groups.edit_section_images')}</h3>
           </CardHeader>
           <CardBody className="flex flex-col gap-4">
@@ -277,7 +277,7 @@ export function GroupEdit() {
         {/* Basic info */}
         <Card>
           <CardHeader className="flex items-center gap-2 pb-0">
-            <Users size={18} className="text-muted" />
+            <Users size={18} className="text-muted" aria-hidden="true" />
             <h3 className="font-semibold">{t('groups.edit_section_basic')}</h3>
           </CardHeader>
           <CardBody className="flex flex-col gap-4">
@@ -312,7 +312,7 @@ export function GroupEdit() {
         {/* Group Type */}
         <Card>
           <CardHeader className="flex items-center gap-2 pb-0">
-            <Settings size={18} className="text-muted" />
+            <Settings size={18} className="text-muted" aria-hidden="true" />
             <h3 className="font-semibold">{t('groups.edit_section_type')}</h3>
           </CardHeader>
           <CardBody>
@@ -352,7 +352,7 @@ export function GroupEdit() {
         {/* Visibility & Status */}
         <Card>
           <CardHeader className="flex items-center gap-2 pb-0">
-            <Shield size={18} className="text-muted" />
+            <Shield size={18} className="text-muted" aria-hidden="true" />
             <h3 className="font-semibold">{t('groups.edit_section_visibility')}</h3>
           </CardHeader>
           <CardBody className="flex flex-col gap-4">
@@ -382,7 +382,7 @@ export function GroupEdit() {
         {hasFeature('federation') && (
           <Card>
             <CardHeader className="flex items-center gap-2 pb-0">
-              <Globe size={18} className="text-muted" />
+              <Globe size={18} className="text-muted" aria-hidden="true" />
               <h3 className="font-semibold">{t('groups.edit_section_federation')}</h3>
             </CardHeader>
             <CardBody>
@@ -404,7 +404,7 @@ export function GroupEdit() {
         {/* Admin Controls */}
         <Card>
           <CardHeader className="flex items-center gap-2 pb-0">
-            <Star size={18} className="text-muted" />
+            <Star size={18} className="text-muted" aria-hidden="true" />
             <h3 className="font-semibold">{t('groups.edit_section_admin')}</h3>
           </CardHeader>
           <CardBody>
@@ -425,7 +425,7 @@ export function GroupEdit() {
         {/* Branding */}
         <Card>
           <CardHeader className="flex items-center gap-2 pb-0">
-            <Palette size={18} className="text-muted" />
+            <Palette size={18} className="text-muted" aria-hidden="true" />
             <h3 className="font-semibold">{t('groups.edit_section_branding')}</h3>
           </CardHeader>
           <CardBody className="flex flex-col gap-4">

@@ -246,11 +246,11 @@ export function VerifyIdentityOptionalPage() {
 
   if (pageState === 'loading') {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center p-4">
+      <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="min-h-[60vh] flex items-center justify-center p-4">
         <PageMeta title={t('identity.page_title')} noIndex />
         <GlassCard className="p-8 text-center max-w-md">
           <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
-            <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" />
+            <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" aria-hidden="true" />
           </div>
           <h1 className="text-2xl font-bold text-theme-primary">{t('identity.loading_title')}</h1>
         </GlassCard>
@@ -270,7 +270,7 @@ export function VerifyIdentityOptionalPage() {
             <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('identity.verified_title')}</h1>
             <p className="text-theme-muted mb-2">{t('identity.verified_body')}</p>
             <div className="flex items-center justify-center gap-2 mt-4 mb-6 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-              <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />
               <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">{t('identity.verified_badge_label')}</span>
             </div>
             <div className="flex flex-col gap-3">
@@ -290,7 +290,7 @@ export function VerifyIdentityOptionalPage() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
           <GlassCard className="p-8 text-center">
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-500/20 flex items-center justify-center">
-              <ShieldX className="w-8 h-8 text-red-400" />
+              <ShieldX className="w-8 h-8 text-red-400" aria-hidden="true" />
             </div>
             <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('identity.failed_title')}</h1>
             <p className="text-theme-muted mb-2">{t('identity.failed_body')}</p>
@@ -313,7 +313,7 @@ export function VerifyIdentityOptionalPage() {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-md">
           <GlassCard className="p-8 text-center">
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-red-500/20 flex items-center justify-center">
-              <ShieldX className="w-8 h-8 text-red-400" />
+              <ShieldX className="w-8 h-8 text-red-400" aria-hidden="true" />
             </div>
             <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('identity.error_title')}</h1>
             <p className="text-theme-muted mb-6">{errorMessage}</p>
@@ -334,7 +334,7 @@ export function VerifyIdentityOptionalPage() {
           <GlassCard className="p-5 sm:p-8">
             <div className="text-center mb-6">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-emerald-500/20 mb-4">
-                <CalendarDays className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
+                <CalendarDays className="w-8 h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
               </div>
               <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">{t('identity.dob_title')}</h1>
               <p className="text-theme-muted mt-2">{t('identity.dob_body')}</p>
@@ -389,7 +389,7 @@ export function VerifyIdentityOptionalPage() {
           <GlassCard className="p-5 sm:p-8">
             <div className="text-center mb-6">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-emerald-500/20 mb-4">
-                <CreditCard className="w-8 h-8 text-indigo-500 dark:text-indigo-400" />
+                <CreditCard className="w-8 h-8 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />
               </div>
               <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">{t('identity.fee_title')}</h1>
               <p className="text-theme-muted mt-2">{t('identity.fee_body', { fee: feeDisplay })}</p>
@@ -412,7 +412,7 @@ export function VerifyIdentityOptionalPage() {
                   isLoading={isCreatingPayment}
                   className="w-full bg-gradient-to-r from-indigo-500 to-emerald-600 text-white font-medium"
                   size="lg"
-                  startContent={!isCreatingPayment ? <CreditCard className="w-5 h-5" /> : undefined}
+                  startContent={!isCreatingPayment ? <CreditCard className="w-5 h-5" aria-hidden="true" /> : undefined}
                 >
                   {t('identity.pay_button', { fee: feeDisplay })}
                 </Button>
@@ -484,7 +484,7 @@ export function VerifyIdentityOptionalPage() {
                 isLoading={isStarting}
                 className="w-full bg-gradient-to-r from-indigo-500 to-emerald-600 text-white font-medium"
                 size="lg"
-                startContent={!isStarting ? <ShieldCheck className="w-5 h-5" /> : undefined}
+                startContent={!isStarting ? <ShieldCheck className="w-5 h-5" aria-hidden="true" /> : undefined}
                 spinner={<Loader2 className="w-4 h-4 animate-spin" />}
               >
                 {t('identity.start_button')}
@@ -503,7 +503,7 @@ export function VerifyIdentityOptionalPage() {
               )}
 
               <div className="flex items-center justify-center gap-2 text-sm text-theme-muted">
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
                 {t('identity.waiting')}
               </div>
 

@@ -185,5 +185,7 @@
     "create": {
       "title": "Cruthaigh Malartú Grúpa"
     }
-  }
+  },
+  "role_provider": "Provider",
+  "role_receiver": "Receiver"
 }

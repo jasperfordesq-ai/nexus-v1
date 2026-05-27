@@ -91,7 +91,7 @@ export function ChangelogPage() {
       <Card>
         <Card.Content className="py-6 px-4 sm:px-6">
           {state.status === 'loading' && (
-            <div className="flex items-center justify-center py-12 gap-3 text-foreground-500">
+            <div role="status" aria-busy="true" aria-label={t('changelog_page.loading')} className="flex items-center justify-center py-12 gap-3 text-foreground-500">
               <Spinner size="sm" />
               <span className="text-sm">
                 {t('changelog_page.loading')}
@@ -99,7 +99,7 @@ export function ChangelogPage() {
             </div>
           )}
           {state.status === 'error' && (
-            <div className="py-8 text-center text-sm text-danger">
+            <div role="alert" className="py-8 text-center text-sm text-danger">
               {t('changelog_page.error')}
               <p className="mt-2 text-xs text-foreground-500 font-mono">{state.message}</p>
             </div>

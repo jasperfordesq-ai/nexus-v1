@@ -96,7 +96,7 @@ export function ErrorLogs() {
         actions={
           <Button
             variant="tertiary"
-            startContent={<RefreshCw size={16} />}
+            startContent={<RefreshCw aria-hidden="true" size={16} />}
             onPress={loadData}
             isLoading={loading}
             size="sm"

@@ -28,5 +28,6 @@
   "status_triaging": "In triage",
   "status_in_progress": "In corso",
   "status_resolved": "Risolto",
-  "status_closed": "Chiuso"
+  "status_closed": "Chiuso",
+  "loading": "Loading..."
 }

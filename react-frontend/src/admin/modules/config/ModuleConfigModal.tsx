@@ -404,13 +404,13 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
                 : 'bg-accent/10 text-accent'
             }`}
           >
-            <Icon size={20} />
+            <Icon size={20} aria-hidden="true" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <span>{moduleName}</span>
               {!isEditable && (
-                <Chip size="sm" variant="soft" color="warning" startContent={<Construction size={12} />}>
+                <Chip size="sm" variant="soft" color="warning" startContent={<Construction size={12} aria-hidden="true" />}>
                   {t('config.beta')}
                 </Chip>
               )}
@@ -422,7 +422,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
         <ModalBody>
           {/* Loading state */}
           {isEditable && loading && (
-            <div className="flex justify-center py-8">
+            <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-8">
               <Spinner size="lg" />
             </div>
           )}
@@ -431,7 +431,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
           {isLinkOut && (
             <Card className="bg-surface-secondary">
               <CardBody className="flex flex-col items-center gap-4 py-8">
-                <Info size={40} className="text-muted" />
+                <Info size={40} className="text-muted" aria-hidden="true" />
                 <div className="text-center">
                   <p className="text-sm text-muted">
                     {t('config.modal_onboarding_desc')}
@@ -440,7 +440,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
                 {module.detailPageUrl && (
                   <Button
                     variant="tertiary"
-                    startContent={<ExternalLink size={16} />}
+                    startContent={<ExternalLink size={16} aria-hidden="true" />}
                     onPress={handleNavigateToDetail}
                   >
                     {t('config.modal_go_to_onboarding')}
@@ -454,7 +454,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
           {!isLinkOut && !isEditable && allComingSoon && module.configOptions.length > 0 && (
             <Card className="bg-warning-50 dark:bg-warning-50/10 mb-4">
               <CardBody className="flex flex-row items-center gap-3 py-3">
-                <Construction size={18} className="text-warning flex-shrink-0" />
+                <Construction size={18} className="text-warning flex-shrink-0" aria-hidden="true" />
                 <p className="text-sm text-warning-700 dark:text-warning-400">
                   {t('config.modal_coming_soon_notice')}
                 </p>
@@ -525,7 +525,7 @@ export default function ModuleConfigModal({ module, isOpen, onClose }: ModuleCon
               <Button
                 variant="tertiary"
                 size="sm"
-                startContent={<ExternalLink size={14} />}
+                startContent={<ExternalLink size={14} aria-hidden="true" />}
                 onPress={handleNavigateToDetail}
               >
                 {t('config.modal_open_broker_page')}

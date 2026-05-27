@@ -104,7 +104,7 @@ export function SuccessStoriesPage() {
 
         {/* Loading */}
         {isLoading && (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div role="status" aria-busy="true" className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
             {[0, 1, 2].map((i) => (
               <GlassCard key={i} className="space-y-3 p-5">
                 <Skeleton className="h-5 w-2/3 rounded-lg" />
@@ -118,7 +118,7 @@ export function SuccessStoriesPage() {
 
         {/* Error */}
         {error && !isLoading && (
-          <GlassCard className="p-6">
+          <GlassCard role="alert" className="p-6">
             <div className="flex items-center gap-3 text-danger">
               <AlertCircle className="h-5 w-5 shrink-0" aria-hidden="true" />
               <p className="font-medium">{t('error_loading')}</p>

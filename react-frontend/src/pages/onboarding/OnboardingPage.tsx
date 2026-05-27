@@ -548,7 +548,7 @@ export function OnboardingPage() {
             transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.8, delay: 0.3 }}
             className="inline-flex p-6 rounded-full bg-gradient-to-br from-emerald-500/20 to-teal-500/20"
           >
-            <PartyPopper className="w-16 h-16 text-emerald-500" />
+            <PartyPopper className="w-16 h-16 text-emerald-500" aria-hidden="true" />
           </motion.div>
 
           <motion.div
@@ -587,7 +587,7 @@ export function OnboardingPage() {
 
   if (configLoading) {
     return (
-      <div className="flex items-center justify-center py-20">
+      <div role="status" aria-busy="true" className="flex items-center justify-center py-20">
         <Spinner size="lg" />
       </div>
     );
@@ -1357,7 +1357,7 @@ function StepIndicator({ currentStep, totalSteps, visitedSteps, completedSteps, 
                 `}
               >
                 {isCompleted ? (
-                  <CheckCircle className="w-4 h-4" />
+                  <CheckCircle className="w-4 h-4" aria-hidden="true" />
                 ) : (
                   <span>{step}</span>
                 )}

@@ -242,7 +242,7 @@ export function FederationMemberProfilePage() {
   // Loading
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-20">
+      <div role="status" aria-busy="true" aria-label={t('member_profile.loading')} className="flex items-center justify-center py-20">
         <Spinner size="lg" label={t('member_profile.loading')} />
       </div>
     );
@@ -259,7 +259,7 @@ export function FederationMemberProfilePage() {
             { label: t('member_profile.breadcrumb_profile') },
           ]}
         />
-        <GlassCard className="p-8 text-center">
+        <GlassCard role="alert" className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">
             {t('member_profile.not_found_heading')}
@@ -511,7 +511,7 @@ export function FederationMemberProfilePage() {
             {(onClose) => (
               <>
                 <ModalHeader className="flex items-center gap-2">
-                  <Coins className="w-5 h-5 text-emerald-500" />
+                  <Coins className="w-5 h-5 text-emerald-500" aria-hidden="true" />
                   {t('member_profile.send_credits_to', { name: member.name })}
                 </ModalHeader>
                 <ModalBody className="gap-4">

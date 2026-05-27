@@ -123,7 +123,7 @@ export function MySubscriptionPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-16">
+      <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-16">
         <PageMeta title={t('premium.manage_title')} noIndex />
         <Spinner size="lg" />
       </div>
@@ -138,7 +138,7 @@ export function MySubscriptionPage() {
         <PageMeta title={t('premium.manage_title')} noIndex />
         <Card className="border border-border">
           <CardBody className="text-center py-10 flex flex-col items-center gap-4">
-            <Crown size={48} className="text-yellow-500" />
+            <Crown size={48} className="text-yellow-500" aria-hidden="true" />
             <h1 className="text-xl font-semibold">
               {t('premium.no_subscription_title')}
             </h1>
@@ -159,7 +159,7 @@ export function MySubscriptionPage() {
       <PageMeta title={t('premium.manage_title')} noIndex />
       <Card className="border border-border">
         <CardHeader className="flex items-center gap-3">
-          <Crown className="text-yellow-500" size={24} />
+          <Crown className="text-yellow-500" size={24} aria-hidden="true" />
           <div>
             <h1 className="text-2xl font-semibold">{sub.tier_name}</h1>
             <p className="text-sm text-[var(--color-text-secondary)]">
@@ -206,7 +206,7 @@ export function MySubscriptionPage() {
           <div className="flex flex-col gap-2 sm:flex-row">
             <Button
               variant="secondary"
-              startContent={<ExternalLink size={16} />}
+              startContent={<ExternalLink size={16} aria-hidden="true" />}
               onPress={openPortal}
               isLoading={actionBusy === 'portal'}
               isDisabled={actionBusy !== null}

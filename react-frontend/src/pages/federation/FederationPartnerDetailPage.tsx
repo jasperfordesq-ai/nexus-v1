@@ -131,7 +131,7 @@ export function FederationPartnerDetailPage() {
   // Loading
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-20">
+      <div role="status" aria-busy="true" aria-label={t('partner_detail.loading')} className="flex items-center justify-center py-20">
         <PageMeta title={t('partner_detail.loading')} noIndex />
         <Spinner size="lg" label={t('partner_detail.loading')} />
       </div>
@@ -150,7 +150,7 @@ export function FederationPartnerDetailPage() {
             { label: t('partner_detail.breadcrumb_not_found') },
           ]}
         />
-        <GlassCard className="p-8 text-center">
+        <GlassCard role="alert" className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">
             {t('partner_detail.not_found_heading')}

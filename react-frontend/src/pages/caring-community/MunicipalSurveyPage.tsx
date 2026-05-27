@@ -262,7 +262,7 @@ function SurveyForm({ survey, onBack, onSuccess, t }: SurveyFormProps) {
   if (alreadyResponded) {
     return (
       <GlassCard className="p-6 flex flex-col items-center gap-4 text-center">
-        <CheckCircle size={48} className="text-success" />
+        <CheckCircle size={48} className="text-success" aria-hidden="true" />
         <p className="text-foreground">{t('already_responded')}</p>
         <Button variant="flat" onPress={onBack}>
           {t('back')}
@@ -411,7 +411,7 @@ export default function MunicipalSurveyPage() {
           description={t('meta.description')}
         />
         <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col items-center gap-6 text-center">
-          <CheckCircle size={64} className="text-success" />
+          <CheckCircle size={64} className="text-success" aria-hidden="true" />
           <h1 className="text-2xl font-bold">{t('success_title')}</h1>
           <p className="text-foreground">{t('success_body')}</p>
           <Button color="primary" variant="flat" onPress={handleBack}>
@@ -451,19 +451,19 @@ export default function MunicipalSurveyPage() {
       />
       <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col gap-6">
         <div className="flex items-center gap-3">
-          <ClipboardList size={24} className="text-accent" />
+          <ClipboardList size={24} className="text-accent" aria-hidden="true" />
           <h1 className="text-2xl font-bold">{t('meta.title')}</h1>
         </div>
         <p className="text-foreground text-sm">{t('meta.description')}</p>
 
         {loading && (
-          <div className="flex justify-center py-10">
+          <div role="status" aria-busy="true" aria-label={t('meta.title')} className="flex justify-center py-10">
             <Spinner size="lg" />
           </div>
         )}
 
         {!loading && error && (
-          <p className="text-danger text-sm">{error}</p>
+          <p role="alert" className="text-danger text-sm">{error}</p>
         )}
 
         {!loading && !error && surveys.length === 0 && (

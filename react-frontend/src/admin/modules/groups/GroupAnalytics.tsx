@@ -52,7 +52,7 @@ export function GroupAnalytics() {
     return (
       <div>
         <PageHeader title={t('groups.group_analytics_title')} description={t('groups.group_analytics_desc')} />
-        <div className="flex items-center justify-center py-20">
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex items-center justify-center py-20">
           <Spinner size="lg" />
         </div>
       </div>
@@ -106,7 +106,7 @@ export function GroupAnalytics() {
       {data.pending_approvals > 0 && (
         <Card className="mb-6 border-warning/30 bg-warning/5">
           <CardBody className="flex flex-row items-center gap-3 py-3">
-            <Clock size={20} className="text-warning shrink-0" />
+            <Clock size={20} className="text-warning shrink-0" aria-hidden="true" />
             <p className="text-sm text-foreground">
               {t('groups.pending_approvals_message')}
             </p>
@@ -133,7 +133,7 @@ export function GroupAnalytics() {
                     <span className="font-medium text-foreground">{group.name}</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-sm text-muted">
-                    <Users size={14} />
+                    <Users size={14} aria-hidden="true" />
                     <span>{t('groups.member')}</span>
                   </div>
                 </div>

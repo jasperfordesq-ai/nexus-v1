@@ -33,5 +33,6 @@
   "load_error": "Laden van beoordelingen mislukt. Probeer het opnieuw.",
   "load_more": "Meer laden",
   "stars": "{{count}} ster",
-  "stars_plural": "{{count}} sterren"
+  "stars_plural": "{{count}} sterren",
+  "rating_aria": "{{n}} out of 5 stars"
 }

@@ -571,7 +571,7 @@ export function JobsPage() {
           {!error && (
             <>
               {isLoading ? (
-                <div className="space-y-4" aria-busy="true" aria-label={t('loading')}>
+                <div role="status" className="space-y-4" aria-busy="true" aria-label={t('loading')}>
                   {[1, 2, 3].map((i) => (
                     <GlassCard key={i} className="p-5 animate-pulse">
                       <div className="flex gap-4">

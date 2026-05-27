@@ -1173,5 +1173,6 @@
     "refresh_federation_peers": "Verbund-Peers aktualisieren",
     "refresh_kpi_baselines": "Aktualisieren Sie die KPI-Baselines",
     "refresh_research_partnerships": "Forschungskooperationen auffrischen"
-  }
+  },
+  "loading": "Loading..."
 }

@@ -202,7 +202,7 @@ export function CivicDigestPage() {
       <Card>
         <CardBody className="gap-3 p-6">
           <div className="flex items-center gap-2">
-            <Bell className="h-5 w-5 text-accent" aria-hidden />
+            <Bell className="h-5 w-5 text-accent" aria-hidden="true" />
             <h1 className="text-xl font-bold text-theme-primary">{t('intro_title')}</h1>
           </div>
           <p className="text-sm leading-relaxed text-theme-muted">{t('intro_body')}</p>
@@ -212,7 +212,7 @@ export function CivicDigestPage() {
       {/* Transparency global note */}
       <Card>
         <CardBody className="flex flex-row items-start gap-3 p-4">
-          <Info className="mt-0.5 h-5 w-5 shrink-0 text-accent" aria-hidden />
+          <Info className="mt-0.5 h-5 w-5 shrink-0 text-accent" aria-hidden="true" />
           <p className="text-xs leading-relaxed text-theme-muted">
             {t('transparency.global_note')}
           </p>
@@ -221,7 +221,7 @@ export function CivicDigestPage() {
 
       {/* Loading state */}
       {isLoading && (
-        <div className="space-y-3">
+        <div role="status" aria-busy="true" aria-label={t('loading')} className="space-y-3">
           {[0, 1, 2].map((n) => (
             <Card key={n}>
               <CardBody className="space-y-2 p-5">
@@ -236,9 +236,9 @@ export function CivicDigestPage() {
 
       {/* Error state */}
       {error && !isLoading && (
-        <Card>
+        <Card role="alert">
           <CardBody className="flex flex-row items-center gap-3 p-5 text-danger">
-            <AlertTriangle className="h-5 w-5 shrink-0" aria-hidden />
+            <AlertTriangle className="h-5 w-5 shrink-0" aria-hidden="true" />
             <p className="text-sm font-medium">{t('error_loading')}</p>
           </CardBody>
         </Card>
@@ -267,7 +267,7 @@ export function CivicDigestPage() {
                   <CardBody className="gap-3 p-5">
                     <div className="flex items-start gap-3">
                       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface-secondary">
-                        <Icon className="h-5 w-5 text-theme-primary" aria-hidden />
+                        <Icon className="h-5 w-5 text-theme-primary" aria-hidden="true" />
                       </div>
                       <div className="flex-1">
                         <div className="flex flex-wrap items-center gap-2">
@@ -313,7 +313,7 @@ export function CivicDigestPage() {
                               <Button
                                 size="sm"
                                 variant="light"
-                                startContent={<HelpCircle className="h-3.5 w-3.5" aria-hidden />}
+                                startContent={<HelpCircle className="h-3.5 w-3.5" aria-hidden="true" />}
                                 className="h-7 min-h-0 px-2 text-xs"
                               >
                                 {t('transparency.why_button')}
@@ -363,7 +363,7 @@ export function CivicDigestPage() {
       <Card>
         <CardBody className="gap-4 p-6">
           <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-accent" aria-hidden />
+            <Sparkles className="h-5 w-5 text-accent" aria-hidden="true" />
             <h2 className="text-lg font-semibold text-theme-primary">{t('prefs_title')}</h2>
           </div>
 

@@ -94,7 +94,7 @@ export function BlockedUsersPage() {
           <div className="flex max-w-2xl items-start gap-4">
             <Link to={tenantPath('/settings?tab=privacy')}>
               <Button isIconOnly variant="tertiary" aria-label={t('back', { ns: 'common' })}>
-                <ArrowLeft className="h-5 w-5" />
+                <ArrowLeft className="h-5 w-5" aria-hidden="true" />
               </Button>
             </Link>
             <div>
@@ -102,7 +102,7 @@ export function BlockedUsersPage() {
                 {t('blocked_users.privacy_badge')}
               </Chip>
               <h1 className="flex items-center gap-3 text-3xl font-bold leading-tight text-theme-primary sm:text-4xl">
-                <ShieldOff className="h-8 w-8 text-[var(--color-error)]" />
+                <ShieldOff className="h-8 w-8 text-[var(--color-error)]" aria-hidden="true" />
                 {t('blocked_users.title')}
               </h1>
               <p className="mt-2 text-sm leading-6 text-theme-muted sm:text-base">{t('blocked_users.subtitle')}</p>

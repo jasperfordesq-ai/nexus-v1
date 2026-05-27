@@ -264,7 +264,7 @@ export function TenantShow() {
         <Button
           variant="secondary"
           className="mt-4"
-          startContent={<ArrowLeft size={16} />}
+          startContent={<ArrowLeft aria-hidden="true" size={16} />}
           onPress={() => navigate(tenantPath('/admin/super/tenants'))}
         >
           {t('super.back_to_tenants')}
@@ -292,13 +292,13 @@ export function TenantShow() {
           <div className="flex items-center gap-2">
             <Button
               variant="secondary"
-              startContent={<ArrowLeft size={16} />}
+              startContent={<ArrowLeft aria-hidden="true" size={16} />}
               onPress={() => navigate(tenantPath('/admin/super/tenants'))}
             >
               {t('super.back')}
             </Button>
             <Button
-              startContent={<Edit size={16} />}
+              startContent={<Edit aria-hidden="true" size={16} />}
               onPress={() => navigate(tenantPath(`/admin/super/tenants/${tenant.id}/edit`))}
             >
               {t('super.edit')}
@@ -335,7 +335,7 @@ export function TenantShow() {
           <Card>
             <CardHeader className="pb-0">
               <div className="flex items-center gap-2">
-                <Building2 size={18} className="text-accent" />
+                <Building2 aria-hidden="true" size={18} className="text-accent" />
                 <h3 className="text-lg font-semibold">{t('super.section_tenant_information')}</h3>
               </div>
             </CardHeader>
@@ -395,7 +395,7 @@ export function TenantShow() {
             <Card>
               <CardHeader className="pb-0">
                 <div className="flex items-center gap-2">
-                  <Users size={18} className="text-accent" />
+                  <Users aria-hidden="true" size={18} className="text-accent" />
                   <h3 className="text-lg font-semibold">{t('super.section_contact_information')}</h3>
                 </div>
               </CardHeader>
@@ -413,7 +413,7 @@ export function TenantShow() {
           <Card>
             <CardHeader className="pb-0">
               <div className="flex items-center gap-2">
-                <Search size={18} className="text-accent" />
+                <Search aria-hidden="true" size={18} className="text-accent" />
                 <h3 className="text-lg font-semibold">{t('super.section_seo_settings')}</h3>
               </div>
             </CardHeader>
@@ -434,7 +434,7 @@ export function TenantShow() {
           <Card>
             <CardHeader className="pb-0">
               <div className="flex items-center gap-2">
-                <MapPin size={18} className="text-accent" />
+                <MapPin aria-hidden="true" size={18} className="text-accent" />
                 <h3 className="text-lg font-semibold">{t('super.section_location')}</h3>
               </div>
             </CardHeader>
@@ -453,7 +453,7 @@ export function TenantShow() {
           <Card>
             <CardHeader className="pb-0">
               <div className="flex items-center gap-2">
-                <Globe size={18} className="text-accent" />
+                <Globe aria-hidden="true" size={18} className="text-accent" />
                 <h3 className="text-lg font-semibold">{t('super.section_social_media')}</h3>
               </div>
             </CardHeader>
@@ -465,7 +465,7 @@ export function TenantShow() {
                     const SocialIcon = social.icon;
                     return (
                       <div key={social.key} className="flex items-center gap-3">
-                        <SocialIcon size={18} className="text-muted shrink-0" />
+                        <SocialIcon aria-hidden="true" size={18} className="text-muted shrink-0" />
                         <span className="text-sm font-medium text-muted w-24 shrink-0">
                           {social.label}
                         </span>
@@ -476,7 +476,7 @@ export function TenantShow() {
                           className="flex items-center gap-1 text-sm text-accent hover:underline truncate"
                         >
                           {social.url}
-                          <ExternalLink size={12} className="shrink-0" />
+                          <ExternalLink aria-hidden="true" size={12} className="shrink-0" />
                         </a>
                       </div>
                     );
@@ -492,7 +492,7 @@ export function TenantShow() {
           <Card>
             <CardHeader className="pb-0">
               <div className="flex items-center gap-2">
-                <Languages size={18} className="text-accent" />
+                <Languages aria-hidden="true" size={18} className="text-accent" />
                 <h3 className="text-lg font-semibold">{t('super.section_languages')}</h3>
               </div>
             </CardHeader>
@@ -529,7 +529,7 @@ export function TenantShow() {
           <Card>
             <CardHeader className="pb-0">
               <div className="flex items-center gap-2">
-                <Network size={18} className="text-accent" />
+                <Network aria-hidden="true" size={18} className="text-accent" />
                 <h3 className="text-lg font-semibold">{t('super.section_features_modules')}</h3>
               </div>
             </CardHeader>

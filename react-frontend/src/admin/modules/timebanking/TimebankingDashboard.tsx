@@ -108,12 +108,12 @@ export function TimebankingDashboard() {
         {/* Top Earners */}
         <Card >
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <TrendingUp size={18} className="text-success" />
+            <TrendingUp size={18} className="text-success" aria-hidden="true" />
             <h3 className="font-semibold">{t('timebanking.top_earners')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
-              <div className="flex h-40 items-center justify-center">
+              <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex h-40 items-center justify-center">
                 <Spinner />
               </div>
             ) : stats?.top_earners && stats.top_earners.length > 0 ? (
@@ -151,12 +151,12 @@ export function TimebankingDashboard() {
         {/* Top Spenders */}
         <Card >
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <Wallet size={18} className="text-warning" />
+            <Wallet size={18} className="text-warning" aria-hidden="true" />
             <h3 className="font-semibold">{t('timebanking.top_spenders')}</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4">
             {loading ? (
-              <div className="flex h-40 items-center justify-center">
+              <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex h-40 items-center justify-center">
                 <Spinner />
               </div>
             ) : stats?.top_spenders && stats.top_spenders.length > 0 ? (
@@ -207,7 +207,7 @@ export function TimebankingDashboard() {
               endContent={<ChevronRight size={16} />}
             >
               <div className="flex items-center gap-2">
-                <AlertTriangle size={18} />
+                <AlertTriangle size={18} aria-hidden="true" />
                 <span>{t('timebanking.fraud_alerts_title')}</span>
               </div>
             </Button>
@@ -220,7 +220,7 @@ export function TimebankingDashboard() {
               endContent={<ChevronRight size={16} />}
             >
               <div className="flex items-center gap-2">
-                <HandHeart size={18} />
+                <HandHeart size={18} aria-hidden="true" />
                 <span>{t('timebanking.community_fund_title')}</span>
               </div>
             </Button>
@@ -233,7 +233,7 @@ export function TimebankingDashboard() {
               endContent={<ChevronRight size={16} />}
             >
               <div className="flex items-center gap-2">
-                <Users size={18} />
+                <Users size={18} aria-hidden="true" />
                 <span>{t('timebanking.user_report_title')}</span>
               </div>
             </Button>
@@ -246,7 +246,7 @@ export function TimebankingDashboard() {
               endContent={<ChevronRight size={16} />}
             >
               <div className="flex items-center gap-2">
-                <Building2 size={18} />
+                <Building2 size={18} aria-hidden="true" />
                 <span>{t('timebanking.org_wallets_title')}</span>
               </div>
             </Button>

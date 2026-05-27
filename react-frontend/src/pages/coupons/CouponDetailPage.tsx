@@ -96,7 +96,7 @@ export default function CouponDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-16">
+      <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-16">
         <PageMeta title={t('coupon.details')} noIndex />
         <Spinner />
       </div>
@@ -107,7 +107,7 @@ export default function CouponDetailPage() {
     return (
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         <PageMeta title={t('coupon.details')} noIndex />
-        <Button as={Link} to="/coupons" variant="light" startContent={<ArrowLeft className="w-4 h-4" />}>
+        <Button as={Link} to="/coupons" variant="light" startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}>
           {t('coupon.back_to_coupons')}
         </Button>
       </div>
@@ -140,7 +140,7 @@ export default function CouponDetailPage() {
         as={Link}
         to="/coupons"
         variant="light"
-        startContent={<ArrowLeft className="w-4 h-4" />}
+        startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
         className="mb-4"
       >
         {t('coupon.back_to_coupons')}
@@ -149,7 +149,7 @@ export default function CouponDetailPage() {
       <Card>
         <CardBody className="p-6">
           <div className="flex items-start justify-between mb-4">
-            <Tag className="w-10 h-10 text-accent" />
+            <Tag className="w-10 h-10 text-accent" aria-hidden="true" />
             <Chip color="success" variant="flat" size="lg">
               {formatDiscount()}
             </Chip>
@@ -175,7 +175,7 @@ export default function CouponDetailPage() {
           <div className="flex flex-col sm:flex-row gap-3">
             <Button
               color="primary"
-              startContent={<Copy className="w-4 h-4" />}
+              startContent={<Copy className="w-4 h-4" aria-hidden="true" />}
               onPress={handleCopy}
               className="flex-1"
             >
@@ -183,7 +183,7 @@ export default function CouponDetailPage() {
             </Button>
             <Button
               color="secondary"
-              startContent={<QrCode className="w-4 h-4" />}
+              startContent={<QrCode className="w-4 h-4" aria-hidden="true" />}
               onPress={handleGenerateQr}
               isLoading={qrLoading}
               className="flex-1"

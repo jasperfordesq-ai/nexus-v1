@@ -260,7 +260,7 @@ export function BlogPage() {
       {!error && (
         <>
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" aria-busy="true" aria-label={t('loading_posts')}>
+            <div role="status" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" aria-busy="true" aria-label={t('loading_posts')}>
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <GlassCard key={i} className="overflow-hidden animate-pulse">
                   <div className="h-48 bg-theme-hover" />

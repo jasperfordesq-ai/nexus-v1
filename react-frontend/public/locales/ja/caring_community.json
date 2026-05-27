@@ -1173,5 +1173,6 @@
     "refresh_federation_peers": "フェデレーションピアを更新する",
     "refresh_kpi_baselines": "KPI ベースラインを更新する",
     "refresh_research_partnerships": "研究パートナーシップを更新する"
-  }
+  },
+  "loading": "Loading..."
 }

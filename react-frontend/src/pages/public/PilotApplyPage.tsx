@@ -305,9 +305,9 @@ export function PilotApplyPage() {
               onValueChange={v => set('requested_slug', v.toLowerCase())}
               classNames={inputClasses}
               endContent={
-                slugStatus.state === 'checking' ? <Loader2 className="w-4 h-4 animate-spin text-theme-muted" /> :
-                slugStatus.state === 'available' ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> :
-                slugStatus.state === 'unavailable' ? <XCircle className="w-4 h-4 text-rose-500" /> :
+                slugStatus.state === 'checking' ? <Loader2 className="w-4 h-4 animate-spin text-theme-muted" aria-hidden="true" /> :
+                slugStatus.state === 'available' ? <CheckCircle2 className="w-4 h-4 text-emerald-500" aria-hidden="true" /> :
+                slugStatus.state === 'unavailable' ? <XCircle className="w-4 h-4 text-rose-500" aria-hidden="true" /> :
                 null
               }
             />
@@ -329,7 +329,7 @@ export function PilotApplyPage() {
             value={form.requested_subdomain}
             onValueChange={v => set('requested_subdomain', v.toLowerCase())}
             classNames={inputClasses}
-            startContent={<Globe className="w-4 h-4 text-theme-subtle" />}
+            startContent={<Globe className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
           />
 
           {/* Category */}

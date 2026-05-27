@@ -630,14 +630,14 @@ export default function ConnectionsPage() {
           >
             <div className="mt-4">
               {loading.accepted ? (
-                <div role="status" aria-label={t('loading')}>
+                <div role="status" aria-label={t('loading')} aria-busy="true">
                   <div className="grid gap-3 sm:grid-cols-2">
                     {[1, 2, 3, 4].map(i => <ConnectionSkeleton key={i} />)}
                   </div>
                 </div>
               ) : filterBySearch(accepted).length === 0 ? (
                 <EmptyState
-                  icon={<Users2 className="w-7 h-7" />}
+                  icon={<Users2 className="w-7 h-7" aria-hidden="true" />}
                   title={t('empty_no_connections_title')}
                   description={
                     searchQuery
@@ -703,14 +703,14 @@ export default function ConnectionsPage() {
           >
             <div className="mt-4">
               {loading.pending_received ? (
-                <div role="status" aria-label={t('loading')}>
+                <div role="status" aria-label={t('loading')} aria-busy="true">
                   <div className="grid gap-3 sm:grid-cols-2">
                     {[1, 2].map(i => <ConnectionSkeleton key={i} />)}
                   </div>
                 </div>
               ) : filterBySearch(pendingReceived).length === 0 ? (
                 <EmptyState
-                  icon={<UserPlus className="w-7 h-7" />}
+                  icon={<UserPlus className="w-7 h-7" aria-hidden="true" />}
                   title={t('empty_no_pending_title')}
                   description={
                     searchQuery
@@ -764,14 +764,14 @@ export default function ConnectionsPage() {
           >
             <div className="mt-4">
               {loading.pending_sent ? (
-                <div role="status" aria-label={t('loading')}>
+                <div role="status" aria-label={t('loading')} aria-busy="true">
                   <div className="grid gap-3 sm:grid-cols-2">
                     {[1, 2].map(i => <ConnectionSkeleton key={i} />)}
                   </div>
                 </div>
               ) : filterBySearch(pendingSent).length === 0 ? (
                 <EmptyState
-                  icon={<Send className="w-7 h-7" />}
+                  icon={<Send className="w-7 h-7" aria-hidden="true" />}
                   title={t('empty_no_sent_title')}
                   description={
                     searchQuery

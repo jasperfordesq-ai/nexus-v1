@@ -215,7 +215,10 @@
     "message_label": "Nachricht",
     "message_placeholder": "Schreiben Sie Ihre Nachricht...",
     "cancel": "Stornieren",
-    "send_message": "Nachricht senden"
+    "send_message": "Nachricht senden",
+    "thread_aria_no_unread": "Conversation with {{name}} from {{tenant}}",
+    "thread_aria_unread": "Conversation with {{name}} from {{tenant}}, {{count}} unread message",
+    "thread_aria_unread_plural": "Conversation with {{name}} from {{tenant}}, {{count}} unread messages"
   },
   "listings": {
     "page_title": "Föderationseinträge",

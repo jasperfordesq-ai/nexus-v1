@@ -185,5 +185,7 @@
     "create": {
       "title": "Crear Intercambio en Grupo"
     }
-  }
+  },
+  "role_provider": "Provider",
+  "role_receiver": "Receiver"
 }

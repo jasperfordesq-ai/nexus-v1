@@ -268,7 +268,7 @@ export function RequestHelpPage() {
                 to={tenantPath('/caring-community')}
                 color="primary"
                 variant="flat"
-                startContent={<ArrowLeft className="h-4 w-4" />}
+                startContent={<ArrowLeft className="h-4 w-4" aria-hidden="true" />}
               >
                 {t('request_help.success.back')}
               </Button>
@@ -327,11 +327,11 @@ export function RequestHelpPage() {
                 isDisabled={voiceStatus === 'processing'}
                 startContent={
                   voiceStatus === 'processing' ? (
-                    <Loader className="h-5 w-5 animate-spin" />
+                    <Loader className="h-5 w-5 animate-spin" aria-hidden="true" />
                   ) : voiceStatus === 'recording' ? (
-                    <Square className="h-5 w-5" />
+                    <Square className="h-5 w-5" aria-hidden="true" />
                   ) : (
-                    <Mic className="h-5 w-5" />
+                    <Mic className="h-5 w-5" aria-hidden="true" />
                   )
                 }
               >

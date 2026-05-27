@@ -196,7 +196,7 @@ export default function PartnerDashboardPage() {
     return (
       <>
         {pageMeta}
-        <div className="flex justify-center p-20">
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center p-20">
           <Spinner />
         </div>
       </>
@@ -235,7 +235,7 @@ export default function PartnerDashboardPage() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold flex items-center gap-2">
-            <BarChart3 size={24} /> {t('partner_analytics.title')}
+            <BarChart3 size={24} aria-hidden="true" /> {t('partner_analytics.title')}
           </h1>
           <p className="text-sm text-[var(--color-text-muted)]">
             {t('partner_analytics.subtitle')}
@@ -258,22 +258,22 @@ export default function PartnerDashboardPage() {
 
       <Tabs aria-label={t('partner_analytics.tabs_aria')}>
         {enabled.has('trends') && (
-          <Tab key="trends" title={<span className="flex items-center gap-2"><TrendingUp size={14} /> {t('partner_analytics.tab_trends')}</span>}>
+          <Tab key="trends" title={<span className="flex items-center gap-2"><TrendingUp size={14} aria-hidden="true" /> {t('partner_analytics.tab_trends')}</span>}>
             <TrendsTab data={data} t={t} />
           </Tab>
         )}
         {enabled.has('demand_supply') && (
-          <Tab key="ds" title={<span className="flex items-center gap-2"><MapPin size={14} /> {t('partner_analytics.tab_demand_supply')}</span>}>
+          <Tab key="ds" title={<span className="flex items-center gap-2"><MapPin size={14} aria-hidden="true" /> {t('partner_analytics.tab_demand_supply')}</span>}>
             <DemandSupplyTab data={data} t={t} />
           </Tab>
         )}
         {enabled.has('demographics') && (
-          <Tab key="demo" title={<span className="flex items-center gap-2"><Users size={14} /> {t('partner_analytics.tab_demographics')}</span>}>
+          <Tab key="demo" title={<span className="flex items-center gap-2"><Users size={14} aria-hidden="true" /> {t('partner_analytics.tab_demographics')}</span>}>
             <DemographicsTab data={data} t={t} />
           </Tab>
         )}
         {enabled.has('footfall') && (
-          <Tab key="ff" title={<span className="flex items-center gap-2"><BarChart3 size={14} /> {t('partner_analytics.tab_footfall')}</span>}>
+          <Tab key="ff" title={<span className="flex items-center gap-2"><BarChart3 size={14} aria-hidden="true" /> {t('partner_analytics.tab_footfall')}</span>}>
             <FootfallTab data={data} t={t} />
           </Tab>
         )}
@@ -281,7 +281,7 @@ export default function PartnerDashboardPage() {
 
       <Card>
         <CardHeader className="flex items-center gap-2">
-          <Download size={16} /> {t('partner_analytics.reports_title')}
+          <Download size={16} aria-hidden="true" /> {t('partner_analytics.reports_title')}
         </CardHeader>
         <CardBody>
           {reports.length === 0 ? (
@@ -310,7 +310,7 @@ export default function PartnerDashboardPage() {
                     rel="noopener noreferrer"
                     size="sm"
                     variant="flat"
-                    startContent={<Download size={14} />}
+                    startContent={<Download size={14} aria-hidden="true" />}
                     isDisabled={!r.file_url || r.status !== 'generated'}
                     className="w-full sm:w-auto"
                   >
@@ -392,15 +392,17 @@ function TrendsTab({ data, t }: { data: DashboardPayload; t: T }) {
       <Card>
         <CardHeader>{t('partner_analytics.engagement_overview')}</CardHeader>
         <CardBody>
-          <ResponsiveContainer width="100%" height={280}>
-            <LineChart data={series}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} />
-            </LineChart>
-          </ResponsiveContainer>
+          <div role="img" aria-label={t('partner_analytics.line_chart_aria')}>
+            <ResponsiveContainer width="100%" height={280}>
+              <LineChart data={series}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="value" stroke="#3b82f6" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         </CardBody>
       </Card>
     </div>
@@ -429,17 +431,19 @@ function DemandSupplyTab({ data, t }: { data: DashboardPayload; t: T }) {
               {t('partner_analytics.no_data')}
             </p>
           ) : (
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={barData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="postcode" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="offers" fill="#10b981" name={t('partner_analytics.offers')} />
-                <Bar dataKey="requests" fill="#f59e0b" name={t('partner_analytics.requests')} />
-              </BarChart>
-            </ResponsiveContainer>
+            <div role="img" aria-label={t('partner_analytics.bar_chart_aria')}>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={barData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="postcode" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="offers" fill="#10b981" name={t('partner_analytics.offers')} />
+                  <Bar dataKey="requests" fill="#f59e0b" name={t('partner_analytics.requests')} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           )}
         </CardBody>
       </Card>
@@ -489,31 +493,35 @@ function DemographicsTab({ data, t }: { data: DashboardPayload; t: T }) {
       <Card>
         <CardHeader>{t('partner_analytics.age_distribution')}</CardHeader>
         <CardBody>
-          <ResponsiveContainer width="100%" height={260}>
-            <PieChart>
-              <Pie data={ageData} dataKey="value" nameKey="name" outerRadius={90} label>
-                {ageData.map((_, i) => (
-                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
+          <div role="img" aria-label={t('partner_analytics.pie_chart_aria')}>
+            <ResponsiveContainer width="100%" height={260}>
+              <PieChart>
+                <Pie data={ageData} dataKey="value" nameKey="name" outerRadius={90} label>
+                  {ageData.map((_, i) => (
+                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
         </CardBody>
       </Card>
       <Card>
         <CardHeader>{t('partner_analytics.gender_distribution')}</CardHeader>
         <CardBody>
-          <ResponsiveContainer width="100%" height={260}>
-            <BarChart data={genderData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="value" fill="#8b5cf6" />
-            </BarChart>
-          </ResponsiveContainer>
+          <div role="img" aria-label={t('partner_analytics.bar_chart_aria')}>
+            <ResponsiveContainer width="100%" height={260}>
+              <BarChart data={genderData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="value" fill="#8b5cf6" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </CardBody>
       </Card>
     </div>
@@ -531,17 +539,19 @@ function FootfallTab({ data, t }: { data: DashboardPayload; t: T }) {
       <Card>
         <CardHeader>{t('partner_analytics.footfall_by_area')}</CardHeader>
         <CardBody>
-          <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={rows}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="area" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Area type="monotone" dataKey="page_views" stroke="#06b6d4" fill="#06b6d4" name={t('partner_analytics.page_views')} />
-              <Area type="monotone" dataKey="visitors" stroke="#10b981" fill="#10b981" name={t('partner_analytics.distinct_visitors')} />
-            </AreaChart>
-          </ResponsiveContainer>
+          <div role="img" aria-label={t('partner_analytics.area_chart_aria')}>
+            <ResponsiveContainer width="100%" height={300}>
+              <AreaChart data={rows}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="area" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Area type="monotone" dataKey="page_views" stroke="#06b6d4" fill="#06b6d4" name={t('partner_analytics.page_views')} />
+                <Area type="monotone" dataKey="visitors" stroke="#10b981" fill="#10b981" name={t('partner_analytics.distinct_visitors')} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
         </CardBody>
       </Card>
     </div>

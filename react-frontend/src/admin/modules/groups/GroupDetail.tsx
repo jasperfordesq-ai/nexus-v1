@@ -154,7 +154,7 @@ export default function GroupDetail() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <Users className="w-8 h-8 text-accent" />
+            <Users className="w-8 h-8 text-accent" aria-hidden="true" />
             <div>
               <div className="text-2xl font-bold">{group.member_count || 0}</div>
               <div className="text-xs text-gray-500">{t('groups.members')}</div>
@@ -163,7 +163,7 @@ export default function GroupDetail() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <FileText className="w-8 h-8 text-success" />
+            <FileText className="w-8 h-8 text-success" aria-hidden="true" />
             <div>
               <div className="text-2xl font-bold">{group.stats?.posts_count || 0}</div>
               <div className="text-xs text-gray-500">{t('groups.posts')}</div>
@@ -172,7 +172,7 @@ export default function GroupDetail() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <Calendar className="w-8 h-8 text-warning" />
+            <Calendar className="w-8 h-8 text-warning" aria-hidden="true" />
             <div>
               <div className="text-2xl font-bold">{group.stats?.events_count || 0}</div>
               <div className="text-xs text-gray-500">{t('groups.events')}</div>
@@ -181,7 +181,7 @@ export default function GroupDetail() {
         </Card>
         <Card className="p-4">
           <div className="flex items-center gap-3">
-            <TrendingUp className="w-8 h-8 text-accent" />
+            <TrendingUp className="w-8 h-8 text-accent" aria-hidden="true" />
             <div>
               <div className="text-2xl font-bold">{group.stats?.activity_score || 0}</div>
               <div className="text-xs text-gray-500">{t('groups.activity_score')}</div>

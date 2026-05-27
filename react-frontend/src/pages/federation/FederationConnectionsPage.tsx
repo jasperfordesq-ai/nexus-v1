@@ -161,11 +161,11 @@ export function FederationConnectionsPage() {
       </Tabs>
 
       {isLoading ? (
-        <div className="flex items-center justify-center py-16">
+        <div role="status" aria-busy="true" aria-label={t('connections.loading')} className="flex items-center justify-center py-16">
           <Spinner size="lg" label={t('connections.loading')} />
         </div>
       ) : loadError ? (
-        <GlassCard className="p-8 text-center">
+        <GlassCard role="alert" className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{t('connections.load_error')}</p>
           <Button
@@ -178,9 +178,9 @@ export function FederationConnectionsPage() {
       ) : connections.length === 0 ? (
         <GlassCard className="p-8 text-center">
           <div className="w-16 h-16 rounded-full bg-indigo-500/10 flex items-center justify-center mx-auto mb-4">
-            {activeTab === 'accepted' && <UserCheck className="w-8 h-8 text-indigo-500" />}
-            {activeTab === 'pending_received' && <UserPlus className="w-8 h-8 text-indigo-500" />}
-            {activeTab === 'pending_sent' && <Send className="w-8 h-8 text-indigo-500" />}
+            {activeTab === 'accepted' && <UserCheck className="w-8 h-8 text-indigo-500" aria-hidden="true" />}
+            {activeTab === 'pending_received' && <UserPlus className="w-8 h-8 text-indigo-500" aria-hidden="true" />}
+            {activeTab === 'pending_sent' && <Send className="w-8 h-8 text-indigo-500" aria-hidden="true" />}
           </div>
           <h3 className="text-lg font-semibold text-theme-primary mb-2">
             {activeTab === 'accepted' && t('connections.empty_connected')}
@@ -193,7 +193,7 @@ export function FederationConnectionsPage() {
             {activeTab === 'pending_sent' && t('connections.empty_sent_desc')}
           </p>
           {activeTab === 'accepted' && (
-            <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white" startContent={<Globe className="w-4 h-4" />} onPress={() => navigate(tenantPath('/federation/members'))}>
+            <Button className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white" startContent={<Globe className="w-4 h-4" aria-hidden="true" />} onPress={() => navigate(tenantPath('/federation/members'))}>
               {t('connections.browse_members')}
             </Button>
           )}
@@ -235,13 +235,13 @@ function ConnectionCard({ connection, tab, actionLoading, onAction, onMessage, o
           <div className="relative flex-shrink-0">
             <Avatar src={resolveAvatarUrl(connection.avatar_url)} name={displayName} className="w-12 h-12 ring-2 ring-indigo-500/20" />
             <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-indigo-500 flex items-center justify-center ring-1 ring-white dark:ring-gray-900" title={connection.tenant_name}>
-              <Globe className="w-3 h-3 text-white" />
+              <Globe className="w-3 h-3 text-white" aria-hidden="true" />
             </div>
           </div>
           <div className="min-w-0 flex-1">
             <p className="font-semibold text-theme-primary truncate">{displayName}</p>
             <div className="flex items-center gap-2 text-sm text-theme-muted">
-              <Globe className="w-3.5 h-3.5 flex-shrink-0" />
+              <Globe className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
               <span className="truncate">{connection.tenant_name}</span>
             </div>
             {connection.message && tab === 'pending_received' && (

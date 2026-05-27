@@ -379,7 +379,7 @@ export function DashboardPage() {
             <GlassCard className="h-full p-5 sm:p-6">
               <SectionHeader icon={<ListTodo className="w-4 h-4 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />} iconColor="indigo" title={t('sections.recent_listings')} linkTo={tenantPath('/listings')} linkText={t('view_all')} linkAriaLabel={t('aria.view_all_listings')} />
               {isLoading ? (
-                <div aria-label={t('aria.loading_listings')} aria-busy="true" className="space-y-3">
+                <div aria-label={t('aria.loading_listings')} role="status" aria-busy="true" className="space-y-3">
                   {Array.from({ length: 3 }).map((_, i) => (<Skeleton key={i} className="rounded-lg"><div className="h-16 rounded-lg bg-surface-tertiary" /></Skeleton>))}
                 </div>
               ) : stats.recentListings.length > 0 ? (
@@ -417,7 +417,7 @@ export function DashboardPage() {
               <GlassCard className="h-full p-5 sm:p-6">
                 <SectionHeader icon={<Activity className="w-4 h-4 text-purple-500 dark:text-purple-400" aria-hidden="true" />} iconColor="purple" title={t('sections.recent_activity')} linkTo={tenantPath('/feed')} linkText={t('view_all_caps')} linkAriaLabel={t('aria.view_all_activity')} />
                 {activityLoading ? (
-                  <div aria-label={t('aria.loading_activity')} aria-busy="true" className="space-y-3">
+                  <div aria-label={t('aria.loading_activity')} role="status" aria-busy="true" className="space-y-3">
                     {Array.from({ length: 3 }).map((_, i) => (
                       <div key={i} className="flex items-center gap-3 p-3">
                         <Skeleton className="rounded-full shrink-0"><div className="w-10 h-10 rounded-full bg-surface-tertiary" /></Skeleton>
@@ -466,7 +466,7 @@ export function DashboardPage() {
                 <div className="relative">
                   <SectionHeader icon={<Calendar className="w-4 h-4 text-rose-500 dark:text-rose-400" aria-hidden="true" />} iconColor="rose" title={t('sections.upcoming_events')} linkTo={tenantPath('/events')} linkText={t('view_all_caps')} linkAriaLabel={t('aria.view_all_events')} />
                   {eventsLoading ? (
-                    <div aria-label={t('aria.loading_events')} aria-busy="true" className="space-y-3">
+                    <div aria-label={t('aria.loading_events')} role="status" aria-busy="true" className="space-y-3">
                       {Array.from({ length: 3 }).map((_, i) => (
                         <div key={i} className="flex items-center gap-3"><Skeleton className="rounded-lg shrink-0"><div className="w-12 h-14 rounded-lg bg-surface-tertiary" /></Skeleton><div className="flex-1 space-y-2"><Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-surface-tertiary w-3/4" /></Skeleton><Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-surface-secondary w-1/2" /></Skeleton></div></div>
                       ))}
@@ -512,7 +512,7 @@ export function DashboardPage() {
               <GlassCard className="h-full p-5 sm:p-6">
                 <SectionHeader icon={<Users className="w-4 h-4 text-teal-500 dark:text-teal-400" aria-hidden="true" />} iconColor="teal" title={t('sections.my_groups')} linkTo={tenantPath('/groups')} linkText={t('view_all_caps')} linkAriaLabel={t('aria.view_all_groups')} />
                 {groupsLoading ? (
-                  <div aria-label={t('aria.loading_groups')} aria-busy="true" className="space-y-3">
+                  <div aria-label={t('aria.loading_groups')} role="status" aria-busy="true" className="space-y-3">
                     {Array.from({ length: 3 }).map((_, i) => (<div key={i} className="flex items-center gap-3"><Skeleton className="rounded-lg shrink-0"><div className="w-10 h-10 rounded-lg bg-surface-tertiary" /></Skeleton><div className="flex-1 space-y-2"><Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-surface-tertiary w-2/3" /></Skeleton><Skeleton className="rounded-lg"><div className="h-3 rounded-lg bg-surface-secondary w-1/3" /></Skeleton></div></div>))}
                   </div>
                 ) : stats.myGroups.length > 0 ? (
@@ -554,7 +554,7 @@ export function DashboardPage() {
                 <div className="relative">
                   <SectionHeader icon={<TrendingUp className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" />} iconColor="amber" title={t('sections.your_progress')} linkTo={tenantPath('/achievements')} linkText={t('view_achievements')} linkAriaLabel={t('aria.view_achievements')} />
                   {isLoading ? (
-                    <div aria-label={t('aria.loading_progress')} aria-busy="true" className="space-y-4">
+                    <div aria-label={t('aria.loading_progress')} role="status" aria-busy="true" className="space-y-4">
                       <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-surface-tertiary w-1/2" /></Skeleton>
                       <Skeleton className="rounded-full"><div className="h-2 rounded-full bg-surface-secondary" /></Skeleton>
                       <Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-surface-secondary w-1/3" /></Skeleton>
@@ -598,7 +598,7 @@ export function DashboardPage() {
                 <div className="relative">
                   <SectionHeader icon={<Sparkles className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" />} iconColor="amber" title={t('sections.suggested_for_you')} linkTo={tenantPath('/listings')} linkText={t('browse_all')} linkAriaLabel={t('aria.browse_all_listings')} />
                   {suggestedLoading ? (
-                    <div aria-label={t('aria.loading_suggestions')} aria-busy="true" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div aria-label={t('aria.loading_suggestions')} role="status" aria-busy="true" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {Array.from({ length: 4 }).map((_, i) => (<Skeleton key={i} className="rounded-lg"><div className="h-24 rounded-lg bg-surface-tertiary" /></Skeleton>))}
                     </div>
                   ) : stats.suggestedListings.length > 0 ? (
@@ -633,7 +633,7 @@ export function DashboardPage() {
               <GlassCard className="h-full p-5 sm:p-6">
                 <SectionHeader icon={<ThumbsUp className="w-4 h-4 text-indigo-500 dark:text-indigo-400" aria-hidden="true" />} iconColor="indigo" title={t('sections.endorsements')} linkTo={tenantPath(`/profile/${user?.id}`)} linkText={t('view_all')} linkAriaLabel={t('aria.view_all_endorsements')} />
                 {isLoading ? (
-                  <div aria-label={t('aria.loading_endorsements')} aria-busy="true" className="space-y-2">
+                  <div aria-label={t('aria.loading_endorsements')} role="status" aria-busy="true" className="space-y-2">
                     {Array.from({ length: 3 }).map((_, i) => (<div key={i} className="flex items-center justify-between p-2"><Skeleton className="rounded-lg"><div className="h-4 rounded-lg bg-surface-tertiary w-2/3" /></Skeleton><Skeleton className="rounded-full"><div className="h-5 w-8 rounded-full bg-surface-tertiary" /></Skeleton></div>))}
                   </div>
                 ) : (
@@ -757,7 +757,7 @@ function PendingReviewsCard() {
           <SectionIcon color="amber"><Star className="w-4 h-4 text-[var(--color-warning)]" aria-hidden="true" /></SectionIcon>
           <h2 className="text-lg font-semibold text-theme-primary">{t('sections.pending_reviews')}</h2>
         </div>
-        <div aria-label={t('aria.loading_pending_reviews')} aria-busy="true" className="space-y-3">
+        <div aria-label={t('aria.loading_pending_reviews')} role="status" aria-busy="true" className="space-y-3">
           {Array.from({ length: 2 }).map((_, i) => (<Skeleton key={i} className="rounded-lg"><div className="h-16 rounded-lg bg-surface-tertiary" /></Skeleton>))}
         </div>
       </GlassCard>

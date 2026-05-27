@@ -304,7 +304,7 @@ export function FederationListingsPage() {
 
       {/* Loading State */}
       {isLoading && listings.length === 0 && (
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <GlassCard key={i} className="p-5 animate-pulse">
               <div className="h-4 bg-theme-hover rounded w-2/3 mb-3" />
@@ -318,7 +318,7 @@ export function FederationListingsPage() {
 
       {/* Error State */}
       {!isLoading && loadError && (
-        <GlassCard className="p-8 text-center">
+        <GlassCard role="alert" className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">
             {t('listings.unable_to_load')}
@@ -447,7 +447,7 @@ export function FederationListingsPage() {
                       )}
                       {isExternal && (
                         <Chip size="sm" variant="flat" className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
-                          startContent={<Globe className="w-3 h-3" />}
+                          startContent={<Globe className="w-3 h-3" aria-hidden="true" />}
                         >
                           {t('listings.external_partner')}
                         </Chip>
@@ -606,8 +606,11 @@ function FederatedListingCard({ listing, onViewDetails }: FederatedListingCardPr
 
   return (
     <GlassCard
+      role="button"
+      tabIndex={0}
       className="p-5 md:hover:scale-[1.02] transition-transform h-full flex flex-col cursor-pointer"
       onClick={onViewDetails}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onViewDetails(); } }}
     >
       {/* Image or Type Icon */}
       {imageSrc ? (

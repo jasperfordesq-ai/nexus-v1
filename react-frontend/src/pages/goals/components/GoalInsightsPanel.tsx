@@ -105,7 +105,7 @@ export function GoalInsightsPanel({ goalId, canNudge = false }: GoalInsightsPane
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" aria-busy="true" aria-label={t('insights.loading')}>
+      <div role="status" className="grid grid-cols-1 sm:grid-cols-2 gap-3" aria-busy="true" aria-label={t('insights.loading')}>
         {[1, 2, 3, 4].map((item) => (
           <Skeleton key={item} className="h-20 rounded-lg" />
         ))}

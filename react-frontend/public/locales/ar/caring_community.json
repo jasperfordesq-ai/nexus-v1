@@ -1173,5 +1173,6 @@
     "refresh_federation_peers": "تحديث أقرانهم الاتحاد",
     "refresh_kpi_baselines": "قم بتحديث الخطوط الأساسية لمؤشرات الأداء الرئيسية",
     "refresh_research_partnerships": "تحديث الشراكات البحثية"
-  }
+  },
+  "loading": "Loading..."
 }

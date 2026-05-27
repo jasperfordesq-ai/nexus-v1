@@ -175,7 +175,7 @@ export function BlogPostPage() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="max-w-3xl mx-auto space-y-6" aria-busy="true" aria-label={t('loading_post')}>
+      <div role="status" className="max-w-3xl mx-auto space-y-6" aria-busy="true" aria-label={t('loading_post')}>
         <PageMeta title={t('page_title')} noIndex />
         <div className="animate-pulse">
           <div className="h-6 bg-theme-hover rounded w-1/4 mb-4" />

@@ -134,7 +134,7 @@ export default function ModuleConfiguration() {
         description={t('config.module_configuration_desc')}
         actions={
           <div className="flex items-center gap-2">
-            <Chip color="warning" variant="soft" size="sm" startContent={<Construction size={14} />}>
+            <Chip color="warning" variant="soft" size="sm" startContent={<Construction size={14} aria-hidden="true" />}>
               {t('config.beta')}
             </Chip>
             <Button variant="tertiary" size="sm" startContent={<RefreshCw size={16} />} onPress={loadConfig}>
@@ -192,7 +192,7 @@ export default function ModuleConfiguration() {
 
       {/* Loading state — inline so the search Input is never unmounted (prevents browser search-history re-injection) */}
       {loading && (
-        <div className="flex justify-center items-center min-h-[300px]">
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center items-center min-h-[300px]">
           <Spinner size="lg" />
         </div>
       )}
@@ -238,7 +238,7 @@ export default function ModuleConfiguration() {
       {/* No results */}
       {!loading && filteredCore.length === 0 && filteredFeatures.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 text-muted">
-          <Search size={48} className="mb-4" />
+          <Search size={48} className="mb-4" aria-hidden="true" />
           <p className="text-lg">{t('config.no_modules_match')}</p>
           <Button
             variant="tertiary"

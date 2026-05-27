@@ -115,7 +115,7 @@ export function UserCreate() {
         actions={
           <Button
             variant="tertiary"
-            startContent={<ArrowLeft size={16} />}
+            startContent={<ArrowLeft aria-hidden="true" size={16} />}
             onPress={() => navigate(tenantPath('/admin/users'))}
           >
             {t('users.back_to_users')}
@@ -245,7 +245,7 @@ export function UserCreate() {
               </Button>
               <Button
                 type="submit"
-                startContent={!submitting ? <Save size={16} /> : undefined}
+                startContent={!submitting ? <Save aria-hidden="true" size={16} /> : undefined}
                 isLoading={submitting}
               >
                 {t('users.create_user_title')}

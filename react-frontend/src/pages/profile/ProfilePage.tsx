@@ -493,7 +493,7 @@ export function ProfilePage() {
   if (error && !profile) {
     return (
       <div className="max-w-4xl mx-auto">
-        <GlassCard className="p-8 text-center">
+        <GlassCard role="alert" className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('unable_to_load')}</h2>
           <p className="text-theme-muted mb-4">{error}</p>
@@ -1162,7 +1162,7 @@ export function ProfilePage() {
           {activeTab === 'reviews' && (
             <div role="tabpanel" id="panel-reviews" aria-labelledby="tab-reviews" className="space-y-4">
               {isLoadingReviews ? (
-                <div aria-label={t('aria.loading_reviews')} aria-busy="true" className="space-y-3">
+                <div role="status" aria-label={t('aria.loading_reviews')} aria-busy="true" className="space-y-3">
                   <GlassCard className="p-4">
                     <Skeleton className="h-4 w-24 rounded" />
                   </GlassCard>

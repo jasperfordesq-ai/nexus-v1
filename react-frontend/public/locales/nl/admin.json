@@ -16982,5 +16982,16 @@
     "template_deleted": "Sjabloon verwijderd.",
     "template_duplicated": "Sjabloon gedupliceerd.",
     "title": "Sjablonen"
+  },
+  "admin_settings": {
+    "logo_uploaded": "Partner logo uploaded",
+    "upload_failed": "Upload failed",
+    "partner_logo_label": "Partner Logo",
+    "partner_logo_hint": "Shown in the footer left slot. PNG, JPEG, WebP or SVG — max 2 MB.",
+    "replace_image": "Replace image",
+    "upload_image": "Upload image"
+  },
+  "national": {
+    "trend_chart_aria": "Chart showing community activity trends over time"
   }
 }

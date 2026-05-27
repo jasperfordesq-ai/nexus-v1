@@ -28,5 +28,6 @@
   "status_triaging": "トリアージ中",
   "status_in_progress": "進行中",
   "status_resolved": "解決済み",
-  "status_closed": "終了"
+  "status_closed": "終了",
+  "loading": "Loading..."
 }

@@ -114,7 +114,7 @@ export function SafeguardingTab() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
+      <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex items-center justify-center py-12">
         <Spinner size="lg" />
       </div>
     );
@@ -125,7 +125,7 @@ export function SafeguardingTab() {
       <GlassCard className="p-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="p-3 rounded-xl bg-blue-500/20">
-            <Shield className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+            <Shield className="w-6 h-6 text-blue-600 dark:text-blue-400" aria-hidden="true" />
           </div>
           <div>
             <h2 className="text-lg font-semibold text-theme-primary">

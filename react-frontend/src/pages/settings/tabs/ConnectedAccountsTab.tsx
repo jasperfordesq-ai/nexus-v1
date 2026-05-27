@@ -128,7 +128,7 @@ export function ConnectedAccountsTab() {
               key={provider}
               className="flex items-center gap-4 p-4 rounded-xl border border-[var(--border-default)] bg-[var(--color-surface)]"
             >
-              <meta.Icon className="w-7 h-7 flex-shrink-0" />
+              <meta.Icon className="w-7 h-7 flex-shrink-0" aria-hidden="true" />
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-theme-primary">{t(meta.providerLabelKey)}</p>
                 {linked ? (

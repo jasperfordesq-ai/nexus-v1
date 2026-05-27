@@ -209,13 +209,13 @@ export function AdminSettings() {
       if (res.data?.url) {
         setForm(prev => ({ ...prev, partner_logo_url: res.data!.url }));
         setOriginalForm(prev => ({ ...prev, partner_logo_url: res.data!.url }));
-        toast.success('Partner logo uploaded');
+        toast.success(t('admin_settings.logo_uploaded'));
         refreshTenant();
       } else {
-        toast.error('Upload failed');
+        toast.error(t('admin_settings.upload_failed'));
       }
     } catch {
-      toast.error('Upload failed');
+      toast.error(t('admin_settings.upload_failed'));
     } finally {
       setUploadingLogo(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -261,7 +261,7 @@ export function AdminSettings() {
           title={t('system.admin_settings_title')}
           description={t('system.admin_settings_desc', { name: tenant?.name || t('system.your_community') })}
         />
-        <div className="flex justify-center py-16">
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
       </div>
@@ -279,7 +279,7 @@ export function AdminSettings() {
         <Card>
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Settings size={20} /> {t('system.section_general')}
+              <Settings size={20} aria-hidden="true" /> {t('system.section_general')}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
@@ -332,7 +332,7 @@ export function AdminSettings() {
         <Card>
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Scale size={20} /> {t('system.section_branding_legal')}
+              <Scale size={20} aria-hidden="true" /> {t('system.section_branding_legal')}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
@@ -347,9 +347,9 @@ export function AdminSettings() {
             />
             {/* Partner Logo Upload */}
             <div className="space-y-2">
-              <p className="text-sm font-medium">Partner Logo</p>
+              <p className="text-sm font-medium">{t('admin_settings.partner_logo_label')}</p>
               <p className="text-xs text-muted">
-                Shown in the footer left slot. PNG, JPEG, WebP or SVG — max 2 MB.
+                {t('admin_settings.partner_logo_hint')}
               </p>
               {form.partner_logo_url && (
                 <div className="flex items-start gap-3 rounded-lg border border-border bg-surface-secondary p-3">
@@ -387,7 +387,7 @@ export function AdminSettings() {
                   startContent={!uploadingLogo ? <Upload size={14} /> : undefined}
                   onPress={() => fileInputRef.current?.click()}
                 >
-                  {form.partner_logo_url ? 'Replace image' : 'Upload image'}
+                  {form.partner_logo_url ? t('admin_settings.replace_image') : t('admin_settings.upload_image')}
                 </Button>
               </div>
             </div>
@@ -408,7 +408,7 @@ export function AdminSettings() {
           <Card className="border-2 border-warning/30">
             <CardHeader>
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Lock size={18} className="text-warning" />
+                <Lock size={18} className="text-warning" aria-hidden="true" />
                 {t('system.powered_by_branding_section')}
                 <Chip size="sm" color="warning" variant="soft">{t('system.god_only_chip')}</Chip>
               </h3>

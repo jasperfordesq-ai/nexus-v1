@@ -179,7 +179,7 @@ export function GdprRequests() {
           <div className="flex gap-2">
             <Button
               variant="tertiary"
-              startContent={<RefreshCw size={16} />}
+              startContent={<RefreshCw aria-hidden="true" size={16} />}
               onPress={loadData}
               isLoading={loading}
               size="sm"
@@ -187,7 +187,7 @@ export function GdprRequests() {
               {t('enterprise.refresh')}
             </Button>
             <Button
-              startContent={<Plus size={16} />}
+              startContent={<Plus aria-hidden="true" size={16} />}
               onPress={() => navigate(tenantPath('/admin/enterprise/gdpr/requests/create'))}
               size="sm"
             >

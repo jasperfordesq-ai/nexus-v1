@@ -58,5 +58,6 @@
     "reason_announcement": "إعلان رسمي",
     "no_reasons": "الترتيب الافتراضي"
   },
-  "prefs_cadence_monthly": "ملخص شهري"
+  "prefs_cadence_monthly": "ملخص شهري",
+  "loading": "Loading..."
 }

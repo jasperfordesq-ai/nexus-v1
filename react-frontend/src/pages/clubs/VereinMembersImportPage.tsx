@@ -192,7 +192,7 @@ export default function VereinMembersImportPage() {
           size="sm"
           variant="flat"
           className="self-start"
-          startContent={<ArrowLeft className="w-4 h-4" />}
+          startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
         >
           {t('back')}
         </Button>
@@ -201,7 +201,7 @@ export default function VereinMembersImportPage() {
       {/* Step 1: upload */}
       <Card className="border border-border shadow-sm">
         <CardHeader className="flex items-center gap-2">
-          <Upload className="w-5 h-5 text-accent" />
+          <Upload className="w-5 h-5 text-accent" aria-hidden="true" />
           <h2 className="text-base font-semibold">
             {t('verein_import.step1')}
           </h2>
@@ -229,7 +229,7 @@ export default function VereinMembersImportPage() {
           <div className="flex justify-end">
             <Button
               color="primary"
-              startContent={<FileText className="w-4 h-4" />}
+              startContent={<FileText className="w-4 h-4" aria-hidden="true" />}
               onPress={() => void runPreview()}
               isLoading={loadingPreview}
             >
@@ -241,7 +241,7 @@ export default function VereinMembersImportPage() {
 
       {/* Step 2: preview */}
       {loadingPreview && (
-        <div className="flex items-center justify-center py-8">
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex items-center justify-center py-8">
           <Spinner size="lg" />
         </div>
       )}
@@ -249,7 +249,7 @@ export default function VereinMembersImportPage() {
       {preview && (
         <Card className="border border-border shadow-sm">
           <CardHeader className="flex items-center gap-2 flex-wrap">
-            <FileText className="w-5 h-5 text-accent" />
+            <FileText className="w-5 h-5 text-accent" aria-hidden="true" />
             <h2 className="text-base font-semibold">
               {t('verein_import.step2')}
             </h2>
@@ -282,8 +282,8 @@ export default function VereinMembersImportPage() {
             </div>
 
             {preview.summary.invalid > 0 && (
-              <div className="flex items-center gap-2 p-3 bg-danger-50 border border-danger-200 rounded-lg text-sm text-danger-800">
-                <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+              <div role="alert" className="flex items-center gap-2 p-3 bg-danger-50 border border-danger-200 rounded-lg text-sm text-danger-800">
+                <AlertTriangle className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                 <span>
                   {t('verein_import.errors.has_invalid_summary')}
                 </span>
@@ -330,7 +330,7 @@ export default function VereinMembersImportPage() {
               </Button>
               <Button
                 color="primary"
-                startContent={<CheckCircle2 className="w-4 h-4" />}
+                startContent={<CheckCircle2 className="w-4 h-4" aria-hidden="true" />}
                 onPress={() => void runImport()}
                 isLoading={importing}
                 isDisabled={preview.summary.invalid > 0}
@@ -346,7 +346,7 @@ export default function VereinMembersImportPage() {
       {importResult && (
         <Card className="border border-border shadow-sm">
           <CardHeader className="flex items-center gap-2">
-            <CheckCircle2 className="w-5 h-5 text-success" />
+            <CheckCircle2 className="w-5 h-5 text-success" aria-hidden="true" />
             <h2 className="text-base font-semibold">
               {t('verein_import.result.title')}
             </h2>

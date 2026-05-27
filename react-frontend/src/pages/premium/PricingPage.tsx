@@ -114,7 +114,7 @@ export function PricingPage() {
     <div className="max-w-6xl mx-auto px-4 py-10">
       <PageMeta title={t('premium.pricing_title')} noIndex />
       <div className="text-center mb-10">
-        <Crown className="mx-auto mb-3 text-yellow-500" size={48} />
+        <Crown className="mx-auto mb-3 text-yellow-500" size={48} aria-hidden="true" />
         <h1 className="text-3xl font-bold mb-2">
           {t('premium.pricing_title')}
         </h1>
@@ -138,7 +138,7 @@ export function PricingPage() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-16">
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
       ) : tiers.length === 0 ? (
@@ -156,7 +156,7 @@ export function PricingPage() {
               <Card key={tier.id} className="flex flex-col border border-theme-default bg-surface">
                 <CardHeader className="flex flex-col items-start gap-2">
                   <div className="flex items-center gap-2">
-                    <Crown size={20} className="text-yellow-500" />
+                    <Crown size={20} className="text-yellow-500" aria-hidden="true" />
                     <h2 className="text-xl font-semibold">{tier.name}</h2>
                   </div>
                   {tier.description && (
@@ -187,7 +187,7 @@ export function PricingPage() {
                     ) : (
                       tier.features.map((f) => (
                         <li key={f} className="flex items-start gap-2 text-sm">
-                          <CheckCircle2 size={16} className="text-green-500 mt-0.5 shrink-0" />
+                          <CheckCircle2 size={16} className="text-green-500 mt-0.5 shrink-0" aria-hidden="true" />
                           <span>{i18n.exists(`premium.feature.${f}`, { ns: 'common' }) ? t(`premium.feature.${f}`) : f}</span>
                         </li>
                       ))

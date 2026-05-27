@@ -215,7 +215,10 @@
     "message_label": "Bericht",
     "message_placeholder": "Schrijf uw bericht...",
     "cancel": "Annuleren",
-    "send_message": "Bericht verzenden"
+    "send_message": "Bericht verzenden",
+    "thread_aria_no_unread": "Conversation with {{name}} from {{tenant}}",
+    "thread_aria_unread": "Conversation with {{name}} from {{tenant}}, {{count}} unread message",
+    "thread_aria_unread_plural": "Conversation with {{name}} from {{tenant}}, {{count}} unread messages"
   },
   "listings": {
     "page_title": "Federatie-vermeldingen",

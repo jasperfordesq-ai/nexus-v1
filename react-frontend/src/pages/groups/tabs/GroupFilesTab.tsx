@@ -237,7 +237,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
 
   if (loading && files.length === 0) {
     return (
-      <div className="flex justify-center py-12" aria-label={t('files.loading')} aria-busy="true">
+      <div role="status" className="flex justify-center py-12" aria-label={t('files.loading')} aria-busy="true">
         <Spinner size="lg" />
       </div>
     );

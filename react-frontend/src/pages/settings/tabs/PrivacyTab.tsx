@@ -465,7 +465,7 @@ export function PrivacyTab({
                   <SelectItem key="other" id="other">{t('insurance.other')}</SelectItem>
                 </Select>
                 <label className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-theme-elevated hover:bg-theme-hover cursor-pointer transition-colors border border-border">
-                  <Upload className="w-4 h-4 text-theme-primary" />
+                  <Upload className="w-4 h-4 text-theme-primary" aria-hidden="true" />
                   <span className="text-sm font-medium text-theme-primary">
                     {insuranceUploading ? t('insurance.uploading') : t('insurance.upload_certificate')}
                   </span>

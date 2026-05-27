@@ -62,11 +62,13 @@ interface PendingReview {
 // ─── Star display component ───────────────────────────────────────────────────
 
 function StarRating({ rating }: { rating: number }): JSX.Element {
+  const { t } = useTranslation('reviews');
   return (
-    <div className="flex items-center gap-0.5" aria-label={`${rating} out of 5 stars`}>
+    <div className="flex items-center gap-0.5" aria-label={t('rating_aria', { n: rating })}>
       {Array.from({ length: 5 }, (_, i) => (
         <Star
           key={i}
+          aria-hidden="true"
           className={`w-4 h-4 ${i < rating ? 'fill-amber-400 text-amber-400' : 'text-theme-subtle'}`}
         />
       ))}
@@ -134,7 +136,7 @@ function ReviewCard({
                 onPress={handleDelete}
                 aria-label={t('review_card.delete')}
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-4 h-4" aria-hidden="true" />
               </Button>
             )}
           </div>
@@ -163,7 +165,7 @@ function ReviewCard({
 function EmptyState({ message, subtitle }: { message: string; subtitle: string }): JSX.Element {
   return (
     <div className="text-center py-12 text-[var(--color-text-muted)]">
-      <Star className="w-12 h-12 mx-auto mb-3 opacity-30" />
+      <Star className="w-12 h-12 mx-auto mb-3 opacity-30" aria-hidden="true" />
       <p className="font-medium">{message}</p>
       <p className="text-sm mt-1 opacity-70">{subtitle}</p>
     </div>
@@ -249,8 +251,8 @@ export default function ReviewsPage(): JSX.Element {
 
   if (error) {
     return (
-      <div className="max-w-2xl mx-auto p-6 text-center">
-        <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-danger" />
+      <div role="alert" className="max-w-2xl mx-auto p-6 text-center">
+        <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-danger" aria-hidden="true" />
         <p className="text-[var(--color-text-muted)]">{t('load_error')}</p>
         <Button className="mt-4" onPress={() => { setError(null); fetchReceived(); fetchPending(); }}>{t('load_more')}</Button>
       </div>

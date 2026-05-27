@@ -113,7 +113,7 @@ export function AcceptableUsePage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[50vh]">
+      <div role="status" aria-busy="true" aria-label={t('common:loading')} className="flex justify-center items-center min-h-[50vh]">
         <Spinner size="lg" />
       </div>
     );

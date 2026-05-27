@@ -325,7 +325,7 @@ export function HourGiftPage() {
                         value={recipientQuery}
                         onValueChange={setRecipientQuery}
                         variant="bordered"
-                        startContent={<Search className="h-4 w-4 text-muted" />}
+                        startContent={<Search className="h-4 w-4 text-muted" aria-hidden="true" />}
                       />
                       {searching && <Spinner size="sm" className="mt-2" />}
                       {recipientResults.length > 0 && (
@@ -389,7 +389,7 @@ export function HourGiftPage() {
                   color="primary"
                   size="lg"
                   className="w-full text-base"
-                  startContent={<Gift className="h-5 w-5" />}
+                  startContent={<Gift className="h-5 w-5" aria-hidden="true" />}
                   isDisabled={!canSubmit}
                   onPress={() => setConfirmOpen(true)}
                 >
@@ -401,7 +401,7 @@ export function HourGiftPage() {
             <Tab key="inbox" title={t('hour_gift.tabs.inbox')}>
               <div className="mt-4 space-y-3">
                 {inboxLoading ? (
-                  <div className="flex justify-center py-6">
+                  <div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-6">
                     <Spinner size="md" />
                   </div>
                 ) : inbox.length === 0 ? (
@@ -497,7 +497,7 @@ export function HourGiftPage() {
             <Tab key="sent" title={t('hour_gift.tabs.sent')}>
               <div className="mt-4 space-y-3">
                 {sentLoading ? (
-                  <div className="flex justify-center py-6">
+                  <div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-6">
                     <Spinner size="md" />
                   </div>
                 ) : sent.length === 0 ? (

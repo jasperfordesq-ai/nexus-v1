@@ -3,6 +3,8 @@
   "subtitle": "Multi-participant exchanges with split types and confirmations",
   "page_title": "Group Exchanges",
   "new_exchange": "New Exchange",
+  "role_provider": "Provider",
+  "role_receiver": "Receiver",
   "create_exchange": "Create Group Exchange",
   "load_more": "Load More",
   "try_again": "Try Again",

@@ -68,7 +68,7 @@ export default function DevelopersAuthPage() {
       <PageMeta title={t('developers.auth_meta_title')} description={t('developers.auth_intro')} />
       <header className="mb-8">
         <div className="flex items-center gap-3 text-[var(--color-text-muted)] mb-3">
-          <Key size={20} />
+          <Key size={20} aria-hidden="true" />
           <span className="uppercase tracking-wide text-xs font-semibold">
             {t('developers.page_title')}
           </span>

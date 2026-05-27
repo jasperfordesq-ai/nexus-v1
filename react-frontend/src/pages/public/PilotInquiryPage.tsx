@@ -87,7 +87,7 @@ function StepIndicator({ current, total }: { current: number; total: number }) {
                           'bg-theme-elevated text-theme-muted',
               ].join(' ')}
             >
-              {isDone ? <CheckCircle className="w-4 h-4" /> : step}
+              {isDone ? <CheckCircle className="w-4 h-4" aria-hidden="true" /> : step}
             </div>
             {step < total && (
               <div className={[

@@ -101,7 +101,7 @@ export function TranslationTab() {
     <div className="space-y-6">
       <GlassCard className="p-6">
         <div className="flex items-center gap-2 mb-4">
-          <Sparkles className="w-5 h-5 text-indigo-500" />
+          <Sparkles className="w-5 h-5 text-indigo-500" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary">
             {t('feed.personalisation.label')}
           </h2>
@@ -126,7 +126,7 @@ export function TranslationTab() {
 
       <GlassCard className="p-6">
         <div className="flex items-center gap-2 mb-4">
-          <Languages className="w-5 h-5 text-indigo-500" />
+          <Languages className="w-5 h-5 text-indigo-500" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary">
             {t('settings_translation.section_title')}
           </h2>
@@ -175,7 +175,7 @@ export function TranslationTab() {
           isLoading={isSaving}
           isDisabled={isLoading}
           onPress={handleSave}
-          startContent={<Save className="w-4 h-4" />}
+          startContent={<Save className="w-4 h-4" aria-hidden="true" />}
         >
           {t('save')}
         </Button>

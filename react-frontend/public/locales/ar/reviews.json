@@ -33,5 +33,6 @@
   "load_error": "فشل تحميل التقييمات. يرجى المحاولة مرة أخرى.",
   "load_more": "تحميل المزيد",
   "stars": "{{count}} نجمة",
-  "stars_plural": "{{count}} نجوم"
+  "stars_plural": "{{count}} نجوم",
+  "rating_aria": "{{n}} out of 5 stars"
 }

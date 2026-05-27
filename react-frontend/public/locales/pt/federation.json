@@ -215,7 +215,10 @@
     "message_label": "Mensagem",
     "message_placeholder": "Escreva sua mensagem...",
     "cancel": "Cancelar",
-    "send_message": "Enviar mensagem"
+    "send_message": "Enviar mensagem",
+    "thread_aria_no_unread": "Conversation with {{name}} from {{tenant}}",
+    "thread_aria_unread": "Conversation with {{name}} from {{tenant}}, {{count}} unread message",
+    "thread_aria_unread_plural": "Conversation with {{name}} from {{tenant}}, {{count}} unread messages"
   },
   "listings": {
     "page_title": "Listagens da Federação",

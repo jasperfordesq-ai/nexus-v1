@@ -290,7 +290,7 @@ export default function CareProviderDirectoryPage() {
 
         {/* Results */}
         {loading ? (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div role="status" aria-busy="true" aria-label={t('loading')} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }).map((_, i) => (
               <ProviderCardSkeleton key={i} />
             ))}

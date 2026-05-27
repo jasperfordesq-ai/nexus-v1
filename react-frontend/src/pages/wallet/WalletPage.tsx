@@ -258,7 +258,7 @@ export function WalletPage() {
             <p className="text-theme-muted mb-4">{error}</p>
             <Button
               className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white"
-              startContent={<RefreshCw className="w-4 h-4" />}
+              startContent={<RefreshCw aria-hidden="true" className="w-4 h-4" />}
               onPress={() => loadWalletData()}
             >
               {t('try_again')}

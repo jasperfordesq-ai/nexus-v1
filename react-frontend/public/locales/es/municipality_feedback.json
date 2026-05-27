@@ -28,5 +28,6 @@
   "status_triaging": "En clasificación",
   "status_in_progress": "En progreso",
   "status_resolved": "Resuelto",
-  "status_closed": "Cerrado"
+  "status_closed": "Cerrado",
+  "loading": "Loading..."
 }

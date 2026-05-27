@@ -73,13 +73,13 @@ export default function CouponsPage() {
       </header>
 
       {loading ? (
-        <div className="flex justify-center py-16">
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-16">
           <Spinner />
         </div>
       ) : items.length === 0 ? (
         <Card>
           <CardBody className="text-center py-12">
-            <Tag className="w-12 h-12 mx-auto mb-3 text-[var(--color-text-secondary)]" />
+            <Tag className="w-12 h-12 mx-auto mb-3 text-[var(--color-text-secondary)]" aria-hidden="true" />
             <h3 className="text-lg font-semibold mb-1">{t('coupon.no_coupons')}</h3>
             <p className="text-[var(--color-text-secondary)]">{t('coupon.no_coupons_subtitle')}</p>
           </CardBody>
@@ -90,7 +90,7 @@ export default function CouponsPage() {
             <Card key={c.id} className="hover:shadow-lg transition-shadow">
               <CardBody className="p-5">
                 <div className="flex items-start justify-between mb-3">
-                  <Tag className="w-6 h-6 text-accent" />
+                  <Tag className="w-6 h-6 text-accent" aria-hidden="true" />
                   <Chip size="sm" color="success" variant="flat">
                     {formatDiscount(c)}
                   </Chip>

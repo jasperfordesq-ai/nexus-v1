@@ -33,5 +33,6 @@
   "load_error": "Error al cargar las reseñas. Por favor, inténtalo de nuevo.",
   "load_more": "Cargar más",
   "stars": "{{count}} estrella",
-  "stars_plural": "{{count}} estrellas"
+  "stars_plural": "{{count}} estrellas",
+  "rating_aria": "{{n}} out of 5 stars"
 }

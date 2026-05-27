@@ -179,7 +179,7 @@ export function FraudAlerts() {
           <Dropdown>
             <DropdownTrigger>
               <Button isIconOnly size="sm" variant="tertiary" aria-label={t('timebanking.label_actions')}>
-                <MoreVertical size={16} />
+                <MoreVertical size={16} aria-hidden="true" />
               </Button>
             </DropdownTrigger>
             <DropdownMenu
@@ -250,7 +250,7 @@ export function FraudAlerts() {
         onRefresh={loadAlerts}
         emptyContent={
           <div className="flex flex-col items-center gap-2 py-8">
-            <AlertTriangle size={32} className="text-muted" />
+            <AlertTriangle size={32} className="text-muted" aria-hidden="true" />
             <p className="text-sm text-muted">{t('timebanking.no_fraud_alerts')}</p>
           </div>
         }

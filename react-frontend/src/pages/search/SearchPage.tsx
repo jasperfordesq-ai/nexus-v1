@@ -321,7 +321,7 @@ export function SearchPage() {
 
           {/* Results Content */}
           {searchError ? (
-            <GlassCard className="p-8 text-center">
+            <GlassCard role="alert" className="p-8 text-center">
               <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
               <h2 className="text-lg font-semibold text-theme-primary mb-2">{t('error_title')}</h2>
               <p className="text-theme-muted mb-4">{searchError}</p>
@@ -348,7 +348,7 @@ export function SearchPage() {
             </div>
           ) : totalResults === 0 ? (
             <PublicEmptyState
-              icon={<Search className="w-12 h-12" />}
+              icon={<Search className="w-12 h-12" aria-hidden="true" />}
               title={t('no_results_title')}
               description={t('no_results_desc', { query })}
               tips={[t('empty_tip_spelling'), t('empty_tip_filters'), t('empty_tip_broaden')]}

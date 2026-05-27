@@ -61,7 +61,7 @@ export default function MyDataExportPage(): JSX.Element {
             to={tenantPath('/caring-community')}
             variant="light"
             size="sm"
-            startContent={<ArrowLeft size={16} />}
+            startContent={<ArrowLeft size={16} aria-hidden="true" />}
           >
             {t('data_export.back')}
           </Button>
@@ -82,7 +82,7 @@ export default function MyDataExportPage(): JSX.Element {
           <Button
             color="primary"
             size="lg"
-            startContent={<Download size={18} />}
+            startContent={<Download size={18} aria-hidden="true" />}
             onPress={() => {
               void handleDownload();
             }}

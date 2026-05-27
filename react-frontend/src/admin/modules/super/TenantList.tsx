@@ -157,25 +157,25 @@ export function TenantList() {
           </Button>
         </DropdownTrigger>
         <DropdownMenu aria-label={t('super.tenant_actions')} onAction={handleMenuAction}>
-          <DropdownItem key="view" id="view" startContent={<Eye size={14} />}>
+          <DropdownItem key="view" id="view" startContent={<Eye aria-hidden="true" size={14} />}>
             {t('super.action_view')}
           </DropdownItem>
-          <DropdownItem key="edit" id="edit" startContent={<Edit size={14} />}>
+          <DropdownItem key="edit" id="edit" startContent={<Edit aria-hidden="true" size={14} />}>
             {t('common.edit')}
           </DropdownItem>
-          <DropdownItem key="toggle-hub" id="toggle-hub" startContent={tenant.allows_subtenants ? <ToggleLeft size={14} /> : <ToggleRight size={14} />}>
+          <DropdownItem key="toggle-hub" id="toggle-hub" startContent={tenant.allows_subtenants ? <ToggleLeft aria-hidden="true" size={14} /> : <ToggleRight aria-hidden="true" size={14} />}>
             {tenant.allows_subtenants ? t('super.disable_hub') : t('super.enable_hub')}
           </DropdownItem>
           {tenant.is_active ? (
-            <DropdownItem key="deactivate" id="deactivate" startContent={<Shield size={14} />} className="text-warning" color="warning">
+            <DropdownItem key="deactivate" id="deactivate" startContent={<Shield aria-hidden="true" size={14} />} className="text-warning" color="warning">
               {t('super.deactivate')}
             </DropdownItem>
           ) : (
-            <DropdownItem key="reactivate" id="reactivate" startContent={<Shield size={14} />} className="text-success" color="success">
+            <DropdownItem key="reactivate" id="reactivate" startContent={<Shield aria-hidden="true" size={14} />} className="text-success" color="success">
               {t('super.reactivate')}
             </DropdownItem>
           )}
-          <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" variant="danger">
+          <DropdownItem key="delete" id="delete" startContent={<Trash2 aria-hidden="true" size={14} />} className="text-danger" variant="danger">
             {t('common.delete')}
           </DropdownItem>
         </DropdownMenu>
@@ -280,13 +280,13 @@ export function TenantList() {
               as={Link}
               to={tenantPath('/admin/super/tenants/hierarchy')}
               variant="tertiary"
-              startContent={<Network size={16} />}
+              startContent={<Network aria-hidden="true" size={16} />}
               size="sm"
             >
               {t('super.view_hierarchy')}
             </Button>
             <Button
-              startContent={<Plus size={16} />}
+              startContent={<Plus aria-hidden="true" size={16} />}
               onPress={() => navigate(tenantPath('/admin/super/tenants/create'))}
             >
               {t('super.create_tenant')}

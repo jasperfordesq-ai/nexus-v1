@@ -206,7 +206,7 @@ export function OrganisationsPage() {
       {!error && (
         <>
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" aria-busy="true" aria-label={t('organisations.loading')}>
+            <div role="status" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" aria-busy="true" aria-label={t('organisations.loading')}>
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <GlassCard key={i} className="p-5 animate-pulse">
                   <div className="flex items-center gap-3 mb-3">

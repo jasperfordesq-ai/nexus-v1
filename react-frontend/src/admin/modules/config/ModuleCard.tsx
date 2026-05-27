@@ -47,7 +47,7 @@ export default function ModuleCard({ module, enabled, onToggle, onConfigure, tog
                 : 'bg-accent/10 text-accent'
             }`}
           >
-            <Icon size={20} />
+            <Icon size={20} aria-hidden="true" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-2">
@@ -85,7 +85,7 @@ export default function ModuleCard({ module, enabled, onToggle, onConfigure, tog
             <Button
               size="sm"
               variant="tertiary"
-              startContent={<Settings2 size={14} />}
+              startContent={<Settings2 size={14} aria-hidden="true" />}
               onPress={() => onConfigure(module)}
             >
               {t('config.configure')}

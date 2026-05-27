@@ -87,7 +87,7 @@ export function SuperDashboard() {
         actions={
           <Button
             variant="tertiary"
-            startContent={<RefreshCw size={16} />}
+            startContent={<RefreshCw aria-hidden="true" size={16} />}
             onPress={loadData}
             isLoading={loading}
             size="sm"
@@ -147,8 +147,8 @@ export function SuperDashboard() {
                 to={action.href}
                 variant="secondary"
                 className="min-h-11 justify-between px-4 py-3"
-                endContent={<ArrowRight size={16} />}
-                startContent={<action.icon size={18} />}
+                endContent={<ArrowRight aria-hidden="true" size={16} />}
+                startContent={<action.icon aria-hidden="true" size={18} />}
               >
                 {action.label}
               </Button>
@@ -166,7 +166,7 @@ export function SuperDashboard() {
       ) : tenants.length === 0 ? (
         <Card >
           <CardBody className="flex flex-col items-center py-12 text-muted">
-            <Building2 size={40} className="mb-2" />
+            <Building2 aria-hidden="true" size={40} className="mb-2" />
             <p>{t('super.no_tenants_found')}</p>
           </CardBody>
         </Card>
@@ -196,7 +196,7 @@ export function SuperDashboard() {
                 </div>
                 <div className="flex items-center gap-4 text-sm text-muted">
                   <span className="flex items-center gap-1">
-                    <Users size={14} />
+                    <Users aria-hidden="true" size={14} />
                     {t('super.users_count', { count: tenant.user_count ?? 0 })}
                   </span>
                   {tenant.allows_subtenants && (
@@ -216,7 +216,7 @@ export function SuperDashboard() {
             as={Link}
             to={tenantPath('/admin/super/tenants')}
             variant="tertiary"
-            endContent={<ArrowRight size={16} />}
+            endContent={<ArrowRight aria-hidden="true" size={16} />}
           >
             {t('super.view_all_tenants')}
           </Button>

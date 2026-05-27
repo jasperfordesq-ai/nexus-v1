@@ -383,7 +383,7 @@ export function ListingDetailPage() {
       <>
         <PageMeta title={t('not_found_title')} noIndex />
         <EmptyState
-          icon={<AlertCircle className="w-12 h-12" />}
+          icon={<AlertCircle className="w-12 h-12" aria-hidden="true" />}
           title={t('not_found_title')}
           description={error || t('not_found_fallback')}
           action={

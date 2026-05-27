@@ -142,7 +142,7 @@ export function OrgWallets() {
         onRefresh={loadWallets}
         emptyContent={
           <div className="flex flex-col items-center gap-2 py-8">
-            <Building2 size={32} className="text-muted" />
+            <Building2 size={32} className="text-muted" aria-hidden="true" />
             <p className="text-sm text-muted">{t('timebanking.no_org_wallets')}</p>
           </div>
         }

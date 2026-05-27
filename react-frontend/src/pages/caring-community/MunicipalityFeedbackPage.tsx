@@ -136,7 +136,7 @@ export default function MunicipalityFeedbackPage() {
         <CardBody className="space-y-2">
           <div className="flex items-center gap-3">
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/15">
-              <Inbox size={20} className="text-accent" />
+              <Inbox size={20} className="text-accent" aria-hidden="true" />
             </span>
             <h1 className="text-xl font-bold sm:text-2xl">{t('intro_title')}</h1>
           </div>
@@ -229,7 +229,7 @@ export default function MunicipalityFeedbackPage() {
           <div className="flex justify-end">
             <Button
               color="primary"
-              startContent={<MessageSquare size={14} />}
+              startContent={<MessageSquare size={14} aria-hidden="true" />}
               onPress={handleSubmit}
               isLoading={submitting}
               isDisabled={!subject.trim() || !body.trim()}
@@ -245,7 +245,7 @@ export default function MunicipalityFeedbackPage() {
         <CardBody className="space-y-3">
           <h2 className="text-lg font-semibold">{t('my_submissions_title')}</h2>
           {loadingList ? (
-            <div className="flex justify-center py-8">
+            <div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-8">
               <Spinner size="sm" />
             </div>
           ) : items.length === 0 ? (

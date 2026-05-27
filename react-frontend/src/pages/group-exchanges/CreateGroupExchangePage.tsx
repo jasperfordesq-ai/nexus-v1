@@ -420,7 +420,7 @@ export function CreateGroupExchangePage() {
                       ? 'bg-indigo-500/20 text-indigo-400 ring-2 ring-indigo-500'
                       : 'bg-theme-elevated text-theme-subtle'}
                 `}>
-                  {isComplete ? <CheckCircle className="w-4 h-4" /> : stepNum}
+                  {isComplete ? <CheckCircle className="w-4 h-4" aria-hidden="true" /> : stepNum}
                 </div>
                 <span className={`text-xs text-center hidden sm:block ${isCurrent ? 'text-theme-primary font-medium' : 'text-theme-subtle'}`}>
                   {label}
@@ -898,7 +898,7 @@ export function CreateGroupExchangePage() {
                             />
                           }
                         >
-                          {p.name} ({p.role})
+                          {p.name} ({p.role === 'provider' ? t('role_provider') : t('role_receiver')})
                         </Chip>
                       ))}
                     </div>
@@ -964,7 +964,7 @@ function ParticipantRow({ participant, splitType, onRemove, onHoursChange, onWei
           variant="flat"
           color={participant.role === 'provider' ? 'success' : 'warning'}
         >
-          {participant.role}
+          {participant.role === 'provider' ? t('role_provider') : t('role_receiver')}
         </Chip>
       </div>
 

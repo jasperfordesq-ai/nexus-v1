@@ -185,5 +185,7 @@
     "create": {
       "title": "Gruppenaustausch erstellen"
     }
-  }
+  },
+  "role_provider": "Provider",
+  "role_receiver": "Receiver"
 }

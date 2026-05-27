@@ -1173,5 +1173,6 @@
     "refresh_federation_peers": "Federatie-peers vernieuwen",
     "refresh_kpi_baselines": "KPI-basislijnen vernieuwen",
     "refresh_research_partnerships": "Onderzoekspartnerschappen vernieuwen"
-  }
+  },
+  "loading": "Loading..."
 }

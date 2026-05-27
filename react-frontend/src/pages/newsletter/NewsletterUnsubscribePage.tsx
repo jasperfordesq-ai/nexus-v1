@@ -72,20 +72,20 @@ export default function NewsletterUnsubscribePage() {
       <Card className="w-full max-w-md">
       <Card.Content className="p-8 text-center">
         <div className="mb-6">
-          <Mail className="mx-auto text-muted" size={40} />
+          <Mail className="mx-auto text-muted" size={40} aria-hidden="true" />
         </div>
 
         {state === 'loading' && (
-          <>
-            <Loader2 className="mx-auto animate-spin text-accent mb-4" size={32} />
+          <div role="status" aria-busy="true" aria-label={t('newsletter.processing')}>
+            <Loader2 className="mx-auto animate-spin text-accent mb-4" size={32} aria-hidden="true" />
             <h1 className="text-xl font-semibold text-foreground">{t('newsletter.processing')}</h1>
             <p className="mt-2 text-muted text-sm">{t('newsletter.removing_from_list')}</p>
-          </>
+          </div>
         )}
 
         {state === 'success' && (
           <>
-            <CheckCircle className="mx-auto text-success mb-4" size={36} />
+            <CheckCircle className="mx-auto text-success mb-4" size={36} aria-hidden="true" />
             <h1 className="text-xl font-semibold text-foreground">{t('newsletter.unsubscribed')}</h1>
             <p className="mt-2 text-muted text-sm">
               {t('newsletter.unsubscribed_description')}
@@ -103,7 +103,7 @@ export default function NewsletterUnsubscribePage() {
 
         {state === 'already_done' && (
           <>
-            <CheckCircle className="mx-auto text-success mb-4" size={36} />
+            <CheckCircle className="mx-auto text-success mb-4" size={36} aria-hidden="true" />
             <h1 className="text-xl font-semibold text-foreground">{t('newsletter.already_unsubscribed')}</h1>
             <p className="mt-2 text-muted text-sm">
               {t('newsletter.already_unsubscribed_description')}
@@ -113,7 +113,7 @@ export default function NewsletterUnsubscribePage() {
 
         {state === 'invalid' && (
           <>
-            <XCircle className="mx-auto text-danger mb-4" size={36} />
+            <XCircle className="mx-auto text-danger mb-4" size={36} aria-hidden="true" />
             <h1 className="text-xl font-semibold text-foreground">{t('newsletter.invalid_link')}</h1>
             <p className="mt-2 text-muted text-sm">
               {t('newsletter.invalid_link_description')}
@@ -131,7 +131,7 @@ export default function NewsletterUnsubscribePage() {
 
         {state === 'error' && (
           <>
-            <XCircle className="mx-auto text-danger mb-4" size={36} />
+            <XCircle className="mx-auto text-danger mb-4" size={36} aria-hidden="true" />
             <h1 className="text-xl font-semibold text-foreground">{t('newsletter.something_went_wrong')}</h1>
             <p className="mt-2 text-muted text-sm">
               {t('newsletter.error_description')}

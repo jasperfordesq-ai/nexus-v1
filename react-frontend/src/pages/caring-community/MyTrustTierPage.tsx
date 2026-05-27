@@ -133,7 +133,7 @@ export function MyTrustTierPage() {
 
         {/* Error state */}
         {error && !isLoading && (
-          <GlassCard className="p-6">
+          <GlassCard role="alert" className="p-6">
             <div className="flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-3 text-danger">
                 <AlertCircle className="h-5 w-5 shrink-0" aria-hidden="true" />
@@ -154,7 +154,7 @@ export function MyTrustTierPage() {
 
         {/* Loading skeleton */}
         {isLoading && (
-          <GlassCard className="p-6 space-y-4">
+          <GlassCard role="status" aria-busy="true" className="p-6 space-y-4">
             <Skeleton className="h-6 w-1/3 rounded-lg" />
             <Skeleton className="h-4 w-2/3 rounded-lg" />
             <Skeleton className="h-3 w-full rounded-lg" />

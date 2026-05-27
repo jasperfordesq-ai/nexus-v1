@@ -1354,7 +1354,7 @@ export function ConversationPage() {
     return (
       <div className="mx-auto flex min-h-[50dvh] w-full max-w-3xl items-center justify-center px-4">
         <PageMeta title={t('page_meta.conversation.title')} noIndex />
-        <GlassCard className="w-full p-6 text-center sm:p-8">
+        <GlassCard role="alert" className="w-full p-6 text-center sm:p-8">
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-500/10 text-[var(--color-warning)]">
             <AlertTriangle className="h-7 w-7" aria-hidden="true" />
           </div>
@@ -1695,7 +1695,7 @@ export function ConversationPage() {
           {/* Loading indicator for older messages */}
           {isLoadingOlder && (
             <div className="flex justify-center py-2">
-              <div role="status" aria-label={t('loading_older')}>
+              <div role="status" aria-label={t('loading_older')} aria-busy="true">
                 <Loader2 className="w-5 h-5 text-theme-subtle animate-spin" aria-hidden="true" />
               </div>
             </div>

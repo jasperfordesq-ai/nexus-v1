@@ -816,12 +816,12 @@ export function FederationMessagesPage() {
 
       {/* Main content area */}
       {isLoading ? (
-        <GlassCard className="p-12 flex flex-col items-center justify-center gap-4">
+        <GlassCard role="status" aria-busy="true" aria-label={t('messages.loading')} className="p-12 flex flex-col items-center justify-center gap-4">
           <Spinner size="lg" color="primary" />
           <p className="text-theme-muted">{t('messages.loading')}</p>
         </GlassCard>
       ) : loadError ? (
-        <GlassCard className="p-8 text-center">
+        <GlassCard role="alert" className="p-8 text-center">
           <Globe className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h3 className="text-lg font-semibold text-theme-primary mb-2">{t('messages.unable_to_load')}</h3>
           <p className="text-theme-muted mb-4">{t('messages.unable_to_load_description')}</p>
@@ -903,11 +903,11 @@ export function FederationMessagesPage() {
                               : 'hover:bg-theme-hover'
                           }`}
                           onPress={() => selectThread(thread)}
-                          aria-label={`Conversation with ${thread.partner.name} from ${thread.partner.tenant_name}${
+                          aria-label={
                             thread.unreadCount > 0
-                              ? `, ${thread.unreadCount} unread message${thread.unreadCount > 1 ? 's' : ''}`
-                              : ''
-                          }`}
+                              ? t(thread.unreadCount > 1 ? 'messages.thread_aria_unread_plural' : 'messages.thread_aria_unread', { name: thread.partner.name, tenant: thread.partner.tenant_name, count: thread.unreadCount })
+                              : t('messages.thread_aria_no_unread', { name: thread.partner.name, tenant: thread.partner.tenant_name })
+                          }
                         >
                           <div className="flex items-center gap-3 w-full min-w-0">
                             {/* Avatar + unread dot */}
@@ -1059,7 +1059,7 @@ export function FederationMessagesPage() {
                         }
                         onPress={handleAutoTranslateToggle}
                       >
-                        <Languages className="w-4 h-4" />
+                        <Languages className="w-4 h-4" aria-hidden="true" />
                       </Button>
                     </Tooltip>
                   )}
@@ -1399,7 +1399,7 @@ export function FederationMessagesPage() {
                                     size="sm"
                                     variant="flat"
                                     className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 h-4 text-[10px]"
-                                    startContent={<Globe className="w-2.5 h-2.5" />}
+                                    startContent={<Globe className="w-2.5 h-2.5" aria-hidden="true" />}
                                   >
                                     {t('external')}
                                   </Chip>

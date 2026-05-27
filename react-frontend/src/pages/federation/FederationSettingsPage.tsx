@@ -254,7 +254,7 @@ export function FederationSettingsPage() {
             {t('settings.subheading')}
           </p>
         </div>
-        <div className="flex items-center justify-center py-20">
+        <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex items-center justify-center py-20">
           <Spinner size="lg" />
         </div>
       </div>
@@ -268,7 +268,7 @@ export function FederationSettingsPage() {
           { label: t('settings.breadcrumb_federation'), href: tenantPath('/federation') },
           { label: t('settings.breadcrumb_settings') },
         ]} />
-        <GlassCard className="p-8 text-center">
+        <GlassCard role="alert" className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{loadError}</p>
           <Button

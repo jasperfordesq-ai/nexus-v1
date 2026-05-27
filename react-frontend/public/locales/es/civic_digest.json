@@ -58,5 +58,6 @@
     "reason_announcement": "Anuncio oficial",
     "no_reasons": "Clasificación predeterminada"
   },
-  "prefs_cadence_monthly": "Resumen mensual"
+  "prefs_cadence_monthly": "Resumen mensual",
+  "loading": "Loading..."
 }

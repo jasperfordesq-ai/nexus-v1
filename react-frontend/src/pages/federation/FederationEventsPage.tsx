@@ -276,7 +276,7 @@ export function FederationEventsPage() {
 
       {/* Loading State */}
       {isLoading && events.length === 0 && (
-        <div className="space-y-4">
+        <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="space-y-4">
           {[1, 2, 3].map((i) => (
             <GlassCard key={i} className="p-5 animate-pulse">
               <div className="flex gap-4">
@@ -294,7 +294,7 @@ export function FederationEventsPage() {
 
       {/* Error State */}
       {!isLoading && loadError && (
-        <GlassCard className="p-8 text-center">
+        <GlassCard role="alert" className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">
             {t('events.unable_to_load')}

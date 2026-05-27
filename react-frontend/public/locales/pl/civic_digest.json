@@ -58,5 +58,6 @@
     "reason_announcement": "Oficjalne ogłoszenie",
     "no_reasons": "Domyślne sortowanie"
   },
-  "prefs_cadence_monthly": "Podsumowanie miesięczne"
+  "prefs_cadence_monthly": "Podsumowanie miesięczne",
+  "loading": "Loading..."
 }

@@ -126,7 +126,7 @@ export default function GroupTypes() {
             {t('groups.group_types_desc')}
           </p>
         </div>
-        <Button startContent={<Plus className="w-4 h-4" />} onPress={onCreateOpen}>
+        <Button startContent={<Plus className="w-4 h-4" aria-hidden="true" />} onPress={onCreateOpen}>
           {t('groups.create_type')}
         </Button>
       </div>
@@ -173,7 +173,7 @@ export default function GroupTypes() {
                     <Button
                       size="sm"
                       variant="tertiary"
-                      startContent={<Settings className="w-3 h-3" />}
+                      startContent={<Settings className="w-3 h-3" aria-hidden="true" />}
                       onPress={() => openPolicies(type)}
                     >
                       {t('groups.policies')}

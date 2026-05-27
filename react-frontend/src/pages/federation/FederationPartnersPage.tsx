@@ -185,7 +185,7 @@ export function FederationPartnersPage() {
 
       {/* Loading State */}
       {isLoading && (
-        <div className="grid md:grid-cols-2 gap-4">
+        <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="grid md:grid-cols-2 gap-4">
           {[1, 2, 3, 4].map((i) => (
             <GlassCard key={i} className="p-6 animate-pulse">
               <div className="flex items-start gap-4">
@@ -203,7 +203,7 @@ export function FederationPartnersPage() {
 
       {/* Error State */}
       {!isLoading && loadError && (
-        <GlassCard className="p-8 text-center">
+        <GlassCard role="alert" className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">
             {t('partners.unable_to_load')}
@@ -463,7 +463,7 @@ function PartnerCard({ partner, onViewDetails }: PartnerCardProps) {
               size="sm"
               variant="flat"
               className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400"
-              startContent={<Globe className="w-3 h-3" />}
+              startContent={<Globe className="w-3 h-3" aria-hidden="true" />}
             >
               {t('external')}
             </Chip>

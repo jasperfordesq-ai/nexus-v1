@@ -185,5 +185,7 @@
     "create": {
       "title": "グループ交換を作成"
     }
-  }
+  },
+  "role_provider": "Provider",
+  "role_receiver": "Receiver"
 }

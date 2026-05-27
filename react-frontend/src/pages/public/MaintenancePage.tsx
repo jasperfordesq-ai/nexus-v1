@@ -41,7 +41,7 @@ export function MaintenancePage() {
         <Card.Content className="text-center py-12 px-6 gap-6">
           <div className="flex justify-center">
             <div className="w-20 h-20 bg-linear-to-br from-accent to-accent-soft rounded-full flex items-center justify-center">
-              <Wrench size={40} className="text-white" />
+              <Wrench size={40} className="text-white" aria-hidden="true" />
             </div>
           </div>
 
@@ -61,7 +61,7 @@ export function MaintenancePage() {
 
           <div className="rounded-lg bg-accent-soft dark:bg-accent-soft border border-accent dark:border-accent px-4 py-3 text-left">
             <div className="flex gap-3 items-start">
-              <Info size={18} className="text-accent mt-0.5 shrink-0" />
+              <Info size={18} className="text-accent mt-0.5 shrink-0" aria-hidden="true" />
               <p className="text-sm text-muted">
                 {t('maintenance.deploy_notice')}
               </p>
@@ -76,7 +76,7 @@ export function MaintenancePage() {
             <Button
               as={Link}
               to={adminPath}
-              startContent={<LogIn size={18} />}
+              startContent={<LogIn size={18} aria-hidden="true" />}
               size="sm"
             >
               {t('maintenance.admin_login')}

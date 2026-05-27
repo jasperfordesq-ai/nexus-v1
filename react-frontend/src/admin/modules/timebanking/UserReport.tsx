@@ -265,7 +265,7 @@ export function UserReport() {
         onRefresh={loadUsers}
         emptyContent={
           <div className="flex flex-col items-center gap-2 py-8">
-            <Users size={32} className="text-muted" />
+            <Users size={32} className="text-muted" aria-hidden="true" />
             <p className="text-sm text-muted">{t('timebanking.no_users_found')}</p>
           </div>
         }

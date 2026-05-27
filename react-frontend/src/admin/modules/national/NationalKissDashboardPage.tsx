@@ -249,7 +249,7 @@ export function NationalKissDashboardPage() {
         description={t('national_kiss_dashboard.meta.description')}
         actions={
           <span className="inline-flex items-center gap-2 text-muted">
-            <Landmark size={20} />
+            <Landmark size={20} aria-hidden="true" />
           </span>
         }
       />
@@ -386,7 +386,7 @@ export function NationalKissDashboardPage() {
       {/* National trend chart */}
       <Card>
         <CardHeader className="flex items-center gap-2">
-          <Activity size={18} />
+          <Activity size={18} aria-hidden="true" />
           <h2 className="text-lg font-semibold">{t('national_kiss_dashboard.trend.title')}</h2>
         </CardHeader>
         <CardBody>
@@ -397,7 +397,7 @@ export function NationalKissDashboardPage() {
           ) : trend.length === 0 ? (
             <p className="text-sm text-muted">{t('national_kiss_dashboard.trend.empty')}</p>
           ) : (
-            <div className="h-72 w-full">
+            <div role="img" aria-label={t('national.trend_chart_aria')} className="h-72 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <ComposedChart data={trend} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border, #e5e7eb)" />
@@ -549,7 +549,7 @@ export function NationalKissDashboardPage() {
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <Card>
           <CardHeader className="flex items-center gap-2">
-            <TrendingUp size={18} className="text-success" />
+            <TrendingUp size={18} className="text-success" aria-hidden="true" />
             <h2 className="text-lg font-semibold">{t('national_kiss_dashboard.leaderboards.top_title')}</h2>
           </CardHeader>
           <CardBody>
@@ -569,7 +569,7 @@ export function NationalKissDashboardPage() {
         </Card>
         <Card>
           <CardHeader className="flex items-center gap-2">
-            <TrendingDown size={18} className="text-danger" />
+            <TrendingDown size={18} className="text-danger" aria-hidden="true" />
             <h2 className="text-lg font-semibold">{t('national_kiss_dashboard.leaderboards.bottom_title')}</h2>
           </CardHeader>
           <CardBody>

@@ -28,5 +28,6 @@
   "status_triaging": "قيد الفرز",
   "status_in_progress": "قيد التنفيذ",
   "status_resolved": "تم الحل",
-  "status_closed": "مغلق"
+  "status_closed": "مغلق",
+  "loading": "Loading..."
 }

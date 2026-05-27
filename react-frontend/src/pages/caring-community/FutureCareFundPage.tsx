@@ -277,7 +277,7 @@ export function FutureCareFundPage() {
 
         {/* Error state */}
         {error && !isLoading && (
-          <GlassCard className="p-6">
+          <GlassCard role="alert" className="p-6">
             <div className="flex items-center gap-3 text-danger">
               <AlertCircle className="h-5 w-5 shrink-0" aria-hidden="true" />
               <p className="font-medium">{t('future_care_fund.errors.load_failed')}</p>

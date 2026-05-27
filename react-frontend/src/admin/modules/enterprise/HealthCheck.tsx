@@ -116,7 +116,7 @@ export function HealthCheck() {
         actions={
           <Button
             variant="tertiary"
-            startContent={<RefreshCw size={16} />}
+            startContent={<RefreshCw aria-hidden="true" size={16} />}
             onPress={handleRefresh}
             isLoading={loading}
             size="sm"
@@ -127,7 +127,7 @@ export function HealthCheck() {
       />
 
       {loading ? (
-        <div className="flex justify-center py-16">
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
       ) : result ? (
@@ -136,7 +136,7 @@ export function HealthCheck() {
           <Card >
             <CardBody className="flex flex-row items-center gap-4 p-6">
               <div className={`flex h-14 w-14 items-center justify-center rounded-full bg-${statusColor}/10`}>
-                <HeartPulse size={28} className={`text-${statusColor}`} />
+                <HeartPulse aria-hidden="true" size={28} className={`text-${statusColor}`} />
               </div>
               <div>
                 <h3 className="text-lg font-bold text-foreground">{t('enterprise.system_status')}</h3>
@@ -158,9 +158,9 @@ export function HealthCheck() {
                 <CardBody className="flex flex-row items-center gap-4 p-5">
                   <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full ${check.status === 'ok' ? 'bg-success/10' : 'bg-danger/10'}`}>
                     {check.status === 'ok' ? (
-                      <CheckCircle size={24} className="text-success" />
+                      <CheckCircle aria-hidden="true" size={24} className="text-success" />
                     ) : (
-                      <XCircle size={24} className="text-danger" />
+                      <XCircle aria-hidden="true" size={24} className="text-danger" />
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
@@ -191,7 +191,7 @@ export function HealthCheck() {
           {/* Health Check History */}
           <Card >
             <CardHeader className="flex items-center gap-2 px-6 pt-5 pb-0">
-              <History size={18} className="text-muted" />
+              <History aria-hidden="true" size={18} className="text-muted" />
               <h3 className="text-base font-semibold">{t('enterprise.history')}</h3>
               <Chip size="sm" variant="soft">
                 {t('enterprise.last_n_checks', { count: history.length })}
@@ -200,7 +200,7 @@ export function HealthCheck() {
             <Separator className="mt-3" />
             <CardBody className="px-0 pb-0">
               {historyLoading ? (
-                <div className="flex justify-center py-8">
+                <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-8">
                   <Spinner size="sm" />
                 </div>
               ) : history.length === 0 ? (

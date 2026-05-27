@@ -153,7 +153,7 @@ export default function MunicipalityCalendarPage() {
 
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Calendar className="w-6 h-6 text-accent" />
+          <Calendar className="w-6 h-6 text-accent" aria-hidden="true" />
           {t('verein_federation.calendar.title')}
         </h1>
         {code ? (
@@ -184,7 +184,7 @@ export default function MunicipalityCalendarPage() {
               onPress={() => setMonthOffset((m) => m - 1)}
               aria-label={t('verein_federation.calendar.prev')}
             >
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-4 h-4" aria-hidden="true" />
             </Button>
             <Chip variant="tertiary">{monthLabel}</Chip>
             <Button
@@ -194,7 +194,7 @@ export default function MunicipalityCalendarPage() {
               onPress={() => setMonthOffset((m) => m + 1)}
               aria-label={t('verein_federation.calendar.next')}
             >
-              <ChevronRight className="w-4 h-4" />
+              <ChevronRight className="w-4 h-4" aria-hidden="true" />
             </Button>
             <Button size="sm" variant="tertiary" onPress={() => setMonthOffset(0)}>
               {t('verein_federation.calendar.today')}
@@ -208,7 +208,7 @@ export default function MunicipalityCalendarPage() {
               {t('verein_federation.calendar.no_municipality')}
             </p>
           ) : loading ? (
-            <div className="flex items-center justify-center py-8">
+            <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex items-center justify-center py-8">
               <Spinner size="lg" />
             </div>
           ) : data && Object.keys(data.buckets).length === 0 ? (

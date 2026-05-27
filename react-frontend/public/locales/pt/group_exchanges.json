@@ -185,5 +185,7 @@
     "create": {
       "title": "Criar Troca em Grupo"
     }
-  }
+  },
+  "role_provider": "Provider",
+  "role_receiver": "Receiver"
 }

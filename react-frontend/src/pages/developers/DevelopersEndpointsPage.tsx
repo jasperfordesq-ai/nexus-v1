@@ -52,7 +52,7 @@ export default function DevelopersEndpointsPage() {
       <PageMeta title={t('developers.endpoints_meta_title')} description={t('developers.endpoints_intro')} />
       <header className="mb-8">
         <div className="flex items-center gap-3 text-[var(--color-text-muted)] mb-3">
-          <BookOpen size={20} />
+          <BookOpen size={20} aria-hidden="true" />
           <span className="uppercase tracking-wide text-xs font-semibold">
             {t('developers.page_title')}
           </span>

@@ -339,7 +339,7 @@ export function HourTransferPage() {
           </h2>
 
           {historyLoading ? (
-            <div className="flex justify-center py-8">
+            <div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-8">
               <Spinner size="md" />
             </div>
           ) : history.length === 0 ? (

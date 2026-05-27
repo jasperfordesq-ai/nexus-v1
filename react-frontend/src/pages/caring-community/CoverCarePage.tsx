@@ -301,7 +301,7 @@ export default function CoverCarePage() {
         </GlassCard>
 
         {loading && (
-          <div className="flex justify-center py-8">
+          <div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-8">
             <Spinner />
           </div>
         )}

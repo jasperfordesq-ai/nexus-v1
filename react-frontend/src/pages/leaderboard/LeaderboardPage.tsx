@@ -191,7 +191,7 @@ function SeasonCard() {
 
   if (isLoading) {
     return (
-      <GlassCard className="p-5" aria-label={t('leaderboard.season.loading')} aria-busy="true">
+      <GlassCard role="status" className="p-5" aria-label={t('leaderboard.season.loading')} aria-busy="true">
         <div className="space-y-3">
           <Skeleton className="rounded-lg">
             <div className="h-5 rounded-lg bg-surface-tertiary w-1/3" />
@@ -790,7 +790,7 @@ function CompetitiveLeaderboard(props: CompetitiveLeaderboardProps) {
       {!error && (
         <>
           {isLoading ? (
-            <GlassCard className="divide-y divide-white/5" aria-label={t('leaderboard.loading')} aria-busy="true">
+            <GlassCard role="status" className="divide-y divide-white/5" aria-label={t('leaderboard.loading')} aria-busy="true">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="flex items-center gap-4 p-4">
                   <Skeleton className="rounded-full flex-shrink-0">

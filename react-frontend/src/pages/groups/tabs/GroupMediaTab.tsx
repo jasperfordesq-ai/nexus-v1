@@ -220,6 +220,7 @@ export function GroupMediaTab({ groupId, isAdmin, isMember = true }: GroupMediaT
   if (loading && items.length === 0) {
     return (
       <div
+        role="status"
         className="flex justify-center py-12"
         aria-label={t('media.loading')}
         aria-busy="true"

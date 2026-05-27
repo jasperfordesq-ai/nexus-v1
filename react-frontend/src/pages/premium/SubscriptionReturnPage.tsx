@@ -104,7 +104,7 @@ export function SubscriptionReturnPage() {
 
           {status === 'success' && (
             <>
-              <CheckCircle2 size={56} className="text-green-500" />
+              <CheckCircle2 size={56} className="text-green-500" aria-hidden="true" />
               <h1 className="text-2xl font-semibold">
                 {t('premium.return_success_title')}
               </h1>
@@ -126,7 +126,7 @@ export function SubscriptionReturnPage() {
 
           {status === 'cancelled' && (
             <>
-              <XCircle size={48} className="text-[var(--color-text-secondary)]" />
+              <XCircle size={48} className="text-[var(--color-text-secondary)]" aria-hidden="true" />
               <h1 className="text-xl font-semibold">
                 {t('premium.return_cancelled_title')}
               </h1>

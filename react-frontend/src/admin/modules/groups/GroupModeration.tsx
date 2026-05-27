@@ -81,7 +81,7 @@ export function GroupModeration() {
             <Chip
               size="sm"
               variant="soft" color="danger"
-              startContent={<Flag size={12} />}
+              startContent={<Flag size={12} aria-hidden="true" />}
             >
               {t('groups.report_count')}
             </Chip>
@@ -107,7 +107,7 @@ export function GroupModeration() {
     return (
       <div className="space-y-6">
         <PageHeader title={t('groups.group_moderation_title')} description={t('groups.group_moderation_desc')} />
-        <div className="flex items-center justify-center py-20">
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex items-center justify-center py-20">
           <Spinner size="lg" />
         </div>
       </div>

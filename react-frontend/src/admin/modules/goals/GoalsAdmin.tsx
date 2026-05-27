@@ -256,7 +256,7 @@ export function GoalsAdmin() {
             </div>
           ) : goals.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-3 py-16 text-muted">
-              <Target size={48} />
+              <Target size={48} aria-hidden="true" />
               <p className="text-lg font-medium">{t('goals.no_goals_found')}</p>
               <p className="text-sm">
                 {search ? t('goals.try_adjusting_search') : t('goals.no_goals_created_yet')}

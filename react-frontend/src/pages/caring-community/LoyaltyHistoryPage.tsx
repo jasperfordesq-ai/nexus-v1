@@ -119,7 +119,7 @@ export function LoyaltyHistoryPage() {
       </Link>
 
       <div className="flex items-center gap-3 mb-2">
-        <Coins className="w-7 h-7 text-warning" />
+        <Coins className="w-7 h-7 text-warning" aria-hidden="true" />
         <h1 className="text-2xl font-semibold text-foreground">
           {t('loyalty.history.meta.title')}
         </h1>
@@ -129,7 +129,7 @@ export function LoyaltyHistoryPage() {
       </p>
 
       {loading && (
-        <div className="space-y-3">
+        <div role="status" aria-busy="true" className="space-y-3">
           {[1, 2, 3].map((i) => (
             <Skeleton key={i} className="h-20 w-full rounded-xl" />
           ))}
@@ -140,7 +140,7 @@ export function LoyaltyHistoryPage() {
         <EmptyState
           title={t('loyalty.history.empty.title')}
           description={t('loyalty.history.empty.body')}
-          icon={<Coins className="w-12 h-12 text-muted" />}
+          icon={<Coins className="w-12 h-12 text-muted" aria-hidden="true" />}
         />
       )}
 
@@ -195,7 +195,7 @@ export function LoyaltyHistoryPage() {
       )}
 
       {error && !loading && (
-        <p className="mt-4 text-sm text-danger">{error}</p>
+        <p role="alert" className="mt-4 text-sm text-danger">{error}</p>
       )}
     </div>
   );

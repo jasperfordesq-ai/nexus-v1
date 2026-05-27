@@ -170,7 +170,7 @@ export function ClubsPage() {
 
       {/* Error */}
       {error && !isLoading && (
-        <GlassCard className="p-8 text-center">
+        <GlassCard role="alert" className="p-8 text-center">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <h2 className="text-lg font-semibold text-theme-primary mb-2">{error}</h2>
           <Button
@@ -187,7 +187,7 @@ export function ClubsPage() {
       {!error && (
         <>
           {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div role="status" aria-busy="true" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <GlassCard key={i} className="p-5 animate-pulse">
                   <div className="flex items-center gap-3 mb-3">

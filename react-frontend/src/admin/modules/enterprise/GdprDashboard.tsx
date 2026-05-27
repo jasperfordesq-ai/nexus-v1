@@ -144,7 +144,7 @@ export function GdprDashboard() {
           <div className="flex gap-2">
             <Button
               variant="tertiary"
-              startContent={<RefreshCw size={16} />}
+              startContent={<RefreshCw aria-hidden="true" size={16} />}
               onPress={loadData}
               isLoading={loading}
               size="sm"
@@ -157,8 +157,8 @@ export function GdprDashboard() {
 
       {/* Active Breach Alert */}
       {activeBreaches > 0 && (
-        <div className="mb-6 p-4 rounded-xl border-2 border-danger bg-danger-50 animate-pulse flex items-center gap-3">
-          <ShieldAlert size={24} className="text-danger shrink-0" />
+        <div role="alert" className="mb-6 p-4 rounded-xl border-2 border-danger bg-danger-50 animate-pulse flex items-center gap-3">
+          <ShieldAlert aria-hidden="true" size={24} className="text-danger shrink-0" />
           <div className="flex-1">
             <p className="font-semibold text-danger">
               {t('enterprise.gdpr_active_breaches_alert')}
@@ -264,8 +264,8 @@ export function GdprDashboard() {
           <Card >
             <CardBody className="p-4 space-y-3">
               {overdueCount > 0 && (
-                <div className="p-3 rounded-lg bg-danger-50 border border-danger-200 flex items-center gap-2">
-                  <AlertTriangle size={16} className="text-danger shrink-0" />
+                <div role="alert" className="p-3 rounded-lg bg-danger-50 border border-danger-200 flex items-center gap-2">
+                  <AlertTriangle aria-hidden="true" size={16} className="text-danger shrink-0" />
                   <span className="text-sm text-danger font-medium">
                     {t('enterprise.gdpr_overdue_requests', { count: overdueCount })}
                   </span>
@@ -276,7 +276,7 @@ export function GdprDashboard() {
                 <Button
                   size="sm"
                   variant="tertiary"
-                  startContent={<Plus size={14} />}
+                  startContent={<Plus aria-hidden="true" size={14} />}
                   as={Link}
                   to={tenantPath('/admin/enterprise/gdpr/requests/create')}
                 >
@@ -285,7 +285,7 @@ export function GdprDashboard() {
                 <Button
                   size="sm"
                   variant="danger"
-                  startContent={<AlertTriangle size={14} />}
+                  startContent={<AlertTriangle aria-hidden="true" size={14} />}
                   as={Link}
                   to={tenantPath('/admin/enterprise/gdpr/breaches')}
                 >
@@ -303,13 +303,13 @@ export function GdprDashboard() {
           <Card key={link.href}  isPressable as={Link} to={link.href}>
             <CardBody className="flex flex-row items-center gap-4 p-4">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10">
-                <link.icon size={20} className="text-accent" />
+                <link.icon aria-hidden="true" size={20} className="text-accent" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-foreground">{link.label}</p>
                 <p className="text-sm text-muted">{link.description}</p>
               </div>
-              <ArrowRight size={16} className="text-muted shrink-0" />
+              <ArrowRight aria-hidden="true" size={16} className="text-muted shrink-0" />
             </CardBody>
           </Card>
         ))}

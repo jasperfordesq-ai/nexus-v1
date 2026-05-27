@@ -33,5 +33,6 @@
   "load_error": "レビューの読み込みに失敗しました。もう一度お試しください。",
   "load_more": "もっと読み込む",
   "stars": "{{count}}つ星",
-  "stars_plural": "{{count}}つ星"
+  "stars_plural": "{{count}}つ星",
+  "rating_aria": "{{n}} out of 5 stars"
 }

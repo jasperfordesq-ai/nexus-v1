@@ -651,7 +651,7 @@ export function GroupExchangeDetailPage() {
                     variant="flat"
                     color={p.role === 'provider' ? 'success' : 'warning'}
                   >
-                    {p.role}
+                    {p.role === 'provider' ? t('role_provider') : t('role_receiver')}
                   </Chip>
                 </TableCell>
                 <TableCell className={exchange.split_type === 'custom' || exchange.split_type === 'weighted' ? 'text-right text-theme-primary' : ''}>
@@ -681,7 +681,7 @@ export function GroupExchangeDetailPage() {
                       onPress={() => handleRemoveParticipant(p.user_id)}
                       aria-label={t('detail.remove_participant', { name: p.user_name })}
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-4 h-4" aria-hidden="true" />
                     </Button>
                   )}
                 </TableCell>
@@ -777,6 +777,7 @@ export function GroupExchangeDetailPage() {
                 variant={addRole === 'provider' ? 'solid' : 'flat'}
                 color={addRole === 'provider' ? 'success' : 'default'}
                 onPress={() => setAddRole('provider')}
+                aria-pressed={addRole === 'provider'}
                 className={addRole !== 'provider' ? 'bg-theme-elevated text-theme-muted' : ''}
               >
                 {t('detail.role_provider')}
@@ -786,6 +787,7 @@ export function GroupExchangeDetailPage() {
                 variant={addRole === 'receiver' ? 'solid' : 'flat'}
                 color={addRole === 'receiver' ? 'warning' : 'default'}
                 onPress={() => setAddRole('receiver')}
+                aria-pressed={addRole === 'receiver'}
                 className={addRole !== 'receiver' ? 'bg-theme-elevated text-theme-muted' : ''}
               >
                 {t('detail.role_receiver')}

@@ -259,7 +259,7 @@ export default function ProjectAnnouncementsPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center py-16">
+      <div role="status" aria-busy="true" aria-label={t('meta.title')} className="flex justify-center py-16">
         <Spinner size="lg" />
       </div>
     );
@@ -288,7 +288,7 @@ export default function ProjectAnnouncementsPage() {
             </Button>
           </Link>
 
-          {error && <p className="text-sm text-danger">{error}</p>}
+          {error && <p role="alert" className="text-sm text-danger">{error}</p>}
 
           <GlassCard className="p-6">
             <div className="flex flex-col gap-5">
@@ -447,7 +447,7 @@ export default function ProjectAnnouncementsPage() {
           </div>
         </div>
 
-        {error && <p className="text-sm text-danger">{error}</p>}
+        {error && <p role="alert" className="text-sm text-danger">{error}</p>}
 
         {!error && projects.length === 0 && (
           <GlassCard className="p-8 text-center text-theme-muted">{t('empty')}</GlassCard>

@@ -185,5 +185,7 @@
     "create": {
       "title": "Utwórz Wymianę Grupową"
     }
-  }
+  },
+  "role_provider": "Provider",
+  "role_receiver": "Receiver"
 }

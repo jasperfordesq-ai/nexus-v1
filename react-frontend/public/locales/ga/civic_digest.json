@@ -58,5 +58,6 @@
     "reason_announcement": "Fógra oifigiúil",
     "no_reasons": "Rangú réamhshocraithe"
   },
-  "prefs_cadence_monthly": "Achoimre mhíosúil"
+  "prefs_cadence_monthly": "Achoimre mhíosúil",
+  "loading": "Loading..."
 }

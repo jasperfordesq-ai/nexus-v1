@@ -185,5 +185,7 @@
     "create": {
       "title": "إنشاء تبادل مجموعة"
     }
-  }
+  },
+  "role_provider": "Provider",
+  "role_receiver": "Receiver"
 }

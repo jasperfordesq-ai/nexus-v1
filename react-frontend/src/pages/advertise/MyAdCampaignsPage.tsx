@@ -219,7 +219,7 @@ export function MyAdCampaignsPage() {
       {/* Campaign list */}
       <GlassCard className="overflow-hidden">
         {isLoading ? (
-          <div className="flex justify-center py-12">
+          <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-12">
             <Spinner />
           </div>
         ) : error ? (

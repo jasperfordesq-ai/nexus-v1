@@ -447,7 +447,7 @@ export function UserEdit() {
         <PageHeader
           title={t('meta.edit_user')}
           actions={
-            <Button variant="tertiary" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/users'))}>
+            <Button variant="tertiary" startContent={<ArrowLeft aria-hidden="true" size={16} />} onPress={() => navigate(tenantPath('/admin/users'))}>
               {t('actions.back_to_users')}
             </Button>
           }
@@ -477,7 +477,7 @@ export function UserEdit() {
               <Button
                 variant="tertiary"
                 color="warning"
-                startContent={<LogIn size={16} />}
+                startContent={<LogIn aria-hidden="true" size={16} />}
                 onPress={handleImpersonate}
                 isLoading={impersonateLoading}
                 size="sm"
@@ -485,7 +485,7 @@ export function UserEdit() {
                 {t('actions.impersonate')}
               </Button>
             )}
-            <Button variant="tertiary" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/users'))}>
+            <Button variant="tertiary" startContent={<ArrowLeft aria-hidden="true" size={16} />} onPress={() => navigate(tenantPath('/admin/users'))}>
               {t('actions.back_to_users')}
             </Button>
           </div>
@@ -565,7 +565,7 @@ export function UserEdit() {
                   placeholder={t('placeholders.organisation_name')}
                     value={organizationName}
                     onValueChange={setOrganizationName}
-                    startContent={<Building2 size={14} className="text-muted" />}
+                    startContent={<Building2 aria-hidden="true" size={14} className="text-muted" />}
                     isDisabled={submitting}
                   />
                 )}
@@ -602,7 +602,7 @@ export function UserEdit() {
           <Card>
             <CardHeader className="px-6 pt-5 pb-0">
               <div className="flex items-center gap-2">
-                <ShieldAlert size={18} className="text-warning" />
+                <ShieldAlert aria-hidden="true" size={18} className="text-warning" />
                 <h3 className="text-lg font-semibold text-foreground">{t('sections.super_admin_access')}</h3>
               </div>
             </CardHeader>
@@ -634,7 +634,7 @@ export function UserEdit() {
           <Card className="border-2 border-danger/30">
             <CardHeader className="px-6 pt-5 pb-0">
               <div className="flex items-center gap-2">
-                <ShieldAlert size={18} className="text-danger" />
+                <ShieldAlert aria-hidden="true" size={18} className="text-danger" />
                 <h3 className="text-lg font-semibold text-danger">{t('sections.global_super_admin')}</h3>
               </div>
             </CardHeader>
@@ -666,7 +666,7 @@ export function UserEdit() {
           <Card className="border border-indigo-400/30">
             <CardHeader className="px-6 pt-5 pb-0">
               <div className="flex items-center gap-2">
-                <Landmark size={18} className="text-indigo-500" />
+                <Landmark aria-hidden="true" size={18} className="text-indigo-500" />
                 <h3 className="text-lg font-semibold text-foreground">{t('sections.municipal_announcer')}</h3>
               </div>
             </CardHeader>
@@ -693,7 +693,7 @@ export function UserEdit() {
         <Card>
           <CardHeader className="px-6 pt-5 pb-0">
             <div className="flex items-center gap-2">
-              <KeyRound size={18} className="text-accent" />
+              <KeyRound aria-hidden="true" size={18} className="text-accent" />
               <h3 className="text-lg font-semibold text-foreground">{t('sections.account_actions')}</h3>
             </div>
           </CardHeader>
@@ -702,7 +702,7 @@ export function UserEdit() {
               <Button
                 size="sm"
                 variant="tertiary"
-                startContent={<KeyRound size={14} />}
+                startContent={<KeyRound aria-hidden="true" size={14} />}
                 onPress={() => setPasswordModalOpen(true)}
               >
                 {t('actions.set_password')}
@@ -710,7 +710,7 @@ export function UserEdit() {
               <Button
                 size="sm"
                 variant="tertiary"
-                startContent={<Mail size={14} />}
+                startContent={<Mail aria-hidden="true" size={14} />}
                 onPress={handleSendPasswordReset}
                 isLoading={resetEmailLoading}
               >
@@ -719,7 +719,7 @@ export function UserEdit() {
               <Button
                 size="sm"
                 variant="tertiary"
-                startContent={<Mail size={14} />}
+                startContent={<Mail aria-hidden="true" size={14} />}
                 onPress={handleSendWelcomeEmail}
                 isLoading={welcomeEmailLoading}
               >
@@ -734,7 +734,7 @@ export function UserEdit() {
           <CardHeader className="px-6 pt-5 pb-0">
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center gap-2">
-                <Coins size={18} className="text-accent" />
+                <Coins aria-hidden="true" size={18} className="text-accent" />
                 <h3 className="text-lg font-semibold text-foreground">{t('sections.time_credits')}</h3>
               </div>
               <Button size="sm" variant="secondary" onPress={() => setBalanceModalOpen(true)}>
@@ -758,7 +758,7 @@ export function UserEdit() {
               <Button
                 size="sm"
                 variant="tertiary"
-                startContent={<RefreshCw size={14} />}
+                startContent={<RefreshCw aria-hidden="true" size={14} />}
                 onPress={handleRecheckBadges}
                 isLoading={recheckingBadges}
               >
@@ -797,7 +797,7 @@ export function UserEdit() {
         <Card>
           <CardHeader className="px-6 pt-5 pb-0">
             <div className="flex items-center gap-2">
-              <ShieldCheck size={18} className="text-success" />
+              <ShieldCheck aria-hidden="true" size={18} className="text-success" />
               <h3 className="text-lg font-semibold text-foreground">{t('sections.gdpr_consents')}</h3>
             </div>
           </CardHeader>
@@ -853,7 +853,7 @@ export function UserEdit() {
         <Card>
           <CardHeader className="px-6 pt-5 pb-0">
             <div className="flex items-center gap-2">
-              <ShieldAlert size={18} className="text-warning" />
+              <ShieldAlert aria-hidden="true" size={18} className="text-warning" />
               <h3 className="text-lg font-semibold text-foreground">{t('sections.safeguarding')}</h3>
             </div>
           </CardHeader>
@@ -866,7 +866,7 @@ export function UserEdit() {
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <ShieldCheck size={16} className="text-accent" />
+                      <ShieldCheck aria-hidden="true" size={16} className="text-accent" />
                       <p className="font-medium text-foreground">{t('sections.vetting_status')}</p>
                     </div>
                     <div className="flex items-center gap-2">
@@ -934,7 +934,7 @@ export function UserEdit() {
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
-                      <FileCheck size={16} className="text-accent" />
+                      <FileCheck aria-hidden="true" size={16} className="text-accent" />
                       <p className="font-medium text-foreground">{t('sections.insurance_certificates')}</p>
                     </div>
                     <div className="flex items-center gap-2">

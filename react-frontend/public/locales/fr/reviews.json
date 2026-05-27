@@ -33,5 +33,6 @@
   "load_error": "Échec du chargement des avis. Veuillez réessayer.",
   "load_more": "Charger plus",
   "stars": "{{count}} étoile",
-  "stars_plural": "{{count}} étoiles"
+  "stars_plural": "{{count}} étoiles",
+  "rating_aria": "{{n}} out of 5 stars"
 }

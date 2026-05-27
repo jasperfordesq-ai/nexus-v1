@@ -58,5 +58,6 @@
     "reason_safety": "Veiligheidswaarschuwing",
     "reason_announcement": "Officiële aankondiging",
     "no_reasons": "Standaardrangschikking"
-  }
+  },
+  "loading": "Loading..."
 }

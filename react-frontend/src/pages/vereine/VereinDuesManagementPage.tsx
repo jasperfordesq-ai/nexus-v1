@@ -272,7 +272,7 @@ export function VereinDuesManagementPage() {
       <PageMeta title={t('verein_dues.admin_page_title')} noIndex />
       <div className="container max-w-6xl mx-auto p-4 md:p-6 space-y-6">
       <div className="flex items-center gap-3">
-        <Receipt className="w-7 h-7 text-accent" />
+        <Receipt className="w-7 h-7 text-accent" aria-hidden="true" />
         <h1 className="text-2xl md:text-3xl font-bold text-foreground">
           {t('verein_dues.admin_heading')}
         </h1>
@@ -339,7 +339,7 @@ export function VereinDuesManagementPage() {
         <Card className="bg-danger-50 border border-danger-200">
           <CardBody className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
-              <AlertCircle className="w-6 h-6 text-danger" />
+              <AlertCircle className="w-6 h-6 text-danger" aria-hidden="true" />
               <div>
                 <div className="font-semibold text-danger">
                   {t('verein_dues.admin_overdue_title')}
@@ -349,7 +349,7 @@ export function VereinDuesManagementPage() {
                 </div>
               </div>
             </div>
-            <Button color="danger" className="w-full sm:w-auto sm:shrink-0" startContent={<Bell className="w-4 h-4" />} onPress={onBulkRemind}>
+            <Button color="danger" className="w-full sm:w-auto sm:shrink-0" startContent={<Bell className="w-4 h-4" aria-hidden="true" />} onPress={onBulkRemind}>
               {t('verein_dues.admin_bulk_remind')}
             </Button>
           </CardBody>
@@ -395,7 +395,7 @@ export function VereinDuesManagementPage() {
         </CardHeader>
         <CardBody className="overflow-x-auto">
           {isLoading ? (
-            <div className="flex justify-center py-10"><Spinner size="lg" color="primary" /></div>
+            <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-10"><Spinner size="lg" color="primary" /></div>
           ) : (
             <Table aria-label={t('verein_dues.admin_members')}>
               <TableHeader>
@@ -450,10 +450,10 @@ export function VereinDuesManagementPage() {
                       <div className="flex flex-wrap gap-2">
                         {(row.status === 'pending' || row.status === 'overdue') && (
                           <>
-                            <Button size="sm" variant="flat" startContent={<Bell className="w-3 h-3" />} onPress={() => onSendReminder(row.id)}>
+                            <Button size="sm" variant="flat" startContent={<Bell className="w-3 h-3" aria-hidden="true" />} onPress={() => onSendReminder(row.id)}>
                               {t('verein_dues.action_remind')}
                             </Button>
-                            <Button size="sm" variant="flat" color="warning" startContent={<CheckCircle2 className="w-3 h-3" />} onPress={() => { setWaiveDuesId(row.id); setWaiveReason(''); }}>
+                            <Button size="sm" variant="flat" color="warning" startContent={<CheckCircle2 className="w-3 h-3" aria-hidden="true" />} onPress={() => { setWaiveDuesId(row.id); setWaiveReason(''); }}>
                               {t('verein_dues.action_waive')}
                             </Button>
                           </>
