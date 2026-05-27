@@ -14651,6 +14651,7 @@
       }
     },
     "push": {
+      "page_title": "Feachtais brú",
       "chart_opens_title": "Osclaíonn {{count}}",
       "chart_sends_title": "Seolann {{count}}",
       "create_title": "Feachtas brú nua",

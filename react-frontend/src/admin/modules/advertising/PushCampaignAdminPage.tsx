@@ -1,6 +1,7 @@
 import { Button, Card, CardBody, CardHeader, Chip, ChipProps, Input, Spinner, Textarea, Select, SelectItem, useDisclosure, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tab, Tabs, Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from '@/components/ui';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { usePageTitle } from '@/hooks/usePageTitle';
 
 import { Separator } from '@heroui/react';
 import BarChart3 from 'lucide-react/icons/bar-chart-3';
@@ -246,6 +247,7 @@ function MiniBarChart({
 
 export default function PushCampaignAdminPage() {
   const { t } = useTranslation('admin');
+  usePageTitle(t('advertising.push.page_title'));
 
   // Modals
   const detailDisc   = useDisclosure();

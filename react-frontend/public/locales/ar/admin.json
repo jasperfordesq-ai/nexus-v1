@@ -14651,6 +14651,7 @@
       }
     },
     "push": {
+      "page_title": "حملات الإشعارات الفورية",
       "chart_opens_title": "يتم فتح {{count}}",
       "chart_sends_title": "يرسل {{count}}",
       "create_title": "حملة دفع جديدة",

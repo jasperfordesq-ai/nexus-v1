@@ -14651,6 +14651,7 @@
       }
     },
     "push": {
+      "page_title": "プッシュキャンペーン",
       "chart_opens_title": "{{count}} ????",
       "chart_sends_title": "{{count}} ????",
       "create_title": "新しいプッシュキャンペーン",

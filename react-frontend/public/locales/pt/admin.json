@@ -14651,6 +14651,7 @@
       }
     },
     "push": {
+      "page_title": "Campanhas push",
       "chart_opens_title": "{{count}} abre",
       "chart_sends_title": "{{count}} envia",
       "create_title": "Nova campanha push",
