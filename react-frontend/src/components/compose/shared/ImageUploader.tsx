@@ -64,6 +64,7 @@ export function ImageUploader({
         accept="image/jpeg,image/png,image/gif,image/webp"
         className="hidden"
         onChange={handleChange}
+        aria-hidden="true"
       />
 
       {preview && (

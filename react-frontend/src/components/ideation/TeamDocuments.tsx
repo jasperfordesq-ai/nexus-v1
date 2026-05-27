@@ -186,6 +186,7 @@ export function TeamDocuments({ groupId, isGroupAdmin }: TeamDocumentsProps) {
             className="hidden"
             onChange={handleUpload}
             accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.png,.jpg,.jpeg,.gif,.svg,.zip,.rar"
+            aria-hidden="true"
           />
           <Button
             color="primary"

@@ -76,6 +76,7 @@ export function VideoUploader({ onVideoSelect, onVideoRemove, selectedVideo }: V
         accept="video/mp4,video/webm,video/ogg,video/quicktime"
         className="hidden"
         onChange={handleChange}
+        aria-hidden="true"
       />
 
       {!selectedVideo && (

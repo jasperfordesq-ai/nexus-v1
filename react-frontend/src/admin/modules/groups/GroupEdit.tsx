@@ -239,6 +239,7 @@ export function GroupEdit() {
                   accept="image/*"
                   className="hidden"
                   onChange={(e) => handleImageUpload(e, 'avatar')}
+                  aria-hidden="true"
                 />
               </div>
 
@@ -268,6 +269,7 @@ export function GroupEdit() {
                   accept="image/*"
                   className="hidden"
                   onChange={(e) => handleImageUpload(e, 'cover')}
+                  aria-hidden="true"
                 />
               </div>
             </div>

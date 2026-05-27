@@ -685,6 +685,7 @@ export function Subscribers() {
                 accept=".csv"
                 className="hidden"
                 onChange={handleFileSelect}
+                aria-hidden="true"
               />
 
               {importRows.length > 0 && (

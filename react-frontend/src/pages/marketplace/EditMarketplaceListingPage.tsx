@@ -556,6 +556,7 @@ export function EditMarketplaceListingPage() {
               multiple
               onChange={(e) => handleImageSelect(e.target.files)}
               className="hidden"
+              aria-hidden="true"
             />
           </div>
 

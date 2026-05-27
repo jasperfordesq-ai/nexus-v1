@@ -168,6 +168,7 @@ export function ApplyModal({
                     type="file"
                     accept=".pdf,.doc,.docx"
                     className="hidden"
+                    aria-hidden="true"
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) {
