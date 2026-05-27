@@ -32,9 +32,16 @@ import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
 
 type OrderMode = 'purchases' | 'sales';
+type OrderStatusTab = 'all' | 'active' | 'completed' | 'cancelled';
 type DisputeReason = 'not_received' | 'not_as_described' | 'damaged' | 'wrong_item' | 'other';
 const SHIPPING_METHODS = ['standard', 'express', 'tracked', 'hand_delivery', 'other'];
 const DISPUTE_REASONS: DisputeReason[] = ['not_received', 'not_as_described', 'damaged', 'wrong_item', 'other'];
+const ORDER_STATUS_FILTERS: Record<OrderStatusTab, string | null> = {
+  all: null,
+  active: 'paid,processing,shipped',
+  completed: 'delivered,completed',
+  cancelled: 'cancelled,refunded,disputed',
+};
 
 export default function MarketplaceOrdersRoute() {
   return (
@@ -49,6 +56,7 @@ function MarketplaceOrdersScreen() {
   const primary = usePrimaryColor();
   const theme = useTheme();
   const [mode, setMode] = useState<OrderMode>('purchases');
+  const [statusTab, setStatusTab] = useState<OrderStatusTab>('all');
   const [shipOrder, setShipOrder] = useState<MarketplaceOrder | null>(null);
   const [cancelOrder, setCancelOrder] = useState<MarketplaceOrder | null>(null);
   const [rateOrder, setRateOrder] = useState<MarketplaceOrder | null>(null);
@@ -64,13 +72,13 @@ function MarketplaceOrdersScreen() {
   const [disputeDescription, setDisputeDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const orders = usePaginatedApi<MarketplaceOrder, Awaited<ReturnType<typeof getMarketplaceOrders>>>(
-    (cursor) => getMarketplaceOrders(mode, cursor),
+    (cursor) => getMarketplaceOrders(mode, cursor, ORDER_STATUS_FILTERS[statusTab]),
     (response) => ({
       items: response.data,
       cursor: marketplaceNextCursor(response),
       hasMore: marketplaceHasMore(response),
     }),
-    [mode],
+    [mode, statusTab],
   );
 
   function openShipModal(order: MarketplaceOrder) {
@@ -218,6 +226,19 @@ function MarketplaceOrdersScreen() {
                   <HeroButton.Label>{t('orders.sales')}</HeroButton.Label>
                 </HeroButton>
               </View>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+                {(['all', 'active', 'completed', 'cancelled'] as OrderStatusTab[]).map((tab) => (
+                  <HeroButton
+                    key={tab}
+                    size="sm"
+                    variant={statusTab === tab ? 'primary' : 'secondary'}
+                    onPress={() => setStatusTab(tab)}
+                    style={statusTab === tab ? { backgroundColor: primary } : undefined}
+                  >
+                    <HeroButton.Label>{t(`orders.tabs.${tab}`)}</HeroButton.Label>
+                  </HeroButton>
+                ))}
+              </ScrollView>
             </HeroCard.Body>
           </HeroCard>
         }

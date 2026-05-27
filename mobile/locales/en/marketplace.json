@@ -207,6 +207,12 @@
     "subtitle": "Track purchases and sales from marketplace checkout.",
     "purchases": "Purchases",
     "sales": "Sales",
+    "tabs": {
+      "all": "All",
+      "active": "Active",
+      "completed": "Completed",
+      "cancelled": "Closed"
+    },
     "number": "Order {{number}}",
     "tracking": "Tracking: {{number}}",
     "markShipped": "Mark shipped",

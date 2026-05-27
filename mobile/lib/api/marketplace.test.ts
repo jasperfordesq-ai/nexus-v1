@@ -34,6 +34,7 @@ import {
   getMarketplaceListing,
   getMarketplaceListingPickupSlots,
   getMarketplaceListings,
+  getMarketplaceOrders,
   getMarketplaceOrderRatings,
   getMarketplaceOffers,
   getMarketplacePickupSlots,
@@ -339,6 +340,13 @@ describe('marketplace api', () => {
     (api.put as jest.Mock).mockResolvedValue({ data: { id: 14 } });
     (api.post as jest.Mock).mockResolvedValue({ data: { id: 2 } });
     (api.get as jest.Mock).mockResolvedValue({ data: [] });
+
+    await getMarketplaceOrders('purchases', 'next', 'paid,shipped');
+    expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/orders/purchases', {
+      cursor: 'next',
+      limit: '20',
+      status: 'paid,shipped',
+    });
 
     await shipMarketplaceOrder(14, {
       tracking_number: 'TRACK123',

@@ -534,10 +534,12 @@ export function withdrawMarketplaceOffer(id: number): Promise<MarketplaceDataRes
 export function getMarketplaceOrders(
   mode: 'purchases' | 'sales',
   cursor?: string | null,
+  status?: string | null,
 ): Promise<MarketplaceCollectionResponse<MarketplaceOrder>> {
   const query: Record<string, string> = {};
   addQueryValue(query, 'cursor', cursor);
   addQueryValue(query, 'limit', 20);
+  addQueryValue(query, 'status', status);
   return api.get<MarketplaceCollectionResponse<MarketplaceOrder>>(`${API_V2}/marketplace/orders/${mode}`, query);
 }
 
