@@ -120,7 +120,7 @@ export function VideoUploader({ onVideoSelect, onVideoRemove, selectedVideo }: V
       )}
 
       {error && (
-        <div className="flex items-center gap-2 mt-2 text-xs text-[var(--color-error)]">
+        <div role="alert" className="flex items-center gap-2 mt-2 text-xs text-[var(--color-error)]">
           <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" aria-hidden="true" />
           <span>{error}</span>
         </div>

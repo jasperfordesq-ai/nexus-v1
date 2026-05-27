@@ -411,7 +411,7 @@ export function SubAccountsManager() {
       )}
 
       {error && !isLoading && (
-        <div className="rounded-lg border border-[var(--color-warning)]/30 bg-[var(--color-warning)]/10 p-6 text-center">
+        <div role="alert" className="rounded-lg border border-[var(--color-warning)]/30 bg-[var(--color-warning)]/10 p-6 text-center">
           <AlertTriangle className="w-8 h-8 text-[var(--color-warning)] mx-auto mb-3" aria-hidden="true" />
           <p className="text-sm text-theme-muted mb-3">{error}</p>
           <Button

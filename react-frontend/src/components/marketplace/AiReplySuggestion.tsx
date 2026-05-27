@@ -99,7 +99,7 @@ export function AiReplySuggestion({
           {t('ai_reply.suggest')}
         </Button>
         {error && (
-          <span className="text-xs text-danger">{error}</span>
+          <span role="alert" className="text-xs text-danger">{error}</span>
         )}
       </div>
     );

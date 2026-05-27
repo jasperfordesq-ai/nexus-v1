@@ -190,7 +190,7 @@ export function PromotionSelector({
           )}
 
           {error && products.length > 0 && (
-            <p className="text-sm text-danger mt-2">{error}</p>
+            <p role="alert" className="text-sm text-danger mt-2">{error}</p>
           )}
         </ModalBody>
 
