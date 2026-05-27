@@ -5,18 +5,26 @@
 
 import {
   BillingCycle,
+  communityOnboardingPackages,
+  communityTimebankPlans,
   hostingPlans,
   maintenancePlans,
   onboardingPackages,
   oneOffServices,
+  ProductLine,
   recurringAddOns,
   supportTiers,
+  type CommunityTimebankPlan,
   type HostingPlan,
 } from '../data/pricing';
 
+export type QuotePlan = HostingPlan | CommunityTimebankPlan;
+
 export interface QuoteInput {
+  productLine?: ProductLine;
   activeMembers: number;
   billingCycle: BillingCycle;
+  communityPlanId?: string;
   supportTierId: string;
   maintenancePlanId: string;
   onboardingPackageId: string;
@@ -33,7 +41,9 @@ export interface QuoteLineItem {
 }
 
 export interface QuoteEstimate {
-  hostingPlan: HostingPlan;
+  productLine: ProductLine;
+  productLineLabel: string;
+  hostingPlan: QuotePlan;
   billingCycle: BillingCycle;
   monthlyRecurring: number;
   annualRecurring: number;
@@ -61,13 +71,136 @@ export function recommendHostingPlan(activeMembers: number): HostingPlan {
   );
 }
 
+export function recommendCommunityTimebankPlan(activeMembers: number): CommunityTimebankPlan {
+  const normalisedMembers = Math.max(0, Math.ceil(activeMembers));
+
+  return (
+    communityTimebankPlans.find((plan) => plan.activeMemberLimit !== null && normalisedMembers <= plan.activeMemberLimit) ??
+    communityTimebankPlans[communityTimebankPlans.length - 1]
+  );
+}
+
 export function estimateQuote(input: QuoteInput): QuoteEstimate {
+  const productLine = input.productLine ?? 'full-platform';
+
+  if (productLine === 'community-timebanking') {
+    return estimateCommunityQuote(input);
+  }
+
+  return estimateFullPlatformQuote(input);
+}
+
+export function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat('en-IE', {
+    style: 'currency',
+    currency: 'EUR',
+    maximumFractionDigits: 0,
+  }).format(amount);
+}
+
+export function buildOrderEmail(input: OrderEmailInput): string {
+  const monthlyLines = input.quote.lineItems
+    .filter((item) => item.cadence === 'monthly')
+    .map((item) => `- ${item.label}: ${formatCurrency(item.amountEur)}/mo${item.quantity > 1 ? ` x${item.quantity}` : ''}`)
+    .join('\n');
+
+  const oneOffLines = input.quote.lineItems
+    .filter((item) => item.cadence === 'one-off')
+    .map((item) => `- ${item.label}: ${formatCurrency(item.amountEur)}${item.quantity > 1 ? ` x${item.quantity}` : ''}`)
+    .join('\n');
+
+  const subject = `Project NEXUS hosting order enquiry - ${input.organisation || input.quote.hostingPlan.name}`;
+  const body = [
+    'Hello Project NEXUS,',
+    '',
+    'I would like to discuss this managed hosting order.',
+    '',
+    `Contact: ${input.contactName}`,
+    `Organisation: ${input.organisation}`,
+    `Email: ${input.email}`,
+    `Region: ${input.region}`,
+    '',
+    `Product line: ${input.quote.productLineLabel}`,
+    `Recommended plan: ${input.quote.hostingPlan.name}`,
+    `Billing preference: ${input.quote.billingCycle}`,
+    `Estimated monthly recurring: ${formatCurrency(input.quote.monthlyRecurring)}`,
+    `Estimated annual recurring: ${formatCurrency(input.quote.annualRecurring)}`,
+    `Estimated one-off total: ${formatCurrency(input.quote.oneOffTotal)}`,
+    `Estimated first-year total: ${formatCurrency(input.quote.firstYearTotal)}`,
+    '',
+    'Recurring items:',
+    monthlyLines || '- None selected',
+    '',
+    'One-off items:',
+    oneOffLines || '- None selected',
+    '',
+    'Notes:',
+    input.note || 'No extra notes added.',
+  ].join('\n');
+
+  return `mailto:jasper@hour-timebank.ie?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+function estimateCommunityQuote(input: QuoteInput): QuoteEstimate {
+  const plan =
+    communityTimebankPlans.find((item) => item.id === input.communityPlanId) ?? recommendCommunityTimebankPlan(input.activeMembers);
+  const onboarding = findById(communityOnboardingPackages, input.onboardingPackageId);
+  const monthlyPlanAmount = input.billingCycle === 'annual' ? plan.annualMonthlyEur : plan.monthlyEur;
+
+  const recurringItems: QuoteLineItem[] = [
+    {
+      id: plan.id,
+      label: `${plan.name} timebanking`,
+      amountEur: monthlyPlanAmount,
+      quantity: 1,
+      cadence: 'monthly',
+    },
+  ];
+
+  const oneOffItems: QuoteLineItem[] = [
+    {
+      id: `${plan.id}-setup`,
+      label: `${plan.name} setup`,
+      amountEur: plan.setupEur,
+      quantity: 1,
+      cadence: 'one-off',
+    },
+    {
+      id: onboarding.id,
+      label: onboarding.label,
+      amountEur: onboarding.fixedEur,
+      quantity: 1,
+      cadence: 'one-off',
+    },
+  ];
+
+  const monthlyRecurring = sum(recurringItems.map((item) => item.amountEur));
+  const annualWithoutDiscount = plan.monthlyEur * 12;
+  const annualRecurring = input.billingCycle === 'annual' ? plan.annualEur : annualWithoutDiscount;
+  const annualSavings = annualWithoutDiscount - annualRecurring;
+  const oneOffTotal = sum(oneOffItems.map((item) => item.amountEur));
+
+  return {
+    productLine: 'community-timebanking',
+    productLineLabel: 'Community Timebanking',
+    hostingPlan: plan,
+    billingCycle: input.billingCycle,
+    monthlyRecurring,
+    annualRecurring,
+    annualSavings,
+    oneOffTotal,
+    firstYearTotal: annualRecurring + oneOffTotal,
+    lineItems: [...recurringItems, ...oneOffItems].filter((item) => item.amountEur !== 0),
+  };
+}
+
+function estimateFullPlatformQuote(input: QuoteInput): QuoteEstimate {
   const hostingPlan = recommendHostingPlan(input.activeMembers);
   const support = findById(supportTiers, input.supportTierId);
   const maintenance = findById(maintenancePlans, input.maintenancePlanId);
   const onboarding = findById(onboardingPackages, input.onboardingPackageId);
 
-  const lineItems: QuoteLineItem[] = [
+  const recurringItems: QuoteLineItem[] = [
     {
       id: hostingPlan.id,
       label: `${hostingPlan.name} hosting`,
@@ -99,7 +232,7 @@ export function estimateQuote(input: QuoteInput): QuoteEstimate {
       return;
     }
 
-    lineItems.push({
+    recurringItems.push({
       id,
       label: option.label,
       amountEur: option.monthlyEur * safeQuantity,
@@ -142,14 +275,15 @@ export function estimateQuote(input: QuoteInput): QuoteEstimate {
     });
   });
 
-  const allLineItems = [...lineItems, ...oneOffItems];
-  const monthlyRecurring = sum(lineItems.map((item) => item.amountEur));
+  const monthlyRecurring = sum(recurringItems.map((item) => item.amountEur));
   const annualWithoutDiscount = monthlyRecurring * 12;
   const annualRecurring = input.billingCycle === 'annual' ? monthlyRecurring * 10 : annualWithoutDiscount;
   const annualSavings = annualWithoutDiscount - annualRecurring;
   const oneOffTotal = sum(oneOffItems.map((item) => item.amountEur));
 
   return {
+    productLine: 'full-platform',
+    productLineLabel: 'Full Platform Hosting',
     hostingPlan,
     billingCycle: input.billingCycle,
     monthlyRecurring,
@@ -157,58 +291,8 @@ export function estimateQuote(input: QuoteInput): QuoteEstimate {
     annualSavings,
     oneOffTotal,
     firstYearTotal: annualRecurring + oneOffTotal,
-    lineItems: allLineItems.filter((item) => item.amountEur !== 0),
+    lineItems: [...recurringItems, ...oneOffItems].filter((item) => item.amountEur !== 0),
   };
-}
-
-export function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat('en-IE', {
-    style: 'currency',
-    currency: 'EUR',
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
-
-export function buildOrderEmail(input: OrderEmailInput): string {
-  const monthlyLines = input.quote.lineItems
-    .filter((item) => item.cadence === 'monthly')
-    .map((item) => `- ${item.label}: ${formatCurrency(item.amountEur)}/mo${item.quantity > 1 ? ` x${item.quantity}` : ''}`)
-    .join('\n');
-
-  const oneOffLines = input.quote.lineItems
-    .filter((item) => item.cadence === 'one-off')
-    .map((item) => `- ${item.label}: ${formatCurrency(item.amountEur)}${item.quantity > 1 ? ` x${item.quantity}` : ''}`)
-    .join('\n');
-
-  const subject = `Project NEXUS hosting order enquiry - ${input.organisation || input.quote.hostingPlan.name}`;
-  const body = [
-    'Hello Project NEXUS,',
-    '',
-    'I would like to discuss this managed hosting order.',
-    '',
-    `Contact: ${input.contactName}`,
-    `Organisation: ${input.organisation}`,
-    `Email: ${input.email}`,
-    `Region: ${input.region}`,
-    '',
-    `Recommended plan: ${input.quote.hostingPlan.name}`,
-    `Billing preference: ${input.quote.billingCycle}`,
-    `Estimated monthly recurring: ${formatCurrency(input.quote.monthlyRecurring)}`,
-    `Estimated annual recurring: ${formatCurrency(input.quote.annualRecurring)}`,
-    `Estimated one-off total: ${formatCurrency(input.quote.oneOffTotal)}`,
-    `Estimated first-year total: ${formatCurrency(input.quote.firstYearTotal)}`,
-    '',
-    'Recurring items:',
-    monthlyLines || '- None selected',
-    '',
-    'One-off items:',
-    oneOffLines || '- None selected',
-    '',
-    'Notes:',
-    input.note || 'No extra notes added.',
-  ].join('\n');
-
-  return `mailto:jasper@hour-timebank.ie?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
 function findById<T extends { id: string }>(items: T[], id: string): T {

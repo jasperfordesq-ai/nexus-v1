@@ -4,6 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 export type BillingCycle = 'monthly' | 'annual';
+export type ProductLine = 'community-timebanking' | 'full-platform';
 
 export interface HostingPlan {
   id: string;
@@ -20,6 +21,18 @@ export interface HostingPlan {
   bestFor: string;
 }
 
+export interface CommunityTimebankPlan extends HostingPlan {
+  annualMonthlyEur: number;
+  annualEur: number;
+  comparisonMonthlyGbp: number;
+  comparisonAnnualGbp: number;
+  summary: string;
+  included: string[];
+  heldBack: string[];
+  fairUse: string[];
+  upgradeTrigger: string;
+}
+
 export interface RecurringOption {
   id: string;
   label: string;
@@ -34,6 +47,165 @@ export interface OneOffOption {
   description: string;
 }
 
+export interface CompetitorBenchmark {
+  name: string;
+  monthlyGbp: number;
+  annualGbp: number;
+  features: string[];
+  source: string;
+}
+
+export const madeOpenCheckedOn = '27 May 2026';
+
+export const madeOpenCommunityBenchmarks: CompetitorBenchmark[] = [
+  {
+    name: 'Made Open Timebank',
+    monthlyGbp: 49.99,
+    annualGbp: 499.99,
+    source: 'https://madeopen.co.uk/pricing',
+    features: [
+      'Offers and requests',
+      'Hours and minutes logging',
+      'Events',
+      'Customisation settings',
+      'About page',
+      'Member management',
+      'Optional chatroom',
+      'Invite to timebank',
+    ],
+  },
+  {
+    name: 'Made Open Timebank Plus',
+    monthlyGbp: 74.99,
+    annualGbp: 749.99,
+    source: 'https://madeopen.co.uk/pricing',
+    features: ['All Timebank features', 'Downloads of recorded time', 'Rewards', 'Donations'],
+  },
+  {
+    name: 'Made Open Timebank Pro',
+    monthlyGbp: 99.99,
+    annualGbp: 999.99,
+    source: 'https://madeopen.co.uk/pricing',
+    features: ['All Timebank Plus features', 'Dedicated landing page', 'Embedding multiple timebanks', 'Annual report'],
+  },
+];
+
+export const madeOpenPlatformBenchmarks = [
+  {
+    name: 'Made Open Innovator',
+    annualGbp: 12000,
+    detail: 'Single licensing organisation, up to 3,000 registered users, choice of 4 key features, setup, onboarding, auto reports, and 2 hours account support per month.',
+  },
+  {
+    name: 'Made Open Enterprise',
+    annualGbp: 24000,
+    detail: 'Up to 6 licensing organisations, up to 12,000 registered users, unlimited features and add-ons, customisation, KPI reports, and quarterly reviews.',
+  },
+];
+
+export const communityTimebankPlans: CommunityTimebankPlan[] = [
+  {
+    id: 'community-edition',
+    name: 'Community Edition',
+    activeMemberLabel: 'Up to 150 active members',
+    activeMemberLimit: 150,
+    monthlyEur: 39,
+    annualMonthlyEur: 29,
+    annualEur: 348,
+    setupEur: 0,
+    comparisonMonthlyGbp: 49.99,
+    comparisonAnnualGbp: 499.99,
+    infrastructure: 'Shared NEXUS community cluster',
+    tenants: '1 timebank tenant',
+    storage: '2 GB',
+    email: '1k emails/month',
+    p1Response: '3 business days',
+    bestFor: 'new timebanks, unfunded pilots, mutual aid groups, and small neighbourhood projects',
+    summary: 'A deliberately lean timebank: exchange, members, groups, events, messaging, admin basics, PWA, backups, and upgrades.',
+    included: [
+      'Offers, requests, and service listings',
+      'Time credit wallet, hour logging, and exchange history',
+      'Member directory, invitations, and basic profiles',
+      'Groups, simple events, and basic messaging',
+      'One standard NEXUS subdomain',
+      'Basic branding using logo, colour, and welcome copy',
+      'Core admin dashboard, moderation, backups, and quarterly upgrades',
+    ],
+    heldBack: [
+      'Federation, multi-tenant networks, custom domains, and dedicated staging',
+      'AI chat, semantic search, recommendations, advanced gamification, and automations',
+      'Volunteering programmes, job board, donations, payments, SSO, and custom reports',
+    ],
+    fairUse: ['150 active members', '2 GB storage', '1,000 outbound emails per month', 'Fair-use moderation and support queue'],
+    upgradeTrigger: 'Move to Community Plus when you need reports, a custom domain, donations, or more than 150 active members.',
+  },
+  {
+    id: 'community-plus',
+    name: 'Community Plus',
+    activeMemberLabel: 'Up to 500 active members',
+    activeMemberLimit: 500,
+    monthlyEur: 69,
+    annualMonthlyEur: 59,
+    annualEur: 708,
+    setupEur: 150,
+    comparisonMonthlyGbp: 74.99,
+    comparisonAnnualGbp: 749.99,
+    infrastructure: 'Shared NEXUS community cluster',
+    tenants: '1 timebank tenant',
+    storage: '10 GB',
+    email: '5k emails/month',
+    p1Response: '2 business days',
+    bestFor: 'funded local timebanks that need reporting, donations, and stronger launch support',
+    summary: 'Everything in Community Edition plus practical reporting and the features most funded community teams ask for first.',
+    included: [
+      'All Community Edition features',
+      'Recorded-time exports and monthly coordinator report',
+      'Rewards and donation-ready configuration',
+      'Custom domain connection',
+      'Expanded admin roles and launch checklist',
+      'Basic resource library and public landing content',
+    ],
+    heldBack: [
+      'Federation, multi-tenant networks, advanced volunteering, SSO, AI modules, dedicated infrastructure, and bespoke integrations',
+      'Mobile app store submission and full compliance evidence packs',
+    ],
+    fairUse: ['500 active members', '10 GB storage', '5,000 outbound emails per month', 'Two admin users included'],
+    upgradeTrigger: 'Move to Community Pro when you need an annual impact pack, multiple embedded timebanks, or a bigger audience.',
+  },
+  {
+    id: 'community-pro',
+    name: 'Community Pro',
+    activeMemberLabel: 'Up to 1,500 active members',
+    activeMemberLimit: 1500,
+    monthlyEur: 99,
+    annualMonthlyEur: 89,
+    annualEur: 1068,
+    setupEur: 250,
+    comparisonMonthlyGbp: 99.99,
+    comparisonAnnualGbp: 999.99,
+    infrastructure: 'Shared NEXUS community cluster with reserved capacity',
+    tenants: '1 tenant plus public landing space',
+    storage: '25 GB',
+    email: '20k emails/month',
+    p1Response: '1 business day',
+    bestFor: 'larger timebanks that want a serious public presence without buying the full civic platform',
+    summary: 'The strongest timebank-only package before a buyer should graduate into the full Project NEXUS platform.',
+    included: [
+      'All Community Plus features',
+      'Public landing page, embedded timebank widgets, and annual impact pack',
+      'Advanced exports, retention views, and coordinator summary metrics',
+      'Priority launch review and quarterly roadmap call',
+      'Room to grow before full platform procurement',
+    ],
+    heldBack: [
+      'Full federation, multi-tenant hierarchy, AI matching, advanced volunteering, marketplace payments, SSO, and custom development',
+      'Dedicated VM, custom fork maintenance, and high-touch managed operations',
+    ],
+    fairUse: ['1,500 active members', '25 GB storage', '20,000 outbound emails per month', 'Quarterly service review'],
+    upgradeTrigger: 'Move to full platform hosting when you need multiple communities, federation, AI, volunteering, or bespoke modules.',
+  },
+];
+
 export const hostingPlans: HostingPlan[] = [
   {
     id: 'spark',
@@ -47,7 +219,7 @@ export const hostingPlans: HostingPlan[] = [
     storage: '5 GB',
     email: '5k emails/month',
     p1Response: 'Next business day',
-    bestFor: 'small timebanks, pilots, and proof-of-need launches',
+    bestFor: 'small full-platform pilots that need the whole NEXUS module set',
   },
   {
     id: 'community',
@@ -199,6 +371,27 @@ export const onboardingPackages: OneOffOption[] = [
     label: 'Enterprise launch',
     fixedEur: 7500,
     description: 'Discovery, migration, staff training, communications plan, soft launch, and go-live.',
+  },
+];
+
+export const communityOnboardingPackages: OneOffOption[] = [
+  {
+    id: 'community-self-start',
+    label: 'Self-start community setup',
+    fixedEur: 0,
+    description: 'Tenant provision, launch checklist, and a short admin handover note.',
+  },
+  {
+    id: 'community-assisted-launch',
+    label: 'Assisted community launch',
+    fixedEur: 250,
+    description: 'One launch clinic, branding setup, member import template, and coordinator checklist.',
+  },
+  {
+    id: 'community-import-launch',
+    label: 'Community import launch',
+    fixedEur: 650,
+    description: 'CSV member import, starter content, coordinator training, and first-month launch check.',
   },
 ];
 

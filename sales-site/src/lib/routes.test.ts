@@ -13,7 +13,7 @@ describe('sales routes', () => {
     expect(normaliseSalesPath('/features#federation')).toBe('/features');
   });
 
-  it('shows Features as a primary navigation item between Platform and Hosting', () => {
-    expect(salesNavItems.slice(0, 3).map((item) => item.label)).toEqual(['Platform', 'Features', 'Hosting']);
+  it('shows Pricing as the primary commercial navigation item', () => {
+    expect(salesNavItems.slice(0, 3).map((item) => item.label)).toEqual(['Platform', 'Features', 'Pricing']);
   });
 });

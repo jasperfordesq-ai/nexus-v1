@@ -101,6 +101,29 @@ const communities = [
   },
 ];
 
+const buyerFeatureMap = [
+  {
+    buyerQuestion: 'I just need a timebank.',
+    communityEdition: 'Yes: offers, requests, time credits, members, groups, simple events, messaging, and admin basics.',
+    fullPlatform: 'Adds federation, volunteering programmes, analytics, AI discovery, and multi-community governance.',
+  },
+  {
+    buyerQuestion: 'I need Made Open-style community modules.',
+    communityEdition: 'Partly: the entry plan covers the timebanking core, not every civic engagement module.',
+    fullPlatform: 'Yes: listings, volunteering, events, groups, resources, blogs, goals, matches, reviews, search, leaderboards, achievements, and help.',
+  },
+  {
+    buyerQuestion: 'I need a network, not one group.',
+    communityEdition: 'No: one timebank tenant only, so the entry price stays believable.',
+    fullPlatform: 'Yes: multi-tenant hierarchy, tenant domains, federation, shared discovery, and regional or national operating models.',
+  },
+  {
+    buyerQuestion: 'I need custom procurement or integrations.',
+    communityEdition: 'Not the right lane: keep it lean or upgrade.',
+    fullPlatform: 'Yes: SSO, data migration, compliance packs, custom federation adapters, and managed support options.',
+  },
+];
+
 export default function FeaturesPage({ onNavigate }: FeaturesPageProps) {
   return (
     <>
@@ -166,6 +189,38 @@ export default function FeaturesPage({ onNavigate }: FeaturesPageProps) {
         </div>
       </section>
 
+      <section className="border-y border-white/10 bg-white/[0.035]">
+        <div className="mx-auto max-w-7xl px-5 py-16">
+          <div className="mb-10 grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
+            <div>
+              <p className="text-sm font-bold tracking-[0.16em] text-[#f5c86a] uppercase">Buyer feature map</p>
+              <h2 className="mt-3 text-3xl font-black text-white md:text-5xl">Community Edition is not the whole product.</h2>
+            </div>
+            <p className="text-base leading-8 text-white/64">
+              That is the point. The cheaper entry plan is for timebanking basics. The full platform is where the broader community, civic, federation, AI, and operational modules belong.
+            </p>
+          </div>
+          <div className="grid gap-4">
+            {buyerFeatureMap.map((row) => (
+              <article key={row.buyerQuestion} className="grid gap-4 rounded-2xl border border-white/10 bg-black/18 p-5 lg:grid-cols-[0.7fr_1fr_1fr]">
+                <div>
+                  <p className="text-xs font-black tracking-[0.16em] text-[#9edbd2] uppercase">Buyer question</p>
+                  <h3 className="mt-2 text-xl font-black text-white">{row.buyerQuestion}</h3>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/[0.04] p-4">
+                  <p className="mb-2 text-sm font-black text-[#f5c86a]">Community Edition</p>
+                  <p className="text-sm leading-6 text-white/58">{row.communityEdition}</p>
+                </div>
+                <div className="rounded-xl border border-[#55d6be]/20 bg-[#55d6be]/8 p-4">
+                  <p className="mb-2 text-sm font-black text-[#bffbf2]">Full platform</p>
+                  <p className="text-sm leading-6 text-white/62">{row.fullPlatform}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section id="module-catalogue" className="border-y border-white/10 bg-white/[0.03]">
         <div className="mx-auto max-w-7xl px-5 py-16">
           <div className="mb-10 grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
@@ -174,7 +229,7 @@ export default function FeaturesPage({ onNavigate }: FeaturesPageProps) {
               <h2 className="mt-3 text-3xl font-black text-white md:text-5xl">60+ production-ready modules.</h2>
             </div>
             <p className="text-base leading-8 text-white/64">
-              All open source. All Dockerized. Hosted plans change capacity, uptime, support, and infrastructure; the feature set is not carved up into artificial paid gates.
+              All open source. All Dockerized. Full platform hosted plans change capacity, uptime, support, and infrastructure; the entry Community Edition is a narrower timebanking package.
             </p>
           </div>
 

@@ -3,64 +3,96 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Button, Card } from '@heroui/react';
+import { Button, Card, Chip } from '@heroui/react';
 import { ArrowRight, BadgeCheck, Globe2, HandCoins, Network, ShieldCheck, Sparkles } from 'lucide-react';
+
+import { communityTimebankPlans, hostingPlans } from '../data/pricing';
+import { formatCurrency } from '../lib/pricingEngine';
 
 interface HomePageProps {
   onNavigate: (href: string) => void;
 }
 
 const highlights = [
-  { label: '60+ modules', value: 'included', icon: Sparkles },
-  { label: '11 languages', value: 'RTL ready', icon: Globe2 },
-  { label: 'Federation', value: '4 protocols', icon: Network },
-  { label: 'Licence', value: 'AGPL-3.0', icon: ShieldCheck },
+  { label: 'Community entry', value: 'EUR29/mo', icon: HandCoins },
+  { label: 'Production modules', value: '60+', icon: Sparkles },
+  { label: 'Languages', value: '11', icon: Globe2 },
+  { label: 'Licence', value: 'AGPL', icon: ShieldCheck },
 ];
 
 const pillars = [
   {
-    title: 'Timebanking at the centre',
-    body: 'A real exchange engine with wallets, broker controls, volunteering, group exchanges, reviews, and equal-time economics.',
+    title: 'Start small without looking small',
+    body: 'Community Edition gives new timebanks a credible managed package with offers, requests, time credits, members, groups, events, messaging, admin basics, backups, and upgrades.',
     icon: HandCoins,
   },
   {
-    title: 'Enterprise operations without lock-in',
-    body: 'Managed hosting, support, maintenance, migration, compliance packs, and custom development on top of open-source software.',
+    title: 'Upgrade into the full platform',
+    body: 'When the project needs federation, AI, volunteering, multi-tenant networks, payments, SSO, custom development, or managed operations, the higher platform tiers are ready.',
     icon: BadgeCheck,
   },
   {
-    title: 'Built for networks',
-    body: 'Multi-tenant hierarchies, federation, tenant domains, accessible frontend delivery, and the ability to connect beyond one platform.',
+    title: 'Built with the real product stack',
+    body: 'The sales site now mirrors the confidence of the React frontend: React 19, TypeScript, HeroUI v3, Tailwind CSS 4, Laravel, MariaDB, Redis, and Meilisearch.',
     icon: Network,
   },
 ];
 
+const stackItems = ['React 19', 'TypeScript', 'HeroUI v3', 'Tailwind CSS 4', 'Laravel 12', 'MariaDB', 'Redis', 'Meilisearch'];
+
 export default function HomePage({ onNavigate }: HomePageProps) {
+  const entryPlan = communityTimebankPlans[0];
+  const fullPlan = hostingPlans[0];
+
   return (
     <>
       <section className="border-b border-white/10">
         <div className="mx-auto flex w-full max-w-7xl flex-col px-5 py-16 lg:py-24">
-          <div className="max-w-4xl">
-            <p className="mb-5 w-fit rounded-full border border-white/14 bg-white/6 px-4 py-2 text-xs font-bold tracking-[0.16em] text-[#9edbd2] uppercase">
-              Open source community infrastructure
-            </p>
-            <h1 className="max-w-4xl text-4xl font-black leading-[1.05] tracking-normal text-white sm:text-5xl md:text-7xl">
-              Timebanking, community, and civic operations in one platform.
-            </h1>
-            <p className="mt-7 max-w-2xl text-lg leading-8 text-white/68">
-              Project NEXUS is an AGPL-licensed community platform with time credits, federation, AI matching, real-time messaging, volunteering, governance, and managed hosting that buyers can actually compare.
-            </p>
-            <div className="mt-9 flex flex-wrap gap-3">
-              <Button size="lg" variant="outline" onPress={() => onNavigate('/features')}>
-                Explore features
-              </Button>
-              <Button size="lg" onPress={() => onNavigate('/hosting')}>
-                Compare hosting
-                <ArrowRight className="size-5" />
-              </Button>
-              <Button size="lg" variant="outline" onPress={() => window.location.assign('https://hour-timebank.ie')}>
-                See live platform
-              </Button>
+          <div className="grid gap-10 lg:grid-cols-[1fr_26rem] lg:items-end">
+            <div className="max-w-4xl">
+              <p className="mb-5 w-fit rounded-full border border-white/14 bg-white/6 px-4 py-2 text-xs font-bold tracking-[0.16em] text-[#9edbd2] uppercase">
+                Open-source community infrastructure
+              </p>
+              <h1 className="max-w-4xl text-4xl font-black leading-[1.05] tracking-normal text-white sm:text-5xl md:text-7xl">
+                Timebanking first. Full civic platform when you are ready.
+              </h1>
+              <p className="mt-7 max-w-2xl text-lg leading-8 text-white/68">
+                Project NEXUS is an AGPL-licensed platform for time credits, community exchange, federation, volunteering, content, events, governance, AI-assisted discovery, and managed hosting.
+              </p>
+              <div className="mt-9 flex flex-wrap gap-3">
+                <Button size="lg" onPress={() => onNavigate('/hosting')}>
+                  Build a hosting quote
+                  <ArrowRight className="size-5" />
+                </Button>
+                <Button size="lg" variant="outline" onPress={() => onNavigate('/features')}>
+                  Explore features
+                </Button>
+                <Button size="lg" variant="outline" onPress={() => window.location.assign('https://hour-timebank.ie')}>
+                  See live platform
+                </Button>
+              </div>
+            </div>
+
+            <div className="glass-panel rounded-[1.25rem] p-5">
+              <p className="text-sm font-bold tracking-[0.14em] text-white/45 uppercase">Commercial lanes</p>
+              <div className="mt-4 grid gap-3">
+                <div className="rounded-xl border border-[#55d6be]/25 bg-[#55d6be]/10 p-4">
+                  <Chip color="success" variant="soft">
+                    Entry
+                  </Chip>
+                  <p className="mt-3 text-2xl font-black text-white">{entryPlan.name}</p>
+                  <p className="mt-1 text-3xl font-black text-[#f5c86a]">{formatCurrency(entryPlan.annualMonthlyEur)}/mo</p>
+                  <p className="mt-2 text-sm leading-6 text-white/58">Feature-limited timebanking for new and small communities.</p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+                  <Chip color="accent" variant="soft">
+                    Full platform
+                  </Chip>
+                  <p className="mt-3 text-2xl font-black text-white">{fullPlan.name}</p>
+                  <p className="mt-1 text-3xl font-black text-[#f5c86a]">{formatCurrency(fullPlan.monthlyEur)}/mo</p>
+                  <p className="mt-2 text-sm leading-6 text-white/58">All stable modules, capacity tiers, and managed service options.</p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -112,15 +144,22 @@ export default function HomePage({ onNavigate }: HomePageProps) {
       <section className="border-y border-white/10 bg-white/[0.035]">
         <div className="mx-auto grid max-w-7xl gap-8 px-5 py-14 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
-            <p className="text-sm font-bold tracking-[0.16em] text-[#f5c86a] uppercase">Transparent hosting</p>
-            <h2 className="mt-3 text-3xl font-black text-white md:text-4xl">Built to be cheaper than the civic enterprise incumbents.</h2>
+            <p className="text-sm font-bold tracking-[0.16em] text-[#f5c86a] uppercase">Professional stack</p>
+            <h2 className="mt-3 text-3xl font-black text-white md:text-4xl">The sales site now points at the same modern product story as the app.</h2>
           </div>
-          <div className="text-lg leading-8 text-white/66">
-            <p>
-              Competitors often hide pricing, gate features, or price every implementation as a bespoke project. NEXUS keeps the code open and charges for the work customers actually need: hosting, uptime, support, maintenance, migration, compliance, and custom development.
+          <div>
+            <p className="text-lg leading-8 text-white/66">
+              The buyer journey is set up for a future proper ordering flow: product line selection, plan rules, launch services, quote summary, and structured enquiry data.
             </p>
+            <div className="mt-6 flex flex-wrap gap-2">
+              {stackItems.map((item) => (
+                <span key={item} className="rounded-full border border-white/10 bg-black/22 px-3 py-2 text-sm font-bold text-white/72">
+                  {item}
+                </span>
+              ))}
+            </div>
             <Button className="mt-7" onPress={() => onNavigate('/hosting')}>
-              Open the comparison workbench
+              Open the order workbench
               <ArrowRight className="size-5" />
             </Button>
           </div>

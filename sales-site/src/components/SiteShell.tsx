@@ -86,7 +86,7 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
               Source
             </Button>
             <Button size="sm" onPress={() => handleInternalNav('/hosting')}>
-              Compare Hosting
+              Pricing
             </Button>
           </div>
 
@@ -135,7 +135,7 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
               <span className="font-black tracking-[0.16em] uppercase">Project NEXUS</span>
             </div>
             <p className="max-w-md text-sm leading-7 text-white/62">
-              Enterprise community platform hosting for timebanking, volunteering, civic participation, and multi-community networks.
+              Community timebanking from EUR29/month, plus full managed platform hosting for volunteering, civic participation, federation, and multi-community networks.
             </p>
             <p className="mt-4 text-xs text-white/45">
               Copyright © 2024-2026 Jasper Ford. Licensed under AGPL-3.0-or-later.
@@ -145,7 +145,7 @@ export default function SiteShell({ children, currentPath, onNavigate }: SiteShe
             title="Compare"
             links={[
               ['Features', '/features'],
-              ['Hosting calculator', '/hosting'],
+              ['Pricing and order workbench', '/hosting'],
               ['Live demo', 'https://hour-timebank.ie'],
               ['Accessible frontend', 'https://accessible.project-nexus.ie'],
             ]}

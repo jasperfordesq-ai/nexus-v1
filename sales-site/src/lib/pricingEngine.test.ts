@@ -9,6 +9,7 @@ import {
   buildOrderEmail,
   estimateQuote,
   formatCurrency,
+  recommendCommunityTimebankPlan,
   recommendHostingPlan,
 } from './pricingEngine';
 
@@ -20,6 +21,35 @@ describe('pricingEngine', () => {
     expect(recommendHostingPlan(1001).id).toBe('growth');
     expect(recommendHostingPlan(30001).id).toBe('network');
     expect(recommendHostingPlan(100001).id).toBe('federation');
+  });
+
+  it('recommends the smallest community timebanking tier that covers the active member count', () => {
+    expect(recommendCommunityTimebankPlan(50).id).toBe('community-edition');
+    expect(recommendCommunityTimebankPlan(151).id).toBe('community-plus');
+    expect(recommendCommunityTimebankPlan(501).id).toBe('community-pro');
+    expect(recommendCommunityTimebankPlan(5000).id).toBe('community-pro');
+  });
+
+  it('prices Community Edition below the Made Open community timebanking entry benchmark', () => {
+    const quote = estimateQuote({
+      productLine: 'community-timebanking',
+      activeMembers: 150,
+      billingCycle: 'annual',
+      communityPlanId: 'community-edition',
+      supportTierId: 'standard',
+      maintenancePlanId: 'track-latest',
+      onboardingPackageId: 'community-assisted-launch',
+      addOns: {},
+      oneOffServices: {},
+    });
+
+    expect(quote.productLineLabel).toBe('Community Timebanking');
+    expect(quote.hostingPlan.id).toBe('community-edition');
+    expect(quote.monthlyRecurring).toBe(29);
+    expect(quote.annualRecurring).toBe(348);
+    expect(quote.annualSavings).toBe(120);
+    expect(quote.oneOffTotal).toBe(250);
+    expect(quote.firstYearTotal).toBe(598);
   });
 
   it('applies annual billing as two months free on recurring charges', () => {
@@ -94,6 +124,7 @@ describe('pricingEngine', () => {
     expect(href).toContain('mailto:jasper@hour-timebank.ie');
     expect(decodeURIComponent(href)).toContain('Ava Murphy');
     expect(decodeURIComponent(href)).toContain('Scale');
+    expect(decodeURIComponent(href)).toContain('Full Platform Hosting');
     expect(decodeURIComponent(href)).toContain('Managed support');
     expect(decodeURIComponent(href)).toContain('We need a multi-tenant launch.');
   });

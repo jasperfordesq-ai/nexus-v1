@@ -3,17 +3,22 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { Button, Card, NumberField } from '@heroui/react';
-import { Calculator, CheckCircle2, Minus, Plus, Server } from 'lucide-react';
+import { Button, Card, Chip, NumberField } from '@heroui/react';
+import { Calculator, CheckCircle2, LockKeyhole, Minus, Plus, Server, Sparkles } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 import {
+  communityOnboardingPackages,
+  communityTimebankPlans,
+  madeOpenCheckedOn,
   maintenancePlans,
   onboardingPackages,
   oneOffServices,
   recurringAddOns,
   supportTiers,
   type BillingCycle,
+  type CommunityTimebankPlan,
+  type ProductLine,
 } from '../data/pricing';
 import { estimateQuote, formatCurrency, type QuoteEstimate, type QuoteInput } from '../lib/pricingEngine';
 import OrderForm from './OrderForm';
@@ -23,11 +28,13 @@ interface QuoteBuilderProps {
 }
 
 const defaultInput: QuoteInput = {
-  activeMembers: 1000,
+  productLine: 'community-timebanking',
+  activeMembers: 150,
   billingCycle: 'annual',
+  communityPlanId: 'community-edition',
   supportTierId: 'standard',
   maintenancePlanId: 'track-latest',
-  onboardingPackageId: 'quick-start',
+  onboardingPackageId: 'community-assisted-launch',
   addOns: {
     'compliance-pack': 0,
     'dedicated-staging': 0,
@@ -118,9 +125,29 @@ const launchChoices = [
   },
 ];
 
+const communityLaunchChoices = [
+  {
+    id: 'community-self-start',
+    title: 'Self-start',
+    plainEnglish: 'Lowest cost. We provision the timebank and you configure content.',
+  },
+  {
+    id: 'community-assisted-launch',
+    title: 'Assisted launch',
+    plainEnglish: 'Best for most new groups: one clinic, branding setup, and a clean launch checklist.',
+  },
+  {
+    id: 'community-import-launch',
+    title: 'Import launch',
+    plainEnglish: 'Use this when you already have members or starter content to migrate.',
+  },
+];
+
 export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
   const [input, setInput] = useState<QuoteInput>(defaultInput);
   const quote = useMemo(() => estimateQuote(input), [input]);
+  const isCommunity = quote.productLine === 'community-timebanking';
+  const communityPlan = isCommunityPlan(quote.hostingPlan) ? quote.hostingPlan : communityTimebankPlans[0];
 
   useEffect(() => {
     onQuoteChange(quote);
@@ -135,14 +162,21 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
               <Calculator className="size-4" />
               Quote builder
             </p>
-            <h2 className="text-3xl font-black text-white md:text-5xl">Build a real managed hosting order.</h2>
+            <h2 className="text-3xl font-black text-white md:text-5xl">Choose the right commercial lane.</h2>
             <p className="mt-5 max-w-xl text-base leading-7 text-white/64">
-              This estimates the hosted service, support, maintenance, launch work, and selected add-ons. It is deliberately built around capacity and after-sales delivery, not artificial feature gates.
+              The entry offer is deliberately cheaper and deliberately narrower. Full platform hosting still prices by capacity, operations, support, and launch work.
             </p>
 
             <Card className="mt-8 border border-white/10 bg-white/[0.06] p-5">
-              <p className="text-sm font-bold text-white/58 uppercase">Recommended plan</p>
-              <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <Chip color={isCommunity ? 'success' : 'accent'} variant="soft">
+                  {quote.productLineLabel}
+                </Chip>
+                <Chip color="warning" variant="soft">
+                  {quote.billingCycle === 'annual' ? 'Annual billing' : 'Monthly billing'}
+                </Chip>
+              </div>
+              <div className="mt-4 flex flex-wrap items-end justify-between gap-4">
                 <div>
                   <p className="text-4xl font-black text-white">{quote.hostingPlan.name}</p>
                   <p className="mt-1 text-sm text-white/58">{quote.hostingPlan.activeMemberLabel}</p>
@@ -159,11 +193,13 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
               </div>
               <div className="mt-5 rounded-xl border border-[#55d6be]/20 bg-[#55d6be]/8 p-4">
                 <p className="flex items-center gap-2 text-sm font-bold text-[#bffbf2]">
-                  <Server className="size-4" />
-                  All stable modules are included on every hosted tier.
+                  {isCommunity ? <LockKeyhole className="size-4" /> : <Server className="size-4" />}
+                  {isCommunity ? 'Feature-limited on purpose.' : 'All stable modules are included on full platform hosting.'}
                 </p>
                 <p className="mt-2 text-sm leading-6 text-white/58">
-                  The estimate changes with capacity and service level, not with artificial feature gates.
+                  {isCommunity
+                    ? 'Community Timebanking is the credible low-price option: core timebanking stays on, expensive platform features stay off.'
+                    : 'The estimate changes with capacity and service level, not with artificial feature gates.'}
                 </p>
               </div>
             </Card>
@@ -172,123 +208,223 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
 
         <div className="space-y-5">
           <Card className="border border-white/10 bg-white/[0.055] p-5">
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div>
-                <h3 className="text-xl font-black text-white">1. How many active members do you expect?</h3>
-                <p className="text-sm leading-6 text-white/55">
-                  Pick a starting point, then adjust the number. Active members means people who sign in during a typical 90-day period.
-                </p>
-              </div>
-              <span className="rounded-full border border-white/12 bg-black/20 px-4 py-2 text-sm font-black text-white">
-                {input.activeMembers.toLocaleString('en-IE')} active members
-              </span>
-            </div>
-
-            <div className="mt-5 grid gap-3 md:grid-cols-5">
-              {capacityPresets.map((preset) => (
-                <CapacityPreset
-                  key={preset.label}
-                  active={input.activeMembers === preset.members}
-                  detail={preset.detail}
-                  label={preset.label}
-                  members={preset.members}
-                  onPress={() => setInput((value) => ({ ...value, activeMembers: preset.members }))}
-                />
-              ))}
-            </div>
-
-            <div className="mt-5 grid gap-3 rounded-2xl border border-white/10 bg-black/18 p-4 md:grid-cols-[1fr_auto] md:items-end">
-              <div>
-                <p className="text-sm font-bold text-white">Use your own estimate</p>
-                <p className="mt-1 text-sm leading-6 text-white/52">Type a number or use the stepper for fine control.</p>
-              </div>
-              <NumberField
-                aria-label="Expected active members"
-                className="w-full md:w-64"
-                formatOptions={{ maximumFractionDigits: 0 }}
-                minValue={50}
-                maxValue={250000}
-                step={250}
-                value={input.activeMembers}
-                onChange={(nextValue) => setInput((value) => ({ ...value, activeMembers: Math.max(50, Number(nextValue) || 50) }))}
-              >
-                <NumberField.Group>
-                  <NumberField.DecrementButton />
-                  <NumberField.Input />
-                  <NumberField.IncrementButton />
-                </NumberField.Group>
-              </NumberField>
-            </div>
-          </Card>
-
-          <Card className="border border-white/10 bg-white/[0.055] p-5">
-            <h3 className="text-xl font-black text-white">2. How would you like to buy it?</h3>
-            <p className="mt-1 text-sm leading-6 text-white/55">Annual billing is usually the cleanest procurement route and includes two months free.</p>
+            <h3 className="text-xl font-black text-white">1. What are you buying?</h3>
+            <p className="mt-1 text-sm leading-6 text-white/55">
+              Pick the lean timebanking offer for affordability, or the full platform when you need the whole NEXUS stack.
+            </p>
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
-              <BillingButton
-                active={input.billingCycle === 'annual'}
-                label="Annual"
-                detail="Two months free"
-                onPress={() => updateBilling(setInput, 'annual')}
+              <ProductLineButton
+                active={input.productLine === 'community-timebanking'}
+                title="Community Timebanking"
+                price="from EUR29/mo"
+                detail="Core timebanking only, priced below Made Open's public Community Timebanks entry plan."
+                onPress={() => switchProductLine(setInput, 'community-timebanking')}
               />
-              <BillingButton
-                active={input.billingCycle === 'monthly'}
-                label="Monthly"
-                detail="No prepay discount"
-                onPress={() => updateBilling(setInput, 'monthly')}
+              <ProductLineButton
+                active={input.productLine === 'full-platform'}
+                title="Full Platform Hosting"
+                price="from EUR99/mo"
+                detail="All stable NEXUS modules, capacity tiers, support, maintenance, and launch services."
+                onPress={() => switchProductLine(setInput, 'full-platform')}
               />
             </div>
           </Card>
 
-          <ChoiceCardSection
-            title="3. What support do you want us to provide?"
-            description="Support changes how quickly and closely we help after launch."
-            choices={supportChoices}
-            options={supportTiers}
-            cadence="monthly"
-            selectedId={input.supportTierId}
-            onSelect={(supportTierId) => setInput((value) => ({ ...value, supportTierId }))}
-          />
+          {isCommunity ? (
+            <>
+              <Card className="border border-white/10 bg-white/[0.055] p-5">
+                <h3 className="text-xl font-black text-white">2. Pick the Community Timebanking plan.</h3>
+                <p className="mt-1 text-sm leading-6 text-white/55">
+                  Benchmark checked {madeOpenCheckedOn}. The entry tier is cheaper, but the feature set is intentionally smaller.
+                </p>
+                <div className="mt-5 grid gap-4 lg:grid-cols-3">
+                  {communityTimebankPlans.map((plan) => (
+                    <CommunityPlanCard
+                      key={plan.id}
+                      plan={plan}
+                      selected={input.communityPlanId === plan.id}
+                      onPress={() =>
+                        setInput((value) => ({
+                          ...value,
+                          activeMembers: plan.activeMemberLimit ?? value.activeMembers,
+                          communityPlanId: plan.id,
+                        }))
+                      }
+                    />
+                  ))}
+                </div>
+              </Card>
 
-          <ChoiceCardSection
-            title="4. How should upgrades be handled?"
-            description="Choose whether you want to stay current, hold a release, or maintain a bespoke fork."
-            choices={maintenanceChoices}
-            options={maintenancePlans}
-            cadence="monthly"
-            selectedId={input.maintenancePlanId}
-            onSelect={(maintenancePlanId) => setInput((value) => ({ ...value, maintenancePlanId }))}
-          />
+              <Card className="border border-white/10 bg-white/[0.055] p-5">
+                <h3 className="text-xl font-black text-white">3. What stays on and what stays off?</h3>
+                <div className="mt-5 grid gap-4 lg:grid-cols-2">
+                  <FeatureList title="Included" items={communityPlan.included} tone="include" />
+                  <FeatureList title="Held back until upgrade" items={communityPlan.heldBack} tone="held-back" />
+                </div>
+                <div className="mt-5 rounded-xl border border-white/10 bg-black/18 p-4">
+                  <p className="text-sm font-black text-white">Fair-use guardrails</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {communityPlan.fairUse.map((item) => (
+                      <Chip key={item} variant="soft">
+                        {item}
+                      </Chip>
+                    ))}
+                  </div>
+                  <p className="mt-4 text-sm leading-6 text-white/58">{communityPlan.upgradeTrigger}</p>
+                </div>
+              </Card>
 
-          <ChoiceCardSection
-            title="5. How much launch help do you need?"
-            description="This covers setup, migration, training, and go-live support before the service opens."
-            choices={launchChoices}
-            options={onboardingPackages}
-            cadence="one-off"
-            selectedId={input.onboardingPackageId}
-            onSelect={(onboardingPackageId) => setInput((value) => ({ ...value, onboardingPackageId }))}
-          />
+              <Card className="border border-white/10 bg-white/[0.055] p-5">
+                <h3 className="text-xl font-black text-white">4. How would you like to buy it?</h3>
+                <p className="mt-1 text-sm leading-6 text-white/55">
+                  Annual billing makes the entry price visibly sharper without making the product feel throwaway.
+                </p>
+                <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                  <BillingButton
+                    active={input.billingCycle === 'annual'}
+                    label="Annual"
+                    detail={`${formatCurrency(communityPlan.annualEur)} per year`}
+                    onPress={() => updateBilling(setInput, 'annual')}
+                  />
+                  <BillingButton
+                    active={input.billingCycle === 'monthly'}
+                    label="Monthly"
+                    detail={`${formatCurrency(communityPlan.monthlyEur)} per month`}
+                    onPress={() => updateBilling(setInput, 'monthly')}
+                  />
+                </div>
+              </Card>
 
-          <OptionCounterSection
-            title="Recurring add-ons"
-            options={recurringAddOns.filter((item) => ['extra-storage-100gb', 'dedicated-staging', 'compliance-pack', 'additional-sub-tenant', 'extra-email-250k', 'bring-your-own-keys'].includes(item.id))}
-            selected={input.addOns}
-            cadence="monthly"
-            onChange={(id, quantity) => setInput((value) => ({ ...value, addOns: { ...value.addOns, [id]: quantity } }))}
-          />
+              <ChoiceCardSection
+                title="5. How much launch help do you need?"
+                description="Keep it self-start if price is everything, or add a small launch clinic so the first experience feels professional."
+                choices={communityLaunchChoices}
+                options={communityOnboardingPackages}
+                cadence="one-off"
+                selectedId={input.onboardingPackageId}
+                onSelect={(onboardingPackageId) => setInput((value) => ({ ...value, onboardingPackageId }))}
+              />
 
-          <OptionCounterSection
-            title="Launch and custom services"
-            options={oneOffServices.filter((item) => ['branding-theme-pack', 'data-migration', 'mobile-app-store-submission', 'federation-onboarding', 'custom-federation-adapter', 'sso-saml'].includes(item.id))}
-            selected={input.oneOffServices}
-            cadence="one-off"
-            onChange={(id, quantity) =>
-              setInput((value) => ({ ...value, oneOffServices: { ...value.oneOffServices, [id]: quantity } }))
-            }
-          />
+              <OrderForm quote={quote} />
+            </>
+          ) : (
+            <>
+              <Card className="border border-white/10 bg-white/[0.055] p-5">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-xl font-black text-white">2. How many active members do you expect?</h3>
+                    <p className="text-sm leading-6 text-white/55">
+                      Active members means people who sign in during a typical 90-day period.
+                    </p>
+                  </div>
+                  <span className="rounded-full border border-white/12 bg-black/20 px-4 py-2 text-sm font-black text-white">
+                    {input.activeMembers.toLocaleString('en-IE')} active members
+                  </span>
+                </div>
 
-          <OrderForm quote={quote} />
+                <div className="mt-5 grid gap-3 md:grid-cols-5">
+                  {capacityPresets.map((preset) => (
+                    <CapacityPreset
+                      key={preset.label}
+                      active={input.activeMembers === preset.members}
+                      detail={preset.detail}
+                      label={preset.label}
+                      members={preset.members}
+                      onPress={() => setInput((value) => ({ ...value, activeMembers: preset.members }))}
+                    />
+                  ))}
+                </div>
+
+                <div className="mt-5 grid gap-3 rounded-2xl border border-white/10 bg-black/18 p-4 md:grid-cols-[1fr_auto] md:items-end">
+                  <div>
+                    <p className="text-sm font-bold text-white">Use your own estimate</p>
+                    <p className="mt-1 text-sm leading-6 text-white/52">Type a number or use the stepper for fine control.</p>
+                  </div>
+                  <NumberField
+                    aria-label="Expected active members"
+                    className="w-full md:w-64"
+                    formatOptions={{ maximumFractionDigits: 0 }}
+                    minValue={50}
+                    maxValue={250000}
+                    step={250}
+                    value={input.activeMembers}
+                    onChange={(nextValue) =>
+                      setInput((value) => ({ ...value, activeMembers: Math.max(50, Number(nextValue) || 50) }))
+                    }
+                  >
+                    <NumberField.Group>
+                      <NumberField.DecrementButton />
+                      <NumberField.Input />
+                      <NumberField.IncrementButton />
+                    </NumberField.Group>
+                  </NumberField>
+                </div>
+              </Card>
+
+              <Card className="border border-white/10 bg-white/[0.055] p-5">
+                <h3 className="text-xl font-black text-white">3. How would you like to buy it?</h3>
+                <p className="mt-1 text-sm leading-6 text-white/55">Annual billing is usually the cleanest procurement route and includes two months free.</p>
+                <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                  <BillingButton active={input.billingCycle === 'annual'} label="Annual" detail="Two months free" onPress={() => updateBilling(setInput, 'annual')} />
+                  <BillingButton active={input.billingCycle === 'monthly'} label="Monthly" detail="No prepay discount" onPress={() => updateBilling(setInput, 'monthly')} />
+                </div>
+              </Card>
+
+              <ChoiceCardSection
+                title="4. What support do you want us to provide?"
+                description="Support changes how quickly and closely we help after launch."
+                choices={supportChoices}
+                options={supportTiers}
+                cadence="monthly"
+                selectedId={input.supportTierId}
+                onSelect={(supportTierId) => setInput((value) => ({ ...value, supportTierId }))}
+              />
+
+              <ChoiceCardSection
+                title="5. How should upgrades be handled?"
+                description="Choose whether you want to stay current, hold a release, or maintain a bespoke fork."
+                choices={maintenanceChoices}
+                options={maintenancePlans}
+                cadence="monthly"
+                selectedId={input.maintenancePlanId}
+                onSelect={(maintenancePlanId) => setInput((value) => ({ ...value, maintenancePlanId }))}
+              />
+
+              <ChoiceCardSection
+                title="6. How much launch help do you need?"
+                description="This covers setup, migration, training, and go-live support before the service opens."
+                choices={launchChoices}
+                options={onboardingPackages}
+                cadence="one-off"
+                selectedId={input.onboardingPackageId}
+                onSelect={(onboardingPackageId) => setInput((value) => ({ ...value, onboardingPackageId }))}
+              />
+
+              <OptionCounterSection
+                title="Recurring add-ons"
+                options={recurringAddOns.filter((item) =>
+                  ['extra-storage-100gb', 'dedicated-staging', 'compliance-pack', 'additional-sub-tenant', 'extra-email-250k', 'bring-your-own-keys'].includes(item.id),
+                )}
+                selected={input.addOns}
+                cadence="monthly"
+                onChange={(id, quantity) => setInput((value) => ({ ...value, addOns: { ...value.addOns, [id]: quantity } }))}
+              />
+
+              <OptionCounterSection
+                title="Launch and custom services"
+                options={oneOffServices.filter((item) =>
+                  ['branding-theme-pack', 'data-migration', 'mobile-app-store-submission', 'federation-onboarding', 'custom-federation-adapter', 'sso-saml'].includes(item.id),
+                )}
+                selected={input.oneOffServices}
+                cadence="one-off"
+                onChange={(id, quantity) =>
+                  setInput((value) => ({ ...value, oneOffServices: { ...value.oneOffServices, [id]: quantity } }))
+                }
+              />
+
+              <OrderForm quote={quote} />
+            </>
+          )}
         </div>
       </div>
     </section>
@@ -300,6 +436,98 @@ function Metric({ label, value }: { label: string; value: string }) {
     <div className="rounded-xl border border-white/10 bg-black/20 p-3">
       <p className="text-lg font-black text-white">{value}</p>
       <p className="text-xs font-semibold text-white/45 uppercase">{label}</p>
+    </div>
+  );
+}
+
+function ProductLineButton({
+  active,
+  title,
+  price,
+  detail,
+  onPress,
+}: {
+  active: boolean;
+  title: string;
+  price: string;
+  detail: string;
+  onPress: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={`rounded-2xl border p-5 text-left transition ${
+        active ? 'border-[#55d6be] bg-[#55d6be]/12 shadow-lg shadow-[#55d6be]/10' : 'border-white/10 bg-black/18 hover:border-white/24'
+      }`}
+      onClick={onPress}
+    >
+      <span className="flex items-start gap-3">
+        <span
+          className={`mt-1 grid size-5 shrink-0 place-items-center rounded-full border ${
+            active ? 'border-[#55d6be] bg-[#55d6be] text-black' : 'border-white/20 text-transparent'
+          }`}
+        >
+          <CheckCircle2 className="size-3.5" />
+        </span>
+        <span>
+          <span className="block text-lg font-black text-white">{title}</span>
+          <span className="mt-2 block text-2xl font-black text-[#f5c86a]">{price}</span>
+          <span className="mt-2 block text-sm leading-6 text-white/58">{detail}</span>
+        </span>
+      </span>
+    </button>
+  );
+}
+
+function CommunityPlanCard({
+  plan,
+  selected,
+  onPress,
+}: {
+  plan: CommunityTimebankPlan;
+  selected: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      className={`flex h-full flex-col rounded-2xl border p-4 text-left transition ${
+        selected ? 'border-[#55d6be] bg-[#55d6be]/12 shadow-lg shadow-[#55d6be]/10' : 'border-white/10 bg-black/18 hover:border-white/24'
+      }`}
+      onClick={onPress}
+    >
+      <span className="flex items-start justify-between gap-3">
+        <span>
+          <span className="block text-lg font-black text-white">{plan.name}</span>
+          <span className="mt-1 block text-xs font-semibold text-white/45 uppercase">{plan.activeMemberLabel}</span>
+        </span>
+        {selected ? <CheckCircle2 className="size-5 text-[#55d6be]" /> : null}
+      </span>
+      <span className="mt-4 block text-3xl font-black text-[#f5c86a]">{formatCurrency(plan.annualMonthlyEur)}</span>
+      <span className="text-xs font-semibold text-white/45 uppercase">per month, billed annually</span>
+      <span className="mt-3 block text-sm leading-6 text-white/60">{plan.summary}</span>
+      <span className="mt-auto pt-4 text-xs leading-5 text-white/42">
+        Benchmark: GBP{plan.comparisonMonthlyGbp}/mo or GBP{plan.comparisonAnnualGbp}/yr on the nearest Made Open Community Timebanks tier.
+      </span>
+    </button>
+  );
+}
+
+function FeatureList({ title, items, tone }: { title: string; items: string[]; tone: 'include' | 'held-back' }) {
+  return (
+    <div className="rounded-xl border border-white/10 bg-black/18 p-4">
+      <p className="mb-4 flex items-center gap-2 text-sm font-black text-white">
+        {tone === 'include' ? <CheckCircle2 className="size-4 text-[#55d6be]" /> : <LockKeyhole className="size-4 text-[#f5c86a]" />}
+        {title}
+      </p>
+      <ul className="grid gap-3">
+        {items.map((item) => (
+          <li key={item} className="grid grid-cols-[auto_1fr] gap-2 text-sm leading-6 text-white/58">
+            <span className={tone === 'include' ? 'mt-2 size-1.5 rounded-full bg-[#55d6be]' : 'mt-2 size-1.5 rounded-full bg-[#f5c86a]'} />
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -455,4 +683,19 @@ function OptionCounterSection({
 
 function updateBilling(setInput: React.Dispatch<React.SetStateAction<QuoteInput>>, billingCycle: BillingCycle) {
   setInput((value) => ({ ...value, billingCycle }));
+}
+
+function switchProductLine(setInput: React.Dispatch<React.SetStateAction<QuoteInput>>, productLine: ProductLine) {
+  setInput((value) => ({
+    ...value,
+    productLine,
+    activeMembers: productLine === 'community-timebanking' ? 150 : 1000,
+    billingCycle: 'annual',
+    communityPlanId: productLine === 'community-timebanking' ? 'community-edition' : value.communityPlanId,
+    onboardingPackageId: productLine === 'community-timebanking' ? 'community-assisted-launch' : 'quick-start',
+  }));
+}
+
+function isCommunityPlan(plan: QuoteEstimate['hostingPlan']): plan is CommunityTimebankPlan {
+  return 'annualMonthlyEur' in plan;
 }

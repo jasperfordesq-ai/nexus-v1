@@ -57,7 +57,7 @@ describe('sales-site public content policy', () => {
     expect(featuresPage).not.toContain('className="grid module-grid gap-4"');
   });
 
-  it('keeps the hosting page focused on quote and order flow, not product comparison cards', () => {
+  it('keeps the hosting page focused on pricing and order flow, not the old comparison workbench', () => {
     const hostingPage = readFileSync(resolve(__dirname, '..', 'components', 'HostingPage.tsx'), 'utf8');
 
     expect(hostingPage).not.toContain('ComparisonWorkbench');
@@ -65,7 +65,9 @@ describe('sales-site public content policy', () => {
     expect(hostingPage).not.toContain('SourceDrawer');
     expect(hostingPage).not.toContain('selectedCompetitorId');
     expect(hostingPage).not.toContain('Compare competitors');
-    expect(hostingPage).not.toContain('Made Open');
+    expect(hostingPage).toContain('Made Open');
+    expect(hostingPage).toContain('Community Timebanks benchmark');
+    expect(hostingPage).toContain('Community Edition details');
   });
 
   it('uses a guided hosting calculator instead of cryptic dropdowns and a raw range slider', () => {
@@ -73,8 +75,22 @@ describe('sales-site public content policy', () => {
 
     expect(quoteBuilder).toContain('CapacityPreset');
     expect(quoteBuilder).toContain('ChoiceCardSection');
+    expect(quoteBuilder).toContain('CommunityPlanCard');
+    expect(quoteBuilder).toContain('ProductLineButton');
     expect(quoteBuilder).toContain('What support do you want us to provide?');
     expect(quoteBuilder).not.toContain('type="range"');
     expect(quoteBuilder).not.toContain('function SelectField');
+  });
+
+  it('advertises a cheaper but feature-limited Community Timebanking entry lane', () => {
+    const pricing = readFileSync(resolve(__dirname, '..', 'data', 'pricing.ts'), 'utf8');
+    const hostingPage = readFileSync(resolve(__dirname, '..', 'components', 'HostingPage.tsx'), 'utf8');
+    const quoteBuilder = readFileSync(resolve(__dirname, '..', 'components', 'QuoteBuilder.tsx'), 'utf8');
+
+    expect(pricing).toContain("id: 'community-edition'");
+    expect(pricing).toContain('annualMonthlyEur: 29');
+    expect(pricing).toContain('comparisonMonthlyGbp: 49.99');
+    expect(hostingPage).toContain('A cheaper way in, without cheapening the platform.');
+    expect(quoteBuilder).toContain('Feature-limited on purpose.');
   });
 });

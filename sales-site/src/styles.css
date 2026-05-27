@@ -4,11 +4,11 @@
 :root {
   color-scheme: dark;
   font-family: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --nexus-bg: #07080d;
+  --nexus-bg: #07100f;
   --nexus-ink: #f7f8fb;
   --nexus-muted: #a7afbf;
-  --nexus-panel: #10131d;
-  --nexus-panel-strong: #171b29;
+  --nexus-panel: #101817;
+  --nexus-panel-strong: #18211f;
   --nexus-line: rgba(255, 255, 255, 0.12);
   --nexus-accent: #55d6be;
   --nexus-blue: #7ca7ff;
@@ -28,9 +28,9 @@ body {
   margin: 0;
   min-width: 320px;
   background:
-    linear-gradient(135deg, rgba(85, 214, 190, 0.08) 0%, transparent 34%),
-    linear-gradient(215deg, rgba(245, 200, 106, 0.08) 0%, transparent 32%),
-    linear-gradient(180deg, #07080d 0%, #0b0d14 44%, #07080d 100%);
+    linear-gradient(110deg, rgba(85, 214, 190, 0.1) 0%, rgba(85, 214, 190, 0) 28%),
+    linear-gradient(250deg, rgba(245, 200, 106, 0.1) 0%, rgba(245, 200, 106, 0) 30%),
+    linear-gradient(180deg, #07100f 0%, #10121c 42%, #07080d 100%);
   color: var(--nexus-ink);
   font-family: "Inter", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   line-height: 1.5;
@@ -54,9 +54,14 @@ textarea {
 
 .glass-panel {
   border: 1px solid var(--nexus-line);
-  background: rgba(16, 19, 29, 0.78);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
+  background: linear-gradient(180deg, rgba(16, 24, 23, 0.88), rgba(10, 13, 20, 0.82));
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(18px);
+}
+
+::selection {
+  background: rgba(85, 214, 190, 0.34);
+  color: #ffffff;
 }
 
 .source-link {
