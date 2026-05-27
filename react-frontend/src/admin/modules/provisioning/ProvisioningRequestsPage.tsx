@@ -205,7 +205,7 @@ export function ProvisioningRequestsPage() {
       {loading ? (
         <div className="flex justify-center py-12" role="status" aria-busy="true" aria-label={t('loading')}><Spinner size="lg" /></div>
       ) : requests.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
+        <div className="text-center py-16 text-gray-500 dark:text-gray-400">
           <Building className="w-12 h-12 mx-auto mb-3 opacity-30" aria-hidden="true" />
           <p>{t('empty_status')}</p>
         </div>
@@ -231,8 +231,8 @@ export function ProvisioningRequestsPage() {
                 <p className="text-xs text-gray-500 truncate">
                   <Globe className="inline w-3 h-3 mr-1" aria-hidden="true" />/{req.requested_slug}
                 </p>
-                <p className="text-xs text-gray-400 truncate">{req.applicant_name} — {req.applicant_email}</p>
-                <p className="text-xs text-gray-400">
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{req.applicant_name} — {req.applicant_email}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   {new Date(req.created_at).toLocaleString()}
                 </p>
               </CardBody>
@@ -256,58 +256,58 @@ export function ProvisioningRequestsPage() {
               <ModalBody className="space-y-4 text-sm">
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.applicant')}</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.applicant')}</p>
                     <p>{selected.applicant_name}</p>
                     <p className="text-indigo-700 dark:text-indigo-400">{selected.applicant_email}</p>
                     {selected.applicant_phone && <p>{selected.applicant_phone}</p>}
                   </div>
                   <div>
-                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.country_region')}</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.country_region')}</p>
                     <p>{selected.country_code}{selected.region_or_canton ? ` · ${selected.region_or_canton}` : ''}</p>
                   </div>
                   <div>
-                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.slug')}</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.slug')}</p>
                     <p className="font-mono">{selected.requested_slug}</p>
                   </div>
                   <div>
-                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.subdomain')}</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.subdomain')}</p>
                     <p className="font-mono">{selected.requested_subdomain ?? '—'}</p>
                   </div>
                   <div>
-                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.category')}</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.category')}</p>
                     <p>{selected.tenant_category}</p>
                   </div>
                   <div>
-                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.expected_size')}</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.expected_size')}</p>
                     <p>{selected.expected_member_count_bucket ?? '—'}</p>
                   </div>
                   <div>
-                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.languages')}</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.languages')}</p>
                     <p>{t('languages_value', { languages: parsedLanguages.length > 0 ? parsedLanguages.join(', ') : t('empty_value'), defaultLanguage: selected.default_language })}</p>
                   </div>
                   <div>
-                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.provisioned_tenant')}</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.provisioned_tenant')}</p>
                     <p>{selected.provisioned_tenant_id ? `#${selected.provisioned_tenant_id}` : '—'}</p>
                   </div>
                 </div>
 
                 {selected.intended_use && (
                   <div>
-                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">{t('fields.intended_use')}</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide mb-1">{t('fields.intended_use')}</p>
                     <p className="text-gray-300 italic whitespace-pre-wrap">{selected.intended_use}</p>
                   </div>
                 )}
 
                 {selected.rejection_reason && (
                   <div>
-                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">{t('fields.rejection_reason')}</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide mb-1">{t('fields.rejection_reason')}</p>
                     <p className="text-rose-600 dark:text-rose-400">{selected.rejection_reason}</p>
                   </div>
                 )}
 
                 {parsedLog !== null && (
                   <div>
-                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">{t('fields.provisioning_log')}</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide mb-1">{t('fields.provisioning_log')}</p>
                     <pre className="text-xs bg-gray-800/40 rounded p-2 overflow-x-auto">
                       {JSON.stringify(parsedLog, null, 2)}
                     </pre>
@@ -317,7 +317,7 @@ export function ProvisioningRequestsPage() {
                 {/* Reject reason input (only relevant for pending/under_review) */}
                 {(selected.status === 'pending' || selected.status === 'under_review') && (
                   <div className="border-t border-white/10 pt-4">
-                    <p className="text-gray-400 text-xs uppercase tracking-wide mb-2">
+                    <p className="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wide mb-2">
                       {t('rejection_reason_label')}
                     </p>
                     <Textarea
@@ -330,7 +330,7 @@ export function ProvisioningRequestsPage() {
                   </div>
                 )}
 
-                <div className="border-t border-white/10 pt-3 grid grid-cols-2 gap-2 text-xs text-gray-400">
+                <div className="border-t border-white/10 pt-3 grid grid-cols-2 gap-2 text-xs text-gray-500 dark:text-gray-400">
                   <div><span className="font-medium text-gray-300">{t('submitted')}:</span> {new Date(selected.created_at).toLocaleString()}</div>
                   {selected.reviewed_at && (
                     <div><span className="font-medium text-gray-300">{t('reviewed')}:</span> {new Date(selected.reviewed_at).toLocaleString()}</div>
