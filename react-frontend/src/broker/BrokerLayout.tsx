@@ -14,6 +14,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { adminBroker, adminUsers } from '@/admin/api/adminApi';
 import { BrokerSidebar, type BrokerBadgeCounts } from './components/BrokerSidebar';
 import { BrokerHeader } from './components/BrokerHeader';
@@ -30,6 +31,7 @@ const EMPTY_BADGES: BrokerBadgeCounts = {
 };
 
 export function BrokerLayout() {
+  const { t } = useTranslation('broker');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [badges, setBadges] = useState<BrokerBadgeCounts>(EMPTY_BADGES);
@@ -149,7 +151,7 @@ export function BrokerLayout() {
       {mobileDrawerOpen && (
         <button
           type="button"
-          aria-label="Close navigation"
+          aria-label={t('layout.close_navigation')}
           className="fixed inset-0 z-30 w-full h-full cursor-default bg-black/50 md:hidden"
           onClick={closeMobileDrawer}
         />
@@ -158,7 +160,7 @@ export function BrokerLayout() {
         ref={drawerRef}
         role="dialog"
         aria-modal="true"
-        aria-label="Navigation"
+        aria-label={t('layout.navigation')}
         inert={!mobileDrawerOpen || undefined}
         className={`fixed left-0 top-0 z-40 h-[100dvh] w-64 max-w-[calc(100dvw-var(--safe-area-left)-var(--safe-area-right))] border-r border-divider bg-surface transition-transform duration-300 md:hidden ${
           mobileDrawerOpen ? 'translate-x-0' : '-translate-x-full'

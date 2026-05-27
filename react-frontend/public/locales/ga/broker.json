@@ -1086,5 +1086,9 @@
       "vetting_stuck": "<b>\"Tá tíl an fhíoraithe sáite\"</b> — tiomáintear an cuntar Fíorú ar Feitheamh ag <code>vetting_records.status = 'pending'</code>. Fíoraigh nó diúltaigh; ní ghlanfaidh aon rud an tíl go dtí go mbogann gach ró ar feitheamh ar aghaidh.",
       "no_copies": "<b>\"Níltear ag cóipeáil teachtaireachtaí\"</b> — deimhnigh go bhfuil <code>under_monitoring = 1</code> ag an mball ar <code>user_messaging_restrictions</code>. Mura bhfuil an ró ann, cuir leis trí Mhonatóireacht Úsáideoirí le cúis."
     }
+  },
+  "layout": {
+    "close_navigation": "Close navigation",
+    "navigation": "Navigation"
   }
 }

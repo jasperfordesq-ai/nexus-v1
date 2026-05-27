@@ -1086,5 +1086,9 @@
       "vetting_stuck": "<b>\"La scheda verifica è bloccata\"</b> — il contatore Verifiche in attesa è guidato da <code>vetting_records.status = 'pending'</code>. Verifica o rifiuta; nulla pulirà la scheda finché ogni riga in attesa non sarà gestita.",
       "no_copies": "<b>\"I messaggi non vengono copiati\"</b> — verifica che il membro abbia <code>under_monitoring = 1</code> in <code>user_messaging_restrictions</code>. Se la riga manca, aggiungilo tramite Monitoraggio Utenti con un motivo."
     }
+  },
+  "layout": {
+    "close_navigation": "Close navigation",
+    "navigation": "Navigation"
   }
 }

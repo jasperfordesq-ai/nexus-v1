@@ -1086,5 +1086,9 @@
       "vetting_stuck": "<b>\"بطاقة التحقق متجمدة\"</b> — يعتمد عدّاد التحقق المعلق على <code>vetting_records.status = 'pending'</code>. تحقق أو ارفض؛ لن تُمسح البطاقة حتى تتم معالجة كل سجل معلق.",
       "no_copies": "<b>\"الرسائل لا تُنسخ\"</b> — تأكد أن لدى العضو <code>under_monitoring = 1</code> في <code>user_messaging_restrictions</code>. إذا كان السجل مفقودًا، أضفه عبر مراقبة المستخدمين مع سبب."
     }
+  },
+  "layout": {
+    "close_navigation": "Close navigation",
+    "navigation": "Navigation"
   }
 }

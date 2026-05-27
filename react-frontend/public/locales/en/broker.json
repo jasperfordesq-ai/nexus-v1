@@ -1086,5 +1086,9 @@
       "vetting_stuck": "<b>\"The vetting tile is stuck\"</b> — the Vetting Pending counter is driven by <code>vetting_records.status = 'pending'</code>. Either verify or reject; nothing will clear the tile until each pending row has moved on.",
       "no_copies": "<b>\"Messages aren't being copied\"</b> — confirm the member has <code>under_monitoring = 1</code> on <code>user_messaging_restrictions</code>. If the row is missing, add them via User Monitoring with a reason."
     }
+  },
+  "layout": {
+    "close_navigation": "Close navigation",
+    "navigation": "Navigation"
   }
 }

@@ -1086,5 +1086,9 @@
       "vetting_stuck": "<b>« La tuile de vérification est bloquée »</b> — le compteur Vérifications en attente est piloté par <code>vetting_records.status = 'pending'</code>. Vérifiez ou rejetez ; rien n'effacera la tuile tant que chaque ligne en attente n'aura pas évolué.",
       "no_copies": "<b>« Les messages ne sont pas copiés »</b> — vérifiez que le membre a <code>under_monitoring = 1</code> dans <code>user_messaging_restrictions</code>. Si la ligne manque, ajoutez-le via Surveillance des utilisateurs avec un motif."
     }
+  },
+  "layout": {
+    "close_navigation": "Close navigation",
+    "navigation": "Navigation"
   }
 }

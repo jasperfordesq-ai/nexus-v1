@@ -1086,5 +1086,9 @@
       "vetting_stuck": "<b>\"Die Überprüfungs-Kachel hängt\"</b> — der Zähler für ausstehende Überprüfungen wird durch <code>vetting_records.status = 'pending'</code> gesteuert. Entweder verifizieren oder ablehnen; die Kachel wird erst gelöscht, wenn jede ausstehende Zeile bearbeitet wurde.",
       "no_copies": "<b>\"Nachrichten werden nicht kopiert\"</b> — bestätigen Sie, dass das Mitglied <code>under_monitoring = 1</code> in <code>user_messaging_restrictions</code> hat. Fehlt der Eintrag, fügen Sie ihn über die Nutzerüberwachung mit Begründung hinzu."
     }
+  },
+  "layout": {
+    "close_navigation": "Close navigation",
+    "navigation": "Navigation"
   }
 }

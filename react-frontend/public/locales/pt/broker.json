@@ -1086,5 +1086,9 @@
       "vetting_stuck": "<b>\"O mosaico de verificação está bloqueado\"</b> — o contador de Verificações Pendentes é alimentado por <code>vetting_records.status = 'pending'</code>. Verifique ou rejeite; nada limpará o mosaico até que cada linha pendente seja processada.",
       "no_copies": "<b>\"As mensagens não estão a ser copiadas\"</b> — confirme que o membro tem <code>under_monitoring = 1</code> em <code>user_messaging_restrictions</code>. Se faltar a linha, adicione-o via Monitorização de Utilizadores com um motivo."
     }
+  },
+  "layout": {
+    "close_navigation": "Close navigation",
+    "navigation": "Navigation"
   }
 }

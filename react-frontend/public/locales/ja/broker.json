@@ -1086,5 +1086,9 @@
       "vetting_stuck": "<b>「身元確認タイルが止まっている」</b> — 身元確認保留カウンターは<code>vetting_records.status = 'pending'</code>で駆動されます。検証または却下してください。保留中の各行が処理されるまでタイルはクリアされません。",
       "no_copies": "<b>「メッセージがコピーされない」</b> — メンバーの<code>user_messaging_restrictions</code>に<code>under_monitoring = 1</code>があるか確認してください。行が無い場合は、ユーザー監視から理由を付けて追加してください。"
     }
+  },
+  "layout": {
+    "close_navigation": "Close navigation",
+    "navigation": "Navigation"
   }
 }

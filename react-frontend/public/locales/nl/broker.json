@@ -1086,5 +1086,9 @@
       "vetting_stuck": "<b>\"De verificatietegel hangt vast\"</b> — de teller Verificaties in afwachting wordt aangestuurd door <code>vetting_records.status = 'pending'</code>. Verifieer of wijs af; niets wist de tegel totdat elke wachtende rij is afgehandeld.",
       "no_copies": "<b>\"Berichten worden niet gekopieerd\"</b> — bevestig dat het lid <code>under_monitoring = 1</code> heeft in <code>user_messaging_restrictions</code>. Ontbreekt de rij, voeg het lid dan via Gebruikersmonitoring toe met een reden."
     }
+  },
+  "layout": {
+    "close_navigation": "Close navigation",
+    "navigation": "Navigation"
   }
 }

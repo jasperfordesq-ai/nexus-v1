@@ -1086,5 +1086,9 @@
       "vetting_stuck": "<b>„Kafelek weryfikacji utknął”</b> — licznik Oczekujących Weryfikacji jest sterowany przez <code>vetting_records.status = 'pending'</code>. Zweryfikuj lub odrzuć; nic nie wyczyści kafelka, dopóki każdy oczekujący wiersz nie zostanie przetworzony.",
       "no_copies": "<b>„Wiadomości nie są kopiowane”</b> — potwierdź, że członek ma <code>under_monitoring = 1</code> w <code>user_messaging_restrictions</code>. Jeśli wiersz brakuje, dodaj go przez Monitorowanie Użytkowników z uzasadnieniem."
     }
+  },
+  "layout": {
+    "close_navigation": "Close navigation",
+    "navigation": "Navigation"
   }
 }
