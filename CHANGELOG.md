@@ -9,11 +9,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Community Fund administration.** New admin module under Timebanking for administering a shared community time-credit fund, with its own service, API endpoints, sidebar/breadcrumb navigation, a schema fix migration, and full translations in all 11 languages.
+
+- **Configurable "Powered By" footer branding and partner logo.** Tenants can now show a "Powered By" slot in the footer (label, light/dark logo images, and a click-through URL) and a separate partner-logo slot with its own link, all configurable by the platform owner with upload endpoints. NEXUS branding ships as the default. The footer attribution panel was redesigned to accommodate this.
+
+- **Mobile app migrated to HeroUI Native v3 + NativeWind.** The Expo/Capacitor mobile app was rebuilt on HeroUI Native v3 with NativeWind across its UI primitives, auth screens, tab screens, and modal screens, with deep-link, image, offline-detection, and "More" menu fixes and updated EAS build configuration.
+
 ### Changed
 
 - **React upgraded from 18 to 19.** Full production upgrade including React 19 concurrent features, updated type definitions (`@types/react` 19.x), and Vitest/testing-library compatibility fixes. All 223 usages of deprecated APIs resolved. Build, type-check, and smoke tests pass.
 
-- **HeroUI v3 migration — incremental (phases 1–5 of 10 complete).** Frontend component library migrated from v2 to v3 using `@heroui-v3/react` alias coexistence strategy so the app stays functional throughout. Phases complete: (1) v3 aliases and styles installed; (2) `Divider` → `Separator` (126 files); (3) removed v2 components replaced — `Code` and `Snippet` with app-local wrappers, `Image` with native `img`; (4) `Progress` → `ProgressBar` compound component via app-local wrapper (51 files); (5) `TimeInput` → `TimeField` compound component via app-local wrapper (3 files). Remaining phases cover `Dropdown*`, `AccordionItem`, `SelectItem` (197 files), `useDisclosure` → `useOverlayState`, and final provider/deps cleanup.
+- **`framer-motion` removed.** As part of the React 19 modernization, the `framer-motion` dependency was dropped and replaced with a local CSS-transition-backed shim at `@/lib/motion`, repointing every animation import site. Smaller bundle and one fewer heavy dependency, with no visible change to animations.
+
+- **HeroUI v3 migration — complete.** The frontend component library migration from v2 to v3 (`@heroui/react`) is finished; the v2 npm alias has been removed. All remaining components were migrated to v3 (`Dropdown`, `Select`, `Accordion`, `Tabs`, `Modal`, `Drawer`, `Table`, `Badge`, `Switch`, `Checkbox`, `Radio`, `Tooltip`, `Skeleton`, `Slider`, `Popover`, `Pagination`, `DatePicker`, `ScrollShadow`, `ButtonGroup`), the `useDisclosure` → `useOverlayState` hook adapter landed, the `@heroui/styles` internal dependency was removed, and a final wrapper/test/visual audit pass confirmed the app is clean on v3. (Supersedes the earlier "phases 1–5 of 10" status.)
+
+- **Admin panel is now fully translated in all 11 languages.** The previous admin-English-only policy was reversed; admin UI strings now resolve through the same i18n system as the rest of the platform, and PHP locale namespaces were filled across all 10 non-English languages.
+
+- **Module Configuration cleaned up.** Five unimplemented orphan modules (merchant coupons, member premium, AI agents, partner API, regional analytics) were removed from the admin Module Configuration screen so admins no longer see dead toggles. The Help Centre link was also removed from the utility navbar and a duplicate AGPL footer notice was removed.
+
+### Accessibility
+
+- **Platform-wide WCAG 2.1 AA audit (four rounds).** A multi-round accessibility campaign brought the React frontend and admin panel toward WCAG 2.1 AA: colour-contrast fixes, semantic landmarks and `role` attributes (e.g. feed cards as `article`), ARIA labels on all `Tabs` and `Input` elements, accessible names on icon-only controls, `aria-expanded` on menus, `aria-live`/live regions for chat and search results, `aria-busy` on skeletons, keyboard support for sortable table-column headers, focus indicators, and `usePageTitle` on pages that were missing a browser/screen-reader title. Round 4 alone covered 24 pages and 10 admin modules. The accessible-frontend link was relabelled to reference "WCAG 2.2 AA" across all 11 languages.
+
+### Security
+
+- **Member surnames are now hidden from non-admin viewers, platform-wide.** Surnames were previously returned in all user-facing API responses. They are now gated behind an admin check at every exposure point (public profile, member directory listing, and member search), so non-admins see only the first name while admins continue to see full names.
 
 ### Fixed
 
@@ -24,6 +46,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Welcome credits now granted when admin approves via status change.** Admins were approving members by editing their status to "active" (the user detail edit page) rather than using the dedicated Approve button. The generic `update()` endpoint set `is_approved=1` but never called `grantWelcomeCredits`, so no starting balance was applied. Fix: detect the `pending → active` transition in `update()` and run the same credit-grant + welcome-email + in-app-notification flow as the dedicated `/approve` endpoint. Also fixed: `grantWelcomeCredits` was reading the `welcome_credits` tenant-settings key (which doesn't exist) instead of `wallet.starting_balance` (the key the admin Settings page actually writes). The code now reads `wallet.starting_balance` with a fallback chain so every tenant resolves the correct value. Backfilled 5 credits to the one user who had been approved but received nothing.
 
 - **Member activity reports now show real data.** `AuthController::login()` never stamped `last_login_at` on successful login after the Laravel migration, so `/admin/reports/members` showed "No active members found" for all tenants. Fixed by adding `DB::table('users')->update(['last_login_at' => now()])` immediately after token creation. A backfill migration approximates past login dates from `personal_access_tokens.created_at` for all active users so reports are immediately useful.
+
+- **Wallet transfer/donation UX and a 404.** The wallet `DonateModal` exposed an unusable numeric "Recipient ID" field, now replaced with an avatar/member search picker. A missing `GET /v2/wallet/config` endpoint that caused the `TransferModal` to 404 every time it opened was added.
+
+- **Member profile tabs no longer collapse.** A HeroUI v3 Tabs CSS issue hid all but the selected tab on member profiles; all tabs render correctly again.
+
+- **Dashboard and Explore layout fixes.** Restored the dashboard quick-action tiles and stopped the Explore page tabs from wrapping onto a second line.
+
+- **Admin search box no longer triggers browser autofill.** The browser was autofilling a saved admin email into the admin search field; this is now suppressed.
+
+- **Build & infrastructure reliability.** Raised the Workbox precache size limit to 5 MB (large bundles were being skipped), cast GD image dimensions to integers and guarded against `localStorage` quota errors, unpinned the Redis PECL extension to fix the Docker build, added a queue watchdog cron to recover dead Horizon workers, and hardened container storage permissions.
 
 ---
 
