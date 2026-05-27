@@ -229,6 +229,12 @@ export function SearchPage() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">
+      {/* Screen-reader live region: announces result count after each search */}
+      <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+        {hasSearched && !isLoading
+          ? t('results_count_announcement', { count: totalResults })
+          : null}
+      </div>
       <PageMeta title={t('page_meta.title')} description={t('page_meta.description')} noIndex />
       <PublicPageHero
         eyebrow={t('hero_eyebrow')}

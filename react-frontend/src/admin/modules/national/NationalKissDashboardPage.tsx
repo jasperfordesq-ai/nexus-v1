@@ -463,13 +463,48 @@ export function NationalKissDashboardPage() {
               classNames={{ base: 'overflow-x-auto' }}
             >
               <TableHeader>
-                <TableColumn onClick={() => handleSort('name')} className="cursor-pointer">{t('national_kiss_dashboard.comparative.cooperative')}</TableColumn>
-                <TableColumn onClick={() => handleSort('hours')} className="cursor-pointer text-right"><span title={t('national_kiss_dashboard.comparative.hours_title')}>{t('national_kiss_dashboard.comparative.hours_sort')}</span></TableColumn>
+                <TableColumn
+                  role="columnheader"
+                  tabIndex={0}
+                  onClick={() => handleSort('name')}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSort('name'); } }}
+                  aria-sort={sortKey === 'name' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
+                  className="cursor-pointer"
+                >{t('national_kiss_dashboard.comparative.cooperative')}</TableColumn>
+                <TableColumn
+                  role="columnheader"
+                  tabIndex={0}
+                  onClick={() => handleSort('hours')}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSort('hours'); } }}
+                  aria-sort={sortKey === 'hours' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
+                  className="cursor-pointer text-right"
+                ><span title={t('national_kiss_dashboard.comparative.hours_title')}>{t('national_kiss_dashboard.comparative.hours_sort')}</span></TableColumn>
                 <TableColumn><span title={t('national_kiss_dashboard.comparative.members_title')}>{t('national_kiss_dashboard.comparative.members')}</span></TableColumn>
                 <TableColumn><span title={t('national_kiss_dashboard.comparative.recipients_title')}>{t('national_kiss_dashboard.comparative.recipients')}</span></TableColumn>
-                <TableColumn onClick={() => handleSort('active_tandems')} className="cursor-pointer text-right"><span title={t('national_kiss_dashboard.comparative.tandems_title')}>{t('national_kiss_dashboard.comparative.tandems_sort')}</span></TableColumn>
-                <TableColumn onClick={() => handleSort('retention_rate_pct')} className="cursor-pointer text-right"><span title={t('national_kiss_dashboard.comparative.retention_title')}>{t('national_kiss_dashboard.comparative.retention_sort')}</span></TableColumn>
-                <TableColumn onClick={() => handleSort('reciprocity_pct')} className="cursor-pointer text-right"><span title={t('national_kiss_dashboard.comparative.reciprocity_title')}>{t('national_kiss_dashboard.comparative.reciprocity_sort')}</span></TableColumn>
+                <TableColumn
+                  role="columnheader"
+                  tabIndex={0}
+                  onClick={() => handleSort('active_tandems')}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSort('active_tandems'); } }}
+                  aria-sort={sortKey === 'active_tandems' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
+                  className="cursor-pointer text-right"
+                ><span title={t('national_kiss_dashboard.comparative.tandems_title')}>{t('national_kiss_dashboard.comparative.tandems_sort')}</span></TableColumn>
+                <TableColumn
+                  role="columnheader"
+                  tabIndex={0}
+                  onClick={() => handleSort('retention_rate_pct')}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSort('retention_rate_pct'); } }}
+                  aria-sort={sortKey === 'retention_rate_pct' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
+                  className="cursor-pointer text-right"
+                ><span title={t('national_kiss_dashboard.comparative.retention_title')}>{t('national_kiss_dashboard.comparative.retention_sort')}</span></TableColumn>
+                <TableColumn
+                  role="columnheader"
+                  tabIndex={0}
+                  onClick={() => handleSort('reciprocity_pct')}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSort('reciprocity_pct'); } }}
+                  aria-sort={sortKey === 'reciprocity_pct' ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}
+                  className="cursor-pointer text-right"
+                ><span title={t('national_kiss_dashboard.comparative.reciprocity_title')}>{t('national_kiss_dashboard.comparative.reciprocity_sort')}</span></TableColumn>
                 <TableColumn>{t('national_kiss_dashboard.comparative.status')}</TableColumn>
               </TableHeader>
               <TableBody>

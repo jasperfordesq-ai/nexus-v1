@@ -960,7 +960,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
                 </span>
               )}
               {onToggleSave && (
-                <span onClick={handleSaveContainerClick}>
+                <span role="presentation" onClick={handleSaveContainerClick}>
                   <Button
                     isIconOnly
                     size="sm"
@@ -1012,7 +1012,7 @@ const ListingCard = memo(function ListingCard({ listing, viewMode, isSaving, onT
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-200 pointer-events-none" aria-hidden="true" />
           {/* Floating save button */}
           {onToggleSave && (
-            <div className="absolute top-2 right-2" onClick={handleSaveContainerClick}>
+            <div role="presentation" className="absolute top-2 right-2" onClick={handleSaveContainerClick}>
               <Button
                 isIconOnly
                 size="sm"

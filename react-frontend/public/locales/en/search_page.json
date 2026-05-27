@@ -85,5 +85,6 @@
     "title": "Search",
     "description": "Search your community for listings, members, groups, events, and useful local activity across the Project NEXUS timebanking platform."
   },
-  "tabs_aria": "Search result type filter"
+  "tabs_aria": "Search result type filter",
+  "results_count_announcement": "{{count}} results found"
 }
