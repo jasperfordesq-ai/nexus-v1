@@ -139,6 +139,91 @@ export interface MarketplaceDashboard {
   saves_30d?: number;
 }
 
+export interface MarketplaceSavedSearch {
+  id: number;
+  name: string;
+  search_query?: string | null;
+  filters?: Record<string, unknown> | null;
+  alert_frequency: 'instant' | 'daily' | 'weekly';
+  alert_channel: 'email' | 'push' | 'both';
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface MarketplaceCollection {
+  id: number;
+  name: string;
+  description?: string | null;
+  is_public: boolean;
+  item_count: number;
+  created_at: string;
+  updated_at?: string | null;
+}
+
+export interface MarketplaceCollectionItem {
+  collection_item_id?: number;
+  note?: string | null;
+  added_at?: string;
+  listing: MarketplaceListingItem;
+}
+
+export interface MarketplacePromotionProduct {
+  type: 'bump' | 'featured' | 'top_of_category' | 'homepage_carousel';
+  label: string;
+  description: string;
+  price: number;
+  currency: string;
+  duration_hours: number;
+}
+
+export interface MarketplacePromotion {
+  id: number;
+  promotion_type: string;
+  amount_paid: number;
+  currency: string;
+  started_at: string;
+  expires_at: string;
+  is_active: boolean;
+  impressions?: number;
+  clicks?: number;
+  listing?: { id: number; title: string; status: string } | null;
+}
+
+export interface MarketplacePickupSlot {
+  id: number;
+  slot_start: string;
+  slot_end: string;
+  capacity: number;
+  booked_count: number;
+  is_recurring?: boolean;
+  recurring_pattern?: string | null;
+  is_active: boolean;
+}
+
+export interface MarketplacePickupReservation {
+  id: number;
+  slot_id?: number;
+  order_id: number;
+  listing_id?: number;
+  qr_code?: string;
+  status: string;
+  reserved_at?: string | null;
+  picked_up_at?: string | null;
+}
+
+export interface MerchantCoupon {
+  id: number;
+  code: string;
+  title: string;
+  description?: string | null;
+  discount_type: 'percent' | 'fixed' | 'bogo';
+  discount_value?: number | null;
+  status: 'draft' | 'active' | 'paused' | 'expired';
+  max_uses?: number | null;
+  used_count?: number;
+  valid_until?: string | null;
+}
+
 export interface MarketplaceCollectionResponse<T> {
   data: T[];
   meta?: { cursor?: string | null; next_cursor?: string | null; has_more?: boolean };
@@ -365,6 +450,115 @@ export function getMarketplaceSellerListings(
 
 export function getMarketplaceDashboard(): Promise<MarketplaceDataResponse<MarketplaceDashboard>> {
   return api.get<MarketplaceDataResponse<MarketplaceDashboard>>(`${API_V2}/marketplace/seller/dashboard`);
+}
+
+export function getMarketplaceSavedSearches(): Promise<MarketplaceDataResponse<MarketplaceSavedSearch[]>> {
+  return api.get<MarketplaceDataResponse<MarketplaceSavedSearch[]>>(`${API_V2}/marketplace/saved-searches`);
+}
+
+export function createMarketplaceSavedSearch(payload: {
+  name: string;
+  search_query?: string | null;
+  filters?: Record<string, unknown> | null;
+  alert_frequency?: 'instant' | 'daily' | 'weekly';
+  alert_channel?: 'email' | 'push' | 'both';
+}): Promise<MarketplaceDataResponse<MarketplaceSavedSearch>> {
+  return api.post<MarketplaceDataResponse<MarketplaceSavedSearch>>(`${API_V2}/marketplace/saved-searches`, payload);
+}
+
+export function deleteMarketplaceSavedSearch(id: number): Promise<MarketplaceDataResponse<{ deleted: boolean }>> {
+  return api.delete<MarketplaceDataResponse<{ deleted: boolean }>>(`${API_V2}/marketplace/saved-searches/${id}`);
+}
+
+export function getMarketplaceCollections(): Promise<MarketplaceDataResponse<MarketplaceCollection[]>> {
+  return api.get<MarketplaceDataResponse<MarketplaceCollection[]>>(`${API_V2}/marketplace/collections`);
+}
+
+export function createMarketplaceCollection(payload: {
+  name: string;
+  description?: string | null;
+  is_public?: boolean;
+}): Promise<MarketplaceDataResponse<MarketplaceCollection>> {
+  return api.post<MarketplaceDataResponse<MarketplaceCollection>>(`${API_V2}/marketplace/collections`, payload);
+}
+
+export function deleteMarketplaceCollection(id: number): Promise<MarketplaceDataResponse<{ deleted: boolean }>> {
+  return api.delete<MarketplaceDataResponse<{ deleted: boolean }>>(`${API_V2}/marketplace/collections/${id}`);
+}
+
+export function getMarketplaceCollectionItems(
+  id: number,
+  cursor?: string | null,
+): Promise<MarketplaceCollectionResponse<MarketplaceCollectionItem>> {
+  const query: Record<string, string> = {};
+  addQueryValue(query, 'cursor', cursor);
+  addQueryValue(query, 'limit', 20);
+  return api.get<MarketplaceCollectionResponse<MarketplaceCollectionItem>>(`${API_V2}/marketplace/collections/${id}/items`, query);
+}
+
+export function addMarketplaceCollectionItem(id: number, listingId: number, note?: string | null): Promise<MarketplaceDataResponse<{ added: boolean }>> {
+  return api.post<MarketplaceDataResponse<{ added: boolean }>>(`${API_V2}/marketplace/collections/${id}/items`, {
+    listing_id: listingId,
+    note,
+  });
+}
+
+export function getMarketplacePromotionProducts(): Promise<MarketplaceDataResponse<MarketplacePromotionProduct[]>> {
+  return api.get<MarketplaceDataResponse<MarketplacePromotionProduct[]>>(`${API_V2}/marketplace/promotions/products`);
+}
+
+export function getMyMarketplacePromotions(): Promise<MarketplaceDataResponse<MarketplacePromotion[]>> {
+  return api.get<MarketplaceDataResponse<MarketplacePromotion[]>>(`${API_V2}/marketplace/promotions/mine`);
+}
+
+export function promoteMarketplaceListing(id: number, promotionType: MarketplacePromotionProduct['type']): Promise<MarketplaceDataResponse<MarketplacePromotion>> {
+  return api.post<MarketplaceDataResponse<MarketplacePromotion>>(`${API_V2}/marketplace/listings/${id}/promote`, {
+    promotion_type: promotionType,
+  });
+}
+
+export function getMarketplacePickupSlots(): Promise<MarketplaceDataResponse<MarketplacePickupSlot[]>> {
+  return api.get<MarketplaceDataResponse<MarketplacePickupSlot[]>>(`${API_V2}/marketplace/seller/pickup-slots`);
+}
+
+export function createMarketplacePickupSlot(payload: {
+  slot_start: string;
+  slot_end: string;
+  capacity?: number;
+  is_active?: boolean;
+}): Promise<MarketplaceDataResponse<MarketplacePickupSlot>> {
+  return api.post<MarketplaceDataResponse<MarketplacePickupSlot>>(`${API_V2}/marketplace/seller/pickup-slots`, payload);
+}
+
+export function deleteMarketplacePickupSlot(id: number): Promise<MarketplaceDataResponse<{ deleted: boolean }>> {
+  return api.delete<MarketplaceDataResponse<{ deleted: boolean }>>(`${API_V2}/marketplace/seller/pickup-slots/${id}`);
+}
+
+export function getMyMarketplacePickups(): Promise<MarketplaceDataResponse<MarketplacePickupReservation[]>> {
+  return api.get<MarketplaceDataResponse<MarketplacePickupReservation[]>>(`${API_V2}/marketplace/me/pickups`);
+}
+
+export function scanMarketplacePickup(qrCode: string): Promise<MarketplaceDataResponse<MarketplacePickupReservation>> {
+  return api.post<MarketplaceDataResponse<MarketplacePickupReservation>>(`${API_V2}/marketplace/seller/pickup-scan`, { qr_code: qrCode });
+}
+
+export function getMerchantCoupons(): Promise<MarketplaceDataResponse<{ items: MerchantCoupon[] }>> {
+  return api.get<MarketplaceDataResponse<{ items: MerchantCoupon[] }>>(`${API_V2}/marketplace/seller/coupons`);
+}
+
+export function createMerchantCoupon(payload: {
+  title: string;
+  code?: string | null;
+  description?: string | null;
+  discount_type: 'percent' | 'fixed' | 'bogo';
+  discount_value?: number | null;
+  status?: 'draft' | 'active' | 'paused';
+}): Promise<MarketplaceDataResponse<MerchantCoupon>> {
+  return api.post<MarketplaceDataResponse<MerchantCoupon>>(`${API_V2}/marketplace/seller/coupons`, payload);
+}
+
+export function deleteMerchantCoupon(id: number): Promise<MarketplaceDataResponse<{ deleted: boolean }>> {
+  return api.delete<MarketplaceDataResponse<{ deleted: boolean }>>(`${API_V2}/marketplace/seller/coupons/${id}`);
 }
 
 export function marketplaceNextCursor<T>(response: MarketplaceCollectionResponse<T>): string | null {

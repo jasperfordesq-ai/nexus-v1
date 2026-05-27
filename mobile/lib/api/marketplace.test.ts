@@ -14,14 +14,25 @@ jest.mock('@/lib/constants', () => ({
 import { api } from '@/lib/api/client';
 import {
   createMarketplaceListing,
+  createMarketplaceCollection,
+  createMarketplacePickupSlot,
+  createMarketplaceSavedSearch,
+  createMerchantCoupon,
   getMarketplaceCategories,
+  getMarketplaceCollections,
   getMarketplaceListing,
   getMarketplaceListings,
   getMarketplaceOffers,
+  getMarketplacePickupSlots,
+  getMarketplaceSavedSearches,
   getMyMarketplaceListings,
+  getMyMarketplacePickups,
+  getMyMarketplacePromotions,
   makeMarketplaceOffer,
   marketplaceHasMore,
   marketplaceNextCursor,
+  promoteMarketplaceListing,
+  scanMarketplacePickup,
   updateMarketplaceListing,
   uploadMarketplaceImages,
 } from './marketplace';
@@ -123,5 +134,66 @@ describe('marketplace api', () => {
     await uploadMarketplaceImages(8, ['file:///tmp/a.jpg']);
 
     expect(api.upload).toHaveBeenCalledWith('/api/v2/marketplace/listings/8/images', expect.any(FormData));
+  });
+
+  it('wires marketplace discovery collections and saved searches', async () => {
+    (api.get as jest.Mock).mockResolvedValue({ data: [] });
+    (api.post as jest.Mock).mockResolvedValue({ data: { id: 1 } });
+
+    await getMarketplaceCollections();
+    expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/collections');
+
+    await createMarketplaceCollection({ name: 'Garden kit', description: 'Useful things', is_public: false });
+    expect(api.post).toHaveBeenCalledWith('/api/v2/marketplace/collections', {
+      name: 'Garden kit',
+      description: 'Useful things',
+      is_public: false,
+    });
+
+    await getMarketplaceSavedSearches();
+    expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/saved-searches');
+
+    await createMarketplaceSavedSearch({ name: 'Bikes', search_query: 'bike', alert_frequency: 'daily', alert_channel: 'push' });
+    expect(api.post).toHaveBeenCalledWith('/api/v2/marketplace/saved-searches', {
+      name: 'Bikes',
+      search_query: 'bike',
+      alert_frequency: 'daily',
+      alert_channel: 'push',
+    });
+  });
+
+  it('wires promotions, pickups, and seller coupons', async () => {
+    (api.get as jest.Mock).mockResolvedValue({ data: [] });
+    (api.post as jest.Mock).mockResolvedValue({ data: { id: 1 } });
+
+    await getMyMarketplacePromotions();
+    expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/promotions/mine');
+
+    await promoteMarketplaceListing(9, 'featured');
+    expect(api.post).toHaveBeenCalledWith('/api/v2/marketplace/listings/9/promote', { promotion_type: 'featured' });
+
+    await getMarketplacePickupSlots();
+    expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/seller/pickup-slots');
+
+    await createMarketplacePickupSlot({ slot_start: '2026-06-01 10:00', slot_end: '2026-06-01 12:00', capacity: 4 });
+    expect(api.post).toHaveBeenCalledWith('/api/v2/marketplace/seller/pickup-slots', {
+      slot_start: '2026-06-01 10:00',
+      slot_end: '2026-06-01 12:00',
+      capacity: 4,
+    });
+
+    await getMyMarketplacePickups();
+    expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/me/pickups');
+
+    await scanMarketplacePickup('abc123');
+    expect(api.post).toHaveBeenCalledWith('/api/v2/marketplace/seller/pickup-scan', { qr_code: 'abc123' });
+
+    await createMerchantCoupon({ title: 'June discount', discount_type: 'percent', discount_value: 10, status: 'active' });
+    expect(api.post).toHaveBeenCalledWith('/api/v2/marketplace/seller/coupons', {
+      title: 'June discount',
+      discount_type: 'percent',
+      discount_value: 10,
+      status: 'active',
+    });
   });
 });

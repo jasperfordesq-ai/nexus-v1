@@ -11,6 +11,8 @@
     "sell": "Sell item",
     "myListings": "My listings",
     "offers": "Offers",
+    "orders": "Orders",
+    "tools": "Tools",
     "browse": "Browse marketplace",
     "view": "View"
   },
@@ -213,6 +215,95 @@
     "verified": "Verified",
     "empty": "No active listings",
     "emptyHint": "This seller does not have public listings right now."
+  },
+  "tools": {
+    "eyebrow": "Seller and discovery tools",
+    "title": "Marketplace tools",
+    "subtitle": "Manage saved searches, collections, promotions, pickup slots, and seller coupons.",
+    "delete": "Delete",
+    "tabs": {
+      "collections": "Collections",
+      "savedSearches": "Saved searches",
+      "promotions": "Promotions",
+      "pickups": "Pickups",
+      "coupons": "Coupons"
+    },
+    "collections": {
+      "title": "Collections",
+      "subtitle": "Group useful listings into private or public collections.",
+      "name": "Name",
+      "namePlaceholder": "Weekend project ideas",
+      "description": "Description",
+      "descriptionPlaceholder": "Optional note",
+      "create": "Create collection",
+      "empty": "No collections yet",
+      "count": "{{count}} listings",
+      "saveFailed": "Could not create this collection.",
+      "deleteFailed": "Could not delete this collection."
+    },
+    "savedSearches": {
+      "title": "Saved searches",
+      "subtitle": "Save a marketplace search and keep alerts close to the mobile app.",
+      "name": "Name",
+      "namePlaceholder": "Bikes under 100",
+      "query": "Search query",
+      "queryPlaceholder": "bike, tools, sofa...",
+      "create": "Save search",
+      "empty": "No saved searches yet",
+      "saveFailed": "Could not save this search.",
+      "deleteFailed": "Could not delete this search.",
+      "frequency": {
+        "instant": "Instant alerts",
+        "daily": "Daily alerts",
+        "weekly": "Weekly alerts"
+      }
+    },
+    "promotions": {
+      "title": "Promotions",
+      "subtitle": "Promote your listings and review active promotion metrics.",
+      "promote": "Promote listing",
+      "empty": "No active promotions",
+      "failed": "Could not promote this listing.",
+      "metrics": "{{impressions}} impressions · {{clicks}} clicks",
+      "types": {
+        "bump": "Bump",
+        "featured": "Featured",
+        "top_of_category": "Top of category",
+        "homepage_carousel": "Homepage carousel"
+      }
+    },
+    "pickups": {
+      "title": "Pickups",
+      "subtitle": "Create click-and-collect slots, scan pickup QR codes, and review reservations.",
+      "start": "Slot start",
+      "startPlaceholder": "2026-06-01 10:00",
+      "end": "Slot end",
+      "endPlaceholder": "2026-06-01 12:00",
+      "createSlot": "Create pickup slot",
+      "qr": "QR code",
+      "qrPlaceholder": "Paste or scan pickup code",
+      "scan": "Mark pickup complete",
+      "slotFailed": "Could not create this pickup slot.",
+      "scanFailed": "Could not scan this pickup code.",
+      "deleteFailed": "Could not delete this pickup slot.",
+      "emptySlots": "No pickup slots yet",
+      "emptyReservations": "No pickup reservations yet",
+      "capacity": "{{booked}}/{{capacity}} booked",
+      "order": "Order {{order}}"
+    },
+    "coupons": {
+      "title": "Seller coupons",
+      "subtitle": "Create and manage merchant coupons for marketplace checkout.",
+      "name": "Coupon title",
+      "namePlaceholder": "June community discount",
+      "value": "Discount percent",
+      "valuePlaceholder": "10",
+      "create": "Create coupon",
+      "empty": "No seller coupons yet",
+      "discount": "{{value}}% · {{status}}",
+      "saveFailed": "Could not create this coupon.",
+      "deleteFailed": "Could not delete this coupon."
+    }
   },
   "hub": {
     "unable_to_load": "Could not load marketplace listings.",

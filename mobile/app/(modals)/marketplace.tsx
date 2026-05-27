@@ -213,6 +213,16 @@ function MarketplaceScreen() {
                     <HeroButton.Label>{t('actions.myListings')}</HeroButton.Label>
                   </HeroButton>
                 </View>
+                <View className="flex-row gap-2">
+                  <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-orders' as Href)}>
+                    <Ionicons name="receipt-outline" size={16} color={primary} />
+                    <HeroButton.Label>{t('actions.orders')}</HeroButton.Label>
+                  </HeroButton>
+                  <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-tools' as Href)}>
+                    <Ionicons name="construct-outline" size={16} color={primary} />
+                    <HeroButton.Label>{t('actions.tools')}</HeroButton.Label>
+                  </HeroButton>
+                </View>
               </HeroCard.Body>
             </HeroCard>
 
