@@ -234,7 +234,7 @@ export function BiometricSettings() {
   // Still checking
   if (supported === null || loading) {
     return (
-      <div className="w-full p-4 rounded-lg bg-theme-elevated text-left">
+      <div className="w-full p-4 rounded-lg bg-theme-elevated text-left" role="status" aria-busy="true" aria-label="Loading">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-lg bg-indigo-500/20">
             <Fingerprint className="w-5 h-5 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />

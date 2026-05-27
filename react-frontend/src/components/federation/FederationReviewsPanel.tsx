@@ -184,7 +184,7 @@ export function FederationReviewsPanel({ memberId, tenantId }: FederationReviews
   // ─── Loading ────────────────────────────────────────────────────────────
   if (isLoading) {
     return (
-      <div className="space-y-3" aria-busy="true">
+      <div className="space-y-3" role="status" aria-busy="true" aria-label="Loading">
         {[0, 1, 2].map((i) => (
           <Card key={i} className="bg-theme-elevated">
             <CardBody className="gap-3">

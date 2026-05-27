@@ -225,7 +225,7 @@ export function CommunityProjectsTab() {
 
       {/* Loading */}
       {!error && isLoading && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4" role="status" aria-busy="true" aria-label="Loading">
           {[1, 2, 3, 4].map((i) => (
             <GlassCard key={i} className="p-5 animate-pulse">
               <div className="h-5 bg-theme-hover rounded w-2/3 mb-3" />

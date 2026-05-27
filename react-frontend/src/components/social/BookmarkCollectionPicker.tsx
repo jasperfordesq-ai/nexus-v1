@@ -53,7 +53,7 @@ export function BookmarkCollectionPicker({ selectedId, onSelect, onClose }: Book
 
   if (isLoading) {
     return (
-      <div className="flex justify-center p-4">
+      <div className="flex justify-center p-4" role="status" aria-busy="true" aria-label="Loading">
         <Spinner size="sm" />
       </div>
     );

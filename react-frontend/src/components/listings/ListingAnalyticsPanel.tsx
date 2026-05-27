@@ -70,7 +70,7 @@ export function ListingAnalyticsPanel({ listingId }: ListingAnalyticsPanelProps)
   if (isLoading) {
     return (
       <GlassCard className="p-6">
-        <div className="flex items-center justify-center py-8">
+        <div className="flex items-center justify-center py-8" role="status" aria-busy="true" aria-label="Loading">
           <Spinner size="lg" />
         </div>
       </GlassCard>

@@ -103,7 +103,7 @@ export function FederationCommunityPicker({ isOpen, onClose, onSelect }: Props) 
           />
 
           {loading ? (
-            <div className="flex justify-center py-12">
+            <div className="flex justify-center py-12" role="status" aria-busy="true" aria-label="Loading">
               <Spinner size="md" />
             </div>
           ) : filteredPeers.length === 0 ? (

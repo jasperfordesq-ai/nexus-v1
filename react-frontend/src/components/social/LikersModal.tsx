@@ -83,7 +83,7 @@ export function LikersModal({ isOpen, onClose, loadLikers, likesCount }: LikersM
         </ModalHeader>
         <ModalBody className="pb-4">
           {isLoading && likers.length === 0 ? (
-            <div className="flex justify-center py-8">
+            <div className="flex justify-center py-8" role="status" aria-busy="true" aria-label="Loading">
               <Spinner size="md" />
             </div>
           ) : likers.length === 0 ? (

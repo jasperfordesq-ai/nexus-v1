@@ -1172,7 +1172,7 @@ function HoursTab() {
       {!error && (
         <>
           {isLoading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4" role="status" aria-busy="true" aria-label="Loading">
               {[1, 2, 3].map((i) => (
                 <GlassCard key={i} className="p-5 animate-pulse">
                   <div className="h-8 bg-theme-hover rounded w-1/2 mb-2" />

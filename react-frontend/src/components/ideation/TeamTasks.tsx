@@ -284,7 +284,7 @@ export function TeamTasks({ groupId, isGroupAdmin, members = [] }: TeamTasksProp
 
       {/* Loading */}
       {isLoading && (
-        <div className="flex justify-center py-8">
+        <div className="flex justify-center py-8" role="status" aria-busy="true" aria-label="Loading">
           <Spinner size="md" />
         </div>
       )}

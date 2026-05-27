@@ -685,7 +685,7 @@ export function JobDetailPage() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6" role="status" aria-busy="true" aria-label="Loading">
         <PageMeta title={t('detail.loading')} noIndex />
         <GlassCard className="p-6 animate-pulse">
           <div className="h-8 bg-theme-hover rounded w-1/2 mb-4" />

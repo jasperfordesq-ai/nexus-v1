@@ -168,6 +168,9 @@ export function MapSearchView({
       <div
         className={`rounded-xl bg-surface-secondary animate-pulse flex items-center justify-center ${className}`}
         style={{ height }}
+        role="status"
+        aria-busy="true"
+        aria-label="Loading"
       >
         <Spinner size="lg" color="accent" />
       </div>

@@ -59,7 +59,7 @@ export function MostAppreciatedWidget({ period = 'last_30d', limit = 10, classNa
       </CardHeader>
       <CardBody className="space-y-2">
         {loading ? (
-          <div className="flex justify-center py-6"><Spinner size="sm" /></div>
+          <div className="flex justify-center py-6" role="status" aria-busy="true" aria-label="Loading"><Spinner size="sm" /></div>
         ) : rows.length === 0 ? (
           <p className="text-sm text-[var(--text-muted)]">
             {t('appreciations.most_empty')}

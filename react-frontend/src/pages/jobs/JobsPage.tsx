@@ -636,7 +636,7 @@ export function JobsPage() {
       {activeTab === 'saved' && (
         <>
           {isLoadingSaved ? (
-            <div className="space-y-4">
+            <div className="space-y-4" role="status" aria-busy="true" aria-label="Loading">
               {[1, 2].map((i) => (
                 <GlassCard key={i} className="p-5 animate-pulse">
                   <div className="flex gap-4">
@@ -687,7 +687,7 @@ export function JobsPage() {
             </Link>
           </div>
           {isLoadingMyPostings ? (
-            <div className="space-y-4">
+            <div className="space-y-4" role="status" aria-busy="true" aria-label="Loading">
               {[1, 2].map((i) => (
                 <GlassCard key={i} className="p-5 animate-pulse">
                   <div className="flex gap-4">

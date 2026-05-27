@@ -189,7 +189,7 @@ export function AccessibilityTab() {
 
       {/* Loading */}
       {!error && isLoading && (
-        <div className="space-y-4">
+        <div className="space-y-4" role="status" aria-busy="true" aria-label="Loading">
           {[1, 2].map((i) => (
             <GlassCard key={i} className="p-5 animate-pulse">
               <div className="h-4 bg-theme-hover rounded w-1/4 mb-3" />

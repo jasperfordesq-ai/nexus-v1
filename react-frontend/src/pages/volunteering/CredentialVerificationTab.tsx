@@ -276,7 +276,7 @@ export function CredentialVerificationTab() {
 
       {/* Loading */}
       {!error && isLoading && (
-        <div className="space-y-4">
+        <div className="space-y-4" role="status" aria-busy="true" aria-label="Loading">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
               <GlassCard key={i} className="p-5 animate-pulse">

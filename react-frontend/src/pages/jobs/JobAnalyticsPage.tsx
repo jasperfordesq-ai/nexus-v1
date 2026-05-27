@@ -209,7 +209,7 @@ export function JobAnalyticsPage() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6" role="status" aria-busy="true" aria-label="Loading">
         <div className="h-8 bg-theme-hover rounded w-1/3 animate-pulse" />
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (

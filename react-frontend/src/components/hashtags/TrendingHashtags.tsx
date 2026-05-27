@@ -54,7 +54,7 @@ export function TrendingHashtags({ limit = 10 }: { limit?: number }) {
           <TrendingUp className="w-4 h-4 text-indigo-500" aria-hidden="true" />
           <h3 className="font-semibold text-theme-primary text-sm">{t('trending.title')}</h3>
         </div>
-        <div className="flex justify-center py-3">
+        <div className="flex justify-center py-3" role="status" aria-busy="true" aria-label="Loading">
           <Spinner size="sm" />
         </div>
       </GlassCard>

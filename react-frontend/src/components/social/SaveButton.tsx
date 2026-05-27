@@ -192,7 +192,7 @@ export function SaveButton({
           </p>
 
           {isLoading ? (
-            <div className="flex justify-center py-4"><Spinner size="sm" /></div>
+            <div className="flex justify-center py-4" role="status" aria-busy="true" aria-label="Loading"><Spinner size="sm" /></div>
           ) : (
             <>
               <Button

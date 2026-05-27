@@ -312,7 +312,7 @@ export function QualificationModal({
                   </div>
                 </div>
               ) : (
-                <div className="flex justify-center py-8">
+                <div className="flex justify-center py-8" role="status" aria-busy="true" aria-label="Loading">
                   <Spinner />
                 </div>
               )}
