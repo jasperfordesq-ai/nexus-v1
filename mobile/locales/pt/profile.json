@@ -15,6 +15,7 @@
   "actions": "Acoes",
   "search": "Search",
   "listings": "Listings",
+  "marketplace": "Marketplace",
   "jobs": "Jobs",
   "wallet": "Wallet",
   "messages": "Messages",
@@ -30,6 +31,7 @@
   "navDescriptions": {
     "search": "Search listings, members, events, groups, and posts.",
     "listings": "Browse offers, requests, and timebank exchanges.",
+    "marketplace": "Buy, sell, save, and manage community marketplace listings.",
     "jobs": "Browse job vacancies, applications, and your own postings.",
     "wallet": "Review your balance, transactions, and time credit history.",
     "messages": "Open conversations and federation messages.",

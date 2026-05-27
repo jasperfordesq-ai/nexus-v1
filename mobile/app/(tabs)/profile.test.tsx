@@ -29,6 +29,7 @@ jest.mock('react-i18next', () => ({
         'messages': 'Messages',
         'notifications': 'Notifications',
         'listings': 'Listings',
+        'marketplace': 'Marketplace',
         'signOut': 'Sign out',
         'signOutConfirmTitle': 'Sign out',
         'signOutConfirmMessage': 'Are you sure you want to sign out?',
@@ -63,6 +64,7 @@ jest.mock('react-i18next', () => ({
         'navDescriptions.groups': 'Your community spaces and group conversations.',
         'navDescriptions.search': 'Search listings, members, events, groups, and posts.',
         'navDescriptions.listings': 'Browse offers, requests, and timebank exchanges.',
+        'navDescriptions.marketplace': 'Buy, sell, save, and manage community marketplace listings.',
         'navDescriptions.jobs': 'Browse job vacancies, applications, and your own postings.',
         'navDescriptions.events': 'Browse workshops, meetups, and community gatherings.',
         'navDescriptions.browseMembers': 'Find neighbours by name, profile, or shared interests.',
@@ -180,6 +182,7 @@ describe('MoreScreen (More tab)', () => {
     expect(getByText('Discover')).toBeTruthy();
     expect(getByText('Search')).toBeTruthy();
     expect(getByText('Listings')).toBeTruthy();
+    expect(getByText('Marketplace')).toBeTruthy();
     expect(getByText('Jobs')).toBeTruthy();
     expect(getByText('Events')).toBeTruthy();
     expect(getByText('Browse Members')).toBeTruthy();

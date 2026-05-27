@@ -249,6 +249,38 @@ function RootNavigator() {
         options={{ ...modalOptions, headerShown: false, title: t('jobs:title') }}
       />
       <Stack.Screen
+        name="(modals)/marketplace"
+        options={{ ...modalOptions, headerShown: false, title: t('marketplace:title') }}
+      />
+      <Stack.Screen
+        name="(modals)/marketplace-detail"
+        options={{ ...modalOptions, headerShown: false, title: t('marketplace:detail.title') }}
+      />
+      <Stack.Screen
+        name="(modals)/new-marketplace-listing"
+        options={{ ...modalOptions, headerShown: false, title: t('marketplace:forms.createTitle') }}
+      />
+      <Stack.Screen
+        name="(modals)/edit-marketplace-listing"
+        options={{ ...modalOptions, headerShown: false, title: t('marketplace:forms.editTitle') }}
+      />
+      <Stack.Screen
+        name="(modals)/marketplace-my-listings"
+        options={{ ...modalOptions, headerShown: false, title: t('marketplace:myListings.title') }}
+      />
+      <Stack.Screen
+        name="(modals)/marketplace-offers"
+        options={{ ...modalOptions, headerShown: false, title: t('marketplace:offers.title') }}
+      />
+      <Stack.Screen
+        name="(modals)/marketplace-orders"
+        options={{ ...modalOptions, headerShown: false, title: t('marketplace:orders.title') }}
+      />
+      <Stack.Screen
+        name="(modals)/marketplace-seller"
+        options={{ ...modalOptions, headerShown: false, title: t('marketplace:seller.title') }}
+      />
+      <Stack.Screen
         name="(modals)/job-detail"
         options={{ ...modalOptions, headerShown: false, title: t('jobs:detailTitle') }}
       />

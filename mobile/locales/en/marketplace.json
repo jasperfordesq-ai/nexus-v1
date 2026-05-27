@@ -1,0 +1,221 @@
+{
+  "title": "Marketplace",
+  "eyebrow": "Community marketplace",
+  "subtitle": "Browse, sell, save, and manage community marketplace listings.",
+  "loadMore": "Load more",
+  "featureGate": {
+    "title": "Marketplace is not available",
+    "description": "This community has not enabled marketplace listings."
+  },
+  "actions": {
+    "sell": "Sell item",
+    "myListings": "My listings",
+    "offers": "Offers",
+    "browse": "Browse marketplace",
+    "view": "View"
+  },
+  "search": {
+    "placeholder": "Search marketplace..."
+  },
+  "featured": {
+    "title": "Featured listings",
+    "count": "{{count}} featured"
+  },
+  "filters": {
+    "allCategories": "All categories",
+    "noCategory": "No category",
+    "priceType": {
+      "all": "All prices",
+      "free": "Free",
+      "fixed": "Fixed price",
+      "negotiable": "Negotiable",
+      "contact": "Contact seller",
+      "auction": "Auction"
+    }
+  },
+  "empty": {
+    "title": "No marketplace listings yet",
+    "subtitle": "Try another search or post the first listing."
+  },
+  "common": {
+    "free": "Free",
+    "seller": "Seller",
+    "save_failed": "Could not update saved listings."
+  },
+  "priceType": {
+    "fixed": "Fixed price",
+    "negotiable": "Negotiable",
+    "free": "Free",
+    "auction": "Auction",
+    "contact": "Contact seller"
+  },
+  "condition": {
+    "new": "New",
+    "like_new": "Like new",
+    "good": "Good",
+    "fair": "Fair",
+    "poor": "Poor"
+  },
+  "delivery_method": {
+    "pickup": "Local pickup",
+    "shipping": "Shipping",
+    "both": "Pickup or shipping",
+    "community_delivery": "Community delivery",
+    "other": "Delivery options"
+  },
+  "sellerType": {
+    "private": "Private seller",
+    "business": "Business"
+  },
+  "detail": {
+    "title": "Listing details",
+    "invalid": "Invalid listing",
+    "invalidHint": "We could not identify which listing to open.",
+    "notFound": "Listing not found",
+    "notFoundHint": "This item may have been sold, removed, or moved.",
+    "share": "Share listing",
+    "noImages": "No images yet",
+    "seller": "Seller",
+    "verifiedSeller": "Verified seller",
+    "communitySeller": "Community seller",
+    "viewSeller": "View seller profile",
+    "description": "Description",
+    "quantity": "{{count}} available",
+    "views": "{{count}} views",
+    "save": "Save",
+    "saved": "Saved",
+    "unsave": "Remove from saved",
+    "makeOffer": "Make offer",
+    "buyNow": "Buy now",
+    "orderCreated": "Order created",
+    "orderCreatedHint": "Order {{order}} was created. Payment and delivery details can be managed from orders.",
+    "orderFailed": "Could not create the order."
+  },
+  "forms": {
+    "eyebrow": "New marketplace listing",
+    "createTitle": "Sell an item",
+    "editTitle": "Edit listing",
+    "subtitle": "Use the same marketplace fields as the web app so buyers get complete details.",
+    "title": "Title",
+    "titlePlaceholder": "What are you selling?",
+    "tagline": "Short tagline",
+    "taglinePlaceholder": "A quick summary for browsing cards",
+    "description": "Description",
+    "descriptionPlaceholder": "Condition, measurements, collection details, and anything buyers should know.",
+    "priceType": "Price type",
+    "price": "Price",
+    "pricePlaceholder": "0.00",
+    "timeCredits": "Time credits",
+    "timeCreditsPlaceholder": "Optional time-credit value",
+    "condition": "Condition",
+    "category": "Category",
+    "quantity": "Quantity",
+    "location": "Location",
+    "locationPlaceholder": "Where can buyers collect or view it?",
+    "delivery": "Delivery",
+    "sellerType": "Seller type",
+    "media": "Images",
+    "addImages": "Add images",
+    "mediaHint": "Add up to 8 images now. Reordering and video upload remain available on the web seller tools.",
+    "permissionTitle": "Permission needed",
+    "permissionMessage": "Please allow access to your photo library to add marketplace images.",
+    "footerCreateTitle": "Review listing",
+    "footerEditTitle": "Review changes",
+    "footerSubtitle": "Publish the listing when the details are ready.",
+    "publish": "Publish",
+    "update": "Update",
+    "validation": "Validation",
+    "required": "Title and description are required.",
+    "loadFailed": "Could not load this listing.",
+    "saveFailed": "Could not save this listing."
+  },
+  "owner": {
+    "title": "Seller tools",
+    "edit": "Edit",
+    "manage": "Manage",
+    "renew": "Renew",
+    "delete": "Delete",
+    "deleteTitle": "Delete listing",
+    "deleteMessage": "Remove this marketplace listing?",
+    "deleteFailed": "Could not delete this listing.",
+    "renewFailed": "Could not renew this listing."
+  },
+  "myListings": {
+    "eyebrow": "Seller dashboard",
+    "title": "My listings",
+    "subtitle": "Manage active listings, renew items, and review sales signals.",
+    "active": "{{count}} active",
+    "sales": "{{count}} sales",
+    "offers": "{{count}} offers",
+    "empty": "No marketplace listings yet",
+    "emptyHint": "Create a listing to start selling in your community."
+  },
+  "offers": {
+    "eyebrow": "Negotiations",
+    "title": "Marketplace offers",
+    "subtitle": "Review received offers and track offers you have made.",
+    "received": "Received",
+    "sentTab": "Sent",
+    "listing": "Listing",
+    "makeTitle": "Make an offer",
+    "amount": "Offer amount",
+    "amountPlaceholder": "0.00",
+    "message": "Message",
+    "messagePlaceholder": "Add a note for the seller",
+    "amountRequired": "Enter a valid offer amount.",
+    "submit": "Send offer",
+    "sent": "Offer sent",
+    "sentHint": "The seller can now accept, decline, or counter.",
+    "failed": "Could not send this offer.",
+    "empty": "No offers yet",
+    "emptyHint": "Offers you send or receive will appear here.",
+    "accept": "Accept",
+    "decline": "Decline",
+    "withdraw": "Withdraw",
+    "actionFailed": "Could not update this offer.",
+    "status": {
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "declined": "Declined",
+      "countered": "Countered",
+      "expired": "Expired",
+      "withdrawn": "Withdrawn"
+    }
+  },
+  "orders": {
+    "eyebrow": "Marketplace orders",
+    "title": "Orders",
+    "subtitle": "Track purchases and sales from marketplace checkout.",
+    "purchases": "Purchases",
+    "sales": "Sales",
+    "number": "Order {{number}}",
+    "empty": "No orders yet",
+    "emptyHint": "Marketplace purchases and sales will appear here.",
+    "status": {
+      "pending": "Pending",
+      "paid": "Paid",
+      "processing": "Processing",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "disputed": "Disputed"
+    }
+  },
+  "seller": {
+    "eyebrow": "Seller profile",
+    "title": "Seller profile",
+    "notFound": "Seller not found",
+    "notFoundHint": "This seller profile is not available.",
+    "rating": "{{rating}} rating",
+    "sales": "{{count}} sales",
+    "active": "{{count}} active",
+    "verified": "Verified",
+    "empty": "No active listings",
+    "emptyHint": "This seller does not have public listings right now."
+  },
+  "hub": {
+    "unable_to_load": "Could not load marketplace listings.",
+    "load_more_failed": "Could not load more listings."
+  }
+}

@@ -1,0 +1,131 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { Image, Pressable, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
+import { useTranslation } from 'react-i18next';
+
+import type { MarketplaceListingItem } from '@/lib/api/marketplace';
+import Avatar from '@/components/ui/Avatar';
+import { usePrimaryColor } from '@/lib/hooks/useTenant';
+import { useTheme } from '@/lib/hooks/useTheme';
+import { withAlpha } from '@/lib/utils/color';
+import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
+
+export function formatMarketplacePrice(
+  price: number | null | undefined,
+  priceType: string | undefined,
+  currency: string | undefined,
+  freeLabel: string,
+): string {
+  if (priceType === 'free' || price === null || price === undefined || Number(price) === 0) {
+    return freeLabel;
+  }
+
+  try {
+    return new Intl.NumberFormat(undefined, {
+      style: 'currency',
+      currency: currency || 'EUR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }).format(Number(price));
+  } catch {
+    return `${currency || 'EUR'} ${price}`;
+  }
+}
+
+export default function MarketplaceListingCard({
+  item,
+  onPress,
+  onSavePress,
+}: {
+  item: MarketplaceListingItem;
+  onPress: () => void;
+  onSavePress?: () => void;
+}) {
+  const { t } = useTranslation('marketplace');
+  const primary = usePrimaryColor();
+  const theme = useTheme();
+  const accent =
+    item.price_type === 'free'
+      ? theme.success
+      : item.is_promoted
+        ? theme.warning
+        : primary;
+  const imageUrl = resolveImageUrl(item.image?.thumbnail_url ?? item.image?.url ?? item.images?.[0]?.thumbnail_url ?? item.images?.[0]?.url);
+  const price = formatMarketplacePrice(item.price, item.price_type, item.price_currency, t('common.free'));
+
+  return (
+    <Pressable accessibilityRole="button" accessibilityLabel={item.title} onPress={onPress}>
+      <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
+        <View className="h-1.5" style={{ backgroundColor: accent }} />
+        <HeroCard.Body className="gap-3 p-3">
+          <View className="flex-row gap-3">
+            <Surface variant="secondary" className="h-24 w-24 items-center justify-center overflow-hidden rounded-panel-inner p-0">
+              {imageUrl ? (
+                <Image source={{ uri: imageUrl }} className="h-full w-full" resizeMode="cover" />
+              ) : (
+                <Ionicons name="bag-handle-outline" size={30} color={accent} />
+              )}
+            </Surface>
+
+            <View className="min-w-0 flex-1 gap-2">
+              <View className="flex-row items-start gap-2">
+                <View className="min-w-0 flex-1">
+                  <Text className="text-base font-bold leading-5" style={{ color: theme.text }} numberOfLines={2}>
+                    {item.title}
+                  </Text>
+                  {item.tagline ? (
+                    <Text className="mt-0.5 text-xs leading-4" style={{ color: theme.textSecondary }} numberOfLines={2}>
+                      {item.tagline}
+                    </Text>
+                  ) : null}
+                </View>
+                {onSavePress ? (
+                  <Pressable accessibilityRole="button" accessibilityLabel={item.is_saved ? t('detail.unsave') : t('detail.save')} onPress={onSavePress}>
+                    <View className="size-9 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.12) }}>
+                      <Ionicons name={item.is_saved ? 'heart' : 'heart-outline'} size={18} color={primary} />
+                    </View>
+                  </Pressable>
+                ) : null}
+              </View>
+
+              <View className="flex-row flex-wrap gap-1.5">
+                <Chip size="sm" variant="secondary">
+                  <Ionicons name={item.price_type === 'free' ? 'gift-outline' : 'pricetag-outline'} size={12} color={accent} />
+                  <Chip.Label>{price}</Chip.Label>
+                </Chip>
+                {item.condition ? (
+                  <Chip size="sm" variant="secondary">
+                    <Chip.Label>{t(`condition.${item.condition}`)}</Chip.Label>
+                  </Chip>
+                ) : null}
+                {item.category?.name ? (
+                  <Chip size="sm" variant="secondary">
+                    <Chip.Label>{item.category.name}</Chip.Label>
+                  </Chip>
+                ) : null}
+              </View>
+
+              <View className="flex-row items-center gap-2">
+                <Avatar uri={item.user?.avatar_url} name={item.user?.name} size={28} />
+                <View className="min-w-0 flex-1">
+                  <Text className="text-xs font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+                    {item.user?.name ?? t('common.seller')}
+                  </Text>
+                  <Text className="text-[11px]" style={{ color: theme.textMuted }} numberOfLines={1}>
+                    {item.location || t(`delivery_method.${item.delivery_method || 'other'}`)}
+                  </Text>
+                </View>
+                {item.user?.is_verified ? <Ionicons name="shield-checkmark-outline" size={16} color={theme.success} /> : null}
+              </View>
+            </View>
+          </View>
+        </HeroCard.Body>
+      </HeroCard>
+    </Pressable>
+  );
+}

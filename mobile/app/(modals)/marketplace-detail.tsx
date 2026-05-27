@@ -1,0 +1,395 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { useEffect, useState } from 'react';
+import { Alert, Image, Modal, ScrollView, Share, TextInput, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { router, useLocalSearchParams, type Href } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
+import { useTranslation } from 'react-i18next';
+import * as Haptics from '@/lib/haptics';
+
+import AppTopBar from '@/components/ui/AppTopBar';
+import Avatar from '@/components/ui/Avatar';
+import EmptyState from '@/components/ui/EmptyState';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
+import { formatMarketplacePrice } from '@/components/marketplace/MarketplaceListingCard';
+import {
+  createMarketplaceOrder,
+  getMarketplaceListing,
+  makeMarketplaceOffer,
+  saveMarketplaceListing,
+  unsaveMarketplaceListing,
+  type MarketplaceListingDetail,
+} from '@/lib/api/marketplace';
+import { APP_URL } from '@/lib/constants';
+import { usePrimaryColor } from '@/lib/hooks/useTenant';
+import { useTheme } from '@/lib/hooks/useTheme';
+import { useAuth } from '@/lib/hooks/useAuth';
+import { withAlpha } from '@/lib/utils/color';
+import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
+
+export default function MarketplaceDetailRoute() {
+  return (
+    <ModalErrorBoundary>
+      <MarketplaceDetailScreen />
+    </ModalErrorBoundary>
+  );
+}
+
+function MarketplaceDetailScreen() {
+  const { t } = useTranslation(['marketplace', 'common']);
+  const params = useLocalSearchParams<{ id?: string }>();
+  const primary = usePrimaryColor();
+  const theme = useTheme();
+  const { user } = useAuth();
+  const listingId = Number(params.id);
+  const safeId = Number.isFinite(listingId) && listingId > 0 ? listingId : 0;
+  const [listing, setListing] = useState<MarketplaceListingDetail | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isActionLoading, setIsActionLoading] = useState(false);
+  const [activeImage, setActiveImage] = useState(0);
+  const [offerOpen, setOfferOpen] = useState(false);
+  const [offerAmount, setOfferAmount] = useState('');
+  const [offerMessage, setOfferMessage] = useState('');
+
+  useEffect(() => {
+    void loadListing();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [safeId]);
+
+  async function loadListing() {
+    if (!safeId) {
+      setIsLoading(false);
+      return;
+    }
+    setIsLoading(true);
+    try {
+      const response = await getMarketplaceListing(safeId);
+      setListing(response.data);
+    } catch {
+      setListing(null);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  if (!safeId) {
+    return (
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('detail.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
+        <EmptyState icon="bag-handle-outline" title={t('detail.invalid')} subtitle={t('detail.invalidHint')} />
+      </SafeAreaView>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('detail.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
+        <View className="flex-1 items-center justify-center">
+          <LoadingSpinner />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!listing) {
+    return (
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('detail.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace' as Href} />
+        <EmptyState
+          icon="bag-handle-outline"
+          title={t('detail.notFound')}
+          subtitle={t('detail.notFoundHint')}
+          actionLabel={t('actions.browse')}
+          onAction={() => router.replace('/(modals)/marketplace' as Href)}
+        />
+      </SafeAreaView>
+    );
+  }
+
+  const images = listing.images?.length ? listing.images : listing.image ? [listing.image] : [];
+  const activeImageUrl = resolveImageUrl(images[activeImage]?.url ?? images[activeImage]?.thumbnail_url);
+  const accent = listing.price_type === 'free' ? theme.success : listing.is_promoted ? theme.warning : primary;
+  const priceLabel = formatMarketplacePrice(listing.price, listing.price_type, listing.price_currency, t('common.free'));
+  const isOwner = Boolean(listing.is_own || (user?.id && listing.user?.id === user.id));
+  const canBuy = !isOwner && listing.status === 'active' && listing.price_type !== 'contact' && listing.price_type !== 'auction';
+
+  async function handleToggleSave() {
+    if (!listing) return;
+    void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const previous = listing;
+    setListing({ ...listing, is_saved: !listing.is_saved });
+    try {
+      if (listing.is_saved) await unsaveMarketplaceListing(listing.id);
+      else await saveMarketplaceListing(listing.id);
+    } catch {
+      setListing(previous);
+      Alert.alert(t('common:errors.alertTitle'), t('common.save_failed'));
+    }
+  }
+
+  async function handleBuyNow() {
+    if (!listing || isActionLoading) return;
+    setIsActionLoading(true);
+    try {
+      const response = await createMarketplaceOrder({ listing_id: listing.id, quantity: 1 });
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      Alert.alert(t('detail.orderCreated'), t('detail.orderCreatedHint', { order: response.data.order_number }));
+    } catch (err) {
+      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('detail.orderFailed'));
+    } finally {
+      setIsActionLoading(false);
+    }
+  }
+
+  async function handleSubmitOffer() {
+    if (!listing || isActionLoading) return;
+    const amount = Number(offerAmount.replace(/[,\s]/g, ''));
+    if (!Number.isFinite(amount) || amount <= 0) {
+      Alert.alert(t('forms.validation'), t('offers.amountRequired'));
+      return;
+    }
+    setIsActionLoading(true);
+    try {
+      await makeMarketplaceOffer(listing.id, { amount, message: offerMessage.trim() || null });
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setOfferOpen(false);
+      setOfferAmount('');
+      setOfferMessage('');
+      Alert.alert(t('offers.sent'), t('offers.sentHint'));
+    } catch (err) {
+      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('offers.failed'));
+    } finally {
+      setIsActionLoading(false);
+    }
+  }
+
+  async function handleShare() {
+    try {
+      await Share.share({
+        title: listing!.title,
+        message: `${listing!.title}\n\n${APP_URL}/marketplace/${listing!.id}`,
+        url: `${APP_URL}/marketplace/${listing!.id}`,
+      });
+    } catch {
+      // Share dismissed.
+    }
+  }
+
+  return (
+    <SafeAreaView className="flex-1 bg-background">
+      <AppTopBar
+        title={t('detail.title')}
+        backLabel={t('common:back')}
+        fallbackHref={'/(modals)/marketplace' as Href}
+        rightAction={{ accessibilityLabel: t('detail.share'), icon: 'share-outline', onPress: handleShare }}
+      />
+
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 142 }}>
+        <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
+          <View className="h-1.5" style={{ backgroundColor: accent }} />
+          <HeroCard.Body className="gap-4 p-4">
+            <Surface variant="secondary" className="aspect-[4/3] items-center justify-center overflow-hidden rounded-panel-inner p-0">
+              {activeImageUrl ? (
+                <Image source={{ uri: activeImageUrl }} className="h-full w-full" resizeMode="cover" />
+              ) : (
+                <View className="items-center gap-2">
+                  <Ionicons name="bag-handle-outline" size={44} color={accent} />
+                  <Text className="text-sm" style={{ color: theme.textSecondary }}>{t('detail.noImages')}</Text>
+                </View>
+              )}
+            </Surface>
+
+            {images.length > 1 ? (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+                {images.map((image, index) => {
+                  const thumb = resolveImageUrl(image.thumbnail_url ?? image.url);
+                  return (
+                    <HeroButton
+                      key={`${image.id ?? index}`}
+                      isIconOnly
+                      variant={activeImage === index ? 'primary' : 'secondary'}
+                      onPress={() => setActiveImage(index)}
+                      style={activeImage === index ? { backgroundColor: primary } : undefined}
+                    >
+                      {thumb ? <Image source={{ uri: thumb }} className="size-9 rounded-xl" resizeMode="cover" /> : <Ionicons name="image-outline" size={17} color={activeImage === index ? '#fff' : primary} />}
+                    </HeroButton>
+                  );
+                })}
+              </ScrollView>
+            ) : null}
+
+            <View className="gap-2">
+              <View className="flex-row flex-wrap gap-2">
+                <Chip size="sm" variant="secondary">
+                  <Ionicons name={listing.price_type === 'free' ? 'gift-outline' : 'pricetag-outline'} size={12} color={accent} />
+                  <Chip.Label>{priceLabel}</Chip.Label>
+                </Chip>
+                <Chip size="sm" variant="secondary">
+                  <Chip.Label>{t(`priceType.${listing.price_type}`)}</Chip.Label>
+                </Chip>
+                {listing.condition ? (
+                  <Chip size="sm" variant="secondary">
+                    <Chip.Label>{t(`condition.${listing.condition}`)}</Chip.Label>
+                  </Chip>
+                ) : null}
+              </View>
+              <Text className="text-2xl font-bold leading-8" style={{ color: theme.text }}>{listing.title}</Text>
+              {listing.tagline ? <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{listing.tagline}</Text> : null}
+            </View>
+          </HeroCard.Body>
+        </HeroCard>
+
+        <HeroCard className="mb-3 rounded-panel p-0">
+          <HeroCard.Body className="gap-3 p-4">
+            <Text className="text-base font-bold" style={{ color: theme.text }}>{t('detail.seller')}</Text>
+            <Surface variant="secondary" className="flex-row items-center gap-3 rounded-panel-inner p-3">
+              <Avatar uri={listing.user?.avatar_url} name={listing.user?.name} size={44} />
+              <View className="min-w-0 flex-1">
+                <Text className="text-base font-semibold" style={{ color: theme.text }} numberOfLines={1}>
+                  {listing.user?.name ?? t('common.seller')}
+                </Text>
+                <Text className="text-xs" style={{ color: theme.textSecondary }} numberOfLines={1}>
+                  {listing.user?.is_verified ? t('detail.verifiedSeller') : t('detail.communitySeller')}
+                </Text>
+              </View>
+              {listing.user?.is_verified ? <Ionicons name="shield-checkmark-outline" size={20} color={theme.success} /> : null}
+            </Surface>
+            {listing.user?.id ? (
+              <HeroButton variant="secondary" onPress={() => router.push({ pathname: '/(modals)/marketplace-seller', params: { id: String(listing.user?.id) } } as unknown as Href)}>
+                <Ionicons name="storefront-outline" size={16} color={primary} />
+                <HeroButton.Label>{t('detail.viewSeller')}</HeroButton.Label>
+              </HeroButton>
+            ) : null}
+          </HeroCard.Body>
+        </HeroCard>
+
+        <HeroCard className="mb-3 rounded-panel p-0">
+          <HeroCard.Body className="gap-3 p-4">
+            <Text className="text-base font-bold" style={{ color: theme.text }}>{t('detail.description')}</Text>
+            <Text className="text-sm leading-6" style={{ color: theme.textSecondary }}>{listing.description}</Text>
+            <View className="flex-row flex-wrap gap-2">
+              {listing.location ? (
+                <Chip size="sm" variant="secondary">
+                  <Ionicons name="location-outline" size={12} color={primary} />
+                  <Chip.Label>{listing.location}</Chip.Label>
+                </Chip>
+              ) : null}
+              <Chip size="sm" variant="secondary">
+                <Ionicons name="cube-outline" size={12} color={theme.textSecondary} />
+                <Chip.Label>{t('detail.quantity', { count: listing.quantity })}</Chip.Label>
+              </Chip>
+              <Chip size="sm" variant="secondary">
+                <Ionicons name="eye-outline" size={12} color={theme.textSecondary} />
+                <Chip.Label>{t('detail.views', { count: listing.views_count })}</Chip.Label>
+              </Chip>
+              <Chip size="sm" variant="secondary">
+                <Ionicons name="car-outline" size={12} color={theme.textSecondary} />
+                <Chip.Label>{t(`delivery_method.${listing.delivery_method || 'other'}`)}</Chip.Label>
+              </Chip>
+            </View>
+          </HeroCard.Body>
+        </HeroCard>
+
+        {isOwner ? (
+          <HeroCard className="rounded-panel p-0">
+            <HeroCard.Body className="gap-3 p-4">
+              <Text className="text-base font-bold" style={{ color: theme.text }}>{t('owner.title')}</Text>
+              <View className="flex-row gap-2">
+                <HeroButton className="flex-1" variant="primary" onPress={() => router.push({ pathname: '/(modals)/edit-marketplace-listing', params: { id: String(listing.id) } } as unknown as Href)} style={{ backgroundColor: primary }}>
+                  <Ionicons name="create-outline" size={16} color="#fff" />
+                  <HeroButton.Label>{t('owner.edit')}</HeroButton.Label>
+                </HeroButton>
+                <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-my-listings' as Href)}>
+                  <Ionicons name="stats-chart-outline" size={16} color={primary} />
+                  <HeroButton.Label>{t('owner.manage')}</HeroButton.Label>
+                </HeroButton>
+              </View>
+            </HeroCard.Body>
+          </HeroCard>
+        ) : null}
+      </ScrollView>
+
+      {!isOwner ? (
+        <Surface variant="default" className="border-t border-border/50 px-4 pt-3 pb-4">
+          <View className="flex-row gap-2">
+            <HeroButton className="flex-1" variant="secondary" onPress={handleToggleSave}>
+              <Ionicons name={listing.is_saved ? 'heart' : 'heart-outline'} size={17} color={primary} />
+              <HeroButton.Label>{listing.is_saved ? t('detail.saved') : t('detail.save')}</HeroButton.Label>
+            </HeroButton>
+            <HeroButton className="flex-1" variant="secondary" onPress={() => setOfferOpen(true)}>
+              <Ionicons name="hand-left-outline" size={17} color={primary} />
+              <HeroButton.Label>{t('detail.makeOffer')}</HeroButton.Label>
+            </HeroButton>
+            {canBuy ? (
+              <HeroButton className="flex-1" variant="primary" onPress={handleBuyNow} isDisabled={isActionLoading} style={{ backgroundColor: primary }}>
+                <Ionicons name="card-outline" size={17} color="#fff" />
+                <HeroButton.Label>{t('detail.buyNow')}</HeroButton.Label>
+              </HeroButton>
+            ) : null}
+          </View>
+        </Surface>
+      ) : null}
+
+      <Modal visible={offerOpen} transparent animationType="slide" onRequestClose={() => setOfferOpen(false)}>
+        <View className="flex-1 justify-end bg-black/40">
+          <Surface variant="default" className="rounded-t-[28px] p-4">
+            <View className="mb-4 flex-row items-center justify-between">
+              <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('offers.makeTitle')}</Text>
+              <HeroButton isIconOnly variant="secondary" onPress={() => setOfferOpen(false)}>
+                <Ionicons name="close-outline" size={20} color={primary} />
+              </HeroButton>
+            </View>
+            <View className="gap-3">
+              <FormInput label={t('offers.amount')} value={offerAmount} onChangeText={setOfferAmount} placeholder={t('offers.amountPlaceholder')} keyboardType="decimal-pad" />
+              <FormInput label={t('offers.message')} value={offerMessage} onChangeText={setOfferMessage} placeholder={t('offers.messagePlaceholder')} multiline />
+              <HeroButton variant="primary" onPress={handleSubmitOffer} isDisabled={isActionLoading} style={{ backgroundColor: primary }}>
+                <Ionicons name="send-outline" size={17} color="#fff" />
+                <HeroButton.Label>{t('offers.submit')}</HeroButton.Label>
+              </HeroButton>
+            </View>
+          </Surface>
+        </View>
+      </Modal>
+    </SafeAreaView>
+  );
+}
+
+function FormInput({
+  label,
+  value,
+  onChangeText,
+  placeholder,
+  keyboardType = 'default',
+  multiline = false,
+}: {
+  label: string;
+  value: string;
+  onChangeText: (value: string) => void;
+  placeholder: string;
+  keyboardType?: 'default' | 'decimal-pad';
+  multiline?: boolean;
+}) {
+  const theme = useTheme();
+  return (
+    <View className="gap-2">
+      <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{label}</Text>
+      <TextInput
+        className={`${multiline ? 'min-h-24 py-3' : 'min-h-12'} rounded-panel-inner border px-3 text-sm`}
+        style={{ borderColor: theme.border, color: theme.text, backgroundColor: theme.bg, textAlignVertical: multiline ? 'top' : 'center' }}
+        value={value}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
+        placeholderTextColor={theme.textMuted}
+        keyboardType={keyboardType}
+        multiline={multiline}
+      />
+    </View>
+  );
+}
