@@ -860,6 +860,7 @@ const FeedCard = React.memo(function FeedCard({
             content={translatedContent ?? item.content}
             truncated={item.content_truncated}
             detailPath={detailPath ? tenantPath(detailPath) : undefined}
+            postTitle={item.title ?? undefined}
           />
           {item.content && (
             <div className="mt-1">

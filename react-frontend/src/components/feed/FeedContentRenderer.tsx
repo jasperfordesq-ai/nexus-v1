@@ -25,6 +25,8 @@ interface FeedContentRendererProps {
   truncated?: boolean;
   /** Path to the detail page (used for "read more" link) */
   detailPath?: string;
+  /** Post title used to build an accessible aria-label for the "Read more" link (WCAG 2.4.4) */
+  postTitle?: string;
 }
 
 /* ───────────────────────── Constants ───────────────────────── */
@@ -103,6 +105,7 @@ export function FeedContentRenderer({
   content,
   truncated = false,
   detailPath,
+  postTitle,
 }: FeedContentRendererProps) {
   const { t } = useTranslation('feed');
   const { tenantPath } = useTenant();
@@ -127,6 +130,7 @@ export function FeedContentRenderer({
           <Link
             to={detailPath}
             className="text-[var(--color-primary)] hover:underline text-sm font-medium"
+            aria-label={postTitle ? t('card.read_more_about', { title: postTitle }) : undefined}
           >
             ...{t('card.read_more')}
           </Link>
@@ -143,6 +147,7 @@ export function FeedContentRenderer({
         <Link
           to={detailPath}
           className="text-[var(--color-primary)] hover:underline ms-1 text-sm font-medium"
+          aria-label={postTitle ? t('card.read_more_about', { title: postTitle }) : undefined}
         >
           {t('card.read_more')}
         </Link>
