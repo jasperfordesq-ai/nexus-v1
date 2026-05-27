@@ -731,7 +731,7 @@ export default function FederationHubPage() {
     return (
       <div className="max-w-6xl mx-auto px-4 py-8">
         <Breadcrumbs items={breadcrumbs} />
-        <div role="status" aria-label={t('hub.loading')} className="flex flex-col items-center justify-center py-24">
+        <div role="status" aria-busy="true" aria-label={t('hub.loading')} className="flex flex-col items-center justify-center py-24">
           <Spinner size="lg" color="primary" />
           <p className="text-muted mt-4">{t('hub.loading')}</p>
         </div>

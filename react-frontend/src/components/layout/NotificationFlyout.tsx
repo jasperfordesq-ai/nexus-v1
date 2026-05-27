@@ -155,7 +155,7 @@ export function NotificationFlyout() {
   const notificationBody = (
     <>
       {isLoading ? (
-        <div className="p-4 space-y-3 bg-[var(--surface-solid)]">
+        <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="p-4 space-y-3 bg-[var(--surface-solid)]">
           {[1, 2, 3].map(i => (
             <div key={i} className="flex gap-3">
               <Skeleton className="w-8 h-8 rounded-full shrink-0" />

@@ -384,8 +384,8 @@ export function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
               </div>
             ) : isLoading ? (
               /* Loading */
-              <div className="flex items-center gap-2 py-4">
-                <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+              <div role="status" aria-busy="true" aria-label={t('loading')} className="flex items-center gap-2 py-4">
+                <div className="w-4 h-4 border-2 border-accent border-t-transparent rounded-full animate-spin" aria-hidden="true" />
                 <span className="text-sm text-muted">{t('search.searching')}</span>
               </div>
             ) : query.trim().length >= 2 ? (

@@ -64,9 +64,9 @@ export class FeatureErrorBoundary extends Component<
           animate={{ opacity: 1, y: 0 }}
           className="p-4"
         >
-          <GlassCard className="p-6 text-center">
+          <GlassCard role="alert" className="p-6 text-center">
             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-amber-500/20 mb-4">
-              <AlertTriangle className="w-6 h-6 text-amber-400" />
+              <AlertTriangle className="w-6 h-6 text-amber-400" aria-hidden="true" />
             </div>
             <h3 className="text-lg font-semibold text-theme-primary mb-2">
               {i18n.t('error_boundary.title', { ns: 'common' })}

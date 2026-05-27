@@ -104,12 +104,13 @@ export function PostAnalyticsModal({ isOpen, onClose, postId }: PostAnalyticsMod
             <div
               className="flex justify-center py-12"
               role="status"
+              aria-busy="true"
               aria-label={t('analytics.loading')}
             >
               <Spinner size="lg" aria-hidden="true" />
             </div>
           ) : error ? (
-            <div className="text-center py-8 text-[var(--text-muted)]">
+            <div role="alert" className="text-center py-8 text-[var(--text-muted)]">
               <p>{error}</p>
             </div>
           ) : data ? (

@@ -157,7 +157,7 @@ export function NotificationsTab({
       <h2 className="text-lg font-semibold text-theme-primary mb-6">{t('notifications')}</h2>
 
       {notificationError ? (
-        <div className="text-center py-8">
+        <div role="alert" className="text-center py-8">
           <AlertTriangle className="w-12 h-12 text-[var(--color-warning)] mx-auto mb-4" aria-hidden="true" />
           <p className="text-theme-muted mb-4">{notificationError}</p>
           <Button

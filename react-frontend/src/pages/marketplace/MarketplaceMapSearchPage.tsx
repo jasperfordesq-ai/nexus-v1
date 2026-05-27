@@ -376,7 +376,7 @@ export function MarketplaceMapSearchPage() {
             <div className="space-y-4 sticky top-24">
               {/* List view of results */}
               {isLoading ? (
-                <div className="flex justify-center py-12">
+                <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex justify-center py-12">
                   <Spinner size="lg" color="accent" />
                 </div>
               ) : listings.length === 0 ? (
@@ -460,7 +460,7 @@ export function MarketplaceMapSearchPage() {
             {/* Mobile list view */}
             <div className={viewMode === 'map' ? 'hidden' : 'lg:hidden'}>
               {isLoading ? (
-                <div className="flex justify-center py-12">
+                <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex justify-center py-12">
                   <Spinner size="lg" color="accent" />
                 </div>
               ) : listings.length === 0 ? (

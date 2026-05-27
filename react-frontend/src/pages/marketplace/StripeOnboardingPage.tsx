@@ -127,7 +127,7 @@ export function StripeOnboardingPage() {
   // Loading
   if (isLoadingStatus) {
     return (
-      <div className="flex justify-center py-24">
+      <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex justify-center py-24">
         <Spinner size="lg" color="accent" />
       </div>
     );

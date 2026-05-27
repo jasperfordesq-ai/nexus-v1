@@ -139,7 +139,7 @@ export default function SellerCouponEditPage() {
     return (
       <>
         <PageMeta title={isEdit ? t('coupon.seller.edit_title') : t('coupon.seller.create_title')} noIndex />
-        <div className="flex justify-center py-16">
+        <div role="status" aria-busy="true" aria-label={t('loading')} className="flex justify-center py-16">
           <Spinner />
         </div>
       </>

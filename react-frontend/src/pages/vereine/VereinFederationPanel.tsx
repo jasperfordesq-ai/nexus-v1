@@ -205,7 +205,7 @@ export default function VereinFederationPanel({ organizationId }: Props) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-10">
+      <div role="status" aria-busy="true" aria-label={t('loading')} className="flex items-center justify-center py-10">
         <Spinner size="lg" />
       </div>
     );

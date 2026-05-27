@@ -80,7 +80,7 @@ export function MyPickupsPage() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-16">
+        <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex justify-center py-16">
           <Spinner size="lg" color="accent" />
         </div>
       ) : reservations.length === 0 ? (

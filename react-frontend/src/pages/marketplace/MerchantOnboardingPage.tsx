@@ -426,7 +426,7 @@ export function MerchantOnboardingPage() {
   // ── Loading ───────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
+      <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex items-center justify-center min-h-[60vh]">
         <Spinner size="lg" />
       </div>
     );

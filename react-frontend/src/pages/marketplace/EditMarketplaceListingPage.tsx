@@ -475,7 +475,7 @@ export function EditMarketplaceListingPage() {
   // Loading state
   if (isLoadingListing) {
     return (
-      <div className="flex justify-center py-16">
+      <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex justify-center py-16">
         <Spinner size="lg" color="accent" />
       </div>
     );

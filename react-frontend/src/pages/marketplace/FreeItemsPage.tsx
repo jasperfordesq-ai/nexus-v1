@@ -192,11 +192,11 @@ export function FreeItemsPage() {
 
         {/* Listings */}
         {isLoading ? (
-          <div className="flex justify-center py-16">
+          <div role="status" aria-busy="true" aria-label={t('loading', { ns: 'common' })} className="flex justify-center py-16">
             <Spinner size="lg" color="accent" />
           </div>
         ) : error ? (
-          <GlassCard className="p-8 text-center">
+          <GlassCard role="alert" className="p-8 text-center">
             <p className="text-danger mb-4">{error}</p>
             <Button variant="tertiary" onPress={() => loadListings()}>
               {t('common.try_again')}
