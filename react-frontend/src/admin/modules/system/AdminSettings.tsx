@@ -363,7 +363,7 @@ export function AdminSettings() {
                     isIconOnly
                     size="sm"
                     variant="danger"
-                    aria-label="Remove partner logo"
+                    aria-label={t('admin_settings.remove_partner_logo')}
                     onPress={() => {
                       setForm(prev => ({ ...prev, partner_logo_url: '' }));
                     }}
@@ -378,6 +378,7 @@ export function AdminSettings() {
                 accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
                 className="hidden"
                 onChange={handlePartnerLogoUpload}
+                aria-hidden="true"
               />
               <div className="flex gap-2 flex-wrap">
                 <Button
@@ -446,7 +447,7 @@ export function AdminSettings() {
                     />
                     <Button
                       isIconOnly size="sm" variant="danger"
-                      aria-label="Remove light image"
+                      aria-label={t('admin_settings.remove_light_image')}
                       onPress={() => {
                         setForm(prev => ({ ...prev, powered_by_image_light: '' }));
                         setOriginalForm(prev => ({ ...prev, powered_by_image_light: '' }));
@@ -462,6 +463,7 @@ export function AdminSettings() {
                   accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
                   className="hidden"
                   onChange={(e) => handlePoweredByUpload('light', e)}
+                  aria-hidden="true"
                 />
                 <Button
                   variant="secondary" size="sm"
@@ -486,7 +488,7 @@ export function AdminSettings() {
                     />
                     <Button
                       isIconOnly size="sm" variant="danger"
-                      aria-label="Remove dark image"
+                      aria-label={t('admin_settings.remove_dark_image')}
                       onPress={() => {
                         setForm(prev => ({ ...prev, powered_by_image_dark: '' }));
                         setOriginalForm(prev => ({ ...prev, powered_by_image_dark: '' }));
@@ -502,6 +504,7 @@ export function AdminSettings() {
                   accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
                   className="hidden"
                   onChange={(e) => handlePoweredByUpload('dark', e)}
+                  aria-hidden="true"
                 />
                 <Button
                   variant="secondary" size="sm"

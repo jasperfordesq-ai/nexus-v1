@@ -289,6 +289,7 @@ export function GroupSettingsModal({
                       type="file"
                       accept="image/*"
                       className="hidden"
+                      aria-hidden="true"
                       disabled={uploadingImage}
                       onChange={(e) => onImageUpload(e, 'avatar')}
                     />
@@ -316,6 +317,7 @@ export function GroupSettingsModal({
                       type="file"
                       accept="image/*"
                       className="hidden"
+                      aria-hidden="true"
                       disabled={uploadingImage}
                       onChange={(e) => onImageUpload(e, 'cover')}
                     />

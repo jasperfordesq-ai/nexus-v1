@@ -343,6 +343,7 @@ export function MediaUploader({
         accept="image/jpeg,image/png,image/gif,image/webp"
         multiple
         className="hidden"
+        aria-hidden="true"
         onChange={handleFileChange}
       />
 

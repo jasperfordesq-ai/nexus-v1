@@ -156,6 +156,7 @@ export function DataManagement() {
               type="file"
               accept="application/json,.json"
               className="hidden"
+              aria-hidden="true"
               onChange={handleFileChange}
             />
 

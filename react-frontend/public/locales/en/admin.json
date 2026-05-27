@@ -16760,7 +16760,10 @@
     "partner_logo_label": "Partner Logo",
     "partner_logo_hint": "Shown in the footer left slot. PNG, JPEG, WebP or SVG — max 2 MB.",
     "replace_image": "Replace image",
-    "upload_image": "Upload image"
+    "upload_image": "Upload image",
+    "remove_light_image": "Remove light mode image",
+    "remove_dark_image": "Remove dark mode image",
+    "remove_partner_logo": "Remove partner logo"
   },
   "national": {
     "trend_chart_aria": "Chart showing community activity trends over time"
