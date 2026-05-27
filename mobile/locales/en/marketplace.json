@@ -235,6 +235,11 @@
     },
     "number": "Order {{number}}",
     "tracking": "Tracking: {{number}}",
+    "continuePayment": "Continue payment",
+    "paymentStartedTitle": "Payment started",
+    "paymentStartedHint": "Open checkout to finish paying for this order.",
+    "paymentClientSecretHint": "The payment is ready. Complete checkout from the secure payment sheet or web checkout.",
+    "paymentFailed": "Could not restart checkout for this order.",
     "markShipped": "Mark shipped",
     "confirmDelivery": "Confirm delivery",
     "rate": "Rate order",
@@ -302,13 +307,15 @@
     "emptyHint": "Marketplace purchases and sales will appear here.",
     "status": {
       "pending": "Pending",
+      "pending_payment": "Pending payment",
       "paid": "Paid",
       "processing": "Processing",
       "shipped": "Shipped",
       "delivered": "Delivered",
       "completed": "Completed",
       "cancelled": "Cancelled",
-      "disputed": "Disputed"
+      "disputed": "Disputed",
+      "refunded": "Refunded"
     }
   },
   "checkout": {

@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState } from 'react';
-import { Alert, FlatList, Modal, ScrollView, TextInput, View } from 'react-native';
+import { Alert, FlatList, Linking, Modal, ScrollView, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,6 +20,7 @@ import {
   acceptMarketplaceDeliveryOffer,
   confirmMarketplaceOrderDelivery,
   confirmMarketplaceDeliveryOffer,
+  createMarketplacePaymentIntent,
   disputeMarketplaceOrder,
   getMarketplaceDeliveryOffers,
   getMarketplaceOrders,
@@ -42,9 +43,9 @@ const SHIPPING_METHODS = ['standard', 'express', 'tracked', 'hand_delivery', 'ot
 const DISPUTE_REASONS: DisputeReason[] = ['not_received', 'not_as_described', 'damaged', 'wrong_item', 'other'];
 const ORDER_STATUS_FILTERS: Record<OrderStatusTab, string | null> = {
   all: null,
-  active: 'paid,processing,shipped',
+  active: 'paid,shipped',
   completed: 'delivered,completed',
-  cancelled: 'cancelled,refunded,disputed',
+  cancelled: 'cancelled,refunded',
 };
 
 export default function MarketplaceOrdersRoute() {
@@ -152,6 +153,25 @@ function MarketplaceOrdersScreen() {
       orders.refresh();
     } catch (err) {
       Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('orders.actionFailed'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function continuePayment(order: MarketplaceOrder) {
+    setIsSubmitting(true);
+    try {
+      const payment = await createMarketplacePaymentIntent(order.id);
+      if (payment.data.checkout_url) {
+        await Linking.openURL(payment.data.checkout_url);
+      } else if (payment.data.client_secret) {
+        Alert.alert(t('orders.paymentStartedTitle'), t('orders.paymentClientSecretHint'));
+      } else {
+        Alert.alert(t('orders.paymentStartedTitle'), t('orders.paymentStartedHint'));
+      }
+      orders.refresh();
+    } catch (err) {
+      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('orders.paymentFailed'));
     } finally {
       setIsSubmitting(false);
     }
@@ -289,6 +309,7 @@ function MarketplaceOrdersScreen() {
             isSubmitting={isSubmitting}
             onShip={() => openShipModal(item)}
             onConfirmDelivery={() => void confirmDelivery(item)}
+            onContinuePayment={() => void continuePayment(item)}
             onCancel={() => openCancelModal(item)}
             onRate={() => openRateModal(item)}
             onDispute={() => openDisputeModal(item)}
@@ -486,6 +507,7 @@ function OrderCard({
   isSubmitting,
   onShip,
   onConfirmDelivery,
+  onContinuePayment,
   onCancel,
   onRate,
   onDispute,
@@ -496,6 +518,7 @@ function OrderCard({
   isSubmitting: boolean;
   onShip: () => void;
   onConfirmDelivery: () => void;
+  onContinuePayment: () => void;
   onCancel: () => void;
   onRate: () => void;
   onDispute: () => void;
@@ -528,6 +551,12 @@ function OrderCard({
           </HeroButton>
         ) : null}
         <View className="flex-row flex-wrap gap-2">
+          {mode === 'purchases' && item.status === 'pending_payment' ? (
+            <HeroButton className="flex-1" size="sm" variant="primary" isDisabled={isSubmitting} onPress={onContinuePayment} style={{ minWidth: '46%', backgroundColor: primary }}>
+              <Ionicons name="card-outline" size={14} color="#fff" />
+              <HeroButton.Label>{t('orders.continuePayment')}</HeroButton.Label>
+            </HeroButton>
+          ) : null}
           {mode === 'sales' && item.status === 'paid' ? (
             <HeroButton className="flex-1" size="sm" variant="primary" isDisabled={isSubmitting} onPress={onShip} style={{ minWidth: '46%', backgroundColor: primary }}>
               <Ionicons name="car-outline" size={14} color="#fff" />
@@ -540,7 +569,7 @@ function OrderCard({
               <HeroButton.Label>{t('orders.confirmDelivery')}</HeroButton.Label>
             </HeroButton>
           ) : null}
-          {['pending', 'paid', 'processing'].includes(item.status) ? (
+          {['pending_payment', 'paid'].includes(item.status) ? (
             <HeroButton className="flex-1" size="sm" variant="danger" isDisabled={isSubmitting} onPress={onCancel} style={{ minWidth: '46%' }}>
               <Ionicons name="close-circle-outline" size={14} color="#fff" />
               <HeroButton.Label>{t('orders.cancel')}</HeroButton.Label>
