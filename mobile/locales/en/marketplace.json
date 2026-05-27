@@ -323,6 +323,15 @@
     "openedTitle": "Checkout started",
     "clientSecretHint": "The order was created. Complete payment from the web checkout if the payment sheet does not open on this device."
   },
+  "communityDelivery": {
+    "eyebrow": "Community-powered delivery",
+    "title": "Community delivery",
+    "description": "A trusted member can offer to deliver this order for time credits after checkout.",
+    "step1": "The buyer creates an order for this community-delivery listing.",
+    "step2": "Eligible community members can offer delivery time and requested credits.",
+    "step3": "The buyer or seller accepts an offer, then confirms delivery when the item arrives.",
+    "orderHint": "Mobile can manage delivery offers from Marketplace orders once an order exists. A public delivery discovery route is not available from the backend yet."
+  },
   "pickup": {
     "chooseSlot": "Pickup slot",
     "slotFallback": "Slot {{id}}"

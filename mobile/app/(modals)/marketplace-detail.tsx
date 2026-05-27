@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ComponentProps } from 'react';
 import { Alert, Image, Linking, Modal, ScrollView, Share, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
@@ -423,6 +423,10 @@ function MarketplaceDetailScreen() {
           </HeroCard.Body>
         </HeroCard>
 
+        {listing.delivery_method === 'community_delivery' ? (
+          <CommunityDeliveryInfoCard primary={primary} theme={theme} />
+        ) : null}
+
         {isOwner ? (
           <HeroCard className="rounded-panel p-0">
             <HeroCard.Body className="gap-3 p-4">
@@ -600,6 +604,54 @@ function MarketplaceDetailScreen() {
         </View>
       </Modal>
     </SafeAreaView>
+  );
+}
+
+function CommunityDeliveryInfoCard({ primary, theme }: { primary: string; theme: ReturnType<typeof useTheme> }) {
+  const { t } = useTranslation('marketplace');
+  const steps: Array<{ icon: ComponentProps<typeof Ionicons>['name']; label: string }> = [
+    { icon: 'people-outline', label: t('communityDelivery.step1') },
+    { icon: 'time-outline', label: t('communityDelivery.step2') },
+    { icon: 'checkmark-circle-outline', label: t('communityDelivery.step3') },
+  ];
+
+  return (
+    <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
+      <View className="h-1.5" style={{ backgroundColor: theme.success }} />
+      <HeroCard.Body className="gap-4 p-4">
+        <View className="flex-row items-start gap-3">
+          <View className="size-12 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(theme.success, 0.14) }}>
+            <Ionicons name="car-outline" size={23} color={theme.success} />
+          </View>
+          <View className="min-w-0 flex-1 gap-1">
+            <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>
+              {t('communityDelivery.eyebrow')}
+            </Text>
+            <Text className="text-base font-bold" style={{ color: theme.text }}>
+              {t('communityDelivery.title')}
+            </Text>
+            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+              {t('communityDelivery.description')}
+            </Text>
+          </View>
+        </View>
+        <View className="gap-2">
+          {steps.map((step) => (
+            <Surface key={step.icon} variant="secondary" className="flex-row items-center gap-3 rounded-panel-inner px-3 py-2.5">
+              <View className="size-8 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.12) }}>
+                <Ionicons name={step.icon} size={15} color={primary} />
+              </View>
+              <Text className="min-w-0 flex-1 text-sm leading-5" style={{ color: theme.textSecondary }}>
+                {step.label}
+              </Text>
+            </Surface>
+          ))}
+        </View>
+        <Text className="text-xs leading-5" style={{ color: theme.textMuted }}>
+          {t('communityDelivery.orderHint')}
+        </Text>
+      </HeroCard.Body>
+    </HeroCard>
   );
 }
 
