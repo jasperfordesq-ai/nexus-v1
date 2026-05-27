@@ -20,7 +20,7 @@ describe('pricingEngine', () => {
     expect(recommendHostingPlan(1000).id).toBe('community');
     expect(recommendHostingPlan(1001).id).toBe('growth');
     expect(recommendHostingPlan(30001).id).toBe('network');
-    expect(recommendHostingPlan(100001).id).toBe('federation');
+    expect(recommendHostingPlan(100001).id).toBe('enterprise-custom');
   });
 
   it('recommends the smallest community timebanking tier that covers the active member count', () => {
@@ -67,6 +67,28 @@ describe('pricingEngine', () => {
     expect(quote.monthlyRecurring).toBe(299);
     expect(quote.annualRecurring).toBe(2990);
     expect(quote.annualSavings).toBe(598);
+  });
+
+  it('switches full platform enquiries above 100,000 active members to custom pricing', () => {
+    const quote = estimateQuote({
+      activeMembers: 250000,
+      billingCycle: 'annual',
+      supportTierId: 'managed',
+      maintenancePlanId: 'custom-fork',
+      onboardingPackageId: 'enterprise-launch',
+      addOns: {
+        'compliance-pack': 1,
+      },
+      oneOffServices: {
+        'data-migration': 1,
+      },
+    });
+
+    expect(quote.hostingPlan.id).toBe('enterprise-custom');
+    expect(quote.pricingMode).toBe('custom');
+    expect(quote.monthlyRecurring).toBe(0);
+    expect(quote.firstYearTotal).toBe(0);
+    expect(quote.lineItems.map((item) => item.label).join(' ')).toContain('Bespoke architecture');
   });
 
   it('combines support, maintenance, add-ons, and launch services into one estimate', () => {
@@ -127,5 +149,32 @@ describe('pricingEngine', () => {
     expect(decodeURIComponent(href)).toContain('Full Platform Hosting');
     expect(decodeURIComponent(href)).toContain('Managed support');
     expect(decodeURIComponent(href)).toContain('We need a multi-tenant launch.');
+  });
+
+  it('labels enterprise custom enquiries as custom quotes in the order email', () => {
+    const quote = estimateQuote({
+      activeMembers: 100001,
+      billingCycle: 'annual',
+      supportTierId: 'standard',
+      maintenancePlanId: 'track-latest',
+      onboardingPackageId: 'none',
+      addOns: {},
+      oneOffServices: {},
+    });
+
+    const href = buildOrderEmail({
+      contactName: 'Ava Murphy',
+      organisation: 'National Network',
+      email: 'ava@example.org',
+      region: 'Global',
+      note: 'We may reach a million users.',
+      quote,
+    });
+
+    const body = decodeURIComponent(href);
+
+    expect(body).toContain('Pricing mode: Bespoke enterprise discovery required');
+    expect(body).toContain('Estimated monthly recurring: Custom quote');
+    expect(body).toContain('Enterprise Custom');
   });
 });

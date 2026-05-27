@@ -13,6 +13,7 @@ export interface HostingPlan {
   activeMemberLimit: number | null;
   monthlyEur: number;
   setupEur: number;
+  isCustom?: boolean;
   infrastructure: string;
   tenants: string;
   storage: string;
@@ -214,18 +215,19 @@ export const hostingPlans: HostingPlan[] = [
     bestFor: 'national networks, consortia, and serious institutional programmes',
   },
   {
-    id: 'federation',
-    name: 'Federation',
-    activeMemberLabel: '100,000+ or multi-platform operator',
+    id: 'enterprise-custom',
+    name: 'Enterprise Custom',
+    activeMemberLabel: 'Over 100,000 active members or high-traffic network',
     activeMemberLimit: null,
-    monthlyEur: 8999,
-    setupEur: 5000,
-    infrastructure: 'Cluster plus replicas',
-    tenants: 'Unlimited',
+    monthlyEur: 0,
+    setupEur: 0,
+    isCustom: true,
+    infrastructure: 'Bespoke architecture',
+    tenants: 'Custom',
     storage: 'Custom',
     email: 'Custom',
-    p1Response: '15-minute P1 response',
-    bestFor: 'national federation operators and multi-platform timebanking networks',
+    p1Response: 'Custom SLA',
+    bestFor: 'national operators, unusually large communities, million-user scenarios, and high-traffic federation networks',
   },
 ];
 
@@ -447,7 +449,7 @@ export const oneOffServices: OneOffOption[] = [
     id: 'data-migration',
     label: 'Data migration from existing platform',
     fixedEur: 2500,
-    description: 'Migration from hOurworld, TimeBanks.org, Komunitin, CSV, or custom database.',
+    description: 'Migration from CSV exports, spreadsheets, legacy databases, or a custom source system.',
   },
   {
     id: 'sso-saml',

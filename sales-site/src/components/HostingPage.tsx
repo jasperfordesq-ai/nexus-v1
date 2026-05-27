@@ -20,8 +20,8 @@ interface HostingPageProps {
 
 const proofPoints = [
   { label: 'Community entry', value: 'EUR29/mo', icon: BadgeEuro },
-  { label: 'Timebanking lane', value: 'Limited', icon: Boxes },
-  { label: 'Full platform lane', value: 'All modules', icon: Layers3 },
+  { label: 'Published cap', value: '100k', icon: Boxes },
+  { label: 'Enterprise layer', value: '>100k', icon: Layers3 },
   { label: 'Licence', value: 'AGPL', icon: Scale },
 ];
 
@@ -36,7 +36,7 @@ const pricingPrinciples = [
   },
   {
     title: 'Keep procurement honest',
-    body: 'Full NEXUS hosting remains priced around capacity, infrastructure, support, maintenance, onboarding, data migration, and custom delivery.',
+    body: 'Full NEXUS hosting has published capacity tiers up to 100,000 active members, then moves into bespoke enterprise pricing before high-scale usage can distort the model.',
   },
 ];
 
@@ -96,15 +96,46 @@ export default function HostingPage({ onNavigate }: HostingPageProps) {
                     <span className="text-white/58">{formatCurrency(plan.annualMonthlyEur)}/mo annual</span>
                   </div>
                 ))}
-                {hostingPlans.slice(0, 3).map((plan) => (
+                {hostingPlans.map((plan) => (
                   <div key={plan.id} className="grid grid-cols-[1fr_auto] rounded-xl border border-white/10 bg-black/14 p-3 text-sm">
                     <span className="font-bold text-white">{plan.name} full platform</span>
-                    <span className="text-white/58">{formatCurrency(plan.monthlyEur)}/mo</span>
+                    <span className="text-right text-white/58">{plan.isCustom ? 'Bespoke quote' : `${formatCurrency(plan.monthlyEur)}/mo`}</span>
                   </div>
                 ))}
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-5 py-16">
+        <div className="mb-9 grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <p className="text-sm font-bold tracking-[0.16em] text-[var(--color-primary)] uppercase">Full platform capacity</p>
+            <h2 className="mt-3 text-3xl font-black text-white md:text-5xl">Published pricing has a hard ceiling.</h2>
+          </div>
+          <p className="text-base leading-8 text-white/64">
+            The public calculator prices realistic managed hosting up to 100,000 active members. Above that, NEXUS switches to Enterprise Custom so a high-growth or million-user platform is priced against real traffic, support, storage, and architecture.
+          </p>
+        </div>
+        <div className="grid gap-3">
+          {hostingPlans.map((plan) => (
+            <div
+              key={plan.id}
+              className={`grid gap-4 rounded-2xl border p-5 md:grid-cols-[0.75fr_1fr_auto] md:items-center ${
+                plan.isCustom ? 'border-[color:var(--color-accent)]/30 bg-[color:var(--color-accent)]/8' : 'border-white/10 bg-black/18'
+              }`}
+            >
+              <div>
+                <p className="text-xl font-black text-white">{plan.name}</p>
+                <p className="mt-1 text-sm font-semibold text-white/45 uppercase">{plan.activeMemberLabel}</p>
+              </div>
+              <p className="text-sm leading-6 text-white/58">{plan.bestFor}</p>
+              <p className="text-left text-2xl font-black text-[var(--color-primary)] md:text-right">
+                {plan.isCustom ? 'Bespoke quote' : `${formatCurrency(plan.monthlyEur)}/mo`}
+              </p>
+            </div>
+          ))}
         </div>
       </section>
 

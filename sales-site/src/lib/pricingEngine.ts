@@ -45,6 +45,7 @@ export interface QuoteEstimate {
   productLineLabel: string;
   hostingPlan: QuotePlan;
   billingCycle: BillingCycle;
+  pricingMode: 'published' | 'custom';
   monthlyRecurring: number;
   annualRecurring: number;
   annualSavings: number;
@@ -98,15 +99,21 @@ export function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
+export function formatQuoteAmount(quote: QuoteEstimate, amount: number): string {
+  return quote.pricingMode === 'custom' ? 'Custom quote' : formatCurrency(amount);
+}
+
 export function buildOrderEmail(input: OrderEmailInput): string {
+  const formatLineAmount = (item: QuoteLineItem) =>
+    input.quote.pricingMode === 'custom' && item.amountEur === 0 ? 'Custom quote' : formatCurrency(item.amountEur);
   const monthlyLines = input.quote.lineItems
     .filter((item) => item.cadence === 'monthly')
-    .map((item) => `- ${item.label}: ${formatCurrency(item.amountEur)}/mo${item.quantity > 1 ? ` x${item.quantity}` : ''}`)
+    .map((item) => `- ${item.label}: ${formatLineAmount(item)}${input.quote.pricingMode === 'custom' ? '' : '/mo'}${item.quantity > 1 ? ` x${item.quantity}` : ''}`)
     .join('\n');
 
   const oneOffLines = input.quote.lineItems
     .filter((item) => item.cadence === 'one-off')
-    .map((item) => `- ${item.label}: ${formatCurrency(item.amountEur)}${item.quantity > 1 ? ` x${item.quantity}` : ''}`)
+    .map((item) => `- ${item.label}: ${formatLineAmount(item)}${item.quantity > 1 ? ` x${item.quantity}` : ''}`)
     .join('\n');
 
   const subject = `Project NEXUS hosting order enquiry - ${input.organisation || input.quote.hostingPlan.name}`;
@@ -122,11 +129,12 @@ export function buildOrderEmail(input: OrderEmailInput): string {
     '',
     `Product line: ${input.quote.productLineLabel}`,
     `Recommended plan: ${input.quote.hostingPlan.name}`,
+    `Pricing mode: ${input.quote.pricingMode === 'custom' ? 'Bespoke enterprise discovery required' : 'Published calculator estimate'}`,
     `Billing preference: ${input.quote.billingCycle}`,
-    `Estimated monthly recurring: ${formatCurrency(input.quote.monthlyRecurring)}`,
-    `Estimated annual recurring: ${formatCurrency(input.quote.annualRecurring)}`,
-    `Estimated one-off total: ${formatCurrency(input.quote.oneOffTotal)}`,
-    `Estimated first-year total: ${formatCurrency(input.quote.firstYearTotal)}`,
+    `Estimated monthly recurring: ${formatQuoteAmount(input.quote, input.quote.monthlyRecurring)}`,
+    `Estimated annual recurring: ${formatQuoteAmount(input.quote, input.quote.annualRecurring)}`,
+    `Estimated one-off total: ${formatQuoteAmount(input.quote, input.quote.oneOffTotal)}`,
+    `Estimated first-year total: ${formatQuoteAmount(input.quote, input.quote.firstYearTotal)}`,
     '',
     'Recurring items:',
     monthlyLines || '- None selected',
@@ -185,6 +193,7 @@ function estimateCommunityQuote(input: QuoteInput): QuoteEstimate {
     productLineLabel: 'Community Timebanking',
     hostingPlan: plan,
     billingCycle: input.billingCycle,
+    pricingMode: 'published',
     monthlyRecurring,
     annualRecurring,
     annualSavings,
@@ -196,6 +205,11 @@ function estimateCommunityQuote(input: QuoteInput): QuoteEstimate {
 
 function estimateFullPlatformQuote(input: QuoteInput): QuoteEstimate {
   const hostingPlan = recommendHostingPlan(input.activeMembers);
+
+  if (hostingPlan.isCustom) {
+    return estimateEnterpriseCustomQuote(input, hostingPlan);
+  }
+
   const support = findById(supportTiers, input.supportTierId);
   const maintenance = findById(maintenancePlans, input.maintenancePlanId);
   const onboarding = findById(onboardingPackages, input.onboardingPackageId);
@@ -286,12 +300,44 @@ function estimateFullPlatformQuote(input: QuoteInput): QuoteEstimate {
     productLineLabel: 'Full Platform Hosting',
     hostingPlan,
     billingCycle: input.billingCycle,
+    pricingMode: 'published',
     monthlyRecurring,
     annualRecurring,
     annualSavings,
     oneOffTotal,
     firstYearTotal: annualRecurring + oneOffTotal,
     lineItems: [...recurringItems, ...oneOffItems].filter((item) => item.amountEur !== 0),
+  };
+}
+
+function estimateEnterpriseCustomQuote(input: QuoteInput, hostingPlan: HostingPlan): QuoteEstimate {
+  return {
+    productLine: 'full-platform',
+    productLineLabel: 'Full Platform Hosting',
+    hostingPlan,
+    billingCycle: input.billingCycle,
+    pricingMode: 'custom',
+    monthlyRecurring: 0,
+    annualRecurring: 0,
+    annualSavings: 0,
+    oneOffTotal: 0,
+    firstYearTotal: 0,
+    lineItems: [
+      {
+        id: hostingPlan.id,
+        label: 'Enterprise Custom hosting, capacity, and traffic discovery',
+        amountEur: 0,
+        quantity: 1,
+        cadence: 'monthly',
+      },
+      {
+        id: 'enterprise-custom-commercials',
+        label: 'Bespoke architecture, SLA, support, migration, and commercial terms',
+        amountEur: 0,
+        quantity: 1,
+        cadence: 'one-off',
+      },
+    ],
   };
 }
 

@@ -97,4 +97,16 @@ describe('sales-site public content policy', () => {
     expect(hostingPage).toContain('A cheaper way in, without cheapening the platform.');
     expect(quoteBuilder).toContain('Feature-limited on purpose.');
   });
+
+  it('keeps published full platform pricing capped and routes high-scale networks to enterprise custom', () => {
+    const pricing = readFileSync(resolve(__dirname, '..', 'data', 'pricing.ts'), 'utf8');
+    const hostingPage = readFileSync(resolve(__dirname, '..', 'components', 'HostingPage.tsx'), 'utf8');
+    const quoteBuilder = readFileSync(resolve(__dirname, '..', 'components', 'QuoteBuilder.tsx'), 'utf8');
+
+    expect(pricing).toContain("id: 'enterprise-custom'");
+    expect(pricing).toContain('Over 100,000 active members');
+    expect(hostingPage).toContain('Published pricing has a hard ceiling.');
+    expect(quoteBuilder).toContain('Published pricing stops at 100,000 active members.');
+    expect(quoteBuilder).toContain('Anything over the public cap');
+  });
 });

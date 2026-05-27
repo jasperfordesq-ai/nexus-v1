@@ -7,7 +7,7 @@ import { Button, Card, Input, TextArea } from '@heroui/react';
 import { Mail, Send } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
-import { buildOrderEmail, formatCurrency, type QuoteEstimate } from '../lib/pricingEngine';
+import { buildOrderEmail, formatQuoteAmount, type QuoteEstimate } from '../lib/pricingEngine';
 
 interface OrderFormProps {
   quote: QuoteEstimate;
@@ -48,8 +48,10 @@ export default function OrderForm({ quote }: OrderFormProps) {
         </div>
         <div className="rounded-xl border border-white/10 bg-black/20 p-3 text-right">
           <p className="text-xs font-semibold text-white/45 uppercase">{quote.productLineLabel}</p>
-          <p className="text-xs font-semibold text-white/45 uppercase">First-year estimate</p>
-          <p className="text-2xl font-black text-white">{formatCurrency(quote.firstYearTotal)}</p>
+          <p className="text-xs font-semibold text-white/45 uppercase">
+            {quote.pricingMode === 'custom' ? 'Enterprise estimate' : 'First-year estimate'}
+          </p>
+          <p className="text-2xl font-black text-white">{formatQuoteAmount(quote, quote.firstYearTotal)}</p>
         </div>
       </div>
 

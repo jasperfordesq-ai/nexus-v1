@@ -19,7 +19,7 @@ import {
   type CommunityTimebankPlan,
   type ProductLine,
 } from '../data/pricing';
-import { estimateQuote, formatCurrency, type QuoteEstimate, type QuoteInput } from '../lib/pricingEngine';
+import { estimateQuote, formatCurrency, formatQuoteAmount, type QuoteEstimate, type QuoteInput } from '../lib/pricingEngine';
 import OrderForm from './OrderForm';
 
 interface QuoteBuilderProps {
@@ -48,11 +48,12 @@ const defaultInput: QuoteInput = {
 };
 
 const capacityPresets = [
-  { label: 'Pilot', members: 100, detail: 'Small launch or proof of need' },
-  { label: 'Local community', members: 1000, detail: 'Established timebank or programme' },
-  { label: 'Regional network', members: 10000, detail: 'County, city, or multi-programme network' },
-  { label: 'Large network', members: 30000, detail: 'Public-sector or national programme' },
-  { label: 'Federation', members: 100000, detail: 'Multi-platform or national federation' },
+  { label: 'Pilot', members: 100, displayValue: '100', memberKind: 'active members', detail: 'Small launch or proof of need' },
+  { label: 'Local', members: 1000, displayValue: '1k', memberKind: 'active members', detail: 'Established timebank or programme' },
+  { label: 'Regional', members: 10000, displayValue: '10k', memberKind: 'active members', detail: 'County, city, or multi-programme network' },
+  { label: 'Large', members: 30000, displayValue: '30k', memberKind: 'active members', detail: 'Public-sector or multi-programme network' },
+  { label: 'Network', members: 100000, displayValue: 'Up to 100k', memberKind: 'published maximum', detail: 'Largest fixed public tier' },
+  { label: 'Enterprise', members: 100001, displayValue: '>100k', memberKind: 'custom pricing', detail: 'Anything over the public cap' },
 ];
 
 const supportChoices = [
@@ -146,6 +147,7 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
   const [input, setInput] = useState<QuoteInput>(defaultInput);
   const quote = useMemo(() => estimateQuote(input), [input]);
   const isCommunity = quote.productLine === 'community-timebanking';
+  const isCustomQuote = quote.pricingMode === 'custom';
   const communityPlan = isCommunityPlan(quote.hostingPlan) ? quote.hostingPlan : communityTimebankPlans[0];
 
   useEffect(() => {
@@ -181,24 +183,32 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
                   <p className="mt-1 text-sm text-white/58">{quote.hostingPlan.activeMemberLabel}</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-3xl font-black text-[var(--color-accent)]">{formatCurrency(quote.monthlyRecurring)}</p>
+                  <p className="whitespace-nowrap text-2xl font-black text-[var(--color-accent)] md:text-3xl">
+                    {formatQuoteAmount(quote, quote.monthlyRecurring)}
+                  </p>
                   <p className="text-xs font-semibold text-white/45 uppercase">monthly recurring</p>
                 </div>
               </div>
               <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                <Metric label="Annual recurring" value={formatCurrency(quote.annualRecurring)} />
-                <Metric label="Annual saving" value={formatCurrency(quote.annualSavings)} />
-                <Metric label="One-off" value={formatCurrency(quote.oneOffTotal)} />
+                <Metric label="Annual recurring" value={formatQuoteAmount(quote, quote.annualRecurring)} />
+                <Metric label="Annual saving" value={isCustomQuote ? 'Discovery' : formatCurrency(quote.annualSavings)} />
+                <Metric label="One-off" value={formatQuoteAmount(quote, quote.oneOffTotal)} />
               </div>
               <div className="mt-5 rounded-xl border border-[color:var(--color-accent)]/20 bg-[color:var(--color-accent)]/8 p-4">
                 <p className="flex items-center gap-2 text-sm font-bold text-[var(--color-accent)]">
                   {isCommunity ? <LockKeyhole className="size-4" /> : <Server className="size-4" />}
-                  {isCommunity ? 'Feature-limited on purpose.' : 'All stable modules are included on full platform hosting.'}
+                  {isCommunity
+                    ? 'Feature-limited on purpose.'
+                    : isCustomQuote
+                      ? 'Enterprise scale needs discovery before pricing.'
+                      : 'All stable modules are included on full platform hosting.'}
                 </p>
                 <p className="mt-2 text-sm leading-6 text-white/58">
                   {isCommunity
                     ? 'Community Timebanking is the credible low-price option: core timebanking stays on, expensive platform features stay off.'
-                    : 'The estimate changes with capacity and service level, not with artificial feature gates.'}
+                    : isCustomQuote
+                      ? 'Published pricing stops at 100,000 active members. Above that, traffic, storage, email, SLA, migration, and tenancy design need a bespoke quote.'
+                      : 'The estimate changes with capacity and service level, not with artificial feature gates.'}
                 </p>
               </div>
             </Card>
@@ -223,7 +233,7 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
                 active={input.productLine === 'full-platform'}
                 title="Full Platform Hosting"
                 price="from EUR99/mo"
-                detail="All stable NEXUS modules, capacity tiers, support, maintenance, and launch services."
+                detail="All stable NEXUS modules with published tiers up to 100k active members and custom enterprise pricing above that."
                 onPress={() => switchProductLine(setInput, 'full-platform')}
               />
             </div>
@@ -317,17 +327,19 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
                     </p>
                   </div>
                   <span className="rounded-full border border-white/12 bg-black/20 px-4 py-2 text-sm font-black text-white">
-                    {input.activeMembers.toLocaleString('en-IE')} active members
+                    {formatActiveMemberLabel(input.activeMembers)}
                   </span>
                 </div>
 
-                <div className="mt-5 grid gap-3 md:grid-cols-5">
+                <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {capacityPresets.map((preset) => (
                     <CapacityPreset
                       key={preset.label}
                       active={input.activeMembers === preset.members}
                       detail={preset.detail}
+                      displayValue={preset.displayValue}
                       label={preset.label}
+                      memberKind={preset.memberKind}
                       members={preset.members}
                       onPress={() => setInput((value) => ({ ...value, activeMembers: preset.members }))}
                     />
@@ -337,15 +349,17 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
                 <div className="mt-5 grid gap-3 rounded-2xl border border-white/10 bg-black/18 p-4 md:grid-cols-[1fr_auto] md:items-end">
                   <div>
                     <p className="text-sm font-bold text-white">Use your own estimate</p>
-                    <p className="mt-1 text-sm leading-6 text-white/52">Type a number or use the stepper for fine control.</p>
+                    <p className="mt-1 text-sm leading-6 text-white/52">
+                      Published pricing is capped at 100,000 active members. Larger or unusually busy networks move to enterprise discovery.
+                    </p>
                   </div>
                   <NumberField
                     aria-label="Expected active members"
                     className="w-full md:w-64"
                     formatOptions={{ maximumFractionDigits: 0 }}
                     minValue={50}
-                    maxValue={250000}
-                    step={250}
+                    maxValue={1000000}
+                    step={1000}
                     value={input.activeMembers}
                     onChange={(nextValue) =>
                       setInput((value) => ({ ...value, activeMembers: Math.max(50, Number(nextValue) || 50) }))
@@ -360,66 +374,72 @@ export default function QuoteBuilder({ onQuoteChange }: QuoteBuilderProps) {
                 </div>
               </Card>
 
-              <Card className="border border-white/10 bg-white/[0.055] p-5">
-                <h3 className="text-xl font-black text-white">3. How would you like to buy it?</h3>
-                <p className="mt-1 text-sm leading-6 text-white/55">Annual billing is usually the cleanest procurement route and includes two months free.</p>
-                <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                  <BillingButton active={input.billingCycle === 'annual'} label="Annual" detail="Two months free" onPress={() => updateBilling(setInput, 'annual')} />
-                  <BillingButton active={input.billingCycle === 'monthly'} label="Monthly" detail="No prepay discount" onPress={() => updateBilling(setInput, 'monthly')} />
-                </div>
-              </Card>
+              {isCustomQuote ? (
+                <EnterpriseCustomSection />
+              ) : (
+                <>
+                  <Card className="border border-white/10 bg-white/[0.055] p-5">
+                    <h3 className="text-xl font-black text-white">3. How would you like to buy it?</h3>
+                    <p className="mt-1 text-sm leading-6 text-white/55">Annual billing is usually the cleanest procurement route and includes two months free.</p>
+                    <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                      <BillingButton active={input.billingCycle === 'annual'} label="Annual" detail="Two months free" onPress={() => updateBilling(setInput, 'annual')} />
+                      <BillingButton active={input.billingCycle === 'monthly'} label="Monthly" detail="No prepay discount" onPress={() => updateBilling(setInput, 'monthly')} />
+                    </div>
+                  </Card>
 
-              <ChoiceCardSection
-                title="4. What support do you want us to provide?"
-                description="Support changes how quickly and closely we help after launch."
-                choices={supportChoices}
-                options={supportTiers}
-                cadence="monthly"
-                selectedId={input.supportTierId}
-                onSelect={(supportTierId) => setInput((value) => ({ ...value, supportTierId }))}
-              />
+                  <ChoiceCardSection
+                    title="4. What support do you want us to provide?"
+                    description="Support changes how quickly and closely we help after launch."
+                    choices={supportChoices}
+                    options={supportTiers}
+                    cadence="monthly"
+                    selectedId={input.supportTierId}
+                    onSelect={(supportTierId) => setInput((value) => ({ ...value, supportTierId }))}
+                  />
 
-              <ChoiceCardSection
-                title="5. How should upgrades be handled?"
-                description="Choose whether you want to stay current, hold a release, or maintain a bespoke fork."
-                choices={maintenanceChoices}
-                options={maintenancePlans}
-                cadence="monthly"
-                selectedId={input.maintenancePlanId}
-                onSelect={(maintenancePlanId) => setInput((value) => ({ ...value, maintenancePlanId }))}
-              />
+                  <ChoiceCardSection
+                    title="5. How should upgrades be handled?"
+                    description="Choose whether you want to stay current, hold a release, or maintain a bespoke fork."
+                    choices={maintenanceChoices}
+                    options={maintenancePlans}
+                    cadence="monthly"
+                    selectedId={input.maintenancePlanId}
+                    onSelect={(maintenancePlanId) => setInput((value) => ({ ...value, maintenancePlanId }))}
+                  />
 
-              <ChoiceCardSection
-                title="6. How much launch help do you need?"
-                description="This covers setup, migration, training, and go-live support before the service opens."
-                choices={launchChoices}
-                options={onboardingPackages}
-                cadence="one-off"
-                selectedId={input.onboardingPackageId}
-                onSelect={(onboardingPackageId) => setInput((value) => ({ ...value, onboardingPackageId }))}
-              />
+                  <ChoiceCardSection
+                    title="6. How much launch help do you need?"
+                    description="This covers setup, migration, training, and go-live support before the service opens."
+                    choices={launchChoices}
+                    options={onboardingPackages}
+                    cadence="one-off"
+                    selectedId={input.onboardingPackageId}
+                    onSelect={(onboardingPackageId) => setInput((value) => ({ ...value, onboardingPackageId }))}
+                  />
 
-              <OptionCounterSection
-                title="Recurring add-ons"
-                options={recurringAddOns.filter((item) =>
-                  ['extra-storage-100gb', 'dedicated-staging', 'compliance-pack', 'additional-sub-tenant', 'extra-email-250k', 'bring-your-own-keys'].includes(item.id),
-                )}
-                selected={input.addOns}
-                cadence="monthly"
-                onChange={(id, quantity) => setInput((value) => ({ ...value, addOns: { ...value.addOns, [id]: quantity } }))}
-              />
+                  <OptionCounterSection
+                    title="Recurring add-ons"
+                    options={recurringAddOns.filter((item) =>
+                      ['extra-storage-100gb', 'dedicated-staging', 'compliance-pack', 'additional-sub-tenant', 'extra-email-250k', 'bring-your-own-keys'].includes(item.id),
+                    )}
+                    selected={input.addOns}
+                    cadence="monthly"
+                    onChange={(id, quantity) => setInput((value) => ({ ...value, addOns: { ...value.addOns, [id]: quantity } }))}
+                  />
 
-              <OptionCounterSection
-                title="Launch and custom services"
-                options={oneOffServices.filter((item) =>
-                  ['branding-theme-pack', 'data-migration', 'mobile-app-store-submission', 'federation-onboarding', 'custom-federation-adapter', 'sso-saml'].includes(item.id),
-                )}
-                selected={input.oneOffServices}
-                cadence="one-off"
-                onChange={(id, quantity) =>
-                  setInput((value) => ({ ...value, oneOffServices: { ...value.oneOffServices, [id]: quantity } }))
-                }
-              />
+                  <OptionCounterSection
+                    title="Launch and custom services"
+                    options={oneOffServices.filter((item) =>
+                      ['branding-theme-pack', 'data-migration', 'mobile-app-store-submission', 'federation-onboarding', 'custom-federation-adapter', 'sso-saml'].includes(item.id),
+                    )}
+                    selected={input.oneOffServices}
+                    cadence="one-off"
+                    onChange={(id, quantity) =>
+                      setInput((value) => ({ ...value, oneOffServices: { ...value.oneOffServices, [id]: quantity } }))
+                    }
+                  />
+                </>
+              )}
 
               <OrderForm quote={quote} />
             </>
@@ -545,27 +565,60 @@ function CapacityPreset({
   active,
   label,
   detail,
+  displayValue,
+  memberKind,
   members,
   onPress,
 }: {
   active: boolean;
   label: string;
   detail: string;
+  displayValue: string;
+  memberKind: string;
   members: number;
   onPress: () => void;
 }) {
   return (
     <button
       type="button"
-      className={`rounded-2xl border p-4 text-left transition ${
+      className={`min-h-36 rounded-2xl border p-4 text-left transition ${
         active ? 'border-[color:var(--color-accent)] bg-[color:var(--color-accent)]/12 shadow-lg shadow-[var(--glow-accent-subtle)]' : 'border-white/10 bg-black/18 hover:border-white/24'
       }`}
       onClick={onPress}
     >
       <span className="block text-sm font-black text-white">{label}</span>
-      <span className="mt-1 block text-2xl font-black text-[var(--color-primary)]">{members.toLocaleString('en-IE')}</span>
+      <span className={`mt-2 block font-black leading-none text-[var(--color-primary)] ${members === 100000 ? 'text-2xl' : 'text-3xl'}`}>{displayValue}</span>
+      <span className="mt-1 block text-xs font-semibold text-white/36 uppercase">{memberKind}</span>
       <span className="mt-2 block text-xs leading-5 text-white/52">{detail}</span>
     </button>
+  );
+}
+
+function EnterpriseCustomSection() {
+  return (
+    <section className="rounded-2xl border border-[color:var(--color-accent)]/28 bg-[color:var(--color-accent)]/8 p-5">
+      <p className="flex items-center gap-2 text-sm font-bold tracking-[0.16em] text-[var(--color-accent)] uppercase">
+        <Sparkles className="size-4" />
+        Enterprise custom
+      </p>
+      <h3 className="mt-2 text-2xl font-black text-white">Published pricing stops at 100,000 active members.</h3>
+      <p className="mt-3 max-w-3xl text-sm leading-6 text-white/62">
+        Above that point, the sensible commercial model depends on traffic shape, tenant count, storage, outbound email, search volume, integrations, migration, support cover, and SLA. This keeps the site honest for million-user scenarios without hiding the affordable tiers below the cap.
+      </p>
+      <dl className="mt-5 grid gap-4 sm:grid-cols-2">
+        {[
+          ['Capacity model', 'Active users, page views, peak concurrency, email volume, storage, and search indexing.'],
+          ['Architecture', 'Dedicated cluster, data residency, backup retention, observability, staging, and scaling plan.'],
+          ['Service level', 'Support windows, incident response, release cadence, security evidence, and escalation route.'],
+          ['Commercial terms', 'Bespoke monthly platform fee, onboarding, migration, and any shared-risk growth model.'],
+        ].map(([term, description]) => (
+          <div key={term} className="border-l border-[color:var(--color-accent)]/35 pl-4">
+            <dt className="font-black text-white">{term}</dt>
+            <dd className="mt-1 text-sm leading-6 text-white/56">{description}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
   );
 }
 
@@ -676,6 +729,10 @@ function OptionCounterSection({
       </div>
     </section>
   );
+}
+
+function formatActiveMemberLabel(activeMembers: number): string {
+  return activeMembers > 100000 ? 'Over 100,000 active members' : `${activeMembers.toLocaleString('en-IE')} active members`;
 }
 
 function updateBilling(setInput: React.Dispatch<React.SetStateAction<QuoteInput>>, billingCycle: BillingCycle) {
