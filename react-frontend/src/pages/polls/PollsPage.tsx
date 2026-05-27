@@ -1227,7 +1227,7 @@ export function PollsPage() {
                         {rankedResults.winner ? (
                           <div className="flex items-center gap-2 p-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
                             <TrendingUp className="w-4 h-4 text-emerald-400" aria-hidden="true" />
-                            <span className="text-sm font-medium text-emerald-400">
+                            <span className="text-sm font-medium text-emerald-700 dark:text-emerald-400">
                               {t('winner_label', { name: String(rankedResults.winner) })}
                             </span>
                           </div>
@@ -1260,7 +1260,7 @@ export function PollsPage() {
                                   );
                                 })}
                               {eliminated && (
-                                <p className="text-[10px] text-red-400 mt-1">{t('eliminated_candidate', { name: eliminated })}</p>
+                                <p className="text-[10px] text-red-600 dark:text-red-400 mt-1">{t('eliminated_candidate', { name: eliminated })}</p>
                               )}
                             </div>
                           );

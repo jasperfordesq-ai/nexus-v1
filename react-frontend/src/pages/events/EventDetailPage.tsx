@@ -729,7 +729,7 @@ export function EventDetailPage() {
             <div className="flex items-center gap-3">
               <Ban className="w-5 h-5 text-red-400 flex-shrink-0" aria-hidden="true" />
               <div>
-                <p className="text-red-400 font-semibold">{t('detail.event_cancelled')}</p>
+                <p className="text-red-600 dark:text-red-400 font-semibold">{t('detail.event_cancelled')}</p>
                 {event.cancellation_reason && (
                   <p className="text-red-300/80 text-sm mt-1">{t('detail.cancellation_reason', { reason: event.cancellation_reason })}</p>
                 )}
@@ -1388,7 +1388,7 @@ export function EventDetailPage() {
                       <CardBody className="flex flex-row items-center gap-4 p-3">
                         {/* Mini Date Badge */}
                         <div className="bg-gradient-to-br from-amber-500/20 to-orange-500/20 rounded-lg p-2 text-center min-w-[48px]">
-                          <div className="text-amber-400 text-[10px] font-medium uppercase leading-none">
+                          <div className="text-amber-700 dark:text-amber-400 text-[10px] font-medium uppercase leading-none">
                             {monthLabel}
                           </div>
                           <div className="text-theme-primary text-lg font-bold leading-tight">
