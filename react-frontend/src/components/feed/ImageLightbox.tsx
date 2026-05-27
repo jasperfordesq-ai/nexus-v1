@@ -15,7 +15,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence, type PanInfo } from 'framer-motion';import X from 'lucide-react/icons/x';
+import { motion, AnimatePresence, type PanInfo } from '@/lib/motion';import X from 'lucide-react/icons/x';
 import ChevronLeft from 'lucide-react/icons/chevron-left';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import Download from 'lucide-react/icons/download';

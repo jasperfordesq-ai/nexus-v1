@@ -1,5 +1,5 @@
 import PenSquare from 'lucide-react/icons/square-pen';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui';
 

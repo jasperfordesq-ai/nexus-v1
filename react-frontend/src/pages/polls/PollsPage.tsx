@@ -19,7 +19,7 @@ import { Select, SelectItem, useDisclosure, GlassCard, Progress, Button, Chip, I
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import type { DateInputValue } from '@/components/ui';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from '@/lib/motion';
 import { DatePicker } from '@/components/ui';
 import { Separator } from '@heroui/react';
 import BarChart3 from 'lucide-react/icons/chart-column';

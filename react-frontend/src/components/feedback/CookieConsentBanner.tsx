@@ -24,7 +24,7 @@ import ChevronDown from 'lucide-react/icons/chevron-down';
 import ChevronUp from 'lucide-react/icons/chevron-up';
 import Shield from 'lucide-react/icons/shield';
 import ExternalLink from 'lucide-react/icons/external-link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from '@/lib/motion';
 import { useCookieConsent } from '@/contexts/CookieConsentContext';
 import { useTenant } from '@/contexts';
 import { useTranslation } from 'react-i18next';

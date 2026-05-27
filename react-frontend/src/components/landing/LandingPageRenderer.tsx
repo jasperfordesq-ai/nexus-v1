@@ -16,7 +16,7 @@
  */
 
 import { useMemo } from 'react';
-import { MotionConfig } from 'framer-motion';
+import { MotionConfig } from '@/lib/motion';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTenant } from '@/contexts';

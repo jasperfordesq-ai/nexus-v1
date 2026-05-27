@@ -18,7 +18,7 @@ import { Select, SelectItem, useDisclosure, GlassCard, ConfettiCelebration, Prog
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import Target from 'lucide-react/icons/target';
 import Plus from 'lucide-react/icons/plus';

@@ -113,7 +113,7 @@ vi.mock('@/components/feedback', () => ({
   ),
 }));
 
-vi.mock('framer-motion', () => ({
+vi.mock('@/lib/motion', () => ({
   motion: {
     div: ({ children, ...rest }: Record<string, unknown>) => (
       <div {...(rest as object)}>{children as ReactNode}</div>

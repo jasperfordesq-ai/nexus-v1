@@ -13,7 +13,7 @@
  */
 
 import { useState, useRef, useCallback, useEffect, useId } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from '@/lib/motion';
 
 import Heart from 'lucide-react/icons/heart';
 import Clock from 'lucide-react/icons/clock';
@@ -322,7 +322,7 @@ export function ReactionPicker({
                   placement="top"
                 >
                   <motion.button
-                    ref={(el) => { itemRefs.current[idx] = el; }}
+                    ref={(el: HTMLButtonElement | null) => { itemRefs.current[idx] = el; }}
                     whileHover={{ scale: 1.35, y: -4 }}
                     whileTap={{ scale: 0.9 }}
                     transition={{ type: 'spring', stiffness: 500, damping: 20 }}

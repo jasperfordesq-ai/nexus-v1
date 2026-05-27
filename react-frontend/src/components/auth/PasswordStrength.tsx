@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import Loader2 from 'lucide-react/icons/loader-circle';

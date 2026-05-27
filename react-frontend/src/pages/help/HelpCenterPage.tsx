@@ -14,7 +14,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';import { SafeHtml } from '@/components/ui/SafeHtml';
+import { motion } from '@/lib/motion';import { SafeHtml } from '@/components/ui/SafeHtml';
 import HelpCircle from 'lucide-react/icons/circle-help';
 import Search from 'lucide-react/icons/search';
 import MessageSquare from 'lucide-react/icons/message-square';

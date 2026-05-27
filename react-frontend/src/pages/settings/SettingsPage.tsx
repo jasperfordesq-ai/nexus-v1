@@ -19,7 +19,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Key } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import User from 'lucide-react/icons/user';
 import Bell from 'lucide-react/icons/bell';

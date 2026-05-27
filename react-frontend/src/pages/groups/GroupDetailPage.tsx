@@ -11,7 +11,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';import AlertCircle from 'lucide-react/icons/circle-alert';
+import { motion } from '@/lib/motion';import AlertCircle from 'lucide-react/icons/circle-alert';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import RefreshCw from 'lucide-react/icons/refresh-cw';
 import { GlassCard, useDisclosure, Button } from '@/components/ui';

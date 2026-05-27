@@ -13,7 +13,7 @@ import { Select, SelectItem, GlassCard, Progress, Button, Input, Textarea, Switc
 
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from '@/lib/motion';
 
 import Briefcase from 'lucide-react/icons/briefcase';
 import Building2 from 'lucide-react/icons/building-2';

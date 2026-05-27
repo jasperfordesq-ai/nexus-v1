@@ -11,7 +11,7 @@
  */
 
 import { forwardRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from '@/lib/motion';
 
 import UserCheck from 'lucide-react/icons/user-check';
 import { useTranslation } from 'react-i18next';

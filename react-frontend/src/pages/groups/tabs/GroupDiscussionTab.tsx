@@ -9,7 +9,7 @@
  */
 
 import { Fragment } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from '@/lib/motion';
 
 import MessageSquare from 'lucide-react/icons/message-square';
 import Lock from 'lucide-react/icons/lock';

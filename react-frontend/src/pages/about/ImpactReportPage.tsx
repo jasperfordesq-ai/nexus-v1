@@ -12,7 +12,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import FileText from 'lucide-react/icons/file-text';
 import BookOpen from 'lucide-react/icons/book-open';

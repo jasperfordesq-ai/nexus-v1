@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 import UserPlus from 'lucide-react/icons/user-plus';
 import Search from 'lucide-react/icons/search';
 import Handshake from 'lucide-react/icons/handshake';

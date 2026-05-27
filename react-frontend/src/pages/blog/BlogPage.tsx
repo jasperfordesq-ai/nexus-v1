@@ -11,7 +11,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import BookOpen from 'lucide-react/icons/book-open';
 import RefreshCw from 'lucide-react/icons/refresh-cw';

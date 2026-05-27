@@ -11,7 +11,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';import { Separator } from '@heroui/react';
+import { motion } from '@/lib/motion';import { Separator } from '@heroui/react';
 import Scale from 'lucide-react/icons/scale';
 import Shield from 'lucide-react/icons/shield';
 import FileText from 'lucide-react/icons/file-text';

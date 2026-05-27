@@ -16,7 +16,7 @@ vi.mock('react-router-dom', () => ({
   Outlet: () => <div data-testid="outlet" />,
 }));
 
-vi.mock('framer-motion', () => ({
+vi.mock('@/lib/motion', () => ({
   motion: new Proxy({}, {
     get: (_target: Record<string, unknown>, tag: string) => {
       return React.forwardRef(({ children, ...rest }: Record<string, unknown>, ref: React.Ref<HTMLElement>) =>

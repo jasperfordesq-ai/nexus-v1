@@ -12,7 +12,7 @@
  * exists, so we ship one rather than a "being prepared" placeholder.
  */
 
-import { motion } from 'framer-motion';import ShieldCheck from 'lucide-react/icons/shield-check';
+import { motion } from '@/lib/motion';import ShieldCheck from 'lucide-react/icons/shield-check';
 import Ban from 'lucide-react/icons/ban';
 import UserX from 'lucide-react/icons/user-x';
 import Bot from 'lucide-react/icons/bot';

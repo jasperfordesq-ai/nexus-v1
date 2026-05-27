@@ -15,7 +15,7 @@
 
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import BookOpen from 'lucide-react/icons/book-open';
 import Search from 'lucide-react/icons/search';

@@ -8,7 +8,7 @@ import { render, screen } from '@/test/test-utils';
 import { BackToTop } from './BackToTop';
 
 // Mock framer-motion
-vi.mock('framer-motion', () => ({
+vi.mock('@/lib/motion', () => ({
   motion: new Proxy({}, {
     get: (_, tag) => {
       return ({ children, ...props }: Record<string, unknown>) => {

@@ -50,7 +50,7 @@ vi.mock('@/contexts', () => ({
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/lib/logger', () => ({ logError: vi.fn() }));
 vi.mock('@/components/seo', () => ({ PageMeta: () => null }));
-vi.mock('framer-motion', () => {
+vi.mock('@/lib/motion', () => {
   const motionProxy = new Proxy({}, {
     get: (_target, prop) => {
       return React.forwardRef(({ children, ...props }: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {

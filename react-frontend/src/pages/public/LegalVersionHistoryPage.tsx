@@ -22,7 +22,7 @@
 
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from '@/lib/motion';
 import { sanitizeRichText } from '@/lib/sanitize';
 import { Chip } from '@heroui/react';
 import History from 'lucide-react/icons/history';

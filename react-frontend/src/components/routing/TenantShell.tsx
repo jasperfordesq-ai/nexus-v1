@@ -261,7 +261,7 @@ function BootstrapError({ onRetry }: { onRetry: () => void }) {
  * Inline component to avoid circular dependency with lazy-loaded NotFoundPage.
  */
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';import { Helmet } from 'react-helmet-async';
+import { motion } from '@/lib/motion';import { Helmet } from 'react-helmet-async';
 import Home from 'lucide-react/icons/house';
 import Search from 'lucide-react/icons/search';
 import Globe from 'lucide-react/icons/globe';

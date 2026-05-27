@@ -13,7 +13,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';import ShieldCheck from 'lucide-react/icons/shield-check';
+import { motion } from '@/lib/motion';import ShieldCheck from 'lucide-react/icons/shield-check';
 import ShieldX from 'lucide-react/icons/shield-x';
 import Fingerprint from 'lucide-react/icons/fingerprint';
 import ExternalLink from 'lucide-react/icons/external-link';

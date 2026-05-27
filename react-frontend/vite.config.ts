@@ -181,7 +181,6 @@ export default defineConfig(({ command, mode }) => {
     // (lucide-react/icons/*) so the full-barrel 784 KB pre-bundle is no longer needed.
     include: [
       '@heroui/react',
-      'framer-motion',
       'react',
       'react-dom',
       'react-router-dom',
@@ -256,7 +255,6 @@ export default defineConfig(({ command, mode }) => {
         manualChunks: {
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
           'vendor-heroui': ['@heroui/react'],
-          'vendor-motion': ['framer-motion'],
           'vendor-i18n': ['i18next', 'react-i18next'],
           'vendor-charts': ['recharts'],
         },

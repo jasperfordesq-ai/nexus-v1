@@ -9,7 +9,7 @@
 
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';import Lock from 'lucide-react/icons/lock';
+import { motion } from '@/lib/motion';import Lock from 'lucide-react/icons/lock';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import Eye from 'lucide-react/icons/eye';

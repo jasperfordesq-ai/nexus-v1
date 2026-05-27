@@ -13,7 +13,7 @@
  * placeholder.
  */
 
-import { motion } from 'framer-motion';import Users from 'lucide-react/icons/users';
+import { motion } from '@/lib/motion';import Users from 'lucide-react/icons/users';
 import Heart from 'lucide-react/icons/heart';
 import Shield from 'lucide-react/icons/shield';
 import MessageCircle from 'lucide-react/icons/message-circle';

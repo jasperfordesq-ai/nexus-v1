@@ -11,7 +11,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 
 import React from "react";
-vi.mock('framer-motion', () => ({
+vi.mock('@/lib/motion', () => ({
   motion: new Proxy({}, {
     get: (_: object, prop: string | symbol) => {
       return React.forwardRef(({ children, ...props }: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {

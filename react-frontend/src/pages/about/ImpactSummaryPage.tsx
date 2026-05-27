@@ -11,7 +11,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';import TrendingUp from 'lucide-react/icons/trending-up';
+import { motion } from '@/lib/motion';import TrendingUp from 'lucide-react/icons/trending-up';
 import Heart from 'lucide-react/icons/heart';
 import Stethoscope from 'lucide-react/icons/stethoscope';
 import FileText from 'lucide-react/icons/file-text';

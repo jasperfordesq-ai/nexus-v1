@@ -6,7 +6,7 @@ import { Card } from '@/components/ui';
 
 import { forwardRef, type ReactNode, type HTMLAttributes, type MouseEvent } from 'react';
 
-import { motion, type Variants } from 'framer-motion';
+import { motion, type Variants } from '@/lib/motion';
 
 /** Exclude HTML event props that conflict with Framer Motion's signatures */
 type SafeHtmlProps = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onDrag' | 'onDragStart' | 'onDragEnd' | 'onAnimationStart'>;

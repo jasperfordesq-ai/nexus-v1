@@ -17,7 +17,7 @@ import { Select, SelectItem, GlassCard, Button, Chip, Input } from '@/components
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';import Search from 'lucide-react/icons/search';
+import { motion } from '@/lib/motion';import Search from 'lucide-react/icons/search';
 import Globe from 'lucide-react/icons/globe';
 import Users from 'lucide-react/icons/users';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';

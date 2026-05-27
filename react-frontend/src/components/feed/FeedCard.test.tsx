@@ -49,7 +49,7 @@ vi.mock('@/lib/helpers', () => ({
   formatRelativeTime: vi.fn(() => '2 hours ago'),
 }));
 
-vi.mock('framer-motion', () => ({
+vi.mock('@/lib/motion', () => ({
   motion: {
     div: ({ children, ...props }: Record<string, unknown>) => {
       const { variants, initial, animate, exit, layout, ...rest } = props; void variants; void initial; void animate; void exit; void layout;

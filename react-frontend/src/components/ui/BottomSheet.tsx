@@ -12,7 +12,7 @@
  */
 
 import { useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 import { Modal, ModalContent, ModalHeader, ModalBody } from '@/components/ui';
 
 

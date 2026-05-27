@@ -46,7 +46,7 @@ vi.mock('@/components/legal/CustomLegalDocument', () => ({
   default: () => <div data-testid="custom-legal">Custom Legal Doc</div>,
   CustomLegalDocument: () => <div data-testid="custom-legal">Custom Legal Doc</div>,
 }));
-vi.mock('framer-motion', () => {
+vi.mock('@/lib/motion', () => {
   const proxy = new Proxy({}, {
     get: (_t: object, prop: string | symbol) => {
       return React.forwardRef(({ children, ...p }: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {

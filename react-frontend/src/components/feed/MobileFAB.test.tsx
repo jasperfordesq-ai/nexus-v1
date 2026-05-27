@@ -31,7 +31,7 @@ vi.mock('@/contexts', () => ({
   useToast: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() }),
 }));
 
-vi.mock('framer-motion', () => ({
+vi.mock('@/lib/motion', () => ({
   motion: {
     div: ({ children, ...props }: Record<string, unknown>) => {
       const { variants, initial, animate, exit, layout, transition, whileHover, whileTap, ...rest } = props;

@@ -13,7 +13,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';import ArrowLeft from 'lucide-react/icons/arrow-left';
+import { motion } from '@/lib/motion';import ArrowLeft from 'lucide-react/icons/arrow-left';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import FileText from 'lucide-react/icons/file-text';
 import { sanitizeRichText } from '@/lib/sanitize';

@@ -12,7 +12,7 @@ import {
   useEffect,
   useCallback,
   useRef } from 'react';
-import { motion } from 'framer-motion';import Trophy from 'lucide-react/icons/trophy';
+import { motion } from '@/lib/motion';import Trophy from 'lucide-react/icons/trophy';
 import Users from 'lucide-react/icons/users';
 import Star from 'lucide-react/icons/star';
 import Clock from 'lucide-react/icons/clock';

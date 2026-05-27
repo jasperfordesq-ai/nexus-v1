@@ -20,7 +20,7 @@ import {
   useState,
   useEffect,
   useCallback } from 'react';
-import { motion } from 'framer-motion';import TrendingUp from 'lucide-react/icons/trending-up';
+import { motion } from '@/lib/motion';import TrendingUp from 'lucide-react/icons/trending-up';
 import ClipboardCheck from 'lucide-react/icons/clipboard-check';
 import Trophy from 'lucide-react/icons/trophy';
 import Users from 'lucide-react/icons/users';

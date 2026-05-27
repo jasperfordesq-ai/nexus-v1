@@ -18,7 +18,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';import { Separator } from '@heroui/react';
+import { motion } from '@/lib/motion';import { Separator } from '@heroui/react';
 import BookOpen from 'lucide-react/icons/book-open';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import ThumbsUp from 'lucide-react/icons/thumbs-up';

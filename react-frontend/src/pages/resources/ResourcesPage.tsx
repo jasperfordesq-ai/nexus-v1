@@ -12,7 +12,7 @@ import { Select, SelectItem, useDisclosure, GlassCard, Progress, Button, Chip, I
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import FolderOpen from 'lucide-react/icons/folder-open';
 import RefreshCw from 'lucide-react/icons/refresh-cw';

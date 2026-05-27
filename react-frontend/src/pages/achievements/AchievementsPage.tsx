@@ -9,7 +9,7 @@ import { Select, SelectItem, GlassCard, Progress, Button, Chip, Spinner, Modal, 
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from '@/lib/motion';
 
 import Trophy from 'lucide-react/icons/trophy';
 import Medal from 'lucide-react/icons/medal';

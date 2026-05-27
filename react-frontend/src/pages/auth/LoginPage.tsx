@@ -18,7 +18,7 @@ import { useState, useEffect, useRef, useCallback, type FormEvent } from 'react'
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 
 import { Separator } from '@heroui/react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from '@/lib/motion';
 import Mail from 'lucide-react/icons/mail';
 import Lock from 'lucide-react/icons/lock';
 import Eye from 'lucide-react/icons/eye';

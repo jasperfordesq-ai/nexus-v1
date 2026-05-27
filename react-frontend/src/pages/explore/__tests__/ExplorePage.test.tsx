@@ -193,7 +193,7 @@ vi.mock('@/components/explore', () => ({
   HorizontalScroll: ({ children }: { children: React.ReactNode }) => <div data-testid="horizontal-scroll">{children}</div>,
 }));
 
-vi.mock('framer-motion', () => ({
+vi.mock('@/lib/motion', () => ({
   motion: {
     div: ({ children, ...props }: Record<string, unknown>) => {
       const safe: Record<string, unknown> = {};

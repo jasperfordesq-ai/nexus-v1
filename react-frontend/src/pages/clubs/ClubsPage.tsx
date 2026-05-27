@@ -13,7 +13,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import Users from 'lucide-react/icons/users';
 import Search from 'lucide-react/icons/search';

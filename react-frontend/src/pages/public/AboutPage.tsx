@@ -16,7 +16,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';import Hexagon from 'lucide-react/icons/hexagon';
+import { motion } from '@/lib/motion';import Hexagon from 'lucide-react/icons/hexagon';
 import UserPlus from 'lucide-react/icons/user-plus';
 import Search from 'lucide-react/icons/search';
 import Handshake from 'lucide-react/icons/handshake';

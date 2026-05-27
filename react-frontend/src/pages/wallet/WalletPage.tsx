@@ -10,7 +10,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Papa from 'papaparse';
 import { useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import Wallet from 'lucide-react/icons/wallet';
 import ArrowUpRight from 'lucide-react/icons/arrow-up-right';

@@ -9,7 +9,7 @@ import { CustomLegalDocument } from './CustomLegalDocument';
 import type { LegalDocument } from '@/hooks/useLegalDocument';
 
 // Mock framer-motion to strip animation props
-vi.mock('framer-motion', () => {
+vi.mock('@/lib/motion', () => {
   const handler = {
     get: (_: unknown, tag: string) => {
       return ({

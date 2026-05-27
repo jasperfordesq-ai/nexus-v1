@@ -18,7 +18,7 @@ import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 import { Chip } from '@heroui/react';
 import { sanitizeRichText } from '@/lib/sanitize';
 import FileText from 'lucide-react/icons/file-text';

@@ -39,7 +39,7 @@ import { MemoryRouter } from 'react-router-dom';
 // ─── Mocks ────────────────────────────────────────────────────────────────────
 
 // framer-motion: strip motion-only props so axe sees plain DOM elements
-vi.mock('framer-motion', () => {
+vi.mock('@/lib/motion', () => {
   const passthrough = (Tag: string) => ({ children, ...props }: Record<string, unknown>) => {
     const motionKeys = new Set([
       'variants', 'initial', 'animate', 'exit', 'transition',

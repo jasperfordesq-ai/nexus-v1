@@ -9,7 +9,7 @@
 
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from '@/lib/motion';
 
 import Bell from 'lucide-react/icons/bell';
 import MessageSquare from 'lucide-react/icons/message-square';

@@ -11,7 +11,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import Award from 'lucide-react/icons/award';
 import Calendar from 'lucide-react/icons/calendar';

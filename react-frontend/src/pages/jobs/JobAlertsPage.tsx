@@ -16,7 +16,7 @@ import { Select, SelectItem, useDisclosure, GlassCard, Button, Input, Modal, Mod
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import Bell from 'lucide-react/icons/bell';
 import Plus from 'lucide-react/icons/plus';

@@ -10,7 +10,7 @@
  */
 
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from '@/lib/motion';
 
 import ListTodo from 'lucide-react/icons/list-todo';
 import Calendar from 'lucide-react/icons/calendar';

@@ -21,7 +21,7 @@ import { Select, SelectItem, GlassCard, Button, Input, Textarea, Switch, Checkbo
  */
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from '@/lib/motion';
 
 import MapPin from 'lucide-react/icons/map-pin';
 import CheckCircle from 'lucide-react/icons/check-circle';

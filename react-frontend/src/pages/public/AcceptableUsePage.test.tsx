@@ -74,7 +74,7 @@ vi.mock('@/components/ui', () => ({
   SkeletonList: () => null,
 }));
 
-vi.mock('framer-motion', () => {
+vi.mock('@/lib/motion', () => {
   const motionProps = new Set(['variants', 'initial', 'animate', 'layout', 'transition', 'exit', 'whileHover', 'whileTap', 'whileInView', 'viewport']);
   const filterMotion = (props: Record<string, unknown>) => {
     const filtered: Record<string, unknown> = {};

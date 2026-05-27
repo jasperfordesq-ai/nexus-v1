@@ -16,7 +16,7 @@ const listingItemVariants = {
   hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.25 } }, };
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import Search from 'lucide-react/icons/search';
 import Plus from 'lucide-react/icons/plus';

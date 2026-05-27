@@ -14,7 +14,7 @@ import { Card } from '@heroui/react';
  */
 
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import Bell from 'lucide-react/icons/bell';
 import Clock from 'lucide-react/icons/clock';

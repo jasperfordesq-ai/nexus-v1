@@ -11,7 +11,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 import { framerMotionMock } from '@/test/mocks';
 
-vi.mock('framer-motion', () => framerMotionMock);
+vi.mock('@/lib/motion', () => framerMotionMock);
 
 const communityProjectTranslations: Record<string, string> = {
   'community_projects.heading': 'Community Projects',

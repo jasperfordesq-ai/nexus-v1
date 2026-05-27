@@ -8,7 +8,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import Clock from 'lucide-react/icons/clock';
 import Users from 'lucide-react/icons/users';

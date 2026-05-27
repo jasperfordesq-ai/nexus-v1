@@ -12,7 +12,7 @@ import { Select, SelectItem, GlassCard, Button, Input, Textarea, CheckboxGroup, 
  */
 
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import Building from 'lucide-react/icons/building';
 import Globe from 'lucide-react/icons/globe';

@@ -11,7 +11,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';import Accessibility from 'lucide-react/icons/accessibility';
+import { motion } from '@/lib/motion';import Accessibility from 'lucide-react/icons/accessibility';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import MessageSquare from 'lucide-react/icons/message-square';
 import Monitor from 'lucide-react/icons/monitor';

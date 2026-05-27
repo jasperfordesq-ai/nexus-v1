@@ -11,7 +11,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import Heart from 'lucide-react/icons/heart';
 import Activity from 'lucide-react/icons/activity';

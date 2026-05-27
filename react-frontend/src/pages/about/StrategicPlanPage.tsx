@@ -11,7 +11,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import Compass from 'lucide-react/icons/compass';
 import Download from 'lucide-react/icons/download';

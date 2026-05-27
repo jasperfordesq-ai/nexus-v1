@@ -59,7 +59,7 @@ vi.mock('lucide-react', () => ({
   X: () => <span data-testid="icon-close" />,
 }));
 
-vi.mock('framer-motion', () => ({
+vi.mock('@/lib/motion', () => ({
   motion: {
     div: ({ children, ...props }: Record<string, unknown>) => <div {...props}>{children}</div>,
   },

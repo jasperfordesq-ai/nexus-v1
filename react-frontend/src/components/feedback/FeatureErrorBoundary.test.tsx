@@ -7,7 +7,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen } from '@/test/test-utils';
 import { FeatureErrorBoundary } from './FeatureErrorBoundary';
 
-vi.mock('framer-motion', () => {
+vi.mock('@/lib/motion', () => {
   const handler = {
     get: (_: unknown, tag: string) => {
       return ({ children, _initial, _animate, _exit, _transition, _variants, _whileHover, _whileTap, ...rest }: Record<string, unknown>) => {

@@ -66,7 +66,7 @@ vi.mock('../../components', () => ({
   ),
 }));
 
-vi.mock('framer-motion', () => ({
+vi.mock('@/lib/motion', () => ({
   motion: {
     div: ({ children, ...props }: Record<string, unknown>) => <div>{children}</div>,
   },

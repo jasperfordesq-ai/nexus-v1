@@ -8,7 +8,7 @@ import { render, screen } from '@/test/test-utils';
 import { GlassCard } from './GlassCard';
 
 // Mock framer-motion to strip animation props and render as regular elements
-vi.mock('framer-motion', () => {
+vi.mock('@/lib/motion', () => {
   const handler = {
     get: (_target: Record<string, unknown>, tag: string) => {
       return ({ children, ...rest }: Record<string, unknown>) => {

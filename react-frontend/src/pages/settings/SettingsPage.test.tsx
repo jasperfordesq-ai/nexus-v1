@@ -247,7 +247,7 @@ vi.mock('@/components/LanguageSwitcher', () => ({
 // Mock framer-motion — IMPORTANT: use a stable MotionDiv component, NOT a Proxy that
 // creates a new component class on each property access. React tracks component identity;
 // a new class per render causes unmount/remount cycles → infinite effect loops.
-vi.mock('framer-motion', async () => {
+vi.mock('@/lib/motion', async () => {
   const R = await import('react');
   const MOTION_PROPS = new Set(['variants', 'initial', 'animate', 'exit', 'layout', 'whileHover', 'whileTap', 'transition', 'whileInView', 'viewport', 'layoutId']);
   const MotionDiv = R.forwardRef(({ children, ...props }: Record<string, unknown>, ref: R.Ref<HTMLDivElement>) => {

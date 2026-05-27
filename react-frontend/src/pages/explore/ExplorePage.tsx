@@ -38,7 +38,7 @@ import Briefcase from 'lucide-react/icons/briefcase';
 import X from 'lucide-react/icons/x';
 import History from 'lucide-react/icons/history';
 import Trash2 from 'lucide-react/icons/trash-2';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { PageMeta } from '@/components/seo/PageMeta';
 import { useApi } from '@/hooks/useApi';

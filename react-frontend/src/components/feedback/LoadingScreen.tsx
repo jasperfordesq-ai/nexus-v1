@@ -10,7 +10,7 @@ import { Skeleton } from '@/components/ui';
  * Full-page loading indicator
  */
 
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import Loader2 from 'lucide-react/icons/loader-circle';
 import i18n from 'i18next';

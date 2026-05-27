@@ -15,7 +15,7 @@ import { Button, Input, Card, CardBody, Chip, Avatar, Tabs, Tab, Skeleton } from
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import Users2 from 'lucide-react/icons/users-round';
 import UserCheck from 'lucide-react/icons/user-check';

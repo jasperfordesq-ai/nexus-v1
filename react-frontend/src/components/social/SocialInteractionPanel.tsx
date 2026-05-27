@@ -10,7 +10,7 @@
  * (post/listing/event/goal/poll/review/volunteer/challenge/resource/job/blog/discussion).
  */
 
-import { useCallback, useEffect, useState } from 'react';import { AnimatePresence, motion } from 'framer-motion';
+import { useCallback, useEffect, useState } from 'react';import { AnimatePresence, motion } from '@/lib/motion';
 import Heart from 'lucide-react/icons/heart';
 import MessageCircle from 'lucide-react/icons/message-circle';
 import { useTranslation } from 'react-i18next';

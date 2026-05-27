@@ -13,7 +13,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';import Hash from 'lucide-react/icons/hash';
+import { motion } from '@/lib/motion';import Hash from 'lucide-react/icons/hash';
 import Search from 'lucide-react/icons/search';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import RefreshCw from 'lucide-react/icons/refresh-cw';

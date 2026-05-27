@@ -14,7 +14,7 @@
 
 import React, { Suspense, useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
+import { motion } from '@/lib/motion';import LayoutDashboard from 'lucide-react/icons/layout-dashboard';
 import ClipboardList from 'lucide-react/icons/clipboard-list';
 import Clock from 'lucide-react/icons/clock';
 import Users from 'lucide-react/icons/users';

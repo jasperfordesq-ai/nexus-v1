@@ -24,7 +24,7 @@ import { ImagePlaceholder } from '@/components/ui/ImagePlaceholder';
 
 // ─── Mocks ────────────────────────────────────────────────────────────────────
 
-vi.mock('framer-motion', () => ({
+vi.mock('@/lib/motion', () => ({
   motion: new Proxy({} as Record<string, unknown>, {
     get: (_target, prop: string) => {
       const { forwardRef, createElement } = require('react');

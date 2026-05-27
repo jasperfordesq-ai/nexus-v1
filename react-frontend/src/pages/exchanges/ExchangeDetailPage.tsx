@@ -16,7 +16,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import ArrowRightLeft from 'lucide-react/icons/arrow-right-left';
 import CheckCircle from 'lucide-react/icons/circle-check-big';

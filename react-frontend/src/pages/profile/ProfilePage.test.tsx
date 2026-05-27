@@ -137,7 +137,7 @@ vi.mock('@/components/seo', () => ({ PageMeta: () => null }));
 vi.mock('dompurify', () => ({
   default: { addHook: vi.fn(), sanitize: (html: string) => html },
 }));
-vi.mock('framer-motion', () => {
+vi.mock('@/lib/motion', () => {
   const motionProps = new Set(['variants', 'initial', 'animate', 'layout', 'transition', 'exit', 'whileHover', 'whileTap', 'whileInView', 'viewport']);
   const filterMotion = (props: Record<string, unknown>) => {
     const filtered: Record<string, unknown> = {};

@@ -52,7 +52,7 @@ vi.mock('@/components/ui', () => ({
   GlassCard: ({ children, ...props }: Record<string, unknown>) => <div {...props}>{children}</div>,
 }));
 
-vi.mock('framer-motion', () => {
+vi.mock('@/lib/motion', () => {
   return {
     motion: {
       div: ({ children, ...props }: Record<string, unknown>) => <div>{children}</div>,

@@ -63,7 +63,7 @@ vi.mock('react-i18next', () => ({
   }),
 }));
 
-vi.mock('framer-motion', () => ({
+vi.mock('@/lib/motion', () => ({
   motion: new Proxy({}, {
     get: (_: object, prop: string) => {
       const { createElement, forwardRef } = require('react');

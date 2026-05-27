@@ -10,7 +10,7 @@
  * Uses Framer Motion. Must be inside a `position: relative` container.
  */
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from '@/lib/motion';
 import PartyPopper from 'lucide-react/icons/party-popper';
 
 const COLORS = ['#6366f1', '#a855f7', '#22c55e', '#f59e0b', '#ec4899'];

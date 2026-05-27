@@ -9,7 +9,7 @@ import { Select, SelectItem, useDisclosure, GlassCard, Button, Chip, Input, Text
  */
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import Receipt from 'lucide-react/icons/receipt';
 import Plus from 'lucide-react/icons/plus';

@@ -13,7 +13,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Link } from 'react-router-dom';
 import { motion,
-  AnimatePresence } from 'framer-motion';
+  AnimatePresence } from '@/lib/motion';
 
 import { Separator } from '@heroui/react';
 import Heart from 'lucide-react/icons/heart';

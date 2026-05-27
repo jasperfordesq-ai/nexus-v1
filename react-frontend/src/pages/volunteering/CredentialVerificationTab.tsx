@@ -12,7 +12,7 @@ import { Select, SelectItem, useDisclosure, GlassCard, Button, Chip, Input, Moda
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import ShieldCheck from 'lucide-react/icons/shield-check';
 import Upload from 'lucide-react/icons/upload';

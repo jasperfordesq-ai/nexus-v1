@@ -14,7 +14,7 @@ import { Select, SelectItem, GlassCard, Button, Spinner, Input, Switch } from '@
  */
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import Settings from 'lucide-react/icons/settings';
 import Eye from 'lucide-react/icons/eye';

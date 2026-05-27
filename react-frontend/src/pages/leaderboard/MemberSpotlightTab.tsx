@@ -12,7 +12,7 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import Sparkles from 'lucide-react/icons/sparkles';
 import ChevronRight from 'lucide-react/icons/chevron-right';

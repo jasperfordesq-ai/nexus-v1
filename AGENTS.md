@@ -262,7 +262,7 @@ This project is **publicly released** under AGPL-3.0-or-later at <https://github
 **The React frontend (`react-frontend/`) is the sole frontend for all pages.** There are no maintained PHP views.
 
 - **ALL UI work** goes in `react-frontend/`
-- **UI stack**: React 19 + TypeScript + **HeroUI v3** (`@heroui/react`) + **Tailwind CSS 4** (Framer Motion being removed as part of HeroUI v3 migration)
+- **UI stack**: React 19 + TypeScript + **HeroUI v3** (`@heroui/react`) + **Tailwind CSS 4**. The v3 package migration is complete (no v2 npm alias). Framer Motion has been removed — animations use the local `@/lib/motion` shim (CSS-transition-backed) or Tailwind/CSS. Do NOT reintroduce `framer-motion`.
 - **Icons**: Lucide React (`lucide-react`)
 - Use HeroUI components as primary building blocks
 - Use Tailwind CSS utilities for layout/spacing — **no separate CSS component files**

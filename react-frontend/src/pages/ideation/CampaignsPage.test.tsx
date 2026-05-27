@@ -8,7 +8,7 @@ import { render, screen, waitFor } from '@/test/test-utils';
 import { api } from '@/lib/api';
 import type { ReactNode } from 'react';
 
-vi.mock('framer-motion', () => ({
+vi.mock('@/lib/motion', () => ({
   motion: {
     div: ({ children, ...props }: { children?: ReactNode; [k: string]: unknown }) => {
       const { variants: _v, initial: _i, animate: _a, exit: _e, transition: _t, ...rest } = props as Record<string, unknown>;

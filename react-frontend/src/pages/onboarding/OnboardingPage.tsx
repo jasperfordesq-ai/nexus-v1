@@ -18,7 +18,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from '@/lib/motion';
 
 import { Separator } from '@heroui/react';
 import Sparkles from 'lucide-react/icons/sparkles';

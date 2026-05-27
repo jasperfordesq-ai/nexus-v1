@@ -10,7 +10,7 @@ import { Select, SelectItem, GlassCard, MemberCardSkeleton, AlgorithmLabel, useA
 
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import Search from 'lucide-react/icons/search';
 import Users from 'lucide-react/icons/users';

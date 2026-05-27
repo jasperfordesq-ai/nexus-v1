@@ -134,7 +134,7 @@ vi.mock('@/pages/public/MaintenancePage', () => ({
   default: () => <div>Maintenance mode</div>,
 }));
 
-vi.mock('framer-motion', () => {
+vi.mock('@/lib/motion', () => {
   const proxy = new Proxy({}, {
     get: (_t: object, prop: string | symbol) => {
       return React.forwardRef(({ children, ...p }: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {

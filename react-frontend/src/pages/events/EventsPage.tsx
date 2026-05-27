@@ -10,7 +10,7 @@ import { Select, SelectItem, GlassCard, Button, Chip, Input, Skeleton } from '@/
 
 import { useState, useEffect, useCallback, useRef, memo, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import Search from 'lucide-react/icons/search';
 import Calendar from 'lucide-react/icons/calendar';

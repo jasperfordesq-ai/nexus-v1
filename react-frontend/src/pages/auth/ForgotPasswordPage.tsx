@@ -9,7 +9,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';import Mail from 'lucide-react/icons/mail';
+import { motion } from '@/lib/motion';import Mail from 'lucide-react/icons/mail';
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import { useTranslation } from 'react-i18next';

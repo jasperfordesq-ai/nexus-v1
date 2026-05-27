@@ -11,7 +11,7 @@ import { Select, SelectItem, useDisclosure, GlassCard, Progress, Button, Chip, S
 import React, { useState, useEffect, useCallback, useRef, Suspense } from 'react';
 import { ErrorBoundary } from '@/components/feedback/ErrorBoundary';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import Heart from 'lucide-react/icons/heart';
 import Plus from 'lucide-react/icons/plus';

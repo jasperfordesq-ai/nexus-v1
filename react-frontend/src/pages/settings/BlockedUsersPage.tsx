@@ -6,7 +6,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import ShieldOff from 'lucide-react/icons/shield-off';

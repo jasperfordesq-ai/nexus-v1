@@ -7,7 +7,7 @@ import { type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import ChevronRight from 'lucide-react/icons/chevron-right';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 interface ExploreSectionProps {
   title: string;

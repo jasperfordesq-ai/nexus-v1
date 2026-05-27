@@ -64,7 +64,7 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
-vi.mock('framer-motion', async () => {
+vi.mock('@/lib/motion', async () => {
   const { framerMotionMock } = await import('@/test/mocks');
   return framerMotionMock;
 });

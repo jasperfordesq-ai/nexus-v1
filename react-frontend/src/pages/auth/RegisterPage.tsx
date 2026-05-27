@@ -21,7 +21,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
 import { Separator } from '@heroui/react';
 import { motion,
-  AnimatePresence } from 'framer-motion';
+  AnimatePresence } from '@/lib/motion';
 import User from 'lucide-react/icons/user';
 import Mail from 'lucide-react/icons/mail';
 import Lock from 'lucide-react/icons/lock';

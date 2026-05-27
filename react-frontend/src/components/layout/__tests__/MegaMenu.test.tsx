@@ -34,7 +34,7 @@ vi.mock('react-i18next', () => ({
 
 type MockMotionProps = { children?: React.ReactNode; [key: string]: unknown };
 
-vi.mock('framer-motion', async () => {
+vi.mock('@/lib/motion', async () => {
   const react = await import('react');
   const passthrough = (tag: string) => ({ children, ...props }: MockMotionProps) =>
     react.createElement(tag, props, children);

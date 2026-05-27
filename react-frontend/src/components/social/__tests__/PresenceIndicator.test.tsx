@@ -45,7 +45,7 @@ vi.mock('@/contexts/PresenceContext', () => ({
   usePresence: vi.fn(() => mockPresenceContext),
 }));
 
-vi.mock('framer-motion', () => ({
+vi.mock('@/lib/motion', () => ({
   motion: {
     div: ({ children, className, ...rest }: Record<string, unknown>) => {
       // Filter out framer-motion props and render a plain div

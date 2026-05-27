@@ -11,7 +11,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
 import { framerMotionMock } from '@/test/mocks';
 
-vi.mock('framer-motion', () => framerMotionMock);
+vi.mock('@/lib/motion', () => framerMotionMock);
 
 // Stable t function reference to avoid useCallback/useEffect re-trigger loops
 const credentialTranslations: Record<string, string> = {

@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { forwardRef, type ReactNode, type MouseEventHandler } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 export interface GlassButtonProps {
   children: ReactNode;

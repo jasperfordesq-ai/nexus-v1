@@ -16,7 +16,7 @@
 import { useState, useEffect, useRef, useCallback, type ChangeEvent, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, Link, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from '@/lib/motion';
 
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Info from 'lucide-react/icons/info';

@@ -26,7 +26,7 @@ import { Chip as HeroChip, ToggleButton, ToggleButtonGroup } from '@heroui/react
 
 import { useState, useEffect, useCallback, useRef, memo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import Briefcase from 'lucide-react/icons/briefcase';
 import Search from 'lucide-react/icons/search';

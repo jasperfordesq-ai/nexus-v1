@@ -9,7 +9,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@/test/test-utils';
-vi.mock('framer-motion', async () => {
+vi.mock('@/lib/motion', async () => {
   const { framerMotionMock } = await import('@/test/mocks');
   return framerMotionMock;
 });

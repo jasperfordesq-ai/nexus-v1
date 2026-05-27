@@ -76,7 +76,7 @@ vi.mock('@/lib/map-config', () => ({
   MAPS_ENABLED: false,
 }));
 
-vi.mock('framer-motion', () => ({
+vi.mock('@/lib/motion', () => ({
   motion: new Proxy({}, {
     get: (_target: unknown, tag: string | symbol) => {
       const Component = ({ children, variants, initial, animate, exit, layout, whileHover, whileTap, transition, ...rest }: Record<string, unknown>) => {

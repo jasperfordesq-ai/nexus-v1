@@ -43,7 +43,7 @@ vi.mock('../ImageLightbox', () => ({
   ),
 }));
 
-vi.mock('framer-motion', () => ({
+vi.mock('@/lib/motion', () => ({
   motion: {
     div: ({ children, onClick, ...props }: Record<string, unknown>) => {
       const safe: Record<string, unknown> = {};

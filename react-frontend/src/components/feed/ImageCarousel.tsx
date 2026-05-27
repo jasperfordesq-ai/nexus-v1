@@ -14,7 +14,8 @@
  */
 
 import { useState, useCallback, useRef } from 'react';
-import { motion, AnimatePresence, type PanInfo } from 'framer-motion';import ChevronLeft from 'lucide-react/icons/chevron-left';
+import { motion, AnimatePresence, type PanInfo } from '@/lib/motion';
+import ChevronLeft from 'lucide-react/icons/chevron-left';
 import ChevronRight from 'lucide-react/icons/chevron-right';
 import { useTranslation } from 'react-i18next';
 import { resolveAssetUrl } from '@/lib/helpers';

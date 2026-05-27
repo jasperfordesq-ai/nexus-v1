@@ -16,7 +16,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';import Handshake from 'lucide-react/icons/handshake';
+import { motion } from '@/lib/motion';import Handshake from 'lucide-react/icons/handshake';
 import Clock from 'lucide-react/icons/clock';
 import Users from 'lucide-react/icons/users';
 import Heart from 'lucide-react/icons/heart';

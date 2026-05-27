@@ -11,7 +11,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 import { Chip, Separator } from '@heroui/react';
 import Cookie from 'lucide-react/icons/cookie';
 import Shield from 'lucide-react/icons/shield';

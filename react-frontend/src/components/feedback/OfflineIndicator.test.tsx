@@ -7,7 +7,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@/test/test-utils';
 import { OfflineIndicator } from './OfflineIndicator';
 
-vi.mock('framer-motion', () => {
+vi.mock('@/lib/motion', () => {
   const handler = {
     get: (_: unknown, tag: string) => {
       return ({ children, _initial, _animate, _exit, _transition, _variants, ...rest }: Record<string, unknown>) => {

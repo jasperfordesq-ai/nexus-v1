@@ -13,7 +13,7 @@ import { render, screen } from '@/test/test-utils';
 
 vi.mock('@/hooks/usePageTitle', () => ({ usePageTitle: vi.fn() }));
 
-vi.mock('framer-motion', async () => {
+vi.mock('@/lib/motion', async () => {
   const { framerMotionMock } = await import('@/test/mocks');
   return framerMotionMock;
 });

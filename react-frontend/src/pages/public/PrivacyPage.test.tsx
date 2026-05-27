@@ -45,7 +45,7 @@ vi.mock('@/components/legal/CustomLegalDocument', () => ({
   default: () => <div data-testid="custom-legal">Custom Legal Doc</div>,
   CustomLegalDocument: () => <div data-testid="custom-legal">Custom Legal Doc</div>,
 }));
-vi.mock('framer-motion', () => ({
+vi.mock('@/lib/motion', () => ({
   motion: {
     div: ({ children, ...props }: Record<string, unknown>) => {
       const motionKeys = new Set(["variants", "initial", "animate", "transition", "whileInView", "viewport", "layout", "exit", "whileHover", "whileTap"]);

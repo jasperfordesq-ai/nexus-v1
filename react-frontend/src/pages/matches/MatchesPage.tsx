@@ -12,7 +12,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from '@/lib/motion';
 
 import Sparkles from 'lucide-react/icons/sparkles';
 import ListChecks from 'lucide-react/icons/list-checks';

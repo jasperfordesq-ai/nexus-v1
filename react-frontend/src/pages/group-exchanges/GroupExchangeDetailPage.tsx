@@ -22,7 +22,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
 import CheckCircle from 'lucide-react/icons/circle-check-big';

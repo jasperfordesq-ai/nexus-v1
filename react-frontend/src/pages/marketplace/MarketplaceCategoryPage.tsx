@@ -18,7 +18,7 @@ import { Select, SelectItem, GlassCard, Button, Chip, Spinner, Input, Checkbox, 
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import { Separator } from '@heroui/react';
 import Search from 'lucide-react/icons/search';

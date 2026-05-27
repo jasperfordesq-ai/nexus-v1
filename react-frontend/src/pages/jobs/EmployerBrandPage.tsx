@@ -10,7 +10,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 import { Chip } from '@heroui/react';
 import { Slider } from '@/components/ui';
 import Briefcase from 'lucide-react/icons/briefcase';

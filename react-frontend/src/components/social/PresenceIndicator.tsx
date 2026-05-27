@@ -18,7 +18,7 @@
 
 import { memo, useMemo } from 'react';
 import { Tooltip } from '@/components/ui';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import { useTranslation } from 'react-i18next';
 import { usePresenceOptional, type PresenceStatus } from '@/contexts/PresenceContext';

@@ -11,7 +11,7 @@ import { Select, SelectItem, GlassCard, Button, Chip, Input, Textarea, Radio, Ra
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import Save from 'lucide-react/icons/save';
 import Clock from 'lucide-react/icons/clock';

@@ -16,7 +16,7 @@ import { Select, SelectItem, GlassCard, Button, Chip, Avatar, Tabs, Tab, Skeleto
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, type Variants } from 'framer-motion';
+import { motion, type Variants } from '@/lib/motion';
 
 import Trophy from 'lucide-react/icons/trophy';
 import Medal from 'lucide-react/icons/medal';

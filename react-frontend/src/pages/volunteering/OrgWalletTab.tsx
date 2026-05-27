@@ -8,7 +8,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import Wallet from 'lucide-react/icons/wallet';
 import ArrowDownToLine from 'lucide-react/icons/arrow-down-to-line';

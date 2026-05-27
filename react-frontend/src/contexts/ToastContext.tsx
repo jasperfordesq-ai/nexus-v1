@@ -9,7 +9,7 @@
  */
 
 import { createContext, useContext, useState, useCallback, useMemo, useRef, forwardRef, type ReactNode } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';import X from 'lucide-react/icons/x';
+import { motion, AnimatePresence } from '@/lib/motion';import X from 'lucide-react/icons/x';
 import CheckCircle from 'lucide-react/icons/circle-check-big';
 import AlertCircle from 'lucide-react/icons/circle-alert';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';

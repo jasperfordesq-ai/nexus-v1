@@ -14,7 +14,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { motion } from 'framer-motion';import X from 'lucide-react/icons/x';
+import { motion } from '@/lib/motion';import X from 'lucide-react/icons/x';
 import Camera from 'lucide-react/icons/camera';
 import Type from 'lucide-react/icons/type';
 import BarChart3 from 'lucide-react/icons/chart-column';

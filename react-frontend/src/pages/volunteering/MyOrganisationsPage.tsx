@@ -12,7 +12,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';import Building2 from 'lucide-react/icons/building-2';
+import { motion } from '@/lib/motion';import Building2 from 'lucide-react/icons/building-2';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import Plus from 'lucide-react/icons/plus';
 import { GlassCard, Button, Chip, Spinner } from '@/components/ui';

@@ -8,7 +8,7 @@
  * Displays the group activity feed with create-post prompt, feed cards, and load-more.
  */
 
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from '@/lib/motion';
 
 import { Separator } from '@heroui/react';
 import Lock from 'lucide-react/icons/lock';

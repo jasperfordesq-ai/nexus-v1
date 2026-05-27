@@ -16,7 +16,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 import { Slider } from '@/components/ui';
 import { Separator } from '@heroui/react';
 import ClipboardCheck from 'lucide-react/icons/clipboard-check';

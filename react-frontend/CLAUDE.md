@@ -7,10 +7,10 @@
 | Item | Value |
 |------|-------|
 | **Framework** | React 19 + TypeScript (strict) |
-| **Component Library** | HeroUI v3 (`@heroui/react`) |
+| **Component Library** | HeroUI v3 (`@heroui/react`) — migration complete, no v2 npm alias |
 | **CSS** | Tailwind CSS 4 (`@tailwindcss/vite` plugin) |
 | **Icons** | Lucide React (`lucide-react`) |
-| **Animation** | Framer Motion (being removed — HeroUI v3 migration in progress) |
+| **Animation** | Local `@/lib/motion` shim (CSS-transition-backed). **Do NOT add `framer-motion` imports** — it has been removed. Prefer Tailwind/CSS animations or the shim. |
 | **Rich Text** | Lexical editor |
 | **Charts** | Recharts |
 | **Routing** | React Router v6 (tenant slug support) |

@@ -13,7 +13,7 @@
 import React, { useState, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 import { Badge } from '@/components/ui';
 import House from 'lucide-react/icons/house';
 import ListTodo from 'lucide-react/icons/list-todo';

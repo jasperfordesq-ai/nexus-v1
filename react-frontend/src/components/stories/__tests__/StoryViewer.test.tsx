@@ -48,8 +48,8 @@ vi.mock('@/lib/helpers', () => ({
   tenantPath: (p: string) => '/test' + p,
 }));
 
-vi.mock('framer-motion', async () => {
-  const actual = await vi.importActual<typeof import('framer-motion')>('framer-motion');
+vi.mock('@/lib/motion', async () => {
+  const actual = await vi.importActual<typeof import('@/lib/motion')>('@/lib/motion');
   return {
     ...actual,
     motion: {

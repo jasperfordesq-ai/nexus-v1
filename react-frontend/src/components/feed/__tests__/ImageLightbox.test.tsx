@@ -37,7 +37,7 @@ vi.mock('@/lib/helpers', () => ({
   resolveAssetUrl: (url: string | null) => url || '',
 }));
 
-vi.mock('framer-motion', () => ({
+vi.mock('@/lib/motion', () => ({
   motion: {
     div: ({ children, onClick, role, ...props }: Record<string, unknown>) => {
       const safe: Record<string, unknown> = {};

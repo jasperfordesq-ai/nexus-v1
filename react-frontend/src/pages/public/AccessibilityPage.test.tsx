@@ -33,7 +33,7 @@ vi.mock('@/contexts', () => ({
 
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 vi.mock('@/components/seo', () => ({ PageMeta: () => null }));
-vi.mock('framer-motion', () => {
+vi.mock('@/lib/motion', () => {
   const proxy = new Proxy({}, {
     get: (_t: object, prop: string | symbol) => {
       return React.forwardRef(({ children, ...p }: Record<string, unknown>, ref: React.Ref<HTMLElement>) => {

@@ -138,7 +138,7 @@ vi.mock('@/components/seo', () => ({ PageMeta: () => null }));
 vi.mock('@/hooks', () => ({ usePageTitle: vi.fn() }));
 
 // ── Mock framer-motion ──────────────────────────────────────────────────────
-vi.mock('framer-motion', async () => {
+vi.mock('@/lib/motion', async () => {
   const React = await import('react');
   const handler: ProxyHandler<Record<string, never>> = {
     get: (_target, prop) => {

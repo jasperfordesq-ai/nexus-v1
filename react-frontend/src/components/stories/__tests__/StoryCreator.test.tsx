@@ -51,8 +51,8 @@ vi.mock('@/lib/compress-image', () => ({
   compressImage: vi.fn(async (file: File) => file),
 }));
 
-vi.mock('framer-motion', async () => {
-  const actual = await vi.importActual<typeof import('framer-motion')>('framer-motion');
+vi.mock('@/lib/motion', async () => {
+  const actual = await vi.importActual<typeof import('@/lib/motion')>('@/lib/motion');
   return {
     ...actual,
     motion: {

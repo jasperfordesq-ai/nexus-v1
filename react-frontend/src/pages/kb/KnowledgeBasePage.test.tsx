@@ -11,7 +11,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@/test/test-utils';
 import { framerMotionMock } from '@/test/mocks';
 
-vi.mock('framer-motion', () => framerMotionMock);
+vi.mock('@/lib/motion', () => framerMotionMock);
 
 const stableT = (key: string, fallbackOrOpts?: string | Record<string, unknown>, _opts?: Record<string, unknown>) => {
   if (typeof fallbackOrOpts === 'string') return fallbackOrOpts;

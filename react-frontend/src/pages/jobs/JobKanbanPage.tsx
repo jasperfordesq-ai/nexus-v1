@@ -15,7 +15,7 @@ import { Select, SelectItem, GlassCard, Button, Spinner, Input, Textarea, Modal,
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import ArrowLeft from 'lucide-react/icons/arrow-left';
 import Briefcase from 'lucide-react/icons/briefcase';

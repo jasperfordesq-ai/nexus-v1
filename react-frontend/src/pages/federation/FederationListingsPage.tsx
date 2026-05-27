@@ -18,7 +18,7 @@ import { Select, SelectItem, GlassCard, Button, Chip, Input, Modal, ModalContent
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import Search from 'lucide-react/icons/search';
 import Globe from 'lucide-react/icons/globe';

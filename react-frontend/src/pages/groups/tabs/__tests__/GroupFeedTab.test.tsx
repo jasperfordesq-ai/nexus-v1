@@ -35,7 +35,7 @@ vi.mock('@/contexts/ToastContext', () => ({
   ToastProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-vi.mock('framer-motion', async () => {
+vi.mock('@/lib/motion', async () => {
   const { framerMotionMock } = await import('@/test/mocks');
   return framerMotionMock;
 });

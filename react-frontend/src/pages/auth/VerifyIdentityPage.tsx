@@ -16,7 +16,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';import ShieldCheck from 'lucide-react/icons/shield-check';
+import { motion } from '@/lib/motion';import ShieldCheck from 'lucide-react/icons/shield-check';
 import ShieldX from 'lucide-react/icons/shield-x';
 import ShieldAlert from 'lucide-react/icons/shield-alert';
 import ExternalLink from 'lucide-react/icons/external-link';

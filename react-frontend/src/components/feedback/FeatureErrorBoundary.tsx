@@ -9,7 +9,7 @@
  */
 
 import { Component, type ReactNode, type ErrorInfo } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import RefreshCw from 'lucide-react/icons/refresh-cw';import i18n from 'i18next';
 import { GlassCard, Button } from '@/components/ui';

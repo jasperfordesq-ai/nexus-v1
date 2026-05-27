@@ -11,7 +11,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 import { Chip } from '@heroui/react';
 import Building from 'lucide-react/icons/building';
 import ArrowLeft from 'lucide-react/icons/arrow-left';

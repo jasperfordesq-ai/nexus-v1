@@ -12,7 +12,7 @@ import { Select, SelectItem, GlassCard, Button, Input, Textarea } from '@/compon
 
 import { useState, type FormEvent } from 'react';
 import { useTurnstile } from '@/hooks/useTurnstile';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 import { Helmet } from 'react-helmet-async';import Mail from 'lucide-react/icons/mail';
 import MessageSquare from 'lucide-react/icons/message-square';
 import Loader2 from 'lucide-react/icons/loader-circle';

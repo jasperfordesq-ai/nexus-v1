@@ -41,7 +41,7 @@ vi.mock('@/hooks', () => ({
   usePageTitle: vi.fn(),
 }));
 
-vi.mock('framer-motion');
+vi.mock('@/lib/motion');
 
 import { AdminLayout } from '../AdminLayout';
 

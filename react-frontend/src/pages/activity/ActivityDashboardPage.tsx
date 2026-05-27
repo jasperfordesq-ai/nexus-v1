@@ -18,7 +18,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { motion } from 'framer-motion';import Activity from 'lucide-react/icons/activity';
+import { motion } from '@/lib/motion';import Activity from 'lucide-react/icons/activity';
 import ArrowUpRight from 'lucide-react/icons/arrow-up-right';
 import ArrowDownLeft from 'lucide-react/icons/arrow-down-left';
 import Users from 'lucide-react/icons/users';

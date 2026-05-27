@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 import Clock from 'lucide-react/icons/clock';
 import Users from 'lucide-react/icons/users';
 import Zap from 'lucide-react/icons/zap';

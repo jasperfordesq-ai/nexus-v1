@@ -17,7 +17,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';import Handshake from 'lucide-react/icons/handshake';
+import { motion } from '@/lib/motion';import Handshake from 'lucide-react/icons/handshake';
 import ArrowRight from 'lucide-react/icons/arrow-right';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import ShieldCheck from 'lucide-react/icons/shield-check';

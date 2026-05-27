@@ -8,7 +8,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 
 import ArrowLeftRight from 'lucide-react/icons/arrow-left-right';
 import Check from 'lucide-react/icons/check';

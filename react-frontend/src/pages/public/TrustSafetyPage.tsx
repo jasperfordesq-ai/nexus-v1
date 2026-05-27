@@ -19,7 +19,7 @@
  */
 
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';import ShieldCheck from 'lucide-react/icons/shield-check';
+import { motion } from '@/lib/motion';import ShieldCheck from 'lucide-react/icons/shield-check';
 import ListChecks from 'lucide-react/icons/list-checks';
 import HeartHandshake from 'lucide-react/icons/heart-handshake';
 import AlertTriangle from 'lucide-react/icons/alert-triangle';

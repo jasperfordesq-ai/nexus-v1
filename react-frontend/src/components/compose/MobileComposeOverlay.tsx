@@ -12,7 +12,7 @@
  */
 
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from '@/lib/motion';
 import { ScrollShadow } from '@/components/ui';
 import X from 'lucide-react/icons/x';
 import { useTranslation } from 'react-i18next';

@@ -5,7 +5,7 @@
 
 import { Link } from 'react-router-dom';
 
-import { motion } from 'framer-motion';
+import { motion } from '@/lib/motion';
 import { useTenant } from '@/contexts';
 import { Avatar, Tooltip } from '@/components/ui';
 

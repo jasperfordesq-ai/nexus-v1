@@ -54,7 +54,7 @@ vi.mock('@/components/feedback', () => ({
   LoadingScreen: ({ message }: { message?: string }) => <div>{message || 'Loading...'}</div>,
 }));
 
-vi.mock('framer-motion');
+vi.mock('@/lib/motion');
 
 // Mock all admin module components to avoid deep dependency chains
 vi.mock('../modules/dashboard/AdminDashboard', () => ({

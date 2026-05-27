@@ -61,7 +61,7 @@ vi.mock('@/lib/helpers', () => ({
   resolveAvatarUrl: vi.fn((url: unknown) => url || '/default-avatar.png'),
 }));
 
-vi.mock('framer-motion', () => ({
+vi.mock('@/lib/motion', () => ({
   motion: {
     div: ({ children, variants, initial, animate, exit, layout, ...rest }: Record<string, unknown>) => {
       void variants; void initial; void animate; void exit; void layout;

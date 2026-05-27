@@ -5,7 +5,7 @@ import { Select, SelectItem, GlassCard, Button, Chip, Input, Textarea } from '@/
 // See NOTICE file for attribution and acknowledgements.
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { motion } from 'framer-motion';import Accessibility from 'lucide-react/icons/accessibility';
+import { motion } from '@/lib/motion';import Accessibility from 'lucide-react/icons/accessibility';
 import Info from 'lucide-react/icons/info';
 import Plus from 'lucide-react/icons/plus';
 import Save from 'lucide-react/icons/save';
