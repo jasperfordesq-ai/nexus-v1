@@ -89,9 +89,9 @@ describe('RegisterPage', () => {
     apiMocks.post.mockResolvedValue({ success: true });
   });
 
-  it('renders without crashing', () => {
+  it('renders without crashing', async () => {
     render(<RegisterPage />);
-    expect(screen.getAllByText(/Create Account/i).length).toBeGreaterThanOrEqual(1);
+    expect(await screen.findByRole('button', { name: /create account/i })).toBeInTheDocument();
   });
 
   it('shows link to login page', () => {
@@ -99,11 +99,11 @@ describe('RegisterPage', () => {
     expect(screen.getByText(/already have an account/i)).toBeInTheDocument();
   });
 
-  it('marks phone and location as required without initial phone error styling', () => {
+  it('marks phone and location as required without initial phone error styling', async () => {
     render(<RegisterPage />);
 
-    const locationInput = screen.getByLabelText(/location/i);
-    const phoneInput = screen.getByLabelText(/phone number/i);
+    const locationInput = await screen.findByLabelText(/location/i);
+    const phoneInput = await screen.findByLabelText(/phone number/i);
 
     expect(locationInput).toBeRequired();
     expect(phoneInput).toBeRequired();
@@ -133,7 +133,26 @@ describe('RegisterPage', () => {
     render(<RegisterPage />);
 
     expect(await screen.findByText(/registration is closed/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: /registration is closed/i })).toBeInTheDocument();
     expect(screen.getByText(/not accepting new registrations/i)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /create account/i })).not.toBeInTheDocument();
+  });
+
+  it('withholds the registration form when registration status cannot be checked', async () => {
+    apiMocks.get.mockImplementation((url: string) => {
+      if (url === '/v2/auth/registration-info') {
+        return Promise.reject(new Error('registration policy unavailable'));
+      }
+
+      return Promise.resolve({
+        success: true,
+        data: [{ id: 2, name: 'Test Tenant', slug: 'test' }],
+      });
+    });
+
+    render(<RegisterPage />);
+
+    expect(await screen.findByText(/registration status unavailable/i)).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /create account/i })).not.toBeInTheDocument();
   });
 });

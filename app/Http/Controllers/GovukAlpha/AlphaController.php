@@ -245,7 +245,9 @@ class AlphaController extends Controller
             : '';
 
         return $this->view('accessible-frontend::register', [
-            'title' => __('govuk_alpha.auth.register_title'),
+            'title' => $registrationClosed
+                ? __('govuk_alpha.auth.registration_closed_title')
+                : __('govuk_alpha.auth.register_title'),
             'tenantSlug' => $tenantSlug,
             'activeNav' => 'register',
             'status' => self::asStr($request->query('status')) ?: null,

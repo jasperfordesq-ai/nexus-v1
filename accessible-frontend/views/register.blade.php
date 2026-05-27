@@ -7,8 +7,10 @@
 @section('content')
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <h1 class="govuk-heading-xl">{{ __('govuk_alpha.auth.register_title') }}</h1>
-            <p class="govuk-body-l">{{ __('govuk_alpha.auth.register_description', ['community' => $tenant['name'] ?? $tenantSlug]) }}</p>
+            <h1 class="govuk-heading-xl">{{ ($registrationClosed ?? false) ? __('govuk_alpha.auth.registration_closed_title') : __('govuk_alpha.auth.register_title') }}</h1>
+            @if (!($registrationClosed ?? false))
+                <p class="govuk-body-l">{{ __('govuk_alpha.auth.register_description', ['community' => $tenant['name'] ?? $tenantSlug]) }}</p>
+            @endif
 
             @php
                 $errorStatuses = [

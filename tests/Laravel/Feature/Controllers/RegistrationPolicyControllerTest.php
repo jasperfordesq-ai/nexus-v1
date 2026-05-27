@@ -77,6 +77,76 @@ class RegistrationPolicyControllerTest extends TestCase
         $response->assertStatus(400);
     }
 
+    public function test_validate_invite_does_not_reveal_valid_codes_when_registration_is_closed(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+
+        DB::table('tenant_invite_codes')->insert([
+            'tenant_id' => $this->testTenantId,
+            'code' => 'CLOSED01',
+            'created_by' => $admin->id,
+            'max_uses' => 1,
+            'uses_count' => 0,
+            'is_active' => 1,
+            'created_at' => now(),
+        ]);
+        DB::table('tenant_settings')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId, 'setting_key' => 'general.registration_mode'],
+            [
+                'setting_value' => 'closed',
+                'setting_type' => 'string',
+                'updated_at' => now(),
+            ]
+        );
+        app(\App\Services\TenantSettingsService::class)->clearCacheForTenant($this->testTenantId);
+
+        $response = $this->apiPost('/v2/auth/validate-invite', [
+            'code' => 'CLOSED01',
+        ]);
+
+        $response->assertOk();
+        $response->assertJsonPath('data.valid', false);
+        $response->assertJsonPath('data.reason', 'registration_closed');
+    }
+
+    public function test_validate_invite_still_reports_valid_code_when_registration_allows_invites(): void
+    {
+        $admin = User::factory()->forTenant($this->testTenantId)->create([
+            'status' => 'active',
+            'is_approved' => true,
+        ]);
+
+        DB::table('tenant_invite_codes')->insert([
+            'tenant_id' => $this->testTenantId,
+            'code' => 'INVITE01',
+            'created_by' => $admin->id,
+            'max_uses' => 1,
+            'uses_count' => 0,
+            'is_active' => 1,
+            'created_at' => now(),
+        ]);
+        DB::table('tenant_settings')->updateOrInsert(
+            ['tenant_id' => $this->testTenantId, 'setting_key' => 'general.registration_mode'],
+            [
+                'setting_value' => 'invite_only',
+                'setting_type' => 'string',
+                'updated_at' => now(),
+            ]
+        );
+        app(\App\Services\TenantSettingsService::class)->clearCacheForTenant($this->testTenantId);
+
+        $response = $this->apiPost('/v2/auth/validate-invite', [
+            'code' => 'INVITE01',
+        ]);
+
+        $response->assertOk();
+        $response->assertJsonPath('data.valid', true);
+        $response->assertJsonPath('data.reason', null);
+    }
+
     // ------------------------------------------------------------------
     //  GET /v2/auth/registration-info (public pre-registration)
     // ------------------------------------------------------------------

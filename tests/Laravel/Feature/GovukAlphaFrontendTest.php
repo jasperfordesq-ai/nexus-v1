@@ -80,6 +80,8 @@ class GovukAlphaFrontendTest extends TestCase
         $response = $this->get("/{$this->testTenantSlug}/alpha/register");
 
         $response->assertOk();
+        $response->assertSee('<h1 class="govuk-heading-xl">' . __('govuk_alpha.auth.registration_closed_title') . '</h1>', false);
+        $response->assertDontSee('<h1 class="govuk-heading-xl">' . __('govuk_alpha.auth.register_title') . '</h1>', false);
         $response->assertSee(__('govuk_alpha.auth.registration_closed_title'));
         $response->assertSee(__('govuk_alpha.auth.registration_closed_body'));
         $response->assertDontSee('name="first_name"', false);

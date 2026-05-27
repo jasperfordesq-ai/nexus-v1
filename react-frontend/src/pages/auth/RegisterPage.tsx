@@ -74,6 +74,7 @@ interface RegistrationInfo {
 }
 
 type ProfileType = 'individual' | 'organisation';
+type RegistrationInfoStatus = 'idle' | 'loading' | 'ready' | 'unavailable';
 
 const STEP_KEYS = ['community', 'details', 'account', 'terms'] as const;
 
@@ -156,6 +157,9 @@ export function RegisterPage() {
   const [inviteCodeChecking, setInviteCodeChecking] = useState(false);
   const [requiresInviteCode, setRequiresInviteCode] = useState(false);
   const [registrationClosed, setRegistrationClosed] = useState(false);
+  const [registrationInfoStatus, setRegistrationInfoStatus] = useState<RegistrationInfoStatus>(
+    () => (tenant?.id ? 'loading' : 'idle')
+  );
 
   // Post-registration pending state (verification/approval required)
   const [pendingResult, setPendingResult] = useState<RegisterResult | null>(null);
@@ -213,13 +217,17 @@ export function RegisterPage() {
   // Fetch registration info when tenant is resolved (to know if invite code is required)
   useEffect(() => {
     const effectiveTenantId = selectedTenantId || (tenant?.id ? String(tenant.id) : '');
-    if (!effectiveTenantId) return;
+    if (!effectiveTenantId) {
+      setRegistrationInfoStatus('idle');
+      return;
+    }
 
     let cancelled = false;
     const fetchRegInfo = async () => {
       setRequiresInviteCode(false);
       setInviteCodeValid(null);
       setRegistrationClosed(false);
+      setRegistrationInfoStatus('loading');
       try {
         const res = await api.get<RegistrationInfo>('/v2/auth/registration-info', { skipAuth: true });
         if (cancelled) return;
@@ -230,9 +238,14 @@ export function RegisterPage() {
             res.data.registration_mode === 'closed' ||
             res.data.can_register === false
           );
+          setRegistrationInfoStatus('ready');
+        } else {
+          setRegistrationInfoStatus('unavailable');
         }
-      } catch {
-        // Non-critical — default to no invite code required
+      } catch (err) {
+        if (cancelled) return;
+        logError('[RegisterPage] Failed to fetch registration policy', err);
+        setRegistrationInfoStatus('unavailable');
       }
     };
     fetchRegInfo();
@@ -297,7 +310,9 @@ export function RegisterPage() {
   // Validation for each step
   // tenant?.id means TenantContext already resolved the tenant (custom domain or slug route)
   const tenantSelected = !!tenant?.id || tenants.length === 0 || tenants.length === 1 || !!selectedTenantId;
-  const isStep1Valid = !registrationClosed && tenantSelected && (!requiresInviteCode || inviteCodeValid === true);
+  const registrationPolicyTenantResolved = !!selectedTenantId || !!tenant?.id;
+  const registrationPolicyReady = !registrationPolicyTenantResolved || registrationInfoStatus === 'ready';
+  const isStep1Valid = registrationPolicyReady && !registrationClosed && tenantSelected && (!requiresInviteCode || inviteCodeValid === true);
   // Verified-location is encouraged but NOT a hard client-side gate. If
   // Google Places fails to load (ad-blocker, slow network, maps disabled
   // for tenant) lat/lng stay undefined — we still let the user submit and
@@ -348,7 +363,7 @@ export function RegisterPage() {
   const handleSubmit = useCallback(async (e: FormEvent) => {
     e.preventDefault();
 
-    if (registrationClosed) {
+    if (registrationClosed || !registrationPolicyReady) {
       return;
     }
 
@@ -424,7 +439,7 @@ export function RegisterPage() {
     tenant?.id, register, firstName, lastName, email, profileType, organizationName,
     location, latitude, longitude, phone, termsAccepted, newsletterOptIn,
     requiresInviteCode, inviteCode, navigate, tenantPath, passwordCheck.isAcceptable,
-    registrationClosed,
+    registrationClosed, registrationPolicyReady,
   ]);
 
   const passwordValid = passwordCheck.isAcceptable;
@@ -447,11 +462,25 @@ export function RegisterPage() {
     isPhoneValid(phone) &&
     (tenants.length === 0 || !!selectedTenantId || !!tenant?.id) &&
     (!requiresInviteCode || inviteCodeValid === true) &&
+    registrationPolicyReady &&
     !registrationClosed;
 
   // Step progress percentage
   const progressPercent = (currentStep / STEPS.length) * 100;
   const getStepLabel = (stepId: number) => t(`register.step_${STEPS[stepId - 1]?.key ?? STEP_KEYS[0]}`);
+  const registrationPolicyLoading = registrationPolicyTenantResolved && registrationInfoStatus === 'loading';
+  const registrationPolicyUnavailable = registrationPolicyTenantResolved && registrationInfoStatus === 'unavailable';
+  const registerHeaderTitle = registrationClosed
+    ? t('register.registration_closed_title')
+    : registrationPolicyUnavailable
+      ? t('register.registration_status_unavailable_title')
+      : registrationPolicyLoading
+        ? t('register.registration_status_checking_title')
+        : t('register.title');
+  const registerHeaderSubtitle =
+    registrationClosed || registrationPolicyUnavailable || registrationPolicyLoading
+      ? null
+      : t('register.subtitle_with_name', { name: tenant?.name || 'NEXUS' });
 
   // Render step content
   const renderStepContent = (step: number) => {
@@ -900,7 +929,6 @@ export function RegisterPage() {
       <div className="flex items-start gap-3">
         <Lock className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-300" aria-hidden="true" />
         <div className="space-y-2">
-          <h2 className="text-base font-semibold">{t('register.registration_closed_title')}</h2>
           <p className="text-sm leading-6">{t('register.registration_closed_body')}</p>
           <Link
             to={tenantPath('/login')}
@@ -912,6 +940,35 @@ export function RegisterPage() {
       </div>
     </div>
   );
+
+  const renderRegistrationPolicyNotice = (status: 'loading' | 'unavailable') => {
+    const isUnavailable = status === 'unavailable';
+
+    return (
+      <div
+        role={isUnavailable ? 'alert' : 'status'}
+        aria-live={isUnavailable ? 'assertive' : 'polite'}
+        className={`rounded-xl border p-4 text-left ${
+          isUnavailable
+            ? 'border-red-300/70 bg-red-50 text-red-950 dark:border-red-400/30 dark:bg-red-500/10 dark:text-red-100'
+            : 'border-blue-300/70 bg-blue-50 text-blue-950 dark:border-blue-400/30 dark:bg-blue-500/10 dark:text-blue-100'
+        }`}
+      >
+        <div className="flex items-start gap-3">
+          {isUnavailable ? (
+            <ShieldCheck className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600 dark:text-red-300" aria-hidden="true" />
+          ) : (
+            <Loader2 className="mt-0.5 h-5 w-5 flex-shrink-0 animate-spin text-blue-600 dark:text-blue-300" aria-hidden="true" />
+          )}
+          <p className="text-sm leading-6">
+            {isUnavailable
+              ? t('register.registration_status_unavailable_body')
+              : t('register.registration_status_checking_body')}
+          </p>
+        </div>
+      </div>
+    );
+  };
 
   // Desktop: Show all fields at once
   // Mobile: Show step-by-step
@@ -1200,10 +1257,12 @@ export function RegisterPage() {
             >
               <User className="w-7 h-7 sm:w-8 sm:h-8 text-indigo-600 dark:text-indigo-400" aria-hidden="true" />
             </motion.div>
-            <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">{t('register.title')}</h1>
-            <p className="text-theme-muted mt-2 text-sm sm:text-base">
-              {t('register.subtitle_with_name', { name: tenant?.name || 'NEXUS' })}
-            </p>
+            <h1 className="text-xl sm:text-2xl font-bold text-theme-primary">{registerHeaderTitle}</h1>
+            {registerHeaderSubtitle && (
+              <p className="text-theme-muted mt-2 text-sm sm:text-base">
+                {registerHeaderSubtitle}
+              </p>
+            )}
           </div>
 
           {/* Error Alert */}
@@ -1219,7 +1278,13 @@ export function RegisterPage() {
           )}
 
           {/* Form */}
-          {registrationClosed ? renderClosedRegistrationNotice() : renderForm()}
+          {registrationClosed
+            ? renderClosedRegistrationNotice()
+            : registrationPolicyUnavailable
+              ? renderRegistrationPolicyNotice('unavailable')
+              : registrationPolicyLoading
+                ? renderRegistrationPolicyNotice('loading')
+                : renderForm()}
 
           {/* Divider */}
           <Separator className="my-6 bg-theme-elevated" />

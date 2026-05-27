@@ -338,6 +338,11 @@ class RegistrationPolicyController extends BaseApiController
         }
 
         $tenantId = $this->getTenantId();
+        $policy = $this->registrationPolicyService->getEffectivePolicy($tenantId);
+        if (($policy['registration_mode'] ?? 'open') === 'closed') {
+            return $this->respondWithData(['valid' => false, 'reason' => 'registration_closed']);
+        }
+
         $result = $this->inviteCodeService->validate($tenantId, $code);
 
         return $this->respondWithData(['valid' => $result['valid'], 'reason' => $result['reason'] ?? null]);
