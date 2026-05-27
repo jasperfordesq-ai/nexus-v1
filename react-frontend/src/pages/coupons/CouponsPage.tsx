@@ -15,6 +15,7 @@ import Tag from 'lucide-react/icons/tag';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { useTenant, useToast } from '@/contexts';
+import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 import { logError } from '@/lib/logger';
 
@@ -35,6 +36,7 @@ export default function CouponsPage() {
   const { t } = useTranslation('common');
   const toast = useToast();
   const { tenantPath } = useTenant();
+  usePageTitle(t('coupon.page_title'));
   const [items, setItems] = useState<CouponItem[]>([]);
   const [loading, setLoading] = useState(true);
 

@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 
 import Webhook from 'lucide-react/icons/webhook';
 import { PageMeta } from '@/components/seo';
+import { usePageTitle } from '@/hooks';
 
 const NODE_VERIFY = `// Verify an inbound NEXUS webhook (Node 18+)
 import crypto from 'crypto';
@@ -62,6 +63,7 @@ echo 'ok';`;
 
 export default function DevelopersWebhooksPage() {
   const { t } = useTranslation('common');
+  usePageTitle(t('developers.webhooks_meta_title'));
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-10">

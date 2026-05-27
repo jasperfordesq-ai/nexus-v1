@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 
 import BookOpen from 'lucide-react/icons/book-open';
 import { PageMeta } from '@/components/seo';
+import { usePageTitle } from '@/hooks';
 
 interface Endpoint {
   method: 'GET' | 'POST';
@@ -44,6 +45,7 @@ function methodColor(m: 'GET' | 'POST'): 'success' | 'primary' {
 
 export default function DevelopersEndpointsPage() {
   const { t } = useTranslation('common');
+  usePageTitle(t('developers.endpoints_meta_title'));
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">

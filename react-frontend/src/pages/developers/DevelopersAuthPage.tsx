@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 
 import Key from 'lucide-react/icons/key';
 import { PageMeta } from '@/components/seo';
+import { usePageTitle } from '@/hooks';
 
 const CURL_SNIPPET = `# 1. Exchange credentials for an access token
 curl -X POST https://api.project-nexus.ie/api/partner/v1/oauth/token \\
@@ -54,6 +55,7 @@ async function listUsers(accessToken) {
 
 export default function DevelopersAuthPage() {
   const { t } = useTranslation('common');
+  usePageTitle(t('developers.auth_meta_title'));
 
   const steps = [
     { titleKey: 'developers.auth_step1_title', bodyKey: 'developers.auth_step1_body' },

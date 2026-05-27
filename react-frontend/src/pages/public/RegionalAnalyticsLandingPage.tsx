@@ -20,11 +20,13 @@ import ShieldCheck from 'lucide-react/icons/shield-check';
 import TrendingUp from 'lucide-react/icons/trending-up';
 import Users from 'lucide-react/icons/users';
 import { useTenant } from '@/contexts';
+import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 
 export default function RegionalAnalyticsLandingPage() {
   const { t } = useTranslation('common');
   const { tenantPath } = useTenant();
+  usePageTitle(t('regional_analytics.page_title'));
 
   const features = [
     {

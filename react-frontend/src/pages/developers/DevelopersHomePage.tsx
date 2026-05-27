@@ -15,6 +15,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import Code from 'lucide-react/icons/code';
+import { usePageTitle } from '@/hooks';
 import Key from 'lucide-react/icons/key';
 import Webhook from 'lucide-react/icons/webhook';
 import BookOpen from 'lucide-react/icons/book-open';
@@ -24,6 +25,7 @@ import { PageMeta } from '@/components/seo';
 
 export default function DevelopersHomePage() {
   const { t } = useTranslation('common');
+  usePageTitle(t('developers.page_title'));
 
   const features = [
     { icon: Key, titleKey: 'developers.feature_oauth_title', bodyKey: 'developers.feature_oauth_body' },

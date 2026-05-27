@@ -18,6 +18,7 @@ import ArrowLeft from 'lucide-react/icons/arrow-left';
 import { useTranslation } from 'react-i18next';
 import { api } from '@/lib/api';
 import { useToast } from '@/contexts';
+import { usePageTitle } from '@/hooks';
 import { PageMeta } from '@/components/seo';
 import { logError } from '@/lib/logger';
 
@@ -43,6 +44,7 @@ export default function CouponDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation('common');
   const toast = useToast();
+  usePageTitle(t('coupon.details'));
 
   const [coupon, setCoupon] = useState<CouponDetail | null>(null);
   const [loading, setLoading] = useState(true);
