@@ -9,7 +9,7 @@
  * All admin pages render inside this layout.
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AdminSidebar } from './components/AdminSidebar';
@@ -34,6 +34,8 @@ function AdminLayoutShell() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const location = useLocation();
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const returnFocusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     setMobileDrawerOpen(false);
@@ -41,12 +43,59 @@ function AdminLayoutShell() {
 
   const { t } = useTranslation('admin_nav');
 
+  const openMobileDrawer = useCallback(() => {
+    returnFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    setMobileDrawerOpen(true);
+  }, []);
+
+  const closeMobileDrawer = useCallback(() => {
+    setMobileDrawerOpen(false);
+  }, []);
+
+  // Move focus into drawer on open, return to trigger on close
+  useEffect(() => {
+    if (mobileDrawerOpen) {
+      const focusableSelector = 'button:not([disabled]), a[href], input:not([disabled]), [tabindex]:not([tabindex="-1"])';
+      const firstFocusable = drawerRef.current?.querySelector<HTMLElement>(focusableSelector);
+      firstFocusable?.focus();
+    } else {
+      returnFocusRef.current?.focus();
+      returnFocusRef.current = null;
+    }
+  }, [mobileDrawerOpen]);
+
+  // Escape key and Tab-trap for mobile drawer
+  useEffect(() => {
+    if (!mobileDrawerOpen) return;
+
+    const focusableSelector = [
+      'a[href]', 'button:not([disabled])', 'input:not([disabled])',
+      'select:not([disabled])', 'textarea:not([disabled])', '[tabindex]:not([tabindex="-1"])',
+    ].join(',');
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { closeMobileDrawer(); return; }
+      if (e.key !== 'Tab') return;
+      const focusable = Array.from(
+        drawerRef.current?.querySelectorAll<HTMLElement>(focusableSelector) ?? []
+      ).filter((el) => el.offsetParent !== null);
+      if (focusable.length === 0) { e.preventDefault(); return; }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [mobileDrawerOpen, closeMobileDrawer]);
+
   return (
     <div className="min-h-screen bg-background">
       {/* Skip navigation — screen-reader / keyboard users jump straight to content */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[9999] focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:text-white focus:shadow-lg"
+        className="sr-only focus-visible:not-sr-only focus-visible:fixed focus-visible:left-4 focus-visible:top-4 focus-visible:z-[9999] focus-visible:rounded-lg focus-visible:bg-[var(--color-primary)] focus-visible:px-4 focus-visible:py-2 focus-visible:text-white focus-visible:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
       >
         {t('skip_to_main', 'Skip to main content')}
       </a>
@@ -60,7 +109,7 @@ function AdminLayoutShell() {
       </div>
 
       {/* Header */}
-      <AdminHeader sidebarCollapsed={sidebarCollapsed} onSidebarToggle={() => setMobileDrawerOpen((prev) => !prev)} />
+      <AdminHeader sidebarCollapsed={sidebarCollapsed} onSidebarToggle={() => mobileDrawerOpen ? closeMobileDrawer() : openMobileDrawer()} />
 
       {/* Mobile sidebar overlay */}
       {mobileDrawerOpen && (
@@ -68,14 +117,21 @@ function AdminLayoutShell() {
           type="button"
           aria-label={t('close_sidebar')}
           className="fixed inset-0 z-30 w-full cursor-default bg-black/50 md:hidden"
-          onClick={() => setMobileDrawerOpen(false)}
+          onClick={closeMobileDrawer}
         />
       )}
       {/* Mobile sidebar drawer */}
-      <div className={`fixed left-0 top-0 z-40 h-[100dvh] w-64 max-w-[calc(100dvw-var(--safe-area-left)-var(--safe-area-right))] border-r border-divider bg-surface transition-transform duration-300 md:hidden ${mobileDrawerOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <div
+        ref={drawerRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={t('admin_navigation', 'Admin navigation')}
+        {...(!mobileDrawerOpen ? { inert: 'true' } : {})}
+        className={`fixed left-0 top-0 z-40 h-[100dvh] w-64 max-w-[calc(100dvw-var(--safe-area-left)-var(--safe-area-right))] border-r border-divider bg-surface transition-transform duration-300 md:hidden ${mobileDrawerOpen ? 'translate-x-0' : '-translate-x-full'}`}
+      >
         <AdminSidebar
           collapsed={false}
-          onToggle={() => setMobileDrawerOpen(false)}
+          onToggle={closeMobileDrawer}
         />
       </div>
 

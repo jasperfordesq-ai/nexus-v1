@@ -25,6 +25,28 @@
 @import "./styles/background.css";
 
 /* ─────────────────────────────────────────────
+   WCAG 2.4.7 — FOCUS VISIBLE (global fallback)
+   HeroUI / React Aria components supply their own
+   data-focus-visible ring styles. This rule catches
+   every plain HTML interactive element (<a>, <button>,
+   <input>, <select>, <textarea>, <summary>,
+   and anything with tabIndex) that is NOT managed by
+   HeroUI, ensuring a visible focus indicator for
+   keyboard and switch-access users in ALL themes.
+   outline-offset:2 keeps the ring outside the element
+   border so it stays visible on coloured backgrounds.
+   ───────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: inherit;
+}
+
+/* Remove the native outline from elements that already
+   supply a custom ring via Tailwind focus-visible:ring-*
+   utilities (those classes set outline:none themselves). */
+
+/* ─────────────────────────────────────────────
    EDGE-TO-EDGE SAFE AREA INSETS
    Required for Capacitor on Android 15 (API 35) and iOS.
    WindowCompat.setDecorFitsSystemWindows(false) lets the WebView

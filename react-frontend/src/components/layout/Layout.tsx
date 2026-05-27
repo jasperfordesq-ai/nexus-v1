@@ -144,10 +144,10 @@ export function Layout({
       {/* Global SEO tags (verification meta, Organization JSON-LD) */}
       <SeoHead />
 
-      {/* Skip navigation — visible on focus only */}
+      {/* Skip navigation — visible on keyboard focus only (WCAG 2.4.1 + 2.4.7) */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-accent focus:text-accent-foreground focus:rounded-lg focus:shadow-lg"
+        className="sr-only focus-visible:not-sr-only focus-visible:absolute focus-visible:top-4 focus-visible:left-4 focus-visible:z-[9999] focus-visible:px-4 focus-visible:py-2 focus-visible:bg-[var(--color-primary)] focus-visible:text-white focus-visible:rounded-lg focus-visible:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
       >
         {t('accessibility.skip_to_content')}
       </a>
@@ -229,10 +229,10 @@ export function AuthLayout() {
 
   return (
     <div className="min-h-screen max-w-[100vw] flex flex-col overflow-x-clip">
-      {/* Skip navigation — visible on focus only */}
+      {/* Skip navigation — visible on keyboard focus only (WCAG 2.4.1 + 2.4.7) */}
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-accent focus:text-accent-foreground focus:rounded-lg focus:shadow-lg"
+        className="sr-only focus-visible:not-sr-only focus-visible:absolute focus-visible:top-4 focus-visible:left-4 focus-visible:z-[9999] focus-visible:px-4 focus-visible:py-2 focus-visible:bg-[var(--color-primary)] focus-visible:text-white focus-visible:rounded-lg focus-visible:shadow-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
       >
         {t('accessibility.skip_to_content')}
       </a>

@@ -32,7 +32,7 @@ export function SdgGoalsPicker({ selected, onChange }: SdgGoalsPickerProps) {
               key={goal.id}
               size="sm"
               variant={isActive ? 'primary' : 'secondary'}
-              className={`cursor-pointer transition-all text-xs ${
+              className={`cursor-pointer transition-all text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-base)] ${
                 isActive
                   ? 'text-white shadow-sm'
                   : 'bg-[var(--surface-elevated)] text-[var(--text-muted)] hover:bg-[var(--surface-hover)]'

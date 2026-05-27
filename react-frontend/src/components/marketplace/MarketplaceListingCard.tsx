@@ -53,7 +53,7 @@ export function MarketplaceListingCard({ listing, onSave, onUnsave }: Marketplac
     >
       <Link
         to={tenantPath(`/marketplace/${listing.id}`)}
-        className="block h-full focus-visible:outline-none"
+        className="block h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-base)] rounded-[inherit]"
       >
         {/* Image container */}
         <div className="relative aspect-video overflow-hidden">

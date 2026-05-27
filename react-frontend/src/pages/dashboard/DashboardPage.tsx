@@ -693,7 +693,7 @@ function StatCard({ icon, label, value, color, href, isLoading }: StatCardProps)
     rose: 'bg-rose-500/10 text-rose-600 dark:bg-rose-500/15 dark:text-rose-300',
   };
   return (
-    <Link to={tenantPath(href)} aria-label={`${label}: ${isLoading ? t('common.loading') : value}`} className="block focus-visible:outline-none">
+    <Link to={tenantPath(href)} aria-label={`${label}: ${isLoading ? t('common.loading') : value}`} className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-base)]">
       <GlassCard hoverable className="min-h-[124px] p-4 focus-within:ring-2 focus-within:ring-accent/40">
         <div className={`mb-3 inline-flex rounded-xl p-2.5 ${colorClasses[color]}`}>{icon}</div>
         <div className="text-xs font-medium uppercase tracking-wide text-theme-muted sm:text-sm sm:normal-case sm:tracking-normal">{label}</div>

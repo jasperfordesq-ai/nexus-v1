@@ -282,7 +282,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
           <Chip
             variant={activeFolder === null ? 'solid' : 'bordered'}
             color="primary"
-            className="cursor-pointer"
+            className="cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-base)]"
             role="button"
             tabIndex={0}
             aria-pressed={activeFolder === null}
@@ -296,7 +296,7 @@ export function GroupFilesTab({ groupId, isAdmin, isMember = true, currentUserId
               key={folder.folder}
               variant={activeFolder === folder.folder ? 'solid' : 'bordered'}
               color="primary"
-              className="cursor-pointer"
+              className="cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface-base)]"
               role="button"
               tabIndex={0}
               aria-pressed={activeFolder === folder.folder}
