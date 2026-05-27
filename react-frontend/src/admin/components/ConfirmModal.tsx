@@ -14,6 +14,8 @@ import AlertTriangle from 'lucide-react/icons/triangle-alert';
 import { useTranslation } from 'react-i18next';
 import { Button, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
 
+type ConfirmColor = 'danger' | 'warning' | 'primary';
+
 interface ConfirmModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -28,9 +30,21 @@ interface ConfirmModalProps {
    * call sites.
    */
   cancelLabel?: string;
-  confirmColor?: 'danger' | 'warning' | 'primary';
+  confirmColor?: ConfirmColor;
   isLoading?: boolean;
   children?: React.ReactNode;
+}
+
+function confirmVariant(confirmColor: ConfirmColor) {
+  switch (confirmColor) {
+    case 'danger':
+      return 'danger' as const;
+    case 'warning':
+      return 'secondary' as const;
+    case 'primary':
+    default:
+      return 'primary' as const;
+  }
 }
 
 export function ConfirmModal({
@@ -84,7 +98,7 @@ export function ConfirmModal({
             {resolvedCancelLabel}
           </Button>
           <Button
-            color={confirmColor}
+            variant={confirmVariant(confirmColor)}
             onPress={handleConfirm}
             isLoading={isLoading}
             isDisabled={isLoading || inFlightRef.current}
