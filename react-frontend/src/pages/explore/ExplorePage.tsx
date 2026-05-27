@@ -63,7 +63,6 @@ interface TrendingPost {
   comments_count: number;
   engagement: number;
 }
-
 interface PopularListing {
   id: number;
   title: string;
@@ -356,14 +355,13 @@ function EmptyState({ icon: Icon, message, cta, onAction }: {
       </div>
       <p className="text-sm text-[var(--text-muted)] max-w-xs">{message}</p>
       {cta && onAction && (
-        <Button size="sm" color="primary" variant="flat" className="mt-3" onPress={onAction}>
+        <Button size="sm" variant="secondary" className="mt-3" onPress={onAction}>
           {cta}
         </Button>
       )}
     </div>
   );
 }
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -567,7 +565,7 @@ export default function ExplorePage() {
         >
           <Input
             size="lg"
-            variant="bordered"
+            variant="secondary"
             placeholder={t('search_placeholder')}
             value={searchQuery}
             onValueChange={setSearchQuery}
@@ -581,7 +579,7 @@ export default function ExplorePage() {
           />
           <Button
             type="submit"
-            color="primary"
+            variant="primary"
             size="lg"
             className="shrink-0"
             aria-label={t('search_placeholder')}
@@ -596,7 +594,7 @@ export default function ExplorePage() {
             {effectiveCategories.slice(0, 8).map((cat) => (
               <Chip
                 key={cat.id}
-                variant="flat"
+                variant="soft"
                 size="sm"
                 className="cursor-pointer hover:bg-[var(--surface-hover)] transition-colors"
                 onClick={() => navigate(tenantPath(`/listings?category=${cat.slug}`))}
@@ -614,12 +612,10 @@ export default function ExplorePage() {
           selectedKey={activeTab}
           onSelectionChange={handleTabChange}
           variant="underlined"
-          color="primary"
-          size="lg"
           classNames={{
-            base: 'w-full sm:w-auto',
-            tabList: 'w-full sm:w-auto gap-0 sm:gap-2 justify-center border-b border-[var(--border-default)]',
-            tab: 'text-sm sm:text-base px-3 sm:px-5 h-10',
+            base: 'w-full max-w-full sm:w-auto',
+            tabList: 'w-max max-w-full gap-1 sm:gap-2 justify-start sm:justify-center border-b border-border',
+            tab: 'min-h-10 px-4 sm:px-5 text-sm sm:text-base',
             cursor: 'bg-accent',
             tabContent: 'group-data-[selected=true]:text-accent',
           }}
@@ -636,10 +632,10 @@ export default function ExplorePage() {
 
       {/* ─── API Error Banner ─────────────────────────────────────────────── */}
       {error && !isLoading && (
-        <div className="mb-6 flex items-center gap-3 px-4 py-3 rounded-xl bg-danger-50 border border-danger-200 text-danger-700 dark:bg-danger-900/20 dark:border-danger-800 dark:text-danger-400">
+        <div className="mb-6 flex items-center gap-3 rounded-xl border border-danger bg-danger-soft px-4 py-3 text-danger">
           <AlertCircle className="w-5 h-5 shrink-0" aria-hidden="true" />
           <span className="text-sm flex-1">{t('error_loading')}</span>
-          <Button size="sm" variant="flat" color="danger" onPress={() => retry()} startContent={<RefreshCw className="w-4 h-4" />}>
+          <Button size="sm" variant="danger-soft" onPress={() => retry()} startContent={<RefreshCw className="w-4 h-4" />}>
             {t('retry')}
           </Button>
         </div>
@@ -664,7 +660,7 @@ export default function ExplorePage() {
                   <Card className="h-full border border-[var(--card-border)] bg-[var(--card-bg)] hover:bg-[var(--card-hover-bg)] transition-colors">
                     <CardBody className="p-4 gap-3">
                       <div className="flex items-center gap-2">
-                        <Chip size="sm" variant="flat" className="text-xs capitalize">
+                        <Chip size="sm" variant="soft" className="text-xs capitalize">
                           {item.content_type}
                         </Chip>
                         {item.meta && (
@@ -865,9 +861,9 @@ export default function ExplorePage() {
                       ) : (
                         <div className="w-full h-32 rounded-lg bg-gradient-to-br from-[var(--surface-elevated)] to-[var(--glass-bg)] flex flex-col items-center justify-center gap-1.5">
                           {listing.type === 'offer' ? (
-                            <HandHeart className="w-7 h-7 text-[var(--color-primary)] opacity-40" />
+                            <HandHeart className="w-7 h-7 text-accent opacity-40" />
                           ) : (
-                            <Search className="w-7 h-7 text-[var(--color-primary)] opacity-40" />
+                            <Search className="w-7 h-7 text-accent opacity-40" />
                           )}
                           <span className="text-[10px] font-medium uppercase tracking-wider text-[var(--text-subtle)]">
                             {listing.type}
@@ -879,13 +875,13 @@ export default function ExplorePage() {
                           {listing.category_name && (
                             <Chip
                               size="sm"
-                              variant="flat"
+                              variant="soft"
                               className="text-xs"
                             >
                               {listing.category_name}
                             </Chip>
                           )}
-                          <Chip size="sm" variant="flat" className="text-xs capitalize">
+                          <Chip size="sm" variant="soft" className="text-xs capitalize">
                             {listing.type}
                           </Chip>
                         </div>
@@ -955,8 +951,8 @@ export default function ExplorePage() {
                           loading="lazy"
                         />
                       ) : (
-                        <div className="w-full h-28 rounded-lg bg-gradient-to-br from-[var(--color-primary)]/10 to-[var(--color-secondary)]/10 flex items-center justify-center">
-                          <Calendar className="w-8 h-8 text-[var(--color-primary)]" />
+                        <div className="w-full h-28 rounded-lg bg-accent-soft flex items-center justify-center">
+                          <Calendar className="w-8 h-8 text-accent" />
                         </div>
                       )}
                       <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-2">
@@ -964,7 +960,7 @@ export default function ExplorePage() {
                       </h3>
                       <div className="flex flex-col gap-1 text-xs text-[var(--text-muted)]">
                         <span className="flex items-center gap-1">
-                          <Calendar className="w-3.5 h-3.5 text-[var(--color-primary)]" />
+                          <Calendar className="w-3.5 h-3.5 text-accent" />
                           {formatDateTime(event.start_at)}
                         </span>
                         {event.location && (
@@ -1037,8 +1033,7 @@ export default function ExplorePage() {
                       )}
                       <Button
                         size="sm"
-                        variant="flat"
-                        color="primary"
+                        variant="secondary"
                         className="w-full"
                       >
                         {t('active_groups.view_group')}
@@ -1124,7 +1119,7 @@ export default function ExplorePage() {
               {data!.trending_hashtags.map((hashtag) => (
                 <Link key={hashtag.id} to={tenantPath(`/feed/hashtag/${hashtag.tag}`)}>
                   <Chip
-                    variant="flat"
+                    variant="soft"
                     size="md"
                     startContent={<Hash className="w-3.5 h-3.5" />}
                     className="cursor-pointer hover:bg-[var(--surface-hover)] transition-colors"
@@ -1162,7 +1157,7 @@ export default function ExplorePage() {
                     <CardBody className="p-4 gap-3">
                       <div className="flex items-center gap-2">
                         {listing.match_reason && (
-                          <Chip size="sm" variant="flat" color="secondary" className="text-xs">
+                          <Chip size="sm" variant="soft" color="secondary" className="text-xs">
                             <TrendingUp className="w-3 h-3 mr-1 inline" />
                             {listing.match_reason}
                           </Chip>
@@ -1189,7 +1184,7 @@ export default function ExplorePage() {
                           </p>
                           <div className="flex items-center gap-2 mt-1">
                             {listing.category_name && (
-                              <Chip size="sm" variant="flat" className="text-[10px]">
+                              <Chip size="sm" variant="soft" className="text-[10px]">
                                 {listing.category_name}
                               </Chip>
                             )}
@@ -1209,7 +1204,7 @@ export default function ExplorePage() {
                 <Button
                   isIconOnly
                   size="sm"
-                  variant="flat"
+                  variant="tertiary"
                   radius="full"
                   className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity min-w-6 w-6 h-6 bg-[var(--surface-elevated)] hover:bg-[var(--surface-hover)]"
                   onClick={(e) => { e.preventDefault(); handleDismiss('listing', listing.id, 'not_relevant'); }}
@@ -1240,7 +1235,7 @@ export default function ExplorePage() {
               >
                 <Card className="h-full border border-[var(--card-border)] bg-[var(--card-bg)] hover:bg-[var(--card-hover-bg)] transition-colors">
                   <CardBody className="p-4 gap-3">
-                    <div className="flex items-center gap-2 text-xs text-[var(--color-primary)] font-medium">
+                    <div className="flex items-center gap-2 text-xs text-accent font-medium">
                       <Navigation className="w-3.5 h-3.5" />
                       {t('near_you.distance', { distance: listing.distance_km })}
                     </div>
@@ -1257,7 +1252,7 @@ export default function ExplorePage() {
                       <span className="text-xs text-[var(--text-muted)] truncate">{listing.author_name}</span>
                     </div>
                     {listing.category_name && (
-                      <Chip size="sm" variant="flat" className="text-xs">{listing.category_name}</Chip>
+                      <Chip size="sm" variant="soft" className="text-xs">{listing.category_name}</Chip>
                     )}
                   </CardBody>
                 </Card>
@@ -1295,7 +1290,7 @@ export default function ExplorePage() {
                   {member.name}
                 </Link>
                 {member.reason && (
-                  <span className="text-[10px] text-[var(--color-primary)] text-center">
+                  <span className="text-[10px] text-accent text-center">
                     {member.reason === 'Recommended for you' ? t('suggested_connections.recommended')
                       : member.reason === 'Similar interests' ? t('suggested_connections.similar')
                       : t('suggested_connections.mutual')}
@@ -1303,8 +1298,7 @@ export default function ExplorePage() {
                 )}
                 <Button
                   size="sm"
-                  variant="flat"
-                  color="primary"
+                  variant="secondary"
                   className="text-xs h-7 px-3"
                   startContent={<UserPlus className="w-3 h-3" />}
                   onPress={() => navigate(tenantPath(`/messages/new/${member.id}`))}
@@ -1341,8 +1335,8 @@ export default function ExplorePage() {
                         loading="lazy"
                       />
                     ) : (
-                      <div className="w-full h-28 rounded-lg bg-gradient-to-br from-[var(--color-primary)]/10 to-[var(--color-secondary)]/10 flex items-center justify-center">
-                        <BookOpen className="w-8 h-8 text-[var(--color-primary)]" />
+                      <div className="w-full h-28 rounded-lg bg-accent-soft flex items-center justify-center">
+                        <BookOpen className="w-8 h-8 text-accent" />
                       </div>
                     )}
                     <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-2">
@@ -1433,7 +1427,7 @@ export default function ExplorePage() {
                 <Card className="h-full border border-[var(--card-border)] bg-[var(--card-bg)] hover:bg-[var(--card-hover-bg)] transition-colors">
                   <CardBody className="p-4 gap-3">
                     <div className="flex items-center gap-2">
-                      <BarChart3 className="w-4 h-4 text-[var(--color-primary)]" />
+                      <BarChart3 className="w-4 h-4 text-accent" />
                       <span className="text-xs text-[var(--text-muted)]">
                         {t('polls.options', { count: poll.option_count })}
                       </span>
@@ -1447,7 +1441,7 @@ export default function ExplorePage() {
                         <span>{t('polls.closes', { date: formatDate(poll.closes_at) })}</span>
                       )}
                     </div>
-                    <Button size="sm" variant="flat" color="primary" className="w-full">
+                    <Button size="sm" variant="secondary" className="w-full">
                       {t('polls.vote_now')}
                     </Button>
                   </CardBody>
@@ -1469,7 +1463,7 @@ export default function ExplorePage() {
             {data.in_demand_skills.map((skill) => (
               <Chip
                 key={skill.skill_name}
-                variant="flat"
+                variant="soft"
                 size="md"
                 startContent={<Wrench className="w-3.5 h-3.5" />}
                 className="cursor-pointer hover:bg-[var(--surface-hover)] transition-colors"
@@ -1538,8 +1532,8 @@ export default function ExplorePage() {
                 <Card className="h-full border border-[var(--card-border)] bg-[var(--card-bg)] hover:bg-[var(--card-hover-bg)] transition-colors">
                   <CardBody className="p-4 gap-2">
                     <div className="flex items-start gap-3">
-                      <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-[var(--color-primary)]/10 shrink-0">
-                        <Briefcase className="w-5 h-5 text-[var(--color-primary)]" />
+                      <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-accent-soft shrink-0">
+                        <Briefcase className="w-5 h-5 text-accent" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-1">
@@ -1585,12 +1579,12 @@ export default function ExplorePage() {
               >
                 <Card className="h-full border border-[var(--card-border)] bg-[var(--card-bg)] hover:bg-[var(--card-hover-bg)] transition-colors">
                   <CardBody className="p-4 gap-3">
-                    <FolderOpen className="w-6 h-6 text-[var(--color-secondary)]" />
+                    <FolderOpen className="w-6 h-6 text-accent" />
                     <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-2">
                       {resource.title}
                     </h3>
                     {resource.category_name && (
-                      <Chip size="sm" variant="flat" className="text-xs">{resource.category_name}</Chip>
+                      <Chip size="sm" variant="soft" className="text-xs">{resource.category_name}</Chip>
                     )}
                     <span className="text-xs text-[var(--text-muted)]">
                       {t('resources.views', { count: resource.view_count })}
@@ -1612,8 +1606,7 @@ export default function ExplorePage() {
           <div className="flex items-center justify-end mb-2 -mt-2">
             <Button
               size="sm"
-              variant="light"
-              color="danger"
+              variant="danger-soft"
               startContent={<Trash2 className="w-3.5 h-3.5" />}
               onPress={handleClearRecentlyViewed}
             >
@@ -1644,7 +1637,7 @@ export default function ExplorePage() {
                     <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-2">
                       {item.title}
                     </h3>
-                    <Chip size="sm" variant="flat" className="text-xs capitalize">
+                    <Chip size="sm" variant="soft" className="text-xs capitalize">
                       {item.type}
                     </Chip>
                   </CardBody>
@@ -1700,8 +1693,7 @@ export default function ExplorePage() {
                   {isAuthenticated && (
                     <Button
                       size="sm"
-                      variant="flat"
-                      color="primary"
+                      variant="secondary"
                       className="text-xs h-7 px-3"
                       startContent={<UserPlus className="w-3 h-3" />}
                       onPress={() => navigate(tenantPath(`/messages/new/${member.id}`))}
@@ -1729,8 +1721,8 @@ export default function ExplorePage() {
                 <Card className="h-full border border-[var(--card-border)] bg-[var(--card-bg)] hover:bg-[var(--card-hover-bg)] transition-colors">
                   <CardBody className="p-4 gap-3">
                     <div className="flex items-start gap-3">
-                      <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-[var(--color-secondary)]/10 shrink-0">
-                        <Lightbulb className="w-5 h-5 text-[var(--color-secondary)]" />
+                      <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-accent-soft shrink-0">
+                        <Lightbulb className="w-5 h-5 text-accent" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <h3 className="text-sm font-semibold text-[var(--text-primary)] line-clamp-1">
@@ -1760,7 +1752,7 @@ export default function ExplorePage() {
                               value={getChallengeProgress(challenge.start_date, challenge.end_date)}
                               classNames={{
                                 track: 'bg-[var(--surface-elevated)]',
-                                indicator: 'bg-[var(--color-secondary)]',
+                                indicator: 'bg-accent',
                               }}
                             />
                           </div>

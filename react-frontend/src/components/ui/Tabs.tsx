@@ -103,10 +103,10 @@ export function Tabs({
       variant={mapVariant(variant)}
       {...props}
     >
-      <HeroUITabs.ListContainer>
+      <HeroUITabs.ListContainer className="max-w-full overflow-x-auto">
         <HeroUITabs.List
           aria-label={ariaLabel}
-          className={combineClasses(fullWidth && 'w-full', classNames?.tabList)}
+          className={combineClasses('min-w-max', fullWidth && 'w-full', classNames?.tabList)}
         >
           {tabChildren.map((child, index) => {
             const id = normalizeKey(child.key, index);
@@ -114,11 +114,18 @@ export function Tabs({
             return (
               <HeroUITabs.Tab
                 key={id}
-                className={combineClasses(fullWidth && 'flex-1', classNames?.tab, child.props.className)}
+                className={combineClasses(
+                  'w-fit min-w-fit shrink-0 whitespace-nowrap',
+                  fullWidth && 'flex-1 justify-center',
+                  classNames?.tab,
+                  child.props.className,
+                )}
                 id={id}
                 isDisabled={child.props.isDisabled}
               >
-                {child.props.title ?? child.props.children}
+                <span className={combineClasses('whitespace-nowrap', classNames?.tabContent)}>
+                  {child.props.title ?? child.props.children}
+                </span>
                 {disableCursorAnimation ? null : <HeroUITabs.Indicator className={classNames?.cursor} />}
               </HeroUITabs.Tab>
             );
