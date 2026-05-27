@@ -238,7 +238,7 @@ export function EmailSettings() {
         <Card>
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Mail size={20} /> {t('email_provider_heading')}
+              <Mail aria-hidden="true" size={20} /> {t('email_provider_heading')}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
@@ -269,7 +269,7 @@ export function EmailSettings() {
           <Card>
             <CardHeader>
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Shield size={20} /> {t('sendgrid_configuration')}
+                <Shield aria-hidden="true" size={20} /> {t('sendgrid_configuration')}
               </h3>
             </CardHeader>
             <CardBody className="gap-4">
@@ -329,7 +329,7 @@ export function EmailSettings() {
           <Card>
             <CardHeader>
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Globe size={20} /> {t('gmail_api_configuration')}
+                <Globe aria-hidden="true" size={20} /> {t('gmail_api_configuration')}
               </h3>
             </CardHeader>
             <CardBody className="gap-4">
@@ -380,7 +380,7 @@ export function EmailSettings() {
           <Card>
             <CardHeader>
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Globe size={20} /> {t('smtp_configuration')}
+                <Globe aria-hidden="true" size={20} /> {t('smtp_configuration')}
               </h3>
             </CardHeader>
             <CardBody className="gap-4">
@@ -451,7 +451,7 @@ export function EmailSettings() {
           <Card>
             <CardHeader>
               <h3 className="text-lg font-semibold flex items-center gap-2">
-                <Globe size={20} /> {t('platform_default_heading')}
+                <Globe aria-hidden="true" size={20} /> {t('platform_default_heading')}
               </h3>
             </CardHeader>
             <CardBody>
@@ -472,7 +472,7 @@ export function EmailSettings() {
         <Card>
           <CardHeader>
             <h3 className="text-lg font-semibold flex items-center gap-2">
-              <Send size={20} /> {t('test_email_heading')}
+              <Send aria-hidden="true" size={20} /> {t('test_email_heading')}
             </h3>
           </CardHeader>
           <CardBody className="gap-4">
@@ -488,7 +488,7 @@ export function EmailSettings() {
             />
             <Button
               variant="secondary"
-              startContent={<Send size={16} />}
+              startContent={<Send aria-hidden="true" size={16} />}
               onPress={handleTestEmail}
               isLoading={testing}
             >
@@ -500,7 +500,7 @@ export function EmailSettings() {
         {/* Save Button */}
         <div className="flex justify-end">
           <Button
-            startContent={<Save size={16} />}
+            startContent={<Save aria-hidden="true" size={16} />}
             onPress={handleSave}
             isLoading={saving}
             isDisabled={saving}

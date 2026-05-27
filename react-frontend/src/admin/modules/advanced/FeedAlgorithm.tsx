@@ -94,7 +94,7 @@ export function FeedAlgorithm() {
 
       <div className="space-y-4">
         <Card >
-          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Rss size={20} /> {t('feed_ranking_weights')}</h3></CardHeader>
+          <CardHeader><h3 className="text-lg font-semibold flex items-center gap-2"><Rss aria-hidden="true" size={20} /> {t('feed_ranking_weights')}</h3></CardHeader>
           <CardBody className="gap-6">
             <div>
               <p className="text-sm font-medium mb-2">{t('recency_weight')}</p>
@@ -143,7 +143,7 @@ export function FeedAlgorithm() {
         </Card>
 
         <div className="flex justify-end">
-          <Button startContent={<Save size={16} />} onPress={handleSave} isLoading={saving} isDisabled={saving}>{t('save_algorithm')}</Button>
+          <Button startContent={<Save aria-hidden="true" size={16} />} onPress={handleSave} isLoading={saving} isDisabled={saving}>{t('save_algorithm')}</Button>
         </div>
       </div>
     </div>

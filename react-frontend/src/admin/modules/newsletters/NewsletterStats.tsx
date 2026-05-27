@@ -242,7 +242,7 @@ export function NewsletterStats() {
           actions={
             <Button
               variant="secondary"
-              startContent={<ArrowLeft size={16} />}
+              startContent={<ArrowLeft aria-hidden="true" size={16} />}
               onPress={() => navigate(tenantPath('/admin/newsletters'))}
             >
               {t('newsletters.back')}
@@ -272,7 +272,7 @@ export function NewsletterStats() {
           actions={
             <Button
               variant="secondary"
-              startContent={<ArrowLeft size={16} />}
+              startContent={<ArrowLeft aria-hidden="true" size={16} />}
               onPress={() => navigate(tenantPath('/admin/newsletters'))}
             >
               {t('newsletters.back')}
@@ -281,7 +281,7 @@ export function NewsletterStats() {
         />
         <Card>
           <CardBody className="flex flex-col items-center gap-3 py-12 text-center">
-            <Mail size={48} className="text-muted" />
+            <Mail aria-hidden="true" size={48} className="text-muted" />
             <p className="text-lg font-semibold text-foreground">{error || t('newsletters.error_not_found')}</p>
             <Button
               variant="primary"
@@ -308,7 +308,7 @@ export function NewsletterStats() {
           <div className="flex flex-wrap gap-2">
             <Button
               variant="secondary"
-              startContent={<ArrowLeft size={16} />}
+              startContent={<ArrowLeft aria-hidden="true" size={16} />}
               onPress={() => navigate(tenantPath('/admin/newsletters'))}
             >
               {t('newsletters.back')}
@@ -316,7 +316,7 @@ export function NewsletterStats() {
             {newsletter.status === 'sent' && (
               <Button
                 variant="secondary"
-                startContent={<BarChart3 size={16} />}
+                startContent={<BarChart3 aria-hidden="true" size={16} />}
                 onPress={() => navigate(tenantPath(`/admin/newsletters/${id}/activity`))}
               >
                 {t('newsletters.activity_log')}
@@ -325,7 +325,7 @@ export function NewsletterStats() {
             {nonOpenerCount > 0 && newsletter.status === 'sent' && (
             <Button
                 variant="secondary"
-                startContent={<Send size={16} />}
+                startContent={<Send aria-hidden="true" size={16} />}
                 onPress={() => setResendOpen(true)}
               >
                 {t('newsletters.resend_to_non_openers_count')}
@@ -397,7 +397,7 @@ export function NewsletterStats() {
       {/* ── Engagement Funnel ── */}
       <Card  className="mb-6">
         <CardHeader className="flex flex-row items-center gap-2 px-5 pb-0 pt-5">
-          <TrendingUp size={18} className="text-muted" />
+          <TrendingUp aria-hidden="true" size={18} className="text-muted" />
           <h3 className="text-lg font-semibold text-foreground">{t('newsletters.section_engagement_funnel')}</h3>
         </CardHeader>
         <CardBody className="space-y-4 px-5 pb-5">
@@ -448,7 +448,7 @@ export function NewsletterStats() {
             {/* Winner Announcement */}
             {ab_test.winner && (
               <div className="flex items-center gap-3 rounded-lg bg-success-50 p-4 dark:bg-success-50/10">
-                <Trophy size={24} className="text-success" />
+                <Trophy aria-hidden="true" size={24} className="text-success" />
                 <div>
                   <p className="font-semibold text-success-700 dark:text-success">
                     {t('newsletters.winner_subject')}
@@ -529,7 +529,7 @@ export function NewsletterStats() {
         {deviceTotal > 0 && (
           <Card  className="lg:col-span-1">
             <CardHeader className="flex flex-row items-center gap-2 px-5 pb-0 pt-5">
-              <Monitor size={18} className="text-muted" />
+              <Monitor aria-hidden="true" size={18} className="text-muted" />
               <h3 className="text-lg font-semibold text-foreground">{t('newsletters.section_devices')}</h3>
             </CardHeader>
             <CardBody className="px-5 pb-5">
@@ -568,7 +568,7 @@ export function NewsletterStats() {
                   const pct = deviceTotal > 0 ? Math.round((count / deviceTotal) * 100) : 0;
                   return (
                     <div key={device} className="flex items-center gap-2 text-sm">
-                      <Icon size={14} style={{ '--device-color': DEVICE_COLORS[device], color: 'var(--device-color)' } as CSSProperties} />
+                      <Icon aria-hidden="true" size={14} style={{ '--device-color': DEVICE_COLORS[device], color: 'var(--device-color)' } as CSSProperties} />
                       <span className="capitalize text-foreground">{t(`newsletters.device_${device}`)}</span>
                       <span className="ml-auto font-semibold">{pct}%</span>
                     </div>
@@ -583,7 +583,7 @@ export function NewsletterStats() {
         {timeline.length > 0 && (
           <Card  className={deviceTotal > 0 ? 'lg:col-span-2' : 'lg:col-span-3'}>
             <CardHeader className="flex flex-row items-center gap-2 px-5 pb-0 pt-5">
-              <Clock size={18} className="text-muted" />
+              <Clock aria-hidden="true" size={18} className="text-muted" />
               <h3 className="text-lg font-semibold text-foreground">{t('newsletters.section_engagement_timeline')}</h3>
               <span className="ml-auto text-xs text-muted">{t('newsletters.first_48_hours')}</span>
             </CardHeader>
@@ -646,7 +646,7 @@ export function NewsletterStats() {
       {emailClients.length > 0 && (
         <Card  className="mb-6">
           <CardHeader className="flex flex-row items-center gap-2 px-5 pb-0 pt-5">
-            <Mail size={18} className="text-muted" />
+            <Mail aria-hidden="true" size={18} className="text-muted" />
             <h3 className="text-lg font-semibold text-foreground">{t('newsletters.section_email_clients')}</h3>
           </CardHeader>
           <CardBody className="px-5 pb-5">
@@ -671,7 +671,7 @@ export function NewsletterStats() {
       {top_links.length > 0 && (
         <Card  className="mb-6">
           <CardHeader className="flex flex-row items-center gap-2 px-5 pb-0 pt-5">
-            <ExternalLink size={18} className="text-muted" />
+            <ExternalLink aria-hidden="true" size={18} className="text-muted" />
             <h3 className="text-lg font-semibold text-foreground">{t('newsletters.section_top_clicked_links')}</h3>
           </CardHeader>
           <CardBody className="px-5 pb-5">
@@ -717,7 +717,7 @@ export function NewsletterStats() {
         <Card  className="mb-6">
           <CardHeader className="flex flex-row items-center justify-between px-5 pb-0 pt-5">
             <div className="flex items-center gap-2">
-              <BarChart3 size={18} className="text-muted" />
+              <BarChart3 aria-hidden="true" size={18} className="text-muted" />
               <h3 className="text-lg font-semibold text-foreground">{t('newsletters.section_recent_activity')}</h3>
             </div>
             {newsletter.status === 'sent' && (
@@ -789,7 +789,7 @@ export function NewsletterStats() {
           <div className="flex flex-wrap gap-3">
             <Button
               variant="secondary"
-              startContent={<Copy size={16} />}
+              startContent={<Copy aria-hidden="true" size={16} />}
               onPress={async () => {
                 try {
                   const res = await adminNewsletters.duplicateNewsletter(Number(id));
@@ -809,7 +809,7 @@ export function NewsletterStats() {
             {newsletter.status === 'sent' && (
               <Button
                 variant="secondary"
-                startContent={<BarChart3 size={16} />}
+                startContent={<BarChart3 aria-hidden="true" size={16} />}
                 onPress={() => navigate(tenantPath(`/admin/newsletters/${id}/activity`))}
               >
                 {t('newsletters.btn_full_activity_log')}
@@ -929,7 +929,7 @@ function AbVariantCard({
           <Chip size="sm" color={chipColor} variant="soft">{label}</Chip>
           {isWinner && (
             <div className="flex items-center gap-1 text-success">
-              <Trophy size={14} />
+              <Trophy aria-hidden="true" size={14} />
               <span className="text-xs font-semibold">{tLocal('newsletters.winner')}</span>
             </div>
           )}

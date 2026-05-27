@@ -187,7 +187,7 @@ export function NewsletterAnalytics() {
         actions={
           <Button
             variant="secondary"
-            startContent={<RefreshCw size={16} />}
+            startContent={<RefreshCw aria-hidden="true" size={16} />}
             onPress={loadData}
             isLoading={loading}
           >
@@ -240,7 +240,7 @@ export function NewsletterAnalytics() {
         <Card className="mt-6">
           <CardHeader className="flex items-center gap-3 px-6 pb-0 pt-5">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent-soft text-accent">
-              <BarChart3 size={20} />
+              <BarChart3 aria-hidden="true" size={20} />
             </div>
             <div>
               <h3 className="text-base font-semibold">{t('newsletters.section_engagement_summary')}</h3>
@@ -276,7 +276,7 @@ export function NewsletterAnalytics() {
                   label={t('newsletters.label_failed')}
                   value={totals.total_failed}
                   color="text-danger"
-                  icon={<AlertTriangle size={14} className="text-danger" />}
+                  icon={<AlertTriangle aria-hidden="true" size={14} className="text-danger" />}
                 />
               )}
             </div>
@@ -289,7 +289,7 @@ export function NewsletterAnalytics() {
         <Card className="mt-6">
           <CardHeader className="flex items-center gap-3 px-6 pb-0 pt-5">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
-              <TrendingUp size={20} />
+              <TrendingUp aria-hidden="true" size={20} />
             </div>
             <div>
               <h3 className="text-base font-semibold">{t('newsletters.section_monthly_performance')}</h3>
@@ -400,7 +400,7 @@ export function NewsletterAnalytics() {
         <Card className="mt-6">
           <CardHeader className="flex items-center gap-3 px-6 pb-0 pt-5">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-warning/10 text-warning">
-              <Trophy size={20} />
+              <Trophy aria-hidden="true" size={20} />
             </div>
             <div>
               <h3 className="text-base font-semibold">{t('newsletters.section_top_performers')}</h3>
@@ -473,7 +473,7 @@ export function NewsletterAnalytics() {
         <Card className="mt-6">
           <CardHeader className="flex items-center gap-3 px-6 pb-0 pt-5">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-success/10 text-success">
-              <Target size={20} />
+              <Target aria-hidden="true" size={20} />
             </div>
             <div>
               <h3 className="text-base font-semibold">{t('newsletters.section_benchmark')}</h3>
@@ -504,7 +504,7 @@ export function NewsletterAnalytics() {
         <Card className="mt-6">
           <CardBody className="flex flex-col items-center justify-center py-16 text-center">
             <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-surface-secondary">
-              <BarChart3 size={40} className="text-muted" />
+              <BarChart3 aria-hidden="true" size={40} className="text-muted" />
             </div>
             <h3 className="text-lg font-semibold">{t('newsletters.empty_no_analytics')}</h3>
             <p className="mt-1 text-muted">
@@ -592,7 +592,7 @@ function BenchmarkCard({
           variant="soft"
           color={isAbove ? 'success' : 'danger'}
           startContent={
-            isAbove ? <TrendingUp size={12} /> : <TrendingUp size={12} className="rotate-180" />
+            isAbove ? <TrendingUp aria-hidden="true" size={12} /> : <TrendingUp aria-hidden="true" size={12} className="rotate-180" />
           }
         >
           {isAbove ? '+' : ''}

@@ -431,13 +431,13 @@ export function NewsletterForm() {
         description={isEdit ? t('newsletter_form.desc_edit') : t('newsletter_form.desc_create')}
         actions={
           <div className="flex gap-2">
-            <Button variant="secondary" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/newsletters'))}>
+            <Button variant="secondary" startContent={<ArrowLeft aria-hidden="true" size={16} />} onPress={() => navigate(tenantPath('/admin/newsletters'))}>
               {t('newsletter_form.back')}
             </Button>
             {isEdit && !isSent && (
               <Button
                 variant="secondary"
-                startContent={<TestTube size={16} />}
+                startContent={<TestTube aria-hidden="true" size={16} />}
                 onPress={handleSendTest}
                 isLoading={sendingTest}
               >
@@ -581,7 +581,7 @@ export function NewsletterForm() {
           <Card  className="border-2 border-accent">
             <CardBody className="gap-3">
               <div className="flex items-center gap-2">
-                <Users size={18} className="text-accent" />
+                <Users aria-hidden="true" size={18} className="text-accent" />
                 <span className="text-sm font-semibold">{t('newsletter_form.estimated_recipients')}</span>
               </div>
               <div className="text-center">
@@ -638,7 +638,7 @@ export function NewsletterForm() {
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
-                <Repeat size={16} />
+                <Repeat aria-hidden="true" size={16} />
                 <h3 className="text-sm font-semibold">{t('newsletter_form.section_recurring_schedule')}</h3>
               </div>
             </CardHeader>
@@ -722,7 +722,7 @@ export function NewsletterForm() {
           <Card>
             <CardHeader>
               <div className="flex items-center gap-2">
-                <Target size={16} />
+                <Target aria-hidden="true" size={16} />
                 <h3 className="text-sm font-semibold">{t('newsletter_form.section_target_audience')}</h3>
               </div>
             </CardHeader>
@@ -768,7 +768,7 @@ export function NewsletterForm() {
               {/* Geo targeting */}
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <MapPin size={14} className="text-muted" />
+                  <MapPin aria-hidden="true" size={14} className="text-muted" />
                   <p className="text-xs font-medium text-foreground">{t('newsletter_form.geo_targeting_optional')}</p>
                 </div>
                 <Input
@@ -797,7 +797,7 @@ export function NewsletterForm() {
               {groups.length > 0 && (
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <UsersRound size={14} className="text-muted" />
+                    <UsersRound aria-hidden="true" size={14} className="text-muted" />
                     <p className="text-xs font-medium text-foreground">{t('newsletter_form.group_targeting_optional')}</p>
                   </div>
                   <Select
@@ -827,7 +827,7 @@ export function NewsletterForm() {
             <Card>
               <CardHeader>
                 <div className="flex items-center gap-2">
-                  <Calendar size={16} />
+                  <Calendar aria-hidden="true" size={16} />
                   <h3 className="text-sm font-semibold">{t('newsletter_form.section_template')}</h3>
                 </div>
               </CardHeader>
@@ -855,7 +855,7 @@ export function NewsletterForm() {
               <>
                 <Button
 
-                  startContent={<Save size={16} />}
+                  startContent={<Save aria-hidden="true" size={16} />}
                   onPress={handleSubmit}
                   isLoading={saving}
                   className="w-full"
@@ -867,7 +867,7 @@ export function NewsletterForm() {
                   <Tooltip content={recipientCount === 0 ? t('newsletter_form.no_recipients_match') : t('newsletter_form.send_to_all_targeted')}>
                     <Button
 
-                      startContent={<Send size={16} />}
+                      startContent={<Send aria-hidden="true" size={16} />}
                       onPress={() => setConfirmSendOpen(true)}
                       isDisabled={recipientCount === 0}
                       className="w-full"
@@ -882,7 +882,7 @@ export function NewsletterForm() {
             {isSent && (
               <Card className="bg-success-50 dark:bg-success-50/10">
                 <CardBody className="flex-row items-center gap-3">
-                  <CheckCircle size={20} className="text-success" />
+                  <CheckCircle aria-hidden="true" size={20} className="text-success" />
                   <div>
                     <p className="text-sm font-medium text-success">{t('newsletter_form.newsletter_sent')}</p>
                     <p className="text-xs text-success-600 dark:text-success-400">{t('newsletter_form.newsletter_sent_desc')}</p>
@@ -902,7 +902,7 @@ export function NewsletterForm() {
       <Modal isOpen={confirmSendOpen} onClose={() => setConfirmSendOpen(false)} size="md">
         <ModalContent>
           <ModalHeader className="flex items-center gap-2">
-            <AlertCircle size={20} className="text-warning" />
+            <AlertCircle aria-hidden="true" size={20} className="text-warning" />
             {t('newsletter_form.confirm_send')}
           </ModalHeader>
           <ModalBody>
@@ -949,7 +949,7 @@ export function NewsletterForm() {
             </Button>
             <Button
 
-              startContent={<Send size={16} />}
+              startContent={<Send aria-hidden="true" size={16} />}
               onPress={handleSendNow}
               isLoading={sending}
             >

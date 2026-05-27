@@ -171,7 +171,7 @@ export function BillingPage() {
       {!loading && subscription && (
         <Card className="mb-6">
           <CardHeader className="flex gap-3">
-            <Users className="w-5 h-5 text-accent" />
+            <Users aria-hidden="true" className="w-5 h-5 text-accent" />
             <h3 className="text-lg font-semibold">
               {t('billing.your_plan_usage')}
             </h3>
@@ -252,7 +252,7 @@ export function BillingPage() {
       </Modal>
 
       {loading ? (
-        <div className="flex justify-center py-12">
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-12">
           <Spinner size="lg" />
         </div>
       ) : (
@@ -260,7 +260,7 @@ export function BillingPage() {
           {/* Current Plan Card */}
           <Card className="lg:col-span-2">
             <CardHeader className="flex gap-3">
-              <CreditCard className="w-5 h-5 text-accent" />
+              <CreditCard aria-hidden="true" className="w-5 h-5 text-accent" />
               <h3 className="text-lg font-semibold">{t('billing.current_plan')}</h3>
             </CardHeader>
             <Separator />
@@ -317,14 +317,14 @@ export function BillingPage() {
                 </>
               ) : (
                 <div className="text-center py-6">
-                  <CreditCard className="w-12 h-12 text-muted mx-auto mb-3" />
+                  <CreditCard aria-hidden="true" className="w-12 h-12 text-muted mx-auto mb-3" />
                   <p className="text-muted mb-4">
                     {t('billing.no_subscription')}
                   </p>
                   <Button
                     as={Link}
                     to={tenantPath('/admin/billing/plans')}
-                    endContent={<ArrowRight className="w-4 h-4" />}
+                    endContent={<ArrowRight aria-hidden="true" className="w-4 h-4" />}
                   >
                     {t('billing.choose_plan')}
                   </Button>
@@ -345,8 +345,8 @@ export function BillingPage() {
                 to={tenantPath('/admin/billing/plans')}
                 variant="tertiary"
                 className="justify-start"
-                startContent={<CreditCard className="w-4 h-4" />}
-                endContent={<ArrowRight className="w-4 h-4 ml-auto" />}
+                startContent={<CreditCard aria-hidden="true" className="w-4 h-4" />}
+                endContent={<ArrowRight aria-hidden="true" className="w-4 h-4 ml-auto" />}
                 fullWidth
               >
                 {t('billing.change_plan')}
@@ -356,8 +356,8 @@ export function BillingPage() {
                 <Button
                   variant="tertiary"
                   className="justify-start"
-                  startContent={<Settings className="w-4 h-4" />}
-                  endContent={<ArrowRight className="w-4 h-4 ml-auto" />}
+                  startContent={<Settings aria-hidden="true" className="w-4 h-4" />}
+                  endContent={<ArrowRight aria-hidden="true" className="w-4 h-4 ml-auto" />}
                   isLoading={portalLoading}
                   onPress={handleManagePayment}
                   fullWidth
@@ -371,8 +371,8 @@ export function BillingPage() {
                 to={tenantPath('/admin/billing/invoices')}
                 variant="tertiary"
                 className="justify-start"
-                startContent={<Receipt className="w-4 h-4" />}
-                endContent={<ArrowRight className="w-4 h-4 ml-auto" />}
+                startContent={<Receipt aria-hidden="true" className="w-4 h-4" />}
+                endContent={<ArrowRight aria-hidden="true" className="w-4 h-4 ml-auto" />}
                 fullWidth
               >
                 {t('billing.view_invoices')}

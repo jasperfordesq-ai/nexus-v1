@@ -193,7 +193,7 @@ export function ActivityLog() {
         actions={
           <Button
             variant="tertiary"
-            startContent={<RefreshCw size={16} />}
+            startContent={<RefreshCw aria-hidden="true" size={16} />}
             onPress={loadData}
             isLoading={loading}
           >
@@ -216,7 +216,7 @@ export function ActivityLog() {
         onPageChange={setPage}
         emptyContent={
           <div className="flex flex-col items-center gap-2 py-8 text-muted">
-            <Activity size={40} />
+            <Activity aria-hidden="true" size={40} />
             <p>{t('system.no_activity_log_entries')}</p>
           </div>
         }

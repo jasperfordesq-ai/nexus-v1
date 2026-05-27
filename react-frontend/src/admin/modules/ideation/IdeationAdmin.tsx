@@ -125,19 +125,19 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
         </Button>
       </DropdownTrigger>
       <DropdownMenu aria-label={t('ideation.label_challenge_actions')} onAction={handleAction}>
-        <DropdownItem key="view" id="view" startContent={<Eye size={14} />}>
+        <DropdownItem key="view" id="view" startContent={<Eye aria-hidden="true" size={14} />}>
           {t('ideation.view_details')}
         </DropdownItem>
         <DropdownItem
           key="draft" id="draft"
-          startContent={<FileEdit size={14} />}
+          startContent={<FileEdit aria-hidden="true" size={14} />}
           className={challenge.status !== 'draft' ? '' : 'hidden'}
         >
           {t('ideation.mark_as_draft')}
         </DropdownItem>
         <DropdownItem
           key="open" id="open"
-          startContent={<CheckCircle size={14} />}
+          startContent={<CheckCircle aria-hidden="true" size={14} />}
           color="success"
           className={challenge.status !== 'open' ? 'text-success' : 'hidden'}
         >
@@ -145,14 +145,14 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
         </DropdownItem>
         <DropdownItem
           key="voting" id="voting"
-          startContent={<Vote size={14} />}
+          startContent={<Vote aria-hidden="true" size={14} />}
           className={challenge.status !== 'voting' ? 'text-accent' : 'hidden'}
         >
           {t('ideation.mark_as_voting')}
         </DropdownItem>
         <DropdownItem
           key="evaluating" id="evaluating"
-          startContent={<ClipboardCheck size={14} />}
+          startContent={<ClipboardCheck aria-hidden="true" size={14} />}
           color="warning"
           className={challenge.status !== 'evaluating' ? 'text-warning' : 'hidden'}
         >
@@ -160,21 +160,21 @@ function ChallengeActions({ challenge, onStatusChange, onDelete, onView }: Chall
         </DropdownItem>
         <DropdownItem
           key="closed" id="closed"
-          startContent={<XCircle size={14} />}
+          startContent={<XCircle aria-hidden="true" size={14} />}
           className={challenge.status !== 'closed' ? '' : 'hidden'}
         >
           {t('ideation.mark_as_closed')}
         </DropdownItem>
         <DropdownItem
           key="archived" id="archived"
-          startContent={<Archive size={14} />}
+          startContent={<Archive aria-hidden="true" size={14} />}
           className={challenge.status !== 'archived' ? '' : 'hidden'}
         >
           {t('ideation.mark_as_archived')}
         </DropdownItem>
         <DropdownItem
           key="delete" id="delete"
-          startContent={<Trash2 size={14} />}
+          startContent={<Trash2 aria-hidden="true" size={14} />}
           className="text-danger"
           variant="danger"
         >
@@ -360,7 +360,7 @@ export function IdeationAdmin() {
         description={t('ideation.ideation_admin_desc')}
         actions={
           <div className="flex gap-2 items-center">
-            <Chip variant="soft" startContent={<Lightbulb size={14} />}>
+            <Chip variant="soft" startContent={<Lightbulb aria-hidden="true" size={14} />}>
               {t('ideation.total_count', { count: total })}
             </Chip>
             <Button

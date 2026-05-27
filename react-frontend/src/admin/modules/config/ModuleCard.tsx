@@ -51,7 +51,14 @@ export default function ModuleCard({ module, enabled, onToggle, onConfigure, tog
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-2">
-              <h3 className="text-sm font-semibold truncate">{moduleName}</h3>
+              <div className="flex items-center gap-1.5 min-w-0">
+                <h3 className="text-sm font-semibold truncate">{moduleName}</h3>
+                {module.stage && (
+                  <Chip size="sm" variant="soft" color={module.stage === 'alpha' ? 'warning' : 'secondary'} className="flex-shrink-0">
+                    {t(`config.stage_${module.stage}`)}
+                  </Chip>
+                )}
+              </div>
               <Switch
                 size="sm"
                 isSelected={enabled}

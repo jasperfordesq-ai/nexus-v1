@@ -383,7 +383,7 @@ export function Subscribers() {
             <Button
               variant="secondary"
               size="sm"
-              startContent={<RefreshCw size={14} />}
+              startContent={<RefreshCw aria-hidden="true" size={14} />}
               onPress={() => loadData()}
               isLoading={loading}
             >
@@ -392,7 +392,7 @@ export function Subscribers() {
             <Button
               variant="secondary"
               size="sm"
-              startContent={<Download size={14} />}
+              startContent={<Download aria-hidden="true" size={14} />}
               onPress={handleExport}
               isLoading={exportLoading}
             >
@@ -401,7 +401,7 @@ export function Subscribers() {
             <Button
               variant="secondary"
               size="sm"
-              startContent={<Upload size={14} />}
+              startContent={<Upload aria-hidden="true" size={14} />}
               onPress={() => setImportModalOpen(true)}
             >
               {t('newsletters.import_csv')}
@@ -409,7 +409,7 @@ export function Subscribers() {
             <Button
 
               size="sm"
-              startContent={<UserPlus size={14} />}
+              startContent={<UserPlus aria-hidden="true" size={14} />}
               onPress={() => setAddModalOpen(true)}
             >
               {t('newsletters.add_subscriber')}
@@ -422,7 +422,7 @@ export function Subscribers() {
       <Card>
         <CardBody className="flex flex-row items-center gap-4 p-4">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent">
-            <Users size={20} />
+            <Users aria-hidden="true" size={20} />
           </div>
           <div className="min-w-0 flex-1">
             <p className="font-medium text-foreground">{t('newsletters.sync_platform_members')}</p>
@@ -433,7 +433,7 @@ export function Subscribers() {
           <Button
             variant="primary"
             size="sm"
-            startContent={<RefreshCw size={14} />}
+            startContent={<RefreshCw aria-hidden="true" size={14} />}
             onPress={handleSync}
             isLoading={syncLoading}
           >
@@ -478,7 +478,7 @@ export function Subscribers() {
             size="sm"
             placeholder={t('newsletters.placeholder_search_by_name_or_email')}
             aria-label={t('newsletters.label_search_subscribers')}
-            startContent={<Search size={14} className="text-muted" />}
+            startContent={<Search aria-hidden="true" size={14} className="text-muted" />}
             value={searchInput}
             onValueChange={handleSearchChange}
             isClearable
@@ -519,13 +519,13 @@ export function Subscribers() {
         <TableBody
           emptyContent={
             <div className="flex flex-col items-center gap-2 py-8 text-muted">
-              <Users size={40} />
+              <Users aria-hidden="true" size={40} />
               <p className="text-lg font-medium">{t('newsletters.no_subscribers_found')}</p>
               <p className="text-sm">{t('newsletters.no_subscribers_hint')}</p>
             </div>
           }
           isLoading={loading && items.length === 0}
-          loadingContent={<RefreshCw size={24} className="animate-spin text-muted" />}
+          loadingContent={<RefreshCw aria-hidden="true" size={24} className="animate-spin text-muted" />}
         >
           {items.map((sub) => (
             <TableRow key={sub.id}>
@@ -584,13 +584,13 @@ export function Subscribers() {
               <p className="truncate text-xs text-muted">{subscribeUrl}</p>
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="secondary" size="sm" startContent={<Copy size={14} />} onPress={copySubscribeLink}>
+              <Button variant="secondary" size="sm" startContent={<Copy aria-hidden="true" size={14} />} onPress={copySubscribeLink}>
                 {t('newsletters.copy')}
               </Button>
               <Button
                 variant="secondary"
                 size="sm"
-                startContent={<ExternalLink size={14} />}
+                startContent={<ExternalLink aria-hidden="true" size={14} />}
                 as="a"
                 href={subscribeUrl}
                 target="_blank"
@@ -671,7 +671,7 @@ export function Subscribers() {
                   }
                 }}
               >
-                <Upload size={32} className="text-muted" />
+                <Upload aria-hidden="true" size={32} className="text-muted" />
                 <p className="font-medium text-foreground">
                   {importFileName || t('newsletters.click_or_drag_csv')}
                 </p>

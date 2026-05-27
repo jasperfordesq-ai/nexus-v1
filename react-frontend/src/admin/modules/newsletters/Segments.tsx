@@ -122,7 +122,7 @@ export function Segments() {
       sortable: true,
       render: (item) => (
         <div className="flex items-center gap-1.5">
-          <Users size={14} className="text-muted" />
+          <Users aria-hidden="true" size={14} className="text-muted" />
           <span>{(item.subscriber_count || 0).toLocaleString()}</span>
         </div>
       ),
@@ -151,14 +151,14 @@ export function Segments() {
             <DropdownMenu aria-label={t('newsletters.col_actions')}>
               <DropdownItem
                 key="edit" id="edit"
-                startContent={<Pencil size={14} />}
+                startContent={<Pencil aria-hidden="true" size={14} />}
                 onPress={() => navigate(tenantPath(`/admin/newsletters/segments/edit/${item.id}`))}
               >
                 {t('newsletters.edit')}
               </DropdownItem>
               <DropdownItem
                 key="delete" id="delete"
-                startContent={<Trash2 size={14} />}
+                startContent={<Trash2 aria-hidden="true" size={14} />}
                 className="text-danger"
                 variant="danger"
                 onPress={() => {
@@ -183,7 +183,7 @@ export function Segments() {
           description={t('newsletter_segments.description')}
           actions={
             <Button
-              startContent={<Plus size={16} />}
+              startContent={<Plus aria-hidden="true" size={16} />}
               onPress={() => navigate(tenantPath('/admin/newsletters/segments/create'))}
             >
               {t('segment_form.btn_create_segment')}
@@ -210,14 +210,14 @@ export function Segments() {
           <div className="flex gap-2">
             <Button
               variant="tertiary"
-              startContent={<RefreshCw size={16} />}
+              startContent={<RefreshCw aria-hidden="true" size={16} />}
               onPress={loadData}
               isLoading={loading}
             >
               {t('newsletters.refresh')}
             </Button>
             <Button
-              startContent={<Plus size={16} />}
+              startContent={<Plus aria-hidden="true" size={16} />}
               onPress={() => navigate(tenantPath('/admin/newsletters/segments/create'))}
             >
               {t('segment_form.btn_create_segment')}

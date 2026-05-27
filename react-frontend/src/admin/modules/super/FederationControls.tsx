@@ -165,8 +165,8 @@ export function FederationControls() {
 
   if (!controls) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <AlertTriangle size={48} className="text-warning" />
+      <div role="alert" className="flex flex-col items-center justify-center min-h-[400px] gap-4">
+        <AlertTriangle aria-hidden="true" size={48} className="text-warning" />
         <p className="text-lg text-muted">{t('super.failed_to_load_federation_controls')}</p>
         <Button onPress={loadData}>{t('super.retry')}</Button>
       </div>
@@ -262,7 +262,7 @@ export function FederationControls() {
           Displayed prominently so operators notice when it is missing. */}
       <Card className={jwtStatus && !jwtStatus.configured ? 'border-2 border-warning' : ''}>
         <CardHeader className="flex items-center gap-3">
-          <KeyRound size={20} className={jwtStatus?.configured ? 'text-success' : 'text-warning'} />
+          <KeyRound aria-hidden="true" size={20} className={jwtStatus?.configured ? 'text-success' : 'text-warning'} />
           <div className="flex-1">
             <p className="font-semibold">{t('super.jwt_auth_title')}</p>
             <p className="text-xs text-muted">
@@ -273,7 +273,7 @@ export function FederationControls() {
             jwtStatus.configured ? (
               <Chip color="success" variant="soft" size="sm">{t('super.status_configured')}</Chip>
             ) : (
-              <Chip color="warning" variant="soft" size="sm" startContent={<AlertTriangle size={14} />}>{t('super.status_not_configured')}</Chip>
+              <Chip color="warning" variant="soft" size="sm" startContent={<AlertTriangle aria-hidden="true" size={14} />}>{t('super.status_not_configured')}</Chip>
             )
           ) : (
             <Chip variant="soft" size="sm">…</Chip>
@@ -424,13 +424,13 @@ export function FederationControls() {
           >
             <CardBody className="flex flex-row items-center gap-3">
               <div className={`p-2 rounded-lg ${colorClasses[link.color]?.bg ?? ''}`}>
-                <link.icon size={20} className={colorClasses[link.color]?.text ?? ''} />
+                <link.icon aria-hidden="true" size={20} className={colorClasses[link.color]?.text ?? ''} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-medium text-sm">{link.label}</p>
                 <p className="text-xs text-muted truncate">{link.description}</p>
               </div>
-              <ArrowRight size={16} className="text-muted shrink-0" />
+              <ArrowRight aria-hidden="true" size={16} className="text-muted shrink-0" />
             </CardBody>
           </Card>
         ))}
@@ -440,7 +440,7 @@ export function FederationControls() {
       {controls.emergency_lockdown_active && (
         <Card className="border-2 border-danger bg-danger-50 dark:bg-danger-950">
           <CardBody className="flex flex-row items-center gap-4">
-            <Lock size={24} className="text-danger shrink-0" />
+            <Lock aria-hidden="true" size={24} className="text-danger shrink-0" />
             <div className="flex-1">
               <p className="font-semibold text-danger">{t('super.emergency_lockdown_active')}</p>
               <p className="text-sm text-danger-600 dark:text-danger-400">
@@ -451,7 +451,7 @@ export function FederationControls() {
               variant="secondary"
               className="text-success"
               size="sm"
-              startContent={<Unlock size={16} />}
+              startContent={<Unlock aria-hidden="true" size={16} />}
               onPress={() => setLockdownConfirm(true)}
             >
               {t('super.lift_lockdown')}
@@ -464,7 +464,7 @@ export function FederationControls() {
         {/* System Status */}
         <Card>
           <CardHeader className="flex gap-2 items-center pb-0">
-            <Globe size={20} className="text-accent" />
+            <Globe aria-hidden="true" size={20} className="text-accent" />
             <h3 className="font-semibold text-lg">{t('super.system_status')}</h3>
           </CardHeader>
           <CardBody className="flex flex-col gap-4">
@@ -494,7 +494,7 @@ export function FederationControls() {
             <Separator />
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                {controls.emergency_lockdown_active ? <Lock size={16} className="text-danger" /> : <Unlock size={16} className="text-success" />}
+                {controls.emergency_lockdown_active ? <Lock aria-hidden="true" size={16} className="text-danger" /> : <Unlock aria-hidden="true" size={16} className="text-success" />}
                 <div>
                   <p className="font-medium">{t('super.lockdown_status')}</p>
                   <p className="text-xs text-muted">{t('super.lockdown_status_desc')}</p>
@@ -508,7 +508,7 @@ export function FederationControls() {
               <Button
                 variant="danger-soft"
                 size="sm"
-                startContent={<AlertTriangle size={16} />}
+                startContent={<AlertTriangle aria-hidden="true" size={16} />}
                 onPress={() => setLockdownConfirm(true)}
               >
                 {t('super.emergency_lockdown')}
@@ -520,7 +520,7 @@ export function FederationControls() {
         {/* Feature Toggles */}
         <Card>
           <CardHeader className="flex gap-2 items-center pb-0">
-            <Shield size={20} className="text-accent" />
+            <Shield aria-hidden="true" size={20} className="text-accent" />
             <h3 className="font-semibold text-lg">{t('super.cross_tenant_features')}</h3>
           </CardHeader>
           <CardBody className="flex flex-col gap-3">
@@ -545,7 +545,7 @@ export function FederationControls() {
         <Card>
           <CardHeader className="flex justify-between items-center pb-0">
             <div className="flex gap-2 items-center">
-              <Network size={20} className="text-success" />
+              <Network aria-hidden="true" size={20} className="text-success" />
               <h3 className="font-semibold text-lg">{t('super.whitelist')}</h3>
               <Chip size="sm" variant="soft">{whitelist.length}</Chip>
             </div>
@@ -554,7 +554,7 @@ export function FederationControls() {
               to={tenantPath('/admin/super/federation/whitelist')}
               size="sm"
               variant="tertiary"
-              endContent={<ArrowRight size={14} />}
+              endContent={<ArrowRight aria-hidden="true" size={14} />}
             >
               {t('super.manage')}
             </Button>
@@ -569,7 +569,7 @@ export function FederationControls() {
                 className="max-w-[120px]"
                 variant="secondary"
               />
-              <Button size="sm" startContent={<Plus size={14} />} onPress={handleAddWhitelist}>
+              <Button size="sm" startContent={<Plus aria-hidden="true" size={14} />} onPress={handleAddWhitelist}>
                 {t('super.add')}
               </Button>
             </div>
@@ -596,7 +596,7 @@ export function FederationControls() {
         <Card>
           <CardHeader className="flex justify-between items-center pb-0">
             <div className="flex gap-2 items-center">
-              <Handshake size={20} className="text-accent" />
+              <Handshake aria-hidden="true" size={20} className="text-accent" />
               <h3 className="font-semibold text-lg">{t('super.partnerships')}</h3>
               <Chip size="sm" variant="soft">{partnerships.length}</Chip>
             </div>
@@ -605,7 +605,7 @@ export function FederationControls() {
               to={tenantPath('/admin/super/federation/partnerships')}
               size="sm"
               variant="tertiary"
-              endContent={<ArrowRight size={14} />}
+              endContent={<ArrowRight aria-hidden="true" size={14} />}
             >
               {t('super.manage')}
             </Button>
@@ -619,7 +619,7 @@ export function FederationControls() {
                 return (
                   <div key={p.id} className="flex items-center justify-between py-2 border-b border-border last:border-b-0">
                     <div className="flex items-center gap-2 min-w-0">
-                      <Users size={14} className="text-muted shrink-0" />
+                      <Users aria-hidden="true" size={14} className="text-muted shrink-0" />
                       <span className="text-sm font-medium truncate">
                         {p.tenant_1_name}
                       </span>

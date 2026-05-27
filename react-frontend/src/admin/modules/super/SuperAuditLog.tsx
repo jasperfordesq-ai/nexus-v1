@@ -182,7 +182,7 @@ export default function SuperAuditLog() {
           <Button
             variant="tertiary"
             size="sm"
-            startContent={<Download size={16} />}
+            startContent={<Download aria-hidden="true" size={16} />}
             onPress={exportCsv}
             isDisabled={logs.length === 0}
           >
@@ -261,7 +261,7 @@ export default function SuperAuditLog() {
           <Button
             size="sm"
             variant="danger"
-            startContent={<X size={14} />}
+            startContent={<X aria-hidden="true" size={14} />}
             onPress={clearFilters}
           >
             {t('super.clear_filters')}

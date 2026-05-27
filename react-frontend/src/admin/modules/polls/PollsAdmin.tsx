@@ -239,7 +239,7 @@ export function PollsAdmin() {
         title={t('polls.polls_admin_title')}
         description={t('polls.polls_admin_desc')}
         actions={
-          <Chip variant="soft" startContent={<BarChart3 size={14} />}>
+          <Chip variant="soft" startContent={<BarChart3 aria-hidden="true" size={14} />}>
             {t('polls.total_count')}
           </Chip>
         }

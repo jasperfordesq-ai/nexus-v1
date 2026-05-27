@@ -64,6 +64,9 @@ export type ConfigSource =
 
 export type ConfigOptionType = 'boolean' | 'number' | 'string' | 'select';
 
+/** Development maturity stage of a module. Absent = stable/generally available. */
+export type ModuleStage = 'alpha' | 'beta';
+
 export interface SelectChoice {
   value: string;
   label: string;
@@ -92,6 +95,8 @@ export interface ModuleDefinition {
   configOptions: ConfigOption[];
   /** Link to an existing dedicated admin page for this module's config */
   detailPageUrl?: string;
+  /** Development maturity stage. Omit for stable/GA modules. */
+  stage?: ModuleStage;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -335,12 +340,13 @@ const FEATURE_MODULES: ModuleDefinition[] = [
   },
   {
     id: 'caring_community',
-    name: 'Caring Community',
+    name: 'Caring Community Alpha',
     description: 'Integrated hub for time banking, volunteering, organisations, impact, and mutual aid',
     icon: Heart,
     type: 'feature',
     configSource: 'tenant_features',
     detailPageUrl: '/caring',
+    stage: 'alpha',
     configOptions: [
       { key: 'caring_community.dashboard_enabled', label: 'Dashboard Hub', description: 'Show the integrated Caring Community hub in member navigation', type: 'boolean', defaultValue: true, category: 'Visibility' },
       { key: 'caring_community.show_municipal_reporting', label: 'Municipal Reporting', description: 'Show municipal/canton reporting surfaces when available', type: 'boolean', defaultValue: true, category: 'Reporting' },

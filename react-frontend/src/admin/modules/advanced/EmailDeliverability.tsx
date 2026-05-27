@@ -365,7 +365,7 @@ export default function EmailDeliverability() {
       <section className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="space-y-2">
           <div className="flex items-center gap-3">
-            <Mail className="h-7 w-7 text-theme-primary" />
+            <Mail aria-hidden="true" className="h-7 w-7 text-theme-primary" />
             <div>
               <h1 className="text-2xl font-bold text-theme-primary">{t('email_deliverability.title')}</h1>
               <p className="text-sm text-theme-secondary">{t('email_deliverability.subtitle')}</p>
@@ -403,7 +403,7 @@ export default function EmailDeliverability() {
               key={`${warning.code}-${warning.severity}-${index}`}
               color={warning.severity === 'critical' ? 'danger' : warning.severity === 'warning' ? 'warning' : 'primary'}
               variant="tertiary"
-              startContent={<AlertTriangle className="h-4 w-4" />}
+              startContent={<AlertTriangle aria-hidden="true" className="h-4 w-4" />}
               title={t([
                 `email_deliverability.warnings.${warning.code}.title`,
                 'email_deliverability.warnings.default_title',
@@ -425,7 +425,7 @@ export default function EmailDeliverability() {
               <CardBody className="gap-2">
                 <div className="flex items-center justify-between gap-3">
                   <div className="text-xs font-semibold uppercase text-theme-subtle">{metric.label}</div>
-                  <Icon className={`h-4 w-4 ${metric.color}`} />
+                  <Icon aria-hidden="true" className={`h-4 w-4 ${metric.color}`} />
                 </div>
                 <div className={`text-2xl font-bold ${metric.color}`}>{loadingSummary ? <Spinner size="sm" /> : metric.value}</div>
                 <div className="text-xs text-theme-secondary">{metric.detail}</div>
@@ -585,7 +585,7 @@ export default function EmailDeliverability() {
             <div className="grid w-full grid-cols-1 gap-2 md:grid-cols-2 xl:w-auto xl:grid-cols-6">
               <Input
                 size="sm"
-                startContent={<Search className="h-4 w-4 text-theme-subtle" />}
+                startContent={<Search aria-hidden="true" className="h-4 w-4 text-theme-subtle" />}
                 label={t('email_deliverability.filters.recipient')}
                 value={logSearch}
                 onValueChange={setLogSearch}
@@ -684,7 +684,7 @@ export default function EmailDeliverability() {
             <div className="grid w-full grid-cols-1 gap-2 md:grid-cols-2 lg:w-auto lg:grid-cols-4">
               <Input
                 size="sm"
-                startContent={<Search className="h-4 w-4 text-theme-subtle" />}
+                startContent={<Search aria-hidden="true" className="h-4 w-4 text-theme-subtle" />}
                 label={t('email_deliverability.filters.email')}
                 value={suppSearch}
                 onValueChange={setSuppSearch}

@@ -194,37 +194,37 @@ export function NewsletterList() {
             else if (key === 'resend') setResendTarget(item.id);
             else if (key === 'delete') setDeleteTarget(item);
           }}>
-            <DropdownItem key="edit" id="edit" startContent={<Edit size={14} />}>{t('newsletters.edit')}</DropdownItem>
+            <DropdownItem key="edit" id="edit" startContent={<Edit aria-hidden="true" size={14} />}>{t('newsletters.edit')}</DropdownItem>
             <DropdownItem
               key="send" id="send"
-              startContent={<Send size={14} />}
+              startContent={<Send aria-hidden="true" size={14} />}
               className={item.status === 'draft' || item.status === 'scheduled' ? '' : 'hidden'}
             >
               {t('newsletters.send_now')}
             </DropdownItem>
             <DropdownItem
               key="stats" id="stats"
-              startContent={<BarChart3 size={14} />}
+              startContent={<BarChart3 aria-hidden="true" size={14} />}
               className={item.status === 'sent' || item.status === 'sending' ? '' : 'hidden'}
             >
               {t('newsletters.stats')}
             </DropdownItem>
             <DropdownItem
               key="activity" id="activity"
-              startContent={<Activity size={14} />}
+              startContent={<Activity aria-hidden="true" size={14} />}
               className={item.status === 'sent' ? '' : 'hidden'}
             >
               {t('newsletters.activity_log')}
             </DropdownItem>
-            <DropdownItem key="duplicate" id="duplicate" startContent={<Copy size={14} />}>{t('newsletters.duplicate')}</DropdownItem>
+            <DropdownItem key="duplicate" id="duplicate" startContent={<Copy aria-hidden="true" size={14} />}>{t('newsletters.duplicate')}</DropdownItem>
             <DropdownItem
               key="resend" id="resend"
-              startContent={<Send size={14} />}
+              startContent={<Send aria-hidden="true" size={14} />}
               className={item.status === 'sent' ? '' : 'hidden'}
             >
               {t('newsletters.resend_to_non_openers')}
             </DropdownItem>
-            <DropdownItem key="delete" id="delete" startContent={<Trash2 size={14} />} className="text-danger" variant="danger">{t('newsletters.delete')}</DropdownItem>
+            <DropdownItem key="delete" id="delete" startContent={<Trash2 aria-hidden="true" size={14} />} className="text-danger" variant="danger">{t('newsletters.delete')}</DropdownItem>
           </DropdownMenu>
         </Dropdown>
       ),
@@ -238,8 +238,8 @@ export function NewsletterList() {
         description={t('newsletters.newsletter_list_desc')}
         actions={
           <div className="flex gap-2">
-            <Button variant="tertiary" startContent={<RefreshCw size={16} />} onPress={loadData} isLoading={loading}>{t('newsletters.refresh')}</Button>
-            <Button startContent={<Plus size={16} />} onPress={() => navigate(tenantPath('/admin/newsletters/create'))}>{t('newsletters.create_newsletter')}</Button>
+            <Button variant="tertiary" startContent={<RefreshCw aria-hidden="true" size={16} />} onPress={loadData} isLoading={loading}>{t('newsletters.refresh')}</Button>
+            <Button startContent={<Plus aria-hidden="true" size={16} />} onPress={() => navigate(tenantPath('/admin/newsletters/create'))}>{t('newsletters.create_newsletter')}</Button>
           </div>
         }
       />
@@ -255,7 +255,7 @@ export function NewsletterList() {
         onRefresh={loadData}
         emptyContent={
           <div className="flex flex-col items-center gap-2 py-8 text-muted">
-            <Mail size={40} />
+            <Mail aria-hidden="true" size={40} />
             <p>{t('newsletters.no_newsletters_found')}</p>
             <p className="text-xs">{t('newsletters.create_first_newsletter')}</p>
           </div>

@@ -198,11 +198,11 @@ export function RevenueDashboard() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-20">
+        <div role="status" aria-busy="true" aria-label={t('common.loading')} className="flex justify-center py-20">
           <Spinner size="lg" />
         </div>
       ) : error ? (
-        <Card>
+        <Card role="alert">
           <CardBody>
             <p className="text-danger text-center py-8">{error}</p>
           </CardBody>
@@ -214,23 +214,23 @@ export function RevenueDashboard() {
             <StatCard
               label={t('billing.mrr')}
               value={`${formatCurrency(data.mrr)}/mo`}
-              icon={<DollarSign className="w-4 h-4" />}
+              icon={<DollarSign aria-hidden="true" className="w-4 h-4" />}
             />
             <StatCard
               label={t('billing.arr')}
               value={`${formatCurrency(data.arr)}/yr`}
               color="success"
-              icon={<TrendingUp className="w-4 h-4" />}
+              icon={<TrendingUp aria-hidden="true" className="w-4 h-4" />}
             />
             <StatCard
               label={t('billing.active_tenants')}
               value={data.active_tenants}
-              icon={<Building2 className="w-4 h-4" />}
+              icon={<Building2 aria-hidden="true" className="w-4 h-4" />}
             />
             <StatCard
               label={t('billing.total_users')}
               value={data.total_platform_users.toLocaleString()}
-              icon={<Users className="w-4 h-4" />}
+              icon={<Users aria-hidden="true" className="w-4 h-4" />}
             />
           </div>
 

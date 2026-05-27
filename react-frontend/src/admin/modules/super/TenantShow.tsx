@@ -545,8 +545,8 @@ export function TenantShow() {
                       size="sm"
                       startContent={
                         enabled
-                          ? <CheckCircle2 size={12} />
-                          : <XCircle size={12} />
+                          ? <CheckCircle2 aria-hidden="true" size={12} />
+                          : <XCircle aria-hidden="true" size={12} />
                       }
                     >
                       {t(FEATURE_LABEL_KEYS[feature] ?? feature)}
@@ -612,7 +612,7 @@ export function TenantShow() {
           <Card>
             <CardHeader className="pb-0">
               <div className="flex items-center gap-2">
-                <Building2 size={18} className="text-accent" />
+                <Building2 aria-hidden="true" size={18} className="text-accent" />
                 <h3 className="text-lg font-semibold">
                   {t('super.section_children')}
                   {tenant.children.length > 0 && (
@@ -663,7 +663,7 @@ export function TenantShow() {
             <CardHeader className="pb-0">
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center gap-2">
-                  <Users size={18} className="text-accent" />
+                  <Users aria-hidden="true" size={18} className="text-accent" />
                   <h3 className="text-lg font-semibold">
                     {t('super.section_admins')}
                     {tenant.admins.length > 0 && (
@@ -676,7 +676,7 @@ export function TenantShow() {
                 <Button
                   size="sm"
                   variant="secondary"
-                  startContent={<UserPlus size={14} />}
+                  startContent={<UserPlus aria-hidden="true" size={14} />}
                   onPress={() => setShowAddAdmin(!showAddAdmin)}
                 >
                   {showAddAdmin ? t('super.cancel') : t('super.add')}
@@ -800,7 +800,7 @@ export function TenantShow() {
               <Button
                 variant="primary"
                 fullWidth
-                startContent={<Edit size={16} />}
+                startContent={<Edit aria-hidden="true" size={16} />}
                 onPress={() => navigate(tenantPath(`/admin/super/tenants/${tenant.id}/edit`))}
               >
                 {t('super.edit_tenant')}
@@ -809,7 +809,7 @@ export function TenantShow() {
                 <Button
                   variant="secondary"
                   fullWidth
-                  startContent={<Plus size={16} />}
+                  startContent={<Plus aria-hidden="true" size={16} />}
                   onPress={() => navigate(tenantPath(`/admin/super/tenants/create?parent_id=${tenant.id}`))}
                 >
                   {t('super.create_sub_tenant')}
@@ -818,7 +818,7 @@ export function TenantShow() {
               <Button
                 variant="secondary"
                 fullWidth
-                startContent={<ArrowLeft size={16} />}
+                startContent={<ArrowLeft aria-hidden="true" size={16} />}
                 onPress={() => navigate(tenantPath('/admin/super/tenants'))}
               >
                 {t('super.back_to_tenants')}
@@ -830,7 +830,7 @@ export function TenantShow() {
           <Card>
             <CardHeader className="pb-0">
               <div className="flex items-center gap-2">
-                <Network size={18} className="text-accent" />
+                <Network aria-hidden="true" size={18} className="text-accent" />
                 <h3 className="text-lg font-semibold">{t('super.section_hub_settings')}</h3>
               </div>
             </CardHeader>
@@ -857,7 +857,7 @@ export function TenantShow() {
             <Card>
               <CardHeader className="pb-0">
                 <div className="flex items-center gap-2">
-                  <MoveRight size={18} className="text-warning" />
+                  <MoveRight aria-hidden="true" size={18} className="text-warning" />
                   <h3 className="text-lg font-semibold">{t('super.section_move_tenant')}</h3>
                 </div>
               </CardHeader>
@@ -884,7 +884,7 @@ export function TenantShow() {
             <Card className="border-danger/30">
               <CardHeader className="pb-0">
                 <div className="flex items-center gap-2 text-danger">
-                  <AlertTriangle size={18} />
+                  <AlertTriangle aria-hidden="true" size={18} />
                   <h3 className="text-lg font-semibold">{t('super.section_danger_zone')}</h3>
                 </div>
               </CardHeader>
@@ -894,7 +894,7 @@ export function TenantShow() {
                   className={tenant.is_active ? undefined : 'text-success'}
                   fullWidth
                   isDisabled={actionLoading}
-                  startContent={<Power size={16} />}
+                  startContent={<Power aria-hidden="true" size={16} />}
                   onPress={handleToggleActive}
                 >
                   {tenant.is_active ? t('super.deactivate_tenant') : t('super.reactivate_tenant')}

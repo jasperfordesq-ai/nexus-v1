@@ -71,7 +71,7 @@ export function UserPermissions() {
         title={t('users.permissions_title')}
         description={t('users.permissions_description')}
         actions={
-          <Button variant="tertiary" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/users'))}>
+          <Button variant="tertiary" startContent={<ArrowLeft aria-hidden="true" size={16} />} onPress={() => navigate(tenantPath('/admin/users'))}>
             {t('common.back')}
           </Button>
         }
@@ -89,7 +89,7 @@ export function UserPermissions() {
         <div className="flex flex-col gap-4">
           <Card >
             <CardHeader className="flex items-center gap-2">
-              <Shield size={20} />
+              <Shield aria-hidden="true" size={20} />
               <h3 className="text-lg font-semibold">{user.name}</h3>
               <span className="text-sm text-muted">({user.email})</span>
             </CardHeader>
@@ -127,7 +127,7 @@ export function UserPermissions() {
 
           <Card  className="border border-warning/30 bg-warning/5">
             <CardBody className="flex flex-row items-start gap-3">
-              <Info size={20} className="text-warning shrink-0 mt-0.5" />
+              <Info aria-hidden="true" size={20} className="text-warning shrink-0 mt-0.5" />
               <div>
                 <div className="font-medium">{t('users.permissions_editor_coming_soon_title')}</div>
                 <p className="text-sm text-muted mt-1">{t('users.permissions_editor_coming_soon_desc')}</p>

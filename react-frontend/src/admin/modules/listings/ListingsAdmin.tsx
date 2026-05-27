@@ -190,7 +190,7 @@ function FeaturedListingsPanel() {
           size="sm"
           variant="tertiary"
           color="warning"
-          startContent={<StarOff size={14} />}
+          startContent={<StarOff aria-hidden="true" size={14} />}
           onPress={() => setUnfeatureConfirm(item)}
         >
           {t('listings.unfeature')}
@@ -211,7 +211,7 @@ function FeaturedListingsPanel() {
           <Input type="search" name="admin-search" autoComplete="off"
             placeholder={t('listings.placeholder_search_active_listings_to_feature')}
             aria-label={t('listings.label_search_listings')}
-            startContent={<Search size={16} className="text-muted" />}
+            startContent={<Search aria-hidden="true" size={16} className="text-muted" />}
             value={searchQuery}
             onValueChange={handleSearch}
             size="sm"
@@ -243,7 +243,7 @@ function FeaturedListingsPanel() {
                     size="sm"
                     color="warning"
                     variant="tertiary"
-                    startContent={<Star size={14} />}
+                    startContent={<Star aria-hidden="true" size={14} />}
                     isLoading={featureLoading === listing.id}
                     onPress={() => handleFeature(listing.id)}
                   >

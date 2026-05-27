@@ -81,7 +81,7 @@ export default function Operations() {
         title="Operations"
         description="Cache statistics and background job controls."
         actions={
-          <Button variant="tertiary" size="sm" startContent={<RefreshCw size={16} />} onPress={load}>
+          <Button variant="tertiary" size="sm" startContent={<RefreshCw aria-hidden="true" size={16} />} onPress={load}>
             Refresh
           </Button>
         }
@@ -90,7 +90,7 @@ export default function Operations() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card >
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <Database size={18} className="text-warning" />
+            <Database aria-hidden="true" size={18} className="text-warning" />
             <h3 className="font-semibold">Cache</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4 space-y-3">
@@ -113,7 +113,7 @@ export default function Operations() {
               fullWidth
               variant="tertiary"
               color="warning"
-              startContent={<Trash2 size={14} />}
+              startContent={<Trash2 aria-hidden="true" size={14} />}
               onPress={handleClearCache}
               size="sm"
             >
@@ -124,7 +124,7 @@ export default function Operations() {
 
         <Card >
           <CardHeader className="flex items-center gap-2 px-4 pt-4 pb-0">
-            <Timer size={18} className="text-accent" />
+            <Timer aria-hidden="true" size={18} className="text-accent" />
             <h3 className="font-semibold">Background jobs</h3>
           </CardHeader>
           <CardBody className="px-4 pb-4 space-y-3">
@@ -143,7 +143,7 @@ export default function Operations() {
                   onPress={() => handleRunJob(job.id)}
                   aria-label={`Run ${job.name}`}
                 >
-                  <Play size={14} />
+                  <Play aria-hidden="true" size={14} />
                 </Button>
               </div>
             )) : (
