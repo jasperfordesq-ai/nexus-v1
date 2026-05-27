@@ -349,7 +349,7 @@ export function MembersPage() {
       )}
 
       {/* Quick Filters */}
-      <div className="flex flex-wrap items-center gap-2" aria-label={t('members.quick_filters')}>
+      <div className="flex flex-wrap items-center gap-2" role="group" aria-label={t('members.quick_filters')}>
         <Button
           size="sm"
           variant={quickFilter === 'all' ? 'solid' : 'flat'}
@@ -752,7 +752,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
                   <h3 className="truncate font-semibold text-theme-primary">{displayName}</h3>
                   {member.is_verified && (
                     <Tooltip content={t('members.verified_member')}>
-                      <BadgeCheck className="w-4 h-4 text-teal-500 shrink-0" aria-label={t('members.verified_member')} />
+                      <BadgeCheck className="w-4 h-4 text-teal-500 shrink-0" aria-hidden="true" />
                     </Tooltip>
                   )}
                   {hasGamification && level > 0 && (
@@ -761,10 +761,10 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
                     </Chip>
                   )}
                   {hasGamification && showcasedBadges.length > 0 && (
-                    <span className="flex items-center gap-0.5 ml-1" aria-label={t('members.showcased_badges')}>
+                    <span className="flex items-center gap-0.5 ml-1" role="img" aria-label={t('members.showcased_badges')}>
                       {showcasedBadges.map((badge) => (
                         <Tooltip key={badge.badge_key} content={badge.name}>
-                          <span className="text-base leading-none cursor-default" aria-label={badge.name}>{badge.icon || '🏆'}</span>
+                          <span className="text-base leading-none cursor-default" role="img" aria-label={badge.name}>{badge.icon || '🏆'}</span>
                         </Tooltip>
                       ))}
                     </span>
@@ -835,7 +835,7 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
             <h3 className="font-semibold text-theme-primary">{displayName}</h3>
             {member.is_verified && (
               <Tooltip content={t('members.verified_member')}>
-                <BadgeCheck className="w-4 h-4 text-teal-500 shrink-0" aria-label={t('members.verified_member')} />
+                <BadgeCheck className="w-4 h-4 text-teal-500 shrink-0" aria-hidden="true" />
               </Tooltip>
             )}
             {hasGamification && level > 0 && (
@@ -845,10 +845,10 @@ const MemberCard = memo(function MemberCard({ member, viewMode, sortBy }: Member
             )}
           </div>
           {hasGamification && showcasedBadges.length > 0 && (
-            <div className="flex items-center justify-center gap-1 mt-1.5" aria-label={t('members.showcased_badges')}>
+            <div className="flex items-center justify-center gap-1 mt-1.5" role="img" aria-label={t('members.showcased_badges')}>
               {showcasedBadges.map((badge) => (
                 <Tooltip key={badge.badge_key} content={badge.name}>
-                  <span className="text-lg leading-none cursor-default" aria-label={badge.name}>{badge.icon || '🏆'}</span>
+                  <span className="text-lg leading-none cursor-default" role="img" aria-label={badge.name}>{badge.icon || '🏆'}</span>
                 </Tooltip>
               ))}
             </div>

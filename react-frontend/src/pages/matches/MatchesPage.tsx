@@ -180,24 +180,24 @@ export function MatchesPage() {
       {/* Stats row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <GlassCard className="p-4 text-center">
-          <Target className="w-5 h-5 text-indigo-400 mx-auto mb-1" />
+          <Target className="w-5 h-5 text-indigo-400 mx-auto mb-1" aria-hidden="true" />
           <p className="text-2xl font-bold text-theme-primary">{totalMatches}</p>
           <p className="text-xs text-theme-subtle">{t('stats_total_matches')}</p>
         </GlassCard>
         <GlassCard className="p-4 text-center">
-          <TrendingUp className="w-5 h-5 text-emerald-400 mx-auto mb-1" />
+          <TrendingUp className="w-5 h-5 text-emerald-400 mx-auto mb-1" aria-hidden="true" />
           <p className="text-2xl font-bold text-theme-primary">{avgScore}%</p>
           <p className="text-xs text-theme-subtle">{t('stats_avg_score')}</p>
         </GlassCard>
         <GlassCard className="p-4 text-center">
-          <Zap className="w-5 h-5 text-amber-400 mx-auto mb-1" />
+          <Zap className="w-5 h-5 text-amber-400 mx-auto mb-1" aria-hidden="true" />
           <p className="text-2xl font-bold text-theme-primary">
             {matches.filter((m) => m.match_score >= 80).length}
           </p>
           <p className="text-xs text-theme-subtle">{t('stats_hot_matches')}</p>
         </GlassCard>
         <GlassCard className="p-4 text-center">
-          <Filter className="w-5 h-5 text-purple-400 mx-auto mb-1" />
+          <Filter className="w-5 h-5 text-purple-400 mx-auto mb-1" aria-hidden="true" />
           <p className="text-2xl font-bold text-theme-primary">
             {Object.keys(sourceTypeCounts).length}
           </p>
@@ -245,7 +245,7 @@ export function MatchesPage() {
 
       {/* Matches list */}
       {loading ? (
-        <div className="flex justify-center py-16">
+        <div role="status" aria-label={t('loading')} className="flex justify-center py-16">
           <Spinner size="lg" />
         </div>
       ) : filteredMatches.length === 0 ? (
@@ -284,15 +284,18 @@ export function MatchesPage() {
                       {/* Score badge */}
                       <div className="flex-shrink-0 relative">
                         <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${config.color}`}>
-                          <Icon className="w-6 h-6" />
+                          <Icon className="w-6 h-6" aria-hidden="true" />
                         </div>
-                        <div className={`absolute -top-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold ${
-                          match.match_score >= 80
-                            ? 'bg-emerald-500 text-white'
-                            : match.match_score >= 60
-                            ? 'bg-amber-500 text-white'
-                            : 'bg-surface-tertiary text-foreground'
-                        }`}>
+                        <div
+                          className={`absolute -top-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                            match.match_score >= 80
+                              ? 'bg-emerald-500 text-white'
+                              : match.match_score >= 60
+                              ? 'bg-amber-500 text-white'
+                              : 'bg-surface-tertiary text-foreground'
+                          }`}
+                          aria-label={t('score_label', { score: match.match_score })}
+                        >
                           {match.match_score}
                         </div>
                       </div>

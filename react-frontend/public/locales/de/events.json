@@ -281,7 +281,8 @@
     "total_votes": "{{count}} Stimmen",
     "vote_success": "Stimme erfasst!",
     "vote_failed": "Stimme konnte nicht erfasst werden",
-    "view_full": "Vollständige Umfrage anzeigen"
+    "view_full": "Vollständige Umfrage anzeigen",
+    "loading": "Loading polls..."
   },
   "radius_5": "5 km",
   "radius_10": "10 km",

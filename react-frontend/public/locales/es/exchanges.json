@@ -108,7 +108,8 @@
     "prep_time": "Tiempo de Preparación",
     "ratings": "Valoraciones",
     "rate_exchange": "Valorar Este Intercambio",
-    "prep_time_value": "{{count}}h"
+    "prep_time_value": "{{count}}h",
+    "rating_value": "Rating: {{rating}} out of 5"
   },
   "modal": {
     "decline_title": "Rechazar Solicitud de Intercambio",

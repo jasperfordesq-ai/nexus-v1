@@ -60,27 +60,27 @@ interface TimelineEntry {
 function getTimelineIcon(action: string, newStatus?: string | null): React.ReactNode {
   const iconClass = 'w-4 h-4';
   if (action === 'created' || newStatus === 'pending_provider' || newStatus === 'pending_broker') {
-    return <Circle className={iconClass} />;
+    return <Circle className={iconClass} aria-hidden="true" />;
   }
   if (action === 'accepted' || newStatus === 'accepted') {
-    return <Check className={iconClass} />;
+    return <Check className={iconClass} aria-hidden="true" />;
   }
   if (action === 'declined' || newStatus === 'cancelled') {
-    return <Ban className={iconClass} />;
+    return <Ban className={iconClass} aria-hidden="true" />;
   }
   if (action === 'started' || newStatus === 'in_progress') {
-    return <Play className={iconClass} />;
+    return <Play className={iconClass} aria-hidden="true" />;
   }
   if (action === 'completed' || newStatus === 'completed') {
-    return <CheckCircle className={iconClass} />;
+    return <CheckCircle className={iconClass} aria-hidden="true" />;
   }
   if (action === 'confirmed' || newStatus === 'pending_confirmation') {
-    return <UserCheck className={iconClass} />;
+    return <UserCheck className={iconClass} aria-hidden="true" />;
   }
   if (newStatus === 'disputed') {
-    return <AlertTriangle className={iconClass} />;
+    return <AlertTriangle className={iconClass} aria-hidden="true" />;
   }
-  return <Clock className={iconClass} />;
+  return <Clock className={iconClass} aria-hidden="true" />;
 }
 
 function getTimelineColor(action: string, newStatus?: string | null): string {
@@ -548,7 +548,7 @@ export function ExchangeDetailPage() {
         {exchange.status === 'completed' && ratings.length > 0 && (
           <div className="mb-6">
             <h3 className="text-sm font-medium text-theme-muted mb-3 flex items-center gap-2">
-              <Star className="w-4 h-4 text-amber-400" />
+              <Star className="w-4 h-4 text-amber-400" aria-hidden="true" />
               {t('detail.ratings')}
             </h3>
             <div className="space-y-3">
@@ -556,14 +556,15 @@ export function ExchangeDetailPage() {
                 <div key={r.id} className="bg-theme-elevated rounded-lg p-3">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-sm font-medium text-theme-primary">{r.rater.name}</span>
-                    <div className="flex gap-0.5">
+                    <span className="flex gap-0.5" aria-label={t('detail.rating_value', { rating: r.rating })}>
                       {[1, 2, 3, 4, 5].map((s) => (
                         <Star
                           key={s}
                           className={`w-4 h-4 ${s <= r.rating ? 'text-amber-400 fill-amber-400' : 'text-theme-muted'}`}
+                          aria-hidden="true"
                         />
                       ))}
-                    </div>
+                    </span>
                   </div>
                   {r.comment && <p className="text-sm text-theme-muted">{r.comment}</p>}
                 </div>

@@ -695,6 +695,7 @@ export function ListingDetailPage() {
                 size="sm"
                 onPress={toggleComments}
                 aria-expanded={showComments}
+                aria-controls="listing-comments"
                 className="min-h-7 p-0 transition-colors hover:text-theme-primary"
               >
                 {social.commentsCount} {social.commentsCount === 1 ? t('comment') : t('comments')}

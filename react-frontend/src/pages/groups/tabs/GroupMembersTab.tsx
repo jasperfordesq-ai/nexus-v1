@@ -56,7 +56,7 @@ export function GroupMembersTab({
   return (
     <GlassCard className="p-4 sm:p-6">
       {membersLoading ? (
-        <div className="flex justify-center py-10" aria-label={t('detail.members_loading_aria')}>
+        <div role="status" className="flex justify-center py-10" aria-label={t('detail.members_loading_aria')}>
           <Spinner size="lg" />
         </div>
       ) : members.length > 0 ? (

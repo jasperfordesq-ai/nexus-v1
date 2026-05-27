@@ -195,7 +195,9 @@
     "feed_empty_desc": "このグループで最初に何かをシェアしましょう！",
     "feed_create_post": "投稿を作成",
     "feed_load_more": "もっと読み込む",
-    "member_actions_aria": "メンバーのアクション"
+    "member_actions_aria": "メンバーのアクション",
+    "feed_loading": "Loading group feed...",
+    "events_loading": "Loading group events..."
   },
   "form": {
     "create_title": "新しいグループを作成",

@@ -152,7 +152,7 @@ function TierLadder({
                 isCurrent || isActive ? 'ring-2 ring-white/40 ring-offset-1 ring-offset-transparent' : '',
               ].join(' ')}
               style={{ height: `${Math.max(8, (tier.min / 900) * 48 + 8)}px` }}
-              title={t('nexus_score.tier_threshold', { tier: tierLabel, min: tier.min })}
+              aria-label={t('nexus_score.tier_threshold', { tier: tierLabel, min: tier.min })}
             />
             {isActive && (
               <span className={`text-[9px] font-bold leading-none ${tier.color}`}>
@@ -229,8 +229,8 @@ export default function NexusScorePage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <Spinner size="lg" color="secondary" />
+      <div role="status" aria-label={t('nexus_score.loading')} className="flex items-center justify-center min-h-[60vh]">
+        <Spinner size="lg" color="secondary" aria-hidden="true" />
       </div>
     );
   }
@@ -239,7 +239,7 @@ export default function NexusScorePage() {
 
   if (error || !data) {
     return (
-      <div className="max-w-lg mx-auto px-4 py-16 text-center">
+      <div role="alert" className="max-w-lg mx-auto px-4 py-16 text-center">
         <AlertTriangle className="w-12 h-12 text-warning mx-auto mb-4" aria-hidden="true" />
         <p className="text-theme-subtle mb-6">{error}</p>
         <Button color="primary" onPress={() => load()}>
@@ -298,7 +298,7 @@ export default function NexusScorePage() {
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
             {/* Score ring */}
             <div className="relative flex-shrink-0">
-              <svg width="120" height="120" viewBox="0 0 120 120" className="-rotate-90">
+              <svg width="120" height="120" viewBox="0 0 120 120" className="-rotate-90" aria-hidden="true">
                 <circle cx="60" cy="60" r="52" fill="none" stroke="currentColor"
                   className="text-theme-elevated" strokeWidth="10" />
                 <circle cx="60" cy="60" r="52" fill="none"

@@ -397,7 +397,8 @@
   },
   "skills": {
     "title": "あなたのスキル",
-    "description": "他のメンバーがあなたを見つけられるように、プロフィールにスキルを追加してください。コミュニティのメンバーはあなたのスキルを承認できます。"
+    "description": "他のメンバーがあなたを見つけられるように、プロフィールにスキルを追加してください。コミュニティのメンバーはあなたのスキルを承認できます。",
+    "loading": "Loading skills..."
   },
   "password_modal": {
     "title": "パスワードを変更",
@@ -608,5 +609,6 @@
   },
   "push_campaign_opt_in": "プロモーションのプッシュ通知を受け取る",
   "push_campaign_opt_in_description": "地域のビジネスや団体がターゲット型プッシュ通知を送信することを許可します。いつでも解除できます。",
-  "tabs_aria": "Settings sections"
+  "tabs_aria": "Settings sections",
+  "twofa_loading_setup": "Loading two-factor setup..."
 }

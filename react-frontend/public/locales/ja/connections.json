@@ -36,5 +36,6 @@
   "toast_cancel_failed": "リクエストをキャンセルできませんでした",
   "page_meta": {
     "title": "つながり"
-  }
+  },
+  "loading": "Loading connections..."
 }

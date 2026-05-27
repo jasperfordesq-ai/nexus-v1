@@ -1070,7 +1070,7 @@ export function FeedPage() {
                 content: 'flex items-center gap-2 text-white font-medium text-sm',
               }}
               startContent={<ArrowUp className="w-3.5 h-3.5 text-white" aria-hidden="true" />}
-              onClick={handleScrollToNewPosts}
+              onPress={handleScrollToNewPosts}
             >
               {t('realtime.new_posts', { count: pendingPostCount })}
             </Chip>

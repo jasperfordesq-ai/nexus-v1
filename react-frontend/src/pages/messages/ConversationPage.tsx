@@ -1420,7 +1420,7 @@ export function ConversationPage() {
                   <span
                     className={`absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-[var(--color-surface)] ${other_user.is_online ? 'bg-success' : 'bg-muted'}`}
                     aria-label={statusLabel ?? undefined}
-                    role="img"
+                    role={statusLabel ? 'img' : undefined}
                   />
                 )}
               </div>
@@ -1479,20 +1479,16 @@ export function ConversationPage() {
               </Tooltip>
             )}
 
-            <Link
-              to={tenantPath(`/profile/${other_user.id}`)}
-              className="hidden sm:block"
+            <Button
+              isIconOnly
+              variant="secondary"
+              size="sm"
+              className="hidden sm:flex bg-theme-elevated text-theme-muted"
+              aria-label={t('aria_view_profile')}
+              onPress={() => navigate(tenantPath(`/profile/${other_user.id}`))}
             >
-              <Button
-                isIconOnly
-                variant="secondary"
-                size="sm"
-                className="bg-theme-elevated text-theme-muted"
-                aria-label={t('aria_view_profile')}
-              >
-                <Info className="w-4 h-4" />
-              </Button>
-            </Link>
+              <Info className="w-4 h-4" aria-hidden="true" />
+            </Button>
 
             <Dropdown>
               <DropdownTrigger>
@@ -1699,7 +1695,9 @@ export function ConversationPage() {
           {/* Loading indicator for older messages */}
           {isLoadingOlder && (
             <div className="flex justify-center py-2">
-              <Loader2 className="w-5 h-5 text-theme-subtle animate-spin" />
+              <div role="status" aria-label={t('loading_older')}>
+                <Loader2 className="w-5 h-5 text-theme-subtle animate-spin" aria-hidden="true" />
+              </div>
             </div>
           )}
 

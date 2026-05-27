@@ -720,7 +720,7 @@ export function LoginPage() {
                         variant="tertiary"
                         onPress={handleBack2FA}
                         className="flex-1 bg-theme-elevated text-theme-muted hover:bg-theme-hover"
-                        startContent={<ArrowLeft className="w-4 h-4" />}
+                        startContent={<ArrowLeft className="w-4 h-4" aria-hidden="true" />}
                       >
                         {t('login.back')}
                       </Button>

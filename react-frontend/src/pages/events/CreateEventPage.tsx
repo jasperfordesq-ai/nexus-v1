@@ -857,10 +857,8 @@ export function CreateEventPage() {
                 {/* Days of Week (for weekly/biweekly) */}
                 {(formData.recurrenceFrequency === 'weekly' || formData.recurrenceFrequency === 'biweekly') && (
                   <div>
-                    <label className="block text-sm font-medium text-theme-muted mb-2">
-                      {t('form.recurrence_days')}
-                    </label>
                     <CheckboxGroup
+                      label={t('form.recurrence_days')}
                       orientation="horizontal"
                       value={formData.recurrenceDays}
                       onChange={(val) => {
@@ -885,7 +883,7 @@ export function CreateEventPage() {
                       ))}
                     </CheckboxGroup>
                     {errors.recurrenceDays && (
-                      <p className="text-xs text-danger mt-1">{errors.recurrenceDays}</p>
+                      <p role="alert" className="text-xs text-danger mt-1">{errors.recurrenceDays}</p>
                     )}
                   </div>
                 )}

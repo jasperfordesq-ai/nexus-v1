@@ -36,5 +36,6 @@
   "toast_cancel_failed": "Impossibile annullare la richiesta",
   "page_meta": {
     "title": "Connessioni"
-  }
+  },
+  "loading": "Loading connections..."
 }

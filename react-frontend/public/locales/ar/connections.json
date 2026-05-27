@@ -36,5 +36,6 @@
   "toast_cancel_failed": "فشل في إلغاء الطلب",
   "page_meta": {
     "title": "الاتصالات"
-  }
+  },
+  "loading": "Loading connections..."
 }

@@ -419,7 +419,8 @@
       "elite": "Elite",
       "legendary": "Lendário"
     },
-    "max_score_label": "/{{max}}"
+    "max_score_label": "/{{max}}",
+    "loading": "Loading your NexusScore..."
   },
   "common": {
     "refresh": "Atualizar",

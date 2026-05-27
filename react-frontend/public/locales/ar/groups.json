@@ -195,7 +195,9 @@
     "feed_empty_desc": "كن أول من يشارك شيئًا مع هذه المجموعة!",
     "feed_create_post": "إنشاء منشور",
     "feed_load_more": "تحميل المزيد",
-    "member_actions_aria": "إجراءات الأعضاء"
+    "member_actions_aria": "إجراءات الأعضاء",
+    "feed_loading": "Loading group feed...",
+    "events_loading": "Loading group events..."
   },
   "form": {
     "create_title": "إنشاء مجموعة جديدة",

@@ -419,7 +419,8 @@
       "elite": "エリート",
       "legendary": "伝説の"
     },
-    "max_score_label": "/{{max}}"
+    "max_score_label": "/{{max}}",
+    "loading": "Loading your NexusScore..."
   },
   "common": {
     "refresh": "リフレッシュ",

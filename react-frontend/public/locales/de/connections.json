@@ -36,5 +36,6 @@
   "toast_cancel_failed": "Anfrage konnte nicht abgebrochen werden",
   "page_meta": {
     "title": "Verbindungen"
-  }
+  },
+  "loading": "Loading connections..."
 }

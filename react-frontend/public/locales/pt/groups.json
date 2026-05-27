@@ -195,7 +195,9 @@
     "feed_empty_desc": "Seja o primeiro a partilhar algo com este grupo!",
     "feed_create_post": "Criar Publicação",
     "feed_load_more": "Carregar Mais",
-    "member_actions_aria": "Ações do membro"
+    "member_actions_aria": "Ações do membro",
+    "feed_loading": "Loading group feed...",
+    "events_loading": "Loading group events..."
   },
   "form": {
     "create_title": "Criar Novo Grupo",

@@ -36,5 +36,6 @@
   "toast_cancel_failed": "Kon verzoek niet annuleren",
   "page_meta": {
     "title": "Verbindingen"
-  }
+  },
+  "loading": "Loading connections..."
 }

@@ -28,5 +28,6 @@
   "page_meta": {
     "title": "マッチ"
   },
-  "filter_tabs_aria": "Match source filter"
+  "filter_tabs_aria": "Match source filter",
+  "loading": "Loading matches..."
 }

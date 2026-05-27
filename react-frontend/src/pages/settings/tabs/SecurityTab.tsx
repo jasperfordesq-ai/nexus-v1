@@ -491,7 +491,9 @@ export function SecurityTab({
           <ModalBody>
             {!twoFactorSetupData ? (
               <div className="flex items-center justify-center py-12">
-                <Spinner size="lg" />
+                <div role="status" aria-label={t('twofa_loading_setup')}>
+                  <Spinner size="lg" />
+                </div>
               </div>
             ) : (
               <div className="space-y-6">

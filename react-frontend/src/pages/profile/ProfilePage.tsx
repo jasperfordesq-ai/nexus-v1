@@ -629,7 +629,7 @@ export function ProfilePage() {
                         color="success"
                         variant="flat"
                         size="sm"
-                        startContent={<UserCheck className="w-3 h-3" />}
+                        startContent={<UserCheck className="w-3 h-3" aria-hidden="true" />}
                       >
                         {t('connected')}
                       </Chip>

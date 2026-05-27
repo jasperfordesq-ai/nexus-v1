@@ -276,7 +276,7 @@ export function WalletPage() {
               <p className="text-sm font-medium text-theme-subtle">{t('your_balance')}</p>
 
               {isLoading ? (
-                <div className="mt-3" aria-label={t('aria.loading_balance')} aria-busy="true">
+                <div className="mt-3" role="status" aria-label={t('aria.loading_balance')} aria-busy="true">
                   <Skeleton className="rounded-xl">
                     <div className="h-16 w-48 rounded-xl bg-surface-tertiary" />
                   </Skeleton>
@@ -411,7 +411,7 @@ export function WalletPage() {
           {/* Transactions List */}
           <div className="mt-6 space-y-3">
             {isLoading ? (
-              <div aria-label={t('aria.loading_transactions')} aria-busy="true" className="space-y-3">
+              <div role="status" aria-label={t('aria.loading_transactions')} aria-busy="true" className="space-y-3">
                 {Array.from({ length: 5 }).map((_, i) => (
                 <div key={i} className="p-4 rounded-lg bg-theme-elevated">
                   <div className="flex items-center gap-4">

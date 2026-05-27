@@ -36,5 +36,6 @@
   "toast_cancel_failed": "Failed to cancel request",
   "page_meta": {
     "title": "Connections"
-  }
+  },
+  "loading": "Loading connections..."
 }

@@ -281,7 +281,8 @@
     "total_votes": "{{count}} głosów",
     "vote_success": "Głos zarejestrowany!",
     "vote_failed": "Nie udało się zarejestrować głosu",
-    "view_full": "Zobacz całą ankietę"
+    "view_full": "Zobacz całą ankietę",
+    "loading": "Loading polls..."
   },
   "radius_5": "5 km",
   "radius_10": "10 km",

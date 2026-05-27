@@ -36,5 +36,6 @@
   "toast_cancel_failed": "Nie udało się anulować prośby",
   "page_meta": {
     "title": "Połączenia"
-  }
+  },
+  "loading": "Loading connections..."
 }

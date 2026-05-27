@@ -45,8 +45,8 @@ export function SkillsTab() {
           {t('skills.description')}
         </p>
         {isLoading ? (
-          <div className="flex justify-center py-8">
-            <Spinner size="lg" />
+          <div role="status" aria-label={t('skills.loading')} className="flex justify-center py-8">
+            <Spinner size="lg" aria-hidden="true" />
           </div>
         ) : (
           <SkillSelector userSkills={userSkills} onSkillsChange={loadSkills} />

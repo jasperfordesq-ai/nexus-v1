@@ -281,7 +281,8 @@
     "total_votes": "{{count}} vóta",
     "vote_success": "Vóta taifeadta!",
     "vote_failed": "Theip ar vóta a thaifeadadh",
-    "view_full": "Féach ar an bpobalbhreith iomlán"
+    "view_full": "Féach ar an bpobalbhreith iomlán",
+    "loading": "Loading polls..."
   },
   "radius_5": "5 km",
   "radius_10": "10 km",

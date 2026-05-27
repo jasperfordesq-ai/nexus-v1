@@ -128,6 +128,8 @@
     "no_members_title": "No members yet",
     "no_members_desc": "Be the first to join this group",
     "members_loading_aria": "Loading group members",
+    "feed_loading": "Loading group feed...",
+    "events_loading": "Loading group events...",
     "member_owner": "Owner",
     "member_admin": "Admin",
     "member_joined": "Joined {{date}}",

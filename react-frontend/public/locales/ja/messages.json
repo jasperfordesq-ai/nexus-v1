@@ -207,5 +207,6 @@
       "title": "会話"
     }
   },
-  "character_count": "{{current}}/{{max}}"
+  "character_count": "{{current}}/{{max}}",
+  "loading_older": "Loading older messages"
 }

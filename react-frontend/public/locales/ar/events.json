@@ -281,7 +281,8 @@
     "total_votes": "{{count}} الأصوات",
     "vote_success": "تم تسجيل التصويت!",
     "vote_failed": "فشل في تسجيل التصويت",
-    "view_full": "عرض الاستطلاع الكامل"
+    "view_full": "عرض الاستطلاع الكامل",
+    "loading": "Loading polls..."
   },
   "radius_5": "5 كم",
   "radius_10": "10 كم",

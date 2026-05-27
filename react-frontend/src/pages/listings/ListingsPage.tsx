@@ -411,7 +411,7 @@ export function ListingsPage() {
                 <Button
                   variant="primary"
                   className="shrink-0 font-semibold"
-                  startContent={<Plus className="w-4 h-4" />}
+                  startContent={<Plus className="w-4 h-4" aria-hidden="true" />}
                 >
                   {t('create')}
                 </Button>
@@ -671,6 +671,7 @@ export function ListingsPage() {
       {/* Listings Grid/List */}
       {isLoading && listings.length === 0 ? (
         <div
+          role="status"
           className={viewMode === 'grid' ? 'grid sm:grid-cols-2 lg:grid-cols-3 gap-4' : 'space-y-4'}
           aria-label={t('aria.loading_listings')}
           aria-busy="true"

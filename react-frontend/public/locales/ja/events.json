@@ -281,7 +281,8 @@
     "total_votes": "{{count}} 票",
     "vote_success": "投票が記録されました！",
     "vote_failed": "投票を記録できませんでした",
-    "view_full": "アンケート全文を見る"
+    "view_full": "アンケート全文を見る",
+    "loading": "Loading polls..."
   },
   "radius_5": "5km",
   "radius_10": "10km",

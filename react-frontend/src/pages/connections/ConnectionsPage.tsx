@@ -630,8 +630,10 @@ export default function ConnectionsPage() {
           >
             <div className="mt-4">
               {loading.accepted ? (
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {[1, 2, 3, 4].map(i => <ConnectionSkeleton key={i} />)}
+                <div role="status" aria-label={t('loading')}>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {[1, 2, 3, 4].map(i => <ConnectionSkeleton key={i} />)}
+                  </div>
                 </div>
               ) : filterBySearch(accepted).length === 0 ? (
                 <EmptyState
@@ -701,8 +703,10 @@ export default function ConnectionsPage() {
           >
             <div className="mt-4">
               {loading.pending_received ? (
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {[1, 2].map(i => <ConnectionSkeleton key={i} />)}
+                <div role="status" aria-label={t('loading')}>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {[1, 2].map(i => <ConnectionSkeleton key={i} />)}
+                  </div>
                 </div>
               ) : filterBySearch(pendingReceived).length === 0 ? (
                 <EmptyState
@@ -760,8 +764,10 @@ export default function ConnectionsPage() {
           >
             <div className="mt-4">
               {loading.pending_sent ? (
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {[1, 2].map(i => <ConnectionSkeleton key={i} />)}
+                <div role="status" aria-label={t('loading')}>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {[1, 2].map(i => <ConnectionSkeleton key={i} />)}
+                  </div>
                 </div>
               ) : filterBySearch(pendingSent).length === 0 ? (
                 <EmptyState

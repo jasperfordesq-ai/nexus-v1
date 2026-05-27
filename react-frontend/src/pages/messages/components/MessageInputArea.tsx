@@ -158,7 +158,7 @@ export function MessageInputArea({
       {/* Recording indicator */}
       {isDirectMessagingEnabled && !messagingRestriction?.messaging_disabled && isRecording && (
         <div className="flex flex-wrap items-center gap-3 mb-3 p-3 bg-red-500/10 rounded-lg border border-red-500/20">
-          <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse shrink-0" />
+          <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse shrink-0" aria-hidden="true" />
           <span className="text-theme-primary font-medium">{formatRecordingTime(recordingTime)}</span>
           <span className="min-w-0 text-theme-subtle text-sm">{t('recording')}</span>
           <div className="flex w-full gap-2 sm:ml-auto sm:w-auto">
@@ -195,7 +195,7 @@ export function MessageInputArea({
                 />
               ) : (
                 <div className="w-16 h-16 flex flex-col items-center justify-center bg-theme-elevated rounded-lg border border-theme-default">
-                  <FileText className="w-6 h-6 text-theme-subtle" />
+                  <FileText className="w-6 h-6 text-theme-subtle" aria-hidden="true" />
                   <span className="text-[10px] text-theme-subtle truncate max-w-14 px-1">
                     {item.file.name.split('.').pop()?.toUpperCase()}
                   </span>
@@ -218,7 +218,7 @@ export function MessageInputArea({
       {/* Text input form */}
       {isDirectMessagingEnabled && !messagingRestriction?.messaging_disabled && !isRecording && !audioBlob && (
         <form onSubmit={onSendMessage} className="flex min-w-0 gap-2 sm:gap-3">
-          {/* Hidden file input */}
+          {/* Hidden file input — triggered programmatically via the labelled Button; hidden from AT */}
           <input
             ref={fileInputRef}
             type="file"
@@ -226,6 +226,7 @@ export function MessageInputArea({
             accept="image/*,.pdf,.doc,.docx,.txt"
             className="hidden"
             onChange={onFileSelect}
+            aria-hidden="true"
           />
           {/* Attachment button */}
           <Button

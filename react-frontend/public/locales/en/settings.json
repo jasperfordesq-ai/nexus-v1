@@ -397,7 +397,8 @@
   },
   "skills": {
     "title": "Your Skills",
-    "description": "Add skills to your profile so other members can find you. Community members can endorse your skills."
+    "description": "Add skills to your profile so other members can find you. Community members can endorse your skills.",
+    "loading": "Loading skills..."
   },
   "password_modal": {
     "title": "Change Password",
@@ -608,5 +609,6 @@
   },
   "push_campaign_opt_in": "Receive promoted push notifications",
   "push_campaign_opt_in_description": "Allow local businesses and organisations to send you targeted push notifications. You can opt out at any time.",
-  "tabs_aria": "Settings sections"
+  "tabs_aria": "Settings sections",
+  "twofa_loading_setup": "Loading two-factor setup..."
 }

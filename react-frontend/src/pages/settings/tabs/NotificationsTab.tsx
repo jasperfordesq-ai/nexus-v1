@@ -282,7 +282,7 @@ export function NotificationsTab({
                   </p>
                 </div>
                 <Select
-                  aria-label={t('notification_prefs.activity_digest')}
+                  label={t('notification_prefs.activity_digest')}
                   selectedKeys={[digestFrequency]}
                   onSelectionChange={(keys) => {
                     const value = Array.from(keys)[0] as string;
@@ -355,7 +355,7 @@ export function NotificationsTab({
                   <p className="text-sm text-theme-subtle">{t('match_digest.frequency_description')}</p>
                 </div>
                 <Select
-                  aria-label={t('match_digest.frequency')}
+                  label={t('match_digest.frequency')}
                   selectedKeys={[matchDigestFrequency]}
                   onSelectionChange={(keys) => {
                     const value = Array.from(keys)[0] as string;

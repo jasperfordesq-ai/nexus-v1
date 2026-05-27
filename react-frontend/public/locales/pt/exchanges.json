@@ -108,7 +108,8 @@
     "prep_time": "Tempo de Preparação",
     "ratings": "Avaliações",
     "rate_exchange": "Avaliar Esta Troca",
-    "prep_time_value": "{{count}}h"
+    "prep_time_value": "{{count}}h",
+    "rating_value": "Rating: {{rating}} out of 5"
   },
   "modal": {
     "decline_title": "Recusar Pedido de Troca",

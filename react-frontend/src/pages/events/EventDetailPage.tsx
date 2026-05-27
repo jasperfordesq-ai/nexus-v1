@@ -725,7 +725,7 @@ export function EventDetailPage() {
       <GlassCard className="p-6 sm:p-8">
         {/* E5: Cancellation Banner */}
         {isCancelled && (
-          <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30">
+          <div role="alert" className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30">
             <div className="flex items-center gap-3">
               <Ban className="w-5 h-5 text-red-400 flex-shrink-0" aria-hidden="true" />
               <div>
@@ -1021,7 +1021,7 @@ export function EventDetailPage() {
                 </div>
               )}
               {isLoadingPolls && (
-                <div className="mb-8 space-y-3">
+                <div role="status" aria-busy="true" aria-label={t('polls.loading')} className="mb-8 space-y-3">
                   <Skeleton className="w-48 h-6 rounded-lg" />
                   <Skeleton className="w-full h-32 rounded-lg" />
                 </div>

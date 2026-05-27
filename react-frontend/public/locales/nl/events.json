@@ -281,7 +281,8 @@
     "total_votes": "{{count}} stemmen",
     "vote_success": "Stem opgenomen!",
     "vote_failed": "Kan de stemming niet registreren",
-    "view_full": "Bekijk de volledige opiniepeiling"
+    "view_full": "Bekijk de volledige opiniepeiling",
+    "loading": "Loading polls..."
   },
   "radius_5": "5 km",
   "radius_10": "10 km",

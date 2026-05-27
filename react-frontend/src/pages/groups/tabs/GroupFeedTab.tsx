@@ -154,7 +154,7 @@ export function GroupFeedTab({
 
       {/* Feed Items */}
       {feedLoading && feedItems.length === 0 ? (
-        <div className="space-y-4">
+        <div role="status" aria-busy="true" aria-label={t('detail.feed_loading')} className="space-y-4">
           {[1, 2, 3].map((i) => (
             <GlassCard key={i} className="p-5">
               <div className="flex items-center gap-3 mb-4">

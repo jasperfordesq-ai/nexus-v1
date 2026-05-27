@@ -163,15 +163,15 @@ export function HelpCenterPage() {
       >
         {/* Loading state */}
         {loading && (
-          <GlassCard className="p-12 text-center">
-            <Spinner size="lg" className="mx-auto" />
+          <GlassCard className="p-12 text-center" role="status" aria-label={t('help.loading')}>
+            <Spinner size="lg" className="mx-auto" aria-hidden="true" />
             <p className="text-theme-muted mt-4 text-sm">{t('help.loading')}</p>
           </GlassCard>
         )}
 
         {/* Error state */}
         {!loading && loadError && (
-          <GlassCard className="p-8 text-center">
+          <GlassCard className="p-8 text-center" role="alert">
             <HelpCircle className="w-12 h-12 text-theme-subtle mx-auto mb-4 opacity-50" aria-hidden="true" />
             <h2 className="text-lg font-semibold text-theme-primary mb-2">
               {t('help.load_error_title')}

@@ -397,7 +397,8 @@
   },
   "skills": {
     "title": "As Suas Competências",
-    "description": "Adicione competências ao seu perfil para que outros membros o possam encontrar. Os membros da comunidade podem recomendar as suas competências."
+    "description": "Adicione competências ao seu perfil para que outros membros o possam encontrar. Os membros da comunidade podem recomendar as suas competências.",
+    "loading": "Loading skills..."
   },
   "password_modal": {
     "title": "Alterar Palavra-passe",
@@ -608,5 +609,6 @@
   },
   "push_campaign_opt_in": "Receber notificações push patrocinadas",
   "push_campaign_opt_in_description": "Permita que empresas e organizações locais lhe enviem notificações push direcionadas. Pode cancelar a qualquer momento.",
-  "tabs_aria": "Settings sections"
+  "tabs_aria": "Settings sections",
+  "twofa_loading_setup": "Loading two-factor setup..."
 }

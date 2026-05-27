@@ -133,7 +133,7 @@ export function ProfileTab({
           {/* Name fields */}
           {isIdVerified && (
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-sm">
-              <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" aria-hidden="true" />
               <span className="text-emerald-700 dark:text-emerald-300 font-medium">
                 {t('profile.identity_verified_lock')}
               </span>
@@ -147,7 +147,7 @@ export function ProfileTab({
               onChange={(e) => onProfileDataChange((prev) => ({ ...prev, first_name: e.target.value }))}
               classNames={inputClassNames}
               isReadOnly={isIdVerified}
-              endContent={isIdVerified ? <Lock className="w-4 h-4 text-theme-subtle" /> : undefined}
+              endContent={isIdVerified ? <Lock className="w-4 h-4 text-theme-subtle" aria-hidden="true" /> : undefined}
             />
             <Input
               label={t('profile.last_name')}
@@ -156,7 +156,7 @@ export function ProfileTab({
               onChange={(e) => onProfileDataChange((prev) => ({ ...prev, last_name: e.target.value }))}
               classNames={inputClassNames}
               isReadOnly={isIdVerified}
-              endContent={isIdVerified ? <Lock className="w-4 h-4 text-theme-subtle" /> : undefined}
+              endContent={isIdVerified ? <Lock className="w-4 h-4 text-theme-subtle" aria-hidden="true" /> : undefined}
             />
           </div>
 
@@ -170,7 +170,7 @@ export function ProfileTab({
             max={new Date().toISOString().split('T')[0]}
             isReadOnly={isIdVerified}
             isDisabled={isIdVerified}
-            endContent={isIdVerified ? <Lock className="w-4 h-4 text-theme-subtle" /> : undefined}
+            endContent={isIdVerified ? <Lock className="w-4 h-4 text-theme-subtle" aria-hidden="true" /> : undefined}
             description={
               isIdVerified
                 ? t('identity_verified_lock_dob')
@@ -296,8 +296,8 @@ export function ProfileTab({
 
         <div className="space-y-6">
           {/* Language preference */}
-          <div>
-            <p className="text-sm font-medium text-theme-primary mb-1">{t('language_preference')}</p>
+          <div role="group" aria-labelledby="lang-label-id">
+            <p id="lang-label-id" className="text-sm font-medium text-theme-primary mb-1">{t('language_preference')}</p>
             <p className="text-xs text-theme-muted mb-3">{t('select_language')}</p>
             <LanguageSwitcher compact={false} />
           </div>

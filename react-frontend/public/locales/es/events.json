@@ -281,7 +281,8 @@
     "total_votes": "{{count}} votos",
     "vote_success": "Voto registrado!",
     "vote_failed": "No se pudo registrar el voto",
-    "view_full": "Ver encuesta completa"
+    "view_full": "Ver encuesta completa",
+    "loading": "Loading polls..."
   },
   "radius_5": "5 kilometros",
   "radius_10": "10 kilometros",

@@ -281,7 +281,8 @@
     "total_votes": "{{count}} voix",
     "vote_success": "Vote enregistré !",
     "vote_failed": "Impossible d'enregistrer le vote",
-    "view_full": "Voir le sondage complet"
+    "view_full": "Voir le sondage complet",
+    "loading": "Loading polls..."
   },
   "radius_5": "5km",
   "radius_10": "10km",

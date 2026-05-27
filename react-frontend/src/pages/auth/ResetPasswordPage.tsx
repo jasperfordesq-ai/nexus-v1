@@ -112,7 +112,7 @@ export function ResetPasswordPage() {
         >
           <GlassCard className="p-5 text-center sm:p-8">
             <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
-              <CheckCircle className="w-8 h-8 text-emerald-400" />
+              <CheckCircle className="w-8 h-8 text-emerald-400" aria-hidden="true" />
             </div>
             <h1 className="text-2xl font-bold text-theme-primary mb-2">{t('reset_password.success_title')}</h1>
             <p className="text-theme-muted mb-6">
@@ -142,7 +142,7 @@ export function ResetPasswordPage() {
           to={tenantPath('/login')}
           className="flex items-center gap-2 text-theme-muted hover:text-theme-primary transition-colors mb-6"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4" aria-hidden="true" />
           {t('reset_password.back_to_login')}
         </Link>
 
@@ -171,7 +171,7 @@ export function ResetPasswordPage() {
                 placeholder={t('reset_password.new_password_placeholder')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                startContent={<Lock className="w-4 h-4 text-theme-subtle" />}
+                startContent={<Lock className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
                 endContent={
                   <Button
                     isIconOnly
@@ -204,7 +204,7 @@ export function ResetPasswordPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               onBlur={() => setConfirmTouched(true)}
-              startContent={<Lock className="w-4 h-4 text-theme-subtle" />}
+              startContent={<Lock className="w-4 h-4 text-theme-subtle" aria-hidden="true" />}
               isInvalid={confirmTouched && confirmPassword.length > 0 && password !== confirmPassword}
               errorMessage={confirmTouched && confirmPassword.length > 0 && password !== confirmPassword ? t('reset_password.passwords_no_match') : ''}
               classNames={{

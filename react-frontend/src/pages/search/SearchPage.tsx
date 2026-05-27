@@ -252,7 +252,7 @@ export function SearchPage() {
             placeholder={t('search_placeholder')}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            startContent={<Search className="w-5 h-5 text-theme-subtle" />}
+            startContent={<Search className="w-5 h-5 text-theme-subtle" aria-hidden="true" />}
             aria-label={t('search_placeholder')}
             size="lg"
             classNames={{
@@ -333,7 +333,7 @@ export function SearchPage() {
               </Button>
             </GlassCard>
           ) : isLoading ? (
-            <div aria-label={t('aria.loading_search_results')} aria-busy="true" className="space-y-4">
+            <div role="status" aria-label={t('aria.loading_search_results')} aria-busy="true" className="space-y-4">
               {Array.from({ length: 6 }).map((_, i) => (
                 <GlassCard key={i} className="p-4">
                   <div className="flex items-center gap-3">

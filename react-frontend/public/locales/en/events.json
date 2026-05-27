@@ -275,6 +275,7 @@
     "coming_soon_desc": "Global reminder preferences are coming soon. In the meantime, you can set reminders on individual events from their detail page."
   },
   "polls": {
+    "loading": "Loading polls...",
     "title": "Event Polls",
     "status_open": "Open",
     "status_closed": "Closed",
