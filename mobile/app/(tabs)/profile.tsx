@@ -58,6 +58,7 @@ const MARKETPLACE: MenuItem[] = [
   { labelKey: 'marketplaceBrowse', descriptionKey: 'navDescriptions.marketplaceBrowse', icon: 'bag-handle-outline', route: '/(modals)/marketplace' as Href, tone: '#0ea5e9', featureGate: 'marketplace' },
   { labelKey: 'marketplaceSell', descriptionKey: 'navDescriptions.marketplaceSell', icon: 'add-circle-outline', route: '/(modals)/new-marketplace-listing' as Href, tone: '#22c55e', featureGate: 'marketplace' },
   { labelKey: 'marketplaceMyListings', descriptionKey: 'navDescriptions.marketplaceMyListings', icon: 'albums-outline', route: '/(modals)/marketplace-my-listings' as Href, tone: '#6366f1', featureGate: 'marketplace' },
+  { labelKey: 'marketplaceSellerSetup', descriptionKey: 'navDescriptions.marketplaceSellerSetup', icon: 'storefront-outline', route: '/(modals)/marketplace-merchant-onboarding' as Href, tone: '#0f766e', featureGate: 'marketplace' },
   { labelKey: 'marketplaceOrders', descriptionKey: 'navDescriptions.marketplaceOrders', icon: 'receipt-outline', route: '/(modals)/marketplace-orders' as Href, tone: '#f97316', featureGate: 'marketplace' },
   { labelKey: 'marketplacePickups', descriptionKey: 'navDescriptions.marketplacePickups', icon: 'qr-code-outline', route: '/(modals)/marketplace-pickups' as Href, tone: '#0ea5e9', featureGate: 'marketplace' },
   { labelKey: 'marketplaceCoupons', descriptionKey: 'navDescriptions.marketplaceCoupons', icon: 'ticket-outline', route: '/(modals)/marketplace-coupons' as Href, tone: '#16a34a', featureGate: 'merchant_coupons' },

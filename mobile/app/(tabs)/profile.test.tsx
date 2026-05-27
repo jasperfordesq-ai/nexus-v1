@@ -34,6 +34,7 @@ jest.mock('react-i18next', () => ({
         'marketplaceBrowse': 'Browse marketplace',
         'marketplaceSell': 'Sell something',
         'marketplaceMyListings': 'My marketplace listings',
+        'marketplaceSellerSetup': 'Seller setup',
         'marketplaceOrders': 'Marketplace orders',
         'marketplacePickups': 'Marketplace pickups',
         'marketplaceCoupons': 'Marketplace coupons',
@@ -81,6 +82,7 @@ jest.mock('react-i18next', () => ({
         'navDescriptions.marketplaceBrowse': 'Browse all marketplace listings, categories, maps, and saved searches.',
         'navDescriptions.marketplaceSell': 'Create a new marketplace listing with photos, price, delivery, and category details.',
         'navDescriptions.marketplaceMyListings': 'Review, edit, and manage the marketplace items you have listed.',
+        'navDescriptions.marketplaceSellerSetup': 'Create or update the seller profile used by marketplace buyers.',
         'navDescriptions.marketplaceOrders': 'Track marketplace purchases, sales, payments, pickup, delivery, ratings, and disputes.',
         'navDescriptions.marketplacePickups': 'Show pickup reservations and QR codes for click-and-collect orders.',
         'navDescriptions.marketplaceCoupons': 'Browse active merchant coupons and show checkout QR codes.',
@@ -223,6 +225,7 @@ describe('MoreScreen (More tab)', () => {
     expect(getByText('Browse marketplace')).toBeTruthy();
     expect(getByText('Sell something')).toBeTruthy();
     expect(getByText('My marketplace listings')).toBeTruthy();
+    expect(getByText('Seller setup')).toBeTruthy();
     expect(getByText('Marketplace orders')).toBeTruthy();
     expect(getByText('Marketplace pickups')).toBeTruthy();
     expect(getByText('Marketplace coupons')).toBeTruthy();
