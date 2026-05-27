@@ -231,8 +231,8 @@ class SuccessStoryService
                 'unit' => '%',
                 'audience' => 'municipality',
                 'sub_region_id' => null,
-                'method_caveat' => 'Illustrative example based on Agoris claim; not measured on this tenant.',
-                'evidence_source' => 'Agoris municipality page (illustrative)',
+                'method_caveat' => 'Illustrative example based on a peer community claim; not measured on this tenant.',
+                'evidence_source' => 'Peer municipality page (illustrative)',
             ],
             [
                 'title' => '25% more volunteer engagement',
@@ -244,8 +244,8 @@ class SuccessStoryService
                 'unit' => '%',
                 'audience' => 'verein_members',
                 'sub_region_id' => null,
-                'method_caveat' => 'Illustrative example based on Agoris claim; not measured on this tenant.',
-                'evidence_source' => 'Agoris municipality page (illustrative)',
+                'method_caveat' => 'Illustrative example based on a peer community claim; not measured on this tenant.',
+                'evidence_source' => 'Peer municipality page (illustrative)',
             ],
             [
                 'title' => 'CHF 12,250 in formal care costs offset',
