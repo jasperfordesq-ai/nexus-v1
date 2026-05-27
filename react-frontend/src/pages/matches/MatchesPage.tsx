@@ -66,10 +66,10 @@ interface Match {
 type SourceFilter = 'all' | 'listing' | 'job' | 'volunteering' | 'group';
 
 const SOURCE_CONFIG: Record<string, { icon: typeof ListChecks; labelKey: string; color: string; path: string }> = {
-  listing: { icon: ListChecks, labelKey: 'source_listing', color: 'text-blue-400 bg-blue-400/10', path: '/listings' },
-  job: { icon: Briefcase, labelKey: 'source_job', color: 'text-amber-400 bg-amber-400/10', path: '/jobs' },
-  volunteering: { icon: Heart, labelKey: 'source_volunteering', color: 'text-rose-400 bg-rose-400/10', path: '/volunteering' },
-  group: { icon: Users, labelKey: 'source_group', color: 'text-emerald-400 bg-emerald-400/10', path: '/groups' },
+  listing: { icon: ListChecks, labelKey: 'source_listing', color: 'text-blue-700 dark:text-blue-400 bg-blue-400/10', path: '/listings' },
+  job: { icon: Briefcase, labelKey: 'source_job', color: 'text-amber-700 dark:text-amber-400 bg-amber-400/10', path: '/jobs' },
+  volunteering: { icon: Heart, labelKey: 'source_volunteering', color: 'text-rose-600 dark:text-rose-400 bg-rose-400/10', path: '/volunteering' },
+  group: { icon: Users, labelKey: 'source_group', color: 'text-emerald-700 dark:text-emerald-400 bg-emerald-400/10', path: '/groups' },
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
