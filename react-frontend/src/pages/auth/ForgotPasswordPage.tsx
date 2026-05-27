@@ -134,7 +134,7 @@ export function ForgotPasswordPage() {
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} aria-label={t('forgot_password.title')} className="space-y-6">
             <Input
               type="email"
               label={t('forgot_password.email_address_label')}

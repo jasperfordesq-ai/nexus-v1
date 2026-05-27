@@ -874,7 +874,7 @@ export function RegisterPage() {
       // Desktop view - all fields visible
       const oauthTenantId = selectedTenantId || (tenant?.id ? String(tenant.id) : '');
       return (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} aria-label={t('register.title')} className="space-y-4">
           {oauthTenantId && (
             <OAuthButtons intent="register" tenantId={oauthTenantId} />
           )}
@@ -912,7 +912,7 @@ export function RegisterPage() {
     // Mobile view - step by step
     const oauthTenantIdMobile = selectedTenantId || (tenant?.id ? String(tenant.id) : '');
     return (
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} aria-label={t('register.title')} className="space-y-4">
         {currentStep === 1 && oauthTenantIdMobile && (
           <OAuthButtons intent="register" tenantId={oauthTenantIdMobile} />
         )}

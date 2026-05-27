@@ -786,7 +786,9 @@
     "select_category": "Roghnaigh catagóir",
     "verification_badges": "Suaitheantais fhírúcháin",
     "search_skills": "Cuardaigh scileanna",
-    "user_menu_trigger": "User menu for {{name}}"
+    "user_menu_trigger": "User menu for {{name}}",
+    "feed_sidebar": "Community sidebar",
+    "filter_panel": "Filter panel"
   },
   "skills": {
     "browse_title": "Eolaire Scileanna Pobail",

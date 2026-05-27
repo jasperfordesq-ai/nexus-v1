@@ -14067,7 +14067,8 @@
         "rejected": "Voorstel afgewezen"
       }
     },
-    "tabs_aria": "Agent proposal status filter"
+    "tabs_aria": "Agent proposal status filter",
+    "toggle": "Enable or disable {{name}}"
   },
   "fadp": {
     "meta": {

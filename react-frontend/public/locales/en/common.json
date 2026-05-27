@@ -786,7 +786,9 @@
     "select_category": "Select a category",
     "verification_badges": "Verification badges",
     "search_skills": "Search skills",
-    "user_menu_trigger": "User menu for {{name}}"
+    "user_menu_trigger": "User menu for {{name}}",
+    "feed_sidebar": "Community sidebar",
+    "filter_panel": "Filter panel"
   },
   "skills": {
     "browse_title": "Community Skills Directory",

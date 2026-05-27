@@ -446,7 +446,7 @@ export function LoginPage() {
                   )}
 
                   {/* Form */}
-                  <form onSubmit={handleLogin} className="space-y-5">
+                  <form onSubmit={handleLogin} aria-label={t('login.title')} className="space-y-5">
                     {/* Tenant resolved from URL/domain — show as read-only info */}
                     {showResolvedTenant && (
                       <div className="p-3 rounded-xl bg-theme-elevated border border-theme-default">
@@ -667,7 +667,7 @@ export function LoginPage() {
                   )}
 
                   {/* Form */}
-                  <form onSubmit={handleVerify2FA} className="space-y-5">
+                  <form onSubmit={handleVerify2FA} aria-label={t('page_meta.verify_identity.title')} className="space-y-5">
                     <Input
                       type="text"
                       label={useBackupCode ? t('login.twofa_backup_code_label') : t('login.twofa_code_label')}

@@ -129,6 +129,7 @@
       "disabled": "Disabled",
       "enabled": "Enabled"
     },
+    "toggle": "Enable or disable {{name}}",
     "run_status": {
       "completed": "Completed",
       "failed": "Failed",

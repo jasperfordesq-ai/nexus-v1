@@ -285,6 +285,8 @@ export function EmailSettings() {
               <Input
                 label={t('label_from_email')}
                 placeholder={t('placeholder_noreply_example')}
+                type="email"
+                autoComplete="email"
                 variant="secondary"
                 value={formData.sendgrid_from_email}
                 onValueChange={(v) => updateField('sendgrid_from_email', v)}
@@ -427,6 +429,8 @@ export function EmailSettings() {
               <Input
                 label={t('label_from_email')}
                 placeholder={t('placeholder_noreply_example')}
+                type="email"
+                autoComplete="email"
                 variant="secondary"
                 value={formData.smtp_from_email}
                 onValueChange={(v) => updateField('smtp_from_email', v)}

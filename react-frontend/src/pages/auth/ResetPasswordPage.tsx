@@ -163,7 +163,7 @@ export function ResetPasswordPage() {
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} aria-label={t('reset_password.title')} className="space-y-6">
             <div>
               <Input
                 type={showPassword ? 'text' : 'password'}

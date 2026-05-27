@@ -168,6 +168,7 @@ export default function AgentsAdminPage() {
                 isSelected={def.is_enabled}
                 onValueChange={() => handleToggle(def)}
                 isDisabled={busyId === def.id}
+                aria-label={t('agents.toggle', { name: def.name })}
               />
             </CardHeader>
             <CardBody className="space-y-3">

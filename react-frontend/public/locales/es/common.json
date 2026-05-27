@@ -786,7 +786,9 @@
     "select_category": "Seleccionar una categoría",
     "verification_badges": "Insignias de verificación",
     "search_skills": "Buscar habilidades",
-    "user_menu_trigger": "User menu for {{name}}"
+    "user_menu_trigger": "User menu for {{name}}",
+    "feed_sidebar": "Community sidebar",
+    "filter_panel": "Filter panel"
   },
   "skills": {
     "browse_title": "Directorio de Habilidades de la Comunidad",

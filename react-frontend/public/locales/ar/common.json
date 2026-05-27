@@ -786,7 +786,9 @@
     "select_category": "اختر فئة",
     "verification_badges": "شارات التحقق",
     "search_skills": "البحث عن مهارات",
-    "user_menu_trigger": "User menu for {{name}}"
+    "user_menu_trigger": "User menu for {{name}}",
+    "feed_sidebar": "Community sidebar",
+    "filter_panel": "Filter panel"
   },
   "skills": {
     "browse_title": "دليل مهارات المجتمع",

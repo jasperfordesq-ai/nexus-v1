@@ -786,7 +786,9 @@
     "select_category": "カテゴリを選択",
     "verification_badges": "認証バッジ",
     "search_skills": "スキルを検索",
-    "user_menu_trigger": "User menu for {{name}}"
+    "user_menu_trigger": "User menu for {{name}}",
+    "feed_sidebar": "Community sidebar",
+    "filter_panel": "Filter panel"
   },
   "skills": {
     "browse_title": "コミュニティスキルディレクトリ",

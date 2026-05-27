@@ -1325,7 +1325,7 @@ export function FeedPage() {
 
       {/* Right Sidebar — full widget panel in normal document flow. */}
       {showDesktopSidebar && (
-        <aside data-testid="feed-sidebar-panel" className="static hidden w-72 shrink-0 self-start lg:block">
+        <aside data-testid="feed-sidebar-panel" role="complementary" aria-label={t('aria.feed_sidebar')} className="static hidden w-72 shrink-0 self-start lg:block">
           <SidebarErrorBoundary>
             <FeedSidebar />
           </SidebarErrorBoundary>

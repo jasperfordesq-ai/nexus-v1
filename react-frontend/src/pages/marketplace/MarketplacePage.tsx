@@ -394,7 +394,7 @@ export function MarketplacePage() {
           </div>
 
           {/* Desktop sidebar */}
-          <aside className="hidden lg:block w-72 shrink-0 space-y-6">
+          <aside className="hidden lg:block w-72 shrink-0 space-y-6" role="complementary" aria-label={t('aria.filter_panel')}>
             {/* Sell CTA */}
             {isAuthenticated && (
               <GlassCard className="p-5 text-center space-y-3">

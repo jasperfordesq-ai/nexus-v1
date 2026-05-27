@@ -62,6 +62,7 @@ function combineClasses(...classes: Array<string | undefined>): string | undefin
 }
 
 export function Spinner({
+  'aria-label': ariaLabel,
   className,
   classNames,
   color,
@@ -72,6 +73,7 @@ export function Spinner({
 }: SpinnerProps) {
   const spinner = (
     <HeroUISpinner
+      aria-label={ariaLabel ?? (label ? String(label) : undefined)}
       className={combineClasses(classNames?.wrapper, classNames?.circle1, classNames?.circle2, className)}
       color={mapColor(color)}
       {...props}

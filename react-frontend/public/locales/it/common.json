@@ -786,7 +786,9 @@
     "select_category": "Seleziona una categoria",
     "verification_badges": "Badge di verifica",
     "search_skills": "Cerca competenze",
-    "user_menu_trigger": "User menu for {{name}}"
+    "user_menu_trigger": "User menu for {{name}}",
+    "feed_sidebar": "Community sidebar",
+    "filter_panel": "Filter panel"
   },
   "skills": {
     "browse_title": "Elenco Competenze della Comunità",
