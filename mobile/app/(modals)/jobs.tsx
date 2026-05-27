@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 import {
   getJobs,
   getMyApplications,
+  getMyPostings,
   acceptInterview,
   declineInterview,
   acceptOffer,
@@ -47,6 +48,7 @@ import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 const JOB_TYPES = ['', 'paid', 'volunteer', 'timebank'] as const;
 const COMMITMENT_TYPES = ['', 'full_time', 'part_time', 'flexible', 'one_off'] as const;
+type JobsTab = 'browse' | 'myApplications' | 'myPostings';
 
 // ---------------------------------------------------------------------------
 // Job card component
@@ -435,7 +437,7 @@ export default function JobsScreen() {
   const primary = usePrimaryColor();
   const theme = useTheme();
 
-  const [activeTab, setActiveTab] = useState<'browse' | 'myApplications'>('browse');
+  const [activeTab, setActiveTab] = useState<JobsTab>('browse');
   const [search, setSearch] = useState('');
   const [committedSearch, setCommittedSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
@@ -522,6 +524,22 @@ export default function JobsScreen() {
     loadMore: loadMoreApps,
     refresh: refreshApps,
   } = usePaginatedApi<JobApplication, ApplicationsResponse>(appFetchFn, appExtractor, []);
+
+  // My Postings tab — owner-facing parity with the React web jobs page.
+  const postingsFetchFn = useCallback(
+    (cursor: string | null) => getMyPostings({ cursor }),
+    [],
+  );
+
+  const {
+    items: postings,
+    isLoading: postingsLoading,
+    isLoadingMore: postingsLoadingMore,
+    error: postingsError,
+    hasMore: postingsHasMore,
+    loadMore: loadMorePostings,
+    refresh: refreshPostings,
+  } = usePaginatedApi<JobVacancy, JobsResponse>(postingsFetchFn, jobExtractor, []);
 
   const renderJob = useCallback(
     ({ item }: { item: JobVacancy }) => (
@@ -631,6 +649,22 @@ export default function JobsScreen() {
             {t('tabs.myApplications')}
           </Text>
         </Pressable>
+        <Pressable
+          className="flex-1 items-center rounded-panel-inner py-2.5"
+          style={{ backgroundColor: activeTab === 'myPostings' ? primary : 'transparent' }}
+          onPress={() => setActiveTab('myPostings')}
+          accessibilityRole="tab"
+          accessibilityState={{ selected: activeTab === 'myPostings' }}
+          accessibilityLabel={t('tabs.myPostings')}
+        >
+          <Text
+            className="text-sm font-semibold"
+            style={{ color: activeTab === 'myPostings' ? '#fff' : theme.textSecondary }}
+            numberOfLines={1}
+          >
+            {t('tabs.myPostings')}
+          </Text>
+        </Pressable>
         </View>
       </Surface>
 
@@ -738,7 +772,7 @@ export default function JobsScreen() {
             contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: 32, paddingTop: 4 }}
           />
         </>
-      ) : (
+      ) : activeTab === 'myApplications' ? (
         <FlatList<JobApplication>
           data={applications}
           keyExtractor={(item) => String(item.id)}
@@ -772,6 +806,47 @@ export default function JobsScreen() {
           }
           ListFooterComponent={
             appsLoadingMore ? (
+              <View className="py-4">
+                <LoadingSpinner />
+              </View>
+            ) : null
+          }
+          contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 16, paddingBottom: 32, paddingTop: 4 }}
+        />
+      ) : (
+        <FlatList<JobVacancy>
+          data={postings}
+          keyExtractor={(item) => String(item.id)}
+          renderItem={renderJob}
+          onEndReached={postingsHasMore ? loadMorePostings : undefined}
+          onEndReachedThreshold={0.3}
+          refreshControl={
+            <RefreshControl
+              refreshing={postingsLoading && postings.length > 0}
+              onRefresh={refreshPostings}
+              tintColor={primary}
+            />
+          }
+          ListEmptyComponent={
+            postingsLoading ? (
+              <LoadingSpinner />
+            ) : postingsError ? (
+              <View className="flex-1 justify-center items-center p-10">
+                <Text className="text-sm text-danger text-center">{postingsError}</Text>
+                <Pressable onPress={refreshPostings} className="mt-3">
+                  <Text style={{ color: primary }} className="text-sm font-semibold">{t('retry', 'Retry')}</Text>
+                </Pressable>
+              </View>
+            ) : (
+              <EmptyState
+                icon="briefcase-outline"
+                title={t('postings.empty')}
+                subtitle={t('postings.emptyHint')}
+              />
+            )
+          }
+          ListFooterComponent={
+            postingsLoadingMore ? (
               <View className="py-4">
                 <LoadingSpinner />
               </View>

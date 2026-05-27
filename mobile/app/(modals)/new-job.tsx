@@ -3,16 +3,16 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert, ScrollView, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Text } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 
-import { createJob, type CreateJobPayload } from '@/lib/api/jobs';
+import { createJob, getJobDetail, updateJob, type CreateJobPayload, type JobVacancy } from '@/lib/api/jobs';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
@@ -22,9 +22,18 @@ import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
 type JobType = CreateJobPayload['type'];
 type Commitment = CreateJobPayload['commitment'];
+type SalaryType = 'hourly' | 'monthly' | 'annual';
 
 const jobTypes: JobType[] = ['volunteer', 'timebank', 'paid'];
 const commitments: Commitment[] = ['flexible', 'part_time', 'full_time', 'one_off'];
+const salaryTypes: SalaryType[] = ['hourly', 'monthly', 'annual'];
+
+function optionalNumber(value: string): number | null {
+  const normalized = value.replace(/[,\s]/g, '').trim();
+  if (!normalized) return null;
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? parsed : null;
+}
 
 export default function NewJobRoute() {
   return (
@@ -36,8 +45,11 @@ export default function NewJobRoute() {
 
 function NewJobScreen() {
   const { t } = useTranslation(['jobs', 'common']);
+  const params = useLocalSearchParams<{ id?: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const jobId = Number(params.id);
+  const isEditing = Number.isFinite(jobId) && jobId > 0;
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [type, setType] = useState<JobType>('volunteer');
@@ -47,9 +59,66 @@ function NewJobScreen() {
   const [skills, setSkills] = useState('');
   const [hours, setHours] = useState('');
   const [credits, setCredits] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
+  const [salaryMin, setSalaryMin] = useState('');
+  const [salaryMax, setSalaryMax] = useState('');
+  const [salaryCurrency, setSalaryCurrency] = useState('');
+  const [salaryType, setSalaryType] = useState<SalaryType>('annual');
+  const [salaryNegotiable, setSalaryNegotiable] = useState(false);
+  const [blindHiring, setBlindHiring] = useState(false);
+  const [tagline, setTagline] = useState('');
+  const [videoUrl, setVideoUrl] = useState('');
+  const [benefits, setBenefits] = useState('');
   const [deadline, setDeadline] = useState('');
   const [isRemote, setIsRemote] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [hasHydratedEdit, setHasHydratedEdit] = useState(false);
+
+  useEffect(() => {
+    if (!isEditing || hasHydratedEdit) return;
+
+    let isMounted = true;
+    getJobDetail(jobId)
+      .then((response) => {
+        if (!isMounted) return;
+        hydrateFromJob(response.data);
+        setHasHydratedEdit(true);
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        Alert.alert(t('create.failedTitle'), t('create.loadFailed'));
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [hasHydratedEdit, isEditing, jobId, t]);
+
+  function hydrateFromJob(job: JobVacancy) {
+    setTitle(job.title ?? '');
+    setDescription(job.description ?? '');
+    setType(job.type ?? 'volunteer');
+    setCommitment(job.commitment ?? 'flexible');
+    setLocation(job.location ?? '');
+    setCategory(job.category ?? '');
+    setSkills((job.skills_required ?? []).join(', '));
+    setHours(job.hours_per_week !== null && job.hours_per_week !== undefined ? String(job.hours_per_week) : '');
+    setCredits(job.time_credits !== null && job.time_credits !== undefined ? String(job.time_credits) : '');
+    setContactEmail(job.contact_email ?? '');
+    setContactPhone(job.contact_phone ?? '');
+    setSalaryMin(job.salary_min !== null && job.salary_min !== undefined ? String(job.salary_min) : '');
+    setSalaryMax(job.salary_max !== null && job.salary_max !== undefined ? String(job.salary_max) : '');
+    setSalaryCurrency(job.salary_currency ?? '');
+    setSalaryType(job.salary_type ?? 'annual');
+    setSalaryNegotiable(Boolean(job.salary_negotiable));
+    setBlindHiring(Boolean(job.blind_hiring));
+    setTagline(job.tagline ?? '');
+    setVideoUrl(job.video_url ?? '');
+    setBenefits((job.benefits ?? []).join(', '));
+    setDeadline(job.deadline ? job.deadline.slice(0, 10) : '');
+    setIsRemote(Boolean(job.is_remote));
+  }
 
   async function submit() {
     if (!title.trim() || !description.trim()) {
@@ -59,7 +128,7 @@ function NewJobScreen() {
 
     setIsSubmitting(true);
     try {
-      const result = await createJob({
+      const payload: CreateJobPayload = {
         title: title.trim(),
         description: description.trim(),
         type,
@@ -68,14 +137,25 @@ function NewJobScreen() {
         is_remote: isRemote,
         category: category.trim() || null,
         skills_required: skills.split(',').map((skill) => skill.trim()).filter(Boolean),
-        hours_per_week: hours.trim() ? Number(hours) : null,
-        time_credits: credits.trim() ? Number(credits) : null,
+        hours_per_week: optionalNumber(hours),
+        time_credits: optionalNumber(credits),
+        contact_email: contactEmail.trim() || null,
+        contact_phone: contactPhone.trim() || null,
+        salary_min: optionalNumber(salaryMin),
+        salary_max: optionalNumber(salaryMax),
+        salary_currency: salaryCurrency.trim() || null,
+        salary_type: type === 'paid' ? salaryType : null,
         deadline: deadline.trim() || null,
-        salary_negotiable: true,
+        salary_negotiable: salaryNegotiable,
+        blind_hiring: blindHiring,
+        tagline: tagline.trim() || null,
+        video_url: videoUrl.trim() || null,
+        benefits: benefits.split(',').map((benefit) => benefit.trim()).filter(Boolean),
         status: 'open',
-      });
+      };
+      const result = isEditing ? await updateJob(jobId, payload) : await createJob(payload);
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      const id = result.data?.id;
+      const id = result.data?.id ?? jobId;
       if (id) {
         router.replace({ pathname: '/(modals)/job-detail', params: { id: String(id) } });
       } else {
@@ -119,6 +199,30 @@ function NewJobScreen() {
             <FormField label={t('create.skillsLabel')} value={skills} onChangeText={setSkills} placeholder={t('create.skillsPlaceholder')} theme={theme} />
             <FormField label={t('create.hoursLabel')} value={hours} onChangeText={setHours} placeholder={t('create.hoursPlaceholder')} theme={theme} keyboardType="decimal-pad" />
             <FormField label={t('create.creditsLabel')} value={credits} onChangeText={setCredits} placeholder={t('create.creditsPlaceholder')} theme={theme} keyboardType="decimal-pad" />
+            <FormField label={t('create.contactEmailLabel')} value={contactEmail} onChangeText={setContactEmail} placeholder={t('create.contactEmailPlaceholder')} theme={theme} keyboardType="email-address" />
+            <FormField label={t('create.contactPhoneLabel')} value={contactPhone} onChangeText={setContactPhone} placeholder={t('create.contactPhonePlaceholder')} theme={theme} keyboardType="phone-pad" />
+            {type === 'paid' ? (
+              <View className="gap-4">
+                <View className="flex-row gap-3">
+                  <View className="min-w-0 flex-1">
+                    <FormField label={t('create.salaryMinLabel')} value={salaryMin} onChangeText={setSalaryMin} placeholder={t('create.salaryPlaceholder')} theme={theme} keyboardType="decimal-pad" />
+                  </View>
+                  <View className="min-w-0 flex-1">
+                    <FormField label={t('create.salaryMaxLabel')} value={salaryMax} onChangeText={setSalaryMax} placeholder={t('create.salaryPlaceholder')} theme={theme} keyboardType="decimal-pad" />
+                  </View>
+                </View>
+                <FormField label={t('create.salaryCurrencyLabel')} value={salaryCurrency} onChangeText={setSalaryCurrency} placeholder={t('create.salaryCurrencyPlaceholder')} theme={theme} />
+                <ButtonGroup label={t('create.salaryTypeLabel')} values={salaryTypes} selected={salaryType} onSelect={setSalaryType} labelFor={(value) => t(`create.salaryType.${value}`)} primary={primary} theme={theme} />
+                <HeroButton
+                  variant={salaryNegotiable ? 'primary' : 'secondary'}
+                  onPress={() => setSalaryNegotiable((value) => !value)}
+                  style={salaryNegotiable ? { backgroundColor: primary } : undefined}
+                >
+                  <Ionicons name="cash-outline" size={15} color={salaryNegotiable ? '#fff' : primary} />
+                  <HeroButton.Label>{t('create.salaryNegotiable')}</HeroButton.Label>
+                </HeroButton>
+              </View>
+            ) : null}
             <FormField label={t('create.deadlineLabel')} value={deadline} onChangeText={setDeadline} placeholder={t('create.deadlinePlaceholder')} theme={theme} />
 
             <HeroButton variant={isRemote ? 'primary' : 'secondary'} onPress={() => setIsRemote((value) => !value)} style={isRemote ? { backgroundColor: primary } : undefined}>
@@ -126,13 +230,21 @@ function NewJobScreen() {
               <HeroButton.Label>{t('create.remote')}</HeroButton.Label>
             </HeroButton>
 
+            <HeroButton variant={blindHiring ? 'primary' : 'secondary'} onPress={() => setBlindHiring((value) => !value)} style={blindHiring ? { backgroundColor: primary } : undefined}>
+              <Ionicons name="eye-off-outline" size={15} color={blindHiring ? '#fff' : primary} />
+              <HeroButton.Label>{t('create.blindHiring')}</HeroButton.Label>
+            </HeroButton>
+
+            <FormField label={t('create.taglineLabel')} value={tagline} onChangeText={setTagline} placeholder={t('create.taglinePlaceholder')} theme={theme} />
+            <FormField label={t('create.videoUrlLabel')} value={videoUrl} onChangeText={setVideoUrl} placeholder={t('create.videoUrlPlaceholder')} theme={theme} keyboardType="url" />
+            <FormField label={t('create.benefitsLabel')} value={benefits} onChangeText={setBenefits} placeholder={t('create.benefitsPlaceholder')} theme={theme} />
           </HeroCard.Body>
         </HeroCard>
       </ScrollView>
       <FormActionFooter
-        title={t('create.reviewTitle')}
-        subtitle={t('create.reviewSubtitle')}
-        submitLabel={t('create.submit')}
+        title={isEditing ? t('create.editReviewTitle') : t('create.reviewTitle')}
+        subtitle={isEditing ? t('create.editReviewSubtitle') : t('create.reviewSubtitle')}
+        submitLabel={isEditing ? t('create.updateSubmit') : t('create.submit')}
         primary={primary}
         isSubmitting={isSubmitting}
         onSubmit={submit}
@@ -187,7 +299,7 @@ function FormField({
   placeholder: string;
   theme: ReturnType<typeof useTheme>;
   multiline?: boolean;
-  keyboardType?: 'default' | 'decimal-pad';
+  keyboardType?: 'default' | 'decimal-pad' | 'email-address' | 'phone-pad' | 'url';
 }) {
   return (
     <View className="gap-2">

@@ -40,7 +40,7 @@ function NewGroupScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function submit() {
-    if (!name.trim()) {
+    if (!name.trim() || !description.trim()) {
       Alert.alert(t('create.validationTitle'), t('create.validationRequired'));
       return;
     }

@@ -60,6 +60,7 @@ export interface CreateEventPayload {
   start_time: string;
   end_time?: string | null;
   location?: string | null;
+  category_name?: string | null;
   is_online?: boolean;
   online_link?: string | null;
   max_attendees?: number | null;

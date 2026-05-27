@@ -4,7 +4,8 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
+import { Alert } from 'react-native';
+import { render, fireEvent, waitFor } from '@testing-library/react-native';
 
 // --- Mocks ---
 
@@ -105,6 +106,13 @@ jest.mock('expo-haptics', () => ({
   ImpactFeedbackStyle: { Light: 'light' },
 }));
 
+jest.mock('@/lib/haptics', () => ({
+  impactAsync: jest.fn().mockResolvedValue(undefined),
+  notificationAsync: jest.fn().mockResolvedValue(undefined),
+  ImpactFeedbackStyle: { Light: 'light' },
+  NotificationFeedbackType: { Success: 'success', Error: 'error' },
+}));
+
 jest.mock('@expo/vector-icons', () => ({
   Ionicons: 'View',
 }));
@@ -121,11 +129,14 @@ jest.mock('@/components/ui/LoadingSpinner', () => () => null);
 // --- Tests ---
 
 import VolunteeringDetailScreen from './volunteering-detail';
+import { expressInterest, signUpForShift } from '@/lib/api/volunteering';
 
 const defaultApiState = { data: null, isLoading: false, error: null, refresh: jest.fn() };
 
 beforeEach(() => {
   mockUseApi.mockReturnValue(defaultApiState);
+  jest.clearAllMocks();
+  jest.spyOn(Alert, 'alert').mockImplementation(() => undefined);
 });
 
 const mockOpportunity = {
@@ -213,4 +224,32 @@ describe('VolunteeringDetailScreen', () => {
     expect(getAllByText('Opportunity not found.').length).toBeGreaterThan(0);
     expect(getAllByText('Go Back').length).toBeGreaterThan(0);
   });
+
+  it('submits an interest note for an open opportunity', async () => {
+    mockUseApi.mockReturnValue({ data: { data: mockOpportunity }, isLoading: false, error: null, refresh: jest.fn() });
+
+    const { getByPlaceholderText, getByText } = render(<VolunteeringDetailScreen />);
+
+    fireEvent.changeText(getByPlaceholderText(/Tell the organiser/), 'Happy to help on Saturday mornings.');
+    fireEvent.press(getByText('Express Interest'));
+
+    await waitFor(() => {
+      expect(expressInterest).toHaveBeenCalledWith(10, 'Happy to help on Saturday mornings.');
+      expect(Alert.alert).toHaveBeenCalledWith('Interest sent', 'The organisation will be in touch.');
+    });
+  });
+
+  it('signs up for a shift from the detail page', async () => {
+    mockUseApi.mockReturnValue({ data: { data: mockOpportunity }, isLoading: false, error: null, refresh: jest.fn() });
+
+    const { getByText } = render(<VolunteeringDetailScreen />);
+
+    fireEvent.press(getByText('Sign up for shift'));
+
+    await waitFor(() => {
+      expect(signUpForShift).toHaveBeenCalledWith(1);
+      expect(Alert.alert).toHaveBeenCalledWith('Shift joined', 'You joined the shift.');
+    });
+  });
 });
+

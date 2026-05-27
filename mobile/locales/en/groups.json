@@ -93,7 +93,7 @@
     "reviewSubtitle": "Check the group name, visibility, location, and federation listing before creating it.",
     "submit": "Create group",
     "validationTitle": "Check group details",
-    "validationRequired": "Add a group name before continuing.",
+    "validationRequired": "Add a group name and description before continuing.",
     "failedTitle": "Group not created",
     "failedDescription": "We could not create the group. Please try again."
   }

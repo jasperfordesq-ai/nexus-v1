@@ -165,6 +165,10 @@ function RootNavigator() {
         options={{ ...modalOptions, headerShown: false, title: t('jobs:create.title') }}
       />
       <Stack.Screen
+        name="(modals)/edit-job"
+        options={{ ...modalOptions, headerShown: false, title: t('jobs:create.editTitle') }}
+      />
+      <Stack.Screen
         name="(modals)/exchange-detail"
         options={{ ...modalOptions, headerShown: false, title: t('exchanges:detailTitle') }}
       />
@@ -178,7 +182,7 @@ function RootNavigator() {
       />
       <Stack.Screen
         name="(modals)/notifications"
-        options={{ ...modalOptions, title: t('notifications:title') }}
+        options={{ ...modalOptions, headerShown: false, title: t('notifications:title') }}
       />
       <Stack.Screen
         name="(modals)/wallet"
@@ -202,7 +206,7 @@ function RootNavigator() {
       />
       <Stack.Screen
         name="(modals)/change-password"
-        options={{ ...modalOptions, title: t('settings:changePasswordTitle') }}
+        options={{ ...modalOptions, headerShown: false, title: t('settings:changePasswordTitle') }}
       />
       <Stack.Screen
         name="(modals)/verify-identity"
@@ -214,11 +218,11 @@ function RootNavigator() {
       />
       <Stack.Screen
         name="(modals)/blog"
-        options={{ ...modalOptions, title: t('blog:title') }}
+        options={{ ...modalOptions, headerShown: false, title: t('blog:title') }}
       />
       <Stack.Screen
         name="(modals)/blog-post"
-        options={{ ...modalOptions, title: t('blog:postTitle') }}
+        options={{ ...modalOptions, headerShown: false, title: t('blog:postTitle') }}
       />
       <Stack.Screen
         name="(modals)/gamification"
@@ -242,11 +246,19 @@ function RootNavigator() {
       />
       <Stack.Screen
         name="(modals)/jobs"
-        options={{ ...modalOptions, title: t('jobs:title') }}
+        options={{ ...modalOptions, headerShown: false, title: t('jobs:title') }}
       />
       <Stack.Screen
         name="(modals)/job-detail"
-        options={{ ...modalOptions, title: t('jobs:detailTitle') }}
+        options={{ ...modalOptions, headerShown: false, title: t('jobs:detailTitle') }}
+      />
+      <Stack.Screen
+        name="(modals)/job-analytics"
+        options={{ ...modalOptions, headerShown: false, title: t('jobs:analytics.title') }}
+      />
+      <Stack.Screen
+        name="(modals)/job-pipeline"
+        options={{ ...modalOptions, headerShown: false, title: t('jobs:kanban.pipeline_title') }}
       />
       <Stack.Screen
         name="(modals)/organisations"
@@ -254,11 +266,11 @@ function RootNavigator() {
       />
       <Stack.Screen
         name="(modals)/organisation-detail"
-        options={{ ...modalOptions, title: t('organisations:detailTitle') }}
+        options={{ ...modalOptions, headerShown: false, title: t('organisations:detailTitle') }}
       />
       <Stack.Screen
         name="(modals)/endorsements"
-        options={{ ...modalOptions, title: t('endorsements:title') }}
+        options={{ ...modalOptions, headerShown: false, title: t('endorsements:title') }}
       />
       <Stack.Screen
         name="(modals)/federation"
@@ -310,7 +322,7 @@ function RootNavigator() {
       />
       <Stack.Screen
         name="(modals)/search"
-        options={{ ...modalOptions, title: t('search:title') }}
+        options={{ ...modalOptions, headerShown: false, title: t('search:title') }}
       />
       <Stack.Screen
         name="(modals)/image-viewer"

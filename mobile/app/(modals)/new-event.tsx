@@ -20,6 +20,9 @@ import AppTopBar from '@/components/ui/AppTopBar';
 import FormActionFooter from '@/components/ui/FormActionFooter';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
 
+const eventCategoryIds = ['workshop', 'social', 'outdoor', 'online', 'meeting', 'training', 'other'] as const;
+type EventCategoryId = (typeof eventCategoryIds)[number];
+
 function tomorrowLocalValue() {
   const date = new Date(Date.now() + 24 * 60 * 60 * 1000);
   date.setMinutes(0, 0, 0);
@@ -48,10 +51,11 @@ function NewEventScreen() {
   const [description, setDescription] = useState('');
   const [startTime, setStartTime] = useState(tomorrowLocalValue());
   const [endTime, setEndTime] = useState('');
+  const [category, setCategory] = useState<EventCategoryId | ''>('');
   const [location, setLocation] = useState('');
-  const [onlineLink, setOnlineLink] = useState('');
+  const [videoUrl, setVideoUrl] = useState('');
   const [maxAttendees, setMaxAttendees] = useState('');
-  const [isOnline, setIsOnline] = useState(false);
+  const [allowRemoteAttendance, setAllowRemoteAttendance] = useState(false);
   const [isFederated, setIsFederated] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -71,8 +75,9 @@ function NewEventScreen() {
         start_time: start,
         end_time: end,
         location: location.trim() || null,
-        is_online: isOnline,
-        online_link: onlineLink.trim() || null,
+        category_name: category || null,
+        is_online: allowRemoteAttendance,
+        online_link: allowRemoteAttendance && videoUrl.trim() ? videoUrl.trim() : null,
         max_attendees: maxAttendees.trim() ? Number(maxAttendees) : null,
         federated_visibility: isFederated ? 'listed' : 'none',
       });
@@ -114,14 +119,32 @@ function NewEventScreen() {
           <HeroCard.Body className="gap-4 p-4">
             <FormField label={t('create.titleLabel')} value={title} onChangeText={setTitle} placeholder={t('create.titlePlaceholder')} theme={theme} />
             <FormField label={t('create.descriptionLabel')} value={description} onChangeText={setDescription} placeholder={t('create.descriptionPlaceholder')} theme={theme} multiline />
+            <View className="gap-2">
+              <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('create.categoryLabel')}</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+                {eventCategoryIds.map((value) => (
+                  <HeroButton
+                    key={value}
+                    size="sm"
+                    variant={category === value ? 'primary' : 'secondary'}
+                    onPress={() => setCategory((current) => (current === value ? '' : value))}
+                    style={category === value ? { backgroundColor: primary } : undefined}
+                  >
+                    <HeroButton.Label>{t(`category.${value}`)}</HeroButton.Label>
+                  </HeroButton>
+                ))}
+              </ScrollView>
+            </View>
             <FormField label={t('create.startLabel')} value={startTime} onChangeText={setStartTime} placeholder={t('create.datePlaceholder')} theme={theme} />
             <FormField label={t('create.endLabel')} value={endTime} onChangeText={setEndTime} placeholder={t('create.optionalDatePlaceholder')} theme={theme} />
             <FormField label={t('create.locationLabel')} value={location} onChangeText={setLocation} placeholder={t('create.locationPlaceholder')} theme={theme} />
-            <FormField label={t('create.onlineLinkLabel')} value={onlineLink} onChangeText={setOnlineLink} placeholder={t('create.onlineLinkPlaceholder')} theme={theme} />
+            <ToggleChip label={t('create.remoteAttendance')} selected={allowRemoteAttendance} onPress={() => setAllowRemoteAttendance((value) => !value)} primary={primary} />
+            {allowRemoteAttendance ? (
+              <FormField label={t('create.videoUrlLabel')} value={videoUrl} onChangeText={setVideoUrl} placeholder={t('create.videoUrlPlaceholder')} theme={theme} />
+            ) : null}
             <FormField label={t('create.maxAttendeesLabel')} value={maxAttendees} onChangeText={setMaxAttendees} placeholder={t('create.maxAttendeesPlaceholder')} theme={theme} keyboardType="number-pad" />
 
             <View className="flex-row flex-wrap gap-2">
-              <ToggleChip label={t('create.online')} selected={isOnline} onPress={() => setIsOnline((value) => !value)} primary={primary} />
               <ToggleChip label={t('create.federated')} selected={isFederated} onPress={() => setIsFederated((value) => !value)} primary={primary} />
             </View>
 

@@ -3,7 +3,7 @@
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -66,6 +66,8 @@ export default function EditProfileScreen() {
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [avatarUri, setAvatarUri] = useState(fullUser?.avatar_url ?? null);
+  const latestAvatarUriRef = useRef<string | null>(fullUser?.avatar_url ?? null);
+  const avatarUpdatedLocallyRef = useRef(false);
   const [hydrating, setHydrating] = useState(false);
   const [hasHydratedFullProfile, setHasHydratedFullProfile] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
@@ -79,6 +81,9 @@ export default function EditProfileScreen() {
     phone !== baselineProfile.phone;
 
   function applyProfileData(profile: Partial<User>) {
+    const nextAvatarUri = avatarUpdatedLocallyRef.current
+      ? latestAvatarUriRef.current
+      : profile.avatar_url ?? null;
     const nextProfile = {
       firstName: profile.first_name ?? '',
       lastName: profile.last_name ?? '',
@@ -92,7 +97,8 @@ export default function EditProfileScreen() {
     setLocation(nextProfile.location);
     setPhone(nextProfile.phone);
     setBaselineProfile(nextProfile);
-    setAvatarUri(profile.avatar_url ?? null);
+    latestAvatarUriRef.current = nextAvatarUri;
+    setAvatarUri(nextAvatarUri);
   }
 
   async function handlePickAvatar() {
@@ -116,6 +122,8 @@ export default function EditProfileScreen() {
       setUploadingAvatar(true);
       const response = await updateAvatar(result.assets[0].uri);
       const nextAvatarUrl = withImageVersion(response.data.avatar_url);
+      avatarUpdatedLocallyRef.current = true;
+      latestAvatarUriRef.current = nextAvatarUrl;
       setAvatarUri(nextAvatarUrl);
 
       if (fullUser) {
@@ -142,9 +150,12 @@ export default function EditProfileScreen() {
       try {
         const response = await getMe();
         if (!isMounted) return;
-        applyProfileData(response.data);
-        refreshUser(response.data);
-        await storage.setJson(STORAGE_KEYS.USER_DATA, response.data);
+        const nextUser = avatarUpdatedLocallyRef.current
+          ? { ...response.data, avatar_url: latestAvatarUriRef.current }
+          : response.data;
+        applyProfileData(nextUser);
+        refreshUser(nextUser);
+        await storage.setJson(STORAGE_KEYS.USER_DATA, nextUser);
       } catch {
         if (!isMounted) return;
         applyProfileData(user as Partial<User>);

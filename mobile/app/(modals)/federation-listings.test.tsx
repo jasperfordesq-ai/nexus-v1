@@ -10,10 +10,11 @@ const mockLoadMore = jest.fn();
 const mockRefresh = jest.fn();
 const mockUseApi = jest.fn();
 const mockUsePaginatedApi = jest.fn();
+let mockSearchParams: Record<string, string> = {};
 
 jest.mock('expo-router', () => ({
   router: { push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
-  useLocalSearchParams: () => ({}),
+  useLocalSearchParams: () => mockSearchParams,
 }));
 
 jest.mock('react-i18next', () => ({
@@ -127,6 +128,7 @@ jest.mock('@/components/ui/Input', () => 'View');
 jest.mock('@/components/ui/Toggle', () => 'View');
 
 import FederationListingsScreen from './federation-listings';
+import { getFederationListings } from '@/lib/api/federation';
 
 const listing = {
   id: 90624,
@@ -142,8 +144,11 @@ const listing = {
 };
 
 beforeEach(() => {
+  mockSearchParams = {};
   mockLoadMore.mockClear();
   mockRefresh.mockClear();
+  mockUsePaginatedApi.mockClear();
+  (getFederationListings as jest.Mock).mockReset();
   mockUseApi.mockReturnValue({ data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() });
   mockUsePaginatedApi.mockReturnValue({
     items: [listing],
@@ -175,5 +180,16 @@ describe('FederationListingsScreen', () => {
     expect(getByText('Listing details')).toBeTruthy();
     expect(getByText('Posted by')).toBeTruthy();
     expect(getByText('Message author')).toBeTruthy();
+  });
+
+  it('passes partner route filters to the listing API fetcher', async () => {
+    mockSearchParams = { partner_id: 'ext-2' };
+    (getFederationListings as jest.Mock).mockResolvedValue({ data: [], meta: { cursor: null, has_more: false } });
+
+    render(<FederationListingsScreen />);
+    const fetchPage = mockUsePaginatedApi.mock.calls[0][0] as (cursor: string | null) => Promise<unknown>;
+    await fetchPage(null);
+
+    expect(getFederationListings).toHaveBeenCalledWith({ per_page: '30', partner_id: 'ext-2' });
   });
 });

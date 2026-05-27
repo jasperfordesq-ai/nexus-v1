@@ -24,11 +24,14 @@ jest.mock('react-i18next', () => ({
         'subtitle': 'Browse paid, volunteer, and time-credit roles from the community.',
         'tabs.browse': 'Browse',
         'tabs.myApplications': 'My Applications',
+        'tabs.myPostings': 'My Postings',
         'search.placeholder': 'Search jobs...',
         'empty': 'No jobs found',
         'emptyHint': 'Try adjusting your filters or check back later',
         'applications.empty': 'No applications yet',
         'applications.emptyHint': 'Apply to jobs to see them here',
+        'postings.empty': 'No postings yet',
+        'postings.emptyHint': 'Create a job to manage your roles here.',
         'card.remote': 'Remote',
         'card.featured': 'Featured',
         'card.applications': opts ? `${String(opts.count ?? 0)} applications` : '0 applications',
@@ -89,6 +92,7 @@ jest.mock('@expo/vector-icons', () => ({
 jest.mock('@/lib/api/jobs', () => ({
   getJobs: jest.fn(),
   getMyApplications: jest.fn(),
+  getMyPostings: jest.fn(),
 }));
 
 jest.mock('@/components/ui/LoadingSpinner', () => () => null);
@@ -163,10 +167,11 @@ describe('JobsScreen', () => {
     expect(getByPlaceholderText('Search jobs...')).toBeTruthy();
   });
 
-  it('renders Browse and My Applications tabs', () => {
+  it('renders Browse, My Applications, and My Postings tabs', () => {
     const { getByText } = render(<JobsScreen />);
     expect(getByText('Browse')).toBeTruthy();
     expect(getByText('My Applications')).toBeTruthy();
+    expect(getByText('My Postings')).toBeTruthy();
   });
 
   it('renders empty state when no jobs and not loading', () => {
@@ -178,7 +183,7 @@ describe('JobsScreen', () => {
     let callCount = 0;
     mockUsePaginatedApi.mockImplementation(() => {
       callCount += 1;
-      if (callCount % 2 === 1) {
+      if ((callCount - 1) % 3 === 0) {
         return {
           items: [mockJob],
           isLoading: false,
@@ -224,7 +229,7 @@ describe('JobsScreen', () => {
     let callCount = 0;
     mockUsePaginatedApi.mockImplementation(() => {
       callCount += 1;
-      if (callCount % 2 === 1) {
+      if ((callCount - 1) % 3 === 0) {
         return {
           items: [mockJob],
           isLoading: false,
@@ -243,14 +248,14 @@ describe('JobsScreen', () => {
   });
 
   it('renders application cards in My Applications tab', () => {
-    // First call per render: browse jobs (empty), second call per render: applications
+    // First call per render: browse jobs, second: applications, third: postings.
     let callCount = 0;
     mockUsePaginatedApi.mockImplementation(() => {
       callCount += 1;
-      if (callCount % 2 === 1) {
-        return { items: [], isLoading: false, isLoadingMore: false, error: null, hasMore: false, loadMore: jest.fn(), refresh: jest.fn() };
+      if ((callCount - 2) % 3 === 0) {
+        return { items: [mockApplication], isLoading: false, isLoadingMore: false, error: null, hasMore: false, loadMore: jest.fn(), refresh: jest.fn() };
       }
-      return { items: [mockApplication], isLoading: false, isLoadingMore: false, error: null, hasMore: false, loadMore: jest.fn(), refresh: jest.fn() };
+      return { items: [], isLoading: false, isLoadingMore: false, error: null, hasMore: false, loadMore: jest.fn(), refresh: jest.fn() };
     });
 
     const { getByText } = render(<JobsScreen />);
@@ -258,5 +263,22 @@ describe('JobsScreen', () => {
     fireEvent.press(getByText('My Applications'));
     // The application title should be visible
     expect(getByText('Community Coordinator')).toBeTruthy();
+  });
+
+  it('renders owner postings in My Postings tab', () => {
+    let callCount = 0;
+    mockUsePaginatedApi.mockImplementation(() => {
+      callCount += 1;
+      if (callCount % 3 === 0) {
+        return { items: [mockJob], isLoading: false, isLoadingMore: false, error: null, hasMore: false, loadMore: jest.fn(), refresh: jest.fn() };
+      }
+      return { items: [], isLoading: false, isLoadingMore: false, error: null, hasMore: false, loadMore: jest.fn(), refresh: jest.fn() };
+    });
+
+    const { getByText } = render(<JobsScreen />);
+    fireEvent.press(getByText('My Postings'));
+
+    expect(getByText('Community Coordinator')).toBeTruthy();
+    expect(getByText('Dublin Community Hub')).toBeTruthy();
   });
 });

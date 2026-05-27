@@ -8,10 +8,11 @@ import { fireEvent, render } from '@testing-library/react-native';
 
 const mockUseApi = jest.fn();
 const mockUsePaginatedApi = jest.fn();
+let mockSearchParams: Record<string, string> = {};
 
 jest.mock('expo-router', () => ({
   router: { push: jest.fn(), replace: jest.fn(), back: jest.fn(), canGoBack: jest.fn(() => false) },
-  useLocalSearchParams: () => ({}),
+  useLocalSearchParams: () => mockSearchParams,
 }));
 
 jest.mock('react-i18next', () => ({
@@ -106,8 +107,13 @@ jest.mock('@/components/ui/Toggle', () => 'View');
 
 import FederationGroupsScreen from './federation-groups';
 import FederationEventsScreen from './federation-events';
+import { getFederationEvents, getFederationGroups } from '@/lib/api/federation';
 
 beforeEach(() => {
+  mockSearchParams = {};
+  mockUsePaginatedApi.mockClear();
+  (getFederationEvents as jest.Mock).mockReset();
+  (getFederationGroups as jest.Mock).mockReset();
   mockUseApi.mockReturnValue({ data: { data: [] }, isLoading: false, error: null, refresh: jest.fn() });
 });
 
@@ -137,6 +143,26 @@ describe('Federation group and event directory actions', () => {
     expect(getByText('Back to groups')).toBeTruthy();
   });
 
+  it('passes partner route filters to the group API fetcher', async () => {
+    mockSearchParams = { partner_id: 'ext-2' };
+    (getFederationGroups as jest.Mock).mockResolvedValue({ data: [], meta: { cursor: null, has_more: false } });
+    mockUsePaginatedApi.mockReturnValue({
+      items: [],
+      isLoading: false,
+      isLoadingMore: false,
+      error: null,
+      hasMore: false,
+      loadMore: jest.fn(),
+      refresh: jest.fn(),
+    });
+
+    render(<FederationGroupsScreen />);
+    const fetchPage = mockUsePaginatedApi.mock.calls[0][0] as (cursor: string | null) => Promise<unknown>;
+    await fetchPage(null);
+
+    expect(getFederationGroups).toHaveBeenCalledWith({ per_page: '30', partner_id: 'ext-2' });
+  });
+
   it('opens a federated event detail view from an event card', () => {
     mockUsePaginatedApi.mockReturnValue({
       items: [{
@@ -163,5 +189,25 @@ describe('Federation group and event directory actions', () => {
 
     expect(getByText('Federated event')).toBeTruthy();
     expect(getByText('Back to events')).toBeTruthy();
+  });
+
+  it('passes partner route filters to the event API fetcher', async () => {
+    mockSearchParams = { partner_id: '5' };
+    (getFederationEvents as jest.Mock).mockResolvedValue({ data: [], meta: { cursor: null, has_more: false } });
+    mockUsePaginatedApi.mockReturnValue({
+      items: [],
+      isLoading: false,
+      isLoadingMore: false,
+      error: null,
+      hasMore: false,
+      loadMore: jest.fn(),
+      refresh: jest.fn(),
+    });
+
+    render(<FederationEventsScreen />);
+    const fetchPage = mockUsePaginatedApi.mock.calls[0][0] as (cursor: string | null) => Promise<unknown>;
+    await fetchPage(null);
+
+    expect(getFederationEvents).toHaveBeenCalledWith({ per_page: '30', partner_id: '5', upcoming: 'true' });
   });
 });

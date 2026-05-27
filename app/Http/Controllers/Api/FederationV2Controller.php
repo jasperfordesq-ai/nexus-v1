@@ -978,7 +978,7 @@ class FederationV2Controller extends BaseApiController
                     'description' => $l['description'] ?? '',
                     'type' => $l['type'] ?? 'offer',
                     'category_name' => $l['category_name'] ?? $l['category'] ?? null,
-                    'image_url' => $l['image_url'] ?? null,
+                    'image_url' => self::resolveExternalUrl($l['image_url'] ?? null, $partnerBaseUrl),
                     'estimated_hours' => isset($l['rate']) ? (float) $l['rate'] : (isset($l['estimated_hours']) ? (float) $l['estimated_hours'] : null),
                     'location' => $l['location'] ?? null,
                     'author' => [
@@ -1026,7 +1026,7 @@ class FederationV2Controller extends BaseApiController
                     'description' => $l['description'] ?? '',
                     'type' => $l['type'] ?? 'offer',
                     'category_name' => $l['category_name'] ?? $l['category'] ?? null,
-                    'image_url' => $l['image_url'] ?? null,
+                    'image_url' => self::resolveExternalUrl($l['image_url'] ?? null, $baseUrl),
                     'estimated_hours' => isset($l['rate']) ? (float) $l['rate'] : (isset($l['estimated_hours']) ? (float) $l['estimated_hours'] : null),
                     'location' => $l['location'] ?? null,
                     'author' => [

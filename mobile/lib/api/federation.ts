@@ -272,7 +272,7 @@ export function sendFederationMessage(payload: {
 }
 
 export function markFederationMessageRead(id: number | string): Promise<{ data?: unknown }> {
-  return api.post<{ data?: unknown }>(`${API_V2}/federation/messages/${id}/read`, {});
+  return api.post<{ data?: unknown }>(`${API_V2}/federation/messages/${id}/mark-read`, {});
 }
 
 export function getFederationSettings(): Promise<{ data: { settings: FederationSettings; enabled: boolean } } | { settings: FederationSettings; enabled: boolean }> {

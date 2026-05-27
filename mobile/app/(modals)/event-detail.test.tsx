@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 // --- Mocks ---
 
@@ -93,6 +93,7 @@ jest.mock('@/components/ui/LoadingSpinner', () => () => null);
 // --- Tests ---
 
 import EventDetailScreen from './event-detail';
+import { rsvpEvent } from '@/lib/api/events';
 
 const defaultApiState = { data: null, isLoading: false, error: null, refresh: jest.fn() };
 
@@ -151,4 +152,18 @@ describe('EventDetailScreen', () => {
     const { getByText } = render(<EventDetailScreen />);
     expect(getByText('Going')).toBeTruthy();
   });
+
+  it('submits an RSVP and updates the visible attendee count', async () => {
+    mockUseApi.mockReturnValue({ data: { data: mockEvent }, isLoading: false, error: null, refresh: jest.fn() });
+
+    const { getByText } = render(<EventDetailScreen />);
+
+    fireEvent.press(getByText('Going'));
+
+    await waitFor(() => {
+      expect(rsvpEvent).toHaveBeenCalledWith(7, 'going');
+      expect(getByText(/1 going.*0 interested/)).toBeTruthy();
+    });
+  });
 });
+

@@ -24,6 +24,7 @@ import {
   getFederationPartners,
   getFederationStats,
   getFederationPartner,
+  markFederationMessageRead,
 } from './federation';
 import type { FederationResponse, FederatedTenant, FederationStats } from './federation';
 
@@ -112,5 +113,17 @@ describe('getFederationPartner', () => {
     const result = await getFederationPartner(1);
     expect(api.get).toHaveBeenCalledWith('/api/v2/federation/partners/1');
     expect(result.data.name).toBe('Community A');
+  });
+});
+
+describe('markFederationMessageRead', () => {
+  beforeEach(() => { jest.clearAllMocks(); });
+
+  it('uses the backend mark-read route for federated messages', async () => {
+    (api.post as jest.Mock).mockResolvedValue({ data: { success: true } });
+
+    await markFederationMessageRead(230);
+
+    expect(api.post).toHaveBeenCalledWith('/api/v2/federation/messages/230/mark-read', {});
   });
 });

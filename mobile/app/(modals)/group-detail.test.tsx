@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { render } from '@testing-library/react-native';
+import { fireEvent, render, waitFor } from '@testing-library/react-native';
 
 // --- Mocks ---
 
@@ -103,6 +103,13 @@ jest.mock('expo-haptics', () => ({
   ImpactFeedbackStyle: { Light: 'light' },
 }));
 
+jest.mock('@/lib/haptics', () => ({
+  impactAsync: jest.fn().mockResolvedValue(undefined),
+  notificationAsync: jest.fn().mockResolvedValue(undefined),
+  ImpactFeedbackStyle: { Light: 'light' },
+  NotificationFeedbackType: { Success: 'success', Error: 'error' },
+}));
+
 jest.mock('@expo/vector-icons', () => ({
   Ionicons: 'View',
 }));
@@ -123,11 +130,13 @@ jest.mock('@/components/ui/LoadingSpinner', () => () => null);
 // --- Tests ---
 
 import GroupDetailScreen from './group-detail';
+import { joinGroup } from '@/lib/api/groups';
 
 const defaultApiState = { data: null, isLoading: true, error: null, refresh: jest.fn() };
 
 beforeEach(() => {
   mockUseApi.mockReturnValue(defaultApiState);
+  jest.clearAllMocks();
 });
 
 const mockGroupDetail = {
@@ -215,5 +224,23 @@ describe('GroupDetailScreen', () => {
 
     const { getByText } = render(<GroupDetailScreen />);
     expect(getByText('A club for gardening enthusiasts.')).toBeTruthy();
+  });
+
+  it('joins a public group from the detail page', async () => {
+    mockUseApi.mockReturnValue({
+      data: { data: { ...mockGroupDetail, is_member: false } },
+      isLoading: false,
+      error: null,
+      refresh: jest.fn(),
+    });
+
+    const { getByText } = render(<GroupDetailScreen />);
+
+    fireEvent.press(getByText('Join'));
+
+    await waitFor(() => {
+      expect(joinGroup).toHaveBeenCalledWith(1);
+      expect(getByText('Leave')).toBeTruthy();
+    });
   });
 });

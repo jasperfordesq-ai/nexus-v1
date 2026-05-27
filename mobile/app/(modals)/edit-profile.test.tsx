@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import React from 'react';
-import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, render, waitFor } from '@testing-library/react-native';
 
 // --- Mocks ---
 
@@ -161,6 +161,7 @@ jest.mock('@/components/ui/Button', () => {
 
 import EditProfileScreen from './edit-profile';
 import { updateAvatar } from '@/lib/api/profile';
+import { getMe } from '@/lib/api/auth';
 
 describe('EditProfileScreen', () => {
   beforeEach(() => {
@@ -195,6 +196,41 @@ describe('EditProfileScreen', () => {
     await waitFor(() => expect(mockRefreshUser).toHaveBeenCalledWith(expect.objectContaining({
       avatar_url: expect.stringContaining('/uploads/avatars/jane.jpg?v='),
     })));
+  });
+
+  it('keeps a freshly uploaded avatar if profile hydration returns stale data', async () => {
+    let resolveProfile: (value: unknown) => void = () => undefined;
+    (getMe as jest.Mock).mockReturnValueOnce(new Promise((resolve) => {
+      resolveProfile = resolve;
+    }));
+
+    const { getByLabelText } = render(<EditProfileScreen />);
+
+    fireEvent.press(getByLabelText('Change profile photo'));
+
+    await waitFor(() => expect(updateAvatar).toHaveBeenCalledWith('file:///tmp/jane.jpg'));
+
+    await act(async () => {
+      resolveProfile({
+        data: {
+          id: 1,
+          first_name: 'Jane',
+          last_name: 'Doe',
+          bio: 'Community builder',
+          location: 'Dublin',
+          phone: '+353 87 123 4567',
+          avatar_url: null,
+        },
+      });
+    });
+
+    await waitFor(() => {
+      expect(mockRefreshUser.mock.calls.length).toBeGreaterThanOrEqual(2);
+      const lastRefresh = mockRefreshUser.mock.calls.at(-1)?.[0];
+      expect(lastRefresh).toEqual(expect.objectContaining({
+        avatar_url: expect.stringContaining('/uploads/avatars/jane.jpg?v='),
+      }));
+    });
   });
 
   it('pre-fills form fields with user data', () => {

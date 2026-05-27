@@ -16,17 +16,18 @@ import {
   Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, router } from 'expo-router';
+import { useLocalSearchParams, router, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Button as HeroButton, Card as HeroCard, Chip, Surface } from 'heroui-native';
 import * as Haptics from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 
-import { getJobDetail, applyToJob, saveJob, unsaveJob, getSavedProfile } from '@/lib/api/jobs';
-import type { JobVacancy } from '@/lib/api/jobs';
+import { getJobApplications, getJobDetail, applyToJob, saveJob, unsaveJob, getSavedProfile, updateJobApplication, updateJobStatus } from '@/lib/api/jobs';
+import type { JobOwnerApplication, JobVacancy } from '@/lib/api/jobs';
 import { useApi } from '@/lib/hooks/useApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
+import { useAuth } from '@/lib/hooks/useAuth';
 import { withAlpha } from '@/lib/utils/color';
 import AppTopBar from '@/components/ui/AppTopBar';
 import Avatar from '@/components/ui/Avatar';
@@ -41,11 +42,12 @@ export default function JobDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const primary = usePrimaryColor();
   const theme = useTheme();
+  const { user } = useAuth();
 
   const jobId = Number(id);
   const safeId = isNaN(jobId) || jobId <= 0 ? 0 : jobId;
 
-  const { data, isLoading } = useApi(
+  const { data, isLoading, refresh: refreshJob } = useApi(
     () => getJobDetail(safeId),
     [safeId],
     { enabled: safeId > 0 },
@@ -81,6 +83,13 @@ export default function JobDetailScreen() {
       // Silently ignore — saved profile is optional
     });
   }, [applyModalVisible]);
+
+  const isOwner = !!job && user?.id === (job.user_id ?? job.creator.id);
+  const ownerApplicationsApi = useApi(
+    () => getJobApplications(safeId),
+    [safeId, user?.id, job?.user_id, job?.creator?.id],
+    { enabled: safeId > 0 && isOwner },
+  );
 
   if (safeId === 0) {
     return (
@@ -173,6 +182,17 @@ export default function JobDetailScreen() {
       });
     } catch {
       // User dismissed share sheet — no error needed
+    }
+  }
+
+  async function handleToggleVacancyStatus() {
+    if (!job) return;
+    try {
+      await updateJobStatus(job.id, job.status === 'open' ? 'closed' : 'open');
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      refreshJob();
+    } catch {
+      Alert.alert(t('common:errors.alertTitle'), t('owner.statusUpdateError'));
     }
   }
 
@@ -366,10 +386,45 @@ export default function JobDetailScreen() {
             </Text>
           </DetailSection>
         ) : null}
+
+        {isOwner ? (
+          <>
+            <OwnerToolsSection
+              job={job}
+              primary={primary}
+              theme={theme}
+              t={t}
+              onEdit={() => router.push({ pathname: '/(modals)/edit-job', params: { id: String(job.id) } } as unknown as Href)}
+              onAnalytics={() => router.push({ pathname: '/(modals)/job-analytics', params: { id: String(job.id) } } as unknown as Href)}
+              onPipeline={() => router.push({ pathname: '/(modals)/job-pipeline', params: { id: String(job.id) } } as unknown as Href)}
+              onToggleStatus={() => void handleToggleVacancyStatus()}
+            />
+            <OwnerApplicationsSection
+              applications={Array.isArray(ownerApplicationsApi.data?.data) ? ownerApplicationsApi.data.data : []}
+              isLoading={ownerApplicationsApi.isLoading}
+              error={ownerApplicationsApi.error}
+              onRefresh={ownerApplicationsApi.refresh}
+              primary={primary}
+              theme={theme}
+              t={t}
+            />
+          </>
+        ) : null}
       </ScrollView>
 
       <Surface variant="default" className="absolute bottom-0 left-0 right-0 gap-3 border-t border-border px-4 pb-5 pt-3">
         <View className="flex-row gap-2">
+          {isOwner ? (
+            <HeroButton
+              className="flex-1"
+              variant="secondary"
+              accessibilityLabel={t('detail.edit')}
+              onPress={() => router.push({ pathname: '/(modals)/edit-job', params: { id: String(job.id) } } as unknown as Href)}
+            >
+              <Ionicons name="create-outline" size={17} color={primary} />
+              <HeroButton.Label>{t('detail.edit')}</HeroButton.Label>
+            </HeroButton>
+          ) : null}
           <HeroButton
             className="flex-1"
             variant="secondary"
@@ -546,5 +601,206 @@ function DetailSection({
         {children}
       </HeroCard.Body>
     </HeroCard>
+  );
+}
+
+function OwnerToolsSection({
+  job,
+  primary,
+  theme,
+  t,
+  onEdit,
+  onAnalytics,
+  onPipeline,
+  onToggleStatus,
+}: {
+  job: JobVacancy;
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+  onEdit: () => void;
+  onAnalytics: () => void;
+  onPipeline: () => void;
+  onToggleStatus: () => void;
+}) {
+  const statusTone = job.status === 'open' ? theme.success ?? '#22c55e' : theme.warning ?? '#f59e0b';
+  return (
+    <HeroCard className="mb-4 rounded-panel p-0">
+      <HeroCard.Body className="gap-4 p-4">
+        <View className="flex-row items-start gap-3">
+          <View className="size-11 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+            <Ionicons name="briefcase-outline" size={21} color={primary} />
+          </View>
+          <View className="min-w-0 flex-1 gap-1">
+            <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('owner.toolsTitle')}</Text>
+            <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>
+              {job.applications_count > 0
+                ? t('owner.hasApplicants', { count: job.applications_count })
+                : t('owner.noApplicants')}
+            </Text>
+          </View>
+          <Chip size="sm" variant="secondary">
+            <Ionicons name={job.status === 'open' ? 'checkmark-circle-outline' : 'pause-circle-outline'} size={13} color={statusTone} />
+            <Chip.Label>{t(`owner.status.${job.status}`)}</Chip.Label>
+          </Chip>
+        </View>
+
+        <View className="flex-row flex-wrap gap-2">
+          <HeroButton size="sm" variant="secondary" onPress={onEdit}>
+            <Ionicons name="create-outline" size={14} color={primary} />
+            <HeroButton.Label>{t('detail.edit')}</HeroButton.Label>
+          </HeroButton>
+          <HeroButton size="sm" variant="secondary" onPress={onAnalytics}>
+            <Ionicons name="analytics-outline" size={14} color={primary} />
+            <HeroButton.Label>{t('detail.analytics')}</HeroButton.Label>
+          </HeroButton>
+          <HeroButton size="sm" variant="secondary" onPress={onPipeline}>
+            <Ionicons name="git-network-outline" size={14} color={primary} />
+            <HeroButton.Label>{t('detail.kanban_board')}</HeroButton.Label>
+          </HeroButton>
+          <HeroButton size="sm" variant={job.status === 'open' ? 'secondary' : 'primary'} style={job.status === 'open' ? undefined : { backgroundColor: primary }} onPress={onToggleStatus}>
+            <Ionicons name={job.status === 'open' ? 'close-circle-outline' : 'refresh-outline'} size={14} color={job.status === 'open' ? theme.error : '#fff'} />
+            <HeroButton.Label>{job.status === 'open' ? t('detail.close_vacancy') : t('detail.reopen_vacancy')}</HeroButton.Label>
+          </HeroButton>
+        </View>
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function OwnerApplicationsSection({
+  applications,
+  isLoading,
+  error,
+  onRefresh,
+  primary,
+  theme,
+  t,
+}: {
+  applications: JobOwnerApplication[];
+  isLoading: boolean;
+  error: string | null;
+  onRefresh: () => void;
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+}) {
+  return (
+    <HeroCard className="mb-4 rounded-panel p-0">
+      <HeroCard.Body className="gap-3 p-4">
+        <View className="flex-row items-center justify-between gap-3">
+          <View className="min-w-0 flex-1">
+            <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>
+              {t('owner.applicationsTitle')}
+            </Text>
+            <Text className="text-sm" style={{ color: theme.textSecondary }}>
+              {t('owner.applicationsSubtitle')}
+            </Text>
+          </View>
+          <Chip size="sm" variant="secondary">
+            <Chip.Label>{t('owner.applicationsCount', { count: applications.length })}</Chip.Label>
+          </Chip>
+        </View>
+
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : error ? (
+          <View className="gap-2">
+            <Text className="text-sm" style={{ color: theme.error }}>{error}</Text>
+            <HeroButton size="sm" variant="secondary" onPress={onRefresh}>
+              <HeroButton.Label>{t('retry')}</HeroButton.Label>
+            </HeroButton>
+          </View>
+        ) : applications.length === 0 ? (
+          <Surface variant="secondary" className="rounded-panel-inner p-4">
+            <Text className="text-sm font-semibold" style={{ color: theme.text }}>{t('owner.noApplications')}</Text>
+            <Text className="mt-1 text-sm" style={{ color: theme.textSecondary }}>{t('owner.noApplicationsHint')}</Text>
+          </Surface>
+        ) : (
+          <View className="gap-3">
+            {applications.slice(0, 5).map((application) => (
+              <OwnerApplicationCard
+                key={application.id}
+                application={application}
+                primary={primary}
+                theme={theme}
+                t={t}
+                onUpdated={onRefresh}
+              />
+            ))}
+          </View>
+        )}
+      </HeroCard.Body>
+    </HeroCard>
+  );
+}
+
+function OwnerApplicationCard({
+  application,
+  primary,
+  theme,
+  t,
+  onUpdated,
+}: {
+  application: JobOwnerApplication;
+  primary: string;
+  theme: ReturnType<typeof useTheme>;
+  t: (key: string, opts?: Record<string, unknown>) => string;
+  onUpdated: () => void;
+}) {
+  const [isUpdating, setIsUpdating] = useState(false);
+  const applicantName = application.applicant?.name?.trim() || t('owner.unknownApplicant');
+  const submitted = application.created_at
+    ? new Date(application.created_at).toLocaleDateString('default', { day: 'numeric', month: 'short', year: 'numeric' })
+    : '';
+
+  async function updateStatus(status: JobOwnerApplication['status']) {
+    if (isUpdating) return;
+    setIsUpdating(true);
+    try {
+      await updateJobApplication(application.id, { status });
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      onUpdated();
+    } catch {
+      Alert.alert(t('common:errors.alertTitle'), t('owner.updateError'));
+    } finally {
+      setIsUpdating(false);
+    }
+  }
+
+  return (
+    <Surface variant="secondary" className="gap-3 rounded-panel-inner p-3">
+      <View className="flex-row items-start gap-3">
+        <Avatar uri={application.applicant?.avatar_url ?? null} name={applicantName} size={38} />
+        <View className="min-w-0 flex-1 gap-1">
+          <Text className="text-sm font-bold" style={{ color: theme.text }} numberOfLines={1}>{applicantName}</Text>
+          {submitted ? <Text className="text-xs" style={{ color: theme.textSecondary }}>{t('owner.appliedOn', { date: submitted })}</Text> : null}
+        </View>
+        <Chip size="sm" variant="secondary">
+          <Chip.Label>{t(`applications.status.${application.status}`)}</Chip.Label>
+        </Chip>
+      </View>
+      {application.message ? (
+        <Text className="text-sm leading-5" style={{ color: theme.textSecondary }} numberOfLines={3}>
+          {application.message}
+        </Text>
+      ) : null}
+      <View className="flex-row flex-wrap gap-2">
+        <HeroButton size="sm" variant="secondary" isDisabled={isUpdating} onPress={() => void updateStatus('reviewed')}>
+          <HeroButton.Label>{t('owner.markReviewed')}</HeroButton.Label>
+        </HeroButton>
+        <HeroButton size="sm" variant="secondary" isDisabled={isUpdating} onPress={() => void updateStatus('shortlisted')}>
+          <HeroButton.Label>{t('owner.shortlist')}</HeroButton.Label>
+        </HeroButton>
+        <HeroButton size="sm" variant="secondary" isDisabled={isUpdating} onPress={() => void updateStatus('rejected')}>
+          <Ionicons name="close-circle-outline" size={14} color={theme.error} />
+          <HeroButton.Label>{t('owner.reject')}</HeroButton.Label>
+        </HeroButton>
+        <HeroButton size="sm" variant="primary" style={{ backgroundColor: primary }} isDisabled={isUpdating} onPress={() => void updateStatus('interview')}>
+          <Ionicons name="calendar-outline" size={14} color="#fff" />
+          <HeroButton.Label>{t('owner.moveToInterview')}</HeroButton.Label>
+        </HeroButton>
+      </View>
+    </Surface>
   );
 }

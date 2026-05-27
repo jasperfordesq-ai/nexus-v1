@@ -8,8 +8,12 @@ import { API_V2 } from '@/lib/constants';
 
 export interface JobVacancy {
   id: number;
+  user_id?: number;
   title: string;
   description: string;
+  tagline?: string | null;
+  video_url?: string | null;
+  benefits?: string[];
   location: string | null;
   is_remote: boolean;
   type: 'paid' | 'volunteer' | 'timebank';
@@ -23,6 +27,9 @@ export interface JobVacancy {
   salary_currency: string | null;
   salary_type: 'hourly' | 'monthly' | 'annual' | null;
   salary_negotiable: boolean;
+  contact_email?: string | null;
+  contact_phone?: string | null;
+  blind_hiring?: boolean;
   deadline: string | null;
   status: 'open' | 'closed' | 'filled' | 'draft';
   views_count: number;
@@ -76,6 +83,59 @@ export interface JobApplication {
   offer?: JobOffer | null;
 }
 
+export interface JobOwnerApplication {
+  id: number;
+  vacancy_id: number;
+  user_id?: number;
+  applicant?: {
+    id: number;
+    name: string | null;
+    avatar_url: string | null;
+    email: string | null;
+  };
+  message?: string | null;
+  status: 'applied' | 'pending' | 'screening' | 'reviewed' | 'shortlisted' | 'interview' | 'offer' | 'accepted' | 'rejected' | 'withdrawn';
+  stage?: string | null;
+  cv_filename?: string | null;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface JobAnalyticsData {
+  job_id: number;
+  total_views: number;
+  unique_viewers: number;
+  total_applications: number;
+  conversion_rate: number;
+  avg_time_to_apply_hours: number | null;
+  time_to_fill_days: number | null;
+  views_by_day: Array<{ date: string; count: number }>;
+  applications_by_stage: Array<{ stage: string; count: number }>;
+  weekly_trend: Array<{ week: string; count: number }>;
+  referral_stats: {
+    total_shares: number;
+    referral_applications: number;
+    referral_conversion_pct: number;
+  } | null;
+  scorecard_avg: number | null;
+  created_at: string;
+  status: string;
+}
+
+export interface JobPredictionsData {
+  expected_applications: { value: number; current: number; label: string };
+  estimated_time_to_fill: { value: number | null; days_posted: number; label: string };
+  conversion_rate: { yours: number; average: number; label: string };
+  salary_comparison: {
+    your_salary: number;
+    market_avg: number;
+    diff_percent: number;
+    label: string;
+  } | null;
+  similar_jobs_analyzed: number;
+  ai_insights?: string[];
+}
+
 export interface JobsResponse {
   data: JobVacancy[];
   meta: { has_more: boolean; cursor: string | null };
@@ -97,10 +157,24 @@ export interface CreateJobPayload {
   skills_required?: string[];
   hours_per_week?: number | null;
   time_credits?: number | null;
+  contact_email?: string | null;
+  contact_phone?: string | null;
+  salary_min?: number | null;
+  salary_max?: number | null;
+  salary_currency?: string | null;
+  salary_type?: string | null;
   deadline?: string | null;
   status?: 'open' | 'draft';
   salary_negotiable?: boolean;
+  blind_hiring?: boolean;
+  tagline?: string | null;
+  video_url?: string | null;
+  benefits?: string[];
 }
+
+export type UpdateJobPayload = Partial<Omit<CreateJobPayload, 'status'>> & {
+  status?: 'open' | 'closed' | 'filled' | 'draft';
+};
 
 /**
  * GET /api/v2/jobs — list job vacancies for the current tenant.
@@ -124,6 +198,14 @@ export function createJob(payload: CreateJobPayload): Promise<{ data: JobVacancy
   return api.post<{ data: JobVacancy }>(`${API_V2}/jobs`, payload);
 }
 
+export function updateJob(id: number, payload: CreateJobPayload): Promise<{ data: JobVacancy }> {
+  return api.put<{ data: JobVacancy }>(`${API_V2}/jobs/${id}`, payload);
+}
+
+export function updateJobStatus(id: number, status: 'open' | 'closed' | 'filled' | 'draft'): Promise<{ data: JobVacancy }> {
+  return api.put<{ data: JobVacancy }>(`${API_V2}/jobs/${id}`, { status });
+}
+
 /**
  * GET /api/v2/jobs/recommended — recommended job vacancies for the authenticated user.
  */
@@ -136,6 +218,25 @@ export function getRecommendedJobs(): Promise<{ data: JobVacancy[] }> {
  */
 export function getJobDetail(id: number): Promise<{ data: JobVacancy }> {
   return api.get<{ data: JobVacancy }>(`${API_V2}/jobs/${id}`);
+}
+
+export function getJobApplications(id: number): Promise<{ data: JobOwnerApplication[] }> {
+  return api.get<{ data: JobOwnerApplication[] }>(`${API_V2}/jobs/${id}/applications`);
+}
+
+export function getJobAnalytics(id: number): Promise<{ data: JobAnalyticsData }> {
+  return api.get<{ data: JobAnalyticsData }>(`${API_V2}/jobs/${id}/analytics`);
+}
+
+export function getJobPredictions(id: number): Promise<{ data: JobPredictionsData }> {
+  return api.get<{ data: JobPredictionsData }>(`${API_V2}/jobs/${id}/predictions`);
+}
+
+export function updateJobApplication(
+  applicationId: number,
+  payload: { status: JobOwnerApplication['status']; notes?: string | null },
+): Promise<{ data: { message: string } }> {
+  return api.put<{ data: { message: string } }>(`${API_V2}/jobs/applications/${applicationId}`, payload);
 }
 
 /**
@@ -173,6 +274,17 @@ export function getMyApplications(params: {
   if (params.cursor) query.cursor = params.cursor;
   if (params.status) query.status = params.status;
   return api.get<ApplicationsResponse>(`${API_V2}/jobs/my-applications`, query);
+}
+
+/**
+ * GET /api/v2/jobs/my-postings — list job vacancies posted by the authenticated user.
+ */
+export function getMyPostings(params: {
+  cursor?: string | null;
+}): Promise<JobsResponse> {
+  const query: Record<string, string> = {};
+  if (params.cursor) query.cursor = params.cursor;
+  return api.get<JobsResponse>(`${API_V2}/jobs/my-postings`, query);
 }
 
 /**
