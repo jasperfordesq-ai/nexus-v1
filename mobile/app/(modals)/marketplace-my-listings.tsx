@@ -175,6 +175,16 @@ function DashboardCard({ stats, primary }: { stats: MarketplaceDashboard; primar
           <Chip size="sm" variant="secondary"><Chip.Label>{t('myListings.sales', { count: stats.total_sales ?? 0 })}</Chip.Label></Chip>
           <Chip size="sm" variant="secondary"><Chip.Label>{t('myListings.offers', { count: stats.pending_offers ?? 0 })}</Chip.Label></Chip>
         </View>
+        <View className="flex-row gap-2">
+          <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-merchant-onboarding' as Href)}>
+            <Ionicons name="storefront-outline" size={16} color={primary} />
+            <HeroButton.Label>{t('myListings.onboarding')}</HeroButton.Label>
+          </HeroButton>
+          <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-stripe-onboarding' as Href)}>
+            <Ionicons name="card-outline" size={16} color={primary} />
+            <HeroButton.Label>{t('myListings.payments')}</HeroButton.Label>
+          </HeroButton>
+        </View>
       </HeroCard.Body>
     </HeroCard>
   );

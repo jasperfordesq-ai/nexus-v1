@@ -19,6 +19,7 @@ import {
   createMarketplacePickupSlot,
   createMarketplaceSavedSearch,
   createMerchantCoupon,
+  completeMerchantOnboarding,
   getMarketplaceCategories,
   getMarketplaceCollectionItems,
   getMarketplaceCollections,
@@ -28,6 +29,8 @@ import {
   getMarketplaceOffers,
   getMarketplacePickupSlots,
   getMarketplaceSavedSearches,
+  getMarketplaceStripeOnboardingStatus,
+  getMerchantOnboardingStatus,
   getMyMarketplaceListings,
   getMyMarketplacePickups,
   getMyMarketplacePromotions,
@@ -38,6 +41,10 @@ import {
   removeMarketplaceCollectionItem,
   reserveMarketplacePickup,
   scanMarketplacePickup,
+  saveMerchantOnboardingStep1,
+  saveMerchantOnboardingStep2,
+  saveMerchantOnboardingStep3,
+  startMarketplaceStripeOnboarding,
   updateMarketplaceListing,
   uploadMarketplaceImages,
   validateMarketplaceCoupon,
@@ -234,5 +241,48 @@ describe('marketplace api', () => {
       order_total_cents: 2500,
       listing_id: 9,
     });
+  });
+
+  it('wires merchant and Stripe onboarding endpoints', async () => {
+    (api.get as jest.Mock).mockResolvedValue({ data: { onboarding_completed: false, profile: null } });
+    (api.post as jest.Mock).mockResolvedValue({ data: { profile: { id: 1 } } });
+
+    await getMerchantOnboardingStatus();
+    expect(api.get).toHaveBeenCalledWith('/api/v2/merchant-onboarding/status');
+
+    await saveMerchantOnboardingStep1({
+      seller_type: 'business',
+      business_name: 'Nexus Shop',
+      display_name: 'Nexus Shop',
+      bio: 'Community seller',
+      business_registration: null,
+    });
+    expect(api.post).toHaveBeenCalledWith('/api/v2/merchant-onboarding/step-1', {
+      seller_type: 'business',
+      business_name: 'Nexus Shop',
+      display_name: 'Nexus Shop',
+      bio: 'Community seller',
+      business_registration: null,
+    });
+
+    await saveMerchantOnboardingStep2({ business_address: { city: 'Cork' } });
+    expect(api.post).toHaveBeenCalledWith('/api/v2/merchant-onboarding/step-2', {
+      business_address: { city: 'Cork' },
+    });
+
+    await saveMerchantOnboardingStep3({ avatar_url: '/uploads/avatar.jpg', cover_image_url: null });
+    expect(api.post).toHaveBeenCalledWith('/api/v2/merchant-onboarding/step-3', {
+      avatar_url: '/uploads/avatar.jpg',
+      cover_image_url: null,
+    });
+
+    await completeMerchantOnboarding();
+    expect(api.post).toHaveBeenCalledWith('/api/v2/merchant-onboarding/complete', {});
+
+    await getMarketplaceStripeOnboardingStatus();
+    expect(api.get).toHaveBeenCalledWith('/api/v2/marketplace/seller/onboard/status');
+
+    await startMarketplaceStripeOnboarding();
+    expect(api.post).toHaveBeenCalledWith('/api/v2/marketplace/seller/onboard', {});
   });
 });

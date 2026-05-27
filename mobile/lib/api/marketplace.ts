@@ -223,6 +223,34 @@ export interface MarketplacePaymentIntent {
   client_secret?: string;
 }
 
+export interface MerchantSellerProfile {
+  id?: number;
+  seller_type?: 'private' | 'business' | string;
+  business_name?: string | null;
+  display_name?: string | null;
+  bio?: string | null;
+  business_registration?: string | null;
+  business_address?: Record<string, string> | string | null;
+  opening_hours?: Record<string, { open: string; close: string } | null> | string | null;
+  avatar_url?: string | null;
+  cover_image_url?: string | null;
+  onboarding_completed_at?: string | null;
+}
+
+export interface MerchantOnboardingStatus {
+  has_profile: boolean;
+  onboarding_completed: boolean;
+  profile: MerchantSellerProfile | null;
+}
+
+export interface MarketplaceStripeOnboardingStatus {
+  stripe_onboarding_complete: boolean;
+  stripe_account_id?: string | null;
+  charges_enabled?: boolean;
+  payouts_enabled?: boolean;
+  details_submitted?: boolean;
+}
+
 export interface MerchantCoupon {
   id: number;
   code: string;
@@ -469,6 +497,46 @@ export function validateMarketplaceCoupon(payload: {
   listing_id: number;
 }): Promise<MarketplaceDataResponse<{ discount_cents: number }>> {
   return api.post<MarketplaceDataResponse<{ discount_cents: number }>>(`${API_V2}/coupons/validate`, payload);
+}
+
+export function getMerchantOnboardingStatus(): Promise<MarketplaceDataResponse<MerchantOnboardingStatus>> {
+  return api.get<MarketplaceDataResponse<MerchantOnboardingStatus>>(`${API_V2}/merchant-onboarding/status`);
+}
+
+export function saveMerchantOnboardingStep1(payload: {
+  seller_type: 'private' | 'business';
+  business_name?: string | null;
+  display_name: string;
+  bio: string;
+  business_registration?: string | null;
+}): Promise<MarketplaceDataResponse<{ profile: MerchantSellerProfile }>> {
+  return api.post<MarketplaceDataResponse<{ profile: MerchantSellerProfile }>>(`${API_V2}/merchant-onboarding/step-1`, payload);
+}
+
+export function saveMerchantOnboardingStep2(payload: {
+  business_address: Record<string, string>;
+  opening_hours?: Record<string, { open: string; close: string } | null>;
+}): Promise<MarketplaceDataResponse<{ profile: MerchantSellerProfile }>> {
+  return api.post<MarketplaceDataResponse<{ profile: MerchantSellerProfile }>>(`${API_V2}/merchant-onboarding/step-2`, payload);
+}
+
+export function saveMerchantOnboardingStep3(payload: {
+  avatar_url: string;
+  cover_image_url?: string | null;
+}): Promise<MarketplaceDataResponse<{ profile: MerchantSellerProfile }>> {
+  return api.post<MarketplaceDataResponse<{ profile: MerchantSellerProfile }>>(`${API_V2}/merchant-onboarding/step-3`, payload);
+}
+
+export function completeMerchantOnboarding(): Promise<MarketplaceDataResponse<MerchantSellerProfile & { badge_granted?: boolean }>> {
+  return api.post<MarketplaceDataResponse<MerchantSellerProfile & { badge_granted?: boolean }>>(`${API_V2}/merchant-onboarding/complete`, {});
+}
+
+export function getMarketplaceStripeOnboardingStatus(): Promise<MarketplaceDataResponse<MarketplaceStripeOnboardingStatus>> {
+  return api.get<MarketplaceDataResponse<MarketplaceStripeOnboardingStatus>>(`${API_V2}/marketplace/seller/onboard/status`);
+}
+
+export function startMarketplaceStripeOnboarding(): Promise<MarketplaceDataResponse<{ account_id?: string; onboarding_url?: string; url?: string }>> {
+  return api.post<MarketplaceDataResponse<{ account_id?: string; onboarding_url?: string; url?: string }>>(`${API_V2}/marketplace/seller/onboard`, {});
 }
 
 export function getMarketplaceSeller(id: number): Promise<MarketplaceDataResponse<MarketplaceSellerProfile>> {

@@ -90,6 +90,16 @@ function MarketplaceToolsScreen() {
                     <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('tools.subtitle')}</Text>
                   </View>
                 </View>
+                <View className="flex-row gap-2">
+                  <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-merchant-onboarding' as Href)}>
+                    <Ionicons name="storefront-outline" size={16} color={primary} />
+                    <HeroButton.Label>{t('tools.onboarding')}</HeroButton.Label>
+                  </HeroButton>
+                  <HeroButton className="flex-1" variant="secondary" onPress={() => router.push('/(modals)/marketplace-stripe-onboarding' as Href)}>
+                    <Ionicons name="card-outline" size={16} color={primary} />
+                    <HeroButton.Label>{t('tools.payments')}</HeroButton.Label>
+                  </HeroButton>
+                </View>
               </HeroCard.Body>
             </HeroCard>
 

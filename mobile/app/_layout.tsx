@@ -297,6 +297,14 @@ function RootNavigator() {
         options={{ ...modalOptions, headerShown: false, title: t('marketplace:seller.title') }}
       />
       <Stack.Screen
+        name="(modals)/marketplace-merchant-onboarding"
+        options={{ ...modalOptions, headerShown: false, title: t('marketplace:merchantOnboarding.title') }}
+      />
+      <Stack.Screen
+        name="(modals)/marketplace-stripe-onboarding"
+        options={{ ...modalOptions, headerShown: false, title: t('marketplace:stripeOnboarding.title') }}
+      />
+      <Stack.Screen
         name="(modals)/job-detail"
         options={{ ...modalOptions, headerShown: false, title: t('jobs:detailTitle') }}
       />

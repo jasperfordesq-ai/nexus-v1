@@ -1,0 +1,173 @@
+// Copyright © 2024–2026 Jasper Ford
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Author: Jasper Ford
+// See NOTICE file for attribution and acknowledgements.
+
+import { useEffect, useState } from 'react';
+import { Alert, Linking, ScrollView, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { router, type Href } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'heroui-native';
+import { useTranslation } from 'react-i18next';
+
+import ModalErrorBoundary from '@/components/ModalErrorBoundary';
+import AppTopBar from '@/components/ui/AppTopBar';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import {
+  getMarketplaceStripeOnboardingStatus,
+  startMarketplaceStripeOnboarding,
+  type MarketplaceStripeOnboardingStatus,
+} from '@/lib/api/marketplace';
+import { usePrimaryColor, useTenant } from '@/lib/hooks/useTenant';
+import { useTheme } from '@/lib/hooks/useTheme';
+import { withAlpha } from '@/lib/utils/color';
+
+export default function MarketplaceStripeOnboardingRoute() {
+  return (
+    <ModalErrorBoundary>
+      <MarketplaceStripeOnboardingScreen />
+    </ModalErrorBoundary>
+  );
+}
+
+function MarketplaceStripeOnboardingScreen() {
+  const { t } = useTranslation(['marketplace', 'common']);
+  const { hasFeature } = useTenant();
+  const primary = usePrimaryColor();
+  const theme = useTheme();
+  const [status, setStatus] = useState<MarketplaceStripeOnboardingStatus | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isStarting, setIsStarting] = useState(false);
+
+  async function load() {
+    setIsLoading(true);
+    try {
+      const response = await getMarketplaceStripeOnboardingStatus();
+      setStatus(response.data);
+    } catch {
+      setStatus(null);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    void load();
+  }, []);
+
+  async function start() {
+    setIsStarting(true);
+    try {
+      const response = await startMarketplaceStripeOnboarding();
+      const url = response.data.onboarding_url ?? response.data.url;
+      if (!url) throw new Error(t('stripeOnboarding.startFailed'));
+      await Linking.openURL(url);
+    } catch (err) {
+      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('stripeOnboarding.startFailed'));
+    } finally {
+      setIsStarting(false);
+    }
+  }
+
+  if (!hasFeature('marketplace')) {
+    return (
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('stripeOnboarding.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace-my-listings' as Href} />
+        <View className="flex-1 items-center justify-center px-6">
+          <Text style={{ color: theme.textSecondary }}>{t('featureGate.description')}</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <SafeAreaView className="flex-1 bg-background">
+        <AppTopBar title={t('stripeOnboarding.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace-my-listings' as Href} />
+        <View className="flex-1 items-center justify-center"><LoadingSpinner /></View>
+      </SafeAreaView>
+    );
+  }
+
+  const complete = Boolean(status?.stripe_onboarding_complete);
+
+  return (
+    <SafeAreaView className="flex-1 bg-background">
+      <AppTopBar title={t('stripeOnboarding.title')} backLabel={t('common:back')} fallbackHref={'/(modals)/marketplace-my-listings' as Href} />
+      <ScrollView contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 132 }}>
+        <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
+          <View className="h-1.5" style={{ backgroundColor: complete ? theme.success : primary }} />
+          <HeroCard.Body className="gap-4 p-4">
+            <View className="flex-row items-start gap-3">
+              <View className="size-13 items-center justify-center rounded-3xl" style={{ backgroundColor: withAlpha(complete ? theme.success : primary, 0.14) }}>
+                <Ionicons name={complete ? 'shield-checkmark-outline' : 'card-outline'} size={25} color={complete ? theme.success : primary} />
+              </View>
+              <View className="min-w-0 flex-1 gap-1">
+                <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('stripeOnboarding.eyebrow')}</Text>
+                <Text className="text-2xl font-bold" style={{ color: theme.text }}>{complete ? t('stripeOnboarding.completeTitle') : t('stripeOnboarding.title')}</Text>
+                <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{complete ? t('stripeOnboarding.completeSubtitle') : t('stripeOnboarding.subtitle')}</Text>
+              </View>
+            </View>
+            <View className="flex-row flex-wrap gap-2">
+              <StatusChip label={t('stripeOnboarding.charges')} enabled={Boolean(status?.charges_enabled)} />
+              <StatusChip label={t('stripeOnboarding.payouts')} enabled={Boolean(status?.payouts_enabled)} />
+              <StatusChip label={t('stripeOnboarding.details')} enabled={Boolean(status?.details_submitted)} />
+            </View>
+          </HeroCard.Body>
+        </HeroCard>
+
+        <HeroCard className="mb-3 rounded-panel p-0">
+          <HeroCard.Body className="gap-3 p-4">
+            <ChecklistRow icon="business-outline" title={t('stripeOnboarding.needBank')} subtitle={t('stripeOnboarding.needBankHint')} />
+            <ChecklistRow icon="id-card-outline" title={t('stripeOnboarding.needIdentity')} subtitle={t('stripeOnboarding.needIdentityHint')} />
+            <ChecklistRow icon="lock-closed-outline" title={t('stripeOnboarding.secure')} subtitle={t('stripeOnboarding.secureHint')} />
+          </HeroCard.Body>
+        </HeroCard>
+
+        <HeroCard className="rounded-panel p-0">
+          <HeroCard.Body className="gap-3 p-4">
+            <HeroButton variant="primary" onPress={() => void start()} isDisabled={isStarting || complete} style={{ backgroundColor: complete ? theme.success : primary }}>
+              <Ionicons name={complete ? 'checkmark-circle-outline' : 'open-outline'} size={17} color="#fff" />
+              <HeroButton.Label>{complete ? t('stripeOnboarding.completeButton') : t('stripeOnboarding.start')}</HeroButton.Label>
+            </HeroButton>
+            <HeroButton variant="secondary" onPress={() => void load()} isDisabled={isStarting}>
+              <Ionicons name="refresh-outline" size={17} color={primary} />
+              <HeroButton.Label>{t('stripeOnboarding.checkStatus')}</HeroButton.Label>
+            </HeroButton>
+            <HeroButton variant="secondary" onPress={() => router.replace('/(modals)/marketplace-my-listings' as Href)}>
+              <Ionicons name="albums-outline" size={17} color={primary} />
+              <HeroButton.Label>{t('stripeOnboarding.goListings')}</HeroButton.Label>
+            </HeroButton>
+          </HeroCard.Body>
+        </HeroCard>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+function StatusChip({ label, enabled }: { label: string; enabled: boolean }) {
+  const theme = useTheme();
+  return (
+    <Chip size="sm" variant="secondary">
+      <Ionicons name={enabled ? 'checkmark-circle-outline' : 'ellipse-outline'} size={12} color={enabled ? theme.success : theme.textMuted} />
+      <Chip.Label>{label}</Chip.Label>
+    </Chip>
+  );
+}
+
+function ChecklistRow({ icon, title, subtitle }: { icon: React.ComponentProps<typeof Ionicons>['name']; title: string; subtitle: string }) {
+  const primary = usePrimaryColor();
+  const theme = useTheme();
+  return (
+    <Surface variant="secondary" className="flex-row gap-3 rounded-panel-inner p-3">
+      <View className="size-10 items-center justify-center rounded-2xl" style={{ backgroundColor: withAlpha(primary, 0.14) }}>
+        <Ionicons name={icon} size={19} color={primary} />
+      </View>
+      <View className="min-w-0 flex-1">
+        <Text className="text-sm font-bold" style={{ color: theme.text }}>{title}</Text>
+        <Text className="mt-1 text-xs leading-4" style={{ color: theme.textSecondary }}>{subtitle}</Text>
+      </View>
+    </Surface>
+  );
+}
