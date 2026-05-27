@@ -22,6 +22,8 @@ import {
   createMarketplaceSavedSearch,
   createMerchantCoupon,
   completeMerchantOnboarding,
+  cancelMarketplaceOrder,
+  confirmMarketplaceOrderDelivery,
   deleteMarketplaceShippingOption,
   getMarketplaceCategories,
   getMarketplaceCollectionItems,
@@ -53,6 +55,7 @@ import {
   saveMerchantOnboardingStep2,
   saveMerchantOnboardingStep3,
   startMarketplaceStripeOnboarding,
+  shipMarketplaceOrder,
   updateMarketplaceShippingOption,
   updateMarketplaceListing,
   uploadMarketplaceImages,
@@ -326,6 +329,29 @@ describe('marketplace api', () => {
       code: 'SAVE10',
       order_total_cents: 2500,
       listing_id: 9,
+    });
+  });
+
+  it('wires marketplace order lifecycle actions', async () => {
+    (api.put as jest.Mock).mockResolvedValue({ data: { id: 14 } });
+
+    await shipMarketplaceOrder(14, {
+      tracking_number: 'TRACK123',
+      tracking_url: 'https://tracking.test/TRACK123',
+      shipping_method: 'tracked',
+    });
+    expect(api.put).toHaveBeenCalledWith('/api/v2/marketplace/orders/14/ship', {
+      tracking_number: 'TRACK123',
+      tracking_url: 'https://tracking.test/TRACK123',
+      shipping_method: 'tracked',
+    });
+
+    await confirmMarketplaceOrderDelivery(14);
+    expect(api.put).toHaveBeenCalledWith('/api/v2/marketplace/orders/14/confirm-delivery');
+
+    await cancelMarketplaceOrder(14, 'Changed plans');
+    expect(api.put).toHaveBeenCalledWith('/api/v2/marketplace/orders/14/cancel', {
+      reason: 'Changed plans',
     });
   });
 

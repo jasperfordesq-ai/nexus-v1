@@ -522,6 +522,21 @@ export function getMarketplaceOrders(
   return api.get<MarketplaceCollectionResponse<MarketplaceOrder>>(`${API_V2}/marketplace/orders/${mode}`, query);
 }
 
+export function shipMarketplaceOrder(
+  id: number,
+  payload: { tracking_number?: string | null; tracking_url?: string | null; shipping_method?: string | null },
+): Promise<MarketplaceDataResponse<MarketplaceOrder>> {
+  return api.put<MarketplaceDataResponse<MarketplaceOrder>>(`${API_V2}/marketplace/orders/${id}/ship`, payload);
+}
+
+export function confirmMarketplaceOrderDelivery(id: number): Promise<MarketplaceDataResponse<MarketplaceOrder>> {
+  return api.put<MarketplaceDataResponse<MarketplaceOrder>>(`${API_V2}/marketplace/orders/${id}/confirm-delivery`);
+}
+
+export function cancelMarketplaceOrder(id: number, reason: string): Promise<MarketplaceDataResponse<MarketplaceOrder>> {
+  return api.put<MarketplaceDataResponse<MarketplaceOrder>>(`${API_V2}/marketplace/orders/${id}/cancel`, { reason });
+}
+
 export function createMarketplaceOrder(payload: {
   listing_id: number;
   offer_id?: number;
