@@ -2110,7 +2110,8 @@
     "name_label": "名前",
     "description_label": "説明（任意）",
     "make_public": "公開する",
-    "create": "作成"
+    "create": "作成",
+    "confirm_create": "Create collection"
   },
   "appreciations": {
     "title": "感謝を送る",

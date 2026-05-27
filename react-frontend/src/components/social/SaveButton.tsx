@@ -240,7 +240,7 @@ export function SaveButton({
                     }}
                     className="flex-1"
                   />
-                  <Button isIconOnly size="sm" color="primary" onPress={handleCreate}>
+                  <Button isIconOnly size="sm" color="primary" onPress={handleCreate} aria-label={t('collections.confirm_create')}>
                     <Check className="w-3 h-3" />
                   </Button>
                 </div>

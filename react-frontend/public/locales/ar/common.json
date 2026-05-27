@@ -2110,7 +2110,8 @@
     "name_label": "الاسم",
     "description_label": "الوصف (اختياري)",
     "make_public": "اجعلها عامة",
-    "create": "إنشاء"
+    "create": "إنشاء",
+    "confirm_create": "Create collection"
   },
   "appreciations": {
     "title": "أرسل رسالة شكر",

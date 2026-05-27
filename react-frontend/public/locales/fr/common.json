@@ -2110,7 +2110,8 @@
     "name_label": "Nom",
     "description_label": "Description (facultative)",
     "make_public": "Rendre publique",
-    "create": "Créer"
+    "create": "Créer",
+    "confirm_create": "Create collection"
   },
   "appreciations": {
     "title": "Envoyer un remerciement",

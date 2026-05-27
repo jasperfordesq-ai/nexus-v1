@@ -104,7 +104,8 @@
     "save_to": "Guardar en colección",
     "no_collection": "General (sin colección)",
     "new_collection": "Nueva colección",
-    "collection_name": "Nombre de la colección"
+    "collection_name": "Nombre de la colección",
+    "confirm_create": "Create collection"
   },
   "bookmarks": {
     "page_title": "Guardado",

@@ -2111,7 +2111,8 @@
     "name_label": "Name",
     "description_label": "Description (optional)",
     "make_public": "Make public",
-    "create": "Create"
+    "create": "Create",
+    "confirm_create": "Create collection"
   },
   "appreciations": {
     "title": "Send a thank-you",

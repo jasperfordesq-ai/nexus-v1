@@ -387,6 +387,7 @@ export default function MembersPage() {
                 variant="light"
                 size="sm"
                 onPress={() => openNotes(user)}
+                aria-label={t('members.open_notes_for', { name: user.name })}
               >
                 <StickyNote size={15} className="text-muted" />
               </Button>
@@ -569,6 +570,7 @@ export default function MembersPage() {
                     isDisabled={!newNote.trim()}
                     onPress={handleAddNote}
                     className="self-end"
+                    aria-label={t('members.send_note')}
                   >
                     <Send size={16} />
                   </Button>

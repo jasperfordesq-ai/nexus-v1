@@ -2110,7 +2110,8 @@
     "name_label": "Naam",
     "description_label": "Beschrijving (optioneel)",
     "make_public": "Openbaar maken",
-    "create": "Aanmaken"
+    "create": "Aanmaken",
+    "confirm_create": "Create collection"
   },
   "appreciations": {
     "title": "Een bedankje sturen",

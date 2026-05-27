@@ -194,7 +194,9 @@
     "time_days_ago": "{{count}}d ago",
     "note_system_author": "System",
     "hours_short": "hrs",
-    "tabs_aria": "Member status filter"
+    "tabs_aria": "Member status filter",
+    "open_notes_for": "Open notes for {{name}}",
+    "send_note": "Send note"
   },
   "onboarding": {
     "title": "Onboarding",

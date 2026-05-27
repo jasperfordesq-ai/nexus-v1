@@ -83,7 +83,8 @@
     "new_collection": "مجموعة جديدة",
     "collection_name": "اسم المجموعة",
     "save": "حفظ",
-    "saved": "محفوظ"
+    "saved": "محفوظ",
+    "confirm_create": "Create collection"
   },
   "bookmarks": {
     "title": "العناصر المحفوظة",

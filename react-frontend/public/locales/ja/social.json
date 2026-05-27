@@ -83,7 +83,8 @@
     "new_collection": "新しいコレクション",
     "collection_name": "コレクション名",
     "save": "保存",
-    "saved": "保存済み"
+    "saved": "保存済み",
+    "confirm_create": "Create collection"
   },
   "bookmarks": {
     "title": "保存したアイテム",

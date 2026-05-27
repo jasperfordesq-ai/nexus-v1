@@ -107,7 +107,7 @@ export function BookmarkCollectionPicker({ selectedId, onSelect, onClose }: Book
             autoFocus
             className="flex-1"
           />
-          <Button size="sm" isIconOnly onPress={handleCreate} isLoading={isSubmitting}>
+          <Button size="sm" isIconOnly onPress={handleCreate} isLoading={isSubmitting} aria-label={t('bookmark.confirm_create')}>
             <Check className="w-3 h-3" />
           </Button>
         </div>

@@ -107,7 +107,8 @@
     "save_to": "Save to collection",
     "no_collection": "General (no collection)",
     "new_collection": "New collection",
-    "collection_name": "Collection name"
+    "collection_name": "Collection name",
+    "confirm_create": "Create collection"
   },
   "bookmarks": {
     "loading": "Loading bookmarks...",

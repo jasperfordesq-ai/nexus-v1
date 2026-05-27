@@ -104,7 +104,8 @@
     "save_to": "Sábháil sa bhailiúchán",
     "no_collection": "Ginearálta (gan bailiúchán)",
     "new_collection": "Bailiúchán nua",
-    "collection_name": "Ainm bailiúcháin"
+    "collection_name": "Ainm bailiúcháin",
+    "confirm_create": "Create collection"
   },
   "bookmarks": {
     "page_title": "Sábháilte",

@@ -104,7 +104,8 @@
     "save_to": "Opslaan in collectie",
     "no_collection": "Algemeen (geen collectie)",
     "new_collection": "Nieuwe collectie",
-    "collection_name": "Collectienaam"
+    "collection_name": "Collectienaam",
+    "confirm_create": "Create collection"
   },
   "bookmarks": {
     "page_title": "Opgeslagen",

@@ -104,7 +104,8 @@
     "save_to": "In Sammlung speichern",
     "no_collection": "Allgemein (keine Sammlung)",
     "new_collection": "Neue Sammlung",
-    "collection_name": "Sammlungsname"
+    "collection_name": "Sammlungsname",
+    "confirm_create": "Create collection"
   },
   "bookmarks": {
     "page_title": "Gespeichert",

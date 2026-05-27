@@ -2110,7 +2110,8 @@
     "name_label": "Ainm",
     "description_label": "Cur síos (roghnach)",
     "make_public": "Déan poiblí",
-    "create": "Cruthaigh"
+    "create": "Cruthaigh",
+    "confirm_create": "Create collection"
   },
   "appreciations": {
     "title": "Seol nóta buíochais",

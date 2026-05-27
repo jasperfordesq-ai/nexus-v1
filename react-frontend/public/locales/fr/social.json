@@ -104,7 +104,8 @@
     "save_to": "Enregistrer dans la collection",
     "no_collection": "Général (pas de collection)",
     "new_collection": "Nouvelle collection",
-    "collection_name": "Nom de la collection"
+    "collection_name": "Nom de la collection",
+    "confirm_create": "Create collection"
   },
   "bookmarks": {
     "page_title": "Enregistré",

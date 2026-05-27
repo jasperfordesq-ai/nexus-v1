@@ -194,7 +194,9 @@
     "time_days_ago": "{{count}}日前",
     "note_system_author": "システム",
     "hours_short": "時間",
-    "tabs_aria": "Member status filter"
+    "tabs_aria": "Member status filter",
+    "open_notes_for": "Open notes for {{name}}",
+    "send_note": "Send note"
   },
   "onboarding": {
     "title": "オンボーディング",
