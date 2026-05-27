@@ -205,7 +205,7 @@ export default function FederationPeersAdminPage() {
               <Button
                 isIconOnly
                 size="sm"
-                variant="flat"
+                variant="tertiary"
                 onPress={() => void fetchPeers()}
                 isLoading={loading}
                 aria-label={t('federation_peers_admin.actions.refresh_aria')}
@@ -215,7 +215,6 @@ export default function FederationPeersAdminPage() {
             </Tooltip>
             <Button
               size="sm"
-              color="primary"
               startContent={<Plus size={15} />}
               onPress={() => { resetForm(); setCreateOpen(true); }}
             >
@@ -226,16 +225,16 @@ export default function FederationPeersAdminPage() {
       />
 
       {/* Intro card */}
-      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" >
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('federation_peers_admin.about.title')}</p>
-              <p className="text-default-600">
+              <p className="text-muted">
                 {t('federation_peers_admin.about.body')}
               </p>
-              <div className="space-y-0.5 pt-1 text-default-500">
+              <div className="space-y-0.5 pt-1 text-muted">
                 <p><strong>{t('federation_peers_admin.about.shared_secret_label')}</strong> {t('federation_peers_admin.about.shared_secret_body')}</p>
                 <p><strong>{t('federation_peers_admin.status.pending')}:</strong> {t('federation_peers_admin.about.pending_body')}</p>
                 <p><strong>{t('federation_peers_admin.status.active')}:</strong> {t('federation_peers_admin.about.active_body')}</p>
@@ -270,11 +269,11 @@ export default function FederationPeersAdminPage() {
                     <TableCell>
                       <div className="font-medium">{peer.display_name}</div>
                       {peer.notes && (
-                        <div className="text-xs text-default-500 max-w-xs truncate">{peer.notes}</div>
+                        <div className="text-xs text-muted max-w-xs truncate">{peer.notes}</div>
                       )}
                     </TableCell>
                     <TableCell>
-                      <code className="text-xs bg-default-100 px-1.5 py-0.5 rounded">
+                      <code className="text-xs bg-surface-secondary px-1.5 py-0.5 rounded">
                         {peer.peer_slug}
                       </code>
                     </TableCell>
@@ -289,12 +288,12 @@ export default function FederationPeersAdminPage() {
                       </a>
                     </TableCell>
                     <TableCell>
-                      <Chip size="sm" color={STATUS_COLOR[peer.status]} variant="flat">
+                      <Chip size="sm" color={STATUS_COLOR[peer.status]} variant="soft">
                         {t(`federation_peers_admin.status.${peer.status}`)}
                       </Chip>
                     </TableCell>
                     <TableCell>
-                      <span className="text-xs text-default-500">
+                      <span className="text-xs text-muted">
                         {peer.last_handshake_at
                           ? new Date(peer.last_handshake_at).toLocaleString()
                           : t('federation_peers_admin.empty.never')}
@@ -319,7 +318,7 @@ export default function FederationPeersAdminPage() {
                         <Tooltip content={t('federation_peers_admin.actions.rotate_secret')}>
                           <Button
                             size="sm"
-                            variant="flat"
+                            variant="tertiary"
                             isIconOnly
                             onPress={() => void handleRotate(peer)}
                             aria-label={t('federation_peers_admin.actions.rotate_secret')}
@@ -330,8 +329,7 @@ export default function FederationPeersAdminPage() {
                         <Tooltip content={t('federation_peers_admin.actions.delete_peer')}>
                           <Button
                             size="sm"
-                            variant="flat"
-                            color="danger"
+                            variant="danger"
                             isIconOnly
                             onPress={() => void handleDelete(peer)}
                             aria-label={t('federation_peers_admin.actions.delete_peer')}
@@ -386,7 +384,7 @@ export default function FederationPeersAdminPage() {
                   onValueChange={setNotes}
                   minRows={2}
                 />
-                <div className="text-xs text-default-500">
+                <div className="text-xs text-muted">
                   <Power size={12} className="inline mr-1" />
                   {t('federation_peers_admin.create_modal.status_hint_prefix')}{' '}
                   <strong>{t('federation_peers_admin.status.pending')}</strong>.
@@ -395,8 +393,8 @@ export default function FederationPeersAdminPage() {
                 </div>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={close} isDisabled={creating}>{t('federation_peers_admin.actions.cancel')}</Button>
-                <Button color="primary" onPress={() => void handleCreate()} isLoading={creating}>
+                <Button variant="tertiary" onPress={close} isDisabled={creating}>{t('federation_peers_admin.actions.cancel')}</Button>
+                <Button onPress={() => void handleCreate()} isLoading={creating}>
                   {t('federation_peers_admin.actions.create_reveal_secret')}
                 </Button>
               </ModalFooter>
@@ -423,26 +421,26 @@ export default function FederationPeersAdminPage() {
                 </p>
                 {secretReveal && (
                   <>
-                    <div className="rounded-lg border border-default-200 bg-default-100 p-3 font-mono text-xs break-all">
+                    <div className="rounded-lg border border-border bg-surface-secondary p-3 font-mono text-xs break-all">
                       {secretReveal.secret}
                     </div>
                     <div className="grid grid-cols-2 gap-2">
                       <Button
-                        variant="flat"
+                        variant="tertiary"
                         startContent={<Copy size={14} />}
                         onPress={() => copyToClipboard(secretReveal.secret)}
                       >
                         {t('federation_peers_admin.actions.copy_secret')}
                       </Button>
                       <Button
-                        variant="flat"
+                        variant="tertiary"
                         startContent={<Copy size={14} />}
                         onPress={() => copyToClipboard(secretReveal.peerSlug)}
                       >
                         {t('federation_peers_admin.actions.copy_peer_slug')}
                       </Button>
                     </div>
-                    <div className="text-xs text-default-500">
+                    <div className="text-xs text-muted">
                       <strong>{t('federation_peers_admin.secret_modal.peer_slug_label')}</strong> <code>{secretReveal.peerSlug}</code><br />
                       <strong>{t('federation_peers_admin.secret_modal.base_url_label')}</strong> <code>{secretReveal.baseUrl}</code>
                     </div>
@@ -450,7 +448,7 @@ export default function FederationPeersAdminPage() {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button color="primary" onPress={close}>{t('federation_peers_admin.actions.copied_secret')}</Button>
+                <Button onPress={close}>{t('federation_peers_admin.actions.copied_secret')}</Button>
               </ModalFooter>
             </>
           )}

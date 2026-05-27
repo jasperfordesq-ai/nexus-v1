@@ -263,7 +263,7 @@ export function MemberTags() {
         {summarySearch && (
           <Button
             size="sm"
-            variant="flat"
+            variant="tertiary"
             onPress={() => setSummarySearch('')}
           >
             {t('crm.clear')}
@@ -279,9 +279,9 @@ export function MemberTags() {
       ) : filteredSummaries.length === 0 ? (
         <Card>
           <CardBody className="flex flex-col items-center py-16 text-center">
-            <Tag size={48} className="text-default-300 mb-4" />
-            <p className="text-default-500 text-lg font-medium">{t('crm.no_tags_found')}</p>
-            <p className="text-default-400 text-sm mt-1">
+            <Tag size={48} className="text-muted mb-4" />
+            <p className="text-muted text-lg font-medium">{t('crm.no_tags_found')}</p>
+            <p className="text-muted text-sm mt-1">
               {summarySearch
                 ? t('crm.no_tags_hint_search')
                 : t('crm.no_tags_hint_default')}
@@ -305,7 +305,7 @@ export function MemberTags() {
                 <Button
                   isIconOnly
                   size="sm"
-                  variant="light"
+                  variant="tertiary"
                   color="danger"
                   onPress={() => {
                     setDeleteSummaryTarget(ts);
@@ -317,8 +317,8 @@ export function MemberTags() {
               </CardHeader>
               <CardBody className="pt-0">
                 <div className="flex items-center gap-2">
-                  <Users size={14} className="text-default-400" />
-                  <Chip size="sm" variant="flat" color="primary">
+                  <Users size={14} className="text-muted" />
+                  <Chip size="sm" variant="soft">
                     {ts.member_count === 1 ? t('crm.member_count') : t('crm.members_count')}
                   </Chip>
                 </div>
@@ -337,7 +337,7 @@ export function MemberTags() {
       {/* Back button */}
       <div className="mb-4">
         <Button
-          variant="light"
+          variant="tertiary"
           startContent={<ArrowLeft size={16} />}
           onPress={backToSummary}
         >
@@ -359,9 +359,9 @@ export function MemberTags() {
       ) : memberTags.length === 0 ? (
         <Card>
           <CardBody className="flex flex-col items-center py-16 text-center">
-            <Users size={48} className="text-default-300 mb-4" />
-            <p className="text-default-500 text-lg font-medium">{t('crm.no_members_with_tag')}</p>
-            <p className="text-default-400 text-sm mt-1">
+            <Users size={48} className="text-muted mb-4" />
+            <p className="text-muted text-lg font-medium">{t('crm.no_members_with_tag')}</p>
+            <p className="text-muted text-sm mt-1">
               {t('crm.no_members_hint')}
             </p>
           </CardBody>
@@ -385,22 +385,22 @@ export function MemberTags() {
                     >
                       {mt.user_name || t('crm.user_with_id', { id: mt.user_id })}
                     </Link>
-                    <p className="text-xs text-default-400">
+                    <p className="text-xs text-muted">
                       {t('crm.user_with_id', { id: mt.user_id })}
                     </p>
                   </div>
-                  <Chip size="sm" variant="flat" color="primary">
+                  <Chip size="sm" variant="soft">
                     <Tag size={12} className="inline mr-1" />
                     {mt.tag}
                   </Chip>
-                  <span className="text-xs text-default-400 hidden sm:inline">
+                  <span className="text-xs text-muted hidden sm:inline">
                     {formatDate(mt.created_at)}
                   </span>
                 </div>
                 <Button
                   isIconOnly
                   size="sm"
-                  variant="light"
+                  variant="tertiary"
                   color="danger"
                   onPress={() => setDeleteTarget(mt)}
                   aria-label={t('crm.remove_tag_from_member_aria', {
@@ -425,7 +425,7 @@ export function MemberTags() {
         title={t('crm.member_tags_title')}
         description={t('crm.member_tags_desc')}
         actions={
-          <Button color="primary" startContent={<Plus size={16} />} onPress={openAddModal}>
+          <Button startContent={<Plus size={16} />} onPress={openAddModal}>
             {t('crm.add_tag')}
           </Button>
         }
@@ -468,8 +468,7 @@ export function MemberTags() {
                   {tagSuggestions.map(ts => (
                     <Chip
                       key={ts.tag}
-                      variant="flat"
-                      color="primary"
+                      variant="soft"
                       className="cursor-pointer hover:opacity-80 transition-opacity"
                       onClick={() => {
                         setFormTag(ts.tag);
@@ -484,10 +483,10 @@ export function MemberTags() {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={addModal.onClose} isDisabled={saving}>
+            <Button variant="tertiary" onPress={addModal.onClose} isDisabled={saving}>
               {t('crm.cancel_button')}
             </Button>
-            <Button color="primary" onPress={handleAddTag} isLoading={saving} isDisabled={saving}>
+            <Button onPress={handleAddTag} isLoading={saving} isDisabled={saving}>
               {t('crm.add_tag')}
             </Button>
           </ModalFooter>

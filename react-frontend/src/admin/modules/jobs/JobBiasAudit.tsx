@@ -131,7 +131,7 @@ function JobBiasAudit() {
               value={dateFrom}
               onValueChange={setDateFrom}
               className="w-48"
-              variant="bordered"
+              variant="secondary"
             />
             <Input
               type="date"
@@ -139,7 +139,7 @@ function JobBiasAudit() {
               value={dateTo}
               onValueChange={setDateTo}
               className="w-48"
-              variant="bordered"
+              variant="secondary"
             />
             <Input
               type="number"
@@ -147,11 +147,10 @@ function JobBiasAudit() {
               value={jobId}
               onValueChange={setJobId}
               className="w-48"
-              variant="bordered"
+              variant="secondary"
               placeholder={t('jobs.bias_all_jobs_placeholder')}
             />
             <Button
-              color="primary"
               onPress={fetchReport}
               isLoading={loading}
               startContent={!loading ? <Filter className="w-4 h-4" /> : undefined}
@@ -159,7 +158,7 @@ function JobBiasAudit() {
               {t('jobs.bias_apply_filters')}
             </Button>
             <Button
-              variant="flat"
+              variant="tertiary"
               onPress={() => {
                 setDateFrom('');
                 setDateTo('');
@@ -180,7 +179,7 @@ function JobBiasAudit() {
       ) : !report ? (
         <Card>
           <CardBody>
-            <p className="text-center text-default-500 py-8">
+            <p className="text-center text-muted py-8">
               {t('jobs.bias_no_data')}
             </p>
           </CardBody>
@@ -189,7 +188,7 @@ function JobBiasAudit() {
         <>
           {/* Period indicator */}
           {report.period.from && report.period.to && (
-            <div className="flex items-center gap-2 text-sm text-default-500">
+            <div className="flex items-center gap-2 text-sm text-muted">
               <Clock className="w-4 h-4" />
               <span>
                 {t('jobs.bias_period')}: {report.period.from} — {report.period.to}
@@ -203,7 +202,7 @@ function JobBiasAudit() {
               label={t('jobs.bias_total_applications')}
               value={report.total_applications}
               icon={Users}
-              color="primary"
+              color="default"
             />
             <StatCard
               label={t('jobs.bias_hiring_velocity')}
@@ -213,7 +212,7 @@ function JobBiasAudit() {
                   : t('jobs.bias_not_available')
               }
               icon={Clock}
-              color="secondary"
+              color="default"
               description={t('jobs.bias_avg_days_to_hire')}
             />
             <StatCard
@@ -245,10 +244,10 @@ function JobBiasAudit() {
                 const pct = maxFunnel > 0 ? (count / maxFunnel) * 100 : 0;
                 return (
                   <div key={stage} className="flex items-center gap-4">
-                    <span className="w-28 text-sm font-medium text-right text-default-700">
+                    <span className="w-28 text-sm font-medium text-right text-foreground">
                       {formatStage(stage)}
                     </span>
-                    <div className="flex-1 h-8 bg-default-100 rounded-lg overflow-hidden relative">
+                    <div className="flex-1 h-8 bg-surface-secondary rounded-lg overflow-hidden relative">
                       <div
                         className={`h-full ${FUNNEL_COLORS[stage] ?? 'bg-accent'} rounded-lg transition-all duration-500`}
                         style={{ width: `${Math.max(pct, 1)}%` }}
@@ -257,7 +256,7 @@ function JobBiasAudit() {
                         {count}
                       </span>
                     </div>
-                    <span className="w-16 text-sm text-default-500 text-right">
+                    <span className="w-16 text-sm text-muted text-right">
                       {pct.toFixed(1)}%
                     </span>
                   </div>
@@ -296,7 +295,7 @@ function JobBiasAudit() {
                         <TableCell className="text-right">
                           <Chip
                             size="sm"
-                            variant="flat"
+                            variant="soft"
                             color={data.rate > 50 ? 'danger' : data.rate > 30 ? 'warning' : 'success'}
                           >
                             {data.rate.toFixed(1)}%
@@ -334,7 +333,7 @@ function JobBiasAudit() {
                         <TableCell className="text-right">
                           <Chip
                             size="sm"
-                            variant="flat"
+                            variant="soft"
                             color={days > 14 ? 'danger' : days > 7 ? 'warning' : 'success'}
                           >
                             {days.toFixed(1)}
@@ -360,7 +359,7 @@ function JobBiasAudit() {
             <CardBody>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {/* Direct */}
-                <div className="p-4 rounded-lg bg-default-50 border border-default-200 space-y-3">
+                <div className="p-4 rounded-lg bg-surface-secondary border border-border space-y-3">
                   <div className="flex items-center gap-2">
                     <Briefcase className="w-5 h-5 text-accent" />
                     <span className="text-base font-semibold">
@@ -372,7 +371,7 @@ function JobBiasAudit() {
                       <p className="text-2xl font-bold text-accent">
                         {report.source_effectiveness.direct.applications}
                       </p>
-                      <p className="text-xs text-default-500">
+                      <p className="text-xs text-muted">
                         {t('jobs.bias_applications')}
                       </p>
                     </div>
@@ -380,7 +379,7 @@ function JobBiasAudit() {
                       <p className="text-2xl font-bold text-success">
                         {report.source_effectiveness.direct.accepted}
                       </p>
-                      <p className="text-xs text-default-500">
+                      <p className="text-xs text-muted">
                         {t('jobs.bias_accepted')}
                       </p>
                     </div>
@@ -388,7 +387,7 @@ function JobBiasAudit() {
                       <p className="text-2xl font-bold">
                         {report.source_effectiveness.direct.rate.toFixed(1)}%
                       </p>
-                      <p className="text-xs text-default-500">
+                      <p className="text-xs text-muted">
                         {t('jobs.bias_rate')}
                       </p>
                     </div>
@@ -396,7 +395,7 @@ function JobBiasAudit() {
                 </div>
 
                 {/* Referral */}
-                <div className="p-4 rounded-lg bg-default-50 border border-default-200 space-y-3">
+                <div className="p-4 rounded-lg bg-surface-secondary border border-border space-y-3">
                   <div className="flex items-center gap-2">
                     <Users className="w-5 h-5 text-accent" />
                     <span className="text-base font-semibold">
@@ -408,7 +407,7 @@ function JobBiasAudit() {
                       <p className="text-2xl font-bold text-accent">
                         {report.source_effectiveness.referral.applications}
                       </p>
-                      <p className="text-xs text-default-500">
+                      <p className="text-xs text-muted">
                         {t('jobs.bias_applications')}
                       </p>
                     </div>
@@ -416,7 +415,7 @@ function JobBiasAudit() {
                       <p className="text-2xl font-bold text-success">
                         {report.source_effectiveness.referral.accepted}
                       </p>
-                      <p className="text-xs text-default-500">
+                      <p className="text-xs text-muted">
                         {t('jobs.bias_accepted')}
                       </p>
                     </div>
@@ -424,7 +423,7 @@ function JobBiasAudit() {
                       <p className="text-2xl font-bold">
                         {report.source_effectiveness.referral.rate.toFixed(1)}%
                       </p>
-                      <p className="text-xs text-default-500">
+                      <p className="text-xs text-muted">
                         {t('jobs.bias_rate')}
                       </p>
                     </div>

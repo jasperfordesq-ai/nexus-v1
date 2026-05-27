@@ -1,11 +1,11 @@
 import { Button, Chip, Spinner, Textarea, Card, CardBody, Select, SelectItem, useDisclosure, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
+// Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
 
 /**
- * AG71 — Pilot Region Inquiry Admin Page
+ * AG71 â€” Pilot Region Inquiry Admin Page
  *
  * Platform-level pipeline board for managing incoming Gemeinde
  * pilot inquiries.  English-only (admin panel policy).
@@ -38,7 +38,7 @@ import { api } from '@/lib/api';
 import { logError } from '@/lib/logger';
 import { StatCard, PageHeader, Abbr } from '../../components';
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface PilotInquiry {
   id: number;
@@ -102,19 +102,19 @@ function stageTranslationKey(stage: string) {
   return STAGES.some(s => s.key === stage) ? `stages.${stage}` : 'stages.unknown';
 }
 
-// ─── Fit score chip ───────────────────────────────────────────────────────────
+// â”€â”€â”€ Fit score chip â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function FitChip({ score }: { score: number | null }) {
-  if (score === null) return <span className="text-xs text-gray-400">—</span>;
+  if (score === null) return <span className="text-xs text-muted">â€”</span>;
   const color = score >= 60 ? 'success' : score >= 40 ? 'warning' : 'default';
   return (
-    <Chip size="sm" color={color} variant="flat">
+    <Chip size="sm" color={color} variant="soft">
       {score.toFixed(1)}
     </Chip>
   );
 }
 
-// ─── Inquiry card (pipeline view) ─────────────────────────────────────────────
+// â”€â”€â”€ Inquiry card (pipeline view) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function InquiryCard({
   inquiry,
@@ -135,17 +135,17 @@ function InquiryCard({
         <div className="flex items-start justify-between gap-2">
           <div>
             <p className="font-semibold text-sm leading-tight">{inquiry.municipality_name}</p>
-            <p className="text-xs text-gray-500">{inquiry.country}{inquiry.region ? ` · ${inquiry.region}` : ''}</p>
+            <p className="text-xs text-muted">{inquiry.country}{inquiry.region ? ` Â· ${inquiry.region}` : ''}</p>
           </div>
           <FitChip score={inquiry.fit_score} />
         </div>
-        <p className="text-xs text-gray-500">{inquiry.contact_name}</p>
+        <p className="text-xs text-muted">{inquiry.contact_name}</p>
         <div className="flex items-center justify-between">
-          <Chip size="sm" color={sc.color as never} variant="flat">
+          <Chip size="sm" color={sc.color as never} variant="soft">
             {t(stageTranslationKey(inquiry.stage), { stage: inquiry.stage })}
           </Chip>
           {inquiry.assigned_user_name?.trim() && (
-            <span className="text-xs text-gray-400 truncate max-w-[100px]">{inquiry.assigned_user_name.trim()}</span>
+            <span className="text-xs text-muted truncate max-w-[100px]">{inquiry.assigned_user_name.trim()}</span>
           )}
         </div>
       </CardBody>
@@ -153,7 +153,7 @@ function InquiryCard({
   );
 }
 
-// ─── Detail modal ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ Detail modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 function InquiryDetailModal({
   inquiry,
@@ -226,7 +226,7 @@ function InquiryDetailModal({
     <Modal isOpen={isOpen} onClose={onClose} size="3xl" scrollBehavior="inside">
       <ModalContent>
         <ModalHeader className="flex items-center gap-2">
-          <MapPin className="w-5 h-5 text-indigo-500" />
+          <MapPin className="w-5 h-5 text-accent" />
           {inquiry.municipality_name}
           <FitChip score={inquiry.fit_score} />
         </ModalHeader>
@@ -234,39 +234,39 @@ function InquiryDetailModal({
           {/* Municipality info */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.country_region')}</p>
-              <p>{inquiry.country}{inquiry.region ? ` · ${inquiry.region}` : ''}</p>
+              <p className="text-muted text-xs uppercase tracking-wide mb-0.5">{t('fields.country_region')}</p>
+              <p>{inquiry.country}{inquiry.region ? ` Â· ${inquiry.region}` : ''}</p>
             </div>
             <div>
-              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.population')}</p>
+              <p className="text-muted text-xs uppercase tracking-wide mb-0.5">{t('fields.population')}</p>
               <p>{inquiry.population?.toLocaleString() ?? t('values.empty')}</p>
             </div>
             <div>
-              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5"><Abbr term="KISS">KISS</Abbr> {t('fields.cooperative')}</p>
+              <p className="text-muted text-xs uppercase tracking-wide mb-0.5"><Abbr term="KISS">KISS</Abbr> {t('fields.cooperative')}</p>
               <p>{inquiry.has_kiss_cooperative ? t('values.yes') : t('values.no')}</p>
             </div>
             <div>
-              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.existing_digital_tool')}</p>
+              <p className="text-muted text-xs uppercase tracking-wide mb-0.5">{t('fields.existing_digital_tool')}</p>
               <p>{inquiry.has_existing_digital_tool ? (inquiry.existing_tool_name ?? t('values.yes')) : t('values.no')}</p>
             </div>
           </div>
 
           {/* Contact */}
           <div>
-            <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">{t('fields.contact')}</p>
+            <p className="text-muted text-xs uppercase tracking-wide mb-1">{t('fields.contact')}</p>
             <p className="font-medium">{inquiry.contact_name}</p>
-            <p className="text-indigo-400">{inquiry.contact_email}</p>
+            <p className="text-accent">{inquiry.contact_email}</p>
             {inquiry.contact_phone && <p>{inquiry.contact_phone}</p>}
-            {inquiry.contact_role && <p className="text-gray-500">{inquiry.contact_role}</p>}
+            {inquiry.contact_role && <p className="text-muted">{inquiry.contact_role}</p>}
           </div>
 
           {/* Modules + timeline + budget */}
           {modules.length > 0 && (
             <div>
-              <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">{t('fields.modules_of_interest')}</p>
+              <p className="text-muted text-xs uppercase tracking-wide mb-1">{t('fields.modules_of_interest')}</p>
               <div className="flex flex-wrap gap-1">
                 {modules.map((m: string) => (
-                  <Chip key={m} size="sm" variant="flat" color="primary">{m.replace(/_/g, ' ')}</Chip>
+                  <Chip key={m} size="sm" variant="soft" color="accent">{m.replace(/_/g, ' ')}</Chip>
                 ))}
               </div>
             </div>
@@ -274,11 +274,11 @@ function InquiryDetailModal({
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.timeline')}</p>
+              <p className="text-muted text-xs uppercase tracking-wide mb-0.5">{t('fields.timeline')}</p>
               <p>{inquiry.timeline_months === 0 ? t('values.asap') : inquiry.timeline_months ? t('values.months', { count: inquiry.timeline_months }) : t('values.empty')}</p>
             </div>
             <div>
-              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.budget')}</p>
+              <p className="text-muted text-xs uppercase tracking-wide mb-0.5">{t('fields.budget')}</p>
               <p>{inquiry.budget_indication?.replace(/_/g, ' ') ?? t('values.empty')}</p>
             </div>
           </div>
@@ -286,23 +286,23 @@ function InquiryDetailModal({
           {/* Notes */}
           {inquiry.notes && (
             <div>
-              <p className="text-gray-400 text-xs uppercase tracking-wide mb-0.5">{t('fields.notes_from_gemeinde')}</p>
-              <p className="text-gray-300 italic">{inquiry.notes}</p>
+              <p className="text-muted text-xs uppercase tracking-wide mb-0.5">{t('fields.notes_from_gemeinde')}</p>
+              <p className="text-foreground italic">{inquiry.notes}</p>
             </div>
           )}
 
           {/* Fit score breakdown */}
           {Object.keys(breakdown).length > 0 && (
             <div>
-              <p className="text-gray-400 text-xs uppercase tracking-wide mb-1">{t('fields.fit_score_breakdown')}</p>
+              <p className="text-muted text-xs uppercase tracking-wide mb-1">{t('fields.fit_score_breakdown')}</p>
               <div className="grid grid-cols-2 gap-1">
                 {Object.entries(breakdown).map(([key, val]) => (
-                  <div key={key} className="flex items-center justify-between text-xs bg-gray-800/40 rounded px-2 py-1">
+                  <div key={key} className="flex items-center justify-between text-xs bg-surface-secondary rounded px-2 py-1">
                     <span className="capitalize">{key.replace(/_/g, ' ')}</span>
-                    <span className="font-semibold text-indigo-400">+{val}</span>
+                    <span className="font-semibold text-accent">+{val}</span>
                   </div>
                 ))}
-                <div className="flex items-center justify-between text-xs bg-indigo-500/20 rounded px-2 py-1 font-semibold col-span-2">
+                <div className="flex items-center justify-between text-xs bg-accent-soft rounded px-2 py-1 font-semibold col-span-2">
                   <span>{t('fields.total')}</span>
                   <span>{inquiry.fit_score}</span>
                 </div>
@@ -311,13 +311,13 @@ function InquiryDetailModal({
           )}
 
           {/* Stage update */}
-          <div className="border-t border-white/10 pt-4">
-            <p className="text-gray-400 text-xs uppercase tracking-wide mb-2">{t('fields.update_stage')}</p>
+          <div className="border-t border-border pt-4">
+            <p className="text-muted text-xs uppercase tracking-wide mb-2">{t('fields.update_stage')}</p>
             <Select
               size="sm"
               selectedKeys={newStage ? [newStage] : []}
               onSelectionChange={keys => setNewStage(Array.from(keys)[0] as string ?? '')}
-              classNames={{ trigger: 'bg-gray-800/50' }}
+              variant="secondary"
             >
               {STAGES.map(s => (
                 <SelectItem key={s.key} id={s.key}>{t(`stages.${s.key}`)}</SelectItem>
@@ -334,7 +334,6 @@ function InquiryDetailModal({
             )}
             <Button
               size="sm"
-              color="primary"
               className="mt-2"
               isLoading={saving}
               onPress={saveStage}
@@ -344,8 +343,8 @@ function InquiryDetailModal({
           </div>
 
           {/* Internal notes */}
-          <div className="border-t border-white/10 pt-4">
-            <p className="text-gray-400 text-xs uppercase tracking-wide mb-2">{t('fields.internal_notes')}</p>
+          <div className="border-t border-border pt-4">
+            <p className="text-muted text-xs uppercase tracking-wide mb-2">{t('fields.internal_notes')}</p>
             <Textarea
               size="sm"
               minRows={2}
@@ -355,7 +354,7 @@ function InquiryDetailModal({
             />
             <Button
               size="sm"
-              variant="flat"
+              variant="secondary"
               className="mt-2"
               isLoading={saving}
               onPress={saveNotes}
@@ -365,22 +364,22 @@ function InquiryDetailModal({
           </div>
 
           {/* Timestamps */}
-          <div className="border-t border-white/10 pt-4 grid grid-cols-2 gap-2 text-xs text-gray-400">
-            <div><span className="font-medium text-gray-300">{t('timestamps.submitted')}:</span> {new Date(inquiry.created_at).toLocaleDateString()}</div>
-            {inquiry.proposal_sent_at && <div><span className="font-medium text-gray-300">{t('timestamps.proposal')}:</span> {new Date(inquiry.proposal_sent_at).toLocaleDateString()}</div>}
-            {inquiry.pilot_agreed_at  && <div><span className="font-medium text-gray-300">{t('timestamps.agreed')}:</span>   {new Date(inquiry.pilot_agreed_at).toLocaleDateString()}</div>}
-            {inquiry.went_live_at     && <div><span className="font-medium text-gray-300">{t('timestamps.live')}:</span>      {new Date(inquiry.went_live_at).toLocaleDateString()}</div>}
+          <div className="border-t border-border pt-4 grid grid-cols-2 gap-2 text-xs text-muted">
+            <div><span className="font-medium text-foreground">{t('timestamps.submitted')}:</span> {new Date(inquiry.created_at).toLocaleDateString()}</div>
+            {inquiry.proposal_sent_at && <div><span className="font-medium text-foreground">{t('timestamps.proposal')}:</span> {new Date(inquiry.proposal_sent_at).toLocaleDateString()}</div>}
+            {inquiry.pilot_agreed_at  && <div><span className="font-medium text-foreground">{t('timestamps.agreed')}:</span>   {new Date(inquiry.pilot_agreed_at).toLocaleDateString()}</div>}
+            {inquiry.went_live_at     && <div><span className="font-medium text-foreground">{t('timestamps.live')}:</span>      {new Date(inquiry.went_live_at).toLocaleDateString()}</div>}
           </div>
         </ModalBody>
         <ModalFooter>
-          <Button variant="light" onPress={onClose}>{t('actions.close')}</Button>
+          <Button variant="tertiary" onPress={onClose}>{t('actions.close')}</Button>
         </ModalFooter>
       </ModalContent>
     </Modal>
   );
 }
 
-// ─── Main page ────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Main page â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function PilotInquiryAdminPage() {
   const { t } = useTranslation('admin', { keyPrefix: 'pilot_inquiry_admin' });
@@ -440,7 +439,7 @@ export function PilotInquiryAdminPage() {
           <div className="flex gap-2">
             <Button
               size="sm"
-              variant="flat"
+              variant="secondary"
               startContent={<RefreshCw className="w-4 h-4" />}
               onPress={loadData}
               isLoading={loading}
@@ -449,8 +448,7 @@ export function PilotInquiryAdminPage() {
             </Button>
             <Button
               size="sm"
-              color="primary"
-              variant="flat"
+              variant="secondary"
               startContent={<Download className="w-4 h-4" />}
               onPress={handleExport}
             >
@@ -460,17 +458,17 @@ export function PilotInquiryAdminPage() {
         }
       />
 
-      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('about.title')}</p>
-              <p className="text-default-600">
+              <p className="text-foreground">
                 {t('about.body_intro_before_gemeinden')}<em>{t('about.gemeinden')}</em>{t('about.body_intro_before_kiss')}
                 <Abbr term="KISS">KISS</Abbr>{t('about.body_intro_after_kiss')}
               </p>
-              <p className="text-default-500">
+              <p className="text-muted">
                 <strong>{t('about.pipeline_stages_label')}</strong> {t('about.pipeline_stages')}{' '}
                 {t('about.fit_score_before')}<strong>{t('about.fit_score_label')}</strong>{t('about.fit_score_after')}
               </p>
@@ -480,12 +478,12 @@ export function PilotInquiryAdminPage() {
       </Card>
 
       {/* Fit score scale */}
-      <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 rounded-lg border border-default-200 bg-default-50 px-3 py-2 text-xs text-default-500">
-        <span className="font-medium text-default-700">{t('fit_scale.title')}</span>
-        <span className="flex items-center gap-1.5"><Chip size="sm" color="success" variant="flat">60-100</Chip>{t('fit_scale.good')}</span>
-        <span className="flex items-center gap-1.5"><Chip size="sm" color="warning" variant="flat">40-59</Chip>{t('fit_scale.potential')}</span>
-        <span className="flex items-center gap-1.5"><Chip size="sm" color="default" variant="flat">0-39</Chip>{t('fit_scale.weak')}</span>
-        <span className="ml-3 text-default-400">{t('fit_scale.factors_before_kiss')}<Abbr term="KISS">KISS</Abbr>{t('fit_scale.factors_after_kiss')}</span>
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 rounded-lg border border-border bg-surface-secondary px-3 py-2 text-xs text-muted">
+        <span className="font-medium text-foreground">{t('fit_scale.title')}</span>
+        <span className="flex items-center gap-1.5"><Chip size="sm" color="success" variant="soft">60-100</Chip>{t('fit_scale.good')}</span>
+        <span className="flex items-center gap-1.5"><Chip size="sm" color="warning" variant="soft">40-59</Chip>{t('fit_scale.potential')}</span>
+        <span className="flex items-center gap-1.5"><Chip size="sm" color="default" variant="soft">0-39</Chip>{t('fit_scale.weak')}</span>
+        <span className="ml-3 text-muted">{t('fit_scale.factors_before_kiss')}<Abbr term="KISS">KISS</Abbr>{t('fit_scale.factors_after_kiss')}</span>
       </div>
 
       {/* Stats row */}
@@ -493,7 +491,7 @@ export function PilotInquiryAdminPage() {
         <StatCard
           title={t('stats.total_inquiries')}
           value={stats?.total ?? 0}
-          icon={<FileText className="w-5 h-5 text-indigo-400" />}
+          icon={<FileText className="w-5 h-5 text-accent" />}
         />
         <StatCard
           title={t('stats.qualified')}
@@ -508,28 +506,28 @@ export function PilotInquiryAdminPage() {
         <StatCard
           title={t('stats.avg_fit_score')}
           value={stats ? stats.avg_fit_score.toFixed(1) : t('values.empty')}
-          icon={<CheckCircle className="w-5 h-5 text-purple-400" />}
+          icon={<CheckCircle className="w-5 h-5 text-accent" />}
         />
       </div>
 
       {/* Stage timing */}
       {stats && (
         <div className="flex flex-col gap-1">
-          <p className="text-xs font-medium text-default-600">{t('velocity.title')}</p>
-          <div className="flex gap-4 text-xs text-gray-400 flex-wrap">
+          <p className="text-xs font-medium text-foreground">{t('velocity.title')}</p>
+          <div className="flex gap-4 text-xs text-muted flex-wrap">
           {stats.avg_days_to_proposal !== null && (
             <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3" /> {t('velocity.avg_to_proposal')} <strong className="text-white">{t('velocity.days', { count: stats.avg_days_to_proposal })}</strong>
+              <Clock className="w-3 h-3" /> {t('velocity.avg_to_proposal')} <strong className="text-foreground">{t('velocity.days', { count: stats.avg_days_to_proposal })}</strong>
             </span>
           )}
           {stats.avg_days_to_agreed !== null && (
             <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3" /> {t('velocity.avg_to_agreed')} <strong className="text-white">{t('velocity.days', { count: stats.avg_days_to_agreed })}</strong>
+              <Clock className="w-3 h-3" /> {t('velocity.avg_to_agreed')} <strong className="text-foreground">{t('velocity.days', { count: stats.avg_days_to_agreed })}</strong>
             </span>
           )}
           {stats.avg_days_to_live !== null && (
             <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3" /> {t('velocity.avg_to_live')} <strong className="text-white">{t('velocity.days', { count: stats.avg_days_to_live })}</strong>
+              <Clock className="w-3 h-3" /> {t('velocity.avg_to_live')} <strong className="text-foreground">{t('velocity.days', { count: stats.avg_days_to_live })}</strong>
             </span>
           )}
           </div>
@@ -538,11 +536,10 @@ export function PilotInquiryAdminPage() {
 
       {/* Stage filter */}
       <div className="flex items-center gap-3 flex-wrap">
-        <span className="text-sm text-gray-400">{t('filters.stage')}</span>
+        <span className="text-sm text-muted">{t('filters.stage')}</span>
         <Button
           size="sm"
-          variant={stageFilter === '' ? 'solid' : 'flat'}
-          color={stageFilter === '' ? 'primary' : 'default'}
+          variant={stageFilter === '' ? 'primary' : 'secondary'}
           onPress={() => setStageFilter('')}
         >
           {t('filters.all')}
@@ -551,8 +548,7 @@ export function PilotInquiryAdminPage() {
           <Button
             key={s.key}
             size="sm"
-            variant={stageFilter === s.key ? 'solid' : 'flat'}
-            color={stageFilter === s.key ? (s.color as never) : 'default'}
+            variant={stageFilter === s.key ? 'primary' : 'secondary'}
             onPress={() => setStageFilter(stageFilter === s.key ? '' : s.key)}
           >
             {t(`stages.${s.key}`)}
@@ -569,10 +565,10 @@ export function PilotInquiryAdminPage() {
           <Spinner size="lg" />
         </div>
       ) : inquiries.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
+        <div className="text-center py-16 text-muted">
           <MapPin className="w-12 h-12 mx-auto mb-3 opacity-30" />
-          <p className="font-medium text-default-600">{t('empty.title')}</p>
-          <p className="text-sm mt-1 text-default-400">
+          <p className="font-medium text-foreground">{t('empty.title')}</p>
+          <p className="text-sm mt-1 text-muted">
             {t('empty.body')}
           </p>
         </div>
@@ -591,12 +587,12 @@ export function PilotInquiryAdminPage() {
       {/* By country summary */}
       {stats && stats.by_country.length > 0 && (
         <div className="mt-4">
-          <p className="text-xs text-gray-400 uppercase tracking-wide mb-2 flex items-center gap-1">
+          <p className="text-xs text-muted uppercase tracking-wide mb-2 flex items-center gap-1">
             <Users className="w-3 h-3" /> {t('summary.by_country')}
           </p>
           <div className="flex gap-2 flex-wrap">
             {stats.by_country.map(c => (
-              <Chip key={c.country} size="sm" variant="flat">
+              <Chip key={c.country} size="sm" variant="soft">
                 {c.country}: {c.count}
               </Chip>
             ))}

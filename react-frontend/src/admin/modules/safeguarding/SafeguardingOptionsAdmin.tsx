@@ -286,14 +286,13 @@ export function SafeguardingOptionsAdmin() {
 
       <div className="space-y-6">
         {/* ─── Active Options ─── */}
-        <Card shadow="sm">
+        <Card >
           <CardHeader className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold">{t('safeguarding.active_options')}</h3>
               <p className="text-sm text-theme-muted">{t('safeguarding.active_options_desc')}</p>
             </div>
             <Button
-              color="primary"
               startContent={<Plus className="w-4 h-4" />}
               onPress={openCreate}
             >
@@ -324,7 +323,7 @@ export function SafeguardingOptionsAdmin() {
 
         {/* ─── Inactive Options ─── */}
         {inactiveOptions.length > 0 && (
-          <Card shadow="sm">
+          <Card >
             <CardHeader>
               <div>
                 <h3 className="text-lg font-semibold text-theme-muted">{t('safeguarding.inactive_options')}</h3>
@@ -339,7 +338,7 @@ export function SafeguardingOptionsAdmin() {
                       <p className="text-sm line-through">{opt.label}</p>
                       <p className="text-xs text-theme-muted">{opt.option_key}</p>
                     </div>
-                    <Chip size="sm" variant="flat" color="default">{t('safeguarding.inactive')}</Chip>
+                    <Chip size="sm" variant="soft" color="default">{t('safeguarding.inactive')}</Chip>
                   </div>
                 ))}
               </div>
@@ -358,7 +357,7 @@ export function SafeguardingOptionsAdmin() {
                 label={t('safeguarding.label_option_key')}
                 value={form.option_key}
                 onValueChange={(v) => setForm(prev => ({ ...prev, option_key: v }))}
-                variant="bordered"
+                variant="secondary"
                 description={t('safeguarding.desc_option_key')}
                 placeholder={t('safeguarding.placeholder_option_key')}
               />
@@ -367,7 +366,7 @@ export function SafeguardingOptionsAdmin() {
               label={t('safeguarding.label_display_label')}
               value={form.label}
               onValueChange={(v) => setForm(prev => ({ ...prev, label: v }))}
-              variant="bordered"
+              variant="secondary"
               placeholder={t('safeguarding.placeholder_display_label')}
               isRequired
             />
@@ -375,7 +374,7 @@ export function SafeguardingOptionsAdmin() {
               label={t('safeguarding.label_description_help')}
               value={form.description}
               onValueChange={(v) => setForm(prev => ({ ...prev, description: v }))}
-              variant="bordered"
+              variant="secondary"
               placeholder={t('safeguarding.placeholder_description_help')}
               minRows={2}
             />
@@ -383,7 +382,7 @@ export function SafeguardingOptionsAdmin() {
               label={t('safeguarding.label_help_url')}
               value={form.help_url}
               onValueChange={(v) => setForm(prev => ({ ...prev, help_url: v }))}
-              variant="bordered"
+              variant="secondary"
               placeholder={t('safeguarding.placeholder_help_url')}
               description={t('safeguarding.desc_help_url')}
             />
@@ -394,7 +393,7 @@ export function SafeguardingOptionsAdmin() {
                 const key = Array.from(keys)[0] as 'checkbox' | 'info' | 'select';
                 setForm(prev => ({ ...prev, option_type: key }));
               }}
-              variant="bordered"
+              variant="secondary"
             >
               <SelectItem key="checkbox" id="checkbox">{t('safeguarding.type_checkbox')}</SelectItem>
               <SelectItem key="info" id="info">{t('safeguarding.type_info')}</SelectItem>
@@ -446,7 +445,7 @@ export function SafeguardingOptionsAdmin() {
                     const key = Array.from(keys)[0] as string || '';
                     updateTrigger('vetting_type_required', key);
                   }}
-                  variant="bordered"
+                  variant="secondary"
                   className="mt-3"
                   description={t('safeguarding.desc_required_vetting_type')}
                 >
@@ -463,8 +462,8 @@ export function SafeguardingOptionsAdmin() {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={createModal.onClose}>{t('safeguarding.cancel')}</Button>
-            <Button color="primary" onPress={handleSave} isLoading={saving} isDisabled={saving}>
+            <Button variant="tertiary" onPress={createModal.onClose}>{t('safeguarding.cancel')}</Button>
+            <Button onPress={handleSave} isLoading={saving} isDisabled={saving}>
               {editingOption ? t('safeguarding.save_changes') : t('safeguarding.create_option')}
             </Button>
           </ModalFooter>
@@ -484,8 +483,8 @@ export function SafeguardingOptionsAdmin() {
             </p>
           </ModalBody>
           <ModalFooter>
-            <Button variant="light" onPress={deleteModal.onClose}>{t('safeguarding.cancel')}</Button>
-            <Button color="danger" onPress={handleDelete}>{t('safeguarding.deactivate')}</Button>
+            <Button variant="tertiary" onPress={deleteModal.onClose}>{t('safeguarding.cancel')}</Button>
+            <Button variant="danger" onPress={handleDelete}>{t('safeguarding.deactivate')}</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
@@ -517,10 +516,10 @@ function OptionCard({
           <CheckCircle className="w-4 h-4 text-success-500 flex-shrink-0" />
           <p className="font-medium text-sm">{option.label}</p>
           {option.is_required && (
-            <Chip size="sm" variant="flat" color="danger" className="text-xs">{t('safeguarding.required')}</Chip>
+            <Chip size="sm" variant="soft" color="danger" className="text-xs">{t('safeguarding.required')}</Chip>
           )}
           {option.preset_source && (
-            <Chip size="sm" variant="flat" color="secondary" className="text-xs">{option.preset_source}</Chip>
+            <Chip size="sm" variant="soft" color="default" className="text-xs">{option.preset_source}</Chip>
           )}
         </div>
         {option.description && (
@@ -529,7 +528,7 @@ function OptionCard({
         {activeTriggers.length > 0 && (
           <div className="flex flex-wrap gap-1 ml-6 mt-1">
             {activeTriggers.map(([key]) => (
-              <Chip key={key} size="sm" variant="flat" color="warning" className="text-xs">
+              <Chip key={key} size="sm" variant="soft" color="warning" className="text-xs">
                 {TRIGGER_I18N_KEY[key] ? t(`safeguarding.trigger_${TRIGGER_I18N_KEY[key]}_label`) : key}
               </Chip>
             ))}
@@ -537,10 +536,10 @@ function OptionCard({
         )}
       </div>
       <div className="flex items-center gap-1 ml-3 flex-shrink-0">
-        <Button isIconOnly size="sm" variant="light" onPress={onEdit} aria-label={t('safeguarding.aria_edit_option')}>
+        <Button isIconOnly size="sm" variant="tertiary" onPress={onEdit} aria-label={t('safeguarding.aria_edit_option')}>
           <Edit3 className="w-4 h-4" />
         </Button>
-        <Button isIconOnly size="sm" variant="light" color="danger" onPress={onDelete} aria-label={t('safeguarding.aria_deactivate_option')}>
+        <Button isIconOnly size="sm" variant="danger" onPress={onDelete} aria-label={t('safeguarding.aria_deactivate_option')}>
           <Trash2 className="w-4 h-4" />
         </Button>
       </div>

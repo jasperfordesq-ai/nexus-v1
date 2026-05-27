@@ -20,7 +20,7 @@ import { useToast } from '@/contexts';
 import { adminFederation } from '../../api/adminApi';
 import { PageHeader, EmptyState } from '../../components';
 import { useTranslation } from 'react-i18next';
-// Copyright © 2024–2026 Jasper Ford
+// Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -133,7 +133,7 @@ export function PartnerDirectory() {
     setLoading(false);
   }, []);
 
-  // Debounced search — also handles initial load on mount (300ms delay)
+  // Debounced search â€” also handles initial load on mount (300ms delay)
   useEffect(() => {
     const timer = setTimeout(() => {
       loadData({
@@ -204,7 +204,7 @@ export function PartnerDirectory() {
         description={t('federation.partner_directory_desc')}
         actions={
           <Button
-            variant="flat"
+            variant="secondary"
             startContent={<RefreshCw size={16} />}
             onPress={() => loadData({ search, region: regionFilter, category: categoryFilter, topic: topicFilter, exclude_partnered: hidePartnered })}
             isLoading={loading}
@@ -222,10 +222,10 @@ export function PartnerDirectory() {
               className="flex-1"
               placeholder={t('federation.search_communities_placeholder')}
               aria-label={t('federation.label_search_partner_communities')}
-              startContent={<Search size={16} className="text-default-400" />}
+              startContent={<Search size={16} className="text-muted" />}
               value={search}
               onValueChange={setSearch}
-              variant="bordered"
+              variant="secondary"
               size="sm"
             />
             {regions.length > 0 && (
@@ -233,7 +233,7 @@ export function PartnerDirectory() {
                 className="w-full md:w-48"
                 placeholder={t('federation.placeholder_all_regions')}
                 size="sm"
-                variant="bordered"
+                variant="secondary"
                 selectedKeys={regionFilter ? [regionFilter] : []}
                 onSelectionChange={(keys) => {
                   const arr = Array.from(keys);
@@ -250,7 +250,7 @@ export function PartnerDirectory() {
                 className="w-full md:w-48"
                 placeholder={t('federation.placeholder_all_categories')}
                 size="sm"
-                variant="bordered"
+                variant="secondary"
                 selectedKeys={categoryFilter ? [categoryFilter] : []}
                 onSelectionChange={(keys) => {
                   const arr = Array.from(keys);
@@ -267,13 +267,13 @@ export function PartnerDirectory() {
                 className="w-full md:w-48"
                 placeholder={t('federation.placeholder_all_topics')}
                 size="sm"
-                variant="bordered"
+                variant="secondary"
                 selectedKeys={topicFilter ? [topicFilter] : []}
                 onSelectionChange={(keys) => {
                   const arr = Array.from(keys);
                   setTopicFilter(arr.length > 0 ? String(arr[0]) : '');
                 }}
-                startContent={<Tag size={14} className="text-default-400" />}
+                startContent={<Tag size={14} className="text-muted" />}
               >
                 {topics.map((tp) => (
                   <SelectItem key={tp.slug} id={tp.slug} textValue={tp.name}>
@@ -286,8 +286,7 @@ export function PartnerDirectory() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Button
-                variant={hidePartnered ? 'solid' : 'flat'}
-                color={hidePartnered ? 'primary' : 'default'}
+                variant={hidePartnered ? 'primary' : 'secondary'}
                 size="sm"
                 startContent={<Filter size={14} />}
                 onPress={() => setHidePartnered(!hidePartnered)}
@@ -295,12 +294,12 @@ export function PartnerDirectory() {
                 {t('federation.hide_partnered')}
               </Button>
               {activeFilters > 0 && (
-                <Button variant="light" size="sm" onPress={clearFilters}>
+                <Button variant="tertiary" size="sm" onPress={clearFilters}>
                   {t('federation.clear_filters')}
                 </Button>
               )}
             </div>
-            <span className="text-sm text-default-400">
+            <span className="text-sm text-muted">
               {loading ? t('federation.loading') : t('federation.communities_found')}
             </span>
           </div>
@@ -311,7 +310,7 @@ export function PartnerDirectory() {
       {loading && communities.length === 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Card key={i} shadow="sm">
+            <Card key={i}>
               <CardBody className="space-y-3 p-4">
                 <div className="flex items-center gap-3">
                   <Skeleton className="h-12 w-12 rounded-full" />
@@ -359,7 +358,7 @@ export function PartnerDirectory() {
                   <div className="absolute top-3 right-3 z-10">
                     <Chip
                       size="sm"
-                      variant="flat"
+                      variant="soft"
                       color={statusConf.color}
                       startContent={<statusConf.icon size={12} />}
                     >
@@ -386,17 +385,17 @@ export function PartnerDirectory() {
                       <h3 className="text-base font-semibold text-foreground truncate pr-16">
                         {community.name}
                       </h3>
-                      <p className="text-xs text-default-400">/{community.slug}</p>
+                      <p className="text-xs text-muted">/{community.slug}</p>
                     </div>
                   </div>
 
                   {community.description && (
-                    <p className="text-sm text-default-500 line-clamp-2">
+                    <p className="text-sm text-muted line-clamp-2">
                       {community.description}
                     </p>
                   )}
 
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-default-400">
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
                     {community.member_count != null && (
                       <span className="flex items-center gap-1">
                         <Users size={12} /> {t('federation.members_count')}
@@ -420,7 +419,7 @@ export function PartnerDirectory() {
                         <Chip
                           key={topic.slug}
                           size="sm"
-                          variant={topic.is_primary ? 'solid' : 'flat'}
+                          variant="soft"
                           color={topic.is_primary ? 'warning' : 'default'}
                           startContent={<Tag size={10} />}
                         >
@@ -428,7 +427,7 @@ export function PartnerDirectory() {
                         </Chip>
                       ))}
                       {communityTopics.length > 5 && (
-                        <Chip size="sm" variant="flat" color="default">
+                        <Chip size="sm" variant="soft" color="default">
                           {t('federation.more_count')}
                         </Chip>
                       )}
@@ -453,7 +452,7 @@ export function PartnerDirectory() {
                       href={`https://${community.domain}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      variant="flat"
+                      variant="secondary"
                       size="sm"
                       startContent={<ExternalLink size={14} />}
                     >
@@ -463,8 +462,7 @@ export function PartnerDirectory() {
 
                   {!status && (
                     <Button
-                      color="primary"
-                      variant="flat"
+                      variant="primary"
                       size="sm"
                       startContent={<Handshake size={14} />}
                       onPress={() => setRequestTarget(community)}
@@ -474,8 +472,7 @@ export function PartnerDirectory() {
                   )}
                   {status === 'active' && (
                     <Button
-                      color="success"
-                      variant="flat"
+                      variant="secondary"
                       size="sm"
                       isDisabled
                       startContent={<CheckCircle size={14} />}
@@ -485,8 +482,7 @@ export function PartnerDirectory() {
                   )}
                   {status === 'pending' && (
                     <Button
-                      color="warning"
-                      variant="flat"
+                      variant="secondary"
                       size="sm"
                       isDisabled
                       startContent={<Clock size={14} />}
@@ -511,7 +507,7 @@ export function PartnerDirectory() {
           <ModalBody>
             {requestTarget && (
               <div className="space-y-4">
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-default-100">
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-surface-secondary">
                   {requestTarget.logo_url ? (
                     <img src={requestTarget.logo_url} alt={t('federation.partner_logo_alt', { name: requestTarget.name || t('federation.label_partner') })} className="w-10 h-10 rounded-lg object-cover" loading="lazy" />
                   ) : (
@@ -522,11 +518,11 @@ export function PartnerDirectory() {
                   <div>
                     <p className="font-medium">{requestTarget.name}</p>
                     {requestTarget.region && (
-                      <p className="text-xs text-default-400">{requestTarget.region}</p>
+                      <p className="text-xs text-muted">{requestTarget.region}</p>
                     )}
                   </div>
                 </div>
-                <p className="text-sm text-default-500">
+                <p className="text-sm text-muted">
                   {t('federation.partnership_request_description')}
                 </p>
                 <Textarea
@@ -534,7 +530,7 @@ export function PartnerDirectory() {
                   placeholder={t('federation.partnership_message_placeholder')}
                   value={requestNotes}
                   onValueChange={setRequestNotes}
-                  variant="bordered"
+                  variant="secondary"
                   maxLength={1000}
                   minRows={3}
                 />
@@ -542,11 +538,10 @@ export function PartnerDirectory() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={() => { setRequestTarget(null); setRequestNotes(''); }}>
+            <Button variant="tertiary" onPress={() => { setRequestTarget(null); setRequestNotes(''); }}>
               {t('federation.cancel')}
             </Button>
             <Button
-              color="primary"
               startContent={<Send size={14} />}
               onPress={handleRequestPartnership}
               isLoading={requestLoading}

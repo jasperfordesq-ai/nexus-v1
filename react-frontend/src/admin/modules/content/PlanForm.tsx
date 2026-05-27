@@ -214,7 +214,7 @@ export function PlanForm() {
           ? t('content.plans_admin_desc')
           : t('content.desc_create_subscription_plans_to_offer_diffe')}
         actions={
-          <Button variant="flat" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/plans'))}>
+          <Button variant="tertiary" startContent={<ArrowLeft size={16} />} onPress={() => navigate(tenantPath('/admin/plans'))}>
             {t('common.back')}
           </Button>
         }
@@ -223,7 +223,7 @@ export function PlanForm() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main form */}
         <div className="lg:col-span-2 flex flex-col gap-6">
-          <Card shadow="sm">
+          <Card >
             <CardHeader>
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <CreditCard size={20} /> {t('content.plan_details')}
@@ -234,14 +234,14 @@ export function PlanForm() {
                 label={t('content.label_name')}
                 placeholder={t('content.plan_name_placeholder')}
                 isRequired
-                variant="bordered"
+                variant="secondary"
                 value={formData.name}
                 onValueChange={(v) => handleChange('name', v)}
               />
               <Textarea
                 label={t('content.label_description')}
                 placeholder={t('content.plan_description_placeholder')}
-                variant="bordered"
+                variant="secondary"
                 minRows={3}
                 value={formData.description}
                 onValueChange={(v) => handleChange('description', v)}
@@ -250,16 +250,16 @@ export function PlanForm() {
                 <Input
                   label={t('content.monthly_price')}
                   type="number" min="0" step="0.01"
-                  variant="bordered"
-                  startContent={<span className="text-default-400 text-sm">EUR</span>}
+                  variant="secondary"
+                  startContent={<span className="text-muted text-sm">EUR</span>}
                   value={formData.price_monthly}
                   onValueChange={(v) => handleChange('price_monthly', v)}
                 />
                 <Input
                   label={t('content.annual_price')}
                   type="number" min="0" step="0.01"
-                  variant="bordered"
-                  startContent={<span className="text-default-400 text-sm">EUR</span>}
+                  variant="secondary"
+                  startContent={<span className="text-muted text-sm">EUR</span>}
                   description={t('content.annual_price_description')}
                   value={formData.price_yearly}
                   onValueChange={(v) => handleChange('price_yearly', v)}
@@ -269,7 +269,7 @@ export function PlanForm() {
                 <Input
                   label={t('content.tier_level')}
                   type="number" min="0" step="1"
-                  variant="bordered"
+                  variant="secondary"
                   description={t('content.tier_level_description')}
                   value={formData.tier_level}
                   onValueChange={(v) => handleChange('tier_level', v)}
@@ -277,7 +277,7 @@ export function PlanForm() {
                 <Input
                   label={t('content.max_users')}
                   type="number" min="1" step="1"
-                  variant="bordered"
+                  variant="secondary"
                   placeholder={t('content.leave_blank_unlimited')}
                   description={t('content.max_users_description')}
                   value={formData.max_users}
@@ -287,7 +287,7 @@ export function PlanForm() {
             </CardBody>
           </Card>
 
-          <Card shadow="sm">
+          <Card >
             <CardHeader>
               <h3 className="text-lg font-semibold">{t('content.selling_points')}</h3>
             </CardHeader>
@@ -295,7 +295,7 @@ export function PlanForm() {
               <Textarea
                 label={t('content.feature_list')}
                 placeholder={t('content.features_placeholder')}
-                variant="bordered"
+                variant="secondary"
                 minRows={6}
                 description={t('content.features_description')}
                 value={formData.features}
@@ -307,7 +307,7 @@ export function PlanForm() {
 
         {/* Sidebar */}
         <div className="flex flex-col gap-6">
-          <Card shadow="sm">
+          <Card >
             <CardHeader>
               <h3 className="text-base font-semibold">{t('content.status_limits')}</h3>
             </CardHeader>
@@ -315,7 +315,7 @@ export function PlanForm() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-medium text-sm">{t('content.label_active')}</p>
-                  <p className="text-xs text-default-500">{t('content.plan_active_description')}</p>
+                  <p className="text-xs text-muted">{t('content.plan_active_description')}</p>
                 </div>
                 <Switch
                   isSelected={formData.is_active}
@@ -328,7 +328,7 @@ export function PlanForm() {
                 <Input
                   label={t('content.max_menus')}
                   type="number" min="1" step="1"
-                  variant="bordered"
+                  variant="secondary"
                   size="sm"
                   placeholder={t('content.max_menus_placeholder')}
                   value={formData.max_menus}
@@ -337,7 +337,7 @@ export function PlanForm() {
                 <Input
                   label={t('content.max_menu_items')}
                   type="number" min="1" step="1"
-                  variant="bordered"
+                  variant="secondary"
                   size="sm"
                   placeholder={t('content.max_menu_items_placeholder')}
                   value={formData.max_menu_items}
@@ -348,7 +348,7 @@ export function PlanForm() {
           </Card>
 
           {isEdit && (
-            <Card shadow="sm">
+            <Card >
               <CardHeader>
                 <h3 className="text-base font-semibold flex items-center gap-2">
                   {t('content.stripe_sync')}
@@ -361,13 +361,13 @@ export function PlanForm() {
                   ) : (
                     <AlertCircle size={16} className="text-warning shrink-0" />
                   )}
-                  <Chip size="sm" variant="flat" color={stripeSynced ? 'success' : 'warning'}>
+                  <Chip size="sm" variant="soft" color={stripeSynced ? 'success' : 'warning'}>
                     {stripeSynced ? t('content.synced') : t('content.not_synced')}
                   </Chip>
                 </div>
 
                 {stripeSynced && (
-                  <div className="flex flex-col gap-1 text-xs text-default-500 break-all">
+                  <div className="flex flex-col gap-1 text-xs text-muted break-all">
                     {stripeStatus.stripe_product_id && (
                       <span><span className="font-medium">{t('content.product')}:</span> {stripeStatus.stripe_product_id}</span>
                     )}
@@ -381,8 +381,8 @@ export function PlanForm() {
                 )}
 
                 <Button
-                  color="secondary"
-                  variant="flat"
+                  color="default"
+                  variant="tertiary"
                   startContent={<RefreshCw size={14} />}
                   onPress={handleSyncStripe}
                   isLoading={syncing}
@@ -391,7 +391,7 @@ export function PlanForm() {
                 >
                   {stripeSynced ? t('content.resync_stripe') : t('content.sync_stripe')}
                 </Button>
-                <p className="text-xs text-default-400">
+                <p className="text-xs text-muted">
                   {t('content.stripe_sync_description')}
                 </p>
               </CardBody>
@@ -400,7 +400,6 @@ export function PlanForm() {
 
           <div className="flex flex-col gap-2">
             <Button
-              color="primary"
               startContent={<Save size={16} />}
               onPress={handleSave}
               isLoading={saving}
@@ -408,7 +407,7 @@ export function PlanForm() {
             >
               {isEdit ? t('federation.save_changes') : t('content.plan_create_title')}
             </Button>
-            <Button variant="flat" onPress={() => navigate(tenantPath('/admin/plans'))} fullWidth>
+            <Button variant="tertiary" onPress={() => navigate(tenantPath('/admin/plans'))} fullWidth>
               {t('cancel')}
             </Button>
           </div>

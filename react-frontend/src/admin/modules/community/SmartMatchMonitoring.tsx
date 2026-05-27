@@ -60,13 +60,12 @@ export function SmartMatchMonitoring() {
           label={t('community.label_matches_generated')}
           value={overview?.total_matches_month ?? 0}
           icon={Activity}
-          color="primary"
         />
         <StatCard
           label={t('community.label_avg_match_score')}
           value={overview?.avg_match_score !== undefined ? `${Number(overview.avg_match_score).toFixed(1)}%` : '--'}
           icon={BarChart3}
-          color="success"
+          color="default"
         />
         <StatCard
           label={t('community.label_approval_rate')}
@@ -78,51 +77,51 @@ export function SmartMatchMonitoring() {
           label={t('community.label_cache_hit_rate')}
           value={overview?.cache_hit_rate !== undefined ? `${Number(overview.cache_hit_rate).toFixed(0)}%` : '--'}
           icon={Activity}
-          color="secondary"
+          color="default"
         />
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <Card shadow="sm">
+        <Card >
           <CardHeader><h3 className="text-lg font-semibold">{t('community.engine_status')}</h3></CardHeader>
           <CardBody>
             {data ? (
               <div className="space-y-3">
-                <div className="flex items-center justify-between py-1 border-b border-default-100">
-                  <span className="text-sm text-default-500">{t('community.broker_approval')}</span>
+                <div className="flex items-center justify-between py-1 border-b border-border">
+                  <span className="text-sm text-muted">{t('community.broker_approval')}</span>
                   <span className="text-sm font-medium">{data.broker_approval_enabled ? t('community.enabled') : t('community.disabled')}</span>
                 </div>
-                <div className="flex items-center justify-between py-1 border-b border-default-100">
-                  <span className="text-sm text-default-500">{t('community.pending_approvals')}</span>
+                <div className="flex items-center justify-between py-1 border-b border-border">
+                  <span className="text-sm text-muted">{t('community.pending_approvals')}</span>
                   <span className="text-sm font-medium">{data.pending_approvals ?? 0}</span>
                 </div>
-                <div className="flex items-center justify-between py-1 border-b border-default-100">
-                  <span className="text-sm text-default-500">{t('community.approved_total')}</span>
+                <div className="flex items-center justify-between py-1 border-b border-border">
+                  <span className="text-sm text-muted">{t('community.approved_total')}</span>
                   <span className="text-sm font-medium">{data.approved_count ?? 0}</span>
                 </div>
-                <div className="flex items-center justify-between py-1 border-b border-default-100">
-                  <span className="text-sm text-default-500">{t('community.rejected_total')}</span>
+                <div className="flex items-center justify-between py-1 border-b border-border">
+                  <span className="text-sm text-muted">{t('community.rejected_total')}</span>
                   <span className="text-sm font-medium">{data.rejected_count ?? 0}</span>
                 </div>
-                <div className="flex items-center justify-between py-1 border-b border-default-100">
-                  <span className="text-sm text-default-500">{t('community.matches_today')}</span>
+                <div className="flex items-center justify-between py-1 border-b border-border">
+                  <span className="text-sm text-muted">{t('community.matches_today')}</span>
                   <span className="text-sm font-medium">{overview?.total_matches_today ?? 0}</span>
                 </div>
-                <div className="flex items-center justify-between py-1 border-b border-default-100">
-                  <span className="text-sm text-default-500">{t('community.matches_this_week')}</span>
+                <div className="flex items-center justify-between py-1 border-b border-border">
+                  <span className="text-sm text-muted">{t('community.matches_this_week')}</span>
                   <span className="text-sm font-medium">{overview?.total_matches_week ?? 0}</span>
                 </div>
-                <div className="flex items-center justify-between py-1 border-b border-default-100">
-                  <span className="text-sm text-default-500">{t('community.hot_matches')}</span>
+                <div className="flex items-center justify-between py-1 border-b border-border">
+                  <span className="text-sm text-muted">{t('community.hot_matches')}</span>
                   <span className="text-sm font-medium">{overview?.hot_matches_count ?? 0}</span>
                 </div>
                 <div className="flex items-center justify-between py-1">
-                  <span className="text-sm text-default-500">{t('community.active_matching_users')}</span>
+                  <span className="text-sm text-muted">{t('community.active_matching_users')}</span>
                   <span className="text-sm font-medium">{overview?.active_users_matching ?? 0}</span>
                 </div>
               </div>
             ) : (
-              <div className="flex flex-col items-center py-8 text-default-400">
+              <div className="flex flex-col items-center py-8 text-muted">
                 <Activity size={40} className="mb-3" />
                 <p>{t('community.no_monitoring_data')}</p>
                 <p className="text-xs mt-1">{t('community.configure_matching_hint')}</p>
@@ -131,20 +130,20 @@ export function SmartMatchMonitoring() {
           </CardBody>
         </Card>
 
-        <Card shadow="sm">
+        <Card >
           <CardHeader><h3 className="text-lg font-semibold">{t('community.score_distribution')}</h3></CardHeader>
           <CardBody>
             {data?.score_distribution && Object.keys(data.score_distribution).length > 0 ? (
               <div className="space-y-3">
                 {Object.entries(data.score_distribution).map(([range, count]) => (
-                  <div key={range} className="flex items-center justify-between py-1 border-b border-default-100 last:border-0">
+                  <div key={range} className="flex items-center justify-between py-1 border-b border-border last:border-0">
                     <span className="text-sm">{range}</span>
                     <span className="text-sm font-medium text-accent">{count}</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col items-center py-8 text-default-400">
+              <div className="flex flex-col items-center py-8 text-muted">
                 <BarChart3 size={40} className="mb-3" />
                 <p className="text-sm">{t('community.no_score_distribution')}</p>
               </div>

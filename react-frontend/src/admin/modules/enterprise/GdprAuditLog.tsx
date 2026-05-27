@@ -169,7 +169,7 @@ export function GdprAuditLog() {
         label: t('enterprise.gdpr_action'),
         sortable: true,
         render: (e) => (
-          <Chip size="sm" variant="flat" color={getActionColor(e.action)}>
+          <Chip size="sm" variant="soft" color={getActionColor(e.action)}>
             {e.action}
           </Chip>
         ),
@@ -178,7 +178,7 @@ export function GdprAuditLog() {
         key: 'entity_type',
         label: t('enterprise.gdpr_col_entity_type'),
         render: (e) => (
-          <Chip size="sm" variant="flat" color="default">
+          <Chip size="sm" variant="soft" color="default">
             {e.entity_type}
           </Chip>
         ),
@@ -203,7 +203,7 @@ export function GdprAuditLog() {
         render: (e) => (
           <Button
             isIconOnly
-            variant="light"
+            variant="tertiary"
             size="sm"
             onPress={() => handleViewEntry(e)}
             aria-label={t('enterprise.gdpr_view_details')}
@@ -226,7 +226,7 @@ export function GdprAuditLog() {
         actions={
           <div className="flex gap-2">
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<Download size={16} />}
               onPress={handleExportCsv}
               size="sm"
@@ -234,7 +234,7 @@ export function GdprAuditLog() {
               {t('enterprise.gdpr_export_csv')}
             </Button>
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<RefreshCw size={16} />}
               onPress={loadData}
               isLoading={loading}
@@ -299,8 +299,7 @@ export function GdprAuditLog() {
             />
 
             <Button
-              color="primary"
-              variant="flat"
+              variant="tertiary"
               size="sm"
               startContent={<Filter size={16} />}
               onPress={handleApplyFilters}
@@ -310,7 +309,7 @@ export function GdprAuditLog() {
 
             {hasActiveFilters && (
               <Button
-                variant="light"
+                variant="tertiary"
                 size="sm"
                 onPress={handleClearFilters}
               >
@@ -348,31 +347,31 @@ export function GdprAuditLog() {
                     {/* Top metadata grid */}
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <p className="text-xs text-default-400">{t('enterprise.gdpr_detail_action')}</p>
-                        <Chip size="sm" variant="flat" color={getActionColor(selectedEntry.action)}>
+                        <p className="text-xs text-muted">{t('enterprise.gdpr_detail_action')}</p>
+                        <Chip size="sm" variant="soft" color={getActionColor(selectedEntry.action)}>
                           {selectedEntry.action}
                         </Chip>
                       </div>
                       <div>
-                        <p className="text-xs text-default-400">{t('enterprise.gdpr_detail_entity_type')}</p>
-                        <Chip size="sm" variant="flat" color="default">
+                        <p className="text-xs text-muted">{t('enterprise.gdpr_detail_entity_type')}</p>
+                        <Chip size="sm" variant="soft" color="default">
                           {selectedEntry.entity_type}
                         </Chip>
                       </div>
                       <div>
-                        <p className="text-xs text-default-400">{t('enterprise.gdpr_detail_entity_id')}</p>
+                        <p className="text-xs text-muted">{t('enterprise.gdpr_detail_entity_id')}</p>
                         <p className="text-sm">{selectedEntry.entity_id}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-default-400">{t('enterprise.gdpr_detail_admin_user')}</p>
+                        <p className="text-xs text-muted">{t('enterprise.gdpr_detail_admin_user')}</p>
                         <p className="text-sm">{selectedEntry.user_name || `ID ${selectedEntry.admin_id}`}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-default-400">{t('enterprise.gdpr_detail_ip_address')}</p>
+                        <p className="text-xs text-muted">{t('enterprise.gdpr_detail_ip_address')}</p>
                         <p className="text-sm font-mono">{selectedEntry.ip_address || '-'}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-default-400">{t('enterprise.gdpr_detail_timestamp')}</p>
+                        <p className="text-xs text-muted">{t('enterprise.gdpr_detail_timestamp')}</p>
                         <p className="text-sm">{new Date(selectedEntry.created_at).toLocaleString()}</p>
                       </div>
                     </div>
@@ -382,16 +381,16 @@ export function GdprAuditLog() {
                       <div className={`grid gap-4 ${selectedEntry.old_value && selectedEntry.new_value ? 'md:grid-cols-2' : 'grid-cols-1'}`}>
                         {selectedEntry.old_value && (
                           <div>
-                            <p className="text-xs text-default-400 mb-1">{t('enterprise.gdpr_old_value')}</p>
-                            <pre className="text-xs bg-default-100 border border-default-200 rounded-lg p-3 overflow-auto max-h-60 whitespace-pre-wrap break-all">
+                            <p className="text-xs text-muted mb-1">{t('enterprise.gdpr_old_value')}</p>
+                            <pre className="text-xs bg-surface-secondary border border-border rounded-lg p-3 overflow-auto max-h-60 whitespace-pre-wrap break-all">
                               {selectedEntry.old_value}
                             </pre>
                           </div>
                         )}
                         {selectedEntry.new_value && (
                           <div>
-                            <p className="text-xs text-default-400 mb-1">{t('enterprise.gdpr_new_value')}</p>
-                            <pre className="text-xs bg-default-100 border border-default-200 rounded-lg p-3 overflow-auto max-h-60 whitespace-pre-wrap break-all">
+                            <p className="text-xs text-muted mb-1">{t('enterprise.gdpr_new_value')}</p>
+                            <pre className="text-xs bg-surface-secondary border border-border rounded-lg p-3 overflow-auto max-h-60 whitespace-pre-wrap break-all">
                               {selectedEntry.new_value}
                             </pre>
                           </div>
@@ -406,7 +405,7 @@ export function GdprAuditLog() {
                 )}
               </ModalBody>
               <ModalFooter>
-                <Button variant="light" onPress={onClose}>
+                <Button variant="tertiary" onPress={onClose}>
                   {t('enterprise.gdpr_close')}
                 </Button>
               </ModalFooter>

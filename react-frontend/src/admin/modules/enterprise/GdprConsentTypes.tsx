@@ -1,5 +1,5 @@
 import { CardBody, Card, Select, SelectItem, Progress, Button, Chip, Spinner, Input, Textarea, Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Switch } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
+// Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -246,7 +246,7 @@ export function GdprConsentTypes() {
         actions={
           <div className="flex gap-2">
             <Button
-              variant="flat"
+              variant="secondary"
               startContent={<RefreshCw size={16} />}
               onPress={loadData}
               isLoading={loading}
@@ -255,7 +255,6 @@ export function GdprConsentTypes() {
               {t('enterprise.refresh')}
             </Button>
             <Button
-              color="primary"
               startContent={<Plus size={16} />}
               onPress={openCreateModal}
               size="sm"
@@ -273,34 +272,34 @@ export function GdprConsentTypes() {
           const consentRate = totalResponses > 0 ? (ct.granted_count / totalResponses) * 100 : 0;
 
           return (
-            <Card key={ct.id} shadow="sm">
+            <Card key={ct.id}>
               <CardBody className="p-4 space-y-3">
                 <div className="flex justify-between items-start">
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold text-foreground truncate">{ct.name}</p>
-                    <p className="text-xs text-default-400 font-mono">{ct.slug}</p>
+                    <p className="text-xs text-muted font-mono">{ct.slug}</p>
                   </div>
                   <div className="flex gap-1 shrink-0">
                     {ct.is_required && (
-                      <Chip size="sm" variant="flat" color="warning">{t('enterprise.gdpr_required')}</Chip>
+                      <Chip size="sm" variant="soft" color="warning">{t('enterprise.gdpr_required')}</Chip>
                     )}
-                    <Chip size="sm" variant="flat" color={ct.is_active ? 'success' : 'default'}>
+                    <Chip size="sm" variant="soft" color={ct.is_active ? 'success' : 'default'}>
                       {ct.is_active ? t('enterprise.gdpr_active') : t('enterprise.gdpr_inactive')}
                     </Chip>
                   </div>
                 </div>
 
                 {ct.category && (
-                  <Chip size="sm" variant="bordered" className="capitalize">{ct.category}</Chip>
+                  <Chip size="sm" variant="soft" className="capitalize">{ct.category}</Chip>
                 )}
 
                 {ct.legal_basis && (
-                  <p className="text-xs text-default-500 line-clamp-2">{ct.legal_basis}</p>
+                  <p className="text-xs text-muted line-clamp-2">{ct.legal_basis}</p>
                 )}
 
                 {/* Consent Rate Progress */}
                 <div>
-                  <div className="flex justify-between text-xs text-default-500 mb-1">
+                  <div className="flex justify-between text-xs text-muted mb-1">
                     <span>{t('enterprise.gdpr_consent_rate')}</span>
                     <span>{consentRate.toFixed(1)}% ({ct.granted_count}/{totalResponses})</span>
                   </div>
@@ -316,7 +315,7 @@ export function GdprConsentTypes() {
                 <div className="flex gap-2 pt-1">
                   <Button
                     size="sm"
-                    variant="flat"
+                    variant="secondary"
                     startContent={<Edit size={12} />}
                     onPress={() => openEditModal(ct)}
                   >
@@ -324,7 +323,7 @@ export function GdprConsentTypes() {
                   </Button>
                   <Button
                     size="sm"
-                    variant="flat"
+                    variant="secondary"
                     startContent={<Users size={12} />}
                     onPress={() => openUsersModal(ct.slug, ct.name)}
                   >
@@ -332,8 +331,7 @@ export function GdprConsentTypes() {
                   </Button>
                   <Button
                     size="sm"
-                    variant="flat"
-                    color="danger"
+                    variant="danger"
                     isIconOnly
                     aria-label={t('enterprise.gdpr_delete')}
                     onPress={() => { setDeleteId(ct.id); setDeleteOpen(true); }}
@@ -347,7 +345,7 @@ export function GdprConsentTypes() {
         })}
 
         {consentTypes.length === 0 && (
-          <div className="col-span-full text-center py-12 text-default-400">
+          <div className="col-span-full text-center py-12 text-muted">
             {t('enterprise.gdpr_no_consent_types')}
           </div>
         )}
@@ -364,7 +362,7 @@ export function GdprConsentTypes() {
                 placeholder={t('enterprise.gdpr_slug_placeholder')}
                 value={formData.slug}
                 onValueChange={(val) => setFormData({ ...formData, slug: val })}
-                variant="bordered"
+                variant="secondary"
                 isRequired
                 isDisabled={!!editingId}
               />
@@ -373,7 +371,7 @@ export function GdprConsentTypes() {
                 placeholder={t('enterprise.gdpr_name_placeholder')}
                 value={formData.name}
                 onValueChange={(val) => setFormData({ ...formData, name: val })}
-                variant="bordered"
+                variant="secondary"
                 isRequired
               />
             </div>
@@ -382,7 +380,7 @@ export function GdprConsentTypes() {
               placeholder={t('enterprise.gdpr_description_placeholder')}
               value={formData.description}
               onValueChange={(val) => setFormData({ ...formData, description: val })}
-              variant="bordered"
+              variant="secondary"
               minRows={2}
             />
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -393,7 +391,7 @@ export function GdprConsentTypes() {
                   const val = Array.from(keys)[0] as string;
                   if (val) setFormData({ ...formData, category: val });
                 }}
-                variant="bordered"
+                variant="secondary"
               >
                 {CATEGORY_OPTIONS.map((key) => (
                   <SelectItem key={key} id={key} className="capitalize">{t(`enterprise.gdpr_category_${key}`)}</SelectItem>
@@ -404,7 +402,7 @@ export function GdprConsentTypes() {
                 placeholder={t('enterprise.gdpr_legal_basis_placeholder')}
                 value={formData.legal_basis}
                 onValueChange={(val) => setFormData({ ...formData, legal_basis: val })}
-                variant="bordered"
+                variant="secondary"
               />
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -414,14 +412,14 @@ export function GdprConsentTypes() {
                 type="number"
                 value={formData.retention_days}
                 onValueChange={(val) => setFormData({ ...formData, retention_days: val })}
-                variant="bordered"
+                variant="secondary"
               />
               <Input
                 label={t('enterprise.gdpr_display_order')}
                 type="number"
                 value={formData.display_order}
                 onValueChange={(val) => setFormData({ ...formData, display_order: val })}
-                variant="bordered"
+                variant="secondary"
               />
             </div>
             <div className="flex gap-6">
@@ -440,10 +438,10 @@ export function GdprConsentTypes() {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={() => setFormOpen(false)} isDisabled={formLoading}>
+            <Button variant="tertiary" onPress={() => setFormOpen(false)} isDisabled={formLoading}>
               {t('enterprise.gdpr_cancel')}
             </Button>
-            <Button color="primary" onPress={handleFormSubmit} isLoading={formLoading}>
+            <Button onPress={handleFormSubmit} isLoading={formLoading}>
               {editingId ? t('enterprise.gdpr_update') : t('enterprise.gdpr_create')}
             </Button>
           </ModalFooter>
@@ -457,7 +455,7 @@ export function GdprConsentTypes() {
             <span>{t('enterprise.gdpr_users_modal_title', { name: usersName })}</span>
             <Button
               size="sm"
-              variant="flat"
+              variant="secondary"
               startContent={<ExternalLink size={14} />}
               onPress={() => handleExportUsers(usersSlug)}
             >
@@ -474,7 +472,7 @@ export function GdprConsentTypes() {
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={() => setUsersOpen(false)}>{t('enterprise.gdpr_close')}</Button>
+            <Button variant="tertiary" onPress={() => setUsersOpen(false)}>{t('enterprise.gdpr_close')}</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

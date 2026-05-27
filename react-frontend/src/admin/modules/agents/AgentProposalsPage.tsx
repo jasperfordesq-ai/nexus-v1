@@ -158,8 +158,8 @@ export default function AgentProposalsPage() {
       </Tabs>
 
       {loading && (
-        <Card shadow="sm" className="border border-divider/70 bg-surface">
-          <CardBody className="py-8 text-sm text-default-500">
+        <Card  className="border border-divider/70 bg-surface">
+          <CardBody className="py-8 text-sm text-muted">
             {t('agents.proposals.loading')}
           </CardBody>
         </Card>
@@ -176,51 +176,50 @@ export default function AgentProposalsPage() {
       {!loading && (
       <div className="space-y-4">
         {items.map((p) => (
-          <Card key={p.id} className="border border-default-200">
+          <Card key={p.id} className="border border-border">
             <CardHeader className="flex flex-wrap gap-2 justify-between items-start">
               <div className="flex flex-wrap gap-2 items-center">
-                <Chip size="sm" variant="flat" color="primary">{p.proposal_type}</Chip>
-                <Chip size="sm" variant="flat" color={confidenceColor(p.confidence_score)}>
+                <Chip size="sm" variant="soft">{p.proposal_type}</Chip>
+                <Chip size="sm" variant="soft" color={confidenceColor(p.confidence_score)}>
                   {t('agents.proposals.confidence', {
                     score: (typeof p.confidence_score === 'string'
                       ? parseFloat(p.confidence_score)
                       : (p.confidence_score ?? 0)).toFixed(2),
                   })}
                 </Chip>
-                <Chip size="sm" variant="flat">{t('agents.proposals.run_id', { id: p.run_id })}</Chip>
+                <Chip size="sm" variant="soft">{t('agents.proposals.run_id', { id: p.run_id })}</Chip>
                 {p.subject_user_id && (
-                  <Chip size="sm" variant="flat">{t('agents.proposals.subject_user', { id: p.subject_user_id })}</Chip>
+                  <Chip size="sm" variant="soft">{t('agents.proposals.subject_user', { id: p.subject_user_id })}</Chip>
                 )}
                 {p.target_user_id && (
-                  <Chip size="sm" variant="flat">{t('agents.proposals.target_user', { id: p.target_user_id })}</Chip>
+                  <Chip size="sm" variant="soft">{t('agents.proposals.target_user', { id: p.target_user_id })}</Chip>
                 )}
-                <Chip size="sm" variant="flat" color={
+                <Chip size="sm" variant="soft" color={
                   p.status === 'approved' ? 'success' :
                   p.status === 'rejected' ? 'danger' : 'warning'
                 }>{t(`agents.proposal_status.${p.status}`, p.status)}</Chip>
               </div>
-              <span className="text-xs text-default-400">
+              <span className="text-xs text-muted">
                 {new Date(p.created_at).toLocaleString()}
               </span>
             </CardHeader>
             <CardBody className="space-y-3">
               {p.reasoning && (
                 <div>
-                  <p className="text-xs font-semibold uppercase text-default-500">{t('agents.proposals.labels.reasoning')}</p>
+                  <p className="text-xs font-semibold uppercase text-muted">{t('agents.proposals.labels.reasoning')}</p>
                   <p className="text-sm">{p.reasoning}</p>
                 </div>
               )}
               <div>
-                <p className="text-xs font-semibold uppercase text-default-500">{t('agents.proposals.labels.payload')}</p>
-                <pre className="text-xs bg-default-100 p-3 rounded-md overflow-x-auto">
+                <p className="text-xs font-semibold uppercase text-muted">{t('agents.proposals.labels.payload')}</p>
+                <pre className="text-xs bg-surface-secondary p-3 rounded-md overflow-x-auto">
                   {JSON.stringify(p.proposal_data, null, 2)}
                 </pre>
               </div>
               {p.status === 'pending_review' && (
                 <div className="flex gap-2 flex-wrap">
                   <Button
-                    color="success"
-                    variant="flat"
+                    variant="secondary"
                     size="sm"
                     startContent={<CheckCircle2 className="w-4 h-4" />}
                     isLoading={busyId === p.id}
@@ -229,8 +228,7 @@ export default function AgentProposalsPage() {
                     {t('agents.proposals.actions.approve')}
                   </Button>
                   <Button
-                    color="primary"
-                    variant="flat"
+                    variant="tertiary"
                     size="sm"
                     startContent={<Edit3 className="w-4 h-4" />}
                     onPress={() => openEdit(p)}
@@ -238,8 +236,7 @@ export default function AgentProposalsPage() {
                     {t('agents.proposals.actions.edit_approve')}
                   </Button>
                   <Button
-                    color="danger"
-                    variant="flat"
+                    variant="danger"
                     size="sm"
                     startContent={<XCircle className="w-4 h-4" />}
                     onPress={() => { setRejecting(p); setRejectNote(''); }}
@@ -266,8 +263,8 @@ export default function AgentProposalsPage() {
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={() => setRejecting(null)}>{t('agents.actions.cancel')}</Button>
-            <Button color="danger" isLoading={busyId === rejecting?.id} onPress={handleConfirmReject}>
+            <Button variant="tertiary" onPress={() => setRejecting(null)}>{t('agents.actions.cancel')}</Button>
+            <Button variant="danger" isLoading={busyId === rejecting?.id} onPress={handleConfirmReject}>
               {t('agents.proposals.actions.reject')}
             </Button>
           </ModalFooter>
@@ -287,8 +284,8 @@ export default function AgentProposalsPage() {
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={() => setEditing(null)}>{t('agents.actions.cancel')}</Button>
-            <Button color="success" isLoading={busyId === editing?.id} onPress={handleEditApprove}>
+            <Button variant="tertiary" onPress={() => setEditing(null)}>{t('agents.actions.cancel')}</Button>
+            <Button variant="secondary" isLoading={busyId === editing?.id} onPress={handleEditApprove}>
               {t('agents.proposals.actions.save_approve')}
             </Button>
           </ModalFooter>

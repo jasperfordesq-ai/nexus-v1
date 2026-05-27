@@ -185,13 +185,13 @@ export function BillingPage() {
             ) : userCount !== null && usagePct !== null ? (
               <>
                 <div className="flex items-center justify-between text-sm mb-1">
-                  <span className="text-default-500">
+                  <span className="text-muted">
                     {t('billing.user_count_label', {
                       count: userCount,
                       max: maxUsers,
                     })}
                   </span>
-                  <span className="text-default-500">{usagePct}%</span>
+                  <span className="text-muted">{usagePct}%</span>
                 </div>
                 <Progress
                   value={usagePct}
@@ -213,8 +213,7 @@ export function BillingPage() {
             ) : null}
 
             <Button
-              color="primary"
-              variant="flat"
+              variant="tertiary"
               size="sm"
               className="self-start"
               onPress={onUpgradeOpen}
@@ -230,7 +229,7 @@ export function BillingPage() {
         <ModalContent>
           <ModalHeader>{t('billing.request_upgrade')}</ModalHeader>
           <ModalBody>
-            <p className="text-default-500 text-sm mb-3">
+            <p className="text-muted text-sm mb-3">
               {t('billing.upgrade_modal_desc')}
             </p>
             <Textarea
@@ -242,10 +241,10 @@ export function BillingPage() {
             />
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onUpgradeClose}>
+            <Button variant="tertiary" onPress={onUpgradeClose}>
               {t('billing.cancel')}
             </Button>
-            <Button color="primary" isLoading={upgradeSending} onPress={handleUpgradeRequest}>
+            <Button isLoading={upgradeSending} onPress={handleUpgradeRequest}>
               {t('billing.send_request')}
             </Button>
           </ModalFooter>
@@ -270,10 +269,10 @@ export function BillingPage() {
                 <>
                   <div className="flex items-center gap-3 flex-wrap">
                     <h4 className="text-xl font-bold">{subscription.plan_name}</h4>
-                    <Chip size="sm" variant="flat" color="primary">
+                    <Chip size="sm" variant="soft">
                       {t('billing.tier')} {subscription.plan_tier_level}
                     </Chip>
-                    <Chip size="sm" variant="flat" color={statusColor(subscription.status)}>
+                    <Chip size="sm" variant="soft" color={statusColor(subscription.status)}>
                       {statusLabel(subscription.status, (key, defaultValue) =>
                         defaultValue === undefined ? t(key) : t(key, defaultValue)
                       )}
@@ -282,13 +281,13 @@ export function BillingPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
                     <div>
-                      <p className="text-sm text-default-500">
+                      <p className="text-sm text-muted">
                         {t('billing.billing_interval')}
                       </p>
                       <p className="font-medium capitalize">{subscription.billing_interval}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-default-500">
+                      <p className="text-sm text-muted">
                         {t('billing.next_billing_date')}
                       </p>
                       <p className="font-medium">
@@ -299,7 +298,7 @@ export function BillingPage() {
                     </div>
                     {subscription.trial_ends_at && (
                       <div>
-                        <p className="text-sm text-default-500">
+                        <p className="text-sm text-muted">
                           {t('billing.trial_ends')}
                         </p>
                         <p className="font-medium">
@@ -309,7 +308,7 @@ export function BillingPage() {
                     )}
                     {subscription.cancel_at_period_end && (
                       <div>
-                        <Chip size="sm" color="warning" variant="flat">
+                        <Chip size="sm" color="warning" variant="soft">
                           {t('billing.cancels_at_period_end')}
                         </Chip>
                       </div>
@@ -318,14 +317,13 @@ export function BillingPage() {
                 </>
               ) : (
                 <div className="text-center py-6">
-                  <CreditCard className="w-12 h-12 text-default-300 mx-auto mb-3" />
-                  <p className="text-default-500 mb-4">
+                  <CreditCard className="w-12 h-12 text-muted mx-auto mb-3" />
+                  <p className="text-muted mb-4">
                     {t('billing.no_subscription')}
                   </p>
                   <Button
                     as={Link}
                     to={tenantPath('/admin/billing/plans')}
-                    color="primary"
                     endContent={<ArrowRight className="w-4 h-4" />}
                   >
                     {t('billing.choose_plan')}
@@ -345,8 +343,7 @@ export function BillingPage() {
               <Button
                 as={Link}
                 to={tenantPath('/admin/billing/plans')}
-                variant="flat"
-                color="primary"
+                variant="tertiary"
                 className="justify-start"
                 startContent={<CreditCard className="w-4 h-4" />}
                 endContent={<ArrowRight className="w-4 h-4 ml-auto" />}
@@ -357,7 +354,7 @@ export function BillingPage() {
 
               {hasActiveSubscription && (
                 <Button
-                  variant="flat"
+                  variant="tertiary"
                   className="justify-start"
                   startContent={<Settings className="w-4 h-4" />}
                   endContent={<ArrowRight className="w-4 h-4 ml-auto" />}
@@ -372,7 +369,7 @@ export function BillingPage() {
               <Button
                 as={Link}
                 to={tenantPath('/admin/billing/invoices')}
-                variant="flat"
+                variant="tertiary"
                 className="justify-start"
                 startContent={<Receipt className="w-4 h-4" />}
                 endContent={<ArrowRight className="w-4 h-4 ml-auto" />}

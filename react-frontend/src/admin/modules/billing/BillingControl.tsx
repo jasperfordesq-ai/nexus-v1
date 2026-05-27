@@ -316,8 +316,7 @@ export function BillingControl() {
         actions={
           <Button
             size="sm"
-            variant="flat"
-            color="default"
+            variant="tertiary"
             startContent={<Download size={14} />}
             onPress={() => window.open('/api/v2/admin/super/billing/export', '_blank')}
           >
@@ -362,7 +361,7 @@ export function BillingControl() {
 
                   {/* Users: own + subtree total */}
                   <TableCell>
-                    <span className="text-sm text-default-600">
+                    <span className="text-sm text-muted">
                       {formatUserCount(row)}
                     </span>
                   </TableCell>
@@ -371,7 +370,7 @@ export function BillingControl() {
                   <TableCell>
                     <Chip
                       size="sm"
-                      variant="flat"
+                      variant="soft"
                       color={getPlanChipColor(row)}
                     >
                       {getPlanChipLabel(row)}
@@ -381,14 +380,14 @@ export function BillingControl() {
                   {/* Effective price */}
                   <TableCell>
                     <div className="flex items-center gap-1 flex-wrap">
-                      <span className="text-sm text-default-700">
+                      <span className="text-sm text-foreground">
                         {row.effective_price
                           ? `${formatEur(row.effective_price.yearly)}/${t('billing.yearly_suffix')}`
                           : '—'
                         }
                       </span>
                       {row.effective_price?.has_custom || row.effective_price?.discount_pct > 0 ? (
-                        <Chip size="sm" variant="flat" color="secondary" className="text-xs">
+                        <Chip size="sm" variant="soft" className="text-xs">
                           {t('billing.custom_badge')}
                         </Chip>
                       ) : null}
@@ -400,7 +399,7 @@ export function BillingControl() {
 
                   {/* Status */}
                   <TableCell>
-                    <span className="text-sm text-default-600">
+                    <span className="text-sm text-muted">
                       {row.is_paused
                         ? t('billing.paused')
                         : row.is_in_grace_period
@@ -418,8 +417,7 @@ export function BillingControl() {
                       <div className="flex items-center gap-1 flex-wrap">
                         <Button
                           size="sm"
-                          color="primary"
-                          variant="flat"
+                          variant="secondary"
                           onPress={() => handleOpenAssign(row)}
                         >
                           {t('billing.assign_plan')}
@@ -427,7 +425,7 @@ export function BillingControl() {
                         <Button
                           size="sm"
                           color={row.is_paused ? 'success' : 'warning'}
-                          variant="flat"
+                          variant={row.is_paused ? 'secondary' : 'tertiary'}
                           isLoading={pausingId === row.tenant_id}
                           onPress={() => void handlePause(row)}
                         >
@@ -435,8 +433,7 @@ export function BillingControl() {
                         </Button>
                         <Button
                           size="sm"
-                          color="secondary"
-                          variant="flat"
+                          variant="tertiary"
                           onPress={() => handleOpenGrace(row)}
                         >
                           {t('billing.set_grace_period')}
@@ -459,7 +456,7 @@ export function BillingControl() {
           <ModalHeader>
             {t('billing.assign_plan_title')}
             {selectedTenant && (
-              <span className="text-default-500 text-sm font-normal ml-2">
+              <span className="text-muted text-sm font-normal ml-2">
                 — {selectedTenant.tenant_name}
               </span>
             )}
@@ -511,7 +508,7 @@ export function BillingControl() {
                       ? String(plans.find((p) => String(p.id) === selectedPlanId)?.user_limit ?? '')
                       : ''
                   }
-                  startContent={<span className="text-default-400 text-sm">€</span>}
+                  startContent={<span className="text-muted text-sm">€</span>}
                 />
 
                 <Input
@@ -520,7 +517,7 @@ export function BillingControl() {
                   min={0}
                   value={customPriceYearly}
                   onValueChange={setCustomPriceYearly}
-                  startContent={<span className="text-default-400 text-sm">€</span>}
+                  startContent={<span className="text-muted text-sm">€</span>}
                 />
 
                 <Input
@@ -530,7 +527,7 @@ export function BillingControl() {
                   max={100}
                   value={discountPct}
                   onValueChange={setDiscountPct}
-                  endContent={<span className="text-default-400 text-sm">%</span>}
+                  endContent={<span className="text-muted text-sm">%</span>}
                 />
 
                 <Input
@@ -540,10 +537,10 @@ export function BillingControl() {
                   placeholder={t('billing.discount_reason_placeholder')}
                 />
 
-                <div className="flex items-center justify-between rounded-lg border border-default-200 px-4 py-3">
+                <div className="flex items-center justify-between rounded-lg border border-border px-4 py-3">
                   <div>
                     <p className="text-sm font-medium">{t('billing.nonprofit_verified')}</p>
-                    <p className="text-xs text-default-500">{t('billing.nonprofit_verified_desc')}</p>
+                    <p className="text-xs text-muted">{t('billing.nonprofit_verified_desc')}</p>
                   </div>
                   <Switch
                     isSelected={nonprofitVerified}
@@ -555,11 +552,10 @@ export function BillingControl() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onAssignClose} isDisabled={assigning}>
+            <Button variant="tertiary" onPress={onAssignClose} isDisabled={assigning}>
               {t('billing.cancel')}
             </Button>
             <Button
-              color="primary"
               onPress={() => void handleAssign()}
               isLoading={assigning}
               isDisabled={!selectedPlanId || plansLoading}
@@ -578,14 +574,14 @@ export function BillingControl() {
           <ModalHeader>
             {t('billing.grace_period_modal_title')}
             {graceTenant && (
-              <span className="text-default-500 text-sm font-normal ml-2">
+              <span className="text-muted text-sm font-normal ml-2">
                 — {graceTenant.tenant_name}
               </span>
             )}
           </ModalHeader>
           <ModalBody>
             <div className="flex flex-col gap-3">
-              <p className="text-sm text-default-600">{t('billing.grace_period_desc')}</p>
+              <p className="text-sm text-muted">{t('billing.grace_period_desc')}</p>
               <Input
                 label={t('billing.grace_days')}
                 type="number"
@@ -597,11 +593,11 @@ export function BillingControl() {
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onGraceClose} isDisabled={settingGrace}>
+            <Button variant="tertiary" onPress={onGraceClose} isDisabled={settingGrace}>
               {t('billing.cancel')}
             </Button>
             <Button
-              color="secondary"
+              variant="secondary"
               onPress={() => void handleSetGrace()}
               isLoading={settingGrace}
               isDisabled={!graceDays}

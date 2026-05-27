@@ -247,7 +247,7 @@ export function MyProfile() {
           description={t('federation.my_profile_desc')}
         />
         <div className="space-y-6">
-          <Card shadow="sm">
+          <Card >
             <CardHeader><Skeleton className="h-5 w-36 rounded-lg" /></CardHeader>
             <CardBody className="space-y-4">
               <Skeleton className="h-10 w-full rounded-lg" />
@@ -267,13 +267,13 @@ export function MyProfile() {
           title={t('federation.my_profile_title')}
           description={t('federation.my_profile_desc')}
           actions={
-            <Button variant="flat" startContent={<RefreshCw size={16} />} onPress={loadData}>
+            <Button variant="tertiary" startContent={<RefreshCw size={16} />} onPress={loadData}>
               {t('federation.refresh')}
             </Button>
           }
         />
-        <Card shadow="sm">
-          <CardBody className="flex flex-col items-center py-8 text-default-400">
+        <Card >
+          <CardBody className="flex flex-col items-center py-8 text-muted">
             <Building size={40} className="mb-2" />
             <p>{t('federation.profile_not_available')}</p>
             <p className="text-xs mt-1">{t('federation.enable_federation_to_create_profile')}</p>
@@ -290,7 +290,7 @@ export function MyProfile() {
         description={t('federation.my_profile_desc')}
         actions={
           <Button
-            variant="flat"
+            variant="tertiary"
             startContent={<RefreshCw size={16} />}
             onPress={() => { loadData(); loadTopics(); }}
             size="sm"
@@ -302,11 +302,10 @@ export function MyProfile() {
 
       <div className="space-y-6">
         {/* Profile Details Card */}
-        <Card shadow="sm">
+        <Card >
           <CardHeader className="flex items-center justify-between">
             <h3 className="text-lg font-semibold">{t('federation.community_profile')}</h3>
             <Button
-              color="primary"
               startContent={<Save size={16} />}
               onPress={handleSaveProfile}
               isLoading={saving}
@@ -321,14 +320,14 @@ export function MyProfile() {
               label={t('federation.community_name')}
               value={name}
               onValueChange={(val) => { setName(val); markDirty(); }}
-              variant="bordered"
+              variant="secondary"
               description={t('federation.desc_the_public_name_of_your_community_in_the')}
             />
             <Input
               label={t('federation.slug')}
               value={profile.slug}
               isReadOnly
-              variant="bordered"
+              variant="secondary"
               description={t('federation.slug_desc')}
             />
             <Input
@@ -336,7 +335,7 @@ export function MyProfile() {
               type="email"
               value={contactEmail}
               onValueChange={(val) => { setContactEmail(val); markDirty(); }}
-              variant="bordered"
+              variant="secondary"
               description={t('federation.public_contact_email_desc')}
             />
             <Input
@@ -344,7 +343,7 @@ export function MyProfile() {
               type="url"
               value={website}
               onValueChange={(val) => { setWebsite(val); markDirty(); }}
-              variant="bordered"
+              variant="secondary"
               placeholder="https://"
               description={t('federation.website_desc')}
             />
@@ -352,7 +351,7 @@ export function MyProfile() {
               label={t('federation.description')}
               value={description}
               onValueChange={(val) => { setDescription(val); markDirty(); }}
-              variant="bordered"
+              variant="secondary"
               minRows={3}
               maxRows={6}
               description={t('federation.desc_a_brief_description_of_your_community_fo')}
@@ -361,19 +360,18 @@ export function MyProfile() {
         </Card>
 
         {/* Topic / Interest Tags Card */}
-        <Card shadow="sm">
+        <Card >
           <CardHeader className="flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <Tag size={18} />
                 {t('federation.topic_tags_title')}
               </h3>
-              <p className="text-sm text-default-400 mt-1">
+              <p className="text-sm text-muted mt-1">
                 {t('federation.topic_tags_desc')}
               </p>
             </div>
             <Button
-              color="primary"
               startContent={<Save size={16} />}
               onPress={handleSaveTopics}
               isLoading={topicsSaving}
@@ -391,7 +389,7 @@ export function MyProfile() {
             ) : (
               <>
                 {/* Selection count */}
-                <div className="text-sm text-default-500">
+                <div className="text-sm text-muted">
                 {t('federation.topics_selected_count', { count: selectedTopicIds.size })}
                 {primaryTopicIds.size > 0 && (
                   <span className="ml-2 text-warning">
@@ -401,14 +399,14 @@ export function MyProfile() {
                 </div>
 
                 {/* Helper text for primary topic toggle */}
-                <p className="text-xs text-default-400">
+                <p className="text-xs text-muted">
                   {t('federation.click_star_for_primary_hint')}
                 </p>
 
                 {/* Topics grouped by category */}
                 {Object.entries(topicsByCategory).map(([category, topics]) => (
                   <div key={category}>
-                    <h4 className="text-sm font-medium text-default-600 mb-2">
+                    <h4 className="text-sm font-medium text-muted mb-2">
                       {CATEGORY_LABELS[category] || category}
                     </h4>
                     <div className="flex flex-wrap gap-2">
@@ -443,9 +441,9 @@ export function MyProfile() {
                 {/* Selected topics summary with primary toggle */}
                 {selectedTopicIds.size > 0 && (
                   <div className="border-t border-divider pt-4">
-                    <h4 className="text-sm font-medium text-default-600 mb-2">
+                    <h4 className="text-sm font-medium text-muted mb-2">
                       {t('federation.your_selected_topics')}
-                      <span className="font-normal text-default-400 ml-2">
+                      <span className="font-normal text-muted ml-2">
                         ({t('federation.click_star_for_primary')})
                       </span>
                     </h4>
@@ -457,14 +455,14 @@ export function MyProfile() {
                           return (
                             <Chip
                               key={topic.id}
-                              variant="solid"
+                              variant="primary"
                               color={isPrimary ? 'warning' : 'primary'}
                               startContent={
                                 <Button
                                   isIconOnly
-                                  variant="light"
+                                  variant="tertiary"
                                   size="sm"
-                                  className="flex items-center min-w-0 w-auto h-auto p-0"
+                                  className="flex items-center min-w-0 w-auto min-h-10 p-0"
                                   onClick={(e) => { e.stopPropagation(); togglePrimary(topic.id); }}
                                   aria-label={isPrimary ? t('federation.remove_primary') : t('federation.set_as_primary')}
                                 >

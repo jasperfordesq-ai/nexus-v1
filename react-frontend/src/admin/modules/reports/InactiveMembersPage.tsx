@@ -290,8 +290,7 @@ export function InactiveMembersPage() {
               ))}
             </Select>
             <Button
-              color="primary"
-              variant="flat"
+              variant="tertiary"
               startContent={<Scan size={16} />}
               onPress={handleDetect}
               isLoading={detecting}
@@ -301,7 +300,7 @@ export function InactiveMembersPage() {
               {t('reports.run_detection')}
             </Button>
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<Download size={16} />}
               onPress={async () => {
                 try { await exportCsv(days); } catch { toast.error(t('reports.failed_to_export_c_s_v')); }
@@ -311,7 +310,7 @@ export function InactiveMembersPage() {
               {t('reports.export_csv')}
             </Button>
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<RefreshCw size={16} />}
               onPress={loadData}
               isLoading={loading}
@@ -351,32 +350,32 @@ export function InactiveMembersPage() {
           label={t('reports.label_inactivity_rate')}
           value={stats ? `${(stats.inactivity_rate * 100).toFixed(1)}%` : '\u2014'}
           icon={Activity}
-          color="secondary"
+          color="default"
           loading={!stats}
         />
       </div>
 
       {/* Secondary stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-6">
-        <Card shadow="sm">
+        <Card >
           <CardBody className="p-4">
-            <p className="text-sm text-default-500">{t('reports.label_active_members')}</p>
+            <p className="text-sm text-muted">{t('reports.label_active_members')}</p>
             <p className="text-2xl font-bold text-foreground">
               {stats?.total_active_members?.toLocaleString() ?? '\u2014'}
             </p>
           </CardBody>
         </Card>
-        <Card shadow="sm">
+        <Card >
           <CardBody className="p-4">
-            <p className="text-sm text-default-500">{t('reports.at_risk')}</p>
+            <p className="text-sm text-muted">{t('reports.at_risk')}</p>
             <p className="text-2xl font-bold text-warning">
               {stats?.at_risk_count?.toLocaleString() ?? '\u2014'}
             </p>
           </CardBody>
         </Card>
-        <Card shadow="sm">
+        <Card >
           <CardBody className="p-4">
-            <p className="text-sm text-default-500">{t('reports.already_notified')}</p>
+            <p className="text-sm text-muted">{t('reports.already_notified')}</p>
             <p className="text-2xl font-bold text-foreground">
               {stats?.notified_count?.toLocaleString() ?? '\u2014'}
             </p>
@@ -386,13 +385,12 @@ export function InactiveMembersPage() {
 
       {/* Bulk action bar */}
       {selectedIds.size > 0 && (
-        <Card shadow="sm" className="mb-4">
+        <Card  className="mb-4">
           <CardBody className="flex flex-row items-center gap-4 p-3">
             <span className="text-sm font-medium text-foreground">
               {t('reports.members_selected_count', { count: selectedIds.size })}
             </span>
             <Button
-              color="primary"
               size="sm"
               startContent={<Bell size={14} />}
               onPress={handleNotify}
@@ -402,7 +400,7 @@ export function InactiveMembersPage() {
               {t('reports.mark_as_notified')}
             </Button>
             <Button
-              variant="flat"
+              variant="tertiary"
               size="sm"
               onPress={() => setSelectedIds(new Set())}
             >
@@ -413,7 +411,7 @@ export function InactiveMembersPage() {
       )}
 
       {/* Members Table */}
-      <Table aria-label={t('reports.label_inactive_members')} shadow="sm">
+      <Table aria-label={t('reports.label_inactive_members')} >
         <TableHeader>
           <TableColumn width={40}>
             <Checkbox
@@ -449,37 +447,37 @@ export function InactiveMembersPage() {
                   <Avatar size="sm" src={resolveAvatarUrl(m.avatar_url) || undefined} name={m.name} />
                   <div>
                     <p className="text-sm font-medium">{m.name}</p>
-                    <p className="text-xs text-default-400">{m.email}</p>
+                    <p className="text-xs text-muted">{m.email}</p>
                   </div>
                 </div>
               </TableCell>
               <TableCell>
                 <Chip
                   size="sm"
-                  variant="flat"
+                  variant="soft"
                   color={FLAG_COLORS[m.flag_type] ?? 'default'}
                 >
                   {t(`reports.flag_${m.flag_type}`)}
                 </Chip>
               </TableCell>
               <TableCell>
-                <span className={`text-sm font-medium ${m.days_inactive > 180 ? 'text-danger' : m.days_inactive > 90 ? 'text-warning' : 'text-default-600'}`}>
+                <span className={`text-sm font-medium ${m.days_inactive > 180 ? 'text-danger' : m.days_inactive > 90 ? 'text-warning' : 'text-muted'}`}>
                   {t('reports.days_count', { count: m.days_inactive })}
                 </span>
               </TableCell>
-              <TableCell className="text-sm text-default-600">
+              <TableCell className="text-sm text-muted">
                 {m.last_activity ? new Date(m.last_activity).toLocaleDateString() : t('reports.never')}
               </TableCell>
-              <TableCell className="text-sm text-default-600">
+              <TableCell className="text-sm text-muted">
                 {m.last_login ? new Date(m.last_login).toLocaleDateString() : t('reports.never')}
               </TableCell>
               <TableCell>
                 {m.notified_at ? (
-                  <Chip size="sm" variant="flat" color="success">
+                  <Chip size="sm" variant="soft" color="default">
                     {new Date(m.notified_at).toLocaleDateString()}
                   </Chip>
                 ) : (
-                  <Chip size="sm" variant="flat" color="default">{t('reports.not_yet')}</Chip>
+                  <Chip size="sm" variant="soft" color="default">{t('reports.not_yet')}</Chip>
                 )}
               </TableCell>
             </TableRow>

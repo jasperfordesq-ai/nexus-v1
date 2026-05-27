@@ -1,5 +1,5 @@
 import { CardBody, Card, Select, SelectItem, Button, Chip, Spinner, Input, Textarea } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
+// Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -154,7 +154,7 @@ export function GdprRequestCreate() {
         description={t('enterprise.gdpr_create_request_desc')}
         actions={
           <Button
-            variant="flat"
+            variant="secondary"
             startContent={<ArrowLeft size={16} />}
             onPress={() => navigate(tenantPath('/admin/enterprise/gdpr/requests'))}
             size="sm"
@@ -164,22 +164,22 @@ export function GdprRequestCreate() {
         }
       />
 
-      <Card shadow="sm">
+      <Card>
         <CardBody className="p-6 space-y-6">
           {/* User Search */}
           <div>
             {selectedUser ? (
               <div className="space-y-2">
-                <p className="text-sm font-medium text-default-700">
+                <p className="text-sm font-medium text-foreground">
                   {t('enterprise.gdpr_user')} <span className="text-danger">*</span>
                 </p>
                 <Chip
                   onClose={handleDeselectUser}
-                  variant="flat"
-                  color="primary"
+                  variant="soft"
+                  color="accent"
                   size="lg"
                 >
-                  {selectedUser.name} ({selectedUser.email}) — ID #{selectedUser.id}
+                  {selectedUser.name} ({selectedUser.email}) â€” ID #{selectedUser.id}
                 </Chip>
               </div>
             ) : (
@@ -199,7 +199,7 @@ export function GdprRequestCreate() {
                     // Delay to allow click on dropdown items
                     setTimeout(() => setShowDropdown(false), 200);
                   }}
-                  variant="bordered"
+                  variant="secondary"
                   isRequired
                   startContent={<Search size={16} />}
                   endContent={searchLoading ? <Spinner size="sm" /> : undefined}
@@ -209,20 +209,20 @@ export function GdprRequestCreate() {
                     {userResults.map((user) => (
                       <Button
                         key={user.id}
-                        variant="light"
-                        className="w-full text-left px-4 py-2.5 hover:bg-default-100 transition-colors first:rounded-t-xl last:rounded-b-xl h-auto min-w-0 justify-start"
+                        variant="ghost"
+                        className="w-full min-h-11 justify-start px-4 py-2.5 text-left transition-colors hover:bg-surface-secondary first:rounded-t-xl last:rounded-b-xl"
                         onMouseDown={(e) => e.preventDefault()}
                         onPress={() => handleSelectUser(user)}
                       >
                         <span className="font-medium text-sm">{user.name}</span>
-                        <span className="text-default-500 text-sm"> ({user.email})</span>
-                        <span className="text-default-400 text-xs ml-1">— ID #{user.id}</span>
+                        <span className="text-muted text-sm"> ({user.email})</span>
+                        <span className="text-muted text-xs ml-1">â€” ID #{user.id}</span>
                       </Button>
                     ))}
                   </div>
                 )}
                 {searchDone && !searchLoading && userResults.length === 0 && userSearch.length >= 2 && (
-                  <p className="text-xs text-default-400 mt-1">{t('enterprise.gdpr_no_users_found_for')}</p>
+                  <p className="text-xs text-muted mt-1">{t('enterprise.gdpr_no_users_found_for')}</p>
                 )}
               </div>
             )}
@@ -230,7 +230,7 @@ export function GdprRequestCreate() {
 
           {/* Request Type - Card Selector */}
           <div>
-            <p className="text-sm font-medium text-default-700 mb-3">
+            <p className="text-sm font-medium text-foreground mb-3">
               {t('enterprise.gdpr_request_type')} <span className="text-danger">*</span>
             </p>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -240,20 +240,20 @@ export function GdprRequestCreate() {
                 return (
                   <Button
                     key={type.key}
-                    variant="flat"
+                    variant="outline"
                     onPress={() => setSelectedType(type.key)}
                     className={`
                       flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all
-                      cursor-pointer text-center h-auto min-w-0
+                      min-h-32 cursor-pointer text-center
                       ${isSelected
                         ? 'border-accent bg-accent-soft shadow-sm'
-                        : 'border-default-200 bg-default-50 hover:border-default-300'
+                        : 'border-border bg-surface-secondary hover:border-muted'
                       }
                     `}
                   >
                     <div className={`
                       flex h-10 w-10 items-center justify-center rounded-lg
-                      ${isSelected ? 'bg-accent/20 text-accent' : 'bg-default-200 text-default-600'}
+                      ${isSelected ? 'bg-accent/20 text-accent' : 'bg-surface text-muted'}
                     `}>
                       <Icon size={20} />
                     </div>
@@ -261,7 +261,7 @@ export function GdprRequestCreate() {
                       <p className={`font-semibold text-sm ${isSelected ? 'text-accent' : 'text-foreground'}`}>
                         {t(type.labelKey)}
                       </p>
-                      <p className="text-xs text-default-500 mt-0.5">{t(type.descriptionKey)}</p>
+                      <p className="text-xs text-muted mt-0.5">{t(type.descriptionKey)}</p>
                     </div>
                   </Button>
                 );
@@ -277,7 +277,7 @@ export function GdprRequestCreate() {
               const val = Array.from(keys)[0] as string;
               if (val) setPriority(val);
             }}
-            variant="bordered"
+            variant="secondary"
             className="max-w-xs"
           >
             {PRIORITY_KEYS.map((key) => (
@@ -293,20 +293,19 @@ export function GdprRequestCreate() {
             placeholder={t('enterprise.gdpr_notes_placeholder')}
             value={notes}
             onValueChange={setNotes}
-            variant="bordered"
+            variant="secondary"
             minRows={3}
           />
 
           {/* Actions */}
           <div className="flex justify-end gap-3 pt-2">
             <Button
-              variant="flat"
+              variant="tertiary"
               onPress={() => navigate(tenantPath('/admin/enterprise/gdpr/requests'))}
             >
               {t('enterprise.gdpr_cancel')}
             </Button>
             <Button
-              color="primary"
               startContent={<Save size={16} />}
               onPress={handleSubmit}
               isLoading={saving}

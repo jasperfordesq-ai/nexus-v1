@@ -224,10 +224,10 @@ export function Neighborhoods() {
         description={t('federation.neighborhoods_desc')}
         actions={
           <div className="flex items-center gap-2">
-            <Button variant="flat" size="sm" startContent={<RefreshCw size={16} />} onPress={() => loadData()}>
+            <Button variant="tertiary" size="sm" startContent={<RefreshCw size={16} />} onPress={() => loadData()}>
               {t('common.refresh')}
             </Button>
-            <Button color="primary" size="sm" startContent={<Plus size={16} />} onPress={createModal.onOpen}>
+            <Button size="sm" startContent={<Plus size={16} />} onPress={createModal.onOpen}>
               {t('federation.new_neighborhood')}
             </Button>
           </div>
@@ -236,21 +236,20 @@ export function Neighborhoods() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard label={t('federation.label_neighborhoods')} value={totalNeighborhoods} icon={MapPin} color="primary" />
-        <StatCard label={t('federation.label_communities')} value={totalTenants} icon={Building2} color="secondary" />
+        <StatCard label={t('federation.label_neighborhoods')} value={totalNeighborhoods} icon={MapPin} color="default" />
+        <StatCard label={t('federation.label_communities')} value={totalTenants} icon={Building2} color="default" />
         <StatCard label={t('federation.label_total_members')} value={totalMembers} icon={Users} color="success" />
         <StatCard label={t('federation.label_shared_events')} value={totalSharedEvents} icon={Calendar} color="warning" />
       </div>
 
       {/* Neighborhoods grid */}
       {neighborhoods.length === 0 ? (
-        <Card shadow="sm">
-          <CardBody className="flex flex-col items-center py-12 text-default-400">
+        <Card>
+          <CardBody className="flex flex-col items-center py-12 text-muted">
             <MapPin size={48} className="mb-4" />
             <p className="text-lg font-medium">{t('federation.no_neighborhoods_yet')}</p>
             <p className="text-sm">{t('federation.no_neighborhoods_desc')}</p>
             <Button
-              color="primary"
               className="mt-4"
               startContent={<Plus size={16} />}
               onPress={createModal.onOpen}
@@ -262,7 +261,7 @@ export function Neighborhoods() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {neighborhoods.map((neighborhood) => (
-            <Card key={neighborhood.id} shadow="sm">
+            <Card key={neighborhood.id}>
               <CardHeader className="flex justify-between items-start">
                 <div>
                   <h3 className="text-lg font-semibold flex items-center gap-2">
@@ -270,13 +269,12 @@ export function Neighborhoods() {
                     {neighborhood.name}
                   </h3>
                   {neighborhood.description && (
-                    <p className="text-sm text-default-500 mt-1">{neighborhood.description}</p>
+                    <p className="text-sm text-muted mt-1">{neighborhood.description}</p>
                   )}
                 </div>
                 <Button
                   size="sm"
-                  variant="flat"
-                  color="danger"
+                  variant="danger-soft"
                   isIconOnly
                   aria-label={t('federation.label_delete_neighborhood')}
                   onPress={() => setDeleteTarget(neighborhood.id)}
@@ -286,7 +284,7 @@ export function Neighborhoods() {
               </CardHeader>
               <CardBody className="space-y-3">
                 {/* Stats row */}
-                <div className="flex items-center gap-4 text-sm text-default-500">
+                <div className="flex items-center gap-4 text-sm text-muted">
                   <span className="flex items-center gap-1">
                     <Building2 size={14} />
                     {t('federation.label_communities')}
@@ -306,10 +304,10 @@ export function Neighborhoods() {
                 {/* Tenants list */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-default-600">{t('federation.label_communities')}</span>
+                    <span className="text-sm font-medium text-foreground">{t('federation.label_communities')}</span>
                     <Button
                       size="sm"
-                      variant="flat"
+                      variant="tertiary"
                       startContent={<UserPlus size={14} />}
                       onPress={() => {
                         setAddToNeighborhood(neighborhood);
@@ -321,13 +319,13 @@ export function Neighborhoods() {
                   </div>
 
                   {neighborhood.tenants.length === 0 ? (
-                    <p className="text-sm text-default-400 py-2">{t('federation.no_communities_in_neighborhood')}</p>
+                    <p className="text-sm text-muted py-2">{t('federation.no_communities_in_neighborhood')}</p>
                   ) : (
                     <div className="space-y-1.5">
                       {neighborhood.tenants.map((tenant) => (
                         <div
                           key={tenant.id}
-                          className="flex items-center justify-between p-2 rounded-lg bg-default-100 hover:bg-default-200 transition-colors"
+                          className="flex items-center justify-between p-2 rounded-lg bg-surface-secondary hover:bg-surface-tertiary transition-colors"
                         >
                           <div className="flex items-center gap-2">
                             <Avatar
@@ -337,16 +335,15 @@ export function Neighborhoods() {
                             />
                             <div>
                               <p className="text-sm font-medium">{tenant.name}</p>
-                              <p className="text-xs text-default-400">
+                              <p className="text-xs text-muted">
                                 {t('federation.members_count')} · {tenant.slug}
                               </p>
                             </div>
                           </div>
                           <Button
                             size="sm"
-                            variant="light"
+                            variant="danger-soft"
                             isIconOnly
-                            color="danger"
                             aria-label={t('federation.remove_tenant_aria', { name: tenant.name })}
                             onPress={() => setRemoveTenantTarget({ neighborhoodId: neighborhood.id, tenantId: tenant.id })}
                           >
@@ -358,7 +355,7 @@ export function Neighborhoods() {
                   )}
                 </div>
 
-                <div className="text-xs text-default-400 pt-1">
+                <div className="text-xs text-muted pt-1">
                   {t('federation.created_time')}
                 </div>
               </CardBody>
@@ -392,9 +389,8 @@ export function Neighborhoods() {
                 />
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('federation.cancel')}</Button>
+                <Button variant="tertiary" onPress={onClose}>{t('federation.cancel')}</Button>
                 <Button
-                  color="primary"
                   isLoading={creating}
                   isDisabled={!newName.trim()}
                   onPress={handleCreate}
@@ -434,9 +430,8 @@ export function Neighborhoods() {
                 </Select>
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onClose}>{t('federation.cancel')}</Button>
+                <Button variant="tertiary" onPress={onClose}>{t('federation.cancel')}</Button>
                 <Button
-                  color="primary"
                   isLoading={addingTenant}
                   isDisabled={!selectedTenantId}
                   onPress={handleAddTenant}

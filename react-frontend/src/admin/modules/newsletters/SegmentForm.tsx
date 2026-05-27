@@ -1,5 +1,5 @@
 import { Button, Card, CardHeader, CardBody, Input, Chip, Spinner, Select, SelectItem, Switch, Tooltip } from '@/components/ui';
-// Copyright © 2024–2026 Jasper Ford
+// Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -27,9 +27,9 @@ import { useTenant } from '@/contexts';
 import { adminNewsletters } from '../../api/adminApi';
 import { PageHeader } from '../../components';
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Types
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface SegmentRule {
   id: string;
@@ -46,9 +46,9 @@ interface SegmentSuggestion {
   estimated_count: number;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Rule Field Configuration
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 interface RuleFieldConfig {
   key: string;
@@ -92,9 +92,9 @@ function generateId(): string {
   return Math.random().toString(36).substring(2, 9);
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // Component
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export function SegmentForm() {
   const { t } = useTranslation('admin');
@@ -169,7 +169,7 @@ export function SegmentForm() {
     }).finally(() => setLoadingSuggestions(false));
   }, [isEdit]);
 
-  // ── Rule Handlers ──
+  // â”€â”€ Rule Handlers â”€â”€
 
   const addRule = useCallback(() => {
     setRules(prev => [...prev, { id: generateId(), field: '', operator: '', value: '' }]);
@@ -193,7 +193,7 @@ export function SegmentForm() {
     }));
   }, []);
 
-  // ── Preview ──
+  // â”€â”€ Preview â”€â”€
 
   const handlePreview = useCallback(async () => {
     setPreviewing(true);
@@ -218,7 +218,7 @@ export function SegmentForm() {
     setPreviewing(false);
   }, [rules, matchType]);
 
-  // ── Save ──
+  // â”€â”€ Save â”€â”€
 
   const handleSave = useCallback(async () => {
     // Validate
@@ -256,7 +256,7 @@ export function SegmentForm() {
     setSaving(false);
   }, [name, description, isActive, matchType, rules, isEdit, id, navigate, tenantPath, t]);
 
-  // ── Apply Suggestion ──
+  // â”€â”€ Apply Suggestion â”€â”€
 
   const applySuggestion = useCallback((suggestion: SegmentSuggestion) => {
     setName(suggestion.name);
@@ -273,7 +273,7 @@ export function SegmentForm() {
     setPreviewCount(suggestion.estimated_count);
   }, []);
 
-  // ── Render helpers ──
+  // â”€â”€ Render helpers â”€â”€
 
   const getFieldConfig = (fieldKey: string): RuleFieldConfig | undefined =>
     RULE_FIELDS.find(f => f.key === fieldKey);
@@ -360,7 +360,7 @@ export function SegmentForm() {
         description={isEdit ? t('segment_form.desc_edit') : t('segment_form.desc_create')}
         actions={
           <Button
-            variant="flat"
+            variant="secondary"
             startContent={<ArrowLeft size={16} />}
             onPress={() => navigate(tenantPath('/admin/newsletters/segments'))}
           >
@@ -370,7 +370,7 @@ export function SegmentForm() {
       />
 
       {errors.form && (
-        <Card shadow="sm">
+        <Card>
           <CardBody>
             <p className="text-danger text-sm">{errors.form}</p>
           </CardBody>
@@ -378,7 +378,7 @@ export function SegmentForm() {
       )}
 
       {/* Segment Details */}
-      <Card shadow="sm">
+      <Card>
         <CardHeader className="pb-0">
           <h3 className="text-lg font-semibold">{t('segment_form.section_segment_details')}</h3>
         </CardHeader>
@@ -412,7 +412,7 @@ export function SegmentForm() {
       </Card>
 
       {/* Rule Builder */}
-      <Card shadow="sm">
+      <Card>
         <CardHeader className="flex justify-between items-center pb-0">
           <h3 className="text-lg font-semibold">{t('segment_form.section_targeting_rules')}</h3>
           <Select
@@ -430,7 +430,7 @@ export function SegmentForm() {
           </Select>
         </CardHeader>
         <CardBody className="space-y-3">
-          <p className="text-sm text-default-500">
+          <p className="text-sm text-muted">
             {matchType === 'all'
               ? t('segment_form.match_all_description')
               : t('segment_form.match_any_description')}
@@ -441,7 +441,7 @@ export function SegmentForm() {
           {rules.map((rule, index) => (
             <div key={rule.id} className="flex flex-wrap items-end gap-2">
               {index > 0 && (
-                <Chip size="sm" variant="flat" color="primary" className="mb-1">
+                <Chip size="sm" variant="soft" color="accent" className="mb-1">
                   {matchType === 'all' ? t('segment_form.chip_and') : t('segment_form.chip_or')}
                 </Chip>
               )}
@@ -484,8 +484,7 @@ export function SegmentForm() {
                 <Button
                   isIconOnly
                   size="sm"
-                  variant="flat"
-                  color="danger"
+                  variant="danger"
                   onPress={() => removeRule(rule.id)}
                   isDisabled={rules.length === 1}
                   aria-label={t('segment_form.remove_rule_aria')}
@@ -499,7 +498,7 @@ export function SegmentForm() {
           <div className="pt-2">
             <Button
               size="sm"
-              variant="flat"
+              variant="secondary"
               startContent={<Plus size={14} />}
               onPress={addRule}
             >
@@ -510,15 +509,14 @@ export function SegmentForm() {
       </Card>
 
       {/* Preview */}
-      <Card shadow="sm">
+      <Card>
         <CardHeader className="pb-0">
           <h3 className="text-lg font-semibold">{t('segment_form.section_preview')}</h3>
         </CardHeader>
         <CardBody>
           <div className="flex items-center gap-4">
             <Button
-              color="secondary"
-              variant="flat"
+              variant="secondary"
               startContent={previewing ? undefined : <Eye size={16} />}
               onPress={handlePreview}
               isLoading={previewing}
@@ -527,12 +525,12 @@ export function SegmentForm() {
             </Button>
 
             {previewCount !== null && (
-              <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-default-100">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-surface-secondary">
                 <Users size={18} className="text-accent" />
                 <span className="text-lg font-semibold text-foreground">
                   {previewCount.toLocaleString()}
                 </span>
-                <span className="text-sm text-default-500">
+                <span className="text-sm text-muted">
                   {t('segment_form.members_match')}
                 </span>
               </div>
@@ -543,7 +541,7 @@ export function SegmentForm() {
 
       {/* Smart Suggestions (create mode only) */}
       {!isEdit && (
-        <Card shadow="sm">
+        <Card>
           <CardHeader className="flex items-center gap-2 pb-0">
             <Sparkles size={18} className="text-warning" />
             <h3 className="text-lg font-semibold">{t('segment_form.section_smart_suggestions')}</h3>
@@ -552,10 +550,10 @@ export function SegmentForm() {
             {loadingSuggestions ? (
               <div className="flex items-center gap-2 py-4">
                 <Spinner size="sm" />
-                <span className="text-sm text-default-500">{t('segment_form.analyzing_member_data')}</span>
+                <span className="text-sm text-muted">{t('segment_form.analyzing_member_data')}</span>
               </div>
             ) : suggestions.length === 0 ? (
-              <p className="text-sm text-default-400 py-2">
+              <p className="text-sm text-muted py-2">
                 {t('segment_form.no_suggestions')}
               </p>
             ) : (
@@ -564,15 +562,15 @@ export function SegmentForm() {
                   <Button
                     key={idx}
                     onPress={() => applySuggestion(suggestion)}
-                    variant="bordered"
-                    className="text-left p-4 rounded-lg border-default-200 hover:border-accent hover:bg-accent-soft h-auto justify-start"
+                    variant="outline"
+                    className="min-h-28 justify-start rounded-lg border-border p-4 text-left hover:border-accent hover:bg-accent-soft"
                   >
                     <div className="flex items-start gap-2 text-left w-full">
                       <Lightbulb size={16} className="text-warning mt-0.5 flex-shrink-0" />
                       <div>
                         <p className="font-medium text-foreground text-sm">{suggestion.name}</p>
-                        <p className="text-xs text-default-500 mt-1 line-clamp-2">{suggestion.description}</p>
-                        <Chip size="sm" variant="flat" color="primary" className="mt-2">
+                        <p className="text-xs text-muted mt-1 line-clamp-2">{suggestion.description}</p>
+                        <Chip size="sm" variant="soft" color="accent" className="mt-2">
                           {t('segment_form.approx_members')}
                         </Chip>
                       </div>
@@ -588,13 +586,12 @@ export function SegmentForm() {
       {/* Actions */}
       <div className="flex justify-end gap-3 pb-8">
         <Button
-          variant="flat"
+          variant="tertiary"
           onPress={() => navigate(tenantPath('/admin/newsletters/segments'))}
         >
           {t('segment_form.btn_cancel')}
         </Button>
         <Button
-          color="primary"
           startContent={saving ? undefined : <Save size={16} />}
           onPress={handleSave}
           isLoading={saving}

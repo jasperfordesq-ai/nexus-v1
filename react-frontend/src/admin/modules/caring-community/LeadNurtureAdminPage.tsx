@@ -172,7 +172,7 @@ export default function LeadNurtureAdminPage() {
   const segmentChips = useMemo(() => {
     if (!summary) return null;
     return SEGMENTS.map((s) => (
-      <Chip key={s} size="sm" variant="flat">
+      <Chip key={s} size="sm" variant="soft">
         {segmentLabel(s)}: {summary.by_segment[s] ?? 0}
       </Chip>
     ));
@@ -190,7 +190,7 @@ export default function LeadNurtureAdminPage() {
               <Button
                 isIconOnly
                 size="sm"
-                variant="flat"
+                variant="tertiary"
                 onPress={load}
                 isLoading={loading}
                 aria-label={t('lead_nurture.actions.refresh_aria')}
@@ -200,7 +200,7 @@ export default function LeadNurtureAdminPage() {
             </Tooltip>
             <Button
               size="sm"
-              variant="flat"
+              variant="tertiary"
               startContent={<Download size={14} />}
               onPress={exportCsv}
             >
@@ -210,13 +210,13 @@ export default function LeadNurtureAdminPage() {
         }
       />
 
-      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" >
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('lead_nurture.about.title')}</p>
-              <p className="text-default-600">
+              <p className="text-muted">
                 {t('lead_nurture.about.body')}
               </p>
             </div>
@@ -232,17 +232,17 @@ export default function LeadNurtureAdminPage() {
           <CardBody className="pt-0 space-y-3">
             <div className="flex items-center gap-3">
               <span className="text-2xl font-bold">{summary.total}</span>
-              <span className="text-sm text-default-500">{t('lead_nurture.summary.total_contacts')}</span>
+              <span className="text-sm text-muted">{t('lead_nurture.summary.total_contacts')}</span>
             </div>
             <Separator />
             <div className="flex flex-wrap gap-2">
-              <span className="text-xs text-default-500 self-center">{t('lead_nurture.summary.by_segment')}</span>
+              <span className="text-xs text-muted self-center">{t('lead_nurture.summary.by_segment')}</span>
               {segmentChips}
             </div>
             <div className="flex flex-wrap gap-2">
-              <span className="text-xs text-default-500 self-center">{t('lead_nurture.summary.by_stage')}</span>
+              <span className="text-xs text-muted self-center">{t('lead_nurture.summary.by_stage')}</span>
               {STAGES.map((s) => (
-                <Chip key={s} size="sm" variant="flat" color={STAGE_COLOR[s]}>
+                <Chip key={s} size="sm" variant="soft" color={STAGE_COLOR[s]}>
                   {stageLabel(s)}: {summary.by_stage[s] ?? 0}
                 </Chip>
               ))}
@@ -253,7 +253,7 @@ export default function LeadNurtureAdminPage() {
 
       <Card>
         <CardHeader className="pb-2 flex items-center gap-2">
-          <Filter size={14} className="text-default-500" />
+          <Filter size={14} className="text-muted" />
           <span className="text-sm font-semibold">{t('lead_nurture.filters.title')}</span>
         </CardHeader>
         <CardBody className="pt-0">
@@ -302,7 +302,7 @@ export default function LeadNurtureAdminPage() {
           </CardHeader>
           <CardBody className="pt-0">
             {data.items.length === 0 ? (
-              <p className="text-sm text-default-500 py-8 text-center">{t('lead_nurture.contacts.empty')}</p>
+              <p className="text-sm text-muted py-8 text-center">{t('lead_nurture.contacts.empty')}</p>
             ) : (
               <Table aria-label={t('lead_nurture.contacts.table_aria')} removeWrapper>
                 <TableHeader>
@@ -321,28 +321,28 @@ export default function LeadNurtureAdminPage() {
                       <TableCell>
                         <div className="flex flex-col">
                           <span className="text-sm font-medium">{c.name ?? emptyValue}</span>
-                          <span className="text-xs text-default-500">{c.email}</span>
+                          <span className="text-xs text-muted">{c.email}</span>
                         </div>
                       </TableCell>
                       <TableCell className="text-sm">{c.organisation ?? emptyValue}</TableCell>
                       <TableCell>
-                        <Chip size="sm" variant="flat">{segmentLabel(c.segment)}</Chip>
+                        <Chip size="sm" variant="soft">{segmentLabel(c.segment)}</Chip>
                       </TableCell>
                       <TableCell>
-                        <Chip size="sm" variant="flat" color={STAGE_COLOR[c.stage]}>
+                        <Chip size="sm" variant="soft" color={STAGE_COLOR[c.stage]}>
                           {stageLabel(c.stage)}
                         </Chip>
                       </TableCell>
-                      <TableCell className="text-xs text-default-500">{c.source ?? emptyValue}</TableCell>
-                      <TableCell className="text-xs text-default-500">
+                      <TableCell className="text-xs text-muted">{c.source ?? emptyValue}</TableCell>
+                      <TableCell className="text-xs text-muted">
                         {c.consent_at ? new Date(c.consent_at).toLocaleDateString() : emptyValue}
                       </TableCell>
-                      <TableCell className="text-xs text-default-500">
+                      <TableCell className="text-xs text-muted">
                         {c.follow_up_at ? new Date(c.follow_up_at).toLocaleDateString() : emptyValue}
                       </TableCell>
                       <TableCell>
                         <div className="flex gap-1">
-                          <Button size="sm" variant="flat" onPress={() => openEdit(c)}>
+                          <Button size="sm" variant="tertiary" onPress={() => openEdit(c)}>
                             {t('lead_nurture.actions.edit')}
                           </Button>
                           {c.stage !== 'unsubscribed' && (
@@ -350,7 +350,7 @@ export default function LeadNurtureAdminPage() {
                               <Button
                                 size="sm"
                                 isIconOnly
-                                variant="flat"
+                                variant="tertiary"
                                 color="danger"
                                 onPress={() => unsubscribe(c)}
                                 aria-label={t('lead_nurture.actions.unsubscribe_aria')}
@@ -376,7 +376,7 @@ export default function LeadNurtureAdminPage() {
           <ModalBody>
             {editing && (
               <div className="space-y-3">
-                <p className="text-sm text-default-500">{editing.name ?? emptyValue} · {editing.email}</p>
+                <p className="text-sm text-muted">{editing.name ?? emptyValue} · {editing.email}</p>
                 <Select
                   label={t('lead_nurture.filters.stage')}
                   description={t('lead_nurture.modal.stage_description')}
@@ -406,8 +406,8 @@ export default function LeadNurtureAdminPage() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={closeEdit} isDisabled={saving}>{t('lead_nurture.actions.cancel')}</Button>
-            <Button color="primary" onPress={saveEdit} isLoading={saving}>{t('lead_nurture.actions.save')}</Button>
+            <Button variant="tertiary" onPress={closeEdit} isDisabled={saving}>{t('lead_nurture.actions.cancel')}</Button>
+            <Button onPress={saveEdit} isLoading={saving}>{t('lead_nurture.actions.save')}</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

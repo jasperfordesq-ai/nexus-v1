@@ -237,7 +237,7 @@ export default function SmartNudgesAdminPage() {
           <div className="flex flex-wrap gap-2">
             <Button
               size="sm"
-              variant="bordered"
+              variant="secondary"
               startContent={<RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />}
               onPress={() => void load()}
               isDisabled={refreshing}
@@ -246,8 +246,7 @@ export default function SmartNudgesAdminPage() {
             </Button>
             <Button
               size="sm"
-              variant="flat"
-              color="secondary"
+              variant="tertiary"
               startContent={<FlaskConical className="w-4 h-4" />}
               onPress={() => void handleDispatch(true)}
               isLoading={running}
@@ -256,7 +255,6 @@ export default function SmartNudgesAdminPage() {
             </Button>
             <Button
               size="sm"
-              color="primary"
               startContent={<Send className="w-4 h-4" />}
               onPress={onOpen}
               isDisabled={!config.enabled}
@@ -268,19 +266,19 @@ export default function SmartNudgesAdminPage() {
       />
 
       {/* About card */}
-      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('smart_nudges.about.title')}</p>
-              <p className="text-default-600">
+              <p className="text-muted">
                 {t('smart_nudges.about.body')}
               </p>
-              <ul className="mt-1 space-y-0.5 text-default-500 list-disc list-inside">
-                <li><span className="font-medium text-default-600">{t('smart_nudges.about.inactivity_label')}:</span> {t('smart_nudges.about.inactivity_body')}</li>
-                <li><span className="font-medium text-default-600">{t('smart_nudges.about.unmatched_request_label')}:</span> {t('smart_nudges.about.unmatched_request_body')}</li>
-                <li><span className="font-medium text-default-600">{t('smart_nudges.about.follow_up_label')}:</span> {t('smart_nudges.about.follow_up_body')}</li>
+              <ul className="mt-1 space-y-0.5 text-muted list-disc list-inside">
+                <li><span className="font-medium text-foreground">{t('smart_nudges.about.inactivity_label')}:</span> {t('smart_nudges.about.inactivity_body')}</li>
+                <li><span className="font-medium text-foreground">{t('smart_nudges.about.unmatched_request_label')}:</span> {t('smart_nudges.about.unmatched_request_body')}</li>
+                <li><span className="font-medium text-foreground">{t('smart_nudges.about.follow_up_label')}:</span> {t('smart_nudges.about.follow_up_body')}</li>
               </ul>
             </div>
           </div>
@@ -289,7 +287,7 @@ export default function SmartNudgesAdminPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <StatCard icon={Bell} label={t('smart_nudges.stats.sent_30d')} value={String(stats.sent_30d)} color="primary" />
+        <StatCard icon={Bell} label={t('smart_nudges.stats.sent_30d')} value={String(stats.sent_30d)} color="default" />
         <StatCard
           icon={TrendingUp}
           label={t('smart_nudges.stats.conversion_30d')}
@@ -335,7 +333,7 @@ export default function SmartNudgesAdminPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium">{t('smart_nudges.config.engine_enabled')}</p>
-              <p className="text-xs text-default-500">{t('smart_nudges.config.engine_description')}</p>
+              <p className="text-xs text-muted">{t('smart_nudges.config.engine_description')}</p>
             </div>
             <Switch
               isSelected={config.enabled}
@@ -385,14 +383,13 @@ export default function SmartNudgesAdminPage() {
 
           <div className="flex flex-col items-end gap-1">
             <Button
-              color="primary"
               startContent={<Save className="w-4 h-4" />}
               onPress={() => void handleSaveConfig()}
               isLoading={savingConfig}
             >
               {t('smart_nudges.actions.save_configuration')}
             </Button>
-            <p className="text-xs text-default-400">
+            <p className="text-xs text-muted">
               {t('smart_nudges.config.save_note')}
             </p>
           </div>
@@ -405,14 +402,14 @@ export default function SmartNudgesAdminPage() {
           <CardHeader className="flex items-center gap-2">
             <FlaskConical className="w-5 h-5 text-accent" />
             <h2 className="text-base font-semibold">{t('smart_nudges.dry_run.title')}</h2>
-            <Chip size="sm" variant="flat" className="ml-auto">
+            <Chip size="sm" variant="soft" className="ml-auto">
               {t('smart_nudges.dry_run.candidates', { count: dryResult.candidates?.length ?? 0 })}
             </Chip>
           </CardHeader>
           <Separator />
           <CardBody>
             {!dryResult.candidates || dryResult.candidates.length === 0 ? (
-              <p className="text-sm text-default-500">{t('smart_nudges.dry_run.empty')}</p>
+              <p className="text-sm text-muted">{t('smart_nudges.dry_run.empty')}</p>
             ) : (
               <Table aria-label={t('smart_nudges.dry_run.table_aria')} removeWrapper>
                 <TableHeader>
@@ -438,16 +435,16 @@ export default function SmartNudgesAdminPage() {
       {/* Recent nudges */}
       <Card>
         <CardHeader className="flex items-center gap-2">
-          <Bell className="w-5 h-5 text-default-500" />
+          <Bell className="w-5 h-5 text-muted" />
           <h2 className="text-base font-semibold">{t('smart_nudges.recent.title')}</h2>
-          <Chip size="sm" variant="flat" className="ml-auto">
+          <Chip size="sm" variant="soft" className="ml-auto">
             {data.recent.length}
           </Chip>
         </CardHeader>
         <Separator />
         <CardBody className="p-0">
           {data.recent.length === 0 ? (
-            <div className="text-center py-12 text-sm text-default-500">{t('smart_nudges.recent.empty')}</div>
+            <div className="text-center py-12 text-sm text-muted">{t('smart_nudges.recent.empty')}</div>
           ) : (
             <Table aria-label={t('smart_nudges.recent.table_aria')} removeWrapper>
               <TableHeader>
@@ -467,7 +464,7 @@ export default function SmartNudgesAdminPage() {
                     <TableCell>
                       <Chip
                         size="sm"
-                        variant="flat"
+                        variant="soft"
                         color={r.status === 'converted' ? 'success' : 'default'}
                       >
                         {statusLabel(r.status)}
@@ -486,16 +483,16 @@ export default function SmartNudgesAdminPage() {
         <ModalContent>
           <ModalHeader>{t('smart_nudges.dispatch_modal.title')}</ModalHeader>
           <ModalBody>
-            <p className="text-sm text-default-600">
+            <p className="text-sm text-muted">
               {t('smart_nudges.dispatch_modal.body_prefix')} <strong>{config.daily_limit}</strong>{' '}
               {t('smart_nudges.dispatch_modal.body_suffix')}
             </p>
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={onClose}>
+            <Button variant="tertiary" onPress={onClose}>
               {t('smart_nudges.actions.cancel')}
             </Button>
-            <Button color="primary" onPress={() => void handleDispatch(false)} isLoading={running}>
+            <Button onPress={() => void handleDispatch(false)} isLoading={running}>
               {t('smart_nudges.actions.dispatch')}
             </Button>
           </ModalFooter>

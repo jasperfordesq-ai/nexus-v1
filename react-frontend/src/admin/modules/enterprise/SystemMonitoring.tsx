@@ -112,7 +112,7 @@ export function SystemMonitoring() {
             <Button
               as={Link}
               to={tenantPath('/admin/enterprise/monitoring/health')}
-              variant="flat"
+              variant="tertiary"
               size="sm"
               endContent={<ArrowRight size={14} />}
             >
@@ -121,7 +121,7 @@ export function SystemMonitoring() {
             <Button
               as={Link}
               to={tenantPath('/admin/enterprise/monitoring/logs')}
-              variant="flat"
+              variant="tertiary"
               size="sm"
               endContent={<ArrowRight size={14} />}
             >
@@ -130,7 +130,7 @@ export function SystemMonitoring() {
             <Button
               as={Link}
               to={tenantPath('/admin/enterprise/monitoring/log-files')}
-              variant="flat"
+              variant="tertiary"
               size="sm"
               endContent={<ArrowRight size={14} />}
             >
@@ -139,7 +139,7 @@ export function SystemMonitoring() {
             <Button
               as={Link}
               to={tenantPath('/admin/enterprise/monitoring/requirements')}
-              variant="flat"
+              variant="tertiary"
               size="sm"
               endContent={<ArrowRight size={14} />}
             >
@@ -148,14 +148,14 @@ export function SystemMonitoring() {
             <Button
               as={Link}
               to={tenantPath('/admin/module-configuration')}
-              variant="flat"
+              variant="tertiary"
               size="sm"
               endContent={<ToggleLeft size={14} />}
             >
               {t('enterprise.module_configuration')}
             </Button>
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<RefreshCw size={16} />}
               onPress={loadData}
               isLoading={loading}
@@ -171,14 +171,14 @@ export function SystemMonitoring() {
       <div className="flex gap-3 mb-6">
         <Chip
           size="sm"
-          variant="flat"
+          variant="soft"
           color={health?.db_connected ? 'success' : 'danger'}
         >
           {t('enterprise.database')}: {health?.db_connected ? t('enterprise.connected') : t('enterprise.disconnected')}
         </Chip>
         <Chip
           size="sm"
-          variant="flat"
+          variant="soft"
           color={health?.redis_connected ? 'success' : 'danger'}
         >
           {t('enterprise.redis')}: {health?.redis_connected ? t('enterprise.connected') : t('enterprise.disconnected')}
@@ -195,7 +195,7 @@ export function SystemMonitoring() {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {/* PHP Process Memory */}
             {memoryPct !== null && (
-              <Card shadow="sm">
+              <Card >
                 <CardBody className="p-4">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
@@ -204,7 +204,7 @@ export function SystemMonitoring() {
                         {t('enterprise.php_process_memory')}
                       </span>
                     </div>
-                    <span className="text-sm text-default-500">
+                    <span className="text-sm text-muted">
                       {health?.memory_usage} / {health?.memory_limit}
                     </span>
                   </div>
@@ -222,7 +222,7 @@ export function SystemMonitoring() {
 
             {/* System / VM Memory */}
             {health?.sys_memory && (
-              <Card shadow="sm">
+              <Card >
                 <CardBody className="p-4">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
@@ -231,7 +231,7 @@ export function SystemMonitoring() {
                         {t('enterprise.vm_memory')}
                       </span>
                     </div>
-                    <span className="text-sm text-default-500">
+                    <span className="text-sm text-muted">
                       {health.sys_memory.used} / {health.sys_memory.total}
                     </span>
                   </div>
@@ -243,7 +243,7 @@ export function SystemMonitoring() {
                     aria-label={t('enterprise.vm_memory_usage')}
                     className="max-w-full"
                   />
-                  <p className="text-xs text-default-400 mt-1">
+                  <p className="text-xs text-muted mt-1">
                     {t('enterprise.memory_available', { value: health.sys_memory.available })}
                   </p>
                 </CardBody>
@@ -254,13 +254,13 @@ export function SystemMonitoring() {
           {/* Server Stats Grid */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {metrics.map((metric) => (
-              <Card key={metric.label} shadow="sm">
+              <Card key={metric.label} >
                 <CardBody className="flex flex-row items-center gap-3 p-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-default-100">
-                    <metric.icon size={20} className="text-default-600" />
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-surface-secondary">
+                    <metric.icon size={20} className="text-muted" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs text-default-500">{metric.label}</p>
+                    <p className="text-xs text-muted">{metric.label}</p>
                     <p className="text-sm font-semibold text-foreground truncate">{metric.value || t('enterprise.empty_value')}</p>
                   </div>
                 </CardBody>
@@ -270,30 +270,30 @@ export function SystemMonitoring() {
 
           {/* Quick Links */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <Card shadow="sm" isPressable as={Link} to={tenantPath('/admin/enterprise/monitoring/log-files')}>
+            <Card  isPressable as={Link} to={tenantPath('/admin/enterprise/monitoring/log-files')}>
               <CardBody className="flex flex-row items-center gap-3 p-4">
                 <FileText size={20} className="text-accent" />
                 <div>
                   <p className="text-sm font-semibold text-foreground">{t('enterprise.log_files')}</p>
-                  <p className="text-xs text-default-500">{t('enterprise.log_files_desc')}</p>
+                  <p className="text-xs text-muted">{t('enterprise.log_files_desc')}</p>
                 </div>
               </CardBody>
             </Card>
-            <Card shadow="sm" isPressable as={Link} to={tenantPath('/admin/enterprise/monitoring/requirements')}>
+            <Card  isPressable as={Link} to={tenantPath('/admin/enterprise/monitoring/requirements')}>
               <CardBody className="flex flex-row items-center gap-3 p-4">
                 <Settings size={20} className="text-warning" />
                 <div>
                   <p className="text-sm font-semibold text-foreground">{t('enterprise.system_requirements')}</p>
-                  <p className="text-xs text-default-500">{t('enterprise.system_requirements_desc')}</p>
+                  <p className="text-xs text-muted">{t('enterprise.system_requirements_desc')}</p>
                 </div>
               </CardBody>
             </Card>
-            <Card shadow="sm" isPressable as={Link} to={tenantPath('/admin/module-configuration')}>
+            <Card  isPressable as={Link} to={tenantPath('/admin/module-configuration')}>
               <CardBody className="flex flex-row items-center gap-3 p-4">
                 <ToggleLeft size={20} className="text-success" />
                 <div>
                   <p className="text-sm font-semibold text-foreground">{t('enterprise.module_configuration')}</p>
-                  <p className="text-xs text-default-500">{t('enterprise.module_configuration_desc')}</p>
+                  <p className="text-xs text-muted">{t('enterprise.module_configuration_desc')}</p>
                 </div>
               </CardBody>
             </Card>

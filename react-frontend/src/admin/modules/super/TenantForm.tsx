@@ -308,7 +308,7 @@ export function TenantForm() {
 
   return (
     <div>
-      <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-default-500 mb-1">
+      <nav aria-label={t('super.breadcrumb_nav_aria')} className="flex items-center gap-1 text-sm text-muted mb-1">
         <Link to={tenantPath('/admin/super')} className="hover:text-accent">{t('tenant_form.breadcrumb_super_admin')}</Link>
         <span>/</span>
         <Link to={tenantPath('/admin/super/tenants')} className="hover:text-accent">{t('tenant_form.breadcrumb_tenants')}</Link>
@@ -321,14 +321,13 @@ export function TenantForm() {
         actions={
           <div className="flex items-center gap-2">
             <Button
-              variant="flat"
+              variant="tertiary"
               startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath(isEdit ? `/admin/super/tenants/${id}` : '/admin/super/tenants'))}
             >
               {t('tenant_form.back')}
             </Button>
             <Button
-              color="primary"
               startContent={<Save size={16} />}
               onPress={handleSubmit}
               isLoading={saving}
@@ -341,7 +340,7 @@ export function TenantForm() {
 
       <Tabs variant="underlined" className="mb-4">
         <Tab key="details" title={t('tenant_form.tab_details')}>
-          <Card shadow="sm">
+          <Card>
             <CardBody className="space-y-4 p-6">
               <Input
                 label={t('tenant_form.name_label')}
@@ -349,7 +348,7 @@ export function TenantForm() {
                 value={form.name}
                 onValueChange={(v) => updateField('name', v)}
                 isRequired
-                startContent={<Building2 size={16} className="text-default-400" />}
+                startContent={<Building2 size={16} className="text-muted" />}
               />
               <Input
                 label={t('tenant_form.slug_label')}
@@ -426,7 +425,7 @@ export function TenantForm() {
         </Tab>
 
         <Tab key="contact" title={t('tenant_form.tab_contact')}>
-          <Card shadow="sm">
+          <Card>
             <CardBody className="space-y-4 p-6">
               <Input
                 label={t('tenant_form.contact_email_label')}
@@ -453,11 +452,11 @@ export function TenantForm() {
         </Tab>
 
         <Tab key="seo" title={t('tenant_form.tab_seo')}>
-          <Card shadow="sm">
+          <Card>
             <CardBody className="space-y-4 p-6">
               {/* Live SERP Preview */}
-              <div className="rounded-lg border border-default-200 p-4 bg-white dark:bg-default-50">
-                <p className="text-xs font-medium uppercase text-default-400 mb-2 flex items-center gap-1">
+              <div className="rounded-lg border border-border p-4 bg-surface">
+                <p className="text-xs font-medium uppercase text-muted mb-2 flex items-center gap-1">
                   <Eye size={12} /> {t('tenant_form.google_search_preview')}
                 </p>
                 <p className="text-lg text-blue-700 dark:text-accent truncate">
@@ -466,7 +465,7 @@ export function TenantForm() {
                 <p className="text-sm text-green-700 dark:text-success truncate">
                   {form.domain ? `https://${form.domain}` : `https://${form.slug || 'tenant'}.project-nexus.ie`}
                 </p>
-                <p className="text-sm text-default-600 line-clamp-2">
+                <p className="text-sm text-muted line-clamp-2">
                   {form.meta_description || t('tenant_form.no_description_set')}
                 </p>
               </div>
@@ -546,7 +545,7 @@ export function TenantForm() {
         </Tab>
 
         <Tab key="location" title={t('tenant_form.tab_location')}>
-          <Card shadow="sm">
+          <Card>
             <CardBody className="space-y-4 p-6">
               <Input
                 label={t('tenant_form.location_name_label')}
@@ -601,7 +600,7 @@ export function TenantForm() {
         </Tab>
 
         <Tab key="social" title={t('tenant_form.tab_social')}>
-          <Card shadow="sm">
+          <Card>
             <CardBody className="space-y-4 p-6">
               <Input
                 label={t('tenant_form.facebook_label')}
@@ -638,7 +637,7 @@ export function TenantForm() {
         </Tab>
 
         <Tab key="languages" title={t('tenant_form.tab_languages')}>
-          <Card shadow="sm">
+          <Card>
             <CardBody className="space-y-4 p-6">
               <Select
                 label={t('tenant_form.default_language_label')}
@@ -660,7 +659,7 @@ export function TenantForm() {
               </Select>
               <div>
                 <p className="text-sm font-medium mb-1">{t('tenant_form.available_languages')}</p>
-                <p className="text-xs text-default-400 mb-3">
+                <p className="text-xs text-muted mb-3">
                   {t('tenant_form.available_languages_desc')}
                 </p>
                 <div className="space-y-2">
@@ -683,7 +682,7 @@ export function TenantForm() {
                       <span className="text-sm">
                         {lang.label} ({lang.short})
                         {lang.code === 'en' && (
-                          <span className="ml-2 text-xs text-default-400">{t('tenant_form.always_enabled')}</span>
+                          <span className="ml-2 text-xs text-muted">{t('tenant_form.always_enabled')}</span>
                         )}
                       </span>
                     </Checkbox>
@@ -695,9 +694,9 @@ export function TenantForm() {
         </Tab>
 
         <Tab key="features" title={t('tenant_form.tab_features')}>
-          <Card shadow="sm">
+          <Card>
             <CardBody className="p-6">
-              <p className="text-sm text-default-500 mb-4">
+              <p className="text-sm text-muted mb-4">
                 {t('tenant_form.features_desc')}
               </p>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -709,13 +708,13 @@ export function TenantForm() {
                     <div
                       key={key}
                       className={`flex items-center gap-3 rounded-lg border p-3 transition-colors ${
-                        enabled ? 'border-success-200 bg-success-50 dark:border-success-800 dark:bg-success-50/10' : 'border-default-200'
+                        enabled ? 'border-success bg-success/10' : 'border-border'
                       }`}
                     >
-                      <Icon size={20} className={enabled ? 'text-success' : 'text-default-400'} />
+                      <Icon size={20} className={enabled ? 'text-success' : 'text-muted'} />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium">{label}</p>
-                        <p className="text-xs text-default-400 truncate">{description}</p>
+                        <p className="text-xs text-muted truncate">{description}</p>
                       </div>
                       <Switch
                         size="sm"
@@ -733,9 +732,9 @@ export function TenantForm() {
           </Card>
         </Tab>
         <Tab key="legal" title={t('tenant_form.tab_legal')}>
-          <Card shadow="sm">
+          <Card>
             <CardBody className="space-y-4 p-6">
-              <p className="text-sm text-default-500 mb-2">
+              <p className="text-sm text-muted mb-2">
                 {t('tenant_form.legal_desc')}
               </p>
               <Textarea
@@ -756,8 +755,7 @@ export function TenantForm() {
               />
               {(form.privacy_text.trim() || form.terms_text.trim()) && (
                 <Button
-                  variant="flat"
-                  color="warning"
+                  variant="tertiary"
                   size="sm"
                   onPress={() => {
                     updateField('privacy_text', '');

@@ -15,7 +15,7 @@ import WifiOff from 'lucide-react/icons/wifi-off';
 import { useTranslation } from 'react-i18next';
 import { useToast } from '@/contexts';
 import { api } from '@/lib/api';
-// Copyright © 2024–2026 Jasper Ford
+// Copyright Â© 2024â€“2026 Jasper Ford
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Author: Jasper Ford
 // See NOTICE file for attribution and acknowledgements.
@@ -126,7 +126,7 @@ export function ProviderHealthDashboard() {
 
   if (loading) {
     return (
-      <Card shadow="sm">
+      <Card>
         <CardHeader>
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <Activity size={20} /> {t('system.provider_health_title')}
@@ -143,14 +143,14 @@ export function ProviderHealthDashboard() {
 
   if (providers.length === 0) {
     return (
-      <Card shadow="sm">
+      <Card>
         <CardHeader>
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <Activity size={20} /> {t('system.provider_health_title')}
           </h3>
         </CardHeader>
         <CardBody>
-          <p className="text-sm text-default-500 text-center py-4">
+          <p className="text-sm text-muted text-center py-4">
             {t('system.no_identity_providers')}
           </p>
         </CardBody>
@@ -159,7 +159,7 @@ export function ProviderHealthDashboard() {
   }
 
   return (
-    <Card shadow="sm">
+    <Card>
       <CardHeader>
         <h3 className="text-lg font-semibold flex items-center gap-2">
           <Activity size={20} /> {t('system.provider_health_title')}
@@ -188,23 +188,23 @@ function ProviderCard({ provider }: { provider: ProviderHealth }) {
         : 'danger';
 
   return (
-    <Card shadow="sm" className="border border-default-200 dark:border-default-100">
+    <Card className="border border-border">
       <CardBody className="gap-3">
         {/* Header row: name + availability */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Shield size={18} className="text-default-500" />
+            <Shield size={18} className="text-muted" />
             <span className="font-semibold text-base">{provider.name}</span>
           </div>
           {provider.available ? (
             <Tooltip content={t('system.tooltip_provider_available')}>
-              <Chip size="sm" color="success" variant="flat" startContent={<Wifi size={12} />}>
+              <Chip size="sm" color="success" variant="soft" startContent={<Wifi size={12} />}>
                 {t('system.provider_available')}
               </Chip>
             </Tooltip>
           ) : (
             <Tooltip content={t('system.tooltip_provider_unavailable')}>
-              <Chip size="sm" color="danger" variant="flat" startContent={<WifiOff size={12} />}>
+              <Chip size="sm" color="danger" variant="soft" startContent={<WifiOff size={12} />}>
                 {t('system.provider_unavailable')}
               </Chip>
             </Tooltip>
@@ -214,7 +214,7 @@ function ProviderCard({ provider }: { provider: ProviderHealth }) {
         {/* Supported levels */}
         <div className="flex flex-wrap gap-1">
           {provider.supported_levels.map((level) => (
-            <Chip key={level} size="sm" variant="bordered" className="text-xs">
+            <Chip key={level} size="sm" variant="soft" className="text-xs">
               {formatLevel(level)}
             </Chip>
           ))}
@@ -223,13 +223,13 @@ function ProviderCard({ provider }: { provider: ProviderHealth }) {
         {/* Latency metrics */}
         <div className="flex items-center gap-3 text-sm">
           <Tooltip content={t('system.tooltip_api_latency')}>
-            <Chip size="sm" variant="flat" color={provider.latency_ms !== null && provider.latency_ms < 500 ? 'success' : provider.latency_ms !== null && provider.latency_ms < 2000 ? 'warning' : 'default'} className="text-xs">
+            <Chip size="sm" variant="soft" color={provider.latency_ms !== null && provider.latency_ms < 500 ? 'success' : provider.latency_ms !== null && provider.latency_ms < 2000 ? 'warning' : 'default'} className="text-xs">
               {provider.latency_ms !== null ? t('system.latency_value_ms', { value: provider.latency_ms }) : t('system.not_available_short')}
             </Chip>
           </Tooltip>
           {provider.avg_completion_seconds !== null && (
             <Tooltip content={t('system.tooltip_avg_completion')}>
-              <Chip size="sm" variant="flat" color="default" className="text-xs">
+              <Chip size="sm" variant="soft" color="default" className="text-xs">
                 {provider.avg_completion_seconds < 60
                   ? t('system.avg_completion_seconds', { count: provider.avg_completion_seconds })
                   : t('system.avg_completion_minutes', { count: Math.round(provider.avg_completion_seconds / 60) })}
@@ -241,7 +241,7 @@ function ProviderCard({ provider }: { provider: ProviderHealth }) {
         {/* Success rate */}
         <div className="space-y-1">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-default-500">{t('system.success_rate_label')}</span>
+            <span className="text-muted">{t('system.success_rate_label')}</span>
             <span className="font-medium">
               {stats.success_rate !== null ? `${stats.success_rate}%` : t('system.not_available_short')}
             </span>
@@ -258,36 +258,36 @@ function ProviderCard({ provider }: { provider: ProviderHealth }) {
         {/* Session counts */}
         <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
           <div className="flex items-center gap-1.5">
-            <Activity size={14} className="text-default-400" />
-            <span className="text-default-500">{t('system.stat_total')}</span>
+            <Activity size={14} className="text-muted" />
+            <span className="text-muted">{t('system.stat_total')}</span>
             <span className="ml-auto font-medium">{stats.total_sessions}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <CheckCircle size={14} className="text-success" />
-            <span className="text-default-500">{t('system.stat_passed')}</span>
+            <span className="text-muted">{t('system.stat_passed')}</span>
             <span className="ml-auto font-medium">{stats.passed}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <XCircle size={14} className="text-danger" />
-            <span className="text-default-500">{t('system.stat_failed')}</span>
+            <span className="text-muted">{t('system.stat_failed')}</span>
             <span className="ml-auto font-medium">{stats.failed}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <Clock size={14} className="text-warning" />
-            <span className="text-default-500">{t('system.stat_pending')}</span>
+            <span className="text-muted">{t('system.stat_pending')}</span>
             <span className="ml-auto font-medium">{stats.pending}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <AlertTriangle size={14} className="text-default-400" />
-            <span className="text-default-500">{t('system.stat_expired')}</span>
+            <AlertTriangle size={14} className="text-muted" />
+            <span className="text-muted">{t('system.stat_expired')}</span>
             <span className="ml-auto font-medium">{stats.expired}</span>
           </div>
         </div>
 
         {/* 24h stats */}
         {recent_24h.total > 0 && (
-          <div className="rounded-lg bg-default-100 dark:bg-default-50 p-2">
-            <p className="text-xs font-medium text-default-500 mb-1">{t('system.last_24h_label')}</p>
+          <div className="rounded-lg bg-surface-secondary p-2">
+            <p className="text-xs font-medium text-muted mb-1">{t('system.last_24h_label')}</p>
             <div className="flex items-center gap-3 text-sm">
               <span>{t('system.sessions_count', { count: recent_24h.total })}</span>
               <span className="text-success">{t('system.passed_count', { count: recent_24h.passed })}</span>
@@ -297,7 +297,7 @@ function ProviderCard({ provider }: { provider: ProviderHealth }) {
         )}
 
         {/* Timestamps */}
-        <div className="space-y-1 text-xs text-default-400 pt-1 border-t border-default-100">
+        <div className="space-y-1 text-xs text-muted pt-1 border-t border-border">
           <Tooltip content={stats.last_session_at || t('system.no_sessions_yet')}>
             <div className="flex items-center justify-between">
               <span>{t('system.last_session_label')}</span>

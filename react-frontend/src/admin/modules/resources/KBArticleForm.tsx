@@ -390,7 +390,7 @@ export function KBArticleForm() {
         <PageHeader
           title={t('resources.edit_resources')}
           actions={
-            <Button variant="flat" startContent={<ArrowLeft size={16} />}
+            <Button variant="tertiary" startContent={<ArrowLeft size={16} />}
               onPress={() => navigate(tenantPath('/admin/resources'))}>
               {t('resources.back')}
             </Button>
@@ -402,7 +402,7 @@ export function KBArticleForm() {
               {loadError || t('resources.failed_to_load_resources')}
             </p>
             <div className="mt-4 flex justify-center">
-              <Button variant="flat" onPress={() => navigate(tenantPath('/admin/resources'))}>
+              <Button variant="tertiary" onPress={() => navigate(tenantPath('/admin/resources'))}>
                 {t('resources.back')}
               </Button>
             </div>
@@ -421,7 +421,7 @@ export function KBArticleForm() {
             : t('resources.create_resources')
         }
         actions={
-          <Button variant="flat" startContent={<ArrowLeft size={16} />}
+          <Button variant="tertiary" startContent={<ArrowLeft size={16} />}
             onPress={() => navigate(tenantPath('/admin/resources'))}>
             {t('resources.back')}
           </Button>
@@ -524,16 +524,16 @@ export function KBArticleForm() {
                   flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed p-10 cursor-pointer transition-colors
                   ${isDragging
                     ? 'border-accent bg-accent/5'
-                    : 'border-default-300 hover:border-accent hover:bg-default-50'
+                    : 'border-border hover:border-accent hover:bg-surface-secondary'
                   }
                 `}
               >
-                <Upload size={32} className="text-default-400" />
+                <Upload size={32} className="text-muted" />
                 <div className="text-center">
                   <p className="text-sm font-medium text-foreground">
                     {t('resources.drop_file')}
                   </p>
-                  <p className="text-xs text-default-400 mt-1">
+                  <p className="text-xs text-muted mt-1">
                     {t('resources.supported_formats')}
                   </p>
                 </div>
@@ -549,17 +549,17 @@ export function KBArticleForm() {
 
             {/* Pending file indicator */}
             {pendingFile && (
-              <div className="flex items-center gap-3 rounded-lg border border-default-200 px-4 py-3">
+              <div className="flex items-center gap-3 rounded-lg border border-border px-4 py-3">
                 <FileText size={18} className="text-accent flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-foreground truncate">{pendingFile.name}</p>
-                  <p className="text-xs text-default-400">{formatFileSize(pendingFile.size)}</p>
+                  <p className="text-xs text-muted">{formatFileSize(pendingFile.size)}</p>
                 </div>
-                <Chip size="sm" variant="flat" color="primary">
+                <Chip size="sm" variant="soft">
                   {pendingFile.name.split('.').pop()?.toUpperCase()}
                 </Chip>
                 <Button
-                  isIconOnly size="sm" variant="light" color="danger"
+                  isIconOnly size="sm" variant="tertiary" color="danger"
                   onPress={() => {
                     setPendingFile(null);
                     if (contentType === 'markdown') {
@@ -646,10 +646,10 @@ export function KBArticleForm() {
                 description={t('resources.sort_order_desc')}
               />
 
-              <div className="flex items-center justify-between rounded-lg border border-default-200 px-4 py-3">
+              <div className="flex items-center justify-between rounded-lg border border-border px-4 py-3">
                 <div>
                   <p className="text-sm font-medium">{t('resources.published')}</p>
-                  <p className="text-xs text-default-400">
+                  <p className="text-xs text-muted">
                     {t('resources.publish_desc')}
                   </p>
                 </div>
@@ -671,13 +671,12 @@ export function KBArticleForm() {
                     <h3 className="text-sm font-semibold text-foreground">
                       {t('resources.attachments')}
                       {attachments.length > 0 && (
-                        <Chip size="sm" variant="flat" className="ml-2">{attachments.length}</Chip>
+                        <Chip size="sm" variant="soft" className="ml-2">{attachments.length}</Chip>
                       )}
                     </h3>
                     <Button
                       size="sm"
-                      variant="flat"
-                      color="primary"
+                      variant="tertiary"
                       startContent={<Upload size={14} />}
                       isLoading={uploadingAttachment}
                       onPress={() => {
@@ -696,23 +695,23 @@ export function KBArticleForm() {
                   </div>
 
                   {attachments.length === 0 && (
-                    <p className="text-xs text-default-400">
+                    <p className="text-xs text-muted">
                       {t('resources.no_attachments')}
                     </p>
                   )}
 
                   {attachments.map((att) => (
-                    <div key={att.id} className="flex items-center gap-3 rounded-lg border border-default-200 px-4 py-2.5">
+                    <div key={att.id} className="flex items-center gap-3 rounded-lg border border-border px-4 py-2.5">
                       <FileText size={16} className="text-accent flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-foreground truncate">{att.file_name}</p>
-                        <p className="text-xs text-default-400">
+                        <p className="text-xs text-muted">
                           {att.mime_type} — {formatFileSize(att.file_size)}
                         </p>
                       </div>
                       <div className="flex gap-1">
                         <Button
-                          isIconOnly size="sm" variant="flat" color="default"
+                          isIconOnly size="sm" variant="tertiary" color="default"
                           as="a" href={resolveAttachmentUrl(att.file_url)} download={att.file_name}
                           target="_blank" rel="noopener noreferrer"
                           aria-label={t('resources.download_attachment')}
@@ -720,7 +719,7 @@ export function KBArticleForm() {
                           <Download size={14} />
                         </Button>
                         <Button
-                          isIconOnly size="sm" variant="flat" color="danger"
+                          isIconOnly size="sm" variant="tertiary" color="danger"
                           onPress={() => deleteAttachment(att.id)}
                           aria-label={t('resources.delete_attachment')}
                         >
@@ -736,7 +735,7 @@ export function KBArticleForm() {
             {/* Submit */}
             <div className="flex justify-end gap-3 pt-2">
               <Button
-                variant="flat"
+                variant="tertiary"
                 onPress={() => navigate(tenantPath('/admin/resources'))}
                 isDisabled={submitting}
               >
@@ -744,7 +743,6 @@ export function KBArticleForm() {
               </Button>
               <Button
                 type="submit"
-                color="primary"
                 startContent={!submitting ? <Save size={16} /> : undefined}
                 isLoading={submitting}
                 isDisabled={submitting}

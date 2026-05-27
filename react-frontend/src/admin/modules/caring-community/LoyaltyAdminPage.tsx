@@ -246,7 +246,7 @@ export default function LoyaltyAdminPage() {
         actions={
           <Button
             size="sm"
-            variant="bordered"
+            variant="secondary"
             startContent={<RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />}
             onPress={() => void loadRedemptions()}
             isDisabled={refreshing}
@@ -257,16 +257,16 @@ export default function LoyaltyAdminPage() {
       />
 
       {/* Intro card */}
-      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft" shadow="none">
+      <Card className="border-l-4 border-l-accent bg-accent-soft dark:bg-accent-soft">
         <CardBody className="px-4 py-3">
           <div className="flex gap-3">
             <Info className="mt-0.5 h-4 w-4 shrink-0 text-accent" aria-hidden="true" />
             <div className="space-y-1 text-sm">
               <p className="font-semibold text-accent dark:text-accent">{t('admin.loyalty.about.title')}</p>
-              <p className="text-default-600">
+              <p className="text-muted">
                 {t('admin.loyalty.about.body')}
               </p>
-              <div className="space-y-0.5 pt-1 text-default-500">
+              <div className="space-y-0.5 pt-1 text-muted">
                 <p><strong>{t('admin.loyalty.about.rate_label')}</strong> {t('admin.loyalty.about.rate_body')}</p>
                 <p><strong>{t('admin.loyalty.about.discount_label')}</strong> {t('admin.loyalty.about.discount_body')}</p>
               </div>
@@ -287,7 +287,7 @@ export default function LoyaltyAdminPage() {
           icon={Wallet}
           label={t('admin.loyalty.stats.hours_redeemed')}
           value={stats.total_credits.toFixed(2)}
-          color="primary"
+          color="default"
         />
         <StatCard
           icon={Store}
@@ -305,7 +305,7 @@ export default function LoyaltyAdminPage() {
         </CardHeader>
         <Separator />
         <CardBody className="space-y-4">
-          <p className="text-sm text-default-600">
+          <p className="text-sm text-muted">
             {t('admin.loyalty.settings.description')}
           </p>
 
@@ -329,11 +329,11 @@ export default function LoyaltyAdminPage() {
               )}
 
               {settings && !settingsLoading && (
-                <div className="space-y-4 border-t border-default-200 pt-4">
+                <div className="space-y-4 border-t border-border pt-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-medium">{t('admin.loyalty.settings.accept_time_credits')}</p>
-                      <p className="text-xs text-default-500">
+                      <p className="text-xs text-muted">
                         {t('admin.loyalty.settings.accept_time_credits_hint')}
                       </p>
                     </div>
@@ -361,8 +361,8 @@ export default function LoyaltyAdminPage() {
                       }
                       min="0"
                       step="0.5"
-                      startContent={<span className="text-default-400 text-xs">CHF</span>}
-                      endContent={<span className="text-default-400 text-xs">/ h</span>}
+                      startContent={<span className="text-muted text-xs">CHF</span>}
+                      endContent={<span className="text-muted text-xs">/ h</span>}
                       isDisabled={!settings.accepts_time_credits || !canManage}
                     />
                     <Input
@@ -379,19 +379,18 @@ export default function LoyaltyAdminPage() {
                       min="0"
                       max="100"
                       step="5"
-                      endContent={<span className="text-default-400 text-xs">%</span>}
+                      endContent={<span className="text-muted text-xs">%</span>}
                       isDisabled={!settings.accepts_time_credits || !canManage}
                     />
                   </div>
 
                   {!canManage && (
-                    <p className="text-sm text-default-500">{t('admin.loyalty.settings.view_only')}</p>
+                    <p className="text-sm text-muted">{t('admin.loyalty.settings.view_only')}</p>
                   )}
 
                   {canManage && (
                     <div className="flex justify-end">
                       <Button
-                        color="primary"
                         startContent={<Save className="w-4 h-4" />}
                         onPress={() => void handleSaveSettings()}
                         isLoading={savingSettings}
@@ -412,7 +411,7 @@ export default function LoyaltyAdminPage() {
         <CardHeader className="flex items-center gap-2">
           <Coins className="w-5 h-5 text-warning" />
           <h2 className="text-base font-semibold">{t('admin.loyalty.ledger.title')}</h2>
-          <Chip size="sm" variant="flat" className="ml-auto">
+          <Chip size="sm" variant="soft" className="ml-auto">
             {redemptions.length}
           </Chip>
         </CardHeader>
@@ -444,17 +443,17 @@ export default function LoyaltyAdminPage() {
                   <TableCell className="text-right text-sm tabular-nums">
                     {row.credits_used.toFixed(2)}
                   </TableCell>
-                  <TableCell className="text-right text-sm tabular-nums text-default-500">
+                  <TableCell className="text-right text-sm tabular-nums text-muted">
                     {row.exchange_rate_chf.toFixed(2)}
                   </TableCell>
                   <TableCell className="text-right text-sm tabular-nums">
-                    <Chip variant="flat" color="success" size="sm">
+                    <Chip variant="soft" color="success" size="sm">
                       CHF {row.discount_chf.toFixed(2)}
                     </Chip>
                   </TableCell>
                   <TableCell className="text-sm">
                     <Chip
-                      variant="flat"
+                      variant="soft"
                       size="sm"
                       color={
                         row.status === 'applied'
@@ -472,14 +471,14 @@ export default function LoyaltyAdminPage() {
                       <Button
                         size="sm"
                         color="danger"
-                        variant="flat"
+                        variant="danger-soft"
                         startContent={<Undo2 className="w-4 h-4" />}
                         onPress={() => openReverseModal(row)}
                       >
                         {t('admin.loyalty.ledger.reverse')}
                       </Button>
                     ) : (
-                      <span className="text-default-400">{t('admin.loyalty.ledger.empty_value')}</span>
+                      <span className="text-muted">{t('admin.loyalty.ledger.empty_value')}</span>
                     )}
                   </TableCell>
                 </TableRow>
@@ -499,13 +498,13 @@ export default function LoyaltyAdminPage() {
           <ModalBody className="gap-4">
             {reverseTarget && (
               <>
-                <p className="text-sm text-default-700">
+                <p className="text-sm text-foreground">
                   {t('admin.loyalty.reverse_modal.body', {
                     hours: reverseTarget.credits_used.toFixed(2),
                     member: reverseTarget.member_name || t('admin.loyalty.reverse_modal.member_fallback'),
                   })}
                 </p>
-                <div className="rounded-md bg-default-100 px-3 py-2 text-xs text-default-600">
+                <div className="rounded-md bg-surface-secondary px-3 py-2 text-xs text-muted">
                   <div>
                     {t('admin.loyalty.reverse_modal.merchant', {
                       merchant: reverseTarget.merchant_name || t('admin.loyalty.table.empty_value'),
@@ -526,7 +525,7 @@ export default function LoyaltyAdminPage() {
                   placeholder={t('admin.loyalty.reverse_modal.reason_placeholder')}
                   value={reverseReason}
                   onValueChange={setReverseReason}
-                  variant="bordered"
+                  variant="secondary"
                   minRows={2}
                   maxRows={4}
                   maxLength={500}
@@ -535,7 +534,7 @@ export default function LoyaltyAdminPage() {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button variant="flat" onPress={closeReverseModal} isDisabled={reversing}>
+            <Button variant="tertiary" onPress={closeReverseModal} isDisabled={reversing}>
               {t('admin.loyalty.reverse_modal.cancel')}
             </Button>
             <Button
