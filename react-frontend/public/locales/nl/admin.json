@@ -2805,7 +2805,7 @@
     "option_identity_verification_fee_cents_desc": "Eenmalige kosten voor identiteitsverificatie. Stel in op 0 voor gratis verificatie. Waarde in centen (bijvoorbeeld 500 = € 5,00)",
     "platform_infrastructure": "Platforminfrastructuur",
     "platform_infrastructure_desc": "Instellingen voor de hele tenant: talen, kaarten en API-sleutels.",
-    "module_name_caring_community": "Zorgzame gemeenschap",
+    "module_name_caring_community": "Zorgzame gemeenschap Alpha",
     "module_desc_caring_community": "Geïntegreerde hub voor tijdbankieren, vrijwilligerswerk, organisaties, impact en wederzijdse hulp",
     "module_name_merchant_coupons": "Koopmanscoupons",
     "module_desc_merchant_coupons": "Kortingsbonnen uitgegeven door marktplaatshandelaren. Los van de gesloten-lus-inwisseling van tijdskredieten. Vereist dat Marketplace is ingeschakeld.",
@@ -2826,7 +2826,9 @@
     "option_choice_jobs_default_currency_eur": "EUR",
     "option_choice_jobs_default_currency_gbp": "GBP",
     "option_choice_jobs_default_currency_usd": "USD",
-    "filter_modules": "Filter modules"
+    "filter_modules": "Filter modules",
+    "stage_alpha": "Alpha",
+    "stage_beta": "Bèta"
   },
   "content": {
     "about_section": "Over Sectie",

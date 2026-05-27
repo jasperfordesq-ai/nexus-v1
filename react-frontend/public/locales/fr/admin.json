@@ -2805,7 +2805,7 @@
     "option_identity_verification_fee_cents_desc": "Frais uniques facturés pour la vérification de l'identité. Réglez sur 0 pour une vérification gratuite. Valeur en centimes (ex: 500 = 5,00 €)",
     "platform_infrastructure": "Infrastructure de plateforme",
     "platform_infrastructure_desc": "Paramètres à l’échelle du locataire: langues, cartes et clés API.",
-    "module_name_caring_community": "Communauté bienveillante",
+    "module_name_caring_community": "Communauté bienveillante Alpha",
     "module_desc_caring_community": "Hub intégré pour la banque de temps, le volontariat, les organisations, l'impact et l'entraide",
     "module_name_merchant_coupons": "Coupons marchands",
     "module_desc_merchant_coupons": "Coupons de réduction émis par les commerçants de la Marketplace. Séparé de l’échange de crédits de temps en boucle fermée. Nécessite que Marketplace soit activé.",
@@ -2826,7 +2826,9 @@
     "option_choice_jobs_default_currency_eur": "EUR",
     "option_choice_jobs_default_currency_gbp": "EUR",
     "option_choice_jobs_default_currency_usd": "USD",
-    "filter_modules": "Filter modules"
+    "filter_modules": "Filter modules",
+    "stage_alpha": "Alpha",
+    "stage_beta": "Bêta"
   },
   "content": {
     "about_section": "À propos de la section",

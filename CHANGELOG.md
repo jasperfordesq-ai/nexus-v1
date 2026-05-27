@@ -29,6 +29,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Module Configuration cleaned up.** Five unimplemented orphan modules (merchant coupons, member premium, AI agents, partner API, regional analytics) were removed from the admin Module Configuration screen so admins no longer see dead toggles. The Help Centre link was also removed from the utility navbar and a duplicate AGPL footer notice was removed.
 
+- **Caring Community marked as Alpha.** The Caring Community module on the admin Module Configuration screen is now labelled "Caring Community Alpha" and shows an Alpha development-stage badge. Module cards support an optional `stage` (`alpha`/`beta`) marker, translated in all 11 languages.
+
 ### Accessibility
 
 - **Platform-wide WCAG 2.1 AA audit (four rounds).** A multi-round accessibility campaign brought the React frontend and admin panel toward WCAG 2.1 AA: colour-contrast fixes, semantic landmarks and `role` attributes (e.g. feed cards as `article`), ARIA labels on all `Tabs` and `Input` elements, accessible names on icon-only controls, `aria-expanded` on menus, `aria-live`/live regions for chat and search results, `aria-busy` on skeletons, keyboard support for sortable table-column headers, focus indicators, and `usePageTitle` on pages that were missing a browser/screen-reader title. Round 4 alone covered 24 pages and 10 admin modules. The accessible-frontend link was relabelled to reference "WCAG 2.2 AA" across all 11 languages.

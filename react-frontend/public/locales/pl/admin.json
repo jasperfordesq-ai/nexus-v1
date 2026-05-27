@@ -2805,7 +2805,7 @@
     "option_identity_verification_fee_cents_desc": "Opłata pobierana jednorazowo za weryfikację tożsamości. Ustaw na 0, aby uzyskać bezpłatną weryfikację. Wartość w centach (np. 500 = 5,00 €)",
     "platform_infrastructure": "Infrastruktura Platformy",
     "platform_infrastructure_desc": "Ustawienia dla całej dzierżawy: języki, mapy i klucze API.",
-    "module_name_caring_community": "Troskliwa społeczność",
+    "module_name_caring_community": "Troskliwa społeczność Alfa",
     "module_desc_caring_community": "Zintegrowane centrum bankowości czasu, wolontariatu, organizacji, wpływu i wzajemnej pomocy",
     "module_name_merchant_coupons": "Kupony handlowe",
     "module_desc_merchant_coupons": "Kupony rabatowe wydawane przez sprzedawców na rynku. Odrębnie od wykupu kredytu w czasie w zamkniętej pętli. Wymaga włączenia Marketplace.",
@@ -2826,7 +2826,9 @@
     "option_choice_jobs_default_currency_eur": "EUR",
     "option_choice_jobs_default_currency_gbp": "GBP",
     "option_choice_jobs_default_currency_usd": "USD",
-    "filter_modules": "Filter modules"
+    "filter_modules": "Filter modules",
+    "stage_alpha": "Alfa",
+    "stage_beta": "Beta"
   },
   "content": {
     "about_section": "O Sekcji",

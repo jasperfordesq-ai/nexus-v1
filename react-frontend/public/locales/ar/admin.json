@@ -2805,7 +2805,7 @@
     "option_identity_verification_fee_cents_desc": "يتم فرض رسوم لمرة واحدة للتحقق من الهوية. اضبط على 0 للتحقق المجاني. القيمة بالسنت (على سبيل المثال 500 = 5.00 يورو)",
     "platform_infrastructure": "البنية التحتية للمنصة",
     "platform_infrastructure_desc": "الإعدادات على مستوى المستأجر: اللغات والخرائط ومفاتيح واجهة برمجة التطبيقات.",
-    "module_name_caring_community": "مجتمع الرعاية",
+    "module_name_caring_community": "مجتمع الرعاية ألفا",
     "module_desc_caring_community": "مركز متكامل للخدمات المصرفية للوقت، والعمل التطوعي، والمنظمات، والتأثير، والمساعدة المتبادلة",
     "module_name_merchant_coupons": "كوبونات التاجر",
     "module_desc_merchant_coupons": "كوبونات الخصم الصادرة عن تجار السوق. منفصل عن استرداد الائتمان الزمني ذو الحلقة المغلقة. يتطلب تمكين Marketplace.",
@@ -2826,7 +2826,9 @@
     "option_choice_jobs_default_currency_eur": "يورو",
     "option_choice_jobs_default_currency_gbp": "GBP",
     "option_choice_jobs_default_currency_usd": "دولار أمريكي",
-    "filter_modules": "Filter modules"
+    "filter_modules": "Filter modules",
+    "stage_alpha": "ألفا",
+    "stage_beta": "بيتا"
   },
   "content": {
     "about_section": "حول القسم",

@@ -2805,7 +2805,7 @@
     "option_identity_verification_fee_cents_desc": "Tariffa una tantum addebitata per la verifica dell'identità. Impostato su 0 per la verifica gratuita. Valore in centesimi (es. 500 = € 5,00)",
     "platform_infrastructure": "Infrastruttura della piattaforma",
     "platform_infrastructure_desc": "Impostazioni a livello di tenant: lingue, mappe e chiavi API.",
-    "module_name_caring_community": "Comunità premurosa",
+    "module_name_caring_community": "Comunità premurosa Alpha",
     "module_desc_caring_community": "Hub integrato per banche del tempo, volontariato, organizzazioni, impatto e mutuo aiuto",
     "module_name_merchant_coupons": "Buoni commerciante",
     "module_desc_merchant_coupons": "Buoni sconto emessi dai commercianti del marketplace. Separato dal riscatto del credito temporale a circuito chiuso. Richiede che Marketplace sia abilitato.",
@@ -2826,7 +2826,9 @@
     "option_choice_jobs_default_currency_eur": "euro",
     "option_choice_jobs_default_currency_gbp": "Sterlina inglese",
     "option_choice_jobs_default_currency_usd": "Dollaro statunitense",
-    "filter_modules": "Filter modules"
+    "filter_modules": "Filter modules",
+    "stage_alpha": "Alpha",
+    "stage_beta": "Beta"
   },
   "content": {
     "about_section": "Informazioni sulla sezione",

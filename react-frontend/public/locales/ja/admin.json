@@ -2805,7 +2805,7 @@
     "option_identity_verification_fee_cents_desc": "本人確認に1回限りの手数料がかかります。無料検証の場合は 0 に設定します。セント単位の価値 (例: 500 = €5.00)",
     "platform_infrastructure": "プラットフォームインフラストラクチャ",
     "platform_infrastructure_desc": "テナント全体の設定: 言語、マップ、API キー。",
-    "module_name_caring_community": "思いやりのあるコミュニティ",
+    "module_name_caring_community": "思いやりのあるコミュニティ アルファ",
     "module_desc_caring_community": "タイム バンキング、ボランティア活動、組織、影響力、相互扶助のための統合ハブ",
     "module_name_merchant_coupons": "加盟店クーポン",
     "module_desc_merchant_coupons": "マーケットプレイスの加盟店が発行する割引クーポン。クローズドループのタイムクレジット償還とは別のものです。マーケットプレイスを有効にする必要があります。",
@@ -2826,7 +2826,9 @@
     "option_choice_jobs_default_currency_eur": "ユーロ",
     "option_choice_jobs_default_currency_gbp": "英ポンド",
     "option_choice_jobs_default_currency_usd": "米ドル",
-    "filter_modules": "Filter modules"
+    "filter_modules": "Filter modules",
+    "stage_alpha": "アルファ",
+    "stage_beta": "ベータ"
   },
   "content": {
     "about_section": "「概要」セクション",
