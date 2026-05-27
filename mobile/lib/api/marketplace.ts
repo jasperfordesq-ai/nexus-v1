@@ -137,6 +137,12 @@ export interface MarketplaceOrderDispute {
   created_at?: string | null;
 }
 
+export interface MarketplaceReport {
+  id: number;
+  status: string;
+  message?: string;
+}
+
 export interface MarketplaceDeliveryOffer {
   id: number;
   order_id: number;
@@ -482,6 +488,13 @@ export function deleteMarketplaceListing(id: number): Promise<void> {
 
 export function saveMarketplaceListing(id: number): Promise<void> {
   return api.post<void>(`${API_V2}/marketplace/listings/${id}/save`);
+}
+
+export function reportMarketplaceListing(
+  id: number,
+  payload: { reason: string; description: string; evidence_urls?: string[] },
+): Promise<MarketplaceDataResponse<MarketplaceReport>> {
+  return api.post<MarketplaceDataResponse<MarketplaceReport>>(`${API_V2}/marketplace/listings/${id}/report`, payload);
 }
 
 export function unsaveMarketplaceListing(id: number): Promise<void> {

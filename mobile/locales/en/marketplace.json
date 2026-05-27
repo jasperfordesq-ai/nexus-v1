@@ -96,7 +96,27 @@
     "buyNow": "Buy now",
     "orderCreated": "Order created",
     "orderCreatedHint": "Order {{order}} was created. Payment and delivery details can be managed from orders.",
-    "orderFailed": "Could not create the order."
+    "orderFailed": "Could not create the order.",
+    "reportListing": "Report listing",
+    "reportTitle": "Report this listing",
+    "reportHint": "Reports are reviewed by the community team. Include enough detail to help moderation make a fair decision.",
+    "reportReason": "Reason",
+    "reportDescription": "Description",
+    "reportDescriptionPlaceholder": "Explain what looks wrong or unsafe about this listing.",
+    "reportRequired": "Describe the issue before submitting the report.",
+    "reportSubmit": "Submit report",
+    "reportSubmittedTitle": "Report submitted",
+    "reportSubmittedHint": "Thank you. The moderation team will review this listing.",
+    "reportFailed": "Could not submit this report.",
+    "reportReasons": {
+      "counterfeit": "Counterfeit",
+      "illegal": "Illegal item",
+      "unsafe": "Unsafe item",
+      "misleading": "Misleading",
+      "discrimination": "Discrimination",
+      "ip_violation": "IP violation",
+      "other": "Other"
+    }
   },
   "forms": {
     "eyebrow": "New marketplace listing",

@@ -56,6 +56,7 @@ import {
   promoteMarketplaceListing,
   counterMarketplaceOffer,
   rateMarketplaceOrder,
+  reportMarketplaceListing,
   removeMarketplaceCollectionItem,
   reserveMarketplacePickup,
   scanMarketplacePickup,
@@ -402,6 +403,22 @@ describe('marketplace api', () => {
 
     await confirmMarketplaceDeliveryOffer(14, 77);
     expect(api.put).toHaveBeenCalledWith('/api/v2/marketplace/orders/14/delivery-offers/77/confirm');
+  });
+
+  it('wires marketplace listing report notices', async () => {
+    (api.post as jest.Mock).mockResolvedValue({ data: { id: 3, status: 'open' } });
+
+    await reportMarketplaceListing(9, {
+      reason: 'misleading',
+      description: 'The listing description appears misleading.',
+      evidence_urls: ['https://example.test/evidence'],
+    });
+
+    expect(api.post).toHaveBeenCalledWith('/api/v2/marketplace/listings/9/report', {
+      reason: 'misleading',
+      description: 'The listing description appears misleading.',
+      evidence_urls: ['https://example.test/evidence'],
+    });
   });
 
   it('wires merchant and Stripe onboarding endpoints', async () => {

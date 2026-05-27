@@ -26,6 +26,7 @@ import {
   getMarketplaceCollections,
   getMarketplaceListing,
   makeMarketplaceOffer,
+  reportMarketplaceListing,
   reserveMarketplacePickup,
   saveMarketplaceListing,
   unsaveMarketplaceListing,
@@ -49,6 +50,9 @@ export default function MarketplaceDetailRoute() {
   );
 }
 
+type ReportReason = 'counterfeit' | 'illegal' | 'unsafe' | 'misleading' | 'discrimination' | 'ip_violation' | 'other';
+const REPORT_REASONS: ReportReason[] = ['counterfeit', 'illegal', 'unsafe', 'misleading', 'discrimination', 'ip_violation', 'other'];
+
 function MarketplaceDetailScreen() {
   const { t } = useTranslation(['marketplace', 'common']);
   const params = useLocalSearchParams<{ id?: string }>();
@@ -63,6 +67,7 @@ function MarketplaceDetailScreen() {
   const [activeImage, setActiveImage] = useState(0);
   const [offerOpen, setOfferOpen] = useState(false);
   const [collectionOpen, setCollectionOpen] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
   const [collections, setCollections] = useState<MarketplaceCollection[]>([]);
   const [isCollectionLoading, setIsCollectionLoading] = useState(false);
   const [pickupSlots, setPickupSlots] = useState<MarketplacePickupSlotOption[]>([]);
@@ -71,6 +76,8 @@ function MarketplaceDetailScreen() {
   const [couponApplied, setCouponApplied] = useState(false);
   const [offerAmount, setOfferAmount] = useState('');
   const [offerMessage, setOfferMessage] = useState('');
+  const [reportReason, setReportReason] = useState<ReportReason>('misleading');
+  const [reportDescription, setReportDescription] = useState('');
 
   useEffect(() => {
     void loadListing();
@@ -231,6 +238,30 @@ function MarketplaceDetailScreen() {
       Alert.alert(t('offers.sent'), t('offers.sentHint'));
     } catch (err) {
       Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('offers.failed'));
+    } finally {
+      setIsActionLoading(false);
+    }
+  }
+
+  async function handleSubmitReport() {
+    if (!listing || isActionLoading) return;
+    if (!reportDescription.trim()) {
+      Alert.alert(t('forms.validation'), t('detail.reportRequired'));
+      return;
+    }
+    setIsActionLoading(true);
+    try {
+      await reportMarketplaceListing(listing.id, {
+        reason: reportReason,
+        description: reportDescription.trim(),
+      });
+      await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setReportOpen(false);
+      setReportReason('misleading');
+      setReportDescription('');
+      Alert.alert(t('detail.reportSubmittedTitle'), t('detail.reportSubmittedHint'));
+    } catch (err) {
+      Alert.alert(t('common:errors.alertTitle'), err instanceof Error ? err.message : t('detail.reportFailed'));
     } finally {
       setIsActionLoading(false);
     }
@@ -470,6 +501,10 @@ function MarketplaceDetailScreen() {
                 </HeroButton>
               ) : null}
             </View>
+            <HeroButton variant="secondary" onPress={() => setReportOpen(true)}>
+              <Ionicons name="flag-outline" size={17} color={theme.error} />
+              <HeroButton.Label>{t('detail.reportListing')}</HeroButton.Label>
+            </HeroButton>
           </View>
         </Surface>
       ) : null}
@@ -524,6 +559,43 @@ function MarketplaceDetailScreen() {
                 <HeroButton.Label>{t('offers.submit')}</HeroButton.Label>
               </HeroButton>
             </View>
+          </Surface>
+        </View>
+      </Modal>
+
+      <Modal visible={reportOpen} transparent animationType="slide" onRequestClose={() => setReportOpen(false)}>
+        <View className="flex-1 justify-end bg-black/40">
+          <Surface variant="default" className="max-h-[86%] rounded-t-[28px] p-4">
+            <View className="mb-4 flex-row items-center justify-between">
+              <Text className="text-lg font-bold" style={{ color: theme.text }}>{t('detail.reportTitle')}</Text>
+              <HeroButton isIconOnly variant="secondary" onPress={() => setReportOpen(false)}>
+                <Ionicons name="close-outline" size={20} color={primary} />
+              </HeroButton>
+            </View>
+            <ScrollView contentContainerStyle={{ gap: 12 }} showsVerticalScrollIndicator={false}>
+              <Text className="text-sm leading-5" style={{ color: theme.textSecondary }}>{t('detail.reportHint')}</Text>
+              <View className="gap-2">
+                <Text className="text-xs font-bold uppercase" style={{ color: theme.textSecondary }}>{t('detail.reportReason')}</Text>
+                <View className="flex-row flex-wrap gap-2">
+                  {REPORT_REASONS.map((reason) => (
+                    <HeroButton
+                      key={reason}
+                      size="sm"
+                      variant={reportReason === reason ? 'primary' : 'secondary'}
+                      onPress={() => setReportReason(reason)}
+                      style={reportReason === reason ? { backgroundColor: primary } : { minWidth: '46%' }}
+                    >
+                      <HeroButton.Label>{t(`detail.reportReasons.${reason}`)}</HeroButton.Label>
+                    </HeroButton>
+                  ))}
+                </View>
+              </View>
+              <FormInput label={t('detail.reportDescription')} value={reportDescription} onChangeText={setReportDescription} placeholder={t('detail.reportDescriptionPlaceholder')} multiline />
+              <HeroButton variant="danger" onPress={handleSubmitReport} isDisabled={isActionLoading}>
+                <Ionicons name="flag-outline" size={17} color="#fff" />
+                <HeroButton.Label>{t('detail.reportSubmit')}</HeroButton.Label>
+              </HeroButton>
+            </ScrollView>
           </Surface>
         </View>
       </Modal>
