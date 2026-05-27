@@ -239,6 +239,9 @@
       "cancelled": "Closed"
     },
     "number": "Order {{number}}",
+    "sellerLabel": "Seller",
+    "buyerLabel": "Buyer",
+    "quantity": "{{count}} items",
     "tracking": "Tracking: {{number}}",
     "continuePayment": "Continue payment",
     "paymentStartedTitle": "Payment started",

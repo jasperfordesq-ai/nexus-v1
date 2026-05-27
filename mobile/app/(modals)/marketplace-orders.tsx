@@ -4,7 +4,7 @@
 // See NOTICE file for attribution and acknowledgements.
 
 import { useEffect, useState } from 'react';
-import { Alert, FlatList, Linking, Modal, ScrollView, TextInput, View } from 'react-native';
+import { Alert, FlatList, Image, Linking, Modal, ScrollView, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams, type Href } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,6 +12,7 @@ import { Button as HeroButton, Card as HeroCard, Chip, Surface, Text } from 'her
 import { useTranslation } from 'react-i18next';
 
 import AppTopBar from '@/components/ui/AppTopBar';
+import Avatar from '@/components/ui/Avatar';
 import EmptyState from '@/components/ui/EmptyState';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import ModalErrorBoundary from '@/components/ModalErrorBoundary';
@@ -35,6 +36,7 @@ import { usePaginatedApi } from '@/lib/hooks/usePaginatedApi';
 import { usePrimaryColor } from '@/lib/hooks/useTenant';
 import { useTheme } from '@/lib/hooks/useTheme';
 import { withAlpha } from '@/lib/utils/color';
+import { resolveImageUrl } from '@/lib/utils/resolveImageUrl';
 
 type OrderMode = 'purchases' | 'sales';
 type OrderStatusTab = 'all' | 'active' | 'completed' | 'cancelled';
@@ -534,17 +536,43 @@ function OrderCard({
   const primary = usePrimaryColor();
   const theme = useTheme();
   const total = `${item.currency || 'EUR'} ${Number(item.total_price).toLocaleString()}`;
+  const imageUrl = resolveImageUrl(item.listing?.image?.url);
+  const counterparty = mode === 'purchases' ? item.seller : item.buyer;
+  const counterpartyLabel = mode === 'purchases' ? t('orders.sellerLabel') : t('orders.buyerLabel');
   return (
-    <HeroCard className="mb-3 rounded-panel p-0">
+    <HeroCard className="mb-3 overflow-hidden rounded-panel p-0">
       <HeroCard.Body className="gap-3 p-4">
-        <View className="flex-row items-start justify-between gap-3">
-          <View className="min-w-0 flex-1">
-            <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={2}>{item.listing?.title ?? item.order_number}</Text>
-            <Text className="text-sm" style={{ color: theme.textSecondary }}>{total}</Text>
+        <View className="flex-row gap-3">
+          <View className="h-20 w-20 items-center justify-center overflow-hidden rounded-panel-inner" style={{ backgroundColor: withAlpha(primary, 0.12) }}>
+            {imageUrl ? (
+              <Image source={{ uri: imageUrl }} className="h-full w-full" resizeMode="cover" />
+            ) : (
+              <Ionicons name="bag-handle-outline" size={28} color={primary} />
+            )}
           </View>
-          <Chip size="sm" variant="secondary"><Chip.Label>{t(`orders.status.${item.status}`, { defaultValue: item.status })}</Chip.Label></Chip>
+          <View className="min-w-0 flex-1 gap-2">
+            <View className="flex-row items-start justify-between gap-3">
+              <View className="min-w-0 flex-1">
+                <Text className="text-base font-bold" style={{ color: theme.text }} numberOfLines={2}>{item.listing?.title ?? item.order_number}</Text>
+                <Text className="text-sm font-semibold" style={{ color: theme.textSecondary }}>{total}</Text>
+              </View>
+              <Chip size="sm" variant="secondary"><Chip.Label>{t(`orders.status.${item.status}`, { defaultValue: item.status })}</Chip.Label></Chip>
+            </View>
+            {counterparty ? (
+              <View className="flex-row items-center gap-2">
+                <Avatar uri={counterparty.avatar_url ?? null} name={counterparty.name} size={28} />
+                <View className="min-w-0 flex-1">
+                  <Text className="text-[11px] font-bold uppercase" style={{ color: theme.textMuted }}>{counterpartyLabel}</Text>
+                  <Text className="text-xs font-semibold" style={{ color: theme.text }} numberOfLines={1}>{counterparty.name}</Text>
+                </View>
+              </View>
+            ) : null}
+          </View>
         </View>
         <Text className="text-xs" style={{ color: theme.textMuted }}>{t('orders.number', { number: item.order_number })}</Text>
+        {item.quantity > 1 ? (
+          <Text className="text-xs" style={{ color: theme.textSecondary }}>{t('orders.quantity', { count: item.quantity })}</Text>
+        ) : null}
         {item.tracking_number ? (
           <Text className="text-xs" style={{ color: theme.textSecondary }}>
             {t('orders.tracking', { number: item.tracking_number })}
